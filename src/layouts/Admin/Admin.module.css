@@ -1,0 +1,20 @@
+.adminLayout {
+  @apply relative;
+}
+
+.adminLayout > .wave {
+  z-index: -10;
+  @apply absolute overflow-x-visible;
+}
+
+.adminLayout > .wave svg {
+  @apply relative block;
+}
+
+.adminLayout > .hide {
+  @apply hidden lg:block;
+}
+
+.adminLayout > main {
+  @apply mx-auto px-4 md:px-8;
+}

@@ -1,0 +1,11 @@
+.formItem {
+  @apply flex flex-col justify-center content-center max-w-xs text-center my-2 mx-4;
+}
+
+.formItem > label {
+  @apply text-xl;
+}
+
+.formItem > select {
+  @apply px-4 py-2 bg-gray-300 rounded-md;
+}

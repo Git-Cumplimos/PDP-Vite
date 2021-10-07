@@ -1,0 +1,22 @@
+/* The Modal (background) */
+.modal {
+  z-index: 5;
+  overflow: auto;
+
+  @apply fixed inset-0 w-full h-full justify-center content-center bg-gray-200 bg-opacity-80;
+}
+
+/* Modal Content/Box */
+.modalContent {
+  @apply max-w-xl bg-gray-600 border-black text-gray-50 m-auto p-6 border-2 h-4/5;
+}
+
+/* The Close Button */
+.close {
+  @apply text-gray-50 float-right cursor-pointer text-3xl;
+}
+
+.close:hover,
+.close:focus {
+  @apply text-gray-400;
+}

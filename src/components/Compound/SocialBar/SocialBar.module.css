@@ -1,0 +1,13 @@
+.socials {
+  background-color: var(--primary);
+
+  @apply p-4 text-white text-xl rounded-l-xl opacity-70 hover:opacity-100;
+}
+
+.socials > ul > li:hover {
+  color: var(--primary-extra-light);
+}
+
+.socials > ul > li {
+  @apply my-2;
+}
