@@ -1,5 +1,5 @@
 .formItem {
-  @apply flex flex-col justify-center content-center max-w-xs text-center my-2 mx-4;
+  @apply flex flex-col justify-center content-center max-w-xs text-center my-4 mx-4;
 }
 
 .formItem > label {
@@ -7,9 +7,16 @@
 }
 
 .formItem > input {
-  @apply px-4 py-2 bg-gray-300 rounded-md text-black;
+  background-color: var(--secondary-light);
+  @apply px-4 py-2 rounded-md text-black;
 }
 
 .formItem > input[type="number"] {
   -moz-appearance: textfield;
+}
+
+.formItem > input::-webkit-outer-spin-button,
+.formItem > input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

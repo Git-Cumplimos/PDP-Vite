@@ -12,15 +12,18 @@ table.table td {
 }
 
 table.table th {
-  @apply bg-gray-700 text-white;
+  background-color: var(--primary);
+  @apply text-white;
 }
 
 table.table td {
-  @apply bg-gray-500 text-white text-center text-base;
+  background-color: var(--primary-extra-light);
+  @apply text-black text-center text-base;
 }
 
 table.table tr:hover td {
-  @apply bg-gray-300 text-black;
+  background-color: var(--primary-light);
+  @apply text-black;
 }
 
 table thead th:first-child,

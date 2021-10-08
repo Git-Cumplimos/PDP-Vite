@@ -5,9 +5,9 @@ import Modal from "../../../components/Base/Modal/Modal";
 import Table from "../../../components/Base/Table/Table";
 import { useLoteria } from "../utils/LoteriaHooks";
 
-const Semanal = () => {
+const Ordinario = () => {
   const {
-    semanal: {
+    ordinario: {
       numero,
       setNumero,
       loterias,
@@ -16,13 +16,13 @@ const Semanal = () => {
       customer: { fracciones, phone },
       setCustomer,
     },
-    searchSemanal,
+    searchOrdinario,
   } = useLoteria();
 
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <div>
+    <div className="w-full flex flex-col justify-center items-center">
       <Form>
         <Input
           id="numLoto"
@@ -32,7 +32,7 @@ const Semanal = () => {
           onChange={(e) => {
             const num = parseInt(e.target.value);
             setNumero(num || "");
-            searchSemanal(num || "");
+            searchOrdinario(num || "");
           }}
         />
       </Form>
@@ -88,15 +88,24 @@ const Semanal = () => {
             }}
           />
           <button
-            className="px-4 py-2 bg-gray-200 text-black border-black rounded-lg"
+            className="px-4 py-2 text-gray-50 border-black rounded-lg"
+            style={{
+              backgroundColor: "var(--primary)",
+            }}
             type="submit"
           >
             Aceptar
           </button>
           <button
-            className="px-4 py-2 bg-gray-200 text-black border-black rounded-lg"
+            className="px-4 py-2 text-gray-50 border-black rounded-lg"
+            style={{
+              backgroundColor: "var(--secondary-dark)",
+            }}
             type="button"
-            onClick={() => setShowModal(false)}
+            onClick={() => {
+              setShowModal(false);
+              setCustomer({ fracciones: "", phone: "" });
+            }}
           >
             Cancelar
           </button>
@@ -106,4 +115,4 @@ const Semanal = () => {
   );
 };
 
-export default Semanal;
+export default Ordinario;

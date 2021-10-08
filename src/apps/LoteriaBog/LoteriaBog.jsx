@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../../utils/AuthHooks";
 import ProvideLoteria from "./components/ProvideLoteria";
 import Select from "../../components/Base/Select/Select";
-import Semanal from "./Views/Semanal";
+import Ordinario from "./Views/Ordinario";
 import Extraordinario from "./Views/Extraordinario";
 import Premios from "./Views/Premios";
 import Reportes from "./Views/Reportes";
@@ -18,7 +18,7 @@ const CashierLoteria = () => {
   const SelectPage = () => {
     switch (page) {
       case "semanal":
-        return <Semanal />;
+        return <Ordinario />;
 
       case "extra":
         return <Extraordinario />;
@@ -35,13 +35,13 @@ const CashierLoteria = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center content-center items-center">
+    <div className="flex flex-col justify-center items-center">
       <Select
         id="pagesLDB"
         label="Elegir pagina"
         options={[
           { value: "", label: "" },
-          { value: "semanal", label: "Loteria semanal" },
+          { value: "semanal", label: "Sorteo oridinario" },
           { value: "extra", label: "Sorteo extraordinario" },
           { value: "premios", label: "Reclamar premios" },
           { value: "reportes", label: "Ver reportes" },

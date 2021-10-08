@@ -1,9 +1,10 @@
 import { useRef } from "react";
 import classes from "./Modal.module.css";
 
-const Modal = ({ handleClose, show, children }) => {
+const Modal = ({ handleClose, show, full = false, children }) => {
   const { modal, modalContent, close } = classes;
   const showHideClassName = show ? "flex" : "hidden";
+  const hasPadding = full ? "p-0" : "p-6";
 
   const refModal = useRef();
 
@@ -15,7 +16,7 @@ const Modal = ({ handleClose, show, children }) => {
 
   return (
     <div ref={refModal} className={`${modal} ${showHideClassName}`}>
-      <section className={`container ${modalContent}`}>
+      <section className={`container ${modalContent} ${hasPadding}`}>
         <span className={`bi bi-x ${close}`} onClick={handleClose} />
         {children}
       </section>

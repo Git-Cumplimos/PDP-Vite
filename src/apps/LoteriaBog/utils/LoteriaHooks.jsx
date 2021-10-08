@@ -2,12 +2,12 @@ import { createContext, useContext, useState } from "react";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
-  semanal:
+  ordinario:
     "http://loteriacons.us-east-2.elasticbeanstalk.com/consultas_loteria",
 };
 
 export const LoteriaContext = createContext({
-  semanal: {
+  ordinario: {
     numero: undefined,
     setNumero: undefined,
     serie: undefined,
@@ -19,7 +19,7 @@ export const LoteriaContext = createContext({
     customer: undefined,
     setCustomer: undefined,
   },
-  searchSemanal: () => {},
+  searchOrdinario: () => {},
   extra: {},
   premios: {},
   reportes: {},
@@ -36,10 +36,10 @@ export const useProvideLoteria = () => {
   const [selected, setSelected] = useState(undefined);
   const [customer, setCustomer] = useState({ fracciones: "", phone: "" });
 
-  const searchSemanal = async (num) => {
+  const searchOrdinario = async (num) => {
     try {
       const res = await fetchData(
-        urls.semanal,
+        urls.ordinario,
         "GET",
         {
           tipo: 1,
@@ -55,7 +55,7 @@ export const useProvideLoteria = () => {
   };
 
   return {
-    semanal: {
+    ordinario: {
       numero,
       setNumero: (val) => setNumero(val),
       serie,
@@ -67,6 +67,6 @@ export const useProvideLoteria = () => {
       customer,
       setCustomer: (val) => setCustomer(val),
     },
-    searchSemanal,
+    searchOrdinario,
   };
 };
