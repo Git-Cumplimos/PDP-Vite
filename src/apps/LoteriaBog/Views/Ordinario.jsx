@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Button from "../../../components/Base/Button/Button";
 import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
@@ -10,6 +11,8 @@ const Ordinario = () => {
     ordinario: {
       numero,
       setNumero,
+      serie,
+      setSerie,
       loterias,
       selected,
       setSelected,
@@ -28,11 +31,32 @@ const Ordinario = () => {
           id="numLoto"
           label="Numero de loteria"
           type="text"
+          minLength="1"
+          maxLength="4"
           value={numero}
+          onInput={(e) => {
+            const num = parseInt(e.target.value) || "";
+            setNumero(num);
+
+            let timer;
+
+            clearTimeout(timer);
+
+            timer = setTimeout(() => {
+              searchOrdinario(num);
+            }, 500);
+          }}
+        />
+        <Input
+          id="numSerie"
+          label="Numero de serie"
+          type="text"
+          minLength="1"
+          maxLength="3"
+          value={serie}
           onChange={(e) => {
             const num = parseInt(e.target.value);
-            setNumero(num || "");
-            searchOrdinario(num || "");
+            setSerie(num || "");
           }}
         />
       </Form>
@@ -87,20 +111,8 @@ const Ordinario = () => {
               setCustomer({ ...cus });
             }}
           />
-          <button
-            className="px-4 py-2 text-gray-50 border-black rounded-lg"
-            style={{
-              backgroundColor: "var(--primary)",
-            }}
-            type="submit"
-          >
-            Aceptar
-          </button>
-          <button
-            className="px-4 py-2 text-gray-50 border-black rounded-lg"
-            style={{
-              backgroundColor: "var(--secondary-dark)",
-            }}
+          <Button type="submit">Aceptar</Button>
+          <Button
             type="button"
             onClick={() => {
               setShowModal(false);
@@ -108,7 +120,7 @@ const Ordinario = () => {
             }}
           >
             Cancelar
-          </button>
+          </Button>
         </Form>
       </Modal>
     </div>

@@ -1,6 +1,6 @@
 import classes from "./Input.module.css";
 
-const Input = ({ label, self = false, ...input }) => {
+const Input = ({ label, self = false, onLazyInput, ...input }) => {
   const { formItem } = classes;
   const { id: _id } = input;
 

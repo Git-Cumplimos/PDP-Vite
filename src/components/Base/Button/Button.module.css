@@ -1,0 +1,13 @@
+.formItem {
+  @apply flex flex-col justify-center content-center max-w-xs text-center my-4 mx-4;
+}
+
+.formItem > button {
+  background-color: var(--secondary-dark);
+
+  @apply px-4 py-2 text-gray-50 border-black rounded-lg;
+}
+
+.formItem > button[type="submit"] {
+  background-color: var(--primary);
+}
