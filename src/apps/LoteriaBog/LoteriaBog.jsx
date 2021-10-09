@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../utils/AuthHooks";
 import ProvideLoteria from "./components/ProvideLoteria";
 import Select from "../../components/Base/Select/Select";
@@ -12,15 +12,34 @@ const AdminLoteria = () => {
 };
 
 const CashierLoteria = () => {
-  const posibles = ["semanal", "extra", "premios", "reportes"];
+  const posibles = ["ordinario", "extraordinario", "premios", "reportes"];
+  
   const [page, setPage] = useState("");
+  const [sorteo, setSorteo] = useState();
+  const [sorteoExtra, setSorteoExtra] = useState();
+
+  const searchLoteriaInfo = (num) => {
+    // fetchData(urls.loteria)
+    //   .then((res) => {})
+    //   .catch((err) => console.error(err));
+    setTimeout(() => {
+      setSorteo("2608");
+      setSorteoExtra("2");
+    }, 1000);
+  };
+
+  useEffect(() => {
+    searchLoteriaInfo(2);
+  }, []);
+
+  // const options
 
   const SelectPage = () => {
     switch (page) {
-      case "semanal":
-        return <Ordinario />;
+      case "ordinario":
+        return <Ordinario sorteo={sorteo} />;
 
-      case "extra":
+      case "extraordinario":
         return <Extraordinario />;
 
       case "premios":
@@ -41,8 +60,8 @@ const CashierLoteria = () => {
         label="Elegir pagina"
         options={[
           { value: "", label: "" },
-          { value: "semanal", label: "Sorteo oridinario" },
-          { value: "extra", label: "Sorteo extraordinario" },
+          { value: "ordinario", label: `Sorteo oridinario - ${sorteo}` },
+          { value: "extraordinario", label: `Sorteo extraordinario - ${sorteoExtra}` },
           { value: "premios", label: "Reclamar premios" },
           { value: "reportes", label: "Ver reportes" },
         ]}

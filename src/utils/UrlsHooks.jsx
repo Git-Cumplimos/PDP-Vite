@@ -81,11 +81,7 @@ export const useProvideUrls = () => {
         link: "/login",
         label: "Login",
         component: Login,
-        props: {
-          /* style: {
-            backgroundImage: "url(../assets/img/personas.png)",
-          }, */
-        },
+        props: {},
       },
     ]);
   }, []);

@@ -8,14 +8,14 @@ import classes from "./Admin.module.css";
 const Admin = () => {
   const { adminLayout } = classes;
 
-  const urls = useUrls();
+  const { urlsPrivate, urlsPrivApps, urlsPublic } = useUrls();
 
   return (
     <div className={adminLayout}>
       <Header />
       <main className="container">
         <Switch>
-          {urls.urlsPrivate
+          {urlsPrivate
             .filter(({ link }) => !(link === undefined || link === null))
             .map(({ link, component: Component, props }) => {
               return (
@@ -24,14 +24,14 @@ const Admin = () => {
                 </PrivateRoute>
               );
             })}
-          {urls.urlsPrivApps.map(({ link, component: Component, props }) => {
+          {urlsPrivApps.map(({ link, component: Component, props }) => {
             return (
               <PrivateRoute key={link} exact path={link}>
                 <Component {...props} />
               </PrivateRoute>
             );
           })}
-          {urls.urlsPublic.map(({ link, component: Component, props }) => {
+          {urlsPublic.map(({ link, component: Component, props }) => {
             return (
               <Route key={link} exact path={link}>
                 <Component {...props} />

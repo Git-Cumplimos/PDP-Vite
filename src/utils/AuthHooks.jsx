@@ -99,7 +99,6 @@ export const useProvideAuth = () => {
   const signOut = () => {
     Auth.signOut()
       .then(() => {
-        console.log("Sign out successfully");
         setCognitoUser(null);
         setSignedIn(false);
         history.push("/login");
