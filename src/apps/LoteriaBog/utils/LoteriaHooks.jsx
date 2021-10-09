@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
@@ -24,7 +24,19 @@ export const LoteriaContext = createContext({
   },
   searchOrdinario: () => {},
   sellOrdinario: () => {},
-  extra: {},
+  extra: {
+    numero: null,
+    setNumero: null,
+    serie: null,
+    setSerie: null,
+    loterias: null,
+    selected: null,
+    setSelected: null,
+    customer: null,
+    setCustomer: null,
+    sellResponse: null,
+    setSellResponse: null,
+  },
 });
 
 export const useLoteria = () => {
@@ -39,6 +51,25 @@ export const useProvideLoteria = () => {
   const [customer, setCustomer] = useState({ fracciones: "", phone: "" });
   const [sellResponse, setSellResponse] = useState(null);
 
+  const [numeroExtra, setNumeroExtra] = useState("");
+  const [serieExtra, setSerieExtra] = useState("");
+  const [loteriasExtra, setLoteriasExtra] = useState(null);
+  const [selectedExtra, setSelectedExtra] = useState(null);
+  const [customerExtra, setCustomerExtra] = useState({
+    fracciones: "",
+    phone: "",
+  });
+  const [sellResponseExtra, setSellResponseExtra] = useState(null);
+
+  useEffect(() => {
+    if (numero === "" && serie === "") {
+      setLoterias([]);
+    }
+    if (numeroExtra === "" && serieExtra === "") {
+      setLoteriasExtra([]);
+    }
+  }, [numero, serie, setLoterias, numeroExtra, serieExtra, setLoteriasExtra]);
+
   const searchOrdinario = async (num) => {
     try {
       const res = await fetchData(
@@ -51,8 +82,10 @@ export const useProvideLoteria = () => {
         {}
       );
       setLoterias(res);
+      setLoteriasExtra(res);
     } catch (err) {
       setLoterias([]);
+      setLoteriasExtra([]);
       console.error(err);
       // throw err;
     }
@@ -61,8 +94,8 @@ export const useProvideLoteria = () => {
   const sellOrdinario = async (sorteo) => {
     const req = {
       num_sorteo: sorteo,
-      num_billete: "3390",
-      serie: "218",
+      num_billete: `${selected.Num_loteria}`,
+      serie: `${selected.Serie}`,
       val_pago: 15000,
       vendedor: 1,
       celular: parseInt(customer.phone),
@@ -73,12 +106,7 @@ export const useProvideLoteria = () => {
       cantidad_frac_billete: 3,
     };
     try {
-      const res = await fetchData(
-        urls.ventaOrdinario,
-        "POST",
-        {},
-        req
-      );
+      const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
       setSellResponse(res);
       console.log(req);
       console.log(res);
@@ -105,5 +133,18 @@ export const useProvideLoteria = () => {
     },
     searchOrdinario,
     sellOrdinario,
+    extra: {
+      numero: numeroExtra,
+      setNumero: setNumeroExtra,
+      serie: serieExtra,
+      setSerie: setSerieExtra,
+      loterias: loteriasExtra,
+      selected: selectedExtra,
+      setSelected: setSelectedExtra,
+      customer: customerExtra,
+      setCustomer: setCustomerExtra,
+      sellResponse: sellResponseExtra,
+      setSellResponse: setSellResponseExtra,
+    },
   };
 };

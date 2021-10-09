@@ -14,6 +14,12 @@ const Modal = ({ handleClose, show, full = false, children }) => {
     }
   }
 
+  if (show) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
+
   return (
     <div ref={refModal} className={`${modal} ${showHideClassName}`}>
       <section className={`container ${modalContent} ${hasPadding}`}>

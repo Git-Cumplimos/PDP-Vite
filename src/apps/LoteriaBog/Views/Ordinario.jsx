@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import Button from "../../../components/Base/Button/Button";
+
 import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import Table from "../../../components/Base/Table/Table";
+import SellResp from "../components/SellResp/SellResp";
 import SendForm from "../components/SendForm/SendForm";
-import Voucher from "../components/Voucher/Voucher";
 import { useLoteria } from "../utils/LoteriaHooks";
 
 const Ordinario = ({ sorteo }) => {
@@ -31,7 +31,10 @@ const Ordinario = ({ sorteo }) => {
 
   useEffect(() => {
     setSellResponse(null);
-  }, [setSellResponse]);
+    setNumero("");
+    setSerie("");
+    setCustomer({ fracciones: "", phone: "" });
+  }, [setSellResponse, setNumero, setSerie, setCustomer]);
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
@@ -42,6 +45,7 @@ const Ordinario = ({ sorteo }) => {
           type="text"
           minLength="1"
           maxLength="4"
+          autoComplete={false}
           value={numero}
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
@@ -61,10 +65,11 @@ const Ordinario = ({ sorteo }) => {
           type="text"
           minLength="1"
           maxLength="3"
+          autoComplete={false}
           value={serie}
-          onChange={(e) => {
-            const num = parseInt(e.target.value);
-            setSerie(num || "");
+          onInput={(e) => {
+            const num = parseInt(e.target.value) || "";
+            setSerie(num);
           }}
         />
       </Form>
@@ -95,19 +100,13 @@ const Ordinario = ({ sorteo }) => {
               sellOrdinario(sorteo);
             }}
           />
-        ) : "msg" in sellResponse ? (
-          <div>
-            <h1>Error: {sellResponse.msg}</h1>
-            <Button
-              onClick={(e) => {
-                setSellResponse(null);
-              }}
-            >
-              Volver
-            </Button>
-          </div>
         ) : (
-          <Voucher {...sellResponse} />
+          <SellResp
+            sellResponse={sellResponse}
+            setSellResponse={setSellResponse}
+            setShowModal={setShowModal}
+            setCustomer={setCustomer}
+          />
         )}
       </Modal>
     </div>

@@ -1,11 +1,20 @@
-const Voucher = ({...props}) => {
-  return (
-    <div>
-      <code>
-        {JSON.stringify(props)}
-      </code>
-    </div>
-  )
-}
+import classes from "./Voucher.module.css";
 
-export default Voucher
+const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
+  const { divPrint } = classes;
+
+  return (
+    <div className={divPrint} ref={refPrint}>
+      {Object.entries(info).map(([key, value]) => {
+        return (
+          <div className="flex flex-row justify-between w-full" key={key}>
+            <h1>{key}:</h1>
+            <h1>{value}</h1>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default Voucher;

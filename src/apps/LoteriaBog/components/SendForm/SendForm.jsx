@@ -22,7 +22,7 @@ const SendForm = ({
           max="3"
           min="1"
           value={fracciones}
-          onChange={(e) => {
+          onInput={(e) => {
             const cus = { fracciones, phone };
             cus.fracciones = e.target.value;
             setCustomer({ ...cus });
@@ -35,7 +35,7 @@ const SendForm = ({
           minLength="10"
           maxLength="10"
           value={phone}
-          onChange={(e) => {
+          onInput={(e) => {
             const cus = { fracciones, phone };
             cus.phone = e.target.value;
             setCustomer({ ...cus });
