@@ -1,15 +1,21 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
-  loteria: "",
   ordinario:
     "http://loteriacons.us-east-2.elasticbeanstalk.com/consultas_loteria",
   ventaOrdinario: "http://loteriaventa.us-east-2.elasticbeanstalk.com/venta",
+  moda: "http://buscadosmas.us-east-2.elasticbeanstalk.com/consurepmasbusca",
 };
 
 export const LoteriaContext = createContext({
-  ordinario: {
+  infoLoto: {
     numero: null,
     setNumero: null,
     serie: null,
@@ -22,21 +28,12 @@ export const LoteriaContext = createContext({
     sellResponse: null,
     setSellResponse: null,
   },
-  searchOrdinario: () => {},
-  sellOrdinario: () => {},
-  extra: {
-    numero: null,
-    setNumero: null,
-    serie: null,
-    setSerie: null,
-    loterias: null,
-    selected: null,
-    setSelected: null,
-    customer: null,
-    setCustomer: null,
-    sellResponse: null,
-    setSellResponse: null,
+  searchLoteria: () => {},
+  sellLoteria: () => {},
+  reportes: {
+    moda: null,
   },
+  searchModa: () => {},
 });
 
 export const useLoteria = () => {
@@ -48,58 +45,53 @@ export const useProvideLoteria = () => {
   const [serie, setSerie] = useState("");
   const [loterias, setLoterias] = useState(null);
   const [selected, setSelected] = useState(null);
-  const [customer, setCustomer] = useState({ fracciones: "", phone: "" });
-  const [sellResponse, setSellResponse] = useState(null);
-
-  const [numeroExtra, setNumeroExtra] = useState("");
-  const [serieExtra, setSerieExtra] = useState("");
-  const [loteriasExtra, setLoteriasExtra] = useState(null);
-  const [selectedExtra, setSelectedExtra] = useState(null);
-  const [customerExtra, setCustomerExtra] = useState({
+  const [customer, setCustomer] = useState({
     fracciones: "",
     phone: "",
+    doc_id: "",
   });
-  const [sellResponseExtra, setSellResponseExtra] = useState(null);
+  const [sellResponse, setSellResponse] = useState(null);
+
+  const [moda, setModa] = useState(null);
 
   useEffect(() => {
     if (numero === "" && serie === "") {
       setLoterias([]);
     }
-    if (numeroExtra === "" && serieExtra === "") {
-      setLoteriasExtra([]);
-    }
-  }, [numero, serie, setLoterias, numeroExtra, serieExtra, setLoteriasExtra]);
+  }, [numero, serie, setLoterias]);
 
-  const searchOrdinario = async (num) => {
+  const searchLoteria = useCallback(async (sorteo, num, ser, page) => {
+    if (num === "" && ser === "") return;
     try {
-      const res = await fetchData(
+      const { Resultado:res, Num_Datos } = await fetchData(
         urls.ordinario,
         "GET",
         {
-          tipo: 1,
           num_loteria: num,
+          serie: ser,
+          sorteo,
+          numero: page,
         },
         {}
       );
       setLoterias(res);
-      setLoteriasExtra(res);
+      return Num_Datos;
     } catch (err) {
       setLoterias([]);
-      setLoteriasExtra([]);
       console.error(err);
-      // throw err;
     }
-  };
+  }, []);
 
-  const sellOrdinario = async (sorteo) => {
+  const sellLoteria = useCallback(async (sorteo) => {
     const req = {
       num_sorteo: sorteo,
-      num_billete: `${selected.Num_loteria}`,
-      serie: `${selected.Serie}`,
-      val_pago: 15000,
+      num_billete: `${selected.Num_billete}`,
+      serie: `${selected.serie}`,
+      val_pago:
+        parseInt(customer.fracciones) * parseFloat(selected.Valor_fraccion),
       vendedor: 1,
       celular: parseInt(customer.phone),
-      cod_loteria: "002",
+      cod_loteria: selected.Cod_loteria,
       cod_distribuidor: "DIS",
       can_frac_venta: parseInt(customer.fracciones),
       can_fracciones: 3,
@@ -108,22 +100,32 @@ export const useProvideLoteria = () => {
     try {
       const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
       setSellResponse(res);
-      console.log(req);
-      console.log(res);
     } catch (err) {
       setSellResponse(null);
       console.error(err);
-      // throw err;
     }
-  };
+  }, [selected, customer]);
+
+  const searchModa = useCallback(async () => {
+    try {
+      const res = await fetchData(urls.moda, "GET", {}, {});
+      console.log(res);
+      setModa(res);
+    } catch (err) {
+      setModa(null);
+      console.error(err);
+      throw err;
+    }
+  }, []);
 
   return {
-    ordinario: {
+    infoLoto: {
       numero,
       setNumero,
       serie,
       setSerie,
       loterias,
+      setLoterias,
       selected,
       setSelected,
       customer,
@@ -131,20 +133,11 @@ export const useProvideLoteria = () => {
       sellResponse,
       setSellResponse,
     },
-    searchOrdinario,
-    sellOrdinario,
-    extra: {
-      numero: numeroExtra,
-      setNumero: setNumeroExtra,
-      serie: serieExtra,
-      setSerie: setSerieExtra,
-      loterias: loteriasExtra,
-      selected: selectedExtra,
-      setSelected: setSelectedExtra,
-      customer: customerExtra,
-      setCustomer: setCustomerExtra,
-      sellResponse: sellResponseExtra,
-      setSellResponse: setSellResponseExtra,
+    searchLoteria,
+    sellLoteria,
+    reportes: {
+      moda,
     },
+    searchModa,
   };
 };

@@ -6,17 +6,21 @@ const HNavbar = ({ links = [], isText = true, isIcon = false }) => {
   return (
     <nav className={navbar}>
       <ul className={`${list} ${isText ? text : ""} ${isIcon ? icon : ""}`}>
-        {links.map(({ label, link }, idx) => {
-          return (
-            <li key={`${link}_${idx}`}>
-              {link === undefined || link === null ? (
-                label
-              ) : (
-                <Link to={link}>{label}</Link>
-              )}
-            </li>
-          );
-        })}
+        {links
+          .filter(({ show }) => {
+            return show === undefined ? true : show;
+          })
+          .map(({ label, link }, idx) => {
+            return (
+              <li key={`${link}_${idx}`}>
+                {link === undefined || link === null ? (
+                  label
+                ) : (
+                  <Link to={link}>{label}</Link>
+                )}
+              </li>
+            );
+          })}
       </ul>
     </nav>
   );

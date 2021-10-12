@@ -2,8 +2,9 @@ import { useRef } from "react";
 import Button from "../../../../components/Base/Button/Button";
 import Voucher from "../Voucher/Voucher";
 import { useReactToPrint } from "react-to-print";
+import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 
-const SellResp = ({ sellResponse, setSellResponse, setShowModal, setCustomer }) => {
+const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) => {
   const printDiv = useRef();
 
   const handlePrint = useReactToPrint({
@@ -25,18 +26,18 @@ const SellResp = ({ sellResponse, setSellResponse, setShowModal, setCustomer }) 
   ) : (
     <div className="flex flex-col justify-center items-center">
       <Voucher {...sellResponse} refPrint={printDiv} />
-      <div className="flex flex-row justify-around">
+      <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
         <Button
           onClick={() => {
-            setShowModal(false);
+            closeModal();
             setSellResponse(null);
-            setCustomer({ fracciones: "", phone: "" });
+            setCustomer({ fracciones: "", phone: "", doc_id: "" });
           }}
         >
           Cerrar
         </Button>
-      </div>
+      </ButtonBar>
     </div>
   );
 };

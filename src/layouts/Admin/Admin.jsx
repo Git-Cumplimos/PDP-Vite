@@ -17,23 +17,26 @@ const Admin = () => {
         <Switch>
           {urlsPrivate
             .filter(({ link }) => !(link === undefined || link === null))
-            .map(({ link, component: Component, props }) => {
+            .map(({ link, component: Component, props, exact }) => {
+              exact = exact === undefined ? true : exact;
               return (
-                <PrivateRoute key={link} exact path={link}>
+                <PrivateRoute key={link} exact={exact} path={link}>
                   <Component {...props} />
                 </PrivateRoute>
               );
             })}
-          {urlsPrivApps.map(({ link, component: Component, props }) => {
+          {urlsPrivApps.map(({ link, component: Component, props, exact }) => {
+            exact = exact === undefined ? true : exact;
             return (
-              <PrivateRoute key={link} exact path={link}>
+              <PrivateRoute key={link} exact={exact} path={link}>
                 <Component {...props} />
               </PrivateRoute>
             );
           })}
-          {urlsPublic.map(({ link, component: Component, props }) => {
+          {urlsPublic.map(({ link, component: Component, props, exact }) => {
+            exact = exact === undefined ? true : exact;
             return (
-              <Route key={link} exact path={link}>
+              <Route key={link} exact={exact} path={link}>
                 <Component {...props} />
               </Route>
             );

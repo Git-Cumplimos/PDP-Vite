@@ -3,7 +3,7 @@ import { Logger } from "@aws-amplify/core";
 import { appendToCognitoUserAgent } from "@aws-amplify/auth";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 const logger = new Logger("withAuthenticator");
 
@@ -65,6 +65,7 @@ export const useProvideAuth = () => {
   }, []);
 
   const history = useHistory();
+  const location = useLocation();
 
   const signIn = async (username, password) => {
     try {
@@ -87,7 +88,7 @@ export const useProvideAuth = () => {
       setCognitoUser(loggedUser);
       setSignedIn(true);
       setUserInfo(await Auth.currentUserInfo());
-      history.push("/");
+      history.push(location.state ? location.state.from : location.pathname);
     } catch (err) {
       if (err.code === "NotAuthorizedException") {
         setCognitoUser(null);

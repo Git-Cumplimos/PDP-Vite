@@ -11,3 +11,7 @@
 .formItem > button[type="submit"] {
   background-color: var(--primary);
 }
+
+.formItem > button:disabled {
+  @apply opacity-40 cursor-default;
+}

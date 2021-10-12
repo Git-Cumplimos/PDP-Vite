@@ -1,10 +1,21 @@
-import { Redirect } from "react-router-dom";
+import { Redirect, useLocation } from "react-router-dom";
 import LoginForm from "../components/Compound/LoginForm/LoginForm";
 import { useAuth } from "../utils/AuthHooks";
 
 const Login = () => {
   const auth = useAuth();
-  return !auth.isSignedIn ? <LoginForm /> : <Redirect to="/" />;
+  const location = useLocation();
+  return !auth.isSignedIn ? (
+    <LoginForm />
+  ) : (
+    <Redirect
+      to={
+        location.state
+          ? location.state.from
+          : location.pathname
+      }
+    />
+  );
 };
 
 export default Login;

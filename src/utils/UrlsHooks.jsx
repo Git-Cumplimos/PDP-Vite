@@ -69,6 +69,13 @@ export const useProvideUrls = () => {
         props: {},
       },
       {
+        link: "/loteria-de-bogota/:page",
+        component: LoteriaBog,
+        props: {},
+        exact: false,
+        show: false,
+      },
+      {
         link: "/marketplace",
         label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
         component: emptyComp,

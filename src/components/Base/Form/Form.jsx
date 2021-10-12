@@ -1,9 +1,9 @@
 import classes from "./Form.module.css";
 
-const Form = ({ children, ...formProps }) => {
+const Form = ({ children, formDir = "row", ...formProps }) => {
   const { Form } = classes;
   return (
-    <form className={Form} {...formProps}>
+    <form className={`${Form} flex-${formDir}`} {...formProps}>
       {children}
     </form>
   );
