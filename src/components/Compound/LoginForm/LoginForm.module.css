@@ -3,14 +3,10 @@
 }
 
 .card {
-  /* border-color: var(--primary); */
-
   @apply my-4 p-4 max-w-md border-2 border-primary rounded-3xl;
 }
 
 .card > hr {
-  /* border-color: var(--secondary); */
-
   @apply border-t-4 border-secondary mb-8 mx-4;
 }
 
@@ -24,8 +20,6 @@ form > .field {
 }
 
 form > .field > input {
-  /* background-color: var(--secondary-light); */
-
   @apply my-3 px-4 py-2 bg-secondary-light rounded-lg text-base w-48 sm:w-60 md:w-80;
 }
 
@@ -38,8 +32,6 @@ form > .field > label {
 }
 
 form > .field > button {
-  /* background-color: var(--secondary-light); */
-
   @apply py-2 px-8 my-6 rounded-full font-medium bg-secondary-light opacity-100 transition-opacity duration-300;
 }
 
