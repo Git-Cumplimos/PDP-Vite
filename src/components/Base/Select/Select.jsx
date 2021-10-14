@@ -21,9 +21,9 @@ const Select = ({ label, options, self = false, ...select}) => {
     <div className={formItem}>
       {label && label !== "" && <label htmlFor={_id}>{label}</label>}
       <select id={_id} {...select}>
-        {options.map(({ value, label }) => {
+        {options.map(({ value, label }, idx) => {
           return (
-            <option key={value} value={value}>
+            <option key={`${value}_${idx}`} value={value}>
               {label}
             </option>
           );

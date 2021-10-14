@@ -88,7 +88,13 @@ export const useProvideAuth = () => {
       setCognitoUser(loggedUser);
       setSignedIn(true);
       setUserInfo(await Auth.currentUserInfo());
-      history.push(location.state ? location.state.from : location.pathname);
+      history.push(
+        location.state
+          ? location.state.from
+          : location.pathname === "/login"
+          ? "/"
+          : location.pathname
+      );
     } catch (err) {
       if (err.code === "NotAuthorizedException") {
         setCognitoUser(null);

@@ -5,12 +5,13 @@ import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
+import Select from "../../../components/Base/Select/Select";
 import Table from "../../../components/Base/Table/Table";
 import SellResp from "../components/SellResp/SellResp";
 import SendForm from "../components/SendForm/SendForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 
-const Loteria = ({ sorteo }) => {
+const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
   const {
     infoLoto: {
       numero,
@@ -33,6 +34,7 @@ const Loteria = ({ sorteo }) => {
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
+  const [sorteo, setSorteo] = useState("");
 
   useEffect(() => {
     setSellResponse(null);
@@ -50,15 +52,26 @@ const Loteria = ({ sorteo }) => {
   }, [sorteo, numero, serie, searchLoteria, page]);
 
   return (
-    <div className="w-full flex flex-col justify-center items-center">
-      Pagina: {page}
-      <br />
-      Maximo paginas: {maxPages}
-      <Form>
+    <>
+      <Form grid>
+        <Select
+          id="selectSorteo"
+          label="Tipo de sorteo"
+          options={[
+            { value: "", label: "" },
+            { value: sorteoOrdi, label: `Sorteo ordinario - ${sorteoOrdi}` },
+            {
+              value: sorteoExtra,
+              label: `Sorteo extraordinario - ${sorteoExtra}`,
+            },
+          ]}
+          value={sorteo}
+          onChange={(e) => setSorteo(e.target.value)}
+        />
         <Input
-          id="numLoto"
-          label="Numero de loteria"
-          type="text"
+          id="numTicket"
+          label="Numero de billete"
+          type="search"
           minLength="1"
           maxLength="4"
           autoComplete="false"
@@ -83,7 +96,7 @@ const Loteria = ({ sorteo }) => {
         <Input
           id="numSerie"
           label="Numero de serie"
-          type="text"
+          type="search"
           minLength="1"
           maxLength="3"
           autoComplete="false"
@@ -105,7 +118,7 @@ const Loteria = ({ sorteo }) => {
             timeOut: 500,
           }}
         />
-        <ButtonBar full>
+        <ButtonBar>
           <Button
             type="button"
             disabled={page < 2}
@@ -133,33 +146,39 @@ const Loteria = ({ sorteo }) => {
         </ButtonBar>
       </Form>
       {Array.isArray(loterias) && loterias.length > 0 ? (
-        <Table
-          headers={[
-            "Numero",
-            "Serie",
-            "Fracciones disponibles",
-            "Valor por fraccion",
-          ]}
-          data={loterias.map(
-            ({
-              Fracciones_disponibles,
-              Num_billete,
-              Valor_fraccion,
-              serie: Serie_lot,
-            }) => {
-              return {
-                Num_billete,
-                Serie_lot,
+        <>
+          <div className="flex flex-row justify-evenly w-full my-4">
+            <h1>Pagina: {page}</h1>
+            <h1>Ultima pagina: {maxPages}</h1>
+          </div>
+          <Table
+            headers={[
+              "Numero",
+              "Serie",
+              "Fracciones disponibles",
+              "Valor por fraccion",
+            ]}
+            data={loterias.map(
+              ({
                 Fracciones_disponibles,
+                Num_billete,
                 Valor_fraccion,
-              };
-            }
-          )}
-          onSelectRow={(e, index) => {
-            setSelected(loterias[index]);
-            setShowModal(true);
-          }}
-        />
+                serie: Serie_lot,
+              }) => {
+                return {
+                  Num_billete,
+                  Serie_lot,
+                  Fracciones_disponibles,
+                  Valor_fraccion,
+                };
+              }
+            )}
+            onSelectRow={(e, index) => {
+              setSelected(loterias[index]);
+              setShowModal(true);
+            }}
+          />
+        </>
       ) : (
         ""
       )}
@@ -184,7 +203,7 @@ const Loteria = ({ sorteo }) => {
           />
         )}
       </Modal>
-    </div>
+    </>
   );
 };
 

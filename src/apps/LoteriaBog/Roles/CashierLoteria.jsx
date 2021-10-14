@@ -1,11 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams, useHistory, useLocation } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useParams, useLocation, Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import Select from "../../../components/Base/Select/Select";
+import AppIcons from "../../../components/Base/AppIcons/AppIcons";
 import fetchData from "../../../utils/fetchData";
 import Loteria from "../Views/Loteria";
 import Premios from "../Views/Premios";
 import Reportes from "../Views/Reportes";
+import Sorteos from "../../../assets/svg/SORTEO-01.svg";
+import Pago from "../../../assets/svg/PAGO-01.svg";
+import Reporte from "../../../assets/svg/REPORTES-01.svg";
+import Button from "../../../components/Base/Button/Button";
 
 const urlLoto =
   "http://loginconsulta.us-east-2.elasticbeanstalk.com/contiploteria";
@@ -14,12 +18,11 @@ const CashierLoteria = () => {
   const [sorteo, setSorteo] = useState(null);
   const [sorteoExtra, setSorteoExtra] = useState(null);
 
-  const history = useHistory();
   const { page } = useParams();
   const { pathname } = useLocation();
 
   const notifyError = useCallback((msg = "Error") => {
-    toast.error(msg, {
+    toast.warning(msg, {
       position: "top-center",
       autoClose: 5000,
       hideProgressBar: false,
@@ -68,61 +71,99 @@ const CashierLoteria = () => {
 
   const SelectPage = () => {
     switch (page) {
-      case "ordinario":
-        return <Loteria sorteo={sorteo} />;
-
-      case "extraordinario":
-        return <Loteria sorteo={sorteoExtra} />;
+      case "sorteos":
+        return <Loteria sorteo={sorteo} sorteoExtra={sorteoExtra} />;
 
       case "premios":
         return <Premios />;
 
       case "reportes":
-        return <Reportes />;
+        return <Reportes sorteo={sorteo} sorteoExtra={sorteoExtra} />;
 
       default:
-        return "";
+        return <p></p>;
     }
   };
 
-  const [options, posibles] = useMemo(() => {
-    const posib = [];
-    const opts = [{ value: "", label: "" }];
-    if (sorteo !== null) {
-      opts.push({ value: "ordinario", label: `Sorteo oridinario - ${sorteo}` });
-      posib.push("ordinario");
-    }
-    if (sorteoExtra !== null) {
-      opts.push({
-        value: "extraordinario",
-        label: `Sorteo extraordinario - ${sorteoExtra}`,
-      });
-      posib.push("extraordinario");
-    }
-    opts.push(
-      { value: "premios", label: "Reclamar premios" },
-      { value: "reportes", label: "Ver reportes" }
+  // const [options, posibles] = useMemo(() => {
+  //   const posib = [];
+  //   const opts = [];
+  //   if (sorteo !== null) {
+  //     opts.push({ value: "ordinario", label: `Sorteo ordinario - ${sorteo}` });
+  //     posib.push("ordinario");
+  //   }
+  //   if (sorteoExtra !== null) {
+  //     opts.push({
+  //       value: "extraordinario",
+  //       label: `Sorteo extraordinario - ${sorteoExtra}`,
+  //     });
+  //     posib.push("extraordinario");
+  //   }
+  //   opts.push(
+  //     { value: "premios", label: "Reclamar premios" },
+  //     { value: "reportes", label: "Ver numeros mas buscados" }
+  //   );
+  //   posib.push("premios", "reportes");
+  //   return [[...opts], [...posib]];
+  // }, [sorteo, sorteoExtra]);
+
+  const LotoIcons = ({ Logo, name }) => {
+    return (
+      <div className="flex flex-col justify-center flex-1 text-center text-base md:text-xl">
+        <AppIcons Logo={Logo} />
+        <h1>{name}</h1>
+      </div>
     );
-    posib.push("premios", "reportes");
-    return [[...opts], [...posib]];
-  }, [sorteo, sorteoExtra]);
+  };
+
+  const options = [
+    { value: "sorteos", label: <LotoIcons Logo={Sorteos} name="Sorteos" /> },
+    {
+      value: "premios",
+      label: <LotoIcons Logo={Pago} name="Reclamar premios" />,
+    },
+    {
+      value: "reportes",
+      label: <LotoIcons Logo={Reporte} name="Reportes" />,
+    },
+  ];
+
+  const posibles = ["sorteos", "premios", "reportes"];
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <>
       <ToastContainer />
-      <Select
-        id="pagesLDB"
-        label="Elegir pagina"
-        options={options}
-        value={page}
-        onChange={(e) =>
-          e.target.value !== undefined && e.target.value === ""
-            ? history.push(`/${pathname.split("/")[1]}`)
-            : history.push(`/${pathname.split("/")[1]}/${e.target.value}`)
-        }
-      />
-      {posibles.includes(page) ? <SelectPage /> : ""}
-    </div>
+      {pathname === `/${pathname.split("/")[1]}` ? (
+        <div className="flex flex-row justify-center gap-8">
+          {options.map(({ value, label }) => {
+            return (
+              <Link to={`/${pathname.split("/")[1]}/${value}`} key={value}>
+                {label}
+              </Link>
+            );
+          })}
+        </div>
+      ) : (
+        ""
+      )}
+      {posibles.includes(page) ? (
+        <div className="flex flex-row justify-evenly w-full">
+          <div className="flex flex-col">
+            <div>{options.find(({ value }) => page === value).label}</div>
+            <div>
+              <Link to={`/${pathname.split("/")[1]}`}>
+                <Button>Volver</Button>
+              </Link>
+            </div>
+          </div>
+          <div className="flex flex-col justify-center items-center flex-1">
+            <SelectPage />
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+    </>
   );
 };
 

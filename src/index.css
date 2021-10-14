@@ -108,10 +108,6 @@
   font-style: italic;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 :root {
   --primary: rgb(226, 106, 34);
   --primary-light: rgb(232, 136, 78);
@@ -120,6 +116,11 @@
   --secondary-light: rgb(225, 225, 223);
   --secondary-dark: rgb(96, 96, 96);
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 
 * {
   box-sizing: border-box;

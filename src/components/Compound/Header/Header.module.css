@@ -11,21 +11,18 @@ header.headerPDP .usrData {
 }
 
 header.headerPDP .usrData > .saldoCupo {
-  background-color: var(--primary);
   max-width: 8.75rem;
-  @apply rounded-full px-6 text-white mx-2 text-center;
+  @apply rounded-full px-6 bg-primary text-white mx-2 text-center;
 }
 
 header.headerPDP .usrData > .comision {
-  background-color: var(--primary-light);
   max-width: 8.75rem;
-  @apply rounded-full px-6 text-white mx-2 text-center;
+  @apply rounded-full px-6 bg-primary-light text-white mx-2 text-center;
 }
 
 header.headerPDP .usrData > .cargar {
-  background-color: var(--secondary-dark);
   max-width: 8.75rem;
-  @apply rounded-full px-6 text-white mx-2 text-center;
+  @apply rounded-full px-6 bg-secondary-dark text-white mx-2 text-center;
 }
 
 header.headerPDP .usrData > .saldoCupo,

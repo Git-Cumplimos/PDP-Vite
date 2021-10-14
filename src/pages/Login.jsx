@@ -12,6 +12,8 @@ const Login = () => {
       to={
         location.state
           ? location.state.from
+          : location.pathname === "/login"
+          ? "/"
           : location.pathname
       }
     />

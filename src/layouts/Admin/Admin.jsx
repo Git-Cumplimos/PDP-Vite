@@ -1,17 +1,27 @@
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, useLocation } from "react-router-dom";
 
 import PrivateRoute from "../../components/Compound/PrivateRoute/PrivateRoute";
 import Header from "../../components/Compound/Header/Header";
 import { useUrls } from "../../utils/UrlsHooks";
 import classes from "./Admin.module.css";
+import SocialBar from "../../components/Compound/SocialBar/SocialBar";
 
 const Admin = () => {
-  const { adminLayout } = classes;
+  const { adminLayout, wave } = classes;
 
   const { urlsPrivate, urlsPrivApps, urlsPublic } = useUrls();
 
+  const { pathname } = useLocation();
+
   return (
     <div className={adminLayout}>
+      {pathname === "/login" ? (
+        <div className={wave}>
+          <SocialBar />
+        </div>
+      ) : (
+        ""
+      )}
       <Header />
       <main className="container">
         <Switch>

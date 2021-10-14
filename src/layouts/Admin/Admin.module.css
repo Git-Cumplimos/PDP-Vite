@@ -3,12 +3,8 @@
 }
 
 .adminLayout > .wave {
-  z-index: -10;
-  @apply absolute overflow-x-visible;
-}
-
-.adminLayout > .wave svg {
-  @apply relative block;
+  /* z-index: -10; */
+  @apply hidden md:block absolute overflow-x-visible right-0 top-4;
 }
 
 .adminLayout > .hide {

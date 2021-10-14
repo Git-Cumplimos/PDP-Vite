@@ -11,17 +11,17 @@ import awsconfig from "./aws-exports";
 Amplify.configure(awsconfig);
 
 function App() {
-  const location = useLocation();
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    if (location.pathname === "/login") {
+    if (pathname === "/login") {
       document.body.classList.remove("loggedBackground");
       document.body.classList.add("loginBackground");
     } else {
       document.body.classList.remove("loginBackground");
       document.body.classList.add("loggedBackground");
     }
-  }, [location.pathname]);
+  }, [pathname]);
 
   return (
     <ProvideAuth>

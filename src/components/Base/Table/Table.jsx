@@ -1,9 +1,9 @@
 import classes from "./Table.module.css";
 
-const Table = ({ headers, data, onSelectRow }) => {
+const Table = ({ headers, data, onSelectRow, className = "", ...tableAtt }) => {
   const { table } = classes;
   return (
-    <table className={table}>
+    <table className={`${table} ${className}`} {...tableAtt}>
       <thead>
         <tr>
           {headers.map((name, index) => {

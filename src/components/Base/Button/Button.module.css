@@ -3,13 +3,11 @@
 }
 
 .formItem > button {
-  background-color: var(--secondary-dark);
-
-  @apply px-4 py-2 text-gray-50 border-black rounded-lg;
+  @apply px-4 py-2 bg-secondary-light text-black rounded-full transition-opacity duration-300;
 }
 
 .formItem > button[type="submit"] {
-  background-color: var(--primary);
+  @apply bg-primary text-white;
 }
 
 .formItem > button:disabled {

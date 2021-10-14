@@ -8,7 +8,7 @@
 
 /* Modal Content/Box */
 .modalContent {
-  @apply max-w-xl bg-gray-50 border-black text-black m-auto border-2;
+  @apply max-w-xl bg-white border-black text-black m-auto border-2;
 }
 
 /* The Close Button */

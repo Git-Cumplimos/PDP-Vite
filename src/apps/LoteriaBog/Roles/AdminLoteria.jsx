@@ -1,0 +1,52 @@
+import { ToastContainer } from "react-toastify";
+import { useParams, useHistory, useLocation } from "react-router-dom";
+import Select from "../../../components/Base/Select/Select";
+import CargaArchivos from "../Views/CargaArchivos";
+
+const AdminLoteria = () => {
+  const history = useHistory();
+  const { page } = useParams();
+  const { pathname } = useLocation();
+
+  const SelectPage = () => {
+    switch (page) {
+      case "cargar":
+        return <CargaArchivos />;
+
+      default:
+        return "";
+    }
+  };
+
+  const check = () => {
+    const posib = [];
+    const opts = [{ value: "", label: "" }];
+    opts.push(
+      { value: "cargar", label: "Cargar archivos" }
+    );
+    posib.push("cargar");
+    return [[...opts], [...posib]];
+  };
+
+  const [options, posibles] = check();
+
+  return (
+    <div className="flex flex-col justify-center items-center w-full">
+      <ToastContainer />
+      <Select
+        id="pagesLDB"
+        label="Elegir pagina"
+        options={options}
+        value={page}
+        onChange={(e) =>
+          e.target.value !== undefined && e.target.value === ""
+            ? history.push(`/${pathname.split("/")[1]}`)
+            : history.push(`/${pathname.split("/")[1]}/${e.target.value}`)
+        }
+      />
+      {posibles.includes(page) ? <SelectPage /> : ""}
+    </div>
+  );
+};
+
+export default AdminLoteria

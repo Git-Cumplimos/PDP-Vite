@@ -1,12 +1,11 @@
 .formItem {
-  @apply flex flex-col justify-center content-center max-w-xs text-center my-2 mx-4;
+  @apply flex flex-row justify-center items-center text-center my-4 mx-4 gap-4;
 }
 
 .formItem > label {
-  @apply text-xl;
+  @apply text-xl text-right w-full min-w-max;
 }
 
 .formItem > select {
-  background-color: var(--secondary-light);
-  @apply px-4 py-2 rounded-md text-black;
+  @apply px-4 py-2 rounded-md bg-secondary-light text-black w-full min-w-max;
 }
