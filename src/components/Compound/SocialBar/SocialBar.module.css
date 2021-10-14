@@ -3,7 +3,7 @@
 }
 
 .socials > ul > li:hover {
-  @apply bg-primary-extra-light;
+  @apply text-primary-extra-light;
 }
 
 .socials > ul > li {
