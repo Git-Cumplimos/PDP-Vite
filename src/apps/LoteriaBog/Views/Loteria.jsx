@@ -29,15 +29,12 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
     },
     searchLoteria,
     sellLoteria,
-    getReportesVentas,
   } = useLoteria();
 
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
-
-  getReportesVentas();
 
   useEffect(() => {
     setSellResponse(null);

@@ -29,7 +29,7 @@ const SendForm = ({
           );
         })}
       </div>
-      <Form onSubmit={handleSubmit} formDir="col">
+      <Form onSubmit={handleSubmit} grid>
         <Input
           id="cantFrac"
           label="Fracciones a comprar"

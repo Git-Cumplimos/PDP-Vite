@@ -61,7 +61,7 @@ export const useProvideAuth = () => {
     appendToCognitoUserAgent("withCustomAuthenticator");
 
     checkUser(setSignedIn, setCognitoUser, setUserInfo);
-    setRoleInfo({ role: 0 });
+    setRoleInfo({ role: 1 });
   }, []);
 
   const history = useHistory();

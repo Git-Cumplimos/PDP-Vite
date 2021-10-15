@@ -14,6 +14,9 @@ const urls = {
   moda: "http://buscadosmas.us-east-2.elasticbeanstalk.com/consurepmasbusca",
   ventasReportes:
     "http://ventasreportes.us-east-2.elasticbeanstalk.com/reportes_ventas",
+  consultaPago:
+    "http://premiospago.us-east-2.elasticbeanstalk.com/pagodepremios",
+  pagoPremio: "http://premiospago.us-east-2.elasticbeanstalk.com/hash",
 };
 
 export const LoteriaContext = createContext({
@@ -43,6 +46,8 @@ export const LoteriaContext = createContext({
   },
   searchModa: () => {},
   getReportesVentas: () => {},
+  isWinner: () => {},
+  makePayment: () => {},
 });
 
 export const useLoteria = () => {
@@ -163,6 +168,33 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
+  const isWinner = useCallback(async (sorteo, billete, serie) => {
+    try {
+      const res = await fetchData(urls.consultaPago, "GET", {
+        num_sorteo: sorteo,
+        bill_ganador: billete,
+        serie_ganadora: serie,
+      });
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const makePayment = useCallback(async (sorteo, billete, serie, hash) => {
+    try {
+      const res = await fetchData(urls.pagoPremio, "GET", {
+        num_sorteo: sorteo,
+        bill_ganador: billete,
+        serie_ganadora: serie,
+        hash,
+      });
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
   return {
     infoLoto: {
       numero,
@@ -191,5 +223,7 @@ export const useProvideLoteria = () => {
     },
     searchModa,
     getReportesVentas,
+    isWinner,
+    makePayment
   };
 };

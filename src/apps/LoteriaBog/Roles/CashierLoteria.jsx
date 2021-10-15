@@ -120,7 +120,7 @@ const CashierLoteria = () => {
     { value: "sorteos", label: <LotoIcons Logo={Sorteos} name="Sorteos" /> },
     {
       value: "premios",
-      label: <LotoIcons Logo={Pago} name="Reclamar premios" />,
+      label: <LotoIcons Logo={Pago} name="Premios" />,
     },
     {
       value: "reportes",
