@@ -12,6 +12,8 @@ const urls = {
     "http://loteriacons.us-east-2.elasticbeanstalk.com/consultas_loteria",
   ventaOrdinario: "http://loteriaventa.us-east-2.elasticbeanstalk.com/venta",
   moda: "http://buscadosmas.us-east-2.elasticbeanstalk.com/consurepmasbusca",
+  ventasReportes:
+    "http://ventasreportes.us-east-2.elasticbeanstalk.com/reportes_ventas",
 };
 
 export const LoteriaContext = createContext({
@@ -40,6 +42,7 @@ export const LoteriaContext = createContext({
     setFechaFinal: null,
   },
   searchModa: () => {},
+  getReportesVentas: () => {},
 });
 
 export const useLoteria = () => {
@@ -120,20 +123,42 @@ export const useProvideLoteria = () => {
     [selected, customer]
   );
 
-  const searchModa = useCallback(async (dateInit, dateEnd, sorteoSearch = null) => {
-    const query = {};
-    if (sorteoSearch !== null) {
-      query.num_sorteo = sorteoSearch;
-    } else {
-      query.fecha_ini = dateInit;
-      query.fecha_fin = dateEnd;
-    }
+  const searchModa = useCallback(
+    async (dateInit, dateEnd, sorteoSearch = null) => {
+      const query = {};
+      if (sorteoSearch !== null) {
+        query.num_sorteo = sorteoSearch;
+      } else {
+        query.fecha_ini = dateInit;
+        query.fecha_fin = dateEnd;
+      }
+      try {
+        const res = await fetchData(urls.moda, "GET", query, {});
+        // console.log(res);
+        setModa(res);
+      } catch (err) {
+        setModa(null);
+        console.error(err);
+      }
+    },
+    []
+  );
+
+  const getReportesVentas = useCallback(async (sorteo) => {
     try {
-      const res = await fetchData(urls.moda, "GET", query, {});
-      console.log(res);
-      setModa(res);
+      const info = await fetchData(urls.ventasReportes, "GET", {
+        sorteo,
+      });
+      const res = info[0];
+      let str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`;
+      for (const venta of res.Campo5) {
+        const line = venta.split("-").join("").concat("\n");
+        str = str.concat(line);
+      }
+      const data = new Blob([str], { type: "text/plain" });
+      const csv = window.URL.createObjectURL(data);
+      return csv;
     } catch (err) {
-      setModa(null);
       console.error(err);
     }
   }, []);
@@ -165,5 +190,6 @@ export const useProvideLoteria = () => {
       setFechaFinal,
     },
     searchModa,
+    getReportesVentas,
   };
 };

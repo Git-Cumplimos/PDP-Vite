@@ -1,0 +1,11 @@
+.progressBar {
+  @apply w-full h-6;
+}
+
+.progressBar[value]::-webkit-progress-bar {
+  @apply bg-gray-400 rounded-lg;
+}
+
+.progressBar[value]::-webkit-progress-value {
+  @apply bg-primary-light rounded-lg;
+}

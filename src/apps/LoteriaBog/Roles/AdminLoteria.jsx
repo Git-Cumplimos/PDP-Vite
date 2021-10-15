@@ -2,6 +2,7 @@ import { ToastContainer } from "react-toastify";
 import { useParams, useHistory, useLocation } from "react-router-dom";
 import Select from "../../../components/Base/Select/Select";
 import CargaArchivos from "../Views/CargaArchivos";
+import DescargarArchivos from "../Views/DescargarArchivos";
 
 const AdminLoteria = () => {
   const history = useHistory();
@@ -13,6 +14,9 @@ const AdminLoteria = () => {
       case "cargar":
         return <CargaArchivos />;
 
+      case "descargar":
+        return <DescargarArchivos />;
+
       default:
         return "";
     }
@@ -22,9 +26,10 @@ const AdminLoteria = () => {
     const posib = [];
     const opts = [{ value: "", label: "" }];
     opts.push(
-      { value: "cargar", label: "Cargar archivos" }
+      { value: "cargar", label: "Cargar archivos" },
+      { value: "descargar", label: "Descargar archivos" }
     );
-    posib.push("cargar");
+    posib.push("cargar", "descargar");
     return [[...opts], [...posib]];
   };
 

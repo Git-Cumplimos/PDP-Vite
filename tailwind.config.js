@@ -1,4 +1,5 @@
 const colors = require("tailwindcss/colors");
+delete colors.lightBlue
 
 module.exports = {
   purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
@@ -16,7 +17,7 @@ module.exports = {
         secondary: "rgba(6, 140, 193, 0.25)",
         "secondary-light": "rgb(225, 225, 223)",
         "secondary-dark": "rgb(96, 96, 96)",
-        colors,
+        ...colors
       },
     },
   },

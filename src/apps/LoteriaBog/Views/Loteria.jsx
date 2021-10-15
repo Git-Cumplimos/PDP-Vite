@@ -29,12 +29,15 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
     },
     searchLoteria,
     sellLoteria,
+    getReportesVentas,
   } = useLoteria();
 
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
+
+  getReportesVentas();
 
   useEffect(() => {
     setSellResponse(null);
@@ -156,20 +159,20 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
               "Numero",
               "Serie",
               "Fracciones disponibles",
-              "Valor por fraccion",
+              // "Valor por fraccion",
             ]}
             data={loterias.map(
               ({
                 Fracciones_disponibles,
                 Num_billete,
-                Valor_fraccion,
+                // Valor_fraccion,
                 serie: Serie_lot,
               }) => {
                 return {
                   Num_billete,
                   Serie_lot,
                   Fracciones_disponibles,
-                  Valor_fraccion,
+                  // Valor_fraccion,
                 };
               }
             )}

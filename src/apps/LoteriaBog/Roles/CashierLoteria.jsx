@@ -134,7 +134,7 @@ const CashierLoteria = () => {
     <>
       <ToastContainer />
       {pathname === `/${pathname.split("/")[1]}` ? (
-        <div className="flex flex-row justify-center gap-8">
+        <div className="flex flex-row flex-wrap justify-center gap-8">
           {options.map(({ value, label }) => {
             return (
               <Link to={`/${pathname.split("/")[1]}/${value}`} key={value}>
@@ -147,9 +147,9 @@ const CashierLoteria = () => {
         ""
       )}
       {posibles.includes(page) ? (
-        <div className="flex flex-row justify-evenly w-full">
+        <div className="flex flex-col md:flex-row justify-evenly w-full">
           <div className="flex flex-col">
-            <div>{options.find(({ value }) => page === value).label}</div>
+            <div className="hidden md:block">{options.find(({ value }) => page === value).label}</div>
             <div>
               <Link to={`/${pathname.split("/")[1]}`}>
                 <Button>Volver</Button>

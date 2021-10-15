@@ -15,16 +15,16 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
   const voucherInfo = {};
 
   if (!("msg" in sellResponse)) {
-    voucherInfo.Comercio = sellResponse.Comercio;
-    voucherInfo["Dirección"] = sellResponse.Direccion;
     voucherInfo["Fecha de venta"] = Intl.DateTimeFormat('es-CO', {
       year: "numeric", month: "numeric", day: "numeric"
     }).format(new Date(sellResponse.fecha_venta));
-    voucherInfo["Hora de venta"] = Intl.DateTimeFormat('es-CO', {
-      hour: "numeric", minute: "numeric"
+    voucherInfo["Hora"] = Intl.DateTimeFormat('es-CO', {
+      hour: "numeric", minute: "numeric", second: "numeric", hour12: false
     }).format(new Date(sellResponse.fecha_venta));
+
+    voucherInfo.Comercio = sellResponse.Comercio;
+    voucherInfo["Dirección"] = sellResponse.Direccion;
     voucherInfo.Fracciones = sellResponse.fracciones;
-    // voucherInfo.Hash = sellResponse.;
     voucherInfo["Id Transacción"] = sellResponse.id_Transaccion;
     voucherInfo["Numero de billete"] = sellResponse.num_loteria;
     voucherInfo.Serie = sellResponse.serie;

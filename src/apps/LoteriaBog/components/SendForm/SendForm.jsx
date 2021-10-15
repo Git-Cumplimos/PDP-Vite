@@ -22,7 +22,7 @@ const SendForm = ({
       <div className="flex flex-col w-1/2 mx-auto">
         {Object.entries(details).map(([key, val]) => {
           return (
-            <div className="flex flex-row justify-between" key={key}>
+            <div className="flex flex-row justify-between text-lg font-medium" key={key}>
               <h1>{key}</h1>
               <h1>{val}</h1>
             </div>
