@@ -181,12 +181,13 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-  const makePayment = useCallback(async (sorteo, billete, serie, hash) => {
+  const makePayment = useCallback(async (sorteo, billete, serie, phone, hash) => {
     try {
       const res = await fetchData(urls.pagoPremio, "GET", {
         num_sorteo: sorteo,
         bill_ganador: billete,
         serie_ganadora: serie,
+        celular: phone,
         hash,
       });
       return res;
