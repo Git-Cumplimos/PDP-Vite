@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 
 import Amplify from "aws-amplify";
 import awsconfig from "./aws-exports";
+import { ToastContainer } from "react-toastify";
 
 Amplify.configure(awsconfig);
 
@@ -26,6 +27,7 @@ function App() {
   return (
     <ProvideAuth>
       <ProvideUrls>
+        <ToastContainer />
         <Admin />
       </ProvideUrls>
     </ProvideAuth>

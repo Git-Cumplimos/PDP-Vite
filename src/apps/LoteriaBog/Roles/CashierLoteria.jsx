@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import AppIcons from "../../../components/Base/AppIcons/AppIcons";
 import fetchData from "../../../utils/fetchData";
 import Loteria from "../Views/Loteria";
@@ -85,28 +85,6 @@ const CashierLoteria = () => {
     }
   };
 
-  // const [options, posibles] = useMemo(() => {
-  //   const posib = [];
-  //   const opts = [];
-  //   if (sorteo !== null) {
-  //     opts.push({ value: "ordinario", label: `Sorteo ordinario - ${sorteo}` });
-  //     posib.push("ordinario");
-  //   }
-  //   if (sorteoExtra !== null) {
-  //     opts.push({
-  //       value: "extraordinario",
-  //       label: `Sorteo extraordinario - ${sorteoExtra}`,
-  //     });
-  //     posib.push("extraordinario");
-  //   }
-  //   opts.push(
-  //     { value: "premios", label: "Reclamar premios" },
-  //     { value: "reportes", label: "Ver numeros mas buscados" }
-  //   );
-  //   posib.push("premios", "reportes");
-  //   return [[...opts], [...posib]];
-  // }, [sorteo, sorteoExtra]);
-
   const LotoIcons = ({ Logo, name }) => {
     return (
       <div className="flex flex-col justify-center flex-1 text-center text-base md:text-xl">
@@ -132,7 +110,6 @@ const CashierLoteria = () => {
 
   return (
     <>
-      <ToastContainer />
       {pathname === `/${pathname.split("/")[1]}` ? (
         <div className="flex flex-row flex-wrap justify-center gap-8">
           {options.map(({ value, label }) => {

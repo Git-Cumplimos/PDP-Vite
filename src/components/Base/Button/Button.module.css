@@ -1,5 +1,5 @@
 .formItem {
-  @apply flex flex-col justify-center content-center max-w-xs text-center my-4 mx-4;
+  @apply flex flex-col justify-center content-center max-w-xs text-center my-4 mx-auto md:mx-4;
 }
 
 .formItem > button {

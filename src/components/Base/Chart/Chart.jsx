@@ -32,6 +32,7 @@ const Chart = ({
             datasets: dataSets,
           }}
           options={{
+            // maintainAspectRatio: false,
             scales: {
               y: {
                 grid: {

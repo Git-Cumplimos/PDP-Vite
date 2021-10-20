@@ -1,19 +1,38 @@
 import { useCallback, useRef, useState } from "react";
+import { toast } from "react-toastify";
 import classes from "./Input.module.css";
 
 const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
   const { formItem, dropzone, File } = classes;
-  const { id: _id, type } = input;
+  const { id: _id, type, disabled } = input;
 
   const [timer, setTimer] = useState(null);
 
   const inputRef = useRef(null);
   const dropZoneRef = useRef(null);
 
+  const notifyError = (msg) => {
+    toast.error(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
   const showDropZone = useCallback(() => {
-    const dropZone = dropZoneRef.current;
-    dropZone.style.display = "block";
-  }, []);
+    if (
+      !disabled &&
+      dropZoneRef.current !== null &&
+      dropZoneRef.current !== undefined
+    ) {
+      const dropZone = dropZoneRef.current;
+      dropZone.style.display = "block";
+    }
+  }, [disabled]);
 
   const hideDropZone = useCallback(() => {
     const dropZone = dropZoneRef.current;
@@ -37,24 +56,28 @@ const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
 
       const tempFiles = [];
 
-      const GetFileTree = (item, path) => {
+      const GetFileTree = async (item, path) => {
         path = path || "";
         const initialItem = item;
         item = item.webkitGetAsEntry(); //Might be renamed to GetAsEntry() in 2020
+        // console.log(item);
         if (!item) return;
         if (item.isFile) {
           const file = initialItem.getAsFile();
+          // console.log("file", file);
           tempFiles.push(file);
         } else if (item.isDirectory) {
-          console.log(item.fullPath); //console.log(item.name)
+          notifyError("Solo se permiten archivos, no carpetas");
+          // tempFiles.splice(0, tempFiles.length);
+          // console.log(item.fullPath); //console.log(item.name)
 
           // Get folder contents
-          let dirReader = item.createReader();
-          dirReader.readEntries((entries) => {
-            entries.forEach((entry) => {
-              GetFileTree(entry, path + item.name + "/");
-            });
-          });
+          // let dirReader = item.createReader();
+          // dirReader.readEntries(async (entries) => {
+          //   entries.forEach(async (entry) => {
+          //     GetFileTree(entry, path + item.name + "/");
+          //   });
+          // });
         }
       };
       for (let i = 0; i < items.length; i++) {
@@ -62,6 +85,7 @@ const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
         GetFileTree(item);
       }
 
+      console.log(tempFiles);
       onGetFile([...tempFiles]);
     },
     [onGetFile, hideDropZone]
@@ -106,15 +130,18 @@ const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
         <>
           <h1>O</h1>
           <h1>Arrasta los archivos</h1>
-          <div
-            id="dropzone"
-            ref={dropZoneRef}
-            className={dropzone}
-            onDragEnter={allowDrag}
-            onDragOver={allowDrag}
-            onDragLeave={() => hideDropZone()}
-            onDrop={handleDrop}
-          ></div>
+          {!disabled ? (
+            <div
+              ref={dropZoneRef}
+              className={dropzone}
+              onDragEnter={allowDrag}
+              onDragOver={allowDrag}
+              onDragLeave={() => hideDropZone()}
+              onDrop={handleDrop}
+            ></div>
+          ) : (
+            ""
+          )}
         </>
       ) : (
         ""
@@ -128,15 +155,18 @@ const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
         <>
           <h1>O</h1>
           <h1>Arrasta los archivos</h1>
-          <div
-            id="dropzone"
-            ref={dropZoneRef}
-            className={dropzone}
-            onDragEnter={allowDrag}
-            onDragOver={allowDrag}
-            onDragLeave={() => hideDropZone()}
-            onDrop={handleDrop}
-          ></div>
+          {!disabled ? (
+            <div
+              ref={dropZoneRef}
+              className={dropzone}
+              onDragEnter={allowDrag}
+              onDragOver={allowDrag}
+              onDragLeave={() => hideDropZone()}
+              onDrop={handleDrop}
+            ></div>
+          ) : (
+            ""
+          )}
         </>
       ) : (
         ""

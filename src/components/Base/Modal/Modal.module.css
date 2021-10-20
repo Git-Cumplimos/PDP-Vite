@@ -1,14 +1,14 @@
 /* The Modal (background) */
 .modal {
   z-index: 5;
-  overflow: auto;
 
   @apply fixed inset-0 w-full h-full justify-center content-center bg-gray-200 bg-opacity-80;
+  @apply overflow-auto;
 }
 
 /* Modal Content/Box */
 .modalContent {
-  @apply max-w-xl bg-white border-black text-black m-auto border-2;
+  @apply container md:max-w-xl bg-white border-black text-black m-auto border-2;
 }
 
 /* The Close Button */

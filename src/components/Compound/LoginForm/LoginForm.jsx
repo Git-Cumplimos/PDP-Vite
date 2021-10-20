@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { useAuth } from "../../../utils/AuthHooks";
@@ -66,7 +66,6 @@ const LoginForm = () => {
 
   return auth.cognitoUser ? (
     <>
-      <ToastContainer />
       <div className="container flex flex-row justify-center items-center">
         <RightArrow xlarge />
         <div className={card}>
@@ -98,7 +97,6 @@ const LoginForm = () => {
     </>
   ) : (
     <div className={contain}>
-      <ToastContainer />
       <form onSubmit={handleCognito}>
         <div className={field}>
           <label htmlFor="email">Usuario:</label>

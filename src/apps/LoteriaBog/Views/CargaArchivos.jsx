@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
 import Select from "../../../components/Base/Select/Select";
@@ -46,9 +46,6 @@ const CargaArchivos = () => {
         f.getMonth() + 1
       }${f.getFullYear()}${fileName}`,
     };
-    console.log(
-      f.getDate() + "" + (f.getMonth() + 1) + "" + f.getFullYear() + fileName
-    );
     bucket
       .putObject(params)
       .on("httpUploadProgress", (evt) => {
@@ -92,18 +89,24 @@ const CargaArchivos = () => {
     saveFile();
   };
 
+  useEffect(() => {
+    setProgress(0);
+    setFile("");
+    setFileName("");
+  }, [archivo]);
+
   return (
     <div>
       <Select
         id="archivos"
         label="Archivo a subir"
         options={options}
+        disabled={progress !== 0 && progress !== 100}
         value={archivo}
         onChange={(e) => setArchivo(e.target.value)}
       />
       {archivo !== "" ? (
         <Form formDir="col" onSubmit={onSubmit}>
-          <ToastContainer />
           <Input
             id={`archivo_${archivo}`}
             label={`Elegir archivo: ${
@@ -112,6 +115,7 @@ const CargaArchivos = () => {
               }).label
             }`}
             type="file"
+            disabled={progress !== 0}
             accept=".txt,.csv"
             onGetFile={onChange}
           />

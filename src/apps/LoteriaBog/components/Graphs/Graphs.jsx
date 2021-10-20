@@ -43,8 +43,8 @@ const Graphs = ({ moda = { billete: [] , serie: []} }) => {
         <>
           <h1 className="text-xl my-4">10 mas buscados</h1>
           <div
-            className={`flex justify-center gap-8 w-full ${
-              graphs ? "flex-col" : "flex-row"
+            className={`flex justify-center gap-8 flex-col w-full ${
+              !graphs ? "md:flex-row" : ""
             }`}
           >
             {Array.isArray(moda.billete) && moda.billete.length > 0 ? (

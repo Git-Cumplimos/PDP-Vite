@@ -1,9 +1,15 @@
 form.Grid {
-  @apply grid gap-4 md:w-full;
+  @apply grid gap-4 xl:w-full;
 
   grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
 }
 
 form.Flex {
   @apply flex flex-wrap justify-evenly content-center;
+}
+
+@media (max-width: 768px) {
+  form.Grid {
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  }
 }

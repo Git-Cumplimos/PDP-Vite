@@ -1,4 +1,3 @@
-import { ToastContainer } from "react-toastify";
 import { useParams, useHistory, useLocation } from "react-router-dom";
 import Select from "../../../components/Base/Select/Select";
 import CargaArchivos from "../Views/CargaArchivos";
@@ -37,7 +36,6 @@ const AdminLoteria = () => {
 
   return (
     <div className="flex flex-col justify-center items-center w-full">
-      <ToastContainer />
       <Select
         id="pagesLDB"
         label="Elegir pagina"

@@ -1,72 +1,89 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLoteria } from "../utils/LoteriaHooks";
 
-import Select from "../../../components/Base/Select/Select";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
 import Input from "../../../components/Base/Input/Input";
 import Form from "../../../components/Base/Form/Form";
+import { toast } from "react-toastify";
 
 const Premios = () => {
-  const [operacion, setOperacion] = useState("");
   const [sorteo, setSorteo] = useState("");
   const [billete, setBillete] = useState("");
   const [serie, setSerie] = useState("");
   const [phone, setPhone] = useState("");
   const [hash, setHash] = useState("");
 
-  const [msgConsulta, setMsgConsulta] = useState("");
-  const [msgPago, setMsgPago] = useState("");
+  const [winner, setWinner] = useState(false);
+  const [isSelf, setIsSelf] = useState(false);
+
+  const [disabledBtns, setDisabledBtns] = useState(false);
 
   const { isWinner, makePayment } = useLoteria();
 
-  useEffect(() => {
-    setMsgConsulta("");
-    setMsgPago("");
-  }, [operacion]);
+  const notify = (msg) => {
+    toast.info(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
+  const notifyError = (msg) => {
+    toast.error(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
   const onSubmit = (e) => {
+    setDisabledBtns(true);
     e.preventDefault();
-    switch (operacion) {
-      case "consulta":
-        isWinner(sorteo, billete, serie).then((res) => {
-          if ("msg" in res) {
-            setMsgConsulta("No ganador");
-          } else {
-            setMsgConsulta("Ganador");
-          }
-        });
-        break;
-      case "pago":
-        makePayment(sorteo, billete, serie, phone, hash).then((res) => {
-          if ("msg" in res) {
-            setMsgPago(res.msg);
-          } else {
-            setMsgPago(JSON.stringify(res));
-          }
-        });
-        break;
 
-      default:
-        break;
-    }
+    isWinner(sorteo, billete, serie)
+      .then((res) => {
+        setDisabledBtns(false);
+        if ("msg" in res) {
+          notify("No ganador");
+          setWinner(false);
+          setIsSelf(false);
+        } else {
+          notify("Ganador");
+          setWinner(true);
+          setIsSelf(true);
+        }
+      })
+      .catch(() => setDisabledBtns(false));
+  };
+
+  const onPay = (e) => {
+    setDisabledBtns(true);
+    e.preventDefault();
+
+    makePayment(sorteo, billete, serie, phone, hash)
+      .then((res) => {
+        setDisabledBtns(false);
+        if ("msg" in res) {
+          notifyError(res.msg);
+        } else {
+          notify(JSON.stringify(res));
+        }
+      })
+      .catch(() => setDisabledBtns(false));
   };
 
   return (
     <>
       <Form onSubmit={onSubmit} grid>
-        <Select
-          id="selectSorteo"
-          label="Tipo de operacion"
-          options={[
-            { value: "", label: "" },
-            { value: "consulta", label: "Consulta" },
-            { value: "pago", label: "Pago" },
-          ]}
-          required={true}
-          value={operacion}
-          onChange={(e) => setOperacion(e.target.value)}
-        />
         <Input
           id="numSorteo"
           label="Numero de sorteo"
@@ -106,7 +123,14 @@ const Premios = () => {
             setSerie(num);
           }}
         />
-        {operacion === "pago" ? (
+        <ButtonBar className="col-auto md:col-span-2">
+          <Button type="submit" disabled={disabledBtns}>
+            Consultar
+          </Button>
+        </ButtonBar>
+      </Form>
+      {winner ? (
+        <Form onSubmit={onPay} grid>
           <>
             <Input
               id="numCel"
@@ -120,26 +144,31 @@ const Premios = () => {
                 setPhone(num);
               }}
             />
-            <Input
-              id="codHash"
-              label="Codigo de seguridad"
-              type="text"
-              autoComplete="false"
-              required={true}
-              value={hash}
-              onInput={(e) => {
-                setHash(e.target.value);
-              }}
-            />
+            {isSelf ? (
+              <Input
+                id="codHash"
+                label="Codigo de seguridad"
+                type="text"
+                autoComplete="false"
+                required={true}
+                value={hash}
+                onInput={(e) => {
+                  setHash(e.target.value);
+                }}
+              />
+            ) : (
+              ""
+            )}
           </>
-        ) : (
-          ""
-        )}
-        <ButtonBar className="col-span-2">
-          <Button type="submit">Buscar</Button>
-        </ButtonBar>
-      </Form>
-      <h1>{msgConsulta || msgPago || ""}</h1>
+          <ButtonBar className="col-auto md:col-span-2">
+            <Button type="submit" disabled={disabledBtns}>
+              Confirmar pago
+            </Button>
+          </ButtonBar>
+        </Form>
+      ) : (
+        ""
+      )}
     </>
   );
 };
