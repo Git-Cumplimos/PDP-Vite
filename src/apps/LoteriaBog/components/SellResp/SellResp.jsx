@@ -17,8 +17,6 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
   if (!("msg" in sellResponse)) {
     sellResponse.fecha_venta = sellResponse.fecha_venta.replace(/-/g, "/");
 
-    console.log(sellResponse);
-
     voucherInfo["Fecha de venta"] = Intl.DateTimeFormat('es-CO', {
       year: "numeric", month: "numeric", day: "numeric"
     }).format(new Date(sellResponse.fecha_venta));
