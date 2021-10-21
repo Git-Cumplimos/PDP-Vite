@@ -59,7 +59,7 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
         </div>
       </div>
       <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
-        Loteria de bogota Transacción exitosa
+        {info["Nombre de loteria"]} Transacción exitosa
       </h1>
       <div className="flex flex-col gap-2 px-2 text-xs">
         <div className="flex flex-row justify-between w-full">

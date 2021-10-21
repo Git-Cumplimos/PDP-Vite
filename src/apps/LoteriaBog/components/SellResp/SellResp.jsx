@@ -17,6 +17,8 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
   if (!("msg" in sellResponse)) {
     sellResponse.fecha_venta = sellResponse.fecha_venta.replace(/-/g, "/");
 
+    console.log(sellResponse);
+
     voucherInfo["Fecha de venta"] = Intl.DateTimeFormat('es-CO', {
       year: "numeric", month: "numeric", day: "numeric"
     }).format(new Date(sellResponse.fecha_venta));
@@ -24,11 +26,12 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
       hour: "numeric", minute: "numeric", second: "numeric", hour12: false
     }).format(new Date(sellResponse.fecha_venta));
 
+    voucherInfo["Nombre de loteria"] = sellResponse.nom_loteria;
     voucherInfo.Comercio = sellResponse.Comercio;
     voucherInfo["Dirección"] = sellResponse.Direccion;
     voucherInfo.Fracciones = sellResponse.fracciones;
     voucherInfo["Id Transacción"] = sellResponse.id_Transaccion;
-    voucherInfo["Numero de billete"] = sellResponse.num_loteria;
+    voucherInfo["Numero de billete"] = sellResponse.num_billete;
     voucherInfo.Serie = sellResponse.serie;
     voucherInfo["Valor pagado"] = sellResponse.valor_pago;
   }
