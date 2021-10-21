@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useAuth } from "../../../utils/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
@@ -56,6 +57,8 @@ export const useLoteria = () => {
 
 export const useProvideLoteria = () => {
   // Datos consulta y compra
+  const { roleInfo } = useAuth();
+
   const [numero, setNumero] = useState("");
   const [serie, setSerie] = useState("");
   const [loterias, setLoterias] = useState(null);
@@ -116,6 +119,8 @@ export const useProvideLoteria = () => {
         can_frac_venta: parseInt(customer.fracciones),
         can_fracciones: 3,
         cantidad_frac_billete: 3,
+        id_comercio: roleInfo.id_comercio,
+        id_usuario: roleInfo.id_usuario,
       };
       try {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
@@ -125,7 +130,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [selected, customer]
+    [selected, customer, roleInfo]
   );
 
   const searchModa = useCallback(
@@ -181,20 +186,23 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-  const makePayment = useCallback(async (sorteo, billete, serie, phone, hash) => {
-    try {
-      const res = await fetchData(urls.pagoPremio, "GET", {
-        num_sorteo: sorteo,
-        bill_ganador: billete,
-        serie_ganadora: serie,
-        celular: phone,
-        hash,
-      });
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+  const makePayment = useCallback(
+    async (sorteo, billete, serie, phone, hash) => {
+      try {
+        const res = await fetchData(urls.pagoPremio, "GET", {
+          num_sorteo: sorteo,
+          bill_ganador: billete,
+          serie_ganadora: serie,
+          celular: phone,
+          hash,
+        });
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
 
   return {
     infoLoto: {
@@ -225,6 +233,6 @@ export const useProvideLoteria = () => {
     searchModa,
     getReportesVentas,
     isWinner,
-    makePayment
+    makePayment,
   };
 };

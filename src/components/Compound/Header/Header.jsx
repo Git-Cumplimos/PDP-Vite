@@ -8,9 +8,6 @@ import UserInfo from "../UserInfo/UserInfo";
 import HNavbar from "../../Base/HNavbar/HNavbar";
 import classes from "./Header.module.css";
 import Modal from "../../Base/Modal/Modal";
-import fetchData from "../../../utils/fetchData";
-
-const url = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -28,21 +25,10 @@ const Header = () => {
 
   useEffect(() => {
     if (roleInfo) {
-      fetchData(
-        url,
-        "GET",
-        {
-          id_comercio: roleInfo.id_comercio,
-          id_dispositivo: roleInfo.id_dispositivo,
-        },
-        {}
-      )
-        .then((res) => {
-          setSaldoDisponible(formatMoney.format(res["Cupo Disponible"]));
-        })
-        .catch((err) => console.error(err));
+      console.log(roleInfo);
+      setSaldoDisponible(formatMoney.format(roleInfo.quota));
     }
-  });
+  }, [roleInfo]);
 
   const { headerPDP, saldoCupo, comision, cargar, usrData, topHeader } =
     classes;

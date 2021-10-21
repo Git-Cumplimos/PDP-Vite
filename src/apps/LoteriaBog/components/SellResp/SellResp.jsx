@@ -3,9 +3,12 @@ import Button from "../../../../components/Base/Button/Button";
 import Voucher from "../Voucher/Voucher";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
+import { useAuth } from "../../../../utils/AuthHooks";
 
 const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) => {
   const printDiv = useRef();
+
+  const { getQuota } = useAuth();
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -55,6 +58,7 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
             closeModal();
             setSellResponse(null);
             setCustomer({ fracciones: "", phone: "", doc_id: "" });
+            getQuota();
           }}
         >
           Cerrar
