@@ -8,10 +8,14 @@ const LoteriaBog = () => {
   return (
     <ProvideLoteria>
       <div className="w-full flex flex-col justify-center items-center">
-        {auth.roleInfo.role === 0 ? (
-          <AdminLoteria />
+        {auth.roleInfo !== undefined && auth.roleInfo !== null ? (
+          auth.roleInfo.role === 0 ? (
+            <AdminLoteria />
+          ) : (
+            <CashierLoteria />
+          )
         ) : (
-          <CashierLoteria />
+          ""
         )}
       </div>
     </ProvideLoteria>

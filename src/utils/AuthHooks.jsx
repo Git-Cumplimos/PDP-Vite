@@ -4,8 +4,11 @@ import { appendToCognitoUserAgent } from "@aws-amplify/auth";
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
+import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
+
+const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -21,9 +24,9 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
-const checkUser = (setSignedIn, setAuthInfo, setUserInfo) => {
+const checkUser = (setSignedIn, setAuthInfo, setUserInfo, setRoleInfo) => {
   if (Auth.user === null || Auth.user === undefined) {
-    setUser(setSignedIn, setAuthInfo, setUserInfo).catch((err) =>
+    setUser(setSignedIn, setAuthInfo, setUserInfo, setRoleInfo).catch((err) =>
       console.error(err)
     );
   } else {
@@ -35,12 +38,21 @@ const checkUser = (setSignedIn, setAuthInfo, setUserInfo) => {
   }
 };
 
-const setUser = async (setSignedIn, setAuthInfo, setUserInfo) => {
+const setUser = async (setSignedIn, setAuthInfo, setUserInfo, setRoleInfo) => {
   try {
     const user = await Auth.currentAuthenticatedUser();
     setAuthInfo(user);
     if (user) setSignedIn(true);
     setUserInfo(await Auth.currentUserInfo());
+    setRoleInfo({
+      role: 1,
+      ...(await fetchData(
+        urlLog,
+        "GET",
+        { correo: "PRUEBAS@GMAIL.COM" },
+        {}
+      )),
+    });
   } catch (err) {
     setSignedIn(false);
     console.error(err);
@@ -60,8 +72,7 @@ export const useProvideAuth = () => {
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
 
-    checkUser(setSignedIn, setCognitoUser, setUserInfo);
-    setRoleInfo({ role: 1 });
+    checkUser(setSignedIn, setCognitoUser, setUserInfo, setRoleInfo);
   }, []);
 
   const history = useHistory();
@@ -88,6 +99,15 @@ export const useProvideAuth = () => {
       setCognitoUser(loggedUser);
       setSignedIn(true);
       setUserInfo(await Auth.currentUserInfo());
+      setRoleInfo({
+        role: 1,
+        ...(await fetchData(
+          urlLog,
+          "GET",
+          { correo: "PRUEBAS@GMAIL.COM" },
+          {}
+        )),
+      });
       history.push(
         location.state
           ? location.state.from
@@ -108,6 +128,7 @@ export const useProvideAuth = () => {
       .then(() => {
         setCognitoUser(null);
         setSignedIn(false);
+        setRoleInfo({});
         history.push("/login");
       })
       .catch((err) => console.error(err));

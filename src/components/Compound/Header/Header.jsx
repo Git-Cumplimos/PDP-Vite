@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../../utils/AuthHooks";
 import { useUrls } from "../../../utils/UrlsHooks";
 import BarIcon from "../../Base/BarIcon/BarIcon";
@@ -8,20 +8,48 @@ import UserInfo from "../UserInfo/UserInfo";
 import HNavbar from "../../Base/HNavbar/HNavbar";
 import classes from "./Header.module.css";
 import Modal from "../../Base/Modal/Modal";
+import fetchData from "../../../utils/fetchData";
+
+const url = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
+
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
 
 const Header = () => {
-  const auth = useAuth();
+  const { isSignedIn, roleInfo } = useAuth();
 
   const { urlsPrivate: urls } = useUrls();
 
   const [showModal, setShowModal] = useState(false);
+  const [saldoDisponible, setSaldoDisponible] = useState();
+
+  useEffect(() => {
+    if (roleInfo) {
+      fetchData(
+        url,
+        "GET",
+        {
+          id_comercio: roleInfo.id_comercio,
+          id_dispositivo: roleInfo.id_dispositivo,
+        },
+        {}
+      )
+        .then((res) => {
+          setSaldoDisponible(formatMoney.format(res["Cupo Disponible"]));
+        })
+        .catch((err) => console.error(err));
+    }
+  });
 
   const { headerPDP, saldoCupo, comision, cargar, usrData, topHeader } =
     classes;
   return (
     <header className={headerPDP}>
-      {!auth.isSignedIn ? (
-        /* !auth.cognitoUser */ true ? (
+      {!isSignedIn ? (
+        /* !cognitoUser */ true ? (
           <>
             <div className={usrData}>
               <LogoPDP large />
@@ -47,7 +75,9 @@ const Header = () => {
               <RightArrow small />
             </div>
             <div className={usrData}>
-              <div className={saldoCupo}>Saldo cupo $1.000.000</div>
+              <div className={saldoCupo}>
+                Saldo cupo {saldoDisponible || "$0.00"}
+              </div>
               <div className={comision}>Comisión $200.000</div>
               <button className={cargar} onClick={() => setShowModal(true)}>
                 Carga tu billetera
