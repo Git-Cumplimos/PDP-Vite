@@ -3,6 +3,7 @@ import Input from "../../../components/Base/Input/Input";
 import Select from "../../../components/Base/Select/Select";
 import Graphs from "../components/Graphs/Graphs";
 import { useLoteria } from "../utils/LoteriaHooks";
+import Modal from "../../../components/Base/Modal/Modal";
 
 const Reportes = ({ sorteo, sorteoExtra }) => {
   const {

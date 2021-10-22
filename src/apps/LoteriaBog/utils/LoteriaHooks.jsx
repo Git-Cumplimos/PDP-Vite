@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 import fetchData from "../../../utils/fetchData";
+import Loteria from "../Views/Loteria";
 
 const urls = {
   ordinario:
@@ -16,7 +17,9 @@ const urls = {
     "http://ventasreportes.us-east-2.elasticbeanstalk.com/reportes_ventas",
   consultaPago:
     "http://premiospago.us-east-2.elasticbeanstalk.com/pagodepremios",
-  pagoPremio: "http://premiospago.us-east-2.elasticbeanstalk.com/hash",
+  premiohash: "http://premiospago.us-east-2.elasticbeanstalk.com/hash",
+  premiofisico: "http://premiospago.us-east-2.elasticbeanstalk.com/fisico",
+  pagopremio: "http://premiospago.us-east-2.elasticbeanstalk.com/hash"
 };
 
 export const LoteriaContext = createContext({
@@ -32,6 +35,8 @@ export const LoteriaContext = createContext({
     setCustomer: null,
     sellResponse: null,
     setSellResponse: null,
+    fracciones_fisi: null,
+    setFracciones_fisi:null,
   },
   searchLoteria: () => {},
   sellLoteria: () => {},
@@ -48,6 +53,8 @@ export const LoteriaContext = createContext({
   getReportesVentas: () => {},
   isWinner: () => {},
   makePayment: () => {},
+  makePayment2: () => {},
+  pagopremio: () => {},
 });
 
 export const useLoteria = () => {
@@ -114,12 +121,13 @@ export const useProvideLoteria = () => {
         cod_loteria: selected.Cod_loteria,
         cod_distribuidor: "DIS",
         can_frac_venta: parseInt(customer.fracciones),
-        can_fracciones: 3,
+        can_fracciones: parseInt(selected.Fracciones_disponibles),
         cantidad_frac_billete: 3,
       };
       try {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
         setSellResponse(res);
+        console.log(Loteria)
       } catch (err) {
         setSellResponse(null);
         console.error(err);
@@ -175,6 +183,7 @@ export const useProvideLoteria = () => {
         bill_ganador: billete,
         serie_ganadora: serie,
       });
+      console.log(res)
       return res;
     } catch (err) {
       console.error(err);
@@ -183,12 +192,41 @@ export const useProvideLoteria = () => {
 
   const makePayment = useCallback(async (sorteo, billete, serie, phone, hash) => {
     try {
-      const res = await fetchData(urls.pagoPremio, "GET", {
+      const res = await fetchData(urls.premiohash, "GET", {
         num_sorteo: sorteo,
         bill_ganador: billete,
         serie_ganadora: serie,
         celular: phone,
         hash,
+      });
+      return res;
+      
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const makePayment2 = useCallback(async (sorteo, billete, serie, fracciones_fisi) => {
+    try {
+      const res = await fetchData(urls.premiofisico, "GET", {
+        num_sorteo: sorteo,
+        bill_ganador: billete,
+        serie_ganadora: serie,
+        cant_fracciones: fracciones_fisi,
+      });
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const pagopremio = useCallback(async (sorteo, billete, serie, hash) => {
+    try {
+      const res = await fetchData(urls.pagopremio, "GET", {
+        num_sorteo: sorteo,
+        bill_ganador: billete,
+        serie_ganadora: serie,
+        hash: hash,
       });
       return res;
     } catch (err) {
@@ -225,6 +263,8 @@ export const useProvideLoteria = () => {
     searchModa,
     getReportesVentas,
     isWinner,
-    makePayment
+    makePayment,
+    makePayment2,
+    pagopremio,
   };
 };
