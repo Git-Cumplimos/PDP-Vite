@@ -67,8 +67,6 @@ const CashierLoteria = () => {
     searchLoteriaInfo();
   }, [searchLoteriaInfo]);
 
-  // const options
-
   const SelectPage = () => {
     switch (page) {
       case "sorteos":

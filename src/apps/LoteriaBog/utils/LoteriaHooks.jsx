@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useAuth } from "../../../utils/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import Loteria from "../Views/Loteria";
 
@@ -63,6 +64,8 @@ export const useLoteria = () => {
 
 export const useProvideLoteria = () => {
   // Datos consulta y compra
+  const { roleInfo } = useAuth();
+
   const [numero, setNumero] = useState("");
   const [serie, setSerie] = useState("");
   const [loterias, setLoterias] = useState(null);
@@ -123,6 +126,8 @@ export const useProvideLoteria = () => {
         can_frac_venta: parseInt(customer.fracciones),
         can_fracciones: parseInt(selected.Fracciones_disponibles),
         cantidad_frac_billete: 3,
+        id_comercio: roleInfo.id_comercio,
+        id_usuario: roleInfo.id_usuario,
       };
       try {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
@@ -133,7 +138,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [selected, customer]
+    [selected, customer, roleInfo]
   );
 
   const searchModa = useCallback(
