@@ -15,7 +15,6 @@ const SendForm = ({
     Numero: selected ? selected.Num_billete : "",
     Serie: selected ? selected.serie : "",
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
-    ...selected
   };
 
   return (

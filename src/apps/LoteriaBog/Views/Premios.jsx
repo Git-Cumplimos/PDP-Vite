@@ -9,9 +9,19 @@ import Form from "../../../components/Base/Form/Form";
 import { toast } from "react-toastify";
 //////////////////////
 import Modal from "../../../components/Base/Modal/Modal";
-import PagarForm from "../components/SendForm/PagarForm ";
+import PagarForm from "../components/SendForm/PagarForm";
+import PagarFormFisico from "../components/SendForm/PagarFormFisico"
+import PagoResp from "../components/SellResp/PagoResp";
 
 const Premios = () => {
+  const {
+    infoLoto: {
+      pagoresponse,
+      setPagoresponse,
+    },
+    
+  } = useLoteria();
+
   const [sorteo, setSorteo] = useState("");
   const [billete, setBillete] = useState("");
   const [serie, setSerie] = useState("");
@@ -22,6 +32,7 @@ const Premios = () => {
   const [tipopago, setTipopago] = useState("");
   const [fracciones_fisi, setFracciones_fisi] = useState("");
 
+  
 
   const [winner, setWinner] = useState(false);
   const [isSelf, setIsSelf] = useState(false);
@@ -36,18 +47,35 @@ const Premios = () => {
       segundo_apellido:"",
       direccion:"",
       telefono:"",
+      fracciones:"",
 
     });
+
+    const [customer2, setCustomer2] = useState(
+      {
+        doc_id:"",
+        primer_nombre:"",
+        segundo_nombre:"",
+        primer_apellido:"",
+        segundo_apellido:"",
+        direccion:"",
+        telefono:"",
+        fracciones:"",
+  
+      }); 
   
   
   
   const closeModal = useCallback(() => {
     setShowModal(false);
+    setWinner('')
+    setPhone('')
+    setHash('')
   });
   ///////////////////////////////////////////////////////
   const [disabledBtns, setDisabledBtns] = useState(false);
 
-  const { isWinner, makePayment, makePayment2, pagopremio} = useLoteria();
+  const { isWinner, makePayment, makePayment2, pagopremio, pagopremiofisico} = useLoteria();
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -111,11 +139,11 @@ const Premios = () => {
         setShowModal(true);
         setDisabledBtns(false);
         setRespagar(res)
-        console.log(res)
+        //console.log(res)
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
-          notify(JSON.stringify(res));
+          //notify(JSON.stringify(res));
         }
       })
       
@@ -131,17 +159,17 @@ const Premios = () => {
         setShowModal(true);
         setDisabledBtns(false);
         setRespagar(res)
-        console.log(res)
+        //console.log(res)
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
-          notify(JSON.stringify(res));
+          //notify(JSON.stringify(res));
         }
       })
       
       .catch(() => setDisabledBtns(false));
   };
-
+  console.log(respagar)
   return (
     <>
       <Form onSubmit={onSubmit} grid>
@@ -260,33 +288,59 @@ const Premios = () => {
         ""
       )}
       
-      <Modal show={showModal} tipo={tipopago} handleClose={() => closeModal()}>
-        {tipopago===2? 
-        (<PagarForm
-          selected={respagar}
-          customer={customer}
-          setCustomer={setCustomer}
-          closeModal={closeModal}
-          handleSubmit={(event) => {
-            event.preventDefault();
-            pagopremio();
-          }}
-        />):
-        (<PagarForm
-          selected={respagar}
-          customer={customer}
-          setCustomer={setCustomer}
-          closeModal={closeModal}
-          handleSubmit={(event) => {
-            event.preventDefault();
-            //pagopremio();
+      {(respagar['msg']===undefined) ? <>
+      <Modal show={showModal} num_tele={phone} handleClose={() => closeModal()}>
+        
+        {pagoresponse===null ? <>
+          {tipopago===2? 
+            (<PagarForm
+              selected={respagar}
+              customer={customer}
+              setCustomer={setCustomer}
+              closeModal={closeModal}
+              handleSubmit={(event) => {
+                event.preventDefault();
+                pagopremio(sorteo, billete, serie, hash, customer, respagar, phone);
+                setSorteo('')
+                setBillete('')
+                setSerie('')
+                setPhone('')
+                setHash('')
+                setWinner('')
+              }}
+            />):
+            (<PagarFormFisico
+              selected={respagar}
+              customer={customer}
+              setCustomer={setCustomer}
+              closeModal={closeModal}
+              handleSubmit={(event) => {
+                event.preventDefault();
+                pagopremiofisico(sorteo, billete, serie, customer,respagar);
+                setSorteo('')
+                setBillete('')
+                setSerie('')
+                setPhone('')
+                setHash('')
+                setWinner('')
           }}
         />)
         }
-        
-        
+        </> :
+        (
+          <PagoResp
+            pagoresponse={pagoresponse}
+            setPagoresponse={setPagoresponse}
+            closeModal={closeModal}
+            setCustomer={setCustomer}
+          />
+        )
+       
+        }        
         
       </Modal>
+      </>: ""}
+      
     </>
   );
 };

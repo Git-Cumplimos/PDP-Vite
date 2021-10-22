@@ -3,7 +3,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
 
-const SendForm = ({
+const SendFormFisico = ({
   selected,
   customer: {
     doc_id,
@@ -13,6 +13,7 @@ const SendForm = ({
     segundo_apellido,
     direccion,
     telefono,
+    fracciones,
 
   },
   setCustomer,
@@ -42,6 +43,27 @@ const SendForm = ({
         })}
       </div>
       <div className="flex flex-col justify-center items-center mx-auto container">
+          <Input
+            id="frac"
+            label="Fracciones:"
+            type="text"
+            value={fracciones}
+            onInput={(e) => {
+              const cus = {
+                doc_id,
+                primer_nombre,
+                segundo_nombre,
+                primer_apellido,
+                segundo_apellido,
+                direccion,
+                telefono,
+                fracciones,
+            
+              };
+              cus.fracciones = e.target.value;
+              setCustomer({ ...cus });
+            }}
+          />
         <Form onSubmit={handleSubmit} grid>
           {selected["Tipo"]===2 ? 
           (<>
@@ -59,6 +81,7 @@ const SendForm = ({
                 segundo_apellido,
                 direccion,
                 telefono,
+                fracciones,
             
               };
               cus.doc_id = e.target.value;
@@ -79,6 +102,7 @@ const SendForm = ({
                 segundo_apellido,
                 direccion,
                 telefono,
+                fracciones,
             
               };
               cus.primer_nombre = e.target.value;
@@ -99,6 +123,7 @@ const SendForm = ({
                 segundo_apellido,
                 direccion,
                 telefono,
+                fracciones,
             
               };
               cus.segundo_nombre = e.target.value;
@@ -119,6 +144,7 @@ const SendForm = ({
                 segundo_apellido,
                 direccion,
                 telefono,
+                fracciones,
             
               };
               cus.primer_apellido = e.target.value;
@@ -139,6 +165,7 @@ const SendForm = ({
                 segundo_apellido,
                 direccion,
                 telefono,
+                fracciones,
             
               };
               cus.segundo_apellido = e.target.value;
@@ -159,6 +186,7 @@ const SendForm = ({
                 segundo_apellido,
                 direccion,
                 telefono,
+                fracciones,
             
               };
               cus.direccion = e.target.value;
@@ -180,6 +208,7 @@ const SendForm = ({
                 segundo_apellido,
                 direccion,
                 telefono,
+                fracciones,
             
               };
               cus.telefono = e.target.value;
@@ -216,4 +245,4 @@ const SendForm = ({
   );
 };
 
-export default SendForm;
+export default SendFormFisico;

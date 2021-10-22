@@ -20,7 +20,8 @@ const urls = {
     "http://premiospago.us-east-2.elasticbeanstalk.com/pagodepremios",
   premiohash: "http://premiospago.us-east-2.elasticbeanstalk.com/hash",
   premiofisico: "http://premiospago.us-east-2.elasticbeanstalk.com/fisico",
-  pagopremio: "http://premiospago.us-east-2.elasticbeanstalk.com/hash"
+  pagopremio: "http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados",
+  pagopremiofisico: 'http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados1',
 };
 
 export const LoteriaContext = createContext({
@@ -38,6 +39,9 @@ export const LoteriaContext = createContext({
     setSellResponse: null,
     fracciones_fisi: null,
     setFracciones_fisi:null,
+    pagoresponse: null,
+    setPagoresponse:null,
+
   },
   searchLoteria: () => {},
   sellLoteria: () => {},
@@ -56,6 +60,7 @@ export const LoteriaContext = createContext({
   makePayment: () => {},
   makePayment2: () => {},
   pagopremio: () => {},
+  pagopremiofisico: () => {},
 });
 
 export const useLoteria = () => {
@@ -76,6 +81,7 @@ export const useProvideLoteria = () => {
     doc_id: "",
   });
   const [sellResponse, setSellResponse] = useState(null);
+  const [pagoresponse, setPagoresponse] = useState(null);
 
   // Datos estadisticas
   const [moda, setModa] = useState(null);
@@ -225,19 +231,75 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-  const pagopremio = useCallback(async (sorteo, billete, serie, hash) => {
-    try {
-      const res = await fetchData(urls.pagopremio, "GET", {
+  
+
+  const pagopremio = useCallback(
+    async (sorteo, billete, serie, hash, customer, respagar, phone) => {
+      console.log(customer)
+      const req = {
+        nombre:(customer.primer_nombre+" "+customer.segundo_nombre + " " +customer.primer_apellido+" "+customer.segundo_apellido),
         num_sorteo: sorteo,
         bill_ganador: billete,
         serie_ganadora: serie,
-        hash: hash,
-      });
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+        cod_seguridad: hash,
+        direccion:(customer.direccion),
+        cod_dane_ciudad: "12",///////////
+        celular: parseInt(phone),
+        valorganado: respagar['valor ganado'],////////////////
+        tipo:parseInt(respagar.Tipo),
+        identificacion:(customer.doc_id),
+        id_usuario: 8,
+        id_comercio: 2
+
+      };
+      try {
+        const res = await fetchData(urls.pagopremio, "POST", {}, req);
+        setPagoresponse(res);
+        
+        //console.log(Loteria)
+      } catch (err) {
+        setPagoresponse(null);
+        console.error(err);
+      }
+    },
+    []
+  );
+
+  const pagopremiofisico = useCallback(
+    async (sorteo, billete, serie, customer2, respagar) => {
+
+      console.log(customer2)
+      const req = {
+        
+          nombre:(customer2.primer_nombre+" "+customer2.segundo_nombre + " " +customer2.primer_apellido+" "+customer2.segundo_apellido),
+          num_sorteo: sorteo,
+          bill_ganador: billete,
+          serie_ganadora: serie,
+          direccion:customer2.direccion,
+          cod_dane_ciudad: "12",
+          celular: customer2.telefono,
+          valorganado: respagar['valor ganado'],
+          tipo:parseInt(respagar.Tipo),
+          identificacion: customer2.doc_id,
+          fraciones:customer2.fracciones,
+          id_usuario: 8,
+          id_comercio: 2
+      
+      
+
+      };
+      try {
+        const res = await fetchData(urls.pagopremiofisico, "POST", {}, req);
+        setPagoresponse(res);
+        
+        //console.log(Loteria)
+      } catch (err) {
+        setPagoresponse(null);
+        console.error(err);
+      }
+    },
+    []
+  );  
 
   return {
     infoLoto: {
@@ -253,6 +315,8 @@ export const useProvideLoteria = () => {
       setCustomer,
       sellResponse,
       setSellResponse,
+      pagoresponse,
+      setPagoresponse,
     },
     searchLoteria,
     sellLoteria,
@@ -271,5 +335,6 @@ export const useProvideLoteria = () => {
     makePayment,
     makePayment2,
     pagopremio,
+    pagopremiofisico,
   };
 };
