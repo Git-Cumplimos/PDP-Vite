@@ -9,6 +9,7 @@ import Amplify from "aws-amplify";
 import awsconfig from "./aws-exports";
 import { ToastContainer } from "react-toastify";
 
+import dayjs from 'dayjs'
 Amplify.configure(awsconfig);
 
 function App() {
@@ -29,8 +30,10 @@ function App() {
       <ProvideUrls>
         <ToastContainer />
         <Admin />
+        <h3 align='right'>Hola {(dayjs().format())}</h3>
       </ProvideUrls>
     </ProvideAuth>
+    
   );
 }
 

@@ -1,3 +1,5 @@
+
+
 import { useCallback, useEffect, useState } from "react";
 
 import Button from "../../../components/Base/Button/Button";
@@ -35,7 +37,7 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
-  const [disabledSelect, setDisabledSelect] = useState(false);
+  
 
  
   useEffect(() => {
@@ -46,6 +48,7 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
     setLoterias("");
     setPage(1);
     setMaxPages(1);
+    
   }, [setSellResponse, setNumero, setSerie, setCustomer, setLoterias]);
 
   const closeModal = useCallback(() => {
@@ -57,7 +60,7 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
     <>
       <Form grid>
         <Select
-          disabled={disabledSelect}
+          disabled={serie!=="" || numero!==""}
           id="selectSorteo"
           label="Tipo de sorteo"
           options={[
@@ -82,9 +85,8 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
             setNumero(num);
-            setDisabledSelect(true)
-            if(num==="" && serie===""){
-            setDisabledSelect(false)}
+            
+            
           }}
           onLazyInput={{
             callback: (e) => {
@@ -110,9 +112,7 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
             setSerie(num);
-            setDisabledSelect(true)
-            if(num==="" && serie===""){
-            setDisabledSelect(false)}
+            
           }}
           onLazyInput={{
             callback: (e) => {
