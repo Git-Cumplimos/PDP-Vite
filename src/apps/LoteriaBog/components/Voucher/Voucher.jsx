@@ -5,6 +5,7 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
   const { divPrint } = classes;
 
   return (
+    
     <div className={divPrint} ref={refPrint}>
       <div className="flex flex-row justify-center items-center w-full">
         <LogoPDP xsmall />

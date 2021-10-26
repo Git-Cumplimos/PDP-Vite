@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, useLocation, Link, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import AppIcons from "../../../components/Base/AppIcons/AppIcons";
 import fetchData from "../../../utils/fetchData";
@@ -10,6 +10,7 @@ import Sorteos from "../../../assets/svg/SORTEO-01.svg";
 import Pago from "../../../assets/svg/PAGO-01.svg";
 import Reporte from "../../../assets/svg/REPORTES-01.svg";
 import Button from "../../../components/Base/Button/Button";
+import dayjs from 'dayjs'
 
 const urlLoto =
   "http://loginconsulta.us-east-2.elasticbeanstalk.com/contiploteria";
@@ -17,8 +18,11 @@ const urlLoto =
 const CashierLoteria = () => {
   const [sorteo, setSorteo] = useState(null);
   const [sorteoExtra, setSorteoExtra] = useState(null);
+  const [day, setDay] = useState('');
+  const [hora, setHora] = useState('');
 
   const { page } = useParams();
+  const  history  = useHistory();
   const { pathname } = useLocation();
 
   const notifyError = useCallback((msg = "Error") => {
@@ -65,11 +69,18 @@ const CashierLoteria = () => {
 
   useEffect(() => {
     searchLoteriaInfo();
+    setDay(dayjs().day())
+    setHora(dayjs().format('HH'))
   }, [searchLoteriaInfo]);
 
   const SelectPage = () => {
     switch (page) {
       case "sorteos":
+        if(day===4 && parseInt(hora)>=20){
+          notifyError('Fuera de horario')
+          history.push(`/${pathname.split("/")[1]}`)
+          return <div></div>;
+        }
         return <Loteria sorteo={sorteo} sorteoExtra={sorteoExtra} />;
 
       case "premios":

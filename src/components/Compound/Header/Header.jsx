@@ -25,7 +25,7 @@ const Header = () => {
 
   useEffect(() => {
     if (roleInfo) {
-      console.log(roleInfo);
+      //console.log(roleInfo);
       setSaldoDisponible(formatMoney.format(roleInfo.quota));
     }
   }, [roleInfo]);

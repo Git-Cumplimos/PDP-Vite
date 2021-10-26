@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback} from "react";
 import { useLoteria } from "../utils/LoteriaHooks";
 
 
@@ -51,18 +51,7 @@ const Premios = () => {
 
     });
 
-    const [customer2, setCustomer2] = useState(
-      {
-        doc_id:"",
-        primer_nombre:"",
-        segundo_nombre:"",
-        primer_apellido:"",
-        segundo_apellido:"",
-        direccion:"",
-        telefono:"",
-        fracciones:"",
-  
-      }); 
+     
   
   
   
@@ -71,6 +60,19 @@ const Premios = () => {
     setWinner('')
     setPhone('')
     setHash('')
+    setFracciones_fisi('')
+    setCustomer({
+      doc_id:"",
+      primer_nombre:"",
+      segundo_nombre:"",
+      primer_apellido:"",
+      segundo_apellido:"",
+      direccion:"",
+      telefono:"",
+      fracciones:"",
+    
+
+    })
   });
   ///////////////////////////////////////////////////////
   const [disabledBtns, setDisabledBtns] = useState(false);
@@ -108,20 +110,27 @@ const Premios = () => {
 
     isWinner(sorteo, billete, serie)
       .then((res) => {
+        
         setDisabledBtns(false);
-        setTipopago(res[0]['Tipo'])
-        console.log(tipopago)
+        
+        if('msg' in res){
+          notify("El pago de premios de este sorteo ya esta vencido");
+          setWinner(false);
+          setIsSelf(false);
+        }
         if (res[0]['Estado'] === false) {
           notify("No ganador");
           setWinner(false);
           setIsSelf(false);
-        } else {
-          if(res[0]['Tipo']===2) {
-          notify("Ganador");
-          setWinner(true);
-          setIsSelf(true);
+        }else {
+            if(res[0]['Tipo']===2) {
+            notify("Ganador");
+            setTipopago(res[0]['Tipo'])
+            setWinner(true);
+            setIsSelf(true);
         }else{
           notify("Ganador!! pero no vendido por Punto de Pago");
+          setTipopago(res[0]['Tipo'])
           setWinner(true);
           setIsSelf(false);  
         }
@@ -139,7 +148,7 @@ const Premios = () => {
         setShowModal(true);
         setDisabledBtns(false);
         setRespagar(res)
-        //console.log(res)
+        
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
@@ -159,7 +168,7 @@ const Premios = () => {
         setShowModal(true);
         setDisabledBtns(false);
         setRespagar(res)
-        //console.log(res)
+        
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
@@ -169,7 +178,7 @@ const Premios = () => {
       
       .catch(() => setDisabledBtns(false));
   };
-  console.log(respagar)
+ 
   return (
     <>
       <Form onSubmit={onSubmit} grid>
@@ -179,6 +188,7 @@ const Premios = () => {
           type="text"
           minLength="4"
           maxLength="4"
+          required={true}
           autoComplete="false"
           value={sorteo}
           onInput={(e) => {
@@ -192,6 +202,7 @@ const Premios = () => {
           type="text"
           minLength="1"/*Verificar para que se puedan poner ceros a la izquierda*/ 
           maxLength="4"
+          required={true}
           autoComplete="false"
           value={billete}
           onInput={(e) => {
@@ -205,6 +216,7 @@ const Premios = () => {
           type="text"
           minLength="1"/*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="3"
+          required={true}
           autoComplete="false"
           value={serie}
           onInput={(e) => {
@@ -263,7 +275,9 @@ const Premios = () => {
             <Input
               id="frac"
               label="Numero de fracciones"
-              type="text"
+              type="number"
+              max='3'
+              min='1'
               autoComplete="false"
               required={true}
               value={fracciones_fisi}
@@ -311,6 +325,7 @@ const Premios = () => {
             />):
             (<PagarFormFisico
               selected={respagar}
+              canFrac={fracciones_fisi}
               customer={customer}
               setCustomer={setCustomer}
               closeModal={closeModal}
@@ -323,6 +338,7 @@ const Premios = () => {
                 setPhone('')
                 setHash('')
                 setWinner('')
+                setFracciones_fisi('')
           }}
         />)
         }

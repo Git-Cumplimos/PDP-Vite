@@ -5,6 +5,7 @@ import Input from "../../../../components/Base/Input/Input";
 
 const SendFormFisico = ({
   selected,
+  canFrac,
   customer: {
     doc_id,
     primer_nombre,
@@ -27,6 +28,26 @@ const SendFormFisico = ({
     
   };
 
+  const params = (number) => {
+    let resp=number
+    
+    if(canFrac===1){
+       resp=number
+    }
+    if(canFrac===2 && number.length>1 && resp[1]!==',' ){
+       resp=resp[0]+","+resp[1]
+    }
+
+    if(canFrac===3 && number.length>2 && resp[1]!==',' ){
+      console.log(resp[0])
+       resp=resp[0]+","+resp[1]+","+resp[2]
+      
+    }
+
+    return resp;   
+  };
+ 
+
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">
@@ -47,6 +68,8 @@ const SendFormFisico = ({
             id="frac"
             label="Fracciones:"
             type="text"
+            maxLength={`${(canFrac-1)*2 + 1}`}
+            minLengt={`${(canFrac-1)*2 + 1}`}
             value={fracciones}
             onInput={(e) => {
               const cus = {
@@ -60,7 +83,8 @@ const SendFormFisico = ({
                 fracciones,
             
               };
-              cus.fracciones = e.target.value;
+
+              cus.fracciones =params(e.target.value);
               setCustomer({ ...cus });
             }}
           />
@@ -232,6 +256,8 @@ const SendFormFisico = ({
                   segundo_apellido:"",
                   direccion:"",
                   telefono:"",
+                  fracciones:"",
+                
             
                 });
               }}

@@ -6,13 +6,14 @@ import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import { useAuth } from "../../../../utils/AuthHooks";
 
 const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) => {
+  const pageStyle = `@page {size: 80mm 160mm}`;
   const printDiv = useRef();
 
   const { getQuota } = useAuth();
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
-    // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
+      pageStyle:pageStyle
   });
 
   const voucherInfo = {};

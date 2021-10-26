@@ -138,7 +138,6 @@ export const useProvideLoteria = () => {
       try {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
         setSellResponse(res);
-        console.log(Loteria)
       } catch (err) {
         setSellResponse(null);
         console.error(err);
@@ -194,7 +193,6 @@ export const useProvideLoteria = () => {
         bill_ganador: billete,
         serie_ganadora: serie,
       });
-      console.log(res)
       return res;
     } catch (err) {
       console.error(err);
@@ -235,7 +233,7 @@ export const useProvideLoteria = () => {
 
   const pagopremio = useCallback(
     async (sorteo, billete, serie, hash, customer, respagar, phone) => {
-      console.log(customer)
+     
       const req = {
         nombre:(customer.primer_nombre+" "+customer.segundo_nombre + " " +customer.primer_apellido+" "+customer.segundo_apellido),
         num_sorteo: sorteo,
@@ -245,11 +243,11 @@ export const useProvideLoteria = () => {
         direccion:(customer.direccion),
         cod_dane_ciudad: "12",///////////
         celular: parseInt(phone),
-        valorganado: respagar['valor ganado'],////////////////
+        valorganado: respagar['valor ganado'],
         tipo:parseInt(respagar.Tipo),
         identificacion:(customer.doc_id),
-        id_usuario: 8,
-        id_comercio: 2
+        id_comercio: roleInfo.id_comercio,
+        id_usuario: roleInfo.id_usuario,
 
       };
       try {
@@ -268,7 +266,7 @@ export const useProvideLoteria = () => {
   const pagopremiofisico = useCallback(
     async (sorteo, billete, serie, customer2, respagar) => {
 
-      console.log(customer2)
+      
       const req = {
         
           nombre:(customer2.primer_nombre+" "+customer2.segundo_nombre + " " +customer2.primer_apellido+" "+customer2.segundo_apellido),
@@ -282,9 +280,8 @@ export const useProvideLoteria = () => {
           tipo:parseInt(respagar.Tipo),
           identificacion: customer2.doc_id,
           fraciones:customer2.fracciones,
-          id_usuario: 8,
-          id_comercio: 2
-      
+          id_comercio: roleInfo.id_comercio,
+          id_usuario: roleInfo.id_usuario,
       
 
       };

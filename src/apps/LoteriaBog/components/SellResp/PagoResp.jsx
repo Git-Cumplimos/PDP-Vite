@@ -5,7 +5,7 @@ import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import { useAuth } from "../../../../utils/AuthHooks";
 
-const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal, setCustomer }) => {
+const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
   const printDiv = useRef();
 
   const { getQuota } = useAuth();
@@ -16,9 +16,9 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal, setCustomer }) =>
   });
 
   const voucherPagoInfo = {};
-  console.log(pagoresponse)
+  
 
-  if (2===2) {
+  if (!("msg" in pagoresponse)) {
     // pagoresponse.fecha_venta = pagoresponse.fecha_venta.replace(/-/g, "/");
 
     voucherPagoInfo["Fecha de pago"] = Intl.DateTimeFormat('es-CO', {
@@ -26,7 +26,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal, setCustomer }) =>
     voucherPagoInfo["Hora"] = Intl.DateTimeFormat('es-CO', {
        hour: "numeric", minute: "numeric", second: "numeric", hour12: false}).format(new Date());
 
-    // voucherPagoInfo["Nombre de loteria"] = pagoresponse.nom_loteria;
+    voucherPagoInfo["Nombre de loteria"] ='Lotería de Bogotá'; //pagoresponse.nom_loteria;
     // voucherPagoInfo.Comercio = pagoresponse.Comercio;
     // voucherPagoInfo["Dirección"] = pagoresponse.Direccion;
     // voucherPagoInfo.Fracciones = pagoresponse.fracciones;

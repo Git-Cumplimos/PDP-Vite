@@ -1,5 +1,3 @@
-
-
 import { useCallback, useEffect, useState } from "react";
 
 import Button from "../../../components/Base/Button/Button";
@@ -37,7 +35,7 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
-  
+ 
 
  
   useEffect(() => {
@@ -48,7 +46,7 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
     setLoterias("");
     setPage(1);
     setMaxPages(1);
-    
+  
   }, [setSellResponse, setNumero, setSerie, setCustomer, setLoterias]);
 
   const closeModal = useCallback(() => {
@@ -86,7 +84,6 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
             const num = parseInt(e.target.value) || "";
             setNumero(num);
             
-            
           }}
           onLazyInput={{
             callback: (e) => {
@@ -112,7 +109,6 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
             setSerie(num);
-            
           }}
           onLazyInput={{
             callback: (e) => {

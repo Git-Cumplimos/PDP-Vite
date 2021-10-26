@@ -10,6 +10,8 @@ import awsconfig from "./aws-exports";
 import { ToastContainer } from "react-toastify";
 
 import dayjs from 'dayjs'
+
+
 Amplify.configure(awsconfig);
 
 function App() {
@@ -24,13 +26,13 @@ function App() {
       document.body.classList.add("loggedBackground");
     }
   }, [pathname]);
-
+ 
   return (
     <ProvideAuth>
       <ProvideUrls>
         <ToastContainer />
         <Admin />
-        <h3 align='right'>Hola {(dayjs().format())}</h3>
+        <h3 className='fecha'>{(dayjs().format(' DD/MM/YYYY HH:MM'))}</h3>
       </ProvideUrls>
     </ProvideAuth>
     

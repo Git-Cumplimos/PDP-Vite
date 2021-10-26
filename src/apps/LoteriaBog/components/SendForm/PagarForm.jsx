@@ -171,26 +171,6 @@ const SendForm = ({
             }}
             
           />
-          {/* <Input
-            id="telefono"
-            label="Telefono:"
-            type="text"
-            value={num_tele}
-            onInput={(e) => {
-              const cus ={
-                doc_id,
-                primer_nombre,
-                segundo_nombre,
-                primer_apellido,
-                segundo_apellido,
-                direccion,
-                telefono,
-            
-              };
-              cus.telefono = e.target.value;
-              setCustomer({ ...cus });
-            }}
-          />           */}
           </>)
           :""}
           
