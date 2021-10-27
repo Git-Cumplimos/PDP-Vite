@@ -46,27 +46,33 @@ export const useProvideAuth = () => {
       const user = await Auth.currentAuthenticatedUser();
       setCognitoUser(user);
       if (user) setSignedIn(true);
-      setUserInfo(await Auth.currentUserInfo());
-      const suserInfo = await fetchData(
-        urlLog,
-        "GET",
-        { correo: "PRUEBAS@GMAIL.COM" },
-        {}
-      );
-      const quota = await fetchData(
-        urlQuota,
-        "GET",
-        {
-          id_comercio: suserInfo.id_comercio,
-          id_dispositivo: suserInfo.id_dispositivo,
-        },
-        {}
-      );
-      setRoleInfo({
-        role: 1,
-        ...suserInfo,
-        quota: Object.values(quota)[0],
-      });
+      const usrInfo = await Auth.currentUserInfo();
+      setUserInfo(usrInfo);
+      if (usrInfo?.attributes?.email) {
+        const suserInfo = await fetchData(
+          urlLog,
+          "GET",
+          { correo: usrInfo?.attributes?.email },
+          {}
+        );
+        const quota = await fetchData(
+          urlQuota,
+          "GET",
+          {
+            id_comercio: 2, //suserInfo.id_comercio,
+            id_dispositivo: 233, //suserInfo.id_dispositivo,
+          },
+          {}
+        );
+        setRoleInfo({
+          role: 1,
+          // ...suserInfo,
+          id_comercio: 2,
+          id_dispositivo: 233,
+          id_usuatio: 8,
+          quota: Object.values(quota)[0],
+        });
+      }
     } catch (err) {
       setSignedIn(false);
       console.error(err);
@@ -83,6 +89,32 @@ export const useProvideAuth = () => {
       Auth.currentUserInfo()
         .then((usr) => setUserInfo(usr))
         .catch((err) => console.error(err));
+
+      fetchData(
+        urlLog,
+        "GET",
+        { correo: Auth.user?.attributes?.email },
+        {}
+      ).then((suserInfo) => {
+        fetchData(
+          urlQuota,
+          "GET",
+          {
+            id_comercio: 2, //suserInfo.id_comercio,
+            id_dispositivo: 233, //suserInfo.id_dispositivo,
+          },
+          {}
+        ).then((quota) => {
+          setRoleInfo({
+            role: 1,
+            // ...suserInfo,
+            id_comercio: 2,
+            id_dispositivo: 233,
+            id_usuatio: 8,
+            quota: Object.values(quota)[0],
+          });
+        });
+      });
     }
   }, [setUser]);
 
@@ -116,27 +148,33 @@ export const useProvideAuth = () => {
         );
         setCognitoUser(loggedUser);
         setSignedIn(true);
-        setUserInfo(await Auth.currentUserInfo());
-        const suserInfo = await fetchData(
-          urlLog,
-          "GET",
-          { correo: "PRUEBAS@GMAIL.COM" },
-          {}
-        );
-        const quota = await fetchData(
-          urlQuota,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
-            id_dispositivo: suserInfo.id_dispositivo,
-          },
-          {}
-        );
-        setRoleInfo({
-          role: 1,
-          ...suserInfo,
-          quota: Object.values(quota)[0],
-        });
+        const usrInfo = await Auth.currentUserInfo();
+        setUserInfo(usrInfo);
+        if (usrInfo?.attributes?.email) {
+          const suserInfo = await fetchData(
+            urlLog,
+            "GET",
+            { correo: usrInfo?.attributes?.email },
+            {}
+          );
+          const quota = await fetchData(
+            urlQuota,
+            "GET",
+            {
+              id_comercio: 2, //suserInfo.id_comercio,
+              id_dispositivo: 233, //suserInfo.id_dispositivo,
+            },
+            {}
+          );
+          setRoleInfo({
+            role: 1,
+            // ...suserInfo,
+            id_comercio: 2,
+            id_dispositivo: 233,
+            id_usuatio: 8,
+            quota: Object.values(quota)[0],
+          });
+        }
         history.push(
           state ? state.from : pathname === "/login" ? "/" : pathname
         );
@@ -167,8 +205,8 @@ export const useProvideAuth = () => {
       urlQuota,
       "GET",
       {
-        id_comercio: roleInfo.id_comercio,
-        id_dispositivo: roleInfo.id_dispositivo,
+        id_comercio: 2, //suserInfo.id_comercio,
+        id_dispositivo: 233, //suserInfo.id_dispositivo,
       },
       {}
     );
