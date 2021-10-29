@@ -32,7 +32,7 @@ function App() {
       <ProvideUrls>
         <ToastContainer />
         <Admin />
-        <h3 className='fecha'>{(dayjs().format(' DD/MM/YYYY HH:MM'))}</h3>
+        {/* <h3 className='fecha'>{(dayjs().format(' DD/MM/YYYY HH:MM'))}</h3> */}
       </ProvideUrls>
     </ProvideAuth>
     

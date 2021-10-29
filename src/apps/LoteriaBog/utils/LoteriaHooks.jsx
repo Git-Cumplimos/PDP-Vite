@@ -22,6 +22,9 @@ const urls = {
   premiofisico: "http://premiospago.us-east-2.elasticbeanstalk.com/fisico",
   pagopremio: "http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados",
   pagopremiofisico: 'http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados1',
+  crearRol: 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/crear_rol',
+  ConsultaCrearSort: "http://sorteos.us-east-2.elasticbeanstalk.com/sorteo",
+  CambiarSort: "http://sorteos.us-east-2.elasticbeanstalk.com/cambio_sorteo"
 };
 
 export const LoteriaContext = createContext({
@@ -41,7 +44,8 @@ export const LoteriaContext = createContext({
     setFracciones_fisi:null,
     pagoresponse: null,
     setPagoresponse:null,
-
+    crearRolresp:null,
+    setCrearRolresp:null,
   },
   searchLoteria: () => {},
   sellLoteria: () => {},
@@ -61,6 +65,9 @@ export const LoteriaContext = createContext({
   makePayment2: () => {},
   pagopremio: () => {},
   pagopremiofisico: () => {},
+  crearRol: () => {},
+  ConsultaCrearSort: () => {},
+  CambiarSort: () => {},
 });
 
 export const useLoteria = () => {
@@ -82,6 +89,7 @@ export const useProvideLoteria = () => {
   });
   const [sellResponse, setSellResponse] = useState(null);
   const [pagoresponse, setPagoresponse] = useState(null);
+  const [crearRolresp, setCrearRolresp] = useState(null);
 
   // Datos estadisticas
   const [moda, setModa] = useState(null);
@@ -253,6 +261,7 @@ export const useProvideLoteria = () => {
       try {
         const res = await fetchData(urls.pagopremio, "POST", {}, req);
         setPagoresponse(res);
+        return res;
         
         //console.log(Loteria)
       } catch (err) {
@@ -296,7 +305,76 @@ export const useProvideLoteria = () => {
       }
     },
     []
-  );  
+  );
+  
+  const crearRol = useCallback(
+    async (pnombre,snombre,papellido,sapellido, rol, email, comercio) => {
+
+      
+      const req = {
+        
+          nombre:pnombre+" "+snombre+" "+papellido+" "+sapellido,
+          rol:rol,
+          email: email,
+          comercio: comercio,
+      
+
+      };
+      try {
+        const res = await fetchData(urls.crearRol, "POST", {}, req);
+        setCrearRolresp(res);
+        return res;
+        
+        //c.onsole.log(Loteria)
+      } catch (err) {
+        setCrearRolresp(null);
+        console.error(err);
+      }
+    },
+    []
+  );
+
+  const ConsultaCrearSort = useCallback(async () => {
+    try {
+      const res = await fetchData(urls.ConsultaCrearSort, "GET", {
+        num_loteria:'02',
+      });
+      
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+
+  const CambiarSort = useCallback(
+    async (resp) => {
+
+      
+      const req = {
+        
+        num_sorteo:2609,
+        num_sorteo_ante:2608,
+        fecha:"2021-11-04",
+        tipo_sorteo:1,
+        num_loteria:"02",
+        nom_loteria:"LoteriaBogota"
+    
+      
+
+      };
+      try {
+        const res = await fetchData(urls.CambiarSort, "POST", {}, req);
+        return res;
+        
+        
+      } catch (err) {
+
+        console.error(err);
+      }
+    },
+    []
+  );
 
   return {
     infoLoto: {
@@ -314,6 +392,8 @@ export const useProvideLoteria = () => {
       setSellResponse,
       pagoresponse,
       setPagoresponse,
+      crearRolresp,
+      setCrearRolresp,
     },
     searchLoteria,
     sellLoteria,
@@ -333,5 +413,8 @@ export const useProvideLoteria = () => {
     makePayment2,
     pagopremio,
     pagopremiofisico,
+    crearRol,
+    ConsultaCrearSort,
+    CambiarSort,
   };
 };

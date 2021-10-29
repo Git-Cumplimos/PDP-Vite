@@ -37,12 +37,14 @@ const CashierLoteria = () => {
     });
   }, []);
 
+
+  //Este servicio sonsulta los sorteos disponibles de la loteria
   const searchLoteriaInfo = useCallback(() => {
     fetchData(
       urlLoto,
       "GET",
       {
-        num_loteria: "01",
+        num_loteria: "02",//este valor debe cambiar dependiendo de la loterie 
       },
       {}
     )

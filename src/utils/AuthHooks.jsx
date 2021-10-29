@@ -63,7 +63,7 @@ export const useProvideAuth = () => {
         {}
       );
       setRoleInfo({
-        role: 1,
+        role: 0,/////////////////////////////////////////////Hacer que no sea dato quemado
         ...suserInfo,
         quota: Object.values(quota)[0],
       });
@@ -133,7 +133,7 @@ export const useProvideAuth = () => {
           {}
         );
         setRoleInfo({
-          role: 1,
+          role: 0,/////////////////////////////////////////////Hacer que no sea dato quemado
           ...suserInfo,
           quota: Object.values(quota)[0],
         });

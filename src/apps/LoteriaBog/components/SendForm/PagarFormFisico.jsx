@@ -2,6 +2,7 @@ import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
+import { useState, useEffect } from "react";
 
 const SendFormFisico = ({
   selected,
@@ -27,25 +28,42 @@ const SendFormFisico = ({
     "Valor ganado": selected ? "$"+selected['valor ganado'] : "",
     
   };
-
-  const params = (number) => {
+    // const [frac1, setFrac1] = useState(false);
+    // const [frac2, setFrac2] = useState(false);
+    // const [frac3, setFrac3] = useState(false);
+    
+    // console.log(frac1,frac2,frac3)
+  
+    const params = (number) => {
+    
     let resp=number
     
     if(canFrac===1){
-       resp=number
+      resp=number
+           
     }
     if(canFrac===2 && number.length>1 && resp[1]!==',' ){
-       resp=resp[0]+","+resp[1]
-    }
-
-    if(canFrac===3 && number.length>2 && resp[1]!==',' ){
-      console.log(resp[0])
-       resp=resp[0]+","+resp[1]+","+resp[2]
+      resp=resp[0]+","+resp[1]
       
     }
-
-    return resp;   
+    if(canFrac===3 && number.length>2 && resp[1]!==',' ){
+      resp=resp[0]+","+resp[1]+","+resp[2]    
+      
+    }
+    
+    return resp;  
+    
+      
+       
   };
+
+  const [disabledBtns, setDisabledBtns] = useState(false);
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    setDisabledBtns(true)
+    handleSubmit()
+  }
  
 
   return (
@@ -64,6 +82,19 @@ const SendFormFisico = ({
         })}
       </div>
       <div className="flex flex-col justify-center items-center mx-auto container">
+          {/* <form grid>
+            <p>Fracciones: </p>
+            <div>
+                <input type="checkbox" id="frac1" value={frac1} onChange={() => {
+                setFrac1(!frac1)}}/> <label for="frac1">1</label>
+
+                <input type="checkbox" id="frac2" value={frac2} onChange={() => {
+                setFrac2(!frac2)}}/> <label for="frac2">2</label>
+
+                <input type="checkbox" id="frac3" value={frac3} onChange={() => {
+                setFrac3(!frac3)}}/> <label for="frac3">3</label>
+            </div>
+          </form> */}
           <Input
             id="frac"
             label="Fracciones:"
@@ -72,6 +103,7 @@ const SendFormFisico = ({
             minLengt={`${(canFrac-1)*2 + 1}`}
             value={fracciones}
             onInput={(e) => {
+              
               const cus = {
                 doc_id,
                 primer_nombre,
@@ -83,12 +115,24 @@ const SendFormFisico = ({
                 fracciones,
             
               };
-
-              cus.fracciones =params(e.target.value);
-              setCustomer({ ...cus });
+                
+              if((parseInt(e.target.value[e.target.value.length-1])>3)||(parseInt(e.target.value[e.target.value.length-1])<1)){
+                  
+              }else{
+                cus.fracciones =params(e.target.value); 
+                if(isNaN(cus.fracciones[0])===true || (parseInt(cus.fracciones[0])<1 || parseInt(cus.fracciones[0])>3)){
+                  cus.fracciones=''
+              }if(cus.fracciones.length>2 && (isNaN(cus.fracciones[2])===true || (parseInt(cus.fracciones[2])<1 || parseInt(cus.fracciones[2])>3) )){
+                  cus.fracciones=''
+              }if(cus.fracciones.length>3 && (isNaN(cus.fracciones[4])===true || (parseInt(cus.fracciones[4])<1 || parseInt(cus.fracciones[4])>3))){
+                cus.fracciones=''
+              }               
+            
+              setCustomer({ ...cus });  
+              } 
             }}
           />
-        <Form onSubmit={handleSubmit} grid>
+        <Form onSubmit={onSubmit} grid>
           {selected["Tipo"]===2 ? 
           (<>
           <Input
@@ -109,7 +153,12 @@ const SendFormFisico = ({
             
               };
               cus.doc_id = e.target.value;
-              setCustomer({ ...cus });
+              if(isNaN(cus.doc_id[cus.doc_id.length-1])===true && cus.doc_id.length>0){
+                
+              }else{
+                setCustomer({ ...cus });
+              }
+              
             }}
           />
           <Input
@@ -236,14 +285,18 @@ const SendFormFisico = ({
             
               };
               cus.telefono = e.target.value;
-              setCustomer({ ...cus });
+              if(isNaN(cus.telefono[cus.telefono.length-1])===true && cus.telefono.length>0){
+                
+              }else{
+                setCustomer({ ...cus });
+              }
             }}
           />          
           </>)
           :""}
           
           <ButtonBar>
-            <Button type="submit">Aceptar</Button>
+            <Button type="submit" disabled={disabledBtns}>Aceptar</Button>
             <Button
               type="button"
               onClick={() => {

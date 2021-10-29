@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
@@ -7,6 +7,8 @@ import AWS from "aws-sdk";
 import ProgressBar from "../../../components/Base/ProgressBar/ProgressBar";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
+import Modal from "../../../components/Base/Modal/Modal";
+import CargarForm from "../components/CargarForm/CargarForm";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_accessKeyId,
@@ -20,23 +22,27 @@ const CargaArchivos = () => {
     { value: "Asignacion", label: "Asignacion" },
     { value: "Resultados", label: "Resultados" },
     { value: "Liquidacion", label: "Liquidacion de premios" },
-    { value: "PagoDePremios", label: "Pago de premios" },
+    { value: "Calendario", label: "Calendario de Sorteos" },
   ];
   const [archivo, setArchivo] = useState("");
   const [file, setFile] = useState("");
   const [fileName, setFileName] = useState("");
 
+  const [showModal, setShowModal] = useState(false);
+
   const [progress, setProgress] = useState(0);
 
   const S3_BUCKET = process.env.REACT_APP_BUCKET;
   const REGION = process.env.REACT_APP_REGION;
-
+  //console.log(S3_BUCKET)
   const bucket = new AWS.S3({
     params: { Bucket: S3_BUCKET },
     region: REGION,
   });
 
   const saveFile = () => {
+    setDisabledBtns(true)
+    closeModal();
     const f = new Date();
     const params = {
       ACL: "public-read",
@@ -83,10 +89,13 @@ const CargaArchivos = () => {
       }
     }
   };
-
+  const [disabledBtns, setDisabledBtns] = useState(false);
+  
   const onSubmit = (event) => {
     event.preventDefault();
-    saveFile();
+    //saveFile();
+    setShowModal(true)
+    setDisabledBtns(false)
   };
 
   useEffect(() => {
@@ -95,6 +104,11 @@ const CargaArchivos = () => {
     setFileName("");
   }, [archivo]);
 
+  const closeModal = useCallback(() => {
+    setShowModal(false);
+    
+  });
+  //console.log(progress)
   return (
     <div>
       <Select
@@ -145,7 +159,22 @@ const CargaArchivos = () => {
       ) : (
         ""
       )}
+      <Modal show={showModal}  handleClose={() => closeModal()}>
+            <CargarForm
+              selected={archivo}
+              file={fileName}
+              disabledBtns={disabledBtns}              
+              closeModal={closeModal}
+              handleSubmit={() => {
+                saveFile();
+              }}
+            />
+
+      </Modal>
+      
     </div>
+    
+    
   );
 };
 

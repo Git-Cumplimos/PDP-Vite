@@ -312,8 +312,7 @@ const Premios = () => {
               customer={customer}
               setCustomer={setCustomer}
               closeModal={closeModal}
-              handleSubmit={(event) => {
-                event.preventDefault();
+              handleSubmit={() => {
                 pagopremio(sorteo, billete, serie, hash, customer, respagar, phone);
                 setSorteo('')
                 setBillete('')
@@ -329,8 +328,7 @@ const Premios = () => {
               customer={customer}
               setCustomer={setCustomer}
               closeModal={closeModal}
-              handleSubmit={(event) => {
-                event.preventDefault();
+              handleSubmit={() => {
                 pagopremiofisico(sorteo, billete, serie, customer,respagar);
                 setSorteo('')
                 setBillete('')

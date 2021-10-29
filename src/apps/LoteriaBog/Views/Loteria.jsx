@@ -194,9 +194,9 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
             customer={customer}
             setCustomer={setCustomer}
             closeModal={closeModal}
-            handleSubmit={(event) => {
-              event.preventDefault();
+            handleSubmit={() => {              
               sellLoteria(sorteo);
+
             }}
           />
         ) : (

@@ -2,6 +2,7 @@ import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
+import { useState } from "react";
 //import { useAuth } from "../../../../utils/AuthHooks";
 
 const SendForm = ({
@@ -16,7 +17,6 @@ const SendForm = ({
     telefono,
 
   },
-  num_tele,
   setCustomer,
   closeModal,
   handleSubmit,
@@ -30,6 +30,14 @@ const SendForm = ({
     
   };
   // const { getQuota } = useAuth();
+
+  const [disabledBtns, setDisabledBtns] = useState(false);
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    setDisabledBtns(true)
+    handleSubmit()
+  }
 
   return (
     <>
@@ -47,7 +55,7 @@ const SendForm = ({
         })}
       </div>
       <div className="flex flex-col justify-center items-center mx-auto container">
-        <Form onSubmit={handleSubmit} grid>
+        <Form onSubmit={onSubmit} grid>
           {selected["Tipo"]===2 ? 
           (<>
           <Input
@@ -67,7 +75,11 @@ const SendForm = ({
             
               };
               cus.doc_id = e.target.value;
-              setCustomer({ ...cus });
+              if(isNaN(cus.doc_id[cus.doc_id.length-1])===true && cus.doc_id.length>0){
+                
+              }else{
+                setCustomer({ ...cus });
+              }
             }}
           />
           <Input
@@ -175,7 +187,7 @@ const SendForm = ({
           :""}
           
           <ButtonBar>
-            <Button type="submit">Aceptar</Button>
+            <Button type="submit" disabled={disabledBtns}>Aceptar</Button>
             <Button
               type="button"
               onClick={() => {
