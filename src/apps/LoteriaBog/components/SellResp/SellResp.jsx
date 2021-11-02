@@ -10,6 +10,7 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
   const printDiv = useRef();
 
   const { getQuota } = useAuth();
+  const { roleInfo } = useAuth();
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -29,13 +30,16 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
     }).format(new Date(sellResponse.fecha_venta));
 
     voucherInfo["Nombre de loteria"] = sellResponse.nom_loteria;
-    voucherInfo.Comercio = sellResponse.Comercio;
-    voucherInfo["Dirección"] = sellResponse.Direccion;
+    voucherInfo.Comercio = roleInfo['nombre comercio'];
+    voucherInfo["Dirección"] = roleInfo.direccion;
     voucherInfo.Fracciones = sellResponse.fracciones;
     voucherInfo["Id Transacción"] = sellResponse.id_Transaccion;
     voucherInfo["Numero de billete"] = sellResponse.num_billete;
+    voucherInfo.telefono = roleInfo.telefono;
     voucherInfo.Serie = sellResponse.serie;
     voucherInfo["Valor pagado"] = sellResponse.valor_pago;
+    voucherInfo.Id_registro = sellResponse['id registro'];
+    voucherInfo["No.terminal"] = roleInfo.id_dispositivo;
   }
 
   return "msg" in sellResponse ? (

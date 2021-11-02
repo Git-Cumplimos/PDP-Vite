@@ -34,7 +34,7 @@ const VoucherPago = ({ setPrintDiv, refPrint, ...info }) => {
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">No. terminal:</h1>
-            <h1>15924</h1>
+            <h1>{info['No.terminal']}</h1>
           </div>
         </div>
         <div className="flex flex-row justify-between w-full">
@@ -44,13 +44,13 @@ const VoucherPago = ({ setPrintDiv, refPrint, ...info }) => {
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Telefono:</h1>
-            <h1>3002204195</h1>
+            <h1>{info.telefono}</h1>
           </div>
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
             <h1 className="font-semibold">Id Trx:</h1>
-            <h1>12345</h1>
+            <h1>{info["Id_registro"]}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Id Transacción:</h1>

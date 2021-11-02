@@ -14,8 +14,12 @@ import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
 
-const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
-const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
+const urlLog = "http://loginconsulta.us-east-2.elasticbeanstalk.com/login";
+const urlQuota = "http://loginconsulta.us-east-2.elasticbeanstalk.com/cupo";
+
+//////////////////////Despliegue de estos servicios anterior
+// const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
+// const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -41,6 +45,8 @@ export const useProvideAuth = () => {
 
   const [roleInfo, setRoleInfo] = useState(null);
 
+ 
+
   const setUser = useCallback(async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
@@ -53,6 +59,7 @@ export const useProvideAuth = () => {
         { correo: "PRUEBAS@GMAIL.COM" },
         {}
       );
+
       const quota = await fetchData(
         urlQuota,
         "GET",
@@ -62,8 +69,9 @@ export const useProvideAuth = () => {
         },
         {}
       );
+      
       setRoleInfo({
-        role: 0,/////////////////////////////////////////////Hacer que no sea dato quemado
+        role: suserInfo.rol,/////////////////////////////////////////////Hacer que no sea dato quemado
         ...suserInfo,
         quota: Object.values(quota)[0],
       });
@@ -120,7 +128,7 @@ export const useProvideAuth = () => {
         const suserInfo = await fetchData(
           urlLog,
           "GET",
-          { correo: "PRUEBAS@GMAIL.COM" },
+          { correo: "PRUEBAS@GMAIL.COM" }, ////////Por ahora  quemado porque los demas correos no tienen cupo
           {}
         );
         const quota = await fetchData(
@@ -133,7 +141,7 @@ export const useProvideAuth = () => {
           {}
         );
         setRoleInfo({
-          role: 0,/////////////////////////////////////////////Hacer que no sea dato quemado
+          role: suserInfo.rol,/////////////////////////////////////////////Hacer que no sea dato quemado
           ...suserInfo,
           quota: Object.values(quota)[0],
         });

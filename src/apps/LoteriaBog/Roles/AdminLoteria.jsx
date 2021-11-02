@@ -105,7 +105,7 @@ const AdminLoteria = () => {
     });
   };
 
-
+  
   return (
     <div className="flex flex-col justify-center items-center w-full">
       <Select
@@ -120,8 +120,7 @@ const AdminLoteria = () => {
         }
       />
       {posibles.includes(page) ? <SelectPage /> : ""}
-      
-      { (day===5) ? (
+      { (day===0) ? (
         <Form formDir="col" onSubmit={onSubmit}>
             <ButtonBar>
               <Button type="submit" diabled={disabledBtns}>Crear nuevo sorteo</Button>
@@ -130,9 +129,10 @@ const AdminLoteria = () => {
           ) : (
             ""
           )}
-      <Modal show={showModal} respCon={respCon} handleClose={() => closeModal()}>
+      <Modal show={showModal} handleClose={() => closeModal()}>
           <SortForm
             closeModal={closeModal}
+            respCon={respCon} 
           />     
 
       </Modal>

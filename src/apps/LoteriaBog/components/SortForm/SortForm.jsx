@@ -14,7 +14,7 @@ const SortForm = ({
   
 
 }) => {
-
+  
   const [respCrearSort, setRespCrearSort] = useState('');
   const [disabledBtns, setDisabledBtns] = useState(false); 
 
@@ -24,7 +24,7 @@ const SortForm = ({
   const onSubmit = (e) => {
     e.preventDefault();
     
-    CambiarSort()
+    CambiarSort(respCon)
       .then((res) => {
         //setShowModal(true);
         //setDisabledBtns(false);
@@ -48,7 +48,7 @@ const SortForm = ({
     });
   };
   
-
+  
   return (
     <>
 

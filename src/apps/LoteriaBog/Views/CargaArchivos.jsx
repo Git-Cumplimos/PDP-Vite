@@ -74,6 +74,22 @@ const CargaArchivos = () => {
     });
   };
 
+  const notify = (msg) => {
+   
+    toast.info(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+  if(progress===100){
+    notify('Cargue éxitoso!!')
+    
+  }
   const onChange = (files) => {
     if (Array.isArray(Array.from(files))) {
       files = Array.from(files);
@@ -117,7 +133,9 @@ const CargaArchivos = () => {
         options={options}
         disabled={progress !== 0 && progress !== 100}
         value={archivo}
-        onChange={(e) => setArchivo(e.target.value)}
+        onChange={(e) => {setArchivo(e.target.value)
+                 setProgress(0)}
+        }
       />
       {archivo !== "" ? (
         <Form formDir="col" onSubmit={onSubmit}>

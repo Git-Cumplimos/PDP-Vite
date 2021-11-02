@@ -145,6 +145,7 @@ export const useProvideLoteria = () => {
       };
       try {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
+        console.log(res)
         setSellResponse(res);
       } catch (err) {
         setSellResponse(null);
@@ -261,15 +262,16 @@ export const useProvideLoteria = () => {
       try {
         const res = await fetchData(urls.pagopremio, "POST", {}, req);
         setPagoresponse(res);
+        console.log(res)
         return res;
-        
+               
         //console.log(Loteria)
       } catch (err) {
         setPagoresponse(null);
         console.error(err);
       }
     },
-    []
+    [roleInfo]
   );
 
   const pagopremiofisico = useCallback(
@@ -298,13 +300,13 @@ export const useProvideLoteria = () => {
         const res = await fetchData(urls.pagopremiofisico, "POST", {}, req);
         setPagoresponse(res);
         
-        //console.log(Loteria)
+        console.log(res)
       } catch (err) {
         setPagoresponse(null);
         console.error(err);
       }
     },
-    []
+    [roleInfo]
   );
   
   const crearRol = useCallback(
@@ -350,15 +352,15 @@ export const useProvideLoteria = () => {
   const CambiarSort = useCallback(
     async (resp) => {
 
-      
+      console.log(resp)
       const req = {
         
-        num_sorteo:2609,
-        num_sorteo_ante:2608,
-        fecha:"2021-11-04",
-        tipo_sorteo:1,
-        num_loteria:"02",
-        nom_loteria:"LoteriaBogota"
+        num_sorteo:resp.sorteo,
+        num_sorteo_ante:resp['sorteo anterior'],
+        fecha:resp.fecha,
+        tipo_sorteo:resp.tipo,
+        num_loteria:resp.loteria,
+        nom_loteria:resp['nombre loteria']
     
       
 
