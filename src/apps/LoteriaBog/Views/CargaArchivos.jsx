@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
@@ -7,6 +7,9 @@ import AWS from "aws-sdk";
 import ProgressBar from "../../../components/Base/ProgressBar/ProgressBar";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
+import Modal from "../../../components/Base/Modal/Modal";
+import CargarForm from "../components/CargarForm/CargarForm";
+import { useLoteria } from "../utils/LoteriaHooks";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_accessKeyId,
@@ -20,23 +23,26 @@ const CargaArchivos = () => {
     { value: "Asignacion", label: "Asignacion" },
     { value: "Resultados", label: "Resultados" },
     { value: "Liquidacion", label: "Liquidacion de premios" },
-    { value: "PagoDePremios", label: "Pago de premios" },
+    { value: "Calendario", label: "Calendario de Sorteos" },
   ];
   const [archivo, setArchivo] = useState("");
   const [file, setFile] = useState("");
   const [fileName, setFileName] = useState("");
 
+  const [showModal, setShowModal] = useState(false);
+
   const [progress, setProgress] = useState(0);
 
   const S3_BUCKET = process.env.REACT_APP_BUCKET;
   const REGION = process.env.REACT_APP_REGION;
-
+  //console.log(S3_BUCKET)
   const bucket = new AWS.S3({
     params: { Bucket: S3_BUCKET },
     region: REGION,
   });
 
   const saveFile = () => {
+    setDisabledBtns(true)
     const f = new Date();
     const params = {
       ACL: "public-read",
@@ -50,11 +56,30 @@ const CargaArchivos = () => {
       .putObject(params)
       .on("httpUploadProgress", (evt) => {
         setProgress(Math.round((evt.loaded / evt.total) * 100));
+        setTimeout(() => {
+          closeModal();
+          EstadoArchivos()
+          .then((res) => {
+            console.log(res)
+            if('Motivo' in res[0]){
+              if(res[0]['Estado']===1){
+              notify(res[0]['Motivo'])}
+              else{
+                notifyError(res[0]['Motivo'])  
+              }
+            }
+
+          })
+          
+        }, 3000);
       })
       .send((err) => {
-        if (err) console.error("Error upluading the file", err);
+        if (err) notifyError("Error en la conexión a la base de datos", err);
       });
+      
   };
+
+  const { EstadoArchivos } = useLoteria();
 
   const notifyError = (msg) => {
     toast.error(msg, {
@@ -68,6 +93,21 @@ const CargaArchivos = () => {
     });
   };
 
+  const notify = (msg) => {
+   
+    toast.info(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+  if(progress===100){
+    
+  }
   const onChange = (files) => {
     if (Array.isArray(Array.from(files))) {
       files = Array.from(files);
@@ -83,10 +123,13 @@ const CargaArchivos = () => {
       }
     }
   };
-
+  const [disabledBtns, setDisabledBtns] = useState(false);
+  
   const onSubmit = (event) => {
     event.preventDefault();
-    saveFile();
+    //saveFile();
+    setShowModal(true)
+    setDisabledBtns(false)
   };
 
   useEffect(() => {
@@ -95,6 +138,14 @@ const CargaArchivos = () => {
     setFileName("");
   }, [archivo]);
 
+  const closeModal = useCallback(() => {
+    setShowModal(false);
+    setProgress(0)
+    setFile("");
+    setFileName("");
+    
+  });
+  //console.log(progress)
   return (
     <div>
       <Select
@@ -103,7 +154,9 @@ const CargaArchivos = () => {
         options={options}
         disabled={progress !== 0 && progress !== 100}
         value={archivo}
-        onChange={(e) => setArchivo(e.target.value)}
+        onChange={(e) => {setArchivo(e.target.value)
+                 setProgress(0)}
+        }
       />
       {archivo !== "" ? (
         <Form formDir="col" onSubmit={onSubmit}>
@@ -145,7 +198,22 @@ const CargaArchivos = () => {
       ) : (
         ""
       )}
+      <Modal show={showModal}  handleClose={() => closeModal()}>
+            <CargarForm
+              selected={archivo}
+              file={fileName}
+              disabledBtns={disabledBtns}              
+              closeModal={closeModal}
+              handleSubmit={() => {
+                saveFile();
+              }}
+            />
+
+      </Modal>
+      
     </div>
+    
+    
   );
 };
 

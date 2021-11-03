@@ -2,6 +2,7 @@ import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
+import { useState } from "react";
 
 const SendForm = ({
   selected,
@@ -17,7 +18,13 @@ const SendForm = ({
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
   };
 
+  const [disabledBtns, setDisabledBtns] = useState(false);
 
+  const onSubmit = (e) => {
+    e.preventDefault();
+    setDisabledBtns(true)
+    handleSubmit()
+  }
 
   return (
     <>
@@ -35,7 +42,7 @@ const SendForm = ({
         })}
       </div>
       <div className="flex flex-col justify-center items-center mx-auto container">
-        <Form onSubmit={handleSubmit} grid>
+        <Form onSubmit={onSubmit} grid>
           <Input
             id="cantFrac"
             label="Fracciones a comprar"
@@ -74,7 +81,7 @@ const SendForm = ({
             }}
           />
           <ButtonBar>
-            <Button type="submit">Aceptar</Button>
+            <Button type="submit" disabled={disabledBtns}>Aceptar</Button>
             <Button
               type="button"
               onClick={() => {

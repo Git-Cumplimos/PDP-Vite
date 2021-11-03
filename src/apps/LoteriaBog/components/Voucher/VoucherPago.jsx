@@ -1,11 +1,10 @@
 import classes from "./Voucher.module.css";
 import LogoPDP from "../../../../components/Base/LogoPDP/LogoPDP";
 
-const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
+const VoucherPago = ({ setPrintDiv, refPrint, ...info }) => {
   const { divPrint } = classes;
 
   return (
-    
     <div className={divPrint} ref={refPrint}>
       <div className="flex flex-row justify-center items-center w-full">
         <LogoPDP xsmall />
@@ -17,8 +16,8 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
       <div className="flex flex-col gap-2 px-2 text-xs">
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">Fecha de venta:</h1>
-            <h1>{info["Fecha de venta"]}</h1>
+            <h1 className="font-semibold">Fecha de pago:</h1>
+            <h1>{info["Fecha de pago"]}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Hora:</h1>
@@ -51,11 +50,11 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
             <h1 className="font-semibold">Id Trx:</h1>
-            <h1>{info.Id_registro}</h1>
+            <h1>{info["Id_registro"]}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Id Transacción:</h1>
-            <h1>{info["Id Transacción"]}</h1>
+            <h1>215</h1> 
           </div>
         </div>
       </div>
@@ -91,4 +90,4 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
   );
 };
 
-export default Voucher;
+export default VoucherPago;

@@ -1,7 +1,6 @@
 import { Auth } from "@aws-amplify/auth";
 import { Logger } from "@aws-amplify/core";
 import { appendToCognitoUserAgent } from "@aws-amplify/auth";
-
 import {
   createContext,
   useCallback,
@@ -14,8 +13,12 @@ import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
 
-const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
-const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
+const urlLog = "http://loginconsulta.us-east-2.elasticbeanstalk.com/login";
+const urlQuota = "http://loginconsulta.us-east-2.elasticbeanstalk.com/cupo";
+
+//////////////////////Despliegue de estos servicios anterior
+// const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
+// const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -41,32 +44,41 @@ export const useProvideAuth = () => {
 
   const [roleInfo, setRoleInfo] = useState(null);
 
+ 
+
   const setUser = useCallback(async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
       setCognitoUser(user);
       if (user) setSignedIn(true);
-      setUserInfo(await Auth.currentUserInfo());
-      const suserInfo = await fetchData(
-        urlLog,
-        "GET",
-        { correo: "PRUEBAS@GMAIL.COM" },
-        {}
-      );
-      const quota = await fetchData(
-        urlQuota,
-        "GET",
-        {
-          id_comercio: suserInfo.id_comercio,
-          id_dispositivo: suserInfo.id_dispositivo,
-        },
-        {}
-      );
-      setRoleInfo({
-        role: 1,
-        ...suserInfo,
-        quota: Object.values(quota)[0],
-      });
+      const usrInfo = await Auth.currentUserInfo();
+      setUserInfo(usrInfo);
+      if (usrInfo?.attributes?.email) {
+        const suserInfo = await fetchData(
+          urlLog,
+          "GET",
+          { correo: usrInfo?.attributes?.email },
+          {}
+        );
+       
+        const quota = await fetchData(
+          urlQuota,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+            id_dispositivo: suserInfo.id_dispositivo,
+          },
+          {}
+        );
+        console.log(quota)
+        setRoleInfo({
+          role: suserInfo.rol,
+          ...suserInfo,
+          
+          quota: quota['cupo disponible'],
+          comision: quota['comisiones'],
+        });
+      }
     } catch (err) {
       setSignedIn(false);
       console.error(err);
@@ -83,6 +95,34 @@ export const useProvideAuth = () => {
       Auth.currentUserInfo()
         .then((usr) => setUserInfo(usr))
         .catch((err) => console.error(err));
+
+      fetchData(
+        urlLog,
+        "GET",
+        { correo: Auth.user?.attributes?.email },
+        {}
+      ).then((suserInfo) => {
+        fetchData(
+          urlQuota,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+            id_dispositivo: suserInfo.id_dispositivo,
+          },
+          {}
+        ).then((quota) => {
+          setRoleInfo({
+            role: suserInfo.rol,
+            ...suserInfo,
+            // id_comercio: 2,
+            // id_dispositivo: 233,
+            // id_usuatio: 8,
+            quota: quota['cupo disponible'],
+            comision: quota['comisiones'],
+                        
+          });
+        });
+      });
     }
   }, [setUser]);
 
@@ -116,27 +156,36 @@ export const useProvideAuth = () => {
         );
         setCognitoUser(loggedUser);
         setSignedIn(true);
-        setUserInfo(await Auth.currentUserInfo());
-        const suserInfo = await fetchData(
-          urlLog,
-          "GET",
-          { correo: "PRUEBAS@GMAIL.COM" },
-          {}
-        );
-        const quota = await fetchData(
-          urlQuota,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
-            id_dispositivo: suserInfo.id_dispositivo,
-          },
-          {}
-        );
-        setRoleInfo({
-          role: 1,
-          ...suserInfo,
-          quota: Object.values(quota)[0],
-        });
+        const usrInfo = await Auth.currentUserInfo();
+        setUserInfo(usrInfo);
+        if (usrInfo?.attributes?.email) {
+          const suserInfo = await fetchData(
+            urlLog,
+            "GET",
+            { correo: usrInfo?.attributes?.email },
+            {}
+          );
+          
+          const quota = await fetchData(
+            urlQuota,
+            "GET",
+            {
+              id_comercio: suserInfo.id_comercio,
+              id_dispositivo: suserInfo.id_dispositivo,
+            },
+            {}
+          );
+                   
+          setRoleInfo({
+            role: suserInfo.rol,
+            ...suserInfo,
+            // id_comercio: 2,
+            // id_dispositivo: 233,
+            // id_usuatio: 8,
+            quota: quota['cupo disponible'],
+            comision: quota['comisiones'],
+          });
+        }
         history.push(
           state ? state.from : pathname === "/login" ? "/" : pathname
         );
@@ -172,10 +221,13 @@ export const useProvideAuth = () => {
       },
       {}
     );
-    tempRole.quota = Object.values(quota)[0];
+    tempRole.quota = quota['cupo disponible'];
+    tempRole.comision= quota['comisiones']
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
 
+  
+  
   return {
     isSignedIn,
     cognitoUser,
