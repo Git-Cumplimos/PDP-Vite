@@ -11,8 +11,7 @@ import Pago from "../../../assets/svg/PAGO-01.svg";
 import Reporte from "../../../assets/svg/REPORTES-01.svg";
 import Button from "../../../components/Base/Button/Button";
 
-const urlLoto =
-  "http://loginconsulta.us-east-2.elasticbeanstalk.com/contiploteria";
+const urlLoto ="http://loginconsulta.us-east-2.elasticbeanstalk.com/contiploteria";
 
 const CashierLoteria = () => {
   const [sorteo, setSorteo] = useState(null);

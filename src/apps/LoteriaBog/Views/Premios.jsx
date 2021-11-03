@@ -48,7 +48,6 @@ const Premios = () => {
   const onSubmit = (e) => {
     setDisabledBtns(true);
     e.preventDefault();
-
     isWinner(sorteo, billete, serie)
       .then((res) => {
         setDisabledBtns(false);
