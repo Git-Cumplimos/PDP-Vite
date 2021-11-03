@@ -83,7 +83,8 @@ const AdminLoteria = () => {
       .then((res) => {
         //setShowModal(true);
         //setDisabledBtns(false);
-        if('msg' in res){
+        console.log(res)
+        if(res.estado===0){          
           notifyError(res.msg)
         }else{
           setRespCon(res)
@@ -120,7 +121,7 @@ const AdminLoteria = () => {
         }
       />
       {posibles.includes(page) ? <SelectPage /> : ""}
-      { (day===0) ? (
+      { (day===3) ? (
         <Form formDir="col" onSubmit={onSubmit}>
             <ButtonBar>
               <Button type="submit" diabled={disabledBtns}>Crear nuevo sorteo</Button>

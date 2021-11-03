@@ -9,6 +9,7 @@ import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
 import Modal from "../../../components/Base/Modal/Modal";
 import CargarForm from "../components/CargarForm/CargarForm";
+import { useLoteria } from "../utils/LoteriaHooks";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_accessKeyId,
@@ -42,7 +43,6 @@ const CargaArchivos = () => {
 
   const saveFile = () => {
     setDisabledBtns(true)
-    closeModal();
     const f = new Date();
     const params = {
       ACL: "public-read",
@@ -56,11 +56,30 @@ const CargaArchivos = () => {
       .putObject(params)
       .on("httpUploadProgress", (evt) => {
         setProgress(Math.round((evt.loaded / evt.total) * 100));
+        setTimeout(() => {
+          closeModal();
+          EstadoArchivos()
+          .then((res) => {
+            console.log(res)
+            if('Motivo' in res[0]){
+              if(res[0]['Estado']===1){
+              notify(res[0]['Motivo'])}
+              else{
+                notifyError(res[0]['Motivo'])  
+              }
+            }
+
+          })
+          
+        }, 3000);
       })
       .send((err) => {
-        if (err) console.error("Error upluading the file", err);
+        if (err) notifyError("Error en la conexión a la base de datos", err);
       });
+      
   };
+
+  const { EstadoArchivos } = useLoteria();
 
   const notifyError = (msg) => {
     toast.error(msg, {
@@ -87,7 +106,6 @@ const CargaArchivos = () => {
     });
   };
   if(progress===100){
-    notify('Cargue éxitoso!!')
     
   }
   const onChange = (files) => {
@@ -122,6 +140,9 @@ const CargaArchivos = () => {
 
   const closeModal = useCallback(() => {
     setShowModal(false);
+    setProgress(0)
+    setFile("");
+    setFileName("");
     
   });
   //console.log(progress)

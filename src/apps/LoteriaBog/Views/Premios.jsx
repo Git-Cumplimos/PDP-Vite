@@ -200,28 +200,34 @@ const Premios = () => {
           id="numBillete"
           label="Numero de billete"
           type="text"
-          minLength="1"/*Verificar para que se puedan poner ceros a la izquierda*/ 
+          minLength="4"/*Verificar para que se puedan poner ceros a la izquierda*/ 
           maxLength="4"
           required={true}
           autoComplete="false"
           value={billete}
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setBillete(num);
+            if(!isNaN(e.target.value)){
+              const num = (e.target.value);
+              setBillete(num);
+              }
+           
+            
           }}
         />
         <Input
           id="numSerie"
           label="Numero de serie"
           type="text"
-          minLength="1"/*Verificar para que se puedan poner ceros a la izquierda*/
+          minLength="3"/*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="3"
           required={true}
           autoComplete="false"
           value={serie}
-          onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setSerie(num);
+          onInput={(e) => {            
+            if(!isNaN(e.target.value)){
+              const num = (e.target.value);
+              setSerie(num);
+              }
           }}
         />
         <ButtonBar className="col-auto md:col-span-2">
@@ -242,8 +248,10 @@ const Premios = () => {
               required={true}
               value={phone}
               onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setPhone(num);
+                if(!isNaN(e.target.value)){
+                  const num = (e.target.value);
+                  setPhone(num);
+                  }
               }}
             />
             {isSelf ? (

@@ -28,7 +28,7 @@ const SortForm = ({
       .then((res) => {
         //setShowModal(true);
         //setDisabledBtns(false);
-        
+          console.log(res)
           setRespCrearSort(res)
           notify(res[0]['msg'])
           closeModal()

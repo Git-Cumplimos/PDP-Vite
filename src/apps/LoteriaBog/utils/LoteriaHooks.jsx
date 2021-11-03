@@ -8,7 +8,6 @@ import {
 import { useAuth } from "../../../utils/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import Loteria from "../Views/Loteria";
-
 const urls = {
   ordinario:
     "http://loteriacons.us-east-2.elasticbeanstalk.com/consultas_loteria",
@@ -24,7 +23,8 @@ const urls = {
   pagopremiofisico: 'http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados1',
   crearRol: 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/crear_rol',
   ConsultaCrearSort: "http://sorteos.us-east-2.elasticbeanstalk.com/sorteo",
-  CambiarSort: "http://sorteos.us-east-2.elasticbeanstalk.com/cambio_sorteo"
+  CambiarSort: "http://sorteos.us-east-2.elasticbeanstalk.com/cambio_sorteo",
+  EstadoArchivos: "http://loteriacons.us-east-2.elasticbeanstalk.com/logs",
 };
 
 export const LoteriaContext = createContext({
@@ -68,6 +68,7 @@ export const LoteriaContext = createContext({
   crearRol: () => {},
   ConsultaCrearSort: () => {},
   CambiarSort: () => {},
+  EstadoArchivos: () => {},
 });
 
 export const useLoteria = () => {
@@ -124,7 +125,7 @@ export const useProvideLoteria = () => {
       console.error(err);
     }
   }, []);
-
+  
   const sellLoteria = useCallback(
     async (sorteo) => {
       const req = {
@@ -136,7 +137,7 @@ export const useProvideLoteria = () => {
         vendedor: 1,
         celular: parseInt(customer.phone),
         cod_loteria: selected.Cod_loteria,
-        cod_distribuidor: "DIS",
+        cod_distribuidor: "PPAGO",////////////////////////////////////#########################
         can_frac_venta: parseInt(customer.fracciones),
         can_fracciones: parseInt(selected.Fracciones_disponibles),
         cantidad_frac_billete: 3,
@@ -145,7 +146,6 @@ export const useProvideLoteria = () => {
       };
       try {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
-        console.log(res)
         setSellResponse(res);
       } catch (err) {
         setSellResponse(null);
@@ -250,7 +250,7 @@ export const useProvideLoteria = () => {
         serie_ganadora: serie,
         cod_seguridad: hash,
         direccion:(customer.direccion),
-        cod_dane_ciudad: "12",///////////
+        cod_dane_ciudad: "12",////////////////////////////////////#########################
         celular: parseInt(phone),
         valorganado: respagar['valor ganado'],
         tipo:parseInt(respagar.Tipo),
@@ -262,10 +262,7 @@ export const useProvideLoteria = () => {
       try {
         const res = await fetchData(urls.pagopremio, "POST", {}, req);
         setPagoresponse(res);
-        console.log(res)
         return res;
-               
-        //console.log(Loteria)
       } catch (err) {
         setPagoresponse(null);
         console.error(err);
@@ -285,7 +282,7 @@ export const useProvideLoteria = () => {
           bill_ganador: billete,
           serie_ganadora: serie,
           direccion:customer2.direccion,
-          cod_dane_ciudad: "12",
+          cod_dane_ciudad: "12",////////////////////////////////////#########################
           celular: customer2.telefono,
           valorganado: respagar['valor ganado'],
           tipo:parseInt(respagar.Tipo),
@@ -299,8 +296,6 @@ export const useProvideLoteria = () => {
       try {
         const res = await fetchData(urls.pagopremiofisico, "POST", {}, req);
         setPagoresponse(res);
-        
-        console.log(res)
       } catch (err) {
         setPagoresponse(null);
         console.error(err);
@@ -326,8 +321,6 @@ export const useProvideLoteria = () => {
         const res = await fetchData(urls.crearRol, "POST", {}, req);
         setCrearRolresp(res);
         return res;
-        
-        //c.onsole.log(Loteria)
       } catch (err) {
         setCrearRolresp(null);
         console.error(err);
@@ -339,7 +332,7 @@ export const useProvideLoteria = () => {
   const ConsultaCrearSort = useCallback(async () => {
     try {
       const res = await fetchData(urls.ConsultaCrearSort, "GET", {
-        num_loteria:'02',
+        num_loteria:'02',////////////////////////////////////#########################
       });
       
       return res;
@@ -352,7 +345,6 @@ export const useProvideLoteria = () => {
   const CambiarSort = useCallback(
     async (resp) => {
 
-      console.log(resp)
       const req = {
         
         num_sorteo:resp.sorteo,
@@ -377,6 +369,16 @@ export const useProvideLoteria = () => {
     },
     []
   );
+
+  const EstadoArchivos = useCallback(async () => {
+    try {
+      const res = await fetchData(urls.EstadoArchivos, "GET", {});
+      console.log(res)
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   return {
     infoLoto: {
@@ -418,5 +420,6 @@ export const useProvideLoteria = () => {
     crearRol,
     ConsultaCrearSort,
     CambiarSort,
+    EstadoArchivos,
   };
 };

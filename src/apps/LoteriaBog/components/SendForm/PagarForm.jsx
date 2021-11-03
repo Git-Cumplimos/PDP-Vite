@@ -62,6 +62,7 @@ const SendForm = ({
             id="num_id"
             label="Identificación:"
             type="text"
+            required={true}
             value={doc_id}
             onInput={(e) => {
               const cus = {
@@ -86,6 +87,7 @@ const SendForm = ({
             id="pnombre"
             label="Primer nombre:"
             type="text"
+            required={true}
             value={primer_nombre}
             onInput={(e) => {
               const cus ={
@@ -103,7 +105,7 @@ const SendForm = ({
             }}
           />
           <Input
-            id="pnombre"
+            id="snombre"
             label="Segundo nombre:"
             type="text"
             value={segundo_nombre}
@@ -126,6 +128,7 @@ const SendForm = ({
             id="papellido"
             label="Primer apellido:"
             type="text"
+            required={true}
             value={primer_apellido}
             onInput={(e) => {
               const cus ={
@@ -166,6 +169,7 @@ const SendForm = ({
             id="direccion"
             label="Dirección:"
             type="text"
+            required={true}
             value={direccion}
             onInput={(e) => {
               const cus ={

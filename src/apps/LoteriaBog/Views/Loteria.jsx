@@ -81,13 +81,15 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
           autoComplete="false"
           value={numero}
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setNumero(num);
-            
+    
+            if(!isNaN(e.target.value)){
+              const num = (e.target.value);
+              setNumero(num);
+              }
           }}
           onLazyInput={{
             callback: (e) => {
-              const num = parseInt(e.target.value) || "";
+              const num = (e.target.value) || "";
               setPage(1);
               searchLoteria(sorteo, num, serie, 1).then((max) => {
                 if (max !== undefined) {
@@ -107,12 +109,14 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
           autoComplete="false"
           value={serie}
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
+            if(!isNaN(e.target.value)){
+            const num = (e.target.value);
             setSerie(num);
+            }
           }}
           onLazyInput={{
             callback: (e) => {
-              const num = parseInt(e.target.value) || "";
+              const num = (e.target.value) || "";
               setPage(1);
               searchLoteria(sorteo, numero, num, 1).then((max) => {
                 if (max !== undefined) {

@@ -22,11 +22,12 @@ const Header = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [saldoDisponible, setSaldoDisponible] = useState();
+  const [comisionTotal, setComisionTotal]= useState();
 
   useEffect(() => {
     if (roleInfo) {
-      //console.log(roleInfo);
       setSaldoDisponible(formatMoney.format(roleInfo.quota));
+      setComisionTotal(formatMoney.format(roleInfo.comision))
     }
   }, [roleInfo]);
 
@@ -64,7 +65,7 @@ const Header = () => {
               <div className={saldoCupo}>
                 Saldo cupo {saldoDisponible || "$0.00"}
               </div>
-              <div className={comision}>Comisión $200.000</div>
+              <div className={comision}>Comisión {comisionTotal || "$0.00"}</div>
               <button className={cargar} onClick={() => setShowModal(true)}>
                 Carga tu billetera
               </button>
