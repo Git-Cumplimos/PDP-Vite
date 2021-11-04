@@ -8,7 +8,7 @@ import Login from "../pages/Login";
 import AuthButton from "../components/Compound/Signout/Signout";
 import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
 import  FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
-
+import  transacciones from "../../src/apps/FundacionMujer/componentsmujer/Pages/Transacciones"
 
 
 export const UrlsContext = createContext({
@@ -91,10 +91,17 @@ export const useProvideUrls = () => {
         exact: false,
         show: false,
       },
+
       {
         link: "/marketplace",
         label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
         component: emptyComp,
+        props: {},
+      },
+      {
+        link: "/transacciones",
+        label: <AppIcons Logo={MARKETPLACE} name="transacciones" />,
+        component: transacciones,
         props: {},
       },
     ]);

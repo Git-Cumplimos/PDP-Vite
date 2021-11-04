@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import Button from "../../../../components/Base/Button/Button";
-import Voucher from "../Voucher/Voucherrecaudo";
+import Voucher from "../Voucher/Voucherreimpresion";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import { useAuth } from "../../../../utils/AuthHooks";
@@ -12,11 +12,12 @@ const Sellfundamujerrecaudo = ({ respuestamujer, setRespuestamujer, closeModal,}
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
-
   });
  
   const voucherInfo = {};
   
+
+  console.log(respuestamujer)
   
   voucherInfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
       year: "numeric",
@@ -31,13 +32,13 @@ const Sellfundamujerrecaudo = ({ respuestamujer, setRespuestamujer, closeModal,}
     }).format(new Date());  
   
 
-
-
-    voucherInfo["Mensaje"] = respuestamujer["Mensaje"]; 
-   voucherInfo["Estado"] =  respuestamujer["Confirmacion"];   
-   voucherInfo["Referencia"] = respuestamujer["Referencia"];
-
-
+    voucherInfo["Nombre"] =  respuestamujer["Nombre"]; 
+    voucherInfo["Documento"] =  respuestamujer["Documento"];  
+    voucherInfo["Documento"] =  respuestamujer["Documento"];  
+    voucherInfo["label"] =  respuestamujer["label"];  
+    voucherInfo["operacion"] =  respuestamujer["operacion"];  
+    voucherInfo["value"] =  respuestamujer["value"];  
+    voucherInfo["id"] =  respuestamujer["id"];  
 
   return "msg" ? (
     <div className="flex flex-col justify-center items-center">

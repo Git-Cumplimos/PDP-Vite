@@ -1,8 +1,10 @@
 import classes from "./Voucher.module.css";
 import LogoPDP from "../../../../components/Base/LogoPDP/LogoPDP";
 
-const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
+const Voucherreimpresion = ({ setPrintDiv, refPrint, ...info }) => {
   const { divPrint } = classes;
+
+
 
 
   return (
@@ -11,7 +13,7 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
         <LogoPDP xsmall />
       </div>
       <h1 className="text-xl font-semibold text-center uppercase">
-        Recibo de pago
+       Reimpresiòn recibo de pago
       </h1>
       <hr className="border-gray-400 my-3" />
       <div className="flex flex-col gap-2 px-2 text-xs">
@@ -29,25 +31,25 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
       <div className="flex flex-col gap-2 px-2 text-xs">
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">referencia:</h1>
-            <h1>{info["Referencia"]}</h1>
+            <h1 className="font-semibold">Nombre:</h1>
+            <h1>{info["Nombre"]}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
-            <h1 className="font-semibold">pin:</h1>
-            <h1>{info.pin}</h1>
+            <h1 className="font-semibold">Nombre:</h1>
+            <h1>{info["label"]}</h1>
           </div>
         </div>
         <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">mensaje:</h1>
-            <h1>{info["Mensaje"]}</h1>
+            <h1 className="font-semibold">documento:</h1>
+            <h1>{info["Documento"]}</h1>
           </div>
       </div>
       <hr className="border-gray-400 my-3" />
       <div className="flex flex-col gap-2 px-2 text-xs text-left">
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">estado:</h1>
-            <h1>{info.Estado}</h1>
+            <h1 className="font-semibold">operacion:</h1>
+            <h1>{info["operacion"]}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">No. terminal:</h1>
@@ -66,17 +68,17 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">Id Trx:</h1>
-            <h1>12345</h1>
+            <h1 className="font-semibold">Fecha original:</h1>
+            <h1>{info["value"]}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Id Transacción:</h1>
-            <h1>{info["Id Transacción"]}</h1>
+            <h1>{info["id"]}</h1>
           </div>
         </div>
       </div>
       <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
-        {info["Nombre de loteria"]}Recaudo Exitoso
+        {info["Nombre de loteria"]} reimpresion exitosa
       </h1>
       <div className="flex flex-col gap-2 px-2 text-xs">
         <div className="flex flex-row justify-between w-full">
@@ -91,14 +93,14 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
         </div>
         <div className="flex flex-row justify-center w-full">
           <div className="flex flex-row justify-center flex-auto gap-2">
-            <h1 className="font-semibold">Valor recaudo:</h1>
+            <h1 className="font-semibold"></h1>
             <h1>{info["Valordesembolso"]}</h1>
           </div>
         </div>
       </div>
       <hr className="border-gray-400 my-3" />
       <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
-        ***ORIGINAL***
+        ***COPY***
       </h1>
       <h1 className="text-center my-3 text-xs font-normal">
         Disclaimer
@@ -107,4 +109,4 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
   );
 };
 
-export default Voucher;
+export default Voucherreimpresion;

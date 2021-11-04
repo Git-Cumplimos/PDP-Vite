@@ -18,6 +18,9 @@ const Desembolsos = () => {
     desembolsospin,
   } = Usemujer();
 
+
+  console.log(respuestamujer)
+
   const [documento, setDocumento] = useState("");
   const [pin, setPin] = useState("");
   const [comercio, setComercio] = useState("");

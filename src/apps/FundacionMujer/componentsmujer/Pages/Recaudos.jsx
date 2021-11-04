@@ -21,6 +21,8 @@ const Recaudo = () => {
     pagorecaudo,
   } = Usemujer();
 
+
+  console.log(RespuestaPagoRecaudo)
   const [Documentoselect, setDocumentoselect] = useState("");
   const [documento, setDocumento] = useState("");
   const [numerocredito, Setnumerocredito] = useState("");

@@ -16,16 +16,10 @@ const urls = {
   recaudo: "http://pagocreditofm-dev.us-east-2.elasticbeanstalk.com/creditos",
   recaudo2: "http://pagocreditofm-dev.us-east-2.elasticbeanstalk.com/creditos",
   pagorecaudo: "http://pagocreditofm-dev.us-east-2.elasticbeanstalk.com",
-  transacciones:"http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view",
- transaccionesuno:"http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view?id_trx=2",
-transaccionesdos:"http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view?Tipo_operacion=2",
-transaccionestres:"http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view?Comercio=2",
-transaccionescuatro:"http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view?response_status=true",
-transaccionescinco:"http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view?Tipo_operacion=2&Comercio=2",
-transaccionesseis:"http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view?Tipo_operacion=2&response_status=true",
-transaccionessiete:"http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view?Comercio=2&response_status=true",
-transaccionesoocho:"http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view?Tipo_operacion=2&Comercio=2&response_status=true"
-
+  tiposoperaciones:
+    "http://tipos-operaciones-pdp-dev.us-east-2.elasticbeanstalk.com/tipos-operaciones",
+  transacciones:
+    "http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view",
 };
 
 export const LoteriaContext = createContext({
@@ -35,7 +29,9 @@ export const LoteriaContext = createContext({
     arreglo: null,
     setArreglo: null,
     RespuestaPagoRecaudo: null,
-     setRespuestaPagoRecaudo: null
+    setRespuestaPagoRecaudo: null,
+    respuestatipooperaciontransaccion: null,
+    setrespuestatipooperaciontransaccion: null,
   },
   searchLoteria: () => {},
   sellLoteria: () => {},
@@ -57,15 +53,9 @@ export const LoteriaContext = createContext({
   recaudo: () => {},
   recaudo2: () => {},
   pagorecaudo: () => {},
-  transacciones:() => {},
-  transaccionesuno:()=>{},
-  transaccionesdos:()=>{},
-  transaccionestres:()=>{},
-  transaccionescuatro:()=>{},
-  transaccionescinco:()=>{},
-  transaccionesseis:()=>{},
-  transaccionessieste:()=>{},
-  transaccionesocho:()=>{},
+
+  transacciones: () => {},
+  tiposdeoperaciones: () => {},
 });
 
 export const Usemujer = () => {
@@ -83,8 +73,17 @@ export const useProvideLoteria = () => {
   const [modal, setModal] = useState(null);
 
   const [respuestamujer, setRespuestamujer] = useState(null);
-  const[arreglo,setArreglo]=useState(null);
-  // Datos estadisticas
+  const [arreglo, setArreglo] = useState(null);
+
+
+
+
+  const [ respuestatipooperaciontransaccion,setrespuestatipooperaciontransaccion, ] = useState(null);
+
+  
+  console.log(respuestatipooperaciontransaccion)
+ 
+
 
   const [sorteo, setSorteo] = useState("");
 
@@ -96,7 +95,7 @@ export const useProvideLoteria = () => {
       const res = await fetchData(urls.consultapin, "GET", {
         documento: documento,
         pin: pin,
-        
+        id_comercio: roleInfo.id_comercio,
       });
       return res;
     } catch (err) {
@@ -109,7 +108,7 @@ export const useProvideLoteria = () => {
     try {
       const res = await fetchData(urls.recaudo, "GET", {
         cedula: 32131,
-        comercio: 321312,
+        comercio: roleInfo.id_comercio,
       });
       return res;
       setLoterias(res);
@@ -124,7 +123,7 @@ export const useProvideLoteria = () => {
     try {
       const res = await fetchData(urls.recaudo2, "GET", {
         cedula: 4324,
-        comercio: 43243,
+        comercio: roleInfo.id_comercio,
       });
       return res;
     } catch (err) {
@@ -137,6 +136,7 @@ export const useProvideLoteria = () => {
     try {
       const res = await fetchData(urls.canselarpin, "GET", {
         transaccion: "TFM102",
+        id_comercio: roleInfo.id_comercio,
       });
       return res;
     } catch (err) {
@@ -149,7 +149,7 @@ export const useProvideLoteria = () => {
     const dato = {
       numero: 1234,
       valor: 120500.5,
-      comercio: 2,
+      comercio: roleInfo.id_comercio,
     };
     let control = await fetch(`${urls.pagorecaudo}/pago`, {
       method: "POST",
@@ -165,11 +165,12 @@ export const useProvideLoteria = () => {
   };
 
   // desembolso
-  const desembolsospin = async () => {
+  const desembolsospin = async (documento, pin) => {
     const dato = {
-      documento: 1080100200,
-      pin: 123,
+      documento: documento,
+      pin: pin,
       valor: 780000.45,
+      id_comercio: roleInfo.id_comercio,
     };
     let control = await fetch(`${urls.desembolso}/desembolsos`, {
       method: "POST",
@@ -183,140 +184,36 @@ export const useProvideLoteria = () => {
   };
 
   //transacciones uno
-  
-  const transacciones = useCallback(async () => {
+
+  const transacciones = useCallback( async (id_trx, Tipo_operacion, response_status) => {
+      try {
+        const res = await fetchData(urls.transacciones, "GET", {
+          
+          id_trx: 2,
+          Tipo_operacion: 2,
+          response_status: 2,
+        }
+        );
+        setrespuestatipooperaciontransaccion(res)
+        return res;
+
+      } catch (err) {
+        console.log("back fallando")
+      }
+    },
+    []
+  );
+
+
+
+  const tiposdeoperaciones = useCallback(async () => {
     try {
-      const res = await fetchData(urls.transacciones, "GET", {
-      
-      });
+      const res = await fetchData(urls.tiposoperaciones, "GET", {});
       return res;
-      setLoterias(res);
     } catch (err) {
-      setLoterias([]);
       console.error(err);
     }
   }, []);
-
-
-    const transaccionesuno = useCallback(async (id_trx) => {
-      try {
-        const res = await fetchData(urls.transaccionesuno, "GET", {
-          id_trx: id_trx,
-        
-        });
-        return res;
-        setLoterias(res);
-      } catch (err) {
-        setLoterias([]);
-        console.error(err);
-      }
-    }, []);
-
-    const transaccionesdos = useCallback(async (Tipo_operacion) => {
-      try {
-        const res = await fetchData(urls.transaccionesdos, "GET", {
-          Tipo_operacion: Tipo_operacion,
-        });
-        return res;
-        setLoterias(res);
-      } catch (err) {
-        setLoterias([]);
-        console.error(err);
-      }
-    }, []);
-   
-    const transaccionestres = useCallback(async (Comercio) => {
-      try {
-        const res = await fetchData(urls.transaccionesdos, "GET", {
-          Comercio: Comercio,
-        });
-        return res;
-        setLoterias(res);
-      } catch (err) {
-        setLoterias([]);
-        console.error(err);
-      }
-    }, []);
-
-    const transaccionescuatro = useCallback(async (response_status) => {
-      try {
-        const res = await fetchData(urls.transaccionescuatro, "GET", {
-          response_status: response_status,
-        });
-        return res;
-        setLoterias(res);
-      } catch (err) {
-        setLoterias([]);
-        console.error(err);
-      }
-    }, []);
-
-
-
-    const transaccionescinco = useCallback(async (Tipo_operacion,Comercio) => {
-      try {
-        const res = await fetchData(urls.transaccionescinco, "GET", {
-          Tipo_operacion: Tipo_operacion,
-          Comercio:Comercio
-        });
-        return res;
-        setLoterias(res);
-      } catch (err) {
-        setLoterias([]);
-        console.error(err);
-      }
-    }, []);
-
-
-    const transaccionesseis = useCallback(async (Tipo_operacion,response_status) => {
-      try {
-        const res = await fetchData(urls.transaccionesseis, "GET", {
-          Tipo_operacion: Tipo_operacion,
-          response_status:response_status
-        });
-        return res;
-        setLoterias(res);
-      } catch (err) {
-        setLoterias([]);
-        console.error(err);
-      }
-    }, []);
-
-
-    
-    const transaccionessieste = useCallback(async (Comercio,response_status) => {
-      try {
-        const res = await fetchData(urls.transaccionessiete, "GET", {
-          Comercio: Comercio,
-          response_status:response_status
-        });
-        return res;
-        setLoterias(res);
-      } catch (err) {
-        setLoterias([]);
-        console.error(err);
-      }
-    }, []);
-
-
-     
-    const transaccionesocho = useCallback(async (Tipo_operacion,Comercio,response_status) => {
-      try {
-        const res = await fetchData(urls.transaccionesoocho, "GET", {
-          Tipo_operacion: Tipo_operacion,
-          Comercio:Comercio,
-          response_status:response_status
-        });
-        return res;
-        setLoterias(res);
-      } catch (err) {
-        setLoterias([]);
-        console.error(err);
-      }
-    }, []);
-   
-
-
 
   return {
     infoLoto: {
@@ -325,12 +222,11 @@ export const useProvideLoteria = () => {
       arreglo,
       setArreglo,
       RespuestaPagoRecaudo,
-      setRespuestaPagoRecaudo
+      setRespuestaPagoRecaudo,
+      respuestatipooperaciontransaccion,
+      setrespuestatipooperaciontransaccion,
     },
-    reportes: {
-     
-     
-    },
+    reportes: {},
     consultapin,
     cancelarpin,
     desembolsospin,
@@ -338,15 +234,7 @@ export const useProvideLoteria = () => {
     recaudo,
     recaudo2,
     pagorecaudo,
-    //transacciones
     transacciones,
-    transaccionesuno,
-    transaccionesdos,
-    transaccionestres,
-    transaccionescuatro,
-    transaccionescinco,
-    transaccionesseis,
-    transaccionessieste,
-    transaccionesocho
+    tiposdeoperaciones,
   };
 };
