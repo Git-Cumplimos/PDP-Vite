@@ -19,7 +19,6 @@ const Desembolsos = () => {
   } = Usemujer();
 
 
-  console.log(respuestamujer)
 
   const [documento, setDocumento] = useState("");
   const [pin, setPin] = useState("");
@@ -61,16 +60,15 @@ const Desembolsos = () => {
         if ("msg" in res) {
           notify("datos confirmados");
         }
-        setRespuestamujer(res);
-        console.log(res);
+        setRespuestamujer(res)
         setShowModal(true);
       })
       .catch(() => setDisabledBtns(false));
     //desembolso pin
     /*  desembolsospin()
-      .then((res) => {
+     en((res) => {
         setDisabledBtns(false);
-        console.log(res);
+        console.log(res); .th
       })
       .catch(() => setDisabledBtns(false)); */
   };

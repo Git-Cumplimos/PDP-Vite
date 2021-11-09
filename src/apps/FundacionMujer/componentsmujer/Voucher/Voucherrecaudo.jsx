@@ -17,7 +17,7 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
       <div className="flex flex-col gap-2 px-2 text-xs">
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">Fecha de reimpresion:</h1>
+            <h1 className="font-semibold">Fecha de venta:</h1>
             <h1>{info["Fecha de venta"]}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
@@ -31,10 +31,6 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
           <div className="flex flex-row justify-start flex-auto gap-2">
             <h1 className="font-semibold">referencia:</h1>
             <h1>{info["Referencia"]}</h1>
-          </div>
-          <div className="flex flex-row justify-end flex-auto gap-2">
-            <h1 className="font-semibold">pin:</h1>
-            <h1>{info.pin}</h1>
           </div>
         </div>
         <div className="flex flex-row justify-start flex-auto gap-2">
@@ -59,15 +55,11 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
             <h1 className="font-semibold">Direccion:</h1>
             <h1>{info["Dirección"]}</h1>
           </div>
-          <div className="flex flex-row justify-end flex-auto gap-2">
-            <h1 className="font-semibold">Telefono:</h1>
-            <h1>3002204195</h1>
-          </div>
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">Id Trx:</h1>
-            <h1>12345</h1>
+            <h1 className="font-semibold"></h1>
+            <h1></h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Id Transacción:</h1>

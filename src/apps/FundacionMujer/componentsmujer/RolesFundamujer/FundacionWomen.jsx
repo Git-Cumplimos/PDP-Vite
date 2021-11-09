@@ -2,20 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import AppIcons from "../../../../components/Base/AppIcons/AppIcons";
-import fetchData from "../../../../utils/fetchData";
-import Loteria from "../../../LoteriaBog/Views/Loteria";
-import Premios from "../../../LoteriaBog/Views/Premios";
-import Reportes from "../../../LoteriaBog/Views/Reportes";
-import Sorteos from "../../../../assets/svg/SORTEO-01.svg";
 
-import Pago from "../../../../assets/svg/PAGO-01.svg";
-import Reporte from "../../../../assets/svg/REPORTES-01.svg";
 import Button from "../../../../components/Base/Button/Button";
 
 // datos fundacion de la mujer
 import Desembolsos from  "../Pages/Desembolsos"; 
 import Recaudo from "../Pages/Recaudos";
-import Transacciones from "../Pages/Transacciones"
+
 
 const FundacionWomen = () => {
 
@@ -55,9 +48,7 @@ const FundacionWomen = () => {
         return  <Recaudo sorteo={recaudo} sorteoExtra={setRecaudo}/>
 
 
-      case "transacciones":
-        return <Transacciones sorteo={transacciones} sorteoExtra={settransacciones}/>
-        return <p></p>;
+   
     }
   };
 
@@ -79,13 +70,10 @@ const FundacionWomen = () => {
       value: "Recaudo",
       label: <FundacionIcons name="Recaudo"  Logo={"https://irp-cdn.multiscreensite.com/c82c664f/MOBILE/png/943810-tuerca_icono.png"}  />,
     },
-    {
-      value: "transacciones",
-      label: <FundacionIcons name="transacciones" Logo={"https://www.elempleo.com/sitios-empresariales/colombia/fundacion-de-la-mujer/video/LogoLoopFundacion_1_1.jpg"}  />,
-    },
+   
   ];
 
-  const posibles = ["Desembolso", "Recaudo", "transacciones"];
+  const posibles = ["Desembolso", "Recaudo"];
 
   return (
     <>

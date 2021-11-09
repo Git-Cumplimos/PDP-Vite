@@ -8,27 +8,37 @@ import Select from "../../../../components/Base/Select/Select";
 import Table from "../../../../components/Base/Table/Table";
 import { Usemujer } from "../../../FundacionMujer/componentsmujer/utils/mujerHooks";
 import { toast } from "react-toastify";
+import SearchFormdospuntouno from "../SearchForm/SearchFormdos";
+import Sellfundamujerrecaudopuntouno from "../../../FundacionMujer/componentsmujer/sellFundamujer/SellFundamujerrecaudo";
 import SearchFormdos from "../SearchForm/SearchFormdos";
-
 import Sellfundamujerrecaudo from "../../../FundacionMujer/componentsmujer/sellFundamujer/SellFundamujerrecaudo";
+
 
 const Recaudo = () => {
   const {
-    infoLoto: { respuestamujer, setRespuestamujer, arreglo, setArreglo  ,RespuestaPagoRecaudo,
-      setRespuestaPagoRecaudo },
+    infoLoto: {
+      respuestamujer,
+      setRespuestamujer,
+      arreglo,
+      setArreglo,
+      RespuestaPagoRecaudo,
+      setRespuestaPagoRecaudo,
+
+      
+    },
     recaudo,
     recaudo2,
     pagorecaudo,
+    pagorecaudocedula
   } = Usemujer();
 
-
-  console.log(RespuestaPagoRecaudo)
   const [Documentoselect, setDocumentoselect] = useState("");
   const [documento, setDocumento] = useState("");
   const [numerocredito, Setnumerocredito] = useState("");
   const [tipobusqueda, setTiposBusqueda] = useState("");
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [cedula, setCedula] = useState("");
+  const [credito, setcredito] = useState("");
   const [comercio, setComercio] = useState("");
   const [selected, setSelected] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -59,9 +69,12 @@ const Recaudo = () => {
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
-    recaudo("")
-    recaudo2("")
-    pagorecaudo("")
+    recaudo("");
+    recaudo2("");
+    setCedula("")
+    setTiposBusqueda("")
+    setcredito("")
+    setRecauditoss("")
   }, []);
 
   //////////////////////
@@ -69,29 +82,31 @@ const Recaudo = () => {
     e.preventDefault();
     setDisabledBtns(true);
     /// recaudo
-    recaudo(cedula, comercio)
-      .then((res) => {
-        setDisabledBtns(false);
-        if ("msg" in res) {
-          notify("recaudo confirmado");
-        }
-        console.log(res);
-        setRecauditoss(res);
-      })
-      .catch(() => setDisabledBtns(false));
-    ///reacudo 2
-    recaudo2(cedula, comercio)
-      .then((res) => {
-        setDisabledBtns(false);
-        if ("msg" in res) {
-          notify("recaudo confirmado");
-        }
-        console.log(res);
-        setRecauditoss(res);
-      })
-      .catch(() => setDisabledBtns(false));
+    if (tipobusqueda == 1) {
+      recaudo(cedula, comercio)
+        .then((res) => {
+          setDisabledBtns(false);
+          if ("msg" in res) {
+            notify("recaudo confirmado");
+          }
+          setRecauditoss(res);
+        })
+        .catch(() => setDisabledBtns(false));
+    } else {
+      ///reacudo 2
+      recaudo2(credito, comercio)
+        .then((res) => {
+          setDisabledBtns(false);
+          if ("msg" in res) {
+            notify("recaudo confirmado");
+          }
+          setRecauditoss(res);
+        })
+        .catch(() => setDisabledBtns(false));
+    }
+
     //pagorecaudo
-   /*  pagorecaudo()
+    /*  pagorecaudo()
       .then((res) => {
         setDisabledBtns(false);
         console.log(res);
@@ -99,12 +114,10 @@ const Recaudo = () => {
       .catch(() => setDisabledBtns(false)); */
   };
 
-
   ///////////////////////////////////////////////
   const recauditosss = () => {
-    setRespuestamujer({...RespuestaPagoRecaudo?.obj });
+    setRespuestamujer({ ...RespuestaPagoRecaudo?.obj });
   };
-
   return (
     <>
       <Form onSubmit={onSubmit} grid>
@@ -132,13 +145,13 @@ const Recaudo = () => {
             id="numpin"
             label="Numero Documento"
             type="text"
-            minLength="4"
-            maxLength="4"
+            minLength="10"
+            maxLength="10"
             autoComplete="false"
-            value={documento}
+            value={cedula}
             onInput={(e) => {
               const num = parseInt(e.target.value) || "";
-              setDocumento(num);
+              setCedula(num);
             }}
           />
         ) : (
@@ -149,21 +162,13 @@ const Recaudo = () => {
             minLength="4"
             maxLength="4"
             autoComplete="false"
-            value={numerocredito}
+            value={credito}
             onInput={(e) => {
               const num = parseInt(e.target.value) || "";
-              Setnumerocredito(num);
+              setcredito(num);
             }}
           />
         )}{" "}
-        <ButtonBar className="col-auto md:col-span-2">
-          <Button type="submit" disabled={disabledBtns}>
-            Consultar recaudos
-          </Button>
-        </ButtonBar>
-       
-       
-       
         {tipobusqueda == 1 ? (
           <Table
             headers={[
@@ -182,7 +187,7 @@ const Recaudo = () => {
           <Table
             headers={[
               "Numero de credito",
-              "cedula",
+               "",
               "Nombre cliente",
               "valor a pagar",
             ]}
@@ -193,28 +198,55 @@ const Recaudo = () => {
             }}
           />
         )}
+          <ButtonBar className="col-auto md:col-span-2">
+            <Button type="submit" disabled={disabledBtns}>
+              Consultar recaudos 
+            </Button>
+          </ButtonBar>
+       
       </Form>
-
-      <Modal show={showModal} handleClose={() => closeModal()}>
-        {!respuestamujer ? (
-          <SearchFormdos
-            selected={selected}
-            closeModal={closeModal}
-            handleSubmit={(event) => {
-              event.preventDefault();
-              pagorecaudo()
-              recauditosss();
-              
-            }}
-          />
+      {tipobusqueda == 1 ? (
+         <Modal show={showModal} handleClose={() => closeModal()}>
+         {!respuestamujer ? (
+           <SearchFormdos
+             selected={selected}
+             closeModal={closeModal}
+             handleSubmit={(event) => {
+               event.preventDefault();
+               pagorecaudo();
+               recauditosss();
+             }}
+           />
+         ) : (
+           <Sellfundamujerrecaudo
+             respuestamujer={respuestamujer}
+             setRespuestamujer={setRespuestamujer}
+             closeModal={closeModal}
+           />
+         )}
+       </Modal>
         ) : (
-          <Sellfundamujerrecaudo
-            respuestamujer={respuestamujer}
-            setRespuestamujer={setRespuestamujer}
-            closeModal={closeModal}
-          />
+          <Modal show={showModal} handleClose={() => closeModal()}>
+          {!respuestamujer ? (
+            <SearchFormdospuntouno
+              selected={selected}
+              closeModal={closeModal}
+              handleSubmit={(event) => {
+                event.preventDefault();
+                pagorecaudocedula()
+                recauditosss();
+              }}
+            />
+          ) : (
+            <Sellfundamujerrecaudopuntouno
+              respuestamujer={respuestamujer}
+              setRespuestamujer={setRespuestamujer}
+              closeModal={closeModal}
+            />
+          )}
+        </Modal>
         )}
-      </Modal>
+      
     </>
   );
 };

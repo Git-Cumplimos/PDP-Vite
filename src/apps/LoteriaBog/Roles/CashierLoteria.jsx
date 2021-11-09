@@ -10,18 +10,22 @@ import Sorteos from "../../../assets/svg/SORTEO-01.svg";
 import Pago from "../../../assets/svg/PAGO-01.svg";
 import Reporte from "../../../assets/svg/REPORTES-01.svg";
 import Button from "../../../components/Base/Button/Button";
-import dayjs from 'dayjs'
+import dayjs from "dayjs";
 
-const urlLoto ="http://loginconsulta.us-east-2.elasticbeanstalk.com/contiploteria";
+const urlLoto = "http://sorteos.us-east-2.elasticbeanstalk.com/contiploteria";
 
 const CashierLoteria = () => {
   const [sorteo, setSorteo] = useState(null);
   const [sorteoExtra, setSorteoExtra] = useState(null);
-  const [day, setDay] = useState('');
-  const [hora, setHora] = useState('');
+
+  const [sorteofisico, setSorteofisico] = useState(null);
+  const [sorteofisicoextraordinario, setSorteofisicoextraordinario] = useState(null);
+
+  const [day, setDay] = useState("");
+  const [hora, setHora] = useState("");
 
   const { page } = useParams();
-  const  history  = useHistory();
+  const history = useHistory();
   const { pathname } = useLocation();
 
   const notifyError = useCallback((msg = "Error") => {
@@ -36,53 +40,91 @@ const CashierLoteria = () => {
     });
   }, []);
 
-
   //Este servicio sonsulta los sorteos disponibles de la loteria
   const searchLoteriaInfo = useCallback(() => {
     fetchData(
       urlLoto,
       "GET",
       {
-        num_loteria: "02",//este valor debe cambiar dependiendo de la loterie 
+        num_loteria: "02", //este valor debe cambiar dependiendo de la loterie
       },
       {}
     )
       .then((res) => {
-        const sortOrd = res.filter(({ tip_sorteo }) => {
-          return tip_sorteo === 1;
+        console.log(res);
+
+        ////sorteo virtual
+        const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 1 && !fisico;
         });
-        const sortExt = res.filter(({ tip_sorteo }) => {
-          return tip_sorteo === 2;
+        const sortExt = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 2 && !fisico;
         });
         if (sortOrd.length > 0) {
           setSorteo(sortOrd[0].num_sorteo);
         } else {
-          notifyError("No se encontraron sorteos ordinarios");
+          /*  notifyError("No se encontraron sorteos ordinarios"); */
         }
         if (sortExt.length > 0) {
           setSorteoExtra(sortExt[0].num_sorteo);
         } else {
-          notifyError("No se encontraron sorteos extraordinarios");
+          /* notifyError("No se encontraron sorteos extraordinarios"); */
         }
-      })
+     
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        
+        ///sorteo fisico
+        const sortOrdfisico = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 1 && fisico;
+        });
+        const sortExtfisico = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 2 && fisico;
+        });
+
+        if (sortOrdfisico.length > 0) {
+          setSorteofisico(sortExtfisico[0].num_sorteo);
+        } else {
+          /*    notifyError("No se encontraron extraordinarios fisicos"); */
+        }
+
+        if (sortExtfisico.length > 0) {
+          setSorteofisicoextraordinario(sortExtfisico[0].num_sorteo);
+        } else {
+          /*   notifyError("No se encontraron extraordinarios fisicos"); */
+        }
+      
+      }
+      
+      
+      )
       .catch((err) => console.error(err));
   }, [notifyError]);
 
+
+
   useEffect(() => {
     searchLoteriaInfo();
-    setDay(dayjs().day())
-    setHora(dayjs().format('HH'))
+    console.log(searchLoteriaInfo());
+    setDay(dayjs().day());
+    setHora(dayjs().format("HH"));
   }, [searchLoteriaInfo]);
 
   const SelectPage = () => {
     switch (page) {
       case "sorteos":
-        if(day===4 && parseInt(hora)>=20){
-          notifyError('Fuera de horario')
-          history.push(`/${pathname.split("/")[1]}`)
+        if (day === 4 && parseInt(hora) >= 20) {
+          notifyError("Fuera de horario");
+          history.push(`/${pathname.split("/")[1]}`);
           return <div></div>;
         }
-        return <Loteria sorteo={sorteo} sorteoExtra={sorteoExtra} />;
+        return <Loteria sorteoOrdifisico={sorteofisico} 
+        sorteoExtrafisico={sorteofisicoextraordinario}
+         sorteo={sorteo}
+          sorteoExtra={sorteoExtra} />;
+
+
 
       case "premios":
         return <Premios />;
@@ -136,7 +178,9 @@ const CashierLoteria = () => {
       {posibles.includes(page) ? (
         <div className="flex flex-col md:flex-row justify-evenly w-full">
           <div className="flex flex-col">
-            <div className="hidden md:block">{options.find(({ value }) => page === value).label}</div>
+            <div className="hidden md:block">
+              {options.find(({ value }) => page === value).label}
+            </div>
             <div>
               <Link to={`/${pathname.split("/")[1]}`}>
                 <Button>Volver</Button>

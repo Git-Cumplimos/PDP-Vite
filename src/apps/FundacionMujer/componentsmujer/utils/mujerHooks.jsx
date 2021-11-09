@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { useAuth } from "../../../../utils/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
 
@@ -16,10 +10,6 @@ const urls = {
   recaudo: "http://pagocreditofm-dev.us-east-2.elasticbeanstalk.com/creditos",
   recaudo2: "http://pagocreditofm-dev.us-east-2.elasticbeanstalk.com/creditos",
   pagorecaudo: "http://pagocreditofm-dev.us-east-2.elasticbeanstalk.com",
-  tiposoperaciones:
-    "http://tipos-operaciones-pdp-dev.us-east-2.elasticbeanstalk.com/tipos-operaciones",
-  transacciones:
-    "http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view",
 };
 
 export const LoteriaContext = createContext({
@@ -32,6 +22,10 @@ export const LoteriaContext = createContext({
     setRespuestaPagoRecaudo: null,
     respuestatipooperaciontransaccion: null,
     setrespuestatipooperaciontransaccion: null,
+    respuestaconsultarecaudo: null,
+    setRespuestaconsultarecaudo: null,
+    respuestaconsultarecaudocreditos: null,
+    setRespuestaconsultarecaudocreditos: null,
   },
   searchLoteria: () => {},
   sellLoteria: () => {},
@@ -53,9 +47,7 @@ export const LoteriaContext = createContext({
   recaudo: () => {},
   recaudo2: () => {},
   pagorecaudo: () => {},
-
-  transacciones: () => {},
-  tiposdeoperaciones: () => {},
+  pagorecaudocedula: () => {},
 });
 
 export const Usemujer = () => {
@@ -65,30 +57,23 @@ export const Usemujer = () => {
 export const useProvideLoteria = () => {
   // Datos consulta y compra
   const { roleInfo } = useAuth();
-
   const [RespuestaPagoRecaudo, setRespuestaPagoRecaudo] = useState(null);
-  const [serie, setSerie] = useState("");
-  const [loterias, setLoterias] = useState(null);
-  const [selected, setSelected] = useState(null);
-  const [modal, setModal] = useState(null);
-
-  const [respuestamujer, setRespuestamujer] = useState(null);
+  const [respuestamujer, setRespuestamujer] = useState();
   const [arreglo, setArreglo] = useState(null);
+  const [
+    respuestatipooperaciontransaccion,
+    setrespuestatipooperaciontransaccion,
+  ] = useState(null);
+
+  const [respuestaconsultarecaudo, setRespuestaconsultarecaudo] = useState();
+  const [
+    respuestaconsultarecaudocreditos,
+    setRespuestaconsultarecaudocreditos,
+  ] = useState();
 
 
-
-
-  const [ respuestatipooperaciontransaccion,setrespuestatipooperaciontransaccion, ] = useState(null);
-
-  
-  console.log(respuestatipooperaciontransaccion)
- 
-
-
-  const [sorteo, setSorteo] = useState("");
-
-  const [fechaFinal, setFechaFinal] = useState("");
-
+  console.log(respuestaconsultarecaudo)
+  console.log(respuestaconsultarecaudocreditos);
   //consulta del pin
   const consultapin = useCallback(async (documento, pin) => {
     try {
@@ -96,34 +81,6 @@ export const useProvideLoteria = () => {
         documento: documento,
         pin: pin,
         id_comercio: roleInfo.id_comercio,
-      });
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
-  // recaudos
-  const recaudo = useCallback(async (cedula, comercio) => {
-    try {
-      const res = await fetchData(urls.recaudo, "GET", {
-        cedula: 32131,
-        comercio: roleInfo.id_comercio,
-      });
-      return res;
-      setLoterias(res);
-    } catch (err) {
-      setLoterias([]);
-      console.error(err);
-    }
-  }, []);
-
-  //recaudos
-  const recaudo2 = useCallback(async (cedula, comercio) => {
-    try {
-      const res = await fetchData(urls.recaudo2, "GET", {
-        cedula: 4324,
-        comercio: roleInfo.id_comercio,
       });
       return res;
     } catch (err) {
@@ -144,12 +101,62 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
+  // desembolso
+  const desembolsospin = async (documento, pin) => {
+    const dato = {
+      id_trx: respuestamujer?.obj["id_trx"],
+      id_usuario: roleInfo.id_usuario,
+      id_comercio: roleInfo.id_comercio,
+    };
+    let control = await fetch(`${urls.desembolso}/desembolsos`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(dato),
+    });
+    let respuesta = await control.json();
+    console.log(respuesta);
+  };
+
+  // recaudos
+  const recaudo = useCallback(async (cedula, comercio) => {
+    try {
+      const res = await fetchData(urls.recaudo, "GET", {
+        cedula: cedula,
+        comercio: 2,
+      });
+
+      setRespuestaconsultarecaudo(res);
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  //recaudos
+  const recaudo2 = useCallback(async (credito, comercio) => {
+    try {
+      const res = await fetchData(urls.recaudo2, "GET", {
+        credito: credito,
+        comercio: 2,
+      });
+
+      setRespuestaconsultarecaudocreditos(res);
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
   //pago recaudo2
   const pagorecaudo = async () => {
     const dato = {
-      numero: 1234,
-      valor: 120500.5,
-      comercio: roleInfo.id_comercio,
+      numero: respuestaconsultarecaudo.obj[0]["Credito"],
+      cedula: respuestaconsultarecaudo.obj[0]["Cedula"],
+      valor: respuestaconsultarecaudo.obj[0]["Valor a pagar"],
+      id_comercio: 1,
+      id_usuario: 2,
     };
     let control = await fetch(`${urls.pagorecaudo}/pago`, {
       method: "POST",
@@ -164,15 +171,14 @@ export const useProvideLoteria = () => {
     setRespuestaPagoRecaudo(respuesta);
   };
 
-  // desembolso
-  const desembolsospin = async (documento, pin) => {
+  const pagorecaudocedula = async () => {
     const dato = {
-      documento: documento,
-      pin: pin,
-      valor: 780000.45,
-      id_comercio: roleInfo.id_comercio,
+      numero: respuestaconsultarecaudocreditos.obj[0]["Cedula"],
+      valor: respuestaconsultarecaudocreditos.obj[0]["Valor a pagar"],
+      id_comercio: 1,
+      id_usuario: 2,
     };
-    let control = await fetch(`${urls.desembolso}/desembolsos`, {
+    let control = await fetch(`${urls.pagorecaudo}/pago`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -181,39 +187,9 @@ export const useProvideLoteria = () => {
     });
     let respuesta = await control.json();
     console.log(respuesta);
+    ///
+    setRespuestaPagoRecaudo(respuesta);
   };
-
-  //transacciones uno
-
-  const transacciones = useCallback( async (id_trx, Tipo_operacion, response_status) => {
-      try {
-        const res = await fetchData(urls.transacciones, "GET", {
-          
-          id_trx: 2,
-          Tipo_operacion: 2,
-          response_status: 2,
-        }
-        );
-        setrespuestatipooperaciontransaccion(res)
-        return res;
-
-      } catch (err) {
-        console.log("back fallando")
-      }
-    },
-    []
-  );
-
-
-
-  const tiposdeoperaciones = useCallback(async () => {
-    try {
-      const res = await fetchData(urls.tiposoperaciones, "GET", {});
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
 
   return {
     infoLoto: {
@@ -225,6 +201,10 @@ export const useProvideLoteria = () => {
       setRespuestaPagoRecaudo,
       respuestatipooperaciontransaccion,
       setrespuestatipooperaciontransaccion,
+      respuestaconsultarecaudo,
+      setRespuestaconsultarecaudo,
+      respuestaconsultarecaudocreditos,
+      setRespuestaconsultarecaudocreditos,
     },
     reportes: {},
     consultapin,
@@ -234,7 +214,6 @@ export const useProvideLoteria = () => {
     recaudo,
     recaudo2,
     pagorecaudo,
-    transacciones,
-    tiposdeoperaciones,
+    pagorecaudocedula,
   };
 };

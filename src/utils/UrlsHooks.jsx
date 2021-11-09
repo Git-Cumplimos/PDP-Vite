@@ -8,7 +8,7 @@ import Login from "../pages/Login";
 import AuthButton from "../components/Compound/Signout/Signout";
 import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
 import  FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
-import  transacciones from "../../src/apps/FundacionMujer/componentsmujer/Pages/Transacciones"
+import  Transacciones from "../pages/Transacciones"
 
 
 export const UrlsContext = createContext({
@@ -101,7 +101,7 @@ export const useProvideUrls = () => {
       {
         link: "/transacciones",
         label: <AppIcons Logo={MARKETPLACE} name="transacciones" />,
-        component: transacciones,
+        component: Transacciones,
         props: {},
       },
     ]);

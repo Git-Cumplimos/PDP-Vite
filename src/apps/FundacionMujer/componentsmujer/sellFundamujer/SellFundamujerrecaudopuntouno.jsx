@@ -1,43 +1,64 @@
 import { useRef } from "react";
 import Button from "../../../../components/Base/Button/Button";
-import Voucher from "../Voucher/Voucher";
+import Voucher from "../Voucher/Voucherrecaudopuntouno";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import { useAuth } from "../../../../utils/AuthHooks";
 
-const Sellfundamujer = ({ respuestamujer, setRespuestamujer, closeModal,/* setCustomer */ }) => {
+const Sellfundamujerrecaudo = ({
+  respuestamujer,
+  setRespuestamujer,
+  closeModal,
+}) => {
   const printDiv = useRef();
 
   const { getQuota } = useAuth();
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
-    // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
- 
-  const voucherInfo = {};
-   
-  
-  voucherInfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-    }).format(new Date());
-    voucherInfo["Hora"] = Intl.DateTimeFormat("es-CO", {
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hour12: false,
-    }).format(new Date());  
-  
+const urls ={
+  ticket:"http:transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view?"
+}
 
-     
-    voucherInfo["Estado"] = respuestamujer?.obj.Estado;
-    voucherInfo["Nombre"] =  respuestamujer?.obj["Nombres Cliente"];
-    voucherInfo["Documento"] = respuestamujer?.obj.Documento;
-    voucherInfo["pin"] = respuestamujer?.obj.Pin;
-    voucherInfo["Valordesembolso"] = respuestamujer?.obj["Valor desembolso"];
-    voucherInfo["idtrx"] = respuestamujer?.obj["id_trx"];
+/* 
+const ticket  = useCallback(async () => {
+  try {
+    const res = await fetchData(urls.ticket, "GET", {
+      id_trx:2,
+      Tipo_operacion=3,
+      Ticket: {} 
+    });
+
+    console.log(res);
+    return res;
+  } catch (err) {
+    console.error(err);
+  }
+}, []);
+
+ */
+const voucherInfo = {};
+
+
+
+  voucherInfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).format(new Date());
+  voucherInfo["Hora"] = Intl.DateTimeFormat("es-CO", {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: false,
+  }).format(new Date());
+
+  voucherInfo["Mensaje"] = respuestamujer["Mensaje"];
+  voucherInfo["Estado"] = respuestamujer["Confirmacion"];
+  voucherInfo["Referencia"] = respuestamujer["Referencia"];
+
+
 
 
   return "msg" ? (
@@ -74,4 +95,4 @@ const Sellfundamujer = ({ respuestamujer, setRespuestamujer, closeModal,/* setCu
     </div>
   );
 };
-export default Sellfundamujer;
+export default Sellfundamujerrecaudo;
