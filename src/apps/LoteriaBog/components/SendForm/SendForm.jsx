@@ -88,8 +88,7 @@ const SendForm = ({
                 closeModal();
                 setCustomer({ fracciones: "", phone: "", doc_id: "" });
               }}
-            >
-              Cancelar
+            >  Cancelar
             </Button>
           </ButtonBar>
         </Form>

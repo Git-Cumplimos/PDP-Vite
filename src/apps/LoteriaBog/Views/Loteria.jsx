@@ -11,7 +11,14 @@ import SellResp from "../components/SellResp/SellResp";
 import SendForm from "../components/SendForm/SendForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 
-const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
+const Loteria = ({
+  sorteo: sorteoOrdi,
+  sorteoExtra,
+
+  
+  sorteoOrdifisico,
+  sorteoExtrafisico,
+}) => {
   const {
     infoLoto: {
       numero,
@@ -29,6 +36,7 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
     },
     searchLoteria,
     sellLoteria,
+    searchLoteriafisico,
   } = useLoteria();
 
   const [showModal, setShowModal] = useState(false);
@@ -36,10 +44,10 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
 
-  const [opciones_sorteo, setOpciones_Sorteo] = useState([{ value: "", label: "" }]);
-  
- 
+  const [opcionesdisponibles, SetOpcionesDisponibles] = useState([{value:"",label:""}]);
+
   useEffect(() => {
+
     setSellResponse(null);
     setNumero("");
     setSerie("");
@@ -47,27 +55,54 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
     setLoterias("");
     setPage(1);
     setMaxPages(1);
-    if(sorteoOrdi!==null){
-      const copy=[...opciones_sorteo]
-      copy.push( { value: sorteoOrdi, label: `Sorteo ordinario - ${sorteoOrdi}` })
-      setOpciones_Sorteo([...copy])
+
+
+    console.log(sorteoOrdi)
+ 
+    const copy = [...opcionesdisponibles];
+    if (sorteoOrdi !== null) {
+      copy.push({
+        value: sorteoOrdi,
+        label: `Sorteo ordinario - ${sorteoOrdi}`,
+      });
+
+      console.log(copy);
     }
-    if(sorteoExtra!==null){
-      const copy=[...opciones_sorteo]
-      copy.push( {
+    if (sorteoExtra !== null) {
+      copy.push({
         value: sorteoExtra,
         label: `Sorteo extraordinario - ${sorteoExtra}`,
-      })
-      setOpciones_Sorteo([...copy])
+      });
     }
-  
+    if (sorteoOrdifisico !== null) {
+      copy.push({
+        value: sorteoOrdifisico,
+        label: `Sorteo ordinario  fisico- ${sorteoOrdifisico}`,
+      });
+    }
+
+    if (sorteoExtrafisico !== null) {
+      console.log(copy);
+      copy.push({
+        value: sorteoExtrafisico,
+        label: `Sorteo extraordinario fisico - ${sorteoExtrafisico}`,
+      });
+    }
+    SetOpcionesDisponibles([...copy]);
+
+
+
+    console.log(opcionesdisponibles)
   }, [setSellResponse, setNumero, setSerie, setCustomer, setLoterias]);
 
   const closeModal = useCallback(() => {
     setShowModal(false);
     searchLoteria(sorteo, numero, serie, page);
+
   }, [sorteo, numero, serie, searchLoteria, page]);
-  
+
+
+
   return (
     <>
       <Form grid>
@@ -75,10 +110,9 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
 
         }
         <Select
-          disabled={serie!=="" || numero!==""}
           id="selectSorteo"
           label="Tipo de sorteo"
-          options={opciones_sorteo}
+          options={opcionesdisponibles}
           value={sorteo}
           onChange={(e) => setSorteo(e.target.value)}
         />
@@ -91,17 +125,19 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
           autoComplete="false"
           value={numero}
           onInput={(e) => {
-    
-            if(!isNaN(e.target.value)){
-              const num = (e.target.value);
-              setNumero(num);
-              }
+            const num = parseInt(e.target.value) || "";
+            setNumero(num);
           }}
           onLazyInput={{
             callback: (e) => {
-              const num = (e.target.value) || "";
+              const num = parseInt(e.target.value) || "";
               setPage(1);
               searchLoteria(sorteo, num, serie, 1).then((max) => {
+                if (max !== undefined) {
+                  setMaxPages(Math.ceil(max / 10));
+                }
+              });
+              searchLoteriafisico().then((max) => {
                 if (max !== undefined) {
                   setMaxPages(Math.ceil(max / 10));
                 }
@@ -119,16 +155,20 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
           autoComplete="false"
           value={serie}
           onInput={(e) => {
-            if(!isNaN(e.target.value)){
-            const num = (e.target.value);
+            const num = parseInt(e.target.value) || "";
             setSerie(num);
-            }
           }}
           onLazyInput={{
             callback: (e) => {
-              const num = (e.target.value) || "";
+              const num = parseInt(e.target.value) || "";
               setPage(1);
               searchLoteria(sorteo, numero, num, 1).then((max) => {
+                if (max !== undefined) {
+                  setMaxPages(Math.ceil(max / 10));
+                }
+              });
+
+              searchLoteriafisico().then((max) => {
                 if (max !== undefined) {
                   setMaxPages(Math.ceil(max / 10));
                 }
@@ -170,33 +210,6 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
             <h1>Pagina: {page}</h1>
             <h1>Ultima pagina: {maxPages}</h1>
           </div>
-          <Table
-            headers={[
-              "Numero",
-              "Serie",
-              "Fracciones disponibles",
-              // "Valor por fraccion",
-            ]}
-            data={loterias.map(
-              ({
-                Fracciones_disponibles,
-                Num_billete,
-                // Valor_fraccion,
-                serie: Serie_lot,
-              }) => {
-                return {
-                  Num_billete,
-                  Serie_lot,
-                  Fracciones_disponibles,
-                  // Valor_fraccion,
-                };
-              }
-            )}
-            onSelectRow={(e, index) => {
-              setSelected(loterias[index]);
-              setShowModal(true);
-            }}
-          />
         </>
       ) : (
         ""
@@ -208,9 +221,9 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
             customer={customer}
             setCustomer={setCustomer}
             closeModal={closeModal}
-            handleSubmit={() => {              
+            handleSubmit={(event) => {
+              event.preventDefault();
               sellLoteria(sorteo);
-
             }}
           />
         ) : (

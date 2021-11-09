@@ -7,6 +7,9 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import AuthButton from "../components/Compound/Signout/Signout";
 import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
+import  FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
+import  Transacciones from "../pages/Transacciones"
+
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
@@ -69,6 +72,12 @@ export const useProvideUrls = () => {
         props: {},
       },
       {
+        link: "/fundacion-mujer",
+        label: <AppIcons Logo={"https://www.elempleo.com/sitios-empresariales/colombia/fundacion-de-la-mujer/video/LogoLoopFundacion_1_1.jpg"} name="Fundacion de la mujer" />,
+        component: FunMujer,
+        props: {},
+      },
+      {
         link: "/loteria-de-bogota/:page",
         component: LoteriaBog,
         props: {},
@@ -76,9 +85,23 @@ export const useProvideUrls = () => {
         show: false,
       },
       {
+        link: "/fundacion-mujer/:page",
+        component: FunMujer,
+        props: {},
+        exact: false,
+        show: false,
+      },
+
+      {
         link: "/marketplace",
         label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
         component: emptyComp,
+        props: {},
+      },
+      {
+        link: "/transacciones",
+        label: <AppIcons Logo={MARKETPLACE} name="transacciones" />,
+        component: Transacciones,
         props: {},
       },
     ]);

@@ -3,6 +3,7 @@ import ProvideLoteria from "./components/ProvideLoteria";
 import AdminLoteria from "./Roles/AdminLoteria";
 import CashierLoteria from "./Roles/CashierLoteria";
 
+
 const LoteriaBog = () => {
   const { roleInfo } = useAuth();
   return (

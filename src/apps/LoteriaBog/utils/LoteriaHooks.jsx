@@ -24,7 +24,6 @@ const urls = {
   ConsultaCrearSort: "http://sorteos.us-east-2.elasticbeanstalk.com/sorteo",
   CambiarSort: "http://sorteos.us-east-2.elasticbeanstalk.com/cambio_sorteo",
   EstadoArchivos: "http://loteriacons.us-east-2.elasticbeanstalk.com/logs",
-
 };
 
 export const LoteriaContext = createContext({
@@ -66,6 +65,7 @@ export const LoteriaContext = createContext({
   ConsultaCrearSort: () => {},
   CambiarSort: () => {},
   EstadoArchivos: () => {},
+  searchLoteriafisico:()=>{}
 });
 
 export const useLoteria = () => {
@@ -79,6 +79,7 @@ export const useProvideLoteria = () => {
   const [numero, setNumero] = useState("");
   const [serie, setSerie] = useState("");
   const [loterias, setLoterias] = useState(null);
+const [ loteriasfisico,setLoteriasfisco] = useState();
   const [selected, setSelected] = useState(null);
   const [customer, setCustomer] = useState({
     fracciones: "",
@@ -96,9 +97,12 @@ export const useProvideLoteria = () => {
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
 
+
+
   useEffect(() => {
     if (numero === "" && serie === "") {
       setLoterias([]);
+
     }
   }, [numero, serie, setLoterias]);
 
@@ -120,6 +124,31 @@ export const useProvideLoteria = () => {
       return Num_Datos;
     } catch (err) {
       setLoterias([]);
+      console.error(err);
+    }
+  }, []);
+
+  const searchLoteriafisico = useCallback(async () => {
+ 
+    try {
+      const { Resultado: res, Num_Datos } = await fetchData(
+        urls.ventafisico,
+        "GET",
+  
+        {
+          num_loteria:"02",
+          num_billete:"1234",
+          serie:"033",
+          sorteo:3,
+          numero: 1,
+        },
+        {}
+      );
+      setLoteriasfisco(res); 
+      console.log(res)
+      return Num_Datos;
+    } catch (err) {
+      setLoteriasfisco([]);
       console.error(err);
     }
   }, []);
@@ -237,7 +266,6 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-  
 
   const pagopremio = useCallback(
     async (sorteo, billete, serie, hash, customer, respagar, phone) => {
@@ -368,6 +396,8 @@ export const useProvideLoteria = () => {
       setSerie,
       loterias,
       setLoterias,
+      loteriasfisico,
+      setLoteriasfisco,
       selected,
       setSelected,
       customer,
@@ -398,5 +428,6 @@ export const useProvideLoteria = () => {
     ConsultaCrearSort,
     CambiarSort,
     EstadoArchivos,
+    searchLoteriafisico
   };
 };

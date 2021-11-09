@@ -107,7 +107,6 @@ const Premios = () => {
     setDisabledBtns(true);
 
     e.preventDefault();
-
     isWinner(sorteo, billete, serie)
       .then((res) => {
     
