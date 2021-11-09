@@ -15,6 +15,10 @@ const logger = new Logger("withAuthenticator");
 
 const urlLog = "http://loginconsulta.us-east-2.elasticbeanstalk.com/login";
 const urlQuota = "http://loginconsulta.us-east-2.elasticbeanstalk.com/cupo";
+const urlcrearRol = "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/crear_rol";
+const urlconsulta_roles = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_rol';
+const urlconsulta_usuarios = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_usuario';
+const urlcambiar_rol = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/modificar_rol';
 
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
@@ -25,10 +29,18 @@ export const AuthContext = createContext({
   cognitoUser: null,
   userInfo: null,
   roleInfo: null,
+  crearRolresp:null,
+  setCrearRolresp:null,
+  roles_disponibles:null,
+  setRoles_disponibles:null,
   signIn: () => {},
   confirmSignIn: () => {},
   signOut: () => {},
   getQuota: () => {},
+  crearRol: () => {},
+  consulta_roles: () => {},
+  consulta_usuarios: () => {},
+  cambiar_rol: () => {},
 });
 
 export const useAuth = () => {
@@ -43,6 +55,86 @@ export const useProvideAuth = () => {
   const [userInfo, setUserInfo] = useState(null);
 
   const [roleInfo, setRoleInfo] = useState(null);
+
+  const [crearRolresp, setCrearRolresp] = useState(null);
+
+  const [roles_disponibles, setRoles_disponibles] = useState(null);
+
+
+
+  const consulta_roles = useCallback(async () => {
+    try {
+      const res = await fetchData(urlconsulta_roles, "GET", {});
+      setRoles_disponibles(res);
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const consulta_usuarios = useCallback(async (email) => {
+    try {
+      const res = await fetchData(urlconsulta_usuarios, "GET", {
+        email:email,
+      });
+    
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+  
+  const crearRol = useCallback(
+    async (pnombre,snombre,papellido,sapellido, rol, email, identificacion,telefono,direccion_residencia) => {
+
+      
+      const req = {
+        
+          nombre:pnombre+" "+snombre+" "+papellido+" "+sapellido,
+          rol:rol,
+          email: email,
+          identificacion: identificacion,
+          telefono: telefono,
+          direccion_residencia: direccion_residencia,
+      
+
+      };
+      try {
+        const res = await fetchData(urlcrearRol, "POST", {}, req);
+        setCrearRolresp(res);
+        return res;
+      } catch (err) {
+        setCrearRolresp(null);
+        console.error(err);
+      }
+    },
+    []
+  );
+
+  const cambiar_rol = useCallback(
+    async (rol, email, email_cambio, telefono_cambio, direccion_residencia) => {
+
+      console.log(telefono_cambio)
+      const req = {
+        
+          rol:rol,
+          email: email,
+          email_cambio:email_cambio,
+          telefono: telefono_cambio,
+          direccion_residencia: direccion_residencia,
+      
+
+      };
+      try {
+        const res = await fetchData(urlcambiar_rol, "PUT", {}, req);
+        console.log(res)
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
 
  
 
@@ -128,7 +220,7 @@ export const useProvideAuth = () => {
 
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
-
+    consulta_roles();
     checkUser();
   }, [checkUser]);
 
@@ -227,15 +319,23 @@ export const useProvideAuth = () => {
   }, [roleInfo]);
 
   
-  
+ 
   return {
     isSignedIn,
     cognitoUser,
     userInfo,
     roleInfo,
+    crearRolresp,
+    setCrearRolresp,
+    roles_disponibles,
+    setRoles_disponibles,
     signIn,
     confirmSignIn,
     signOut,
     getQuota,
+    crearRol,
+    consulta_roles,
+    consulta_usuarios,
+    cambiar_rol,
   };
 };

@@ -9,7 +9,7 @@ const LoteriaBog = () => {
     <ProvideLoteria>
       <div className="w-full flex flex-col justify-center items-center">
         {roleInfo !== undefined && roleInfo !== null ? (
-          roleInfo.role === 0 ? (
+          roleInfo.role[0] === 1 ? (
             <AdminLoteria />
           ) : (
             <CashierLoteria />

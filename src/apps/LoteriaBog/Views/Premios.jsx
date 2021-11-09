@@ -110,8 +110,9 @@ const Premios = () => {
 
     isWinner(sorteo, billete, serie)
       .then((res) => {
-        
+    
         setDisabledBtns(false);
+        console.log(res)
         
         if('msg' in res){
           notify("El pago de premios de este sorteo ya esta vencido");
@@ -148,7 +149,7 @@ const Premios = () => {
         setShowModal(true);
         setDisabledBtns(false);
         setRespagar(res)
-        
+      
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
@@ -178,7 +179,7 @@ const Premios = () => {
       
       .catch(() => setDisabledBtns(false));
   };
- 
+  console.log(respagar)
   return (
     <>
       <Form onSubmit={onSubmit} grid>

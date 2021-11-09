@@ -35,8 +35,9 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
- 
 
+  const [opciones_sorteo, setOpciones_Sorteo] = useState([{ value: "", label: "" }]);
+  
  
   useEffect(() => {
     setSellResponse(null);
@@ -46,6 +47,19 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
     setLoterias("");
     setPage(1);
     setMaxPages(1);
+    if(sorteoOrdi!==null){
+      const copy=[...opciones_sorteo]
+      copy.push( { value: sorteoOrdi, label: `Sorteo ordinario - ${sorteoOrdi}` })
+      setOpciones_Sorteo([...copy])
+    }
+    if(sorteoExtra!==null){
+      const copy=[...opciones_sorteo]
+      copy.push( {
+        value: sorteoExtra,
+        label: `Sorteo extraordinario - ${sorteoExtra}`,
+      })
+      setOpciones_Sorteo([...copy])
+    }
   
   }, [setSellResponse, setNumero, setSerie, setCustomer, setLoterias]);
 
@@ -53,22 +67,18 @@ const Loteria = ({ sorteo: sorteoOrdi, sorteoExtra }) => {
     setShowModal(false);
     searchLoteria(sorteo, numero, serie, page);
   }, [sorteo, numero, serie, searchLoteria, page]);
-
+  
   return (
     <>
       <Form grid>
+        {
+
+        }
         <Select
           disabled={serie!=="" || numero!==""}
           id="selectSorteo"
           label="Tipo de sorteo"
-          options={[
-            { value: "", label: "" },
-            { value: sorteoOrdi, label: `Sorteo ordinario - ${sorteoOrdi}` },
-            {
-              value: sorteoExtra,
-              label: `Sorteo extraordinario - ${sorteoExtra}`,
-            },
-          ]}
+          options={opciones_sorteo}
           value={sorteo}
           onChange={(e) => setSorteo(e.target.value)}
         />

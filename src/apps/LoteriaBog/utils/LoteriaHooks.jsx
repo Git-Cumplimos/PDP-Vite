@@ -21,10 +21,10 @@ const urls = {
   premiofisico: "http://premiospago.us-east-2.elasticbeanstalk.com/fisico",
   pagopremio: "http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados",
   pagopremiofisico: 'http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados1',
-  crearRol: 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/crear_rol',
   ConsultaCrearSort: "http://sorteos.us-east-2.elasticbeanstalk.com/sorteo",
   CambiarSort: "http://sorteos.us-east-2.elasticbeanstalk.com/cambio_sorteo",
   EstadoArchivos: "http://loteriacons.us-east-2.elasticbeanstalk.com/logs",
+
 };
 
 export const LoteriaContext = createContext({
@@ -44,8 +44,6 @@ export const LoteriaContext = createContext({
     setFracciones_fisi:null,
     pagoresponse: null,
     setPagoresponse:null,
-    crearRolresp:null,
-    setCrearRolresp:null,
   },
   searchLoteria: () => {},
   sellLoteria: () => {},
@@ -65,7 +63,6 @@ export const LoteriaContext = createContext({
   makePayment2: () => {},
   pagopremio: () => {},
   pagopremiofisico: () => {},
-  crearRol: () => {},
   ConsultaCrearSort: () => {},
   CambiarSort: () => {},
   EstadoArchivos: () => {},
@@ -91,6 +88,7 @@ export const useProvideLoteria = () => {
   const [sellResponse, setSellResponse] = useState(null);
   const [pagoresponse, setPagoresponse] = useState(null);
   const [crearRolresp, setCrearRolresp] = useState(null);
+  const [roles_disponibles, setRoles_disponibles] = useState(null);
 
   // Datos estadisticas
   const [moda, setModa] = useState(null);
@@ -113,7 +111,7 @@ export const useProvideLoteria = () => {
         {
           num_loteria: num,
           serie: ser,
-          sorteo,
+          sorteo: sorteo,
           numero: page,
         },
         {}
@@ -187,7 +185,7 @@ export const useProvideLoteria = () => {
         const line = venta.split("-").join("").concat("\n");
         str = str.concat(line);
       }
-      const data = new Blob([str], { type: "text/plain" });
+      const data = new Blob([str], { type: "text/plain;charset=utf-8" });
       const csv = window.URL.createObjectURL(data);
       return csv;
     } catch (err) {
@@ -217,6 +215,7 @@ export const useProvideLoteria = () => {
         celular: phone,
         hash,
       });
+     
       return res;
       
     } catch (err) {
@@ -253,6 +252,9 @@ export const useProvideLoteria = () => {
         cod_dane_ciudad: "12",////////////////////////////////////#########################
         celular: parseInt(phone),
         valorganado: respagar['valor ganado'],
+        valor17percent: respagar['valor 17percent'],
+        valor20percent: respagar['valor 20percent'],
+        valorbruto: respagar['valor bruto'],
         tipo:parseInt(respagar.Tipo),
         identificacion:(customer.doc_id),
         id_comercio: roleInfo.id_comercio,
@@ -285,6 +287,9 @@ export const useProvideLoteria = () => {
           cod_dane_ciudad: "12",////////////////////////////////////#########################
           celular: customer2.telefono,
           valorganado: respagar['valor ganado'],
+          valor17percent: respagar['valor 17percent'],
+          valor20percent: respagar['valor 20percent'],
+          valorbruto: respagar['valor bruto'],
           tipo:parseInt(respagar.Tipo),
           identificacion: customer2.doc_id,
           fraciones:customer2.fracciones,
@@ -304,31 +309,6 @@ export const useProvideLoteria = () => {
     [roleInfo]
   );
   
-  const crearRol = useCallback(
-    async (pnombre,snombre,papellido,sapellido, rol, email, comercio) => {
-
-      
-      const req = {
-        
-          nombre:pnombre+" "+snombre+" "+papellido+" "+sapellido,
-          rol:rol,
-          email: email,
-          comercio: comercio,
-      
-
-      };
-      try {
-        const res = await fetchData(urls.crearRol, "POST", {}, req);
-        setCrearRolresp(res);
-        return res;
-      } catch (err) {
-        setCrearRolresp(null);
-        console.error(err);
-      }
-    },
-    []
-  );
-
   const ConsultaCrearSort = useCallback(async () => {
     try {
       const res = await fetchData(urls.ConsultaCrearSort, "GET", {
@@ -396,8 +376,6 @@ export const useProvideLoteria = () => {
       setSellResponse,
       pagoresponse,
       setPagoresponse,
-      crearRolresp,
-      setCrearRolresp,
     },
     searchLoteria,
     sellLoteria,
@@ -417,7 +395,6 @@ export const useProvideLoteria = () => {
     makePayment2,
     pagopremio,
     pagopremiofisico,
-    crearRol,
     ConsultaCrearSort,
     CambiarSort,
     EstadoArchivos,

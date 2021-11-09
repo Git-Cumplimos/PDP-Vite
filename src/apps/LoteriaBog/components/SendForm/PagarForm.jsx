@@ -5,6 +5,12 @@ import Input from "../../../../components/Base/Input/Input";
 import { useState } from "react";
 //import { useAuth } from "../../../../utils/AuthHooks";
 
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
+
 const SendForm = ({
   selected,
   customer: {
@@ -20,16 +26,22 @@ const SendForm = ({
   setCustomer,
   closeModal,
   handleSubmit,
+
+  
   
 
 }) => {
   const details = {
-    "Billete": selected ? selected['Ganadorboleto'] : "",
-    "Serie": selected ? selected['serie:'] : "",
-    "Valor ganado": selected ? "$"+selected['valor ganado'] : "",
+    "Billete:": selected ? selected['Ganadorboleto'] : "",
+    "Serie:": selected ? selected['serie:'] : "",
+    "Valor ganado:": selected ? formatMoney.format(selected['valor bruto']) : "",
+    "Retención 17%:": selected ? formatMoney.format(selected['valor 17percent']) : "",
+    "Retención 20%:": selected ? formatMoney.format(selected['valor 20percent']) : "",
+    "Valor a pagar:": selected ? formatMoney.format(selected['valor ganado']) : "", 
     
   };
   // const { getQuota } = useAuth();
+  
 
   const [disabledBtns, setDisabledBtns] = useState(false);
 

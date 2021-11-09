@@ -11,9 +11,10 @@ import Pago from "../../../assets/svg/PAGO-01.svg";
 import Reporte from "../../../assets/svg/REPORTES-01.svg";
 import Button from "../../../components/Base/Button/Button";
 import dayjs from 'dayjs'
+import { convertToObject } from "typescript";
 
 const urlLoto =
-  "http://loginconsulta.us-east-2.elasticbeanstalk.com/contiploteria";
+  "http://sorteos.us-east-2.elasticbeanstalk.com/contiploteria";
 
 const CashierLoteria = () => {
   const [sorteo, setSorteo] = useState(null);
@@ -49,6 +50,7 @@ const CashierLoteria = () => {
       {}
     )
       .then((res) => {
+        console.log(res)
         const sortOrd = res.filter(({ tip_sorteo }) => {
           return tip_sorteo === 1;
         });
@@ -58,12 +60,12 @@ const CashierLoteria = () => {
         if (sortOrd.length > 0) {
           setSorteo(sortOrd[0].num_sorteo);
         } else {
-          notifyError("No se encontraron sorteos ordinarios");
+          //notifyError("No se encontraron sorteos ordinarios");
         }
         if (sortExt.length > 0) {
           setSorteoExtra(sortExt[0].num_sorteo);
         } else {
-          notifyError("No se encontraron sorteos extraordinarios");
+          //notifyError("No se encontraron sorteos extraordinarios");
         }
       })
       .catch((err) => console.error(err));

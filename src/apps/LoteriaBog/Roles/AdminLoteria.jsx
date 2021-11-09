@@ -12,8 +12,10 @@ import SortForm from "../components/SortForm/SortForm";
 import {toast}  from "react-toastify";
 
 import { useLoteria } from "../utils/LoteriaHooks";
+import { useAuth } from "../../../utils/AuthHooks";
 
 import dayjs from 'dayjs';
+import { ConsoleLogger } from "@aws-amplify/core";
 
 const AdminLoteria = () => {
   const history = useHistory();
@@ -30,6 +32,8 @@ const AdminLoteria = () => {
     setShowModal(false);
     
   });
+
+  
 
 
   useEffect(() => {
@@ -74,8 +78,17 @@ const AdminLoteria = () => {
 
   
   const { ConsultaCrearSort } = useLoteria();
+  const { consulta_roles  } = useAuth();
 
-
+  useEffect(() => {
+    consulta_roles()
+    .then((res) => {
+         
+        
+    })
+    
+  }, [])
+    
   const onSubmit = (e) => {
     e.preventDefault();
     
@@ -106,7 +119,7 @@ const AdminLoteria = () => {
     });
   };
 
-  
+ 
   return (
     <div className="flex flex-col justify-center items-center w-full">
       <Select
@@ -118,10 +131,11 @@ const AdminLoteria = () => {
           e.target.value !== undefined && e.target.value === ""
             ? history.push(`/${pathname.split("/")[1]}`)
             : history.push(`/${pathname.split("/")[1]}/${e.target.value}`)
+            
         }
       />
       {posibles.includes(page) ? <SelectPage /> : ""}
-      { (day===3) ? (
+      { (day===5) ? (
         <Form formDir="col" onSubmit={onSubmit}>
             <ButtonBar>
               <Button type="submit" diabled={disabledBtns}>Crear nuevo sorteo</Button>

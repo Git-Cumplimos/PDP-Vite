@@ -36,9 +36,13 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
     voucherPagoInfo["Numero de billete"] = pagoresponse['boleto'];
     voucherPagoInfo.Serie = pagoresponse['serie'];
     voucherPagoInfo["Valor pagado"] = pagoresponse['valor ganado'];
+    voucherPagoInfo["Valor 17percent"] = pagoresponse['valor 17percent'];
+    voucherPagoInfo["Valor 20percent"] = pagoresponse['valor 20percent'];
+    voucherPagoInfo["Valor bruto"] = pagoresponse['valor bruto'];
     voucherPagoInfo["No.terminal"] = roleInfo.id_dispositivo;
+    voucherPagoInfo["id_transaccion"] = pagoresponse.id;
   }
-
+  console.log(pagoresponse)
   return "msg" in pagoresponse ? (
     <div className="flex flex-col justify-center items-center">
       <h1>Error: {pagoresponse.msg}</h1>
