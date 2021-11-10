@@ -9,6 +9,7 @@ import AuthButton from "../components/Compound/Signout/Signout";
 import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
 import  FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
 import  Transacciones from "../pages/Transacciones"
+import CrearRoles from "../pages/CrearRoles";
 
 
 export const UrlsContext = createContext({
@@ -44,7 +45,7 @@ export const useProvideUrls = () => {
       {
         link: "/seguridad",
         label: "Seguridad",
-        component: emptyComp,
+        component: CrearRoles,
         props: {},
       },
       {

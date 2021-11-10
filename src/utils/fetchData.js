@@ -22,7 +22,7 @@ const fetchData = async (url = "", method = "GET", queries = {}, data = {}) => {
         }
       : {
           method: method,
-        };
+        };      
   fetchOtions.signal = abortController.signal;
   const response = await fetch(url, fetchOtions);
   const json = await response.json();

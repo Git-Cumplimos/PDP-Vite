@@ -51,7 +51,7 @@ const CashierLoteria = () => {
       {}
     )
       .then((res) => {
-        console.log(res);
+        
 
         ////sorteo virtual
         const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
@@ -61,12 +61,12 @@ const CashierLoteria = () => {
           return tip_sorteo === 2 && !fisico;
         });
         if (sortOrd.length > 0) {
-          setSorteo(sortOrd[0].num_sorteo);
+          setSorteo(sortOrd[0]);
         } else {
           /*  notifyError("No se encontraron sorteos ordinarios"); */
         }
         if (sortExt.length > 0) {
-          setSorteoExtra(sortExt[0].num_sorteo);
+          setSorteoExtra(sortExt[0]);
         } else {
           /* notifyError("No se encontraron sorteos extraordinarios"); */
         }
@@ -84,13 +84,13 @@ const CashierLoteria = () => {
         });
 
         if (sortOrdfisico.length > 0) {
-          setSorteofisico(sortExtfisico[0].num_sorteo);
+          setSorteofisico(sortExtfisico[0]);
         } else {
           /*    notifyError("No se encontraron extraordinarios fisicos"); */
         }
 
         if (sortExtfisico.length > 0) {
-          setSorteofisicoextraordinario(sortExtfisico[0].num_sorteo);
+          setSorteofisicoextraordinario(sortExtfisico[0]);
         } else {
           /*   notifyError("No se encontraron extraordinarios fisicos"); */
         }
@@ -106,7 +106,6 @@ const CashierLoteria = () => {
 
   useEffect(() => {
     searchLoteriaInfo();
-    console.log(searchLoteriaInfo());
     setDay(dayjs().day());
     setHora(dayjs().format("HH"));
   }, [searchLoteriaInfo]);
@@ -127,9 +126,11 @@ const CashierLoteria = () => {
 
 
       case "premios":
+       
         return <Premios />;
 
       case "reportes":
+       // console.log(sorteo)
         return <Reportes sorteo={sorteo} sorteoExtra={sorteoExtra} />;
 
       default:

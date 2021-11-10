@@ -111,7 +111,7 @@ const Premios = () => {
       .then((res) => {
     
         setDisabledBtns(false);
-        console.log(res)
+        
         
         if('msg' in res){
           notify("El pago de premios de este sorteo ya esta vencido");
@@ -129,7 +129,7 @@ const Premios = () => {
             setWinner(true);
             setIsSelf(true);
         }else{
-          notify("Ganador!! pero no vendido por Punto de Pago");
+          notify("Ganador con billete físico");
           setTipopago(res[0]['Tipo'])
           setWinner(true);
           setIsSelf(false);  
@@ -178,7 +178,7 @@ const Premios = () => {
       
       .catch(() => setDisabledBtns(false));
   };
-  console.log(respagar)
+  
   return (
     <>
       <Form onSubmit={onSubmit} grid>
@@ -186,7 +186,7 @@ const Premios = () => {
           id="numSorteo"
           label="Numero de sorteo"
           type="text"
-          minLength="4"
+          minLength="1"
           maxLength="4"
           required={true}
           autoComplete="false"

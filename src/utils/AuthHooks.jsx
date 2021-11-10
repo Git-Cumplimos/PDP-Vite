@@ -114,7 +114,7 @@ export const useProvideAuth = () => {
   const cambiar_rol = useCallback(
     async (rol, email, email_cambio, telefono_cambio, direccion_residencia) => {
 
-      console.log(telefono_cambio)
+      
       const req = {
         
           rol:rol,
@@ -127,7 +127,7 @@ export const useProvideAuth = () => {
       };
       try {
         const res = await fetchData(urlcambiar_rol, "PUT", {}, req);
-        console.log(res)
+        
         return res;
       } catch (err) {
         console.error(err);
@@ -162,7 +162,7 @@ export const useProvideAuth = () => {
           },
           {}
         );
-        console.log(quota)
+        
         setRoleInfo({
           role: suserInfo.rol,
           ...suserInfo,

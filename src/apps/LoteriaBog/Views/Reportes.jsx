@@ -27,7 +27,7 @@ const Reportes = ({ sorteo, sorteoExtra }) => {
         label="Sorteo"
         options={[
           { value: "", label: "" },
-          { value: sorteo, label: `Sorteo ordinario - ${sorteo}` },
+          { value: sorteo.num_sorteo, label: `Sorteo ordinario - ${sorteo.num_sorteo}` },
           {
             value: sorteoExtra,
             label: `Sorteo extraordinario - ${sorteoExtra}`,

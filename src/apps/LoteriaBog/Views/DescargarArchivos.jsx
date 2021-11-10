@@ -9,7 +9,7 @@ const DescargarArchivos = () => {
   const { getReportesVentas } = useLoteria();
 
   useEffect(() => {
-    getReportesVentas("2613").then((res) => {
+    getReportesVentas("2612").then((res) => {
       setDownloadRef(res);
     });
   }, [getReportesVentas]);

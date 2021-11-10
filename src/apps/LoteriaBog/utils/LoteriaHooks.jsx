@@ -7,7 +7,8 @@ import {
 } from "react";
 import { useAuth } from "../../../utils/AuthHooks";
 import fetchData from "../../../utils/fetchData";
-import Loteria from "../Views/Loteria";
+//import Loteria from "../Views/Loteria";
+
 const urls = {
   ordinario:
     "http://loteriacons.us-east-2.elasticbeanstalk.com/consultas_loteria",
@@ -65,7 +66,6 @@ export const LoteriaContext = createContext({
   ConsultaCrearSort: () => {},
   CambiarSort: () => {},
   EstadoArchivos: () => {},
-  searchLoteriafisico:()=>{}
 });
 
 export const useLoteria = () => {
@@ -107,16 +107,24 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
   }, [numero, serie, setLoterias]);
 
   const searchLoteria = useCallback(async (sorteo, num, ser, page) => {
+    let fisico=false
+    const sort = sorteo.split('-')
+    if(sort[1]==='true'){
+      fisico=true
+    }
+    
     if (num === "" && ser === "") return;
     try {
       const { Resultado: res, Num_Datos } = await fetchData(
         urls.ordinario,
         "GET",
         {
+          loteria:'02',
           num_loteria: num,
           serie: ser,
-          sorteo: sorteo,
+          sorteo: parseInt(sort[0]),
           numero: page,
+          fisico: fisico
         },
         {}
       );
@@ -128,35 +136,18 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
     }
   }, []);
 
-  const searchLoteriafisico = useCallback(async () => {
- 
-    try {
-      const { Resultado: res, Num_Datos } = await fetchData(
-        urls.ventafisico,
-        "GET",
   
-        {
-          num_loteria:"02",
-          num_billete:"1234",
-          serie:"033",
-          sorteo:3,
-          numero: 1,
-        },
-        {}
-      );
-      setLoteriasfisco(res); 
-      console.log(res)
-      return Num_Datos;
-    } catch (err) {
-      setLoteriasfisco([]);
-      console.error(err);
-    }
-  }, []);
   
   const sellLoteria = useCallback(
     async (sorteo) => {
+      let fisico=false
+      const sort = sorteo.split('-')
+      if(sort[1]==='true'){
+        fisico=true
+      }
+      
       const req = {
-        num_sorteo: sorteo,
+        num_sorteo: parseInt(sort[0]),
         num_billete: `${selected.Num_billete}`,
         serie: `${selected.serie}`,
         val_pago:
@@ -167,9 +158,10 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
         cod_distribuidor: "PPAGO",////////////////////////////////////#########################
         can_frac_venta: parseInt(customer.fracciones),
         can_fracciones: parseInt(selected.Fracciones_disponibles),
-        cantidad_frac_billete: 3,
+        cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
+        fisico:fisico,
       };
       try {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
@@ -381,7 +373,7 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
   const EstadoArchivos = useCallback(async () => {
     try {
       const res = await fetchData(urls.EstadoArchivos, "GET", {});
-      console.log(res)
+      
       return res;
     } catch (err) {
       console.error(err);
@@ -428,6 +420,5 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
     ConsultaCrearSort,
     CambiarSort,
     EstadoArchivos,
-    searchLoteriafisico
   };
 };
