@@ -146,7 +146,6 @@ const CashierLoteria = () => {
       </div>
     );
   };
-
   const options = [
     { value: "sorteos", label: <LotoIcons Logo={Sorteos} name="Sorteos" /> },
     {

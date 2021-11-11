@@ -34,7 +34,7 @@ const LoginForm = () => {
     auth
       .signIn(username, password)
       .then(() => {
-        console.log("user exist");
+        
       })
       .catch((err) => {
         if (err.code === "NotAuthorizedException") {

@@ -1,4 +1,4 @@
-import { useParams, useHistory, useLocation } from "react-router-dom";
+import { useParams, useHistory, useLocation, Link } from "react-router-dom";
 import Select from "../../../components/Base/Select/Select";
 import CargaArchivos from "../Views/CargaArchivos";
 import DescargarArchivos from "../Views/DescargarArchivos";
@@ -16,6 +16,7 @@ import { useAuth } from "../../../utils/AuthHooks";
 
 import dayjs from 'dayjs';
 import { ConsoleLogger } from "@aws-amplify/core";
+import AppIcons from "../../../components/Base/AppIcons/AppIcons";
 
 const AdminLoteria = () => {
   const history = useHistory();
@@ -50,26 +51,44 @@ const AdminLoteria = () => {
       case "descargar":
         return <DescargarArchivos />;
       
-      case "crear_rol":
-        return <CrearRoles />
-      default:
-        return "";
+      // case "crear_rol":
+      //   return <CrearRoles />
+      // default:
+      //   return "";
     }
   };
 
-  const check = () => {
-    const posib = [];
-    const opts = [{ value: "", label: "" }];
-    opts.push(
-      { value: "cargar", label: "Cargar archivos" },
-      { value: "descargar", label: "Descargar archivos" },
-      { value: "crear_rol", label: "Crear un usuario" }
+  const LotoIcons = ({ Logo, name }) => {
+    return (
+      <div className="flex flex-col justify-center flex-1 text-center text-base md:text-xl">
+        <AppIcons Logo={Logo} />
+        <h1>{name}</h1>
+      </div>
     );
-    posib.push("cargar", "descargar", "crear_rol");
-    return [[...opts], [...posib]];
   };
 
-  const [options, posibles] = check();
+  const options = [
+    { value: "cargar", label: <LotoIcons Logo={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_1-P9wrhr8RWkx5zt3f64Ogy-Yr5DoQ_5ww&usqp=CAU'} name="cargar" /> },
+    {
+      value: "descargar",
+      label: <LotoIcons Logo={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU'} name="descargar" />,
+    },
+  ];
+
+  const posibles = ["cargar", "descargar"];
+  // const check = () => {
+  //   const posib = [];
+  //   const opts = [{ value: "", label: "" }];
+  //   opts.push(
+  //     { value: "cargar", label: "Cargar archivos" },
+  //     { value: "descargar", label: "Descargar archivos" },
+  //     // { value: "crear_rol", label: "Crear un usuario" }
+  //   );
+  //   posib.push("cargar", "descargar", "crear_rol");
+  //   return [[...opts], [...posib]];
+  // };
+
+  // const [options, posibles] = check();
 
 
 
@@ -121,8 +140,43 @@ const AdminLoteria = () => {
 
  
   return (
+    
     <div className="flex flex-col justify-center items-center w-full">
-      <Select
+      <>
+      {pathname === `/${pathname.split("/")[1]}` ? (
+        <div className="flex flex-row flex-wrap justify-center gap-8">
+          {options.map(({ value, label }) => {
+            return (
+              <Link to={`/${pathname.split("/")[1]}/${value}`} key={value}>
+                {label}
+              </Link>
+            );
+          })}
+        </div>
+      ) : (
+        ""
+      )}
+      {posibles.includes(page) ? (
+        <div className="flex flex-col md:flex-row justify-evenly w-full">
+          <div className="flex flex-col">
+            <div className="hidden md:block">
+              {options.find(({ value }) => page === value).label}
+            </div>
+            <div>
+              <Link to={`/${pathname.split("/")[1]}`}>
+                <Button>Volver</Button>
+              </Link>
+            </div>
+          </div>
+          <div className="flex flex-col justify-center items-center flex-1">
+            <SelectPage />
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+    </>
+      {/* <Select
         id="pagesLDB"
         label="Elegir operación:"
         options={options}
@@ -134,7 +188,7 @@ const AdminLoteria = () => {
             
         }
       />
-      {posibles.includes(page) ? <SelectPage /> : ""}
+      {posibles.includes(page) ? <SelectPage /> : ""} */}
       { (day===5) ? (
         <Form formDir="col" onSubmit={onSubmit}>
             <ButtonBar>

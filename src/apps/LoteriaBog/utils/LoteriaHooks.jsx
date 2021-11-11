@@ -16,6 +16,8 @@ const urls = {
   moda: "http://buscadosmas.us-east-2.elasticbeanstalk.com/consurepmasbusca",
   ventasReportes:
     "http://ventasreportes.us-east-2.elasticbeanstalk.com/reportes_ventas",
+  con_sort_ventas:
+    "http://ventasreportes.us-east-2.elasticbeanstalk.com/con_sort_vendidos",
   consultaPago:
     "http://premiospago.us-east-2.elasticbeanstalk.com/pagodepremios",
   premiohash: "http://premiospago.us-east-2.elasticbeanstalk.com/hash",
@@ -66,6 +68,7 @@ export const LoteriaContext = createContext({
   ConsultaCrearSort: () => {},
   CambiarSort: () => {},
   EstadoArchivos: () => {},
+  con_sort_ventas: () => {},
 });
 
 export const useLoteria = () => {
@@ -195,10 +198,27 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
     []
   );
 
+  const con_sort_ventas = useCallback(async () => {
+    try {
+      const info = await fetchData(urls.con_sort_ventas, "GET", {});
+      const res = info
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
   const getReportesVentas = useCallback(async (sorteo) => {
+   
+    let fisico=false
+      const sort = sorteo.split('-')
+      if(sort[1]==='true'){
+        fisico=true
+      }
+    
     try {
       const info = await fetchData(urls.ventasReportes, "GET", {
-        sorteo,
+        sorteo:sort[0],
       });
       const res = info[0];
       let str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`;
@@ -420,5 +440,6 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
     ConsultaCrearSort,
     CambiarSort,
     EstadoArchivos,
+    con_sort_ventas,
   };
 };

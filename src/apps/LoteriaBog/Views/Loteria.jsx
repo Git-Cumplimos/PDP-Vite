@@ -99,7 +99,7 @@ const Loteria = ({
 
   }, [sorteo, numero, serie, searchLoteria, page]);
 
- 
+  
   return (
     <>
       <Form grid>

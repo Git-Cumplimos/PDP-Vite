@@ -4,23 +4,22 @@ import AdminLoteria from "./Roles/AdminLoteria";
 import CashierLoteria from "./Roles/CashierLoteria";
 
 
+
+
 const LoteriaBog = () => {
   const { roleInfo } = useAuth();
-  console.log(roleInfo)
   return (
     <ProvideLoteria>
       <div className="w-full flex flex-col justify-center items-center">
-        {roleInfo !== undefined && roleInfo !== null ? (
-          roleInfo.role[0] === 1 ? (
-            <div>
-            <AdminLoteria />
-            <CashierLoteria/></div>
-          ) : (
-            <CashierLoteria />
-          )
-        ) : (
-          ""
-        )}
+        {roleInfo !== undefined && roleInfo !== null && (
+          <>
+          {roleInfo?.role.includes(1)? (
+            <AdminLoteria/>          
+          ):("")}
+          {roleInfo?.role.includes(2)?(
+            <CashierLoteria/>) : ("")}
+        </>)}
+        
       </div>
     </ProvideLoteria>
   );

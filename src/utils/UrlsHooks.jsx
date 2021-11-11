@@ -10,6 +10,8 @@ import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
 import  FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
 import  Transacciones from "../pages/Transacciones"
 import CrearRoles from "../pages/CrearRoles";
+import { useAuth } from "./AuthHooks";
+//import Box from "../components/Base/Cargando/Cargando"
 
 
 export const UrlsContext = createContext({
@@ -31,6 +33,9 @@ export const useProvideUrls = () => {
     return <h1>Componente vacio</h1>;
   };
 
+  const { roleInfo } = useAuth();
+  
+
   useEffect(() => {
     setUrlsPrivate([
       { link: "/", label: "Inicio", component: Home, props: {} },
@@ -45,7 +50,7 @@ export const useProvideUrls = () => {
       {
         link: "/seguridad",
         label: "Seguridad",
-        component: CrearRoles,
+        component: roleInfo?.role?.includes(1)? CrearRoles:emptyComp,
         props: {},
       },
       {
@@ -101,7 +106,7 @@ export const useProvideUrls = () => {
       },
       {
         link: "/transacciones",
-        label: <AppIcons Logo={MARKETPLACE} name="transacciones" />,
+        label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
         component: Transacciones,
         props: {},
       },
@@ -115,7 +120,7 @@ export const useProvideUrls = () => {
         props: {},
       },
     ]);
-  }, []);
+  }, [roleInfo]);
 
   return {
     urlsPrivate,
