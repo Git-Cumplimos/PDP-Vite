@@ -15,10 +15,14 @@ const logger = new Logger("withAuthenticator");
 
 const urlLog = "http://loginconsulta.us-east-2.elasticbeanstalk.com/login";
 const urlQuota = "http://loginconsulta.us-east-2.elasticbeanstalk.com/cupo";
-const urlcrearRol = "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/crear_rol";
-const urlconsulta_roles = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_rol';
-const urlconsulta_usuarios = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_usuario';
-const urlcambiar_rol = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/modificar_rol';
+const urlcrearRol =
+  "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/crear_rol";
+const urlconsulta_roles =
+  "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_rol";
+const urlconsulta_usuarios =
+  "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_usuario";
+const urlcambiar_rol =
+  "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/modificar_rol";
 
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
@@ -29,10 +33,10 @@ export const AuthContext = createContext({
   cognitoUser: null,
   userInfo: null,
   roleInfo: null,
-  crearRolresp:null,
-  setCrearRolresp:null,
-  roles_disponibles:null,
-  setRoles_disponibles:null,
+  crearRolresp: null,
+  setCrearRolresp: null,
+  roles_disponibles: null,
+  setRoles_disponibles: null,
   signIn: () => {},
   confirmSignIn: () => {},
   signOut: () => {},
@@ -60,8 +64,6 @@ export const useProvideAuth = () => {
 
   const [roles_disponibles, setRoles_disponibles] = useState(null);
 
-
-
   const consulta_roles = useCallback(async () => {
     try {
       const res = await fetchData(urlconsulta_roles, "GET", {});
@@ -75,29 +77,34 @@ export const useProvideAuth = () => {
   const consulta_usuarios = useCallback(async (email) => {
     try {
       const res = await fetchData(urlconsulta_usuarios, "GET", {
-        email:email,
+        email: email,
       });
-    
+
       return res;
     } catch (err) {
       console.error(err);
     }
   }, []);
-  
+
   const crearRol = useCallback(
-    async (pnombre,snombre,papellido,sapellido, rol, email, identificacion,telefono,direccion_residencia) => {
-
-      
+    async (
+      pnombre,
+      snombre,
+      papellido,
+      sapellido,
+      rol,
+      email,
+      identificacion,
+      telefono,
+      direccion_residencia
+    ) => {
       const req = {
-        
-          nombre:pnombre+" "+snombre+" "+papellido+" "+sapellido,
-          rol:rol,
-          email: email,
-          identificacion: identificacion,
-          telefono: telefono,
-          direccion_residencia: direccion_residencia,
-      
-
+        nombre: `${pnombre} ${snombre} ${papellido} ${sapellido}`,
+        rol: rol,
+        email: email,
+        identificacion: identificacion,
+        telefono: telefono,
+        direccion_residencia: direccion_residencia,
       };
       try {
         const res = await fetchData(urlcrearRol, "POST", {}, req);
@@ -113,21 +120,15 @@ export const useProvideAuth = () => {
 
   const cambiar_rol = useCallback(
     async (rol, email, email_cambio, telefono_cambio, direccion_residencia) => {
-
-      
       const req = {
-        
-          rol:rol,
-          email: email,
-          email_cambio:email_cambio,
-          telefono: telefono_cambio,
-          direccion_residencia: direccion_residencia,
-      
-
+        rol: rol,
+        email: email,
+        email_cambio: email_cambio,
+        telefono: telefono_cambio,
+        direccion_residencia: direccion_residencia,
       };
       try {
         const res = await fetchData(urlcambiar_rol, "PUT", {}, req);
-        
         return res;
       } catch (err) {
         console.error(err);
@@ -135,8 +136,6 @@ export const useProvideAuth = () => {
     },
     []
   );
-
- 
 
   const setUser = useCallback(async () => {
     try {
@@ -152,7 +151,7 @@ export const useProvideAuth = () => {
           { correo: usrInfo?.attributes?.email },
           {}
         );
-       
+
         const quota = await fetchData(
           urlQuota,
           "GET",
@@ -162,13 +161,16 @@ export const useProvideAuth = () => {
           },
           {}
         );
-        
+
+        const _role = suserInfo.rol;
+        delete suserInfo.rol;
+
         setRoleInfo({
-          role: suserInfo.rol,
+          role: _role,
           ...suserInfo,
-          
-          quota: quota['cupo disponible'],
-          comision: quota['comisiones'],
+
+          quota: quota["cupo disponible"],
+          comision: quota["comisiones"],
         });
       }
     } catch (err) {
@@ -203,15 +205,16 @@ export const useProvideAuth = () => {
           },
           {}
         ).then((quota) => {
+          const _role = suserInfo.rol;
+          delete suserInfo.rol;
           setRoleInfo({
-            role: suserInfo.rol,
+            role: _role,
             ...suserInfo,
             // id_comercio: 2,
             // id_dispositivo: 233,
             // id_usuatio: 8,
-            quota: quota['cupo disponible'],
-            comision: quota['comisiones'],
-                        
+            quota: quota["cupo disponible"],
+            comision: quota["comisiones"],
           });
         });
       });
@@ -222,7 +225,7 @@ export const useProvideAuth = () => {
     appendToCognitoUserAgent("withCustomAuthenticator");
     consulta_roles();
     checkUser();
-  }, [checkUser]);
+  }, [checkUser, consulta_roles]);
 
   const history = useHistory();
   const { state, pathname } = useLocation();
@@ -257,7 +260,7 @@ export const useProvideAuth = () => {
             { correo: usrInfo?.attributes?.email },
             {}
           );
-          
+
           const quota = await fetchData(
             urlQuota,
             "GET",
@@ -267,15 +270,17 @@ export const useProvideAuth = () => {
             },
             {}
           );
-                   
+          const _role = suserInfo.rol;
+          delete suserInfo.rol;
+
           setRoleInfo({
-            role: suserInfo.rol,
+            role: _role,
             ...suserInfo,
             // id_comercio: 2,
             // id_dispositivo: 233,
             // id_usuatio: 8,
-            quota: quota['cupo disponible'],
-            comision: quota['comisiones'],
+            quota: quota["cupo disponible"],
+            comision: quota["comisiones"],
           });
         }
         history.push(
@@ -313,13 +318,11 @@ export const useProvideAuth = () => {
       },
       {}
     );
-    tempRole.quota = quota['cupo disponible'];
-    tempRole.comision= quota['comisiones']
+    tempRole.quota = quota["cupo disponible"];
+    tempRole.comision = quota["comisiones"];
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
 
-  
- 
   return {
     isSignedIn,
     cognitoUser,

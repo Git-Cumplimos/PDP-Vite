@@ -1,5 +1,6 @@
 .formItem {
-  @apply flex flex-col md:flex-row justify-center items-center text-center my-4 mx-4 gap-4;
+  @apply flex flex-col md:flex-row justify-center items-center;
+  @apply text-center my-4 mx-auto md:mx-4 gap-4;
 }
 
 .formItem > label {
@@ -7,5 +8,5 @@
 }
 
 .formItem > select {
-  @apply px-4 py-2 rounded-md bg-secondary-light text-black md:w-full md:min-w-max;
+  @apply px-4 py-2 rounded-md bg-secondary-light text-black md:w-full min-w-full md:min-w-max;
 }

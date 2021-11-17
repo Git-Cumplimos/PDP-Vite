@@ -106,7 +106,7 @@ const Desembolsos = () => {
           required
           minLength="10"
           maxLength="16"
-          autoComplete="false"
+          autoComplete="off"
           value={documento}
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
@@ -120,7 +120,7 @@ const Desembolsos = () => {
           required
           minLength="4"
           maxLength="4"
-          autoComplete="false"
+          autoComplete="off"
           value={pin}
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";

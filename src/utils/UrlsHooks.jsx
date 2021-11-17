@@ -7,10 +7,10 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import AuthButton from "../components/Compound/Signout/Signout";
 import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
-import  FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
-import  Transacciones from "../pages/Transacciones"
+import FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
+import Transacciones from "../pages/Transacciones";
 import CrearRoles from "../pages/CrearRoles";
-
+import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
@@ -28,7 +28,7 @@ export const useProvideUrls = () => {
   const [urlsPrivApps, setUrlsPrivApps] = useState([]);
 
   const emptyComp = () => {
-    return <h1>Componente vacio</h1>;
+    return <p></p>;
   };
 
   useEffect(() => {
@@ -40,7 +40,12 @@ export const useProvideUrls = () => {
         component: emptyComp,
         props: {},
       },
-      { link: "/gestion", label: "Gestion", component: emptyComp, props: {} },
+      {
+        link: "/gestion",
+        label: "Gestion",
+        component: emptyComp,
+        props: {},
+      },
       { link: "/reportes", label: "Reportes", component: emptyComp, props: {} },
       {
         link: "/seguridad",
@@ -55,8 +60,8 @@ export const useProvideUrls = () => {
         props: {},
       },
       {
-        label: <AuthButton />
-      }
+        label: <AuthButton />,
+      },
     ]);
 
     setUrlsPrivApps([
@@ -71,12 +76,21 @@ export const useProvideUrls = () => {
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
         component: LoteriaBog,
         props: {},
+        show: false,
       },
       {
         link: "/fundacion-mujer",
-        label: <AppIcons Logo={"https://www.elempleo.com/sitios-empresariales/colombia/fundacion-de-la-mujer/video/LogoLoopFundacion_1_1.jpg"} name="Fundacion de la mujer" />,
+        label: (
+          <AppIcons
+            Logo={
+              "https://www.elempleo.com/sitios-empresariales/colombia/fundacion-de-la-mujer/video/LogoLoopFundacion_1_1.jpg"
+            }
+            name="Fundacion de la mujer"
+          />
+        ),
         component: FunMujer,
         props: {},
+        show: false,
       },
       {
         link: "/loteria-de-bogota/:page",
@@ -98,11 +112,24 @@ export const useProvideUrls = () => {
         label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
         component: emptyComp,
         props: {},
+        show: false,
       },
       {
         link: "/transacciones",
-        label: <AppIcons Logo={MARKETPLACE} name="transacciones" />,
+        label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
         component: Transacciones,
+        props: {},
+        show: false,
+      },
+      {
+        link: "/update-commerce",
+        label: (
+          <AppIcons
+            Logo={"http://simpleicon.com/wp-content/uploads/refresh.png"}
+            name="Actualizacion de datos"
+          />
+        ),
+        component: FormCommerce,
         props: {},
       },
     ]);

@@ -189,7 +189,7 @@ const Premios = () => {
           minLength="1"
           maxLength="4"
           required={true}
-          autoComplete="false"
+          autoComplete="off"
           value={sorteo}
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
@@ -203,7 +203,7 @@ const Premios = () => {
           minLength="4"/*Verificar para que se puedan poner ceros a la izquierda*/ 
           maxLength="4"
           required={true}
-          autoComplete="false"
+          autoComplete="off"
           value={billete}
           onInput={(e) => {
             if(!isNaN(e.target.value)){
@@ -221,7 +221,7 @@ const Premios = () => {
           minLength="3"/*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="3"
           required={true}
-          autoComplete="false"
+          autoComplete="off"
           value={serie}
           onInput={(e) => {            
             if(!isNaN(e.target.value)){
@@ -244,7 +244,7 @@ const Premios = () => {
               id="numCel"
               label="Numero de celular"
               type="text"
-              autoComplete="false"
+              autoComplete="off"
               required={true}
               value={phone}
               onInput={(e) => {
@@ -259,7 +259,7 @@ const Premios = () => {
                 id="codHash"
                 label="Codigo de seguridad"
                 type="text"
-                autoComplete="false"
+                autoComplete="off"
                 required={true}
                 value={hash}
                 onInput={(e) => {
@@ -286,7 +286,7 @@ const Premios = () => {
               type="number"
               max='3'
               min='1'
-              autoComplete="false"
+              autoComplete="off"
               required={true}
               value={fracciones_fisi}
               onInput={(e) => {
