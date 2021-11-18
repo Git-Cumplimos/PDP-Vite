@@ -92,7 +92,6 @@ const LocationForm = ({ place = "", location }) => {
         show={showModal}
         handleClose={() => setShowModal(false)}
         className="px-6"
-        bigger
       >
         <Input
           id={`buscar_${place}`}
@@ -123,14 +122,10 @@ const LocationForm = ({ place = "", location }) => {
         />
         {Array.isArray(foundMuni) && foundMuni.length > 0 ? (
           <Table
-            headers={[
-              "Region",
-              "Codigo de departamento",
-              "Departamento",
-              "Codigo de municipio",
-              "Municipio",
-            ]}
-            data={foundMuni}
+            headers={["Departamento", "Municipio"]}
+            data={foundMuni.map(({ departamento, municipio }) => {
+              return { departamento, municipio };
+            })}
             onSelectRow={(e, i) => {
               setDepartamento(foundMuni[i].departamento);
               setMunicipio(foundMuni[i].municipio);
