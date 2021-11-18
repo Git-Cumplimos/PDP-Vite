@@ -20,8 +20,10 @@ const urls = {
     "http://premiospago.us-east-2.elasticbeanstalk.com/pagodepremios",
   premiohash: "http://premiospago.us-east-2.elasticbeanstalk.com/hash",
   premiofisico: "http://premiospago.us-east-2.elasticbeanstalk.com/fisico",
-  pagopremio: "http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados",
-  pagopremiofisico: 'http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados1',
+  pagopremio:
+    "http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados",
+  pagopremiofisico:
+    "http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados1",
 };
 
 export const LoteriaContext = createContext({
@@ -38,10 +40,9 @@ export const LoteriaContext = createContext({
     sellResponse: null,
     setSellResponse: null,
     fracciones_fisi: null,
-    setFracciones_fisi:null,
+    setFracciones_fisi: null,
     pagoresponse: null,
-    setPagoresponse:null,
-
+    setPagoresponse: null,
   },
   searchLoteria: () => {},
   sellLoteria: () => {},
@@ -138,7 +139,7 @@ export const useProvideLoteria = () => {
       try {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
         setSellResponse(res);
-        console.log(Loteria)
+        console.log(Loteria);
       } catch (err) {
         setSellResponse(null);
         console.error(err);
@@ -194,68 +195,77 @@ export const useProvideLoteria = () => {
         bill_ganador: billete,
         serie_ganadora: serie,
       });
-      console.log(res)
+      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
     }
   }, []);
 
-  const makePayment = useCallback(async (sorteo, billete, serie, phone, hash) => {
-    try {
-      const res = await fetchData(urls.premiohash, "GET", {
-        num_sorteo: sorteo,
-        bill_ganador: billete,
-        serie_ganadora: serie,
-        celular: phone,
-        hash,
-      });
-      return res;
-      
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+  const makePayment = useCallback(
+    async (sorteo, billete, serie, phone, hash) => {
+      try {
+        const res = await fetchData(urls.premiohash, "GET", {
+          num_sorteo: sorteo,
+          bill_ganador: billete,
+          serie_ganadora: serie,
+          celular: phone,
+          hash,
+        });
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
 
-  const makePayment2 = useCallback(async (sorteo, billete, serie, fracciones_fisi) => {
-    try {
-      const res = await fetchData(urls.premiofisico, "GET", {
-        num_sorteo: sorteo,
-        bill_ganador: billete,
-        serie_ganadora: serie,
-        cant_fracciones: fracciones_fisi,
-      });
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
-  
+  const makePayment2 = useCallback(
+    async (sorteo, billete, serie, fracciones_fisi) => {
+      try {
+        const res = await fetchData(urls.premiofisico, "GET", {
+          num_sorteo: sorteo,
+          bill_ganador: billete,
+          serie_ganadora: serie,
+          cant_fracciones: fracciones_fisi,
+        });
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
 
   const pagopremio = useCallback(
     async (sorteo, billete, serie, hash, customer, respagar, phone) => {
-      console.log(customer)
+      console.log(customer);
       const req = {
-        nombre:(customer.primer_nombre+" "+customer.segundo_nombre + " " +customer.primer_apellido+" "+customer.segundo_apellido),
+        nombre:
+          customer.primer_nombre +
+          " " +
+          customer.segundo_nombre +
+          " " +
+          customer.primer_apellido +
+          " " +
+          customer.segundo_apellido,
         num_sorteo: sorteo,
         bill_ganador: billete,
         serie_ganadora: serie,
         cod_seguridad: hash,
-        direccion:(customer.direccion),
-        cod_dane_ciudad: "12",///////////
+        direccion: customer.direccion,
+        cod_dane_ciudad: "12", ///////////
         celular: parseInt(phone),
-        valorganado: respagar['valor ganado'],////////////////
-        tipo:parseInt(respagar.Tipo),
-        identificacion:(customer.doc_id),
+        valorganado: respagar["valor ganado"], ////////////////
+        tipo: parseInt(respagar.Tipo),
+        identificacion: customer.doc_id,
         id_usuario: 8,
-        id_comercio: 2
-
+        id_comercio: 2,
       };
       try {
         const res = await fetchData(urls.pagopremio, "POST", {}, req);
         setPagoresponse(res);
-        
+
         //console.log(Loteria)
       } catch (err) {
         setPagoresponse(null);
@@ -267,31 +277,33 @@ export const useProvideLoteria = () => {
 
   const pagopremiofisico = useCallback(
     async (sorteo, billete, serie, customer2, respagar) => {
-
-      console.log(customer2)
+      console.log(customer2);
       const req = {
-        
-          nombre:(customer2.primer_nombre+" "+customer2.segundo_nombre + " " +customer2.primer_apellido+" "+customer2.segundo_apellido),
-          num_sorteo: sorteo,
-          bill_ganador: billete,
-          serie_ganadora: serie,
-          direccion:customer2.direccion,
-          cod_dane_ciudad: "12",
-          celular: customer2.telefono,
-          valorganado: respagar['valor ganado'],
-          tipo:parseInt(respagar.Tipo),
-          identificacion: customer2.doc_id,
-          fraciones:customer2.fracciones,
-          id_usuario: 8,
-          id_comercio: 2
-      
-      
-
+        nombre:
+          customer2.primer_nombre +
+          " " +
+          customer2.segundo_nombre +
+          " " +
+          customer2.primer_apellido +
+          " " +
+          customer2.segundo_apellido,
+        num_sorteo: sorteo,
+        bill_ganador: billete,
+        serie_ganadora: serie,
+        direccion: customer2.direccion,
+        cod_dane_ciudad: "12",
+        celular: customer2.telefono,
+        valorganado: respagar["valor ganado"],
+        tipo: parseInt(respagar.Tipo),
+        identificacion: customer2.doc_id,
+        fraciones: customer2.fracciones,
+        id_usuario: 8,
+        id_comercio: 2,
       };
       try {
         const res = await fetchData(urls.pagopremiofisico, "POST", {}, req);
         setPagoresponse(res);
-        
+
         //console.log(Loteria)
       } catch (err) {
         setPagoresponse(null);
@@ -299,7 +311,7 @@ export const useProvideLoteria = () => {
       }
     },
     []
-  );  
+  );
 
   return {
     infoLoto: {

@@ -7,6 +7,7 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import AuthButton from "../components/Compound/Signout/Signout";
 import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
+import MarketPlace from "../apps/MarketPlace/MarketPlace";
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
@@ -51,8 +52,8 @@ export const useProvideUrls = () => {
         props: {},
       },
       {
-        label: <AuthButton />
-      }
+        label: <AuthButton />,
+      },
     ]);
 
     setUrlsPrivApps([
@@ -79,6 +80,12 @@ export const useProvideUrls = () => {
         link: "/marketplace",
         label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
         component: emptyComp,
+        props: {},
+      },
+      {
+        link: "/marketplace/payorder/:orden",
+        // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
+        component: MarketPlace,
         props: {},
       },
     ]);

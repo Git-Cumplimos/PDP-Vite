@@ -6,18 +6,35 @@ import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../../../utils/AuthHooks";
 import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
+import QRCode from "qrcode.react";
 
 const LoginForm = () => {
   const { contain, card, field } = classes;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [cell, setCell] = useState("");
   const [totp, setTotp] = useState("");
+  const [names, setNames] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [newPass, setNewPass] = useState("");
 
   const auth = useAuth();
 
   const notifyError = (msg) => {
     toast.error(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
+  const notify = (msg) => {
+    toast(msg, {
       position: "top-center",
       autoClose: 5000,
       hideProgressBar: false,
@@ -64,7 +81,36 @@ const LoginForm = () => {
       });
   };
 
-  return auth.cognitoUser ? (
+  const handleChangePW = (event) => {
+    event.preventDefault();
+
+    auth
+      .handleChangePass(lastName, names, newPass, auth.cognitoUser, cell)
+      .then()
+      .catch((err) => {
+        console.log("Por alguna razon no funciono", err);
+      });
+  };
+
+  const handleTOTPconfirm = (event) => {
+    event.preventDefault();
+
+    auth
+      .handleverifyTotpToken(totp)
+      .then()
+      .catch((err) => {
+        notify("Token y contraseña establecidos correctamente");
+      });
+
+    setNames("");
+    setLastName("");
+    setTotp("");
+    setCell("");
+    setNewPass("");
+  };
+
+  console.log(names, lastName, newPass);
+  return auth.cognitoUser?.challengeName === "SOFTWARE_TOKEN_MFA" ? (
     <>
       <div className="container flex flex-row justify-center items-center">
         <RightArrow xlarge />
@@ -95,6 +141,110 @@ const LoginForm = () => {
         </div>
       </div>
     </>
+  ) : auth.cognitoUser?.challengeName === "NEW_PASSWORD_REQUIRED" ? (
+    <>
+      <div className="container flex flex-row justify-center items-center">
+        <RightArrow xlarge />
+        <div className={card}>
+          <h1 className="uppercase text-2xl font-medium text-center">
+            Cambio de contraseña nuevo usuario
+          </h1>
+          <hr />
+          <form onSubmit={handleChangePW}>
+            <div className={field}>
+              <label htmlFor="id">Nombres:</label>
+              <input
+                id="names"
+                type="text"
+                maxLength="255"
+                autoFocus
+                autoComplete="off"
+                value={names}
+                onChange={(e) => {
+                  setNames(e.target.value);
+                }}
+              />
+            </div>
+            <div className={field}>
+              <label htmlFor="id">Apellidos:</label>
+              <input
+                id="lastName"
+                type="text"
+                maxLength="255"
+                autoComplete="off"
+                value={lastName}
+                onChange={(e) => {
+                  setLastName(e.target.value);
+                }}
+              />
+            </div>
+            <div className={field}>
+              <label htmlFor="id">Celular:</label>
+              <input
+                id="cell"
+                type="number"
+                maxLength="10"
+                autoComplete="off"
+                value={cell}
+                onChange={(e) => {
+                  setCell(e.target.value);
+                }}
+              />
+            </div>
+            <div className={field}>
+              <label htmlFor="id">Nueva contraseña:</label>
+              <input
+                id="totp"
+                type="text"
+                autoComplete="off"
+                value={newPass}
+                onChange={(e) => {
+                  setNewPass(e.target.value);
+                }}
+              />
+            </div>
+            <div className={field}>
+              <button type="submit">Actualizar datos</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
+  ) : auth.cognitoUser?.challengeName === "MFA_SETUP" ? (
+    <>
+      <div className="container flex flex-row justify-center items-center">
+        <RightArrow xlarge />
+        <div className={card}>
+          <h1 className="uppercase text-2xl font-medium text-center">
+            TOKEN DE SEGURIDAD
+          </h1>
+          <hr />
+          <form onSubmit={handleTOTPconfirm}>
+            <h2>Escanee el siguiente código QR con Google Authenticator</h2>
+            <div className={field}>
+              <QRCode value={auth.qr}></QRCode>
+            </div>
+            <div className={field}>
+              <label htmlFor="id">Validar Token:</label>
+              <input
+                id="lastName"
+                type="text"
+                maxLength="255"
+                autoFocus
+                autoComplete="off"
+                value={totp}
+                onChange={(e) => {
+                  setTotp(e.target.value);
+                }}
+              />
+            </div>
+            <div className={field}>
+              <button type="submit">Finalizar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
   ) : (
     <div className={contain}>
       <form onSubmit={handleCognito}>
@@ -111,7 +261,7 @@ const LoginForm = () => {
           />
         </div>
         <div className={field}>
-          <label htmlFor="password">Contaseña:</label>
+          <label htmlFor="password">Contraseña:</label>
           <input
             type="password"
             value={password}
