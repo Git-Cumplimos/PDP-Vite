@@ -18,8 +18,6 @@ const url_send = process.env.REACT_APP_URL_FORM_COMMERCE;
 
 const url_types = process.env.REACT_APP_URL_TYPES_FORM_COMMERCE;
 
-const url_loc = process.env.REACT_APP_URL_DANE_MUNICIPIOS;
-
 const FormCommerce = () => {
   const [commerceId, setCommerceId] = useState(123);
   const [commerceName, setCommerceName] = useState("");
@@ -141,38 +139,6 @@ const FormCommerce = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-
-    // Revisar municipios
-    try {
-      const comMun = await fetchData(url_loc, "GET", {
-        $where: `municipio='${commerceLocation.municipio[0]}'`,
-        $limit: 5,
-      });
-      if (comMun?.obj.length !== 1) {
-        console.log(comMun?.obj);
-        notifyError("Por favor ingrese un municipio valido para el comercio");
-        return;
-      } else {
-        commerceLocation.foundMunicipios[1](comMun?.obj);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-
-    try {
-      const resMun = await fetchData(url_loc, "GET", {
-        $where: `municipio='${homeLocation.municipio[0]}'`,
-        $limit: 5,
-      });
-      if (resMun?.obj.length !== 1) {
-        notifyError("Por favor ingrese un municipio valido para la residencia");
-        return;
-      } else {
-        homeLocation.foundMunicipios[1](resMun?.obj);
-      }
-    } catch (err) {
-      console.error(err);
-    }
 
     // Ver tipos de negocio
     if (commerceType.length === 0) {

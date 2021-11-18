@@ -1,23 +1,13 @@
+import { useState } from "react";
 import fetchData from "../../../utils/fetchData";
 import AddressInput from "../../Base/AddressInput/AddressInput";
+import Button from "../../Base/Button/Button";
+import ButtonBar from "../../Base/ButtonBar/ButtonBar";
 import Fieldset from "../../Base/Fieldset/Fieldset";
 import Input from "../../Base/Input/Input";
-import Select from "../../Base/Select/Select";
+import Modal from "../../Base/Modal/Modal";
+import Table from "../../Base/Table/Table";
 
-const capitalizeSentence = (sentence) => {
-  const words = sentence.split(/[ ]+/g);
-  for (const key in words) {
-    const word = words[key];
-    words[key] = capitalize(word);
-    const letters = words[key].split(/[.]+/g);
-    for (const key2 in letters) {
-      const letter = letters[key2];
-      letters[key2] = capitalize(letter);
-    }
-    words[key] = letters.join(".");
-  }
-  return words.join(" ");
-};
 const capitalize = (word) => {
   return word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);
 };
@@ -40,6 +30,9 @@ const LocationForm = ({ place = "", location }) => {
   const [localidad, setLocalidad] = locState;
   const [barrio, setBarrio] = barrState;
 
+  const [showModal, setShowModal] = useState(false);
+  const [simpleSearch, setSimpleSearch] = useState("");
+
   return (
     <Fieldset
       legend={`Ubicacion${place !== "" ? ` ${place}` : ""}`}
@@ -49,85 +42,23 @@ const LocationForm = ({ place = "", location }) => {
         id={`municipio_${place}`}
         label="Municipio"
         type="search"
-        list={`opts-muni_${place}`}
-        minLength="4"
-        autoComplete="off"
         value={municipio}
-        onInput={(e) => setMunicipio(capitalizeSentence(e.target.value))}
-        onLazyInput={{
-          callback: (e) => {
-            const municipio = capitalizeSentence(e.target.value);
-            if (municipio.length > 1) {
-              fetchData(url, "GET", {
-                $where: `municipio LIKE '%25${municipio}%25'`,
-                $limit: 5,
-              })
-                .then((res) => {
-                  setFoundMuni(res);
-                  if (res.length === 1) {
-                    setDepartamento(res[0].departamento);
-                  } else {
-                    setDepartamento("");
-                  }
-                })
-                .catch((err) => console.error(err));
-            } else {
-              setFoundMuni([]);
-              setDepartamento("");
-            }
-          },
-          timeOut: 500,
-        }}
+        disabled
         required
       />
-      <datalist id={`opts-muni_${place}`}>
-        {Array.isArray(foundMuni) &&
-          foundMuni
-            .filter(({ municipio: mun }, index) => {
-              return (
-                index ===
-                foundMuni.findIndex((obj) => {
-                  return obj.municipio === mun;
-                })
-              );
-            })
-            .map(({ municipio: mun, c_digo_dane_del_municipio: cod_mun }) => {
-              return <option key={cod_mun} value={mun} />;
-            })}
-      </datalist>
-      <Select
+      <Input
         id={`departamento_${place}`}
         label="Departamento"
-        options={
-          foundMuni.length === 1
-            ? Object.fromEntries([
-                ...foundMuni.map(
-                  ({
-                    departamento: dep,
-                    c_digo_dane_del_departamento: cod_dep,
-                  }) => {
-                    return [dep, cod_dep];
-                  }
-                ),
-              ])
-            : {
-                "": "",
-                ...Object.fromEntries([
-                  ...foundMuni.map(
-                    ({
-                      departamento: dep,
-                      c_digo_dane_del_departamento: cod_dep,
-                    }) => {
-                      return [dep, cod_dep];
-                    }
-                  ),
-                ]),
-              }
-        }
+        type="search"
         value={departamento}
-        onChange={(e) => setDepartamento(e.target.value)}
+        disabled
         required
       />
+      <ButtonBar className="lg:col-span-2">
+        <Button type="button" onClick={() => setShowModal(true)}>
+          Buscar municipio y departamento
+        </Button>
+      </ButtonBar>
       <Input
         id={`barrio_${place}`}
         label="Barrio"
@@ -157,6 +88,61 @@ const LocationForm = ({ place = "", location }) => {
         place={place}
         getAddress={addrState[1]}
       />
+      <Modal
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+        className="px-6"
+        bigger
+      >
+        <Input
+          id={`buscar_${place}`}
+          label="Busqueda por municipio"
+          type="search"
+          minLength="4"
+          autoComplete="off"
+          value={simpleSearch}
+          onInput={(e) => setSimpleSearch(capitalize(e.target.value))}
+          onLazyInput={{
+            callback: (e) => {
+              const query = capitalize(e.target.value);
+              if (query.length > 1) {
+                fetchData(url, "GET", {
+                  $where: `municipio LIKE '%25${query}%25'`,
+                  $limit: 5,
+                })
+                  .then((res) => {
+                    setFoundMuni(res);
+                  })
+                  .catch((err) => console.error(err));
+              } else {
+                setFoundMuni([]);
+              }
+            },
+            timeOut: 500,
+          }}
+        />
+        {Array.isArray(foundMuni) && foundMuni.length > 0 ? (
+          <Table
+            headers={[
+              "Region",
+              "Codigo de departamento",
+              "Departamento",
+              "Codigo de municipio",
+              "Municipio",
+            ]}
+            data={foundMuni}
+            onSelectRow={(e, i) => {
+              setDepartamento(foundMuni[i].departamento);
+              setMunicipio(foundMuni[i].municipio);
+              setFoundMuni([foundMuni[i]]);
+              setSimpleSearch("");
+              setShowModal(false);
+            }}
+          ></Table>
+        ) : (
+          ""
+        )}
+      </Modal>
     </Fieldset>
   );
 };
