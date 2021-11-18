@@ -3,6 +3,7 @@ import AppIcons from "../components/Base/AppIcons/AppIcons";
 import SUSER from "../assets/svg/SUSER-01.svg";
 import MARKETPLACE from "../assets/svg/MARKETPLACE-01.svg";
 import LOTERIA from "../assets/svg/LOTERIA-DE-BOGOTA-01.svg";
+import ACTUALIZACION from "../assets/svg/ActualizacionDeDatos.svg";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import AuthButton from "../components/Compound/Signout/Signout";
@@ -123,12 +124,7 @@ export const useProvideUrls = () => {
       },
       {
         link: "/update-commerce",
-        label: (
-          <AppIcons
-            Logo={"http://simpleicon.com/wp-content/uploads/refresh.png"}
-            name="Actualizacion de datos"
-          />
-        ),
+        label: <AppIcons Logo={ACTUALIZACION} name="Actualizacion de datos" />,
         component: FormCommerce,
         props: {},
       },

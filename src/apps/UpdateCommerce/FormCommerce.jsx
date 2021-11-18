@@ -1,28 +1,33 @@
 import { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "../../components/Base/Button/Button";
 import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import Fieldset from "../../components/Base/Fieldset/Fieldset";
 import Form from "../../components/Base/Form/Form";
 import Input from "../../components/Base/Input/Input";
-import Modal from "../../components/Base/Modal/Modal";
 import MultipleInput from "../../components/Base/MultipleInput/MultipleInput";
-import MultipleSelect from "../../components/Base/MultipleSelect/MultipleSelect";
 import Select from "../../components/Base/Select/Select";
 import LocationForm from "../../components/Compound/LocationForm/LocationForm";
 import { useAuth } from "../../utils/AuthHooks";
 import fetchData from "../../utils/fetchData";
 
-const url =
-  "http://actividades-economicas-ciiu-dev.us-east-2.elasticbeanstalk.com/actividad";
+const url = process.env.REACT_APP_URL_ACTIVIDADES;
+
+const url_send = process.env.REACT_APP_URL_FORM_COMMERCE;
+
+const url_types = process.env.REACT_APP_URL_TYPES_FORM_COMMERCE;
+
+const url_loc = process.env.REACT_APP_URL_DANE_MUNICIPIOS;
 
 const FormCommerce = () => {
   const [commerceId, setCommerceId] = useState(123);
   const [commerceName, setCommerceName] = useState("");
+  const [commerceName2, setCommerceName2] = useState("");
 
   const [legalRepName, setLegalRepName] = useState("");
   const [legalRepIdType, setLegalRepIdType] = useState("");
-  const [legalRepDodId, setLegalRepDodId] = useState("");
+  const [legalRepDocId, setLegalRepDocId] = useState("");
 
   const [phones, setPhones] = useState(["", ""]);
   const [emails, setEmails] = useState([""]);
@@ -48,15 +53,79 @@ const FormCommerce = () => {
   const [commerceType, setCommerceType] = useState([]);
   const [giftLocation, setGiftLocation] = useState("");
 
-  const [showModal, setShowModal] = useState(false);
   const [actividad, setActividad] = useState("");
   const [foundActivities, setFoundActivities] = useState([]);
 
+  // types
+  const [docsTypes, setDocsTypes] = useState({});
+  const [locsTypes, setLocsTypes] = useState({});
+
   const { roleInfo } = useAuth();
+
+  const history = useHistory();
+
   useEffect(() => {
-    // console.log(roleInfo);
     setCommerceId(roleInfo?.id_comercio || 0);
+    fetchData(`${url_send}/review`, "GET", {
+      id_comercio: roleInfo?.id_comercio || 0,
+    })
+      .then((res) => {
+        if (res?.status) {
+          if (res?.obj.isActualizado) {
+            notify(
+              `Formulario ya actualizado el ${Intl.DateTimeFormat("es-CO", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }).format(new Date(res?.obj.fecha_update))}`
+            );
+            history.replace("/");
+          }
+        } else {
+          console.error(res?.msg);
+        }
+      })
+      .catch((err) => console.error(err));
+    fetchData(`${url_types}/type-doc`, "GET", {}, {})
+      .then((res) => {
+        if (res?.status) {
+          const temp = { "": "" };
+          res?.obj.forEach(({ id_doc, Nombre, nombre_corto }) => {
+            temp[`${Nombre} (${nombre_corto})`] = id_doc;
+          });
+          setDocsTypes({ ...temp });
+        } else {
+          console.error(res?.msg);
+        }
+      })
+      .catch((err) => console.error(err));
+    fetchData(`${url_types}/type-loc`, "GET", {}, {})
+      .then((res) => {
+        if (res?.status) {
+          const temp = { "": "" };
+          res?.obj.forEach(({ id_doc, Nombre }) => {
+            temp[Nombre] = id_doc;
+          });
+          setLocsTypes({ ...temp });
+        } else {
+          console.error(res?.msg);
+        }
+      })
+      .catch((err) => console.error(err));
   }, [roleInfo]);
+  console.log();
+
+  const notify = (msg) => {
+    toast.info(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
   const notifyError = (msg) => {
     toast.error(msg, {
@@ -70,38 +139,117 @@ const FormCommerce = () => {
     });
   };
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
 
     // Revisar municipios
-    fetchData(url, "GET", {
-      $where: `municipio='${commerceLocation.municipio[0]}'`,
-      $limit: 5,
-    })
-      .then((res) => {
-        if (res.length !== 1) {
-          notifyError("Por favor ingrese un municipio valido para el comercio");
-        } else {
-          fetchData(url, "GET", {
-            $where: `municipio='${homeLocation.municipio[0]}'`,
-            $limit: 5,
-          })
-            .then((res) => {
-              if (res.length !== 1) {
-                notifyError(
-                  "Por favor ingrese un municipio valido para la residencia"
-                );
-              }
-            })
-            .catch((err) => console.error(err));
-        }
-      })
-      .catch((err) => console.error(err));
+    try {
+      const comMun = await fetchData(url_loc, "GET", {
+        $where: `municipio='${commerceLocation.municipio[0]}'`,
+        $limit: 5,
+      });
+      if (comMun?.obj.length !== 1) {
+        console.log(comMun?.obj);
+        notifyError("Por favor ingrese un municipio valido para el comercio");
+        return;
+      } else {
+        commerceLocation.foundMunicipios[1](comMun?.obj);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    try {
+      const resMun = await fetchData(url_loc, "GET", {
+        $where: `municipio='${homeLocation.municipio[0]}'`,
+        $limit: 5,
+      });
+      if (resMun?.obj.length !== 1) {
+        notifyError("Por favor ingrese un municipio valido para la residencia");
+        return;
+      } else {
+        homeLocation.foundMunicipios[1](resMun?.obj);
+      }
+    } catch (err) {
+      console.error(err);
+    }
 
     // Ver tipos de negocio
     if (commerceType.length === 0) {
       notifyError("Por favor ingrese algun tipo de negocio");
-    } else {
+      return;
+    }
+
+    try {
+      const _res = await fetchData(
+        `${url_send}/fill`,
+        "POST",
+        {},
+        {
+          id_comercio: commerceId,
+          Nombre_comercio: commerceName,
+          Nombre_comercio_2: commerceName2,
+          Tipo_comercio:
+            roleInfo?.tipo_comercio === "CRCS"
+              ? 2
+              : roleInfo?.tipo_comercio === "COMERCIOS CEAS"
+              ? 3
+              : 1,
+          Representante: {
+            Nombre: legalRepName,
+            Tipo_doc: legalRepIdType,
+            Numero_doc: legalRepDocId,
+          },
+          Contacto: {
+            Numeros: phones,
+            Correos: emails,
+          },
+          Location: {
+            Comercio: {
+              Municipio: {
+                id: commerceLocation.foundMunicipios[0][0]
+                  .c_digo_dane_del_municipio,
+                Nombre: commerceLocation.foundMunicipios[0][0].municipio,
+              },
+              Departamento: {
+                id: commerceLocation.foundMunicipios[0][0]
+                  .c_digo_dane_del_departamento,
+                Nombre: commerceLocation.foundMunicipios[0][0].departamento,
+              },
+              Barrio: commerceLocation.barrio[0],
+              Localidad: commerceLocation.localidad[0],
+              Direccion: commerceLocation.direccion[0],
+            },
+            Residencia: {
+              Municipio: {
+                id: homeLocation.foundMunicipios[0][0]
+                  .c_digo_dane_del_municipio,
+                Nombre: homeLocation.foundMunicipios[0][0].municipio,
+              },
+              Departamento: {
+                id: homeLocation.foundMunicipios[0][0]
+                  .c_digo_dane_del_departamento,
+                Nombre: homeLocation.foundMunicipios[0][0].departamento,
+              },
+              Barrio: commerceLocation.barrio[0],
+              Localidad: commerceLocation.localidad[0],
+              Direccion: commerceLocation.direccion[0],
+            },
+          },
+          Type_acts: commerceType.map((val) => {
+            return val.substring(0, 4);
+          }),
+          Gift: giftLocation,
+        }
+      );
+      if (_res?.status) {
+        notify("Formulario subido exitosamente");
+        history.replace("/");
+      } else {
+        notifyError(`Error al subir el formulario: ${_res?.msg}`);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -130,6 +278,29 @@ const FormCommerce = () => {
         <datalist id="oldNameCommerce">
           <option value={roleInfo?.["nombre comercio"] || ""}></option>
         </datalist>
+        {roleInfo?.tipo_comercio === "CRCS" ? (
+          <Input
+            id="commerceName2"
+            label="Nombre del centro medico"
+            type="text"
+            autoComplete="off"
+            value={commerceName2}
+            onInput={(e) => setCommerceName2(e.target.value)}
+            required
+          />
+        ) : roleInfo?.tipo_comercio === "COMERCIOS CEAS" ? (
+          <Input
+            id="commerceName2"
+            label="Nombre del centro de enseñanza"
+            type="text"
+            autoComplete="off"
+            value={commerceName2}
+            onInput={(e) => setCommerceName2(e.target.value)}
+            required
+          />
+        ) : (
+          ""
+        )}
         <Fieldset legend="Representante legal" className="lg:col-span-2">
           <Input
             id="legalRepName"
@@ -141,12 +312,13 @@ const FormCommerce = () => {
             required
           />
           <Input
-            id="legalRepDodId"
+            id="legalRepDocId"
             label="Numero de identificacion"
             type="text"
+            minLength="6"
             autoComplete="off"
-            value={legalRepDodId}
-            onInput={(e) => setLegalRepDodId(e.target.value)}
+            value={legalRepDocId}
+            onInput={(e) => setLegalRepDocId(e.target.value)}
             required
           />
           <div className="flex flex-col md:flex-row justify-center items-center text-center my-4 mx-4 gap-4">
@@ -156,16 +328,7 @@ const FormCommerce = () => {
             <Select
               id="legalRepIdType"
               className="px-4 py-2 rounded-md bg-secondary-light text-black max-w-xs"
-              options={{
-                "": "",
-                "Cédula de ciudadanía (CC)": 13,
-                "Tarjeta de extranjeria (TE)": 21,
-                "Cédula de extranjeria (CE)": 22,
-                "Pasaporte (PA)": 41,
-                "Permiso de permanencia (PE)": 44,
-                "Documento de identificación extranjero": 42,
-                "Número Único de Identificación Personal (NUIP)": 91,
-              }}
+              options={docsTypes || []}
               value={legalRepIdType}
               onChange={(e) =>
                 setLegalRepIdType(parseInt(e.target.value) || "")
@@ -261,11 +424,7 @@ const FormCommerce = () => {
         <Select
           id="giftLocation"
           label="Donde desea recibir el regalo"
-          options={{
-            "": "",
-            Comercio: 1,
-            Residencia: 2,
-          }}
+          options={locsTypes}
           value={giftLocation}
           onChange={(e) => setGiftLocation(parseInt(e.target.value) || "")}
           required

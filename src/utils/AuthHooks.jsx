@@ -13,20 +13,12 @@ import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
 
-const urlLog = "http://loginconsulta.us-east-2.elasticbeanstalk.com/login";
-const urlQuota = "http://loginconsulta.us-east-2.elasticbeanstalk.com/cupo";
-const urlcrearRol =
-  "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/crear_rol";
-const urlconsulta_roles =
-  "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_rol";
-const urlconsulta_usuarios =
-  "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_usuario";
-const urlcambiar_rol =
-  "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/modificar_rol";
-
-//////////////////////Despliegue de estos servicios anterior
-// const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
-// const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
+const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
+const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
+const urlcrearRol = `${process.env.REACT_APP_URL_USRS}/crear_rol`;
+const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
+const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
+const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
 
 export const AuthContext = createContext({
   isSignedIn: false,

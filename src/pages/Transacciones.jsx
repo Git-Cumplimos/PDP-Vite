@@ -20,10 +20,8 @@ const Transacciones = () => {
   ] = useState(null);
 
   const urls = {
-    tiposoperaciones:
-      "http://tipos-operaciones-pdp-dev.us-east-2.elasticbeanstalk.com/tipos-operaciones",
-    transacciones:
-      "http://transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view",
+    tiposoperaciones: process.env.REACT_APP_URL_TRXS_TIPOS,
+    transacciones: process.env.REACT_APP_URL_TRXS_TRX,
   };
 
   console.log(respuestatipooperaciontransaccion);

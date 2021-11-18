@@ -22,7 +22,7 @@ const capitalize = (word) => {
   return word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);
 };
 
-const url = "https://www.datos.gov.co/resource/xdk5-pm3f.json";
+const url = process.env.REACT_APP_URL_DANE_MUNICIPIOS;
 
 const LocationForm = ({ place = "", location }) => {
   const {
@@ -39,17 +39,6 @@ const LocationForm = ({ place = "", location }) => {
   const [foundMuni, setFoundMuni] = foundState;
   const [localidad, setLocalidad] = locState;
   const [barrio, setBarrio] = barrState;
-
-  console.log(
-    ...foundMuni.filter(({ municipio: mun }, index) => {
-      return (
-        index ===
-        foundMuni.findIndex((obj) => {
-          return obj.municipio === mun;
-        })
-      );
-    })
-  );
 
   return (
     <Fieldset
