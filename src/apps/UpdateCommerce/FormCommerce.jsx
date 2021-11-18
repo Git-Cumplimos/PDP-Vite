@@ -112,7 +112,7 @@ const FormCommerce = () => {
         }
       })
       .catch((err) => console.error(err));
-  }, [roleInfo]);
+  }, [roleInfo, history]);
   console.log();
 
   const notify = (msg) => {
