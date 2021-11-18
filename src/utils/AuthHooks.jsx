@@ -56,6 +56,10 @@ export const useProvideAuth = () => {
 
   const [roles_disponibles, setRoles_disponibles] = useState(null);
 
+  const [qr, setQr] = useState("");
+
+  const [username, setUsername] = useState("");
+
   const consulta_roles = useCallback(async () => {
     try {
       const res = await fetchData(urlconsulta_roles, "GET", {});
@@ -227,11 +231,70 @@ export const useProvideAuth = () => {
       const user = await Auth.signIn(username, password);
       if (user) {
         setCognitoUser(user);
+        console.log(user.challengeName, user);
       }
     } catch (err) {
       throw err;
     }
   }, []);
+
+  const handleChangePass = useCallback(
+    async (apellido, nombreUsuario, newpassword, cognitoUser, celular) => {
+      try {
+        const loggedUser = await Auth.completeNewPassword(
+          cognitoUser,
+          newpassword,
+          {
+            family_name: apellido,
+            name: nombreUsuario,
+            phone_number: "+57" + celular,
+            given_name: nombreUsuario,
+            middle_name: nombreUsuario,
+          }
+        );
+        setCognitoUser(loggedUser);
+        if (loggedUser.challengeName === "MFA_SETUP") {
+          handleSetupTOTP(loggedUser);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    []
+  );
+
+  const handleSetupTOTP = async (user) => {
+    try {
+      const validartoken = await Auth.setupTOTP(user);
+      const str =
+        "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
+      setQr(str);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleverifyTotpToken = useCallback(async (totp) => {
+    try {
+      const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
+      if (tokenValidado.accessToken.payload.token_use === "access") {
+        await handlesetPreferredMFA(totp);
+      }
+    } catch (err) {
+      throw new Error(err);
+    }
+  });
+
+  const handlesetPreferredMFA = async (totp) => {
+    try {
+      const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+      if (preferredMFA === "SUCCESS") {
+        await confirmSignIn(totp);
+      }
+    } catch (err) {
+      throw new Error(err);
+    }
+  };
 
   const confirmSignIn = useCallback(
     async (totp) => {
@@ -316,6 +379,8 @@ export const useProvideAuth = () => {
   }, [roleInfo]);
 
   return {
+    handleverifyTotpToken,
+    handleChangePass,
     isSignedIn,
     cognitoUser,
     userInfo,
@@ -332,5 +397,6 @@ export const useProvideAuth = () => {
     consulta_roles,
     consulta_usuarios,
     cambiar_rol,
+    qr,
   };
 };

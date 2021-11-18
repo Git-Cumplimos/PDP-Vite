@@ -12,6 +12,7 @@ import FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
 import Transacciones from "../pages/Transacciones";
 import CrearRoles from "../pages/CrearRoles";
 import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
+import MarketPlace from "../apps/MarketPlace/MarketPlace";
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
@@ -126,6 +127,12 @@ export const useProvideUrls = () => {
         link: "/update-commerce",
         label: <AppIcons Logo={ACTUALIZACION} name="Actualizacion de datos" />,
         component: FormCommerce,
+        props: {},
+      },
+      {
+        link: "/marketplace/payorder/:orden",
+        // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
+        component: MarketPlace,
         props: {},
       },
     ]);

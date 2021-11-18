@@ -229,7 +229,6 @@ export const useProvideLoteria = () => {
           celular: phone,
           hash,
         });
-
         return res;
       } catch (err) {
         console.error(err);
