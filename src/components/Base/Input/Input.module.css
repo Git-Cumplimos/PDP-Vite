@@ -43,6 +43,10 @@
   @apply hidden absolute inset-0;
 }
 
+.formItem > input:disabled {
+  @apply bg-gray-100;
+}
+
 .formItem > input[list]::-webkit-calendar-picker-indicator {
   width: 0;
   margin: 0;
