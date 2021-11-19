@@ -237,9 +237,9 @@ const LoginForm = () => {
                   id="totp"
                   type="text"
                   autoComplete="off"
-                  value={newPass}
+                  value={confirmPass}
                   onChange={(e) => {
-                    setNewPass(e.target.value);
+                    setConfirmPass(e.target.value);
                   }}
                 />
               </div>
@@ -331,9 +331,9 @@ const LoginForm = () => {
                   id="totp"
                   type="text"
                   autoComplete="off"
-                  value={newPass}
+                  value={confirmPass}
                   onChange={(e) => {
-                    setNewPass(e.target.value);
+                    setConfirmPass(e.target.value);
                   }}
                 />
               </div>
