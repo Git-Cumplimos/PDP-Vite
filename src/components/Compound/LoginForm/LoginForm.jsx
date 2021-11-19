@@ -122,6 +122,45 @@ const LoginForm = () => {
       });
   };
 
+  const handleChangeExisting = (event) => {
+    event.preventDefault();
+
+    auth
+      .handleChangePass(
+        auth.parameters.name,
+        auth.parameters.family_name,
+        auth.cognitoUser,
+        auth.parameters.address,
+        auth.parameters.locale,
+        newPass
+      )
+      .then()
+      .catch((err) => {
+        if (err.code === "NotAuthorizedException") {
+          notifyError("La sesion ha expirado");
+        } else if (err.code === "InvalidPasswordException") {
+          notifyError(
+            <h6>
+              Politica de contraseñas:
+              <br />
+              1. Debe contener minimo 8 carácteres
+              <br />
+              2. Contiene al menos una cáracter especial
+              <br />
+              Contiene al menos una letra mayúscula
+              <br />
+              4. Contiene al menos una letra minúscula
+            </h6>
+          );
+        } else if (err.code === "InvalidParameterException") {
+          notifyError("Complete los campos");
+        } else {
+          notifyError("Por favor valide todos los campos");
+          console.log(err.code);
+        }
+      });
+  };
+
   const handleTOTPconfirm = (event) => {
     event.preventDefault();
 
@@ -181,7 +220,7 @@ const LoginForm = () => {
               Cambio de contraseña nuevo usuario
             </h1>
             <hr />
-            <form onSubmit={handleChangePW}>
+            <form onSubmit={handleChangeExisting}>
               <div className={field}>
                 <label htmlFor="id">Nueva contraseña:</label>
                 <input
