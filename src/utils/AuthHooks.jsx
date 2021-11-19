@@ -176,7 +176,7 @@ export const useProvideAuth = () => {
     } else {
       setSignedIn(true);
       setCognitoUser(Auth.user);
-      Auth.currentUserInfo().then((usr) => setUserInfo(usr));
+      Auth.currentUserInfo().then((usr) => setUserInfo(usr)).catch(() => {});
 
       fetchData(
         urlLog,
@@ -204,8 +204,8 @@ export const useProvideAuth = () => {
             quota: quota["cupo disponible"],
             comision: quota["comisiones"],
           });
-        });
-      });
+        }).catch(() => {});
+      }).catch(() => {});
     }
   }, [setUser]);
 
@@ -334,7 +334,7 @@ export const useProvideAuth = () => {
       setSignedIn(false);
       setRoleInfo({});
       history.push("/login");
-    });
+    }).catch(() => {});
   }, [history]);
 
   const handlesetPreferredMFA = useCallback(

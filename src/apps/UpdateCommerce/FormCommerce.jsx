@@ -66,44 +66,50 @@ const FormCommerce = () => {
     setCommerceId(roleInfo?.id_comercio || 0);
     fetchData(`${url_send}/review`, "GET", {
       id_comercio: roleInfo?.id_comercio || 0,
-    }).then((res) => {
-      if (res?.status) {
-        if (res?.obj.isActualizado) {
-          notify(
-            `Formulario ya actualizado el ${Intl.DateTimeFormat("es-CO", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            }).format(new Date(res?.obj.fecha_update))}`
-          );
-          history.replace("/");
+    })
+      .then((res) => {
+        if (res?.status) {
+          if (res?.obj.isActualizado) {
+            notify(
+              `Formulario ya actualizado el ${Intl.DateTimeFormat("es-CO", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }).format(new Date(res?.obj.fecha_update))}`
+            );
+            history.replace("/");
+          }
+        } else {
+          notifyError(res?.msg);
         }
-      } else {
-        notifyError(res?.msg);
-      }
-    });
-    fetchData(`${url_types}/type-doc`, "GET", {}, {}).then((res) => {
-      if (res?.status) {
-        const temp = { "": "" };
-        res?.obj.forEach(({ id_doc, Nombre, nombre_corto }) => {
-          temp[`${Nombre} (${nombre_corto})`] = id_doc;
-        });
-        setDocsTypes({ ...temp });
-      } else {
-        notifyError(res?.msg);
-      }
-    });
-    fetchData(`${url_types}/type-loc`, "GET", {}, {}).then((res) => {
-      if (res?.status) {
-        const temp = { "": "" };
-        res?.obj.forEach(({ id_doc, Nombre }) => {
-          temp[Nombre] = id_doc;
-        });
-        setLocsTypes({ ...temp });
-      } else {
-        notifyError(res?.msg);
-      }
-    });
+      })
+      .catch(() => {});
+    fetchData(`${url_types}/type-doc`, "GET", {}, {})
+      .then((res) => {
+        if (res?.status) {
+          const temp = { "": "" };
+          res?.obj.forEach(({ id_doc, Nombre, nombre_corto }) => {
+            temp[`${Nombre} (${nombre_corto})`] = id_doc;
+          });
+          setDocsTypes({ ...temp });
+        } else {
+          notifyError(res?.msg);
+        }
+      })
+      .catch(() => {});
+    fetchData(`${url_types}/type-loc`, "GET", {}, {})
+      .then((res) => {
+        if (res?.status) {
+          const temp = { "": "" };
+          res?.obj.forEach(({ id_doc, Nombre }) => {
+            temp[Nombre] = id_doc;
+          });
+          setLocsTypes({ ...temp });
+        } else {
+          notifyError(res?.msg);
+        }
+      })
+      .catch(() => {});
   }, [roleInfo, history]);
 
   const notify = (msg) => {
@@ -343,15 +349,17 @@ const FormCommerce = () => {
                   fetchData(url, "GET", {
                     q: _actividad,
                     limit: 5,
-                  }).then((res) => {
-                    if (res?.status) {
-                      setFoundActivities(
-                        res?.obj.map(({ id_actividad, nombre_actividad }) => {
-                          return `${id_actividad} - ${nombre_actividad}`;
-                        })
-                      );
-                    }
-                  });
+                  })
+                    .then((res) => {
+                      if (res?.status) {
+                        setFoundActivities(
+                          res?.obj.map(({ id_actividad, nombre_actividad }) => {
+                            return `${id_actividad} - ${nombre_actividad}`;
+                          })
+                        );
+                      }
+                    })
+                    .catch(() => {});
                 } else {
                   setFoundActivities([]);
                 }
