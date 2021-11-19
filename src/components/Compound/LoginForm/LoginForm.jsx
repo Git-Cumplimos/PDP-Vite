@@ -18,6 +18,8 @@ const LoginForm = () => {
   const [names, setNames] = useState("");
   const [lastName, setLastName] = useState("");
   const [newPass, setNewPass] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
 
   const auth = useAuth();
 
@@ -85,10 +87,29 @@ const LoginForm = () => {
     event.preventDefault();
 
     auth
-      .handleChangePass(lastName, names, newPass, auth.cognitoUser, cell)
+      .handleChangePass(
+        names,
+        lastName,
+        auth.cognitoUser,
+        address,
+        city,
+        newPass
+      )
       .then()
       .catch((err) => {
-        console.log("Por alguna razon no funciono", err);
+        notifyError(
+          <h6>
+            Politica de contraseñas:
+            <br />
+            1. Debe contener minimo 8 carácteres
+            <br />
+            2. Contiene al menos una cáracter especial
+            <br />
+            Contiene al menos una letra mayúscula
+            <br />
+            4. Contiene al menos una letra minúscula
+          </h6>
+        );
       });
   };
 
@@ -142,74 +163,142 @@ const LoginForm = () => {
       </div>
     </>
   ) : auth.cognitoUser?.challengeName === "NEW_PASSWORD_REQUIRED" ? (
-    <>
-      <div className="container flex flex-row justify-center items-center">
-        <RightArrow xlarge />
-        <div className={card}>
-          <h1 className="uppercase text-2xl font-medium text-center">
-            Cambio de contraseña nuevo usuario
-          </h1>
-          <hr />
-          <form onSubmit={handleChangePW}>
-            <div className={field}>
-              <label htmlFor="id">Nombres:</label>
-              <input
-                id="names"
-                type="text"
-                maxLength="255"
-                autoFocus
-                autoComplete="off"
-                value={names}
-                onChange={(e) => {
-                  setNames(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <label htmlFor="id">Apellidos:</label>
-              <input
-                id="lastName"
-                type="text"
-                maxLength="255"
-                autoComplete="off"
-                value={lastName}
-                onChange={(e) => {
-                  setLastName(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <label htmlFor="id">Celular:</label>
-              <input
-                id="cell"
-                type="number"
-                maxLength="10"
-                autoComplete="off"
-                value={cell}
-                onChange={(e) => {
-                  setCell(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <label htmlFor="id">Nueva contraseña:</label>
-              <input
-                id="totp"
-                type="text"
-                autoComplete="off"
-                value={newPass}
-                onChange={(e) => {
-                  setNewPass(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <button type="submit">Actualizar datos</button>
-            </div>
-          </form>
+    auth.parameters.name !== "" ? (
+      <>
+        <div className="container flex flex-row justify-center items-center">
+          <RightArrow xlarge />
+          <div className={card}>
+            <h1 className="uppercase text-2xl font-medium text-center">
+              Cambio de contraseña nuevo usuario
+            </h1>
+            <hr />
+            <form onSubmit={handleChangePW}>
+              <div className={field}>
+                <label htmlFor="id">Nueva contraseña:</label>
+                <input
+                  id="totp"
+                  type="text"
+                  autoComplete="off"
+                  value={newPass}
+                  onChange={(e) => {
+                    setNewPass(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Confirmar contraseña:</label>
+                <input
+                  id="totp"
+                  type="text"
+                  autoComplete="off"
+                  value={newPass}
+                  onChange={(e) => {
+                    setNewPass(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <button type="submit">Actualizar contraseña</button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
-    </>
+      </>
+    ) : (
+      <>
+        <div className="container flex flex-row justify-center items-center">
+          <RightArrow xlarge />
+          <div className={card}>
+            <h1 className="uppercase text-2xl font-medium text-center">
+              Cambio de contraseña nuevo usuario
+            </h1>
+            <hr />
+            <form onSubmit={handleChangePW}>
+              <div className={field}>
+                <label htmlFor="id">Nombres:</label>
+                <input
+                  id="names"
+                  type="text"
+                  maxLength="255"
+                  autoFocus
+                  autoComplete="off"
+                  value={names}
+                  onChange={(e) => {
+                    setNames(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Apellidos:</label>
+                <input
+                  id="lastName"
+                  type="text"
+                  maxLength="255"
+                  autoComplete="off"
+                  value={lastName}
+                  onChange={(e) => {
+                    setLastName(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Direccion:</label>
+                <input
+                  id="address"
+                  type="text"
+                  maxLength="255"
+                  autoComplete="off"
+                  value={address}
+                  onChange={(e) => {
+                    setAddress(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Ciudad:</label>
+                <input
+                  id="ciudad"
+                  type="text"
+                  maxLength="255"
+                  autoComplete="off"
+                  value={city}
+                  onChange={(e) => {
+                    setCity(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Nueva contraseña:</label>
+                <input
+                  id="totp"
+                  type="text"
+                  autoComplete="off"
+                  value={newPass}
+                  onChange={(e) => {
+                    setNewPass(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Confirmar contraseña:</label>
+                <input
+                  id="totp"
+                  type="text"
+                  autoComplete="off"
+                  value={newPass}
+                  onChange={(e) => {
+                    setNewPass(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <button type="submit">Actualizar contraseña</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </>
+    )
   ) : auth.cognitoUser?.challengeName === "MFA_SETUP" ? (
     <>
       <div className="container flex flex-row justify-center items-center">

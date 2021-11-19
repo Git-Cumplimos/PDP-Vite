@@ -68,7 +68,7 @@ export const useProvideUrls = () => {
 
     setUrlsPrivApps([
       {
-        link: "/suser",
+        link: "https://portal.solucionesenred.co/",
         label: <AppIcons Logo={SUSER} name="SUSER" />,
         component: emptyComp,
         props: {},
