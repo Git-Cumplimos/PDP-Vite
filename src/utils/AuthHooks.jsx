@@ -253,14 +253,13 @@ export const useProvideAuth = () => {
       try {
         const loggedUser = await Auth.completeNewPassword(
           cognitoUser,
-          newpassword
-          // {
-          //   name: nombreUsuario,
-          //   family_name: apellido,
-          //   email: parameters.email,
-          //   address: direccion,
-          //   locale: ciudad,
-          // }
+          newpassword,
+          {
+            name: nombreUsuario,
+            family_name: apellido,
+            address: direccion,
+            locale: ciudad,
+          }
         );
         setCognitoUser(loggedUser);
         if (loggedUser.challengeName === "MFA_SETUP") {
@@ -268,7 +267,7 @@ export const useProvideAuth = () => {
         }
       } catch (err) {
         console.log(err);
-        throw new Error(err);
+        throw err;
       }
     },
     []
