@@ -53,16 +53,12 @@ const LoginForm = () => {
 
     auth
       .signIn(username, password)
-      .then(() => {
-        console.log("user exist");
-      })
       .catch((err) => {
         if (err.code === "NotAuthorizedException") {
           notifyError("Usuario o contraseña incorrectos.");
         } else {
           notifyError(err.message);
         }
-        console.error(err);
       });
   };
 
@@ -78,7 +74,6 @@ const LoginForm = () => {
           notifyError("La sesion ha expirado");
         } else {
           notifyError(err.message);
-          console.error(err);
         }
       });
   };
@@ -117,7 +112,6 @@ const LoginForm = () => {
             notifyError("Complete los campos");
           } else {
             notifyError("Por favor valide todos los campos");
-            console.log(err.code);
           }
         });
     } else {
@@ -159,7 +153,6 @@ const LoginForm = () => {
             notifyError("Complete los campos");
           } else {
             notifyError("Por favor valide todos los campos");
-            console.log(err.code);
           }
         });
     } else {
@@ -184,7 +177,6 @@ const LoginForm = () => {
     setNewPass("");
   };
 
-  console.log(names, lastName, newPass);
   return auth.cognitoUser?.challengeName === "SOFTWARE_TOKEN_MFA" ? (
     <>
       <div className="container flex flex-row justify-center items-center">

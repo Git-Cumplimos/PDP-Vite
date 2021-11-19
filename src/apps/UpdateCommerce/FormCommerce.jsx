@@ -66,52 +66,45 @@ const FormCommerce = () => {
     setCommerceId(roleInfo?.id_comercio || 0);
     fetchData(`${url_send}/review`, "GET", {
       id_comercio: roleInfo?.id_comercio || 0,
-    })
-      .then((res) => {
-        if (res?.status) {
-          if (res?.obj.isActualizado) {
-            notify(
-              `Formulario ya actualizado el ${Intl.DateTimeFormat("es-CO", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }).format(new Date(res?.obj.fecha_update))}`
-            );
-            history.replace("/");
-          }
-        } else {
-          console.error(res?.msg);
+    }).then((res) => {
+      if (res?.status) {
+        if (res?.obj.isActualizado) {
+          notify(
+            `Formulario ya actualizado el ${Intl.DateTimeFormat("es-CO", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }).format(new Date(res?.obj.fecha_update))}`
+          );
+          history.replace("/");
         }
-      })
-      .catch((err) => console.error(err));
-    fetchData(`${url_types}/type-doc`, "GET", {}, {})
-      .then((res) => {
-        if (res?.status) {
-          const temp = { "": "" };
-          res?.obj.forEach(({ id_doc, Nombre, nombre_corto }) => {
-            temp[`${Nombre} (${nombre_corto})`] = id_doc;
-          });
-          setDocsTypes({ ...temp });
-        } else {
-          console.error(res?.msg);
-        }
-      })
-      .catch((err) => console.error(err));
-    fetchData(`${url_types}/type-loc`, "GET", {}, {})
-      .then((res) => {
-        if (res?.status) {
-          const temp = { "": "" };
-          res?.obj.forEach(({ id_doc, Nombre }) => {
-            temp[Nombre] = id_doc;
-          });
-          setLocsTypes({ ...temp });
-        } else {
-          console.error(res?.msg);
-        }
-      })
-      .catch((err) => console.error(err));
+      } else {
+        notifyError(res?.msg);
+      }
+    });
+    fetchData(`${url_types}/type-doc`, "GET", {}, {}).then((res) => {
+      if (res?.status) {
+        const temp = { "": "" };
+        res?.obj.forEach(({ id_doc, Nombre, nombre_corto }) => {
+          temp[`${Nombre} (${nombre_corto})`] = id_doc;
+        });
+        setDocsTypes({ ...temp });
+      } else {
+        notifyError(res?.msg);
+      }
+    });
+    fetchData(`${url_types}/type-loc`, "GET", {}, {}).then((res) => {
+      if (res?.status) {
+        const temp = { "": "" };
+        res?.obj.forEach(({ id_doc, Nombre }) => {
+          temp[Nombre] = id_doc;
+        });
+        setLocsTypes({ ...temp });
+      } else {
+        notifyError(res?.msg);
+      }
+    });
   }, [roleInfo, history]);
-  console.log();
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -214,9 +207,7 @@ const FormCommerce = () => {
       } else {
         notifyError(`Error al subir el formulario: ${_res?.msg}`);
       }
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   return (
@@ -352,15 +343,15 @@ const FormCommerce = () => {
                   fetchData(url, "GET", {
                     q: _actividad,
                     limit: 5,
-                  })
-                    .then((res) => {
+                  }).then((res) => {
+                    if (res?.status) {
                       setFoundActivities(
                         res?.obj.map(({ id_actividad, nombre_actividad }) => {
                           return `${id_actividad} - ${nombre_actividad}`;
                         })
                       );
-                    })
-                    .catch((err) => console.error(err));
+                    }
+                  });
                 } else {
                   setFoundActivities([]);
                 }
@@ -387,7 +378,9 @@ const FormCommerce = () => {
                 );
               })}
             </ul>
-          ) : ""}
+          ) : (
+            ""
+          )}
         </div>
         <Select
           id="giftLocation"

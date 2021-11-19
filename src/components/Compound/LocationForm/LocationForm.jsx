@@ -112,7 +112,6 @@ const LocationForm = ({ place = "", location }) => {
                   .then((res) => {
                     setFoundMuni(res);
                   })
-                  .catch((err) => console.error(err));
               } else {
                 setFoundMuni([]);
               }
