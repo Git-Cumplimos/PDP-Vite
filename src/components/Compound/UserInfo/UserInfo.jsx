@@ -6,8 +6,6 @@ const UserInfo = () => {
 
   const { userInfo, name, conv, userid } = classes;
 
-  console.log(roleInfo)
-
   return (
     <div className={userInfo}>
       <p className={name}>{_userInfo?.attributes?.name || ""}</p>
