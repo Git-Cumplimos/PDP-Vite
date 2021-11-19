@@ -74,8 +74,7 @@ const Header = () => {
           <HNavbar links={urls} isText />
           <Modal show={showModal} handleClose={() => setShowModal(false)}>
             <div>
-              <h1>Hola</h1>
-              <button>El modal</button>
+              <h1>Carga tu billetera</h1>
             </div>
           </Modal>
         </>

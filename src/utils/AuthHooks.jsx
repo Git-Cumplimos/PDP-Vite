@@ -241,6 +241,17 @@ export const useProvideAuth = () => {
     }
   }, []);
 
+  const handleSetupTOTP = useCallback(async (user) => {
+    try {
+      const validartoken = await Auth.setupTOTP(user);
+      const str =
+        "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
+      setQr(str);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [username]);
+
   const handleChangePass = useCallback(
     async (
       nombreUsuario,
@@ -270,41 +281,8 @@ export const useProvideAuth = () => {
         throw err;
       }
     },
-    []
+    [handleSetupTOTP]
   );
-
-  const handleSetupTOTP = async (user) => {
-    try {
-      const validartoken = await Auth.setupTOTP(user);
-      const str =
-        "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
-      setQr(str);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleverifyTotpToken = useCallback(async (totp) => {
-    try {
-      const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
-      if (tokenValidado.accessToken.payload.token_use === "access") {
-        await handlesetPreferredMFA(totp);
-      }
-    } catch (err) {
-      throw new Error(err);
-    }
-  });
-
-  const handlesetPreferredMFA = async (totp) => {
-    try {
-      const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
-      if (preferredMFA === "SUCCESS") {
-        await confirmSignIn(totp);
-      }
-    } catch (err) {
-      throw new Error(err);
-    }
-  };
 
   const confirmSignIn = useCallback(
     async (totp) => {
@@ -371,6 +349,28 @@ export const useProvideAuth = () => {
       })
       .catch((err) => console.error(err));
   }, [history]);
+
+  const handlesetPreferredMFA = useCallback(async (totp) => {
+    try {
+      const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+      if (preferredMFA === "SUCCESS") {
+        await confirmSignIn(totp);
+      }
+    } catch (err) {
+      throw new Error(err);
+    }
+  }, [cognitoUser, confirmSignIn]);
+
+  const handleverifyTotpToken = useCallback(async (totp) => {
+    try {
+      const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
+      if (tokenValidado.accessToken.payload.token_use === "access") {
+        await handlesetPreferredMFA(totp);
+      }
+    } catch (err) {
+      throw new Error(err);
+    }
+  }, [cognitoUser, handlesetPreferredMFA]);
 
   const getQuota = useCallback(async () => {
     const tempRole = { ...roleInfo };

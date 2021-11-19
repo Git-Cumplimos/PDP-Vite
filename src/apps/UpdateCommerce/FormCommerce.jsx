@@ -368,24 +368,26 @@ const FormCommerce = () => {
               timeOut: 500,
             }}
           />
-          <ul className="flex flex-col gap-2">
-            {commerceType.map((el, idx) => {
-              return (
-                <li key={idx} className="grid grid-cols-8">
-                  <span className="bi bi-card-list" />
-                  <h1 className="col-span-6">{el}</h1>
-                  <span
-                    onClick={() => {
-                      const copy = [...commerceType];
-                      copy.splice(idx, 1);
-                      setCommerceType([...copy]);
-                    }}
-                    className="bi bi-x text-3xl"
-                  />
-                </li>
-              );
-            })}
-          </ul>
+          {commerceType.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {commerceType.map((el, idx) => {
+                return (
+                  <li key={idx} className="grid grid-cols-8">
+                    <span className="bi bi-card-list" />
+                    <h1 className="col-span-6">{el}</h1>
+                    <span
+                      onClick={() => {
+                        const copy = [...commerceType];
+                        copy.splice(idx, 1);
+                        setCommerceType([...copy]);
+                      }}
+                      className="bi bi-x text-3xl"
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          ) : ""}
         </div>
         <Select
           id="giftLocation"

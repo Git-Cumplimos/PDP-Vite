@@ -10,7 +10,7 @@ import AuthButton from "../components/Compound/Signout/Signout";
 import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
 import FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
 import Transacciones from "../pages/Transacciones";
-import CrearRoles from "../pages/CrearRoles";
+// import CrearRoles from "../pages/CrearRoles";
 import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
 import MarketPlace from "../apps/MarketPlace/MarketPlace";
 
@@ -30,7 +30,7 @@ export const useProvideUrls = () => {
   const [urlsPrivApps, setUrlsPrivApps] = useState([]);
 
   const emptyComp = () => {
-    return <p></p>;
+    return <h1 className="text-4xl text-center mt-8">En mantenimiento</h1>;
   };
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export const useProvideUrls = () => {
       {
         link: "/seguridad",
         label: "Seguridad",
-        component: CrearRoles,
+        component: emptyComp /* CrearRoles */,
         props: {},
       },
       {
