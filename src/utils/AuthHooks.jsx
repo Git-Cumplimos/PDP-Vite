@@ -60,6 +60,8 @@ export const useProvideAuth = () => {
 
   const [username, setUsername] = useState("");
 
+  const [parameters, setParameters] = useState("");
+
   const consulta_roles = useCallback(async () => {
     try {
       const res = await fetchData(urlconsulta_roles, "GET", {});
@@ -231,7 +233,8 @@ export const useProvideAuth = () => {
       const user = await Auth.signIn(username, password);
       if (user) {
         setCognitoUser(user);
-        console.log(user.challengeName, user);
+        setParameters(user.challengeParam.userAttributes);
+        console.log(user.challengeParam.userAttributes);
       }
     } catch (err) {
       throw err;
@@ -239,18 +242,25 @@ export const useProvideAuth = () => {
   }, []);
 
   const handleChangePass = useCallback(
-    async (apellido, nombreUsuario, newpassword, cognitoUser, celular) => {
+    async (
+      nombreUsuario,
+      apellido,
+      cognitoUser,
+      direccion,
+      ciudad,
+      newpassword
+    ) => {
       try {
         const loggedUser = await Auth.completeNewPassword(
           cognitoUser,
-          newpassword,
-          {
-            family_name: apellido,
-            name: nombreUsuario,
-            phone_number: "+57" + celular,
-            given_name: nombreUsuario,
-            middle_name: nombreUsuario,
-          }
+          newpassword
+          // {
+          //   name: nombreUsuario,
+          //   family_name: apellido,
+          //   email: parameters.email,
+          //   address: direccion,
+          //   locale: ciudad,
+          // }
         );
         setCognitoUser(loggedUser);
         if (loggedUser.challengeName === "MFA_SETUP") {
@@ -258,6 +268,7 @@ export const useProvideAuth = () => {
         }
       } catch (err) {
         console.log(err);
+        throw new Error(err);
       }
     },
     []
@@ -398,5 +409,6 @@ export const useProvideAuth = () => {
     consulta_usuarios,
     cambiar_rol,
     qr,
+    parameters,
   };
 };
