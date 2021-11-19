@@ -97,19 +97,28 @@ const LoginForm = () => {
       )
       .then()
       .catch((err) => {
-        notifyError(
-          <h6>
-            Politica de contraseñas:
-            <br />
-            1. Debe contener minimo 8 carácteres
-            <br />
-            2. Contiene al menos una cáracter especial
-            <br />
-            Contiene al menos una letra mayúscula
-            <br />
-            4. Contiene al menos una letra minúscula
-          </h6>
-        );
+        if (err.code === "NotAuthorizedException") {
+          notifyError("La sesion ha expirado");
+        } else if (err.code === "InvalidPasswordException") {
+          notifyError(
+            <h6>
+              Politica de contraseñas:
+              <br />
+              1. Debe contener minimo 8 carácteres
+              <br />
+              2. Contiene al menos una cáracter especial
+              <br />
+              Contiene al menos una letra mayúscula
+              <br />
+              4. Contiene al menos una letra minúscula
+            </h6>
+          );
+        } else if (err.code === "InvalidParameterException") {
+          notifyError("Complete los campos");
+        } else {
+          notifyError("Por favor valide todos los campos");
+          console.log(err.code);
+        }
       });
   };
 
