@@ -18,6 +18,7 @@ const LoginForm = () => {
   const [names, setNames] = useState("");
   const [lastName, setLastName] = useState("");
   const [newPass, setNewPass] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
 
@@ -67,7 +68,6 @@ const LoginForm = () => {
 
   const handleTOTP = (event) => {
     event.preventDefault();
-
     auth
       .confirmSignIn(totp)
       .then()
@@ -85,80 +85,86 @@ const LoginForm = () => {
 
   const handleChangePW = (event) => {
     event.preventDefault();
-
-    auth
-      .handleChangePass(
-        names,
-        lastName,
-        auth.cognitoUser,
-        address,
-        city,
-        newPass
-      )
-      .then()
-      .catch((err) => {
-        if (err.code === "NotAuthorizedException") {
-          notifyError("La sesion ha expirado");
-        } else if (err.code === "InvalidPasswordException") {
-          notifyError(
-            <h6>
-              Politica de contraseñas:
-              <br />
-              1. Debe contener minimo 8 carácteres
-              <br />
-              2. Contiene al menos una cáracter especial
-              <br />
-              Contiene al menos una letra mayúscula
-              <br />
-              4. Contiene al menos una letra minúscula
-            </h6>
-          );
-        } else if (err.code === "InvalidParameterException") {
-          notifyError("Complete los campos");
-        } else {
-          notifyError("Por favor valide todos los campos");
-          console.log(err.code);
-        }
-      });
+    if (newPass === confirmPass) {
+      auth
+        .handleChangePass(
+          names,
+          lastName,
+          auth.cognitoUser,
+          address,
+          city,
+          newPass
+        )
+        .then()
+        .catch((err) => {
+          if (err.code === "NotAuthorizedException") {
+            notifyError("La sesion ha expirado");
+          } else if (err.code === "InvalidPasswordException") {
+            notifyError(
+              <h6>
+                Politica de contraseñas:
+                <br />
+                1. Debe contener minimo 8 carácteres
+                <br />
+                2. Contiene al menos una cáracter especial
+                <br />
+                Contiene al menos una letra mayúscula
+                <br />
+                4. Contiene al menos una letra minúscula
+              </h6>
+            );
+          } else if (err.code === "InvalidParameterException") {
+            notifyError("Complete los campos");
+          } else {
+            notifyError("Por favor valide todos los campos");
+            console.log(err.code);
+          }
+        });
+    } else {
+      notifyError("Las contraseñas no coinciden");
+    }
   };
 
   const handleChangeExisting = (event) => {
     event.preventDefault();
-
-    auth
-      .handleChangePass(
-        auth.parameters.name,
-        auth.parameters.family_name,
-        auth.cognitoUser,
-        auth.parameters.address,
-        auth.parameters.locale,
-        newPass
-      )
-      .then()
-      .catch((err) => {
-        if (err.code === "NotAuthorizedException") {
-          notifyError("La sesion ha expirado");
-        } else if (err.code === "InvalidPasswordException") {
-          notifyError(
-            <h6>
-              Politica de contraseñas:
-              <br />
-              1. Debe contener minimo 8 carácteres
-              <br />
-              2. Contiene al menos una cáracter especial
-              <br />
-              Contiene al menos una letra mayúscula
-              <br />
-              4. Contiene al menos una letra minúscula
-            </h6>
-          );
-        } else if (err.code === "InvalidParameterException") {
-          notifyError("Complete los campos");
-        } else {
-          notifyError("Por favor valide todos los campos");
-          console.log(err.code);
-        }
-      });
+    if (newPass === confirmPass) {
+      auth
+        .handleChangePass(
+          auth.parameters.name,
+          auth.parameters.family_name,
+          auth.cognitoUser,
+          auth.parameters.address,
+          auth.parameters.locale,
+          newPass
+        )
+        .then()
+        .catch((err) => {
+          if (err.code === "NotAuthorizedException") {
+            notifyError("La sesion ha expirado");
+          } else if (err.code === "InvalidPasswordException") {
+            notifyError(
+              <h6>
+                Politica de contraseñas:
+                <br />
+                1. Debe contener minimo 8 carácteres
+                <br />
+                2. Contiene al menos una cáracter especial
+                <br />
+                Contiene al menos una letra mayúscula
+                <br />
+                4. Contiene al menos una letra minúscula
+              </h6>
+            );
+          } else if (err.code === "InvalidParameterException") {
+            notifyError("Complete los campos");
+          } else {
+            notifyError("Por favor valide todos los campos");
+            console.log(err.code);
+          }
+        });
+    } else {
+      notifyError("Las contraseñas no coinciden");
+    }
   };
 
   const handleTOTPconfirm = (event) => {
