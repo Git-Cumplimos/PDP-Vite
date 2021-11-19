@@ -1,6 +1,6 @@
 {
   "auth": {
-    "puntodepago4316e2e0": {
+    "frontpuntodepago492bc4ee": {
       "service": "Cognito",
       "serviceType": "imported",
       "providerPlugin": "awscloudformation",
