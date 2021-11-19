@@ -72,6 +72,7 @@ export const useProvideUrls = () => {
         label: <AppIcons Logo={SUSER} name="SUSER" />,
         component: emptyComp,
         props: {},
+        extern: true,
       },
       {
         link: "/loteria-de-bogota",
@@ -79,6 +80,7 @@ export const useProvideUrls = () => {
         component: LoteriaBog,
         props: {},
         show: false,
+        extern: false,
       },
       {
         link: "/fundacion-mujer",
@@ -93,6 +95,7 @@ export const useProvideUrls = () => {
         component: FunMujer,
         props: {},
         show: false,
+        extern: false,
       },
       {
         link: "/loteria-de-bogota/:page",
@@ -100,6 +103,7 @@ export const useProvideUrls = () => {
         props: {},
         exact: false,
         show: false,
+        extern: false,
       },
       {
         link: "/fundacion-mujer/:page",
@@ -107,6 +111,7 @@ export const useProvideUrls = () => {
         props: {},
         exact: false,
         show: false,
+        extern: false,
       },
 
       {
@@ -115,6 +120,7 @@ export const useProvideUrls = () => {
         component: emptyComp,
         props: {},
         show: false,
+        extern: false,
       },
       {
         link: "/transacciones",
@@ -122,18 +128,21 @@ export const useProvideUrls = () => {
         component: Transacciones,
         props: {},
         show: false,
+        extern: false,
       },
       {
         link: "/update-commerce",
         label: <AppIcons Logo={ACTUALIZACION} name="Actualizacion de datos" />,
         component: FormCommerce,
         props: {},
+        extern: false,
       },
       {
         link: "/marketplace/payorder/:orden",
         // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
         component: MarketPlace,
         props: {},
+        extern: false,
       },
     ]);
 
