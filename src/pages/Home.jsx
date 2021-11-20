@@ -5,6 +5,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useEffect, useState } from "react";
 import ColpensionesImg from "../assets/img/COLPENSIONES.jpg"
+import Banner2 from "../assets/img/BANNER2.jpg"
 
 const Home = () => {
   const { urlsPrivApps: urls } = useUrls();
@@ -13,9 +14,8 @@ const Home = () => {
 
   useEffect(() => {
     setImgs([
-      { name: "Ad1", url: ColpensionesImg },
-      // { name: "Ad2", url: "https://picsum.photos/600" },
-      // { name: "Ad3", url: "https://picsum.photos/100" },
+      { name: "Colpensiones", url: ColpensionesImg },
+      { name: "Punto de pago", url: Banner2 },
     ]);
   }, []);
 
