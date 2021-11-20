@@ -9,7 +9,7 @@ import Amplify from "aws-amplify";
 import awsconfig from "./aws-exports";
 import { ToastContainer } from "react-toastify";
 
-// import MessengerCustomerChat from "react-messenger-customer-chat";
+import MessengerCustomerChat from "react-messenger-customer-chat";
 
 Amplify.configure(awsconfig);
 
@@ -31,7 +31,7 @@ function App() {
       <ProvideUrls>
         <ToastContainer />
         <Admin />
-        {/* <MessengerCustomerChat pageId="455201114671494" appId="<YOUR_APP_ID>" /> */}
+        <MessengerCustomerChat pageId="455201114671494" appId="603779204002555" />
         {/* <MessengerCustomerChat
           pageId="1447497328617399"
           appId="292219355256347"
