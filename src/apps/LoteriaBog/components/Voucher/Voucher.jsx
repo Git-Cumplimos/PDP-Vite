@@ -1,7 +1,7 @@
 import classes from "./Voucher.module.css";
 import LogoPDP from "../../../../components/Base/LogoPDP/LogoPDP";
 
-const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
+const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
   const { divPrint } = classes;
 
   return (

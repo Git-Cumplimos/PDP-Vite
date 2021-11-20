@@ -19,6 +19,7 @@ const urlcrearRol = "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/crear_r
 const urlconsulta_roles = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_rol';
 const urlconsulta_usuarios = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_usuario';
 const urlcambiar_rol = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/modificar_rol';
+const urlCod_loteria_oficina = "http://loteriacons.us-east-2.elasticbeanstalk.com/cod_loteria_oficina";
 
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
@@ -162,14 +163,36 @@ export const useProvideAuth = () => {
           },
           {}
         );
-        
-        setRoleInfo({
-          role: suserInfo.rol,
-          ...suserInfo,
-          
-          quota: quota['cupo disponible'],
-          comision: quota['comisiones'],
-        });
+
+        const resp_cod = await fetchData(
+          urlCod_loteria_oficina,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+          },
+          {}
+        );
+
+        console.log(resp_cod)
+        if('msg' in resp_cod){
+          setRoleInfo({
+            role: suserInfo.rol,
+            ...suserInfo,
+            
+            quota: quota['cupo disponible'],
+            comision: quota['comisiones'],
+          });
+        }else{
+          setRoleInfo({
+            role: suserInfo.rol,
+            ...suserInfo,
+            
+            quota: quota['cupo disponible'],
+            comision: quota['comisiones'],
+            cod_oficina_lot: resp_cod.cod_oficina_lot,
+            cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+          });
+        }
       }
     } catch (err) {
       setSignedIn(false);
@@ -203,15 +226,35 @@ export const useProvideAuth = () => {
           },
           {}
         ).then((quota) => {
-          setRoleInfo({
-            role: suserInfo.rol,
-            ...suserInfo,
-            // id_comercio: 2,
-            // id_dispositivo: 233,
-            // id_usuatio: 8,
-            quota: quota['cupo disponible'],
-            comision: quota['comisiones'],
-                        
+
+          fetchData(
+            urlCod_loteria_oficina,
+            "GET",
+            {
+              id_comercio: suserInfo.id_comercio,
+            },
+            {}
+          ).then((resp_cod) => {
+            if('msg' in resp_cod){
+              setRoleInfo({
+                role: suserInfo.rol,
+                ...suserInfo,
+                
+                quota: quota['cupo disponible'],
+                comision: quota['comisiones'],
+              });
+            }else{
+              setRoleInfo({
+                role: suserInfo.rol,
+                ...suserInfo,
+                
+                quota: quota['cupo disponible'],
+                comision: quota['comisiones'],
+                cod_oficina_lot: resp_cod.cod_oficina_lot,
+                cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+              });
+            }
+
           });
         });
       });
@@ -267,16 +310,36 @@ export const useProvideAuth = () => {
             },
             {}
           );
-                   
-          setRoleInfo({
-            role: suserInfo.rol,
-            ...suserInfo,
-            // id_comercio: 2,
-            // id_dispositivo: 233,
-            // id_usuatio: 8,
-            quota: quota['cupo disponible'],
-            comision: quota['comisiones'],
-          });
+
+          const resp_cod = await fetchData(
+            urlCod_loteria_oficina,
+            "GET",
+            {
+              id_comercio: suserInfo.id_comercio,
+            },
+            {}
+          );
+  
+  
+          if('msg' in resp_cod){
+            setRoleInfo({
+              role: suserInfo.rol,
+              ...suserInfo,
+              
+              quota: quota['cupo disponible'],
+              comision: quota['comisiones'],
+            });
+          }else{
+            setRoleInfo({
+              role: suserInfo.rol,
+              ...suserInfo,
+              
+              quota: quota['cupo disponible'],
+              comision: quota['comisiones'],
+              cod_oficina_lot: resp_cod.cod_oficina_lot,
+              cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+            });
+          }
         }
         history.push(
           state ? state.from : pathname === "/login" ? "/" : pathname
@@ -319,7 +382,7 @@ export const useProvideAuth = () => {
   }, [roleInfo]);
 
   
- 
+  console.log(roleInfo)
   return {
     isSignedIn,
     cognitoUser,

@@ -7,15 +7,19 @@ import Form from "../../../components/Base/Form/Form";
 
 const DescargarArchivos = () => {
   const [downloadRef, setDownloadRef] = useState("");
+  const [downloadRefPagos, setDownloadRefPagos] = useState("");
   const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
     { value: "", label: "" },
   ]);
   const [sorteo, setSorteo] = useState("");
 
-  const { getReportesVentas, con_sort_ventas } = useLoteria();
+  const { getReportesVentas, con_sort_ventas, getReportesPagos} = useLoteria();
   const [disabled_Btn, setDisabled_Btn] = useState(true)
 
   useEffect(() => {
+    getReportesPagos().then((res) => {
+      setDownloadRefPagos(res);
+    });
     con_sort_ventas().then((res) => {
       
       const copy = [...opcionesdisponibles];
@@ -43,6 +47,8 @@ const DescargarArchivos = () => {
     setDisabled_Btn(false)
     getReportesVentas(e.target.value).then((res) => {
       setDownloadRef(res);
+      console.log(res)
+
    });
   };
   
@@ -81,6 +87,21 @@ const DescargarArchivos = () => {
         </a>          
         </Button>
         </ButtonBar> : ''}
+        <ButtonBar>
+        <Button type="button" onClick={() => {
+              disabled();
+            
+            }}>
+          <a
+          href={downloadRefPagos}
+          download={`Reporte_pagos-Sorteo_semana???-${new Date().toLocaleDateString()}-${new Date().toLocaleTimeString()}.txt`}
+          target="_blank"
+          rel="noreferrer" 
+        >
+          Descargar archivo pagos
+        </a>          
+        </Button>
+        </ButtonBar>
 
       </Form>
     </div>

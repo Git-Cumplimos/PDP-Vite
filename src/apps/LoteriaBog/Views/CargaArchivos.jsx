@@ -60,7 +60,7 @@ const CargaArchivos = () => {
           closeModal();
           EstadoArchivos()
           .then((res) => {
-            
+            console.log(res)
             if('Motivo' in res[0]){
               if(res[0]['Estado']===1){
               notify(res[0]['Motivo'])}

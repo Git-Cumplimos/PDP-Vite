@@ -71,18 +71,18 @@ export const useProvideUrls = () => {
         component: emptyComp,
         props: {},
       },
-      {
+      { 
         link: "/loteria-de-bogota",
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
-        component: LoteriaBog,
+        component: roleInfo?.tipo_comercio!=="OFICINAS PROPIAS"?LoteriaBog:emptyComp,//por ahora esta !==
         props: {},
       },
-      {
-        link: "/fundacion-mujer",
-        label: <AppIcons Logo={"https://www.elempleo.com/sitios-empresariales/colombia/fundacion-de-la-mujer/video/LogoLoopFundacion_1_1.jpg"} name="Fundacion de la mujer" />,
-        component: FunMujer,
-        props: {},
-      },
+      // {
+      //   link: "/fundacion-mujer",
+      //   label: <AppIcons Logo={"https://www.elempleo.com/sitios-empresariales/colombia/fundacion-de-la-mujer/video/LogoLoopFundacion_1_1.jpg"} name="Fundacion de la mujer" />,
+      //   component: FunMujer,
+      //   props: {},
+      // },
       {
         link: "/loteria-de-bogota/:page",
         component: LoteriaBog,
@@ -90,26 +90,26 @@ export const useProvideUrls = () => {
         exact: false,
         show: false,
       },
-      {
-        link: "/fundacion-mujer/:page",
-        component: FunMujer,
-        props: {},
-        exact: false,
-        show: false,
-      },
+      // {
+      //   link: "/fundacion-mujer/:page",
+      //   component: FunMujer,
+      //   props: {},
+      //   exact: false,
+      //   show: false,
+      // },
 
-      {
-        link: "/marketplace",
-        label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
-        component: emptyComp,
-        props: {},
-      },
-      {
-        link: "/transacciones",
-        label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
-        component: Transacciones,
-        props: {},
-      },
+      // {
+      //   link: "/marketplace",
+      //   label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
+      //   component: emptyComp,
+      //   props: {},
+      // },
+      // {
+      //   link: "/transacciones",
+      //   label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
+      //   component: Transacciones,
+      //   props: {},
+      // },
     ]);
 
     setUrlsPublic([

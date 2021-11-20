@@ -12,10 +12,15 @@ import fetchData from "../../../utils/fetchData";
 const urls = {
   ordinario:
     "http://loteriacons.us-east-2.elasticbeanstalk.com/consultas_loteria",
+  ordinariofisico:
+    "http://loteriacons.us-east-2.elasticbeanstalk.com/consultas_loteria_fisica", 
   ventaOrdinario: "http://loteriaventa.us-east-2.elasticbeanstalk.com/venta",
+  ventaOrdinariofisica: "http://loteriaventa.us-east-2.elasticbeanstalk.com/ventafisica",
   moda: "http://buscadosmas.us-east-2.elasticbeanstalk.com/consurepmasbusca",
   ventasReportes:
     "http://ventasreportes.us-east-2.elasticbeanstalk.com/reportes_ventas",
+  pagosReportes:
+    "http://ventasreportes.us-east-2.elasticbeanstalk.com/reportes_pago_premios",    
   con_sort_ventas:
     "http://ventasreportes.us-east-2.elasticbeanstalk.com/con_sort_vendidos",
   consultaPago:
@@ -24,9 +29,11 @@ const urls = {
   premiofisico: "http://premiospago.us-east-2.elasticbeanstalk.com/fisico",
   pagopremio: "http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados",
   pagopremiofisico: 'http://premiospago.us-east-2.elasticbeanstalk.com/premios_pagados1',
-  ConsultaCrearSort: "http://sorteos.us-east-2.elasticbeanstalk.com/sorteo",
-  CambiarSort: "http://sorteos.us-east-2.elasticbeanstalk.com/cambio_sorteo",
+  ConsultaCrearSort: "http://sorteos.us-east-2.elasticbeanstalk.com/consulta_sorteos",
+  CambiarSort: "http://sorteos.us-east-2.elasticbeanstalk.com/sorteo",
   EstadoArchivos: "http://loteriacons.us-east-2.elasticbeanstalk.com/logs",
+  
+
 };
 
 export const LoteriaContext = createContext({
@@ -48,7 +55,9 @@ export const LoteriaContext = createContext({
     setPagoresponse:null,
   },
   searchLoteria: () => {},
+  searchLoteriafisica: () => {},
   sellLoteria: () => {},
+  sellLoteriafisica: () => {},
   reportes: {
     moda: null,
     sorteo: null,
@@ -60,6 +69,7 @@ export const LoteriaContext = createContext({
   },
   searchModa: () => {},
   getReportesVentas: () => {},
+  getReportesPagos: () => {},
   isWinner: () => {},
   makePayment: () => {},
   makePayment2: () => {},
@@ -117,6 +127,7 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
     }
     
     if (num === "" && ser === "") return;
+    
     try {
       const { Resultado: res, Num_Datos } = await fetchData(
         urls.ordinario,
@@ -139,33 +150,72 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
     }
   }, []);
 
+  const searchLoteriafisica = useCallback(async (sorteo, num, ser, page) => {
+    let fisico=false
+    const sort = sorteo.split('-')
+    if(sort[1]==='true'){
+      fisico=true
+    }
+    
+    if (num === "" && ser === "") return;
+    
+    try {
+      const { Resultado: res, Num_Datos } = await fetchData(
+        urls.ordinariofisico,
+        "GET",
+        {
+          loteria:'02',
+          num_loteria: num,
+          serie: ser,
+          sorteo: parseInt(sort[0]),
+          numero: page,
+          fisico: fisico,
+          cod_distribuidor: roleInfo.cod_oficina_lot,
+          cod_sucursal: roleInfo.cod_sucursal_lot,
+        },
+        {}
+      );
+      
+      setLoterias(res);
+      return Num_Datos;
+    } catch (err) {
+      setLoterias([]);
+      console.error(err);
+    }
+  }, []);
+
   
   
   const sellLoteria = useCallback(
-    async (sorteo) => {
+    async (sorteo, selecFrac) => {
       let fisico=false
       const sort = sorteo.split('-')
       if(sort[1]==='true'){
         fisico=true
       }
-      
+         
       const req = {
         num_sorteo: parseInt(sort[0]),
         num_billete: `${selected.Num_billete}`,
         serie: `${selected.serie}`,
-        val_pago:
-          parseInt(customer.fracciones) * parseFloat(selected.Valor_fraccion),
+        val_pago: parseInt(customer.fracciones) * parseFloat(selected.Valor_fraccion),
         vendedor: 1,
         celular: parseInt(customer.phone),
         cod_loteria: selected.Cod_loteria,
-        cod_distribuidor: "PPAGO",////////////////////////////////////#########################
+        cod_distribuidor: roleInfo.cod_oficina_lot,
+        cod_sucursal: roleInfo.cod_sucursal_lot,////////////////////////////////////#########################
         can_frac_venta: parseInt(customer.fracciones),
         can_fracciones: parseInt(selected.Fracciones_disponibles),
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
         fisico:fisico,
+        cod_dane:roleInfo.codigo_dane,
+        tipo_comercio:roleInfo.tipo_comercio
+        // frac_fisico_venta:selecFrac,
+        // frac_fisico_disponibles:selected?.Fracciones?.filter(el => !selecFrac?.includes(el)),
       };
+      
       try {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
         setSellResponse(res);
@@ -176,6 +226,47 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
     },
     [selected, customer, roleInfo]
   );
+
+  const sellLoteriafisica = useCallback(
+    async (sorteo, selecFrac) => {
+      let fisico=false
+      const sort = sorteo.split('-')
+      if(sort[1]==='true'){
+        fisico=true
+      }
+         
+      const req = {
+        num_sorteo: parseInt(sort[0]),
+        num_billete: `${selected.Num_billete}`,
+        serie: `${selected.serie}`,
+        val_pago: parseInt(selected?.Fracciones.length)*parseFloat(selected.Valor_fraccion),
+        vendedor: 1,
+        celular: parseInt(customer.phone),
+        cod_loteria: selected.Cod_loteria,
+        cod_distribuidor: roleInfo.cod_oficina_lot,
+        cod_sucursal: roleInfo.cod_sucursal_lot,
+        cantidad_frac_billete: selected.Can_fraccion_billete,
+        id_comercio: roleInfo.id_comercio,
+        id_usuario: roleInfo.id_usuario,
+        fisico:fisico,
+        frac_fisico_venta:selecFrac,
+        frac_fisico_disponibles:selected?.Fracciones?.filter(el => !selecFrac?.includes(el)),
+        cod_dane:roleInfo.codigo_dane,
+        tipo_comercio:roleInfo.tipo_comercio
+      };
+      
+      try {
+        const res = await fetchData(urls.ventaOrdinariofisica, "POST", {}, req);
+        setSellResponse(res);
+      } catch (err) {
+        setSellResponse(null);
+        console.error(err);
+      }
+    },
+    [selected, customer, roleInfo]
+  );
+
+
 
   const searchModa = useCallback(
     async (dateInit, dateEnd, sorteoSearch = null) => {
@@ -200,7 +291,9 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
 
   const con_sort_ventas = useCallback(async () => {
     try {
-      const info = await fetchData(urls.con_sort_ventas, "GET", {});
+      const info = await fetchData(urls.con_sort_ventas, "GET", {
+        num_loteria:'02'/////////////////////////////////////////////////
+      });
       const res = info
       return res;
     } catch (err) {
@@ -218,9 +311,40 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
     
     try {
       const info = await fetchData(urls.ventasReportes, "GET", {
+        num_loteria:'02',////////////////////////////////////////
         sorteo:sort[0],
+        fisico:fisico,
+        cod_distribuidor:roleInfo.cod_oficina_lot,
+        cod_sucursal:roleInfo.cod_sucursal_lot, /////////////////////////////////////////////////
+        cod_dane:roleInfo.codigo_dane
       });
+      
       const res = info[0];
+      let str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`;
+      for (const venta of res.Campo5) {
+        const line = venta.split("-").join("").concat("\n");
+        str = str.concat(line);
+      }
+      const data = new Blob([str], { type: "text/plain;charset=utf-8" });
+      const csv = window.URL.createObjectURL(data);
+      return csv;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const getReportesPagos = useCallback(async () => {
+   
+  
+    
+    try {
+      const info = await fetchData(urls.pagosReportes, "GET", {
+        sorteo_semana:'sorteo_semana',/////////////////////////////////////////////
+        cod_distribuidor:'PPAGO', /////////////////////////////////////////////////
+      });
+
+      const res = info[0];
+     
       let str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`;
       for (const venta of res.Campo5) {
         const line = venta.split("-").join("").concat("\n");
@@ -272,6 +396,7 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
         serie_ganadora: serie,
         cant_fracciones: fracciones_fisi,
       });
+      console.log(res)
       return res;
     } catch (err) {
       console.error(err);
@@ -299,6 +424,7 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
         identificacion:(customer.doc_id),
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
+        tipo_comercio:roleInfo.tipo_comercio
 
       };
       try {
@@ -335,9 +461,11 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
           fraciones:customer2.fracciones,
           id_comercio: roleInfo.id_comercio,
           id_usuario: roleInfo.id_usuario,
+          tipo_comercio:"OFICINAS PROPIAS"//roleInfo.tipo_comercio
       
 
       };
+      
       try {
         const res = await fetchData(urls.pagopremiofisico, "POST", {}, req);
         setPagoresponse(res);
@@ -352,7 +480,19 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
   const ConsultaCrearSort = useCallback(async () => {
     try {
       const res = await fetchData(urls.ConsultaCrearSort, "GET", {
-        num_loteria:'02',////////////////////////////////////#########################
+      });
+      
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const CambiarSort = useCallback(async (tip_sorteo,fisico) => {
+    try {
+      const res = await fetchData(urls.CambiarSort, "GET", {
+        tip_sorteo:tip_sorteo,
+        fisico:fisico
       });
       
       return res;
@@ -362,38 +502,12 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
   }, []);
 
 
-  const CambiarSort = useCallback(
-    async (resp) => {
-
-      const req = {
-        
-        num_sorteo:resp.sorteo,
-        num_sorteo_ante:resp['sorteo anterior'],
-        fecha:resp.fecha,
-        tipo_sorteo:resp.tipo,
-        num_loteria:resp.loteria,
-        nom_loteria:resp['nombre loteria']
-    
-      
-
-      };
-      try {
-        const res = await fetchData(urls.CambiarSort, "POST", {}, req);
-        return res;
-        
-        
-      } catch (err) {
-
-        console.error(err);
-      }
-    },
-    []
-  );
+  
 
   const EstadoArchivos = useCallback(async () => {
     try {
       const res = await fetchData(urls.EstadoArchivos, "GET", {});
-      
+      console.log(res)
       return res;
     } catch (err) {
       console.error(err);
@@ -420,7 +534,9 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
       setPagoresponse,
     },
     searchLoteria,
+    searchLoteriafisica,
     sellLoteria,
+    sellLoteriafisica,
     reportes: {
       moda,
       sorteo,
@@ -432,6 +548,7 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
     },
     searchModa,
     getReportesVentas,
+    getReportesPagos,
     isWinner,
     makePayment,
     makePayment2,

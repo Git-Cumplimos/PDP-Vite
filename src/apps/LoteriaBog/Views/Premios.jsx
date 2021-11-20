@@ -109,7 +109,7 @@ const Premios = () => {
     e.preventDefault();
     isWinner(sorteo, billete, serie)
       .then((res) => {
-    
+        console.log(res)
         setDisabledBtns(false);
         
         
@@ -152,7 +152,9 @@ const Premios = () => {
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
-          //notify(JSON.stringify(res));
+          if(res?.Tipo===0){
+            notifyError('El valor a pagar supera la capacidad de la oficina $'+res['valor ganado']);
+          }else{}
         }
       })
       
@@ -172,7 +174,9 @@ const Premios = () => {
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
-          //notify(JSON.stringify(res));
+          if(res?.Tipo===0){
+            notifyError('El valor a pagar supera la capacidad de la oficina: $'+res['valor ganado']);
+          }else{}
         }
       })
       
@@ -310,7 +314,7 @@ const Premios = () => {
         ""
       )}
       
-      {(respagar['msg']===undefined) ? <>
+      {(respagar['msg']===undefined) && respagar?.Tipo!=0 ? <>
       <Modal show={showModal} num_tele={phone} handleClose={() => closeModal()}>
         
         {pagoresponse===null ? <>
