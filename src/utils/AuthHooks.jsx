@@ -13,8 +13,8 @@ import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
 
-const urlLog = "http://loginconsulta.us-east-2.elasticbeanstalk.com/login";
-const urlQuota = "http://loginconsulta.us-east-2.elasticbeanstalk.com/cupo";
+const urlLog = "http://127.0.0.1:5000/login";
+const urlQuota = "http://127.0.0.1:5000/cupo";
 const urlcrearRol = "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/crear_rol";
 const urlconsulta_roles = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_rol';
 const urlconsulta_usuarios = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_usuario';
@@ -42,6 +42,7 @@ export const AuthContext = createContext({
   consulta_roles: () => {},
   consulta_usuarios: () => {},
   cambiar_rol: () => {},
+  checkUser: () => {},
 });
 
 export const useAuth = () => {
@@ -259,7 +260,7 @@ export const useProvideAuth = () => {
         });
       });
     }
-  }, [setUser]);
+  }, [setUser,]);
 
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
@@ -400,5 +401,6 @@ export const useProvideAuth = () => {
     consulta_roles,
     consulta_usuarios,
     cambiar_rol,
+    checkUser,
   };
 };

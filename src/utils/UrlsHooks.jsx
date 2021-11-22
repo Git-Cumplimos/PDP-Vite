@@ -28,6 +28,7 @@ export const useProvideUrls = () => {
   const [urlsPrivate, setUrlsPrivate] = useState([]);
   const [urlsPublic, setUrlsPublic] = useState([]);
   const [urlsPrivApps, setUrlsPrivApps] = useState([]);
+  
 
   const emptyComp = () => {
     return <h1>Componente vacio</h1>;
@@ -63,7 +64,8 @@ export const useProvideUrls = () => {
         label: <AuthButton />
       }
     ]);
-
+    
+    
     setUrlsPrivApps([
       {
         link: "/suser",
@@ -71,32 +73,38 @@ export const useProvideUrls = () => {
         component: emptyComp,
         props: {},
       },
+
       { 
         link: "/loteria-de-bogota",
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
-        component: roleInfo?.tipo_comercio!=="OFICINAS PROPIAS"?LoteriaBog:emptyComp,//por ahora esta !==
+        component: roleInfo?.tipo_comercio==="OFICINAS PROPIAS"?LoteriaBog:emptyComp,
         props: {},
+        show: roleInfo?.tipo_comercio==="OFICINAS PROPIAS",///////////////////////////////
       },
+      {
+        link: "/loteria-de-bogota/:page",
+        component: roleInfo?.tipo_comercio==="OFICINAS PROPIAS"?LoteriaBog:emptyComp,
+        props: {},
+        exact: false,
+        show: false,
+      },
+    
+      
+  
       // {
       //   link: "/fundacion-mujer",
       //   label: <AppIcons Logo={"https://www.elempleo.com/sitios-empresariales/colombia/fundacion-de-la-mujer/video/LogoLoopFundacion_1_1.jpg"} name="Fundacion de la mujer" />,
       //   component: FunMujer,
       //   props: {},
       // },
+      
       {
-        link: "/loteria-de-bogota/:page",
-        component: LoteriaBog,
+        link: "/fundacion-mujer/:page",
+        component: FunMujer,
         props: {},
         exact: false,
         show: false,
       },
-      // {
-      //   link: "/fundacion-mujer/:page",
-      //   component: FunMujer,
-      //   props: {},
-      //   exact: false,
-      //   show: false,
-      // },
 
       // {
       //   link: "/marketplace",
@@ -125,6 +133,7 @@ export const useProvideUrls = () => {
   return {
     urlsPrivate,
     urlsPublic,
-    urlsPrivApps,
+    urlsPrivApps, 
+    
   };
 };

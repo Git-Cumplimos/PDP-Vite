@@ -10,6 +10,7 @@ import Table from "../../../components/Base/Table/Table";
 import SellResp from "../components/SellResp/SellResp";
 import SendForm from "../components/SendForm/SendForm";
 import { useLoteria } from "../utils/LoteriaHooks";
+import { useAuth } from "../../../utils/AuthHooks";
 
 const Loteria = ({
   sorteo:
@@ -38,6 +39,8 @@ const Loteria = ({
     sellLoteria,
     sellLoteriafisica,
   } = useLoteria();
+
+  
 
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);

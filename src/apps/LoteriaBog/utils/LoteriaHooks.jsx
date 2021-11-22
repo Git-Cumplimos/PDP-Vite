@@ -15,7 +15,7 @@ const urls = {
   ordinariofisico:
     "http://loteriacons.us-east-2.elasticbeanstalk.com/consultas_loteria_fisica", 
   ventaOrdinario: "http://loteriaventa.us-east-2.elasticbeanstalk.com/venta",
-  ventaOrdinariofisica: "http://loteriaventa.us-east-2.elasticbeanstalk.com/ventafisica",
+  ventaOrdinariofisica: "http://127.0.0.1:5000/ventafisica",
   moda: "http://buscadosmas.us-east-2.elasticbeanstalk.com/consurepmasbusca",
   ventasReportes:
     "http://ventasreportes.us-east-2.elasticbeanstalk.com/reportes_ventas",
@@ -151,6 +151,7 @@ const [ loteriasfisico,setLoteriasfisco] = useState();
   }, []);
 
   const searchLoteriafisica = useCallback(async (sorteo, num, ser, page) => {
+    console.log(roleInfo)
     let fisico=false
     const sort = sorteo.split('-')
     if(sort[1]==='true'){

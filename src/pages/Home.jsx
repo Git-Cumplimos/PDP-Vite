@@ -6,7 +6,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useEffect, useState } from "react";
 
 const Home = () => {
-  const { urlsPrivApps: urls } = useUrls();
+  const { urlsPrivApps: urls} = useUrls();
 
   const [imgs, setImgs] = useState([]);
 
@@ -41,6 +41,7 @@ const Home = () => {
         })}
       </Carousel>
       <HNavbar links={urls} isIcon />
+      
     </>
   );
 };
