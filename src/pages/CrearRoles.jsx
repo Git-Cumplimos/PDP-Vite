@@ -167,7 +167,7 @@ const CrearRoles = () => {
                 label="Primer nombre:"
                 type="text"
                 required={true}
-                autoComplete="false"
+                autoComplete="off"
                 value={pnombre}
                 onInput={(e) => {
                    
@@ -179,7 +179,7 @@ const CrearRoles = () => {
                 id="snombre"
                 label="Segundo nombre:"
                 type="text"
-                autoComplete="false"
+                autoComplete="off"
                 value={snombre}
                 onInput={(e) => {
                    
@@ -192,7 +192,7 @@ const CrearRoles = () => {
                 label="Primer apellido:"
                 type="text"
                 required={true}
-                autoComplete="false"
+                autoComplete="off"
                 value={papellido}
                 onInput={(e) => {
                    
@@ -204,7 +204,7 @@ const CrearRoles = () => {
                 id="sapellido"
                 label="Segundo apellido:"
                 type="text"
-                autoComplete="false"
+                autoComplete="off"
                 value={sapellido}
                 onInput={(e) => {
                    
@@ -231,7 +231,7 @@ const CrearRoles = () => {
                 label="Correo:"
                 type="text"
                 required={true}
-                autoComplete="false"
+                autoComplete="off"
                 value={email}
                 onInput={(e) => {
                     
@@ -243,7 +243,7 @@ const CrearRoles = () => {
                 label="Identificacion:"
                 type="text"
                 required={true}
-                autoComplete="false"
+                autoComplete="off"
                 value={identificacion}
                 onInput={(e) => {
                     if(!isNaN(e.target.value)){
@@ -258,7 +258,7 @@ const CrearRoles = () => {
                 label="Telefono:"
                 type="text"
                 required={true}
-                autoComplete="false"
+                autoComplete="off"
                 value={telefono}
                 onInput={(e) => {
                     if(!isNaN(e.target.value)){
@@ -273,7 +273,7 @@ const CrearRoles = () => {
                 label="Direccion:"
                 type="text"
                 required={true}
-                autoComplete="false"
+                autoComplete="off"
                 value={direccion_residencia}
                 onInput={(e) => {
                         const num = (e.target.value);

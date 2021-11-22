@@ -2,8 +2,16 @@ import { useCallback, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import classes from "./Input.module.css";
 
-const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
-  const { formItem, dropzone, File } = classes;
+const Input = ({
+  label,
+  self = false,
+  onLazyInput,
+  onGetFile,
+  suggestions,
+  onSelectSuggestion,
+  ...input
+}) => {
+  const { formItem, dropzone, File, suggestion } = classes;
   const { id: _id, type, disabled } = input;
 
   const [timer, setTimer] = useState(null);
@@ -85,7 +93,6 @@ const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
         GetFileTree(item);
       }
 
-      console.log(tempFiles);
       onGetFile([...tempFiles]);
     },
     [onGetFile, hideDropZone]
@@ -143,6 +150,21 @@ const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
             ""
           )}
         </>
+      ) : Array.isArray(suggestions) && suggestions.length > 0 ? (
+        <ul className={suggestion}>
+          {suggestions.map((el, idx) => {
+            return (
+              <li
+                key={idx}
+                onClick={() => {
+                  onSelectSuggestion(idx, el);
+                }}
+              >
+                <h1>{el}</h1>
+              </li>
+            );
+          })}
+        </ul>
       ) : (
         ""
       )}
@@ -168,6 +190,21 @@ const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
             ""
           )}
         </>
+      ) : Array.isArray(suggestions) && suggestions.length > 0 ? (
+        <ul className={suggestion}>
+          {suggestions.map((el, idx) => {
+            return (
+              <li
+                key={idx}
+                onClick={() => {
+                  onSelectSuggestion(idx, el);
+                }}
+              >
+                <h1>{el}</h1>
+              </li>
+            );
+          })}
+        </ul>
       ) : (
         ""
       )}

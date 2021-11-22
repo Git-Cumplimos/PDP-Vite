@@ -1,0 +1,21 @@
+fieldset.Fieldset {
+  @apply grid gap-4 mx-auto xl:w-full border border-solid border-gray-500 p-3;
+
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+}
+
+fieldset.Fieldset > legend {
+  @apply text-lg;
+}
+
+@media (max-width: 768px) {
+  fieldset.Fieldset {
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  fieldset.Fieldset {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}

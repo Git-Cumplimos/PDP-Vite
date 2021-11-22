@@ -1,6 +1,6 @@
 {
   "authSelections": "userPoolOnly",
-  "resourceName": "puntodepago4316e2e0",
+  "resourceName": "pdpfront51e34afc",
   "serviceType": "imported",
-  "region": "us-east-2"
+  "region": "us-east-1"
 }

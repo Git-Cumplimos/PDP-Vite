@@ -130,7 +130,7 @@ const Loteria = ({
           type="search"
           minLength="1"
           maxLength="4"
-          autoComplete="false"
+          autoComplete="off"
           value={numero}
           onInput={(e) => {
             if(!isNaN(e.target.value)){
@@ -164,7 +164,7 @@ const Loteria = ({
           type="search"
           minLength="1"
           maxLength="3"
-          autoComplete="false"
+          autoComplete="off"
           value={serie}
           onInput={(e) => {
             if(!isNaN(e.target.value)){

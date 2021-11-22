@@ -13,27 +13,31 @@ import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
 
-const urlLog = "http://127.0.0.1:5000/login";
-const urlQuota = "http://127.0.0.1:5000/cupo";
-const urlcrearRol = "http://lot-crear-rol.us-east-2.elasticbeanstalk.com/crear_rol";
-const urlconsulta_roles = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_rol';
-const urlconsulta_usuarios = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/consulta_usuario';
-const urlcambiar_rol = 'http://lot-crear-rol.us-east-2.elasticbeanstalk.com/modificar_rol';
-const urlCod_loteria_oficina = "http://loteriacons.us-east-2.elasticbeanstalk.com/cod_loteria_oficina";
+
+
 
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
 // const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
+
+const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
+const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
+const urlcrearRol = `${process.env.REACT_APP_URL_USRS}/crear_rol`;
+const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
+const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
+const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
+const urlCod_loteria_oficina = "http://loteriacons.us-east-2.elasticbeanstalk.com/cod_loteria_oficina";
+
 
 export const AuthContext = createContext({
   isSignedIn: false,
   cognitoUser: null,
   userInfo: null,
   roleInfo: null,
-  crearRolresp:null,
-  setCrearRolresp:null,
-  roles_disponibles:null,
-  setRoles_disponibles:null,
+  crearRolresp: null,
+  setCrearRolresp: null,
+  roles_disponibles: null,
+  setRoles_disponibles: null,
   signIn: () => {},
   confirmSignIn: () => {},
   signOut: () => {},
@@ -62,44 +66,49 @@ export const useProvideAuth = () => {
 
   const [roles_disponibles, setRoles_disponibles] = useState(null);
 
+  const [qr, setQr] = useState("");
 
+  const [username, setUsername] = useState("");
+
+  const [parameters, setParameters] = useState("");
 
   const consulta_roles = useCallback(async () => {
     try {
       const res = await fetchData(urlconsulta_roles, "GET", {});
       setRoles_disponibles(res);
       return res;
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   }, []);
 
   const consulta_usuarios = useCallback(async (email) => {
     try {
       const res = await fetchData(urlconsulta_usuarios, "GET", {
-        email:email,
+        email: email,
       });
-    
+
       return res;
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   }, []);
-  
+
   const crearRol = useCallback(
-    async (pnombre,snombre,papellido,sapellido, rol, email, identificacion,telefono,direccion_residencia) => {
-
-      
+    async (
+      pnombre,
+      snombre,
+      papellido,
+      sapellido,
+      rol,
+      email,
+      identificacion,
+      telefono,
+      direccion_residencia
+    ) => {
       const req = {
-        
-          nombre:pnombre+" "+snombre+" "+papellido+" "+sapellido,
-          rol:rol,
-          email: email,
-          identificacion: identificacion,
-          telefono: telefono,
-          direccion_residencia: direccion_residencia,
-      
-
+        nombre: `${pnombre} ${snombre} ${papellido} ${sapellido}`,
+        rol: rol,
+        email: email,
+        identificacion: identificacion,
+        telefono: telefono,
+        direccion_residencia: direccion_residencia,
       };
       try {
         const res = await fetchData(urlcrearRol, "POST", {}, req);
@@ -107,7 +116,6 @@ export const useProvideAuth = () => {
         return res;
       } catch (err) {
         setCrearRolresp(null);
-        console.error(err);
       }
     },
     []
@@ -115,30 +123,20 @@ export const useProvideAuth = () => {
 
   const cambiar_rol = useCallback(
     async (rol, email, email_cambio, telefono_cambio, direccion_residencia) => {
-
-      
       const req = {
-        
-          rol:rol,
-          email: email,
-          email_cambio:email_cambio,
-          telefono: telefono_cambio,
-          direccion_residencia: direccion_residencia,
-      
-
+        rol: rol,
+        email: email,
+        email_cambio: email_cambio,
+        telefono: telefono_cambio,
+        direccion_residencia: direccion_residencia,
       };
       try {
         const res = await fetchData(urlcambiar_rol, "PUT", {}, req);
-        
         return res;
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) {}
     },
     []
   );
-
- 
 
   const setUser = useCallback(async () => {
     try {
@@ -154,7 +152,7 @@ export const useProvideAuth = () => {
           { correo: usrInfo?.attributes?.email },
           {}
         );
-       
+
         const quota = await fetchData(
           urlQuota,
           "GET",
@@ -194,23 +192,21 @@ export const useProvideAuth = () => {
             cod_sucursal_lot: resp_cod.cod_sucursal_lot,
           });
         }
+
       }
     } catch (err) {
       setSignedIn(false);
-      console.error(err);
       logger.debug(err);
     }
   }, []);
 
   const checkUser = useCallback(() => {
     if (Auth.user === null || Auth.user === undefined) {
-      setUser().catch((err) => console.error(err));
+      setUser();
     } else {
       setSignedIn(true);
       setCognitoUser(Auth.user);
-      Auth.currentUserInfo()
-        .then((usr) => setUserInfo(usr))
-        .catch((err) => console.error(err));
+      Auth.currentUserInfo().then((usr) => setUserInfo(usr)).catch(() => {});
 
       fetchData(
         urlLog,
@@ -227,6 +223,7 @@ export const useProvideAuth = () => {
           },
           {}
         ).then((quota) => {
+
 
           fetchData(
             urlCod_loteria_oficina,
@@ -255,10 +252,9 @@ export const useProvideAuth = () => {
                 cod_sucursal_lot: resp_cod.cod_sucursal_lot,
               });
             }
-
           });
-        });
-      });
+        }).catch(() => {});
+      }).catch(() => {});
     }
   }, [setUser,]);
 
@@ -266,7 +262,7 @@ export const useProvideAuth = () => {
     appendToCognitoUserAgent("withCustomAuthenticator");
     consulta_roles();
     checkUser();
-  }, [checkUser]);
+  }, [checkUser, consulta_roles]);
 
   const history = useHistory();
   const { state, pathname } = useLocation();
@@ -276,11 +272,55 @@ export const useProvideAuth = () => {
       const user = await Auth.signIn(username, password);
       if (user) {
         setCognitoUser(user);
+        setParameters(user.challengeParam.userAttributes);
       }
     } catch (err) {
       throw err;
     }
   }, []);
+
+  const handleSetupTOTP = useCallback(
+    async (user) => {
+      try {
+        const validartoken = await Auth.setupTOTP(user);
+        const str =
+          "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
+        setQr(str);
+      } catch (err) {}
+    },
+    [username]
+  );
+
+  const handleChangePass = useCallback(
+    async (
+      nombreUsuario,
+      apellido,
+      cognitoUser,
+      direccion,
+      ciudad,
+      newpassword
+    ) => {
+      try {
+        const loggedUser = await Auth.completeNewPassword(
+          cognitoUser,
+          newpassword,
+          {
+            name: nombreUsuario,
+            family_name: apellido,
+            address: direccion,
+            locale: ciudad,
+          }
+        );
+        setCognitoUser(loggedUser);
+        if (loggedUser.challengeName === "MFA_SETUP") {
+          handleSetupTOTP(loggedUser);
+        }
+      } catch (err) {
+        throw err;
+      }
+    },
+    [handleSetupTOTP]
+  );
 
   const confirmSignIn = useCallback(
     async (totp) => {
@@ -301,7 +341,7 @@ export const useProvideAuth = () => {
             { correo: usrInfo?.attributes?.email },
             {}
           );
-          
+
           const quota = await fetchData(
             urlQuota,
             "GET",
@@ -311,6 +351,7 @@ export const useProvideAuth = () => {
             },
             {}
           );
+
 
           const resp_cod = await fetchData(
             urlCod_loteria_oficina,
@@ -341,6 +382,7 @@ export const useProvideAuth = () => {
               cod_sucursal_lot: resp_cod.cod_sucursal_lot,
             });
           }
+
         }
         history.push(
           state ? state.from : pathname === "/login" ? "/" : pathname
@@ -356,15 +398,41 @@ export const useProvideAuth = () => {
   );
 
   const signOut = useCallback(() => {
-    Auth.signOut()
-      .then(() => {
-        setCognitoUser(null);
-        setSignedIn(false);
-        setRoleInfo({});
-        history.push("/login");
-      })
-      .catch((err) => console.error(err));
+    Auth.signOut().then(() => {
+      setCognitoUser(null);
+      setSignedIn(false);
+      setRoleInfo({});
+      history.push("/login");
+    }).catch(() => {});
   }, [history]);
+
+  const handlesetPreferredMFA = useCallback(
+    async (totp) => {
+      try {
+        const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+        if (preferredMFA === "SUCCESS") {
+          await confirmSignIn(totp);
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    [cognitoUser, confirmSignIn]
+  );
+
+  const handleverifyTotpToken = useCallback(
+    async (totp) => {
+      try {
+        const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
+        if (tokenValidado.accessToken.payload.token_use === "access") {
+          await handlesetPreferredMFA(totp);
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    [cognitoUser, handlesetPreferredMFA]
+  );
 
   const getQuota = useCallback(async () => {
     const tempRole = { ...roleInfo };
@@ -377,14 +445,14 @@ export const useProvideAuth = () => {
       },
       {}
     );
-    tempRole.quota = quota['cupo disponible'];
-    tempRole.comision= quota['comisiones']
+    tempRole.quota = quota["cupo disponible"];
+    tempRole.comision = quota["comisiones"];
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
 
-  
-  console.log(roleInfo)
   return {
+    handleverifyTotpToken,
+    handleChangePass,
     isSignedIn,
     cognitoUser,
     userInfo,
@@ -402,5 +470,7 @@ export const useProvideAuth = () => {
     consulta_usuarios,
     cambiar_rol,
     checkUser,
+    qr,
+    parameters,
   };
 };

@@ -147,7 +147,7 @@ const Recaudo = () => {
             type="text"
             minLength="10"
             maxLength="10"
-            autoComplete="false"
+            autoComplete="off"
             value={cedula}
             onInput={(e) => {
               const num = parseInt(e.target.value) || "";
@@ -161,7 +161,7 @@ const Recaudo = () => {
             type="text"
             minLength="4"
             maxLength="4"
-            autoComplete="false"
+            autoComplete="off"
             value={credito}
             onInput={(e) => {
               const num = parseInt(e.target.value) || "";

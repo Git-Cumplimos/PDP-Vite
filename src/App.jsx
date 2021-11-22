@@ -9,8 +9,7 @@ import Amplify from "aws-amplify";
 import awsconfig from "./aws-exports";
 import { ToastContainer } from "react-toastify";
 
-import dayjs from 'dayjs'
-
+import MessengerCustomerChat from "react-messenger-customer-chat";
 
 Amplify.configure(awsconfig);
 
@@ -26,16 +25,19 @@ function App() {
       document.body.classList.add("loggedBackground");
     }
   }, [pathname]);
- 
+
   return (
     <ProvideAuth>
       <ProvideUrls>
         <ToastContainer />
         <Admin />
-        {/* <h3 className='fecha'>{(dayjs().format(' DD/MM/YYYY HH:MM'))}</h3> */}
+        <MessengerCustomerChat
+          pageId="455201114671494"
+          appId="603779204002555"
+          language="es_CO"
+        />
       </ProvideUrls>
     </ProvideAuth>
-    
   );
 }
 

@@ -3,13 +3,12 @@ import { useAuth } from "../../../../utils/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
 
 const urls = {
-  consultapin: "http://consultaPinFM-dev.us-east-2.elasticbeanstalk.com/pin",
-  canselarpin:
-    "http://cancelarpinfm-dev.us-east-2.elasticbeanstalk.com/cancel-pin",
-  desembolso: "http://desembolsosFM-dev.us-east-2.elasticbeanstalk.com",
-  recaudo: "http://pagocreditofm-dev.us-east-2.elasticbeanstalk.com/creditos",
-  recaudo2: "http://pagocreditofm-dev.us-east-2.elasticbeanstalk.com/creditos",
-  pagorecaudo: "http://pagocreditofm-dev.us-east-2.elasticbeanstalk.com",
+  consultapin: `${process.env.REACT_APP_URL_FDLM_CONSULTAPIN}/pin`,
+  cancelarpin: `${process.env.REACT_APP_URL_FDLM_CANCELARPIN}/cancel-pin`,
+  desembolso: `${process.env.REACT_APP_URL_FDLM_DESEMBOLSOS}`,
+  recaudo: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}/creditos`,
+  recaudo2: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}/creditos`,
+  pagorecaudo: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}`,
 };
 
 export const LoteriaContext = createContext({
@@ -91,7 +90,7 @@ export const useProvideLoteria = () => {
   //cancelar pin
   const cancelarpin = useCallback(async (transaccion) => {
     try {
-      const res = await fetchData(urls.canselarpin, "GET", {
+      const res = await fetchData(urls.cancelarpin, "GET", {
         transaccion: "TFM102",
         id_comercio: roleInfo.id_comercio,
       });

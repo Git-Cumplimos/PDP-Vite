@@ -192,8 +192,8 @@ const Premios = () => {
           type="text"
           minLength="1"
           maxLength="4"
-          required={true}
-          autoComplete="false"
+          required
+          autoComplete="off"
           value={sorteo}
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
@@ -206,8 +206,8 @@ const Premios = () => {
           type="text"
           minLength="4"/*Verificar para que se puedan poner ceros a la izquierda*/ 
           maxLength="4"
-          required={true}
-          autoComplete="false"
+          required
+          autoComplete="off"
           value={billete}
           onInput={(e) => {
             if(!isNaN(e.target.value)){
@@ -224,8 +224,8 @@ const Premios = () => {
           type="text"
           minLength="3"/*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="3"
-          required={true}
-          autoComplete="false"
+          required
+          autoComplete="off"
           value={serie}
           onInput={(e) => {            
             if(!isNaN(e.target.value)){
@@ -248,8 +248,8 @@ const Premios = () => {
               id="numCel"
               label="Numero de celular"
               type="text"
-              autoComplete="false"
-              required={true}
+              autoComplete="off"
+              required
               value={phone}
               onInput={(e) => {
                 if(!isNaN(e.target.value)){
@@ -263,8 +263,8 @@ const Premios = () => {
                 id="codHash"
                 label="Codigo de seguridad"
                 type="text"
-                autoComplete="false"
-                required={true}
+                autoComplete="off"
+                required
                 value={hash}
                 onInput={(e) => {
                   setHash(e.target.value);
@@ -290,8 +290,8 @@ const Premios = () => {
               type="number"
               max='3'
               min='1'
-              autoComplete="false"
-              required={true}
+              autoComplete="off"
+              required
               value={fracciones_fisi}
               onInput={(e) => {
                 const num = parseInt(e.target.value) || "";

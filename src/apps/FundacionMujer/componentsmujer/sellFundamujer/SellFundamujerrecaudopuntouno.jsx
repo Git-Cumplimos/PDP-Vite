@@ -17,9 +17,6 @@ const Sellfundamujerrecaudo = ({
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-const urls ={
-  ticket:"http:transacciones-pdp-dev.us-east-2.elasticbeanstalk.com/transaciones-view?"
-}
 
 /* 
 const ticket  = useCallback(async () => {

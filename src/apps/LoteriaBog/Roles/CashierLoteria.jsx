@@ -12,7 +12,7 @@ import Reporte from "../../../assets/svg/REPORTES-01.svg";
 import Button from "../../../components/Base/Button/Button";
 import dayjs from "dayjs";
 
-const urlLoto = "http://sorteos.us-east-2.elasticbeanstalk.com/contiploteria";
+const urlLoto = `${process.env.REACT_APP_LOTO_SORTEOS}/contiploteria`;
 
 const CashierLoteria = () => {
   const [sorteo, setSorteo] = useState(null);
