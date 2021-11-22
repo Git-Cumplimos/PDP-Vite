@@ -16,7 +16,7 @@ const SocialBar = () => {
         </li>
         <li>
           <a
-            href="https://facebook.com"
+            href="https://www.facebook.com/PDPmultibanco/"
             target="_blank"
             rel="noopener noreferrer"
           >

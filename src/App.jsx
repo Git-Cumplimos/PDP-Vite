@@ -31,11 +31,11 @@ function App() {
       <ProvideUrls>
         <ToastContainer />
         <Admin />
-        <MessengerCustomerChat pageId="455201114671494" appId="603779204002555" />
-        {/* <MessengerCustomerChat
-          pageId="1447497328617399"
-          appId="292219355256347"
-        /> */}
+        <MessengerCustomerChat
+          pageId="455201114671494"
+          appId="603779204002555"
+          language="es_CO"
+        />
       </ProvideUrls>
     </ProvideAuth>
   );
