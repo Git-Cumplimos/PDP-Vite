@@ -11,9 +11,10 @@ import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
 
 import FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
 import Transacciones from "../pages/Transacciones";
-// import CrearRoles from "../pages/CrearRoles";
+import CrearRoles from "../pages/CrearRoles";
 import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
 import MarketPlace from "../apps/MarketPlace/MarketPlace";
+import { useAuth } from "./AuthHooks";
 
 
 export const UrlsContext = createContext({
@@ -58,7 +59,7 @@ export const useProvideUrls = () => {
       {
         link: "/seguridad",
         label: "Seguridad",
-        component: roleInfo?.role?.includes(1)? CrearRoles:emptyComp,
+        component:CrearRoles,
 
         props: {},
       },

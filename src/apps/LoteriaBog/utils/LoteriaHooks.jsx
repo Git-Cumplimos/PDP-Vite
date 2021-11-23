@@ -12,16 +12,13 @@ import fetchData from "../../../utils/fetchData";
 const urls = {
 
   ordinario: `${process.env.REACT_APP_URL_LOTO1}/consultas_loteria`,
-  ordinariofisico:
-    "http://loteriacons.us-east-2.elasticbeanstalk.com/consultas_loteria_fisica", 
+  ordinariofisico: `${process.env.REACT_APP_URL_LOTO1}/consultas_loteria_fisica`, 
   ventaOrdinario: `${process.env.REACT_APP_URL_LOTO_VENTA}/venta`,
-  ventaOrdinariofisica: "http://loteriaventa.us-east-2.elasticbeanstalk.com/ventafisica",
+  ventaOrdinariofisica: `${process.env.REACT_APP_URL_LOTO_VENTA}/ventafisica`,
   moda: `${process.env.REACT_APP_URL_LOTO_MODA}/consurepmasbusca`,
   ventasReportes: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`,
-  pagosReportes:
-    "http://ventasreportes.us-east-2.elasticbeanstalk.com/reportes_pago_premios",
-  con_sort_ventas:
-    "http://ventasreportes.us-east-2.elasticbeanstalk.com/con_sort_vendidos",   
+  pagosReportes:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_pago_premios`,
+  con_sort_ventas:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_sort_vendidos`,   
   consultaPago: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/pagodepremios`,
   premiohash: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/hash`,
   premiofisico: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/fisico`,
@@ -318,13 +315,22 @@ export const useProvideLoteria = () => {
         cod_sucursal:roleInfo.cod_sucursal_lot, /////////////////////////////////////////////////
         cod_dane:roleInfo.codigo_dane
       });
-      
+     
       const res = info[0];
-      let str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`;
-      for (const venta of res.Campo5) {
-        const line = venta.split("-").join("").concat("\n");
-        str = str.concat(line);
+      if(fisico===true){
+        var str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n`;
+        for (const venta of res.Campo4) {
+          const line = venta.split("-").join("").concat("\n");
+          str = str.concat(line);
+        }
+      }else{
+        var str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`
+        for (const venta of res.Campo5) {
+          const line = venta.split("-").join("").concat("\n");
+          str = str.concat(line);
+        }  
       }
+      
       const data = new Blob([str], { type: "text/plain;charset=utf-8" });
       const csv = window.URL.createObjectURL(data);
       return csv;
@@ -389,20 +395,7 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-  const makePayment2 = useCallback(async (sorteo, billete, serie, fracciones_fisi) => {
-    try {
-      const res = await fetchData(urls.premiofisico, "GET", {
-        num_sorteo: sorteo,
-        bill_ganador: billete,
-        serie_ganadora: serie,
-        cant_fracciones: fracciones_fisi,
-      });
-      console.log(res)
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+
 
 
   const makePayment2 = useCallback(

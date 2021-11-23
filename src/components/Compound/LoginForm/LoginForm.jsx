@@ -47,18 +47,16 @@ const LoginForm = () => {
       progress: undefined,
     });
   };
-
+  
   const handleCognito = (event) => {
     event.preventDefault();
 
     auth
       .signIn(username, password)
-<<<<<<< HEAD
       .then(() => {
         
       })
-=======
->>>>>>> d1b01c3a0cca300a0e330a79343e24def2e6fe12
+
       .catch((err) => {
         if (err.code === "NotAuthorizedException") {
           notifyError("Usuario o contraseña incorrectos.");

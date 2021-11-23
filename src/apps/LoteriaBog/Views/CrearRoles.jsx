@@ -29,7 +29,7 @@ const CrearRoles = () => {
     const [direccion_residencia, setDireccion_residencia] = useState('')
     const [disabledBtns, setDisabledBtns] = useState(false)
     const [checkedState, setCheckedState] = useState(
-        new Array(roles_disponibles.length).fill(false)
+        new Array(roles_disponibles?.length).fill(false)
       );
       const [roles, setRoles] = useState([]);
     
@@ -58,6 +58,7 @@ const CrearRoles = () => {
         e.preventDefault();
         if(Array.isArray(roles) && roles.length>0){
         crearRol(pnombre,snombre,papellido,sapellido,roles,email,identificacion,telefono,direccion_residencia).then((res) => {
+            console.log(res)
             if(res.msg==='Usuario creado exitosamente'){
                 notify(res.msg) 
                 signUp(pnombre,snombre,papellido,sapellido,roles,email,identificacion,telefono);
@@ -78,7 +79,7 @@ const CrearRoles = () => {
         const password='1234' ///////////////////////
         const email=correo
         const phone_number=telefono
-        const family_name=papellido + sapellido
+        const family_name=pnombre + sapellido
         const name=correo//pnombre +""+ snombre
 
         try{

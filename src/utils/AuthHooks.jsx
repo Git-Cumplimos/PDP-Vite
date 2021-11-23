@@ -26,7 +26,7 @@ const urlcrearRol = `${process.env.REACT_APP_URL_USRS}/crear_rol`;
 const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
 const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
 const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
-const urlCod_loteria_oficina = "http://loteriacons.us-east-2.elasticbeanstalk.com/cod_loteria_oficina";
+const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
 
 
 export const AuthContext = createContext({
@@ -142,6 +142,7 @@ export const useProvideAuth = () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
       setCognitoUser(user);
+      
       if (user) setSignedIn(true);
       const usrInfo = await Auth.currentUserInfo();
       setUserInfo(usrInfo);
@@ -152,7 +153,6 @@ export const useProvideAuth = () => {
           { correo: usrInfo?.attributes?.email },
           {}
         );
-
         const quota = await fetchData(
           urlQuota,
           "GET",
@@ -450,6 +450,7 @@ export const useProvideAuth = () => {
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
 
+  console.log(roleInfo)
   return {
     handleverifyTotpToken,
     handleChangePass,
