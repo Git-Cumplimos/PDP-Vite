@@ -9,16 +9,23 @@ import Banner2 from "../assets/img/BANNER2.jpg";
 import { Link } from "react-router-dom";
 import AppIcons from "../components/Base/AppIcons/AppIcons";
 import ACTUALIZACION from "../assets/svg/ActualizacionDeDatos.svg";
-import { useAuth } from "../utils/AuthHooks";
+import { Auth } from "aws-amplify";
 
 const Home = () => {
   const { urlsPrivApps: urls } = useUrls();
-  const { cognitoUser } = useAuth();
 
   const [emails, setEmails] = useState([
     "directora.mercadeo@puntodepago.com.co",
     "maria.valero@puntodepago.com.co",
   ]);
+  const [setLocalEmail, setSetLocalEmail] = useState("");
+
+  useEffect(() => {
+    Auth.currentUserInfo().then((res) => {
+      setSetLocalEmail(res?.attributes?.email ?? "");
+    });
+  }, []);
+
 
   const [imgs, setImgs] = useState([]);
 
@@ -49,7 +56,7 @@ const Home = () => {
         })}
       </Carousel>
       <HNavbar links={urls} isIcon />
-      {emails.includes(cognitoUser?.attributes?.email ?? "") ? (
+      {emails.includes(setLocalEmail) ? (
         <Link to={"/review-commerce-forms"}>
           <AppIcons
             Logo={ACTUALIZACION}

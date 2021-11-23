@@ -43,6 +43,7 @@ export const AuthContext = createContext({
   consulta_usuarios: () => {},
   cambiar_rol: () => {},
   checkUser: () => {},
+  parameters: null,
 });
 
 export const useAuth = () => {
@@ -132,22 +133,19 @@ export const useProvideAuth = () => {
     []
   );
 
-  const handleSetupTOTP = useCallback(
-    async (user) => {
-      try {
-        const validartoken = await Auth.setupTOTP(user);
-        const str =
-          "otpauth://totp/AWSCognito:" +
-          parameters.email +
-          "?secret=" +
-          validartoken +
-          "&issuer=" +
-          "Punto de Pago Multibanco";
-        setQr(str);
-      } catch (err) {}
-    },
-    [cognitoUser]
-  );
+  const handleSetupTOTP = useCallback(async (user) => {
+    try {
+      const validartoken = await Auth.setupTOTP(user);
+      const str =
+        "otpauth://totp/AWSCognito:" +
+        parameters.email +
+        "?secret=" +
+        validartoken +
+        "&issuer=" +
+        "Punto de Pago Multibanco";
+      setQr(str);
+    } catch (err) {}
+  }, []);
 
   const setUser = useCallback(async () => {
     try {
