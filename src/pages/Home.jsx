@@ -49,7 +49,7 @@ const Home = () => {
         })}
       </Carousel>
       <HNavbar links={urls} isIcon />
-      {emails.includes(cognitoUser?.attributes?.email) ? (
+      {emails.includes(cognitoUser?.attributes?.email ?? "") ? (
         <Link to={"/review-commerce-forms"}>
           <AppIcons
             Logo={ACTUALIZACION}
