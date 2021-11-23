@@ -236,27 +236,29 @@ export const useProvideAuth = () => {
                   id_comercio: suserInfo.id_comercio,
                 },
                 {}
-              ).then((resp_cod) => {
-                if ("msg" in resp_cod) {
-                  setRoleInfo({
-                    role: suserInfo.rol,
-                    ...suserInfo,
+              )
+                .then((resp_cod) => {
+                  if ("msg" in resp_cod) {
+                    setRoleInfo({
+                      role: suserInfo.rol,
+                      ...suserInfo,
 
-                    quota: quota["cupo disponible"],
-                    comision: quota["comisiones"],
-                  });
-                } else {
-                  setRoleInfo({
-                    role: suserInfo.rol,
-                    ...suserInfo,
+                      quota: quota["cupo disponible"],
+                      comision: quota["comisiones"],
+                    });
+                  } else {
+                    setRoleInfo({
+                      role: suserInfo.rol,
+                      ...suserInfo,
 
-                    quota: quota["cupo disponible"],
-                    comision: quota["comisiones"],
-                    cod_oficina_lot: resp_cod.cod_oficina_lot,
-                    cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-                  });
-                }
-              }).catch(() => {});
+                      quota: quota["cupo disponible"],
+                      comision: quota["comisiones"],
+                      cod_oficina_lot: resp_cod.cod_oficina_lot,
+                      cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+                    });
+                  }
+                })
+                .catch(() => {});
             })
             .catch(() => {});
         })
@@ -332,7 +334,6 @@ export const useProvideAuth = () => {
 
   const confirmSignIn = useCallback(
     async (totp) => {
-      console.log(totp);
       try {
         const loggedUser = await Auth.confirmSignIn(
           cognitoUser,
@@ -343,52 +344,56 @@ export const useProvideAuth = () => {
         setSignedIn(true);
         const usrInfo = await Auth.currentUserInfo();
         setUserInfo(usrInfo);
-        if (usrInfo?.attributes?.email) {
-          const suserInfo = await fetchData(
-            urlLog,
-            "GET",
-            { correo: usrInfo?.attributes?.email },
-            {}
-          );
+        try {
+          if (usrInfo?.attributes?.email) {
+            const suserInfo = await fetchData(
+              urlLog,
+              "GET",
+              { correo: usrInfo?.attributes?.email },
+              {}
+            );
 
-          const quota = await fetchData(
-            urlQuota,
-            "GET",
-            {
-              id_comercio: suserInfo.id_comercio,
-              id_dispositivo: suserInfo.id_dispositivo,
-            },
-            {}
-          );
+            const quota = await fetchData(
+              urlQuota,
+              "GET",
+              {
+                id_comercio: suserInfo.id_comercio,
+                id_dispositivo: suserInfo.id_dispositivo,
+              },
+              {}
+            );
 
-          const resp_cod = await fetchData(
-            urlCod_loteria_oficina,
-            "GET",
-            {
-              id_comercio: suserInfo.id_comercio,
-            },
-            {}
-          );
+            const resp_cod = await fetchData(
+              urlCod_loteria_oficina,
+              "GET",
+              {
+                id_comercio: suserInfo.id_comercio,
+              },
+              {}
+            );
 
-          if ("msg" in resp_cod) {
-            setRoleInfo({
-              role: suserInfo.rol,
-              ...suserInfo,
+            if ("msg" in resp_cod) {
+              setRoleInfo({
+                role: suserInfo.rol,
+                ...suserInfo,
 
-              quota: quota["cupo disponible"],
-              comision: quota["comisiones"],
-            });
-          } else {
-            setRoleInfo({
-              role: suserInfo.rol,
-              ...suserInfo,
+                quota: quota["cupo disponible"],
+                comision: quota["comisiones"],
+              });
+            } else {
+              setRoleInfo({
+                role: suserInfo.rol,
+                ...suserInfo,
 
-              quota: quota["cupo disponible"],
-              comision: quota["comisiones"],
-              cod_oficina_lot: resp_cod.cod_oficina_lot,
-              cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-            });
+                quota: quota["cupo disponible"],
+                comision: quota["comisiones"],
+                cod_oficina_lot: resp_cod.cod_oficina_lot,
+                cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+              });
+            }
           }
+        } catch (err) {
+          console.log(err);
         }
         history.push(state?.from || pathname === "/login" ? "/" : pathname);
       } catch (err) {
@@ -450,7 +455,7 @@ export const useProvideAuth = () => {
     } catch (err) {}
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
-  console.log(cognitoUser);
+
   return {
     handleverifyTotpToken,
     handleChangePass,
