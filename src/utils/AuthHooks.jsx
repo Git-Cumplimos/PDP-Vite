@@ -13,9 +13,6 @@ import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
 
-
-
-
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
 // const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
@@ -27,7 +24,6 @@ const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
 const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
 const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
-
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -142,7 +138,7 @@ export const useProvideAuth = () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
       setCognitoUser(user);
-      
+
       if (user) setSignedIn(true);
       const usrInfo = await Auth.currentUserInfo();
       setUserInfo(usrInfo);
@@ -172,27 +168,25 @@ export const useProvideAuth = () => {
           {}
         );
 
-        console.log(resp_cod)
-        if('msg' in resp_cod){
+        if ("msg" in resp_cod) {
           setRoleInfo({
             role: suserInfo.rol,
             ...suserInfo,
-            
-            quota: quota['cupo disponible'],
-            comision: quota['comisiones'],
+
+            quota: quota["cupo disponible"],
+            comision: quota["comisiones"],
           });
-        }else{
+        } else {
           setRoleInfo({
             role: suserInfo.rol,
             ...suserInfo,
-            
-            quota: quota['cupo disponible'],
-            comision: quota['comisiones'],
+
+            quota: quota["cupo disponible"],
+            comision: quota["comisiones"],
             cod_oficina_lot: resp_cod.cod_oficina_lot,
             cod_sucursal_lot: resp_cod.cod_sucursal_lot,
           });
         }
-
       }
     } catch (err) {
       setSignedIn(false);
@@ -206,63 +200,65 @@ export const useProvideAuth = () => {
     } else {
       setSignedIn(true);
       setCognitoUser(Auth.user);
-      Auth.currentUserInfo().then((usr) => setUserInfo(usr)).catch(() => {});
+      Auth.currentUserInfo()
+        .then((usr) => setUserInfo(usr))
+        .catch(() => {});
 
-      fetchData(
-        urlLog,
-        "GET",
-        { correo: Auth.user?.attributes?.email },
-        {}
-      ).then((suserInfo) => {
-        fetchData(
-          urlQuota,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
-            id_dispositivo: suserInfo.id_dispositivo,
-          },
-          {}
-        ).then((quota) => {
-
-
+      fetchData(urlLog, "GET", { correo: Auth.user?.attributes?.email }, {})
+        .then((suserInfo) => {
           fetchData(
-            urlCod_loteria_oficina,
+            urlQuota,
             "GET",
             {
               id_comercio: suserInfo.id_comercio,
+              id_dispositivo: suserInfo.id_dispositivo,
             },
             {}
-          ).then((resp_cod) => {
-            if('msg' in resp_cod){
-              setRoleInfo({
-                role: suserInfo.rol,
-                ...suserInfo,
-                
-                quota: quota['cupo disponible'],
-                comision: quota['comisiones'],
+          )
+            .then((quota) => {
+              fetchData(
+                urlCod_loteria_oficina,
+                "GET",
+                {
+                  id_comercio: suserInfo.id_comercio,
+                },
+                {}
+              ).then((resp_cod) => {
+                if ("msg" in resp_cod) {
+                  setRoleInfo({
+                    role: suserInfo.rol,
+                    ...suserInfo,
+
+                    quota: quota["cupo disponible"],
+                    comision: quota["comisiones"],
+                  });
+                } else {
+                  setRoleInfo({
+                    role: suserInfo.rol,
+                    ...suserInfo,
+
+                    quota: quota["cupo disponible"],
+                    comision: quota["comisiones"],
+                    cod_oficina_lot: resp_cod.cod_oficina_lot,
+                    cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+                  });
+                }
               });
-            }else{
-              setRoleInfo({
-                role: suserInfo.rol,
-                ...suserInfo,
-                
-                quota: quota['cupo disponible'],
-                comision: quota['comisiones'],
-                cod_oficina_lot: resp_cod.cod_oficina_lot,
-                cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-              });
-            }
-          });
-        }).catch(() => {});
-      }).catch(() => {});
+            })
+            .catch(() => {});
+        })
+        .catch(() => {});
     }
-  }, [setUser,]);
+  }, [setUser]);
 
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
     consulta_roles();
     checkUser();
-  }, [checkUser, consulta_roles]);
+    if (cognitoUser?.challengeName === "MFA_SETUP") {
+      handleSetupTOTP(cognitoUser);
+    }
+  }, [checkUser, consulta_roles, cognitoUser]);
 
   const history = useHistory();
   const { state, pathname } = useLocation();
@@ -284,7 +280,12 @@ export const useProvideAuth = () => {
       try {
         const validartoken = await Auth.setupTOTP(user);
         const str =
-          "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
+          "otpauth://totp/AWSCognito:" +
+          username +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
         setQr(str);
       } catch (err) {}
     },
@@ -352,7 +353,6 @@ export const useProvideAuth = () => {
             {}
           );
 
-
           const resp_cod = await fetchData(
             urlCod_loteria_oficina,
             "GET",
@@ -361,28 +361,26 @@ export const useProvideAuth = () => {
             },
             {}
           );
-  
-  
-          if('msg' in resp_cod){
+
+          if ("msg" in resp_cod) {
             setRoleInfo({
               role: suserInfo.rol,
               ...suserInfo,
-              
-              quota: quota['cupo disponible'],
-              comision: quota['comisiones'],
+
+              quota: quota["cupo disponible"],
+              comision: quota["comisiones"],
             });
-          }else{
+          } else {
             setRoleInfo({
               role: suserInfo.rol,
               ...suserInfo,
-              
-              quota: quota['cupo disponible'],
-              comision: quota['comisiones'],
+
+              quota: quota["cupo disponible"],
+              comision: quota["comisiones"],
               cod_oficina_lot: resp_cod.cod_oficina_lot,
               cod_sucursal_lot: resp_cod.cod_sucursal_lot,
             });
           }
-
         }
         history.push(
           state ? state.from : pathname === "/login" ? "/" : pathname
@@ -390,6 +388,8 @@ export const useProvideAuth = () => {
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
           setCognitoUser(null);
+          setSignedIn(false);
+          signOut();
         }
         throw err;
       }
@@ -398,18 +398,21 @@ export const useProvideAuth = () => {
   );
 
   const signOut = useCallback(() => {
-    Auth.signOut().then(() => {
-      setCognitoUser(null);
-      setSignedIn(false);
-      setRoleInfo({});
-      history.push("/login");
-    }).catch(() => {});
+    Auth.signOut()
+      .then(() => {
+        setCognitoUser(null);
+        setSignedIn(false);
+        setRoleInfo({});
+        history.push("/login");
+      })
+      .catch(() => {});
   }, [history]);
 
   const handlesetPreferredMFA = useCallback(
     async (totp) => {
       try {
         const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+        signOut();
         if (preferredMFA === "SUCCESS") {
           await confirmSignIn(totp);
         }
@@ -426,6 +429,7 @@ export const useProvideAuth = () => {
         const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
         if (tokenValidado.accessToken.payload.token_use === "access") {
           await handlesetPreferredMFA(totp);
+          history.push("/login");
         }
       } catch (err) {
         throw new Error(err);
@@ -450,7 +454,6 @@ export const useProvideAuth = () => {
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
 
-  console.log(roleInfo)
   return {
     handleverifyTotpToken,
     handleChangePass,
