@@ -175,15 +175,16 @@ export const useProvideAuth = () => {
         console.log(resp_cod)
         if('msg' in resp_cod){
           setRoleInfo({
-            role: suserInfo.rol,
+            
             ...suserInfo,
             
             quota: quota['cupo disponible'],
             comision: quota['comisiones'],
           });
+          
         }else{
           setRoleInfo({
-            role: suserInfo.rol,
+            
             ...suserInfo,
             
             quota: quota['cupo disponible'],
@@ -235,7 +236,7 @@ export const useProvideAuth = () => {
           ).then((resp_cod) => {
             if('msg' in resp_cod){
               setRoleInfo({
-                role: suserInfo.rol,
+                
                 ...suserInfo,
                 
                 quota: quota['cupo disponible'],
@@ -243,7 +244,7 @@ export const useProvideAuth = () => {
               });
             }else{
               setRoleInfo({
-                role: suserInfo.rol,
+                
                 ...suserInfo,
                 
                 quota: quota['cupo disponible'],
@@ -365,7 +366,7 @@ export const useProvideAuth = () => {
   
           if('msg' in resp_cod){
             setRoleInfo({
-              role: suserInfo.rol,
+              
               ...suserInfo,
               
               quota: quota['cupo disponible'],
@@ -373,7 +374,7 @@ export const useProvideAuth = () => {
             });
           }else{
             setRoleInfo({
-              role: suserInfo.rol,
+              
               ...suserInfo,
               
               quota: quota['cupo disponible'],

@@ -1,23 +1,30 @@
 {
-  "prod": {
+  "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-pdpfront-prod-210213-authRole",
-      "UnauthRoleArn": "arn:aws:iam::161885268058:role/amplify-pdpfront-prod-210213-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::161885268058:role/amplify-pdpfront-prod-210213-authRole",
-      "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-pdpfront-prod-210213-deployment",
-      "UnauthRoleName": "amplify-pdpfront-prod-210213-unauthRole",
-      "StackName": "amplify-pdpfront-prod-210213",
-      "StackId": "arn:aws:cloudformation:us-east-1:161885268058:stack/amplify-pdpfront-prod-210213/b9434000-48dc-11ec-8241-1253cbbcbe2b",
-      "AmplifyAppId": "d3qoimewmvepuf"
+      "AuthRoleName": "amplify-puntodepago-dev-94833-authRole",
+      "UnauthRoleArn": "arn:aws:iam::641955663261:role/amplify-puntodepago-dev-94833-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::641955663261:role/amplify-puntodepago-dev-94833-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-puntodepago-dev-94833-deployment",
+      "UnauthRoleName": "amplify-puntodepago-dev-94833-unauthRole",
+      "StackName": "amplify-puntodepago-dev-94833",
+      "StackId": "arn:aws:cloudformation:us-east-2:641955663261:stack/amplify-puntodepago-dev-94833/708e36b0-4c6c-11ec-8c6a-06ceaf99c0c6",
+      "AmplifyAppId": "d2j15bbatcf8no"
     },
     "categories": {
       "auth": {
-        "pdpfront51e34afc": {
-          "userPoolId": "us-east-1_3bdNhk1hg",
-          "userPoolName": "Formulario1",
-          "webClientId": "1elfntjkt0riasq92clr8na3q9",
-          "nativeClientId": "1elfntjkt0riasq92clr8na3q9"
+        "puntodepago4b8de9ef": {
+          "userPoolId": "us-east-2_jtr8cWC4d",
+          "userPoolName": "PuntoDePago_master_client",
+          "webClientId": "21ofldig7b4ios43hvs3f4c38b",
+          "nativeClientId": "21ofldig7b4ios43hvs3f4c38b",
+          "identityPoolId": "us-east-2:0a490ece-0d4a-4fd4-9f0a-838ed483d66f",
+          "identityPoolName": "pdp_master_identitypool",
+          "allowUnauthenticatedIdentities": false,
+          "authRoleArn": "arn:aws:iam::641955663261:role/Cognito_pdp_master_identitypoolAuth_Role",
+          "authRoleName": "Cognito_pdp_master_identitypoolAuth_Role",
+          "unauthRoleArn": "arn:aws:iam::641955663261:role/Cognito_pdp_master_identitypoolUnauth_Role",
+          "unauthRoleName": "Cognito_pdp_master_identitypoolUnauth_Role"
         }
       }
     }

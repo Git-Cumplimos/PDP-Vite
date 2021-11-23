@@ -13,14 +13,19 @@ const LoteriaBog = () => {
       <div className="w-full flex flex-col justify-center items-center">
         {/* {roleInfo !== undefined && roleInfo !== null && (
           <>
-          {roleInfo?.role.includes(1)? (
+          {roleInfo?.roles.includes(1)? (
             <AdminLoteria/>          
           ):("")}
-          {roleInfo?.role.includes(2)?(
+          {roleInfo?.roles.includes(2)?(
             <CashierLoteria/>) : ("")}
         </>)} */}
-          <AdminLoteria/>
-         <CashierLoteria/>
+        {roleInfo !== undefined && roleInfo !== null && (
+          <>
+          {roleInfo?.roles.includes(1)? (
+            <AdminLoteria/>          
+          ):(
+            <CashierLoteria/>)}
+        </>)}
       </div>
     </ProvideLoteria>
   );
