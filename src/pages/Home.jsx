@@ -22,7 +22,7 @@ const Home = () => {
 
   useEffect(() => {
     Auth.currentUserInfo().then((res) => {
-      setSetLocalEmail(res?.attributes?.email);
+      setSetLocalEmail(res?.attributes?.email ?? "");
     });
   }, []);
 
@@ -56,7 +56,7 @@ const Home = () => {
         })}
       </Carousel>
       <HNavbar links={urls} isIcon />
-      {emails.includes(setLocalEmail ?? "") ? (
+      {emails.includes(setLocalEmail) ? (
         <Link to={"/review-commerce-forms"}>
           <AppIcons
             Logo={ACTUALIZACION}
