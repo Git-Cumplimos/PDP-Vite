@@ -133,22 +133,19 @@ export const useProvideAuth = () => {
     []
   );
 
-  const handleSetupTOTP = useCallback(
-    async (user) => {
-      try {
-        const validartoken = await Auth.setupTOTP(user);
-        const str =
-          "otpauth://totp/AWSCognito:" +
-          user?.attributes?.email +
-          "?secret=" +
-          validartoken +
-          "&issuer=" +
-          "Punto de Pago Multibanco";
-        setQr(str);
-      } catch (err) {}
-    },
-    []
-  );
+  const handleSetupTOTP = useCallback(async (user) => {
+    try {
+      const validartoken = await Auth.setupTOTP(user);
+      const str =
+        "otpauth://totp/AWSCognito:" +
+        parameters.email +
+        "?secret=" +
+        validartoken +
+        "&issuer=" +
+        "Punto de Pago Multibanco";
+      setQr(str);
+    } catch (err) {}
+  }, []);
 
   const setUser = useCallback(async () => {
     try {
@@ -453,7 +450,7 @@ export const useProvideAuth = () => {
     } catch (err) {}
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
-
+  console.log(cognitoUser?.signInUserSession?.idToken?.payload?.email);
   return {
     handleverifyTotpToken,
     handleChangePass,
