@@ -138,7 +138,7 @@ export const useProvideAuth = () => {
         const validartoken = await Auth.setupTOTP(user);
         const str =
           "otpauth://totp/AWSCognito:" +
-          cognitoUser?.attributes?.email ?? "" +
+          cognitoUser?.attributes?.email +
           "?secret=" +
           validartoken +
           "&issuer=" +
