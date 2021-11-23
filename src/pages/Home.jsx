@@ -17,6 +17,7 @@ const Home = () => {
   const [emails, setEmails] = useState([
     "directora.mercadeo@puntodepago.com.co",
     "maria.valero@puntodepago.com.co",
+    "CAFEINTERNETNAOM@GMAIL.COM",
   ]);
   const [setLocalEmail, setSetLocalEmail] = useState("");
 
@@ -25,7 +26,6 @@ const Home = () => {
       setSetLocalEmail(res?.attributes?.email ?? "");
     });
   }, []);
-
 
   const [imgs, setImgs] = useState([]);
 
