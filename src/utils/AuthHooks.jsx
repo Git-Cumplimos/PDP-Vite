@@ -315,9 +315,7 @@ export const useProvideAuth = () => {
             comision: quota["comisiones"],
           });
         }
-        history.push(
-          state ? state.from : pathname === "/login" ? "/" : pathname
-        );
+        history.push(state?.from || pathname === "/login" ? "/" : pathname);
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
           setCognitoUser(null);

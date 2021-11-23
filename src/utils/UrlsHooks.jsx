@@ -13,6 +13,7 @@ import Transacciones from "../pages/Transacciones";
 // import CrearRoles from "../pages/CrearRoles";
 import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
 import MarketPlace from "../apps/MarketPlace/MarketPlace";
+import CommerceInfo from "../apps/UpdateCommerce/CommerceInfo";
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
@@ -84,14 +85,7 @@ export const useProvideUrls = () => {
       },
       {
         link: "/fundacion-mujer",
-        label: (
-          <AppIcons
-            Logo={
-              "https://www.elempleo.com/sitios-empresariales/colombia/fundacion-de-la-mujer/video/LogoLoopFundacion_1_1.jpg"
-            }
-            name="Fundacion de la mujer"
-          />
-        ),
+        label: <AppIcons name="Fundacion de la mujer" />,
         component: FunMujer,
         props: {},
         show: false,
@@ -137,6 +131,20 @@ export const useProvideUrls = () => {
         props: {},
         extern: false,
       },
+      {
+        link: "/review-commerce-forms",
+        label: (
+          <AppIcons
+            Logo={ACTUALIZACION}
+            name="Revisar actualizacion de datos"
+          />
+        ),
+        component: CommerceInfo,
+        props: {},
+        extern: false,
+        show: false,
+      },
+      // REACT_APP_URL_FORM_COMMERCE
       {
         link: "/marketplace/payorder/:orden",
         // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,

@@ -241,7 +241,7 @@ const FormCommerce = () => {
         <datalist id="oldNameCommerce">
           <option value={roleInfo?.["nombre comercio"] || ""}></option>
         </datalist>
-        {roleInfo?.tipo_comercio === "CRCS" ? (
+        {roleInfo?.tipo_comercio.includes("CRC") ? (
           <Input
             id="commerceName2"
             label="Nombre del centro medico"
@@ -251,7 +251,7 @@ const FormCommerce = () => {
             onInput={(e) => setCommerceName2(e.target.value)}
             required
           />
-        ) : roleInfo?.tipo_comercio === "COMERCIOS CEAS" ? (
+        ) : roleInfo?.tipo_comercio.includes("CEA") ? (
           <Input
             id="commerceName2"
             label="Nombre del centro de enseñanza"
