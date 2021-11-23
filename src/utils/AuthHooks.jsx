@@ -256,7 +256,7 @@ export const useProvideAuth = () => {
                     cod_sucursal_lot: resp_cod.cod_sucursal_lot,
                   });
                 }
-              });
+              }).catch(() => {});
             })
             .catch(() => {});
         })
