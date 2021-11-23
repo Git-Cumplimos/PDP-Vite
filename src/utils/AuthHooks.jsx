@@ -13,12 +13,21 @@ import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
 
+
+
+
+//////////////////////Despliegue de estos servicios anterior
+// const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
+// const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
+
 const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
 const urlcrearRol = `${process.env.REACT_APP_URL_USRS}/crear_rol`;
 const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
 const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
 const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
+const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
+
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -37,6 +46,7 @@ export const AuthContext = createContext({
   consulta_roles: () => {},
   consulta_usuarios: () => {},
   cambiar_rol: () => {},
+  checkUser: () => {},
 });
 
 export const useAuth = () => {
@@ -60,14 +70,14 @@ export const useProvideAuth = () => {
 
   const [username, setUsername] = useState("");
 
+  const [parameters, setParameters] = useState("");
+
   const consulta_roles = useCallback(async () => {
     try {
       const res = await fetchData(urlconsulta_roles, "GET", {});
       setRoles_disponibles(res);
       return res;
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   }, []);
 
   const consulta_usuarios = useCallback(async (email) => {
@@ -77,9 +87,7 @@ export const useProvideAuth = () => {
       });
 
       return res;
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   }, []);
 
   const crearRol = useCallback(
@@ -108,7 +116,6 @@ export const useProvideAuth = () => {
         return res;
       } catch (err) {
         setCrearRolresp(null);
-        console.error(err);
       }
     },
     []
@@ -126,9 +133,7 @@ export const useProvideAuth = () => {
       try {
         const res = await fetchData(urlcambiar_rol, "PUT", {}, req);
         return res;
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) {}
     },
     []
   );
@@ -137,6 +142,7 @@ export const useProvideAuth = () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
       setCognitoUser(user);
+      
       if (user) setSignedIn(true);
       const usrInfo = await Auth.currentUserInfo();
       setUserInfo(usrInfo);
@@ -147,7 +153,6 @@ export const useProvideAuth = () => {
           { correo: usrInfo?.attributes?.email },
           {}
         );
-
         const quota = await fetchData(
           urlQuota,
           "GET",
@@ -158,33 +163,50 @@ export const useProvideAuth = () => {
           {}
         );
 
-        const _role = suserInfo.rol;
-        delete suserInfo.rol;
+        const resp_cod = await fetchData(
+          urlCod_loteria_oficina,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+          },
+          {}
+        );
 
-        setRoleInfo({
-          role: _role,
-          ...suserInfo,
+        console.log(resp_cod)
+        if('msg' in resp_cod){
+          setRoleInfo({
+            role: suserInfo.rol,
+            ...suserInfo,
+            
+            quota: quota['cupo disponible'],
+            comision: quota['comisiones'],
+          });
+        }else{
+          setRoleInfo({
+            role: suserInfo.rol,
+            ...suserInfo,
+            
+            quota: quota['cupo disponible'],
+            comision: quota['comisiones'],
+            cod_oficina_lot: resp_cod.cod_oficina_lot,
+            cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+          });
+        }
 
-          quota: quota["cupo disponible"],
-          comision: quota["comisiones"],
-        });
       }
     } catch (err) {
       setSignedIn(false);
-      console.error(err);
       logger.debug(err);
     }
   }, []);
 
   const checkUser = useCallback(() => {
     if (Auth.user === null || Auth.user === undefined) {
-      setUser().catch((err) => console.error(err));
+      setUser();
     } else {
       setSignedIn(true);
       setCognitoUser(Auth.user);
-      Auth.currentUserInfo()
-        .then((usr) => setUserInfo(usr))
-        .catch((err) => console.error(err));
+      Auth.currentUserInfo().then((usr) => setUserInfo(usr)).catch(() => {});
 
       fetchData(
         urlLog,
@@ -201,21 +223,40 @@ export const useProvideAuth = () => {
           },
           {}
         ).then((quota) => {
-          const _role = suserInfo.rol;
-          delete suserInfo.rol;
-          setRoleInfo({
-            role: _role,
-            ...suserInfo,
-            // id_comercio: 2,
-            // id_dispositivo: 233,
-            // id_usuatio: 8,
-            quota: quota["cupo disponible"],
-            comision: quota["comisiones"],
+
+
+          fetchData(
+            urlCod_loteria_oficina,
+            "GET",
+            {
+              id_comercio: suserInfo.id_comercio,
+            },
+            {}
+          ).then((resp_cod) => {
+            if('msg' in resp_cod){
+              setRoleInfo({
+                role: suserInfo.rol,
+                ...suserInfo,
+                
+                quota: quota['cupo disponible'],
+                comision: quota['comisiones'],
+              });
+            }else{
+              setRoleInfo({
+                role: suserInfo.rol,
+                ...suserInfo,
+                
+                quota: quota['cupo disponible'],
+                comision: quota['comisiones'],
+                cod_oficina_lot: resp_cod.cod_oficina_lot,
+                cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+              });
+            }
           });
-        });
-      });
+        }).catch(() => {});
+      }).catch(() => {});
     }
-  }, [setUser]);
+  }, [setUser,]);
 
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
@@ -231,25 +272,43 @@ export const useProvideAuth = () => {
       const user = await Auth.signIn(username, password);
       if (user) {
         setCognitoUser(user);
-        console.log(user.challengeName, user);
+        setParameters(user.challengeParam.userAttributes);
       }
     } catch (err) {
       throw err;
     }
   }, []);
 
+  const handleSetupTOTP = useCallback(
+    async (user) => {
+      try {
+        const validartoken = await Auth.setupTOTP(user);
+        const str =
+          "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
+        setQr(str);
+      } catch (err) {}
+    },
+    [username]
+  );
+
   const handleChangePass = useCallback(
-    async (apellido, nombreUsuario, newpassword, cognitoUser, celular) => {
+    async (
+      nombreUsuario,
+      apellido,
+      cognitoUser,
+      direccion,
+      ciudad,
+      newpassword
+    ) => {
       try {
         const loggedUser = await Auth.completeNewPassword(
           cognitoUser,
           newpassword,
           {
-            family_name: apellido,
             name: nombreUsuario,
-            phone_number: "+57" + celular,
-            given_name: nombreUsuario,
-            middle_name: nombreUsuario,
+            family_name: apellido,
+            address: direccion,
+            locale: ciudad,
           }
         );
         setCognitoUser(loggedUser);
@@ -257,44 +316,11 @@ export const useProvideAuth = () => {
           handleSetupTOTP(loggedUser);
         }
       } catch (err) {
-        console.log(err);
+        throw err;
       }
     },
-    []
+    [handleSetupTOTP]
   );
-
-  const handleSetupTOTP = async (user) => {
-    try {
-      const validartoken = await Auth.setupTOTP(user);
-      const str =
-        "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
-      setQr(str);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleverifyTotpToken = useCallback(async (totp) => {
-    try {
-      const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
-      if (tokenValidado.accessToken.payload.token_use === "access") {
-        await handlesetPreferredMFA(totp);
-      }
-    } catch (err) {
-      throw new Error(err);
-    }
-  });
-
-  const handlesetPreferredMFA = async (totp) => {
-    try {
-      const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
-      if (preferredMFA === "SUCCESS") {
-        await confirmSignIn(totp);
-      }
-    } catch (err) {
-      throw new Error(err);
-    }
-  };
 
   const confirmSignIn = useCallback(
     async (totp) => {
@@ -325,18 +351,38 @@ export const useProvideAuth = () => {
             },
             {}
           );
-          const _role = suserInfo.rol;
-          delete suserInfo.rol;
 
-          setRoleInfo({
-            role: _role,
-            ...suserInfo,
-            // id_comercio: 2,
-            // id_dispositivo: 233,
-            // id_usuatio: 8,
-            quota: quota["cupo disponible"],
-            comision: quota["comisiones"],
-          });
+
+          const resp_cod = await fetchData(
+            urlCod_loteria_oficina,
+            "GET",
+            {
+              id_comercio: suserInfo.id_comercio,
+            },
+            {}
+          );
+  
+  
+          if('msg' in resp_cod){
+            setRoleInfo({
+              role: suserInfo.rol,
+              ...suserInfo,
+              
+              quota: quota['cupo disponible'],
+              comision: quota['comisiones'],
+            });
+          }else{
+            setRoleInfo({
+              role: suserInfo.rol,
+              ...suserInfo,
+              
+              quota: quota['cupo disponible'],
+              comision: quota['comisiones'],
+              cod_oficina_lot: resp_cod.cod_oficina_lot,
+              cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+            });
+          }
+
         }
         history.push(
           state ? state.from : pathname === "/login" ? "/" : pathname
@@ -352,15 +398,41 @@ export const useProvideAuth = () => {
   );
 
   const signOut = useCallback(() => {
-    Auth.signOut()
-      .then(() => {
-        setCognitoUser(null);
-        setSignedIn(false);
-        setRoleInfo({});
-        history.push("/login");
-      })
-      .catch((err) => console.error(err));
+    Auth.signOut().then(() => {
+      setCognitoUser(null);
+      setSignedIn(false);
+      setRoleInfo({});
+      history.push("/login");
+    }).catch(() => {});
   }, [history]);
+
+  const handlesetPreferredMFA = useCallback(
+    async (totp) => {
+      try {
+        const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+        if (preferredMFA === "SUCCESS") {
+          await confirmSignIn(totp);
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    [cognitoUser, confirmSignIn]
+  );
+
+  const handleverifyTotpToken = useCallback(
+    async (totp) => {
+      try {
+        const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
+        if (tokenValidado.accessToken.payload.token_use === "access") {
+          await handlesetPreferredMFA(totp);
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    [cognitoUser, handlesetPreferredMFA]
+  );
 
   const getQuota = useCallback(async () => {
     const tempRole = { ...roleInfo };
@@ -378,6 +450,7 @@ export const useProvideAuth = () => {
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
 
+  console.log(roleInfo)
   return {
     handleverifyTotpToken,
     handleChangePass,
@@ -397,6 +470,8 @@ export const useProvideAuth = () => {
     consulta_roles,
     consulta_usuarios,
     cambiar_rol,
+    checkUser,
     qr,
+    parameters,
   };
 };

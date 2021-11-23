@@ -146,17 +146,16 @@ const CashierLoteria = () => {
       </div>
     );
   };
-
   const options = [
     { value: "sorteos", label: <LotoIcons Logo={Sorteos} name="Sorteos" /> },
-    {
-      value: "premios",
-      label: <LotoIcons Logo={Pago} name="Premios" />,
-    },
-    {
-      value: "reportes",
-      label: <LotoIcons Logo={Reporte} name="Reportes" />,
-    },
+    // {
+    //   value: "premios",
+    //   label: <LotoIcons Logo={Pago} name="Premios" />,
+    // },
+    // {
+    //   value: "reportes",
+    //   label: <LotoIcons Logo={Reporte} name="Reportes" />,
+    // },
   ];
 
   const posibles = ["sorteos", "premios", "reportes"];

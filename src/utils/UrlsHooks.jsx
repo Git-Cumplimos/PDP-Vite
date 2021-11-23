@@ -8,11 +8,14 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import AuthButton from "../components/Compound/Signout/Signout";
 import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
+
 import FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
 import Transacciones from "../pages/Transacciones";
 import CrearRoles from "../pages/CrearRoles";
 import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
 import MarketPlace from "../apps/MarketPlace/MarketPlace";
+import { useAuth } from "./AuthHooks";
+
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
@@ -28,10 +31,14 @@ export const useProvideUrls = () => {
   const [urlsPrivate, setUrlsPrivate] = useState([]);
   const [urlsPublic, setUrlsPublic] = useState([]);
   const [urlsPrivApps, setUrlsPrivApps] = useState([]);
+  
 
   const emptyComp = () => {
-    return <p></p>;
+    return <h1 className="text-4xl text-center mt-8">En mantenimiento</h1>;
   };
+
+  const { roleInfo } = useAuth();
+  
 
   useEffect(() => {
     setUrlsPrivate([
@@ -52,7 +59,8 @@ export const useProvideUrls = () => {
       {
         link: "/seguridad",
         label: "Seguridad",
-        component: CrearRoles,
+        component:CrearRoles,
+
         props: {},
       },
       {
@@ -65,20 +73,25 @@ export const useProvideUrls = () => {
         label: <AuthButton />,
       },
     ]);
-
+    
+    
     setUrlsPrivApps([
       {
-        link: "/suser",
+        link: "https://portal.solucionesenred.co/",
         label: <AppIcons Logo={SUSER} name="SUSER" />,
         component: emptyComp,
         props: {},
+        extern: true,
       },
-      {
+
+      { 
         link: "/loteria-de-bogota",
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
-        component: LoteriaBog,
+
+        component: roleInfo?.tipo_comercio==="OFICINAS PROPIAS"?LoteriaBog:emptyComp,
         props: {},
-        show: false,
+        show: roleInfo?.tipo_comercio==="OFICINAS PROPIAS",///////////////////////////////
+        extern: false,
       },
       {
         link: "/fundacion-mujer",
@@ -93,20 +106,34 @@ export const useProvideUrls = () => {
         component: FunMujer,
         props: {},
         show: false,
+        extern: false,
+
       },
       {
         link: "/loteria-de-bogota/:page",
-        component: LoteriaBog,
+        component: roleInfo?.tipo_comercio==="OFICINAS PROPIAS"?LoteriaBog:emptyComp,
         props: {},
         exact: false,
         show: false,
+        extern: false,
       },
+    
+      
+  
+      // {
+      //   link: "/fundacion-mujer",
+      //   label: <AppIcons Logo={"https://www.elempleo.com/sitios-empresariales/colombia/fundacion-de-la-mujer/video/LogoLoopFundacion_1_1.jpg"} name="Fundacion de la mujer" />,
+      //   component: FunMujer,
+      //   props: {},
+      // },
+      
       {
         link: "/fundacion-mujer/:page",
         component: FunMujer,
         props: {},
         exact: false,
         show: false,
+        extern: false,
       },
 
       {
@@ -115,6 +142,7 @@ export const useProvideUrls = () => {
         component: emptyComp,
         props: {},
         show: false,
+        extern: false,
       },
       {
         link: "/transacciones",
@@ -122,18 +150,21 @@ export const useProvideUrls = () => {
         component: Transacciones,
         props: {},
         show: false,
+        extern: false,
       },
       {
         link: "/update-commerce",
         label: <AppIcons Logo={ACTUALIZACION} name="Actualizacion de datos" />,
         component: FormCommerce,
         props: {},
+        extern: false,
       },
       {
         link: "/marketplace/payorder/:orden",
         // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
         component: MarketPlace,
         props: {},
+        extern: false,
       },
     ]);
 
@@ -145,11 +176,12 @@ export const useProvideUrls = () => {
         props: {},
       },
     ]);
-  }, []);
+  }, [roleInfo]);
 
   return {
     urlsPrivate,
     urlsPublic,
-    urlsPrivApps,
+    urlsPrivApps, 
+    
   };
 };

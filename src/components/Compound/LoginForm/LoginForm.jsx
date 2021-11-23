@@ -18,6 +18,9 @@ const LoginForm = () => {
   const [names, setNames] = useState("");
   const [lastName, setLastName] = useState("");
   const [newPass, setNewPass] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
 
   const auth = useAuth();
 
@@ -44,28 +47,27 @@ const LoginForm = () => {
       progress: undefined,
     });
   };
-
+  
   const handleCognito = (event) => {
     event.preventDefault();
 
     auth
       .signIn(username, password)
       .then(() => {
-        console.log("user exist");
+        
       })
+
       .catch((err) => {
         if (err.code === "NotAuthorizedException") {
           notifyError("Usuario o contraseña incorrectos.");
         } else {
           notifyError(err.message);
         }
-        console.error(err);
       });
   };
 
   const handleTOTP = (event) => {
     event.preventDefault();
-
     auth
       .confirmSignIn(totp)
       .then()
@@ -76,20 +78,90 @@ const LoginForm = () => {
           notifyError("La sesion ha expirado");
         } else {
           notifyError(err.message);
-          console.error(err);
         }
       });
   };
 
   const handleChangePW = (event) => {
     event.preventDefault();
+    if (newPass === confirmPass) {
+      auth
+        .handleChangePass(
+          names,
+          lastName,
+          auth.cognitoUser,
+          address,
+          city,
+          newPass
+        )
+        .then()
+        .catch((err) => {
+          if (err.code === "NotAuthorizedException") {
+            notifyError("La sesion ha expirado");
+          } else if (err.code === "InvalidPasswordException") {
+            notifyError(
+              <h6>
+                Politica de contraseñas:
+                <br />
+                1. Debe contener minimo 8 carácteres
+                <br />
+                2. Contiene al menos una cáracter especial
+                <br />
+                Contiene al menos una letra mayúscula
+                <br />
+                4. Contiene al menos una letra minúscula
+              </h6>
+            );
+          } else if (err.code === "InvalidParameterException") {
+            notifyError("Complete los campos");
+          } else {
+            notifyError("Por favor valide todos los campos");
+          }
+        });
+    } else {
+      notifyError("Las contraseñas no coinciden");
+    }
+  };
 
-    auth
-      .handleChangePass(lastName, names, newPass, auth.cognitoUser, cell)
-      .then()
-      .catch((err) => {
-        console.log("Por alguna razon no funciono", err);
-      });
+  const handleChangeExisting = (event) => {
+    event.preventDefault();
+    if (newPass === confirmPass) {
+      auth
+        .handleChangePass(
+          auth.parameters.name,
+          auth.parameters.family_name,
+          auth.cognitoUser,
+          auth.parameters.address,
+          auth.parameters.locale,
+          newPass
+        )
+        .then()
+        .catch((err) => {
+          if (err.code === "NotAuthorizedException") {
+            notifyError("La sesion ha expirado");
+          } else if (err.code === "InvalidPasswordException") {
+            notifyError(
+              <h6>
+                Politica de contraseñas:
+                <br />
+                1. Debe contener minimo 8 carácteres
+                <br />
+                2. Contiene al menos una cáracter especial
+                <br />
+                Contiene al menos una letra mayúscula
+                <br />
+                4. Contiene al menos una letra minúscula
+              </h6>
+            );
+          } else if (err.code === "InvalidParameterException") {
+            notifyError("Complete los campos");
+          } else {
+            notifyError("Por favor valide todos los campos");
+          }
+        });
+    } else {
+      notifyError("Las contraseñas no coinciden");
+    }
   };
 
   const handleTOTPconfirm = (event) => {
@@ -109,7 +181,6 @@ const LoginForm = () => {
     setNewPass("");
   };
 
-  console.log(names, lastName, newPass);
   return auth.cognitoUser?.challengeName === "SOFTWARE_TOKEN_MFA" ? (
     <>
       <div className="container flex flex-row justify-center items-center">
@@ -142,74 +213,142 @@ const LoginForm = () => {
       </div>
     </>
   ) : auth.cognitoUser?.challengeName === "NEW_PASSWORD_REQUIRED" ? (
-    <>
-      <div className="container flex flex-row justify-center items-center">
-        <RightArrow xlarge />
-        <div className={card}>
-          <h1 className="uppercase text-2xl font-medium text-center">
-            Cambio de contraseña nuevo usuario
-          </h1>
-          <hr />
-          <form onSubmit={handleChangePW}>
-            <div className={field}>
-              <label htmlFor="id">Nombres:</label>
-              <input
-                id="names"
-                type="text"
-                maxLength="255"
-                autoFocus
-                autoComplete="off"
-                value={names}
-                onChange={(e) => {
-                  setNames(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <label htmlFor="id">Apellidos:</label>
-              <input
-                id="lastName"
-                type="text"
-                maxLength="255"
-                autoComplete="off"
-                value={lastName}
-                onChange={(e) => {
-                  setLastName(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <label htmlFor="id">Celular:</label>
-              <input
-                id="cell"
-                type="number"
-                maxLength="10"
-                autoComplete="off"
-                value={cell}
-                onChange={(e) => {
-                  setCell(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <label htmlFor="id">Nueva contraseña:</label>
-              <input
-                id="totp"
-                type="text"
-                autoComplete="off"
-                value={newPass}
-                onChange={(e) => {
-                  setNewPass(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <button type="submit">Actualizar datos</button>
-            </div>
-          </form>
+    auth.parameters.name !== "" ? (
+      <>
+        <div className="container flex flex-row justify-center items-center">
+          <RightArrow xlarge />
+          <div className={card}>
+            <h1 className="uppercase text-2xl font-medium text-center">
+              Cambio de contraseña nuevo usuario
+            </h1>
+            <hr />
+            <form onSubmit={handleChangeExisting}>
+              <div className={field}>
+                <label htmlFor="id">Nueva contraseña:</label>
+                <input
+                  id="totp"
+                  type="text"
+                  autoComplete="off"
+                  value={newPass}
+                  onChange={(e) => {
+                    setNewPass(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Confirmar contraseña:</label>
+                <input
+                  id="totp"
+                  type="text"
+                  autoComplete="off"
+                  value={confirmPass}
+                  onChange={(e) => {
+                    setConfirmPass(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <button type="submit">Actualizar contraseña</button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
-    </>
+      </>
+    ) : (
+      <>
+        <div className="container flex flex-row justify-center items-center">
+          <RightArrow xlarge />
+          <div className={card}>
+            <h1 className="uppercase text-2xl font-medium text-center">
+              Cambio de contraseña nuevo usuario
+            </h1>
+            <hr />
+            <form onSubmit={handleChangePW}>
+              <div className={field}>
+                <label htmlFor="id">Nombres:</label>
+                <input
+                  id="names"
+                  type="text"
+                  maxLength="255"
+                  autoFocus
+                  autoComplete="off"
+                  value={names}
+                  onChange={(e) => {
+                    setNames(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Apellidos:</label>
+                <input
+                  id="lastName"
+                  type="text"
+                  maxLength="255"
+                  autoComplete="off"
+                  value={lastName}
+                  onChange={(e) => {
+                    setLastName(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Direccion:</label>
+                <input
+                  id="address"
+                  type="text"
+                  maxLength="255"
+                  autoComplete="off"
+                  value={address}
+                  onChange={(e) => {
+                    setAddress(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Ciudad:</label>
+                <input
+                  id="ciudad"
+                  type="text"
+                  maxLength="255"
+                  autoComplete="off"
+                  value={city}
+                  onChange={(e) => {
+                    setCity(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Nueva contraseña:</label>
+                <input
+                  id="totp"
+                  type="text"
+                  autoComplete="off"
+                  value={newPass}
+                  onChange={(e) => {
+                    setNewPass(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <label htmlFor="id">Confirmar contraseña:</label>
+                <input
+                  id="totp"
+                  type="text"
+                  autoComplete="off"
+                  value={confirmPass}
+                  onChange={(e) => {
+                    setConfirmPass(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={field}>
+                <button type="submit">Actualizar contraseña</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </>
+    )
   ) : auth.cognitoUser?.challengeName === "MFA_SETUP" ? (
     <>
       <div className="container flex flex-row justify-center items-center">

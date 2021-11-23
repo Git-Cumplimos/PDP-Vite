@@ -10,11 +10,15 @@ const HNavbar = ({ links = [], isText = true, isIcon = false }) => {
           .filter(({ show }) => {
             return show === undefined ? true : show;
           })
-          .map(({ label, link }, idx) => {
+          .map(({ label, link, extern }, idx) => {
             return (
               <li key={`${link}_${idx}`}>
                 {link === undefined || link === null ? (
                   label
+                ) : extern ? (
+                  <a href={link} target="_blank" rel="noopener noreferrer">
+                    {label}
+                  </a>
                 ) : (
                   <Link to={link}>{label}</Link>
                 )}

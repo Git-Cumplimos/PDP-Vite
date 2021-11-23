@@ -6,7 +6,23 @@ import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import { useAuth } from "../../../../utils/AuthHooks";
 
 const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) => {
-  const pageStyle = `@page {size: 80mm 160mm}`;
+  const pageStyle = `
+  @page {
+    size: 80mm 50mm;
+  }
+
+  @media all {
+    .pagebreak {
+      display: none;
+    }
+  }
+
+  @media print {
+    .pagebreak {
+      page-break-before: always;
+    }
+  }
+`;
   const printDiv = useRef();
 
   const { getQuota } = useAuth();
@@ -55,7 +71,7 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
     </div>
   ) : (
     <div className="flex flex-col justify-center items-center">
-      <Voucher {...voucherInfo} refPrint={printDiv} />
+      <Voucher {...voucherInfo} refPrint={printDiv} pageStyle={pageStyle}/>
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
         <Button

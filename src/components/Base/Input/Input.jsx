@@ -93,7 +93,6 @@ const Input = ({
         GetFileTree(item);
       }
 
-      console.log(tempFiles);
       onGetFile([...tempFiles]);
     },
     [onGetFile, hideDropZone]

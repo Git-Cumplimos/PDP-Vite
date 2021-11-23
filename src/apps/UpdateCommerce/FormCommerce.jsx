@@ -80,10 +80,10 @@ const FormCommerce = () => {
             history.replace("/");
           }
         } else {
-          console.error(res?.msg);
+          notifyError(res?.msg);
         }
       })
-      .catch((err) => console.error(err));
+      .catch(() => {});
     fetchData(`${url_types}/type-doc`, "GET", {}, {})
       .then((res) => {
         if (res?.status) {
@@ -93,10 +93,10 @@ const FormCommerce = () => {
           });
           setDocsTypes({ ...temp });
         } else {
-          console.error(res?.msg);
+          notifyError(res?.msg);
         }
       })
-      .catch((err) => console.error(err));
+      .catch(() => {});
     fetchData(`${url_types}/type-loc`, "GET", {}, {})
       .then((res) => {
         if (res?.status) {
@@ -106,12 +106,11 @@ const FormCommerce = () => {
           });
           setLocsTypes({ ...temp });
         } else {
-          console.error(res?.msg);
+          notifyError(res?.msg);
         }
       })
-      .catch((err) => console.error(err));
+      .catch(() => {});
   }, [roleInfo, history]);
-  console.log();
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -214,9 +213,7 @@ const FormCommerce = () => {
       } else {
         notifyError(`Error al subir el formulario: ${_res?.msg}`);
       }
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   return (
@@ -354,13 +351,15 @@ const FormCommerce = () => {
                     limit: 5,
                   })
                     .then((res) => {
-                      setFoundActivities(
-                        res?.obj.map(({ id_actividad, nombre_actividad }) => {
-                          return `${id_actividad} - ${nombre_actividad}`;
-                        })
-                      );
+                      if (res?.status) {
+                        setFoundActivities(
+                          res?.obj.map(({ id_actividad, nombre_actividad }) => {
+                            return `${id_actividad} - ${nombre_actividad}`;
+                          })
+                        );
+                      }
                     })
-                    .catch((err) => console.error(err));
+                    .catch(() => {});
                 } else {
                   setFoundActivities([]);
                 }
@@ -368,24 +367,28 @@ const FormCommerce = () => {
               timeOut: 500,
             }}
           />
-          <ul className="flex flex-col gap-2">
-            {commerceType.map((el, idx) => {
-              return (
-                <li key={idx} className="grid grid-cols-8">
-                  <span className="bi bi-card-list" />
-                  <h1 className="col-span-6">{el}</h1>
-                  <span
-                    onClick={() => {
-                      const copy = [...commerceType];
-                      copy.splice(idx, 1);
-                      setCommerceType([...copy]);
-                    }}
-                    className="bi bi-x text-3xl"
-                  />
-                </li>
-              );
-            })}
-          </ul>
+          {commerceType.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {commerceType.map((el, idx) => {
+                return (
+                  <li key={idx} className="grid grid-cols-8">
+                    <span className="bi bi-card-list" />
+                    <h1 className="col-span-6">{el}</h1>
+                    <span
+                      onClick={() => {
+                        const copy = [...commerceType];
+                        copy.splice(idx, 1);
+                        setCommerceType([...copy]);
+                      }}
+                      className="bi bi-x text-3xl"
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            ""
+          )}
         </div>
         <Select
           id="giftLocation"

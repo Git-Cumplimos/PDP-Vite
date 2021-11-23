@@ -1,23 +1,23 @@
 {
-  "dev": {
+  "prod": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-puntodepago-dev-102801-authRole",
-      "UnauthRoleArn": "arn:aws:iam::641955663261:role/amplify-puntodepago-dev-102801-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::641955663261:role/amplify-puntodepago-dev-102801-authRole",
-      "Region": "us-east-2",
-      "DeploymentBucketName": "amplify-puntodepago-dev-102801-deployment",
-      "UnauthRoleName": "amplify-puntodepago-dev-102801-unauthRole",
-      "StackName": "amplify-puntodepago-dev-102801",
-      "StackId": "arn:aws:cloudformation:us-east-2:641955663261:stack/amplify-puntodepago-dev-102801/55dd3a30-284c-11ec-bfd2-020a4e309172",
-      "AmplifyAppId": "d37kgw2ltopn23"
+      "AuthRoleName": "amplify-pdpfront-prod-210213-authRole",
+      "UnauthRoleArn": "arn:aws:iam::161885268058:role/amplify-pdpfront-prod-210213-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::161885268058:role/amplify-pdpfront-prod-210213-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-pdpfront-prod-210213-deployment",
+      "UnauthRoleName": "amplify-pdpfront-prod-210213-unauthRole",
+      "StackName": "amplify-pdpfront-prod-210213",
+      "StackId": "arn:aws:cloudformation:us-east-1:161885268058:stack/amplify-pdpfront-prod-210213/b9434000-48dc-11ec-8241-1253cbbcbe2b",
+      "AmplifyAppId": "d3qoimewmvepuf"
     },
     "categories": {
       "auth": {
-        "puntodepago4316e2e0": {
-          "userPoolId": "us-east-2_jtr8cWC4d",
-          "userPoolName": "PuntoDePago_master_client",
-          "webClientId": "21ofldig7b4ios43hvs3f4c38b",
-          "nativeClientId": "21ofldig7b4ios43hvs3f4c38b"
+        "pdpfront51e34afc": {
+          "userPoolId": "us-east-1_3bdNhk1hg",
+          "userPoolName": "Formulario1",
+          "webClientId": "1elfntjkt0riasq92clr8na3q9",
+          "nativeClientId": "1elfntjkt0riasq92clr8na3q9"
         }
       }
     }

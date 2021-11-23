@@ -29,7 +29,7 @@ const CrearRoles = () => {
     const [direccion_residencia, setDireccion_residencia] = useState('')
     const [disabledBtns, setDisabledBtns] = useState(false)
     const [checkedState, setCheckedState] = useState(
-        new Array(roles_disponibles.length).fill(false)
+        new Array(roles_disponibles?.length).fill(false)
       );
       const [roles, setRoles] = useState([]);
     
@@ -58,6 +58,7 @@ const CrearRoles = () => {
         e.preventDefault();
         if(Array.isArray(roles) && roles.length>0){
         crearRol(pnombre,snombre,papellido,sapellido,roles,email,identificacion,telefono,direccion_residencia).then((res) => {
+            console.log(res)
             if(res.msg==='Usuario creado exitosamente'){
                 notify(res.msg) 
                 signUp(pnombre,snombre,papellido,sapellido,roles,email,identificacion,telefono);
@@ -78,7 +79,7 @@ const CrearRoles = () => {
         const password='1234' ///////////////////////
         const email=correo
         const phone_number=telefono
-        const family_name=papellido + sapellido
+        const family_name=pnombre + sapellido
         const name=correo//pnombre +""+ snombre
 
         try{
@@ -155,7 +156,7 @@ const CrearRoles = () => {
                 id="pnombre"
                 label="Primer nombre:"
                 type="text"
-                required={true}
+                required
                 autoComplete="off"
                 value={pnombre}
                 onInput={(e) => {
@@ -180,7 +181,7 @@ const CrearRoles = () => {
                 id="papellido"
                 label="Primer apellido:"
                 type="text"
-                required={true}
+                required
                 autoComplete="off"
                 value={papellido}
                 onInput={(e) => {
@@ -204,7 +205,7 @@ const CrearRoles = () => {
                 {/* <Select
                     id="rol"
                     label="Rol:"
-                    required={true}
+                    required
                     options={[
                         { value: "", label: "" },
                         { value: 1, label: `Administrador` },
@@ -219,7 +220,7 @@ const CrearRoles = () => {
                 id="email"
                 label="Correo:"
                 type="text"
-                required={true}
+                required
                 autoComplete="off"
                 value={email}
                 onInput={(e) => {
@@ -231,7 +232,7 @@ const CrearRoles = () => {
                 id="identificacion"
                 label="Identificacion:"
                 type="text"
-                required={true}
+                required
                 autoComplete="off"
                 value={identificacion}
                 onInput={(e) => {
@@ -246,7 +247,7 @@ const CrearRoles = () => {
                 id="telefono"
                 label="Telefono:"
                 type="text"
-                required={true}
+                required
                 autoComplete="off"
                 value={telefono}
                 onInput={(e) => {
@@ -261,7 +262,7 @@ const CrearRoles = () => {
                 id="Direccion"
                 label="Direccion:"
                 type="text"
-                required={true}
+                required
                 autoComplete="off"
                 value={direccion_residencia}
                 onInput={(e) => {

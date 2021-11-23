@@ -109,7 +109,7 @@ const Premios = () => {
     e.preventDefault();
     isWinner(sorteo, billete, serie)
       .then((res) => {
-    
+        console.log(res)
         setDisabledBtns(false);
         
         
@@ -152,7 +152,9 @@ const Premios = () => {
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
-          //notify(JSON.stringify(res));
+          if(res?.Tipo===0){
+            notifyError('El valor a pagar supera la capacidad de la oficina $'+res['valor ganado']);
+          }else{}
         }
       })
       
@@ -172,7 +174,9 @@ const Premios = () => {
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
-          //notify(JSON.stringify(res));
+          if(res?.Tipo===0){
+            notifyError('El valor a pagar supera la capacidad de la oficina: $'+res['valor ganado']);
+          }else{}
         }
       })
       
@@ -188,7 +192,7 @@ const Premios = () => {
           type="text"
           minLength="1"
           maxLength="4"
-          required={true}
+          required
           autoComplete="off"
           value={sorteo}
           onInput={(e) => {
@@ -202,7 +206,7 @@ const Premios = () => {
           type="text"
           minLength="4"/*Verificar para que se puedan poner ceros a la izquierda*/ 
           maxLength="4"
-          required={true}
+          required
           autoComplete="off"
           value={billete}
           onInput={(e) => {
@@ -220,7 +224,7 @@ const Premios = () => {
           type="text"
           minLength="3"/*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="3"
-          required={true}
+          required
           autoComplete="off"
           value={serie}
           onInput={(e) => {            
@@ -245,7 +249,7 @@ const Premios = () => {
               label="Numero de celular"
               type="text"
               autoComplete="off"
-              required={true}
+              required
               value={phone}
               onInput={(e) => {
                 if(!isNaN(e.target.value)){
@@ -260,7 +264,7 @@ const Premios = () => {
                 label="Codigo de seguridad"
                 type="text"
                 autoComplete="off"
-                required={true}
+                required
                 value={hash}
                 onInput={(e) => {
                   setHash(e.target.value);
@@ -287,7 +291,7 @@ const Premios = () => {
               max='3'
               min='1'
               autoComplete="off"
-              required={true}
+              required
               value={fracciones_fisi}
               onInput={(e) => {
                 const num = parseInt(e.target.value) || "";
@@ -310,7 +314,7 @@ const Premios = () => {
         ""
       )}
       
-      {(respagar['msg']===undefined) ? <>
+      {(respagar['msg']===undefined) && respagar?.Tipo!=0 ? <>
       <Modal show={showModal} num_tele={phone} handleClose={() => closeModal()}>
         
         {pagoresponse===null ? <>

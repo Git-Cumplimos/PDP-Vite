@@ -9,9 +9,8 @@ import {toast}  from "react-toastify";
 const SortForm = ({
 
   closeModal,
-  respCon,
-
-  
+  fisico,
+  tip_sorteo  
 
 }) => {
   
@@ -24,14 +23,14 @@ const SortForm = ({
   const onSubmit = (e) => {
     e.preventDefault();
     
-    CambiarSort(respCon)
+    CambiarSort(tip_sorteo,fisico)
       .then((res) => {
         //setShowModal(true);
         //setDisabledBtns(false);
           console.log(res)
           setRespCrearSort(res)
-          notify(res[0]['msg'])
-          closeModal()
+          notify(res['msg'])
+          closeModal()          
           
       })
   }
@@ -48,7 +47,7 @@ const SortForm = ({
     });
   };
   
-  
+  console.log(tip_sorteo,fisico)
   return (
     <>
 
@@ -57,7 +56,10 @@ const SortForm = ({
             <div
               className="flex flex-row justify-between text-lg font-medium"
             >
-              <h1>¿Esta seguro que desea actualizar el sorteo?</h1>
+              {fisico===false&&tip_sorteo===1?<h1>¿Esta seguro de crear SORTEO ORDINARIO VIRTUAL?</h1>:''}
+              {fisico===false&&tip_sorteo===2?<h1>¿Esta seguro de crear SORTEO ESTRAORDINARIO VIRTUAL?</h1>:''}
+              {fisico===true&&tip_sorteo===1?<h1>¿Esta seguro de crear SORTEO ORDINARIO FISICO?</h1>:''}
+              {fisico===true&&tip_sorteo===2?<h1>¿Esta seguro de crear SORTEO ESTRAORDINARIO FISICO?</h1>:''}
               
             </div>
             

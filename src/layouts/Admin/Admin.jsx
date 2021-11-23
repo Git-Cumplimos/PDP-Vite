@@ -9,7 +9,7 @@ import SocialBar from "../../components/Compound/SocialBar/SocialBar";
 const Admin = () => {
   const { adminLayout, wave } = classes;
 
-  const { urlsPrivate, urlsPrivApps, urlsPublic } = useUrls();
+  const { urlsPrivate, urlsPrivApps, urlsPublic} = useUrls();
 
   const { pathname } = useLocation();
 
@@ -35,14 +35,16 @@ const Admin = () => {
                 </PrivateRoute>
               );
             })}
-          {urlsPrivApps.map(({ link, component: Component, props, exact }) => {
-            exact = exact === undefined ? true : exact;
-            return (
-              <PrivateRoute key={link} exact={exact} path={link}>
-                <Component {...props} />
-              </PrivateRoute>
-            );
-          })}
+          {urlsPrivApps
+            .filter(({ extern }) => !extern)
+            .map(({ link, component: Component, props, exact }) => {
+              exact = exact === undefined ? true : exact;
+              return (
+                <PrivateRoute key={link} exact={exact} path={link}>
+                  <Component {...props} />
+                </PrivateRoute>
+              );
+            })}
           {urlsPublic.map(({ link, component: Component, props, exact }) => {
             exact = exact === undefined ? true : exact;
             return (
@@ -51,6 +53,7 @@ const Admin = () => {
               </Route>
             );
           })}
+         
         </Switch>
       </main>
     </div>
