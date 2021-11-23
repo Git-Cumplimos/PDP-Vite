@@ -138,7 +138,7 @@ export const useProvideAuth = () => {
       const validartoken = await Auth.setupTOTP(user);
       const str =
         "otpauth://totp/AWSCognito:" +
-        parameters.email +
+        cognitoUser?.username +
         "?secret=" +
         validartoken +
         "&issuer=" +
@@ -450,7 +450,7 @@ export const useProvideAuth = () => {
     } catch (err) {}
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
-  console.log(cognitoUser?.signInUserSession?.idToken?.payload?.email);
+  console.log(cognitoUser);
   return {
     handleverifyTotpToken,
     handleChangePass,
