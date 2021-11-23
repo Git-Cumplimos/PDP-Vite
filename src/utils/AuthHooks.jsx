@@ -64,8 +64,6 @@ export const useProvideAuth = () => {
 
   const [qr, setQr] = useState("");
 
-  const [username, setUsername] = useState("");
-
   const [parameters, setParameters] = useState("");
 
   const consulta_roles = useCallback(async () => {
