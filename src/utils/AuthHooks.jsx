@@ -437,17 +437,19 @@ export const useProvideAuth = () => {
 
   const getQuota = useCallback(async () => {
     const tempRole = { ...roleInfo };
-    const quota = await fetchData(
-      urlQuota,
-      "GET",
-      {
-        id_comercio: roleInfo.id_comercio,
-        id_dispositivo: roleInfo.id_dispositivo,
-      },
-      {}
-    );
-    tempRole.quota = quota["cupo disponible"];
-    tempRole.comision = quota["comisiones"];
+    try {
+      const quota = await fetchData(
+        urlQuota,
+        "GET",
+        {
+          id_comercio: roleInfo.id_comercio,
+          id_dispositivo: roleInfo.id_dispositivo,
+        },
+        {}
+      );
+      tempRole.quota = quota["cupo disponible"];
+      tempRole.comision = quota["comisiones"];
+    } catch (err) {}
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
 
