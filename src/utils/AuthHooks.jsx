@@ -43,6 +43,7 @@ export const AuthContext = createContext({
   consulta_usuarios: () => {},
   cambiar_rol: () => {},
   checkUser: () => {},
+  parameters: null,
 });
 
 export const useAuth = () => {
@@ -138,7 +139,7 @@ export const useProvideAuth = () => {
         const validartoken = await Auth.setupTOTP(user);
         const str =
           "otpauth://totp/AWSCognito:" +
-          cognitoUser?.attributes?.email ?? "" +
+          user?.attributes?.email +
           "?secret=" +
           validartoken +
           "&issuer=" +
@@ -146,7 +147,7 @@ export const useProvideAuth = () => {
         setQr(str);
       } catch (err) {}
     },
-    [cognitoUser]
+    []
   );
 
   const setUser = useCallback(async () => {
