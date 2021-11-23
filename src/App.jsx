@@ -34,7 +34,7 @@ function App() {
         <MessengerCustomerChat
           pageId="455201114671494"
           appId="603779204002555"
-          language="es_CO"
+          language="es_LA"
         />
       </ProvideUrls>
     </ProvideAuth>

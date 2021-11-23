@@ -72,16 +72,16 @@ const AdminLoteria = () => {
   // const [options, posibles] = check();
 
 
-  const { consulta_roles  } = useAuth();
+  // const { consulta_roles  } = useAuth();
 
-  useEffect(() => {
-    consulta_roles()
-    .then((res) => {
+  // useEffect(() => {
+  //   consulta_roles()
+  //   .then((res) => {
          
         
-    })
+  //   })
     
-  }, [])
+  // }, [])
     
   return (
     

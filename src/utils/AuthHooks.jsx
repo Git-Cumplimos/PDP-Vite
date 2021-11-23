@@ -266,7 +266,7 @@ export const useProvideAuth = () => {
 
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
-    consulta_roles();
+    // consulta_roles();
     checkUser();
     if (cognitoUser?.challengeName === "MFA_SETUP") {
       handleSetupTOTP(cognitoUser);
