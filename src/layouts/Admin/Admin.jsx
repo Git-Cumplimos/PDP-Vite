@@ -9,7 +9,7 @@ import SocialBar from "../../components/Compound/SocialBar/SocialBar";
 const Admin = () => {
   const { adminLayout, wave } = classes;
 
-  const { urlsPrivate, urlsPrivApps, urlsPublic } = useUrls();
+  const { urlsPrivate, urlsPrivApps, urlsPublic} = useUrls();
 
   const { pathname } = useLocation();
 
@@ -53,6 +53,7 @@ const Admin = () => {
               </Route>
             );
           })}
+         
         </Switch>
       </main>
     </div>

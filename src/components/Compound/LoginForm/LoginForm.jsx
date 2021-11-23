@@ -53,6 +53,8 @@ const LoginForm = () => {
 
     auth
       .signIn(username, password)
+      .then(() => {})
+
       .catch((err) => {
         if (err.code === "NotAuthorizedException") {
           notifyError("Usuario o contraseña incorrectos.");
@@ -223,7 +225,7 @@ const LoginForm = () => {
                 <label htmlFor="id">Nueva contraseña:</label>
                 <input
                   id="totp"
-                  type="text"
+                  type="password"
                   autoComplete="off"
                   value={newPass}
                   onChange={(e) => {
@@ -235,7 +237,7 @@ const LoginForm = () => {
                 <label htmlFor="id">Confirmar contraseña:</label>
                 <input
                   id="totp"
-                  type="text"
+                  type="password"
                   autoComplete="off"
                   value={confirmPass}
                   onChange={(e) => {
@@ -317,7 +319,7 @@ const LoginForm = () => {
                 <label htmlFor="id">Nueva contraseña:</label>
                 <input
                   id="totp"
-                  type="text"
+                  type="password"
                   autoComplete="off"
                   value={newPass}
                   onChange={(e) => {
@@ -329,7 +331,7 @@ const LoginForm = () => {
                 <label htmlFor="id">Confirmar contraseña:</label>
                 <input
                   id="totp"
-                  type="text"
+                  type="password"
                   autoComplete="off"
                   value={confirmPass}
                   onChange={(e) => {

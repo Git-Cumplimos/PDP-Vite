@@ -14,6 +14,7 @@ import Transacciones from "../pages/Transacciones";
 import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
 import MarketPlace from "../apps/MarketPlace/MarketPlace";
 import CommerceInfo from "../apps/UpdateCommerce/CommerceInfo";
+import { useAuth } from "./AuthHooks";
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
@@ -34,6 +35,8 @@ export const useProvideUrls = () => {
     return <h1 className="text-4xl text-center mt-8">En mantenimiento</h1>;
   };
 
+  const { roleInfo } = useAuth();
+
   useEffect(() => {
     setUrlsPrivate([
       { link: "/", label: "Inicio", component: Home, props: {} },
@@ -53,7 +56,7 @@ export const useProvideUrls = () => {
       {
         link: "/seguridad",
         label: "Seguridad",
-        component: emptyComp /* CrearRoles */,
+        component: emptyComp,
         props: {},
       },
       {
@@ -75,12 +78,17 @@ export const useProvideUrls = () => {
         props: {},
         extern: true,
       },
+
       {
         link: "/loteria-de-bogota",
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
-        component: LoteriaBog,
+
+        component:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
+            ? LoteriaBog
+            : emptyComp,
         props: {},
-        show: false,
+        show: roleInfo?.tipo_comercio === "OFICINAS PROPIAS", ///////////////////////////////
         extern: false,
       },
       {
@@ -93,11 +101,21 @@ export const useProvideUrls = () => {
       },
       {
         link: "/loteria-de-bogota/:page",
-        component: LoteriaBog,
+        component:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
+            ? LoteriaBog
+            : emptyComp,
         props: {},
         exact: false,
         show: false,
         extern: false,
+      },
+      {
+        link: "/fundacion-mujer",
+        label: <AppIcons name="Fundacion de la mujer" />,
+        component: FunMujer,
+        props: {},
+        show: false,
       },
       {
         link: "/fundacion-mujer/:page",
@@ -107,7 +125,6 @@ export const useProvideUrls = () => {
         show: false,
         extern: false,
       },
-
       {
         link: "/marketplace",
         label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
@@ -144,13 +161,13 @@ export const useProvideUrls = () => {
         extern: false,
         show: false,
       },
-      // REACT_APP_URL_FORM_COMMERCE
       {
         link: "/marketplace/payorder/:orden",
         // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
         component: MarketPlace,
         props: {},
         extern: false,
+        show: false,
       },
     ]);
 
@@ -162,7 +179,7 @@ export const useProvideUrls = () => {
         props: {},
       },
     ]);
-  }, []);
+  }, [roleInfo]);
 
   return {
     urlsPrivate,

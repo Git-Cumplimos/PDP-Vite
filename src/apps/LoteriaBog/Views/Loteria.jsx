@@ -10,6 +10,7 @@ import Table from "../../../components/Base/Table/Table";
 import SellResp from "../components/SellResp/SellResp";
 import SendForm from "../components/SendForm/SendForm";
 import { useLoteria } from "../utils/LoteriaHooks";
+import { useAuth } from "../../../utils/AuthHooks";
 
 const Loteria = ({
   sorteo:
@@ -34,13 +35,18 @@ const Loteria = ({
       setSellResponse,
     },
     searchLoteria,
+    searchLoteriafisica,
     sellLoteria,
+    sellLoteriafisica,
   } = useLoteria();
+
+  
 
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
+  const [selecFrac, setSelecFrac] = useState([]);
 
   const [opcionesdisponibles, SetOpcionesDisponibles] = useState([{value:"",label:""}]);
 
@@ -95,11 +101,15 @@ const Loteria = ({
 
   const closeModal = useCallback(() => {
     setShowModal(false);
-    searchLoteria(sorteo, numero, serie, page);
+    {sorteo.split('-')[1]==='true'? 
+    searchLoteriafisica(sorteo, numero, serie, page)         
+    :
+    searchLoteria(sorteo, numero, serie, page)
+    }
+    
 
-  }, [sorteo, numero, serie, searchLoteria, page]);
+  }, [sorteo, numero, serie, searchLoteria,searchLoteriafisica, page]);
 
- 
   return (
     <>
       <Form grid>
@@ -132,11 +142,18 @@ const Loteria = ({
             callback: (e) => {
               const num = parseInt(e.target.value) || "";
               setPage(1);
+              {sorteo.split('-')[1]==='true'? 
+              searchLoteriafisica(sorteo, num, serie, 1).then((max) => {
+                if (max !== undefined) {
+                  setMaxPages(Math.ceil(max / 10));
+                }
+              })
+              :
               searchLoteria(sorteo, num, serie, 1).then((max) => {
                 if (max !== undefined) {
                   setMaxPages(Math.ceil(max / 10));
                 }
-              });
+              })}
             },
             timeOut: 500,
           }}
@@ -159,11 +176,18 @@ const Loteria = ({
             callback: (e) => {
               const num = parseInt(e.target.value) || "";
               setPage(1);
-              searchLoteria(sorteo, numero, num, 1).then((max) => {
+              {sorteo.split('-')[1]==='true'? 
+              searchLoteriafisica(sorteo, num, serie, 1).then((max) => {
                 if (max !== undefined) {
                   setMaxPages(Math.ceil(max / 10));
                 }
-              });
+              })
+              :
+              searchLoteria(sorteo, num, serie, 1).then((max) => {
+                if (max !== undefined) {
+                  setMaxPages(Math.ceil(max / 10));
+                }
+              })}
             },
             timeOut: 500,
           }}
@@ -175,7 +199,10 @@ const Loteria = ({
             onClick={() => {
               if (page > 1) {
                 setPage(page - 1);
-                searchLoteria(sorteo, numero, serie, page - 1);
+                {sorteo.split('-')[1]==='true'?
+                searchLoteriafisica(sorteo, numero, serie, page + 1):
+                searchLoteria(sorteo, numero, serie, page + 1)
+                }
               }
             }}
           >
@@ -187,7 +214,11 @@ const Loteria = ({
             onClick={() => {
               if (page < maxPages) {
                 setPage(page + 1);
-                searchLoteria(sorteo, numero, serie, page + 1);
+                {sorteo.split('-')[1]==='true'?
+                searchLoteriafisica(sorteo, numero, serie, page + 1):
+                searchLoteria(sorteo, numero, serie, page + 1)
+                }
+              
               }
             }}
           >
@@ -223,6 +254,7 @@ const Loteria = ({
               }
             )}
             onSelectRow={(e, index) => {
+              console.log(loterias[index].Fracciones)
               setSelected(loterias[index]);
               setShowModal(true);
             }}
@@ -234,13 +266,20 @@ const Loteria = ({
       <Modal show={showModal} handleClose={() => closeModal()}>
         {sellResponse === null ? (
           <SendForm
+            sorteo={sorteo}
+            selecFrac={selecFrac}
+            setSelecFrac={setSelecFrac}
             selected={selected}
+            setSelected={setSelected}
             customer={customer}
             setCustomer={setCustomer}
             closeModal={closeModal}
             handleSubmit={(event) => {
+              {sorteo.split('-')[1]==='true'?
+              sellLoteriafisica(sorteo,selecFrac):
+              sellLoteria(sorteo)
+              }
               
-              sellLoteria(sorteo);
             }}
           />
         ) : (

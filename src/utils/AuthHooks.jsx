@@ -13,12 +13,17 @@ import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
 
+//////////////////////Despliegue de estos servicios anterior
+// const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
+// const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
+
 const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
 const urlcrearRol = `${process.env.REACT_APP_URL_USRS}/crear_rol`;
 const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
 const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
 const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
+const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -37,6 +42,7 @@ export const AuthContext = createContext({
   consulta_roles: () => {},
   consulta_usuarios: () => {},
   cambiar_rol: () => {},
+  checkUser: () => {},
 });
 
 export const useAuth = () => {
@@ -128,10 +134,28 @@ export const useProvideAuth = () => {
     []
   );
 
+  const handleSetupTOTP = useCallback(
+    async (user) => {
+      try {
+        const validartoken = await Auth.setupTOTP(user);
+        const str =
+          "otpauth://totp/AWSCognito:" +
+          cognitoUser?.attributes?.email ?? "" +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
+        setQr(str);
+      } catch (err) {}
+    },
+    [cognitoUser]
+  );
+
   const setUser = useCallback(async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
       setCognitoUser(user);
+
       if (user) setSignedIn(true);
       const usrInfo = await Auth.currentUserInfo();
       setUserInfo(usrInfo);
@@ -142,7 +166,6 @@ export const useProvideAuth = () => {
           { correo: usrInfo?.attributes?.email },
           {}
         );
-
         const quota = await fetchData(
           urlQuota,
           "GET",
@@ -153,16 +176,34 @@ export const useProvideAuth = () => {
           {}
         );
 
-        const _role = suserInfo.rol;
-        delete suserInfo.rol;
+        const resp_cod = await fetchData(
+          urlCod_loteria_oficina,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+          },
+          {}
+        );
 
-        setRoleInfo({
-          role: _role,
-          ...suserInfo,
+        if ("msg" in resp_cod) {
+          setRoleInfo({
+            role: suserInfo.rol,
+            ...suserInfo,
 
-          quota: quota["cupo disponible"],
-          comision: quota["comisiones"],
-        });
+            quota: quota["cupo disponible"],
+            comision: quota["comisiones"],
+          });
+        } else {
+          setRoleInfo({
+            role: suserInfo.rol,
+            ...suserInfo,
+
+            quota: quota["cupo disponible"],
+            comision: quota["comisiones"],
+            cod_oficina_lot: resp_cod.cod_oficina_lot,
+            cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+          });
+        }
       }
     } catch (err) {
       setSignedIn(false);
@@ -176,36 +217,54 @@ export const useProvideAuth = () => {
     } else {
       setSignedIn(true);
       setCognitoUser(Auth.user);
-      Auth.currentUserInfo().then((usr) => setUserInfo(usr)).catch(() => {});
+      Auth.currentUserInfo()
+        .then((usr) => setUserInfo(usr))
+        .catch(() => {});
 
-      fetchData(
-        urlLog,
-        "GET",
-        { correo: Auth.user?.attributes?.email },
-        {}
-      ).then((suserInfo) => {
-        fetchData(
-          urlQuota,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
-            id_dispositivo: suserInfo.id_dispositivo,
-          },
-          {}
-        ).then((quota) => {
-          const _role = suserInfo.rol;
-          delete suserInfo.rol;
-          setRoleInfo({
-            role: _role,
-            ...suserInfo,
-            // id_comercio: 2,
-            // id_dispositivo: 233,
-            // id_usuatio: 8,
-            quota: quota["cupo disponible"],
-            comision: quota["comisiones"],
-          });
-        }).catch(() => {});
-      }).catch(() => {});
+      fetchData(urlLog, "GET", { correo: Auth.user?.attributes?.email }, {})
+        .then((suserInfo) => {
+          fetchData(
+            urlQuota,
+            "GET",
+            {
+              id_comercio: suserInfo.id_comercio,
+              id_dispositivo: suserInfo.id_dispositivo,
+            },
+            {}
+          )
+            .then((quota) => {
+              fetchData(
+                urlCod_loteria_oficina,
+                "GET",
+                {
+                  id_comercio: suserInfo.id_comercio,
+                },
+                {}
+              ).then((resp_cod) => {
+                if ("msg" in resp_cod) {
+                  setRoleInfo({
+                    role: suserInfo.rol,
+                    ...suserInfo,
+
+                    quota: quota["cupo disponible"],
+                    comision: quota["comisiones"],
+                  });
+                } else {
+                  setRoleInfo({
+                    role: suserInfo.rol,
+                    ...suserInfo,
+
+                    quota: quota["cupo disponible"],
+                    comision: quota["comisiones"],
+                    cod_oficina_lot: resp_cod.cod_oficina_lot,
+                    cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+                  });
+                }
+              });
+            })
+            .catch(() => {});
+        })
+        .catch(() => {});
     }
   }, [setUser]);
 
@@ -213,7 +272,10 @@ export const useProvideAuth = () => {
     appendToCognitoUserAgent("withCustomAuthenticator");
     consulta_roles();
     checkUser();
-  }, [checkUser, consulta_roles]);
+    if (cognitoUser?.challengeName === "MFA_SETUP") {
+      handleSetupTOTP(cognitoUser);
+    }
+  }, [checkUser, consulta_roles, cognitoUser, handleSetupTOTP]);
 
   const history = useHistory();
   const { state, pathname } = useLocation();
@@ -229,18 +291,6 @@ export const useProvideAuth = () => {
       throw err;
     }
   }, []);
-
-  const handleSetupTOTP = useCallback(
-    async (user) => {
-      try {
-        const validartoken = await Auth.setupTOTP(user);
-        const str =
-          "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
-        setQr(str);
-      } catch (err) {}
-    },
-    [username]
-  );
 
   const handleChangePass = useCallback(
     async (
@@ -264,7 +314,7 @@ export const useProvideAuth = () => {
         );
         setCognitoUser(loggedUser);
         if (loggedUser.challengeName === "MFA_SETUP") {
-          handleSetupTOTP(loggedUser);
+          await handleSetupTOTP(loggedUser);
         }
       } catch (err) {
         throw err;
@@ -273,8 +323,20 @@ export const useProvideAuth = () => {
     [handleSetupTOTP]
   );
 
+  const signOut = useCallback(() => {
+    Auth.signOut()
+      .then(() => {
+        setCognitoUser(null);
+        setSignedIn(false);
+        setRoleInfo({});
+        history.push("/login");
+      })
+      .catch(() => {});
+  }, [history]);
+
   const confirmSignIn = useCallback(
     async (totp) => {
+      console.log(totp);
       try {
         const loggedUser = await Auth.confirmSignIn(
           cognitoUser,
@@ -302,43 +364,54 @@ export const useProvideAuth = () => {
             },
             {}
           );
-          const _role = suserInfo.rol;
-          delete suserInfo.rol;
 
-          setRoleInfo({
-            role: _role,
-            ...suserInfo,
-            // id_comercio: 2,
-            // id_dispositivo: 233,
-            // id_usuatio: 8,
-            quota: quota["cupo disponible"],
-            comision: quota["comisiones"],
-          });
+          const resp_cod = await fetchData(
+            urlCod_loteria_oficina,
+            "GET",
+            {
+              id_comercio: suserInfo.id_comercio,
+            },
+            {}
+          );
+
+          if ("msg" in resp_cod) {
+            setRoleInfo({
+              role: suserInfo.rol,
+              ...suserInfo,
+
+              quota: quota["cupo disponible"],
+              comision: quota["comisiones"],
+            });
+          } else {
+            setRoleInfo({
+              role: suserInfo.rol,
+              ...suserInfo,
+
+              quota: quota["cupo disponible"],
+              comision: quota["comisiones"],
+              cod_oficina_lot: resp_cod.cod_oficina_lot,
+              cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+            });
+          }
         }
         history.push(state?.from || pathname === "/login" ? "/" : pathname);
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
           setCognitoUser(null);
+          setSignedIn(false);
+          signOut();
         }
         throw err;
       }
     },
-    [cognitoUser, history, state, pathname]
+    [cognitoUser, history, state, pathname, signOut]
   );
-
-  const signOut = useCallback(() => {
-    Auth.signOut().then(() => {
-      setCognitoUser(null);
-      setSignedIn(false);
-      setRoleInfo({});
-      history.push("/login");
-    }).catch(() => {});
-  }, [history]);
 
   const handlesetPreferredMFA = useCallback(
     async (totp) => {
       try {
         const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+        signOut();
         if (preferredMFA === "SUCCESS") {
           await confirmSignIn(totp);
         }
@@ -346,7 +419,7 @@ export const useProvideAuth = () => {
         throw new Error(err);
       }
     },
-    [cognitoUser, confirmSignIn]
+    [cognitoUser, confirmSignIn, signOut]
   );
 
   const handleverifyTotpToken = useCallback(
@@ -355,12 +428,13 @@ export const useProvideAuth = () => {
         const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
         if (tokenValidado.accessToken.payload.token_use === "access") {
           await handlesetPreferredMFA(totp);
+          history.push("/login");
         }
       } catch (err) {
         throw new Error(err);
       }
     },
-    [cognitoUser, handlesetPreferredMFA]
+    [cognitoUser, handlesetPreferredMFA, history]
   );
 
   const getQuota = useCallback(async () => {
@@ -398,6 +472,7 @@ export const useProvideAuth = () => {
     consulta_roles,
     consulta_usuarios,
     cambiar_rol,
+    checkUser,
     qr,
     parameters,
   };
