@@ -325,6 +325,7 @@ export const useProvideAuth = () => {
 
   const confirmSignIn = useCallback(
     async (totp) => {
+      console.log(totp);
       try {
         const loggedUser = await Auth.confirmSignIn(
           cognitoUser,
