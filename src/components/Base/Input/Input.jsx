@@ -65,7 +65,7 @@ const Input = ({
       const tempFiles = [];
 
       const GetFileTree = async (item, path) => {
-        path = path || "";
+        path = path ?? "";
         const initialItem = item;
         item = item.webkitGetAsEntry(); //Might be renamed to GetAsEntry() in 2020
         // console.log(item);

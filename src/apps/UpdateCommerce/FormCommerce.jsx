@@ -63,9 +63,9 @@ const FormCommerce = () => {
   const history = useHistory();
 
   useEffect(() => {
-    setCommerceId(roleInfo?.id_comercio || 0);
+    setCommerceId(roleInfo?.id_comercio ?? 0);
     fetchData(`${url_send}/review`, "GET", {
-      id_comercio: roleInfo?.id_comercio || 0,
+      id_comercio: roleInfo?.id_comercio ?? 0,
     })
       .then((res) => {
         if (res?.status) {
@@ -135,6 +135,8 @@ const FormCommerce = () => {
       progress: undefined,
     });
   };
+
+  console.log(roleInfo)
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -239,7 +241,7 @@ const FormCommerce = () => {
           required
         />
         <datalist id="oldNameCommerce">
-          <option value={roleInfo?.["nombre comercio"] || ""}></option>
+          <option value={roleInfo?.["nombre comercio"] ?? ""}></option>
         </datalist>
         {roleInfo?.tipo_comercio.includes("CRC") ? (
           <Input
