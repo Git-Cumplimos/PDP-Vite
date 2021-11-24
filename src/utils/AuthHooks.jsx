@@ -23,7 +23,7 @@ const urlcrearRol = `${process.env.REACT_APP_URL_USRS}/crear_rol`;
 const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
 const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
 const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
-const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
+// const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -145,7 +145,7 @@ export const useProvideAuth = () => {
         "Punto de Pago Multibanco";
       setQr(str);
     } catch (err) {}
-  }, []);
+  }, [cognitoUser?.username]);
 
   const setUser = useCallback(async () => {
     try {
@@ -172,34 +172,42 @@ export const useProvideAuth = () => {
           {}
         );
 
-        const resp_cod = await fetchData(
-          urlCod_loteria_oficina,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
-          },
-          {}
-        );
+        setRoleInfo({
+          role: suserInfo.rol,
+          ...suserInfo,
 
-        if ("msg" in resp_cod) {
-          setRoleInfo({
-            role: suserInfo.rol,
-            ...suserInfo,
+          quota: quota["cupo disponible"],
+          comision: quota["comisiones"],
+        });
 
-            quota: quota["cupo disponible"],
-            comision: quota["comisiones"],
-          });
-        } else {
-          setRoleInfo({
-            role: suserInfo.rol,
-            ...suserInfo,
+        // const resp_cod = await fetchData(
+        //   urlCod_loteria_oficina,
+        //   "GET",
+        //   {
+        //     id_comercio: suserInfo.id_comercio,
+        //   },
+        //   {}
+        // );
 
-            quota: quota["cupo disponible"],
-            comision: quota["comisiones"],
-            cod_oficina_lot: resp_cod.cod_oficina_lot,
-            cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-          });
-        }
+        // if ("msg" in resp_cod) {
+        //   setRoleInfo({
+        //     role: suserInfo.rol,
+        //     ...suserInfo,
+
+        //     quota: quota["cupo disponible"],
+        //     comision: quota["comisiones"],
+        //   });
+        // } else {
+        //   setRoleInfo({
+        //     role: suserInfo.rol,
+        //     ...suserInfo,
+
+        //     quota: quota["cupo disponible"],
+        //     comision: quota["comisiones"],
+        //     cod_oficina_lot: resp_cod.cod_oficina_lot,
+        //     cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+        //   });
+        // }
       }
     } catch (err) {
       setSignedIn(false);
@@ -229,36 +237,43 @@ export const useProvideAuth = () => {
             {}
           )
             .then((quota) => {
-              fetchData(
-                urlCod_loteria_oficina,
-                "GET",
-                {
-                  id_comercio: suserInfo.id_comercio,
-                },
-                {}
-              )
-                .then((resp_cod) => {
-                  if ("msg" in resp_cod) {
-                    setRoleInfo({
-                      role: suserInfo.rol,
-                      ...suserInfo,
+              setRoleInfo({
+                role: suserInfo.rol,
+                ...suserInfo,
 
-                      quota: quota["cupo disponible"],
-                      comision: quota["comisiones"],
-                    });
-                  } else {
-                    setRoleInfo({
-                      role: suserInfo.rol,
-                      ...suserInfo,
+                quota: quota["cupo disponible"],
+                comision: quota["comisiones"],
+              });
+              // fetchData(
+              //   urlCod_loteria_oficina,
+              //   "GET",
+              //   {
+              //     id_comercio: suserInfo.id_comercio,
+              //   },
+              //   {}
+              // )
+              //   .then((resp_cod) => {
+              //     if ("msg" in resp_cod) {
+              //       setRoleInfo({
+              //         role: suserInfo.rol,
+              //         ...suserInfo,
 
-                      quota: quota["cupo disponible"],
-                      comision: quota["comisiones"],
-                      cod_oficina_lot: resp_cod.cod_oficina_lot,
-                      cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-                    });
-                  }
-                })
-                .catch(() => {});
+              //         quota: quota["cupo disponible"],
+              //         comision: quota["comisiones"],
+              //       });
+              //     } else {
+              //       setRoleInfo({
+              //         role: suserInfo.rol,
+              //         ...suserInfo,
+
+              //         quota: quota["cupo disponible"],
+              //         comision: quota["comisiones"],
+              //         cod_oficina_lot: resp_cod.cod_oficina_lot,
+              //         cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+              //       });
+              //     }
+              //   })
+              //   .catch(() => {});
             })
             .catch(() => {});
         })
@@ -363,38 +378,44 @@ export const useProvideAuth = () => {
               {}
             );
 
-            const resp_cod = await fetchData(
-              urlCod_loteria_oficina,
-              "GET",
-              {
-                id_comercio: suserInfo.id_comercio,
-              },
-              {}
-            );
+            setRoleInfo({
+              role: suserInfo.rol,
+              ...suserInfo,
 
-            if ("msg" in resp_cod) {
-              setRoleInfo({
-                role: suserInfo.rol,
-                ...suserInfo,
+              quota: quota["cupo disponible"],
+              comision: quota["comisiones"],
+            });
 
-                quota: quota["cupo disponible"],
-                comision: quota["comisiones"],
-              });
-            } else {
-              setRoleInfo({
-                role: suserInfo.rol,
-                ...suserInfo,
+            // const resp_cod = await fetchData(
+            //   urlCod_loteria_oficina,
+            //   "GET",
+            //   {
+            //     id_comercio: suserInfo.id_comercio,
+            //   },
+            //   {}
+            // );
 
-                quota: quota["cupo disponible"],
-                comision: quota["comisiones"],
-                cod_oficina_lot: resp_cod.cod_oficina_lot,
-                cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-              });
-            }
+            // if ("msg" in resp_cod) {
+            //   setRoleInfo({
+            //     role: suserInfo.rol,
+            //     ...suserInfo,
+
+            //     quota: quota["cupo disponible"],
+            //     comision: quota["comisiones"],
+            //   });
+            // } else {
+            //   setRoleInfo({
+            //     role: suserInfo.rol,
+            //     ...suserInfo,
+
+            //     quota: quota["cupo disponible"],
+            //     comision: quota["comisiones"],
+            //     cod_oficina_lot: resp_cod.cod_oficina_lot,
+            //     cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+            //   });
+            // }
           }
-        } catch (err) {
-          console.log(err);
-        }
+        } catch (err) {}
         history.push(state?.from || pathname === "/login" ? "/" : pathname);
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
