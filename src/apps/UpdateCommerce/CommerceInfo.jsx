@@ -8,10 +8,16 @@ import Input from "../../components/Base/Input/Input";
 import fetchData from "../../utils/fetchData";
 
 const capitalize = (word = "") => {
+  if (word.length === 0) {
+    return "";
+  }
   return `${word.at(0).toUpperCase()}${word.slice(1)}`;
 };
 
 const capitalizePhrase = (words = "") => {
+  if (words.length === 0) {
+    return "";
+  }
   const caps = [];
   for (const word of words.split(" ")) {
     caps.push(capitalize(word));
@@ -51,18 +57,6 @@ const CommerceInfo = () => {
   const [fechaFin, setFechaFin] = useState("");
   const [commerceName, setCommerceName] = useState("");
 
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
   const notifyError = (msg) => {
     toast.error(msg, {
       position: "top-center",
@@ -97,6 +91,29 @@ const CommerceInfo = () => {
       .catch((err) => {});
   }, []);
 
+  useEffect(() => {
+    const queries = {
+      page,
+    };
+    if (fechaIni && fechaFin) {
+      queries.date_ini = fechaIni;
+      queries.date_fin = fechaFin;
+    }
+    if (commerceName) {
+      queries.$q_name = commerceName;
+    }
+    fetchData(`${url_form}/review-all`, "GET", queries)
+      .then((res) => {
+        if (res?.status) {
+          setMaxPage(res?.obj.max_pages);
+          setData(res?.obj.results);
+        } else {
+          notifyError(res?.msg ?? "Respuesta de servicio vacia");
+        }
+      })
+      .catch((err) => {});
+  }, [page, commerceName, fechaFin, fechaIni]);
+
   return (
     <div className="flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl text-center">Revisar actualizacion de datos</h1>
@@ -122,8 +139,8 @@ const CommerceInfo = () => {
               if (commerceName) {
                 queries.$q_name = commerceName;
               }
-              console.log(_fechaIni)
-              console.log(fechaFin)
+              console.log(_fechaIni);
+              console.log(fechaFin);
               if ("date_ini" in queries) {
                 fetchData(`${url_form}/review-all`, "GET", queries)
                   .then((res) => {
@@ -212,6 +229,26 @@ const CommerceInfo = () => {
           }}
         />
       </Form>
+      {maxPage !== 1 && maxPage !== 0 ? (
+        <ButtonBar>
+          <Button
+            type="button"
+            onClick={() => setPage(page - 1)}
+            disabled={page < 2}
+          >
+            Anterior
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setPage(page + 1)}
+            disabled={page >= maxPage}
+          >
+            Siguiente
+          </Button>
+        </ButtonBar>
+      ) : (
+        ""
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
         {data.map(
           (
@@ -235,7 +272,7 @@ const CommerceInfo = () => {
                 <div className="mx-4">
                   <h1 className="font-medium">Representante legal</h1>
                   <ul>
-                    <li>{capitalizePhrase(Nombre.toLowerCase())}</li>
+                    <li>{capitalizePhrase(Nombre?.toLowerCase() ?? "")}</li>
                     <li>{Doc_show}</li>
                   </ul>
                 </div>
@@ -300,26 +337,6 @@ const CommerceInfo = () => {
           }
         )}
       </div>
-      {maxPage !== 1 && maxPage !== 0 ? (
-        <ButtonBar>
-          <Button
-            type="button"
-            onClick={() => setPage(page - 1)}
-            disabled={page < 2}
-          >
-            Anterior
-          </Button>
-          <Button
-            type="button"
-            onClick={() => setPage(page + 1)}
-            disabled={page >= maxPage}
-          >
-            Siguiente
-          </Button>
-        </ButtonBar>
-      ) : (
-        ""
-      )}
     </div>
   );
 };

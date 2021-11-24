@@ -136,8 +136,6 @@ const FormCommerce = () => {
     });
   };
 
-  console.log(roleInfo)
-
   const onSubmit = async (event) => {
     event.preventDefault();
 
@@ -157,9 +155,9 @@ const FormCommerce = () => {
           Nombre_comercio: commerceName,
           Nombre_comercio_2: commerceName2,
           Tipo_comercio:
-            roleInfo?.tipo_comercio === "CRCS"
+            roleInfo?.tipo_comercio?.includes("CRCS")
               ? 2
-              : roleInfo?.tipo_comercio === "COMERCIOS CEAS"
+              : roleInfo?.tipo_comercio?.includes("CEAS")
               ? 3
               : 1,
           Representante: {

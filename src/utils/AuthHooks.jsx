@@ -290,10 +290,6 @@ export const useProvideAuth = () => {
     }
   }, [checkUser, consulta_roles, cognitoUser, handleSetupTOTP]);
 
-  useEffect(() => {
-    console.log(roleInfo);
-  }, [roleInfo]);
-
   const history = useHistory();
   const { state, pathname } = useLocation();
 
