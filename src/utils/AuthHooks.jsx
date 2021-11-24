@@ -12,7 +12,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
-
+//////////////////////AMBIENTE DE CERTIFICACION VALIDAR TODAS LAS POSIBILIDADES
+//////////////////////ANTES DE SUBIR A PRODUCCION
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
 // const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
@@ -133,19 +134,22 @@ export const useProvideAuth = () => {
     []
   );
 
-  const handleSetupTOTP = useCallback(async (user) => {
-    try {
-      const validartoken = await Auth.setupTOTP(user);
-      const str =
-        "otpauth://totp/AWSCognito:" +
-        cognitoUser?.username +
-        "?secret=" +
-        validartoken +
-        "&issuer=" +
-        "Punto de Pago Multibanco";
-      setQr(str);
-    } catch (err) {}
-  }, [cognitoUser?.username]);
+  const handleSetupTOTP = useCallback(
+    async (user) => {
+      try {
+        const validartoken = await Auth.setupTOTP(user);
+        const str =
+          "otpauth://totp/AWSCognito:" +
+          cognitoUser?.username +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
+        setQr(str);
+      } catch (err) {}
+    },
+    [cognitoUser?.username]
+  );
 
   const setUser = useCallback(async () => {
     try {
