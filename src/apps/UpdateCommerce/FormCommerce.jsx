@@ -63,9 +63,9 @@ const FormCommerce = () => {
   const history = useHistory();
 
   useEffect(() => {
-    setCommerceId(roleInfo?.id_comercio || 0);
+    setCommerceId(roleInfo?.id_comercio ?? 0);
     fetchData(`${url_send}/review`, "GET", {
-      id_comercio: roleInfo?.id_comercio || 0,
+      id_comercio: roleInfo?.id_comercio ?? 0,
     })
       .then((res) => {
         if (res?.status) {
@@ -135,6 +135,8 @@ const FormCommerce = () => {
       progress: undefined,
     });
   };
+
+  console.log(roleInfo)
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -239,9 +241,9 @@ const FormCommerce = () => {
           required
         />
         <datalist id="oldNameCommerce">
-          <option value={roleInfo?.["nombre comercio"] || ""}></option>
+          <option value={roleInfo?.["nombre comercio"] ?? ""} />
         </datalist>
-        {roleInfo?.tipo_comercio === "CRCS" ? (
+        {roleInfo?.tipo_comercio?.includes("CRC") ? (
           <Input
             id="commerceName2"
             label="Nombre del centro medico"
@@ -251,7 +253,7 @@ const FormCommerce = () => {
             onInput={(e) => setCommerceName2(e.target.value)}
             required
           />
-        ) : roleInfo?.tipo_comercio === "COMERCIOS CEAS" ? (
+        ) : roleInfo?.tipo_comercio?.includes("CEA") ? (
           <Input
             id="commerceName2"
             label="Nombre del centro de enseñanza"

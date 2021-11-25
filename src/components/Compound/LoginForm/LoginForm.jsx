@@ -47,15 +47,13 @@ const LoginForm = () => {
       progress: undefined,
     });
   };
-  
+
   const handleCognito = (event) => {
     event.preventDefault();
 
     auth
       .signIn(username, password)
-      .then(() => {
-        
-      })
+      .then(() => {})
 
       .catch((err) => {
         if (err.code === "NotAuthorizedException") {
@@ -227,7 +225,7 @@ const LoginForm = () => {
                 <label htmlFor="id">Nueva contraseña:</label>
                 <input
                   id="totp"
-                  type="text"
+                  type="password"
                   autoComplete="off"
                   value={newPass}
                   onChange={(e) => {
@@ -239,7 +237,7 @@ const LoginForm = () => {
                 <label htmlFor="id">Confirmar contraseña:</label>
                 <input
                   id="totp"
-                  type="text"
+                  type="password"
                   autoComplete="off"
                   value={confirmPass}
                   onChange={(e) => {
@@ -321,7 +319,7 @@ const LoginForm = () => {
                 <label htmlFor="id">Nueva contraseña:</label>
                 <input
                   id="totp"
-                  type="text"
+                  type="password"
                   autoComplete="off"
                   value={newPass}
                   onChange={(e) => {
@@ -333,7 +331,7 @@ const LoginForm = () => {
                 <label htmlFor="id">Confirmar contraseña:</label>
                 <input
                   id="totp"
-                  type="text"
+                  type="password"
                   autoComplete="off"
                   value={confirmPass}
                   onChange={(e) => {
