@@ -79,7 +79,7 @@ export const useProvideUrls = () => {
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
         component: LoteriaBog,
         props: {},
-        show: roleInfo?.tipo_comercio==="OFICINAS PROPIAS"||roleInfo?.roles.includes(1),///////////////////////////////
+        show: roleInfo?.tipo_comercio==="OFICINAS PROPIAS"||roleInfo?.roles?.includes(1)||roleInfo?.id_comercio===2,///////////////////////////////
       },
       {
         link: "/loteria-de-bogota/:page",
@@ -112,12 +112,12 @@ export const useProvideUrls = () => {
       //   component: emptyComp,
       //   props: {},
       // },
-      // {
-      //   link: "/transacciones",
-      //   label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
-      //   component: Transacciones,
-      //   props: {},
-      // },
+      {
+        link: "/transacciones",
+        label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
+        component: Transacciones,
+        props: {},
+      },
     ]);
 
     setUrlsPublic([

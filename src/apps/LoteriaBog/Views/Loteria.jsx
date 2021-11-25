@@ -101,6 +101,10 @@ const Loteria = ({
 
   const closeModal = useCallback(() => {
     setShowModal(false);
+    setSellResponse(null)
+    setCustomer({ fracciones: "", phone: "", doc_id: "" });
+    setSelected(null)
+    setSelecFrac([])
     {sorteo.split('-')[1]==='true'? 
     searchLoteriafisica(sorteo, numero, serie, page)         
     :
@@ -200,8 +204,8 @@ const Loteria = ({
               if (page > 1) {
                 setPage(page - 1);
                 {sorteo.split('-')[1]==='true'?
-                searchLoteriafisica(sorteo, numero, serie, page + 1):
-                searchLoteria(sorteo, numero, serie, page + 1)
+                searchLoteriafisica(sorteo, numero, serie, page - 1):
+                searchLoteria(sorteo, numero, serie, page - 1)
                 }
               }
             }}

@@ -50,10 +50,10 @@ const AdminLoteria = () => {
       value: "descargar",
       label: <LotoIcons Logo={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU'} name="Descargar" />,
     },
-    {
-      value: "crear_sorteos",
-      label: <LotoIcons Logo={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU'} name="Crear Sorteos" />,
-    },
+    // {
+    //   value: "crear_sorteos",
+    //   label: <LotoIcons Logo={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU'} name="Crear Sorteos" />,
+    // },
   ];
 
   const posibles = ["cargar", "descargar","crear_sorteos"];

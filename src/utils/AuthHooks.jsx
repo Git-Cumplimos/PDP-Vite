@@ -27,6 +27,7 @@ const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
 const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
 const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
+const urlCiudad_dane= `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 
 
 export const AuthContext = createContext({
@@ -172,6 +173,15 @@ export const useProvideAuth = () => {
           {}
         );
 
+        const resp_ciudad = await fetchData(
+          urlCiudad_dane,
+          "GET",
+          {
+            c_digo_dane_del_municipio: suserInfo.codigo_dane,
+          },
+          {}
+        );
+
         console.log(resp_cod)
         if('msg' in resp_cod){
           setRoleInfo({
@@ -180,6 +190,7 @@ export const useProvideAuth = () => {
             
             quota: quota['cupo disponible'],
             comision: quota['comisiones'],
+            ciudad:resp_ciudad[0].municipio
           });
           
         }else{
@@ -191,6 +202,7 @@ export const useProvideAuth = () => {
             comision: quota['comisiones'],
             cod_oficina_lot: resp_cod.cod_oficina_lot,
             cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+            ciudad:resp_ciudad[0].municipio
           });
         }
 
@@ -225,6 +237,14 @@ export const useProvideAuth = () => {
           {}
         ).then((quota) => {
 
+         fetchData(
+            urlCiudad_dane,
+            "GET",
+            {
+              c_digo_dane_del_municipio: suserInfo.codigo_dane,
+            },
+            {}
+          ).then((resp_ciudad) => {
 
           fetchData(
             urlCod_loteria_oficina,
@@ -241,6 +261,7 @@ export const useProvideAuth = () => {
                 
                 quota: quota['cupo disponible'],
                 comision: quota['comisiones'],
+                ciudad:resp_ciudad[0].municipio
               });
             }else{
               setRoleInfo({
@@ -251,9 +272,10 @@ export const useProvideAuth = () => {
                 comision: quota['comisiones'],
                 cod_oficina_lot: resp_cod.cod_oficina_lot,
                 cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+                ciudad:resp_ciudad[0].municipio
               });
             }
-          });
+          });});
         }).catch(() => {});
       }).catch(() => {});
     }
@@ -352,6 +374,14 @@ export const useProvideAuth = () => {
             },
             {}
           );
+          const resp_ciudad = await fetchData(
+            urlCiudad_dane,
+            "GET",
+            {
+              c_digo_dane_del_municipio: suserInfo.codigo_dane,
+            },
+            {}
+          );
 
 
           const resp_cod = await fetchData(
@@ -371,6 +401,7 @@ export const useProvideAuth = () => {
               
               quota: quota['cupo disponible'],
               comision: quota['comisiones'],
+              ciudad:resp_ciudad[0].municipio,
             });
           }else{
             setRoleInfo({
@@ -381,6 +412,7 @@ export const useProvideAuth = () => {
               comision: quota['comisiones'],
               cod_oficina_lot: resp_cod.cod_oficina_lot,
               cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+              ciudad:resp_ciudad[0].municipio,
             });
           }
 

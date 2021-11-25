@@ -46,12 +46,12 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
     }).format(new Date(sellResponse.fecha_venta));
 
     voucherInfo["Nombre de loteria"] = sellResponse.nom_loteria;
-    voucherInfo.Comercio = roleInfo['nombre comercio'];
+    voucherInfo.Comercio = roleInfo.id_comercio;
     voucherInfo["Dirección"] = roleInfo.direccion;
     voucherInfo.Fracciones = sellResponse.fracciones;
     voucherInfo["Id Transacción"] = sellResponse.id_Transaccion;
     voucherInfo["Numero de billete"] = sellResponse.num_billete;
-    voucherInfo.telefono = roleInfo.telefono;
+    voucherInfo.ciudad = roleInfo.ciudad;
     voucherInfo.Serie = sellResponse.serie;
     voucherInfo["Valor pagado"] = sellResponse.valor_pago;
     voucherInfo.Id_registro = sellResponse['id registro'];

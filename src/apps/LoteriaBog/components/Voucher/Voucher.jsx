@@ -30,7 +30,7 @@ const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
       <div className="flex flex-col gap-2 px-2 text-xs text-left">
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">Comercio:</h1>
+            <h1 className="font-semibold">Id Comercio:</h1>
             <h1>{info.Comercio}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
@@ -40,12 +40,12 @@ const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">Direccion:</h1>
-            <h1>{info["Dirección"]}</h1>
+            <h1 className="font-semibold">Municipio:</h1>
+            <h1>{info.ciudad}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
-            <h1 className="font-semibold">Telefono:</h1>
-            <h1>{info.telefono}</h1>
+            <h1 className="font-semibold">Dirección:</h1>
+            <h1>{info.Dirección}</h1>
           </div>
         </div>
         <div className="flex flex-row justify-between w-full">
@@ -85,7 +85,7 @@ const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
         ***ORIGINAL***
       </h1>
       <h1 className="text-center my-3 text-xs font-normal">
-        Disclaimer
+        Para quejas o reclamos comuniquese al *num PDP*
       </h1>
     </div>
   );
