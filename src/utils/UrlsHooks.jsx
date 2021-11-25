@@ -74,11 +74,9 @@ export const useProvideUrls = () => {
       {
         link: "https://portal.solucionesenred.co/",
         label: <AppIcons Logo={SUSER} name="SUSER" />,
-        component: emptyComp,
         props: {},
         extern: true,
       },
-
       {
         link: "/loteria-de-bogota",
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
@@ -109,13 +107,6 @@ export const useProvideUrls = () => {
         exact: false,
         show: false,
         extern: false,
-      },
-      {
-        link: "/fundacion-mujer",
-        label: <AppIcons name="Fundacion de la mujer" />,
-        component: FunMujer,
-        props: {},
-        show: false,
       },
       {
         link: "/fundacion-mujer/:page",
