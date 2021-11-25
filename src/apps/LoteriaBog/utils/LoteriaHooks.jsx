@@ -16,6 +16,7 @@ const urls = {
   ventaOrdinario: `${process.env.REACT_APP_URL_LOTO_VENTA}/venta`,
   ventaOrdinariofisica: `${process.env.REACT_APP_URL_LOTO_VENTA}/ventafisica`,
   moda: `${process.env.REACT_APP_URL_LOTO_MODA}/consurepmasbusca`,
+  con_distribuidor_venta:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_distribuidores`,
   ventasReportes: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`,
   pagosReportes:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_pago_premios`,
   con_sort_ventas:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_sort_vendidos`,   
@@ -61,6 +62,7 @@ export const LoteriaContext = createContext({
     setFechaFinal: null,
   },
   searchModa: () => {},
+  con_distribuidor_venta: () => {},
   getReportesVentas: () => {},
   getReportesPagos: () => {},
   isWinner: () => {},
@@ -247,13 +249,15 @@ export const useProvideLoteria = () => {
         id_usuario: roleInfo.id_usuario,
         fisico:fisico,
         frac_fisico_venta:selecFrac,
-        frac_fisico_disponibles:selected?.Fracciones?.filter(el => !selecFrac?.includes(el)),
+        frac_fisico_disponibles:selected?.Fracciones,
+        frac_fisico_final:selected?.Fracciones?.filter(el => !selecFrac?.includes(el)),
         cod_dane:roleInfo.codigo_dane,
         tipo_comercio:roleInfo.tipo_comercio
       };
       
       try {
         const res = await fetchData(urls.ventaOrdinariofisica, "POST", {}, req);
+        console.log(res)
         setSellResponse(res);
       } catch (err) {
         setSellResponse(null);
@@ -298,42 +302,56 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-  const getReportesVentas = useCallback(async (sorteo) => {
+  const con_distribuidor_venta = useCallback(async () => {
+   
+    try {
+      const info = await fetchData(urls.con_distribuidor_venta, "GET", {});
+      console.log(info)    
+      return info;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const getReportesVentas = useCallback(async (sorteo,cod_distribuidor) => {
    
     let fisico=false
+    let distribuidor=roleInfo.cod_oficina_lot
       const sort = sorteo.split('-')
       if(sort[1]==='true'){
         fisico=true
+        distribuidor=cod_distribuidor
       }
-    
+      
     try {
       const info = await fetchData(urls.ventasReportes, "GET", {
         num_loteria:'02',////////////////////////////////////////
         sorteo:sort[0],
         fisico:fisico,
-        cod_distribuidor:roleInfo.cod_oficina_lot,
+        cod_distribuidor:distribuidor,
         cod_sucursal:roleInfo.cod_sucursal_lot, /////////////////////////////////////////////////
         cod_dane:roleInfo.codigo_dane
       });
      
-      const res = info[0];
-      if(fisico===true){
-        var str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n`;
-        for (const venta of res.Campo4) {
-          const line = venta.split("-").join("").concat("\n");
-          str = str.concat(line);
-        }
-      }else{
+      
+      console.log(info)
+      if('msg' in info){
+        return info;
+      }
+      else{
+        const res = info[0];
         var str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`
         for (const venta of res.Campo5) {
-          const line = venta.split("-").join("").concat("\n");
-          str = str.concat(line);
+            const line = venta.split("-").join("").concat("\n");
+            str = str.concat(line);
         }  
+        
+        
+        const data = new Blob([str], { type: "text/plain;charset=utf-8" });
+        const csv = window.URL.createObjectURL(data);
+        return {'archivo':csv};
       }
       
-      const data = new Blob([str], { type: "text/plain;charset=utf-8" });
-      const csv = window.URL.createObjectURL(data);
-      return csv;
     } catch (err) {
       console.error(err);
     }
@@ -564,6 +582,7 @@ export const useProvideLoteria = () => {
       setFechaFinal,
     },
     searchModa,
+    con_distribuidor_venta,
     getReportesVentas,
     getReportesPagos,
     isWinner,

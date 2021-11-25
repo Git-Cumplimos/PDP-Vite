@@ -4,6 +4,7 @@ import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import { useLoteria } from "../utils/LoteriaHooks";
 import Select from "../../../components/Base/Select/Select";
 import Form from "../../../components/Base/Form/Form";
+import { toast } from "react-toastify";
 
 const DescargarArchivos = () => {
   const [downloadRef, setDownloadRef] = useState("");
@@ -11,9 +12,15 @@ const DescargarArchivos = () => {
   const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
     { value: "", label: "" },
   ]);
+  
+  const [opcionesdistri, SetOpcionesDistri] = useState([
+    { value: "", label: "" },
+  ]);
+  
+  const [distribuidor, setDistribuidor] = useState("");
   const [sorteo, setSorteo] = useState("");
 
-  const { getReportesVentas, con_sort_ventas, getReportesPagos} = useLoteria();
+  const { getReportesVentas, con_sort_ventas, getReportesPagos, con_distribuidor_venta} = useLoteria();
   const [disabled_Btn, setDisabled_Btn] = useState(true)
 
   useEffect(() => {
@@ -40,21 +47,55 @@ const DescargarArchivos = () => {
       }
       SetOpcionesDisponibles([...copy]);
     });
+
+    con_distribuidor_venta().then((res) => {
+      
+      const copy2 = [...opcionesdisponibles];
+      if (copy2.length === 1) {
+        console.log(res.info)
+        for (var i = 0; i < res?.info?.length; i++) {
+          
+            copy2.push({
+              value: `${res.info[i]}`,
+              label: `${res.info[i]}`,
+            });
+        }
+      }
+      SetOpcionesDistri([...copy2]);
+    });    
   }, []);
 
   const onSubmit = (e) => {
     e.preventDefault();
+    
     setDisabled_Btn(false)
-    getReportesVentas(e.target.value).then((res) => {
-      setDownloadRef(res);
+    getReportesVentas(sorteo,e.target.value).then((res) => {
       console.log(res)
-
+      if('msg' in res){
+        notifyError(res.msg);
+        setDownloadRef(res.msg);
+      }else{
+      setDownloadRef(res.archivo);
+      console.log(res)
+      }
    });
   };
   
   const disabled = (e) =>{
     setDisabled_Btn(true)
   }
+
+  const notifyError = (msg) => {
+    toast.error(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
 
   return (
@@ -68,9 +109,22 @@ const DescargarArchivos = () => {
           value={sorteo}
           onChange={(e) => {
             setSorteo(e.target.value);
-            onSubmit(e)
+            
           }}
         />
+        {sorteo!==''?
+        <Select
+        id="selectDistribuidor"
+        label="Distribuidor"
+        options={opcionesdistri}
+        required={true}
+        value={distribuidor}
+        onChange={(e) => {
+          setDistribuidor(e.target.value);
+          onSubmit(e);
+        }}
+        />:""}
+        
         {!disabled_Btn?
         <ButtonBar>
         <Button type="button" onClick={() => {
@@ -79,7 +133,7 @@ const DescargarArchivos = () => {
             }}>
           <a
           href={downloadRef}
-          download={`Reporte_ventas-${sorteo}-${new Date().toLocaleDateString()}-${new Date().toLocaleTimeString()}.txt`}
+          download={`Reporte_ventas-${sorteo}-${distribuidor}-${new Date().toLocaleDateString()}-${new Date().toLocaleTimeString()}.txt`}
           target="_blank"
           rel="noreferrer" 
         >
@@ -87,9 +141,10 @@ const DescargarArchivos = () => {
         </a>          
         </Button>
         </ButtonBar> : ''}
-        <ButtonBar>
+        {/* <ButtonBar>
         <Button type="button" onClick={() => {
               disabled();
+              onsubmit();
             
             }}>
           <a
@@ -101,7 +156,7 @@ const DescargarArchivos = () => {
           Descargar archivo pagos
         </a>          
         </Button>
-        </ButtonBar>
+        </ButtonBar> */}
 
       </Form>
     </div>

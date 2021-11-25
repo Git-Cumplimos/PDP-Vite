@@ -128,7 +128,8 @@ const UsersForm = ({
 
   const details = {
     "Nombre:": respConsulta ? respConsulta['nombre'] : "",
-    "Identificación:": respConsulta ? respConsulta['identificacion'] : "",  
+    "Identificación:": respConsulta ? respConsulta['identificacion'] : "",
+    "Correo:": respConsulta ? respConsulta['email'] : "",  
   };
 
   
@@ -139,7 +140,7 @@ const UsersForm = ({
       <div className="flex flex-col justify-center items-center mx-auto container">
         {respConsulta?
         <>
-        <div className="flex flex-col w-1/2 mx-auto">
+        <div className="flex flex-col  mx-auto">
         {Object.entries(details).map(([key, val]) => {
           return (
             <div
@@ -153,16 +154,7 @@ const UsersForm = ({
         })}
         </div>
         <Form  onSubmit={cambiar} grid>
-        <Input
-            id="email"
-            label="Correo:"
-            type="text"
-            required={true}
-            value={email_cambio}
-            onInput={(e) => {
-            setEmail_cambio(e.target.value);              
-            }}
-          />
+        
           <Input
             id="direccion"
             label="Dirección:"

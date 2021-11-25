@@ -13,6 +13,9 @@ import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
 
+
+
+
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
 // const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
@@ -23,7 +26,9 @@ const urlcrearRol = `${process.env.REACT_APP_URL_USRS}/crear_rol`;
 const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
 const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
 const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
-// const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
+const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
+const urlCiudad_dane= `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
+
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -43,7 +48,6 @@ export const AuthContext = createContext({
   consulta_usuarios: () => {},
   cambiar_rol: () => {},
   checkUser: () => {},
-  parameters: null,
 });
 
 export const useAuth = () => {
@@ -64,6 +68,8 @@ export const useProvideAuth = () => {
   const [roles_disponibles, setRoles_disponibles] = useState(null);
 
   const [qr, setQr] = useState("");
+
+  const [username, setUsername] = useState("");
 
   const [parameters, setParameters] = useState("");
 
@@ -133,25 +139,11 @@ export const useProvideAuth = () => {
     []
   );
 
-  const handleSetupTOTP = useCallback(async (user) => {
-    try {
-      const validartoken = await Auth.setupTOTP(user);
-      const str =
-        "otpauth://totp/AWSCognito:" +
-        cognitoUser?.username +
-        "?secret=" +
-        validartoken +
-        "&issuer=" +
-        "Punto de Pago Multibanco";
-      setQr(str);
-    } catch (err) {}
-  }, [cognitoUser?.username]);
-
   const setUser = useCallback(async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
       setCognitoUser(user);
-
+      
       if (user) setSignedIn(true);
       const usrInfo = await Auth.currentUserInfo();
       setUserInfo(usrInfo);
@@ -172,42 +164,48 @@ export const useProvideAuth = () => {
           {}
         );
 
-        setRoleInfo({
-          role: suserInfo.rol,
-          ...suserInfo,
+        const resp_cod = await fetchData(
+          urlCod_loteria_oficina,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+          },
+          {}
+        );
 
-          quota: quota["cupo disponible"],
-          comision: quota["comisiones"],
-        });
+        const resp_ciudad = await fetchData(
+          urlCiudad_dane,
+          "GET",
+          {
+            c_digo_dane_del_municipio: suserInfo.codigo_dane,
+          },
+          {}
+        );
 
-        // const resp_cod = await fetchData(
-        //   urlCod_loteria_oficina,
-        //   "GET",
-        //   {
-        //     id_comercio: suserInfo.id_comercio,
-        //   },
-        //   {}
-        // );
+        console.log(resp_cod)
+        if('msg' in resp_cod){
+          setRoleInfo({
+            
+            ...suserInfo,
+            
+            quota: quota['cupo disponible'],
+            comision: quota['comisiones'],
+            ciudad:resp_ciudad[0].municipio
+          });
+          
+        }else{
+          setRoleInfo({
+            
+            ...suserInfo,
+            
+            quota: quota['cupo disponible'],
+            comision: quota['comisiones'],
+            cod_oficina_lot: resp_cod.cod_oficina_lot,
+            cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+            ciudad:resp_ciudad[0].municipio
+          });
+        }
 
-        // if ("msg" in resp_cod) {
-        //   setRoleInfo({
-        //     role: suserInfo.rol,
-        //     ...suserInfo,
-
-        //     quota: quota["cupo disponible"],
-        //     comision: quota["comisiones"],
-        //   });
-        // } else {
-        //   setRoleInfo({
-        //     role: suserInfo.rol,
-        //     ...suserInfo,
-
-        //     quota: quota["cupo disponible"],
-        //     comision: quota["comisiones"],
-        //     cod_oficina_lot: resp_cod.cod_oficina_lot,
-        //     cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-        //   });
-        // }
       }
     } catch (err) {
       setSignedIn(false);
@@ -221,74 +219,73 @@ export const useProvideAuth = () => {
     } else {
       setSignedIn(true);
       setCognitoUser(Auth.user);
-      Auth.currentUserInfo()
-        .then((usr) => setUserInfo(usr))
-        .catch(() => {});
+      Auth.currentUserInfo().then((usr) => setUserInfo(usr)).catch(() => {});
 
-      fetchData(urlLog, "GET", { correo: Auth.user?.attributes?.email }, {})
-        .then((suserInfo) => {
+      fetchData(
+        urlLog,
+        "GET",
+        { correo: Auth.user?.attributes?.email },
+        {}
+      ).then((suserInfo) => {
+        fetchData(
+          urlQuota,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+            id_dispositivo: suserInfo.id_dispositivo,
+          },
+          {}
+        ).then((quota) => {
+
+         fetchData(
+            urlCiudad_dane,
+            "GET",
+            {
+              c_digo_dane_del_municipio: suserInfo.codigo_dane,
+            },
+            {}
+          ).then((resp_ciudad) => {
+
           fetchData(
-            urlQuota,
+            urlCod_loteria_oficina,
             "GET",
             {
               id_comercio: suserInfo.id_comercio,
-              id_dispositivo: suserInfo.id_dispositivo,
             },
             {}
-          )
-            .then((quota) => {
+          ).then((resp_cod) => {
+            if('msg' in resp_cod){
               setRoleInfo({
-                role: suserInfo.rol,
+                
                 ...suserInfo,
-
-                quota: quota["cupo disponible"],
-                comision: quota["comisiones"],
+                
+                quota: quota['cupo disponible'],
+                comision: quota['comisiones'],
+                ciudad:resp_ciudad[0].municipio
               });
-              // fetchData(
-              //   urlCod_loteria_oficina,
-              //   "GET",
-              //   {
-              //     id_comercio: suserInfo.id_comercio,
-              //   },
-              //   {}
-              // )
-              //   .then((resp_cod) => {
-              //     if ("msg" in resp_cod) {
-              //       setRoleInfo({
-              //         role: suserInfo.rol,
-              //         ...suserInfo,
-
-              //         quota: quota["cupo disponible"],
-              //         comision: quota["comisiones"],
-              //       });
-              //     } else {
-              //       setRoleInfo({
-              //         role: suserInfo.rol,
-              //         ...suserInfo,
-
-              //         quota: quota["cupo disponible"],
-              //         comision: quota["comisiones"],
-              //         cod_oficina_lot: resp_cod.cod_oficina_lot,
-              //         cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-              //       });
-              //     }
-              //   })
-              //   .catch(() => {});
-            })
-            .catch(() => {});
-        })
-        .catch(() => {});
+            }else{
+              setRoleInfo({
+                
+                ...suserInfo,
+                
+                quota: quota['cupo disponible'],
+                comision: quota['comisiones'],
+                cod_oficina_lot: resp_cod.cod_oficina_lot,
+                cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+                ciudad:resp_ciudad[0].municipio
+              });
+            }
+          });});
+        }).catch(() => {});
+      }).catch(() => {});
     }
-  }, [setUser]);
+  }, [setUser,]);
 
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
-    // consulta_roles();
+    consulta_roles();
     checkUser();
-    if (cognitoUser?.challengeName === "MFA_SETUP") {
-      handleSetupTOTP(cognitoUser);
-    }
-  }, [checkUser, consulta_roles, cognitoUser, handleSetupTOTP]);
+  }, [checkUser, consulta_roles]);
 
   const history = useHistory();
   const { state, pathname } = useLocation();
@@ -304,6 +301,18 @@ export const useProvideAuth = () => {
       throw err;
     }
   }, []);
+
+  const handleSetupTOTP = useCallback(
+    async (user) => {
+      try {
+        const validartoken = await Auth.setupTOTP(user);
+        const str =
+          "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
+        setQr(str);
+      } catch (err) {}
+    },
+    [username]
+  );
 
   const handleChangePass = useCallback(
     async (
@@ -327,7 +336,7 @@ export const useProvideAuth = () => {
         );
         setCognitoUser(loggedUser);
         if (loggedUser.challengeName === "MFA_SETUP") {
-          await handleSetupTOTP(loggedUser);
+          handleSetupTOTP(loggedUser);
         }
       } catch (err) {
         throw err;
@@ -335,17 +344,6 @@ export const useProvideAuth = () => {
     },
     [handleSetupTOTP]
   );
-
-  const signOut = useCallback(() => {
-    Auth.signOut()
-      .then(() => {
-        setCognitoUser(null);
-        setSignedIn(false);
-        setRoleInfo({});
-        history.push("/login");
-      })
-      .catch(() => {});
-  }, [history]);
 
   const confirmSignIn = useCallback(
     async (totp) => {
@@ -359,81 +357,92 @@ export const useProvideAuth = () => {
         setSignedIn(true);
         const usrInfo = await Auth.currentUserInfo();
         setUserInfo(usrInfo);
-        try {
-          if (usrInfo?.attributes?.email) {
-            const suserInfo = await fetchData(
-              urlLog,
-              "GET",
-              { correo: usrInfo?.attributes?.email },
-              {}
-            );
+        if (usrInfo?.attributes?.email) {
+          const suserInfo = await fetchData(
+            urlLog,
+            "GET",
+            { correo: usrInfo?.attributes?.email },
+            {}
+          );
 
-            const quota = await fetchData(
-              urlQuota,
-              "GET",
-              {
-                id_comercio: suserInfo.id_comercio,
-                id_dispositivo: suserInfo.id_dispositivo,
-              },
-              {}
-            );
+          const quota = await fetchData(
+            urlQuota,
+            "GET",
+            {
+              id_comercio: suserInfo.id_comercio,
+              id_dispositivo: suserInfo.id_dispositivo,
+            },
+            {}
+          );
+          const resp_ciudad = await fetchData(
+            urlCiudad_dane,
+            "GET",
+            {
+              c_digo_dane_del_municipio: suserInfo.codigo_dane,
+            },
+            {}
+          );
 
+
+          const resp_cod = await fetchData(
+            urlCod_loteria_oficina,
+            "GET",
+            {
+              id_comercio: suserInfo.id_comercio,
+            },
+            {}
+          );
+  
+  
+          if('msg' in resp_cod){
             setRoleInfo({
-              role: suserInfo.rol,
+              
               ...suserInfo,
-
-              quota: quota["cupo disponible"],
-              comision: quota["comisiones"],
+              
+              quota: quota['cupo disponible'],
+              comision: quota['comisiones'],
+              ciudad:resp_ciudad[0].municipio,
             });
-
-            // const resp_cod = await fetchData(
-            //   urlCod_loteria_oficina,
-            //   "GET",
-            //   {
-            //     id_comercio: suserInfo.id_comercio,
-            //   },
-            //   {}
-            // );
-
-            // if ("msg" in resp_cod) {
-            //   setRoleInfo({
-            //     role: suserInfo.rol,
-            //     ...suserInfo,
-
-            //     quota: quota["cupo disponible"],
-            //     comision: quota["comisiones"],
-            //   });
-            // } else {
-            //   setRoleInfo({
-            //     role: suserInfo.rol,
-            //     ...suserInfo,
-
-            //     quota: quota["cupo disponible"],
-            //     comision: quota["comisiones"],
-            //     cod_oficina_lot: resp_cod.cod_oficina_lot,
-            //     cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-            //   });
-            // }
+          }else{
+            setRoleInfo({
+              
+              ...suserInfo,
+              
+              quota: quota['cupo disponible'],
+              comision: quota['comisiones'],
+              cod_oficina_lot: resp_cod.cod_oficina_lot,
+              cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+              ciudad:resp_ciudad[0].municipio,
+            });
           }
-        } catch (err) {}
-        history.push(state?.from || pathname === "/login" ? "/" : pathname);
+
+        }
+        history.push(
+          state ? state.from : pathname === "/login" ? "/" : pathname
+        );
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
           setCognitoUser(null);
-          setSignedIn(false);
-          signOut();
         }
         throw err;
       }
     },
-    [cognitoUser, history, state, pathname, signOut]
+    [cognitoUser, history, state, pathname]
   );
+
+  const signOut = useCallback(() => {
+    Auth.signOut().then(() => {
+      setCognitoUser(null);
+      setSignedIn(false);
+      setRoleInfo({});
+      history.push("/login");
+    }).catch(() => {});
+  }, [history]);
 
   const handlesetPreferredMFA = useCallback(
     async (totp) => {
       try {
         const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
-        signOut();
         if (preferredMFA === "SUCCESS") {
           await confirmSignIn(totp);
         }
@@ -441,7 +450,7 @@ export const useProvideAuth = () => {
         throw new Error(err);
       }
     },
-    [cognitoUser, confirmSignIn, signOut]
+    [cognitoUser, confirmSignIn]
   );
 
   const handleverifyTotpToken = useCallback(
@@ -450,33 +459,31 @@ export const useProvideAuth = () => {
         const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
         if (tokenValidado.accessToken.payload.token_use === "access") {
           await handlesetPreferredMFA(totp);
-          history.push("/login");
         }
       } catch (err) {
         throw new Error(err);
       }
     },
-    [cognitoUser, handlesetPreferredMFA, history]
+    [cognitoUser, handlesetPreferredMFA]
   );
 
   const getQuota = useCallback(async () => {
     const tempRole = { ...roleInfo };
-    try {
-      const quota = await fetchData(
-        urlQuota,
-        "GET",
-        {
-          id_comercio: roleInfo.id_comercio,
-          id_dispositivo: roleInfo.id_dispositivo,
-        },
-        {}
-      );
-      tempRole.quota = quota["cupo disponible"];
-      tempRole.comision = quota["comisiones"];
-    } catch (err) {}
+    const quota = await fetchData(
+      urlQuota,
+      "GET",
+      {
+        id_comercio: roleInfo.id_comercio,
+        id_dispositivo: roleInfo.id_dispositivo,
+      },
+      {}
+    );
+    tempRole.quota = quota["cupo disponible"];
+    tempRole.comision = quota["comisiones"];
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
 
+  console.log(roleInfo)
   return {
     handleverifyTotpToken,
     handleChangePass,

@@ -64,61 +64,83 @@ const CrearRoles = () => {
     }
   };
 
-  const signUp = async (
-    pnombre,
-    snombre,
-    papellido,
-    sapellido,
-    correo,
-    identificacion,
-    telefono
-  ) => {
-    const username = correo;
-    const password = "Cumplimos2021."; ///////////////////////
-    const email = correo;
-    const phone_number = "+57" + telefono;
-    const family_name = papellido + sapellido;
-    const name = pnombre + " " + snombre;
-    const given_name = "";
-    const middle_name = "";
 
-    try {
-      const loggedUser = await Auth.signUp({
-        username,
-        password,
-        attributes: {
-          email,
-          phone_number,
-          family_name,
-          name,
-          given_name,
-          middle_name,
-        },
-      });
-      console.log(loggedUser);
-      console.log("successfully signed up!");
+    const signUp=async(
+      pnombre,
+      snombre,
+      papellido,
+      sapellido,
+      correo,
+      identificacion,
+      telefono
+      )=>{
+        const username=correo
+        const password='Cumplimos2021*' ///////////////////////
+        const email=correo
+        const phone_number='+57'+telefono
+        const family_name=papellido + sapellido
+        const name=pnombre +" "+ snombre
+        const given_name= ""
+        const middle_name= ""
 
-      crearRol(
-        pnombre,
-        snombre,
-        papellido,
-        sapellido,
-        roles,
-        email,
-        identificacion,
-        telefono,
-        direccion_residencia
-      ).then((res) => {
-        if (res.msg === "Usuario creado exitosamente") {
-          notify(res.msg);
-          //signUp(pnombre,snombre,papellido,sapellido,roles,email,identificacion,telefono);
-        } else {
-          notifyError(res.msg);
-        }
-      });
-    } catch (err) {
-      console.log("error signUp: ", err);
-      notifyError("El correo ya existe");
+        try{
+            const loggedUser = await Auth.signUp({
+                username,
+                password,
+                attributes:{
+                    email,
+                    phone_number,
+                    family_name,
+                    name,
+                    given_name,
+                    middle_name,
+            }});
+            console.log(loggedUser)
+            console.log('successfully signed up!')
+            notify('Usuario creado exitosamente en cognito')
+            
+            crearRol(pnombre,
+              snombre,
+              papellido,
+              sapellido,
+              roles,
+              email,
+              identificacion,
+              telefono,
+              direccion_residencia
+              ).then((res) => {
+                if(res.msg==='Usuario creado exitosamente'){
+                    notify(res.msg) 
+                    //signUp(pnombre,snombre,papellido,sapellido,roles,email,identificacion,telefono);
+                }                
+                    
+                else{
+                    notifyError(res.msg)
+                }      
+            });
+
+        }catch(err){console.log('error signUp: ',err);
+                    crearRol(
+                      pnombre,
+                      snombre,
+                      papellido,
+                      sapellido,
+                      roles,
+                      email,
+                      identificacion,
+                      telefono,
+                      direccion_residencia
+                      ).then((res) => {
+                        if(res.msg==='Usuario creado exitosamente'){
+                            notify(res.msg) 
+                            //signUp(pnombre,snombre,papellido,sapellido,roles,email,identificacion,telefono);
+                        }           
+                        else{
+                            notifyError(res.msg)
+                        }      
+                    });
+                    notifyError('El correo ya existe en cognito')
+
     }
   };
 
