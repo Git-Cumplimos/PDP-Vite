@@ -1,6 +1,13 @@
 import classes from "./Voucher.module.css";
 import LogoPDP from "../../../../components/Base/LogoPDP/LogoPDP";
 
+
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
+
 const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
   const { divPrint } = classes;
 
@@ -76,7 +83,7 @@ const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
         <div className="flex flex-row justify-center w-full">
           <div className="flex flex-row justify-center flex-auto gap-2">
             <h1 className="font-semibold">Valor pago:</h1>
-            <h1>{info["Valor pagado"]}</h1>
+            <h1>{formatMoney.format(info["Valor pagado"])}</h1>
           </div>
         </div>
       </div>

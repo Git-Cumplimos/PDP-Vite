@@ -79,11 +79,11 @@ export const useProvideUrls = () => {
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
 
         component:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.id_comercio=== 2
             ? LoteriaBog
             : emptyComp,
         props: {},
-        show: roleInfo?.tipo_comercio === "OFICINAS PROPIAS", ///////////////////////////////
+        show: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.id_comercio=== 2, ///////////////////////////////
         extern: false,
       },
       {
@@ -97,7 +97,7 @@ export const useProvideUrls = () => {
       {
         link: "/loteria-de-bogota/:page",
         component:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.id_comercio=== 2
             ? LoteriaBog
             : emptyComp,
         props: {},

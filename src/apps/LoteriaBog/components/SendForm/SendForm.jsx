@@ -4,6 +4,12 @@ import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
 import { useState, useEffect } from "react";
 
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
+
 const SendForm = ({
   sorteo,
   selecFrac,
@@ -16,7 +22,7 @@ const SendForm = ({
   handleSubmit,
 }) => {
   const details = {
-    "Valor por fraccion": selected ? selected.Valor_fraccion : "",
+    "Valor por fraccion": selected ? formatMoney.format(selected.Valor_fraccion) : "",
     Numero: selected ? selected.Num_billete : "",
     Serie: selected ? selected.serie : "",
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
