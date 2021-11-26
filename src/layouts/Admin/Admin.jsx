@@ -53,7 +53,9 @@ const Admin = () => {
               </Route>
             );
           })}
-         
+          <Route path="*">
+            <h1 className="text-4xl text-center mt-8">404 Not found</h1>
+          </Route>
         </Switch>
       </main>
     </div>
