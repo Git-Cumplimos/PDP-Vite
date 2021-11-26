@@ -193,6 +193,11 @@ const Transacciones = () => {
           <Table
             headers={["Fecha", "operacion", "Monto"]}
             data={trxs.map(({ Created_at, Tipo_operacion, Monto }) => {
+              Created_at = Intl.DateTimeFormat("es-CO", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+              }).format(new Date(Created_at));
               return {
                 Created_at,
                 Tipo_operacion,
