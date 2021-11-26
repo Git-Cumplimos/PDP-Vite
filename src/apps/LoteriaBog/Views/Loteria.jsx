@@ -144,7 +144,7 @@ const Loteria = ({
           }}
           onLazyInput={{
             callback: (e) => {
-              const num = parseInt(e.target.value) || "";
+              const num = !isNaN(e.target.value)? e.target.value : "";
               setPage(1);
               {sorteo.split('-')[1]==='true'? 
               searchLoteriafisica(sorteo, num, serie, 1).then((max) => {
@@ -178,10 +178,10 @@ const Loteria = ({
           }}
           onLazyInput={{
             callback: (e) => {
-              const num = parseInt(e.target.value) || "";
+              const num =!isNaN(e.target.value)? e.target.value : "";
               setPage(1);
               {sorteo.split('-')[1]==='true'? 
-              searchLoteriafisica(sorteo, num, serie, 1).then((max) => {
+              searchLoteriafisica(sorteo, numero, num, 1).then((max) => {
                 if (max !== undefined) {
                   setMaxPages(Math.ceil(max / 10));
                 }
