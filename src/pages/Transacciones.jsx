@@ -215,7 +215,7 @@ const Transacciones = () => {
             <Tickets
               refPrint={printDiv}
               type="Reimpresión"
-              /* ticket={selected?.Ticket} */
+              ticket={selected?.Ticket}
             />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>

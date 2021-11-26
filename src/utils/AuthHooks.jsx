@@ -25,6 +25,8 @@ const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario
 const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
+const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;
+
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -44,6 +46,7 @@ export const AuthContext = createContext({
   consulta_usuarios: () => {},
   cambiar_rol: () => {},
   checkUser: () => {},
+  infoTicket: () => {},
 });
 
 export const useAuth = () => {
@@ -65,7 +68,7 @@ export const useProvideAuth = () => {
 
   const [qr, setQr] = useState("");
 
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("CERT");
 
   const [parameters, setParameters] = useState("");
 
@@ -77,6 +80,26 @@ export const useProvideAuth = () => {
     } catch (err) {}
   }, []);
 
+
+  const infoTicket = useCallback(
+    async (id_trx,Tipo_operacion,ticket) => {
+      const get={
+        id_trx:id_trx,
+        Tipo_operacion:Tipo_operacion
+      }
+      const post={Ticket:ticket}
+      
+      try {
+        const res = await fetchData(urlInfoTicket, "PUT", get, post);
+        console.log(res)
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
+
   const consulta_usuarios = useCallback(async (email) => {
     try {
       const res = await fetchData(urlconsulta_usuarios, "GET", {
@@ -87,36 +110,36 @@ export const useProvideAuth = () => {
     } catch (err) {}
   }, []);
 
-  const crearRol = useCallback(
-    async (
-      pnombre,
-      snombre,
-      papellido,
-      sapellido,
-      rol,
-      email,
-      identificacion,
-      telefono,
-      direccion_residencia
-    ) => {
-      const req = {
-        nombre: `${pnombre} ${snombre} ${papellido} ${sapellido}`,
-        rol: rol,
-        email: email,
-        identificacion: identificacion,
-        telefono: telefono,
-        direccion_residencia: direccion_residencia,
-      };
-      try {
-        const res = await fetchData(urlcrearRol, "POST", {}, req);
-        setCrearRolresp(res);
-        return res;
-      } catch (err) {
-        setCrearRolresp(null);
-      }
-    },
-    []
-  );
+  // const crearRol = useCallback(
+  //   async (
+  //     pnombre,
+  //     snombre,
+  //     papellido,
+  //     sapellido,
+  //     rol,
+  //     email,
+  //     identificacion,
+  //     telefono,
+  //     direccion_residencia
+  //   ) => {
+  //     const req = {
+  //       nombre: `${pnombre} ${snombre} ${papellido} ${sapellido}`,
+  //       rol: rol,
+  //       email: email,
+  //       identificacion: identificacion,
+  //       telefono: telefono,
+  //       direccion_residencia: direccion_residencia,
+  //     };
+  //     try {
+  //       const res = await fetchData(urlcrearRol, "POST", {}, req);
+  //       setCrearRolresp(res);
+  //       return res;
+  //     } catch (err) {
+  //       setCrearRolresp(null);
+  //     }
+  //   },
+  //   []
+  // );
 
   const cambiar_rol = useCallback(
     async (rol, email, email_cambio, telefono_cambio, direccion_residencia) => {
@@ -150,7 +173,7 @@ export const useProvideAuth = () => {
           { correo: usrInfo?.attributes?.email },
           {}
         );
-        console.log(suserInfo)
+        console.log(suserInfo);
         const quota = await fetchData(
           urlQuota,
           "GET",
@@ -216,7 +239,7 @@ export const useProvideAuth = () => {
 
       fetchData(urlLog, "GET", { correo: Auth.user?.attributes?.email }, {})
         .then((suserInfo) => {
-          console.log(suserInfo)
+          console.log(suserInfo);
           fetchData(
             urlQuota,
             "GET",
@@ -278,6 +301,22 @@ export const useProvideAuth = () => {
     checkUser();
   }, [checkUser, consulta_roles]);
 
+  useEffect(async () => {
+    if (cognitoUser?.challengeName === "MFA_SETUP") {
+      try {
+        const validartoken = await Auth.setupTOTP(cognitoUser);
+        const str =
+          "otpauth://totp/AWSCognito:" +
+          username +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
+        setQr(str);
+      } catch (err) {}
+    }
+  }, [cognitoUser]);
+
   const history = useHistory();
   const { state, pathname } = useLocation();
 
@@ -298,7 +337,12 @@ export const useProvideAuth = () => {
       try {
         const validartoken = await Auth.setupTOTP(user);
         const str =
-          "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
+          "otpauth://totp/AWSCognito:" +
+          username +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
         setQr(str);
       } catch (err) {}
     },
@@ -355,7 +399,7 @@ export const useProvideAuth = () => {
             { correo: usrInfo?.attributes?.email },
             {}
           );
-          console.log(suserInfo)
+          console.log(suserInfo);
           const quota = await fetchData(
             urlQuota,
             "GET",
@@ -486,12 +530,13 @@ export const useProvideAuth = () => {
     confirmSignIn,
     signOut,
     getQuota,
-    crearRol,
+    // crearRol,
     consulta_roles,
     consulta_usuarios,
     cambiar_rol,
     checkUser,
     qr,
     parameters,
+    infoTicket,
   };
 };
