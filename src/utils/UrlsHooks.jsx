@@ -71,6 +71,7 @@ export const useProvideUrls = () => {
         link: "/suser",
         label: <AppIcons Logo={SUSER} name="SUSER" />,
         props: {},
+        extern: true,
       },
       {
         link: "/loteria-de-bogota",
@@ -122,7 +123,6 @@ export const useProvideUrls = () => {
         label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
         component: Transacciones,
         props: {},
-        show: false,
         extern: false,
       },
       {

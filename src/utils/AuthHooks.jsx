@@ -13,9 +13,6 @@ import fetchData from "./fetchData";
 
 const logger = new Logger("withAuthenticator");
 
-
-
-
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
 // const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
@@ -27,8 +24,7 @@ const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
 const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
 const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
-const urlCiudad_dane= `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
-
+const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -143,7 +139,7 @@ export const useProvideAuth = () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
       setCognitoUser(user);
-      
+
       if (user) setSignedIn(true);
       const usrInfo = await Auth.currentUserInfo();
       setUserInfo(usrInfo);
@@ -154,21 +150,13 @@ export const useProvideAuth = () => {
           { correo: usrInfo?.attributes?.email },
           {}
         );
+        console.log(suserInfo)
         const quota = await fetchData(
           urlQuota,
           "GET",
           {
             id_comercio: suserInfo.id_comercio,
             id_dispositivo: suserInfo.id_dispositivo,
-          },
-          {}
-        );
-
-        const resp_cod = await fetchData(
-          urlCod_loteria_oficina,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
           },
           {}
         );
@@ -182,30 +170,33 @@ export const useProvideAuth = () => {
           {}
         );
 
-        console.log(resp_cod)
-        if('msg' in resp_cod){
+        setRoleInfo({
+          ...suserInfo,
+          quota: quota["cupo disponible"],
+          comision: quota["comisiones"],
+          ciudad: resp_ciudad[0].municipio,
+        });
+
+        const resp_cod = await fetchData(
+          urlCod_loteria_oficina,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+          },
+          {}
+        );
+
+        console.log(resp_cod);
+        if (!("msg" in resp_cod)) {
           setRoleInfo({
-            
             ...suserInfo,
-            
-            quota: quota['cupo disponible'],
-            comision: quota['comisiones'],
-            ciudad:resp_ciudad[0].municipio
-          });
-          
-        }else{
-          setRoleInfo({
-            
-            ...suserInfo,
-            
-            quota: quota['cupo disponible'],
-            comision: quota['comisiones'],
+            quota: quota["cupo disponible"],
+            comision: quota["comisiones"],
             cod_oficina_lot: resp_cod.cod_oficina_lot,
             cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-            ciudad:resp_ciudad[0].municipio
+            ciudad: resp_ciudad[0].municipio,
           });
         }
-
       }
     } catch (err) {
       setSignedIn(false);
@@ -219,67 +210,67 @@ export const useProvideAuth = () => {
     } else {
       setSignedIn(true);
       setCognitoUser(Auth.user);
-      Auth.currentUserInfo().then((usr) => setUserInfo(usr)).catch(() => {});
+      Auth.currentUserInfo()
+        .then((usr) => setUserInfo(usr))
+        .catch(() => {});
 
-      fetchData(
-        urlLog,
-        "GET",
-        { correo: Auth.user?.attributes?.email },
-        {}
-      ).then((suserInfo) => {
-        fetchData(
-          urlQuota,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
-            id_dispositivo: suserInfo.id_dispositivo,
-          },
-          {}
-        ).then((quota) => {
-
-         fetchData(
-            urlCiudad_dane,
-            "GET",
-            {
-              c_digo_dane_del_municipio: suserInfo.codigo_dane,
-            },
-            {}
-          ).then((resp_ciudad) => {
-
+      fetchData(urlLog, "GET", { correo: Auth.user?.attributes?.email }, {})
+        .then((suserInfo) => {
+          console.log(suserInfo)
           fetchData(
-            urlCod_loteria_oficina,
+            urlQuota,
             "GET",
             {
               id_comercio: suserInfo.id_comercio,
+              id_dispositivo: suserInfo.id_dispositivo,
             },
             {}
-          ).then((resp_cod) => {
-            if('msg' in resp_cod){
-              setRoleInfo({
-                
-                ...suserInfo,
-                
-                quota: quota['cupo disponible'],
-                comision: quota['comisiones'],
-                ciudad:resp_ciudad[0].municipio
-              });
-            }else{
-              setRoleInfo({
-                
-                ...suserInfo,
-                
-                quota: quota['cupo disponible'],
-                comision: quota['comisiones'],
-                cod_oficina_lot: resp_cod.cod_oficina_lot,
-                cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-                ciudad:resp_ciudad[0].municipio
-              });
-            }
-          });});
-        }).catch(() => {});
-      }).catch(() => {});
+          )
+            .then((quota) => {
+              fetchData(
+                urlCiudad_dane,
+                "GET",
+                {
+                  c_digo_dane_del_municipio: suserInfo.codigo_dane,
+                },
+                {}
+              )
+                .then((resp_ciudad) => {
+                  fetchData(
+                    urlCod_loteria_oficina,
+                    "GET",
+                    {
+                      id_comercio: suserInfo.id_comercio,
+                    },
+                    {}
+                  )
+                    .then((resp_cod) => {
+                      setRoleInfo({
+                        ...suserInfo,
+                        quota: quota["cupo disponible"],
+                        comision: quota["comisiones"],
+                        ciudad: resp_ciudad[0].municipio,
+                      });
+                      if (!("msg" in resp_cod)) {
+                        setRoleInfo({
+                          ...suserInfo,
+                          quota: quota["cupo disponible"],
+                          comision: quota["comisiones"],
+                          cod_oficina_lot: resp_cod.cod_oficina_lot,
+                          cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+                          ciudad: resp_ciudad[0].municipio,
+                        });
+                      }
+                    })
+                    .catch(() => {});
+                })
+                .catch(() => {});
+            })
+            .catch(() => {});
+        })
+        .catch(() => {});
     }
-  }, [setUser,]);
+  }, [setUser]);
 
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
@@ -364,7 +355,7 @@ export const useProvideAuth = () => {
             { correo: usrInfo?.attributes?.email },
             {}
           );
-
+          console.log(suserInfo)
           const quota = await fetchData(
             urlQuota,
             "GET",
@@ -374,6 +365,7 @@ export const useProvideAuth = () => {
             },
             {}
           );
+
           const resp_ciudad = await fetchData(
             urlCiudad_dane,
             "GET",
@@ -383,6 +375,12 @@ export const useProvideAuth = () => {
             {}
           );
 
+          setRoleInfo({
+            ...suserInfo,
+            quota: quota["cupo disponible"],
+            comision: quota["comisiones"],
+            ciudad: resp_ciudad[0].municipio,
+          });
 
           const resp_cod = await fetchData(
             urlCod_loteria_oficina,
@@ -392,30 +390,18 @@ export const useProvideAuth = () => {
             },
             {}
           );
-  
-  
-          if('msg' in resp_cod){
+
+          console.log(resp_cod);
+          if (!("msg" in resp_cod)) {
             setRoleInfo({
-              
               ...suserInfo,
-              
-              quota: quota['cupo disponible'],
-              comision: quota['comisiones'],
-              ciudad:resp_ciudad[0].municipio,
-            });
-          }else{
-            setRoleInfo({
-              
-              ...suserInfo,
-              
-              quota: quota['cupo disponible'],
-              comision: quota['comisiones'],
+              quota: quota["cupo disponible"],
+              comision: quota["comisiones"],
               cod_oficina_lot: resp_cod.cod_oficina_lot,
               cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-              ciudad:resp_ciudad[0].municipio,
+              ciudad: resp_ciudad[0].municipio,
             });
           }
-
         }
         history.push(
           state ? state.from : pathname === "/login" ? "/" : pathname
@@ -431,12 +417,14 @@ export const useProvideAuth = () => {
   );
 
   const signOut = useCallback(() => {
-    Auth.signOut().then(() => {
-      setCognitoUser(null);
-      setSignedIn(false);
-      setRoleInfo({});
-      history.push("/login");
-    }).catch(() => {});
+    Auth.signOut()
+      .then(() => {
+        setCognitoUser(null);
+        setSignedIn(false);
+        setRoleInfo({});
+        history.push("/login");
+      })
+      .catch(() => {});
   }, [history]);
 
   const handlesetPreferredMFA = useCallback(
@@ -483,7 +471,6 @@ export const useProvideAuth = () => {
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
 
-  console.log(roleInfo)
   return {
     handleverifyTotpToken,
     handleChangePass,
