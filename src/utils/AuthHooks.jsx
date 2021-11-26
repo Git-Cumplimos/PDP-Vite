@@ -65,7 +65,7 @@ export const useProvideAuth = () => {
 
   const [qr, setQr] = useState("");
 
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("CERT");
 
   const [parameters, setParameters] = useState("");
 
@@ -278,6 +278,22 @@ export const useProvideAuth = () => {
     checkUser();
   }, [checkUser, consulta_roles]);
 
+  useEffect(async () => {
+    if (cognitoUser?.challengeName === "MFA_SETUP") {
+      try {
+        const validartoken = await Auth.setupTOTP(cognitoUser);
+        const str =
+          "otpauth://totp/AWSCognito:" +
+          username +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
+        setQr(str);
+      } catch (err) {}
+    }
+  }, [cognitoUser]);
+
   const history = useHistory();
   const { state, pathname } = useLocation();
 
@@ -298,7 +314,12 @@ export const useProvideAuth = () => {
       try {
         const validartoken = await Auth.setupTOTP(user);
         const str =
-          "otpauth://totp/AWSCognito:" + username + "?secret=" + validartoken;
+          "otpauth://totp/AWSCognito:" +
+          username +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
         setQr(str);
       } catch (err) {}
     },
@@ -470,7 +491,7 @@ export const useProvideAuth = () => {
     tempRole.comision = quota["comisiones"];
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
-
+  console.log(cognitoUser);
   return {
     handleverifyTotpToken,
     handleChangePass,
