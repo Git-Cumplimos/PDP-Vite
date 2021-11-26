@@ -52,7 +52,7 @@ export const useProvideUrls = () => {
       {
         link: "/seguridad",
         label: "Seguridad",
-        component: roleInfo?.roles?.includes(1)? CrearRoles:emptyComp,
+        component: roleInfo?.roles?.includes(1) ? CrearRoles : emptyComp,
         props: {},
       },
       {
@@ -62,8 +62,8 @@ export const useProvideUrls = () => {
         props: {},
       },
       {
-        label: <AuthButton />
-      }
+        label: <AuthButton />,
+      },
     ]);
 
     setUrlsPrivApps([
@@ -164,7 +164,7 @@ export const useProvideUrls = () => {
       },
     ]);
   }, [roleInfo]);
-
+  console.log(roleInfo);
   return {
     urlsPrivate,
     urlsPublic,

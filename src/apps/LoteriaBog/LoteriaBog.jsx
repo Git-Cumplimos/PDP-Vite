@@ -3,9 +3,6 @@ import ProvideLoteria from "./components/ProvideLoteria";
 import AdminLoteria from "./Roles/AdminLoteria";
 import CashierLoteria from "./Roles/CashierLoteria";
 
-
-
-
 const LoteriaBog = () => {
   const { roleInfo } = useAuth();
   return (
@@ -21,11 +18,13 @@ const LoteriaBog = () => {
         </>)} */}
         {roleInfo !== undefined && roleInfo !== null && (
           <>
-          {roleInfo?.roles.includes(1)? (
-            <AdminLoteria/>          
-          ):(
-            <CashierLoteria/>)}
-        </>)}
+            {roleInfo?.roles?.includes(1) ? (
+              <AdminLoteria />
+            ) : (
+              <CashierLoteria />
+            )}
+          </>
+        )}
       </div>
     </ProvideLoteria>
   );
