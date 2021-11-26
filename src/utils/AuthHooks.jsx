@@ -150,21 +150,13 @@ export const useProvideAuth = () => {
           { correo: usrInfo?.attributes?.email },
           {}
         );
+        console.log(suserInfo);
         const quota = await fetchData(
           urlQuota,
           "GET",
           {
             id_comercio: suserInfo.id_comercio,
             id_dispositivo: suserInfo.id_dispositivo,
-          },
-          {}
-        );
-
-        const resp_cod = await fetchData(
-          urlCod_loteria_oficina,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
           },
           {}
         );
@@ -178,19 +170,26 @@ export const useProvideAuth = () => {
           {}
         );
 
+        setRoleInfo({
+          ...suserInfo,
+          quota: quota["cupo disponible"],
+          comision: quota["comisiones"],
+          ciudad: resp_ciudad[0].municipio,
+        });
+
+        const resp_cod = await fetchData(
+          urlCod_loteria_oficina,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+          },
+          {}
+        );
+
         console.log(resp_cod);
-        if ("msg" in resp_cod) {
+        if (!("msg" in resp_cod)) {
           setRoleInfo({
             ...suserInfo,
-
-            quota: quota["cupo disponible"],
-            comision: quota["comisiones"],
-            ciudad: resp_ciudad[0].municipio,
-          });
-        } else {
-          setRoleInfo({
-            ...suserInfo,
-
             quota: quota["cupo disponible"],
             comision: quota["comisiones"],
             cod_oficina_lot: resp_cod.cod_oficina_lot,
@@ -217,6 +216,7 @@ export const useProvideAuth = () => {
 
       fetchData(urlLog, "GET", { correo: Auth.user?.attributes?.email }, {})
         .then((suserInfo) => {
+          console.log(suserInfo);
           fetchData(
             urlQuota,
             "GET",
@@ -234,36 +234,37 @@ export const useProvideAuth = () => {
                   c_digo_dane_del_municipio: suserInfo.codigo_dane,
                 },
                 {}
-              ).then((resp_ciudad) => {
-                fetchData(
-                  urlCod_loteria_oficina,
-                  "GET",
-                  {
-                    id_comercio: suserInfo.id_comercio,
-                  },
-                  {}
-                ).then((resp_cod) => {
-                  if ("msg" in resp_cod) {
-                    setRoleInfo({
-                      ...suserInfo,
-
-                      quota: quota["cupo disponible"],
-                      comision: quota["comisiones"],
-                      ciudad: resp_ciudad[0].municipio,
-                    });
-                  } else {
-                    setRoleInfo({
-                      ...suserInfo,
-
-                      quota: quota["cupo disponible"],
-                      comision: quota["comisiones"],
-                      cod_oficina_lot: resp_cod.cod_oficina_lot,
-                      cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-                      ciudad: resp_ciudad[0].municipio,
-                    });
-                  }
-                });
-              });
+              )
+                .then((resp_ciudad) => {
+                  fetchData(
+                    urlCod_loteria_oficina,
+                    "GET",
+                    {
+                      id_comercio: suserInfo.id_comercio,
+                    },
+                    {}
+                  )
+                    .then((resp_cod) => {
+                      setRoleInfo({
+                        ...suserInfo,
+                        quota: quota["cupo disponible"],
+                        comision: quota["comisiones"],
+                        ciudad: resp_ciudad[0].municipio,
+                      });
+                      if (!("msg" in resp_cod)) {
+                        setRoleInfo({
+                          ...suserInfo,
+                          quota: quota["cupo disponible"],
+                          comision: quota["comisiones"],
+                          cod_oficina_lot: resp_cod.cod_oficina_lot,
+                          cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+                          ciudad: resp_ciudad[0].municipio,
+                        });
+                      }
+                    })
+                    .catch(() => {});
+                })
+                .catch(() => {});
             })
             .catch(() => {});
         })
@@ -354,7 +355,7 @@ export const useProvideAuth = () => {
             { correo: usrInfo?.attributes?.email },
             {}
           );
-
+          console.log(suserInfo);
           const quota = await fetchData(
             urlQuota,
             "GET",
@@ -364,6 +365,7 @@ export const useProvideAuth = () => {
             },
             {}
           );
+
           const resp_ciudad = await fetchData(
             urlCiudad_dane,
             "GET",
@@ -372,6 +374,13 @@ export const useProvideAuth = () => {
             },
             {}
           );
+
+          setRoleInfo({
+            ...suserInfo,
+            quota: quota["cupo disponible"],
+            comision: quota["comisiones"],
+            ciudad: resp_ciudad[0].municipio,
+          });
 
           const resp_cod = await fetchData(
             urlCod_loteria_oficina,
@@ -382,18 +391,10 @@ export const useProvideAuth = () => {
             {}
           );
 
-          if ("msg" in resp_cod) {
+          console.log(resp_cod);
+          if (!("msg" in resp_cod)) {
             setRoleInfo({
               ...suserInfo,
-
-              quota: quota["cupo disponible"],
-              comision: quota["comisiones"],
-              ciudad: resp_ciudad[0].municipio,
-            });
-          } else {
-            setRoleInfo({
-              ...suserInfo,
-
               quota: quota["cupo disponible"],
               comision: quota["comisiones"],
               cod_oficina_lot: resp_cod.cod_oficina_lot,
@@ -470,7 +471,6 @@ export const useProvideAuth = () => {
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
 
-  console.log(roleInfo);
   return {
     handleverifyTotpToken,
     handleChangePass,

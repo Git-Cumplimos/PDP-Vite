@@ -70,10 +70,9 @@ export const useProvideUrls = () => {
       {
         link: "/suser",
         label: <AppIcons Logo={SUSER} name="SUSER" />,
-        component: emptyComp,
         props: {},
+        extern: true,
       },
-
       {
         link: "/loteria-de-bogota",
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
@@ -109,13 +108,6 @@ export const useProvideUrls = () => {
         show: false,
       },
       {
-        link: "/fundacion-mujer",
-        label: <AppIcons name="Fundacion de la mujer" />,
-        component: FunMujer,
-        props: {},
-        show: false,
-      },
-      {
         link: "/fundacion-mujer/:page",
         component: FunMujer,
         props: {},
@@ -135,7 +127,6 @@ export const useProvideUrls = () => {
         label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
         component: Transacciones,
         props: {},
-        show: false,
         extern: false,
       },
       {
