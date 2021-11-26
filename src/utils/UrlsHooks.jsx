@@ -52,7 +52,7 @@ export const useProvideUrls = () => {
       {
         link: "/seguridad",
         label: "Seguridad",
-        component: roleInfo?.roles?.includes(1)? CrearRoles:emptyComp,
+        component: roleInfo?.roles?.includes(1) ? CrearRoles : emptyComp,
         props: {},
       },
       {
@@ -62,8 +62,8 @@ export const useProvideUrls = () => {
         props: {},
       },
       {
-        label: <AuthButton />
-      }
+        label: <AuthButton />,
+      },
     ]);
 
     setUrlsPrivApps([
@@ -79,11 +79,14 @@ export const useProvideUrls = () => {
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
 
         component:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.id_comercio === 13032
             ? LoteriaBog
             : emptyComp,
         props: {},
-        show: roleInfo?.tipo_comercio === "OFICINAS PROPIAS", ///////////////////////////////
+        show:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.id_comercio === 13032, ///////////////////////////////
         extern: false,
       },
       {
@@ -97,7 +100,8 @@ export const useProvideUrls = () => {
       {
         link: "/loteria-de-bogota/:page",
         component:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.id_comercio === 13032
             ? LoteriaBog
             : emptyComp,
         props: {},
@@ -173,7 +177,7 @@ export const useProvideUrls = () => {
       },
     ]);
   }, [roleInfo]);
-
+  console.log(roleInfo);
   return {
     urlsPrivate,
     urlsPublic,

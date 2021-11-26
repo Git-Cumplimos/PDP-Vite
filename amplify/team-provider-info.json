@@ -1,15 +1,25 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-puntodepago-dev-165900-authRole",
-      "UnauthRoleArn": "arn:aws:iam::161885268058:role/amplify-puntodepago-dev-165900-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::161885268058:role/amplify-puntodepago-dev-165900-authRole",
+      "AuthRoleName": "amplify-puntodepago-dev-173427-authRole",
+      "UnauthRoleArn": "arn:aws:iam::161885268058:role/amplify-puntodepago-dev-173427-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::161885268058:role/amplify-puntodepago-dev-173427-authRole",
       "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-puntodepago-dev-165900-deployment",
-      "UnauthRoleName": "amplify-puntodepago-dev-165900-unauthRole",
-      "StackName": "amplify-puntodepago-dev-165900",
-      "StackId": "arn:aws:cloudformation:us-east-1:161885268058:stack/amplify-puntodepago-dev-165900/e74a03e0-4e3a-11ec-b96f-12d2028a0f59",
-      "AmplifyAppId": "d219kr3yc3qnb8"
+      "DeploymentBucketName": "amplify-puntodepago-dev-173427-deployment",
+      "UnauthRoleName": "amplify-puntodepago-dev-173427-unauthRole",
+      "StackName": "amplify-puntodepago-dev-173427",
+      "StackId": "arn:aws:cloudformation:us-east-1:161885268058:stack/amplify-puntodepago-dev-173427/da362350-4e3f-11ec-8a81-0a9a40def425",
+      "AmplifyAppId": "d1jalia3ua3wq7"
+    },
+    "categories": {
+      "auth": {
+        "puntodepago8ff30837": {
+          "userPoolId": "us-east-1_3bdNhk1hg",
+          "userPoolName": "Formulario1",
+          "webClientId": "1elfntjkt0riasq92clr8na3q9",
+          "nativeClientId": "1elfntjkt0riasq92clr8na3q9"
+        }
+      }
     }
   }
 }
