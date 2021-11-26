@@ -45,35 +45,44 @@ const SellResp = ({
     pageStyle: pageStyle,
   });
 
-  const voucherInfo = useMemo(() => {}, []);
+  const voucherInfo = useMemo(() => {
+    const vinfo = {};
+    if (!("msg" in sellResponse)) {
+      sellResponse.fecha_venta = sellResponse.fecha_venta.replace(/-/g, "/");
 
-  if (!("msg" in sellResponse)) {
-    sellResponse.fecha_venta = sellResponse.fecha_venta.replace(/-/g, "/");
+      vinfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      }).format(new Date(sellResponse.fecha_venta));
+      vinfo["Hora"] = Intl.DateTimeFormat("es-CO", {
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        hour12: false,
+      }).format(new Date(sellResponse.fecha_venta));
 
-    voucherInfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-    }).format(new Date(sellResponse.fecha_venta));
-    voucherInfo["Hora"] = Intl.DateTimeFormat("es-CO", {
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hour12: false,
-    }).format(new Date(sellResponse.fecha_venta));
+      vinfo["Nombre de loteria"] = sellResponse.nom_loteria;
+      vinfo.Comercio = roleInfo.id_comercio;
+      vinfo["Dirección"] = roleInfo.direccion;
+      vinfo.Fracciones = sellResponse.fracciones;
+      vinfo["Id Transacción"] = sellResponse.id_Transaccion;
+      vinfo["Numero de billete"] = sellResponse.num_billete;
+      vinfo.ciudad = roleInfo.ciudad;
+      vinfo.Serie = sellResponse.serie;
+      vinfo["Valor pagado"] = sellResponse.valor_pago;
+      vinfo.id_trx = sellResponse["id_trx"];
+      vinfo["No.terminal"] = roleInfo.id_dispositivo;
 
-    voucherInfo["Nombre de loteria"] = sellResponse.nom_loteria;
-    voucherInfo.Comercio = roleInfo.id_comercio;
-    voucherInfo["Dirección"] = roleInfo.direccion;
-    voucherInfo.Fracciones = sellResponse.fracciones;
-    voucherInfo["Id Transacción"] = sellResponse.id_Transaccion;
-    voucherInfo["Numero de billete"] = sellResponse.num_billete;
-    voucherInfo.ciudad = roleInfo.ciudad;
-    voucherInfo.Serie = sellResponse.serie;
-    voucherInfo["Valor pagado"] = sellResponse.valor_pago;
-    voucherInfo.id_trx = sellResponse["id_trx"];
-    voucherInfo["No.terminal"] = roleInfo.id_dispositivo;
-  }
+      return vinfo;
+    }
+  }, [
+    roleInfo.ciudad,
+    roleInfo.direccion,
+    roleInfo.id_comercio,
+    roleInfo.id_dispositivo,
+    sellResponse,
+  ]);
 
   const ticket = useMemo(() => {
     return {
