@@ -33,7 +33,7 @@ export const useProvideUrls = () => {
   const [urlsPrivApps, setUrlsPrivApps] = useState([]);
 
   const emptyComp = () => {
-    return <h1>Componente vacio</h1>;
+    return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
   };
 
   const { roleInfo } = useAuth();
