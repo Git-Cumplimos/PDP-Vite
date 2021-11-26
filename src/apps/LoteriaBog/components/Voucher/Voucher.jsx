@@ -58,7 +58,7 @@ const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
             <h1 className="font-semibold">Id Trx:</h1>
-            <h1>{info.Id_registro}</h1>
+            <h1>{info.id_trx}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Id Transacción:</h1>
@@ -78,6 +78,10 @@ const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Serie:</h1>
             <h1>{info.Serie}</h1>
+          </div>
+          <div className="flex flex-row justify-start flex-auto gap-2">
+            <h1 className="font-semibold">Fracciones:</h1>
+            <h1>{info.Fracciones}</h1>
           </div>
         </div>
         <div className="flex flex-row justify-center w-full">

@@ -25,6 +25,8 @@ const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario
 const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
+const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;
+
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -44,6 +46,7 @@ export const AuthContext = createContext({
   consulta_usuarios: () => {},
   cambiar_rol: () => {},
   checkUser: () => {},
+  infoTicket: () => {},
 });
 
 export const useAuth = () => {
@@ -76,6 +79,26 @@ export const useProvideAuth = () => {
       return res;
     } catch (err) {}
   }, []);
+
+
+  const infoTicket = useCallback(
+    async (id_trx,Tipo_operacion,ticket) => {
+      const get={
+        id_trx:id_trx,
+        Tipo_operacion:Tipo_operacion
+      }
+      const post={Ticket:ticket}
+      
+      try {
+        const res = await fetchData(urlInfoTicket, "PUT", get, post);
+        console.log(res)
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
 
   const consulta_usuarios = useCallback(async (email) => {
     try {
@@ -470,7 +493,7 @@ export const useProvideAuth = () => {
     tempRole.comision = quota["comisiones"];
     setRoleInfo({ ...tempRole });
   }, [roleInfo]);
-
+  console.log(roleInfo)
   return {
     handleverifyTotpToken,
     handleChangePass,
@@ -493,5 +516,6 @@ export const useProvideAuth = () => {
     checkUser,
     qr,
     parameters,
+    infoTicket,
   };
 };
