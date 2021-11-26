@@ -27,7 +27,6 @@ const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_o
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;
 
-
 export const AuthContext = createContext({
   isSignedIn: false,
   cognitoUser: null,
@@ -80,25 +79,21 @@ export const useProvideAuth = () => {
     } catch (err) {}
   }, []);
 
+  const infoTicket = useCallback(async (id_trx, Tipo_operacion, ticket) => {
+    const get = {
+      id_trx: id_trx,
+      Tipo_operacion: Tipo_operacion,
+    };
+    const post = { Ticket: ticket };
 
-  const infoTicket = useCallback(
-    async (id_trx,Tipo_operacion,ticket) => {
-      const get={
-        id_trx:id_trx,
-        Tipo_operacion:Tipo_operacion
-      }
-      const post={Ticket:ticket}
-      
-      try {
-        const res = await fetchData(urlInfoTicket, "PUT", get, post);
-        console.log(res)
-        return res;
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    []
-  );
+    try {
+      const res = await fetchData(urlInfoTicket, "PUT", get, post);
+      console.log(res);
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   const consulta_usuarios = useCallback(async (email) => {
     try {
@@ -301,21 +296,24 @@ export const useProvideAuth = () => {
     checkUser();
   }, [checkUser, consulta_roles]);
 
-  useEffect(async () => {
-    if (cognitoUser?.challengeName === "MFA_SETUP") {
-      try {
-        const validartoken = await Auth.setupTOTP(cognitoUser);
-        const str =
-          "otpauth://totp/AWSCognito:" +
-          username +
-          "?secret=" +
-          validartoken +
-          "&issuer=" +
-          "Punto de Pago Multibanco";
-        setQr(str);
-      } catch (err) {}
-    }
-  }, [cognitoUser]);
+  useEffect(() => {
+    const validate = async () => {
+      if (cognitoUser?.challengeName === "MFA_SETUP") {
+        try {
+          const validartoken = await Auth.setupTOTP(cognitoUser);
+          const str =
+            "otpauth://totp/AWSCognito:" +
+            username +
+            "?secret=" +
+            validartoken +
+            "&issuer=" +
+            "Punto de Pago Multibanco";
+          setQr(str);
+        } catch (err) {}
+      }
+    };
+    validate();
+  }, [cognitoUser, username]);
 
   const history = useHistory();
   const { state, pathname } = useLocation();

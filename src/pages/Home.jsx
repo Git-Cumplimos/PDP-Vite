@@ -27,14 +27,10 @@ const Home = () => {
     });
   }, []);
 
-  const [imgs, setImgs] = useState([]);
-
-  useEffect(() => {
-    setImgs([
-      { name: "Colpensiones", url: ColpensionesImg },
-      { name: "Punto de pago", url: Banner2 },
-    ]);
-  }, []);
+  const [imgs, setImgs] = useState([
+    { name: "Colpensiones", url: ColpensionesImg },
+    { name: "Punto de pago", url: Banner2 },
+  ]);
 
   return (
     <>

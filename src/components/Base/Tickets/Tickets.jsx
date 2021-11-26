@@ -8,21 +8,24 @@ const Tickets = ({
   type = "ORIGINAL",
   ticket = {
     title: "Recibo de pago",
-    timeInfo: { "Fecha de venta": "sdfs", Hora: "12:22:00" },
-    commerceInfo: {
-      "Id Comercio": 2,
-      "No. terminal": 233,
-      Municipio: "Bogota",
-      Dirección: "Calle 11 # 11 - 2",
-      "Id Trx": 233,
-      "Id Transacción": 99,
+    timeInfo: { 
+      "Fecha de venta": "sdfs", 
+      Hora: "12:22:00" 
     },
+    commerceInfo: [
+      ["Id Comercio", 2],
+      ["No. terminal", 233],
+      ["Municipio", "Bogota"],
+      ["Dirección", "Calle 11 # 11 - 2"],
+      ["Id Trx", 233],
+      ["Id Transacción", 99],
+    ],
     commerceName: "Loteria de bogotá",
-    trxInfo: {
-      Billete: "0222",
-      Serie: "231",
-      "Valor pago": 20000.0,
-    },
+    trxInfo: [
+      ["Billete", "0222"],
+      ["Serie", "231"],
+      ["Valor pago", 20000.0],
+    ],
     disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
   },
 }) => {
@@ -54,7 +57,7 @@ const Tickets = ({
       </div>
       <hr className="border-gray-400 my-3" />
       <div className="flex flex-col gap-2 px-2 text-xs text-left">
-        {Object.entries(commerceInfo)
+        {commerceInfo
           .map((e, i, arr) => {
             const chunkSize = 2;
             return i % chunkSize === 0 ? arr.slice(i, i + chunkSize) : null;
@@ -93,7 +96,7 @@ const Tickets = ({
         {commerceName ?? ""} Transacción exitosa
       </h1>
       <div className="flex flex-col gap-2 px-2 text-xs">
-        {Object.entries(trxInfo)
+        {trxInfo
           .map((e, i, arr) => {
             const chunkSize = 2;
             return i % chunkSize === 0 ? arr.slice(i, i + chunkSize) : null;
