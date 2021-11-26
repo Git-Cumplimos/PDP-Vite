@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import Button from "../../../../components/Base/Button/Button";
 import Voucher from "../Voucher/Voucher";
 import { useReactToPrint } from "react-to-print";
@@ -11,7 +11,12 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
-const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) => {
+const SellResp = ({
+  sellResponse,
+  setSellResponse,
+  closeModal,
+  setCustomer,
+}) => {
   const pageStyle = `
   @page {
     size: 80mm 50mm;
@@ -37,19 +42,24 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
-      pageStyle:pageStyle
+    pageStyle: pageStyle,
   });
 
-  const voucherInfo = {};
+  const voucherInfo = useMemo(() => {}, []);
 
   if (!("msg" in sellResponse)) {
     sellResponse.fecha_venta = sellResponse.fecha_venta.replace(/-/g, "/");
 
-    voucherInfo["Fecha de venta"] = Intl.DateTimeFormat('es-CO', {
-      year: "numeric", month: "numeric", day: "numeric"
+    voucherInfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
     }).format(new Date(sellResponse.fecha_venta));
-    voucherInfo["Hora"] = Intl.DateTimeFormat('es-CO', {
-      hour: "numeric", minute: "numeric", second: "numeric", hour12: false
+    voucherInfo["Hora"] = Intl.DateTimeFormat("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: false,
     }).format(new Date(sellResponse.fecha_venta));
 
     voucherInfo["Nombre de loteria"] = sellResponse.nom_loteria;
@@ -61,37 +71,46 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
     voucherInfo.ciudad = roleInfo.ciudad;
     voucherInfo.Serie = sellResponse.serie;
     voucherInfo["Valor pagado"] = sellResponse.valor_pago;
-    voucherInfo.id_trx = sellResponse['id_trx'];
+    voucherInfo.id_trx = sellResponse["id_trx"];
     voucherInfo["No.terminal"] = roleInfo.id_dispositivo;
   }
 
-  const ticket = {
-    title: "Recibo de pago",
-    timeInfo: { "Fecha de venta": voucherInfo["Fecha de venta"], Hora: voucherInfo["Hora"] },
-    commerceInfo: {
-      "Id Comercio": roleInfo.id_comercio,
-      "No. terminal": roleInfo.id_dispositivo,
-      Municipio: roleInfo.ciudad,
-      Dirección: roleInfo.direccion,
-      "Id Trx": sellResponse['id_trx'],
-      "Id Transacción": sellResponse.id_Transaccion,
-    },
-    commerceName: sellResponse.nom_loteria,
-    trxInfo: {
-      Billete: sellResponse.num_billete,
-      Serie: sellResponse.serie,
-      Fracciones: sellResponse.fracciones,
-      "Valor pago": formatMoney.format(sellResponse.valor_pago),
-    },
-    disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
-  }
+  const ticket = useMemo(() => {
+    return {
+      title: "Recibo de pago",
+      timeInfo: {
+        "Fecha de venta": voucherInfo["Fecha de venta"],
+        Hora: voucherInfo["Hora"],
+      },
+      commerceInfo: Object.entries({
+        "Id Comercio": roleInfo.id_comercio,
+        "No. terminal": roleInfo.id_dispositivo,
+        Municipio: roleInfo.ciudad,
+        Dirección: roleInfo.direccion,
+        "Id Trx": sellResponse["id_trx"],
+        "Id Transacción": sellResponse.id_Transaccion,
+      }),
+      commerceName: sellResponse.nom_loteria,
+      trxInfo: Object.entries({
+        Billete: sellResponse.num_billete,
+        Serie: sellResponse.serie,
+        Fracciones: sellResponse.fracciones,
+        "Valor pago": formatMoney.format(sellResponse.valor_pago),
+      }),
+      disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+    };
+  }, [
+    roleInfo.ciudad,
+    roleInfo.direccion,
+    roleInfo.id_comercio,
+    roleInfo.id_dispositivo,
+    sellResponse,
+    voucherInfo,
+  ]);
 
   useEffect(() => {
-    infoTicket(sellResponse['id_trx'],12,ticket)
-    
-  }, [])
-
-  
+    infoTicket(sellResponse["id_trx"], 12, ticket);
+  }, [infoTicket, sellResponse, ticket]);
 
   return "msg" in sellResponse ? (
     <div className="flex flex-col justify-center items-center">
@@ -106,7 +125,7 @@ const SellResp = ({ sellResponse, setSellResponse, closeModal, setCustomer }) =>
     </div>
   ) : (
     <div className="flex flex-col justify-center items-center">
-      <Voucher {...voucherInfo} refPrint={printDiv} pageStyle={pageStyle}/>
+      <Voucher {...voucherInfo} refPrint={printDiv} pageStyle={pageStyle} />
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
         <Button
