@@ -15,12 +15,21 @@ import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
 import MarketPlace from "../apps/MarketPlace/MarketPlace";
 import CommerceInfo from "../apps/UpdateCommerce/CommerceInfo";
 import { useAuth } from "./AuthHooks";
-//import Box from "../components/Base/Cargando/Cargando"
+import Loteria from "../apps/LoteriaBog/Views/Loteria";
+import DescargarArchivos from "../apps/LoteriaBog/Views/DescargarArchivos";
+import CrearSorteos from "../apps/LoteriaBog/Views/CrearSorteos";
+import CargaArchivos from "../apps/LoteriaBog/Views/CargaArchivos";
+import IAMUsers from "../apps/IAM/Views/IAMUsers";
+import IAMGroups from "../apps/IAM/Views/IAMGroups";
+import IAMRoles from "../apps/IAM/Views/IAMRoles";
+import IAMPermissions from "../apps/IAM/Views/IAMPermissions";
+import IAM from "../apps/IAM/IAM";
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
   urlsPublic: [],
   urlsPrivApps: [],
+  urlsPrivateApps: [],
 });
 
 export const useUrls = () => {
@@ -31,14 +40,147 @@ export const useProvideUrls = () => {
   const [urlsPrivate, setUrlsPrivate] = useState([]);
   const [urlsPublic, setUrlsPublic] = useState([]);
   const [urlsPrivApps, setUrlsPrivApps] = useState([]);
+  const [urlsPrivateApps, setUrlsPrivateApps] = useState([]);
 
   const emptyComp = () => {
     return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
   };
 
-  const { roleInfo } = useAuth();
+  const { roleInfo, userPermissions } = useAuth();
 
   useEffect(() => {
+    const allUrlsPrivateApps = [
+      {
+        link: "https://portal.solucionesenred.co/",
+        label: <AppIcons Logo={SUSER} name="SUSER" />,
+        extern: true,
+        permission: [1],
+      },
+      {
+        link: "/loteria-de-bogota",
+        label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
+        component: LoteriaBog,
+        extern: false,
+        permission: [2, 3, 4, 5, 6],
+        subRoutes: [
+          {
+            link: "/loteria-de-bogota/sorteos",
+            label: <AppIcons Logo={LOTERIA} name="Sorteos" />,
+            component: Loteria,
+            extern: false,
+            permission: [3],
+          },
+          {
+            link: "/loteria-de-bogota/cargar",
+            label: <AppIcons Logo={LOTERIA} name="Carga de archivos" />,
+            component: CargaArchivos,
+            extern: false,
+            permission: [4],
+          },
+          {
+            link: "/loteria-de-bogota/descargar",
+            label: <AppIcons Logo={LOTERIA} name="Descarga de archivos" />,
+            component: DescargarArchivos,
+            extern: false,
+            permission: [6],
+          },
+          {
+            link: "/loteria-de-bogota/crear-sorteos",
+            label: <AppIcons Logo={LOTERIA} name="Crear sorteos" />,
+            component: CrearSorteos,
+            extern: false,
+            permission: [5],
+          },
+        ],
+      },
+      {
+        link: "/transacciones",
+        label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
+        component: Transacciones,
+        extern: false,
+        permission: [-1],
+      },
+      {
+        link: "/update-commerce",
+        label: <AppIcons Logo={ACTUALIZACION} name="Actualizacion de datos" />,
+        component: FormCommerce,
+        extern: false,
+        permission: [7],
+      },
+      {
+        link: "/review-commerce-forms",
+        label: (
+          <AppIcons
+            Logo={ACTUALIZACION}
+            name="Revisar actualizacion de datos"
+          />
+        ),
+        component: CommerceInfo,
+        extern: false,
+        permission: [9],
+      },
+      {
+        link: "/marketplace",
+        label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
+        component: MarketPlace,
+        extern: false,
+        permission: [10],
+        subRoutes: [
+          {
+            link: "/marketplace/payorder/:orden",
+            // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
+            component: MarketPlace,
+            extern: false,
+            permission: [10],
+          },
+        ],
+      },
+      {
+        link: "/fundacion-mujer",
+        label: <AppIcons name="Fundacion de la mujer" />,
+        component: FunMujer,
+        extern: false,
+        permission: [],
+      },
+      {
+        link: "/iam",
+        label: <AppIcons Logo={MARKETPLACE} name="IAM" />,
+        component: IAM,
+        extern: false,
+        permission: [11, 12, 13, 14, 15],
+        subRoutes: [
+          {
+            link: "/iam/users",
+            label: <AppIcons Logo={LOTERIA} name="Usuarios" />,
+            component: IAMUsers,
+            extern: false,
+            permission: [13],
+          },
+          {
+            link: "/iam/groups",
+            label: <AppIcons Logo={LOTERIA} name="Grupos" />,
+            component: IAMGroups,
+            extern: false,
+            permission: [12],
+          },
+          {
+            link: "/iam/roles",
+            label: <AppIcons Logo={LOTERIA} name="Roles" />,
+            component: IAMRoles,
+            extern: false,
+            permission: [14],
+          },
+          {
+            link: "/iam/permissions",
+            label: <AppIcons Logo={LOTERIA} name="Permisos" />,
+            component: IAMPermissions,
+            extern: false,
+            permission: [15],
+          },
+        ],
+      },
+    ];
+
     setUrlsPrivate([
       { link: "/", label: "Inicio", component: Home, props: {} },
       {
@@ -66,57 +208,77 @@ export const useProvideUrls = () => {
       },
     ]);
 
+    if (Array.isArray(userPermissions) && userPermissions.length > 0) {
+      const rootUrls = [
+        ...allUrlsPrivateApps
+          .filter(({ permission }) => {
+            for (const per of permission) {
+              if (
+                userPermissions.map(({ id_permission }) => id_permission).includes(per)
+              ) {
+                return true;
+              }
+            }
+            return false;
+          })
+          .map((el) => {
+            const { subRoutes } = el;
+            if (subRoutes) {
+              el.subRoutes = subRoutes.filter(({ permission }) => {
+                for (const per of permission) {
+                  if (
+                    userPermissions
+                      .map(({ id_permission }) => id_permission)
+                      .includes(per)
+                  ) {
+                    return true;
+                  }
+                }
+                return false;
+              });
+            }
+            return el;
+          }),
+      ];
+      setUrlsPrivateApps([...rootUrls]);
+    } else {
+      setUrlsPrivateApps([]);
+    }
+
     setUrlsPrivApps([
       {
-        link: "/suser",
+        link: "https://portal.solucionesenred.co/",
         label: <AppIcons Logo={SUSER} name="SUSER" />,
         props: {},
         extern: true,
+        permission: [1],
       },
       {
         link: "/loteria-de-bogota",
         label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
 
         component:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.id_comercio=== 2
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.id_comercio === 2
             ? LoteriaBog
             : emptyComp,
         props: {},
-        show: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.id_comercio=== 2, ///////////////////////////////
+        show:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.id_comercio === 2, ///////////////////////////////
         extern: false,
-      },
-      {
-        link: "/fundacion-mujer",
-        label: <AppIcons name="Fundacion de la mujer" />,
-        component: FunMujer,
-        props: {},
-        show: false,
-        extern: false,
+        permission: [2, 3, 4, 5, 6],
       },
       {
         link: "/loteria-de-bogota/:page",
         component:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.id_comercio=== 2
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.id_comercio === 2
             ? LoteriaBog
             : emptyComp,
         props: {},
         exact: false,
         show: false,
-      },
-      {
-        link: "/fundacion-mujer/:page",
-        component: FunMujer,
-        props: {},
-        exact: false,
-        show: false,
-      },
-      {
-        link: "/marketplace",
-        label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
-        component: emptyComp,
-        props: {},
-        show: false,
-        extern: false,
       },
       {
         link: "/transacciones",
@@ -146,11 +308,34 @@ export const useProvideUrls = () => {
         show: false,
       },
       {
+        link: "/marketplace",
+        label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
+        component: emptyComp,
+        props: {},
+        show: false,
+        extern: false,
+      },
+      {
         link: "/marketplace/payorder/:orden",
         // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
         component: MarketPlace,
         props: {},
         extern: false,
+        show: false,
+      },
+      {
+        link: "/fundacion-mujer",
+        label: <AppIcons name="Fundacion de la mujer" />,
+        component: FunMujer,
+        props: {},
+        show: false,
+        extern: false,
+      },
+      {
+        link: "/fundacion-mujer/:page",
+        component: FunMujer,
+        props: {},
+        exact: false,
         show: false,
       },
     ]);
@@ -163,11 +348,12 @@ export const useProvideUrls = () => {
         props: {},
       },
     ]);
-  }, [roleInfo]);
-  console.log(roleInfo);
+  }, [roleInfo, userPermissions]);
+
   return {
     urlsPrivate,
     urlsPublic,
     urlsPrivApps,
+    urlsPrivateApps,
   };
 };

@@ -5,11 +5,12 @@ import Header from "../../components/Compound/Header/Header";
 import { useUrls } from "../../utils/UrlsHooks";
 import classes from "./Admin.module.css";
 import SocialBar from "../../components/Compound/SocialBar/SocialBar";
+import { Fragment } from "react";
 
 const Admin = () => {
   const { adminLayout, wave } = classes;
 
-  const { urlsPrivate, urlsPrivApps, urlsPublic} = useUrls();
+  const { urlsPrivate, urlsPrivApps, urlsPublic, urlsPrivateApps } = useUrls();
 
   const { pathname } = useLocation();
 
@@ -45,6 +46,27 @@ const Admin = () => {
                 </PrivateRoute>
               );
             })}
+          {urlsPrivateApps
+            .filter(({ extern }) => !extern)
+            .map(({ link, component: Component, subRoutes }) => {
+              return (
+                <Fragment key={link}>
+                  <PrivateRoute path={link} exact>
+                    <Component subRoutes={subRoutes} />
+                  </PrivateRoute>
+                  {Array.isArray(subRoutes) &&
+                    subRoutes.map(
+                      ({ link: _link, component: SubComponent, label }) => {
+                        return (
+                          <PrivateRoute key={_link} path={_link} exact>
+                            <SubComponent route={{ label }} />
+                          </PrivateRoute>
+                        );
+                      }
+                    )}
+                </Fragment>
+              );
+            })}
           {urlsPublic.map(({ link, component: Component, props, exact }) => {
             exact = exact === undefined ? true : exact;
             return (
@@ -53,9 +75,6 @@ const Admin = () => {
               </Route>
             );
           })}
-          <Route path="*">
-            <h1 className="text-4xl text-center mt-8">404 Not found</h1>
-          </Route>
         </Switch>
       </main>
     </div>

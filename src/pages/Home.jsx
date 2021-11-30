@@ -12,7 +12,7 @@ import ACTUALIZACION from "../assets/svg/ActualizacionDeDatos.svg";
 import { Auth } from "aws-amplify";
 
 const Home = () => {
-  const { urlsPrivApps: urls } = useUrls();
+  const { urlsPrivApps: urls, urlsPrivateApps } = useUrls();
 
   const [emails, setEmails] = useState([
     "directora.mercadeo@puntodepago.com.co",
@@ -62,6 +62,7 @@ const Home = () => {
       ) : (
         ""
       )}
+      <HNavbar links={urlsPrivateApps} isIcon />
     </>
   );
 };

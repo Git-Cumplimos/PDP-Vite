@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import fetchData from "./fetchData";
+import { toast } from "react-toastify";
 
 const logger = new Logger("withAuthenticator");
 
@@ -26,6 +27,7 @@ const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;
+const url_permissions = process.env.REACT_APP_URL_IAM_PDP
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -36,6 +38,8 @@ export const AuthContext = createContext({
   setCrearRolresp: null,
   roles_disponibles: null,
   setRoles_disponibles: null,
+  userPermissions: null,
+  getPermissions: () => {},
   signIn: () => {},
   confirmSignIn: () => {},
   signOut: () => {},
@@ -61,6 +65,8 @@ export const useProvideAuth = () => {
 
   const [roleInfo, setRoleInfo] = useState(null);
 
+  const [userPermissions, setUserPermissions] = useState(null);
+
   const [crearRolresp, setCrearRolresp] = useState(null);
 
   const [roles_disponibles, setRoles_disponibles] = useState(null);
@@ -70,6 +76,18 @@ export const useProvideAuth = () => {
   const [username, setUsername] = useState("CERT");
 
   const [parameters, setParameters] = useState("");
+
+  const notifyError = useCallback((msg = "Error") => {
+    toast.warning(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  }, []);
 
   const consulta_roles = useCallback(async () => {
     try {
@@ -151,6 +169,124 @@ export const useProvideAuth = () => {
       } catch (err) {}
     },
     []
+  );
+
+  const getPermissions = useCallback(
+    async (email) => {
+      try {
+        // Get user
+        const user_res = await fetchData(`${url_permissions}/users`, "GET", {
+          email: email ?? "",
+        });
+        if (!user_res?.status) {
+          throw new Error(user_res?.msg);
+        }
+        if (!Array.isArray(user_res?.obj) || user_res?.obj.length === 0) {
+          notifyError("User not found in db");
+          return;
+        }
+        const uuid = user_res?.obj?.[0].uuid ?? 0;
+        if (uuid === 0) {
+          notifyError("User not found in db");
+          return;
+        }
+
+        // Get group of the user
+        const user_group_res = await fetchData(
+          `${url_permissions}/users-groups`,
+          "GET",
+          {
+            Users_uuid: uuid,
+          }
+        );
+        if (!user_group_res?.status) {
+          throw new Error(user_group_res?.msg);
+        }
+        if (
+          !Array.isArray(user_group_res?.obj) ||
+          user_group_res?.obj.length === 0
+        ) {
+          // notifyError("User has no groups in db");
+          return;
+        }
+
+        const userAccess = [];
+
+        for (const group of user_group_res?.obj) {
+          const id_group = group.Groups_id_group ?? 0;
+          if (id_group !== 0) {
+            // Get roles of the group
+            const group_roles_res = await fetchData(
+              `${url_permissions}/groups-roles`,
+              "GET",
+              {
+                Groups_id_group: id_group,
+              }
+            );
+            if (!group_roles_res?.status) {
+              throw new Error(group_roles_res?.msg);
+            }
+            if (
+              Array.isArray(group_roles_res?.obj) &&
+              group_roles_res?.obj.length > 0
+            ) {
+              for (const role of group_roles_res?.obj) {
+                const id_role = role.Roles_id_role ?? 0;
+                if (id_role !== 0) {
+                  // Get permissions of the role
+                  const role_permissions_res = await fetchData(
+                    `${url_permissions}/roles-permissions`,
+                    "GET",
+                    {
+                      Roles_id_role: id_role,
+                    }
+                  );
+                  if (!role_permissions_res?.status) {
+                    throw new Error(role_permissions_res?.msg);
+                  }
+                  if (
+                    Array.isArray(role_permissions_res?.obj) &&
+                    role_permissions_res?.obj.length > 0
+                  ) {
+                    for (const permission of role_permissions_res?.obj) {
+                      const id_permission =
+                        permission.Permissions_id_permission ?? 0;
+                      if (id_permission !== 0) {
+                        const permissions_res = await fetchData(
+                          `${url_permissions}/permissions`,
+                          "GET",
+                          {
+                            id_permission,
+                          }
+                        );
+                        if (!permissions_res?.status) {
+                          throw new Error(permissions_res?.msg);
+                        }
+                        if (
+                          Array.isArray(permissions_res?.obj) &&
+                          permissions_res?.obj.length > 0
+                        ) {
+                          userAccess.push(...permissions_res?.obj);
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        if (userAccess.length === 0) {
+          notifyError("User has no permissions in db");
+          return;
+        }
+        setUserPermissions(userAccess);
+        return userAccess;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [notifyError]
   );
 
   const setUser = useCallback(async () => {
@@ -294,7 +430,8 @@ export const useProvideAuth = () => {
     appendToCognitoUserAgent("withCustomAuthenticator");
     consulta_roles();
     checkUser();
-  }, [checkUser, consulta_roles]);
+    getPermissions(userInfo?.attributes?.email);
+  }, [checkUser, consulta_roles, getPermissions, userInfo?.attributes?.email]);
 
   useEffect(() => {
     const validate = async () => {
@@ -514,6 +651,8 @@ export const useProvideAuth = () => {
   }, [roleInfo]);
 
   return {
+    userPermissions,
+    getPermissions,
     handleverifyTotpToken,
     handleChangePass,
     isSignedIn,
