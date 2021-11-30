@@ -27,7 +27,7 @@ const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;
-const url_permissions = process.env.REACT_APP_URL_IAM_PDP
+const url_permissions = process.env.REACT_APP_URL_IAM_PDP;
 
 export const AuthContext = createContext({
   isSignedIn: false,
@@ -289,6 +289,23 @@ export const useProvideAuth = () => {
     [notifyError]
   );
 
+  const handleSetupTOTP = useCallback(
+    async (user) => {
+      try {
+        const validartoken = await Auth.setupTOTP(user);
+        const str =
+          "otpauth://totp/AWSCognito:" +
+          cognitoUser?.username +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
+        setQr(str);
+      } catch (err) {}
+    },
+    [cognitoUser?.username]
+  );
+
   const setUser = useCallback(async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
@@ -452,6 +469,25 @@ export const useProvideAuth = () => {
     validate();
   }, [cognitoUser, username]);
 
+  useEffect(() => {
+    const temp = async () => {
+      if (cognitoUser?.challengeName === "MFA_SETUP") {
+        try {
+          const validartoken = await Auth.setupTOTP(cognitoUser);
+          const str =
+            "otpauth://totp/AWSCognito:" +
+            "PROD" +
+            "?secret=" +
+            validartoken +
+            "&issuer=" +
+            "Punto de Pago Multibanco";
+          setQr(str);
+        } catch (err) {}
+      }
+    };
+    temp();
+  }, [cognitoUser]);
+
   const history = useHistory();
   const { state, pathname } = useLocation();
 
@@ -466,23 +502,6 @@ export const useProvideAuth = () => {
       throw err;
     }
   }, []);
-
-  const handleSetupTOTP = useCallback(
-    async (user) => {
-      try {
-        const validartoken = await Auth.setupTOTP(user);
-        const str =
-          "otpauth://totp/AWSCognito:" +
-          username +
-          "?secret=" +
-          validartoken +
-          "&issuer=" +
-          "Punto de Pago Multibanco";
-        setQr(str);
-      } catch (err) {}
-    },
-    [username]
-  );
 
   const handleChangePass = useCallback(
     async (
