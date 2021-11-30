@@ -170,6 +170,7 @@ const LoginForm = () => {
       .then()
       .catch((err) => {
         notify("Token y contraseña establecidos correctamente");
+        console.log(err);
       });
 
     setNames("");

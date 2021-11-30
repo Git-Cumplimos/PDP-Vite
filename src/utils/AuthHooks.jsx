@@ -343,7 +343,7 @@ export const useProvideAuth = () => {
         );
         setCognitoUser(loggedUser);
         if (loggedUser.challengeName === "MFA_SETUP") {
-          await handleSetupTOTP(loggedUser);
+          handleSetupTOTP(loggedUser);
         }
       } catch (err) {
         throw err;
