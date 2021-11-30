@@ -133,19 +133,22 @@ export const useProvideAuth = () => {
     []
   );
 
-  const handleSetupTOTP = useCallback(async (user) => {
-    try {
-      const validartoken = await Auth.setupTOTP(user);
-      const str =
-        "otpauth://totp/AWSCognito:" +
-        cognitoUser?.username +
-        "?secret=" +
-        validartoken +
-        "&issuer=" +
-        "Punto de Pago Multibanco";
-      setQr(str);
-    } catch (err) {}
-  }, [cognitoUser?.username]);
+  const handleSetupTOTP = useCallback(
+    async (user) => {
+      try {
+        const validartoken = await Auth.setupTOTP(user);
+        const str =
+          "otpauth://totp/AWSCognito:" +
+          cognitoUser?.username +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
+        setQr(str);
+      } catch (err) {}
+    },
+    [cognitoUser?.username]
+  );
 
   const setUser = useCallback(async () => {
     try {
@@ -285,10 +288,23 @@ export const useProvideAuth = () => {
     appendToCognitoUserAgent("withCustomAuthenticator");
     // consulta_roles();
     checkUser();
+  }, [checkUser, consulta_roles]);
+
+  useEffect(async () => {
     if (cognitoUser?.challengeName === "MFA_SETUP") {
-      handleSetupTOTP(cognitoUser);
+      try {
+        const validartoken = await Auth.setupTOTP(cognitoUser);
+        const str =
+          "otpauth://totp/AWSCognito:" +
+          "PROD" +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
+        setQr(str);
+      } catch (err) {}
     }
-  }, [checkUser, consulta_roles, cognitoUser, handleSetupTOTP]);
+  }, [cognitoUser]);
 
   const history = useHistory();
   const { state, pathname } = useLocation();
@@ -420,8 +436,6 @@ export const useProvideAuth = () => {
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
           setCognitoUser(null);
-          setSignedIn(false);
-          signOut();
         }
         throw err;
       }
@@ -433,7 +447,6 @@ export const useProvideAuth = () => {
     async (totp) => {
       try {
         const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
-        signOut();
         if (preferredMFA === "SUCCESS") {
           await confirmSignIn(totp);
         }
@@ -441,7 +454,7 @@ export const useProvideAuth = () => {
         throw new Error(err);
       }
     },
-    [cognitoUser, confirmSignIn, signOut]
+    [cognitoUser, confirmSignIn]
   );
 
   const handleverifyTotpToken = useCallback(
@@ -450,13 +463,12 @@ export const useProvideAuth = () => {
         const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
         if (tokenValidado.accessToken.payload.token_use === "access") {
           await handlesetPreferredMFA(totp);
-          history.push("/login");
         }
       } catch (err) {
         throw new Error(err);
       }
     },
-    [cognitoUser, handlesetPreferredMFA, history]
+    [cognitoUser, handlesetPreferredMFA]
   );
 
   const getQuota = useCallback(async () => {
