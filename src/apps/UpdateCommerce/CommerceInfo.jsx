@@ -200,6 +200,7 @@ const CommerceInfo = () => {
           id="name_commerce"
           label="Nombre de comercio"
           type="text"
+          autoComplete="off"
           value={commerceName}
           onInput={(e) => setCommerceName(e.target.value)}
           onLazyInput={{
