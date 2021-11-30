@@ -75,7 +75,7 @@ export const useProvideUrls = () => {
       },
       {
         link: "/loteria-de-bogota",
-        label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
+        label: <AppIcons Logo={LOTERIA} name="Lotería de Bogotá" />,
 
         component:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.id_comercio=== 2

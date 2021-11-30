@@ -95,7 +95,7 @@ const Transacciones = () => {
 
   useEffect(() => {
     tiposOperaciones();
-    setIdComercio(roleInfo?.id_comercio || 2);
+    setIdComercio(roleInfo?.id_comercio || -1);
   }, [tiposOperaciones, roleInfo?.id_comercio]);
   console.log(selected)
   return (
