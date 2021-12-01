@@ -8,6 +8,8 @@ import {
   useEffect,
   useState,
 } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useHistory, useLocation } from "react-router-dom";
 import fetchData from "./fetchData";
 
@@ -50,6 +52,18 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
+const notifyError = (msg) => {
+  toast.error(msg, {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+};
+
 export const useProvideAuth = () => {
   const [isSignedIn, setSignedIn] = useState(false);
 
@@ -66,6 +80,8 @@ export const useProvideAuth = () => {
   const [qr, setQr] = useState("");
 
   const [parameters, setParameters] = useState("");
+
+  const [timer, setTimer] = useState(null);
 
   const consulta_roles = useCallback(async () => {
     try {
@@ -132,6 +148,17 @@ export const useProvideAuth = () => {
     },
     []
   );
+  const history = useHistory();
+  const signOut = useCallback(() => {
+    Auth.signOut()
+      .then(() => {
+        setCognitoUser(null);
+        setSignedIn(false);
+        setRoleInfo({});
+        history.push("/login");
+      })
+      .catch(() => {});
+  }, [history]);
 
   const handleSetupTOTP = useCallback(
     async (user) => {
@@ -149,6 +176,30 @@ export const useProvideAuth = () => {
     },
     [cognitoUser?.username]
   );
+
+  const rechargeTOTP = useCallback(async () => {
+    if (cognitoUser?.challengeName === "MFA_SETUP") {
+      setTimer(
+        setTimeout(() => {
+          signOut();
+          notifyError("La sesión ha expirado, por favor intente de nuevo");
+        }, 60000)
+      );
+      try {
+        const validartoken = await Auth.setupTOTP(cognitoUser);
+        const str =
+          "otpauth://totp/AWSCognito:" +
+          "PROD" +
+          "?secret=" +
+          validartoken +
+          "&issuer=" +
+          "Punto de Pago Multibanco";
+        setQr(str);
+      } catch (err) {
+        throw new Error(err);
+      }
+    }
+  }, [cognitoUser, signOut]);
 
   const setUser = useCallback(async () => {
     try {
@@ -290,23 +341,10 @@ export const useProvideAuth = () => {
     checkUser();
   }, [checkUser, consulta_roles]);
 
-  useEffect(async () => {
-    if (cognitoUser?.challengeName === "MFA_SETUP") {
-      try {
-        const validartoken = await Auth.setupTOTP(cognitoUser);
-        const str =
-          "otpauth://totp/AWSCognito:" +
-          "PROD" +
-          "?secret=" +
-          validartoken +
-          "&issuer=" +
-          "Punto de Pago Multibanco";
-        setQr(str);
-      } catch (err) {}
-    }
-  }, [cognitoUser]);
+  useEffect(() => {
+    rechargeTOTP();
+  }, [rechargeTOTP]);
 
-  const history = useHistory();
   const { state, pathname } = useLocation();
 
   const signIn = useCallback(async (username, password) => {
@@ -343,25 +381,20 @@ export const useProvideAuth = () => {
         );
         setCognitoUser(loggedUser);
         if (loggedUser.challengeName === "MFA_SETUP") {
+          setTimer(
+            setTimeout(() => {
+              signOut();
+              notifyError("La sesión ha expirado, por favor intente de nuevo");
+            }, 60000)
+          );
           handleSetupTOTP(loggedUser);
         }
       } catch (err) {
         throw err;
       }
     },
-    [handleSetupTOTP]
+    [handleSetupTOTP, signOut]
   );
-
-  const signOut = useCallback(() => {
-    Auth.signOut()
-      .then(() => {
-        setCognitoUser(null);
-        setSignedIn(false);
-        setRoleInfo({});
-        history.push("/login");
-      })
-      .catch(() => {});
-  }, [history]);
 
   const confirmSignIn = useCallback(
     async (totp) => {
@@ -373,6 +406,9 @@ export const useProvideAuth = () => {
         );
         setCognitoUser(loggedUser);
         setSignedIn(true);
+        if (timer) {
+          clearTimeout(timer);
+        }
         const usrInfo = await Auth.currentUserInfo();
         setUserInfo(usrInfo);
         try {
@@ -440,7 +476,7 @@ export const useProvideAuth = () => {
         throw err;
       }
     },
-    [cognitoUser, history, state, pathname, signOut]
+    [cognitoUser, history, state, pathname]
   );
 
   const handlesetPreferredMFA = useCallback(
@@ -465,7 +501,7 @@ export const useProvideAuth = () => {
           await handlesetPreferredMFA(totp);
         }
       } catch (err) {
-        throw new Error(err);
+        throw err;
       }
     },
     [cognitoUser, handlesetPreferredMFA]
@@ -511,5 +547,6 @@ export const useProvideAuth = () => {
     checkUser,
     qr,
     parameters,
+    timer,
   };
 };
