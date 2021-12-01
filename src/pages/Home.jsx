@@ -51,7 +51,7 @@ const Home = () => {
           );
         })}
       </Carousel>
-      <HNavbar links={urls} isIcon />
+      {/* <HNavbar links={urls} isIcon />
       {emails.includes(setLocalEmail.toLowerCase()) ? (
         <Link to={"/review-commerce-forms"}>
           <AppIcons
@@ -61,7 +61,7 @@ const Home = () => {
         </Link>
       ) : (
         ""
-      )}
+      )} */}
       <HNavbar links={urlsPrivateApps} isIcon />
     </>
   );

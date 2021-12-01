@@ -8,5 +8,5 @@
 }
 
 .formItem > select {
-  @apply px-4 py-2 rounded-md bg-secondary-light text-black md:w-full min-w-full md:min-w-max;
+  @apply px-4 py-2 rounded-md bg-secondary-light text-black max-w-xs;
 }

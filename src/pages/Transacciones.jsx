@@ -132,7 +132,7 @@ const Transacciones = () => {
             Object.fromEntries([
               ["", ""],
               ...tiposOp.map(({ Nombre, id_tipo_operacion }) => {
-                return [[Nombre], id_tipo_operacion];
+                return [Nombre, id_tipo_operacion];
               }),
             ]) || { "": "" }
           }

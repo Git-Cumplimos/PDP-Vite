@@ -36,7 +36,7 @@ const Admin = () => {
                 </PrivateRoute>
               );
             })}
-          {urlsPrivApps
+          {/* {urlsPrivApps
             .filter(({ extern }) => !extern)
             .map(({ link, component: Component, props, exact }) => {
               exact = exact === undefined ? true : exact;
@@ -45,27 +45,32 @@ const Admin = () => {
                   <Component {...props} />
                 </PrivateRoute>
               );
+            })} */}
+          {urlsPrivateApps
+            .filter(({ extern }) => !extern)
+            .map(({ link, component: Component, subRoutes }) => {
+              console.log({ link, component: Component, subRoutes });
+              return (
+                <PrivateRoute key={link} path={link} exact>
+                  <Component subRoutes={subRoutes} />
+                </PrivateRoute>
+              );
             })}
           {urlsPrivateApps
             .filter(({ extern }) => !extern)
             .map(({ link, component: Component, subRoutes }) => {
-              return (
-                <Fragment key={link}>
-                  <PrivateRoute path={link} exact>
-                    <Component subRoutes={subRoutes} />
-                  </PrivateRoute>
-                  {Array.isArray(subRoutes) &&
-                    subRoutes.map(
-                      ({ link: _link, component: SubComponent, label }) => {
-                        return (
-                          <PrivateRoute key={_link} path={_link} exact>
-                            <SubComponent route={{ label }} />
-                          </PrivateRoute>
-                        );
-                      }
-                    )}
-                </Fragment>
-              );
+              console.log({ link, component: Component, subRoutes });
+              return Array.isArray(subRoutes)
+                ? subRoutes.map(
+                    ({ link: _link, component: SubComponent, label }) => {
+                      return (
+                        <PrivateRoute key={_link} path={_link} exact>
+                          <SubComponent route={{ label }} />
+                        </PrivateRoute>
+                      );
+                    }
+                  )
+                : "";
             })}
           {urlsPublic.map(({ link, component: Component, props, exact }) => {
             exact = exact === undefined ? true : exact;

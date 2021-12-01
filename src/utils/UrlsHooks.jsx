@@ -23,7 +23,8 @@ import IAMUsers from "../apps/IAM/Views/IAMUsers";
 import IAMGroups from "../apps/IAM/Views/IAMGroups";
 import IAMRoles from "../apps/IAM/Views/IAMRoles";
 import IAMPermissions from "../apps/IAM/Views/IAMPermissions";
-import IAM from "../apps/IAM/IAM";
+import IAMIndex from "../apps/IAM/IAMIndex";
+import IAMPolicies from "../apps/IAM/Views/IAMPolicies";
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
@@ -145,9 +146,9 @@ export const useProvideUrls = () => {
       {
         link: "/iam",
         label: <AppIcons Logo={MARKETPLACE} name="IAM" />,
-        component: IAM,
+        component: IAMIndex,
         extern: false,
-        permission: [11, 12, 13, 14, 15],
+        permission: [11, 12, 13, 14, 15, 16],
         subRoutes: [
           {
             link: "/iam/users",
@@ -162,6 +163,13 @@ export const useProvideUrls = () => {
             component: IAMGroups,
             extern: false,
             permission: [12],
+          },
+          {
+            link: "/iam/policies",
+            label: <AppIcons Logo={LOTERIA} name="Politicas" />,
+            component: IAMPolicies,
+            extern: false,
+            permission: [16],
           },
           {
             link: "/iam/roles",
@@ -194,7 +202,7 @@ export const useProvideUrls = () => {
       {
         link: "/seguridad",
         label: "Seguridad",
-        component: roleInfo?.roles?.includes(1) ? CrearRoles : emptyComp,
+        component: emptyComp,
         props: {},
       },
       {
@@ -212,6 +220,7 @@ export const useProvideUrls = () => {
       const rootUrls = [
         ...allUrlsPrivateApps
           .filter(({ permission }) => {
+            if (permission[0] === -1) return true;
             for (const per of permission) {
               if (
                 userPermissions.map(({ id_permission }) => id_permission).includes(per)

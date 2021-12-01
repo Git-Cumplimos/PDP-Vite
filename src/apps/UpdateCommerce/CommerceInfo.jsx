@@ -62,7 +62,7 @@ const CommerceInfo = () => {
   const downloadRef = useRef(null);
 
   const notifyError = (msg) => {
-    toast.error(msg, {
+    toast.warn(msg, {
       position: "top-center",
       autoClose: 5000,
       hideProgressBar: false,

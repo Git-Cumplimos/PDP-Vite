@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../components/Base/Form/Form";
@@ -7,6 +7,8 @@ import Modal from "../../../components/Base/Modal/Modal";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import fetchData from "../../../utils/fetchData";
+import EditUserForm from "../components/Users/EditUserForm";
+import UserForm from "../components/Users/UserForm";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -14,14 +16,20 @@ const IAMUsers = ({ route }) => {
   const { label } = route;
 
   const [usuariosDB, setUsuariosDB] = useState([]);
-  const [emailSearch, setEmailSearch] = useState("");
-  const [unameSearch, setUnameSearch] = useState("");
 
   const [showModal, setShowModal] = useState(false);
+  const [selected, setSelected] = useState(null);
 
-  const onCloseModal = () => {
-    showModal(false);
-  }
+  const onCloseModal = (fcn) => {
+    const form = refFrom.current;
+    const formData = new FormData(form);
+
+    fcn?.();
+    setShowModal(false);
+    setSelected(null);
+    
+    searchUsers(formData.get("emailSearch"), formData.get("unameSearch"));
+  };
 
   const searchUsers = useCallback((email, uname) => {
     const queries = {};
@@ -31,73 +39,102 @@ const IAMUsers = ({ route }) => {
     if (uname && uname !== "") {
       queries.uname = uname;
     }
-    fetchData(`${url}/users`, "GET", queries)
-      .then((res) => {
-        if (res?.status) {
-          setUsuariosDB(res?.obj);
-        }
-      })
-      .catch((err) => console.error(err));
-  }, [])
+    if (Object.keys(queries).length > 0) {
+      fetchData(`${url}/users`, "GET", queries)
+        .then((res) => {
+          if (res?.status) {
+            setUsuariosDB(res?.obj);
+          }
+        })
+        .catch((err) => console.error(err));
+    } else {
+      setUsuariosDB([]);
+    }
+  }, []);
 
-  useEffect(() => {
-    searchUsers();
-  }, [searchUsers]);
+  const refFrom = useRef(null);
+
+  const onChange = (e) => {
+    const form = refFrom.current;
+    const formData = new FormData(form);
+
+    searchUsers(formData.get("emailSearch"), formData.get("unameSearch"));
+  };
 
   return (
     <SubPage label={label}>
       <ButtonBar>
-        <Button>Nuevo usuario</Button>
+        <Button type={"button"} onClick={() => setShowModal(true)}>
+          Nuevo usuario
+        </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar usuarios</h1>
-      <Form grid>
+      <Form
+        onLazyChange={{
+          callback: onChange,
+          timeOut: 300,
+        }}
+        reff={refFrom}
+        grid
+      >
         <Input
           id={"emailSearch"}
+          name={"emailSearch"}
           label={"Email"}
-          type={"text"}
+          type={"search"}
           autoComplete="off"
-          value={emailSearch}
-          onInput={(e) => {
-            setEmailSearch(e.target.value);
-          }}
-          onLazyInput={{
-            callback: (e) => {
-              const email = e.target.value;
-              searchUsers(email, unameSearch);
-            },
-            timeOut: 300
-          }}
         />
         <Input
           id={"unameSearch"}
+          name={"unameSearch"}
           label={"Nombre"}
-          type={"text"}
+          type={"search"}
           autoComplete="off"
-          value={unameSearch}
-          onInput={(e) => {
-            setUnameSearch(e.target.value);
-          }}
-          onLazyInput={{
-            callback: (e) => {
-              const uname = e.target.value;
-              searchUsers(emailSearch, uname);
-            },
-            timeOut: 300
-          }}
         />
       </Form>
       {Array.isArray(usuariosDB) && usuariosDB.length > 0 ? (
         <Table
-          headers={["Nombre completo", "E-mail"]}
-          data={usuariosDB.map(({ uname, email }) => {
-            return { uname, email };
+          headers={["Id", "Nombre completo", "E-mail"]}
+          data={usuariosDB.map(({ uuid, uname, email }) => {
+            return { uuid, uname, email };
           })}
+          onSelectRow={(e, i) => {
+            const {
+              active,
+              direccion,
+              doc_id,
+              email,
+              phone,
+              uname,
+              uuid,
+              doc_type: { "Nombre corto": _doc_type },
+            } = usuariosDB[i];
+            const userMapped = {
+              "Id usuario": uuid,
+              "Nombre completo": uname,
+              Identificacion: `${_doc_type} ${doc_id}`,
+              Email: email,
+              edit: {
+                uuid,
+                direccion,
+                phone,
+                active,
+              },
+            };
+            setSelected({ ...userMapped });
+            setShowModal(true);
+            console.log(userMapped);
+          }}
         />
       ) : (
         ""
       )}
       <Modal show={showModal} handleClose={onCloseModal}>
-        
+        {selected ? (
+          <EditUserForm selected={selected} onCloseModal={onCloseModal} />
+        ) : (
+          <UserForm onCloseModal={onCloseModal} />
+        )}
       </Modal>
     </SubPage>
   );

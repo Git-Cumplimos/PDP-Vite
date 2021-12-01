@@ -1,7 +1,7 @@
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
 
-const IAM = ({ subRoutes }) => {
+const IAMIndex = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default IAM;
+export default IAMIndex;

@@ -17,8 +17,7 @@ const ToggleInput = ({
         <input
           id={_id}
           type="checkbox"
-          checked={value}
-          onChange={() => setValue(!value)}
+          {...select}
         />
         <span className={`${slider} ${round}`} />
       </label>
@@ -30,8 +29,7 @@ const ToggleInput = ({
         <input
           id={_id}
           type="checkbox"
-          checked={value}
-          onChange={() => setValue(!value)}
+          {...select}
         />
         <span className={`${slider} ${round}`} />
       </label>

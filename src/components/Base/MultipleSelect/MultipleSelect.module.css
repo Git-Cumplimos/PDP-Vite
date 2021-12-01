@@ -7,7 +7,7 @@
 }
 
 .formItem > .items {
-  @apply flex flex-row flex-wrap gap-4 text-black;
+  @apply flex flex-row flex-wrap justify-center gap-4 text-black;
 }
 
 .formItem > .items > div {
