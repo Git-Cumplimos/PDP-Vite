@@ -20,10 +20,6 @@ const logger = new Logger("withAuthenticator");
 
 const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
-const urlcrearRol = `${process.env.REACT_APP_URL_USRS}/crear_rol`;
-const urlconsulta_roles = `${process.env.REACT_APP_URL_USRS}/consulta_rol`;
-const urlconsulta_usuarios = `${process.env.REACT_APP_URL_USRS}/consulta_usuario`;
-const urlcambiar_rol = `${process.env.REACT_APP_URL_USRS}/modificar_rol`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;
@@ -44,10 +40,6 @@ export const AuthContext = createContext({
   confirmSignIn: () => {},
   signOut: () => {},
   getQuota: () => {},
-  crearRol: () => {},
-  consulta_roles: () => {},
-  consulta_usuarios: () => {},
-  cambiar_rol: () => {},
   checkUser: () => {},
   infoTicket: () => {},
 });
@@ -77,6 +69,10 @@ export const useProvideAuth = () => {
 
   const [parameters, setParameters] = useState("");
 
+  const history = useHistory();
+  
+  const { state, pathname } = useLocation();
+
   const notifyError = useCallback((msg = "Error") => {
     toast.warning(msg, {
       position: "top-center",
@@ -87,14 +83,6 @@ export const useProvideAuth = () => {
       draggable: true,
       progress: undefined,
     });
-  }, []);
-
-  const consulta_roles = useCallback(async () => {
-    try {
-      const res = await fetchData(urlconsulta_roles, "GET", {});
-      setRoles_disponibles(res);
-      return res;
-    } catch (err) {}
   }, []);
 
   const infoTicket = useCallback(async (id_trx, Tipo_operacion, ticket) => {
@@ -112,64 +100,6 @@ export const useProvideAuth = () => {
       console.error(err);
     }
   }, []);
-
-  const consulta_usuarios = useCallback(async (email) => {
-    try {
-      const res = await fetchData(urlconsulta_usuarios, "GET", {
-        email: email,
-      });
-
-      return res;
-    } catch (err) {}
-  }, []);
-
-  // const crearRol = useCallback(
-  //   async (
-  //     pnombre,
-  //     snombre,
-  //     papellido,
-  //     sapellido,
-  //     rol,
-  //     email,
-  //     identificacion,
-  //     telefono,
-  //     direccion_residencia
-  //   ) => {
-  //     const req = {
-  //       nombre: `${pnombre} ${snombre} ${papellido} ${sapellido}`,
-  //       rol: rol,
-  //       email: email,
-  //       identificacion: identificacion,
-  //       telefono: telefono,
-  //       direccion_residencia: direccion_residencia,
-  //     };
-  //     try {
-  //       const res = await fetchData(urlcrearRol, "POST", {}, req);
-  //       setCrearRolresp(res);
-  //       return res;
-  //     } catch (err) {
-  //       setCrearRolresp(null);
-  //     }
-  //   },
-  //   []
-  // );
-
-  const cambiar_rol = useCallback(
-    async (rol, email, email_cambio, telefono_cambio, direccion_residencia) => {
-      const req = {
-        rol: rol,
-        email: email,
-        email_cambio: email_cambio,
-        telefono: telefono_cambio,
-        direccion_residencia: direccion_residencia,
-      };
-      try {
-        const res = await fetchData(urlcambiar_rol, "PUT", {}, req);
-        return res;
-      } catch (err) {}
-    },
-    []
-  );
 
   const getPermissions = useCallback(
     async (email) => {
@@ -445,10 +375,9 @@ export const useProvideAuth = () => {
 
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
-    consulta_roles();
     checkUser();
     getPermissions(userInfo?.attributes?.email);
-  }, [checkUser, consulta_roles, getPermissions, userInfo?.attributes?.email]);
+  }, [checkUser, getPermissions, userInfo?.attributes?.email]);
 
   useEffect(() => {
     const validate = async () => {
@@ -487,9 +416,6 @@ export const useProvideAuth = () => {
     };
     temp();
   }, [cognitoUser]);
-
-  const history = useHistory();
-  const { state, pathname } = useLocation();
 
   const signIn = useCallback(async (username, password) => {
     try {
@@ -686,10 +612,6 @@ export const useProvideAuth = () => {
     confirmSignIn,
     signOut,
     getQuota,
-    // crearRol,
-    consulta_roles,
-    consulta_usuarios,
-    cambiar_rol,
     checkUser,
     qr,
     parameters,
