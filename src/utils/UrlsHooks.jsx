@@ -124,17 +124,15 @@ export const useProvideUrls = () => {
         link: "/marketplace",
         label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
         component: MarketPlace,
+        extern: true,
+        permission: [0],
+      },
+      {
+        link: "/marketplace/payorder/:orden",
+        label: null,
+        component: MarketPlace,
         extern: false,
         permission: [10],
-        subRoutes: [
-          {
-            link: "/payorder/:orden",
-            // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
-            component: MarketPlace,
-            extern: false,
-            permission: [10],
-          },
-        ],
       },
       {
         link: "/fundacion-mujer",
@@ -222,11 +220,9 @@ export const useProvideUrls = () => {
           .filter(({ permission }) => {
             if (permission[0] === -1) return true;
             for (const per of permission) {
-              if (
-                userPermissions.map(({ id_permission }) => id_permission).includes(per)
-              ) {
-                return true;
-              }
+              return userPermissions
+                .map(({ id_permission }) => id_permission)
+                .includes(per);
             }
             return false;
           })

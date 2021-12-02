@@ -7,8 +7,12 @@ const HNavbar = ({ links = [], isText = true, isIcon = false }) => {
     <nav className={navbar}>
       <ul className={`${list} ${isText ? text : ""} ${isIcon ? icon : ""}`}>
         {links
-          .filter(({ show }) => {
-            return show === undefined ? true : show;
+          .filter(({ show, label }) => {
+            return label === undefined || label === null
+              ? false
+              : show === undefined
+              ? true
+              : show;
           })
           .map(({ label, link, extern }, idx) => {
             return (
