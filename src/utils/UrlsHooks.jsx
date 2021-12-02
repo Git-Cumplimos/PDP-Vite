@@ -29,7 +29,6 @@ import IAMPolicies from "../apps/IAM/Views/IAMPolicies";
 export const UrlsContext = createContext({
   urlsPrivate: [],
   urlsPublic: [],
-  urlsPrivApps: [],
   urlsPrivateApps: [],
 });
 
@@ -40,7 +39,6 @@ export const useUrls = () => {
 export const useProvideUrls = () => {
   const [urlsPrivate, setUrlsPrivate] = useState([]);
   const [urlsPublic, setUrlsPublic] = useState([]);
-  const [urlsPrivApps, setUrlsPrivApps] = useState([]);
   const [urlsPrivateApps, setUrlsPrivateApps] = useState([]);
 
   const emptyComp = () => {
@@ -250,101 +248,6 @@ export const useProvideUrls = () => {
       setUrlsPrivateApps([]);
     }
 
-    setUrlsPrivApps([
-      {
-        link: "https://portal.solucionesenred.co/",
-        label: <AppIcons Logo={SUSER} name="SUSER" />,
-        props: {},
-        extern: true,
-        permission: [1],
-      },
-      {
-        link: "/loteria-de-bogota",
-        label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
-
-        component:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.id_comercio === 2
-            ? LoteriaBog
-            : emptyComp,
-        props: {},
-        show:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.id_comercio === 2, ///////////////////////////////
-        extern: false,
-        permission: [2, 3, 4, 5, 6],
-      },
-      {
-        link: "/loteria-de-bogota/:page",
-        component:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.id_comercio === 2
-            ? LoteriaBog
-            : emptyComp,
-        props: {},
-        exact: false,
-        show: false,
-      },
-      {
-        link: "/transacciones",
-        label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
-        component: Transacciones,
-        props: {},
-        extern: false,
-      },
-      {
-        link: "/update-commerce",
-        label: <AppIcons Logo={ACTUALIZACION} name="Actualizacion de datos" />,
-        component: FormCommerce,
-        props: {},
-        extern: false,
-      },
-      {
-        link: "/review-commerce-forms",
-        label: (
-          <AppIcons
-            Logo={ACTUALIZACION}
-            name="Revisar actualizacion de datos"
-          />
-        ),
-        component: CommerceInfo,
-        props: {},
-        extern: false,
-        show: false,
-      },
-      {
-        link: "/marketplace",
-        label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
-        component: emptyComp,
-        props: {},
-        show: false,
-        extern: false,
-      },
-      {
-        link: "/marketplace/payorder/:orden",
-        // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
-        component: MarketPlace,
-        props: {},
-        extern: false,
-        show: false,
-      },
-      {
-        link: "/fundacion-mujer",
-        label: <AppIcons name="Fundacion de la mujer" />,
-        component: FunMujer,
-        props: {},
-        show: false,
-        extern: false,
-      },
-      {
-        link: "/fundacion-mujer/:page",
-        component: FunMujer,
-        props: {},
-        exact: false,
-        show: false,
-      },
-    ]);
-
     setUrlsPublic([
       {
         link: "/login",
@@ -358,7 +261,6 @@ export const useProvideUrls = () => {
   return {
     urlsPrivate,
     urlsPublic,
-    urlsPrivApps,
     urlsPrivateApps,
   };
 };
