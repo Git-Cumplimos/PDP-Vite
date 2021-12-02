@@ -97,7 +97,7 @@ const Transacciones = () => {
     tiposOperaciones();
     setIdComercio(roleInfo?.id_comercio || 2);
   }, [tiposOperaciones, roleInfo?.id_comercio]);
-
+  console.log(selected)
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Transacciones</h1>

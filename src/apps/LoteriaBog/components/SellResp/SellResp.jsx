@@ -5,6 +5,7 @@ import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import { useAuth } from "../../../../utils/AuthHooks";
 import { useEffect } from "react";
+import Tickets from "../../../../components/Base/Tickets/Tickets";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -134,7 +135,10 @@ const SellResp = ({
     </div>
   ) : (
     <div className="flex flex-col justify-center items-center">
-      <Voucher {...voucherInfo} refPrint={printDiv} pageStyle={pageStyle} />
+      <Tickets
+              refPrint={printDiv}
+              ticket={ticket}
+            />
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
         <Button
