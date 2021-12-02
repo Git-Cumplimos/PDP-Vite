@@ -10,7 +10,7 @@ import fetchData from "../../../../utils/fetchData";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
-const EditGroupForm = ({ selected, onCloseModal }) => {
+const EditUserGroupForm = ({ selected, onCloseModal }) => {
   const [usuariosGrupo, setUsuariosGrupo] = useState({});
   const [usuariosDB, setUsuariosDB] = useState([]);
 
@@ -38,17 +38,14 @@ const EditGroupForm = ({ selected, onCloseModal }) => {
     });
   };
 
-  const searchUsers = useCallback(async (email, uname) => {
+  const searchUsers = useCallback(async (gname) => {
     const queries = {};
-    if (email && email !== "") {
-      queries.email = email;
-    }
-    if (uname && uname !== "") {
-      queries.uname = uname;
+    if (gname && gname !== "") {
+      queries.name_group = gname;
     }
     if (Object.keys(queries).length > 0) {
       try {
-        const res = await fetchData(`${url_iam}/users`, "GET", queries);
+        const res = await fetchData(`${url_iam}/groups`, "GET", queries);
         if (res?.status) {
           return res?.obj;
         }
@@ -61,21 +58,21 @@ const EditGroupForm = ({ selected, onCloseModal }) => {
     }
   }, []);
 
-  const searchUsersByGroup = useCallback(async (id_group) => {
+  const searchGroupByUsers = useCallback(async (uuid) => {
     const temp_res = {};
     try {
       const usersGroups = await fetchData(`${url_iam}/users-groups`, "GET", {
-        Groups_id_group: id_group ?? 0,
+        Users_uuid: uuid ?? 0,
       });
       if (usersGroups?.status) {
         for (const userGroup of usersGroups?.obj) {
           try {
-            const user = await fetchData(`${url_iam}/users`, "GET", {
-              uuid: userGroup.Users_uuid,
+            const user = await fetchData(`${url_iam}/groups`, "GET", {
+              id_group: userGroup.Groups_id_group,
             });
             if (user?.status) {
-              const usrInfo = user?.obj[0];
-              temp_res[`${usrInfo.uuid}) ${usrInfo.email}`] = true;
+              const groupInfo = user?.obj[0];
+              temp_res[`${groupInfo.id_group}) ${groupInfo.name_group}`] = true;
             }
           } catch (_err) {}
         }
@@ -89,10 +86,10 @@ const EditGroupForm = ({ selected, onCloseModal }) => {
   }, []);
 
   useEffect(() => {
-    searchUsersByGroup(selected?.edit?.id_group).then((res) => {
+    searchGroupByUsers(selected?.edit?.uuid).then((res) => {
       setUsuariosGrupo(res);
     });
-  }, [searchUsersByGroup, selected?.edit?.id_group]);
+  }, [searchGroupByUsers, selected?.edit?.uuid]);
 
   const refFrom = useRef(null);
 
@@ -101,26 +98,7 @@ const EditGroupForm = ({ selected, onCloseModal }) => {
     const formData = new FormData(form);
 
     searchUsers(formData.get("userEmail_edit"))
-      .then((emailSearch) => {
-        searchUsers("", formData.get("userEmail_edit"))
-          .then((nameSearch) => {
-            console.log(emailSearch);
-            console.log(nameSearch);
-            const allSearch = [...emailSearch, ...nameSearch];
-            console.log(allSearch);
-            setUsuariosDB([
-              ...allSearch.filter((el, idx, arr) => {
-                return (
-                  idx ===
-                  arr.findIndex((_el) => {
-                    return _el.uuid === el.uuid;
-                  })
-                );
-              }),
-            ]);
-          })
-          .catch((err) => {});
-      })
+      .then((res) => setUsuariosDB([...res]))
       .catch((err) => {});
   };
 
@@ -134,14 +112,14 @@ const EditGroupForm = ({ selected, onCloseModal }) => {
 
     for (const [key, value] of relations) {
       try {
-        const [uuid] = key.split(") ");
+        const [id_group] = key.split(") ");
         if (value) {
           const usersGroups = await fetchData(
             `${url_iam}/users-groups`,
             "GET",
             {
-              Users_uuid: uuid,
-              Groups_id_group: selected?.edit?.id_group ?? 0,
+              Users_uuid: selected?.edit?.uuid ?? 0,
+              Groups_id_group: id_group,
             }
           );
           if (usersGroups?.status) {
@@ -156,8 +134,8 @@ const EditGroupForm = ({ selected, onCloseModal }) => {
                 "POST",
                 {},
                 {
-                  Users_uuid: uuid,
-                  Groups_id_group: selected?.edit?.id_group ?? 0,
+                  Users_uuid: selected?.edit?.uuid ?? 0,
+                  Groups_id_group: id_group,
                 }
               );
               if (addUser2Group?.status) {
@@ -170,8 +148,8 @@ const EditGroupForm = ({ selected, onCloseModal }) => {
             `${url_iam}/users-groups`,
             "GET",
             {
-              Users_uuid: uuid,
-              Groups_id_group: selected?.edit?.id_group ?? 0,
+              Users_uuid: selected?.edit?.uuid ?? 0,
+              Groups_id_group: id_group,
             }
           );
           if (usersGroups?.status) {
@@ -184,8 +162,8 @@ const EditGroupForm = ({ selected, onCloseModal }) => {
                 `${url_iam}/users-groups`,
                 "DELETE",
                 {
-                  Users_uuid: uuid,
-                  Groups_id_group: selected?.edit?.id_group ?? 0,
+                  Users_uuid: selected?.edit?.uuid ?? 0,
+                  Groups_id_group: id_group,
                 }
               );
               if (addUser2Group?.status) {
@@ -247,20 +225,20 @@ const EditGroupForm = ({ selected, onCloseModal }) => {
         <Input
           id={`userEmail_edit`}
           name={`userEmail_edit`}
-          label={"Buscar usuario para añadir"}
+          label={"Buscar grupo para añadir"}
           type={"text"}
           autoComplete="off"
         />
         {Array.isArray(usuariosDB) && usuariosDB.length > 0 ? (
           <Table
-            headers={["Id", "Nombre completo", "E-mail"]}
-            data={usuariosDB.map(({ uuid, uname, email }) => {
-              return { uuid, uname, email };
+            headers={["Id", "Nombre completo"]}
+            data={usuariosDB.map(({ id_group, name_group }) => {
+              return { id_group, name_group };
             })}
             onSelectRow={(e, i) => {
-              const { email, uuid } = usuariosDB[i];
+              const { id_group, name_group } = usuariosDB[i];
               const copy = { ...usuariosGrupo };
-              copy[`${uuid}) ${email}`] = true;
+              copy[`${id_group}) ${name_group}`] = true;
               setUsuariosGrupo({ ...copy });
               setUsuariosDB([]);
               refFrom.current.reset();
@@ -270,11 +248,11 @@ const EditGroupForm = ({ selected, onCloseModal }) => {
           ""
         )}
         <ButtonBar>
-          <Button type={"submit"}>Actualizar grupo</Button>
+          <Button type={"submit"}>Actualizar usuario</Button>
         </ButtonBar>
       </Form>
     </div>
   );
 };
 
-export default EditGroupForm;
+export default EditUserGroupForm;

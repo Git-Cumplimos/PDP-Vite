@@ -93,14 +93,14 @@ const Input = ({
         GetFileTree(item);
       }
 
-      onGetFile([...tempFiles]);
+      onGetFile?.([...tempFiles]);
     },
     [onGetFile, hideDropZone]
   );
 
   if (type === "file") {
     input.onChange = (e) => {
-      onGetFile(e.target.files);
+      onGetFile?.(e.target.files);
     };
     window.addEventListener("dragenter", (e) => {
       showDropZone();
@@ -131,7 +131,14 @@ const Input = ({
 
   return self ? (
     <>
-      {label && label !== "" && <label htmlFor={_id}>{label}</label>}
+      {label && label !== "" && (
+        <label
+          htmlFor={_id}
+          className={`${type === "file" ? "text-center" : "text-right"}`}
+        >
+          {label}
+        </label>
+      )}
       <input {...input} ref={inputRef} />
       {type === "file" ? (
         <>
@@ -171,7 +178,14 @@ const Input = ({
     </>
   ) : (
     <div className={`${formItem} ${type === "file" ? File : ""}`}>
-      {label && label !== "" && <label htmlFor={_id}>{label}</label>}
+      {label && label !== "" && (
+        <label
+          htmlFor={_id}
+          className={`${type === "file" ? "text-center" : "text-right"}`}
+        >
+          {label}
+        </label>
+      )}
       <input {...input} ref={inputRef} />
       {type === "file" ? (
         <>

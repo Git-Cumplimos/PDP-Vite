@@ -128,7 +128,7 @@ export const useProvideUrls = () => {
         permission: [10],
         subRoutes: [
           {
-            link: "/marketplace/payorder/:orden",
+            link: "/payorder/:orden",
             // label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
             component: MarketPlace,
             extern: false,

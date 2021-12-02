@@ -7,7 +7,6 @@ import Modal from "../../../components/Base/Modal/Modal";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import fetchData from "../../../utils/fetchData";
-import EditGroupForm from "../components/Groups/EditGroupForm";
 import GroupForm from "../components/Groups/GroupForm";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
@@ -18,7 +17,7 @@ const IAMGroups = ({ route }) => {
   const [gruposDB, setGruposDB] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
-  const [selected, setSelected] = useState(null);
+  const [, setSelected] = useState(null);
 
   const onCloseModal = (fcn) => {
     fcn?.();
@@ -84,28 +83,12 @@ const IAMGroups = ({ route }) => {
           data={gruposDB.map(({ id_group, name_group }) => {
             return { id_group, name_group };
           })}
-          onSelectRow={(e, i) => {
-            const { name_group, id_group } = gruposDB[i];
-            const userMapped = {
-              "ID grupo": id_group,
-              "Nombre del grupo": name_group,
-              edit: {
-                id_group,
-              },
-            };
-            setSelected({ ...userMapped });
-            setShowModal(true);
-          }}
         />
       ) : (
         ""
       )}
       <Modal show={showModal} handleClose={onCloseModal}>
-        {selected ? (
-          <EditGroupForm selected={selected} onCloseModal={onCloseModal} />
-        ) : (
-          <GroupForm onCloseModal={onCloseModal} />
-        )}
+        <GroupForm onCloseModal={onCloseModal} />
       </Modal>
     </SubPage>
   );

@@ -8,7 +8,9 @@ import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import fetchData from "../../../utils/fetchData";
 import EditUserForm from "../components/Users/EditUserForm";
+import MassiveUpload from "../components/Users/MassiveUpload";
 import UserForm from "../components/Users/UserForm";
+import EditUserGroupForm from "../components/Users/EditUserGroupForm";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -19,6 +21,8 @@ const IAMUsers = ({ route }) => {
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [massiveUpload, setMassiveUpload] = useState(false);
+  const [editUser, setEditUser] = useState(0);
 
   const onCloseModal = (fcn) => {
     const form = refFrom.current;
@@ -26,8 +30,10 @@ const IAMUsers = ({ route }) => {
 
     fcn?.();
     setShowModal(false);
+    setMassiveUpload(false);
     setSelected(null);
-    
+    setEditUser(0);
+
     searchUsers(formData.get("emailSearch"), formData.get("unameSearch"));
   };
 
@@ -66,6 +72,15 @@ const IAMUsers = ({ route }) => {
       <ButtonBar>
         <Button type={"button"} onClick={() => setShowModal(true)}>
           Nuevo usuario
+        </Button>
+        <Button
+          type={"button"}
+          onClick={() => {
+            setShowModal(true);
+            setMassiveUpload(true);
+          }}
+        >
+          Creacion masiva de usuarios
         </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar usuarios</h1>
@@ -131,7 +146,22 @@ const IAMUsers = ({ route }) => {
       )}
       <Modal show={showModal} handleClose={onCloseModal}>
         {selected ? (
-          <EditUserForm selected={selected} onCloseModal={onCloseModal} />
+          editUser === 0 ? (
+            <ButtonBar>
+            <Button type={"button"} onClick={() => setEditUser(1)}>
+              Editar usuario
+            </Button>
+            <Button type={"button"} onClick={() => setEditUser(2)}>
+              Editar grupos del usuario
+            </Button>
+          </ButtonBar>
+          ) : editUser === 1 ? (
+            <EditUserForm selected={selected} onCloseModal={onCloseModal} />
+          ) : editUser === 2 ? (
+            <EditUserGroupForm selected={selected} onCloseModal={onCloseModal} />
+          ) : ""
+        ) : massiveUpload ? (
+          <MassiveUpload onCloseModal={onCloseModal} />
         ) : (
           <UserForm onCloseModal={onCloseModal} />
         )}

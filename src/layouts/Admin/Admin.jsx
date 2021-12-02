@@ -5,7 +5,6 @@ import Header from "../../components/Compound/Header/Header";
 import { useUrls } from "../../utils/UrlsHooks";
 import classes from "./Admin.module.css";
 import SocialBar from "../../components/Compound/SocialBar/SocialBar";
-import { Fragment } from "react";
 
 const Admin = () => {
   const { adminLayout, wave } = classes;
@@ -49,7 +48,6 @@ const Admin = () => {
           {urlsPrivateApps
             .filter(({ extern }) => !extern)
             .map(({ link, component: Component, subRoutes }) => {
-              console.log({ link, component: Component, subRoutes });
               return (
                 <PrivateRoute key={link} path={link} exact>
                   <Component subRoutes={subRoutes} />
@@ -59,7 +57,6 @@ const Admin = () => {
           {urlsPrivateApps
             .filter(({ extern }) => !extern)
             .map(({ link, component: Component, subRoutes }) => {
-              console.log({ link, component: Component, subRoutes });
               return Array.isArray(subRoutes)
                 ? subRoutes.map(
                     ({ link: _link, component: SubComponent, label }) => {
