@@ -5,7 +5,7 @@ import Form from "../../Base/Form/Form";
 import Input from "../../Base/Input/Input";
 import Select from "../../Base/Select/Select";
 
-const Pagination = ({ filters, maxPage, onChange: _onChange = () => {} }) => {
+const Pagination = ({ filters, maxPage = 0, onChange: _onChange = () => {} }) => {
   const [page, setPage] = useState(1);
 
   const refFrom = useRef(null);

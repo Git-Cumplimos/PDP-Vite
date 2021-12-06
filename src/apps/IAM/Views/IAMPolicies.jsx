@@ -17,7 +17,6 @@ const IAMPolicies = ({ route }) => {
   const { getPermissions, userInfo } = useAuth();
 
   const [policiesDB, setPoliciesDB] = useState([]);
-  const [maxPage, setMaxPage] = useState(1);
   const [formData, setFormData] = useState(new FormData());
 
   const [showModal, setShowModal] = useState(false);
@@ -30,8 +29,7 @@ const IAMPolicies = ({ route }) => {
 
     searchPolicies(
       formData.get("gnameSearch"),
-      formData.get("rnameSearch"),
-      formData.get("page")
+      formData.get("rnameSearch")
     )
       .then((res) => {
         setPoliciesDB(res);
@@ -46,22 +44,20 @@ const IAMPolicies = ({ route }) => {
       return [];
     }
     try {
-      const groups = await fetchData(`${url}/groups`, "GET", { name_group });
-      const roles = await fetchData(`${url}/roles`, "GET", { name_role });
+      const groups = await fetchData(`${url}/groups`, "GET", { name_group, limit: 0 });
+      const roles = await fetchData(`${url}/roles`, "GET", { name_role, limit: 0 });
 
       const temp_policies = [];
       if (groups?.status && roles?.status) {
         for (const group of groups?.obj?.results) {
           for (const role of roles?.obj?.results) {
-            console.log(group, role);
             const { id_group, name_group: _name_group } = group;
             const { id_role, name_role: _name_role } = role;
             const groupRole = await fetchData(`${url}/groups-roles`, "GET", {
               Groups_id_group: id_group,
               Roles_id_role: id_role,
             });
-            if (groupRole?.status && groupRole?.obj?.results.length > 0) {
-              console.log(groupRole)
+            if (groupRole?.status && groupRole?.obj?.length > 0) {
               temp_policies.push({
                 group: `${id_group}) ${_name_group}`,
                 role: `${id_role}) ${_name_role}`,
@@ -81,8 +77,7 @@ const IAMPolicies = ({ route }) => {
       setFormData(_formData);
       searchPolicies(
         _formData.get("gnameSearch"),
-        _formData.get("rnameSearch"),
-        _formData.get("page")
+        _formData.get("rnameSearch")
       )
         .then((res) => {
           setPoliciesDB(res);
@@ -105,7 +100,6 @@ const IAMPolicies = ({ route }) => {
           gnameSearch: { label: "Nombre del grupo" },
           rnameSearch: { label: "Nombre del rol" },
         }}
-        maxPage={maxPage}
         onChange={onChange}
       />
       {Array.isArray(policiesDB) && policiesDB.length > 0 ? (

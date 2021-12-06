@@ -160,11 +160,8 @@ export const useProvideAuth = () => {
             if (!group_roles_res?.status) {
               throw new Error(group_roles_res?.msg);
             }
-            const gr_res = group_roles_res?.obj?.results
-            if (
-              Array.isArray(gr_res) &&
-              gr_res.length > 0
-            ) {
+            const gr_res = group_roles_res?.obj;
+            if (Array.isArray(gr_res) && gr_res.length > 0) {
               for (const role of gr_res) {
                 const id_role = role.Roles_id_role ?? 0;
                 if (id_role !== 0) {
