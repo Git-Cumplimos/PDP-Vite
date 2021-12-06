@@ -1,30 +1,62 @@
 import { createContext, useContext, useEffect, useState } from "react";
+
+/**
+ * * Logos
+ */
 import AppIcons from "../components/Base/AppIcons/AppIcons";
 import SUSER from "../assets/svg/SUSER-01.svg";
 import MARKETPLACE from "../assets/svg/MARKETPLACE-01.svg";
 import ACTUALIZACION from "../assets/svg/ActualizacionDeDatos.svg";
 import LOTERIA from "../assets/svg/LOTERIA-DE-BOGOTA-01.svg";
+
+
+/**
+ * * Paginas
+ */
+
+/**
+ * Base
+ */
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import AuthButton from "../components/Compound/Signout/Signout";
-import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
-import FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
 import Transacciones from "../pages/Transacciones";
-import CrearRoles from "../pages/CrearRoles";
-import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
-import MarketPlace from "../apps/MarketPlace/MarketPlace";
-import CommerceInfo from "../apps/UpdateCommerce/CommerceInfo";
 import { useAuth } from "./AuthHooks";
+
+/**
+ * Loteria
+ */
+import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
 import Loteria from "../apps/LoteriaBog/Views/Loteria";
 import DescargarArchivos from "../apps/LoteriaBog/Views/DescargarArchivos";
 import CrearSorteos from "../apps/LoteriaBog/Views/CrearSorteos";
 import CargaArchivos from "../apps/LoteriaBog/Views/CargaArchivos";
+
+/**
+ * Marketplace
+ */
+import MarketPlace from "../apps/MarketPlace/MarketPlace";
+
+/**
+ * Fundacion de la mujer
+ */
+import FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
+
+/**
+ * IAM
+ */
 import IAMUsers from "../apps/IAM/Views/IAMUsers";
 import IAMGroups from "../apps/IAM/Views/IAMGroups";
 import IAMRoles from "../apps/IAM/Views/IAMRoles";
 import IAMPermissions from "../apps/IAM/Views/IAMPermissions";
 import IAMIndex from "../apps/IAM/IAMIndex";
 import IAMPolicies from "../apps/IAM/Views/IAMPolicies";
+
+/**
+ * Formulario de actualizacion
+ */
+import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
+import CommerceInfo from "../apps/UpdateCommerce/CommerceInfo";
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
@@ -97,7 +129,7 @@ export const useProvideUrls = () => {
         label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
         component: Transacciones,
         extern: false,
-        permission: [-1],
+        permission: [17],
       },
       {
         link: "/update-commerce",

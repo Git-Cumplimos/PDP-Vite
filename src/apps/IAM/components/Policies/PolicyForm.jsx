@@ -1,12 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
-import Input from "../../../../components/Base/Input/Input";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
-import Select from "../../../../components/Base/Select/Select";
 import Table from "../../../../components/Base/Table/Table";
+import Pagination from "../../../../components/Compound/Pagination/Pagination";
 import fetchData from "../../../../utils/fetchData";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
@@ -40,17 +39,8 @@ const PolicyForm = ({ onCloseModal }) => {
   const [selectedRoles, setSelectedRoles] = useState({});
   const [groups, setGroups] = useState([]);
   const [roles, setRoles] = useState([]);
-
-  const makeForm = useMemo(() => {
-    return {
-      "Nombre del grupo": {
-        required: false,
-      },
-      "Nombre del rol": {
-        required: false,
-      },
-    };
-  }, []);
+  const [maxPageGroups, setMaxPageGroups] = useState(1);
+  const [maxPageRoles, setMaxPageRoles] = useState(1);
 
   const searchGroups = useCallback(async (name_group) => {
     if (name_group === "") {
@@ -62,7 +52,8 @@ const PolicyForm = ({ onCloseModal }) => {
         name_group,
       });
       if (_groups?.status) {
-        setGroups(_groups?.obj);
+        setGroups(_groups?.obj?.results);
+        setMaxPageGroups(_groups?.obj?.maxpages);
       }
     } catch {}
   }, []);
@@ -75,20 +66,25 @@ const PolicyForm = ({ onCloseModal }) => {
     try {
       const _roles = await fetchData(`${url_iam}/roles`, "GET", { name_role });
       if (_roles?.status) {
-        setRoles(_roles?.obj);
+        setRoles(_roles?.obj?.results);
+        setMaxPageRoles(_roles?.obj?.maxpages);
       }
     } catch {}
   }, []);
 
-  const refFrom = useRef(null);
+  const onChangeGroups = useCallback(
+    (formData) => {
+      searchGroups(formData.get("gname"));
+    },
+    [searchGroups]
+  );
 
-  const onChange = (e) => {
-    const form = refFrom.current;
-    const formData = new FormData(form);
-
-    searchGroups(formData.get("Nombre del grupo"));
-    searchRoles(formData.get("Nombre del rol"));
-  };
+  const onChangeRoles = useCallback(
+    (formData) => {
+      searchRoles(formData.get("rname"));
+    },
+    [searchRoles]
+  );
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -136,15 +132,7 @@ const PolicyForm = ({ onCloseModal }) => {
   return (
     <div className="flex flex-col justify-center items-center mx-auto">
       <h1 className="text-2xl my-4">Creacion de politica</h1>
-      <Form
-        onSubmit={onSubmit}
-        onLazyChange={{
-          callback: onChange,
-          timeOut: 300,
-        }}
-        reff={refFrom}
-        grid
-      >
+      <Form onSubmit={onSubmit} grid>
         {Array.isArray(Object.keys(selectedGroups)) &&
         Object.keys(selectedGroups).length > 0 ? (
           <MultipleSelect
@@ -165,34 +153,13 @@ const PolicyForm = ({ onCloseModal }) => {
         ) : (
           ""
         )}
-        {Object.entries(makeForm).map(([key, val]) => {
-          if (!Object.keys(val).includes("options")) {
-            const { required, type } = val;
-            return (
-              <Input
-                key={`${key}_new`}
-                id={`${key}_new`}
-                name={key}
-                label={key}
-                type={type || "text"}
-                autoComplete="off"
-                required={required ?? true}
-              />
-            );
-          } else {
-            const { required, options } = val;
-            return (
-              <Select
-                key={`${key}_new`}
-                id={`${key}_new`}
-                name={key}
-                label={key}
-                required={required ?? true}
-                options={options ?? []}
-              />
-            );
-          }
-        })}
+        <Pagination
+          filters={{
+            gname: { label: "Nombre del grupo" },
+          }}
+          maxPage={maxPageGroups}
+          onChange={onChangeGroups}
+        />
         {Array.isArray(groups) && groups.length > 0 ? (
           <Table
             headers={["Id", "Nombre del grupo"]}
@@ -205,12 +172,18 @@ const PolicyForm = ({ onCloseModal }) => {
               copy[`${id_group}) ${name_group}`] = true;
               setSelectedGroups({ ...copy });
               setGroups([]);
-              refFrom.current.reset();
             }}
           />
         ) : (
           ""
         )}
+        <Pagination
+          filters={{
+            rname: { label: "Nombre del rol" },
+          }}
+          maxPage={maxPageRoles}
+          onChange={onChangeRoles}
+        />
         {Array.isArray(roles) && roles.length > 0 ? (
           <Table
             headers={["Id", "Nombre del rol"]}
@@ -223,7 +196,6 @@ const PolicyForm = ({ onCloseModal }) => {
               copy[`${id_role}) ${name_role}`] = true;
               setSelectedRoles({ ...copy });
               setRoles([]);
-              refFrom.current.reset();
             }}
           />
         ) : (

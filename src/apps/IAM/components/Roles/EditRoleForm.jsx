@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
-import Input from "../../../../components/Base/Input/Input";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
 import Table from "../../../../components/Base/Table/Table";
+import Pagination from "../../../../components/Compound/Pagination/Pagination";
 import fetchData from "../../../../utils/fetchData";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
@@ -13,6 +13,8 @@ const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 const EditRoleForm = ({ selected, onCloseModal }) => {
   const [usuariosGrupo, setUsuariosGrupo] = useState({});
   const [permisosDB, setPermisosDB] = useState([]);
+
+  const [maxPage, setMaxPage] = useState(1);
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -38,16 +40,20 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
     });
   };
 
-  const searchPermissions = useCallback((uname) => {
-    const queries = {};
+  const searchPermissions = useCallback((uname, _page) => {
+    const queries = { limit: 5 };
     if (uname && uname !== "") {
       queries.name_permission = uname;
+    }
+    if (_page) {
+      queries.page = _page;
     }
     if (Object.keys(queries).length > 0) {
       fetchData(`${url_iam}/permissions`, "GET", queries)
         .then((res) => {
           if (res?.status) {
-            setPermisosDB(res?.obj);
+            setPermisosDB(res?.obj?.results);
+            setMaxPage(res?.obj?.maxpages);
           }
         })
         .catch((err) => console.error(err));
@@ -56,7 +62,7 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
     }
   }, []);
 
-  const searchUsersByGroup = useCallback(async (id_role) => {
+  const searchPermissionsByRole = useCallback(async (id_role) => {
     const temp_res = {};
     try {
       const usersGroups = await fetchData(
@@ -73,7 +79,7 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
               id_permission: userGroup.Permissions_id_permission,
             });
             if (user?.status) {
-              const usrInfo = user?.obj[0];
+              const usrInfo = user?.obj?.results?.[0];
               temp_res[
                 `${usrInfo.id_permission}) ${usrInfo.name_permission}`
               ] = true;
@@ -90,18 +96,13 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
   }, []);
 
   useEffect(() => {
-    searchUsersByGroup(selected?.edit?.id_role).then((res) => {
+    searchPermissionsByRole(selected?.edit?.id_role).then((res) => {
       setUsuariosGrupo(res);
     });
-  }, [searchUsersByGroup, selected?.edit?.id_role]);
+  }, [searchPermissionsByRole, selected?.edit?.id_role]);
 
-  const refFrom = useRef(null);
-
-  const onChange = (e) => {
-    const form = refFrom.current;
-    const formData = new FormData(form);
-
-    searchPermissions(formData.get("namePermission_edit"));
+  const onChange = (formData) => {
+    searchPermissions(formData.get("namePermission"), formData.get("page"));
   };
 
   const onSubmit = async (e) => {
@@ -205,15 +206,7 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
           ""
         );
       })}
-      <Form
-        onSubmit={onSubmit}
-        onLazyChange={{
-          callback: onChange,
-          timeOut: 300,
-        }}
-        reff={refFrom}
-        grid
-      >
+      <Form onSubmit={onSubmit} grid>
         {Array.isArray(Object.keys(usuariosGrupo)) &&
         Object.keys(usuariosGrupo).length > 0 ? (
           <MultipleSelect
@@ -224,12 +217,12 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
         ) : (
           ""
         )}
-        <Input
-          id={`namePermission_edit`}
-          name={`namePermission_edit`}
-          label={"Buscar permiso para añadir"}
-          type={"text"}
-          autoComplete="off"
+        <Pagination
+          filters={{
+            namePermission: { label: "Buscar permiso para añadir" },
+          }}
+          maxPage={maxPage}
+          onChange={onChange}
         />
         {Array.isArray(permisosDB) && permisosDB.length > 0 ? (
           <Table
@@ -243,7 +236,6 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
               copy[`${id_permission}) ${name_permission}`] = true;
               setUsuariosGrupo({ ...copy });
               setPermisosDB([]);
-              refFrom.current.reset();
             }}
           />
         ) : (

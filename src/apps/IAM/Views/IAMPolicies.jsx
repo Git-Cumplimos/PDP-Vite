@@ -1,11 +1,10 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
+import Pagination from "../../../components/Compound/Pagination/Pagination";
 import { useAuth } from "../../../utils/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import EditPolicyForm from "../components/Policies/EditPolicyForm";
@@ -18,6 +17,8 @@ const IAMPolicies = ({ route }) => {
   const { getPermissions, userInfo } = useAuth();
 
   const [policiesDB, setPoliciesDB] = useState([]);
+  const [maxPage, setMaxPage] = useState(1);
+  const [formData, setFormData] = useState(new FormData());
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -27,32 +28,40 @@ const IAMPolicies = ({ route }) => {
     setShowModal(false);
     setSelected(null);
 
-    const form = refFrom.current;
-    const formData = new FormData(form);
-
-    searchPolicies(formData.get("gnameSearch"), formData.get("rnameSearch"))
-      .then((res) => setPoliciesDB(res))
+    searchPolicies(
+      formData.get("gnameSearch"),
+      formData.get("rnameSearch"),
+      formData.get("page")
+    )
+      .then((res) => {
+        setPoliciesDB(res);
+      })
       .catch((err) => err);
 
     getPermissions(userInfo?.attributes?.email);
   };
 
   const searchPolicies = useCallback(async (name_group, name_role) => {
+    if (!name_group && !name_role) {
+      return [];
+    }
     try {
       const groups = await fetchData(`${url}/groups`, "GET", { name_group });
       const roles = await fetchData(`${url}/roles`, "GET", { name_role });
 
       const temp_policies = [];
       if (groups?.status && roles?.status) {
-        for (const group of groups?.obj) {
-          for (const role of roles?.obj) {
+        for (const group of groups?.obj?.results) {
+          for (const role of roles?.obj?.results) {
+            console.log(group, role);
             const { id_group, name_group: _name_group } = group;
             const { id_role, name_role: _name_role } = role;
             const groupRole = await fetchData(`${url}/groups-roles`, "GET", {
               Groups_id_group: id_group,
               Roles_id_role: id_role,
             });
-            if (groupRole?.status && groupRole?.obj.length > 0) {
+            if (groupRole?.status && groupRole?.obj?.results.length > 0) {
+              console.log(groupRole)
               temp_policies.push({
                 group: `${id_group}) ${_name_group}`,
                 role: `${id_role}) ${_name_role}`,
@@ -67,16 +76,21 @@ const IAMPolicies = ({ route }) => {
     }
   }, []);
 
-  const refFrom = useRef(null);
-
-  const onChange = (e) => {
-    const form = refFrom.current;
-    const formData = new FormData(form);
-
-    searchPolicies(formData.get("gnameSearch"), formData.get("rnameSearch"))
-      .then((res) => setPoliciesDB(res))
-      .catch((err) => err);
-  };
+  const onChange = useCallback(
+    (_formData) => {
+      setFormData(_formData);
+      searchPolicies(
+        _formData.get("gnameSearch"),
+        _formData.get("rnameSearch"),
+        _formData.get("page")
+      )
+        .then((res) => {
+          setPoliciesDB(res);
+        })
+        .catch((err) => err);
+    },
+    [searchPolicies]
+  );
 
   return (
     <SubPage label={label}>
@@ -86,29 +100,14 @@ const IAMPolicies = ({ route }) => {
         </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar politicas</h1>
-      <Form
-        onLazyChange={{
-          callback: onChange,
-          timeOut: 300,
+      <Pagination
+        filters={{
+          gnameSearch: { label: "Nombre del grupo" },
+          rnameSearch: { label: "Nombre del rol" },
         }}
-        reff={refFrom}
-        grid
-      >
-        <Input
-          id={"gnameSearch"}
-          name={"gnameSearch"}
-          label={"Nombre del grupo"}
-          type={"search"}
-          autoComplete="off"
-        />
-        <Input
-          id={"rnameSearch"}
-          name={"rnameSearch"}
-          label={"Nombre del rol"}
-          type={"search"}
-          autoComplete="off"
-        />
-      </Form>
+        maxPage={maxPage}
+        onChange={onChange}
+      />
       {Array.isArray(policiesDB) && policiesDB.length > 0 ? (
         <Table
           headers={["Grupo", "Rol"]}
@@ -119,7 +118,7 @@ const IAMPolicies = ({ route }) => {
             const { group, role } = policiesDB[i];
             const userMapped = {
               Grupo: group,
-              Rol: role
+              Rol: role,
             };
             setSelected({ ...userMapped });
             setShowModal(true);

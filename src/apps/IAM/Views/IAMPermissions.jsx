@@ -6,6 +6,7 @@ import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
+import Pagination from "../../../components/Compound/Pagination/Pagination";
 import fetchData from "../../../utils/fetchData";
 import EditPermissionForm from "../components/Permissions/EditPermissionForm";
 import PermissionForm from "../components/Permissions/PermissionForm";
@@ -16,31 +17,34 @@ const IAMPermissions = ({ route }) => {
   const { label } = route;
 
   const [permisosDB, setPermisosDB] = useState([]);
+  const [maxPage, setMaxPage] = useState(1);
+  const [formData, setFormData] = useState(new FormData());
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
 
   const onCloseModal = (fcn) => {
-    const form = refFrom.current;
-    const formData = new FormData(form);
-
     fcn?.();
     setShowModal(false);
     setSelected(null);
 
-    searchPermissions(formData.get("unameSearch"));
+    searchPermissions(formData.get("unameSearch"), formData.get("page"));
   };
 
-  const searchPermissions = useCallback((uname) => {
+  const searchPermissions = useCallback((uname, _page) => {
     const queries = {};
     if (uname && uname !== "") {
       queries.name_permission = uname;
+    }
+    if (_page) {
+      queries.page = _page;
     }
     if (Object.keys(queries).length > 0) {
       fetchData(`${url}/permissions`, "GET", queries)
         .then((res) => {
           if (res?.status) {
-            setPermisosDB(res?.obj);
+            setPermisosDB(res?.obj?.results);
+            setMaxPage(res?.obj?.maxpages);
           }
         })
         .catch((err) => console.error(err));
@@ -49,14 +53,13 @@ const IAMPermissions = ({ route }) => {
     }
   }, []);
 
-  const refFrom = useRef(null);
-
-  const onChange = (e) => {
-    const form = refFrom.current;
-    const formData = new FormData(form);
-
-    searchPermissions(formData.get("unameSearch"));
-  };
+  const onChange = useCallback(
+    (_formData) => {
+      setFormData(_formData);
+      searchPermissions(_formData.get("unameSearch"), _formData.get("page"));
+    },
+    [searchPermissions]
+  );
 
   return (
     <SubPage label={label}>
@@ -66,23 +69,13 @@ const IAMPermissions = ({ route }) => {
         </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar permisos</h1>
-      <Form
-        onLazyChange={{
-          callback: onChange,
-          timeOut: 300,
+      <Pagination
+        filters={{
+          unameSearch: { label: "Nombre" },
         }}
-        reff={refFrom}
-        grid
-      >
-        <Input
-          id={"unameSearch"}
-          name={"unameSearch"}
-          label={"Nombre"}
-          type={"search"}
-          autoComplete="off"
-        />
-        <ButtonBar></ButtonBar>
-      </Form>
+        maxPage={maxPage}
+        onChange={onChange}
+      />
       {Array.isArray(permisosDB) && permisosDB.length > 0 ? (
         <Table
           headers={["Id", "Nombre del permiso"]}
@@ -109,7 +102,7 @@ const IAMPermissions = ({ route }) => {
         ""
       )}
       <Modal show={showModal} handleClose={onCloseModal}>
-      {selected ? (
+        {selected ? (
           <EditPermissionForm selected={selected} onCloseModal={onCloseModal} />
         ) : (
           <PermissionForm onCloseModal={onCloseModal} />

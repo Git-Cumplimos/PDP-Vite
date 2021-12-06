@@ -1,11 +1,10 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
+import Pagination from "../../../components/Compound/Pagination/Pagination";
 import fetchData from "../../../utils/fetchData";
 import GroupForm from "../components/Groups/GroupForm";
 
@@ -15,6 +14,8 @@ const IAMGroups = ({ route }) => {
   const { label } = route;
 
   const [gruposDB, setGruposDB] = useState([]);
+  const [maxPage, setMaxPage] = useState(1);
+  const [formData, setFormData] = useState(new FormData());
 
   const [showModal, setShowModal] = useState(false);
   const [, setSelected] = useState(null);
@@ -23,18 +24,24 @@ const IAMGroups = ({ route }) => {
     fcn?.();
     setShowModal(false);
     setSelected(null);
+
+    searchGroups(formData.get("unameSearch"), formData.get("page"));
   };
 
-  const searchGroups = useCallback((uname) => {
+  const searchGroups = useCallback((uname, _page) => {
     const queries = {};
     if (uname && uname !== "") {
       queries.name_group = uname;
+    }
+    if (_page) {
+      queries.page = _page;
     }
     if (Object.keys(queries).length > 0) {
       fetchData(`${url}/groups`, "GET", queries)
         .then((res) => {
           if (res?.status) {
-            setGruposDB(res?.obj);
+            setGruposDB(res?.obj?.results);
+            setMaxPage(res?.obj?.maxpages);
           }
         })
         .catch((err) => console.error(err));
@@ -43,14 +50,13 @@ const IAMGroups = ({ route }) => {
     }
   }, []);
 
-  const refFrom = useRef(null);
-
-  const onChange = (e) => {
-    const form = refFrom.current;
-    const formData = new FormData(form);
-
-    searchGroups(formData.get("unameSearch"));
-  };
+  const onChange = useCallback(
+    (_formData) => {
+      setFormData(_formData);
+      searchGroups(_formData.get("unameSearch"), _formData.get("page"));
+    },
+    [searchGroups]
+  );
 
   return (
     <SubPage label={label}>
@@ -60,23 +66,13 @@ const IAMGroups = ({ route }) => {
         </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar grupos</h1>
-      <Form
-        onLazyChange={{
-          callback: onChange,
-          timeOut: 300,
+      <Pagination
+        filters={{
+          unameSearch: { label: "Nombre" },
         }}
-        reff={refFrom}
-        grid
-      >
-        <Input
-          id={"unameSearch"}
-          name={"unameSearch"}
-          label={"Nombre"}
-          type={"search"}
-          autoComplete="off"
-        />
-        <ButtonBar></ButtonBar>
-      </Form>
+        maxPage={maxPage}
+        onChange={onChange}
+      />
       {Array.isArray(gruposDB) && gruposDB.length > 0 ? (
         <Table
           headers={["Id", "Nombre del grupo"]}

@@ -70,7 +70,7 @@ export const useProvideAuth = () => {
   const [parameters, setParameters] = useState("");
 
   const history = useHistory();
-  
+
   const { state, pathname } = useLocation();
 
   const notifyError = useCallback((msg = "Error") => {
@@ -102,20 +102,24 @@ export const useProvideAuth = () => {
   }, []);
 
   const getPermissions = useCallback(
-    async (email) => {
+    async (email = "") => {
+      if (!email) {
+        return;
+      }
       try {
         // Get user
         const user_res = await fetchData(`${url_permissions}/users`, "GET", {
-          email: email ?? "",
+          email: email,
         });
         if (!user_res?.status) {
           throw new Error(user_res?.msg);
         }
-        if (!Array.isArray(user_res?.obj) || user_res?.obj.length === 0) {
+        const user_res_arr = user_res?.obj?.results;
+        if (!Array.isArray(user_res_arr) || user_res_arr.length === 0) {
           notifyError("User not found in db");
           return;
         }
-        const uuid = user_res?.obj?.[0].uuid ?? 0;
+        const uuid = user_res_arr?.[0].uuid ?? 0;
         if (uuid === 0) {
           notifyError("User not found in db");
           return;
@@ -156,11 +160,12 @@ export const useProvideAuth = () => {
             if (!group_roles_res?.status) {
               throw new Error(group_roles_res?.msg);
             }
+            const gr_res = group_roles_res?.obj?.results
             if (
-              Array.isArray(group_roles_res?.obj) &&
-              group_roles_res?.obj.length > 0
+              Array.isArray(gr_res) &&
+              gr_res.length > 0
             ) {
-              for (const role of group_roles_res?.obj) {
+              for (const role of gr_res) {
                 const id_role = role.Roles_id_role ?? 0;
                 if (id_role !== 0) {
                   // Get permissions of the role
@@ -192,11 +197,9 @@ export const useProvideAuth = () => {
                         if (!permissions_res?.status) {
                           throw new Error(permissions_res?.msg);
                         }
-                        if (
-                          Array.isArray(permissions_res?.obj) &&
-                          permissions_res?.obj.length > 0
-                        ) {
-                          userAccess.push(...permissions_res?.obj);
+                        const per_res = permissions_res?.obj?.results;
+                        if (Array.isArray(per_res) && per_res.length > 0) {
+                          userAccess.push(...per_res);
                         }
                       }
                     }

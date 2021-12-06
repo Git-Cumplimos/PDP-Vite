@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
-import Input from "../../../../components/Base/Input/Input";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
 import Table from "../../../../components/Base/Table/Table";
 import fetchData from "../../../../utils/fetchData";
@@ -50,30 +49,29 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
     if (uname && uname !== "") {
       queries.uname = uname;
     }
-    if (Object.keys(queries).length > 0) {
-      try {
-        const res = await fetchData(`${url_types}`, "GET", {});
-        if (res?.status) {
-          res.obj = await Promise.all(
-            res?.obj.map(async (type) => {
-              const _resAliados = await fetchData(`${url_aliados}`, "GET", {
-                aliado: type.Aliado,
-              });
-              if (_resAliados?.status) {
-                type.Aliado = _resAliados?.obj[0].nombre;
-                type.Aliado_corto = _resAliados?.obj[0].nombre_corto;
-              }
-              return type;
-            })
-          );
-          return res?.obj;
-        }
-        return [];
-      } catch (err) {
-        notifyError(err);
+    // if (Object.keys(queries).length === 0) {
+    //   return [];
+    // }
+    try {
+      const res = await fetchData(`${url_types}`, "GET", {});
+      if (res?.status) {
+        res.obj = await Promise.all(
+          res?.obj.map(async (type) => {
+            const _resAliados = await fetchData(`${url_aliados}`, "GET", {
+              aliado: type.Aliado,
+            });
+            if (_resAliados?.status) {
+              type.Aliado = _resAliados?.obj[0].nombre;
+              type.Aliado_corto = _resAliados?.obj[0].nombre_corto;
+            }
+            return type;
+          })
+        );
+        return res?.obj;
       }
-    } else {
       return [];
+    } catch (err) {
+      notifyError(err);
     }
   }, []);
 
@@ -133,16 +131,20 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
     });
   }, [searchTypesByPermission, selected?.edit?.id_permission]);
 
-  const refFrom = useRef(null);
+  // const onChange = (e) => {
+  //   const form = refFrom.current;
+  //   const formData = new FormData(form);
 
-  const onChange = (e) => {
-    const form = refFrom.current;
-    const formData = new FormData(form);
+  //   searchTypes(formData.get("userEmail_edit"))
+  //     .then((res) => setTypesDB(res))
+  //     .catch((err) => {});
+  // };
 
-    searchTypes(formData.get("userEmail_edit"))
+  useEffect(() => {
+    searchTypes()
       .then((res) => setTypesDB(res))
       .catch((err) => {});
-  };
+  }, [searchTypes]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -231,7 +233,9 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
 
   return (
     <div className="flex flex-col justify-center items-center mx-auto">
-      <h1 className="text-2xl my-4">Editar transacciones visibles para el permiso</h1>
+      <h1 className="text-2xl my-4">
+        Editar transacciones visibles para el permiso
+      </h1>
       {Object.entries(selected).map(([key, val]) => {
         return key !== "edit" ? (
           <div
@@ -245,15 +249,7 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
           ""
         );
       })}
-      <Form
-        onSubmit={onSubmit}
-        onLazyChange={{
-          callback: onChange,
-          timeOut: 300,
-        }}
-        reff={refFrom}
-        grid
-      >
+      <Form onSubmit={onSubmit} grid>
         {Array.isArray(Object.keys(typesByPermissions)) &&
         Object.keys(typesByPermissions).length > 0 ? (
           <MultipleSelect
@@ -264,13 +260,6 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
         ) : (
           ""
         )}
-        <Input
-          id={`userEmail_edit`}
-          name={`userEmail_edit`}
-          label={"Buscar tipo de operacion"}
-          type={"text"}
-          autoComplete="off"
-        />
         {Array.isArray(typesDB) && typesDB.length > 0 ? (
           <Table
             headers={["Id", "Nombre operacion", "Aliado"]}
@@ -282,8 +271,7 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
               const copy = { ...typesByPermissions };
               copy[`${id_tipo_operacion}) ${Nombre} (${Aliado_corto})`] = true;
               setTypesByPermissions({ ...copy });
-              setTypesDB([]);
-              refFrom.current.reset();
+              // setTypesDB([]);
             }}
           />
         ) : (
