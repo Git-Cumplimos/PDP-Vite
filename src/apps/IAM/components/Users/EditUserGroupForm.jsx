@@ -18,7 +18,7 @@ const EditUserGroupForm = ({ selected, onCloseModal }) => {
 
   const { notify, notifyError } = useAuth();
 
-  const searchUsers = useCallback(async (gname, _page) => {
+  const searchGroups = useCallback(async (gname, _page) => {
     const queries = { limit: 5 };
     if (gname && gname !== "") {
       queries.name_group = gname;
@@ -75,7 +75,7 @@ const EditUserGroupForm = ({ selected, onCloseModal }) => {
   }, [searchGroupByUsers, selected?.edit?.uuid]);
 
   const onChange = (formData) => {
-    searchUsers(formData.get("userEmail"), formData.get("page"))
+    searchGroups(formData.get("userEmail"), formData.get("page"))
       .then((res) => {
         setUsuariosDB([...res?.results]);
         setMaxPage(res?.maxpages);

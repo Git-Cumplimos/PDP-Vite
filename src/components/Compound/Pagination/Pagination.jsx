@@ -5,7 +5,12 @@ import Form from "../../Base/Form/Form";
 import Input from "../../Base/Input/Input";
 import Select from "../../Base/Select/Select";
 
-const Pagination = ({ filters, maxPage = 0, onChange: _onChange = () => {} }) => {
+const Pagination = ({
+  filters,
+  maxPage = 0,
+  onChange: _onChange = () => {},
+  lgButtons = true,
+}) => {
   const [page, setPage] = useState(1);
 
   const refFrom = useRef(null);
@@ -60,7 +65,7 @@ const Pagination = ({ filters, maxPage = 0, onChange: _onChange = () => {} }) =>
       })}
       {Object.entries(filters).length === 1 ? <ButtonBar></ButtonBar> : ""}
       {maxPage !== 1 && maxPage !== 0 ? (
-        <ButtonBar className="lg:col-span-2">
+        <ButtonBar className={`${lgButtons ? "lg:col-span-2" : ""}`}>
           <Button
             type="button"
             onClick={(e) => {
