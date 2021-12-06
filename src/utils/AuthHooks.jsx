@@ -30,10 +30,6 @@ export const AuthContext = createContext({
   cognitoUser: null,
   userInfo: null,
   roleInfo: null,
-  crearRolresp: null,
-  setCrearRolresp: null,
-  roles_disponibles: null,
-  setRoles_disponibles: null,
   userPermissions: null,
   getPermissions: () => {},
   signIn: () => {},
@@ -42,6 +38,12 @@ export const AuthContext = createContext({
   getQuota: () => {},
   checkUser: () => {},
   infoTicket: () => {},
+  handleverifyTotpToken: () => {},
+  handleChangePass: () => {},
+  parameters: null,
+  qr: null,
+  notify: () => {},
+  notifyError: () => {},
 });
 
 export const useAuth = () => {
@@ -59,10 +61,6 @@ export const useProvideAuth = () => {
 
   const [userPermissions, setUserPermissions] = useState(null);
 
-  const [crearRolresp, setCrearRolresp] = useState(null);
-
-  const [roles_disponibles, setRoles_disponibles] = useState(null);
-
   const [qr, setQr] = useState("");
 
   const [username, setUsername] = useState("CERT");
@@ -72,6 +70,18 @@ export const useProvideAuth = () => {
   const history = useHistory();
 
   const { state, pathname } = useLocation();
+
+  const notify = useCallback((msg = "Info") => {
+    toast.info(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  }, []);
 
   const notifyError = useCallback((msg = "Error") => {
     toast.warning(msg, {
@@ -99,6 +109,80 @@ export const useProvideAuth = () => {
     } catch (err) {
       console.error(err);
     }
+  }, []);
+
+  const fetchAwsAuth = useCallback(async () => {
+    try {
+      const usrInfo = await Auth.currentUserInfo();
+      setUserInfo(usrInfo);
+
+      const userSession = await Auth.currentSession();
+      console.log(userSession);
+      return usrInfo;
+    } catch (err) {
+      setSignedIn(false);
+      logger.debug(err);
+    }
+  }, []);
+
+  const fetchSuserInfo = useCallback(async (email) => {
+    try {
+      let roleObj = {};
+      const suserInfo = await fetchData(urlLog, "GET", { correo: email }, {});
+      roleObj = { ...suserInfo };
+
+      try {
+        const quota = await fetchData(
+          urlQuota,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+            id_dispositivo: suserInfo.id_dispositivo,
+          },
+          {}
+        );
+        roleObj = {
+          ...roleObj,
+          quota: quota["cupo disponible"],
+          comision: quota["comisiones"],
+        };
+      } catch (err) {}
+
+      try {
+        const resp_ciudad = await fetchData(
+          urlCiudad_dane,
+          "GET",
+          {
+            c_digo_dane_del_municipio: suserInfo.codigo_dane,
+          },
+          {}
+        );
+        roleObj = {
+          ...roleObj,
+          ciudad: resp_ciudad[0].municipio,
+        };
+      } catch (err) {}
+
+      try {
+        const resp_cod = await fetchData(
+          urlCod_loteria_oficina,
+          "GET",
+          {
+            id_comercio: suserInfo.id_comercio,
+          },
+          {}
+        );
+        if (!("msg" in resp_cod)) {
+          roleObj = {
+            ...roleObj,
+            cod_oficina_lot: resp_cod.cod_oficina_lot,
+            cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+          };
+        }
+      } catch (err) {}
+
+      setRoleInfo({ ...roleObj });
+    } catch (err) {}
   }, []);
 
   const getPermissions = useCallback(
@@ -242,68 +326,17 @@ export const useProvideAuth = () => {
       setCognitoUser(user);
 
       if (user) setSignedIn(true);
-      const usrInfo = await Auth.currentUserInfo();
-      setUserInfo(usrInfo);
+
+      const usrInfo = await fetchAwsAuth();
+
       if (usrInfo?.attributes?.email) {
-        const suserInfo = await fetchData(
-          urlLog,
-          "GET",
-          { correo: usrInfo?.attributes?.email },
-          {}
-        );
-        console.log(suserInfo);
-        const quota = await fetchData(
-          urlQuota,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
-            id_dispositivo: suserInfo.id_dispositivo,
-          },
-          {}
-        );
-
-        const resp_ciudad = await fetchData(
-          urlCiudad_dane,
-          "GET",
-          {
-            c_digo_dane_del_municipio: suserInfo.codigo_dane,
-          },
-          {}
-        );
-
-        setRoleInfo({
-          ...suserInfo,
-          quota: quota["cupo disponible"],
-          comision: quota["comisiones"],
-          ciudad: resp_ciudad[0].municipio,
-        });
-
-        const resp_cod = await fetchData(
-          urlCod_loteria_oficina,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
-          },
-          {}
-        );
-
-        console.log(resp_cod);
-        if (!("msg" in resp_cod)) {
-          setRoleInfo({
-            ...suserInfo,
-            quota: quota["cupo disponible"],
-            comision: quota["comisiones"],
-            cod_oficina_lot: resp_cod.cod_oficina_lot,
-            cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-            ciudad: resp_ciudad[0].municipio,
-          });
-        }
+        await fetchSuserInfo(usrInfo?.attributes?.email);
       }
     } catch (err) {
       setSignedIn(false);
       logger.debug(err);
     }
-  }, []);
+  }, [fetchSuserInfo, fetchAwsAuth]);
 
   const checkUser = useCallback(() => {
     if (Auth.user === null || Auth.user === undefined) {
@@ -311,73 +344,19 @@ export const useProvideAuth = () => {
     } else {
       setSignedIn(true);
       setCognitoUser(Auth.user);
-      Auth.currentUserInfo()
-        .then((usr) => setUserInfo(usr))
-        .catch(() => {});
-
-      fetchData(urlLog, "GET", { correo: Auth.user?.attributes?.email }, {})
-        .then((suserInfo) => {
-          console.log(suserInfo);
-          fetchData(
-            urlQuota,
-            "GET",
-            {
-              id_comercio: suserInfo.id_comercio,
-              id_dispositivo: suserInfo.id_dispositivo,
-            },
-            {}
-          )
-            .then((quota) => {
-              fetchData(
-                urlCiudad_dane,
-                "GET",
-                {
-                  c_digo_dane_del_municipio: suserInfo.codigo_dane,
-                },
-                {}
-              )
-                .then((resp_ciudad) => {
-                  fetchData(
-                    urlCod_loteria_oficina,
-                    "GET",
-                    {
-                      id_comercio: suserInfo.id_comercio,
-                    },
-                    {}
-                  )
-                    .then((resp_cod) => {
-                      setRoleInfo({
-                        ...suserInfo,
-                        quota: quota["cupo disponible"],
-                        comision: quota["comisiones"],
-                        ciudad: resp_ciudad[0].municipio,
-                      });
-                      if (!("msg" in resp_cod)) {
-                        setRoleInfo({
-                          ...suserInfo,
-                          quota: quota["cupo disponible"],
-                          comision: quota["comisiones"],
-                          cod_oficina_lot: resp_cod.cod_oficina_lot,
-                          cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-                          ciudad: resp_ciudad[0].municipio,
-                        });
-                      }
-                    })
-                    .catch(() => {});
-                })
-                .catch(() => {});
-            })
-            .catch(() => {});
-        })
-        .catch(() => {});
+      fetchAwsAuth();
+      fetchSuserInfo(Auth.user?.attributes?.email);
     }
-  }, [setUser]);
+  }, [setUser, fetchSuserInfo, fetchAwsAuth]);
 
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
     checkUser();
+  }, [checkUser]);
+
+  useEffect(() => {
     getPermissions(userInfo?.attributes?.email);
-  }, [checkUser, getPermissions, userInfo?.attributes?.email]);
+  }, [getPermissions, userInfo?.attributes?.email]);
 
   useEffect(() => {
     const validate = async () => {
@@ -451,7 +430,7 @@ export const useProvideAuth = () => {
         );
         setCognitoUser(loggedUser);
         if (loggedUser.challengeName === "MFA_SETUP") {
-          handleSetupTOTP(loggedUser);
+          await handleSetupTOTP(loggedUser);
         }
       } catch (err) {
         throw err;
@@ -470,62 +449,10 @@ export const useProvideAuth = () => {
         );
         setCognitoUser(loggedUser);
         setSignedIn(true);
-        const usrInfo = await Auth.currentUserInfo();
-        setUserInfo(usrInfo);
+
+        const usrInfo = await fetchAwsAuth();
         if (usrInfo?.attributes?.email) {
-          const suserInfo = await fetchData(
-            urlLog,
-            "GET",
-            { correo: usrInfo?.attributes?.email },
-            {}
-          );
-          console.log(suserInfo);
-          const quota = await fetchData(
-            urlQuota,
-            "GET",
-            {
-              id_comercio: suserInfo.id_comercio,
-              id_dispositivo: suserInfo.id_dispositivo,
-            },
-            {}
-          );
-
-          const resp_ciudad = await fetchData(
-            urlCiudad_dane,
-            "GET",
-            {
-              c_digo_dane_del_municipio: suserInfo.codigo_dane,
-            },
-            {}
-          );
-
-          setRoleInfo({
-            ...suserInfo,
-            quota: quota["cupo disponible"],
-            comision: quota["comisiones"],
-            ciudad: resp_ciudad[0].municipio,
-          });
-
-          const resp_cod = await fetchData(
-            urlCod_loteria_oficina,
-            "GET",
-            {
-              id_comercio: suserInfo.id_comercio,
-            },
-            {}
-          );
-
-          console.log(resp_cod);
-          if (!("msg" in resp_cod)) {
-            setRoleInfo({
-              ...suserInfo,
-              quota: quota["cupo disponible"],
-              comision: quota["comisiones"],
-              cod_oficina_lot: resp_cod.cod_oficina_lot,
-              cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-              ciudad: resp_ciudad[0].municipio,
-            });
-          }
+          await fetchSuserInfo(usrInfo?.attributes?.email);
         }
         history.push(
           state ? state.from : pathname === "/login" ? "/" : pathname
@@ -537,7 +464,7 @@ export const useProvideAuth = () => {
         throw err;
       }
     },
-    [cognitoUser, history, state, pathname]
+    [cognitoUser, history, state, pathname, fetchSuserInfo, fetchAwsAuth]
   );
 
   const signOut = useCallback(() => {
@@ -604,10 +531,6 @@ export const useProvideAuth = () => {
     cognitoUser,
     userInfo,
     roleInfo,
-    crearRolresp,
-    setCrearRolresp,
-    roles_disponibles,
-    setRoles_disponibles,
     signIn,
     confirmSignIn,
     signOut,
@@ -616,5 +539,7 @@ export const useProvideAuth = () => {
     qr,
     parameters,
     infoTicket,
+    notify,
+    notifyError,
   };
 };
