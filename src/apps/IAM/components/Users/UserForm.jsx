@@ -1,16 +1,18 @@
 import { useMemo } from "react";
-import { toast } from "react-toastify";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
 import Select from "../../../../components/Base/Select/Select";
+import { useAuth } from "../../../../utils/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
 
 const url_types = process.env.REACT_APP_URL_TYPES_FORM_COMMERCE;
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
 const UserForm = ({ onCloseModal }) => {
+  const { notify, notifyError } = useAuth();
+
   const makeForm = useMemo(() => {
     const temp = { "": "" };
     fetchData(`${url_types}/type-doc`, "GET", {}, {})
@@ -44,31 +46,7 @@ const UserForm = ({ onCloseModal }) => {
       Telefono: {},
       Direccion: {},
     };
-  }, []);
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const notifyError = (msg) => {
-    toast.warn(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  }, [notifyError]);
 
   const onSubmit = (e) => {
     e.preventDefault();

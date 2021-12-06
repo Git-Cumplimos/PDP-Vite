@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
 import Table from "../../../../components/Base/Table/Table";
+import { useAuth } from "../../../../utils/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
@@ -17,29 +17,7 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
   const [typesByPermissions, setTypesByPermissions] = useState({});
   const [typesDB, setTypesDB] = useState([]);
 
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const notifyError = (msg) => {
-    toast.warn(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const { notify, notifyError } = useAuth();
 
   const searchTypes = useCallback(async (email, uname) => {
     const queries = {};
@@ -73,7 +51,7 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
     } catch (err) {
       notifyError(err);
     }
-  }, []);
+  }, [notifyError]);
 
   const searchTypesByPermission = useCallback(async (id_permission) => {
     const temp_res = {};
@@ -123,7 +101,7 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
     } catch (err) {
       notifyError(err);
     }
-  }, []);
+  }, [notifyError]);
 
   useEffect(() => {
     searchTypesByPermission(selected?.edit?.id_permission).then((res) => {

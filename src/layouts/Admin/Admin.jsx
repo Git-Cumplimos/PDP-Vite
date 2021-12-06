@@ -9,7 +9,7 @@ import SocialBar from "../../components/Compound/SocialBar/SocialBar";
 const Admin = () => {
   const { adminLayout, wave } = classes;
 
-  const { urlsPrivate, urlsPrivApps, urlsPublic, urlsPrivateApps } = useUrls();
+  const { urlsPrivate, urlsPublic, urlsPrivateApps } = useUrls();
 
   const { pathname } = useLocation();
 

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
 import Button from "../../components/Base/Button/Button";
 import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import Card from "../../components/Base/Card/Card";
 import Form from "../../components/Base/Form/Form";
 import Input from "../../components/Base/Input/Input";
 import Modal from "../../components/Base/Modal/Modal";
+import { useAuth } from "../../utils/AuthHooks";
 import fetchData from "../../utils/fetchData";
 
 const capitalize = (word = "") => {
@@ -61,17 +61,7 @@ const CommerceInfo = () => {
   const [showModal, setShowModal] = useState(false);
   const downloadRef = useRef(null);
 
-  const notifyError = (msg) => {
-    toast.warn(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const { notifyError } = useAuth();
 
   useEffect(() => {
     fetchData(`${url_form}/review-count`)
@@ -93,7 +83,7 @@ const CommerceInfo = () => {
         }
       })
       .catch((err) => {});
-  }, []);
+  }, [notifyError]);
 
   useEffect(() => {
     const queries = {
@@ -116,7 +106,7 @@ const CommerceInfo = () => {
         }
       })
       .catch((err) => {});
-  }, [page, commerceName, fechaFin, fechaIni]);
+  }, [page, commerceName, fechaFin, fechaIni,notifyError]);
 
   return (
     <div className="flex flex-col justify-center items-center my-8">

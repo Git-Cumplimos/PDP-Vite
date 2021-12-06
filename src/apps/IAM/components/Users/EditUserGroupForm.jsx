@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
 import Table from "../../../../components/Base/Table/Table";
 import Pagination from "../../../../components/Compound/Pagination/Pagination";
+import { useAuth } from "../../../../utils/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
@@ -16,29 +16,7 @@ const EditUserGroupForm = ({ selected, onCloseModal }) => {
 
   const [maxPage, setMaxPage] = useState(1);
 
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const notifyError = (msg) => {
-    toast.warn(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const { notify, notifyError } = useAuth();
 
   const searchUsers = useCallback(async (gname, _page) => {
     const queries = { limit: 5 };
@@ -61,7 +39,7 @@ const EditUserGroupForm = ({ selected, onCloseModal }) => {
     } else {
       return [];
     }
-  }, []);
+  }, [notifyError]);
 
   const searchGroupByUsers = useCallback(async (uuid) => {
     const temp_res = {};
@@ -88,7 +66,7 @@ const EditUserGroupForm = ({ selected, onCloseModal }) => {
     } catch (err) {
       notifyError(err);
     }
-  }, []);
+  }, [notifyError]);
 
   useEffect(() => {
     searchGroupByUsers(selected?.edit?.uuid).then((res) => {

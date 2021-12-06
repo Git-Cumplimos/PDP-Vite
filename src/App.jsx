@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 import Amplify from "aws-amplify";
 import awsconfig from "./aws-exports";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import MessengerCustomerChat from "react-messenger-customer-chat";
 

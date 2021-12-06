@@ -30,6 +30,7 @@ export const AuthContext = createContext({
   cognitoUser: null,
   userInfo: null,
   roleInfo: null,
+  userSession: null,
   userPermissions: null,
   getPermissions: () => {},
   signIn: () => {},
@@ -57,13 +58,15 @@ export const useProvideAuth = () => {
 
   const [userInfo, setUserInfo] = useState(null);
 
+  const [userSession, setUserSession] = useState(null);
+
   const [roleInfo, setRoleInfo] = useState(null);
 
   const [userPermissions, setUserPermissions] = useState(null);
 
   const [qr, setQr] = useState("");
 
-  const [username, setUsername] = useState("CERT");
+  const [username] = useState("CERT");
 
   const [parameters, setParameters] = useState("");
 
@@ -104,11 +107,8 @@ export const useProvideAuth = () => {
 
     try {
       const res = await fetchData(urlInfoTicket, "PUT", get, post);
-      console.log(res);
       return res;
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   }, []);
 
   const fetchAwsAuth = useCallback(async () => {
@@ -117,7 +117,7 @@ export const useProvideAuth = () => {
       setUserInfo(usrInfo);
 
       const userSession = await Auth.currentSession();
-      console.log(userSession);
+      setUserSession(userSession);
       return usrInfo;
     } catch (err) {
       setSignedIn(false);
@@ -224,7 +224,6 @@ export const useProvideAuth = () => {
           !Array.isArray(user_group_res?.obj) ||
           user_group_res?.obj.length === 0
         ) {
-          // notifyError("User has no groups in db");
           return;
         }
 
@@ -296,9 +295,7 @@ export const useProvideAuth = () => {
         }
         setUserPermissions(userAccess);
         return userAccess;
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) {}
     },
     [notifyError]
   );
@@ -531,6 +528,7 @@ export const useProvideAuth = () => {
     cognitoUser,
     userInfo,
     roleInfo,
+    userSession,
     signIn,
     confirmSignIn,
     signOut,

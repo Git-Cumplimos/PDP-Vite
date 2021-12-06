@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { useAuth } from "../../../utils/AuthHooks";
 import classes from "./Input.module.css";
 
 const Input = ({
@@ -19,17 +20,7 @@ const Input = ({
   const inputRef = useRef(null);
   const dropZoneRef = useRef(null);
 
-  const notifyError = (msg) => {
-    toast.warn(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const { notifyError } = useAuth();
 
   const showDropZone = useCallback(() => {
     if (
