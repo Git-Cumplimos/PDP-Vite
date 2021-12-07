@@ -81,17 +81,21 @@ const MassiveUpload = ({ onCloseModal }) => {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
+    console.log(usersFile);
+
     if (!usersFile) {
       notifyError("No se ha selecionado un archivo para subir");
+      return;
+    }
+    if (!selectedGroup) {
+      notifyError("No se ha selecionado un grupo al cual añadir a los ususarios");
       return;
     }
 
     setIsUploading(true);
 
-    formData.set("file", usersFile.file);
-    formData.append("id_group", formData.get("Grupo para los usuarios"));
-    formData.delete("Elegir archivo de usuarios");
-    formData.delete("Grupo para los usuarios");
+    formData.append("file", usersFile.file);
+    formData.append("id_group", selectedGroup.id_group);
 
     sendFormData(
       `${url_iam}/users-massive`,
@@ -99,7 +103,6 @@ const MassiveUpload = ({ onCloseModal }) => {
       formData,
       (xhr) => {
         setIsUploading(false);
-        onCloseModal?.();
         if (xhr.status === 200) {
           const res = xhr.response;
           if (!res?.status) {
@@ -112,13 +115,20 @@ const MassiveUpload = ({ onCloseModal }) => {
               // failed_to_group,
               grouped_users,
             } = res?.obj;
-            notify(
-              `Se han creado ${added_users.length} de ${all_users.length} usuarios`
-            );
-            if (added_users.length > 0) {
-              notify(
-                `Se han agrupado ${grouped_users.length} de ${added_users.length} usuarios creados`
+            if (added_users.length === 0) {
+              notifyError(
+                `Se han creado ${added_users.length} de ${all_users.length} usuarios`
               );
+            } else {
+              onCloseModal?.();
+              notify(
+                `Se han creado ${added_users.length} de ${all_users.length} usuarios`
+              );
+              if (added_users.length > 0) {
+                notify(
+                  `Se han agrupado ${grouped_users.length} de ${added_users.length} usuarios creados`
+                );
+              }
             }
           }
         }

@@ -40,7 +40,7 @@ const Pagination = ({
       reff={refFrom}
       grid
     >
-      {Object.entries(filters).map(([key, { type, label, options = {} }]) => {
+      {Object.entries(filters).map(([key, { type, label, options = {}, ...rest }]) => {
         if (options && Object.entries(options).length > 0) {
           return (
             <Select
@@ -49,6 +49,7 @@ const Pagination = ({
               name={key}
               label={label}
               options={options ?? { "": "" }}
+              {...rest}
             />
           );
         }
@@ -60,6 +61,7 @@ const Pagination = ({
             label={label}
             type={type || "search"}
             autoComplete="off"
+            {...rest}
           />
         );
       })}
