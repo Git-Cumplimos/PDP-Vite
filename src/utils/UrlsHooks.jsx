@@ -13,16 +13,11 @@ export const useUrls = () => {
 };
 
 export const useProvideUrls = () => {
-  const [urlsPrivate, setUrlsPrivate] = useState([]);
-  const [urlsPublic, setUrlsPublic] = useState([]);
   const [urlsPrivateApps, setUrlsPrivateApps] = useState([]);
 
   const { userPermissions } = useAuth();
 
   useEffect(() => {
-    setUrlsPublic([...publicUrls]);
-    setUrlsPrivate([...privateUrls]);
-
     if (Array.isArray(userPermissions) && userPermissions.length > 0) {
       const rootUrls = [
         ...allUrlsPrivateApps
@@ -61,8 +56,8 @@ export const useProvideUrls = () => {
   }, [userPermissions]);
 
   return {
-    urlsPrivate,
-    urlsPublic,
+    urlsPrivate: privateUrls,
+    urlsPublic: publicUrls,
     urlsPrivateApps,
   };
 };
