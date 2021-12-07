@@ -24,9 +24,13 @@ export const useProvideUrls = () => {
           .filter(({ permission }) => {
             if (permission[0] === -1) return true;
             for (const per of permission) {
-              return userPermissions
-                .map(({ id_permission }) => id_permission)
-                .includes(per);
+              if (
+                userPermissions
+                  .map(({ id_permission }) => id_permission)
+                  .includes(per)
+              ) {
+                return true;
+              }
             }
             return false;
           })
