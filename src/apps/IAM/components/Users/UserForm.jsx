@@ -76,10 +76,12 @@ const UserForm = ({ onCloseModal }) => {
         } else {
           notifyError(res?.msg);
         }
+        form.reset();
         onCloseModal?.();
       })
       .catch((err) => {
         notifyError(err);
+        form.reset();
         onCloseModal?.();
       });
   };

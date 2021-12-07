@@ -104,6 +104,8 @@ const PolicyForm = ({ onCloseModal }) => {
         _selectedR.length
       )} politica(s)`
     );
+    setSelectedGroups({});
+    setSelectedRoles({});
     onCloseModal?.();
   };
 
