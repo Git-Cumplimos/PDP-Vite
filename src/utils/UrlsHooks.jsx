@@ -17,7 +17,7 @@ export const useProvideUrls = () => {
   const [urlsPublic, setUrlsPublic] = useState([]);
   const [urlsPrivateApps, setUrlsPrivateApps] = useState([]);
 
-  const { roleInfo, userPermissions } = useAuth();
+  const { userPermissions } = useAuth();
 
   useEffect(() => {
     setUrlsPublic([...publicUrls]);
@@ -58,7 +58,7 @@ export const useProvideUrls = () => {
     } else {
       setUrlsPrivateApps([]);
     }
-  }, [roleInfo, userPermissions]);
+  }, [userPermissions]);
 
   return {
     urlsPrivate,
