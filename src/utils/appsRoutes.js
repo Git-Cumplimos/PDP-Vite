@@ -79,7 +79,7 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
     component: LoteriaBog,
     extern: false,
-    permission: [2, 3, 4, 5, 6],
+    permission: [3, 4, 5, 6],
     subRoutes: [
       {
         link: "/loteria-de-bogota/sorteos",
@@ -116,7 +116,7 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
     component: Transacciones,
     extern: false,
-    permission: [17],
+    permission: [8],
   },
   {
     link: "/update-commerce",
@@ -160,7 +160,7 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={MARKETPLACE} name="IAM" />,
     component: IAMIndex,
     extern: false,
-    permission: [11, 12, 13, 14, 15, 16],
+    permission: [12, 13, 14, 15, 16],
     subRoutes: [
       {
         link: "/iam/users",
