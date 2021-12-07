@@ -6,7 +6,6 @@ import Modal from "../components/Base/Modal/Modal";
 import Select from "../components/Base/Select/Select";
 import Table from "../components/Base/Table/Table";
 import Input from "../components/Base/Input/Input";
-import { toast } from "react-toastify";
 import fetchData from "../utils/fetchData";
 import { useAuth } from "../utils/AuthHooks";
 import Tickets from "../components/Base/Tickets/Tickets";
