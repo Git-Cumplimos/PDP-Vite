@@ -5,6 +5,7 @@ import Modal from "../../../components/Base/Modal/Modal";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import Pagination from "../../../components/Compound/Pagination/Pagination";
+import { useAuth } from "../../../utils/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import EditRoleForm from "../components/Roles/EditRoleForm";
 import RoleForm from "../components/Roles/RoleForm";
@@ -13,6 +14,7 @@ const url = process.env.REACT_APP_URL_IAM_PDP;
 
 const IAMRoles = ({ route }) => {
   const { label } = route;
+  const { getPermissions, userInfo } = useAuth();
 
   const [rolesDB, setRolesDB] = useState([]);
   const [maxPage, setMaxPage] = useState(1);
@@ -27,6 +29,7 @@ const IAMRoles = ({ route }) => {
     setSelected(null);
 
     searchRoles(formData.get("unameSearch"), formData.get("page"));
+    getPermissions(userInfo?.attributes?.email);
   };
 
   const searchRoles = useCallback((uname, _page) => {
