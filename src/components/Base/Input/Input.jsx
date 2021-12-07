@@ -1,5 +1,4 @@
 import { useCallback, useRef, useState } from "react";
-import { toast } from "react-toastify";
 import { useAuth } from "../../../utils/AuthHooks";
 import classes from "./Input.module.css";
 
@@ -86,7 +85,7 @@ const Input = ({
 
       onGetFile?.([...tempFiles]);
     },
-    [onGetFile, hideDropZone]
+    [onGetFile, hideDropZone, notifyError]
   );
 
   if (type === "file") {

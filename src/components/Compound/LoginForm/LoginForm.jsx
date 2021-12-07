@@ -10,7 +10,7 @@ const LoginForm = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [cell, setCell] = useState("");
+  const [, setCell] = useState("");
   const [totp, setTotp] = useState("");
   const [names, setNames] = useState("");
   const [lastName, setLastName] = useState("");

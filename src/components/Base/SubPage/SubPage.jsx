@@ -1,5 +1,4 @@
 import { useHistory } from "react-router-dom";
-import AppIcons from "../AppIcons/AppIcons";
 import Button from "../Button/Button";
 
 const SubPage = ({ label, children }) => {

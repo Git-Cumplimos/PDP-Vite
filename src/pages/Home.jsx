@@ -9,11 +9,10 @@ import Banner2 from "../assets/img/BANNER2.jpg";
 import { Link } from "react-router-dom";
 import AppIcons from "../components/Base/AppIcons/AppIcons";
 import ACTUALIZACION from "../assets/svg/ActualizacionDeDatos.svg";
-import { Auth } from "aws-amplify";
 import { useAuth } from "../utils/AuthHooks";
 
 const Home = () => {
-  const { urlsPrivApps: urls, urlsPrivateApps } = useUrls();
+  const { urlsPrivateApps } = useUrls();
   const { userInfo } = useAuth();
 
   const [emails, setEmails] = useState([
@@ -51,8 +50,7 @@ const Home = () => {
         })}
       </Carousel>
       <HNavbar links={urlsPrivateApps} isIcon />
-      {/* <HNavbar links={urls} isIcon />
-      {emails.includes(setLocalEmail.toLowerCase()) ? (
+      {/* {emails.includes(setLocalEmail.toLowerCase()) ? (
         <Link to={"/review-commerce-forms"}>
           <AppIcons
             Logo={ACTUALIZACION}
