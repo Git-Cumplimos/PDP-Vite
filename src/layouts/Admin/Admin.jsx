@@ -35,16 +35,6 @@ const Admin = () => {
                 </PrivateRoute>
               );
             })}
-          {/* {urlsPrivApps
-            .filter(({ extern }) => !extern)
-            .map(({ link, component: Component, props, exact }) => {
-              exact = exact === undefined ? true : exact;
-              return (
-                <PrivateRoute key={link} exact={exact} path={link}>
-                  <Component {...props} />
-                </PrivateRoute>
-              );
-            })} */}
           {urlsPrivateApps
             .filter(({ extern }) => !extern)
             .map(({ link, component: Component, subRoutes }) => {
@@ -56,12 +46,12 @@ const Admin = () => {
             })}
           {urlsPrivateApps
             .filter(({ extern }) => !extern)
-            .map(({ link, component: Component, subRoutes }) => {
+            .map(({ subRoutes }) => {
               return Array.isArray(subRoutes)
                 ? subRoutes.map(
-                    ({ link: _link, component: SubComponent, label }) => {
+                    ({ link, component: SubComponent, label }) => {
                       return (
-                        <PrivateRoute key={_link} path={_link} exact>
+                        <PrivateRoute key={link} path={link} exact>
                           <SubComponent route={{ label }} />
                         </PrivateRoute>
                       );
