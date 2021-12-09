@@ -5,7 +5,6 @@ import Modal from "../../../components/Base/Modal/Modal";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import Pagination from "../../../components/Compound/Pagination/Pagination";
-import { useAuth } from "../../../utils/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import EditPermissionForm from "../components/Permissions/EditPermissionForm";
 import PermissionForm from "../components/Permissions/PermissionForm";
@@ -14,7 +13,6 @@ const url = process.env.REACT_APP_URL_IAM_PDP;
 
 const IAMPermissions = ({ route }) => {
   const { label } = route;
-  const { getPermissions, userInfo } = useAuth();
 
   const [permisosDB, setPermisosDB] = useState([]);
   const [maxPage, setMaxPage] = useState(1);
@@ -29,7 +27,6 @@ const IAMPermissions = ({ route }) => {
     setSelected(null);
 
     searchPermissions(formData.get("unameSearch"), formData.get("page"));
-    getPermissions(userInfo?.attributes?.email);
   };
 
   const searchPermissions = useCallback((uname, _page) => {
@@ -48,7 +45,7 @@ const IAMPermissions = ({ route }) => {
             setMaxPage(res?.obj?.maxpages);
           }
         })
-        .catch((err) => console.error(err));
+        .catch(() => {});
     } else {
       setPermisosDB([]);
     }

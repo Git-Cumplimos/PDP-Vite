@@ -30,14 +30,14 @@ export const AuthContext = createContext({
   cognitoUser: null,
   userInfo: null,
   roleInfo: null,
+  quotaInfo: null,
   userSession: null,
+  pdpUser: null,
   userPermissions: null,
-  getPermissions: () => {},
   signIn: () => {},
   confirmSignIn: () => {},
   signOut: () => {},
   getQuota: () => {},
-  checkUser: () => {},
   infoTicket: () => {},
   handleverifyTotpToken: () => {},
   handleChangePass: () => {},
@@ -61,6 +61,10 @@ export const useProvideAuth = () => {
   const [userSession, setUserSession] = useState(null);
 
   const [roleInfo, setRoleInfo] = useState(null);
+
+  const [quotaInfo, setQuotaInfo] = useState(null);
+
+  const [pdpUser, setPdpUser] = useState(null);
 
   const [userPermissions, setUserPermissions] = useState(null);
 
@@ -111,6 +115,24 @@ export const useProvideAuth = () => {
     } catch (err) {}
   }, []);
 
+  const getQuota = useCallback(async () => {
+    const tempRole = { quota: 0, comision: 0 };
+    if (roleInfo?.id_comercio && roleInfo?.id_dispositivo) {
+      const quota = await fetchData(
+        urlQuota,
+        "GET",
+        {
+          id_comercio: roleInfo?.id_comercio,
+          id_dispositivo: roleInfo?.id_dispositivo,
+        },
+        {}
+      );
+      tempRole.quota = quota["cupo disponible"];
+      tempRole.comision = quota["comisiones"];
+    }
+    setQuotaInfo({ ...tempRole });
+  }, [roleInfo?.id_comercio, roleInfo?.id_dispositivo]);
+
   const fetchAwsAuth = useCallback(async () => {
     try {
       const usrInfo = await Auth.currentUserInfo();
@@ -118,7 +140,7 @@ export const useProvideAuth = () => {
 
       const userSession = await Auth.currentSession();
       setUserSession(userSession);
-      return usrInfo;
+      return usrInfo?.attributes?.email;
     } catch (err) {
       setSignedIn(false);
       logger.debug(err);
@@ -130,23 +152,6 @@ export const useProvideAuth = () => {
       let roleObj = {};
       const suserInfo = await fetchData(urlLog, "GET", { correo: email }, {});
       roleObj = { ...suserInfo };
-
-      try {
-        const quota = await fetchData(
-          urlQuota,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
-            id_dispositivo: suserInfo.id_dispositivo,
-          },
-          {}
-        );
-        roleObj = {
-          ...roleObj,
-          quota: quota["cupo disponible"],
-          comision: quota["comisiones"],
-        };
-      } catch (err) {}
 
       try {
         const resp_ciudad = await fetchData(
@@ -208,6 +213,7 @@ export const useProvideAuth = () => {
           notifyError("User not found in db");
           return;
         }
+        setPdpUser(user_res_arr?.[0]);
 
         // Get group of the user
         const user_group_res = await fetchData(
@@ -300,6 +306,16 @@ export const useProvideAuth = () => {
     [notifyError]
   );
 
+  const saveUserData = useCallback(
+    async (user, email) => {
+      setSignedIn(true);
+      setCognitoUser(user);
+      await fetchSuserInfo(email);
+      await getPermissions(email);
+    },
+    [fetchSuserInfo, getPermissions]
+  );
+
   const handleSetupTOTP = useCallback(
     async (user) => {
       try {
@@ -317,43 +333,45 @@ export const useProvideAuth = () => {
     [cognitoUser?.username]
   );
 
-  const setUser = useCallback(async () => {
+  const checkUser = useCallback(async () => {
+    let user = null;
+    let email = null;
     try {
-      const user = await Auth.currentAuthenticatedUser();
-      setCognitoUser(user);
-
-      if (user) setSignedIn(true);
-
-      const usrInfo = await fetchAwsAuth();
-
-      if (usrInfo?.attributes?.email) {
-        await fetchSuserInfo(usrInfo?.attributes?.email);
+      if (Auth.user === null || Auth.user === undefined) {
+        user = await Auth.currentAuthenticatedUser();
+        email = await fetchAwsAuth();
+      } else {
+        user = Auth.user;
+        email = Auth.user?.attributes?.email;
+        await fetchAwsAuth();
       }
+      if (!user) {
+        setSignedIn(false);
+        setCognitoUser(null);
+        return;
+      }
+      await saveUserData(user, email);
     } catch (err) {
       setSignedIn(false);
+      setCognitoUser(null);
       logger.debug(err);
     }
-  }, [fetchSuserInfo, fetchAwsAuth]);
+  }, [fetchAwsAuth, saveUserData]);
 
-  const checkUser = useCallback(() => {
-    if (Auth.user === null || Auth.user === undefined) {
-      setUser();
-    } else {
-      setSignedIn(true);
-      setCognitoUser(Auth.user);
-      fetchAwsAuth();
-      fetchSuserInfo(Auth.user?.attributes?.email);
-    }
-  }, [setUser, fetchSuserInfo, fetchAwsAuth]);
-
+  // Runs in first load
   useEffect(() => {
     appendToCognitoUserAgent("withCustomAuthenticator");
     checkUser();
   }, [checkUser]);
 
+  console.log(history);
+  // Runs when route change
   useEffect(() => {
-    getPermissions(userInfo?.attributes?.email);
-  }, [getPermissions, userInfo?.attributes?.email]);
+    getQuota();
+    if (pathname?.includes("iam")) {
+      getPermissions(userInfo?.attributes?.email);
+    }
+  }, [getQuota, getPermissions, pathname, userInfo?.attributes?.email]);
 
   useEffect(() => {
     const validate = async () => {
@@ -444,16 +462,10 @@ export const useProvideAuth = () => {
           totp,
           cognitoUser.challengeName
         );
-        setCognitoUser(loggedUser);
-        setSignedIn(true);
+        let email = await fetchAwsAuth();
 
-        const usrInfo = await fetchAwsAuth();
-        if (usrInfo?.attributes?.email) {
-          await fetchSuserInfo(usrInfo?.attributes?.email);
-        }
-        history.push(
-          state ? state.from : pathname === "/login" ? "/" : pathname
-        );
+        await saveUserData(loggedUser, email);
+        history.push(state?.from || pathname === "/login" ? "/" : pathname);
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
           setCognitoUser(null);
@@ -461,7 +473,7 @@ export const useProvideAuth = () => {
         throw err;
       }
     },
-    [cognitoUser, history, state, pathname, fetchSuserInfo, fetchAwsAuth]
+    [cognitoUser, history, state, pathname, fetchAwsAuth, saveUserData]
   );
 
   const signOut = useCallback(() => {
@@ -503,37 +515,21 @@ export const useProvideAuth = () => {
     [cognitoUser, handlesetPreferredMFA]
   );
 
-  const getQuota = useCallback(async () => {
-    const tempRole = { ...roleInfo };
-    const quota = await fetchData(
-      urlQuota,
-      "GET",
-      {
-        id_comercio: roleInfo.id_comercio,
-        id_dispositivo: roleInfo.id_dispositivo,
-      },
-      {}
-    );
-    tempRole.quota = quota["cupo disponible"];
-    tempRole.comision = quota["comisiones"];
-    setRoleInfo({ ...tempRole });
-  }, [roleInfo]);
-
   return {
-    userPermissions,
-    getPermissions,
     handleverifyTotpToken,
     handleChangePass,
     isSignedIn,
     cognitoUser,
     userInfo,
     roleInfo,
+    quotaInfo,
     userSession,
+    pdpUser,
+    userPermissions,
     signIn,
     confirmSignIn,
     signOut,
     getQuota,
-    checkUser,
     qr,
     parameters,
     infoTicket,

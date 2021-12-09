@@ -1,10 +1,11 @@
 import { Route, Switch, useLocation } from "react-router-dom";
+import { useUrls } from "../../utils/UrlsHooks";
 
 import PrivateRoute from "../../components/Compound/PrivateRoute/PrivateRoute";
 import Header from "../../components/Compound/Header/Header";
-import { useUrls } from "../../utils/UrlsHooks";
 import classes from "./Admin.module.css";
 import SocialBar from "../../components/Compound/SocialBar/SocialBar";
+import Error404 from "../../pages/Error404";
 
 const Admin = () => {
   const { adminLayout, wave } = classes;
@@ -67,6 +68,9 @@ const Admin = () => {
               </Route>
             );
           })}
+          <Route path="*">
+            <Error404 />
+          </Route>
         </Switch>
       </main>
     </div>

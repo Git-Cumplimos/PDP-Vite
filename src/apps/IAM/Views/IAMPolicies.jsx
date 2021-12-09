@@ -5,7 +5,6 @@ import Modal from "../../../components/Base/Modal/Modal";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import Pagination from "../../../components/Compound/Pagination/Pagination";
-import { useAuth } from "../../../utils/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import EditPolicyForm from "../components/Policies/EditPolicyForm";
 import PolicyForm from "../components/Policies/PolicyForm";
@@ -14,7 +13,6 @@ const url = process.env.REACT_APP_URL_IAM_PDP;
 
 const IAMPolicies = ({ route }) => {
   const { label } = route;
-  const { getPermissions, userInfo } = useAuth();
 
   const [policiesDB, setPoliciesDB] = useState([]);
   const [formData, setFormData] = useState(new FormData());
@@ -35,8 +33,6 @@ const IAMPolicies = ({ route }) => {
         setPoliciesDB(res);
       })
       .catch((err) => err);
-
-    getPermissions(userInfo?.attributes?.email);
   };
 
   const searchPolicies = useCallback(async (name_group, name_role) => {

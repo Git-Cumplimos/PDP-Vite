@@ -15,14 +15,10 @@ const EditPolicyForm = ({ selected, onCloseModal }) => {
     try {
       const [id_group] = selected.Grupo.split(") ");
       const [id_role] = selected.Rol.split(") ");
-      const groupRole = await fetchData(
-        `${url_iam}/groups-roles`,
-        "DELETE",
-        {
-          Groups_id_group: id_group,
-          Roles_id_role: id_role,
-        }
-      );
+      const groupRole = await fetchData(`${url_iam}/groups-roles`, "DELETE", {
+        Groups_id_group: id_group,
+        Roles_id_role: id_role,
+      });
       if (groupRole?.status) {
         notify("Politica eliminada satisfactoriamente");
       } else {
@@ -51,10 +47,7 @@ const EditPolicyForm = ({ selected, onCloseModal }) => {
           ""
         );
       })}
-      <Form
-        onSubmit={onSubmit}
-        grid
-      >
+      <Form onSubmit={onSubmit} grid>
         <ButtonBar>
           <Button type={"submit"}>Eliminar politica</Button>
         </ButtonBar>

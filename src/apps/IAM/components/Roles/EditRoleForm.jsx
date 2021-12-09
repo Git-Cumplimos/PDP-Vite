@@ -34,7 +34,7 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
             setMaxPage(res?.obj?.maxpages);
           }
         })
-        .catch((err) => console.error(err));
+        .catch(() => {});
     } else {
       setPermisosDB([]);
     }

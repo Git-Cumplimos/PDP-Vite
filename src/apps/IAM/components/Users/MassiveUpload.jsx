@@ -81,8 +81,6 @@ const MassiveUpload = ({ onCloseModal }) => {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    console.log(usersFile);
-
     if (!usersFile) {
       notifyError("No se ha selecionado un archivo para subir");
       return;

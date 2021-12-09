@@ -62,9 +62,13 @@ const FormCommerce = () => {
   const history = useHistory();
 
   useEffect(() => {
-    setCommerceId(roleInfo?.id_comercio ?? 0);
+    if (!roleInfo?.id_comercio) {
+      notifyError(`Comercio sin numero de id`);
+      history.replace("/");
+    }
+    setCommerceId(roleInfo?.id_comercio);
     fetchData(`${url_send}/review`, "GET", {
-      id_comercio: roleInfo?.id_comercio ?? 0,
+      id_comercio: roleInfo?.id_comercio,
     })
       .then((res) => {
         if (res?.status) {

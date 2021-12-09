@@ -5,7 +5,6 @@ import Modal from "../../../components/Base/Modal/Modal";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import Pagination from "../../../components/Compound/Pagination/Pagination";
-import { useAuth } from "../../../utils/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import GroupForm from "../components/Groups/GroupForm";
 
@@ -13,7 +12,6 @@ const url = process.env.REACT_APP_URL_IAM_PDP;
 
 const IAMGroups = ({ route }) => {
   const { label } = route;
-  const { getPermissions, userInfo } = useAuth();
 
   const [gruposDB, setGruposDB] = useState([]);
   const [maxPage, setMaxPage] = useState(1);
@@ -28,7 +26,6 @@ const IAMGroups = ({ route }) => {
     setSelected(null);
 
     searchGroups(formData.get("unameSearch"), formData.get("page"));
-    getPermissions(userInfo?.attributes?.email);
   };
 
   const searchGroups = useCallback((uname, _page) => {
@@ -47,7 +44,7 @@ const IAMGroups = ({ route }) => {
             setMaxPage(res?.obj?.maxpages);
           }
         })
-        .catch((err) => console.error(err));
+        .catch(() => {});
     } else {
       setGruposDB([]);
     }

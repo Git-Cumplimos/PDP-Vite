@@ -10,13 +10,11 @@ import MassiveUpload from "../components/Users/MassiveUpload";
 import UserForm from "../components/Users/UserForm";
 import EditUserGroupForm from "../components/Users/EditUserGroupForm";
 import Pagination from "../../../components/Compound/Pagination/Pagination";
-import { useAuth } from "../../../utils/AuthHooks";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
 const IAMUsers = ({ route }) => {
   const { label } = route;
-  const { getPermissions, userInfo } = useAuth();
 
   const [usuariosDB, setUsuariosDB] = useState([]);
   const [maxPage, setMaxPage] = useState(1);
@@ -39,7 +37,6 @@ const IAMUsers = ({ route }) => {
       formData?.get("unameSearch"),
       formData?.get("page")
     );
-    getPermissions(userInfo?.attributes?.email);
   };
 
   const searchUsers = useCallback((email, uname, _page) => {
@@ -61,7 +58,7 @@ const IAMUsers = ({ route }) => {
             setMaxPage(res?.obj?.maxpages);
           }
         })
-        .catch((err) => console.error(err));
+        .catch(() => {});
     } else {
       setUsuariosDB([]);
     }
