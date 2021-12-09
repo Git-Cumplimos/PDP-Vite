@@ -6,6 +6,8 @@ import SUSER from "../assets/svg/SUSER-01.svg";
 import MARKETPLACE from "../assets/svg/MARKETPLACE-01.svg";
 import ACTUALIZACION from "../assets/svg/ActualizacionDeDatos.svg";
 import LOTERIA from "../assets/svg/LOTERIA-DE-BOGOTA-01.svg";
+import SORTEOS from "../assets/svg/SORTEO-01.svg";
+import REPORTE from "../assets/svg/REPORTES-01.svg";
 
 /**
  * * Paginas
@@ -58,6 +60,11 @@ const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
 };
 
+const CARGAR =
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_1-P9wrhr8RWkx5zt3f64Ogy-Yr5DoQ_5ww&usqp=CAU";
+const DESCARGAR =
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU";
+
 const publicUrls = [
   {
     link: "/login",
@@ -83,28 +90,28 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/loteria-de-bogota/sorteos",
-        label: <AppIcons Logo={LOTERIA} name="Sorteos" />,
+        label: <AppIcons Logo={SORTEOS} name="Sorteos" />,
         component: Loteria,
         extern: false,
         permission: [3],
       },
       {
         link: "/loteria-de-bogota/cargar",
-        label: <AppIcons Logo={LOTERIA} name="Carga de archivos" />,
+        label: <AppIcons Logo={CARGAR} name="Carga de archivos" />,
         component: CargaArchivos,
         extern: false,
         permission: [4],
       },
       {
         link: "/loteria-de-bogota/descargar",
-        label: <AppIcons Logo={LOTERIA} name="Descarga de archivos" />,
+        label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
         component: DescargarArchivos,
         extern: false,
         permission: [6],
       },
       {
         link: "/loteria-de-bogota/crear-sorteos",
-        label: <AppIcons Logo={LOTERIA} name="Crear sorteos" />,
+        label: <AppIcons Logo={REPORTE} name="Crear sorteos" />,
         component: CrearSorteos,
         extern: false,
         permission: [5],
