@@ -364,7 +364,6 @@ export const useProvideAuth = () => {
     checkUser();
   }, [checkUser]);
 
-  console.log(history);
   // Runs when route change
   useEffect(() => {
     getQuota();
