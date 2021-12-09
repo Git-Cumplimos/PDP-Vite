@@ -55,6 +55,7 @@ import IAMPolicies from "../apps/IAM/Views/IAMPolicies";
  */
 import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
 import CommerceInfo from "../apps/UpdateCommerce/CommerceInfo";
+import Error404 from "../pages/Error404";
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -72,6 +73,12 @@ const publicUrls = [
     component: Login,
     props: {},
   },
+  {
+    link: "*",
+    exact: false,
+    component: Error404,
+    props: {},
+  }
 ];
 
 const allUrlsPrivateApps = [
