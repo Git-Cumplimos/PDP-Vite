@@ -25,6 +25,208 @@ const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;
 const url_permissions = process.env.REACT_APP_URL_IAM_PDP;
 
+const notify = (msg = "Info") => {
+  toast.info(msg, {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+};
+
+const notifyError = (msg = "Error") => {
+  toast.warning(msg, {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+};
+
+const infoTicket = async (id_trx, Tipo_operacion, ticket) => {
+  const get = {
+    id_trx: id_trx,
+    Tipo_operacion: Tipo_operacion,
+  };
+  const post = { Ticket: ticket };
+
+  try {
+    const res = await fetchData(urlInfoTicket, "PUT", get, post);
+    return res;
+  } catch (err) {}
+};
+
+const fetchAwsAuth = async () => {
+  try {
+    const uInfo = await Auth.currentUserInfo();
+    const uSession = await Auth.currentSession();
+    return { email: uInfo?.attributes?.email, uInfo, uSession };
+  } catch (err) {
+    logger.debug(err);
+    throw err;
+  }
+};
+
+const fetchSuserInfo = async (email) => {
+  try {
+    let roleObj = {};
+    const suserInfo = await fetchData(urlLog, "GET", { correo: email }, {});
+    roleObj = { ...suserInfo };
+
+    try {
+      const resp_ciudad = await fetchData(
+        urlCiudad_dane,
+        "GET",
+        {
+          c_digo_dane_del_municipio: suserInfo.codigo_dane,
+        },
+        {}
+      );
+      roleObj = {
+        ...roleObj,
+        ciudad: resp_ciudad[0].municipio,
+      };
+    } catch (err) {}
+
+    try {
+      const resp_cod = await fetchData(
+        urlCod_loteria_oficina,
+        "GET",
+        {
+          id_comercio: suserInfo.id_comercio,
+        },
+        {}
+      );
+      if (!("msg" in resp_cod)) {
+        roleObj = {
+          ...roleObj,
+          cod_oficina_lot: resp_cod.cod_oficina_lot,
+          cod_sucursal_lot: resp_cod.cod_sucursal_lot,
+        };
+      }
+    } catch (err) {}
+
+    return roleObj;
+  } catch (err) {}
+};
+
+const getPermissions = async (email = "") => {
+  if (!email) {
+    return;
+  }
+  try {
+    // Get user
+    const user_res = await fetchData(`${url_permissions}/users`, "GET", {
+      email: email,
+    });
+    if (!user_res?.status) {
+      throw new Error(user_res?.msg);
+    }
+    const user_res_arr = user_res?.obj?.results;
+    if (!Array.isArray(user_res_arr) || user_res_arr.length === 0) {
+      notifyError("User not found in db");
+      return { uAccess: [], pdpU: null };
+    }
+    const uuid = user_res_arr?.[0].uuid ?? 0;
+    if (uuid === 0) {
+      notifyError("User not found in db");
+      return { uAccess: [], pdpU: null };
+    }
+
+    // Get group of the user
+    const user_group_res = await fetchData(
+      `${url_permissions}/users-groups`,
+      "GET",
+      {
+        Users_uuid: uuid,
+      }
+    );
+    if (!user_group_res?.status) {
+      throw new Error(user_group_res?.msg);
+    }
+    if (
+      !Array.isArray(user_group_res?.obj) ||
+      user_group_res?.obj.length === 0
+    ) {
+      return { uAccess: [], pdpU: null };
+    }
+
+    const userAccess = [];
+
+    for (const group of user_group_res?.obj) {
+      const id_group = group.Groups_id_group ?? 0;
+      if (id_group !== 0) {
+        // Get roles of the group
+        const group_roles_res = await fetchData(
+          `${url_permissions}/groups-roles`,
+          "GET",
+          {
+            Groups_id_group: id_group,
+          }
+        );
+        if (!group_roles_res?.status) {
+          throw new Error(group_roles_res?.msg);
+        }
+        const gr_res = group_roles_res?.obj;
+        if (Array.isArray(gr_res) && gr_res.length > 0) {
+          for (const role of gr_res) {
+            const id_role = role.Roles_id_role ?? 0;
+            if (id_role !== 0) {
+              // Get permissions of the role
+              const role_permissions_res = await fetchData(
+                `${url_permissions}/roles-permissions`,
+                "GET",
+                {
+                  Roles_id_role: id_role,
+                }
+              );
+              if (!role_permissions_res?.status) {
+                throw new Error(role_permissions_res?.msg);
+              }
+              if (
+                Array.isArray(role_permissions_res?.obj) &&
+                role_permissions_res?.obj.length > 0
+              ) {
+                for (const permission of role_permissions_res?.obj) {
+                  const id_permission =
+                    permission.Permissions_id_permission ?? 0;
+                  if (id_permission !== 0) {
+                    const permissions_res = await fetchData(
+                      `${url_permissions}/permissions`,
+                      "GET",
+                      {
+                        id_permission,
+                      }
+                    );
+                    if (!permissions_res?.status) {
+                      throw new Error(permissions_res?.msg);
+                    }
+                    const per_res = permissions_res?.obj?.results;
+                    if (Array.isArray(per_res) && per_res.length > 0) {
+                      userAccess.push(...per_res);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (userAccess.length === 0) {
+      notifyError("User has no permissions in db");
+      return { uAccess: [], pdpU: null };
+    }
+    return { uAccess: userAccess, pdpU: user_res_arr?.[0] };
+  } catch (err) {}
+};
+
 export const AuthContext = createContext({
   isSignedIn: false,
   cognitoUser: null,
@@ -78,243 +280,39 @@ export const useProvideAuth = () => {
 
   const { state, pathname } = useLocation();
 
-  const notify = useCallback((msg = "Info") => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  }, []);
-
-  const notifyError = useCallback((msg = "Error") => {
-    toast.warning(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  }, []);
-
-  const infoTicket = useCallback(async (id_trx, Tipo_operacion, ticket) => {
-    const get = {
-      id_trx: id_trx,
-      Tipo_operacion: Tipo_operacion,
-    };
-    const post = { Ticket: ticket };
-
-    try {
-      const res = await fetchData(urlInfoTicket, "PUT", get, post);
-      return res;
-    } catch (err) {}
-  }, []);
-
   const getQuota = useCallback(async () => {
     const tempRole = { quota: 0, comision: 0 };
     if (roleInfo?.id_comercio && roleInfo?.id_dispositivo) {
-      const quota = await fetchData(
-        urlQuota,
-        "GET",
-        {
-          id_comercio: roleInfo?.id_comercio,
-          id_dispositivo: roleInfo?.id_dispositivo,
-        },
-        {}
-      );
-      tempRole.quota = quota["cupo disponible"];
-      tempRole.comision = quota["comisiones"];
+      try {
+        const quota = await fetchData(
+          urlQuota,
+          "GET",
+          {
+            id_comercio: roleInfo?.id_comercio,
+            id_dispositivo: roleInfo?.id_dispositivo,
+          },
+          {}
+        );
+        tempRole.quota = quota["cupo disponible"];
+        tempRole.comision = quota["comisiones"];
+      } catch (err) {}
     }
     setQuotaInfo({ ...tempRole });
   }, [roleInfo?.id_comercio, roleInfo?.id_dispositivo]);
 
-  const fetchAwsAuth = useCallback(async () => {
+  const saveUserData = useCallback(async (user, email, uData, uSession) => {
+    setSignedIn(true);
+    setCognitoUser(user);
+    setUserInfo(uData);
+    setUserSession(uSession);
     try {
-      const usrInfo = await Auth.currentUserInfo();
-      setUserInfo(usrInfo);
-
-      const userSession = await Auth.currentSession();
-      setUserSession(userSession);
-      return usrInfo?.attributes?.email;
-    } catch (err) {
-      setSignedIn(false);
-      logger.debug(err);
-    }
-  }, []);
-
-  const fetchSuserInfo = useCallback(async (email) => {
-    try {
-      let roleObj = {};
-      const suserInfo = await fetchData(urlLog, "GET", { correo: email }, {});
-      roleObj = { ...suserInfo };
-
-      try {
-        const resp_ciudad = await fetchData(
-          urlCiudad_dane,
-          "GET",
-          {
-            c_digo_dane_del_municipio: suserInfo.codigo_dane,
-          },
-          {}
-        );
-        roleObj = {
-          ...roleObj,
-          ciudad: resp_ciudad[0].municipio,
-        };
-      } catch (err) {}
-
-      try {
-        const resp_cod = await fetchData(
-          urlCod_loteria_oficina,
-          "GET",
-          {
-            id_comercio: suserInfo.id_comercio,
-          },
-          {}
-        );
-        if (!("msg" in resp_cod)) {
-          roleObj = {
-            ...roleObj,
-            cod_oficina_lot: resp_cod.cod_oficina_lot,
-            cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-          };
-        }
-      } catch (err) {}
-
-      setRoleInfo({ ...roleObj });
+      const role = await fetchSuserInfo(email);
+      const { uAccess, pdpU } = await getPermissions(email);
+      setRoleInfo(role);
+      setUserPermissions(uAccess);
+      setPdpUser(pdpU);
     } catch (err) {}
   }, []);
-
-  const getPermissions = useCallback(
-    async (email = "") => {
-      if (!email) {
-        return;
-      }
-      try {
-        // Get user
-        const user_res = await fetchData(`${url_permissions}/users`, "GET", {
-          email: email,
-        });
-        if (!user_res?.status) {
-          throw new Error(user_res?.msg);
-        }
-        const user_res_arr = user_res?.obj?.results;
-        if (!Array.isArray(user_res_arr) || user_res_arr.length === 0) {
-          notifyError("User not found in db");
-          return;
-        }
-        const uuid = user_res_arr?.[0].uuid ?? 0;
-        if (uuid === 0) {
-          notifyError("User not found in db");
-          return;
-        }
-        setPdpUser(user_res_arr?.[0]);
-
-        // Get group of the user
-        const user_group_res = await fetchData(
-          `${url_permissions}/users-groups`,
-          "GET",
-          {
-            Users_uuid: uuid,
-          }
-        );
-        if (!user_group_res?.status) {
-          throw new Error(user_group_res?.msg);
-        }
-        if (
-          !Array.isArray(user_group_res?.obj) ||
-          user_group_res?.obj.length === 0
-        ) {
-          return;
-        }
-
-        const userAccess = [];
-
-        for (const group of user_group_res?.obj) {
-          const id_group = group.Groups_id_group ?? 0;
-          if (id_group !== 0) {
-            // Get roles of the group
-            const group_roles_res = await fetchData(
-              `${url_permissions}/groups-roles`,
-              "GET",
-              {
-                Groups_id_group: id_group,
-              }
-            );
-            if (!group_roles_res?.status) {
-              throw new Error(group_roles_res?.msg);
-            }
-            const gr_res = group_roles_res?.obj;
-            if (Array.isArray(gr_res) && gr_res.length > 0) {
-              for (const role of gr_res) {
-                const id_role = role.Roles_id_role ?? 0;
-                if (id_role !== 0) {
-                  // Get permissions of the role
-                  const role_permissions_res = await fetchData(
-                    `${url_permissions}/roles-permissions`,
-                    "GET",
-                    {
-                      Roles_id_role: id_role,
-                    }
-                  );
-                  if (!role_permissions_res?.status) {
-                    throw new Error(role_permissions_res?.msg);
-                  }
-                  if (
-                    Array.isArray(role_permissions_res?.obj) &&
-                    role_permissions_res?.obj.length > 0
-                  ) {
-                    for (const permission of role_permissions_res?.obj) {
-                      const id_permission =
-                        permission.Permissions_id_permission ?? 0;
-                      if (id_permission !== 0) {
-                        const permissions_res = await fetchData(
-                          `${url_permissions}/permissions`,
-                          "GET",
-                          {
-                            id_permission,
-                          }
-                        );
-                        if (!permissions_res?.status) {
-                          throw new Error(permissions_res?.msg);
-                        }
-                        const per_res = permissions_res?.obj?.results;
-                        if (Array.isArray(per_res) && per_res.length > 0) {
-                          userAccess.push(...per_res);
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        if (userAccess.length === 0) {
-          notifyError("User has no permissions in db");
-          return;
-        }
-        setUserPermissions(userAccess);
-        return userAccess;
-      } catch (err) {}
-    },
-    [notifyError]
-  );
-
-  const saveUserData = useCallback(
-    async (user, email) => {
-      setSignedIn(true);
-      setCognitoUser(user);
-      await fetchSuserInfo(email);
-      await getPermissions(email);
-    },
-    [fetchSuserInfo, getPermissions]
-  );
 
   const handleSetupTOTP = useCallback(
     async (user) => {
@@ -336,27 +334,38 @@ export const useProvideAuth = () => {
   const checkUser = useCallback(async () => {
     let user = null;
     let email = null;
+    let uInfo = null;
+    let uSession = null;
     try {
       if (Auth.user === null || Auth.user === undefined) {
         user = await Auth.currentAuthenticatedUser();
-        email = await fetchAwsAuth();
+        const {
+          email: _email,
+          uInfo: _uInfo,
+          uSession: _uSession,
+        } = await fetchAwsAuth();
+        email = _email;
+        uInfo = _uInfo;
+        uSession = _uSession;
       } else {
         user = Auth.user;
         email = Auth.user?.attributes?.email;
-        await fetchAwsAuth();
+        const { uInfo: _uInfo, uSession: _uSession } = await fetchAwsAuth();
+        uInfo = _uInfo;
+        uSession = _uSession;
       }
       if (!user) {
         setSignedIn(false);
         setCognitoUser(null);
         return;
       }
-      await saveUserData(user, email);
+      await saveUserData(user, email, uInfo, uSession);
     } catch (err) {
       setSignedIn(false);
       setCognitoUser(null);
       logger.debug(err);
     }
-  }, [fetchAwsAuth, saveUserData]);
+  }, [saveUserData]);
 
   // Runs in first load
   useEffect(() => {
@@ -368,9 +377,12 @@ export const useProvideAuth = () => {
   useEffect(() => {
     getQuota();
     if (pathname?.includes("iam")) {
-      getPermissions(userInfo?.attributes?.email);
+      getPermissions(userInfo?.attributes?.email).then(({ uAccess, pdpU }) => {
+        setUserPermissions(uAccess);
+        setPdpUser(pdpU);
+      });
     }
-  }, [getQuota, getPermissions, pathname, userInfo?.attributes?.email]);
+  }, [getQuota, pathname, userInfo?.attributes?.email]);
 
   useEffect(() => {
     const validate = async () => {
@@ -461,9 +473,9 @@ export const useProvideAuth = () => {
           totp,
           cognitoUser.challengeName
         );
-        let email = await fetchAwsAuth();
+        const { email, uInfo, uSession } = await fetchAwsAuth();
 
-        await saveUserData(loggedUser, email);
+        await saveUserData(loggedUser, email, uInfo, uSession);
         history.push(state?.from || pathname === "/login" ? "/" : pathname);
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
@@ -472,7 +484,7 @@ export const useProvideAuth = () => {
         throw err;
       }
     },
-    [cognitoUser, history, state, pathname, fetchAwsAuth, saveUserData]
+    [cognitoUser, history, state, pathname, saveUserData]
   );
 
   const signOut = useCallback(() => {
