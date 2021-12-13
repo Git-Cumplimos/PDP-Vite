@@ -99,8 +99,6 @@ export const useProvideLoteria = () => {
   });
   const [sellResponse, setSellResponse] = useState(null);
   const [pagoresponse, setPagoresponse] = useState(null);
-  const [crearRolresp, setCrearRolresp] = useState(null);
-  const [roles_disponibles, setRoles_disponibles] = useState(null);
 
   // Datos estadisticas
   const [moda, setModa] = useState(null);
@@ -145,7 +143,6 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-
   const searchLoteriafisica = useCallback(async (sorteo, num, ser, page) => {
     console.log(roleInfo)
     let fisico=false
@@ -180,7 +177,7 @@ export const useProvideLoteria = () => {
       setLoterias([]);
       console.error(err);
     }
-  }, []);
+  }, [roleInfo]);
 
   
   
@@ -354,7 +351,7 @@ export const useProvideLoteria = () => {
     } catch (err) {
       console.error(err);
     }
-  }, []);
+  }, [roleInfo.cod_oficina_lot, roleInfo.cod_sucursal_lot, roleInfo.codigo_dane]);
 
   const getReportesPagos = useCallback(async () => {
    

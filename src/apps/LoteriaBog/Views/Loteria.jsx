@@ -10,15 +10,13 @@ import Table from "../../../components/Base/Table/Table";
 import SellResp from "../components/SellResp/SellResp";
 import SendForm from "../components/SendForm/SendForm";
 import { useLoteria } from "../utils/LoteriaHooks";
-import { useAuth } from "../../../utils/AuthHooks";
+import fetchData from "../../../utils/fetchData";
+import SubPage from "../../../components/Base/SubPage/SubPage";
 
-const Loteria = ({
-  sorteo:
-  sorteoOrdi,
-  sorteoExtra,  
-  sorteoOrdifisico,
-  sorteoExtrafisico,
-}) => {
+const urlLoto = `${process.env.REACT_APP_LOTO_SORTEOS}/contiploteria`;
+
+const Loteria = ({ route }) => {
+  const { label } = route;
   const {
     infoLoto: {
       numero,
@@ -40,7 +38,57 @@ const Loteria = ({
     sellLoteriafisica,
   } = useLoteria();
 
-  
+  const [sorteoOrdi, setSorteoOrdi] = useState(null);
+  const [sorteoExtra, setSorteoExtra] = useState(null);
+
+  const [sorteoOrdifisico, setSorteofisico] = useState(null);
+  const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
+
+  useEffect(() => {
+    fetchData(urlLoto, "GET", {}, {})
+      .then((res) => {
+        ////sorteo virtual
+        const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 1 && !fisico;
+        });
+        const sortExt = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 2 && !fisico;
+        });
+        if (sortOrd.length > 0) {
+          setSorteoOrdi(sortOrd[0]);
+        } else {
+          /*  notifyError("No se encontraron sorteos ordinarios"); */
+        }
+        if (sortExt.length > 0) {
+          setSorteoExtra(sortExt[0]);
+        } else {
+          /* notifyError("No se encontraron sorteos extraordinarios"); */
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ///sorteo fisico
+        const sortOrdfisico = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 1 && fisico;
+        });
+        const sortExtfisico = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 2 && fisico;
+        });
+
+        if (sortOrdfisico.length > 0) {
+          setSorteofisico(sortOrdfisico[0]);
+        } else {
+          /*    notifyError("No se encontraron extraordinarios fisicos"); */
+        }
+
+        if (sortExtfisico.length > 0) {
+          setSorteofisicoextraordinario(sortExtfisico[0]);
+        } else {
+          /*   notifyError("No se encontraron extraordinarios fisicos"); */
+        }
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
@@ -49,10 +97,11 @@ const Loteria = ({
   const [selecFrac, setSelecFrac] = useState([]);
   const [tipoPago, setTipoPago] = useState(1);
 
-  const [opcionesdisponibles, SetOpcionesDisponibles] = useState([{value:"",label:""}]);
+  const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
+    { value: "", label: "" },
+  ]);
 
   useEffect(() => {
-
     setSellResponse(null);
     setNumero("");
     setSerie("");
@@ -61,17 +110,13 @@ const Loteria = ({
     setPage(1);
     setMaxPages(1);
 
-
-    
-    console.log(sorteoExtrafisico)
-    const copy = [...opcionesdisponibles];
+    console.log(sorteoExtrafisico);
+    const copy = [{ value: "", label: "" }];
     if (sorteoOrdi !== null) {
       copy.push({
         value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
         label: `Sorteo ordinario - ${sorteoOrdi.num_sorteo}`,
       });
-
-      
     }
     if (sorteoExtra !== null) {
       copy.push({
@@ -87,42 +132,52 @@ const Loteria = ({
     }
 
     if (sorteoExtrafisico !== null) {
-      
       copy.push({
         value: `${sorteoExtrafisico.num_sorteo}-${sorteoExtrafisico.fisico}-${sorteoExtrafisico.num_loteria}`,
         label: `Sorteo extraordinario fisico - ${sorteoExtrafisico.num_sorteo}`,
       });
     }
     SetOpcionesDisponibles([...copy]);
-
-
-
-    
-  }, [setSellResponse, setNumero, setSerie, setCustomer, setLoterias]);
+  }, [
+    setCustomer,
+    setLoterias,
+    setNumero,
+    setSellResponse,
+    setSerie,
+    sorteoExtra,
+    sorteoExtrafisico,
+    sorteoOrdi,
+    sorteoOrdifisico,
+  ]);
 
   const closeModal = useCallback(() => {
     setShowModal(false);
-    setSellResponse(null)
+    setSellResponse(null);
     setCustomer({ fracciones: "", phone: "", doc_id: "" });
-    setSelected(null)
-    setSelecFrac([])
-    {sorteo.split('-')[1]==='true'? 
-    searchLoteriafisica(sorteo, numero, serie, page)         
-    :
-    searchLoteria(sorteo, numero, serie, page)
-    }
-    
+    setSelected(null);
+    setSelecFrac([]);
 
-  }, [sorteo, numero, serie, searchLoteria,searchLoteriafisica, page]);
-  console.log(selected)
+    sorteo.split("-")[1] === "true"
+      ? searchLoteriafisica(sorteo, numero, serie, page)
+      : searchLoteria(sorteo, numero, serie, page);
+  }, [
+    numero,
+    page,
+    searchLoteria,
+    searchLoteriafisica,
+    serie,
+    setCustomer,
+    setSelected,
+    setSellResponse,
+    sorteo,
+  ]);
+  console.log(selected);
+  console.log(sellResponse);
   return (
-    <>
+    <SubPage label={label}>
       <Form grid>
-        {
-
-        }
         <Select
-          disabled={serie!=="" || numero!==""}
+          disabled={serie !== "" || numero !== ""}
           id="selectSorteo"
           label="Tipo de sorteo"
           options={opcionesdisponibles}
@@ -138,27 +193,28 @@ const Loteria = ({
           autoComplete="off"
           value={numero}
           onInput={(e) => {
-            if(!isNaN(e.target.value)){
-              const num = (e.target.value);
+            if (!isNaN(e.target.value)) {
+              console.log("aver");
+              const num = e.target.value;
               setNumero(num);
-              }
+            }
           }}
           onLazyInput={{
             callback: (e) => {
-              const num = !isNaN(e.target.value)? e.target.value : "";
+              const num = !isNaN(e.target.value) ? e.target.value : "";
               setPage(1);
-              {sorteo.split('-')[1]==='true'? 
-              searchLoteriafisica(sorteo, num, serie, 1).then((max) => {
-                if (max !== undefined) {
-                  setMaxPages(Math.ceil(max / 10));
-                }
-              })
-              :
-              searchLoteria(sorteo, num, serie, 1).then((max) => {
-                if (max !== undefined) {
-                  setMaxPages(Math.ceil(max / 10));
-                }
-              })}
+
+              sorteo.split("-")[1] === "true"
+                ? searchLoteriafisica(sorteo, num, serie, 1).then((max) => {
+                    if (max !== undefined) {
+                      setMaxPages(Math.ceil(max / 10));
+                    }
+                  })
+                : searchLoteria(sorteo, num, serie, 1).then((max) => {
+                    if (max !== undefined) {
+                      setMaxPages(Math.ceil(max / 10));
+                    }
+                  });
             },
             timeOut: 500,
           }}
@@ -172,27 +228,27 @@ const Loteria = ({
           autoComplete="off"
           value={serie}
           onInput={(e) => {
-            if(!isNaN(e.target.value)){
-              const num = (e.target.value);
+            if (!isNaN(e.target.value)) {
+              const num = e.target.value;
               setSerie(num);
-              }
+            }
           }}
           onLazyInput={{
             callback: (e) => {
-              const num =!isNaN(e.target.value)? e.target.value : "";
+              const num = !isNaN(e.target.value) ? e.target.value : "";
               setPage(1);
-              {sorteo.split('-')[1]==='true'? 
-              searchLoteriafisica(sorteo, numero, num, 1).then((max) => {
-                if (max !== undefined) {
-                  setMaxPages(Math.ceil(max / 10));
-                }
-              })
-              :
-              searchLoteria(sorteo, num, serie, 1).then((max) => {
-                if (max !== undefined) {
-                  setMaxPages(Math.ceil(max / 10));
-                }
-              })}
+
+              sorteo.split("-")[1] === "true"
+                ? searchLoteriafisica(sorteo, numero, num, 1).then((max) => {
+                    if (max !== undefined) {
+                      setMaxPages(Math.ceil(max / 10));
+                    }
+                  })
+                : searchLoteria(sorteo, num, serie, 1).then((max) => {
+                    if (max !== undefined) {
+                      setMaxPages(Math.ceil(max / 10));
+                    }
+                  });
             },
             timeOut: 500,
           }}
@@ -204,10 +260,10 @@ const Loteria = ({
             onClick={() => {
               if (page > 1) {
                 setPage(page - 1);
-                {sorteo.split('-')[1]==='true'?
-                searchLoteriafisica(sorteo, numero, serie, page - 1):
-                searchLoteria(sorteo, numero, serie, page - 1)
-                }
+
+                sorteo.split("-")[1] === "true"
+                  ? searchLoteriafisica(sorteo, numero, serie, page - 1)
+                  : searchLoteria(sorteo, numero, serie, page - 1);
               }
             }}
           >
@@ -219,11 +275,10 @@ const Loteria = ({
             onClick={() => {
               if (page < maxPages) {
                 setPage(page + 1);
-                {sorteo.split('-')[1]==='true'?
-                searchLoteriafisica(sorteo, numero, serie, page + 1):
-                searchLoteria(sorteo, numero, serie, page + 1)
-                }
-              
+
+                sorteo.split("-")[1] === "true"
+                  ? searchLoteriafisica(sorteo, numero, serie, page + 1)
+                  : searchLoteria(sorteo, numero, serie, page + 1);
               }
             }}
           >
@@ -245,21 +300,16 @@ const Loteria = ({
               // "Valor por fraccion",
             ]}
             data={loterias.map(
-              ({
-                Fracciones_disponibles,
-                Num_billete,
-                serie: Serie_lot,
-              }) => {
+              ({ Fracciones_disponibles, Num_billete, serie: Serie_lot }) => {
                 return {
                   Num_billete,
                   Serie_lot,
                   Fracciones_disponibles,
-                 
                 };
               }
             )}
             onSelectRow={(e, index) => {
-              console.log(loterias[index].Fracciones)
+              console.log(loterias[index].Fracciones);
               setSelected(loterias[index]);
               setShowModal(true);
             }}
@@ -282,11 +332,9 @@ const Loteria = ({
             setCustomer={setCustomer}
             closeModal={closeModal}
             handleSubmit={(event) => {
-              {sorteo.split('-')[1]==='true'?
-              sellLoteriafisica(sorteo,selecFrac,tipoPago):
-              sellLoteria(sorteo)
-              }
-              
+              sorteo.split("-")[1] === "true"
+                ? sellLoteriafisica(sorteo, selecFrac, tipoPago)
+                : sellLoteria(sorteo);
             }}
           />
         ) : (
@@ -298,7 +346,7 @@ const Loteria = ({
           />
         )}
       </Modal>
-    </>
+    </SubPage>
   );
 };
 

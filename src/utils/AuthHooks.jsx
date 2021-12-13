@@ -109,6 +109,12 @@ const fetchSuserInfo = async (email) => {
           cod_oficina_lot: resp_cod.cod_oficina_lot,
           cod_sucursal_lot: resp_cod.cod_sucursal_lot,
         };
+      } else {
+        roleObj = {
+          ...roleObj,
+          cod_oficina_lot: "PPVIR",
+          cod_sucursal_lot: "00",
+        };
       }
     } catch (err) {}
 

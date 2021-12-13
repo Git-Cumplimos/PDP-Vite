@@ -26,7 +26,7 @@ import AuthButton from "../components/Compound/Signout/Signout";
  */
 import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
 import Loteria from "../apps/LoteriaBog/Views/Loteria";
-import DescargarArchivos from "../apps/LoteriaBog/Views/DescargarArchivos";
+import DescargarArchivosS3 from "../apps/LoteriaBog/Views/DescargarArchivosS3";
 import CrearSorteos from "../apps/LoteriaBog/Views/CrearSorteos";
 import CargaArchivos from "../apps/LoteriaBog/Views/CargaArchivos";
 
@@ -56,6 +56,7 @@ import IAMPolicies from "../apps/IAM/Views/IAMPolicies";
 import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
 import CommerceInfo from "../apps/UpdateCommerce/CommerceInfo";
 import Error404 from "../pages/Error404";
+import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -92,6 +93,7 @@ const allUrlsPrivateApps = [
     link: "/loteria-de-bogota",
     label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
     component: LoteriaBog,
+    provider: ProvideLoteria,
     extern: false,
     permission: [3, 4, 5, 6],
     subRoutes: [
@@ -112,13 +114,13 @@ const allUrlsPrivateApps = [
       {
         link: "/loteria-de-bogota/descargar",
         label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
-        component: DescargarArchivos,
+        component: DescargarArchivosS3,
         extern: false,
         permission: [6],
       },
       {
-        link: "/loteria-de-bogota/crear-sorteos",
-        label: <AppIcons Logo={REPORTE} name="Crear sorteos" />,
+        link: "/loteria-de-bogota/sorteos",
+        label: <AppIcons Logo={REPORTE} name="Sorteos" />,
         component: CrearSorteos,
         extern: false,
         permission: [5],

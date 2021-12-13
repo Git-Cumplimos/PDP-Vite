@@ -7,72 +7,66 @@ import Button from "../../../components/Base/Button/Button";
 import Modal from "../../../components/Base/Modal/Modal";
 import SortForm from "../components/SortForm/SortForm";
 import { useLoteria } from "../utils/LoteriaHooks";
+import SubPage from "../../../components/Base/SubPage/SubPage";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_accessKeyId,
   secretAccessKey: process.env.REACT_APP_secretAccessKey,
 });
 
-const CrearSorteos = () => {
-   
-  const {ConsultaCrearSort, cargueVentasExtra_S3} = useLoteria();
+const CrearSorteos = ({ route }) => {
+  const { label } = route;
+
+  const { ConsultaCrearSort, cargueVentasExtra_S3 } = useLoteria();
   const [resp_con, setResp_con] = useState(null);
   const [tip_sorteo, setTip_sorteo] = useState(null);
   const [sorteo, setSorteo] = useState(null);
   const [num_loteria, setNum_loteria] = useState(null);
 
-
   const [showModal, setShowModal] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
 
   useEffect(() => {
-    ConsultaCrearSort()
-      .then((res) => {
-        console.log(res)
-        setResp_con(res)   
-                 
-      })
-  }, [setResp_con])
-
+    ConsultaCrearSort().then((res) => {
+      console.log(res);
+      setResp_con(res);
+    });
+  }, [setResp_con]);
 
   const S3 = (e) => {
     // e.preventDefault();
     cargueVentasExtra_S3().then((res) => {
-      if(res.estado===true){
+      if (res.estado === true) {
         notify(res.msg);
-      }
-      else{
-        notifyError(res.msg)
+      } else {
+        notifyError(res.msg);
       }
     });
-    };
+  };
 
   const closeModal = useCallback(() => {
     setShowModal(false);
-    ConsultaCrearSort()
-      .then((res) => {
-        console.log(res)
-        setResp_con(res)   
-                 
-      })
-    
+    ConsultaCrearSort().then((res) => {
+      console.log(res);
+      setResp_con(res);
+    });
   });
 
   const onSubmit1 = (e) => {
     e.preventDefault();
-    setTip_sorteo(1)
-    setSorteo(String(parseInt(resp_con?.ordinario.num_sorteo)+1))
-    setNum_loteria(resp_con?.ordinario.num_loteria)
-    setShowModal(true)  
-  }
+    setTip_sorteo(1);
+    setSorteo(String(parseInt(resp_con?.ordinario.num_sorteo) + 1));
+    setNum_loteria(resp_con?.ordinario.num_loteria);
+    setShowModal(true);
+  };
 
   const onSubmit2 = (e) => {
     e.preventDefault();
-    setTip_sorteo(2)
-    setSorteo(String(parseInt(resp_con?.extra.num_sorteo)+1))
-    setNum_loteria(resp_con?.extra.num_loteria)
-    setShowModal(true)
-  }
+    setTip_sorteo(2);
+    setSorteo(String(parseInt(resp_con?.extra.num_sorteo) + 1));
+    setNum_loteria(resp_con?.extra.num_loteria);
+    setShowModal(true);
+  };
 
   const notifyError = (msg) => {
     toast.error(msg, {
@@ -87,7 +81,6 @@ const CrearSorteos = () => {
   };
 
   const notify = (msg) => {
-   
     toast.info(msg, {
       position: "top-center",
       autoClose: 5000,
@@ -98,72 +91,73 @@ const CrearSorteos = () => {
       progress: undefined,
     });
   };
-  console.log(resp_con?.ordinario?.num_loteria)
+  console.log(resp_con?.ordinario?.num_loteria);
   return (
-    <div>
-      {resp_con?.extra?.Cerrar?       
-      <ButtonBar>
-      <Button type="button" onClick={() => {
-              S3();
-            
-            }}>
-      Cerrar sorteo extraordinario   
-      </Button>
-      </ButtonBar>
-       
-      :
-      ""}
+    <SubPage label={label}>
+      <div>
+        {resp_con?.extra?.Cerrar ? (
+          <ButtonBar>
+            <Button
+              type="button"
+              onClick={() => {
+                S3();
+              }}
+            >
+              Cerrar sorteo extraordinario
+            </Button>
+          </ButtonBar>
+        ) : (
+          ""
+        )}
 
-      {resp_con?.ordinario?.Cerrar?      
-      <ButtonBar>
-      <Button type="button" onClick={() => {
-              S3();
-            
-            }}>
-      Cerrar sorteo ordinario   
-      </Button>
-      </ButtonBar>
-       
-      :
-      ""}
-      
-      {resp_con?.ordinario?.num_loteria!==undefined?
-      <Form formDir="col" onSubmit={onSubmit1}>
+        {resp_con?.ordinario?.Cerrar ? (
+          <ButtonBar>
+            <Button
+              type="button"
+              onClick={() => {
+                S3();
+              }}
+            >
+              Cerrar sorteo ordinario
+            </Button>
+          </ButtonBar>
+        ) : (
+          ""
+        )}
+
+        {resp_con?.ordinario?.num_loteria !== undefined ? (
+          <Form formDir="col" onSubmit={onSubmit1}>
             <ButtonBar>
-              <Button 
-              type="submit" 
-              diabled={disabledBtns}
-              >
-              Crear sorteo ordinario
+              <Button type="submit" diabled={disabledBtns}>
+                Crear sorteo ordinario
               </Button>
             </ButtonBar>
-      </Form>:''}
-      {resp_con?.extra?.num_loteria!==undefined? 
-      <Form formDir="col" onSubmit={onSubmit2}>
+          </Form>
+        ) : (
+          ""
+        )}
+        {resp_con?.extra?.num_loteria !== undefined ? (
+          <Form formDir="col" onSubmit={onSubmit2}>
             <ButtonBar>
-              <Button 
-              type="submit" 
-              diabled={disabledBtns}
-              >
-              Crear sorteo extraordinario
+              <Button type="submit" diabled={disabledBtns}>
+                Crear sorteo extraordinario
               </Button>
             </ButtonBar>
-      </Form>:''}
-      <Modal show={showModal} handleClose={() => closeModal()}>
-        <SortForm 
-        closeModal={closeModal} 
-        tip_sorteo={tip_sorteo} 
-        sorteo={sorteo} 
-        setSorteo={setSorteo} 
-        num_loteria={num_loteria}> 
-            
-        </SortForm>
-      </Modal>
-      
-      
-    </div>
-    
-    
+          </Form>
+        ) : (
+          ""
+        )}
+        <Modal show={showModal} handleClose={() => closeModal()}>
+          <SortForm
+            closeModal={closeModal}
+            tip_sorteo={tip_sorteo}
+            sorteo={sorteo}
+            setSorteo={setSorteo}
+            num_loteria={num_loteria}
+          ></SortForm>
+        </Modal>
+      </div>
+    </SubPage>
   );
 };
 

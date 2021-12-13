@@ -22,11 +22,15 @@ export const useProvideUrls = () => {
     const allUrls = [];
 
     for (const url of urls) {
-      const { subRoutes } = url;
+      const { subRoutes, provider } = url;
       allUrls.push({ ...url });
       if (subRoutes) {
         for (const subUrl of getAllRoutes(subRoutes)) {
-          allUrls.push(subUrl);
+          if (provider) {
+            allUrls.push({ ...subUrl, provider });
+          } else {
+            allUrls.push(subUrl);
+          }
         }
       }
     }
@@ -49,11 +53,33 @@ export const useProvideUrls = () => {
         .filter(({ link }) => !(link === undefined || link === null))
         .filter(({ extern }) => !extern)
         .map(
-          ({ link, component: Component, props, exact, subRoutes, label }) => {
+          ({
+            link,
+            component: Component,
+            props,
+            exact,
+            subRoutes,
+            label,
+            provider: Provider,
+          }) => {
             exact = exact === undefined ? true : exact;
             return (
               <Wrapper key={link} path={link} exact={exact}>
-                <Component subRoutes={subRoutes} route={{ label }} {...props} />
+                {Provider ? (
+                  <Provider>
+                    <Component
+                      subRoutes={subRoutes}
+                      route={{ label }}
+                      {...props}
+                    />
+                  </Provider>
+                ) : (
+                  <Component
+                    subRoutes={subRoutes}
+                    route={{ label }}
+                    {...props}
+                  />
+                )}
               </Wrapper>
             );
           }
