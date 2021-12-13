@@ -124,7 +124,7 @@ const fetchSuserInfo = async (email) => {
 
 const getPermissions = async (email = "") => {
   if (!email) {
-    return;
+    return { uAccess: [], pdpU: null };
   }
   try {
     // Get user
@@ -201,8 +201,9 @@ const getPermissions = async (email = "") => {
               ) {
                 for (const permission of role_permissions_res?.obj) {
                   const id_permission =
-                    permission.Permissions_id_permission ?? 0;
-                  if (id_permission !== 0) {
+                    permission.Permissions_id_permission ?? -1;
+                  userAccess.push({ id_permission });
+                  /* if (id_permission !== 0) {
                     const permissions_res = await fetchData(
                       `${url_permissions}/permissions`,
                       "GET",
@@ -215,9 +216,10 @@ const getPermissions = async (email = "") => {
                     }
                     const per_res = permissions_res?.obj?.results;
                     if (Array.isArray(per_res) && per_res.length > 0) {
-                      userAccess.push(...per_res);
+                      const { id_permission, name_permission } = per_res;
+                      userAccess.push({ id_permission, name_permission });
                     }
-                  }
+                  } */
                 }
               }
             }
@@ -286,38 +288,41 @@ export const useProvideAuth = () => {
 
   const { state, pathname } = useLocation();
 
-  const getQuota = useCallback(async () => {
-    const tempRole = { quota: 0, comision: 0 };
+  const getQuota = useCallback(() => {
     if (roleInfo?.id_comercio && roleInfo?.id_dispositivo) {
-      try {
-        const quota = await fetchData(
-          urlQuota,
-          "GET",
-          {
-            id_comercio: roleInfo?.id_comercio,
-            id_dispositivo: roleInfo?.id_dispositivo,
-          },
-          {}
-        );
-        tempRole.quota = quota["cupo disponible"];
-        tempRole.comision = quota["comisiones"];
-      } catch (err) {}
+      fetchData(
+        urlQuota,
+        "GET",
+        {
+          id_comercio: roleInfo?.id_comercio,
+          id_dispositivo: roleInfo?.id_dispositivo,
+        },
+        {}
+      )
+        .then((quota) => {
+          const tempRole = { quota: 0, comision: 0 };
+          tempRole.quota = quota["cupo disponible"];
+          tempRole.comision = quota["comisiones"];
+          setQuotaInfo({ ...tempRole });
+        })
+        .catch(() => setQuotaInfo({ quota: 0, comision: 0 }));
     }
-    setQuotaInfo({ ...tempRole });
   }, [roleInfo?.id_comercio, roleInfo?.id_dispositivo]);
 
-  const saveUserData = useCallback(async (user, email, uData, uSession) => {
+  const saveUserData = useCallback((user, email, uData, uSession) => {
     setSignedIn(true);
     setCognitoUser(user);
     setUserInfo(uData);
     setUserSession(uSession);
-    try {
-      const role = await fetchSuserInfo(email);
-      const { uAccess, pdpU } = await getPermissions(email);
-      setRoleInfo(role);
-      setUserPermissions(uAccess);
-      setPdpUser(pdpU);
-    } catch (err) {}
+    fetchSuserInfo(email)
+      .then((role) => setRoleInfo(role))
+      .catch(() => {});
+    getPermissions(email)
+      .then(({ uAccess, pdpU }) => {
+        setUserPermissions(uAccess);
+        setPdpUser(pdpU);
+      })
+      .catch(() => {});
   }, []);
 
   const handleSetupTOTP = useCallback(
@@ -365,7 +370,7 @@ export const useProvideAuth = () => {
         setCognitoUser(null);
         return;
       }
-      await saveUserData(user, email, uInfo, uSession);
+      saveUserData(user, email, uInfo, uSession);
     } catch (err) {
       setSignedIn(false);
       setCognitoUser(null);
@@ -383,10 +388,12 @@ export const useProvideAuth = () => {
   useEffect(() => {
     getQuota();
     if (pathname?.includes("iam")) {
-      getPermissions(userInfo?.attributes?.email).then(({ uAccess, pdpU }) => {
-        setUserPermissions(uAccess);
-        setPdpUser(pdpU);
-      });
+      getPermissions(userInfo?.attributes?.email)
+        .then(({ uAccess, pdpU }) => {
+          setUserPermissions(uAccess);
+          setPdpUser(pdpU);
+        })
+        .catch(() => {});
     }
   }, [getQuota, pathname, userInfo?.attributes?.email]);
 
@@ -481,7 +488,7 @@ export const useProvideAuth = () => {
         );
         const { email, uInfo, uSession } = await fetchAwsAuth();
 
-        await saveUserData(loggedUser, email, uInfo, uSession);
+        saveUserData(loggedUser, email, uInfo, uSession);
         history.push(state?.from || pathname === "/login" ? "/" : pathname);
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
