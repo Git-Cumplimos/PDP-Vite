@@ -96,8 +96,8 @@ const allUrlsPrivateApps = [
     permission: [3, 4, 5, 6],
     subRoutes: [
       {
-        link: "/loteria-de-bogota/sorteos",
-        label: <AppIcons Logo={SORTEOS} name="Sorteos" />,
+        link: "/loteria-de-bogota/ventas",
+        label: <AppIcons Logo={SORTEOS} name="Ventas" />,
         component: Loteria,
         extern: false,
         permission: [3],
