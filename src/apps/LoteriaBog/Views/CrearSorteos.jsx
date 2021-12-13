@@ -15,10 +15,11 @@ AWS.config.update({
 
 const CrearSorteos = () => {
    
-  const {ConsultaCrearSort} = useLoteria();
+  const {ConsultaCrearSort, cargueVentasExtra_S3} = useLoteria();
   const [resp_con, setResp_con] = useState(null);
   const [tip_sorteo, setTip_sorteo] = useState(null);
-  const [fisico, setFisico] = useState(null);
+  const [sorteo, setSorteo] = useState(null);
+  const [num_loteria, setNum_loteria] = useState(null);
 
 
   const [showModal, setShowModal] = useState(false);
@@ -31,7 +32,20 @@ const CrearSorteos = () => {
         setResp_con(res)   
                  
       })
-  }, [])
+  }, [setResp_con])
+
+
+  const S3 = (e) => {
+    // e.preventDefault();
+    cargueVentasExtra_S3().then((res) => {
+      if(res.estado===true){
+        notify(res.msg);
+      }
+      else{
+        notifyError(res.msg)
+      }
+    });
+    };
 
   const closeModal = useCallback(() => {
     setShowModal(false);
@@ -47,54 +61,101 @@ const CrearSorteos = () => {
   const onSubmit1 = (e) => {
     e.preventDefault();
     setTip_sorteo(1)
-    setFisico(false)
+    setSorteo(String(parseInt(resp_con?.ordinario.num_sorteo)+1))
+    setNum_loteria(resp_con?.ordinario.num_loteria)
     setShowModal(true)  
   }
 
   const onSubmit2 = (e) => {
     e.preventDefault();
     setTip_sorteo(2)
-    setFisico(false)
+    setSorteo(String(parseInt(resp_con?.extra.num_sorteo)+1))
+    setNum_loteria(resp_con?.extra.num_loteria)
     setShowModal(true)
   }
-  const onSubmit3 = (e) => {
-    e.preventDefault();
-    setTip_sorteo(1)
-    setFisico(true)
-    setShowModal(true)
-  }
-  const onSubmit4 = (e) => {
-    e.preventDefault();
-    setTip_sorteo(2)
-    setFisico(true)
-    setShowModal(true)
-  
-  }
-  
+
+  const notifyError = (msg) => {
+    toast.error(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
+  const notify = (msg) => {
+   
+    toast.info(msg, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+  console.log(resp_con?.ordinario?.num_loteria)
   return (
     <div>
-      {resp_con?.virtual_ordinario?<Form formDir="col" onSubmit={onSubmit1}>
+      {resp_con?.extra?.Cerrar?       
+      <ButtonBar>
+      <Button type="button" onClick={() => {
+              S3();
+            
+            }}>
+      Cerrar sorteo extraordinario   
+      </Button>
+      </ButtonBar>
+       
+      :
+      ""}
+
+      {resp_con?.ordinario?.Cerrar?      
+      <ButtonBar>
+      <Button type="button" onClick={() => {
+              S3();
+            
+            }}>
+      Cerrar sorteo ordinario   
+      </Button>
+      </ButtonBar>
+       
+      :
+      ""}
+      
+      {resp_con?.ordinario?.num_loteria!==undefined?
+      <Form formDir="col" onSubmit={onSubmit1}>
             <ButtonBar>
-              <Button type="submit" diabled={disabledBtns}>Crear sorteo ordinario virtual</Button>
+              <Button 
+              type="submit" 
+              diabled={disabledBtns}
+              >
+              Crear sorteo ordinario
+              </Button>
             </ButtonBar>
       </Form>:''}
-      {resp_con?.virtual_extra? <Form formDir="col" onSubmit={onSubmit2}>
+      {resp_con?.extra?.num_loteria!==undefined? 
+      <Form formDir="col" onSubmit={onSubmit2}>
             <ButtonBar>
-              <Button type="submit" diabled={disabledBtns}>Crear sorteo extraordinario virtual</Button>
-            </ButtonBar>
-      </Form>:''}
-      {resp_con?.fisico_ordinario? <Form formDir="col" onSubmit={onSubmit3}>
-            <ButtonBar>
-              <Button type="submit" diabled={disabledBtns}>Crear sorteo ordinario fisico</Button>
-            </ButtonBar>
-      </Form>:''}
-      {resp_con?.fisico_extra?<Form formDir="col" onSubmit={onSubmit4}>
-            <ButtonBar>
-              <Button type="submit" diabled={disabledBtns}>Crear sorteo extraordinario fisico</Button>
+              <Button 
+              type="submit" 
+              diabled={disabledBtns}
+              >
+              Crear sorteo extraordinario
+              </Button>
             </ButtonBar>
       </Form>:''}
       <Modal show={showModal} handleClose={() => closeModal()}>
-        <SortForm closeModal={closeModal} fisico={fisico} tip_sorteo={tip_sorteo}> 
+        <SortForm 
+        closeModal={closeModal} 
+        tip_sorteo={tip_sorteo} 
+        sorteo={sorteo} 
+        setSorteo={setSorteo} 
+        num_loteria={num_loteria}> 
             
         </SortForm>
       </Modal>

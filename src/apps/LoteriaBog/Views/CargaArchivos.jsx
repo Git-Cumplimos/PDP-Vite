@@ -25,7 +25,14 @@ const CargaArchivos = () => {
     { value: "Liquidacion", label: "Liquidacion de premios" },
     { value: "Calendario", label: "Calendario de Sorteos" },
   ];
+
+  const optionsTipoSorteo = [
+    { value: "", label: "" },
+    { value: "Ordinario/", label: "Sorteo Ordinario" },
+    { value: "Extra/", label: "Sorteo Extraordinario" },
+  ];
   const [archivo, setArchivo] = useState("");
+  const [tipoSorteo, setTipoSorteo] = useState("");
   const [file, setFile] = useState("");
   const [fileName, setFileName] = useState("");
 
@@ -40,7 +47,7 @@ const CargaArchivos = () => {
     params: { Bucket: S3_BUCKET },
     region: REGION,
   });
-
+  console.log(`${tipoSorteo}${archivo}/`)
   const saveFile = () => {
     setDisabledBtns(true)
     const f = new Date();
@@ -48,7 +55,7 @@ const CargaArchivos = () => {
       ACL: "public-read",
       Body: file,
       Bucket: S3_BUCKET,
-      Key: `${archivo}/${f.getDate()}${
+      Key: `${tipoSorteo}${archivo}/${f.getDate()}${
         f.getMonth() + 1
       }${f.getFullYear()}${fileName}`,
     };
@@ -155,10 +162,25 @@ const CargaArchivos = () => {
         disabled={progress !== 0 && progress !== 100}
         value={archivo}
         onChange={(e) => {setArchivo(e.target.value)
-                 setProgress(0)}
+                 setProgress(0)
+                 setTipoSorteo("")}
         }
       />
-      {archivo !== "" ? (
+      {archivo ==='PlanDePremios' || archivo==='Asignacion'?
+        <Select
+        id="tip_sorteo"
+        label={`Que sorteo asignar a ${archivo}`}
+        options={optionsTipoSorteo}
+        disabled={progress !== 0 && progress !== 100}
+        value={tipoSorteo}
+        onChange={(e) => {setTipoSorteo(e.target.value)
+                 }
+        }
+        />
+        :
+        ""
+      }
+      {archivo !== "" && archivo !=='PlanDePremios' && archivo!=='Asignacion' || tipoSorteo!==""? (
         <Form formDir="col" onSubmit={onSubmit}>
           <Input
             id={`archivo_${archivo}`}

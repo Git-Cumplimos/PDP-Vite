@@ -47,6 +47,7 @@ const Loteria = ({
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
   const [selecFrac, setSelecFrac] = useState([]);
+  const [tipoPago, setTipoPago] = useState(1);
 
   const [opcionesdisponibles, SetOpcionesDisponibles] = useState([{value:"",label:""}]);
 
@@ -62,11 +63,11 @@ const Loteria = ({
 
 
     
- 
+    console.log(sorteoExtrafisico)
     const copy = [...opcionesdisponibles];
     if (sorteoOrdi !== null) {
       copy.push({
-        value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}`,
+        value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
         label: `Sorteo ordinario - ${sorteoOrdi.num_sorteo}`,
       });
 
@@ -74,13 +75,13 @@ const Loteria = ({
     }
     if (sorteoExtra !== null) {
       copy.push({
-        value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}`,
+        value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}-${sorteoExtra.num_loteria}`,
         label: `Sorteo extraordinario - ${sorteoExtra.num_sorteo}`,
       });
     }
     if (sorteoOrdifisico !== null) {
       copy.push({
-        value: `${sorteoOrdifisico.num_sorteo}-${sorteoOrdifisico.fisico}`,
+        value: `${sorteoOrdifisico.num_sorteo}-${sorteoOrdifisico.fisico}-${sorteoOrdifisico.num_loteria}`,
         label: `Sorteo ordinario  fisico- ${sorteoOrdifisico.num_sorteo}`,
       });
     }
@@ -88,7 +89,7 @@ const Loteria = ({
     if (sorteoExtrafisico !== null) {
       
       copy.push({
-        value: `${sorteoExtrafisico.num_sorteo}-${sorteoExtrafisico.fisico}`,
+        value: `${sorteoExtrafisico.num_sorteo}-${sorteoExtrafisico.fisico}-${sorteoExtrafisico.num_loteria}`,
         label: `Sorteo extraordinario fisico - ${sorteoExtrafisico.num_sorteo}`,
       });
     }
@@ -113,7 +114,7 @@ const Loteria = ({
     
 
   }, [sorteo, numero, serie, searchLoteria,searchLoteriafisica, page]);
-
+  console.log(selected)
   return (
     <>
       <Form grid>
@@ -270,6 +271,8 @@ const Loteria = ({
       <Modal show={showModal} handleClose={() => closeModal()}>
         {sellResponse === null ? (
           <SendForm
+            tipoPago={tipoPago}
+            setTipoPago={setTipoPago}
             sorteo={sorteo}
             selecFrac={selecFrac}
             setSelecFrac={setSelecFrac}
@@ -280,7 +283,7 @@ const Loteria = ({
             closeModal={closeModal}
             handleSubmit={(event) => {
               {sorteo.split('-')[1]==='true'?
-              sellLoteriafisica(sorteo,selecFrac):
+              sellLoteriafisica(sorteo,selecFrac,tipoPago):
               sellLoteria(sorteo)
               }
               

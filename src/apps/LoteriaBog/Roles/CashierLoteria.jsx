@@ -45,9 +45,7 @@ const CashierLoteria = () => {
     fetchData(
       urlLoto,
       "GET",
-      {
-        num_loteria: "02", //este valor debe cambiar dependiendo de la loterie
-      },
+      {},
       {}
     )
       .then((res) => {
@@ -84,7 +82,7 @@ const CashierLoteria = () => {
         });
 
         if (sortOrdfisico.length > 0) {
-          setSorteofisico(sortExtfisico[0]);
+          setSorteofisico(sortOrdfisico[0]);
         } else {
           /*    notifyError("No se encontraron extraordinarios fisicos"); */
         }
@@ -112,8 +110,8 @@ const CashierLoteria = () => {
 
   const SelectPage = () => {
     switch (page) {
-      case "sorteos":
-        if (day === 4 && parseInt(hora) >= 20) {
+      case "ventas":
+        if (day === 2 && parseInt(hora) >= 20) {
           notifyError("Fuera de horario");
           history.push(`/${pathname.split("/")[1]}`);
           return <div></div>;
@@ -147,7 +145,7 @@ const CashierLoteria = () => {
     );
   };
   const options = [
-    { value: "sorteos", label: <LotoIcons Logo={Sorteos} name="Sorteos" /> },
+    { value: "ventas", label: <LotoIcons Logo={Sorteos} name="Ventas" /> },
     // {
     //   value: "premios",
     //   label: <LotoIcons Logo={Pago} name="Premios" />,
@@ -158,7 +156,7 @@ const CashierLoteria = () => {
     // },
   ];
 
-  const posibles = ["sorteos", "premios", "reportes"];
+  const posibles = ["ventas", "premios", "reportes"];
 
   return (
     <>

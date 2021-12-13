@@ -1,6 +1,6 @@
 import { useParams, useHistory, useLocation, Link } from "react-router-dom";
 import CargaArchivos from "../Views/CargaArchivos";
-import DescargarArchivos from "../Views/DescargarArchivos";
+import DescargarArchivosS3 from "../Views/DescargarArchivosS3";
 import CrearSorteos from "../Views/CrearSorteos";
 import Button from "../../../components/Base/Button/Button";
 import { useEffect} from "react";
@@ -23,9 +23,9 @@ const AdminLoteria = () => {
         return <CargaArchivos />;
 
       case "descargar":
-        return <DescargarArchivos />;
+        return <DescargarArchivosS3 />;
       
-      case "crear_sorteos":
+      case "sorteos":
         return <CrearSorteos />;
       
       // case "crear_rol":
@@ -50,13 +50,13 @@ const AdminLoteria = () => {
       value: "descargar",
       label: <LotoIcons Logo={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU'} name="Descargar" />,
     },
-    // {
-    //   value: "crear_sorteos",
-    //   label: <LotoIcons Logo={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU'} name="Crear Sorteos" />,
-    // },
+    {
+      value: "sorteos",
+      label: <LotoIcons Logo={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU'} name="Sorteos" />,
+    },
   ];
 
-  const posibles = ["cargar", "descargar","crear_sorteos"];
+  const posibles = ["cargar", "descargar","sorteos"];
   // const check = () => {
   //   const posib = [];
   //   const opts = [{ value: "", label: "" }];

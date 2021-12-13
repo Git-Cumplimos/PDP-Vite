@@ -4,26 +4,33 @@ import Form from "../../../../components/Base/Form/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { useState } from "react";
 import {toast}  from "react-toastify";
+import Input from "../../../../components/Base/Input/Input";
 //import { useAuth } from "../../../../utils/AuthHooks";
 
 const SortForm = ({
 
   closeModal,
-  fisico,
-  tip_sorteo  
+  tip_sorteo,
+  sorteo,
+  setSorteo,
+  num_loteria
 
 }) => {
   
   const [respCrearSort, setRespCrearSort] = useState('');
-  const [disabledBtns, setDisabledBtns] = useState(false); 
+  const [disabledBtns, setDisabledBtns] = useState(false);
+  const [fecha, setFecha] = useState(null);
+  const [changesorteo, setChangesorteo] = useState(sorteo);
 
-  
+
+
+  console.log(sorteo,tip_sorteo)
   const { CambiarSort } = useLoteria();
   
   const onSubmit = (e) => {
     e.preventDefault();
     
-    CambiarSort(tip_sorteo,fisico)
+    CambiarSort(sorteo,tip_sorteo,fecha,num_loteria)
       .then((res) => {
         //setShowModal(true);
         //setDisabledBtns(false);
@@ -33,6 +40,7 @@ const SortForm = ({
           closeModal()          
           
       })
+    setChangesorteo(sorteo)
   }
   
   const notify = (msg) => {
@@ -47,22 +55,45 @@ const SortForm = ({
     });
   };
   
-  console.log(tip_sorteo,fisico)
+  console.log(tip_sorteo)
   return (
     <>
 
       <div className="flex flex-col justify-center items-center mx-auto container">
         <Form  onSubmit={onSubmit} grid>
             <div
-              className="flex flex-row justify-between text-lg font-medium"
+              className="flex flex-row justify-between text-lg font-medium grid"
             >
-              {fisico===false&&tip_sorteo===1?<h1>¿Esta seguro de crear SORTEO ORDINARIO VIRTUAL?</h1>:''}
-              {fisico===false&&tip_sorteo===2?<h1>¿Esta seguro de crear SORTEO ESTRAORDINARIO VIRTUAL?</h1>:''}
-              {fisico===true&&tip_sorteo===1?<h1>¿Esta seguro de crear SORTEO ORDINARIO FISICO?</h1>:''}
-              {fisico===true&&tip_sorteo===2?<h1>¿Esta seguro de crear SORTEO ESTRAORDINARIO FISICO?</h1>:''}
+             Verifique que el número de sorteo al igual que su fecha de juego!!!
+
               
             </div>
-            
+            <Input
+            id="numsorteo"
+            label="Sorteo"
+            type="search"
+            minLength="1"
+            maxLength="4"
+            autoComplete="off"
+            required='true'
+            value={sorteo}
+            onInput={(e) => {
+              if(!isNaN(e.target.value)){
+                const num = (e.target.value);
+                setSorteo(num);
+                }
+            }}     
+            />
+            <Input
+              id="dateEnd"
+              label="Fecha sorteo"
+              type="date"
+              required='true'
+              value={fecha}
+              onInput={(e) => {
+                setFecha(e.target.value);
+              }}
+            />  
             
         
           <ButtonBar>
@@ -71,6 +102,7 @@ const SortForm = ({
               type="button"
               onClick={() => {
                 closeModal();
+                
                
               }}
             >
