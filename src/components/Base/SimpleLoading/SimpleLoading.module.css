@@ -6,5 +6,5 @@
 
 /* Modal Content/Box */
 .modalContent {
-  @apply flex bg-transparent mx-auto my-72 w-max justify-center align-middle;
+  @apply flex bg-transparent mx-auto my-60 w-max justify-center align-middle;
 }
