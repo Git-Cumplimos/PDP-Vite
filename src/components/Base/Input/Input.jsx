@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { toast } from "react-toastify";
+import { useAuth } from "../../../utils/AuthHooks";
 import classes from "./Input.module.css";
 
 const Input = ({
@@ -19,17 +19,7 @@ const Input = ({
   const inputRef = useRef(null);
   const dropZoneRef = useRef(null);
 
-  const notifyError = (msg) => {
-    toast.error(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const { notifyError } = useAuth();
 
   const showDropZone = useCallback(() => {
     if (
@@ -93,14 +83,14 @@ const Input = ({
         GetFileTree(item);
       }
 
-      onGetFile([...tempFiles]);
+      onGetFile?.([...tempFiles]);
     },
-    [onGetFile, hideDropZone]
+    [onGetFile, hideDropZone, notifyError]
   );
 
   if (type === "file") {
     input.onChange = (e) => {
-      onGetFile(e.target.files);
+      onGetFile?.(e.target.files);
     };
     window.addEventListener("dragenter", (e) => {
       showDropZone();
@@ -131,7 +121,14 @@ const Input = ({
 
   return self ? (
     <>
-      {label && label !== "" && <label htmlFor={_id}>{label}</label>}
+      {label && label !== "" && (
+        <label
+          htmlFor={_id}
+          className={`${type === "file" ? "text-center" : "text-right"}`}
+        >
+          {label}
+        </label>
+      )}
       <input {...input} ref={inputRef} />
       {type === "file" ? (
         <>
@@ -171,7 +168,14 @@ const Input = ({
     </>
   ) : (
     <div className={`${formItem} ${type === "file" ? File : ""}`}>
-      {label && label !== "" && <label htmlFor={_id}>{label}</label>}
+      {label && label !== "" && (
+        <label
+          htmlFor={_id}
+          className={`${type === "file" ? "text-center" : "text-right"}`}
+        >
+          {label}
+        </label>
+      )}
       <input {...input} ref={inputRef} />
       {type === "file" ? (
         <>

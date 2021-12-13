@@ -32,6 +32,7 @@ yarn-error.log*
 .env
 
 **.sample
+/amplify
 amplify/
 
 #amplify-do-not-edit-begin

@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 import Amplify from "aws-amplify";
 import awsconfig from "./aws-exports";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import MessengerCustomerChat from "react-messenger-customer-chat";
 
@@ -31,11 +32,11 @@ function App() {
       <ProvideUrls>
         <ToastContainer />
         <Admin />
-        {/* <MessengerCustomerChat
+        <MessengerCustomerChat
           pageId="455201114671494"
           appId="603779204002555"
           language="es_LA"
-        /> */}
+        />
       </ProvideUrls>
     </ProvideAuth>
   );

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { toast } from "react-toastify";
 import Button from "../../components/Base/Button/Button";
 import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import Fieldset from "../../components/Base/Fieldset/Fieldset";
@@ -58,14 +57,18 @@ const FormCommerce = () => {
   const [docsTypes, setDocsTypes] = useState({});
   const [locsTypes, setLocsTypes] = useState({});
 
-  const { roleInfo } = useAuth();
+  const { roleInfo, notify, notifyError } = useAuth();
 
   const history = useHistory();
 
   useEffect(() => {
-    setCommerceId(roleInfo?.id_comercio ?? 0);
+    if (!roleInfo?.id_comercio) {
+      notifyError(`Comercio sin numero de id`);
+      history.replace("/");
+    }
+    setCommerceId(roleInfo?.id_comercio);
     fetchData(`${url_send}/review`, "GET", {
-      id_comercio: roleInfo?.id_comercio ?? 0,
+      id_comercio: roleInfo?.id_comercio,
     })
       .then((res) => {
         if (res?.status) {
@@ -110,31 +113,7 @@ const FormCommerce = () => {
         }
       })
       .catch(() => {});
-  }, [roleInfo, history]);
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const notifyError = (msg) => {
-    toast.error(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  }, [roleInfo, history, notify, notifyError]);
 
   const onSubmit = async (event) => {
     event.preventDefault();

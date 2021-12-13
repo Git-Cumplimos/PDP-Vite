@@ -1,13 +1,13 @@
 import { Redirect, Route } from "react-router-dom";
 import { useAuth } from "../../../utils/AuthHooks";
 
-const PrivateRoute = ({ children, role, ...rest }) => {
-  const auth = useAuth();
+const PrivateRoute = ({ children, ...rest }) => {
+  const { isSignedIn } = useAuth();
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        auth.isSignedIn ? (
+        isSignedIn ? (
           children
         ) : (
           <Redirect

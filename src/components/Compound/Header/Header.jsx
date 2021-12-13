@@ -16,7 +16,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 });
 
 const Header = () => {
-  const { isSignedIn, roleInfo } = useAuth();
+  const { isSignedIn, quotaInfo } = useAuth();
 
   const { urlsPrivate: urls } = useUrls();
 
@@ -25,11 +25,11 @@ const Header = () => {
   const [comisionTotal, setComisionTotal]= useState();
 
   useEffect(() => {
-    if (roleInfo) {
-      setSaldoDisponible(formatMoney.format(roleInfo.quota));
-      setComisionTotal(formatMoney.format(roleInfo.comision))
+    if (quotaInfo?.comision && quotaInfo?.quota) {
+      setSaldoDisponible(formatMoney.format(quotaInfo?.quota));
+      setComisionTotal(formatMoney.format(quotaInfo?.comision))
     }
-  }, [roleInfo]);
+  }, [quotaInfo?.comision, quotaInfo?.quota]);
 
   const { headerPDP, saldoCupo, comision, cargar, usrData, topHeader } =
     classes;

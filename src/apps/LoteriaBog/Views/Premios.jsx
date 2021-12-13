@@ -92,7 +92,7 @@ const Premios = () => {
   };
 
   const notifyError = (msg) => {
-    toast.error(msg, {
+    toast.warn(msg, {
       position: "top-center",
       autoClose: 5000,
       hideProgressBar: false,

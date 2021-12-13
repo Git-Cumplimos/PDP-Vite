@@ -9,23 +9,21 @@ import Banner2 from "../assets/img/BANNER2.jpg";
 import { Link } from "react-router-dom";
 import AppIcons from "../components/Base/AppIcons/AppIcons";
 import ACTUALIZACION from "../assets/svg/ActualizacionDeDatos.svg";
-import { Auth } from "aws-amplify";
+import { useAuth } from "../utils/AuthHooks";
 
 const Home = () => {
-  const { urlsPrivApps: urls } = useUrls();
+  const { urlsPrivateApps } = useUrls();
+  const { userInfo } = useAuth();
 
   const [emails, setEmails] = useState([
     "directora.mercadeo@puntodepago.com.co",
-    "maria.valero@puntodepago.com.co",
-    "CAFEINTERNETNAOM@GMAIL.COM",
+    "maria.valero@puntodepago.com.co",    
   ]);
   const [setLocalEmail, setSetLocalEmail] = useState("");
 
   useEffect(() => {
-    Auth.currentUserInfo().then((res) => {
-      setSetLocalEmail(res?.attributes?.email ?? "");
-    });
-  }, []);
+    setSetLocalEmail(userInfo?.attributes?.email ?? "");
+  }, [userInfo]);
 
   const [imgs, setImgs] = useState([
     { name: "Colpensiones", url: ColpensionesImg },
@@ -51,8 +49,8 @@ const Home = () => {
           );
         })}
       </Carousel>
-      <HNavbar links={urls} isIcon />
-      {emails.includes(setLocalEmail.toLowerCase()) ? (
+      <HNavbar links={urlsPrivateApps} isIcon />
+      {/* {emails.includes(setLocalEmail.toLowerCase()) ? (
         <Link to={"/review-commerce-forms"}>
           <AppIcons
             Logo={ACTUALIZACION}
@@ -61,7 +59,7 @@ const Home = () => {
         </Link>
       ) : (
         ""
-      )}
+      )} */}
     </>
   );
 };

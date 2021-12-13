@@ -1,8 +1,5 @@
 import { useState } from "react";
 
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
 import { useAuth } from "../../../utils/AuthHooks";
 import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
@@ -13,7 +10,7 @@ const LoginForm = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [cell, setCell] = useState("");
+  const [, setCell] = useState("");
   const [totp, setTotp] = useState("");
   const [names, setNames] = useState("");
   const [lastName, setLastName] = useState("");
@@ -23,30 +20,7 @@ const LoginForm = () => {
   const [city, setCity] = useState("");
 
   const auth = useAuth();
-
-  const notifyError = (msg) => {
-    toast.error(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const notify = (msg) => {
-    toast(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const { notify, notifyError } = auth;
 
   const handleCognito = (event) => {
     event.preventDefault();

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useEffect, useRef, useState } from "react";
 import Button from "../../components/Base/Button/Button";
 import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import Card from "../../components/Base/Card/Card";
 import Form from "../../components/Base/Form/Form";
 import Input from "../../components/Base/Input/Input";
+import Modal from "../../components/Base/Modal/Modal";
+import { useAuth } from "../../utils/AuthHooks";
 import fetchData from "../../utils/fetchData";
 
 const capitalize = (word = "") => {
@@ -57,17 +58,10 @@ const CommerceInfo = () => {
   const [fechaFin, setFechaFin] = useState("");
   const [commerceName, setCommerceName] = useState("");
 
-  const notifyError = (msg) => {
-    toast.error(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const [showModal, setShowModal] = useState(false);
+  const downloadRef = useRef(null);
+
+  const { notifyError } = useAuth();
 
   useEffect(() => {
     fetchData(`${url_form}/review-count`)
@@ -89,7 +83,7 @@ const CommerceInfo = () => {
         }
       })
       .catch((err) => {});
-  }, []);
+  }, [notifyError]);
 
   useEffect(() => {
     const queries = {
@@ -112,7 +106,7 @@ const CommerceInfo = () => {
         }
       })
       .catch((err) => {});
-  }, [page, commerceName, fechaFin, fechaIni]);
+  }, [page, commerceName, fechaFin, fechaIni,notifyError]);
 
   return (
     <div className="flex flex-col justify-center items-center my-8">
@@ -139,8 +133,6 @@ const CommerceInfo = () => {
               if (commerceName) {
                 queries.$q_name = commerceName;
               }
-              console.log(_fechaIni);
-              console.log(fechaFin);
               if ("date_ini" in queries) {
                 fetchData(`${url_form}/review-all`, "GET", queries)
                   .then((res) => {
@@ -198,6 +190,7 @@ const CommerceInfo = () => {
           id="name_commerce"
           label="Nombre de comercio"
           type="text"
+          autoComplete="off"
           value={commerceName}
           onInput={(e) => setCommerceName(e.target.value)}
           onLazyInput={{
@@ -228,7 +221,59 @@ const CommerceInfo = () => {
             timeOut: 500,
           }}
         />
+        <ButtonBar>
+          <Button
+            type={"button"}
+            onClick={() => {
+              const queries = {};
+              if (fechaIni && fechaFin) {
+                queries.date_ini = fechaIni;
+                queries.date_fin = fechaFin;
+              }
+              if (commerceName) {
+                queries.$q_name = commerceName;
+              }
+              setShowModal(true);
+
+              // fetch(`${url_form}/review-csv?$q_name=cea`)
+              fetchData(`${url_form}/review-csv`, "GET", queries)
+                .then((res) => {
+                  const txt = res;
+                  const data = new Blob([txt], {
+                    type: "text/csv;charset=iso-8859-1",
+                  });
+                  const csv = window.URL.createObjectURL(data);
+                  downloadRef.current.href = csv;
+                  downloadRef.current.download = `acutalizacion_comercios_${new Date()}.csv`;
+                  downloadRef.current.click();
+                  downloadRef.current.href = "";
+                  downloadRef.current.download = "";
+                  setShowModal(false);
+                })
+                .catch((err) => {
+                  setShowModal(false);
+                });
+            }}
+          >
+            Descargar csv
+            <a
+              href="_"
+              ref={downloadRef}
+              target="_blank"
+              rel="noreferrer"
+              className="hidden"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              csv
+            </a>
+          </Button>
+        </ButtonBar>
       </Form>
+      <Modal show={showModal} handleClose={() => {}}>
+        <h1 className="text-center text-3xl">Descargando csv</h1>
+      </Modal>
       {maxPage !== 1 && maxPage !== 0 ? (
         <ButtonBar>
           <Button
