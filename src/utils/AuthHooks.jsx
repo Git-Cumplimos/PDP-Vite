@@ -1,18 +1,15 @@
 import { Auth } from "@aws-amplify/auth";
-import { Logger } from "@aws-amplify/core";
-import { appendToCognitoUserAgent } from "@aws-amplify/auth";
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
+  useReducer,
   useState,
 } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import fetchData from "./fetchData";
 import { toast } from "react-toastify";
-
-const logger = new Logger("withAuthenticator");
 
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
@@ -142,7 +139,7 @@ const getPermissions = async (email = "") => {
   } catch (err) {}
 };
 
-export const AuthContext = createContext({
+const initialUser = {
   isSignedIn: false,
   cognitoUser: null,
   userInfo: null,
@@ -151,6 +148,152 @@ export const AuthContext = createContext({
   userSession: null,
   pdpUser: null,
   userPermissions: null,
+};
+
+const SIGN_IN = "SIGN_IN";
+const CONFIRM_SIGN_IN = "CONFIRM_SIGN_IN";
+const SIGN_OUT = "SIGN_OUT";
+const FETCH_PERMISSIONS = "FETCH_PERMISSIONS";
+const FETCH_QUOTAINFO = "FETCH_QUOTAINFO";
+const SET_COGNITOUSER = "SET_COGNITOUSER";
+const SET_USERINFO = "SET_USERINFO";
+const SET_ROLEINFO = "SET_ROLEINFO";
+const SET_PERMISSIONS = "SET_PERMISSIONS";
+const SET_PDPUSER = "SET_PDPUSER";
+const SET_SESSION = "SET_SESSION";
+const SET_QUOTA = "SET_QUOTA";
+
+const reducerAuth = (userState, action) => {
+  const { type, payload } = action;
+  const dispatch = payload?.dispatch;
+  switch (type) {
+    case SIGN_IN:
+      const { user } = payload;
+      return { ...userState, cognitoUser: user };
+
+    case SIGN_OUT:
+      return initialUser;
+
+    case SET_COGNITOUSER:
+      const { cogUser } = payload;
+      return { ...userState, cognitoUser: cogUser, isSignedIn: true };
+
+    case SET_USERINFO:
+      const { uInfo } = payload;
+      return { ...userState, userInfo: uInfo };
+
+    case SET_ROLEINFO:
+      if (payload?.dispatch) {
+        delete payload.dispatch;
+      }
+      const { roleInfo: role } = userState;
+      return { ...userState, roleInfo: { ...role, ...payload } };
+
+    case SET_PERMISSIONS:
+      const { uAccess } = payload;
+      return { ...userState, userPermissions: uAccess };
+
+    case SET_PDPUSER:
+      const { pdpU } = payload;
+      return { ...userState, pdpUser: pdpU };
+
+    case SET_SESSION:
+      const { uSession } = payload;
+      return { ...userState, userSession: uSession };
+
+    case SET_QUOTA:
+      const { quota } = payload;
+      return { ...userState, quotaInfo: quota };
+
+    case FETCH_PERMISSIONS:
+      const { email } = payload;
+      getPermissions(email)
+        .then(({ uAccess, pdpU }) => {
+          dispatch?.({ type: SET_PERMISSIONS, payload: { uAccess } });
+          dispatch?.({ type: SET_PDPUSER, payload: { pdpU } });
+        })
+        .catch(() => {});
+      return userState;
+
+    case FETCH_QUOTAINFO:
+      const { id_comercio, id_dispositivo } = payload;
+      fetchData(
+        urlQuota,
+        "GET",
+        {
+          id_comercio: id_comercio,
+          id_dispositivo: id_dispositivo,
+        },
+        {}
+      )
+        .then((quota) => {
+          const tempRole = { quota: 0, comision: 0 };
+          tempRole.quota = quota["cupo disponible"];
+          tempRole.comision = quota["comisiones"];
+          dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } });
+        })
+        .catch(() =>
+          dispatch?.({
+            type: SET_QUOTA,
+            payload: { quota: { quota: 0, comision: 0 } },
+          })
+        );
+      return userState;
+
+    case CONFIRM_SIGN_IN:
+      const { loggedUser } = payload;
+      if (!loggedUser) {
+        return initialUser;
+      }
+      Auth.currentUserInfo()
+        .then((uInfo) => {
+          dispatch?.({ type: SET_USERINFO, payload: { uInfo } });
+          const email = uInfo?.attributes?.email;
+
+          // Fetch suser info
+          fetchData(urlLog, "GET", { correo: email }, {})
+            .then((suserInfo) => {
+              dispatch?.({ type: SET_ROLEINFO, payload: suserInfo });
+              fetchDane(suserInfo.codigo_dane)
+                .then((ciudad) => {
+                  dispatch?.({
+                    type: SET_ROLEINFO,
+                    payload: { ciudad },
+                  });
+                })
+                .catch(() => {});
+              fetchOficinaLoteria(suserInfo.id_comercio)
+                .then((oficina) => {
+                  dispatch?.({
+                    type: SET_ROLEINFO,
+                    payload: { ...oficina },
+                  });
+                })
+                .catch(() => {});
+            })
+            .catch(() => {});
+
+          // Fetch user permissions
+          dispatch({
+            type: FETCH_PERMISSIONS,
+            payload: { email, dispatch: dispatch },
+          });
+        })
+        .catch(() => {});
+
+      Auth.currentSession()
+        .then((uSession) =>
+          dispatch?.({ type: SET_SESSION, payload: { uSession } })
+        )
+        .catch(() => {});
+      return { ...userState, cognitoUser: loggedUser, isSignedIn: true };
+
+    default:
+      throw new Error(`Bad action ${JSON.stringify(action, null, 2)}`);
+  }
+};
+
+export const AuthContext = createContext({
   signIn: () => {},
   confirmSignIn: () => {},
   signOut: () => {},
@@ -162,6 +305,7 @@ export const AuthContext = createContext({
   qr: null,
   notify: () => {},
   notifyError: () => {},
+  ...initialUser,
 });
 
 export const useAuth = () => {
@@ -169,122 +313,79 @@ export const useAuth = () => {
 };
 
 export const useProvideAuth = () => {
-  const [isSignedIn, setSignedIn] = useState(false);
-
-  const [cognitoUser, setCognitoUser] = useState(null);
-
-  const [userInfo, setUserInfo] = useState(null);
-
-  const [userSession, setUserSession] = useState(null);
-
-  const [roleInfo, setRoleInfo] = useState(null);
-
-  const [quotaInfo, setQuotaInfo] = useState({ quota: 0, comision: 0 });
-
-  const [pdpUser, setPdpUser] = useState(null);
-
-  const [userPermissions, setUserPermissions] = useState(null);
-
   const [qr, setQr] = useState("");
 
   const [username] = useState("CERT");
 
   const [parameters, setParameters] = useState("");
 
+  const [userState, dispatchAuth] = useReducer(reducerAuth, initialUser);
+
+  const { cognitoUser, roleInfo } = userState;
+  const id_comercio = roleInfo?.id_comercio;
+  const id_dispositivo = roleInfo?.id_dispositivo;
+
   const history = useHistory();
 
   const { state, pathname } = useLocation();
 
+  const signIn = useCallback(async (username, password) => {
+    try {
+      const user = await Auth.signIn(username, password);
+      if (user) {
+        dispatchAuth({ type: SIGN_IN, payload: { user } });
+        setParameters(user.challengeParam.userAttributes);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }, []);
+
+  const confirmSignIn = useCallback(
+    async (totp) => {
+      try {
+        const loggedUser = await Auth.confirmSignIn(
+          cognitoUser,
+          totp,
+          cognitoUser.challengeName
+        );
+        dispatchAuth({
+          type: CONFIRM_SIGN_IN,
+          payload: { loggedUser, dispatch: dispatchAuth },
+        });
+        history.push(state?.from || pathname === "/login" ? "/" : pathname);
+      } catch (err) {
+        if (err.code === "NotAuthorizedException") {
+          dispatchAuth({ type: SIGN_OUT });
+        }
+        throw err;
+      }
+    },
+    [cognitoUser, history, state, pathname]
+  );
+
   const signOut = useCallback(() => {
     Auth.signOut()
       .then(() => {
-        setSignedIn(false);
-        setCognitoUser(null);
-        setUserInfo(null);
-        setUserSession(null);
-        setRoleInfo(null);
-        setUserPermissions(null);
-        setPdpUser(null);
-        setQuotaInfo({ quota: 0, comision: 0 });
+        dispatchAuth({ type: SIGN_OUT });
         history.replace("/login");
       })
       .catch(() => {});
   }, [history]);
 
+  // To delete
   const getQuota = useCallback(() => {
-    if (roleInfo?.id_comercio && roleInfo?.id_dispositivo) {
-      fetchData(
-        urlQuota,
-        "GET",
-        {
-          id_comercio: roleInfo?.id_comercio,
-          id_dispositivo: roleInfo?.id_dispositivo,
+    if (id_comercio && id_dispositivo) {
+      dispatchAuth({
+        type: FETCH_QUOTAINFO,
+        payload: {
+          id_comercio: id_comercio,
+          id_dispositivo: id_dispositivo,
+          dispatch: dispatchAuth,
         },
-        {}
-      )
-        .then((quota) => {
-          const tempRole = { quota: 0, comision: 0 };
-          tempRole.quota = quota["cupo disponible"];
-          tempRole.comision = quota["comisiones"];
-          setQuotaInfo({ ...tempRole });
-        })
-        .catch(() => setQuotaInfo({ quota: 0, comision: 0 }));
+      });
     }
-  }, [roleInfo?.id_comercio, roleInfo?.id_dispositivo]);
-
-  const saveUserData = useCallback(
-    (user) => {
-      // Set user vars
-      setSignedIn(true);
-      setCognitoUser(user);
-
-      Auth.currentUserInfo()
-        .then((uInfo) => {
-          setUserInfo(uInfo);
-          const email = uInfo?.attributes?.email;
-
-          // Fetch suser info
-          fetchData(urlLog, "GET", { correo: email }, {})
-            .then((suserInfo) => {
-              setRoleInfo({ ...suserInfo });
-              fetchDane(suserInfo.codigo_dane)
-                .then((ciudad) => {
-                  setRoleInfo((role) => {
-                    return { ...role, ciudad };
-                  });
-                })
-                .catch(() => {});
-              fetchOficinaLoteria(suserInfo.id_comercio)
-                .then((oficina) => {
-                  setRoleInfo((role) => {
-                    return { ...role, ...oficina };
-                  });
-                })
-                .catch(() => {});
-            })
-            .catch(() => {});
-
-          // Fetch user permissions
-          getPermissions(email)
-            .then(({ uAccess, pdpU }) => {
-              const { active } = pdpU;
-              if (!active) {
-                signOut();
-              } else {
-                setUserPermissions(uAccess);
-                setPdpUser(pdpU);
-              }
-            })
-            .catch(() => {});
-        })
-        .catch(() => {});
-
-      Auth.currentSession()
-        .then((uSession) => setUserSession(uSession))
-        .catch(() => {});
-    },
-    [signOut]
-  );
+  }, [id_comercio, id_dispositivo]);
 
   const handleSetupTOTP = useCallback(
     async (user) => {
@@ -303,51 +404,113 @@ export const useProvideAuth = () => {
     [cognitoUser?.username]
   );
 
-  const checkUser = useCallback(() => {
-    if (Auth.user === null || Auth.user === undefined) {
-      Auth.currentAuthenticatedUser()
-        .then((user) => {
-          if (!user) {
-            setSignedIn(false);
-            setCognitoUser(null);
-            return;
+  const handleChangePass = useCallback(
+    async (
+      nombreUsuario,
+      apellido,
+      cognitoUser,
+      direccion,
+      ciudad,
+      newpassword
+    ) => {
+      try {
+        const loggedUser = await Auth.completeNewPassword(
+          cognitoUser,
+          newpassword,
+          {
+            name: nombreUsuario,
+            family_name: apellido,
+            address: direccion,
+            locale: ciudad,
           }
-          saveUserData(user);
-        })
-        .catch((err) => {
-          setSignedIn(false);
-          setCognitoUser(null);
-          logger.debug(err);
+        );
+        dispatchAuth({
+          type: SET_COGNITOUSER,
+          payload: { cogUser: loggedUser },
         });
-    } else {
-      const user = Auth.user;
-      if (!user) {
-        setSignedIn(false);
-        setCognitoUser(null);
-        return;
+        if (loggedUser.challengeName === "MFA_SETUP") {
+          await handleSetupTOTP(loggedUser);
+        }
+      } catch (err) {
+        throw err;
       }
-      saveUserData(user);
-    }
-  }, [saveUserData]);
+    },
+    [handleSetupTOTP]
+  );
+
+  const handlesetPreferredMFA = useCallback(
+    async (totp) => {
+      try {
+        const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+        if (preferredMFA === "SUCCESS") {
+          await confirmSignIn(totp);
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    [cognitoUser, confirmSignIn]
+  );
+
+  const handleverifyTotpToken = useCallback(
+    async (totp) => {
+      try {
+        const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
+        if (tokenValidado.accessToken.payload.token_use === "access") {
+          await handlesetPreferredMFA(totp);
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    [cognitoUser, handlesetPreferredMFA]
+  );
 
   // Runs in first load
   useEffect(() => {
-    appendToCognitoUserAgent("withCustomAuthenticator");
-    checkUser();
-  }, [checkUser]);
+    if (Auth.user === null || Auth.user === undefined) {
+      Auth.currentAuthenticatedUser()
+        .then((user) => {
+          dispatchAuth({
+            type: CONFIRM_SIGN_IN,
+            payload: { loggedUser: user, dispatch: dispatchAuth },
+          });
+        })
+        .catch(() => {
+          dispatchAuth({ type: SIGN_OUT });
+        });
+    } else {
+      dispatchAuth({
+        type: CONFIRM_SIGN_IN,
+        payload: { loggedUser: Auth.user, dispatch: dispatchAuth },
+      });
+    }
+  }, []);
 
   // Runs when route change
   useEffect(() => {
-    getQuota();
-    if (pathname?.includes("iam")) {
-      getPermissions(userInfo?.attributes?.email)
-        .then(({ uAccess, pdpU }) => {
-          setUserPermissions(uAccess);
-          setPdpUser(pdpU);
-        })
-        .catch(() => {});
+    if (id_comercio && id_dispositivo) {
+      dispatchAuth({
+        type: FETCH_QUOTAINFO,
+        payload: {
+          id_comercio: id_comercio,
+          id_dispositivo: id_dispositivo,
+          dispatch: dispatchAuth,
+        },
+      });
     }
-  }, [getQuota, pathname, userInfo?.attributes?.email]);
+  }, [pathname, id_comercio, id_dispositivo]);
+
+  // Runs when route change
+  useEffect(() => {
+    if (pathname?.includes("iam")) {
+      const email = userState?.userInfo?.attributes?.email;
+      dispatchAuth({
+        type: FETCH_PERMISSIONS,
+        payload: { email, dispatch: dispatchAuth },
+      });
+    }
+  }, [pathname, userState?.userInfo?.attributes?.email]);
 
   useEffect(() => {
     const validate = async () => {
@@ -387,108 +550,9 @@ export const useProvideAuth = () => {
     temp();
   }, [cognitoUser]);
 
-  const signIn = useCallback(async (username, password) => {
-    try {
-      const user = await Auth.signIn(username, password);
-      if (user) {
-        setCognitoUser(user);
-        setParameters(user.challengeParam.userAttributes);
-      }
-    } catch (err) {
-      throw err;
-    }
-  }, []);
-
-  const handleChangePass = useCallback(
-    async (
-      nombreUsuario,
-      apellido,
-      cognitoUser,
-      direccion,
-      ciudad,
-      newpassword
-    ) => {
-      try {
-        const loggedUser = await Auth.completeNewPassword(
-          cognitoUser,
-          newpassword,
-          {
-            name: nombreUsuario,
-            family_name: apellido,
-            address: direccion,
-            locale: ciudad,
-          }
-        );
-        setCognitoUser(loggedUser);
-        if (loggedUser.challengeName === "MFA_SETUP") {
-          await handleSetupTOTP(loggedUser);
-        }
-      } catch (err) {
-        throw err;
-      }
-    },
-    [handleSetupTOTP]
-  );
-
-  const confirmSignIn = useCallback(
-    async (totp) => {
-      try {
-        const loggedUser = await Auth.confirmSignIn(
-          cognitoUser,
-          totp,
-          cognitoUser.challengeName
-        );
-        saveUserData(loggedUser);
-        history.push(state?.from || pathname === "/login" ? "/" : pathname);
-      } catch (err) {
-        if (err.code === "NotAuthorizedException") {
-          setCognitoUser(null);
-        }
-        throw err;
-      }
-    },
-    [cognitoUser, history, state, pathname, saveUserData]
-  );
-
-  const handlesetPreferredMFA = useCallback(
-    async (totp) => {
-      try {
-        const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
-        if (preferredMFA === "SUCCESS") {
-          await confirmSignIn(totp);
-        }
-      } catch (err) {
-        throw new Error(err);
-      }
-    },
-    [cognitoUser, confirmSignIn]
-  );
-
-  const handleverifyTotpToken = useCallback(
-    async (totp) => {
-      try {
-        const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
-        if (tokenValidado.accessToken.payload.token_use === "access") {
-          await handlesetPreferredMFA(totp);
-        }
-      } catch (err) {
-        throw new Error(err);
-      }
-    },
-    [cognitoUser, handlesetPreferredMFA]
-  );
-
   return {
     handleverifyTotpToken,
     handleChangePass,
-    isSignedIn,
-    cognitoUser,
-    userInfo,
-    roleInfo,
-    quotaInfo,
-    userSession,
-    pdpUser,
-    userPermissions,
     signIn,
     confirmSignIn,
     signOut,
@@ -498,5 +562,6 @@ export const useProvideAuth = () => {
     infoTicket,
     notify,
     notifyError,
+    ...userState,
   };
 };
