@@ -1,8 +1,69 @@
-import { createContext, useCallback, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { Route } from "react-router-dom";
 import { useAuth } from "./AuthHooks";
 import { allUrlsPrivateApps, privateUrls, publicUrls } from "./appsRoutes";
 import PrivateRoute from "../components/Compound/PrivateRoute/PrivateRoute";
+
+const getAllRoutes = (urls) => {
+  const allUrls = [];
+
+  for (const url of urls) {
+    const { subRoutes, provider } = url;
+    allUrls.push({ ...url });
+    if (subRoutes) {
+      for (const subUrl of getAllRoutes(subRoutes)) {
+        if (provider) {
+          allUrls.push({ ...subUrl, provider });
+        } else {
+          allUrls.push(subUrl);
+        }
+      }
+    }
+  }
+
+  return allUrls;
+};
+
+const toRoute = (urls, Wrapper) => {
+  if (!Array.isArray(urls)) {
+    return [];
+  }
+  if (!Wrapper) {
+    return [];
+  }
+
+  const allurls = getAllRoutes(urls);
+
+  return allurls
+    .filter(({ link }) => !(link === undefined || link === null))
+    .filter(({ extern }) => !extern)
+    .map(
+      ({
+        link,
+        component: Component,
+        props,
+        exact,
+        subRoutes,
+        label,
+        provider: Provider,
+      }) => {
+        exact = exact === undefined ? true : exact;
+        return (
+          <Wrapper key={link} path={link} exact={exact}>
+            {Provider ? (
+              <Provider>
+                <Component subRoutes={subRoutes} route={{ label }} {...props} />
+              </Provider>
+            ) : (
+              <Component subRoutes={subRoutes} route={{ label }} {...props} />
+            )}
+          </Wrapper>
+        );
+      }
+    );
+};
+
+// const publicRoutes = [...toRoute(publicUrls, Route)];
 
 export const UrlsContext = createContext({
   urlsPrivate: [],
@@ -17,76 +78,6 @@ export const useUrls = () => {
 
 export const useProvideUrls = () => {
   const { userPermissions } = useAuth();
-
-  const getAllRoutes = useCallback((urls) => {
-    const allUrls = [];
-
-    for (const url of urls) {
-      const { subRoutes, provider } = url;
-      allUrls.push({ ...url });
-      if (subRoutes) {
-        for (const subUrl of getAllRoutes(subRoutes)) {
-          if (provider) {
-            allUrls.push({ ...subUrl, provider });
-          } else {
-            allUrls.push(subUrl);
-          }
-        }
-      }
-    }
-
-    return allUrls;
-  }, []);
-
-  const toRoute = useCallback(
-    (urls, Wrapper) => {
-      if (!Array.isArray(urls)) {
-        return [];
-      }
-      if (!Wrapper) {
-        return [];
-      }
-
-      const allurls = getAllRoutes(urls);
-
-      return allurls
-        .filter(({ link }) => !(link === undefined || link === null))
-        .filter(({ extern }) => !extern)
-        .map(
-          ({
-            link,
-            component: Component,
-            props,
-            exact,
-            subRoutes,
-            label,
-            provider: Provider,
-          }) => {
-            exact = exact === undefined ? true : exact;
-            return (
-              <Wrapper key={link} path={link} exact={exact}>
-                {Provider ? (
-                  <Provider>
-                    <Component
-                      subRoutes={subRoutes}
-                      route={{ label }}
-                      {...props}
-                    />
-                  </Provider>
-                ) : (
-                  <Component
-                    subRoutes={subRoutes}
-                    route={{ label }}
-                    {...props}
-                  />
-                )}
-              </Wrapper>
-            );
-          }
-        );
-    },
-    [getAllRoutes]
-  );
 
   const urlsPrivateApps = useMemo(() => {
     if (Array.isArray(userPermissions) && userPermissions.length > 0) {
@@ -136,12 +127,13 @@ export const useProvideUrls = () => {
       ...toRoute(urlsPrivateApps, PrivateRoute),
       ...toRoute(publicUrls, Route),
     ];
-  }, [urlsPrivateApps, toRoute]);
+  }, [urlsPrivateApps]);
 
   return {
     urlsPrivate: privateUrls,
     urlsPublic: publicUrls,
     urlsPrivateApps,
     allRoutes,
+    // publicRoutes,
   };
 };
