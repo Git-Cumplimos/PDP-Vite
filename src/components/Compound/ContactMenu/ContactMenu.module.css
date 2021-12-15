@@ -1,11 +1,12 @@
 .contactMenu {
   @apply bottom-7 left-6 fixed;
 
-  @apply grid grid-flow-row auto-rows-auto place-content-center gap-y-5;
+  @apply grid grid-flow-row auto-rows-auto place-content-center gap-y-6;
 }
 
 .chatIcon {
   @apply relative rounded-full text-center p-2 text-2xl text-white z-30;
+  @apply h-12 w-12 shadow-lg;
 
   background-color: rgb(18, 155, 244);
 }
@@ -17,7 +18,7 @@
 /* .chatIcon > span  */
 
 .contactIcons {
-  @apply grid grid-cols-1 grid-rows-2 place-content-center gap-y-5;
+  @apply grid grid-cols-1 grid-rows-2 place-content-center gap-y-6;
   @apply opacity-0;
 
   transform: translate3d(0, 150%, 0);
@@ -44,13 +45,13 @@
 }
 
 .tooltip {
-  @apply hidden absolute left-14 bottom-2 bg-gray-900 text-white text-xs px-2 py-2 rounded;
+  @apply hidden absolute left-14 bottom-2 bg-gray-900 text-white text-xs px-2 py-2 rounded font-medium;
 }
 
 .contactIcons > a.waClass,
 .contactIcons > a.tlClass {
   @apply rounded-full text-center relative;
-  @apply h-12 w-12;
+  @apply h-12 w-12 shadow-lg;
 }
 
 .contactIcons > a.waClass:hover > .tooltip,
