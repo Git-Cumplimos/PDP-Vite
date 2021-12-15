@@ -45,11 +45,10 @@ const Home = () => {
       Bucket: S3_BUCKET,
       Key: "Presentacion.jpg",
     };
-    bucket
-      .getObject(params, (err, data) => {
-        if (err) console.log(err, err.stack);
-        else setImgTry(data);
-      })
+    bucket.getObject(params, (err, data) => {
+      if (err) console.log(err, err.stack);
+      else setImgTry(data);
+    });
   }, []);
 
   return (
@@ -70,16 +69,17 @@ const Home = () => {
             </div>
           );
         })}
+        <div className="aspect-w-16 aspect-h-5">
+          <img
+            src={URL.createObjectURL(
+              new Blob([imgTry?.Body], { type: "image/png" })
+            )}
+            alt="Img try"
+            className="object-cover"
+          />
+        </div>
       </Carousel>
       <HNavbar links={urlsPrivateApps} isIcon />
-      <img
-        src={URL.createObjectURL(
-          new Blob([imgTry?.Body], { type: "image/png" } /* (1) */)
-        )}
-        alt="Img try"
-      />
-      {/* <pre>{JSON.stringify(imgTry?.Body)}</pre> */}
-      {/* {imgTry?.Body} */}
     </>
   );
 };
