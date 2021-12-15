@@ -114,7 +114,7 @@ const FormCommerce = () => {
         }
       })
       .catch(() => {});
-  }, [roleInfo, history, notify, notifyError]);
+  }, [roleInfo, history]);
 
   const onSubmit = async (event) => {
     event.preventDefault();

@@ -1,5 +1,4 @@
 import { useCallback, useRef, useState } from "react";
-import { useAuth } from "../../../utils/AuthHooks";
 import { notifyError } from "../../../utils/notify";
 import classes from "./Input.module.css";
 
