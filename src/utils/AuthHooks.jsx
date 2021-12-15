@@ -273,7 +273,6 @@ export const AuthContext = createContext({
   signIn: () => {},
   confirmSignIn: () => {},
   signOut: () => {},
-  getQuota: () => {},
   infoTicket: () => {},
   handleverifyTotpToken: () => {},
   handleChangePass: () => {},
@@ -346,20 +345,6 @@ export const useProvideAuth = () => {
       })
       .catch(() => {});
   }, [history]);
-
-  // To delete
-  const getQuota = useCallback(() => {
-    if (id_comercio && id_dispositivo) {
-      dispatchAuth({
-        type: FETCH_QUOTAINFO,
-        payload: {
-          id_comercio: id_comercio,
-          id_dispositivo: id_dispositivo,
-          dispatch: dispatchAuth,
-        },
-      });
-    }
-  }, [id_comercio, id_dispositivo]);
 
   const handleSetupTOTP = useCallback(
     async (user) => {
@@ -530,7 +515,6 @@ export const useProvideAuth = () => {
     signIn,
     confirmSignIn,
     signOut,
-    getQuota,
     qr,
     parameters,
     infoTicket,
