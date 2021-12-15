@@ -1,0 +1,25 @@
+.loginLayout {
+  @apply relative;
+}
+
+.loginLayout > .wave {
+  /* z-index: -10; */
+  @apply hidden md:block absolute overflow-x-visible right-0 top-4;
+}
+
+.loginLayout > .hide {
+  @apply hidden lg:block;
+}
+
+.loginLayout > main {
+  @apply mx-auto px-4 md:px-8 pb-4 md:pb-8;
+}
+
+
+header.headerPDP {
+  @apply flex flex-col justify-center items-center px-2 md:px-4;
+}
+
+header.headerPDP .usrData {
+  @apply flex flex-row flex-wrap items-center justify-center px-0 md:px-4 py-4 gap-0;
+}

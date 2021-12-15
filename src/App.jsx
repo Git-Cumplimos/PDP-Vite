@@ -5,13 +5,15 @@ import awsconfig from "./aws-exports";
 
 import { useAuth } from "./utils/AuthHooks";
 import AdminLayout from "./layouts/AdminLayout/AdminLayout";
+import LoginLayout from "./layouts/LoginLayout/LoginLayout";
+import { Switch } from "react-router-dom";
+import { useUrls } from "./utils/UrlsHooks";
 
 Amplify.configure(awsconfig);
 
 function App() {
   const { cognitoUser, isSignedIn } = useAuth();
-
-  console.log(cognitoUser, isSignedIn);
+  const { allRoutes } = useUrls();
 
   useEffect(() => {
     if (cognitoUser && isSignedIn) {
@@ -23,7 +25,15 @@ function App() {
     }
   }, [cognitoUser, isSignedIn]);
 
-  return <AdminLayout />;
+  return cognitoUser && isSignedIn ? (
+    <AdminLayout>
+      <Switch>{allRoutes}</Switch>
+    </AdminLayout>
+  ) : (
+    <LoginLayout>
+      <Switch>{allRoutes}</Switch>
+    </LoginLayout>
+  );
 }
 
 export default App;

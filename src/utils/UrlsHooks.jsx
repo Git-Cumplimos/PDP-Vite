@@ -63,8 +63,6 @@ const toRoute = (urls, Wrapper) => {
     );
 };
 
-// const publicRoutes = [...toRoute(publicUrls, Route)];
-
 export const UrlsContext = createContext({
   urlsPrivate: [],
   urlsPublic: [],
@@ -134,6 +132,5 @@ export const useProvideUrls = () => {
     urlsPublic: publicUrls,
     urlsPrivateApps,
     allRoutes,
-    // publicRoutes,
   };
 };
