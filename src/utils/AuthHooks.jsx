@@ -140,9 +140,9 @@ const SET_SESSION = "SET_SESSION";
 const SET_QUOTA = "SET_QUOTA";
 
 const reducerAuth = (userState, action) => {
-  const { type, payload } = action;
+  const { payload } = action;
   const dispatch = payload?.dispatch;
-  switch (type) {
+  switch (action.type) {
     case SIGN_IN:
       const { user } = payload;
       return { ...userState, cognitoUser: user };
