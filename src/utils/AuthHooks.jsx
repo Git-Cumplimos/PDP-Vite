@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import fetchData from "./fetchData";
-import { toast } from "react-toastify";
+import { notifyError } from "./notify";
 
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
@@ -21,30 +21,6 @@ const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_o
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;
 const url_permissions = process.env.REACT_APP_URL_IAM_PDP;
-
-const notify = (msg = "Info") => {
-  toast.info(msg, {
-    position: "top-center",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-  });
-};
-
-const notifyError = (msg = "Error") => {
-  toast.warning(msg, {
-    position: "top-center",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-  });
-};
 
 const infoTicket = async (id_trx, Tipo_operacion, ticket) => {
   const get = {
@@ -303,8 +279,6 @@ export const AuthContext = createContext({
   handleChangePass: () => {},
   parameters: null,
   qr: null,
-  notify: () => {},
-  notifyError: () => {},
   ...initialUser,
 });
 
@@ -560,8 +534,6 @@ export const useProvideAuth = () => {
     qr,
     parameters,
     infoTicket,
-    notify,
-    notifyError,
     ...userState,
   };
 };

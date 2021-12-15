@@ -5,14 +5,12 @@ import Form from "../../../../components/Base/Form/Form";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
 import Table from "../../../../components/Base/Table/Table";
 import Pagination from "../../../../components/Compound/Pagination/Pagination";
-import { useAuth } from "../../../../utils/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
 const PolicyForm = ({ onCloseModal }) => {
-  const { notify, notifyError } = useAuth();
-
   const [selectedGroups, setSelectedGroups] = useState({});
   const [selectedRoles, setSelectedRoles] = useState({});
   const [groups, setGroups] = useState([]);

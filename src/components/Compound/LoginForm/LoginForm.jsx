@@ -4,6 +4,7 @@ import { useAuth } from "../../../utils/AuthHooks";
 import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
 import QRCode from "qrcode.react";
+import { notify, notifyError } from "../../../utils/notify";
 
 const LoginForm = () => {
   const { contain, card, field } = classes;
@@ -20,7 +21,6 @@ const LoginForm = () => {
   const [city, setCity] = useState("");
 
   const auth = useAuth();
-  const { notify, notifyError } = auth;
 
   const handleCognito = (event) => {
     event.preventDefault();

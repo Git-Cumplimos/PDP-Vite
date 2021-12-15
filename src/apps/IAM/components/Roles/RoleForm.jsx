@@ -4,14 +4,12 @@ import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
 import Select from "../../../../components/Base/Select/Select";
-import { useAuth } from "../../../../utils/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
 const RoleForm = ({ onCloseModal }) => {
-  const { notify, notifyError } = useAuth();
-
   const makeForm = useMemo(() => {
     return {
       "Nombre del rol": {},

@@ -5,8 +5,8 @@ import Form from "../../../../components/Base/Form/Form";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
 import Table from "../../../../components/Base/Table/Table";
 import Pagination from "../../../../components/Compound/Pagination/Pagination";
-import { useAuth } from "../../../../utils/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -15,8 +15,6 @@ const EditUserGroupForm = ({ selected, onCloseModal }) => {
   const [usuariosDB, setUsuariosDB] = useState([]);
 
   const [maxPage, setMaxPage] = useState(1);
-
-  const { notify, notifyError } = useAuth();
 
   const searchGroups = useCallback(async (gname, _page) => {
     const queries = { limit: 5 };
@@ -39,7 +37,7 @@ const EditUserGroupForm = ({ selected, onCloseModal }) => {
     } else {
       return [];
     }
-  }, [notifyError]);
+  }, []);
 
   const searchGroupByUsers = useCallback(async (uuid) => {
     const temp_res = {};
@@ -66,7 +64,7 @@ const EditUserGroupForm = ({ selected, onCloseModal }) => {
     } catch (err) {
       notifyError(err);
     }
-  }, [notifyError]);
+  }, []);
 
   useEffect(() => {
     searchGroupByUsers(selected?.edit?.uuid).then((res) => {

@@ -5,15 +5,13 @@ import Form from "../../../../components/Base/Form/Form";
 import fetchData from "../../../../utils/fetchData";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 import sendFormData from "../../../../utils/sendFormData";
-import { useAuth } from "../../../../utils/AuthHooks";
 import Pagination from "../../../../components/Compound/Pagination/Pagination";
 import Table from "../../../../components/Base/Table/Table";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
 const MassiveUpload = ({ onCloseModal }) => {
-  const { notify, notifyError } = useAuth();
-
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [usersFile, setUsersFile] = useState(null);
@@ -35,7 +33,7 @@ const MassiveUpload = ({ onCloseModal }) => {
         }
       }
     },
-    [notifyError]
+    []
   );
 
   const searchGroups = useCallback(
@@ -61,7 +59,7 @@ const MassiveUpload = ({ onCloseModal }) => {
         return [];
       }
     },
-    [notifyError]
+    []
   );
 
   const onChange = useCallback(

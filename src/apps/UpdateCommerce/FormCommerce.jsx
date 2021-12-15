@@ -10,6 +10,7 @@ import Select from "../../components/Base/Select/Select";
 import LocationForm from "../../components/Compound/LocationForm/LocationForm";
 import { useAuth } from "../../utils/AuthHooks";
 import fetchData from "../../utils/fetchData";
+import { notify, notifyError } from "../../utils/notify";
 
 const url = process.env.REACT_APP_URL_ACTIVIDADES;
 
@@ -57,7 +58,7 @@ const FormCommerce = () => {
   const [docsTypes, setDocsTypes] = useState({});
   const [locsTypes, setLocsTypes] = useState({});
 
-  const { roleInfo, notify, notifyError } = useAuth();
+  const { roleInfo } = useAuth();
 
   const history = useHistory();
 
