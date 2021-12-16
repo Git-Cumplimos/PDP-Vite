@@ -32,7 +32,7 @@ import MarketPlace from "../apps/MarketPlace/MarketPlace";
 /**
  * Fundacion de la mujer
  */
-import FunMujer from "../apps/FundacionMujer/componentsmujer/Pages/FunMujer";
+import FunMujer from "../apps/FundacionMujer/FunMujer";
 
 /**
  * IAM

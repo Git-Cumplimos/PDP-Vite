@@ -1,4 +1,4 @@
-import { LoteriaContext, useProvideLoteria } from "../../FundacionMujer/componentsmujer/utils/mujerHooks";
+import { LoteriaContext, useProvideLoteria } from "../utils/mujerHooks";
 
 const ProvideFundamujer = ({ children }) => {
   const LDB = useProvideLoteria();

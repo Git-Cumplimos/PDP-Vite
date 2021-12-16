@@ -58,8 +58,8 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold"></h1>
-            <h1></h1>
+            <h1 className="font-semibold">nada</h1>
+            <h1>nada</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Id Transacción:</h1>

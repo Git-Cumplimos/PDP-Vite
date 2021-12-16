@@ -1,6 +1,6 @@
-import FundacionWomen from "../RolesFundamujer/FundacionWomen";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import Providefundamujer from "../Providefundamujer";
+import FundacionWomen from "./components/RolesFundamujer/FundacionWomen";
+import { useAuth } from "../../hooks/AuthHooks";
+import Providefundamujer from "./components/Providefundamujer";
 
 const FunMujer = () => {
   const { roleInfo } = useAuth();

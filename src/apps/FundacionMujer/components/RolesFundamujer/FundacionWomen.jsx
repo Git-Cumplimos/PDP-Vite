@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
-import { toast } from "react-toastify";
 import AppIcons from "../../../../components/Base/AppIcons/AppIcons";
 
 import Button from "../../../../components/Base/Button/Button";
 
 // datos fundacion de la mujer
-import Desembolsos from  "../Pages/Desembolsos"; 
-import Recaudo from "../Pages/Recaudos";
+import Desembolsos from  "../../Views/Desembolsos"; 
+import Recaudo from "../../Views/Recaudos";
 
 
 const FundacionWomen = () => {
@@ -16,24 +15,11 @@ const FundacionWomen = () => {
   const [desembolso, setDesembolso] = useState(null);
   
   const [recaudo, setRecaudo] = useState(null);
-  const [transacciones, settransacciones] = useState(null);
 
 
   
   const { page } = useParams();
   const { pathname } = useLocation();
-
-  const notifyError = useCallback((msg = "Error") => {
-    toast.warning(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  }, []);
 
 
 
@@ -47,7 +33,8 @@ const FundacionWomen = () => {
       case"Recaudo":
         return  <Recaudo sorteo={recaudo} sorteoExtra={setRecaudo}/>
 
-
+default:
+  break;
    
     }
   };

@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useState } from "react";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import fetchData from "../../../../utils/fetchData";
+import { useAuth } from "../../../hooks/AuthHooks";
+import fetchData from "../../../utils/fetchData";
 
 const urls = {
   consultapin: `${process.env.REACT_APP_URL_FDLM_CONSULTAPIN}/pin`,
@@ -85,7 +85,7 @@ export const useProvideLoteria = () => {
     } catch (err) {
       console.error(err);
     }
-  }, []);
+  }, [roleInfo.id_comercio]);
 
   //cancelar pin
   const cancelarpin = useCallback(async (transaccion) => {
@@ -98,7 +98,7 @@ export const useProvideLoteria = () => {
     } catch (err) {
       console.error(err);
     }
-  }, []);
+  }, [roleInfo.id_comercio]);
 
   // desembolso
   const desembolsospin = async (documento, pin) => {

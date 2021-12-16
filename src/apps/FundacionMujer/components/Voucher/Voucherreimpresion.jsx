@@ -93,7 +93,7 @@ const Voucherreimpresion = ({ setPrintDiv, refPrint, ...info }) => {
         </div>
         <div className="flex flex-row justify-center w-full">
           <div className="flex flex-row justify-center flex-auto gap-2">
-            <h1 className="font-semibold"></h1>
+            <h1 className="font-semibold">Valir</h1>
             <h1>{info["Valordesembolso"]}</h1>
           </div>
         </div>

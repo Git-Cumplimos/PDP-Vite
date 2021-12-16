@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useState } from "react";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../../components/Base/Form/Form";
-import Input from "../../../../components/Base/Input/Input";
-import Modal from "../../../../components/Base/Modal/Modal";
+import { useCallback, useState } from "react";
+import Button from "../../../components/Base/Button/Button";
+import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
+import Form from "../../../components/Base/Form/Form";
+import Input from "../../../components/Base/Input/Input";
+import Modal from "../../../components/Base/Modal/Modal";
 
-import Sellfundamujer from "../../../FundacionMujer/componentsmujer/sellFundamujer/SellFundamujer";
-import SearchForm from "../SearchForm/SearchForm";
-import { Usemujer } from "../../../FundacionMujer/componentsmujer/utils/mujerHooks";
+import Sellfundamujer from "../components/sellFundamujer/SellFundamujer";
+import SearchForm from "../components/SearchForm/SearchForm";
+import { Usemujer } from "../utils/mujerHooks";
 import { toast } from "react-toastify";
 
 const Desembolsos = () => {
   const {
-    infoLoto: { respuestamujer, setRespuestamujer, setCustomer },
+    infoLoto: { respuestamujer, setRespuestamujer },
     consultapin,
     cancelarpin,
     desembolsospin,
@@ -22,24 +22,12 @@ const Desembolsos = () => {
 
   const [documento, setDocumento] = useState("");
   const [pin, setPin] = useState("");
-  const [comercio, setComercio] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(true);
   const [disabledBtns, setDisabledBtns] = useState(false);
 
   const notify = (msg) => {
     toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-  const notifyError = (msg) => {
-    toast.warn(msg, {
       position: "top-center",
       autoClose: 5000,
       hideProgressBar: false,
@@ -90,7 +78,7 @@ const Desembolsos = () => {
     setPin("");
     consultapin("");
     desembolsospin("");
-  }, []);
+  }, [cancelarpin, consultapin, desembolsospin]);
 
   const Desembolsitos = () => {
     setSelected(false);
