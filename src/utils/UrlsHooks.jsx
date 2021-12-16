@@ -63,6 +63,35 @@ const toRoute = (urls, Wrapper) => {
     );
 };
 
+const filterPermissions = (urls, userAccess) => {
+  if (!Array.isArray(urls)) {
+    return [];
+  }
+
+  const filteredUrls = [
+    ...urls.filter(({ permission }) => {
+      if (permission[0] === -1) return true;
+      for (const per of permission) {
+        if (
+          userAccess.map(({ id_permission }) => id_permission).includes(per)
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }),
+  ];
+
+  for (const key in filteredUrls) {
+    const subRoutes = filteredUrls?.[key]?.subRoutes;
+    if (subRoutes) {
+      filteredUrls[key].subRoutes = filterPermissions(subRoutes, userAccess);
+    }
+  }
+  
+  return filteredUrls;
+};
+
 export const UrlsContext = createContext({
   urlsPrivate: [],
   urlsPublic: [],
@@ -79,41 +108,7 @@ export const useProvideUrls = () => {
 
   const urlsPrivateApps = useMemo(() => {
     if (Array.isArray(userPermissions) && userPermissions.length > 0) {
-      const rootUrls = [
-        ...allUrlsPrivateApps
-          .filter(({ permission }) => {
-            if (permission[0] === -1) return true;
-            for (const per of permission) {
-              if (
-                userPermissions
-                  .map(({ id_permission }) => id_permission)
-                  .includes(per)
-              ) {
-                return true;
-              }
-            }
-            return false;
-          })
-          .map((el) => {
-            const { subRoutes } = el;
-            if (subRoutes) {
-              el.subRoutes = subRoutes.filter(({ permission }) => {
-                for (const per of permission) {
-                  if (
-                    userPermissions
-                      .map(({ id_permission }) => id_permission)
-                      .includes(per)
-                  ) {
-                    return true;
-                  }
-                }
-                return false;
-              });
-            }
-            return el;
-          }),
-      ];
-      return [...rootUrls];
+      return [...filterPermissions(allUrlsPrivateApps, userPermissions)];
     } else {
       return [];
     }

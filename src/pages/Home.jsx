@@ -9,8 +9,7 @@ import { useImgs } from "../utils/ImgsHooks";
 
 const Home = () => {
   const { urlsPrivateApps } = useUrls();
-  const { imgs, svgs: {LOTERIA_DE_BOGOTA_01} } = useImgs();
-  console.log(LOTERIA_DE_BOGOTA_01);
+  const { imgs } = useImgs();
 
   // const [emails, setEmails] = useState([
   //   "directora.mercadeo@puntodepago.com.co",

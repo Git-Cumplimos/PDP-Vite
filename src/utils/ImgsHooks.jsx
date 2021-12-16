@@ -1,52 +1,14 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 
-// Funciones
-import AWS from "aws-sdk";
 import { images, svgs } from "./AssetsObjects";
+import { getFromBucket } from "./S3utility";
 
-AWS.config.update({
-  accessKeyId: process.env.REACT_APP_accessKeyId,
-  secretAccessKey: process.env.REACT_APP_secretAccessKey,
-});
-
+// Funciones
 const S3_BUCKET = process.env.REACT_APP_BUCKET_CMS;
-const REGION = process.env.REACT_APP_REGION;
 
-const bucket = new AWS.S3({
-  params: { Bucket: S3_BUCKET },
-  region: REGION,
-});
-
-const loadImage = async (url) => {
-  const params = {
-    Bucket: S3_BUCKET,
-    Key: url,
-  };
+const loadResource = async (url) => {
   try {
-    const data = await bucket.getObject(params).promise();
-    return URL.createObjectURL(
-      new Blob([data?.Body], { type: data?.ContentType })
-    );
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-const loadSvg = async (url) => {
-  const params = {
-    Bucket: S3_BUCKET,
-    Key: url,
-  };
-  try {
-    const data = await bucket.getObject(params).promise();
-    console.log(data);
-    console.log(new TextDecoder().decode(data?.Body));
-    // return new TextDecoder().decode(data?.Body);
-    // return new Blob([data?.Body], { type: data?.ContentType });
-    // temp.textContent = new TextDecoder().decode(data?.Body);
-    return URL.createObjectURL(
-      new Blob([data?.Body], { type: data?.ContentType })
-    );
+    return await getFromBucket(S3_BUCKET, url);
   } catch (err) {
     console.error(err);
   }
@@ -73,7 +35,7 @@ const reducerImgs = (state, action) => {
 
     case FETCH_IMGS:
       for (const [key, val] of Object.entries(images)) {
-        loadImage(val)
+        loadResource(val)
           .then((url) =>
             payload.dispatch({
               type: SET_IMGS,
@@ -86,7 +48,7 @@ const reducerImgs = (state, action) => {
 
     case FETCH_SVGS:
       for (const [key, val] of Object.entries(svgs)) {
-        loadSvg(val)
+        loadResource(val)
           .then((url) =>
             payload.dispatch({
               type: SET_SVGS,

@@ -34,11 +34,11 @@ const AdminLayout = ({ children }) => {
   const [showModal, setShowModal] = useState(false);
 
   const saldoDisponible = useMemo(() => {
-    return formatMoney.format(quotaInfo?.quota);
+    return formatMoney.format(quotaInfo?.quota ?? 0);
   }, [quotaInfo?.quota]);
 
   const comisionTotal = useMemo(() => {
-    return formatMoney.format(quotaInfo?.comision);
+    return formatMoney.format(quotaInfo?.comision ?? 0);
   }, [quotaInfo?.comision]);
 
   return (
