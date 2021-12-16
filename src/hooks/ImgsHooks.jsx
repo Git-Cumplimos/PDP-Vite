@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 
-import { images, svgs } from "./AssetsObjects";
-import { getFromBucket } from "./S3utility";
+import { images, svgs } from "../utils/AssetsObjects";
+import { getFromBucket } from "../utils/S3utility";
 
 // Funciones
 const S3_BUCKET = process.env.REACT_APP_BUCKET_CMS;

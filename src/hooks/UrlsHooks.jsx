@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo } from "react";
 import { Route } from "react-router-dom";
 import { useAuth } from "./AuthHooks";
-import { allUrlsPrivateApps, privateUrls, publicUrls } from "./appsRoutes";
+import { allUrlsPrivateApps, privateUrls, publicUrls } from "../utils/appsRoutes";
 import PrivateRoute from "../components/Compound/PrivateRoute/PrivateRoute";
 
 const getAllRoutes = (urls) => {
