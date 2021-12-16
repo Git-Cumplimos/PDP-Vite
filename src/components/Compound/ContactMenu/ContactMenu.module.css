@@ -21,7 +21,7 @@
   @apply grid grid-cols-1 grid-rows-2 place-content-center gap-y-6;
   @apply opacity-0;
 
-  transform: translate3d(0, 150%, 0);
+  transform: translate3d(0, 300%, 0);
 }
 
 .animateIn {
@@ -85,8 +85,11 @@
 @keyframes fadeUp {
 	from {
 		opacity: 0;
-		transform: translate3d(0, 150%, 0);
+		transform: translate3d(0, 300%, 0);
 	}
+  2% {
+    transform: translate3d(0, 150%, 0);
+  }
   50% {
     opacity: 0;
   }
@@ -104,9 +107,12 @@
   50% {
     opacity: 0;
   }
+  98% {
+    transform: translate3d(0, 150%, 0);
+  }
 	to {
     opacity: 0;
-		transform: translate3d(0, 150%, 0);
+		transform: translate3d(0, 300%, 0);
 	}
 }
 
