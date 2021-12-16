@@ -24,36 +24,6 @@ body {
   color: hsl(0, 0%, 0%);
 }
 
-body.loginBackground {
-  background-image: url("./assets/img/personas.png"),
-    url("./assets/svg/back-icon.svg"),
-    url("./assets/svg/back-icon-secondary.svg");
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-position: 2.5% 100%, center, center;
-  background-size: 500px, cover, cover;
-}
-
-@media (max-width: 768px) {
-  body.loginBackground {
-    background-image: none;
-  }
-}
-
-body.loggedBackground {
-  background-image: url("./assets/svg/back-icon-2.svg");
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
-
-@media (max-width: 768px) {
-  body.loggedBackground {
-    background-image: none;
-  }
-}
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;

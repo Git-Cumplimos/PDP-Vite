@@ -6,9 +6,11 @@ import BarIcon from "../../components/Base/BarIcon/BarIcon";
 import UserInfo from "../../components/Compound/UserInfo/UserInfo";
 import RightArrow from "../../components/Base/RightArrow/RightArrow";
 import { useAuth } from "../../hooks/AuthHooks";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
 import Modal from "../../components/Base/Modal/Modal";
+import { useImgs } from "../../hooks/ImgsHooks";
+import { useWindowSize } from "../../hooks/WindowSizeHooks";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -40,6 +42,24 @@ const AdminLayout = ({ children }) => {
   const comisionTotal = useMemo(() => {
     return formatMoney.format(quotaInfo?.comision ?? 0);
   }, [quotaInfo?.comision]);
+
+  const [clientWidth] = useWindowSize();
+
+  const {
+    svgs: { backIcon2 },
+  } = useImgs();
+
+  useEffect(() => {
+    if (clientWidth > 768) {
+      document.body.style.backgroundImage = `url("${backIcon2}")`;
+      document.body.style.backgroundAttachment = "fixed";
+      document.body.style.backgroundRepeat = "no-repeat";
+      document.body.style.backgroundPosition = "center";
+      document.body.style.backgroundSize = "cover";
+    } else {
+      document.body.style.backgroundImage = "none";
+    }
+  }, [backIcon2, clientWidth]);
 
   return (
     <div className={adminLayout}>
