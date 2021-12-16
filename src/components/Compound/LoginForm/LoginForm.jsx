@@ -164,7 +164,7 @@ const LoginForm = () => {
           <hr />
           <form onSubmit={handleTOTP}>
             <div className={field}>
-              <label htmlFor="id">Código de seguridad:</label>
+              <label htmlFor="totp">Código de seguridad:</label>
               <input
                 id="totp"
                 type="text"
@@ -196,9 +196,9 @@ const LoginForm = () => {
             <hr />
             <form onSubmit={handleChangeExisting}>
               <div className={field}>
-                <label htmlFor="id">Nueva contraseña:</label>
+                <label htmlFor="newPassword">Nueva contraseña:</label>
                 <input
-                  id="totp"
+                  id="newPassword"
                   type="password"
                   autoComplete="off"
                   value={newPass}
@@ -208,9 +208,9 @@ const LoginForm = () => {
                 />
               </div>
               <div className={field}>
-                <label htmlFor="id">Confirmar contraseña:</label>
+                <label htmlFor="confirmNewPassword">Confirmar contraseña:</label>
                 <input
-                  id="totp"
+                  id="confirmNewPassword"
                   type="password"
                   autoComplete="off"
                   value={confirmPass}
@@ -237,7 +237,7 @@ const LoginForm = () => {
             <hr />
             <form onSubmit={handleChangePW}>
               <div className={field}>
-                <label htmlFor="id">Nombres:</label>
+                <label htmlFor="names">Nombres:</label>
                 <input
                   id="names"
                   type="text"
@@ -251,7 +251,7 @@ const LoginForm = () => {
                 />
               </div>
               <div className={field}>
-                <label htmlFor="id">Apellidos:</label>
+                <label htmlFor="lastName">Apellidos:</label>
                 <input
                   id="lastName"
                   type="text"
@@ -264,7 +264,7 @@ const LoginForm = () => {
                 />
               </div>
               <div className={field}>
-                <label htmlFor="id">Direccion:</label>
+                <label htmlFor="address">Direccion:</label>
                 <input
                   id="address"
                   type="text"
@@ -277,7 +277,7 @@ const LoginForm = () => {
                 />
               </div>
               <div className={field}>
-                <label htmlFor="id">Ciudad:</label>
+                <label htmlFor="ciudad">Ciudad:</label>
                 <input
                   id="ciudad"
                   type="text"
@@ -290,9 +290,9 @@ const LoginForm = () => {
                 />
               </div>
               <div className={field}>
-                <label htmlFor="id">Nueva contraseña:</label>
+                <label htmlFor="newPassword">Nueva contraseña:</label>
                 <input
-                  id="totp"
+                  id="newPassword"
                   type="password"
                   autoComplete="off"
                   value={newPass}
@@ -302,9 +302,9 @@ const LoginForm = () => {
                 />
               </div>
               <div className={field}>
-                <label htmlFor="id">Confirmar contraseña:</label>
+                <label htmlFor="confirmNewPassword">Confirmar contraseña:</label>
                 <input
-                  id="totp"
+                  id="confirmNewPassword"
                   type="password"
                   autoComplete="off"
                   value={confirmPass}
@@ -336,9 +336,9 @@ const LoginForm = () => {
               <QRCode value={auth.qr}></QRCode>
             </div>
             <div className={field}>
-              <label htmlFor="id">Validar Token:</label>
+              <label htmlFor="validateToken">Validar Token:</label>
               <input
-                id="lastName"
+                id="validateToken"
                 type="text"
                 maxLength="255"
                 autoFocus
@@ -374,6 +374,7 @@ const LoginForm = () => {
         <div className={field}>
           <label htmlFor="password">Contraseña:</label>
           <input
+            id="password"
             type="password"
             value={password}
             onChange={(e) => {

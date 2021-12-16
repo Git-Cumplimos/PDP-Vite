@@ -18,9 +18,8 @@ const getFromBucket = async (bucket, file) => {
   };
   try {
     const data = await s3Client.getObject(params).promise();
-    return URL.createObjectURL(
-      new Blob([data?.Body], { type: data?.ContentType })
-    );
+    const blob = new Blob([data?.Body], { type: data?.ContentType });
+    return URL.createObjectURL(blob);
   } catch (err) {
     throw err;
   }

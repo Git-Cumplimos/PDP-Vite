@@ -38,6 +38,7 @@ const ContactMenu = ({ wa, tl, msg }) => {
           target="_blank"
           rel="noopener noreferrer"
           className={waClass}
+          aria-label="WhatsApp"
         >
           <div className={tooltip}>WhatsApp</div>
           <span className="bi bi-whatsapp" />
@@ -47,6 +48,7 @@ const ContactMenu = ({ wa, tl, msg }) => {
           target="_blank"
           rel="noopener noreferrer"
           className={tlClass}
+          aria-label="Telegram"
         >
           <div className={tooltip}>Telegram</div>
           <span className="bi bi-telegram" />

@@ -17,7 +17,8 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
-
+// image/png
+// max-age=86400,must-revalidate
 const AdminLayout = ({ children }) => {
   const {
     adminLayout,

@@ -1,13 +1,13 @@
 const fonts = [
   {
-    fontName: "assets/font/Montserrat-Thin.ttf",
+    fontName: "assets/font/Montserrat-Thin.gz",
     fontParams: {
       weight: 100,
       display: "swap",
     },
   },
   {
-    fontName: "assets/font/Montserrat-ThinItalic.ttf",
+    fontName: "assets/font/Montserrat-ThinItalic.gz",
     fontParams: {
       weight: 100,
       style: "italic",
@@ -16,14 +16,14 @@ const fonts = [
   },
 
   {
-    fontName: "assets/font/Montserrat-ExtraLight.ttf",
+    fontName: "assets/font/Montserrat-ExtraLight.gz",
     fontParams: {
       weight: 200,
       display: "swap",
     },
   },
   {
-    fontName: "assets/font/Montserrat-ExtraLightItalic.ttf",
+    fontName: "assets/font/Montserrat-ExtraLightItalic.gz",
     fontParams: {
       weight: 200,
       style: "italic",
@@ -32,14 +32,14 @@ const fonts = [
   },
 
   {
-    fontName: "assets/font/Montserrat-Light.ttf",
+    fontName: "assets/font/Montserrat-Light.gz",
     fontParams: {
       weight: 300,
       display: "swap",
     },
   },
   {
-    fontName: "assets/font/Montserrat-LightItalic.ttf",
+    fontName: "assets/font/Montserrat-LightItalic.gz",
     fontParams: {
       weight: 300,
       style: "italic",
@@ -48,14 +48,14 @@ const fonts = [
   },
 
   {
-    fontName: "assets/font/Montserrat-Regular.ttf",
+    fontName: "assets/font/Montserrat-Regular.gz",
     fontParams: {
       weight: 400,
       display: "swap",
     },
   },
   {
-    fontName: "assets/font/Montserrat-Italic.ttf",
+    fontName: "assets/font/Montserrat-Italic.gz",
     fontParams: {
       weight: 400,
       style: "italic",
@@ -64,14 +64,14 @@ const fonts = [
   },
 
   {
-    fontName: "assets/font/Montserrat-Medium.ttf",
+    fontName: "assets/font/Montserrat-Medium.gz",
     fontParams: {
       weight: 500,
       display: "swap",
     },
   },
   {
-    fontName: "assets/font/Montserrat-MediumItalic.ttf",
+    fontName: "assets/font/Montserrat-MediumItalic.gz",
     fontParams: {
       weight: 500,
       style: "italic",
@@ -80,14 +80,14 @@ const fonts = [
   },
 
   {
-    fontName: "assets/font/Montserrat-SemiBold.ttf",
+    fontName: "assets/font/Montserrat-SemiBold.gz",
     fontParams: {
       weight: 600,
       display: "swap",
     },
   },
   {
-    fontName: "assets/font/Montserrat-SemiBoldItalic.ttf",
+    fontName: "assets/font/Montserrat-SemiBoldItalic.gz",
     fontParams: {
       weight: 600,
       style: "italic",
@@ -96,14 +96,14 @@ const fonts = [
   },
 
   {
-    fontName: "assets/font/Montserrat-Bold.ttf",
+    fontName: "assets/font/Montserrat-Bold.gz",
     fontParams: {
       weight: 700,
       display: "swap",
     },
   },
   {
-    fontName: "assets/font/Montserrat-BoldItalic.ttf",
+    fontName: "assets/font/Montserrat-BoldItalic.gz",
     fontParams: {
       weight: 700,
       style: "italic",
@@ -112,14 +112,14 @@ const fonts = [
   },
 
   {
-    fontName: "assets/font/Montserrat-ExtraBold.ttf",
+    fontName: "assets/font/Montserrat-ExtraBold.gz",
     fontParams: {
       weight: 800,
       display: "swap",
     },
   },
   {
-    fontName: "assets/font/Montserrat-ExtraBoldItalic.ttf",
+    fontName: "assets/font/Montserrat-ExtraBoldItalic.gz",
     fontParams: {
       weight: 800,
       style: "italic",
@@ -128,14 +128,14 @@ const fonts = [
   },
 
   {
-    fontName: "assets/font/Montserrat-Black.ttf",
+    fontName: "assets/font/Montserrat-Black.gz",
     fontParams: {
       weight: 900,
       display: "swap",
     },
   },
   {
-    fontName: "assets/font/Montserrat-BlackItalic.ttf",
+    fontName: "assets/font/Montserrat-BlackItalic.gz",
     fontParams: {
       weight: 900,
       style: "italic",
