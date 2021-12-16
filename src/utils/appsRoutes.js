@@ -2,12 +2,6 @@
  * * Logos
  */
 import AppIcons from "../components/Base/AppIcons/AppIcons";
-import SUSER from "../assets/svg/SUSER-01.svg";
-import MARKETPLACE from "../assets/svg/MARKETPLACE-01.svg";
-import ACTUALIZACION from "../assets/svg/ActualizacionDeDatos.svg";
-import LOTERIA from "../assets/svg/LOTERIA-DE-BOGOTA-01.svg";
-import SORTEOS from "../assets/svg/SORTEO-01.svg";
-import REPORTE from "../assets/svg/REPORTES-01.svg";
 
 /**
  * * Paginas
@@ -85,13 +79,13 @@ const publicUrls = [
 const allUrlsPrivateApps = [
   {
     link: "https://portal.solucionesenred.co/",
-    label: <AppIcons Logo={SUSER} name="SUSER" />,
+    label: <AppIcons Logo={"SUSER"} name="SUSER" />,
     extern: true,
     permission: [1],
   },
   {
     link: "/loteria-de-bogota",
-    label: <AppIcons Logo={LOTERIA} name="Loteria de bogota" />,
+    label: <AppIcons Logo={"LOTERIA"} name="Loteria de bogota" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
     extern: false,
@@ -99,7 +93,7 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/loteria-de-bogota/ventas",
-        label: <AppIcons Logo={SORTEOS} name="Ventas" />,
+        label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
         component: Loteria,
         extern: false,
         permission: [3],
@@ -120,7 +114,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/loteria-de-bogota/sorteos",
-        label: <AppIcons Logo={REPORTE} name="Sorteos" />,
+        label: <AppIcons Logo={"REPORTE"} name="Sorteos" />,
         component: CrearSorteos,
         extern: false,
         permission: [5],
@@ -129,14 +123,14 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/transacciones",
-    label: <AppIcons Logo={MARKETPLACE} name="Transacciones" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones" />,
     component: Transacciones,
     extern: false,
     permission: [8],
   },
   {
     link: "/update-commerce",
-    label: <AppIcons Logo={ACTUALIZACION} name="Actualizacion de datos" />,
+    label: <AppIcons Logo={"ACTUALIZACION"} name="Actualizacion de datos" />,
     component: FormCommerce,
     extern: false,
     permission: [7],
@@ -144,7 +138,7 @@ const allUrlsPrivateApps = [
   {
     link: "/review-commerce-forms",
     label: (
-      <AppIcons Logo={ACTUALIZACION} name="Revisar actualizacion de datos" />
+      <AppIcons Logo={"ACTUALIZACION"} name="Revisar actualizacion de datos" />
     ),
     component: CommerceInfo,
     extern: false,
@@ -152,7 +146,7 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/marketplace",
-    label: <AppIcons Logo={MARKETPLACE} name="Marketplace" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name="Marketplace" />,
     component: MarketPlace,
     extern: true,
     permission: [0],
@@ -173,42 +167,42 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/iam",
-    label: <AppIcons Logo={MARKETPLACE} name="IAM" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name="IAM" />,
     component: IAMIndex,
     extern: false,
     permission: [12, 13, 14, 15, 16],
     subRoutes: [
       {
         link: "/iam/users",
-        label: <AppIcons Logo={MARKETPLACE} name="Usuarios" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Usuarios" />,
         component: IAMUsers,
         extern: false,
         permission: [13],
       },
       {
         link: "/iam/groups",
-        label: <AppIcons Logo={MARKETPLACE} name="Grupos" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Grupos" />,
         component: IAMGroups,
         extern: false,
         permission: [12],
       },
       {
         link: "/iam/policies",
-        label: <AppIcons Logo={MARKETPLACE} name="Politicas" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Politicas" />,
         component: IAMPolicies,
         extern: false,
         permission: [16],
       },
       {
         link: "/iam/roles",
-        label: <AppIcons Logo={MARKETPLACE} name="Roles" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Roles" />,
         component: IAMRoles,
         extern: false,
         permission: [14],
       },
       {
         link: "/iam/permissions",
-        label: <AppIcons Logo={MARKETPLACE} name="Permisos" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Permisos" />,
         component: IAMPermissions,
         extern: false,
         permission: [15],

@@ -1,8 +1,12 @@
-import LogoPng from "../../../assets/img/logosPuntoDePagoHorizontal.png";
+import { useImgs } from "../../../utils/ImgsHooks";
 import classes from "./LogoPDP.module.css";
 
 const LogoPDP = ({ large = false, small = false, xsmall = false }) => {
   const { logoPDP, lgImg, smImg, xsImg } = classes;
+
+  const {
+    imgs: { pdpHorizontal: LogoPng },
+  } = useImgs();
   return (
     <div
       className={`${logoPDP} ${large ? lgImg : ""} ${small ? smImg : ""} ${

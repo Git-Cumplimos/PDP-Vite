@@ -1,8 +1,12 @@
-import LogoPng from "../../../assets/img/logosPuntoDePagoVertical.jpg";
+import { useImgs } from "../../../utils/ImgsHooks";
 import classes from "./LogoPDPV.module.css";
 
 const LogoPDPV = ({ large = false, small = false, xsmall = false }) => {
   const { logoPDP, lgImg, smImg, xsImg } = classes;
+
+  const {
+    imgs: { pdpVertical: LogoPng },
+  } = useImgs();
   return (
     <div
       className={`${logoPDP} ${large ? lgImg : ""} ${small ? smImg : ""} ${
