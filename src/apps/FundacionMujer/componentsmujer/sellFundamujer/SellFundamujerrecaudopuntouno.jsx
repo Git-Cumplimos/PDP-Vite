@@ -3,7 +3,7 @@ import Button from "../../../../components/Base/Button/Button";
 import Voucher from "../Voucher/Voucherrecaudopuntouno";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import { useAuth } from "../../../../utils/AuthHooks";
+import { useAuth } from "../../../../hooks/AuthHooks";
 
 const Sellfundamujerrecaudo = ({
   respuestamujer,

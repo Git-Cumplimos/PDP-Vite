@@ -1,4 +1,4 @@
-import { UrlsContext, useProvideUrls } from "../../../utils/UrlsHooks";
+import { UrlsContext, useProvideUrls } from "../../../hooks/UrlsHooks";
 
 const ProvideUrls = ({ children }) => {
   const urls = useProvideUrls();

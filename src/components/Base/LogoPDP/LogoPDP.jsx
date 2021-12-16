@@ -1,4 +1,4 @@
-import { useImgs } from "../../../utils/ImgsHooks";
+import { useImgs } from "../../../hooks/ImgsHooks";
 import classes from "./LogoPDP.module.css";
 
 const LogoPDP = ({ large = false, small = false, xsmall = false }) => {

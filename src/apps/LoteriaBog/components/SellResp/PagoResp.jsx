@@ -3,7 +3,7 @@ import Button from "../../../../components/Base/Button/Button";
 import VoucherPago from "../Voucher/VoucherPago";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import { useAuth } from "../../../../utils/AuthHooks";
+import { useAuth } from "../../../../hooks/AuthHooks";
 
 const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
   const printDiv = useRef();

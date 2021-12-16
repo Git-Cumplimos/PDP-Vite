@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useImgs } from "../../../utils/ImgsHooks";
+import { useImgs } from "../../../hooks/ImgsHooks";
 
 const AppIcons = ({ Logo = "", name }) => {
   const { svgs } = useImgs();

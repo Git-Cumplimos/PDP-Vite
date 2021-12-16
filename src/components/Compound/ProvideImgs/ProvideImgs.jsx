@@ -1,4 +1,4 @@
-import { ImgsContext, useProvideImgs } from "../../../utils/ImgsHooks";
+import { ImgsContext, useProvideImgs } from "../../../hooks/ImgsHooks";
 
 const ProvideImgs = ({ children }) => {
   const auth = useProvideImgs();

@@ -1,4 +1,4 @@
-import { useImgs } from "../../../utils/ImgsHooks";
+import { useImgs } from "../../../hooks/ImgsHooks";
 import classes from "./LogoPDPV.module.css";
 
 const LogoPDPV = ({ large = false, small = false, xsmall = false }) => {

@@ -1,4 +1,4 @@
-import { useImgs } from "../../../utils/ImgsHooks";
+import { useImgs } from "../../../hooks/ImgsHooks";
 
 const BarIcon = () => {
   const {

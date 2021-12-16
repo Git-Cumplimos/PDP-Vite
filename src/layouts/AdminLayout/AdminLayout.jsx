@@ -1,11 +1,11 @@
-import { useUrls } from "../../utils/UrlsHooks";
+import { useUrls } from "../../hooks/UrlsHooks";
 
 import classes from "./AdminLayout.module.css";
 import LogoPDP from "../../components/Base/LogoPDP/LogoPDP";
 import BarIcon from "../../components/Base/BarIcon/BarIcon";
 import UserInfo from "../../components/Compound/UserInfo/UserInfo";
 import RightArrow from "../../components/Base/RightArrow/RightArrow";
-import { useAuth } from "../../utils/AuthHooks";
+import { useAuth } from "../../hooks/AuthHooks";
 import { useMemo, useState } from "react";
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
 import Modal from "../../components/Base/Modal/Modal";

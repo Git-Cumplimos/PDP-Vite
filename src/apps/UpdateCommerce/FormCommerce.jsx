@@ -8,7 +8,7 @@ import Input from "../../components/Base/Input/Input";
 import MultipleInput from "../../components/Base/MultipleInput/MultipleInput";
 import Select from "../../components/Base/Select/Select";
 import LocationForm from "../../components/Compound/LocationForm/LocationForm";
-import { useAuth } from "../../utils/AuthHooks";
+import { useAuth } from "../../hooks/AuthHooks";
 import fetchData from "../../utils/fetchData";
 import { notify, notifyError } from "../../utils/notify";
 

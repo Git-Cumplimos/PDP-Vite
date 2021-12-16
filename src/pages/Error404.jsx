@@ -1,5 +1,5 @@
 import { Redirect, useHistory, useLocation } from "react-router-dom";
-import { useAuth } from "../utils/AuthHooks";
+import { useAuth } from "../hooks/AuthHooks";
 import Button from "../components/Base/Button/Button";
 import ButtonBar from "../components/Base/ButtonBar/ButtonBar";
 

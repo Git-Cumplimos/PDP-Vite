@@ -1,4 +1,4 @@
-import { useImgs } from "../../../utils/ImgsHooks";
+import { useImgs } from "../../../hooks/ImgsHooks";
 import classes from "./RightArrow.module.css";
 
 const RightArrow = ({ xlarge = false, large = false, small = false }) => {

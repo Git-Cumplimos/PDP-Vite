@@ -1,4 +1,4 @@
-import { AuthContext, useProvideAuth } from "../../../utils/AuthHooks";
+import { AuthContext, useProvideAuth } from "../../../hooks/AuthHooks";
 
 const ProvideAuth = ({ children }) => {
   const auth = useProvideAuth();

@@ -3,11 +3,11 @@ import { useEffect } from "react";
 import Amplify from "aws-amplify";
 import awsconfig from "./aws-exports";
 
-import { useAuth } from "./utils/AuthHooks";
+import { useAuth } from "./hooks/AuthHooks";
 import AdminLayout from "./layouts/AdminLayout/AdminLayout";
 import LoginLayout from "./layouts/LoginLayout/LoginLayout";
 import { Switch } from "react-router-dom";
-import { useUrls } from "./utils/UrlsHooks";
+import { useUrls } from "./hooks/UrlsHooks";
 
 Amplify.configure(awsconfig);
 

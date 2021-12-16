@@ -1,5 +1,5 @@
 import FundacionWomen from "../RolesFundamujer/FundacionWomen";
-import { useAuth } from "../../../../utils/AuthHooks";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import Providefundamujer from "../Providefundamujer";
 
 const FunMujer = () => {

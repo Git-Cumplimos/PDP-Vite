@@ -1,4 +1,4 @@
-import { useImgs } from "../../../utils/ImgsHooks";
+import { useImgs } from "../../../hooks/ImgsHooks";
 import classes from "./LogoLoto.module.css";
 
 const LogoLoto = ({ large = false, small = false, xsmall = false }) => {

@@ -8,8 +8,8 @@ import {
   useState,
 } from "react";
 import { useHistory, useLocation } from "react-router-dom";
-import fetchData from "./fetchData";
-import { notifyError } from "./notify";
+import fetchData from "../utils/fetchData";
+import { notifyError } from "../utils/notify";
 
 //////////////////////Despliegue de estos servicios anterior
 // const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";

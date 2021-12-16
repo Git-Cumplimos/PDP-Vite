@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useAuth } from "../../../utils/AuthHooks";
+import { useAuth } from "../../../hooks/AuthHooks";
 import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
 import QRCode from "qrcode.react";

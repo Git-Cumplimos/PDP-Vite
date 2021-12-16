@@ -1,11 +1,11 @@
-import { useUrls } from "../utils/UrlsHooks";
+import { useUrls } from "../hooks/UrlsHooks";
 
 import HNavbar from "../components/Base/HNavbar/HNavbar";
 
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useMemo } from "react";
-import { useImgs } from "../utils/ImgsHooks";
+import { useImgs } from "../hooks/ImgsHooks";
 
 const Home = () => {
   const { urlsPrivateApps } = useUrls();
