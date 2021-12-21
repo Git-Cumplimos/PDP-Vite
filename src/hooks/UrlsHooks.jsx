@@ -24,7 +24,7 @@ const getAllRoutes = (urls) => {
   return allUrls;
 };
 
-const toRoute = (urls, Wrapper) => {
+const toRoute = (urls, Wrapper = PrivateRoute) => {
   if (!Array.isArray(urls)) {
     return [];
   }
@@ -116,8 +116,8 @@ export const useProvideUrls = () => {
 
   const allRoutes = useMemo(() => {
     return [
-      ...toRoute(privateUrls, PrivateRoute),
-      ...toRoute(urlsPrivateApps, PrivateRoute),
+      ...toRoute(privateUrls),
+      ...toRoute(urlsPrivateApps),
       ...toRoute(publicUrls, Route),
     ];
   }, [urlsPrivateApps]);

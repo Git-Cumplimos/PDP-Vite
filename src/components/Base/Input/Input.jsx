@@ -93,6 +93,10 @@ const Input = ({
     window.addEventListener("dragenter", (e) => {
       showDropZone();
     });
+  } else if (type === "email") {
+    // for email
+    // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+    input.pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
   }
 
   if (onLazyInput !== undefined) {

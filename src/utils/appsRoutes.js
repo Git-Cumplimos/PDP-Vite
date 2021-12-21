@@ -1,7 +1,14 @@
+import { lazy } from "react";
+
+/**
+ * * Providers
+ */
+import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
+
 /**
  * * Logos
  */
-import AppIcons from "../components/Base/AppIcons/AppIcons";
+const AppIcons = lazy(() => import("../components/Base/AppIcons/AppIcons"));
 
 /**
  * * Paginas
@@ -10,47 +17,52 @@ import AppIcons from "../components/Base/AppIcons/AppIcons";
 /**
  * Base
  */
-import Login from "../pages/Login";
-import Home from "../pages/Home";
-import Transacciones from "../pages/Transacciones";
-import AuthButton from "../components/Compound/Signout/Signout";
+const Login = lazy(() => import("../pages/Login"));
+const Home = lazy(() => import("../pages/Home"));
+const Transacciones = lazy(() => import("../pages/Transacciones"));
+const AuthButton = lazy(() => import("../components/Compound/Signout/Signout"));
+const Error404 = lazy(() => import("../pages/Error404"));
 
 /**
  * Loteria
  */
-import LoteriaBog from "../apps/LoteriaBog/LoteriaBog";
-import Loteria from "../apps/LoteriaBog/Views/Loteria";
-import DescargarArchivosS3 from "../apps/LoteriaBog/Views/DescargarArchivosS3";
-import CrearSorteos from "../apps/LoteriaBog/Views/CrearSorteos";
-import CargaArchivos from "../apps/LoteriaBog/Views/CargaArchivos";
+const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
+const Loteria = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
+const DescargarArchivosS3 = lazy(() =>
+  import("../apps/LoteriaBog/Views/DescargarArchivosS3")
+);
+const CrearSorteos = lazy(() =>
+  import("../apps/LoteriaBog/Views/CrearSorteos")
+);
+const CargaArchivos = lazy(() =>
+  import("../apps/LoteriaBog/Views/CargaArchivos")
+);
 
 /**
  * Marketplace
  */
-import MarketPlace from "../apps/MarketPlace/MarketPlace";
+const MarketPlace = lazy(() => import("../apps/MarketPlace/MarketPlace"));
 
 /**
  * Fundacion de la mujer
  */
-import FunMujer from "../apps/FundacionMujer/FunMujer";
+const FunMujer = lazy(() => import("../apps/FundacionMujer/FunMujer"));
 
 /**
  * IAM
  */
-import IAMUsers from "../apps/IAM/Views/IAMUsers";
-import IAMGroups from "../apps/IAM/Views/IAMGroups";
-import IAMRoles from "../apps/IAM/Views/IAMRoles";
-import IAMPermissions from "../apps/IAM/Views/IAMPermissions";
-import IAMIndex from "../apps/IAM/IAMIndex";
-import IAMPolicies from "../apps/IAM/Views/IAMPolicies";
+const IAMUsers = lazy(() => import("../apps/IAM/Views/IAMUsers"));
+const IAMGroups = lazy(() => import("../apps/IAM/Views/IAMGroups"));
+const IAMRoles = lazy(() => import("../apps/IAM/Views/IAMRoles"));
+const IAMPermissions = lazy(() => import("../apps/IAM/Views/IAMPermissions"));
+const IAMIndex = lazy(() => import("../apps/IAM/IAMIndex"));
+const IAMPolicies = lazy(() => import("../apps/IAM/Views/IAMPolicies"));
 
 /**
  * Formulario de actualizacion
  */
-import FormCommerce from "../apps/UpdateCommerce/FormCommerce";
-import CommerceInfo from "../apps/UpdateCommerce/CommerceInfo";
-import Error404 from "../pages/Error404";
-import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
+const FormCommerce = lazy(() => import("../apps/UpdateCommerce/FormCommerce"));
+const CommerceInfo = lazy(() => import("../apps/UpdateCommerce/CommerceInfo"));
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -73,7 +85,7 @@ const publicUrls = [
     exact: false,
     component: Error404,
     props: {},
-  }
+  },
 ];
 
 const allUrlsPrivateApps = [
