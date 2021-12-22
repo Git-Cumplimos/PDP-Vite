@@ -6,9 +6,8 @@ import Modal from "../components/Base/Modal/Modal";
 import Select from "../components/Base/Select/Select";
 import Table from "../components/Base/Table/Table";
 import Input from "../components/Base/Input/Input";
-import { toast } from "react-toastify";
 import fetchData from "../utils/fetchData";
-import { useAuth } from "../utils/AuthHooks";
+import { useAuth } from "../hooks/AuthHooks";
 import Tickets from "../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
 
@@ -51,7 +50,7 @@ const Transacciones = () => {
             throw new Error(res?.msg);
           }
         })
-        .catch((err) => console.error(err));
+        .catch(() => {});
     },
     []
   );
@@ -68,24 +67,12 @@ const Transacciones = () => {
           throw new Error(res?.msg);
         }
       })
-      .catch((err) => console.error(err));
+      .catch(() => {});
   }, []);
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
   }, []);
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
 
   const printDiv = useRef();
 
@@ -95,9 +82,9 @@ const Transacciones = () => {
 
   useEffect(() => {
     tiposOperaciones();
-    setIdComercio(roleInfo?.id_comercio || 2);
+    setIdComercio(roleInfo?.id_comercio || -1);
   }, [tiposOperaciones, roleInfo?.id_comercio]);
-  console.log(selected)
+
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Transacciones</h1>

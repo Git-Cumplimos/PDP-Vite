@@ -3,7 +3,7 @@ import Button from "../../../../components/Base/Button/Button";
 import Voucher from "../Voucher/Voucher";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import { useAuth } from "../../../../utils/AuthHooks";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import { useEffect } from "react";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 
@@ -102,10 +102,13 @@ const SellResp = ({
       }),
       commerceName: sellResponse.nom_loteria,
       trxInfo: Object.entries({
+        Sorteo:sellResponse.sorteo,
         Billete: sellResponse.num_billete,
         Serie: sellResponse.serie,
         Fracciones: sellResponse.fracciones,
         "Valor pago": formatMoney.format(sellResponse.valor_pago),
+        "Tipo de Billete": sellResponse?.fisico===true? 'Fisico':'Virtual',
+        "Forma de pago": sellResponse?.tipoPago==='12'|| sellResponse.fisico==false? 'Efectivo':'Bono',
       }),
       disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
     };
@@ -117,9 +120,9 @@ const SellResp = ({
     sellResponse,
     voucherInfo,
   ]);
-
+  console.log(sellResponse.tipoPago)
   useEffect(() => {
-    infoTicket(sellResponse["id_trx"], 12, ticket);
+    infoTicket(sellResponse["id_trx"], sellResponse.tipoPago, ticket);
   }, [infoTicket, sellResponse, ticket]);
 
   return "msg" in sellResponse ? (

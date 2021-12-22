@@ -1,16 +1,20 @@
-import { ReactComponent as Icon } from "../../../assets/svg/bar.svg";
+import { useImgs } from "../../../hooks/ImgsHooks";
 
 const BarIcon = () => {
+  const {
+    svgs: { bar },
+  } = useImgs();
   return (
-    <Icon
-      className="hidden sm:block bg-secondary-dark fill-current"
-      width="0.375rem"
-      height="6rem"
-      opacity="0.2"
+    <div
       style={{
-        margin: "0 0.5rem",
+        width: "0.375rem",
       }}
-    />
+      className="hidden sm:block h-24 my-0 mx-2"
+    >
+      <div className="aspect-w-1 aspect-h-1 h-full w-full">
+        <img src={bar} alt={"bar"} />
+      </div>
+    </div>
   );
 };
 

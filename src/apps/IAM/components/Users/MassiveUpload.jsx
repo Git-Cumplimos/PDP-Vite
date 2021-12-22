@@ -1,89 +1,78 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
+import { useCallback, useState } from "react";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
-import Input from "../../../../components/Base/Input/Input";
-import Select from "../../../../components/Base/Select/Select";
 import fetchData from "../../../../utils/fetchData";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 import sendFormData from "../../../../utils/sendFormData";
+import Pagination from "../../../../components/Compound/Pagination/Pagination";
+import Table from "../../../../components/Base/Table/Table";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
 const MassiveUpload = ({ onCloseModal }) => {
-  const [groupsUsers, setGroupsUsers] = useState({ "": "" });
+  const [selectedGroup, setSelectedGroup] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [usersFile, setUsersFile] = useState(null);
 
-  const onFileCharge = useCallback((files) => {
-    if (Array.isArray(Array.from(files))) {
-      files = Array.from(files);
-      if (files.length === 1) {
-        const [m_file] = files;
-        setUsersFile({ file: m_file, fileName: m_file.name });
-      } else {
-        if (files.length > 1) {
-          notifyError("Se debe ingresar un solo archivo para subir");
+  const [maxPage, setMaxPage] = useState(1);
+  const [foundGroups, setFoundGroups] = useState([]);
+
+  const onFileCharge = useCallback(
+    (files) => {
+      if (Array.isArray(Array.from(files))) {
+        files = Array.from(files);
+        if (files.length === 1) {
+          const [m_file] = files;
+          setUsersFile({ file: m_file, fileName: m_file.name });
+        } else {
+          if (files.length > 1) {
+            notifyError("Se debe ingresar un solo archivo para subir");
+          }
         }
       }
-    }
-  }, []);
+    },
+    []
+  );
 
-  const makeForm = useMemo(() => {
-    return {
-      "Elegir archivo de usuarios": {
-        type: "file",
-        disabled: isUploading,
-        accept: ".csv",
-        onGetFile: onFileCharge,
-        required: false,
-      },
-      "Grupo para los usuarios": {
-        options: groupsUsers,
-      },
-    };
-  }, [groupsUsers, isUploading, onFileCharge]);
-
-  useEffect(() => {
-    fetchData(`${url_iam}/groups`, "GET", {}, {})
-      .then((res) => {
-        const temp = { "": "" };
-        if (res?.status) {
-          res?.obj.forEach(({ id_group, name_group }) => {
-            temp[`${name_group}`] = id_group;
-          });
-          setGroupsUsers(temp);
-        } else {
-          notifyError(res?.msg);
+  const searchGroups = useCallback(
+    async (gname, _page) => {
+      const queries = { limit: 5 };
+      if (gname && gname !== "") {
+        queries.name_group = gname;
+      }
+      if (_page) {
+        queries.page = _page;
+      }
+      if (Object.keys(queries).length > 0) {
+        try {
+          const res = await fetchData(`${url_iam}/groups`, "GET", queries);
+          if (res?.status) {
+            return res?.obj;
+          }
+          return [];
+        } catch (err) {
+          notifyError(err);
         }
-      })
-      .catch(() => {});
-  }, []);
+      } else {
+        return [];
+      }
+    },
+    []
+  );
 
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const notifyError = (msg) => {
-    toast.warn(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const onChange = useCallback(
+    (_formData) => {
+      searchGroups(_formData.get("name_group"), _formData.get("page"))
+        .then((res) => {
+          setFoundGroups(res?.results);
+          setMaxPage(res?.maxpages);
+        })
+        .catch(() => {});
+    },
+    [searchGroups]
+  );
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -94,13 +83,15 @@ const MassiveUpload = ({ onCloseModal }) => {
       notifyError("No se ha selecionado un archivo para subir");
       return;
     }
+    if (!selectedGroup) {
+      notifyError("No se ha selecionado un grupo al cual añadir a los ususarios");
+      return;
+    }
 
     setIsUploading(true);
 
     formData.append("file", usersFile.file);
-    formData.append("id_group", formData.get("Grupo para los usuarios"));
-    formData.delete("Elegir archivo de usuarios");
-    formData.delete("Grupo para los usuarios");
+    formData.append("id_group", selectedGroup.id_group);
 
     sendFormData(
       `${url_iam}/users-massive`,
@@ -120,13 +111,20 @@ const MassiveUpload = ({ onCloseModal }) => {
               // failed_to_group,
               grouped_users,
             } = res?.obj;
-            notify(
-              `Se han creado ${added_users.length} de ${all_users.length} usuarios`
-            );
-            if (added_users.length > 0) {
-              notify(
-                `Se han agrupado ${grouped_users.length} de ${added_users.length} usuarios creados`
+            if (added_users.length === 0) {
+              notifyError(
+                `Se han creado ${added_users.length} de ${all_users.length} usuarios`
               );
+            } else {
+              onCloseModal?.();
+              notify(
+                `Se han creado ${added_users.length} de ${all_users.length} usuarios`
+              );
+              if (added_users.length > 0) {
+                notify(
+                  `Se han agrupado ${grouped_users.length} de ${added_users.length} usuarios creados`
+                );
+              }
             }
           }
         }
@@ -143,36 +141,53 @@ const MassiveUpload = ({ onCloseModal }) => {
     <div className="flex flex-col justify-center items-center mx-auto">
       <h1 className="text-2xl my-4">Creacion de usuarios</h1>
       <SimpleLoading show={isUploading} />
+      <Pagination
+        filters={{
+          file: {
+            label: "Elegir archivo de usuarios",
+            type: "file",
+            disabled: isUploading,
+            accept: ".csv",
+            onGetFile: onFileCharge,
+            required: false,
+          },
+          name_group: { label: "Grupo para los usuarios" },
+        }}
+        maxPage={maxPage}
+        onChange={onChange}
+        lgButtons={false}
+      />
+      {selectedGroup ? (
+        <ButtonBar className={"col-span-1"}>
+          <Button
+            type={"button"}
+            onClick={() => {
+              setSelectedGroup(null);
+            }}
+          >
+            {`${selectedGroup.id_group}) ${selectedGroup.name_group}`}{" "}
+            <span className="bi bi-trash-fill" />
+          </Button>
+        </ButtonBar>
+      ) : (
+        ""
+      )}
+      {Array.isArray(foundGroups) && foundGroups.length > 0 ? (
+        <Table
+          headers={["Id", "Nombre del grupo"]}
+          data={foundGroups.map(({ id_group, name_group }) => {
+            return { id_group, name_group };
+          })}
+          onSelectRow={(e, i) => {
+            setSelectedGroup(foundGroups[i]);
+            setFoundGroups([]);
+            setMaxPage(1);
+          }}
+        />
+      ) : (
+        ""
+      )}
       <Form onSubmit={onSubmit} grid>
-        {Object.entries(makeForm).map(([key, val]) => {
-          if (!Object.keys(val).includes("options")) {
-            const { required, type, ...rest } = val;
-            return (
-              <Input
-                key={`${key}_new`}
-                id={`${key}_new`}
-                name={key}
-                label={key}
-                type={type || "text"}
-                autoComplete="off"
-                required={required ?? true}
-                {...rest}
-              />
-            );
-          } else {
-            const { required, options } = val;
-            return (
-              <Select
-                key={`${key}_new`}
-                id={`${key}_new`}
-                name={key}
-                label={key}
-                required={required ?? true}
-                options={options ?? []}
-              />
-            );
-          }
-        })}
         <ButtonBar>
           <Button type={"submit"}>Crear usuarios</Button>
         </ButtonBar>

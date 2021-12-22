@@ -9,11 +9,21 @@ const fetchData = async (
     throw new Error("Method not suported");
   }
 
-  queries = Object.entries(queries).map(([key, value]) => {
-    return `${key}=${value}`;
-  });
+  if ("URLSearchParams" in window) {
+    const params = new URLSearchParams();
+    Object.entries(queries).forEach(([key, value]) => {
+      params.append(key, value);
+    });
+    queries = params.toString();
+  } else {
+    queries = Object.entries(queries)
+      .map(([key, value]) => {
+        return `${key}=${value}`;
+      })
+      .join("&");
+  }
   if (method !== "POST" && queries.length > 0) {
-    url += `?${queries.join("&")}`;
+    url += `?${queries}`;
   }
 
   const fetchOtions = { method: method };

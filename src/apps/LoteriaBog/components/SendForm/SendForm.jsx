@@ -20,6 +20,8 @@ const SendForm = ({
   setCustomer,
   closeModal,
   handleSubmit,
+  tipoPago,
+  setTipoPago,
 }) => {
   const details = {
     "Valor por fraccion": selected ? formatMoney.format(selected.Valor_fraccion) : "",
@@ -69,6 +71,17 @@ const SendForm = ({
     setDisabledBtns(true)
     handleSubmit()
   }
+
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {};
+  // }
+
+  const formPago = (value) => {
+    
+    setTipoPago(value)
+  
+  };
   
   return (
     <>
@@ -94,9 +107,8 @@ const SendForm = ({
             return (
             <Input
              id={frac}
-             label={`${frac}:`}
+             label={`Fracción ${frac}:`}
              type="checkbox"
-             required={true}
              value={frac}
 
              checked={checkedState[index]}
@@ -105,6 +117,24 @@ const SendForm = ({
              )
             
            })}
+           <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
+              Efectivo
+              <input
+                id="Efectivo"
+                value={12}
+                name="pago"
+                type="radio"
+                onChange={(e) => formPago(e.target.value)}
+              />
+              Bono
+              <input
+                id="Bono"
+                value={14}
+                name="pago"
+                type="radio"
+                onChange={(e) => formPago(e.target.value)}
+              />
+            </div>
           </>
          
           :

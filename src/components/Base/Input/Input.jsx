@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { toast } from "react-toastify";
+import { notifyError } from "../../../utils/notify";
 import classes from "./Input.module.css";
 
 const Input = ({
@@ -18,18 +18,6 @@ const Input = ({
 
   const inputRef = useRef(null);
   const dropZoneRef = useRef(null);
-
-  const notifyError = (msg) => {
-    toast.warn(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
 
   const showDropZone = useCallback(() => {
     if (
@@ -105,6 +93,10 @@ const Input = ({
     window.addEventListener("dragenter", (e) => {
       showDropZone();
     });
+  } else if (type === "email") {
+    // for email
+    // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+    input.pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
   }
 
   if (onLazyInput !== undefined) {

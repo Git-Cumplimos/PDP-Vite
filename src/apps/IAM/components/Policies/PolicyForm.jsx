@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { toast } from "react-toastify";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
@@ -7,34 +6,11 @@ import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleS
 import Table from "../../../../components/Base/Table/Table";
 import Pagination from "../../../../components/Compound/Pagination/Pagination";
 import fetchData from "../../../../utils/fetchData";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
 const PolicyForm = ({ onCloseModal }) => {
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const notifyError = (msg) => {
-    toast.warn(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
   const [selectedGroups, setSelectedGroups] = useState({});
   const [selectedRoles, setSelectedRoles] = useState({});
   const [groups, setGroups] = useState([]);
@@ -126,12 +102,62 @@ const PolicyForm = ({ onCloseModal }) => {
         _selectedR.length
       )} politica(s)`
     );
+    setSelectedGroups({});
+    setSelectedRoles({});
     onCloseModal?.();
   };
 
   return (
     <div className="flex flex-col justify-center items-center mx-auto">
       <h1 className="text-2xl my-4">Creacion de politica</h1>
+      <Pagination
+        filters={{
+          gname: { label: "Nombre del grupo" },
+        }}
+        maxPage={maxPageGroups}
+        onChange={onChangeGroups}
+      />
+      {Array.isArray(groups) && groups.length > 0 ? (
+        <Table
+          headers={["Id", "Nombre del grupo"]}
+          data={groups.map(({ id_group, name_group }) => {
+            return { id_group, name_group };
+          })}
+          onSelectRow={(e, i) => {
+            const { id_group, name_group } = groups[i];
+            const copy = { ...selectedGroups };
+            copy[`${id_group}) ${name_group}`] = true;
+            setSelectedGroups({ ...copy });
+            setGroups([]);
+          }}
+        />
+      ) : (
+        ""
+      )}
+      <Pagination
+        filters={{
+          rname: { label: "Nombre del rol" },
+        }}
+        maxPage={maxPageRoles}
+        onChange={onChangeRoles}
+      />
+      {Array.isArray(roles) && roles.length > 0 ? (
+        <Table
+          headers={["Id", "Nombre del rol"]}
+          data={roles.map(({ id_role, name_role }) => {
+            return { id_role, name_role };
+          })}
+          onSelectRow={(e, i) => {
+            const { id_role, name_role } = roles[i];
+            const copy = { ...selectedRoles };
+            copy[`${id_role}) ${name_role}`] = true;
+            setSelectedRoles({ ...copy });
+            setRoles([]);
+          }}
+        />
+      ) : (
+        ""
+      )}
       <Form onSubmit={onSubmit} grid>
         {Array.isArray(Object.keys(selectedGroups)) &&
         Object.keys(selectedGroups).length > 0 ? (
@@ -149,54 +175,6 @@ const PolicyForm = ({ onCloseModal }) => {
             label={"Roles"}
             options={selectedRoles}
             onChange={setSelectedRoles}
-          />
-        ) : (
-          ""
-        )}
-        <Pagination
-          filters={{
-            gname: { label: "Nombre del grupo" },
-          }}
-          maxPage={maxPageGroups}
-          onChange={onChangeGroups}
-        />
-        {Array.isArray(groups) && groups.length > 0 ? (
-          <Table
-            headers={["Id", "Nombre del grupo"]}
-            data={groups.map(({ id_group, name_group }) => {
-              return { id_group, name_group };
-            })}
-            onSelectRow={(e, i) => {
-              const { id_group, name_group } = groups[i];
-              const copy = { ...selectedGroups };
-              copy[`${id_group}) ${name_group}`] = true;
-              setSelectedGroups({ ...copy });
-              setGroups([]);
-            }}
-          />
-        ) : (
-          ""
-        )}
-        <Pagination
-          filters={{
-            rname: { label: "Nombre del rol" },
-          }}
-          maxPage={maxPageRoles}
-          onChange={onChangeRoles}
-        />
-        {Array.isArray(roles) && roles.length > 0 ? (
-          <Table
-            headers={["Id", "Nombre del rol"]}
-            data={roles.map(({ id_role, name_role }) => {
-              return { id_role, name_role };
-            })}
-            onSelectRow={(e, i) => {
-              const { id_role, name_role } = roles[i];
-              const copy = { ...selectedRoles };
-              copy[`${id_role}) ${name_role}`] = true;
-              setSelectedRoles({ ...copy });
-              setRoles([]);
-            }}
           />
         ) : (
           ""

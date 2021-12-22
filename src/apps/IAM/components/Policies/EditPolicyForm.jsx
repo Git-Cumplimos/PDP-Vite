@@ -1,50 +1,22 @@
-import { toast } from "react-toastify";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import fetchData from "../../../../utils/fetchData";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
 const EditPolicyForm = ({ selected, onCloseModal }) => {
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const notifyError = (msg) => {
-    toast.warn(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
   const onSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const [id_group] = selected.Grupo.split(") ");
       const [id_role] = selected.Rol.split(") ");
-      const groupRole = await fetchData(
-        `${url_iam}/groups-roles`,
-        "DELETE",
-        {
-          Groups_id_group: id_group,
-          Roles_id_role: id_role,
-        }
-      );
+      const groupRole = await fetchData(`${url_iam}/groups-roles`, "DELETE", {
+        Groups_id_group: id_group,
+        Roles_id_role: id_role,
+      });
       if (groupRole?.status) {
         notify("Politica eliminada satisfactoriamente");
       } else {
@@ -73,10 +45,7 @@ const EditPolicyForm = ({ selected, onCloseModal }) => {
           ""
         );
       })}
-      <Form
-        onSubmit={onSubmit}
-        grid
-      >
+      <Form onSubmit={onSubmit} grid>
         <ButtonBar>
           <Button type={"submit"}>Eliminar politica</Button>
         </ButtonBar>

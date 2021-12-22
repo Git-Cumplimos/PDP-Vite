@@ -1,36 +1,28 @@
+import { useUrls } from "../hooks/UrlsHooks";
+
 import HNavbar from "../components/Base/HNavbar/HNavbar";
-import { useUrls } from "../utils/UrlsHooks";
 
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { useEffect, useState } from "react";
-import ColpensionesImg from "../assets/img/COLPENSIONES.jpg";
-import Banner2 from "../assets/img/BANNER2.jpg";
-import { Link } from "react-router-dom";
-import AppIcons from "../components/Base/AppIcons/AppIcons";
-import ACTUALIZACION from "../assets/svg/ActualizacionDeDatos.svg";
-import { Auth } from "aws-amplify";
+import { useMemo } from "react";
+import { useImgs } from "../hooks/ImgsHooks";
 
 const Home = () => {
-  const { urlsPrivApps: urls, urlsPrivateApps } = useUrls();
+  const { urlsPrivateApps } = useUrls();
+  const { imgs } = useImgs();
 
-  const [emails, setEmails] = useState([
-    "directora.mercadeo@puntodepago.com.co",
-    "maria.valero@puntodepago.com.co",
-    "CAFEINTERNETNAOM@GMAIL.COM",
-  ]);
-  const [setLocalEmail, setSetLocalEmail] = useState("");
+  // const [emails, setEmails] = useState([
+  //   "directora.mercadeo@puntodepago.com.co",
+  //   "maria.valero@puntodepago.com.co",
+  // ]);
 
-  useEffect(() => {
-    Auth.currentUserInfo().then((res) => {
-      setSetLocalEmail(res?.attributes?.email ?? "");
-    });
-  }, []);
-
-  const [imgs, setImgs] = useState([
-    { name: "Colpensiones", url: ColpensionesImg },
-    { name: "Punto de pago", url: Banner2 },
-  ]);
+  const imgsCarousel = useMemo(() => {
+    const { COLPENSIONES, BANNER2 } = imgs;
+    return [
+      { name: "Colpensiones", url: COLPENSIONES },
+      { name: "Punto de pago", url: BANNER2 },
+    ];
+  }, [imgs]);
 
   return (
     <>
@@ -43,7 +35,7 @@ const Home = () => {
         showThumbs={false}
         showStatus={false}
       >
-        {imgs.map(({ name, url }) => {
+        {imgsCarousel.map(({ name, url }) => {
           return (
             <div className="aspect-w-16 aspect-h-5" key={url}>
               <img alt={name} src={url} className="object-cover" />
@@ -51,17 +43,6 @@ const Home = () => {
           );
         })}
       </Carousel>
-      {/* <HNavbar links={urls} isIcon />
-      {emails.includes(setLocalEmail.toLowerCase()) ? (
-        <Link to={"/review-commerce-forms"}>
-          <AppIcons
-            Logo={ACTUALIZACION}
-            name="Revisar actualizacion de datos"
-          />
-        </Link>
-      ) : (
-        ""
-      )} */}
       <HNavbar links={urlsPrivateApps} isIcon />
     </>
   );

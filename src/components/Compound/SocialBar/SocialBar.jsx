@@ -10,6 +10,7 @@ const SocialBar = () => {
             href="https://twitter.com/"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Twitter"
           >
             <span className="bi bi-twitter" />
           </a>
@@ -19,6 +20,7 @@ const SocialBar = () => {
             href="https://www.facebook.com/PDPmultibanco/"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Facebook"
           >
             <span className="bi bi-facebook" />
           </a>
@@ -28,6 +30,7 @@ const SocialBar = () => {
             href="https://www.instagram.com/"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Instagram"
           >
             <span className="bi bi-instagram" />
           </a>
@@ -37,6 +40,7 @@ const SocialBar = () => {
             href="https://youtube.com"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Youtube"
           >
             <span className="bi bi-youtube" />
           </a>

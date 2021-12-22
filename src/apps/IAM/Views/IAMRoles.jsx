@@ -1,8 +1,6 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
@@ -47,7 +45,7 @@ const IAMRoles = ({ route }) => {
             setMaxPage(res?.obj?.maxpages);
           }
         })
-        .catch((err) => console.error(err));
+        .catch(() => {});
     } else {
       setRolesDB([]);
     }

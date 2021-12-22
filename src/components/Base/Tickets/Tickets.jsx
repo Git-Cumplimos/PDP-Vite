@@ -1,6 +1,5 @@
 import classes from "./Tickets.module.css";
 import LogoPDP from "../LogoPDP/LogoPDP";
-import { useEffect } from "react";
 
 const Tickets = ({
   setPrintDiv,

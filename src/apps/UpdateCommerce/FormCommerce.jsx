@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { toast } from "react-toastify";
 import Button from "../../components/Base/Button/Button";
 import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import Fieldset from "../../components/Base/Fieldset/Fieldset";
@@ -9,8 +8,9 @@ import Input from "../../components/Base/Input/Input";
 import MultipleInput from "../../components/Base/MultipleInput/MultipleInput";
 import Select from "../../components/Base/Select/Select";
 import LocationForm from "../../components/Compound/LocationForm/LocationForm";
-import { useAuth } from "../../utils/AuthHooks";
+import { useAuth } from "../../hooks/AuthHooks";
 import fetchData from "../../utils/fetchData";
+import { notify, notifyError } from "../../utils/notify";
 
 const url = process.env.REACT_APP_URL_ACTIVIDADES;
 
@@ -63,9 +63,13 @@ const FormCommerce = () => {
   const history = useHistory();
 
   useEffect(() => {
-    setCommerceId(roleInfo?.id_comercio ?? 0);
+    if (!roleInfo?.id_comercio) {
+      notifyError(`Comercio sin numero de id`);
+      history.replace("/");
+    }
+    setCommerceId(roleInfo?.id_comercio);
     fetchData(`${url_send}/review`, "GET", {
-      id_comercio: roleInfo?.id_comercio ?? 0,
+      id_comercio: roleInfo?.id_comercio,
     })
       .then((res) => {
         if (res?.status) {
@@ -111,30 +115,6 @@ const FormCommerce = () => {
       })
       .catch(() => {});
   }, [roleInfo, history]);
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const notifyError = (msg) => {
-    toast.warn(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
 
   const onSubmit = async (event) => {
     event.preventDefault();
