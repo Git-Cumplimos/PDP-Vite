@@ -224,30 +224,13 @@ const allUrlsPrivateApps = [
 ];
 
 const privateUrls = [
-  { link: "/", label: "Inicio", component: Home, props: {} },
-  {
-    link: "/info",
-    label: "Informacion general",
-    component: emptyComp,
-    props: {},
-  },
-  { link: "/gestion", label: "Gestion", component: emptyComp, props: {} },
-  { link: "/reportes", label: "Reportes", component: emptyComp, props: {} },
-  {
-    link: "/seguridad",
-    label: "Seguridad",
-    component: emptyComp,
-    props: {},
-  },
-  {
-    link: "/solicitudes",
-    label: "Tus solicitudes",
-    component: emptyComp,
-    props: {},
-  },
-  {
-    label: <AuthButton />,
-  },
+  { link: "/", label: "Inicio", component: Home },
+  { link: "/info", label: "Informacion general", component: emptyComp },
+  { link: "/gestion", label: "Gestion", component: emptyComp },
+  { link: "/reportes", label: "Reportes", component: emptyComp },
+  { link: "/seguridad", label: "Seguridad", component: emptyComp },
+  { link: "/solicitudes", label: "Tus solicitudes", component: emptyComp },
+  { label: <AuthButton /> },
 ];
 
 export { allUrlsPrivateApps, privateUrls, publicUrls };
