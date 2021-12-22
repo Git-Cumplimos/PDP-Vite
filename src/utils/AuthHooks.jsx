@@ -523,7 +523,7 @@ export const useProvideAuth = () => {
               comision: quota["comisiones"],
               cod_oficina_lot: resp_cod.cod_oficina_lot,
               cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-              ciudad: resp_ciudad[0].municipio,
+              ciudad: resp_[0].municipio,
             });
           }
         }
