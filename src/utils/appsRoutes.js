@@ -74,18 +74,8 @@ const DESCARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU";
 
 const publicUrls = [
-  {
-    link: "/login",
-    label: "Login",
-    component: Login,
-    props: {},
-  },
-  {
-    link: "*",
-    exact: false,
-    component: Error404,
-    props: {},
-  },
+  { link: "/login", label: "Login", component: Login },
+  { link: "*", exact: false, component: Error404 },
 ];
 
 const allUrlsPrivateApps = [
