@@ -414,12 +414,13 @@ export const useProvideLoteria = () => {
 
   const makePayment2 = useCallback(
     async (sorteo, billete, serie, fracciones_fisi) => {
+      console.log(fracciones_fisi)
       try {
         const res = await fetchData(urls.premiofisico, "GET", {
           num_sorteo: sorteo,
           bill_ganador: billete,
           serie_ganadora: serie,
-          cant_fracciones: fracciones_fisi,
+          fracciones_fisi: fracciones_fisi,
         });
         return res;
       } catch (err) {
@@ -445,7 +446,7 @@ export const useProvideLoteria = () => {
         serie_ganadora: serie,
         cod_seguridad: hash,
         direccion: customer.direccion,
-        cod_dane_ciudad: "12", ////////////////////////////////////#########################
+        cod_dane_ciudad: roleInfo.codigo_dane,
         celular: parseInt(phone),
         valorganado: respagar["valor ganado"],
         valor17percent: respagar["valor 17percent"],
@@ -455,7 +456,8 @@ export const useProvideLoteria = () => {
         identificacion: customer.doc_id,
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
-        tipo_comercio:roleInfo.tipo_comercio
+        tipo_comercio:roleInfo.tipo_comercio,
+        cod_distribuidor: roleInfo.cod_oficina_lot,
       };
       try {
         const res = await fetchData(urls.pagopremio, "POST", {}, req);
@@ -470,7 +472,7 @@ export const useProvideLoteria = () => {
   );
 
   const pagopremiofisico = useCallback(
-    async (sorteo, billete, serie, customer2, respagar) => {
+    async (sorteo, billete, serie, customer2, respagar,fracciones) => {
       const req = {
 
         
@@ -479,7 +481,7 @@ export const useProvideLoteria = () => {
           bill_ganador: billete,
           serie_ganadora: serie,
           direccion:customer2.direccion,
-          cod_dane_ciudad: "12",////////////////////////////////////#########################
+          cod_dane_ciudad: roleInfo.codigo_dane,
           celular: customer2.telefono,
           valorganado: respagar['valor ganado'],
           valor17percent: respagar['valor 17percent'],
@@ -487,10 +489,11 @@ export const useProvideLoteria = () => {
           valorbruto: respagar['valor bruto'],
           tipo:parseInt(respagar.Tipo),
           identificacion: customer2.doc_id,
-          fraciones:customer2.fracciones,
+          fraciones:fracciones,
           id_comercio: roleInfo.id_comercio,
           id_usuario: roleInfo.id_usuario,
-          tipo_comercio:"OFICINAS PROPIAS"//roleInfo.tipo_comercio
+          tipo_comercio:roleInfo.tipo_comercio,
+          cod_distribuidor: roleInfo.cod_oficina_lot,
       
       };
       
@@ -543,9 +546,11 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-  const cargueVentasExtra_S3 = useCallback(async () => {
+  const cargueVentasExtra_S3 = useCallback(async (tip_sorteo) => {
     try {
-      const res = await fetchData(urls.cargueVentasExtra_S3, "GET", {});
+      const res = await fetchData(urls.cargueVentasExtra_S3, "GET", {
+        tip_sorteo:tip_sorteo
+      });
       console.log(res)
       return res;
     } catch (err) {

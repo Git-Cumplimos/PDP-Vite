@@ -42,29 +42,6 @@ const SendFormFisico = ({
     // const [frac3, setFrac3] = useState(false);
     
     // console.log(frac1,frac2,frac3)
-  
-    const params = (number) => {
-    
-    let resp=number
-    
-    if(canFrac===1){
-      resp=number
-           
-    }
-    if(canFrac===2 && number.length>1 && resp[1]!==',' ){
-      resp=resp[0]+","+resp[1]
-      
-    }
-    if(canFrac===3 && number.length>2 && resp[1]!==',' ){
-      resp=resp[0]+","+resp[1]+","+resp[2]    
-      
-    }
-    
-    return resp;  
-    
-      
-       
-  };
 
   const [disabledBtns, setDisabledBtns] = useState(false);
 
@@ -91,56 +68,6 @@ const SendFormFisico = ({
         })}
       </div>
       <div className="flex flex-col justify-center items-center mx-auto container">
-          {/* <form grid>
-            <p>Fracciones: </p>
-            <div>
-                <input type="checkbox" id="frac1" value={frac1} onChange={() => {
-                setFrac1(!frac1)}}/> <label for="frac1">1</label>
-
-                <input type="checkbox" id="frac2" value={frac2} onChange={() => {
-                setFrac2(!frac2)}}/> <label for="frac2">2</label>
-
-                <input type="checkbox" id="frac3" value={frac3} onChange={() => {
-                setFrac3(!frac3)}}/> <label for="frac3">3</label>
-            </div>
-          </form> */}
-          <Input
-            id="frac"
-            label="Fracciones:"
-            type="text"
-            maxLength={`${(canFrac-1)*2 + 1}`}
-            minLengt={`${(canFrac-1)*2 + 1}`}
-            value={fracciones}
-            onInput={(e) => {
-              
-              const cus = {
-                doc_id,
-                primer_nombre,
-                segundo_nombre,
-                primer_apellido,
-                segundo_apellido,
-                direccion,
-                telefono,
-                fracciones,
-            
-              };
-                
-              if((parseInt(e.target.value[e.target.value.length-1])>3)||(parseInt(e.target.value[e.target.value.length-1])<1)){
-                  
-              }else{
-                cus.fracciones =params(e.target.value); 
-                if(isNaN(cus.fracciones[0])===true || (parseInt(cus.fracciones[0])<1 || parseInt(cus.fracciones[0])>3)){
-                  cus.fracciones=''
-              }if(cus.fracciones.length>2 && (isNaN(cus.fracciones[2])===true || (parseInt(cus.fracciones[2])<1 || parseInt(cus.fracciones[2])>3) )){
-                  cus.fracciones=''
-              }if(cus.fracciones.length>3 && (isNaN(cus.fracciones[4])===true || (parseInt(cus.fracciones[4])<1 || parseInt(cus.fracciones[4])>3))){
-                cus.fracciones=''
-              }               
-            
-              setCustomer({ ...cus });  
-              } 
-            }}
-          />
         <Form onSubmit={onSubmit} grid>
           {selected["Tipo"]===2 ? 
           (<>

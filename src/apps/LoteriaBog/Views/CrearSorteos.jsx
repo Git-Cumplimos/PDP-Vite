@@ -8,6 +8,7 @@ import Modal from "../../../components/Base/Modal/Modal";
 import SortForm from "../components/SortForm/SortForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 import SubPage from "../../../components/Base/SubPage/SubPage";
+import { useAuth } from "../../../utils/AuthHooks";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_accessKeyId,
@@ -16,7 +17,7 @@ AWS.config.update({
 
 const CrearSorteos = ({ route }) => {
   const { label } = route;
-
+  const { notifyError, notify } = useAuth();
   const { ConsultaCrearSort, cargueVentasExtra_S3 } = useLoteria();
   const [resp_con, setResp_con] = useState(null);
   const [tip_sorteo, setTip_sorteo] = useState(null);
@@ -31,11 +32,22 @@ const CrearSorteos = ({ route }) => {
       console.log(res);
       setResp_con(res);
     });
-  }, [setResp_con]);
+  }, [cargueVentasExtra_S3,cargueVentasExtra_S3]);
 
-  const S3 = (e) => {
+  const S3_Extra = (e) => {
     // e.preventDefault();
-    cargueVentasExtra_S3().then((res) => {
+    cargueVentasExtra_S3(2).then((res) => {
+      if (res.estado === true) {
+        notify(res.msg);
+      } else {
+        notifyError(res.msg);
+      }
+    });
+  };
+
+  const S3_Ordi = (e) => {
+    // e.preventDefault();
+    cargueVentasExtra_S3(1).then((res) => {
       if (res.estado === true) {
         notify(res.msg);
       } else {
@@ -68,29 +80,29 @@ const CrearSorteos = ({ route }) => {
     setShowModal(true);
   };
 
-  const notifyError = (msg) => {
-    toast.error(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  // const notifyError = (msg) => {
+  //   toast.error(msg, {
+  //     position: "top-center",
+  //     autoClose: 5000,
+  //     hideProgressBar: false,
+  //     closeOnClick: true,
+  //     pauseOnHover: true,
+  //     draggable: true,
+  //     progress: undefined,
+  //   });
+  // };
 
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  // const notify = (msg) => {
+  //   toast.info(msg, {
+  //     position: "top-center",
+  //     autoClose: 5000,
+  //     hideProgressBar: false,
+  //     closeOnClick: true,
+  //     pauseOnHover: true,
+  //     draggable: true,
+  //     progress: undefined,
+  //   });
+  // };
   console.log(resp_con?.ordinario?.num_loteria);
   return (
     <SubPage label={label}>
@@ -100,7 +112,7 @@ const CrearSorteos = ({ route }) => {
             <Button
               type="button"
               onClick={() => {
-                S3();
+                S3_Extra();
               }}
             >
               Cerrar sorteo extraordinario
@@ -115,7 +127,7 @@ const CrearSorteos = ({ route }) => {
             <Button
               type="button"
               onClick={() => {
-                S3();
+                S3_Ordi();
               }}
             >
               Cerrar sorteo ordinario

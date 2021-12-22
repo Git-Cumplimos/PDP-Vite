@@ -13,7 +13,14 @@ import PagarForm from "../components/SendForm/PagarForm";
 import PagarFormFisico from "../components/SendForm/PagarFormFisico"
 import PagoResp from "../components/SellResp/PagoResp";
 
-const Premios = () => {
+import SubPage from "../../../components/Base/SubPage/SubPage";
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
+const Premios = ({route}) => {
+  const { label } = route;
   const {
     infoLoto: {
       pagoresponse,
@@ -79,6 +86,9 @@ const Premios = () => {
 
   const { isWinner, makePayment, makePayment2, pagopremio, pagopremiofisico} = useLoteria();
 
+  const [fracbill, setFracbill] = useState([]);
+  const [selecFrac, setSelecFrac] = useState([]);
+
   const notify = (msg) => {
     toast.info(msg, {
       position: "top-center",
@@ -109,7 +119,8 @@ const Premios = () => {
     e.preventDefault();
     isWinner(sorteo, billete, serie)
       .then((res) => {
-        console.log(res)
+        fracbill.length=0;
+        
         setDisabledBtns(false);
         
         
@@ -130,9 +141,13 @@ const Premios = () => {
             setIsSelf(true);
         }else{
           notify("Ganador con billete físico");
+          for(var i = 0; i<res[0].cantidad_frac_billete; i++){ 
+            fracbill.push(i+1)
+          }
           setTipopago(res[0]['Tipo'])
+          setCheckedState(new Array(res[0].cantidad_frac_billete).fill(false))
           setWinner(true);
-          setIsSelf(false);  
+          setIsSelf(false);
         }
         }
       })
@@ -153,7 +168,7 @@ const Premios = () => {
           notifyError(res.msg);
         } else {
           if(res?.Tipo===0){
-            notifyError('El valor a pagar supera la capacidad de la oficina $'+res['valor ganado']);
+            notifyError('El valor a pagar supera la capacidad de la oficina '+formatMoney.format(res['valor ganado']));
           }else{}
         }
       })
@@ -165,17 +180,18 @@ const Premios = () => {
     setDisabledBtns(true);
     e.preventDefault();
 
-    makePayment2(sorteo, billete, serie, fracciones_fisi)
+    makePayment2(sorteo, billete, serie, selecFrac)
       .then((res) => {
         setShowModal(true);
         setDisabledBtns(false);
         setRespagar(res)
+        console.log(res)
         
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
           if(res?.Tipo===0){
-            notifyError('El valor a pagar supera la capacidad de la oficina: $'+res['valor ganado']);
+            notifyError('El valor a pagar supera la capacidad de la oficina: '+formatMoney.format(res['valor ganado']));
           }else{}
         }
       })
@@ -183,8 +199,31 @@ const Premios = () => {
       .catch(() => setDisabledBtns(false));
   };
   
+  const [checkedState, setCheckedState] = useState();
+  
+  
+
+  const handleOnChange = (position) => {
+    
+    selecFrac.length=0;
+    const updatedCheckedState = checkedState.map((item, frac) =>
+        
+      (frac) === (position) ? !item : item
+    );
+  
+    setCheckedState(updatedCheckedState);
+
+    for(var i = 0; i<fracbill.length; i++){
+        
+        if(updatedCheckedState[i]===true){
+            selecFrac.push(fracbill[i])
+            
+        }
+    }   
+  }
+  
   return (
-    <>
+    <SubPage label={label}>
       <Form onSubmit={onSubmit} grid>
         <Input
           id="numSorteo"
@@ -234,7 +273,7 @@ const Premios = () => {
               }
           }}
         />
-        <ButtonBar className="col-auto md:col-span-2">
+        <ButtonBar className="lg:col-span-2">
           <Button type="submit" disabled={disabledBtns}>
             Consultar
           </Button>
@@ -282,28 +321,33 @@ const Premios = () => {
         </Form>
         ):
         <Form onSubmit={onPay2} grid>
-          <>
+          
             {/* <h2>Este numero no fue vendido por Punto de pago, solicite el billete</h2> */}
-            <Input
-              id="frac"
-              label="Numero de fracciones"
-              type="number"
-              max='3'
-              min='1'
-              autoComplete="off"
-              required
-              value={fracciones_fisi}
-              onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setFracciones_fisi(num);
-              }}
-            />  
-          </>
-          <ButtonBar className="col-auto md:col-span-2">
+          
+            {fracbill.map((frac,index) => {
+                 
+                 return (
+                 <Input
+                  id={frac}
+                  label={`Fracción ${frac}:`}
+                  type="checkbox"
+                  value={frac}     
+                  checked={checkedState[index]}
+                  onChange={() => handleOnChange(index)}
+                  />
+                  )
+                 
+                })}          
+              
+          
+            {selecFrac.length>=1?
+            <ButtonBar className="col-auto md:col-span-2">
             <Button type="submit" disabled={disabledBtns}>
-              Pagar
+            Pagar
             </Button>
-          </ButtonBar>
+            </ButtonBar>:
+            ""}
+          
         </Form>
         }
         </>
@@ -341,7 +385,7 @@ const Premios = () => {
               setCustomer={setCustomer}
               closeModal={closeModal}
               handleSubmit={() => {
-                pagopremiofisico(sorteo, billete, serie, customer,respagar);
+                pagopremiofisico(sorteo, billete, serie, customer,respagar,selecFrac);
                 setSorteo('')
                 setBillete('')
                 setSerie('')
@@ -366,8 +410,8 @@ const Premios = () => {
         
       </Modal>
       </>: ""}
-      
-    </>
+    </SubPage>  
+    
   );
 };
 

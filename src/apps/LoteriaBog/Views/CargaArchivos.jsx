@@ -33,8 +33,15 @@ const CargaArchivos = ({ route }) => {
     { value: "Ordinario/", label: "Sorteo Ordinario" },
     { value: "Extra/", label: "Sorteo Extraordinario" },
   ];
+
+  const optionsFisiVir = [
+    { value: "", label: "" },
+    { value: "Fisico/", label: "Asignación Fisica" },
+    { value: "Virtual/", label: "Asignación Virtual" },
+  ];
   const [archivo, setArchivo] = useState("");
   const [tipoSorteo, setTipoSorteo] = useState("");
+  const [fisiVirtual, setFisiVirtual] = useState("");
   const [file, setFile] = useState("");
   const [fileName, setFileName] = useState("");
 
@@ -49,7 +56,7 @@ const CargaArchivos = ({ route }) => {
     params: { Bucket: S3_BUCKET },
     region: REGION,
   });
-  console.log(`${tipoSorteo}${archivo}/`);
+  console.log(`${tipoSorteo}${archivo}/${fisiVirtual}`);
   const saveFile = () => {
     setDisabledBtns(true);
     const f = new Date();
@@ -57,7 +64,7 @@ const CargaArchivos = ({ route }) => {
       ACL: "public-read",
       Body: file,
       Bucket: S3_BUCKET,
-      Key: `${tipoSorteo}${archivo}/${f.getDate()}${
+      Key: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
         f.getMonth() + 1
       }${f.getFullYear()}${fileName}`,
     };
@@ -161,12 +168,13 @@ const CargaArchivos = ({ route }) => {
             setArchivo(e.target.value);
             setProgress(0);
             setTipoSorteo("");
+            setFisiVirtual("");
           }}
         />
         {archivo === "PlanDePremios" || archivo === "Asignacion" ? (
           <Select
             id="tip_sorteo"
-            label={`Que sorteo asignar a ${archivo}`}
+            label={`Tipo de sorteo para ${archivo}`}
             options={optionsTipoSorteo}
             disabled={progress !== 0 && progress !== 100}
             value={tipoSorteo}
@@ -177,10 +185,25 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
+        {archivo === "Asignacion" && tipoSorteo !== ""?(
+          <Select
+            id="FisiVir"
+            label={`Asignación fisica o Virtual`}
+            options={optionsFisiVir}
+            disabled={progress !== 0 && progress !== 100}
+            value={fisiVirtual}
+            onChange={(e) => {
+              setFisiVirtual(e.target.value);
+            }}
+          />
+        ) : (
+          ""
+        )}
         {(archivo !== "" &&
           archivo !== "PlanDePremios" &&
           archivo !== "Asignacion") ||
-        tipoSorteo !== "" ? (
+          (archivo == "PlanDePremios" && tipoSorteo !== "")||
+          fisiVirtual!=='' ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <Input
               id={`archivo_${archivo}`}

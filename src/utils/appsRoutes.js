@@ -8,6 +8,7 @@ import ACTUALIZACION from "../assets/svg/ActualizacionDeDatos.svg";
 import LOTERIA from "../assets/svg/LOTERIA-DE-BOGOTA-01.svg";
 import SORTEOS from "../assets/svg/SORTEO-01.svg";
 import REPORTE from "../assets/svg/REPORTES-01.svg";
+import PAGO from "../assets/svg/PAGO-01.svg"; 
 
 /**
  * * Paginas
@@ -29,6 +30,7 @@ import Loteria from "../apps/LoteriaBog/Views/Loteria";
 import DescargarArchivosS3 from "../apps/LoteriaBog/Views/DescargarArchivosS3";
 import CrearSorteos from "../apps/LoteriaBog/Views/CrearSorteos";
 import CargaArchivos from "../apps/LoteriaBog/Views/CargaArchivos";
+import Premios from "../apps/LoteriaBog/Views/Premios";
 
 /**
  * Marketplace
@@ -124,6 +126,13 @@ const allUrlsPrivateApps = [
         component: CrearSorteos,
         extern: false,
         permission: [5],
+      },
+      {
+        link: "/loteria-de-bogota/premios",
+        label: <AppIcons Logo={PAGO} name="Premios" />,
+        component: Premios,
+        extern: false,
+        permission: [5],///////////////////////////////////////////////////////////////////
       },
     ],
   },
