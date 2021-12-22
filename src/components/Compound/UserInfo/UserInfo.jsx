@@ -1,4 +1,4 @@
-import { useAuth } from "../../../utils/AuthHooks";
+import { useAuth } from "../../../hooks/AuthHooks";
 import classes from "./UserInfo.module.css";
 
 const UserInfo = () => {

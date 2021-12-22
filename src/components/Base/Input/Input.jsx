@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { useAuth } from "../../../utils/AuthHooks";
+import { notifyError } from "../../../utils/notify";
 import classes from "./Input.module.css";
 
 const Input = ({
@@ -18,8 +18,6 @@ const Input = ({
 
   const inputRef = useRef(null);
   const dropZoneRef = useRef(null);
-
-  const { notifyError } = useAuth();
 
   const showDropZone = useCallback(() => {
     if (
@@ -85,7 +83,7 @@ const Input = ({
 
       onGetFile?.([...tempFiles]);
     },
-    [onGetFile, hideDropZone, notifyError]
+    [onGetFile, hideDropZone]
   );
 
   if (type === "file") {

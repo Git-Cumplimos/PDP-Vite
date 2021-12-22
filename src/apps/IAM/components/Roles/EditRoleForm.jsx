@@ -5,8 +5,8 @@ import Form from "../../../../components/Base/Form/Form";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
 import Table from "../../../../components/Base/Table/Table";
 import Pagination from "../../../../components/Compound/Pagination/Pagination";
-import { useAuth } from "../../../../utils/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -15,8 +15,6 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
   const [permisosDB, setPermisosDB] = useState([]);
 
   const [maxPage, setMaxPage] = useState(1);
-
-  const { notify, notifyError } = useAuth();
 
   const searchPermissions = useCallback((uname, _page) => {
     const queries = { limit: 5 };
@@ -71,7 +69,7 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
     } catch (err) {
       notifyError(err);
     }
-  }, [notifyError]);
+  }, []);
 
   useEffect(() => {
     searchPermissionsByRole(selected?.edit?.id_role).then((res) => {

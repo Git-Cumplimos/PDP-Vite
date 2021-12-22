@@ -4,7 +4,7 @@ import Form from "../../../../components/Base/Form/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { useState } from "react";
 import {toast}  from "react-toastify";
-//import { useAuth } from "../../../../utils/AuthHooks";
+//import { useAuth } from "../../../../hooks/AuthHooks";
 
 const VeriSortForm = ({
 

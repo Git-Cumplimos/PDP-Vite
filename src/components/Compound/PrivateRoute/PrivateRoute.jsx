@@ -1,5 +1,5 @@
 import { Redirect, Route } from "react-router-dom";
-import { useAuth } from "../../../utils/AuthHooks";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 const PrivateRoute = ({ children, ...rest }) => {
   const { isSignedIn } = useAuth();

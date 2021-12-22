@@ -4,15 +4,13 @@ import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
 import Select from "../../../../components/Base/Select/Select";
-import { useAuth } from "../../../../utils/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const url_types = process.env.REACT_APP_URL_TYPES_FORM_COMMERCE;
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
 const UserForm = ({ onCloseModal }) => {
-  const { notify, notifyError } = useAuth();
-
   const makeForm = useMemo(() => {
     const temp = { "": "" };
     fetchData(`${url_types}/type-doc`, "GET", {}, {})
@@ -46,7 +44,7 @@ const UserForm = ({ onCloseModal }) => {
       Telefono: {},
       Direccion: {},
     };
-  }, [notifyError]);
+  }, []);
 
   const onSubmit = (e) => {
     e.preventDefault();

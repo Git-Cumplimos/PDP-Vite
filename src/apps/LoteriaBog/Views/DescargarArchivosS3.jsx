@@ -8,7 +8,7 @@ import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import DescargaForm from "../components/DescargaForm/DescargaForm";
 import SubPage from "../../../components/Base/SubPage/SubPage";
-import { useAuth } from "../../../utils/AuthHooks";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 const DescargarArchivosS3 = ({ route }) => {
   const { label } = route;

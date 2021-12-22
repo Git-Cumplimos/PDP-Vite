@@ -7,7 +7,7 @@ import Select from "../components/Base/Select/Select";
 import Table from "../components/Base/Table/Table";
 import Input from "../components/Base/Input/Input";
 import fetchData from "../utils/fetchData";
-import { useAuth } from "../utils/AuthHooks";
+import { useAuth } from "../hooks/AuthHooks";
 import Tickets from "../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
 

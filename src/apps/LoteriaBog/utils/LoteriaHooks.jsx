@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useAuth } from "../../../utils/AuthHooks";
+import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 //import Loteria from "../Views/Loteria";
 

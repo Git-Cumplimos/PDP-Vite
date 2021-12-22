@@ -1,5 +1,5 @@
 import { useHistory } from "react-router-dom";
-import { useAuth } from "../../../utils/AuthHooks";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 const AuthButton = () => {
   const auth = useAuth();

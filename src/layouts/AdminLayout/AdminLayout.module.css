@@ -1,0 +1,50 @@
+.adminLayout {
+  @apply relative;
+}
+
+.adminLayout > .wave {
+  /* z-index: -10; */
+  @apply hidden md:block absolute overflow-x-visible right-0 top-4;
+}
+
+.adminLayout > .hide {
+  @apply hidden lg:block;
+}
+
+.adminLayout > main {
+  @apply mx-auto px-4 md:px-8 pb-4 md:pb-8;
+}
+
+
+header.headerPDP {
+  @apply flex flex-col justify-center items-center px-2 md:px-4;
+}
+
+header.headerPDP > .topHeader {
+  @apply flex flex-row flex-wrap items-center justify-center;
+}
+
+header.headerPDP .usrData {
+  @apply flex flex-row flex-wrap items-center justify-center px-0 md:px-4 py-4 gap-0;
+}
+
+header.headerPDP .usrData > .saldoCupo {
+  max-width: 8.75rem;
+  @apply rounded-full px-6 bg-primary text-white mx-2 text-center;
+}
+
+header.headerPDP .usrData > .comision {
+  max-width: 8.75rem;
+  @apply rounded-full px-6 bg-primary-light text-white mx-2 text-center;
+}
+
+header.headerPDP .usrData > .cargar {
+  max-width: 8.75rem;
+  @apply rounded-full px-6 bg-secondary-dark text-white mx-2 text-center;
+}
+
+header.headerPDP .usrData > .saldoCupo,
+header.headerPDP .usrData > .comision,
+header.headerPDP .usrData > .cargar {
+  @apply my-2 md:my-0;
+}

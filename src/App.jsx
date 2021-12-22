@@ -1,44 +1,26 @@
-import Admin from "./layouts/Admin/Admin";
-import ProvideAuth from "./components/Compound/ProvideAuth/ProvideAuth";
-import ProvideUrls from "./components/Compound/ProvideUrls/ProvideUrls";
-
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-
 import Amplify from "aws-amplify";
 import awsconfig from "./aws-exports";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-import MessengerCustomerChat from "react-messenger-customer-chat";
+import { useAuth } from "./hooks/AuthHooks";
+import AdminLayout from "./layouts/AdminLayout/AdminLayout";
+import LoginLayout from "./layouts/LoginLayout/LoginLayout";
+import { Switch } from "react-router-dom";
+import { useUrls } from "./hooks/UrlsHooks";
 
 Amplify.configure(awsconfig);
 
 function App() {
-  const { pathname } = useLocation();
+  const { cognitoUser, isSignedIn } = useAuth();
+  const { allRoutes } = useUrls();
 
-  useEffect(() => {
-    if (pathname === "/login") {
-      document.body.classList.remove("loggedBackground");
-      document.body.classList.add("loginBackground");
-    } else {
-      document.body.classList.remove("loginBackground");
-      document.body.classList.add("loggedBackground");
-    }
-  }, [pathname]);
-
-  return (
-    <ProvideAuth>
-      <ProvideUrls>
-        <ToastContainer />
-        <Admin />
-        <MessengerCustomerChat
-          pageId="455201114671494"
-          appId="603779204002555"
-          language="es_LA"
-        />
-      </ProvideUrls>
-    </ProvideAuth>
+  return cognitoUser && isSignedIn ? (
+    <AdminLayout>
+      <Switch>{allRoutes}</Switch>
+    </AdminLayout>
+  ) : (
+    <LoginLayout>
+      <Switch>{allRoutes}</Switch>
+    </LoginLayout>
   );
 }
 
