@@ -8,37 +8,55 @@
   @apply text-xl md:w-full min-w-max;
 }
 
-.formItem > input {
+.formItem > .suggestion {
+  @apply relative;
+}
+
+.formItem > .suggestion > ul {
+  @apply hidden absolute top-full right-0 bg-gray-300 rounded-md cursor-pointer w-full;
+}
+
+.formItem > .suggestion > input:focus + ul,
+.formItem > .suggestion > ul:focus,
+.formItem > .suggestion > ul:active {
+  @apply block;
+}
+
+.formItem > .suggestion > ul > li {
+  @apply rounded-md px-4 py-2 text-black bg-transparent;
+}
+
+.formItem > .suggestion > ul > li:hover {
+  @apply bg-gray-600 text-gray-50;
+}
+
+.formItem > .suggestion > input {
   /* flex: 1 1 50%; */
   @apply px-4 py-2 rounded-md bg-secondary-light text-black md:w-full min-w-full md:min-w-max;
 }
 
-.formItem > input[type="number"] {
+.formItem > .suggestion > input[type="number"] {
   -moz-appearance: textfield;
 }
 
-.formItem > input[type="checkbox"] {
-  min-width: 100px;
-}
-
-.formItem > input:disabled {
+.formItem > .suggestion > input:disabled {
   @apply bg-gray-100;
 }
 
-.formItem > input[list]::-webkit-calendar-picker-indicator {
+.formItem > .suggestion > input[list]::-webkit-calendar-picker-indicator {
   width: 0;
   margin: 0;
   padding: 0;
   opacity: 0;
 }
 
-.formItem > input::-webkit-outer-spin-button,
-.formItem > input::-webkit-inner-spin-button {
+.formItem > .suggestion > input::-webkit-outer-spin-button,
+.formItem > .suggestion > input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.formItem > input::-webkit-search-cancel-button {
+.formItem > .suggestion > input::-webkit-search-cancel-button {
   -webkit-appearance: none;
   content: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-lg' viewBox='0 0 16 16'><path d='M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z'/></svg>");
   cursor: pointer;

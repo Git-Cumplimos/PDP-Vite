@@ -5,6 +5,7 @@ import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import Fieldset from "../../components/Base/Fieldset/Fieldset";
 import Form from "../../components/Base/Form/Form";
 import Input from "../../components/Base/Input/Input";
+import InputSuggestions from "../../components/Base/InputSuggestions/InputSuggestions";
 import MultipleInput from "../../components/Base/MultipleInput/MultipleInput";
 import Select from "../../components/Base/Select/Select";
 import LocationForm from "../../components/Compound/LocationForm/LocationForm";
@@ -134,12 +135,11 @@ const FormCommerce = () => {
           id_comercio: commerceId,
           Nombre_comercio: commerceName,
           Nombre_comercio_2: commerceName2,
-          Tipo_comercio:
-            roleInfo?.tipo_comercio?.includes("CRCS")
-              ? 2
-              : roleInfo?.tipo_comercio?.includes("CEAS")
-              ? 3
-              : 1,
+          Tipo_comercio: roleInfo?.tipo_comercio?.includes("CRCS")
+            ? 2
+            : roleInfo?.tipo_comercio?.includes("CEAS")
+            ? 3
+            : 1,
           Representante: {
             Nombre: legalRepName,
             Tipo_doc: legalRepIdType,
@@ -305,12 +305,33 @@ const FormCommerce = () => {
         <LocationForm place="comercio" location={commerceLocation} />
         <LocationForm place="residencia" location={homeLocation} />
         <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
-          <Input
-            id="actividades_ec"
-            label="Buscar tipo de negocio"
-            type="search"
-            disabled={commerceType.length === 3}
-            suggestions={foundActivities || []}
+          <InputSuggestions
+            id="actividades_ec2"
+            label={"Buscar tipo de negocio"}
+            type={"search"}
+            suggestions={
+              foundActivities.map((val) => {
+                const foundIdx = val
+                  .toLowerCase()
+                  .indexOf(actividad.toLowerCase());
+                if (foundIdx === -1) {
+                  return <h1 className="text-xs">{val}</h1>;
+                }
+                const str1 = val.substring(0, foundIdx);
+                const str2 = val.substring(
+                  foundIdx,
+                  foundIdx + actividad.length
+                );
+                const str3 = val.substring(foundIdx + actividad.length);
+                return (
+                  <h1 className="text-xs">
+                    {str1}
+                    <strong>{str2}</strong>
+                    {str3}
+                  </h1>
+                );
+              }) || []
+            }
             onSelectSuggestion={(index) => {
               const copy = [...commerceType];
               copy.push(foundActivities[index]);

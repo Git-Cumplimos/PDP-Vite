@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Modal from "../../../components/Base/Modal/Modal";
-import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import fetchData from "../../../utils/fetchData";
 import EditUserForm from "../components/Users/EditUserForm";
@@ -13,9 +12,7 @@ import Pagination from "../../../components/Compound/Pagination/Pagination";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
-const IAMUsers = ({ route }) => {
-  const { label } = route;
-
+const IAMUsers = () => {
   const [usuariosDB, setUsuariosDB] = useState([]);
   const [maxPage, setMaxPage] = useState(1);
   const [formData, setFormData] = useState(new FormData());
@@ -77,7 +74,7 @@ const IAMUsers = ({ route }) => {
   );
 
   return (
-    <SubPage label={label}>
+    <>
       <ButtonBar>
         <Button type={"button"} onClick={() => setShowModal(true)}>
           Nuevo usuario
@@ -164,7 +161,7 @@ const IAMUsers = ({ route }) => {
           <UserForm onCloseModal={onCloseModal} />
         )}
       </Modal>
-    </SubPage>
+    </>
   );
 };
 

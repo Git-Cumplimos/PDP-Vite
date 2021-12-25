@@ -1,6 +1,7 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import Button from "../../Base/Button/Button";
 import ButtonBar from "../../Base/ButtonBar/ButtonBar";
+import FileInput from "../../Base/FileInput/FileInput";
 import Form from "../../Base/Form/Form";
 import Input from "../../Base/Input/Input";
 import Select from "../../Base/Select/Select";
@@ -13,11 +14,9 @@ const Pagination = ({
 }) => {
   const [page, setPage] = useState(1);
 
-  const refFrom = useRef(null);
-
   const onChange = useCallback(
     (e, _page) => {
-      const form = refFrom.current;
+      const form = e.target.form;
       const formData = new FormData(form);
 
       if (_page && !isNaN(_page)) {
@@ -37,34 +36,46 @@ const Pagination = ({
         callback: onChange,
         timeOut: 300,
       }}
-      reff={refFrom}
       grid
     >
-      {Object.entries(filters).map(([key, { type, label, options = {}, ...rest }]) => {
-        if (options && Object.entries(options).length > 0) {
+      {Object.entries(filters).map(
+        ([key, { type, label, options = {}, ...rest }]) => {
+          if (options && Object.entries(options).length > 0) {
+            return (
+              <Select
+                key={`${key}_filter`}
+                id={`${key}_filter`}
+                name={key}
+                label={label}
+                options={options ?? { "": "" }}
+                {...rest}
+              />
+            );
+          }
+          if (type === "file") {
+            return (
+              <FileInput
+                key={`${key}_filter`}
+                id={`${key}_filter`}
+                name={key}
+                label={label}
+                {...rest}
+              />
+            );
+          }
           return (
-            <Select
+            <Input
               key={`${key}_filter`}
               id={`${key}_filter`}
               name={key}
               label={label}
-              options={options ?? { "": "" }}
+              type={type || "search"}
+              autoComplete="off"
               {...rest}
             />
           );
         }
-        return (
-          <Input
-            key={`${key}_filter`}
-            id={`${key}_filter`}
-            name={key}
-            label={label}
-            type={type || "search"}
-            autoComplete="off"
-            {...rest}
-          />
-        );
-      })}
+      )}
       {Object.entries(filters).length === 1 ? <ButtonBar></ButtonBar> : ""}
       {maxPage !== 1 && maxPage !== 0 ? (
         <ButtonBar className={`${lgButtons ? "lg:col-span-2" : ""}`}>

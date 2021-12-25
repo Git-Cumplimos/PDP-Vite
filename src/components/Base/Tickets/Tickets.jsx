@@ -2,7 +2,6 @@ import classes from "./Tickets.module.css";
 import LogoPDP from "../LogoPDP/LogoPDP";
 
 const Tickets = ({
-  setPrintDiv,
   refPrint,
   type = "ORIGINAL",
   ticket = {

@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Modal from "../../../components/Base/Modal/Modal";
-import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import Pagination from "../../../components/Compound/Pagination/Pagination";
 import fetchData from "../../../utils/fetchData";
@@ -11,9 +10,7 @@ import PolicyForm from "../components/Policies/PolicyForm";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
-const IAMPolicies = ({ route }) => {
-  const { label } = route;
-
+const IAMPolicies = () => {
   const [policiesDB, setPoliciesDB] = useState([]);
   const [formData, setFormData] = useState(new FormData());
 
@@ -84,7 +81,7 @@ const IAMPolicies = ({ route }) => {
   );
 
   return (
-    <SubPage label={label}>
+    <>
       <ButtonBar>
         <Button type={"button"} onClick={() => setShowModal(true)}>
           Nueva politica
@@ -124,7 +121,7 @@ const IAMPolicies = ({ route }) => {
           <PolicyForm onCloseModal={onCloseModal} />
         )}
       </Modal>
-    </SubPage>
+    </>
   );
 };
 

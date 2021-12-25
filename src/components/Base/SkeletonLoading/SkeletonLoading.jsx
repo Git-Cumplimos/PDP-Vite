@@ -43,9 +43,9 @@ const SkeletonLoading = () => {
             {/* Upper nav */}
             {Array(8)
               .fill(0)
-              .map(() => {
+              .map((_, ind) => {
                 return (
-                  <li>
+                  <li key={ind}>
                     <span className={textClsSm} />
                   </li>
                 );

@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Modal from "../../../components/Base/Modal/Modal";
-import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import Pagination from "../../../components/Compound/Pagination/Pagination";
 import fetchData from "../../../utils/fetchData";
@@ -11,9 +10,7 @@ import PermissionForm from "../components/Permissions/PermissionForm";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
-const IAMPermissions = ({ route }) => {
-  const { label } = route;
-
+const IAMPermissions = () => {
   const [permisosDB, setPermisosDB] = useState([]);
   const [maxPage, setMaxPage] = useState(1);
   const [formData, setFormData] = useState(new FormData());
@@ -60,7 +57,7 @@ const IAMPermissions = ({ route }) => {
   );
 
   return (
-    <SubPage label={label}>
+    <>
       <ButtonBar>
         <Button type={"button"} onClick={() => setShowModal(true)}>
           Nuevo permiso
@@ -106,7 +103,7 @@ const IAMPermissions = ({ route }) => {
           <PermissionForm onCloseModal={onCloseModal} />
         )}
       </Modal>
-    </SubPage>
+    </>
   );
 };
 

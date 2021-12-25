@@ -1,8 +1,13 @@
 import { createContext, useContext, useMemo } from "react";
 import { Route } from "react-router-dom";
 import { useAuth } from "./AuthHooks";
-import { allUrlsPrivateApps, privateUrls, publicUrls } from "../utils/appsRoutes";
+import {
+  allUrlsPrivateApps,
+  privateUrls,
+  publicUrls,
+} from "../utils/appsRoutes";
 import PrivateRoute from "../components/Compound/PrivateRoute/PrivateRoute";
+import SubPage from "../components/Base/SubPage/SubPage";
 
 const getAllRoutes = (urls) => {
   const allUrls = [];
@@ -24,7 +29,7 @@ const getAllRoutes = (urls) => {
   return allUrls;
 };
 
-const toRoute = (urls, Wrapper = PrivateRoute) => {
+const toRoute = (urls, Wrapper = PrivateRoute, SubWrapper) => {
   if (!Array.isArray(urls)) {
     return [];
   }
@@ -43,7 +48,7 @@ const toRoute = (urls, Wrapper = PrivateRoute) => {
         component: Component,
         props,
         exact,
-        subRoutes,
+        subRoutes = false,
         label,
         provider: Provider,
       }) => {
@@ -52,8 +57,26 @@ const toRoute = (urls, Wrapper = PrivateRoute) => {
           <Wrapper key={link} path={link} exact={exact}>
             {Provider ? (
               <Provider>
-                <Component subRoutes={subRoutes} route={{ label }} {...props} />
+                {SubWrapper ? (
+                  <SubWrapper label={label}>
+                    <Component
+                      subRoutes={subRoutes}
+                      route={{ label }}
+                      {...props}
+                    />
+                  </SubWrapper>
+                ) : (
+                  <Component
+                    subRoutes={subRoutes}
+                    route={{ label }}
+                    {...props}
+                  />
+                )}
               </Provider>
+            ) : SubWrapper ? (
+              <SubWrapper label={label}>
+                <Component subRoutes={subRoutes} route={{ label }} {...props} />
+              </SubWrapper>
             ) : (
               <Component subRoutes={subRoutes} route={{ label }} {...props} />
             )}
@@ -88,7 +111,7 @@ const filterPermissions = (urls, userAccess) => {
       filteredUrls[key].subRoutes = filterPermissions(subRoutes, userAccess);
     }
   }
-  
+
   return filteredUrls;
 };
 
@@ -117,7 +140,7 @@ export const useProvideUrls = () => {
   const allRoutes = useMemo(() => {
     return [
       ...toRoute(privateUrls),
-      ...toRoute(urlsPrivateApps),
+      ...toRoute(urlsPrivateApps, PrivateRoute, SubPage),
       ...toRoute(publicUrls, Route),
     ];
   }, [urlsPrivateApps]);
