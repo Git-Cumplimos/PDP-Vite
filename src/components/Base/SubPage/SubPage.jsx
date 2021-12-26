@@ -1,8 +1,8 @@
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../Button/Button";
 
 const SubPage = ({ label, children }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col md:flex-row justify-evenly w-full">
       <div className="flex flex-col">
@@ -10,7 +10,7 @@ const SubPage = ({ label, children }) => {
           {label}
         </div>
         <div>
-          <Button type={"button"} onClick={history.goBack}>
+          <Button type={"button"} onClick={() => navigate(-1)}>
             Volver
           </Button>
         </div>

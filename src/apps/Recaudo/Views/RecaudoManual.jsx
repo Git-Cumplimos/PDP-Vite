@@ -14,7 +14,7 @@ const initOpts = {
 };
 
 const RecaudoManual = () => {
-  const { id_convenio } = useQuery();
+  const [{ id_convenio }] = useQuery();
 
   const [opts, setOpts] = useState(null);
   const [foundRefs, setFoundRefs] = useState(null);
@@ -23,7 +23,7 @@ const RecaudoManual = () => {
     setFoundRefs(initFounds);
     setOpts(initOpts);
   }, []);
-  
+
   return <FlujoRecaudo opts={opts} foundRefs={foundRefs} />;
 };
 

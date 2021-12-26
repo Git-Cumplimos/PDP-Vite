@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/Base/Button/Button";
 import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import Fieldset from "../../components/Base/Fieldset/Fieldset";
@@ -61,12 +61,12 @@ const FormCommerce = () => {
 
   const { roleInfo } = useAuth();
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!roleInfo?.id_comercio) {
       notifyError(`Comercio sin numero de id`);
-      history.replace("/");
+      navigate("/", { replace: true });
     }
     setCommerceId(roleInfo?.id_comercio);
     fetchData(`${url_send}/review`, "GET", {
@@ -82,7 +82,7 @@ const FormCommerce = () => {
                 day: "numeric",
               }).format(new Date(res?.obj.fecha_update))}`
             );
-            history.replace("/");
+            navigate("/", { replace: true });
           }
         } else {
           notifyError(res?.msg);
@@ -115,7 +115,7 @@ const FormCommerce = () => {
         }
       })
       .catch(() => {});
-  }, [roleInfo, history]);
+  }, [roleInfo, navigate]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -189,7 +189,7 @@ const FormCommerce = () => {
       );
       if (_res?.status) {
         notify("Formulario subido exitosamente");
-        history.replace("/");
+        navigate("/", { replace: true });
       } else {
         notifyError(`Error al subir el formulario: ${_res?.msg}`);
       }

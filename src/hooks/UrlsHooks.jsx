@@ -29,17 +29,54 @@ const getAllRoutes = (urls) => {
   return allUrls;
 };
 
-const toRoute = (urls, Wrapper = PrivateRoute, SubWrapper) => {
+const toRoute = (urls, isPrivate = true, SubWrapper) => {
   if (!Array.isArray(urls)) {
-    return [];
-  }
-  if (!Wrapper) {
     return [];
   }
 
   const allurls = getAllRoutes(urls);
 
-  return allurls
+  const routes = allurls
+    .filter(({ link }) => !(link === undefined || link === null))
+    .filter(({ extern }) => !extern)
+    .map(
+      ({
+        link,
+        component: Page,
+        props,
+        exact,
+        subRoutes = false,
+        label,
+        provider: Provider,
+      }) => {
+        exact = exact === undefined ? true : exact;
+        const pageWrapper = SubWrapper ? (
+          <SubWrapper label={label}>
+            <Page subRoutes={subRoutes} route={{ label }} {...props} />
+          </SubWrapper>
+        ) : (
+          <Page subRoutes={subRoutes} route={{ label }} {...props} />
+        );
+        const routeChild = Provider ? (
+          <Provider>{pageWrapper}</Provider>
+        ) : (
+          pageWrapper
+        );
+        const routeElement = isPrivate ? (
+          <PrivateRoute>{routeChild}</PrivateRoute>
+        ) : (
+          routeChild
+        );
+
+        return (
+          <Route key={link} path={link} exact={exact} element={routeElement} />
+        );
+      }
+    );
+
+  return routes;
+
+  /* return allurls
     .filter(({ link }) => !(link === undefined || link === null))
     .filter(({ extern }) => !extern)
     .map(
@@ -53,37 +90,34 @@ const toRoute = (urls, Wrapper = PrivateRoute, SubWrapper) => {
         provider: Provider,
       }) => {
         exact = exact === undefined ? true : exact;
-        return (
-          <Wrapper key={link} path={link} exact={exact}>
-            {Provider ? (
-              <Provider>
-                {SubWrapper ? (
-                  <SubWrapper label={label}>
-                    <Component
-                      subRoutes={subRoutes}
-                      route={{ label }}
-                      {...props}
-                    />
-                  </SubWrapper>
-                ) : (
-                  <Component
-                    subRoutes={subRoutes}
-                    route={{ label }}
-                    {...props}
-                  />
-                )}
-              </Provider>
-            ) : SubWrapper ? (
-              <SubWrapper label={label}>
-                <Component subRoutes={subRoutes} route={{ label }} {...props} />
-              </SubWrapper>
-            ) : (
-              <Component subRoutes={subRoutes} route={{ label }} {...props} />
+        const pageWrapper = SubWrapper ? (
+          <SubWrapper label={label}>
+            <Component subRoutes={subRoutes} route={{ label }} {...props} />
+          </SubWrapper>
+        ) : (
+          <Component subRoutes={subRoutes} route={{ label }} {...props} />
+        );
+        const routeChild = Provider ? (
+          <Provider>{pageWrapper}</Provider>
+        ) : (
+          pageWrapper
+        );
+        return privatRoute ? (
+          <Route
+            key={link}
+            path={link}
+            exact={exact}
+            render={({ location }) => (
+              <PrivateRoute location={location}>{routeChild}</PrivateRoute>
             )}
-          </Wrapper>
+          />
+        ) : (
+          <Route key={link} path={link} exact={exact}>
+            {routeChild}
+          </Route>
         );
       }
-    );
+    ); */
 };
 
 const filterPermissions = (urls, userAccess) => {
@@ -140,8 +174,8 @@ export const useProvideUrls = () => {
   const allRoutes = useMemo(() => {
     return [
       ...toRoute(privateUrls),
-      ...toRoute(urlsPrivateApps, PrivateRoute, SubPage),
-      ...toRoute(publicUrls, Route),
+      ...toRoute(urlsPrivateApps, true, SubPage),
+      ...toRoute(publicUrls, false),
     ];
   }, [urlsPrivateApps]);
 

@@ -3,6 +3,7 @@ import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
+import useQuery from "../../../hooks/useQuery";
 import FlujoRecaudo from "../components/FlujoRecaudo/FlujoRecaudo";
 
 const initFounds = [
@@ -17,14 +18,21 @@ const initOpts = {
 };
 
 const RecaudoCodigo = () => {
+  const [{ barcode }, setQuery] = useQuery();
   const [opts, setOpts] = useState(null);
   const [foundRefs, setFoundRefs] = useState(null);
 
-  const onSubmitBarcode = useCallback((e) => {
-    e.preventDefault();
-    setFoundRefs(initFounds);
-    setOpts(initOpts);
-  }, []);
+  const onSubmitBarcode = useCallback(
+    (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+
+      setFoundRefs(initFounds);
+      setOpts(initOpts);
+      setQuery({ barcode: formData.get("barcode") }, { replace: true });
+    },
+    [setQuery]
+  );
 
   return (
     <Fragment>
@@ -34,7 +42,8 @@ const RecaudoCodigo = () => {
           name={"barcode"}
           label={"Codigo de barras"}
           type={"search"}
-          autocomplete="off"
+          autoComplete="off"
+          defaultValue={barcode}
         />
         <ButtonBar className={"lg:col-span-2"}>
           <Button type={"submit"}>Buscar</Button>

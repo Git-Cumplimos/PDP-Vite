@@ -5,6 +5,7 @@ import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import ButtonLink from "../../components/Base/ButtonLink/ButtonLink";
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
 import InputSuggestions from "../../components/Base/InputSuggestions/InputSuggestions";
+import useQuery from "../../hooks/useQuery";
 import fetchData from "../../utils/fetchData";
 
 const initialItems = [
@@ -101,7 +102,7 @@ const Recaudo = () => {
         label={"Buscar convenio"}
         name={"nameConvenio"}
         type={"search"}
-        autocomplete="off"
+        autoComplete="off"
         suggestions={mapSuggestions || []}
         onLazyInput={{
           callback: searchConvenios,

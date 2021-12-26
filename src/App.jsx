@@ -3,7 +3,7 @@ import awsconfig from "./aws-exports";
 
 import { Suspense, lazy } from "react";
 import { useAuth } from "./hooks/AuthHooks";
-import { Switch } from "react-router-dom";
+import { Routes } from "react-router-dom";
 import { useUrls } from "./hooks/UrlsHooks";
 import SkeletonLoading from "./components/Base/SkeletonLoading/SkeletonLoading";
 const AdminLayout = lazy(() => import("./layouts/AdminLayout/AdminLayout"));
@@ -19,11 +19,11 @@ function App() {
     <Suspense fallback={<SkeletonLoading />}>
       {cognitoUser && isSignedIn ? (
         <AdminLayout>
-          <Switch>{allRoutes}</Switch>
+          <Routes>{allRoutes}</Routes>
         </AdminLayout>
       ) : (
         <LoginLayout>
-          <Switch>{allRoutes}</Switch>
+          <Routes>{allRoutes}</Routes>
         </LoginLayout>
       )}
     </Suspense>
