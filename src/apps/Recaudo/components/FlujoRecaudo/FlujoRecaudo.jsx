@@ -1,8 +1,8 @@
 import { Fragment, useCallback, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import ButtonLink from "../../../../components/Base/ButtonLink/ButtonLink";
 import Modal from "../../../../components/Base/Modal/Modal";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import RefsForm from "../RefsForm/RefsForm";
@@ -15,6 +15,7 @@ const initFoundsVal = [
 ];
 
 const FlujoRecaudo = ({ foundRefs, opts }) => {
+  const navigate = useNavigate();
   const [brokerData, setBrokerData] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -39,6 +40,10 @@ const FlujoRecaudo = ({ foundRefs, opts }) => {
     setShowModal(false);
   }, []);
 
+  const goToRecaudo = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
   const onMakePayment = useCallback(() => {
     setPaymentStatus(true);
   }, []);
@@ -59,7 +64,7 @@ const FlujoRecaudo = ({ foundRefs, opts }) => {
             <Tickets refPrint={printDiv} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <ButtonLink to="/recaudo">Cerrar</ButtonLink>
+              <Button onClick={goToRecaudo}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
