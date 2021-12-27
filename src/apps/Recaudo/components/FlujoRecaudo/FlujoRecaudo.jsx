@@ -72,7 +72,7 @@ const FlujoRecaudo = ({ foundRefs, opts }) => {
             <h1>¿Esta seguro de realizar el pago?</h1>
             <h1>Resumen de pago</h1>
             <ButtonBar>
-              <Button onClick={onMakePayment}>Aceptar</Button>
+              <Button type="submit" onClick={onMakePayment}>Aceptar</Button>
               <Button onClick={closeModal}>Cancelar</Button>
             </ButtonBar>
           </div>
