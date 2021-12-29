@@ -8,7 +8,7 @@ import EditUserForm from "../components/Users/EditUserForm";
 import MassiveUpload from "../components/Users/MassiveUpload";
 import UserForm from "../components/Users/UserForm";
 import EditUserGroupForm from "../components/Users/EditUserGroupForm";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
+import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -90,7 +90,7 @@ const IAMUsers = () => {
         </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar usuarios</h1>
-      <Pagination
+      <PaginationAuth
         filters={{
           emailSearch: { label: "Email" },
           unameSearch: { label: "Nombre" },

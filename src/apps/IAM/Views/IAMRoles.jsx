@@ -3,7 +3,7 @@ import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Modal from "../../../components/Base/Modal/Modal";
 import Table from "../../../components/Base/Table/Table";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
+import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 import fetchData from "../../../utils/fetchData";
 import EditRoleForm from "../components/Roles/EditRoleForm";
 import RoleForm from "../components/Roles/RoleForm";
@@ -64,7 +64,7 @@ const IAMRoles = () => {
         </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar roles</h1>
-      <Pagination
+      <PaginationAuth
         filters={{
           unameSearch: { label: "Nombre" },
         }}

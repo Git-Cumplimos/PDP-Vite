@@ -11,7 +11,7 @@ const MultipleInput = ({ arrState, label, min = 1, max, required = false }) => {
 
   return (
     <>
-      {arrData.map((phone, index) => {
+      {arrData.map((value, index) => {
         return (
           <Fragment key={index}>
             <Input
@@ -19,7 +19,7 @@ const MultipleInput = ({ arrState, label, min = 1, max, required = false }) => {
               label={`${label(index)}`}
               type="text"
               autoComplete="off"
-              value={phone}
+              value={value}
               onInput={(e) => {
                 const arrData_copy = [...arrData];
                 arrData_copy[index] = e.target.value;

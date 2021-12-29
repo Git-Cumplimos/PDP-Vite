@@ -3,9 +3,9 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import useQuery from "../../../../hooks/useQuery";
 
 import Table from "../../../../components/Base/Table/Table";
-import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
 import { useNavigate } from "react-router-dom";
+import Pagination from "../../../../components/Compound/Pagination/Pagination";
 
 const initTable = [
   {
@@ -80,7 +80,9 @@ const SearchComissions = ({ comissionFace }) => {
   }, [comissions]);
 
   const onChange = useCallback(
-    (ev) => setQuery({ [ev.target.name]: ev.target.value }, { replace: true }),
+    (ev) => {
+      setQuery({ [ev.target.name]: ev.target.value }, { replace: true })
+    },
     [setQuery]
   );
 
@@ -119,20 +121,18 @@ const SearchComissions = ({ comissionFace }) => {
   }, [comissionFace]);
 
   // useEffect(() => {
-  //   const typeTrx = typeTrx;
-  // fetchData("", "GET", { tipo_op: typeTrx })
-  //   .then((res) => {
-  //     if (res?.status) {
-  //       setComissions(res?.obj);
-  //     } else {
-  //       console.error(res?.msg);
-  //     }
-  //   })
-  //   .catch((err) => console.error(err));
+  //   fetchData("", "GET", { tipo_op: typeTrx })
+  //     .then((res) => {
+  //       if (res?.status) {
+  //         setComissions(res?.obj);
+  //       } else {
+  //         console.error(res?.msg);
+  //       }
+  //     })
+  //     .catch((err) => console.error(err));
   // }, [typeTrx]);
 
   // useEffect(() => {
-  //   const comercio = comercio;
   //   fetchData("", "GET", { comercio })
   //     .then((res) => {
   //       if (res?.status) {
@@ -145,7 +145,6 @@ const SearchComissions = ({ comissionFace }) => {
   // }, [comercio]);
 
   // useEffect(() => {
-  //   const convenio = convenio;
   //   fetchData("", "GET", { convenio })
   //     .then((res) => {
   //       if (res?.status) {
@@ -159,7 +158,7 @@ const SearchComissions = ({ comissionFace }) => {
 
   return (
     <Fragment>
-      <Form onLazyChange={{ callback: onChange, timeOut: 500 }} grid>
+      <Pagination maxPage={3} onChange={onChange} grid>
         <Input
           label={"Tipo de transaccion"}
           name={"typeTrx"}
@@ -200,7 +199,7 @@ const SearchComissions = ({ comissionFace }) => {
         ) : (
           ""
         )}
-      </Form>
+      </Pagination>
       {Array.isArray(comissions) && comissions.length > 0 ? (
         <Table
           headers={headersTable}

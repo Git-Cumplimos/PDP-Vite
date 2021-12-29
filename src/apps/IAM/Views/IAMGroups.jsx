@@ -3,7 +3,7 @@ import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Modal from "../../../components/Base/Modal/Modal";
 import Table from "../../../components/Base/Table/Table";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
+import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 import fetchData from "../../../utils/fetchData";
 import GroupForm from "../components/Groups/GroupForm";
 
@@ -63,7 +63,7 @@ const IAMGroups = () => {
         </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar grupos</h1>
-      <Pagination
+      <PaginationAuth
         filters={{
           unameSearch: { label: "Nombre" },
         }}

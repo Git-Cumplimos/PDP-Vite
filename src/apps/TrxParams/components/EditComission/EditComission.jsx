@@ -28,7 +28,8 @@ const initComission = {
 };
 
 const EditComission = () => {
-  const [{ id_tipo_trx, id_comercio, id_convenio, id_autorizador }] = useQuery();
+  const [{ id_tipo_trx, id_comercio, id_convenio, id_autorizador }] =
+    useQuery();
 
   const [editedComission, setEditedComission] = useState(null);
 
@@ -64,19 +65,19 @@ const EditComission = () => {
   }, []);
 
   useEffect(() => {
-    if (id_tipo_trx || id_comercio || id_convenio) {
+    if (id_tipo_trx || id_comercio || id_convenio || id_autorizador) {
       let args = {};
       if (id_tipo_trx) {
-        args = { ...args, id_tipo_trx};
+        args = { ...args, id_tipo_trx };
       }
       if (id_comercio) {
-        args = { ...args, id_comercio};
+        args = { ...args, id_comercio };
       }
       if (id_convenio) {
-        args = { ...args, id_convenio};
+        args = { ...args, id_convenio };
       }
       if (id_autorizador) {
-        args = { ...args, id_autorizador};
+        args = { ...args, id_autorizador };
       }
       setEditedComission(initComission);
       // fetchData("", "GET", args)
@@ -125,6 +126,7 @@ const EditComission = () => {
                       }
                       value={val}
                       onChange={() => {}}
+                      autoComplete="off"
                       required
                     />
                   );

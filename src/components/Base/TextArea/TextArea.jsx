@@ -1,19 +1,11 @@
-import { useEffect, useState } from "react";
-import classes from "./Input.module.css";
+import { useState } from "react";
+import classes from "./TextArea.module.css";
 
-const Input = ({ label, self = false, onLazyInput, ...input }) => {
+const TextArea = ({ label, self = false, onLazyInput, ...input }) => {
   const { formItem } = classes;
-  const { id: _id, type } = input;
+  const { id: _id } = input;
 
-  const [timer, setTimer] = useState(null);
-
-  useEffect(() => {
-    if (type === "email") {
-      // for email
-      // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
-      input.pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    }
-  }, [input, type]);
+  const [timer, setTimer] = useState(null);  
 
   if (onLazyInput !== undefined) {
     const { callback, timeOut } = onLazyInput;
@@ -44,7 +36,7 @@ const Input = ({ label, self = false, onLazyInput, ...input }) => {
           {label}
         </label>
       )}
-      <input {...input} />
+      <textarea {...input} />
     </>
   ) : (
     <div className={`${formItem}`}>
@@ -53,9 +45,9 @@ const Input = ({ label, self = false, onLazyInput, ...input }) => {
           {label}
         </label>
       )}
-      <input {...input} />
+      <textarea {...input} />
     </div>
   );
-};
+}
 
-export default Input;
+export default TextArea

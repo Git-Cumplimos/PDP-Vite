@@ -12,7 +12,7 @@ const ContactMenu = ({ wa, tl, msg }) => {
     animateOut,
     animateLeft,
     animateRight,
-    tooltip
+    tooltip,
   } = classes;
   const linkWa = useMemo(() => {
     const init = "https://api.whatsapp.com/send/";
@@ -77,7 +77,9 @@ const ContactMenu = ({ wa, tl, msg }) => {
           setVisible(!visible);
         }}
       >
-        <div className={tooltip}>Ayuda</div>
+        <div className={tooltip}>
+          Ayuda
+        </div>
         <div ref={xIcon}>
           <span className={`bi bi-x-lg ${visible ? "block" : "hidden"}`} />
         </div>
