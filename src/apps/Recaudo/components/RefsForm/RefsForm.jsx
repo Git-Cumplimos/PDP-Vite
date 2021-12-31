@@ -6,15 +6,15 @@ import Input from "../../../../components/Base/Input/Input";
 const RefsForm = ({ data, onSubmit, btnName }) => {
   return Array.isArray(data) && data.length > 0 ? (
     <Form onSubmit={onSubmit} grid>
-      {data.map(([key, val], ind) => {
+      {data.map(({ nombre_referencia: key, ...rest }, ind) => {
         return (
           <Input
             key={ind}
             id={key}
-            name={key}
             label={key}
             type={"text"}
-            defaultValue={val}
+            autoComplete="off"
+            {...rest}
           />
         );
       })}

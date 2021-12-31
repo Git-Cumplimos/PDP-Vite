@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
@@ -9,8 +9,12 @@ import Table from "../../../components/Base/Table/Table";
 import TextArea from "../../../components/Base/TextArea/TextArea";
 import Pagination from "../../../components/Compound/Pagination/Pagination";
 import useQuery from "../../../hooks/useQuery";
-import fetchData from "../../../utils/fetchData";
-import { notifyError } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
+import {
+  fetchAutorizadores,
+  postAutorizadores,
+  putAutorizadores,
+} from "../utils/fetchRevalAutorizadores";
 
 const calcularDigitoVerificacion = (myNit) => {
   let vpri, z;
@@ -40,38 +44,6 @@ const calcularDigitoVerificacion = (myNit) => {
   return y > 1 ? 11 - y : y;
 };
 
-const initTable = [
-  {
-    "Id autorizador": 2,
-    "Nombre de autorizador": "Davivienda",
-    Nit: "899.233.233-2",
-    Descripcion: "",
-  },
-  {
-    "Id autorizador": 4,
-    "Nombre de autorizador": "Colpatria",
-    Nit: "899.233.233-2",
-    Descripcion: `frefgrgrg
-fewrgfregreg
-gregrg`,
-  },
-];
-
-const searchAutorizadores = async (nameAuto, page) => {
-  if (nameAuto === "") {
-    return [];
-  }
-  try {
-    // const res = await fetchData("", "GET", {
-    //   nombre_autorizador: nameAuto,
-    //   page,
-    // });
-    return initTable;
-  } catch (err) {
-    throw err;
-  }
-};
-
 const Autorizadores = () => {
   const navigate = useNavigate();
   const [{ searchAuto = "", page = 1 }, setQuery] = useQuery();
@@ -84,20 +56,35 @@ const Autorizadores = () => {
 
   const [autorizadores, setAutorizadores] = useState([]);
   const [selectedAuto, setSelectedAuto] = useState(null);
+  const [maxPages, setMaxPages] = useState(0);
+
+  const tableAutorizadores = useMemo(() => {
+    return [
+      ...autorizadores.map(
+        ({ id_autorizador, nombre_autorizador, nit, descripcion }) => {
+          return {
+            "Id autorizador": id_autorizador,
+            "Nombre de autorizador": nombre_autorizador,
+            Nit: nit,
+            Descripcion: descripcion,
+          };
+        }
+      ),
+    ];
+  }, [autorizadores]);
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
       setShowModal(true);
-      setSelectedAuto(autorizadores[i]);
+      setSelectedAuto(tableAutorizadores[i]);
     },
-    [autorizadores]
+    [tableAutorizadores]
   );
 
   const onChange = useCallback(
     (ev) => {
       const formData = new FormData(ev.target.form);
       const nameAuto = formData.get("searchAuto");
-      // const page = parseInt(formData.get("page"));
       setQuery({ searchAuto: nameAuto }, { replace: true });
     },
     [setQuery]
@@ -145,21 +132,58 @@ const Autorizadores = () => {
     });
   }, []);
 
-  const onSubmit = useCallback((ev) => {
-    ev.preventDefault();
+  const onSubmit = useCallback(
+    (ev) => {
+      ev.preventDefault();
 
-    const formData = new FormData(ev.target);
-
-    console.log(Object.fromEntries(formData.entries()));
-
-    // fetchData("", "POST", {}, Object.fromEntries(formData.entries()))
-    //   .then((res) => {})
-    //   .catch((err) => console.error(err));
-  }, []);
+      if (selectedAuto?.["Id autorizador"]) {
+        putAutorizadores(
+          { id_autorizador: selectedAuto?.["Id autorizador"] },
+          {
+            nombre_autorizador: selectedAuto?.["Nombre de autorizador"],
+            nit: selectedAuto?.["Nit"],
+            descripcion: selectedAuto?.["Descripcion"],
+          }
+        )
+          .then((res) => {
+            if (res?.status) {
+              notify(res?.msg);
+              setShowModal(false);
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => console.error(err));
+      } else {
+        postAutorizadores({
+          nombre_autorizador: selectedAuto?.["Nombre de autorizador"],
+          nit: selectedAuto?.["Nit"],
+          descripcion: selectedAuto?.["Descripcion"],
+          comision_cobrada: {
+            type: "monto",
+            ranges: [{ Minimo: 0, Maximo: -1, Porcentaje: 0, Fija: 0 }],
+          },
+        })
+          .then((res) => {
+            if (res?.status) {
+              notify(res?.msg);
+              setShowModal(false);
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => console.error(err));
+      }
+    },
+    [selectedAuto]
+  );
 
   useEffect(() => {
-    searchAutorizadores(searchAuto, page)
-      .then((autoArr) => setAutorizadores(autoArr))
+    fetchAutorizadores(searchAuto, page)
+      .then((autoArr) => {
+        setMaxPages(autoArr?.maxPages);
+        setAutorizadores(autoArr?.results);
+      })
       .catch((err) => console.error(err));
   }, [searchAuto, page]);
 
@@ -180,7 +204,7 @@ const Autorizadores = () => {
           Crear autorizador
         </Button>
       </ButtonBar>
-      <Pagination maxPage={3} onChange={onChange} grid>
+      <Pagination maxPage={maxPages} onChange={onChange} grid>
         <Input
           id="searchAuto"
           name="searchAuto"
@@ -191,10 +215,10 @@ const Autorizadores = () => {
         />
         <ButtonBar></ButtonBar>
       </Pagination>
-      {Array.isArray(autorizadores) && autorizadores.length > 0 ? (
+      {Array.isArray(tableAutorizadores) && tableAutorizadores.length > 0 ? (
         <Table
-          headers={Object.keys(autorizadores[0])}
-          data={autorizadores}
+          headers={Object.keys(tableAutorizadores[0])}
+          data={tableAutorizadores}
           onSelectRow={onSelectAutorizador}
         />
       ) : (
@@ -230,11 +254,11 @@ const Autorizadores = () => {
             label={"Descripcion"}
             autoCapitalize="sentences"
             autoComplete="off"
-            value={selectedAuto?.Descripcion}
+            value={selectedAuto?.Descripcion ?? ""}
             onChange={() => {}}
             defaultValue=""
           />
-          {!selectedAuto ? (
+          {!selectedAuto?.["Id autorizador"] ? (
             <ButtonBar>
               <Button type="submit">Crear autorizador</Button>
               <Button type="button" onClick={handleClose}>
@@ -249,8 +273,12 @@ const Autorizadores = () => {
                   onClick={() => {
                     const urlParams = new URLSearchParams();
                     urlParams.append(
-                      "id_autorizador",
+                      "autorizador_id_autorizador",
                       selectedAuto?.["Id autorizador"]
+                    );
+                    urlParams.append(
+                      "nombre_autorizador",
+                      JSON.stringify(selectedAuto?.["Nombre de autorizador"])
                     );
                     navigate(
                       `/trx-params/comisiones/cobradas?${urlParams.toString()}`

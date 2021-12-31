@@ -23,7 +23,7 @@
 }
 
 .formItem > .suggestion > ul > li {
-  @apply rounded-md px-4 py-2 text-black bg-transparent;
+  @apply rounded-md text-black bg-transparent;
 }
 
 .formItem > .suggestion > ul > li:hover {

@@ -72,6 +72,9 @@ const Comisiones = lazy(() => import("../apps/TrxParams/Views/Comisiones"));
 const Com2Pay = lazy(() =>
   import("../apps/TrxParams/Views/Comisiones/Com2Pay")
 );
+const CreateComision = lazy(() =>
+  import("../apps/TrxParams/Views/Comisiones/CreateComision")
+);
 const Com2Collect = lazy(() =>
   import("../apps/TrxParams/Views/Comisiones/Com2Collect")
 );
@@ -84,12 +87,8 @@ const Autorizadores = lazy(() =>
  * Recaudo
  */
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
-const RecaudoManual = lazy(() =>
-  import("../apps/Recaudo/Views/RecaudoManual")
-);
-const RecaudoCodigo = lazy(() =>
-  import("../apps/Recaudo/Views/RecaudoCodigo")
-);
+const RecaudoManual = lazy(() => import("../apps/Recaudo/Views/RecaudoManual"));
+const RecaudoCodigo = lazy(() => import("../apps/Recaudo/Views/RecaudoCodigo"));
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -259,6 +258,14 @@ const allUrlsPrivateApps = [
             label: <AppIcons Logo="" name={"Comisiones a pagar"} />,
             component: Com2Pay,
             permission: [18],
+            subRoutes: [
+              {
+                link: "/trx-params/comisiones/pagadas/personalizadas",
+                label: <AppIcons Logo="" name={"Comisiones a pagar por comercio"} />,
+                component: CreateComision,
+                permission: [18],
+              },
+            ],
           },
           {
             link: "/trx-params/comisiones/cobradas",

@@ -7,19 +7,33 @@ import useQuery from "../../../hooks/useQuery";
 import FlujoRecaudo from "../components/FlujoRecaudo/FlujoRecaudo";
 
 const initFounds = [
-  ["Numero de contrato", "12424324"],
-  ["Documento", "1080100200"],
-  ["Telefono", "3002004530"],
+  {
+    nombre_referencia: "Numero de contrato",
+    name: "referencias",
+    minLength: 10,
+    maxLength: 10,
+    defaultValue: "1242432477",
+    required: true,
+  },
+  {
+    nombre_referencia: "Documento",
+    name: "referencias",
+    minLength: 10,
+    maxLength: 10,
+    defaultValue: "1080100200",
+    required: true,
+  },
+  {
+    nombre_referencia: "Valor",
+    name: "valor",
+    minLength: 4,
+    maxLength: 8,
+    defaultValue: "5000",
+  },
 ];
-
-const initOpts = {
-  pago_parcial: true,
-  pago_vencido: false,
-};
 
 const RecaudoCodigo = () => {
   const [{ barcode }, setQuery] = useQuery();
-  const [opts, setOpts] = useState(null);
   const [foundRefs, setFoundRefs] = useState(null);
 
   const onSubmitBarcode = useCallback(
@@ -28,8 +42,7 @@ const RecaudoCodigo = () => {
       const formData = new FormData(e.target);
 
       setFoundRefs(initFounds);
-      setOpts(initOpts);
-      setQuery({ barcode: formData.get("barcode") }, { replace: true });
+      setQuery({ barcode: formData.get("barcode"), id_convenio: 5 }, { replace: true });
     },
     [setQuery]
   );
@@ -49,7 +62,7 @@ const RecaudoCodigo = () => {
           <Button type={"submit"}>Buscar</Button>
         </ButtonBar>
       </Form>
-      <FlujoRecaudo opts={opts} foundRefs={foundRefs} />
+      <FlujoRecaudo foundRefs={foundRefs} />
     </Fragment>
   );
 };

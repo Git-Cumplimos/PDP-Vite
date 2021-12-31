@@ -26,13 +26,13 @@ const fetchData = async (
     url += `?${queries}`;
   }
 
-  const fetchOtions = { method: method };
+  const fetchOptions = { method: method };
   if (method === "POST" || method === "PUT") {
-    fetchOtions.headers = { "Content-Type": Content_Type };
-    fetchOtions.body = JSON.stringify(data);
+    fetchOptions.headers = { "Content-Type": Content_Type };
+    fetchOptions.body = JSON.stringify(data);
   }
 
-  const response = await fetch(url, fetchOtions);
+  const response = await fetch(url, fetchOptions);
   const contentType = response.headers.get("content-type");
 
   if (contentType && contentType.includes("application/json")) {

@@ -10,8 +10,9 @@ const useQuery = () => {
   }, [searchParams]);
 
   const setValue = useCallback(
-    (newValue, options) => {
+    (newValue, options, toDelete) => {
       const newSearchParams = new URLSearchParams(searchParams);
+      toDelete?.forEach((key) => newSearchParams.delete(key));
       Object.entries(newValue).forEach(([key, val]) => {
         newSearchParams.set(key, JSON.stringify(val));
       });

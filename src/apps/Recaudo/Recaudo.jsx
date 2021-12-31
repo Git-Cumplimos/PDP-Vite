@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import AppIcons from "../../components/Base/AppIcons/AppIcons";
 import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import ButtonLink from "../../components/Base/ButtonLink/ButtonLink";
-import HNavbar from "../../components/Base/HNavbar/HNavbar";
+// import HNavbar from "../../components/Base/HNavbar/HNavbar";
 import InputSuggestions from "../../components/Base/InputSuggestions/InputSuggestions";
-import useQuery from "../../hooks/useQuery";
 import fetchData from "../../utils/fetchData";
+
+const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
 
 const initialItems = [
   {
@@ -28,32 +29,17 @@ const initialItems = [
   },
 ];
 
-const initialFounds = [
-  {
-    id_convenio: 22,
-    nombre_convenio: "Etb",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/ETB_Bogot%C3%A1_logo.svg/800px-ETB_Bogot%C3%A1_logo.svg.png",
-  },
-  {
-    id_convenio: 32,
-    nombre_convenio: "Kimel",
-    image: "https://picsum.photos/400",
-  },
-];
-
 const Recaudo = () => {
-  const [mostUsed, setMostUsed] = useState([]);
+  const [, setMostUsed] = useState([]);
 
   const [foundConv, setFoundConv] = useState([]);
 
   const mapSuggestions = useMemo(() => {
-    return foundConv.map(({ id_convenio, nombre_convenio, image }) => {
+    return foundConv.map(({ id_convenio, nombre_convenio }) => {
       return (
         <Link to={`/recaudo/manual?id_convenio=${id_convenio}`}>
-          <div className="grid grid-cols-4 place-items-center">
-            <img src={image} alt={nombre_convenio} width={25} height={25} />
-            <h1 className="col-span-3">{nombre_convenio}</h1>
+          <div className="grid grid-cols-1 place-items-center px-4 py-2">
+            <h1 className="text-lg">{nombre_convenio}</h1>
           </div>
         </Link>
       );
@@ -63,17 +49,19 @@ const Recaudo = () => {
   const searchConvenios = useCallback((e) => {
     const _nameConvenio = e.target.value;
     if (_nameConvenio.length > 2) {
-      setFoundConv(initialFounds);
-      // fetchData("", "GET", {
-      //   q: _actividad,
-      //   limit: 5,
-      // })
-      //   .then((res) => {
-      //     if (res?.status) {
-      //       setFoundConv(res?.obj);
-      //     }
-      //   })
-      //   .catch(() => {});
+      // setFoundConv(initialFounds);
+      fetchData(`${urlConvenios}/convenio_many`, "GET", {
+        tags: _nameConvenio,
+        limit: 5,
+      })
+        .then((res) => {
+          if (res?.status) {
+            setFoundConv(res?.obj?.results);
+          } else {
+            console.error(res?.msg);
+          }
+        })
+        .catch(() => {});
     } else {
       setFoundConv([]);
     }
@@ -81,7 +69,7 @@ const Recaudo = () => {
 
   useEffect(() => {
     setMostUsed(initialItems);
-    // fetchData("", "GET", {})
+    // fetchData(`${urlConvenios}/`, "GET", {})
     //   .then((res) => {
     //     if (res?.status) {
     //       setMostUsed(res?.obj);
@@ -97,7 +85,7 @@ const Recaudo = () => {
       <ButtonBar>
         <ButtonLink to="/recaudo/codigo">Leer codigo de barras</ButtonLink>
       </ButtonBar>
-      <HNavbar links={mostUsed} isIcon />
+      {/* <HNavbar links={mostUsed} isIcon /> */}
       <InputSuggestions
         label={"Buscar convenio"}
         name={"nameConvenio"}

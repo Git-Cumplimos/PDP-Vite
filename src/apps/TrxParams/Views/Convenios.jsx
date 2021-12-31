@@ -9,66 +9,13 @@ import Modal from "../../../components/Base/Modal/Modal";
 import Table from "../../../components/Base/Table/Table";
 import Pagination from "../../../components/Compound/Pagination/Pagination";
 import useQuery from "../../../hooks/useQuery";
-
-const initTable = [
-  {
-    "Id convenio": 2,
-    "Nombre de convenio": "Enel",
-  },
-  {
-    "Id convenio": 4,
-    "Nombre de convenio": "Acueducto",
-  },
-];
-
-const initSelected = {
-  "Id convenio": 4,
-  "Nombre de convenio": "Acueducto",
-  Ean13: "7702424562342",
-  Tags: ["Acueducto", "agua", "aseo", "servicio publico"],
-  Referencias: [
-    {
-      "Nombre de Referencia": "Documento",
-      "Longitud minima": 7,
-      "Longitud maxima": 10,
-    },
-    {
-      "Nombre de Referencia": "Numero de contrato",
-      "Longitud minima": 5,
-      "Longitud maxima": 9,
-    },
-  ],
-};
-
-const searchManyConvenios = async (nameAuto, page) => {
-  if (!nameAuto) {
-    return [];
-  }
-  try {
-    // const res = await fetchData("", "GET", {
-    //   nombre_autorizador: nameAuto,
-    //   page,
-    // });
-    return initTable;
-  } catch (err) {
-    throw err;
-  }
-};
-
-const searchUniqueConvenios = async (id_convenio) => {
-  if (!id_convenio) {
-    return [];
-  }
-  try {
-    // const res = await fetchData("", "GET", {
-    //   nombre_autorizador: nameAuto,
-    //   page,
-    // });
-    return initSelected;
-  } catch (err) {
-    throw err;
-  }
-};
+import { notify, notifyError } from "../../../utils/notify";
+import {
+  fetchConveniosMany,
+  fetchConveniosUnique,
+  postConvenios,
+  putConvenios,
+} from "../utils/fetchRevalConvenios";
 
 const Convenios = () => {
   const navigate = useNavigate();
@@ -83,27 +30,50 @@ const Convenios = () => {
 
   const [convenios, setConvenios] = useState([]);
   const [selectedConvenio, setSelectedConvenio] = useState(null);
+  const [maxPages, setMaxPages] = useState(0);
 
   const onSelectConvenio = useCallback(
     (e, i) => {
       setShowModal(true);
-      searchUniqueConvenios(convenios[i]["Id convenio"])
-        .then((autoArr) => setSelectedConvenio(autoArr))
+      fetchConveniosUnique(convenios[i]?.["Id convenio"])
+        .then((res) => {
+          setSelectedConvenio(
+            [...res?.results].map(
+              ({ id_convenio, nombre_convenio, ean13, tags, referencias }) => {
+                return {
+                  "Id convenio": id_convenio,
+                  "Nombre de convenio": nombre_convenio,
+                  Ean13: ean13,
+                  Tags: tags.split(","),
+                  Referencias: [
+                    ...referencias.map(({ nombre_referencia, max, min }) => {
+                      return {
+                        "Nombre de Referencia": nombre_referencia,
+                        "Longitud minima": min,
+                        "Longitud maxima": max,
+                      };
+                    }),
+                  ],
+                };
+              }
+            )[0]
+          );
+        })
         .catch((err) => console.error(err));
+      // searchUniqueConvenios(convenios[i]["Id convenio"])
+      //   .then((autoArr) => setSelectedConvenio(autoArr))
+      //   .catch((err) => console.error(err));
     },
     [convenios]
   );
 
   const onChange = useCallback(
     (ev) => {
-      const formData = new FormData(ev.target.form);
-      const nameConvenio = formData.get("searchConvenio");
-      const eanConvenio = formData.get("ean13Convenio");
-      // const page = parseInt(formData.get("page"));
-      setQuery(
-        { searchConvenio: nameConvenio, ean13Convenio: eanConvenio },
-        { replace: true }
-      );
+      if (ev.target.name === "searchConvenio") {
+        setQuery({ searchConvenio: ev.target.value }, { replace: true });
+      } else if (ev.target.name === "ean13Convenio") {
+        setQuery({ ean13Convenio: ev.target.value }, { replace: true });
+      }
     },
     [setQuery]
   );
@@ -141,23 +111,115 @@ const Convenios = () => {
     setSelectedConvenio(Object.fromEntries(newData));
   }, []);
 
-  const onSubmit = useCallback((ev) => {
-    ev.preventDefault();
+  const onSubmit = useCallback(
+    (ev) => {
+      ev.preventDefault();
 
-    const formData = new FormData(ev.target);
-
-    console.log(Object.fromEntries(formData.entries()));
-
-    // fetchData("", "POST", {}, Object.fromEntries(formData.entries()))
-    //   .then((res) => {})
-    //   .catch((err) => console.error(err));
-  }, []);
+      if (selectedConvenio?.["Id convenio"]) {
+        putConvenios(
+          { id_convenio: selectedConvenio?.["Id convenio"] },
+          {
+            ean13: selectedConvenio?.Ean13,
+            nombre_convenio: selectedConvenio?.["Nombre de convenio"],
+            descripcion: "",
+            tags: selectedConvenio?.Tags.join(","),
+            referencias: [
+              ...selectedConvenio?.Referencias.map(
+                ({
+                  "Nombre de Referencia": nombre_referencia,
+                  "Longitud minima": min,
+                  "Longitud maxima": max,
+                }) => {
+                  return {
+                    nombre_referencia,
+                    min,
+                    max,
+                  };
+                }
+              ),
+            ],
+          }
+        )
+          .then((res) => {
+            if (res?.status) {
+              notify(res?.msg);
+              setShowModal(false);
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => console.error(err));
+      } else {
+        postConvenios({
+          ean13: selectedConvenio?.Ean13,
+          nombre_convenio: selectedConvenio?.["Nombre de convenio"],
+          descripcion: "",
+          tags: selectedConvenio?.Tags.join(","),
+          referencias: [
+            ...selectedConvenio?.Referencias.map(
+              ({
+                "Nombre de Referencia": nombre_referencia,
+                "Longitud minima": min,
+                "Longitud maxima": max,
+              }) => {
+                return {
+                  nombre_referencia,
+                  min,
+                  max,
+                };
+              }
+            ),
+          ],
+          comision_pagada: {
+            type: "monto",
+            ranges: [{ Minimo: 0, Maximo: -1, Porcentaje: 0, Fija: 0 }],
+          },
+        })
+          .then((res) => {
+            if (res?.status) {
+              notify(res?.msg);
+              setShowModal(false);
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => console.error(err));
+      }
+    },
+    [selectedConvenio]
+  );
 
   useEffect(() => {
-    searchManyConvenios(searchConvenio, page)
-      .then((autoArr) => setConvenios(autoArr))
+    fetchConveniosMany(searchConvenio, page)
+      .then((res) => {
+        setConvenios(
+          [...res?.results].map(({ id_convenio, nombre_convenio }) => {
+            return {
+              "Id convenio": id_convenio,
+              "Nombre de convenio": nombre_convenio,
+            };
+          })
+        );
+        setMaxPages(res?.maxPages);
+      })
       .catch((err) => console.error(err));
   }, [searchConvenio, page]);
+
+  useEffect(() => {
+    fetchConveniosUnique(null, ean13Convenio)
+      .then((res) => {
+        setConvenios(
+          [...res?.results].map(({ id_convenio, nombre_convenio }) => {
+            return {
+              "Id convenio": id_convenio,
+              "Nombre de convenio": nombre_convenio,
+            };
+          })
+        );
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  }, [ean13Convenio]);
 
   return (
     <Fragment>
@@ -169,7 +231,7 @@ const Convenios = () => {
           Crear convenio masivo
         </Button> */}
       </ButtonBar>
-      <Pagination maxPage={1} onChange={onChange} grid>
+      <Pagination maxPage={maxPages} onChange={onChange} grid>
         <Input
           id="searchConvenio"
           name="searchConvenio"
@@ -316,7 +378,7 @@ const Convenios = () => {
               </Button>
             </ButtonBar>
           </Fieldset>
-          {!selectedConvenio ? (
+          {!selectedConvenio?.["Id convenio"] ? (
             <ButtonBar>
               <Button type="submit">Crear autorizador</Button>
               <Button type="button" onClick={handleClose}>
@@ -331,7 +393,7 @@ const Convenios = () => {
                   onClick={() => {
                     const urlParams = new URLSearchParams();
                     urlParams.append(
-                      "id_convenio",
+                      "convenios_id_convenio",
                       selectedConvenio?.["Id convenio"]
                     );
                     navigate(

@@ -1,37 +1,32 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import useQuery from "../../../../hooks/useQuery";
 
 import Table from "../../../../components/Base/Table/Table";
 import Input from "../../../../components/Base/Input/Input";
-import { useNavigate } from "react-router-dom";
 import Pagination from "../../../../components/Compound/Pagination/Pagination";
+import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
+import {
+  fetchConveniosMany,
+  fetchConvsPerAuto,
+} from "../../utils/fetchRevalConvenios";
 
-const initTable = [
-  {
-    "Tipo de transaccion": [2, "Recaudo"],
-    Comercio: [4, "papeleria"],
-    Convenio: [3, "Enel"],
-  },
-];
-
-const initTableAuto = [
-  {
-    "Tipo de transaccion": [2, "Recaudo"],
-    Autorizador: [4, "Davivienda"],
-    Convenio: [3, "Enel"],
-  },
-];
-
-const SearchComissions = ({ comissionFace }) => {
+const SearchComissions = ({ comissionFace, onSelectItem }) => {
   const [
-    { typeTrx = "", comercio = "", convenio = "", autorizador = "" },
+    {
+      /* typeTrx = "", */ comercio = "",
+      convenio = "",
+      autorizador = "",
+      page,
+    },
     setQuery,
   ] = useQuery();
 
   const navigate = useNavigate();
 
   const [comissions, setComissions] = useState([]);
+  const [maxPages, setMaxPages] = useState(0);
 
   const headersTable = useMemo(() => {
     if (comissions.length === 0) {
@@ -80,97 +75,115 @@ const SearchComissions = ({ comissionFace }) => {
   }, [comissions]);
 
   const onChange = useCallback(
-    (ev) => {
-      setQuery({ [ev.target.name]: ev.target.value }, { replace: true })
-    },
+    (ev) => setQuery({ [ev.target.name]: ev.target.value }, { replace: true }),
     [setQuery]
   );
 
   const onSelectRow = useCallback(
     (ev, indx) => {
       const _id_tipo_trx = comissions?.[indx]?.["Tipo de transaccion"]?.[0];
-      const _id_comercio = comissions?.[indx]?.Comercio?.[0];
+      const _id_comercio = comercio;
       const _id_autorizador = comissions?.[indx]?.Autorizador?.[0];
+      const _nombre_autorizador = comissions?.[indx]?.Autorizador?.[1];
       const _id_convenio = comissions?.[indx]?.Convenio?.[0];
       const urlParams = new URLSearchParams();
       if (_id_tipo_trx) {
         urlParams.append("id_tipo_trx", _id_tipo_trx);
       }
       if (_id_comercio) {
-        urlParams.append("id_comercio", _id_comercio);
+        urlParams.append("comercios_id_comercio", _id_comercio);
       }
       if (_id_autorizador) {
-        urlParams.append("id_autorizador", _id_autorizador);
+        urlParams.append("autorizador_id_autorizador", _id_autorizador);
+        urlParams.append(
+          "nombre_autorizador",
+          JSON.stringify(_nombre_autorizador)
+        );
       }
       if (_id_convenio) {
-        urlParams.append("id_convenio", _id_convenio);
+        urlParams.append("convenios_id_convenio", _id_convenio);
       }
       navigate(`?${urlParams.toString()}`);
     },
-    [navigate, comissions]
+    [navigate, comissions, comercio]
+  );
+
+  const passItem = useCallback(
+    (ev, indx) => {
+      onSelectItem?.(comissions?.[indx]);
+      setComissions([]);
+    },
+    [onSelectItem, comissions]
   );
 
   useEffect(() => {
-    setComissions(
-      comissionFace === "pay"
-        ? initTable
-        : comissionFace === "collect"
-        ? initTableAuto
-        : []
-    );
-  }, [comissionFace]);
-
-  // useEffect(() => {
-  //   fetchData("", "GET", { tipo_op: typeTrx })
-  //     .then((res) => {
-  //       if (res?.status) {
-  //         setComissions(res?.obj);
-  //       } else {
-  //         console.error(res?.msg);
-  //       }
-  //     })
-  //     .catch((err) => console.error(err));
-  // }, [typeTrx]);
-
-  // useEffect(() => {
-  //   fetchData("", "GET", { comercio })
-  //     .then((res) => {
-  //       if (res?.status) {
-  //         setComissions(res?.obj);
-  //       } else {
-  //         console.error(res?.msg);
-  //       }
-  //     })
-  //     .catch((err) => console.error(err));
-  // }, [comercio]);
-
-  // useEffect(() => {
-  //   fetchData("", "GET", { convenio })
-  //     .then((res) => {
-  //       if (res?.status) {
-  //         setComissions(res?.obj);
-  //       } else {
-  //         console.error(res?.msg);
-  //       }
-  //     })
-  //     .catch((err) => console.error(err));
-  // }, [convenio]);
+    if (convenio && autorizador) {
+      fetchConvsPerAuto(convenio, autorizador)
+        .then((res) => {
+          setComissions([
+            ...res.map(
+              ({
+                Convenio: { id_convenio, nombre_convenio },
+                Autorizador: { id_autorizador, nombre_autorizador },
+              }) => {
+                return {
+                  Convenio: [id_convenio, nombre_convenio],
+                  Autorizador: [id_autorizador, nombre_autorizador],
+                };
+              }
+            ),
+          ]);
+          setMaxPages(0);
+        })
+        .catch((err) => console.error(err));
+    } else if (convenio) {
+      fetchConveniosMany(convenio, page)
+        .then((res) => {
+          setComissions([
+            ...res?.results.map(({ id_convenio, nombre_convenio }) => {
+              return { Convenio: [id_convenio, nombre_convenio] };
+            }),
+          ]);
+          setMaxPages(res?.maxPages);
+        })
+        .catch((err) => console.error(err));
+    } else if (autorizador) {
+      fetchAutorizadores(autorizador, page)
+        .then((res) => {
+          setComissions([
+            ...res?.results.map(({ id_autorizador, nombre_autorizador }) => {
+              return { Autorizador: [id_autorizador, nombre_autorizador] };
+            }),
+          ]);
+          setMaxPages(res?.maxPages);
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [convenio, autorizador, page]);
 
   return (
     <Fragment>
-      <Pagination maxPage={3} onChange={onChange} grid>
-        <Input
+      <Pagination maxPage={maxPages} onChange={onChange} grid>
+        {/* <Input
           label={"Tipo de transaccion"}
           name={"typeTrx"}
           type={"text"}
           autoComplete="off"
           defaultValue={typeTrx}
+        /> */}
+        <Input
+          label={"Convenio"}
+          name={"convenio"}
+          type={"text"}
+          autoComplete="off"
+          defaultValue={convenio}
         />
         {comissionFace === "pay" ? (
           <Input
             label={"Comercio"}
             name={"comercio"}
-            type={"text"}
+            type={"number"}
+            step={"1"}
             autoComplete="off"
             defaultValue={comercio}
           />
@@ -185,26 +198,12 @@ const SearchComissions = ({ comissionFace }) => {
         ) : (
           ""
         )}
-        {Array.isArray(comissions) &&
-        comissions
-          .map(({ "Tipo de transaccion": [, tipo_trx] }) => tipo_trx)
-          .includes("Recaudo") ? (
-          <Input
-            label={"Convenio"}
-            name={"convenio"}
-            type={"text"}
-            autoComplete="off"
-            defaultValue={convenio}
-          />
-        ) : (
-          ""
-        )}
       </Pagination>
       {Array.isArray(comissions) && comissions.length > 0 ? (
         <Table
           headers={headersTable}
           data={dataTable}
-          onSelectRow={onSelectRow}
+          onSelectRow={onSelectItem ? passItem : onSelectRow}
         />
       ) : (
         ""
