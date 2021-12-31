@@ -1,5 +1,7 @@
 import BarIcon from "../BarIcon/BarIcon";
 import RightArrow from "../RightArrow/RightArrow";
+import ContentBox from "./ContentBox/ContentBox";
+import LogoSk from "./LogoSk/LogoSk";
 import classes from "./SkeletonLoading.module.css";
 
 const SkeletonLoading = () => {
@@ -7,10 +9,8 @@ const SkeletonLoading = () => {
     headerPDP,
     topHeader,
     usrData,
-    logoSk,
     userInfo,
     textCls,
-    contentBox,
     btnCls,
     navbar,
     textClsSm,
@@ -22,7 +22,7 @@ const SkeletonLoading = () => {
         <div className={topHeader}>
           <div className={usrData}>
             {/* Logo and user info */}
-            <span className={logoSk} />
+            <LogoSk />
             <BarIcon />
             <div className={userInfo}>
               <span className={textCls} />
@@ -54,7 +54,7 @@ const SkeletonLoading = () => {
         </nav>
       </header>
       <main className="flex justify-center items-center container mx-auto">
-        <span className={contentBox} />
+        <ContentBox />
       </main>
     </div>
   );

@@ -6,6 +6,7 @@ import { useAuth } from "./hooks/AuthHooks";
 import { Routes } from "react-router-dom";
 import { useUrls } from "./hooks/UrlsHooks";
 import SkeletonLoading from "./components/Base/SkeletonLoading/SkeletonLoading";
+import ContentBox from "./components/Base/SkeletonLoading/ContentBox/ContentBox";
 const AdminLayout = lazy(() => import("./layouts/AdminLayout/AdminLayout"));
 const LoginLayout = lazy(() => import("./layouts/LoginLayout/LoginLayout"));
 
@@ -19,11 +20,15 @@ function App() {
     <Suspense fallback={<SkeletonLoading />}>
       {cognitoUser && isSignedIn ? (
         <AdminLayout>
-          <Routes>{allRoutes}</Routes>
+          <Suspense fallback={<ContentBox />}>
+            <Routes>{allRoutes}</Routes>
+          </Suspense>
         </AdminLayout>
       ) : (
         <LoginLayout>
-          <Routes>{allRoutes}</Routes>
+          <Suspense fallback={<ContentBox />}>
+            <Routes>{allRoutes}</Routes>
+          </Suspense>
         </LoginLayout>
       )}
     </Suspense>

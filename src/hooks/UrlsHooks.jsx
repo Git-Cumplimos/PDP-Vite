@@ -75,49 +75,6 @@ const toRoute = (urls, isPrivate = true, SubWrapper) => {
     );
 
   return routes;
-
-  /* return allurls
-    .filter(({ link }) => !(link === undefined || link === null))
-    .filter(({ extern }) => !extern)
-    .map(
-      ({
-        link,
-        component: Component,
-        props,
-        exact,
-        subRoutes = false,
-        label,
-        provider: Provider,
-      }) => {
-        exact = exact === undefined ? true : exact;
-        const pageWrapper = SubWrapper ? (
-          <SubWrapper label={label}>
-            <Component subRoutes={subRoutes} route={{ label }} {...props} />
-          </SubWrapper>
-        ) : (
-          <Component subRoutes={subRoutes} route={{ label }} {...props} />
-        );
-        const routeChild = Provider ? (
-          <Provider>{pageWrapper}</Provider>
-        ) : (
-          pageWrapper
-        );
-        return privatRoute ? (
-          <Route
-            key={link}
-            path={link}
-            exact={exact}
-            render={({ location }) => (
-              <PrivateRoute location={location}>{routeChild}</PrivateRoute>
-            )}
-          />
-        ) : (
-          <Route key={link} path={link} exact={exact}>
-            {routeChild}
-          </Route>
-        );
-      }
-    ); */
 };
 
 const filterPermissions = (urls, userAccess) => {

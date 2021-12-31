@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { useImgs } from "../../../hooks/ImgsHooks";
 
-const AppIcons = ({ Logo = "", name }) => {
+const AppIcons = memo(({ Logo = "", name }) => {
   const { svgs } = useImgs();
   const logo = useMemo(() => {
     if (Logo?.includes("http")) {
@@ -17,6 +17,6 @@ const AppIcons = ({ Logo = "", name }) => {
       {name !== undefined ? <h1>{name}</h1> : null}
     </div>
   );
-};
+});
 
 export default AppIcons;
