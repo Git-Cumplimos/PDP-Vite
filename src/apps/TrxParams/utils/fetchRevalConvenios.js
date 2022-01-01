@@ -8,7 +8,6 @@ export const postConvenios = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
-  console.log(bodyObj);
   try {
     const res = await fetchData(
       `${urlConvenios}/convenio_unique`,
@@ -75,35 +74,46 @@ export const fetchConvsPerAuto = async (tags, nombre_autorizador) => {
     const resAutos = await fetchAutorizadores(nombre_autorizador);
     const resConvsPerAuto = [];
     for (const { id_convenio, nombre_convenio } of resConvs.results) {
-      const resCA = await fetchData(`${urlAutorizadores}/autorizador`, "GET", {
-        convenios_id_convenio: id_convenio,
-      });
-      if (resCA?.status) {
-        const resCAMapped = [
-          ...resCA?.obj?.results.map(({ id_autorizador }) => {
-            return id_autorizador;
-          }),
-        ];
-        console.log(resAutos.results);
-        resAutos.results
-          .filter(({ id_autorizador: el }) => resCAMapped.includes(el))
-          .forEach((auto) => {
-            console.log(auto);
-            resConvsPerAuto.push({
-              Convenio: { id_convenio, nombre_convenio },
-              Autorizador: auto,
-            });
+      const resCA = await fetchAutosPerConv(id_convenio);
+      const resCAMapped = [
+        ...resCA?.results.map(({ id_autorizador }) => {
+          return id_autorizador;
+        }),
+      ];
+      resAutos.results
+        .filter(({ id_autorizador: el }) => resCAMapped.includes(el))
+        .forEach((auto) => {
+          resConvsPerAuto.push({
+            Convenio: { id_convenio, nombre_convenio },
+            Autorizador: auto,
           });
+        });
+      if (resCA?.status) {
       } else {
         console.error(resCA?.msg);
       }
     }
-    console.log(resConvsPerAuto);
     return resConvsPerAuto;
   } catch (err) {
     throw err;
   }
 };
+
+export const fetchAutosPerConv = async (convenios_id_convenio) => {
+  try {
+    const resCA = await fetchData(`${urlAutorizadores}/autorizador`, "GET", {
+      convenios_id_convenio,
+    });
+    if (resCA?.status) {
+      return { ...resCA?.obj };
+    } else {
+      console.error(resCA?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+}
 
 export const putConvenios = async (argsObj, bodyObj) => {
   if (!argsObj || !bodyObj) {

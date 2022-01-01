@@ -6,7 +6,6 @@ export const postComission = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
-  console.log(bodyObj);
   try {
     const res = await fetchData(
       `${urlComissions}/comisiones_pagadas`,
@@ -88,7 +87,6 @@ export const putComissions = async (argsObj, bodyObj) => {
         : "comision_pagada"
     }`]: bodyObj,
   };
-  console.log(bodyObj);
   try {
     const res = await fetchData(
       `${urlComissions}/${

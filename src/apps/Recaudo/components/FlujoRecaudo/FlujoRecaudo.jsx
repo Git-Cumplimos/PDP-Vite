@@ -66,7 +66,7 @@ const FlujoRecaudo = ({ foundRefs, opts }) => {
               if (isNaN(parseFloat(monto))) {
                 valInput.value = res?.obj?.monto;
               }
-              valInput.disabled = !pago_parcial;
+              valInput.readOnly = !pago_parcial;
               valInput.required = true;
               objTemp.push(["Valor", formatMoney.format(res?.obj?.monto)]);
               setSummaryTrx(objTemp);

@@ -6,7 +6,6 @@ export const postAutorizadores = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
-  console.log(bodyObj);
   try {
     const res = await fetchData(
       `${urlAutorizadores}/autorizador`,
@@ -47,7 +46,6 @@ export const putAutorizadores = async (argsObj, bodyObj) => {
   if (!argsObj || !bodyObj) {
     return "Sin datos de url ni body";
   }
-  console.log(bodyObj);
   try {
     const res = await fetchData(
       `${urlAutorizadores}/autorizador`,

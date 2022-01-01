@@ -70,6 +70,7 @@ const EditComission = () => {
       return inputs;
     } catch (err) {
       console.error(err);
+      return [];
     }
   }, [comercios_id_comercio, convenios_id_convenio, nombre_autorizador]);
 
@@ -154,9 +155,16 @@ const EditComission = () => {
     <Fragment>
       <h1 className="text-3xl">Editando comisiones de:</h1>
       <Form grid>
-        {labelInputs.map(([key, val]) => {
-          return <Input type={"text"} label={key} value={val} readOnly disabled />;
-        })}
+        {labelInputs.map(([key, val]) => (
+          <Input
+            type={"text"}
+            key={key}
+            label={key}
+            value={val}
+            readOnly
+            disabled
+          />
+        ))}
         {labelInputs.length === 1 ? <ButtonBar></ButtonBar> : ""}
       </Form>
       <h1 className="text-3xl mt-8">Comision</h1>

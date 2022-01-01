@@ -345,13 +345,16 @@ const Convenios = () => {
                   <ButtonBar>
                     <Button
                       type="button"
-                      onClick={() => {
+                      onClick={() =>
                         setSelectedConvenio((old) => {
+                          if (old?.Referencias.length < 2) {
+                            return old;
+                          }
                           const copy = { ...old };
                           copy?.Referencias.splice(index, 1);
                           return { ...copy };
-                        });
-                      }}
+                        })
+                      }
                     >
                       Eliminar referencia
                     </Button>
@@ -362,8 +365,11 @@ const Convenios = () => {
             <ButtonBar>
               <Button
                 type="button"
-                onClick={() => {
+                onClick={() =>
                   setSelectedConvenio((old) => {
+                    if (old?.Referencias.length > 2) {
+                      return old;
+                    }
                     const copy = { ...old };
                     copy?.Referencias.push({
                       "Nombre de Referencia": "",
@@ -371,8 +377,8 @@ const Convenios = () => {
                       "Longitud maxima": "",
                     });
                     return { ...copy };
-                  });
-                }}
+                  })
+                }
               >
                 Añadir referencia
               </Button>
@@ -402,6 +408,19 @@ const Convenios = () => {
                   }}
                 >
                   Editar comisiones a pagar
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    const urlParams = new URLSearchParams();
+                    urlParams.append(
+                      "convenios_id_convenio",
+                      selectedConvenio?.["Id convenio"]
+                    );
+                    navigate(`autorizadores?${urlParams.toString()}`);
+                  }}
+                >
+                  Editar autorizadores del convenio
                 </Button>
               </ButtonBar>
               <ButtonBar>

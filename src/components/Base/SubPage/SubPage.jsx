@@ -5,7 +5,7 @@ const SubPage = ({ label, children }) => {
   const navigate = useNavigate();
   return (
     <div className="flex flex-col md:flex-row justify-evenly w-full">
-      <div className="flex flex-col">
+      <div className="flex flex-col mr-4">
         <div className="hidden md:block">
           {label}
         </div>

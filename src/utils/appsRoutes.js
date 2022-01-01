@@ -79,6 +79,7 @@ const Com2Collect = lazy(() =>
   import("../apps/TrxParams/Views/Comisiones/Com2Collect")
 );
 const Convenios = lazy(() => import("../apps/TrxParams/Views/Convenios"));
+const ConvAuto = lazy(() => import("../apps/TrxParams/Views/ConvAuto"));
 const Autorizadores = lazy(() =>
   import("../apps/TrxParams/Views/Autorizadores")
 );
@@ -261,7 +262,9 @@ const allUrlsPrivateApps = [
             subRoutes: [
               {
                 link: "/trx-params/comisiones/pagadas/personalizadas",
-                label: <AppIcons Logo="" name={"Comisiones a pagar por comercio"} />,
+                label: (
+                  <AppIcons Logo="" name={"Comisiones a pagar por comercio"} />
+                ),
                 component: CreateComision,
                 permission: [18],
               },
@@ -280,6 +283,14 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo="" name={"Convenios"} />,
         component: Convenios,
         permission: [20],
+        subRoutes: [
+          {
+            link: "/trx-params/convenios/autorizadores",
+            label: <AppIcons Logo="" name={"Autorizadores de convenio"} />,
+            component: ConvAuto,
+            permission: [20],
+          },
+        ],
       },
       {
         link: "/trx-params/autorizadores",
