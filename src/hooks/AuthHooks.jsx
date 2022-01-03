@@ -7,7 +7,7 @@ import {
   useReducer,
   useState,
 } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
 import { notifyError } from "../utils/notify";
 
@@ -298,7 +298,7 @@ export const useProvideAuth = () => {
   const id_comercio = roleInfo?.id_comercio;
   const id_dispositivo = roleInfo?.id_dispositivo;
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { state, pathname } = useLocation();
 
@@ -326,7 +326,7 @@ export const useProvideAuth = () => {
           type: CONFIRM_SIGN_IN,
           payload: { loggedUser, dispatch: dispatchAuth },
         });
-        history.push(state?.from || pathname === "/login" ? "/" : pathname);
+        navigate(state?.from || pathname === "/login" ? "/" : pathname);
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
           dispatchAuth({ type: SIGN_OUT });
@@ -334,17 +334,17 @@ export const useProvideAuth = () => {
         throw err;
       }
     },
-    [cognitoUser, history, state, pathname]
+    [cognitoUser, navigate, state, pathname]
   );
 
   const signOut = useCallback(() => {
     Auth.signOut()
       .then(() => {
         dispatchAuth({ type: SIGN_OUT });
-        history.replace("/login");
+        navigate("/login", { replace: true });
       })
       .catch(() => {});
-  }, [history]);
+  }, [navigate]);
 
   const handleSetupTOTP = useCallback(
     async (user) => {

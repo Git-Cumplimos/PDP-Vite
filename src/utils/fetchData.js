@@ -9,20 +9,30 @@ const fetchData = async (
     throw new Error("Method not suported");
   }
 
-  queries = Object.entries(queries).map(([key, value]) => {
-    return `${key}=${value}`;
-  });
+  if ("URLSearchParams" in window) {
+    const params = new URLSearchParams();
+    Object.entries(queries).forEach(([key, value]) => {
+      params.append(key, value);
+    });
+    queries = params.toString();
+  } else {
+    queries = Object.entries(queries)
+      .map(([key, value]) => {
+        return `${key}=${value}`;
+      })
+      .join("&");
+  }
   if (method !== "POST" && queries.length > 0) {
-    url += `?${queries.join("&")}`;
+    url += `?${queries}`;
   }
 
-  const fetchOtions = { method: method };
+  const fetchOptions = { method: method };
   if (method === "POST" || method === "PUT") {
-    fetchOtions.headers = { "Content-Type": Content_Type };
-    fetchOtions.body = JSON.stringify(data);
+    fetchOptions.headers = { "Content-Type": Content_Type };
+    fetchOptions.body = JSON.stringify(data);
   }
 
-  const response = await fetch(url, fetchOtions);
+  const response = await fetch(url, fetchOptions);
   const contentType = response.headers.get("content-type");
 
   if (contentType && contentType.includes("application/json")) {

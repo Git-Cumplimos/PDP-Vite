@@ -1,24 +1,13 @@
-import { Redirect, Route } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/AuthHooks";
 
-const PrivateRoute = ({ children, ...rest }) => {
+const PrivateRoute = ({ children, redirectTo = "/login" }) => {
   const { isSignedIn } = useAuth();
-  return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        isSignedIn ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/login",
-              state: { from: location },
-            }}
-          />
-        )
-      }
-    />
-  );
+  const location = useLocation();
+
+  if (!isSignedIn) {
+    return <Navigate to={redirectTo} replace state={{ from: location }} />;
+  }
+  return children;
 };
 export default PrivateRoute;

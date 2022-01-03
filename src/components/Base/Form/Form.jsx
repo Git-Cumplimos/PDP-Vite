@@ -7,7 +7,6 @@ const Form = ({
   formDir = "row",
   className = "",
   onLazyChange,
-  reff = null,
   ...formProps
 }) => {
   const { Flex, Grid } = classes;
@@ -39,7 +38,6 @@ const Form = ({
   return (
     <form
       className={`${grid ? Grid : `${Flex} flex-${formDir}`} ${className}`}
-      ref={reff}
       {...formProps}
     >
       {children}

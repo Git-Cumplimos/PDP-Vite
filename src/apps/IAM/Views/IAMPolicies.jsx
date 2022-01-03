@@ -2,18 +2,15 @@ import { useCallback, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Modal from "../../../components/Base/Modal/Modal";
-import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
+import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 import fetchData from "../../../utils/fetchData";
 import EditPolicyForm from "../components/Policies/EditPolicyForm";
 import PolicyForm from "../components/Policies/PolicyForm";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
-const IAMPolicies = ({ route }) => {
-  const { label } = route;
-
+const IAMPolicies = () => {
   const [policiesDB, setPoliciesDB] = useState([]);
   const [formData, setFormData] = useState(new FormData());
 
@@ -84,14 +81,14 @@ const IAMPolicies = ({ route }) => {
   );
 
   return (
-    <SubPage label={label}>
+    <>
       <ButtonBar>
         <Button type={"button"} onClick={() => setShowModal(true)}>
           Nueva politica
         </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar politicas</h1>
-      <Pagination
+      <PaginationAuth
         filters={{
           gnameSearch: { label: "Nombre del grupo" },
           rnameSearch: { label: "Nombre del rol" },
@@ -124,7 +121,7 @@ const IAMPolicies = ({ route }) => {
           <PolicyForm onCloseModal={onCloseModal} />
         )}
       </Modal>
-    </SubPage>
+    </>
   );
 };
 

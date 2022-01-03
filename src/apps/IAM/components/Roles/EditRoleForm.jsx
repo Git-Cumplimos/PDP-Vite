@@ -4,7 +4,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
 import Table from "../../../../components/Base/Table/Table";
-import Pagination from "../../../../components/Compound/Pagination/Pagination";
+import PaginationAuth from "../../../../components/Compound/PaginationAuth/PaginationAuth";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 
@@ -193,7 +193,7 @@ const EditRoleForm = ({ selected, onCloseModal }) => {
         ) : (
           ""
         )}
-        <Pagination
+        <PaginationAuth
           filters={{
             namePermission: { label: "Buscar permiso para añadir" },
           }}

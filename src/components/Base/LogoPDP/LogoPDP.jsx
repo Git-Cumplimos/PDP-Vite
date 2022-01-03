@@ -1,7 +1,8 @@
+import { memo } from "react";
 import { useImgs } from "../../../hooks/ImgsHooks";
 import classes from "./LogoPDP.module.css";
 
-const LogoPDP = ({ large = false, small = false, xsmall = false }) => {
+const LogoPDP = memo(({ large = false, small = false, xsmall = false }) => {
   const { logoPDP, lgImg, smImg, xsImg } = classes;
 
   const {
@@ -18,6 +19,6 @@ const LogoPDP = ({ large = false, small = false, xsmall = false }) => {
       </div>
     </div>
   );
-};
+});
 
 export default LogoPDP;

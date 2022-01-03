@@ -33,6 +33,7 @@ const Modal = ({
         className={`container ${limit} ${modalContent} ${hasPadding}`}
       >
         <span className={`bi bi-x ${close}`} onClick={() => handleClose?.()} />
+        <br />
         {children}
       </section>
     </div>

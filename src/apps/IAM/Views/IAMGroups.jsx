@@ -2,17 +2,14 @@ import { useCallback, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Modal from "../../../components/Base/Modal/Modal";
-import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
+import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 import fetchData from "../../../utils/fetchData";
 import GroupForm from "../components/Groups/GroupForm";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
-const IAMGroups = ({ route }) => {
-  const { label } = route;
-
+const IAMGroups = () => {
   const [gruposDB, setGruposDB] = useState([]);
   const [maxPage, setMaxPage] = useState(1);
   const [formData, setFormData] = useState(new FormData());
@@ -59,14 +56,14 @@ const IAMGroups = ({ route }) => {
   );
 
   return (
-    <SubPage label={label}>
+    <>
       <ButtonBar>
         <Button type={"button"} onClick={() => setShowModal(true)}>
           Nuevo grupo
         </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar grupos</h1>
-      <Pagination
+      <PaginationAuth
         filters={{
           unameSearch: { label: "Nombre" },
         }}
@@ -86,7 +83,7 @@ const IAMGroups = ({ route }) => {
       <Modal show={showModal} handleClose={onCloseModal}>
         <GroupForm onCloseModal={onCloseModal} />
       </Modal>
-    </SubPage>
+    </>
   );
 };
 

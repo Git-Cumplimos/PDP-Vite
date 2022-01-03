@@ -2,20 +2,17 @@ import { useCallback, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Modal from "../../../components/Base/Modal/Modal";
-import SubPage from "../../../components/Base/SubPage/SubPage";
 import Table from "../../../components/Base/Table/Table";
 import fetchData from "../../../utils/fetchData";
 import EditUserForm from "../components/Users/EditUserForm";
 import MassiveUpload from "../components/Users/MassiveUpload";
 import UserForm from "../components/Users/UserForm";
 import EditUserGroupForm from "../components/Users/EditUserGroupForm";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
+import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
-const IAMUsers = ({ route }) => {
-  const { label } = route;
-
+const IAMUsers = () => {
   const [usuariosDB, setUsuariosDB] = useState([]);
   const [maxPage, setMaxPage] = useState(1);
   const [formData, setFormData] = useState(new FormData());
@@ -77,7 +74,7 @@ const IAMUsers = ({ route }) => {
   );
 
   return (
-    <SubPage label={label}>
+    <>
       <ButtonBar>
         <Button type={"button"} onClick={() => setShowModal(true)}>
           Nuevo usuario
@@ -93,7 +90,7 @@ const IAMUsers = ({ route }) => {
         </Button>
       </ButtonBar>
       <h1 className="text-3xl">Buscar usuarios</h1>
-      <Pagination
+      <PaginationAuth
         filters={{
           emailSearch: { label: "Email" },
           unameSearch: { label: "Nombre" },
@@ -164,7 +161,7 @@ const IAMUsers = ({ route }) => {
           <UserForm onCloseModal={onCloseModal} />
         )}
       </Modal>
-    </SubPage>
+    </>
   );
 };
 

@@ -4,7 +4,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
 import Table from "../../../../components/Base/Table/Table";
-import Pagination from "../../../../components/Compound/Pagination/Pagination";
+import PaginationAuth from "../../../../components/Compound/PaginationAuth/PaginationAuth";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 
@@ -110,7 +110,7 @@ const PolicyForm = ({ onCloseModal }) => {
   return (
     <div className="flex flex-col justify-center items-center mx-auto">
       <h1 className="text-2xl my-4">Creacion de politica</h1>
-      <Pagination
+      <PaginationAuth
         filters={{
           gname: { label: "Nombre del grupo" },
         }}
@@ -134,7 +134,7 @@ const PolicyForm = ({ onCloseModal }) => {
       ) : (
         ""
       )}
-      <Pagination
+      <PaginationAuth
         filters={{
           rname: { label: "Nombre del rol" },
         }}

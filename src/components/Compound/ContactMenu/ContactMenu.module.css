@@ -8,7 +8,8 @@
   @apply relative rounded-full text-center p-2 text-2xl text-white z-30;
   @apply h-12 w-12 shadow-lg;
 
-  background-color: rgb(18, 155, 244);
+  /* background-color: rgb(18, 155, 244); */
+  background-color: rgb(255, 126, 41);
 }
 
 .chatIcon:hover > .tooltip {
@@ -26,24 +27,42 @@
 
 .animateIn {
   opacity: 0;
-	animation: fadeUp 250ms ease-out both;
+  animation: fadeUp 250ms ease-out both;
 }
 
 .animateOut {
   opacity: 1;
-	animation: fadeDown 250ms ease-in both;
+  animation: fadeDown 250ms ease-in both;
 }
 
 .animateLeft {
   /* opacity: 1; */
-	animation: rotateLeft 200ms ease-in;
+  animation: rotateLeft 200ms ease-in;
 }
 
 .animateRight {
   /* opacity: 1; */
-	animation: rotateRight 200ms ease-in;
+  animation: rotateRight 200ms ease-in;
 }
 
+.tooltip::before {
+  /* content: url("data:image/svg+xml,<svg width='250' height='250' viewBox='-50 -50 300 300'><polygon fill='#0f0' stroke='#0f0' stroke-width='10' stroke-linejoin='round' points='100,0 0,200 200,200'/></svg>"); */
+  
+  /* @apply block absolute bg-red-700 -right-5; */
+
+  content: " ";
+  position: absolute;
+  top: 30%; /* At the bottom of the tooltip */
+  right: 100%;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent rgb(24, 24, 27) transparent transparent;
+
+  /* fill: #0f0; */
+  /* stroke: #0f0; */
+  /* stroke-width: 10; */
+  /* clip-path: polygon(0 50%, 100% 100%, 100% 0); */
+}
 .tooltip {
   @apply hidden absolute left-14 bottom-2 bg-gray-900 text-white text-xs px-2 py-2 rounded font-medium;
 }
@@ -83,65 +102,65 @@
 }
 
 @keyframes fadeUp {
-	from {
-		opacity: 0;
-		transform: translate3d(0, 300%, 0);
-	}
+  from {
+    opacity: 0;
+    transform: translate3d(0, 300%, 0);
+  }
   2% {
     transform: translate3d(0, 150%, 0);
   }
   50% {
     opacity: 0;
   }
-	to {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 @keyframes fadeDown {
-	from {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
   50% {
     opacity: 0;
   }
   98% {
     transform: translate3d(0, 150%, 0);
   }
-	to {
+  to {
     opacity: 0;
-		transform: translate3d(0, 300%, 0);
-	}
+    transform: translate3d(0, 300%, 0);
+  }
 }
 
 @keyframes rotateLeft {
-	from {
-		/* opacity: 1; */
-		transform: rotate(0deg);
-	}
+  from {
+    /* opacity: 1; */
+    transform: rotate(0deg);
+  }
   50% {
     /* opacity: 0; */
     transform: rotate(90deg);
   }
-	to {
+  to {
     /* opacity: 0; */
-		transform: rotate(90deg);
-	}
+    transform: rotate(90deg);
+  }
 }
 
 @keyframes rotateRight {
-	from {
-		/* opacity: 0; */
-		transform: rotate(90deg);
-	}
+  from {
+    /* opacity: 0; */
+    transform: rotate(90deg);
+  }
   50% {
     /* opacity: 0; */
     transform: rotate(0deg);
   }
-	to {
+  to {
     /* opacity: 1; */
-		transform: rotate(0deg);
-	}
+    transform: rotate(0deg);
+  }
 }

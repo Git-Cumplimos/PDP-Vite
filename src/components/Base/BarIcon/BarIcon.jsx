@@ -1,6 +1,7 @@
+import { memo } from "react";
 import { useImgs } from "../../../hooks/ImgsHooks";
 
-const BarIcon = () => {
+const BarIcon = memo(() => {
   const {
     svgs: { bar },
   } = useImgs();
@@ -16,6 +17,6 @@ const BarIcon = () => {
       </div>
     </div>
   );
-};
+});
 
 export default BarIcon;

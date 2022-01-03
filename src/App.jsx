@@ -1,11 +1,14 @@
 import Amplify from "aws-amplify";
 import awsconfig from "./aws-exports";
 
+import { Suspense, lazy } from "react";
 import { useAuth } from "./hooks/AuthHooks";
-import AdminLayout from "./layouts/AdminLayout/AdminLayout";
-import LoginLayout from "./layouts/LoginLayout/LoginLayout";
-import { Switch } from "react-router-dom";
+import { Routes } from "react-router-dom";
 import { useUrls } from "./hooks/UrlsHooks";
+import SkeletonLoading from "./components/Base/SkeletonLoading/SkeletonLoading";
+import ContentBox from "./components/Base/SkeletonLoading/ContentBox/ContentBox";
+const AdminLayout = lazy(() => import("./layouts/AdminLayout/AdminLayout"));
+const LoginLayout = lazy(() => import("./layouts/LoginLayout/LoginLayout"));
 
 Amplify.configure(awsconfig);
 
@@ -13,14 +16,22 @@ function App() {
   const { cognitoUser, isSignedIn } = useAuth();
   const { allRoutes } = useUrls();
 
-  return cognitoUser && isSignedIn ? (
-    <AdminLayout>
-      <Switch>{allRoutes}</Switch>
-    </AdminLayout>
-  ) : (
-    <LoginLayout>
-      <Switch>{allRoutes}</Switch>
-    </LoginLayout>
+  return (
+    <Suspense fallback={<SkeletonLoading />}>
+      {cognitoUser && isSignedIn ? (
+        <AdminLayout>
+          <Suspense fallback={<ContentBox />}>
+            <Routes>{allRoutes}</Routes>
+          </Suspense>
+        </AdminLayout>
+      ) : (
+        <LoginLayout>
+          <Suspense fallback={<ContentBox />}>
+            <Routes>{allRoutes}</Routes>
+          </Suspense>
+        </LoginLayout>
+      )}
+    </Suspense>
   );
 }
 

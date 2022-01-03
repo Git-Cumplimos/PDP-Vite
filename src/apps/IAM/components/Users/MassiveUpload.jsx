@@ -5,9 +5,36 @@ import Form from "../../../../components/Base/Form/Form";
 import fetchData from "../../../../utils/fetchData";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 import sendFormData from "../../../../utils/sendFormData";
-import Pagination from "../../../../components/Compound/Pagination/Pagination";
+import PaginationAuth from "../../../../components/Compound/PaginationAuth/PaginationAuth";
 import Table from "../../../../components/Base/Table/Table";
 import { notify, notifyError } from "../../../../utils/notify";
+
+const baseCsv = [
+  [
+    "Email",
+    "Nombre completo",
+    "Documento",
+    "Tipo de documento",
+    "Telefono",
+    "Direccion",
+  ],
+  [
+    "david32@gmail.com",
+    "Nicholas David",
+    "1003564323",
+    "CC",
+    "3008789080",
+    "Calle 100 # 13 - 6",
+  ],
+  [
+    "david33@gmail.com",
+    "Nicholas David",
+    "1003564324",
+    "CC",
+    "3008789080",
+    "Calle 100 # 13 -88",
+  ],
+];
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -19,48 +46,42 @@ const MassiveUpload = ({ onCloseModal }) => {
   const [maxPage, setMaxPage] = useState(1);
   const [foundGroups, setFoundGroups] = useState([]);
 
-  const onFileCharge = useCallback(
-    (files) => {
-      if (Array.isArray(Array.from(files))) {
-        files = Array.from(files);
-        if (files.length === 1) {
-          const [m_file] = files;
-          setUsersFile({ file: m_file, fileName: m_file.name });
-        } else {
-          if (files.length > 1) {
-            notifyError("Se debe ingresar un solo archivo para subir");
-          }
-        }
-      }
-    },
-    []
-  );
-
-  const searchGroups = useCallback(
-    async (gname, _page) => {
-      const queries = { limit: 5 };
-      if (gname && gname !== "") {
-        queries.name_group = gname;
-      }
-      if (_page) {
-        queries.page = _page;
-      }
-      if (Object.keys(queries).length > 0) {
-        try {
-          const res = await fetchData(`${url_iam}/groups`, "GET", queries);
-          if (res?.status) {
-            return res?.obj;
-          }
-          return [];
-        } catch (err) {
-          notifyError(err);
-        }
+  const onFileCharge = useCallback((files) => {
+    if (Array.isArray(Array.from(files))) {
+      files = Array.from(files);
+      if (files.length === 1) {
+        const [m_file] = files;
+        setUsersFile({ file: m_file, fileName: m_file.name });
       } else {
-        return [];
+        if (files.length > 1) {
+          notifyError("Se debe ingresar un solo archivo para subir");
+        }
       }
-    },
-    []
-  );
+    }
+  }, []);
+
+  const searchGroups = useCallback(async (gname, _page) => {
+    const queries = { limit: 5 };
+    if (gname && gname !== "") {
+      queries.name_group = gname;
+    }
+    if (_page) {
+      queries.page = _page;
+    }
+    if (Object.keys(queries).length > 0) {
+      try {
+        const res = await fetchData(`${url_iam}/groups`, "GET", queries);
+        if (res?.status) {
+          return res?.obj;
+        }
+        return [];
+      } catch (err) {
+        notifyError(err);
+      }
+    } else {
+      return [];
+    }
+  }, []);
 
   const onChange = useCallback(
     (_formData) => {
@@ -84,7 +105,9 @@ const MassiveUpload = ({ onCloseModal }) => {
       return;
     }
     if (!selectedGroup) {
-      notifyError("No se ha selecionado un grupo al cual añadir a los ususarios");
+      notifyError(
+        "No se ha selecionado un grupo al cual añadir a los ususarios"
+      );
       return;
     }
 
@@ -141,7 +164,45 @@ const MassiveUpload = ({ onCloseModal }) => {
     <div className="flex flex-col justify-center items-center mx-auto">
       <h1 className="text-2xl my-4">Creacion de usuarios</h1>
       <SimpleLoading show={isUploading} />
-      <Pagination
+      <ButtonBar>
+        <Button
+          onClick={() => {
+            const fileName = `(${Intl.DateTimeFormat("es-CO", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false,
+            }).format(new Date())}) Subida masiva de usuarios`;
+            console.log(fileName);
+            const str = `${baseCsv.map((row) => row.join(";")).join("\r\n")}`;
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+              const blob = new Blob([str], {
+                type: "text/csv;charset=iso-8859-1",
+              });
+              window.navigator.msSaveOrOpenBlob(blob, fileName);
+            } else {
+              // other browsers
+              const file = new File([str], fileName, {
+                type: "text/csv;charset=iso-8859-1",
+              });
+              const exportUrl = URL.createObjectURL(file);
+              window.location.assign(exportUrl);
+              URL.revokeObjectURL(exportUrl);
+            }
+            // const data = new Blob([str], {
+            //   type: "text/csv;charset=iso-8859-1",
+            // });
+            // const csv = window.URL.createObjectURL(data);
+            // window.open(csv, "_blank");
+          }}
+        >
+          Descargar csv base
+        </Button>
+      </ButtonBar>
+      <PaginationAuth
         filters={{
           file: {
             label: "Elegir archivo de usuarios",
