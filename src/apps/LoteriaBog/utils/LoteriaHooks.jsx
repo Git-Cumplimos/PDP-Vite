@@ -253,7 +253,7 @@ export const useProvideLoteria = () => {
       
       try {
         const res = await fetchData(urls.ventaOrdinariofisica, "POST", {}, req);
-        console.log(res)
+        console.log(res,"HOLOOOOOOOOOOOOOOOOO")
         setSellResponse(res);
       } catch (err) {
         setSellResponse(null);

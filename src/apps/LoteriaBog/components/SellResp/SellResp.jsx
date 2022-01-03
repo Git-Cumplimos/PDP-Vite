@@ -45,7 +45,7 @@ const SellResp = ({
     content: () => printDiv.current,
     pageStyle: pageStyle,
   });
-
+  console.log(sellResponse)
   const voucherInfo = useMemo(() => {
     const vinfo = {};
     if (!("msg" in sellResponse)) {
@@ -85,30 +85,31 @@ const SellResp = ({
     sellResponse,
   ]);
 
+  if (!("msg" in sellResponse)){} 
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de venta": voucherInfo["Fecha de venta"],
-        Hora: voucherInfo["Hora"],
+        "Fecha de venta": voucherInfo?.["Fecha de venta"],
+        Hora: voucherInfo?.["Hora"],
       },
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo.id_comercio,
         "No. terminal": roleInfo.id_dispositivo,
         Municipio: roleInfo.ciudad,
         Dirección: roleInfo.direccion,
-        "Id Trx": sellResponse["id_trx"],
-        "Id Transacción": sellResponse.id_Transaccion,
+        "Id Trx": sellResponse?.["id_trx"],
+        "Id Transacción": sellResponse?.id_Transaccion,
       }),
-      commerceName: sellResponse.nom_loteria,
+      commerceName: sellResponse?.nom_loteria,
       trxInfo: Object.entries({
-        Sorteo:sellResponse.sorteo,
-        Billete: sellResponse.num_billete,
-        Serie: sellResponse.serie,
-        Fracciones: sellResponse.fracciones,
-        "Valor pago": formatMoney.format(sellResponse.valor_pago),
+        Sorteo:sellResponse?.sorteo,
+        Billete: sellResponse?.num_billete,
+        Serie: sellResponse?.serie,
+        Fracciones: sellResponse?.fracciones,
+        "Valor pago": formatMoney.format(sellResponse?.valor_pago),
         "Tipo de Billete": sellResponse?.fisico===true? 'Fisico':'Virtual',
-        "Forma de pago": sellResponse?.tipoPago==='12'|| sellResponse.fisico==false? 'Efectivo':'Bono',
+        "Forma de pago": sellResponse?.tipoPago==='12'|| sellResponse?.fisico==false? 'Efectivo':'Bono',
       }),
       disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
     };
@@ -120,9 +121,9 @@ const SellResp = ({
     sellResponse,
     voucherInfo,
   ]);
-  console.log(sellResponse.tipoPago)
+  console.log(sellResponse?.tipoPago)
   useEffect(() => {
-    infoTicket(sellResponse["id_trx"], sellResponse.tipoPago, ticket);
+    infoTicket(sellResponse?.["id_trx"], sellResponse?.tipoPago, ticket);
   }, [infoTicket, sellResponse, ticket]);
 
   return "msg" in sellResponse ? (
@@ -149,7 +150,6 @@ const SellResp = ({
             closeModal();
             setSellResponse(null);
             setCustomer({ fracciones: "", phone: "", doc_id: "" });
-            getQuota();
           }}
         >
           Cerrar

@@ -9,6 +9,7 @@ import Modal from "../../../components/Base/Modal/Modal";
 import DescargaForm from "../components/DescargaForm/DescargaForm";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import { useAuth } from "../../../hooks/AuthHooks";
+import { notify, notifyError } from "../../../utils/notify";
 
 const DescargarArchivosS3 = ({ route }) => {
   const { label } = route;
@@ -24,7 +25,7 @@ const DescargarArchivosS3 = ({ route }) => {
 
   const { con_SortVentas_S3 } = useLoteria();
 
-  const { notifyError } = useAuth();
+ 
 
   // const con_sort = (e) => {
 

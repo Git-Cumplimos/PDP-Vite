@@ -123,7 +123,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/loteria-de-bogota/premios",
-        label: <AppIcons Logo={PAGO} name="Premios" />,
+        label: <AppIcons Logo={"PAGO"} name="Premios" />,
         component: Premios,
         extern: false,
         permission: [5],///////////////////////////////////////////////////////////////////

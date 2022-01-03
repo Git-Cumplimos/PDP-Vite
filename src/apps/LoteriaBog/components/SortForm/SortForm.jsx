@@ -5,6 +5,7 @@ import { useLoteria } from "../../utils/LoteriaHooks";
 import { useState } from "react";
 import {toast}  from "react-toastify";
 import Input from "../../../../components/Base/Input/Input";
+import { notify, notifyError } from "../../../../utils/notify";
 //import { useAuth } from "../../../../hooks/AuthHooks";
 
 const SortForm = ({
@@ -22,9 +23,6 @@ const SortForm = ({
   const [fecha, setFecha] = useState(null);
   const [changesorteo, setChangesorteo] = useState(sorteo);
 
-
-
-  console.log(sorteo,tip_sorteo)
   const { CambiarSort } = useLoteria();
   
   const onSubmit = (e) => {
@@ -32,30 +30,19 @@ const SortForm = ({
     
     CambiarSort(sorteo,tip_sorteo,fecha,num_loteria)
       .then((res) => {
-        //setShowModal(true);
-        //setDisabledBtns(false);
-          console.log(res)
           setRespCrearSort(res)
+          if(res["estado"]==true){
           notify(res['msg'])
+          }
+          else{
+            notifyError(res['msg'])
+          }
           closeModal()          
           
       })
     setChangesorteo(sorteo)
   }
   
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-  
-  console.log(tip_sorteo)
   return (
     <>
 
@@ -97,7 +84,7 @@ const SortForm = ({
             
         
           <ButtonBar>
-            <Button type="submit" disabled={disabledBtns}>Actualizar</Button>
+            <Button type="submit" disabled={disabledBtns}>Crear</Button>
             <Button
               type="button"
               onClick={() => {

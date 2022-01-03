@@ -25,7 +25,6 @@ const CargaArchivos = ({ route }) => {
     { value: "Asignacion", label: "Asignacion" },
     { value: "Resultados", label: "Resultados" },
     { value: "Liquidacion", label: "Liquidacion de premios" },
-    { value: "Calendario", label: "Calendario de Sorteos" },
   ];
 
   const optionsTipoSorteo = [

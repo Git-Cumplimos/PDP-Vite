@@ -4,8 +4,9 @@ import VoucherPago from "../Voucher/VoucherPago";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import { useEffect } from "react";
-import { useAuth } from "../../../../utils/AuthHooks";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
+import { notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -178,7 +179,6 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
             closeModal();
             setPagoresponse(null);
             //setCustomer({ fracciones: "", phone: "", doc_id: "" });
-            getQuota();
           }}
         >
           Cerrar

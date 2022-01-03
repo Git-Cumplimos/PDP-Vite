@@ -2,24 +2,42 @@ import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../../components/Base/Form/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { useState } from "react";
-import {toast}  from "react-toastify";
-//import { useAuth } from "../../../../hooks/AuthHooks";
+import { useState,useEffect } from "react";
+import { notify, notifyError } from "../../../../utils/notify";
 
-const VeriSortForm = ({
+const CloseForm = ({
 
   closeModal,
-  handleSubmit
+  tip_sorteo
 
 }) => {
   
+  const { cargueVentasExtra_S3 } = useLoteria();
   const [disabledBtns, setDisabledBtns] = useState(false); 
   
   const onSubmit = (e) => {
     e.preventDefault();
-    handleSubmit()
+    cargueVentasExtra_S3(tip_sorteo).then((res) => {
+      if (res.estado === true) {
+        notify(res.msg);
+      } else {
+        notifyError(res.msg);
+      }
+      closeModal()
+    });
+    
   }
+  const [tipo_sorteo,setTipo_sorteo]=useState(null)
   
+  useEffect(() => {
+    if (tip_sorteo===1){
+      setTipo_sorteo('ordinario')
+    }
+    else{
+      setTipo_sorteo('extraordinario')
+    }
+  }, [tip_sorteo])
+
   
   
   
@@ -29,16 +47,16 @@ const VeriSortForm = ({
       <div className="flex flex-col justify-center items-center mx-auto container">
         <Form  onSubmit={onSubmit} grid>
             <div
-              className="flex flex-row justify-between text-lg font-medium"
+              className="flex flex-row justify-center text-lg font-medium"
             >
-              <h1>Asegurese de que el sorteo que va a crear es el correcto</h1>
+              <h1>¿Cerrar sorteo {tipo_sorteo}?</h1>
               
             </div>
             
             
         
           <ButtonBar>
-            <Button type="submit" disabled={disabledBtns}>Continuar</Button>
+            <Button type="submit" disabled={disabledBtns}>Aceptar</Button>
             <Button
               type="button"
               onClick={() => {
@@ -56,4 +74,4 @@ const VeriSortForm = ({
   );
 };
 
-export default VeriSortForm;
+export default CloseForm;

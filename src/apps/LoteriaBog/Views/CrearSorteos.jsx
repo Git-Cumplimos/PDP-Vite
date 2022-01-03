@@ -6,9 +6,11 @@ import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
 import Modal from "../../../components/Base/Modal/Modal";
 import SortForm from "../components/SortForm/SortForm";
+import CloseForm from "../components/SortForm/CloseForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 import SubPage from "../../../components/Base/SubPage/SubPage";
-import { useAuth } from "../../../utils/AuthHooks";
+import { useAuth } from "../../../hooks/AuthHooks";
+
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_accessKeyId,
@@ -17,47 +19,47 @@ AWS.config.update({
 
 const CrearSorteos = ({ route }) => {
   const { label } = route;
-  const { notifyError, notify } = useAuth();
-  const { ConsultaCrearSort, cargueVentasExtra_S3 } = useLoteria();
+  //const { notifyError, notify } = useAuth();
+  const { ConsultaCrearSort} = useLoteria();
   const [resp_con, setResp_con] = useState(null);
   const [tip_sorteo, setTip_sorteo] = useState(null);
   const [sorteo, setSorteo] = useState(null);
   const [num_loteria, setNum_loteria] = useState(null);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showModal1, setShowModal1] = useState(false);
+  const [showModal2, setShowModal2] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
-
+  const [disable_botoOrdinario, setDisable_botoOrdinario] = useState(false);
+  const [disable_botoExtra, setDisable_botoExtra] = useState(false);
   useEffect(() => {
+    ConsultaCrearSort().then((res) => {
+      setResp_con(res);
+    });
+  }, []);
+
+  const onSubmit3 = (e) => {
+    setTip_sorteo(2);
+    setShowModal2(true)
+    setDisable_botoExtra(true)
+  };
+
+  const onSubmit4 = (e) => {
+    setTip_sorteo(1);
+    setShowModal2(true)
+    setDisable_botoOrdinario(true)
+  };
+
+  const closeModal = useCallback(() => {
+    setShowModal1(false);
     ConsultaCrearSort().then((res) => {
       console.log(res);
       setResp_con(res);
     });
-  }, [cargueVentasExtra_S3,cargueVentasExtra_S3]);
+  });
 
-  const S3_Extra = (e) => {
-    // e.preventDefault();
-    cargueVentasExtra_S3(2).then((res) => {
-      if (res.estado === true) {
-        notify(res.msg);
-      } else {
-        notifyError(res.msg);
-      }
-    });
-  };
-
-  const S3_Ordi = (e) => {
-    // e.preventDefault();
-    cargueVentasExtra_S3(1).then((res) => {
-      if (res.estado === true) {
-        notify(res.msg);
-      } else {
-        notifyError(res.msg);
-      }
-    });
-  };
-
-  const closeModal = useCallback(() => {
-    setShowModal(false);
+  const closeModal2 = useCallback(() => {
+    setShowModal2(false);
+    console.log('Que onda?????????')
     ConsultaCrearSort().then((res) => {
       console.log(res);
       setResp_con(res);
@@ -69,7 +71,8 @@ const CrearSorteos = ({ route }) => {
     setTip_sorteo(1);
     setSorteo(String(parseInt(resp_con?.ordinario.num_sorteo) + 1));
     setNum_loteria(resp_con?.ordinario.num_loteria);
-    setShowModal(true);
+    setShowModal1(true);
+    setDisable_botoOrdinario(false)
   };
 
   const onSubmit2 = (e) => {
@@ -77,33 +80,10 @@ const CrearSorteos = ({ route }) => {
     setTip_sorteo(2);
     setSorteo(String(parseInt(resp_con?.extra.num_sorteo) + 1));
     setNum_loteria(resp_con?.extra.num_loteria);
-    setShowModal(true);
+    setShowModal1(true);
+    setDisable_botoExtra(false)
   };
-
-  // const notifyError = (msg) => {
-  //   toast.error(msg, {
-  //     position: "top-center",
-  //     autoClose: 5000,
-  //     hideProgressBar: false,
-  //     closeOnClick: true,
-  //     pauseOnHover: true,
-  //     draggable: true,
-  //     progress: undefined,
-  //   });
-  // };
-
-  // const notify = (msg) => {
-  //   toast.info(msg, {
-  //     position: "top-center",
-  //     autoClose: 5000,
-  //     hideProgressBar: false,
-  //     closeOnClick: true,
-  //     pauseOnHover: true,
-  //     draggable: true,
-  //     progress: undefined,
-  //   });
-  // };
-  console.log(resp_con?.ordinario?.num_loteria);
+  console.log(resp_con)
   return (
     <SubPage label={label}>
       <div>
@@ -112,8 +92,9 @@ const CrearSorteos = ({ route }) => {
             <Button
               type="button"
               onClick={() => {
-                S3_Extra();
+                onSubmit3();
               }}
+              disabled={disable_botoExtra}
             >
               Cerrar sorteo extraordinario
             </Button>
@@ -127,8 +108,9 @@ const CrearSorteos = ({ route }) => {
             <Button
               type="button"
               onClick={() => {
-                S3_Ordi();
+                onSubmit4();
               }}
+              disabled={disable_botoOrdinario}
             >
               Cerrar sorteo ordinario
             </Button>
@@ -140,7 +122,7 @@ const CrearSorteos = ({ route }) => {
         {resp_con?.ordinario?.num_loteria !== undefined ? (
           <Form formDir="col" onSubmit={onSubmit1}>
             <ButtonBar>
-              <Button type="submit" diabled={disabledBtns}>
+              <Button type="submit" disabled={disabledBtns}>
                 Crear sorteo ordinario
               </Button>
             </ButtonBar>
@@ -151,7 +133,7 @@ const CrearSorteos = ({ route }) => {
         {resp_con?.extra?.num_loteria !== undefined ? (
           <Form formDir="col" onSubmit={onSubmit2}>
             <ButtonBar>
-              <Button type="submit" diabled={disabledBtns}>
+              <Button type="submit" disabled={disabledBtns}>
                 Crear sorteo extraordinario
               </Button>
             </ButtonBar>
@@ -159,7 +141,7 @@ const CrearSorteos = ({ route }) => {
         ) : (
           ""
         )}
-        <Modal show={showModal} handleClose={() => closeModal()}>
+        <Modal show={showModal1} handleClose={() => closeModal()}>
           <SortForm
             closeModal={closeModal}
             tip_sorteo={tip_sorteo}
@@ -167,6 +149,12 @@ const CrearSorteos = ({ route }) => {
             setSorteo={setSorteo}
             num_loteria={num_loteria}
           ></SortForm>
+        </Modal>
+        <Modal show={showModal2} handleClose={() => closeModal2()}>
+          <CloseForm
+            closeModal={closeModal2}
+            tip_sorteo={tip_sorteo}
+          ></CloseForm>
         </Modal>
       </div>
     </SubPage>

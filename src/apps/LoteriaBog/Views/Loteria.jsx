@@ -319,7 +319,7 @@ const Loteria = ({ route }) => {
         ""
       )}
       <Modal show={showModal} handleClose={() => closeModal()}>
-        {sellResponse === null ? (
+        {sellResponse === null? (
           <SendForm
             tipoPago={tipoPago}
             setTipoPago={setTipoPago}

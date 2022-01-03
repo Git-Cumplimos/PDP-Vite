@@ -64,6 +64,7 @@ const DescargaForm = ({ closeModal, selected }) => {
               type="button"
               onClick={() => {
                 closeModal();
+                setUrls(false)
               }}
             >
               Cancelar
