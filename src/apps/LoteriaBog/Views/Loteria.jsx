@@ -174,7 +174,7 @@ const Loteria = ({ route }) => {
   console.log(selected);
   console.log(sellResponse);
   return (
-    <SubPage label={label}>
+    <>
       <Form grid>
         <Select
           disabled={serie !== "" || numero !== ""}
@@ -346,7 +346,7 @@ const Loteria = ({ route }) => {
           />
         )}
       </Modal>
-    </SubPage>
+    </>
   );
 };
 

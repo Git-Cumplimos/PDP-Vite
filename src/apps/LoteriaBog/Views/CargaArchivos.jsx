@@ -155,7 +155,7 @@ const CargaArchivos = ({ route }) => {
   }, []);
   //console.log(progress)
   return (
-    <SubPage label={label}>
+    <>
       <div>
         <Select
           id="archivos"
@@ -254,7 +254,7 @@ const CargaArchivos = ({ route }) => {
           />
         </Modal>
       </div>
-    </SubPage>
+    </>
   );
 };
 

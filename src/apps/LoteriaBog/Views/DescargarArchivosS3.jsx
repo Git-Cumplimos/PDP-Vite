@@ -49,7 +49,7 @@ const DescargarArchivosS3 = ({ route }) => {
   console.log(resp_con_sort);
   console.log(typeof resp_con_sort);
   return (
-    <SubPage label={label}>
+    <>
       <div>
         <Form grid>
           <Input
@@ -223,7 +223,7 @@ const DescargarArchivosS3 = ({ route }) => {
           <DescargaForm closeModal={closeModal} selected={selected} />
         </Modal>
       </div>
-    </SubPage>
+    </>
   );
 };
 

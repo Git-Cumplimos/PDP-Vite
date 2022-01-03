@@ -85,7 +85,7 @@ const CrearSorteos = ({ route }) => {
   };
   console.log(resp_con)
   return (
-    <SubPage label={label}>
+    <>
       <div>
         {resp_con?.extra?.Cerrar ? (
           <ButtonBar>
@@ -157,7 +157,7 @@ const CrearSorteos = ({ route }) => {
           ></CloseForm>
         </Modal>
       </div>
-    </SubPage>
+    </>
   );
 };
 

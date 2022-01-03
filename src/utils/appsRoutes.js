@@ -144,13 +144,13 @@ const allUrlsPrivateApps = [
         component: CrearSorteos,
         permission: [5],
       },
-      {
-        link: "/loteria-de-bogota/premios",
-        label: <AppIcons Logo={"PAGO"} name="Premios" />,
-        component: Premios,
-        extern: false,
-        permission: [5],///////////////////////////////////////////////////////////////////
-      },
+      // {
+      //   link: "/loteria-de-bogota/premios",
+      //   label: <AppIcons Logo={"PAGO"} name="Premios" />,
+      //   component: Premios,
+      //   extern: false,
+      //   permission: [5],///////////////////////////////////////////////////////////////////
+      // },
     ],
   },
   {
