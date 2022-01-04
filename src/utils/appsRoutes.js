@@ -10,7 +10,6 @@ import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
  */
 const AppIcons = lazy(() => import("../components/Base/AppIcons/AppIcons"));
 
-
 /**
  * * Paginas
  */
@@ -89,8 +88,8 @@ const Autorizadores = lazy(() =>
  * Recaudo
  */
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
-const RecaudoManual = lazy(() => import("../apps/Recaudo/Views/RecaudoManual"));
-const RecaudoCodigo = lazy(() => import("../apps/Recaudo/Views/RecaudoCodigo"));
+const RecaudoManual = lazy(() => import("../apps/Recaudo/views/RecaudoManual"));
+const RecaudoCodigo = lazy(() => import("../apps/Recaudo/views/RecaudoCodigo"));
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
