@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import Form from "../../../components/Base/Form/Form";
-import FileInput from "../../../components/Base/FileInput/FileInput";
+import InputX from "../../../components/Base/InputX/InputX";
 import Select from "../../../components/Base/Select/Select";
 import AWS from "aws-sdk";
 import ProgressBar from "../../../components/Base/ProgressBar/ProgressBar";
@@ -206,7 +206,7 @@ const CargaArchivos = ({ route }) => {
           (archivo == "PlanDePremios" && tipoSorteo !== "")||
           fisiVirtual!=='' ? (
           <Form formDir="col" onSubmit={onSubmit}>
-            <FileInput
+            <InputX
               id={`archivo_${archivo}`}
               label={`Elegir archivo: ${
                 options.find(({ value }) => {
