@@ -16,7 +16,7 @@ import { notifyError } from "../utils/notify";
 // const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
 
 const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
-const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
+const urlQuota = `http://127.0.0.1:5000/cupo`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTO1}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;

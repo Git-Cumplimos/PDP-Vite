@@ -351,7 +351,7 @@ export const useProvideLoteria = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [roleInfo.cod_oficina_lot, roleInfo.cod_sucursal_lot, roleInfo.codigo_dane]);
+  }, [roleInfo?.cod_oficina_lot, roleInfo?.cod_sucursal_lot, roleInfo?.codigo_dane]);
 
   const getReportesPagos = useCallback(async () => {
    
