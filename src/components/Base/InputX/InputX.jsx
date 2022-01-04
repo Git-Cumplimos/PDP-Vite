@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { notifyError } from "../../../utils/notify";
-import classes from "./Input.module.css";
+import classes from "./InputX.module.css";
 
 const InputX = ({
   label,
