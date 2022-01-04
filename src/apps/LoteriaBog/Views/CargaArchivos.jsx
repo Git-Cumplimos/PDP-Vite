@@ -118,6 +118,7 @@ const CargaArchivos = ({ route }) => {
   if (progress === 100) {
   }
   const onChange = (files) => {
+    console.log(file)
     if (Array.isArray(Array.from(files))) {
       files = Array.from(files);
       if (files.length === 1) {
@@ -153,7 +154,8 @@ const CargaArchivos = ({ route }) => {
     setFile("");
     setFileName("");
   }, []);
-  //console.log(progress)
+  
+  console.log(file && progress === 0)
   return (
     <>
       <div>
