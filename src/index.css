@@ -1,113 +1,5 @@
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-Thin.ttf");
-  font-weight: 100;
-}
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-ThinItalic.ttf");
-  font-weight: 100;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-ExtraLight.ttf");
-  font-weight: 200;
-}
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-ExtraLightItalic.ttf");
-  font-weight: 200;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-Light.ttf");
-  font-weight: 300;
-}
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-LightItalic.ttf");
-  font-weight: 300;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-Regular.ttf");
-  font-weight: 400;
-}
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-Italic.ttf");
-  font-weight: 400;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-Medium.ttf");
-  font-weight: 500;
-}
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-MediumItalic.ttf");
-  font-weight: 500;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-SemiBold.ttf");
-  font-weight: 600;
-}
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-SemiBoldItalic.ttf");
-  font-weight: 600;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-Bold.ttf");
-  font-weight: 700;
-}
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-BoldItalic.ttf");
-  font-weight: 700;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-ExtraBold.ttf");
-  font-weight: 800;
-}
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-ExtraBoldItalic.ttf");
-  font-weight: 800;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-Black.ttf");
-  font-weight: 900;
-}
-@font-face {
-  font-family: Montserrat;
-  src: url("./assets/font/Montserrat-BlackItalic.ttf");
-  font-weight: 900;
-  font-style: italic;
-}
-
 :root {
   --primary: rgb(226, 106, 34);
   --primary-light: rgb(232, 136, 78);
@@ -115,6 +7,12 @@
   --secondary: rgba(6, 140, 193, 0.25);
   --secondary-light: rgb(225, 225, 223);
   --secondary-dark: rgb(96, 96, 96);
+
+  --min-minmax-sm: 180px;
+  --min-minmax-md: 250px;
+  --min-minmax-base: 300px;
+  --min-minmax-lg: 420px;
+  --min-minmax-xl: 480px;
 }
 
 @tailwind base;
@@ -132,36 +30,6 @@ body {
   color: hsl(0, 0%, 0%);
 }
 
-body.loginBackground {
-  background-image: url("./assets/img/personas.png"),
-    url("./assets/svg/back-icon.svg"),
-    url("./assets/svg/back-icon-secondary.svg");
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-position: 2.5% 100%, center, center;
-  background-size: 500px, cover, cover;
-}
-
-@media (max-width: 768px) {
-  body.loginBackground {
-    background-image: none;
-  }
-}
-
-body.loggedBackground {
-  background-image: url("./assets/svg/back-icon-2.svg");
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
-
-@media (max-width: 768px) {
-  body.loggedBackground {
-    background-image: none;
-  }
-}
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
@@ -170,8 +38,51 @@ code {
 .fecha {
   text-align: right;
   margin-right: 20px;
-  
 }
+
+/* Grid columns auto fit */
+.grid-cols-auto-fit-sm {
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-minmax-sm), 1fr));
+}
+
+.grid-cols-auto-fit-md {
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-minmax-md), 1fr));
+}
+
+.grid-cols-auto-fit-base {
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-minmax-base), 1fr));
+}
+
+.grid-cols-auto-fit-lg {
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-minmax-lg), 1fr));
+}
+
+.grid-cols-auto-fit-xl {
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-minmax-xl), 1fr));
+}
+
+
+/* Grid rows auto fit */
+.grid-rows-auto-fit-sm {
+  grid-template-rows: repeat(auto-fit, minmax(var(--min-minmax-sm), 1fr));
+}
+
+.grid-rows-auto-fit-md {
+  grid-template-rows: repeat(auto-fit, minmax(var(--min-minmax-md), 1fr));
+}
+
+.grid-rows-auto-fit-base {
+  grid-template-rows: repeat(auto-fit, minmax(var(--min-minmax-base), 1fr));
+}
+
+.grid-rows-auto-fit-lg {
+  grid-template-rows: repeat(auto-fit, minmax(var(--min-minmax-lg), 1fr));
+}
+
+.grid-rows-auto-fit-xl {
+  grid-template-rows: repeat(auto-fit, minmax(var(--min-minmax-xl), 1fr));
+}
+
 
 @page {
   size: auto;

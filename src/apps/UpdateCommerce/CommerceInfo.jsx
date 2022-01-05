@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
 import Button from "../../components/Base/Button/Button";
 import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import Card from "../../components/Base/Card/Card";
@@ -7,6 +6,7 @@ import Form from "../../components/Base/Form/Form";
 import Input from "../../components/Base/Input/Input";
 import Modal from "../../components/Base/Modal/Modal";
 import fetchData from "../../utils/fetchData";
+import { notifyError } from "../../utils/notify";
 
 const capitalize = (word = "") => {
   if (word.length === 0) {
@@ -60,18 +60,6 @@ const CommerceInfo = () => {
 
   const [showModal, setShowModal] = useState(false);
   const downloadRef = useRef(null);
-
-  const notifyError = (msg) => {
-    toast.error(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
 
   useEffect(() => {
     fetchData(`${url_form}/review-count`)

@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/Base/Button/Button";
 import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
 import Fieldset from "../../components/Base/Fieldset/Fieldset";
 import Form from "../../components/Base/Form/Form";
 import Input from "../../components/Base/Input/Input";
+import InputSuggestions from "../../components/Base/InputSuggestions/InputSuggestions";
 import MultipleInput from "../../components/Base/MultipleInput/MultipleInput";
 import Select from "../../components/Base/Select/Select";
 import LocationForm from "../../components/Compound/LocationForm/LocationForm";
-import { useAuth } from "../../utils/AuthHooks";
+import { useAuth } from "../../hooks/AuthHooks";
 import fetchData from "../../utils/fetchData";
+import { notify, notifyError } from "../../utils/notify";
 
 const url = process.env.REACT_APP_URL_ACTIVIDADES;
 
@@ -60,12 +61,16 @@ const FormCommerce = () => {
 
   const { roleInfo } = useAuth();
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setCommerceId(roleInfo?.id_comercio ?? 0);
+    if (!roleInfo?.id_comercio) {
+      notifyError(`Comercio sin numero de id`);
+      navigate("/", { replace: true });
+    }
+    setCommerceId(roleInfo?.id_comercio);
     fetchData(`${url_send}/review`, "GET", {
-      id_comercio: roleInfo?.id_comercio ?? 0,
+      id_comercio: roleInfo?.id_comercio,
     })
       .then((res) => {
         if (res?.status) {
@@ -77,7 +82,7 @@ const FormCommerce = () => {
                 day: "numeric",
               }).format(new Date(res?.obj.fecha_update))}`
             );
-            history.replace("/");
+            navigate("/", { replace: true });
           }
         } else {
           notifyError(res?.msg);
@@ -110,31 +115,7 @@ const FormCommerce = () => {
         }
       })
       .catch(() => {});
-  }, [roleInfo, history]);
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const notifyError = (msg) => {
-    toast.error(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  }, [roleInfo, navigate]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -154,12 +135,11 @@ const FormCommerce = () => {
           id_comercio: commerceId,
           Nombre_comercio: commerceName,
           Nombre_comercio_2: commerceName2,
-          Tipo_comercio:
-            roleInfo?.tipo_comercio?.includes("CRCS")
-              ? 2
-              : roleInfo?.tipo_comercio?.includes("CEAS")
-              ? 3
-              : 1,
+          Tipo_comercio: roleInfo?.tipo_comercio?.includes("CRCS")
+            ? 2
+            : roleInfo?.tipo_comercio?.includes("CEAS")
+            ? 3
+            : 1,
           Representante: {
             Nombre: legalRepName,
             Tipo_doc: legalRepIdType,
@@ -209,7 +189,7 @@ const FormCommerce = () => {
       );
       if (_res?.status) {
         notify("Formulario subido exitosamente");
-        history.replace("/");
+        navigate("/", { replace: true });
       } else {
         notifyError(`Error al subir el formulario: ${_res?.msg}`);
       }
@@ -325,12 +305,33 @@ const FormCommerce = () => {
         <LocationForm place="comercio" location={commerceLocation} />
         <LocationForm place="residencia" location={homeLocation} />
         <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
-          <Input
-            id="actividades_ec"
-            label="Buscar tipo de negocio"
-            type="search"
-            disabled={commerceType.length === 3}
-            suggestions={foundActivities || []}
+          <InputSuggestions
+            id="actividades_ec2"
+            label={"Buscar tipo de negocio"}
+            type={"search"}
+            suggestions={
+              foundActivities.map((val) => {
+                const foundIdx = val
+                  .toLowerCase()
+                  .indexOf(actividad.toLowerCase());
+                if (foundIdx === -1) {
+                  return <h1 className="text-xs">{val}</h1>;
+                }
+                const str1 = val.substring(0, foundIdx);
+                const str2 = val.substring(
+                  foundIdx,
+                  foundIdx + actividad.length
+                );
+                const str3 = val.substring(foundIdx + actividad.length);
+                return (
+                  <h1 className="text-xs">
+                    {str1}
+                    <strong>{str2}</strong>
+                    {str3}
+                  </h1>
+                );
+              }) || []
+            }
             onSelectSuggestion={(index) => {
               const copy = [...commerceType];
               copy.push(foundActivities[index]);

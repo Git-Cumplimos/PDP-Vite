@@ -1,31 +1,40 @@
-export const abortController = new AbortController();
-
-const fetchData = async (url = "", method = "GET", queries = {}, data = {}) => {
+const fetchData = async (
+  url = "",
+  method = "GET",
+  queries = {},
+  data = {},
+  Content_Type = "application/json"
+) => {
   if (!["GET", "POST", "PUT", "DELETE"].includes(method)) {
     throw new Error("Method not suported");
   }
 
-  queries = Object.entries(queries).map(([key, value]) => {
-    return `${key}=${value}`;
-  });
-  if (method !== "POST" && queries.length > 0) {
-    url += `?${queries.join("&")}`;
+  if ("URLSearchParams" in window) {
+    const params = new URLSearchParams();
+    Object.entries(queries).forEach(([key, value]) => {
+      params.append(key, value);
+    });
+    queries = params.toString();
+  } else {
+    queries = Object.entries(queries)
+      .map(([key, value]) => {
+        return `${key}=${value}`;
+      })
+      .join("&");
   }
-  const fetchOtions =
-    method === "POST" || method === "PUT"
-      ? {
-          method: method,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      : {
-          method: method,
-        };      
-  fetchOtions.signal = abortController.signal;
-  const response = await fetch(url, fetchOtions);
+  if (method !== "POST" && queries.length > 0) {
+    url += `?${queries}`;
+  }
+
+  const fetchOptions = { method: method };
+  if (method === "POST" || method === "PUT") {
+    fetchOptions.headers = { "Content-Type": Content_Type };
+    fetchOptions.body = JSON.stringify(data);
+  }
+
+  const response = await fetch(url, fetchOptions);
   const contentType = response.headers.get("content-type");
+
   if (contentType && contentType.includes("application/json")) {
     const json = await response.json();
     return json;

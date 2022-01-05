@@ -7,7 +7,7 @@ import Input from "../../../components/Base/Input/Input";
 import { useReactToPrint } from "react-to-print";
 import VoucherMarket from "../Voucher/VoucherMarket";
 import { useMarketPlace } from "../utils/MarketPlaceHooks";
-//import { useAuth } from "../../../../utils/AuthHooks";
+//import { useAuth } from "../../../../hooks/AuthHooks";
 
 const PayForm = ({ selected }) => {
   const pageStyle = `
@@ -43,7 +43,6 @@ const PayForm = ({ selected }) => {
 
   const closeModal = () => {
     setShowModal(false);
-    window.location.reload();
   };
 
   const fetchOrder = () => {
@@ -52,17 +51,17 @@ const PayForm = ({ selected }) => {
     });
     setShowVoucher(true);
   };
-
+  console.log(selected);
   return (
     <div>
       {!showVoucher ? (
         <Form onSubmit={(e) => e.preventDefault()}>
           <div>
-            {"Id de transacción:" + " " + selected.IDcompraMP}
+            {"Id de transacción:" + " " + selected?.obj?.Id_Trx}
             <br />
-            {"Estado:" + " " + selected.EstadoTrx}
+            {"Estado:" + " " + selected?.EstadoTrx}
             <br />
-            {"Valor de la transacción:" + " " + selected.valor_trx}
+            {"Valor de la transacción:" + " " + selected?.obj?.valor}
             <Button type="submit" onClick={fetchOrder}>
               Pagar
             </Button>
@@ -73,7 +72,9 @@ const PayForm = ({ selected }) => {
           <VoucherMarket refPrint={printDiv} pageStyle={pageStyle} />
           <ButtonBar>
             <Button onClick={handlePrint}>Imprimir</Button>
-            <Button onClick={closeModal}>Cerrar</Button>
+            <a href="http://localhost:3001">
+              <Button onClick={closeModal}>Cerrar</Button>
+            </a>
           </ButtonBar>
         </div>
       )}

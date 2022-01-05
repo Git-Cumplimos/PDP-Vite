@@ -1,43 +1,37 @@
-import Admin from "./layouts/Admin/Admin";
-import ProvideAuth from "./components/Compound/ProvideAuth/ProvideAuth";
-import ProvideUrls from "./components/Compound/ProvideUrls/ProvideUrls";
-
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-
 import Amplify from "aws-amplify";
 import awsconfig from "./aws-exports";
-import { ToastContainer } from "react-toastify";
 
-import MessengerCustomerChat from "react-messenger-customer-chat";
+import { Suspense, lazy } from "react";
+import { useAuth } from "./hooks/AuthHooks";
+import { Routes } from "react-router-dom";
+import { useUrls } from "./hooks/UrlsHooks";
+import SkeletonLoading from "./components/Base/SkeletonLoading/SkeletonLoading";
+import ContentBox from "./components/Base/SkeletonLoading/ContentBox/ContentBox";
+const AdminLayout = lazy(() => import("./layouts/AdminLayout/AdminLayout"));
+const LoginLayout = lazy(() => import("./layouts/LoginLayout/LoginLayout"));
 
 Amplify.configure(awsconfig);
 
 function App() {
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    if (pathname === "/login") {
-      document.body.classList.remove("loggedBackground");
-      document.body.classList.add("loginBackground");
-    } else {
-      document.body.classList.remove("loginBackground");
-      document.body.classList.add("loggedBackground");
-    }
-  }, [pathname]);
+  const { cognitoUser, isSignedIn } = useAuth();
+  const { allRoutes } = useUrls();
 
   return (
-    <ProvideAuth>
-      <ProvideUrls>
-        <ToastContainer />
-        <Admin />
-        <MessengerCustomerChat
-          pageId="455201114671494"
-          appId="603779204002555"
-          language="es_LA"
-        />
-      </ProvideUrls>
-    </ProvideAuth>
+    <Suspense fallback={<SkeletonLoading />}>
+      {cognitoUser && isSignedIn ? (
+        <AdminLayout>
+          <Suspense fallback={<ContentBox />}>
+            <Routes>{allRoutes}</Routes>
+          </Suspense>
+        </AdminLayout>
+      ) : (
+        <LoginLayout>
+          <Suspense fallback={<ContentBox />}>
+            <Routes>{allRoutes}</Routes>
+          </Suspense>
+        </LoginLayout>
+      )}
+    </Suspense>
   );
 }
 

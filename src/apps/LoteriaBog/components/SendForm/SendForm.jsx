@@ -4,6 +4,12 @@ import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
 import { useState, useEffect } from "react";
 
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
+
 const SendForm = ({
   sorteo,
   selecFrac,
@@ -14,9 +20,11 @@ const SendForm = ({
   setCustomer,
   closeModal,
   handleSubmit,
+  tipoPago,
+  setTipoPago,
 }) => {
   const details = {
-    "Valor por fraccion": selected ? selected.Valor_fraccion : "",
+    "Valor por fraccion": selected ? formatMoney.format(selected.Valor_fraccion) : "",
     Numero: selected ? selected.Num_billete : "",
     Serie: selected ? selected.serie : "",
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
@@ -55,7 +63,8 @@ const SendForm = ({
     }   
   }
   // useEffect(() => {
-  //     setDisabledBtns(false)
+  //     setSelecFrac([])
+  //     setTipoPago()
   // });
 
   const onSubmit = (e) => {
@@ -63,7 +72,19 @@ const SendForm = ({
     setDisabledBtns(true)
     handleSubmit()
   }
+
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {};
+  // }
+
+  const formPago = (value) => {
+    
+    setTipoPago(value)
   
+  };
+
+  console.log(tipoPago)  
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">
@@ -88,9 +109,8 @@ const SendForm = ({
             return (
             <Input
              id={frac}
-             label={`${frac}:`}
+             label={`Fracción ${frac}:`}
              type="checkbox"
-             required={true}
              value={frac}
 
              checked={checkedState[index]}
@@ -99,6 +119,24 @@ const SendForm = ({
              )
             
            })}
+           <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
+              Efectivo
+              <input
+                id="Efectivo"
+                value={12}
+                name="pago"
+                type="radio"
+                onChange={(e) => formPago(e.target.value)}
+              />
+              Bono
+              <input
+                id="Bono"
+                value={14}
+                name="pago"
+                type="radio"
+                onChange={(e) => formPago(e.target.value)}
+              />
+            </div>
           </>
          
           :

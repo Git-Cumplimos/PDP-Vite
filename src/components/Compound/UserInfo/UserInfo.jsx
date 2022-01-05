@@ -1,4 +1,4 @@
-import { useAuth } from "../../../utils/AuthHooks";
+import { useAuth } from "../../../hooks/AuthHooks";
 import classes from "./UserInfo.module.css";
 
 const UserInfo = () => {
@@ -10,7 +10,10 @@ const UserInfo = () => {
     <div className={userInfo}>
       <p className={name}>{_userInfo?.attributes?.name ?? ""}</p>
       <p className={conv}>{roleInfo?.["nombre comercio"] ?? ""}</p>
-      <p className={userid}>ID: {roleInfo?.["id_comercio"]}</p>
+      <p className={userid}>
+        {roleInfo?.["id_comercio"] ? "ID: " : ""}
+        {roleInfo?.["id_comercio"]}
+      </p>
     </div>
   );
 };

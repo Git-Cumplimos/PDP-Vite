@@ -25,17 +25,6 @@ const OrdenMarket = () => {
     });
   }, []);
 
-  const searchOrder = async () => {
-    try {
-      const res = await fetch(`${urlConsulta}?idCompra=${161}&idComercio=${4}`);
-      const data = await res.json();
-      console.log(data);
-      setConsultas([data]);
-    } catch (error) {
-      console.log("Error en la obtención de los datos", error);
-    }
-  };
-
   const loadModal = (e) => {
     e.preventDefault();
     setShowModal(true);
@@ -56,16 +45,16 @@ const OrdenMarket = () => {
             {[consulta].map((row) => {
               return (
                 <div>
-                  <h1>Mensaje del servicio: {row.Mensaje}</h1>
+                  <h1>Mensaje del servicio: {row.msg}</h1>
                   <h1>Estado de la transacción: {row.EstadoTrx}</h1>
-                  <h1>Valor de la transacción: {row.valor_trx}</h1>
+                  <h1>Valor de la transacción: {row?.obj?.valor}</h1>
                   <h1>Punto de pago &copy;</h1>
                 </div>
               );
             })}
           </Form>
           <ButtonBar>
-            <Button type="submit" onClick={console.log(1)}>
+            <Button type="submit" onClick={(e) => loadModal(e)}>
               Continuar
             </Button>
           </ButtonBar>

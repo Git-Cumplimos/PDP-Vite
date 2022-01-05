@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classes from "./MultipleSelect.module.css";
 
-const MultipleSelect = ({ label, options, onChange, ...select }) => {
+const MultipleSelect = ({ label, options, onChange, disabled = false }) => {
   const { formItem, items, divChecked } = classes;
 
   const [values, setValues] = useState(options);
+
+  useEffect(() => {
+    setValues(options);
+  }, [options]);
 
   return (
     <div className={formItem}>
@@ -16,10 +20,14 @@ const MultipleSelect = ({ label, options, onChange, ...select }) => {
               key={label}
               className={`${checked ? divChecked : ""}`}
               onClick={() => {
-                const copy_vals = { ...values };
-                copy_vals[label] = !checked;
-                setValues({ ...copy_vals });
-                onChange && onChange({ ...copy_vals });
+                if (!disabled) {
+                  setValues((oldValues) => {
+                    const copy_vals = { ...oldValues };
+                    copy_vals[label] = !checked;
+                    onChange?.({ ...copy_vals });
+                    return { ...copy_vals };
+                  });
+                }
               }}
             >
               <label htmlFor={label}>{label}</label>

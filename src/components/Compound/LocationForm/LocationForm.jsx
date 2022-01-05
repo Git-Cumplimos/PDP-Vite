@@ -106,7 +106,7 @@ const LocationForm = ({ place = "", location }) => {
               const query = capitalize(e.target.value);
               if (query.length > 1) {
                 fetchData(url, "GET", {
-                  $where: `municipio LIKE '%25${query}%25'`,
+                  $where: `municipio LIKE '%${query}%'`,
                   $limit: 5,
                 })
                   .then((res) => {

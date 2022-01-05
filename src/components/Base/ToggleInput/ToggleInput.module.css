@@ -27,13 +27,8 @@
 }
 
 .toggle > input:checked + .slider {
-  @apply bg-sky-600;
+  @apply bg-primary;
   /* background-color: #2196F3; */
-}
-
-.toggle > input:focus + .slider {
-  /* @apply shadow-sm ring-sky-600; */
-  box-shadow: 0 0 1px #2196F3;
 }
 
 .toggle > input:checked + .slider::before {

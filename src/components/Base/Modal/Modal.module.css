@@ -8,12 +8,12 @@
 
 /* Modal Content/Box */
 .modalContent {
-  @apply bg-white border-black text-black m-auto border-2;
+  @apply relative bg-white border-black text-black m-auto border-2;
 }
 
 /* The Close Button */
 .close {
-  @apply text-black float-right cursor-pointer text-3xl;
+  @apply absolute right-6 text-black float-right cursor-pointer text-3xl;
 }
 
 .close:hover,

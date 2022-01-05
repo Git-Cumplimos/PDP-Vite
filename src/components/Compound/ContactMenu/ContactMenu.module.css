@@ -1,0 +1,166 @@
+.contactMenu {
+  @apply bottom-7 left-6 fixed;
+
+  @apply grid grid-flow-row auto-rows-auto place-content-center gap-y-6;
+}
+
+.chatIcon {
+  @apply relative rounded-full text-center p-2 text-2xl text-white z-30;
+  @apply h-12 w-12 shadow-lg;
+
+  /* background-color: rgb(18, 155, 244); */
+  background-color: rgb(255, 126, 41);
+}
+
+.chatIcon:hover > .tooltip {
+  @apply block;
+}
+
+/* .chatIcon > span  */
+
+.contactIcons {
+  @apply grid grid-cols-1 grid-rows-2 place-content-center gap-y-6;
+  @apply opacity-0;
+
+  transform: translate3d(0, 300%, 0);
+}
+
+.animateIn {
+  opacity: 0;
+  animation: fadeUp 250ms ease-out both;
+}
+
+.animateOut {
+  opacity: 1;
+  animation: fadeDown 250ms ease-in both;
+}
+
+.animateLeft {
+  /* opacity: 1; */
+  animation: rotateLeft 200ms ease-in;
+}
+
+.animateRight {
+  /* opacity: 1; */
+  animation: rotateRight 200ms ease-in;
+}
+
+.tooltip::before {
+  /* content: url("data:image/svg+xml,<svg width='250' height='250' viewBox='-50 -50 300 300'><polygon fill='#0f0' stroke='#0f0' stroke-width='10' stroke-linejoin='round' points='100,0 0,200 200,200'/></svg>"); */
+  
+  /* @apply block absolute bg-red-700 -right-5; */
+
+  content: " ";
+  position: absolute;
+  top: 30%; /* At the bottom of the tooltip */
+  right: 100%;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent rgb(24, 24, 27) transparent transparent;
+
+  /* fill: #0f0; */
+  /* stroke: #0f0; */
+  /* stroke-width: 10; */
+  /* clip-path: polygon(0 50%, 100% 100%, 100% 0); */
+}
+.tooltip {
+  @apply hidden absolute left-14 bottom-2 bg-gray-900 text-white text-xs px-2 py-2 rounded font-medium;
+}
+
+.contactIcons > a.waClass,
+.contactIcons > a.tlClass {
+  @apply rounded-full text-center relative;
+  @apply h-12 w-12 shadow-lg;
+}
+
+.contactIcons > a.waClass:hover > .tooltip,
+.contactIcons > a.tlClass:hover > .tooltip {
+  @apply block;
+}
+
+.contactIcons > a.waClass {
+  @apply p-2 text-white text-3xl;
+
+  font-size: 30px;
+  line-height: 30px;
+  background-color: #49e670;
+}
+.contactIcons > a.waClass > span {
+  @apply h-12 w-12;
+}
+
+.contactIcons > a.tlClass {
+  background-color: white;
+}
+.contactIcons > a.tlClass > span {
+  @apply text-5xl;
+  @apply h-12 w-12;
+
+  background-color: transparent;
+
+  color: #1e88e5;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 300%, 0);
+  }
+  2% {
+    transform: translate3d(0, 150%, 0);
+  }
+  50% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeDown {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0;
+  }
+  98% {
+    transform: translate3d(0, 150%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, 300%, 0);
+  }
+}
+
+@keyframes rotateLeft {
+  from {
+    /* opacity: 1; */
+    transform: rotate(0deg);
+  }
+  50% {
+    /* opacity: 0; */
+    transform: rotate(90deg);
+  }
+  to {
+    /* opacity: 0; */
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes rotateRight {
+  from {
+    /* opacity: 0; */
+    transform: rotate(90deg);
+  }
+  50% {
+    /* opacity: 0; */
+    transform: rotate(0deg);
+  }
+  to {
+    /* opacity: 1; */
+    transform: rotate(0deg);
+  }
+}

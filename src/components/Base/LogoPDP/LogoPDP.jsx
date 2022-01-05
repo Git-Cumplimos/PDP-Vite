@@ -1,8 +1,13 @@
-import LogoPng from "../../../assets/img/logosPuntoDePagoHorizontal.png";
+import { memo } from "react";
+import { useImgs } from "../../../hooks/ImgsHooks";
 import classes from "./LogoPDP.module.css";
 
-const LogoPDP = ({ large = false, small = false, xsmall = false }) => {
+const LogoPDP = memo(({ large = false, small = false, xsmall = false }) => {
   const { logoPDP, lgImg, smImg, xsImg } = classes;
+
+  const {
+    imgs: { pdpHorizontal: LogoPng },
+  } = useImgs();
   return (
     <div
       className={`${logoPDP} ${large ? lgImg : ""} ${small ? smImg : ""} ${
@@ -14,6 +19,6 @@ const LogoPDP = ({ large = false, small = false, xsmall = false }) => {
       </div>
     </div>
   );
-};
+});
 
 export default LogoPDP;
