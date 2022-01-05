@@ -95,7 +95,7 @@ const Loteria = ({ route }) => {
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
   const [selecFrac, setSelecFrac] = useState([]);
-  const [tipoPago, setTipoPago] = useState(1);
+  const [tipoPago, setTipoPago] = useState('12');
 
   const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
     { value: "", label: "" },
@@ -109,6 +109,7 @@ const Loteria = ({ route }) => {
     setLoterias("");
     setPage(1);
     setMaxPages(1);
+    
 
     console.log(sorteoExtrafisico);
     const copy = [{ value: "", label: "" }];
@@ -156,7 +157,7 @@ const Loteria = ({ route }) => {
     setCustomer({ fracciones: "", phone: "", doc_id: "" });
     setSelected(null);
     setSelecFrac([]);
-
+    setTipoPago('12')
     sorteo.split("-")[1] === "true"
       ? searchLoteriafisica(sorteo, numero, serie, page)
       : searchLoteria(sorteo, numero, serie, page);

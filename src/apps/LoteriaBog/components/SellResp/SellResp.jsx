@@ -111,7 +111,7 @@ const SellResp = ({
         "Tipo de Billete": sellResponse?.fisico===true? 'Fisico':'Virtual',
         "Forma de pago": sellResponse?.tipoPago==='12'|| sellResponse?.fisico==false? 'Efectivo':'Bono',
       }),
-      disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+      disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [
     roleInfo.ciudad,

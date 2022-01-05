@@ -63,7 +63,8 @@ const SendForm = ({
     }   
   }
   // useEffect(() => {
-  //     setDisabledBtns(false)
+  //     setSelecFrac([])
+  //     setTipoPago()
   // });
 
   const onSubmit = (e) => {
@@ -82,7 +83,8 @@ const SendForm = ({
     setTipoPago(value)
   
   };
-  
+
+  console.log(tipoPago)  
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">

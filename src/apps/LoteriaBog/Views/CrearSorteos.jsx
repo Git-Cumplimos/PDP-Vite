@@ -10,12 +10,15 @@ import CloseForm from "../components/SortForm/CloseForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import { useAuth } from "../../../hooks/AuthHooks";
+ 
 
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_accessKeyId,
   secretAccessKey: process.env.REACT_APP_secretAccessKey,
 });
+
+
 
 const CrearSorteos = ({ route }) => {
   const { label } = route;
@@ -31,10 +34,16 @@ const CrearSorteos = ({ route }) => {
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [disable_botoOrdinario, setDisable_botoOrdinario] = useState(false);
   const [disable_botoExtra, setDisable_botoExtra] = useState(false);
+
+  const [day, setDay] = useState(null);
+
+  
   useEffect(() => {
     ConsultaCrearSort().then((res) => {
       setResp_con(res);
     });
+    setDay((new Date()).getDay())
+    
   }, []);
 
   const onSubmit3 = (e) => {
@@ -84,10 +93,11 @@ const CrearSorteos = ({ route }) => {
     setDisable_botoExtra(false)
   };
   console.log(resp_con)
+  console.log(day)
   return (
     <>
       <div>
-        {resp_con?.extra?.Cerrar ? (
+        {resp_con?.extra?.Cerrar && day!=4 ? (
           <ButtonBar>
             <Button
               type="button"
