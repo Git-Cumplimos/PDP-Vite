@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import Form from "../../../components/Base/Form/Form";
 import InputX from "../../../components/Base/InputX/InputX";
 import Select from "../../../components/Base/Select/Select";
-import AWS from "aws-sdk";
+import AWS, { CostExplorer } from "aws-sdk";
 import ProgressBar from "../../../components/Base/ProgressBar/ProgressBar";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
@@ -74,12 +74,13 @@ const CargaArchivos = ({ route }) => {
         setTimeout(() => {
           closeModal();
           EstadoArchivos().then((res) => {
-            console.log(res);
-            if ("Motivo" in res?.[0]) {
-              if (res[0]["Estado"] === 1) {
-                notify(res[0]["Motivo"]);
-              } else {
-                notifyError(res[0]["Motivo"]);
+            if (typeof res != Object) {
+              if ("Motivo" in res?.[0]) {
+                if (res[0]["Estado"] === 1) {
+                  notify(res[0]["Motivo"]);
+                } else {
+                  notifyError(res[0]["Motivo"]);
+                }
               }
             }
           });
@@ -87,6 +88,7 @@ const CargaArchivos = ({ route }) => {
       })
       .send((err) => {
         if (err) notifyError("Error en la conexión a la base de datos", err);
+        console.log(err);
       });
   };
 
@@ -118,7 +120,7 @@ const CargaArchivos = ({ route }) => {
   if (progress === 100) {
   }
   const onChange = (files) => {
-    console.log(file)
+    console.log(file);
     if (Array.isArray(Array.from(files))) {
       files = Array.from(files);
       if (files.length === 1) {
@@ -154,8 +156,8 @@ const CargaArchivos = ({ route }) => {
     setFile("");
     setFileName("");
   }, []);
-  
-  console.log(file && progress === 0)
+
+  console.log(file && progress === 0);
   return (
     <>
       <div>
@@ -186,7 +188,7 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {archivo === "Asignacion" && tipoSorteo !== ""?(
+        {archivo === "Asignacion" && tipoSorteo !== "" ? (
           <Select
             id="FisiVir"
             label={`Asignación fisica o Virtual`}
@@ -203,8 +205,8 @@ const CargaArchivos = ({ route }) => {
         {(archivo !== "" &&
           archivo !== "PlanDePremios" &&
           archivo !== "Asignacion") ||
-          (archivo == "PlanDePremios" && tipoSorteo !== "")||
-          fisiVirtual!=='' ? (
+        (archivo == "PlanDePremios" && tipoSorteo !== "") ||
+        fisiVirtual !== "" ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <InputX
               id={`archivo_${archivo}`}
