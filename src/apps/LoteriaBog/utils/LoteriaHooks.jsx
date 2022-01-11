@@ -31,6 +31,7 @@ const urls = {
   cargueVentasExtra_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reporteVentaExtra_S3`, ////////
   con_SortVentas_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_sort`, ////////
   descargaVentas_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/descarga_reportes_S3`, ////////
+  reportVentas: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`, 
 };
 export const LoteriaContext = createContext({
   infoLoto: {
@@ -77,6 +78,7 @@ export const LoteriaContext = createContext({
   EstadoArchivos: () => {},
   con_sort_ventas: () => {},
   cargueVentasExtra_S3: () => {},
+  reportVentas: () => {},
 });
 
 export const useLoteria = () => {
@@ -593,6 +595,19 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
+  const reportVentas = useCallback(async (fecha_ini,fecha_fin) => {
+    try {
+      const res = await fetchData(urls.reportVentas, "GET", {
+        fecha_ini:fecha_ini,
+        fecha_fin:fecha_fin,
+      });
+      console.log(res)
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
 
 
   return {
@@ -643,5 +658,6 @@ export const useProvideLoteria = () => {
     cargueVentasExtra_S3,
     con_SortVentas_S3,
     descargaVentas_S3,
+    reportVentas,
   };
 };

@@ -8,6 +8,7 @@ import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import DescargaForm from "../components/DescargaForm/DescargaForm";
 import SubPage from "../../../components/Base/SubPage/SubPage";
+import ReportVentasForm from "../components/ReportVentasForm/ReportVentasForm";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
 
@@ -24,9 +25,13 @@ const DescargarArchivosS3 = ({ route }) => {
   const [showModal, setShowModal] = useState(false);
 
   const { con_SortVentas_S3 } = useLoteria();
-
+  const [showModal2, setShowModal2] = useState(false);
  
-
+  const onSubmit = (e) => {
+    e.preventDefault();
+    setShowModal2(true)
+    
+  };
   // const con_sort = (e) => {
 
   //   con_SortVentas_S3(sorteo,fecha_ini,fecha_fin,page).then((res) => {
@@ -44,6 +49,10 @@ const DescargarArchivosS3 = ({ route }) => {
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
+  }, []);
+
+  const closeModal2 = useCallback(async () => {
+    setShowModal2(false);
   }, []);
 
   console.log(resp_con_sort);
@@ -219,8 +228,17 @@ const DescargarArchivosS3 = ({ route }) => {
         ) : (
           ""
         )}
+        <Form formDir="col" onSubmit={onSubmit}>
+          <Button type='submit'>Reporte ventas</Button>  
+        </Form>
         <Modal show={showModal} handleClose={closeModal}>
           <DescargaForm closeModal={closeModal} selected={selected} />
+        </Modal>
+        <Modal show={showModal2} handleClose={closeModal2}>
+          <ReportVentasForm 
+          closeModal={closeModal2}
+          Oficina=''
+          />
         </Modal>
       </div>
     </>

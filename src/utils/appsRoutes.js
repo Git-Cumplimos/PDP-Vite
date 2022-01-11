@@ -22,6 +22,7 @@ const Home = lazy(() => import("../pages/Home"));
 const Transacciones = lazy(() => import("../pages/Transacciones"));
 const AuthButton = lazy(() => import("../components/Compound/Signout/Signout"));
 const Error404 = lazy(() => import("../pages/Error404"));
+const Reportes = lazy(() => import("../pages/Reportes"));
 
 /**
  * Loteria
@@ -313,7 +314,7 @@ const privateUrls = [
   { link: "/", label: "Inicio", component: Home },
   { link: "/info", label: "Informacion general", component: emptyComp },
   { link: "/gestion", label: "Gestion", component: emptyComp },
-  { link: "/reportes", label: "Reportes", component: emptyComp },
+  { link: "/reportes", label: "Reportes", component: Reportes },
   { link: "/seguridad", label: "Seguridad", component: emptyComp },
   { link: "/solicitudes", label: "Tus solicitudes", component: emptyComp },
   { label: <AuthButton /> },

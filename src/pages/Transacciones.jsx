@@ -98,7 +98,9 @@ const Transacciones = () => {
             setPage(1);
             setMaxPages(1);
             setFechaInicial(e.target.value);
+            if(fechaFinal!=='' && tipoOp!==""){
             transacciones(1, idComercio, tipoOp, e.target.value, fechaFinal);
+            }
           }}
         />
         <Input
@@ -109,7 +111,9 @@ const Transacciones = () => {
           onInput={(e) => {
             setPage(1);
             setFechaFinal(e.target.value);
+            if(fechaInicial!=='' && tipoOp!==""){
             transacciones(1, idComercio, tipoOp, fechaInicial, e.target.value);
+            }
           }}
         />
         <Select
@@ -124,6 +128,7 @@ const Transacciones = () => {
             ]) || { "": "" }
           }
           value={tipoOp}
+          required={true}
           onChange={(e) => {
             setPage(1);
             setTipoOp(parseInt(e.target.value) ?? "");
@@ -184,6 +189,8 @@ const Transacciones = () => {
                 year: "numeric",
                 month: "numeric",
                 day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
               }).format(new Date(Created_at));
               return {
                 Created_at,
