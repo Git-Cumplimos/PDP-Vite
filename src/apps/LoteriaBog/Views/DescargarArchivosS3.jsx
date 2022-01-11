@@ -25,8 +25,6 @@ const DescargarArchivosS3 = ({ route }) => {
 
   const { con_SortVentas_S3 } = useLoteria();
 
- 
-
   // const con_sort = (e) => {
 
   //   con_SortVentas_S3(sorteo,fecha_ini,fecha_fin,page).then((res) => {
@@ -46,8 +44,6 @@ const DescargarArchivosS3 = ({ route }) => {
     setShowModal(false);
   }, []);
 
-  console.log(resp_con_sort);
-  console.log(typeof resp_con_sort);
   return (
     <>
       <div>
