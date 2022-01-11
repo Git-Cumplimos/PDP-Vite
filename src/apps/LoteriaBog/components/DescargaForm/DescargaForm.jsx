@@ -13,15 +13,15 @@ const DescargaForm = ({ closeModal, selected }) => {
   const onSubmit = (e) => {
     e.preventDefault();
     descargaVentas_S3(selected).then((res) => {
-      if (!("msg" in res)) {
-        setUrls(res);
-      } else {
-        //notifyError(res.msg)
+      if (res != undefined) {
+        if (!("msg" in res)) {
+          setUrls(res);
+        } else {
+          //notifyError(res.msg)
+        }
       }
     });
   };
-
-  console.log(urls);
   return (
     <>
       <div className="flex flex-col justify-center items-center mx-auto container">
@@ -64,7 +64,7 @@ const DescargaForm = ({ closeModal, selected }) => {
               type="button"
               onClick={() => {
                 closeModal();
-                setUrls(false)
+                setUrls(false);
               }}
             >
               Cancelar

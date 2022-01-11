@@ -143,7 +143,16 @@ const LoginForm = () => {
       .handleverifyTotpToken(totp)
       .then()
       .catch((err) => {
-        notify("Token y contraseña establecidos correctamente");
+        if (err.code === "EnableSoftwareTokenMFAException") {
+          notifyError(
+            "Ha ingresado un código antiguo, escanee el QR e intente de nuevo"
+          );
+        } else {
+          if (auth.timer) {
+            clearTimeout(auth.timer);
+          }
+          notify("Token y contraseña reestablecidos correctamente");
+        }
       });
 
     setNames("");

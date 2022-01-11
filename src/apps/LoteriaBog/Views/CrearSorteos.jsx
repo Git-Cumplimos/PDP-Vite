@@ -10,20 +10,16 @@ import CloseForm from "../components/SortForm/CloseForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import { useAuth } from "../../../hooks/AuthHooks";
- 
-
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_accessKeyId,
   secretAccessKey: process.env.REACT_APP_secretAccessKey,
 });
 
-
-
 const CrearSorteos = ({ route }) => {
   const { label } = route;
   //const { notifyError, notify } = useAuth();
-  const { ConsultaCrearSort} = useLoteria();
+  const { ConsultaCrearSort } = useLoteria();
   const [resp_con, setResp_con] = useState(null);
   const [tip_sorteo, setTip_sorteo] = useState(null);
   const [sorteo, setSorteo] = useState(null);
@@ -37,40 +33,35 @@ const CrearSorteos = ({ route }) => {
 
   const [day, setDay] = useState(null);
 
-  
   useEffect(() => {
     ConsultaCrearSort().then((res) => {
       setResp_con(res);
     });
-    setDay((new Date()).getDay())
-    
+    setDay(new Date().getDay());
   }, []);
 
   const onSubmit3 = (e) => {
     setTip_sorteo(2);
-    setShowModal2(true)
-    setDisable_botoExtra(true)
+    setShowModal2(true);
+    setDisable_botoExtra(true);
   };
 
   const onSubmit4 = (e) => {
     setTip_sorteo(1);
-    setShowModal2(true)
-    setDisable_botoOrdinario(true)
+    setShowModal2(true);
+    setDisable_botoOrdinario(true);
   };
 
   const closeModal = useCallback(() => {
     setShowModal1(false);
     ConsultaCrearSort().then((res) => {
-      console.log(res);
       setResp_con(res);
     });
   });
 
   const closeModal2 = useCallback(() => {
     setShowModal2(false);
-    console.log('Que onda?????????')
     ConsultaCrearSort().then((res) => {
-      console.log(res);
       setResp_con(res);
     });
   });
@@ -81,7 +72,7 @@ const CrearSorteos = ({ route }) => {
     setSorteo(String(parseInt(resp_con?.ordinario.num_sorteo) + 1));
     setNum_loteria(resp_con?.ordinario.num_loteria);
     setShowModal1(true);
-    setDisable_botoOrdinario(false)
+    setDisable_botoOrdinario(false);
   };
 
   const onSubmit2 = (e) => {
@@ -90,14 +81,13 @@ const CrearSorteos = ({ route }) => {
     setSorteo(String(parseInt(resp_con?.extra.num_sorteo) + 1));
     setNum_loteria(resp_con?.extra.num_loteria);
     setShowModal1(true);
-    setDisable_botoExtra(false)
+    setDisable_botoExtra(false);
   };
-  console.log(resp_con)
-  console.log(day)
+
   return (
     <>
       <div>
-        {resp_con?.extra?.Cerrar && day!=4 ? (
+        {resp_con?.extra?.Cerrar && day != 4 ? (
           <ButtonBar>
             <Button
               type="button"
