@@ -387,7 +387,12 @@ export const useProvideAuth = () => {
           type: SIGN_IN,
           payload: { user: loggedUser },
         });
+        console.log(loggedUser);
         if (loggedUser.challengeName === "MFA_SETUP") {
+          setTimeout(() => {
+            signOut();
+            notifyError("La sesión ha expirado, por favor intente de nuevo");
+          }, 90000);
           await handleSetupTOTP(loggedUser);
         }
       } catch (err) {
@@ -476,6 +481,10 @@ export const useProvideAuth = () => {
   useEffect(() => {
     const validate = async () => {
       if (cognitoUser?.challengeName === "MFA_SETUP") {
+        setTimeout(() => {
+          signOut();
+          notifyError("La sesión ha expirado, por favor intente de nuevo");
+        }, 90000);
         try {
           const validartoken = await Auth.setupTOTP(cognitoUser);
           const str =
@@ -495,6 +504,9 @@ export const useProvideAuth = () => {
   useEffect(() => {
     const temp = async () => {
       if (cognitoUser?.challengeName === "MFA_SETUP") {
+        setTimeout(() => {
+          signOut();
+        }, 90000);
         try {
           const validartoken = await Auth.setupTOTP(cognitoUser);
           const str =
