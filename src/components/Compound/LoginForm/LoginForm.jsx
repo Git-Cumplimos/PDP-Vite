@@ -143,6 +143,7 @@ const LoginForm = () => {
       .handleverifyTotpToken(totp)
       .then()
       .catch((err) => {
+        console.log(err);
         if (err.code === "EnableSoftwareTokenMFAException") {
           notifyError(
             "Ha ingresado un código antiguo, escanee el QR e intente de nuevo"
@@ -217,7 +218,9 @@ const LoginForm = () => {
                 />
               </div>
               <div className={field}>
-                <label htmlFor="confirmNewPassword">Confirmar contraseña:</label>
+                <label htmlFor="confirmNewPassword">
+                  Confirmar contraseña:
+                </label>
                 <input
                   id="confirmNewPassword"
                   type="password"
@@ -311,7 +314,9 @@ const LoginForm = () => {
                 />
               </div>
               <div className={field}>
-                <label htmlFor="confirmNewPassword">Confirmar contraseña:</label>
+                <label htmlFor="confirmNewPassword">
+                  Confirmar contraseña:
+                </label>
                 <input
                   id="confirmNewPassword"
                   type="password"
@@ -347,6 +352,7 @@ const LoginForm = () => {
             <div className={field}>
               <label htmlFor="validateToken">Validar Token:</label>
               <input
+                required
                 id="validateToken"
                 type="text"
                 maxLength="255"
