@@ -9,7 +9,7 @@ const Login = () => {
   if (!isSignedIn) {
     return <LoginForm />;
   }
-
+  console.log(isSignedIn);
   return (
     <Navigate to={state?.from || pathname === "/login" ? "/" : pathname} />
   );

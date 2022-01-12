@@ -161,7 +161,7 @@ const LoginForm = () => {
     setCell("");
     setNewPass("");
   };
-
+  console.log(auth.cognitoUser);
   return auth.cognitoUser?.challengeName === "SOFTWARE_TOKEN_MFA" ? (
     <>
       <div className="container flex flex-row justify-center items-center">
@@ -217,7 +217,9 @@ const LoginForm = () => {
                 />
               </div>
               <div className={field}>
-                <label htmlFor="confirmNewPassword">Confirmar contraseña:</label>
+                <label htmlFor="confirmNewPassword">
+                  Confirmar contraseña:
+                </label>
                 <input
                   id="confirmNewPassword"
                   type="password"
@@ -311,7 +313,9 @@ const LoginForm = () => {
                 />
               </div>
               <div className={field}>
-                <label htmlFor="confirmNewPassword">Confirmar contraseña:</label>
+                <label htmlFor="confirmNewPassword">
+                  Confirmar contraseña:
+                </label>
                 <input
                   id="confirmNewPassword"
                   type="password"

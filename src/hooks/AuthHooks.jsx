@@ -288,7 +288,7 @@ export const useAuth = () => {
 export const useProvideAuth = () => {
   const [qr, setQr] = useState("");
 
-  const [username] = useState("CERT");
+  const [username] = useState("PROD");
 
   const [parameters, setParameters] = useState("");
 
@@ -384,8 +384,8 @@ export const useProvideAuth = () => {
           }
         );
         dispatchAuth({
-          type: SET_COGNITOUSER,
-          payload: { cogUser: loggedUser },
+          type: SIGN_IN,
+          payload: { user: loggedUser },
         });
         if (loggedUser.challengeName === "MFA_SETUP") {
           await handleSetupTOTP(loggedUser);
@@ -401,8 +401,10 @@ export const useProvideAuth = () => {
     async (totp) => {
       try {
         const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+        console.log(preferredMFA);
         if (preferredMFA === "SUCCESS") {
           await confirmSignIn(totp);
+          signOut();
         }
       } catch (err) {
         throw new Error(err);
