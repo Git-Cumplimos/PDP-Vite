@@ -9,7 +9,11 @@ import Input from "../../../../components/Base/Input/Input";
 import { notify, notifyError } from "../../../../utils/notify";
 import { ExportToCsv } from "export-to-csv";
 
-//import { useAuth } from "../../../../hooks/AuthHooks";
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
 
 function createCard(
   cod_distribuidor,
@@ -35,7 +39,7 @@ function createCard(
   fecha_venta
   };
 }
-const url_reportVentas = `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`
+const url_reportVentas = `http://127.0.0.1:5000/reportes_ventas`
 
 
 
@@ -45,6 +49,7 @@ const ReportVentasForm = ({closeModal, oficina}) => {
   const [fecha_fin, setFecha_fin] = useState('');
   const [disabledBtns, setDisabledBtns] = useState(true);
   const [resp_report,setResp_report] = useState(null)
+  const [total,setTotal] = useState(null)
   
 
   const reportVentas = useCallback(async (fecha_ini,fecha_fin) => {
@@ -124,6 +129,7 @@ const ReportVentasForm = ({closeModal, oficina}) => {
     setFecha_ini('')
     setFecha_fin('')
     setResp_report(null)
+    setTotal(null)
     return null;
   };
 
@@ -173,7 +179,8 @@ const ReportVentasForm = ({closeModal, oficina}) => {
                         }
                         else{
                           console.log(res)
-                          setResp_report(res)
+                          setResp_report(res.data)
+                          setTotal(res.total)                          
                           setDisabledBtns(false)
                         }                     
                                     
@@ -197,7 +204,8 @@ const ReportVentasForm = ({closeModal, oficina}) => {
                       }
                       else{
                         console.log(res)
-                        setResp_report(res)
+                        setResp_report(res.data)
+                        setTotal(res.total)
                         setDisabledBtns(false)
                       }                     
                                   
@@ -205,6 +213,24 @@ const ReportVentasForm = ({closeModal, oficina}) => {
                 
               }}
             /> 
+            {total!==null?
+            <>
+            <Input
+            id="frac_venta"
+            label="Fracciones vendidas"
+            type="text"
+            required='true'
+            value={total.total_frac}
+            />
+            <Input
+            id="val_total"
+            label="Total ventas"
+            type="text"
+            required='true'
+            value={formatMoney.format(total.val_total)}
+            />
+            </>
+            :""}
                        
             <ButtonBar>
             <Button type="submit" disabled={disabledBtns}>Descargar</Button>
@@ -214,7 +240,9 @@ const ReportVentasForm = ({closeModal, oficina}) => {
                 closeModal();
                 setFecha_fin('');
                 setFecha_ini('');
-                setResp_report(null)        
+                setResp_report(null) 
+                setTotal(null)
+                setDisabledBtns(true)       
               
               }}
             >
