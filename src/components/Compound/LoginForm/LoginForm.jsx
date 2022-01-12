@@ -143,6 +143,7 @@ const LoginForm = () => {
       .handleverifyTotpToken(totp)
       .then()
       .catch((err) => {
+        console.log(err);
         if (err.code === "EnableSoftwareTokenMFAException") {
           notifyError(
             "Ha ingresado un código antiguo, escanee el QR e intente de nuevo"
@@ -161,7 +162,7 @@ const LoginForm = () => {
     setCell("");
     setNewPass("");
   };
-  console.log(auth.cognitoUser);
+
   return auth.cognitoUser?.challengeName === "SOFTWARE_TOKEN_MFA" ? (
     <>
       <div className="container flex flex-row justify-center items-center">
@@ -351,6 +352,7 @@ const LoginForm = () => {
             <div className={field}>
               <label htmlFor="validateToken">Validar Token:</label>
               <input
+                required
                 id="validateToken"
                 type="text"
                 maxLength="255"
