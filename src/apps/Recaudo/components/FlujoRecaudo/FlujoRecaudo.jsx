@@ -19,7 +19,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 
 const pago_parcial = true;
 
-const FlujoRecaudo = ({ foundRefs, opts }) => {
+const FlujoRecaudo = ({ foundRefs }) => {
   const [{ id_convenio }] = useQuery();
 
   const navigate = useNavigate();

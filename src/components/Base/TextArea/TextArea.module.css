@@ -11,7 +11,7 @@
 .formItem > textarea {
   /* flex: 1 1 50%; */
   @apply px-4 py-2 rounded-md bg-secondary-light text-black md:w-full min-w-full md:min-w-max;
-  @apply resize-y;
+  @apply resize-y max-h-60;
 }
 
 .formItem > textarea:disabled {

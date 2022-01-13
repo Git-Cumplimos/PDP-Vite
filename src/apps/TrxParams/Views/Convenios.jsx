@@ -108,7 +108,10 @@ const Convenios = () => {
       }
       newData.push([col, data]);
     });
-    setSelectedConvenio(Object.fromEntries(newData));
+    setSelectedConvenio((old) => ({
+      "Id convenio": old?.["Id convenio"] || -1,
+      ...Object.fromEntries(newData)
+    }));
   }, []);
 
   const onSubmit = useCallback(

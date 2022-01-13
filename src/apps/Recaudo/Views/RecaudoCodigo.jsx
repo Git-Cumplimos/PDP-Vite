@@ -67,6 +67,7 @@ const RecaudoCodigo = () => {
           return {
             nombre_referencia,
             name: "referencias",
+            type: "text",
             minLength: min,
             maxLength: max,
             defaultValue: defVal,
@@ -77,10 +78,12 @@ const RecaudoCodigo = () => {
       {
         nombre_referencia: "Valor",
         name: "valor",
-        minLength: 4,
-        maxLength: 8,
+        type: "number",
+        step: 0.01,
+        min: 1000,
+        max: 99999999,
         defaultValue: monto,
-        readOnly: true
+        readOnly: true,
       },
     ];
   }, [dataConvenio, monto]);
@@ -96,7 +99,7 @@ const RecaudoCodigo = () => {
           setDataConvenio(foundConv);
           setMonto(monto);
           setQuery(
-            { barcode, id_convenio: foundConv?.id_convenio },
+            { id_convenio: foundConv?.id_convenio, barcode },
             { replace: true }
           );
         })
@@ -118,9 +121,16 @@ const RecaudoCodigo = () => {
           autoComplete="off"
         />
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Buscar</Button>
+          <Button type={"submit"} disabled={foundRefs.length > 0}>
+            Buscar
+          </Button>
         </ButtonBar>
       </Form>
+      {dataConvenio && "nombre_convenio" in dataConvenio ? (
+        <h1 className="text-3xl mt-6">Recaudo {dataConvenio?.nombre_convenio}</h1>
+      ) : (
+        ""
+      )}
       <FlujoRecaudo foundRefs={foundRefs} />
     </Fragment>
   );

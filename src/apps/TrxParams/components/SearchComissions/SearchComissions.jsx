@@ -172,6 +172,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           defaultValue={typeTrx}
         /> */}
         <Input
+          id={"convenioComissions"}
           label={"Convenio"}
           name={"convenio"}
           type={"text"}
@@ -180,6 +181,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
         />
         {comissionFace === "pay" ? (
           <Input
+            id={"comercioComissions"}
             label={"Comercio"}
             name={"comercio"}
             type={"number"}
@@ -189,6 +191,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           />
         ) : comissionFace === "collect" ? (
           <Input
+            id={"autorizadorComissions"}
             label={"Autorizador"}
             name={"autorizador"}
             type={"text"}
