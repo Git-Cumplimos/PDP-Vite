@@ -167,6 +167,16 @@ const svgs = {
   right_arrow: "assets/svg/right-arrow.svg",
   SORTEOS: "assets/svg/SORTEO-01.svg",
   SUSER: "assets/svg/SUSER-01.svg",
+  // Recaudo
+  CATALOGOS_Y_REVISTAS: "assets/svg/recaudo/CATALOGOS&REVISTAS.svg",
+  EPS_Y_SALUD: "assets/svg/recaudo/EPS&SALUD.svg",
+  IMPUESTO: "assets/svg/recaudo/IMPUESTO.svg",
+  PAGO_DE_SEGURIDAD_SOCIAL: "assets/svg/recaudo/PAGO_DE_SEGURIDAD_SOCIAL.svg",
+  PRODUCTOS_FINANCIEROS: "assets/svg/recaudo/PRODUCTOS_FINANCIEROS.svg",
+  RECAUDO: "assets/svg/recaudo/RECAUDO.svg",
+  RETIRO: "assets/svg/recaudo/RETIRO.svg",
+  SERVICIOS_PUBLICOS: "assets/svg/recaudo/SERVICIOS_PUBLICOS.svg",
+  UNIVERSIDADES: "assets/svg/recaudo/UNIVERSIDADES.svg",
 };
 
 export { fonts, images, svgs };
