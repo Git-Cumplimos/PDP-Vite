@@ -339,7 +339,7 @@ export const useProvideAuth = () => {
         throw err;
       }
     },
-    [cognitoUser, navigate, state, pathname]
+    [cognitoUser, navigate, state, pathname, timer]
   );
 
   const signOut = useCallback(() => {
@@ -365,7 +365,7 @@ export const useProvideAuth = () => {
         setQr(str);
       } catch (err) {}
     },
-    [cognitoUser?.username]
+    []
   );
 
   const handleChangePass = useCallback(
@@ -405,7 +405,7 @@ export const useProvideAuth = () => {
         throw err;
       }
     },
-    [handleSetupTOTP]
+    [handleSetupTOTP, signOut]
   );
 
   const handlesetPreferredMFA = useCallback(
@@ -420,7 +420,7 @@ export const useProvideAuth = () => {
         throw new Error(err);
       }
     },
-    [cognitoUser, confirmSignIn]
+    [cognitoUser, confirmSignIn, signOut]
   );
 
   const handleverifyTotpToken = useCallback(
@@ -506,7 +506,7 @@ export const useProvideAuth = () => {
       }
     };
     validate();
-  }, [cognitoUser, username]);
+  }, [cognitoUser, username, signOut]);
 
   useEffect(() => {
     const temp = async () => {
@@ -530,7 +530,7 @@ export const useProvideAuth = () => {
       }
     };
     temp();
-  }, [cognitoUser]);
+  }, [cognitoUser, signOut]);
 
   return {
     handleverifyTotpToken,
