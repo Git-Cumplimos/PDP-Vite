@@ -67,7 +67,6 @@ const FlujoRecaudo = ({ foundRefs }) => {
                 valInput.value = res?.obj?.monto;
               }
               valInput.readOnly = !pago_parcial;
-              valInput.required = true;
               objTemp.push(["Valor", formatMoney.format(res?.obj?.monto)]);
               setSummaryTrx(objTemp);
             } else {
