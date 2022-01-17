@@ -92,6 +92,13 @@ const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
 const RecaudoManual = lazy(() => import("../apps/Recaudo/Views/RecaudoManual"));
 const RecaudoCodigo = lazy(() => import("../apps/Recaudo/Views/RecaudoCodigo"));
 
+/**
+ * Daviplata
+ */
+const Daviplata = lazy(() => import("../apps/Daviplata/DaviplataTrx"));
+const Retiro = lazy(() => import("../apps/Daviplata/Views/Retiro"));
+const Deposito = lazy(() => import("../apps/Daviplata/Views/Deposito"));
+
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
 };
@@ -252,7 +259,9 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/trx-params",
-    label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales recaudo"} />,
+    label: (
+      <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales recaudo"} />
+    ),
     component: TrxParams,
     permission: [18, 19, 20, 21],
     subRoutes: [
@@ -271,7 +280,10 @@ const allUrlsPrivateApps = [
               {
                 link: "/trx-params/comisiones/pagadas/personalizadas",
                 label: (
-                  <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar por comercio"} />
+                  <AppIcons
+                    Logo={"IMPUESTO"}
+                    name={"Comisiones a pagar por comercio"}
+                  />
                 ),
                 component: CreateComision,
                 permission: [18],
@@ -294,7 +306,9 @@ const allUrlsPrivateApps = [
         subRoutes: [
           {
             link: "/trx-params/convenios/autorizadores",
-            label: <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />,
+            label: (
+              <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
+            ),
             component: ConvAuto,
             permission: [20],
           },
@@ -302,9 +316,31 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/trx-params/autorizadores",
-        label: <AppIcons Logo={"PRODUCTOS_FINANCIEROS"} name={"Autorizadores"} />,
+        label: (
+          <AppIcons Logo={"PRODUCTOS_FINANCIEROS"} name={"Autorizadores"} />
+        ),
         component: Autorizadores,
         permission: [21],
+      },
+    ],
+  },
+  {
+    link: "/daviplata",
+    label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
+    component: Daviplata,
+    permission: [3],
+    subRoutes: [
+      {
+        link: "/depositosdp",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Depositos" />,
+        component: Deposito,
+        permission: [3],
+      },
+      {
+        link: "/retirosdp",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Retiros" />,
+        component: Retiro,
+        permission: [3],
       },
     ],
   },
