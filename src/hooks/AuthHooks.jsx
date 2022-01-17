@@ -288,9 +288,11 @@ export const useAuth = () => {
 export const useProvideAuth = () => {
   const [qr, setQr] = useState("");
 
-  const [username] = useState("CERT");
+  const [username] = useState("PROD");
 
   const [parameters, setParameters] = useState("");
+
+  const [timer, setTimer] = useState(null);
 
   const [userState, dispatchAuth] = useReducer(reducerAuth, initialUser);
 
@@ -327,6 +329,9 @@ export const useProvideAuth = () => {
           payload: { loggedUser, dispatch: dispatchAuth },
         });
         navigate(state?.from || pathname === "/login" ? "/" : pathname);
+        if (timer) {
+          clearTimeout(timer);
+        }
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
           dispatchAuth({ type: SIGN_OUT });
@@ -334,7 +339,7 @@ export const useProvideAuth = () => {
         throw err;
       }
     },
-    [cognitoUser, navigate, state, pathname]
+    [cognitoUser, navigate, state, pathname, timer]
   );
 
   const signOut = useCallback(() => {
@@ -352,7 +357,7 @@ export const useProvideAuth = () => {
         const validartoken = await Auth.setupTOTP(user);
         const str =
           "otpauth://totp/AWSCognito:" +
-          cognitoUser?.username +
+          "Punto de Pago Token" +
           "?secret=" +
           validartoken +
           "&issuer=" +
@@ -360,7 +365,7 @@ export const useProvideAuth = () => {
         setQr(str);
       } catch (err) {}
     },
-    [cognitoUser?.username]
+    []
   );
 
   const handleChangePass = useCallback(
@@ -384,17 +389,23 @@ export const useProvideAuth = () => {
           }
         );
         dispatchAuth({
-          type: SET_COGNITOUSER,
-          payload: { cogUser: loggedUser },
+          type: SIGN_IN,
+          payload: { user: loggedUser },
         });
         if (loggedUser.challengeName === "MFA_SETUP") {
+          setTimer(
+            setTimeout(() => {
+              signOut();
+              notifyError("La sesión ha expirado, por favor intente de nuevo");
+            }, 90000)
+          );
           await handleSetupTOTP(loggedUser);
         }
       } catch (err) {
         throw err;
       }
     },
-    [handleSetupTOTP]
+    [handleSetupTOTP, signOut]
   );
 
   const handlesetPreferredMFA = useCallback(
@@ -403,12 +414,13 @@ export const useProvideAuth = () => {
         const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
         if (preferredMFA === "SUCCESS") {
           await confirmSignIn(totp);
+          signOut();
         }
       } catch (err) {
         throw new Error(err);
       }
     },
-    [cognitoUser, confirmSignIn]
+    [cognitoUser, confirmSignIn, signOut]
   );
 
   const handleverifyTotpToken = useCallback(
@@ -474,11 +486,17 @@ export const useProvideAuth = () => {
   useEffect(() => {
     const validate = async () => {
       if (cognitoUser?.challengeName === "MFA_SETUP") {
+        setTimer(
+          setTimeout(() => {
+            signOut();
+            notifyError("La sesión ha expirado, por favor intente de nuevo");
+          }, 90000)
+        );
         try {
           const validartoken = await Auth.setupTOTP(cognitoUser);
           const str =
             "otpauth://totp/AWSCognito:" +
-            username +
+            "Punto de Pago Token" +
             "?secret=" +
             validartoken +
             "&issuer=" +
@@ -488,16 +506,21 @@ export const useProvideAuth = () => {
       }
     };
     validate();
-  }, [cognitoUser, username]);
+  }, [cognitoUser, username, signOut]);
 
   useEffect(() => {
     const temp = async () => {
       if (cognitoUser?.challengeName === "MFA_SETUP") {
+        setTimer(
+          setTimeout(() => {
+            signOut();
+          }, 90000)
+        );
         try {
           const validartoken = await Auth.setupTOTP(cognitoUser);
           const str =
             "otpauth://totp/AWSCognito:" +
-            "PROD" +
+            "Punto de Pago Token" +
             "?secret=" +
             validartoken +
             "&issuer=" +
@@ -507,7 +530,7 @@ export const useProvideAuth = () => {
       }
     };
     temp();
-  }, [cognitoUser]);
+  }, [cognitoUser, signOut]);
 
   return {
     handleverifyTotpToken,
@@ -516,6 +539,7 @@ export const useProvideAuth = () => {
     confirmSignIn,
     signOut,
     qr,
+    timer,
     parameters,
     infoTicket,
     ...userState,

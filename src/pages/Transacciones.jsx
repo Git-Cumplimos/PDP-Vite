@@ -12,8 +12,7 @@ import Tickets from "../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
 
 const Transacciones = () => {
-  const { roleInfo } = useAuth();
-
+  const { roleInfo, userPermissions } = useAuth(); 
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
 
@@ -30,7 +29,10 @@ const Transacciones = () => {
   const transacciones = useCallback(
     (page, Comercio, Tipo_operacion, date_ini, date_end) => {
       const url = process.env.REACT_APP_URL_TRXS_TRX;
-      const queries = { Comercio };
+      const queries={};
+      if (!(Comercio===-1 || Comercio==='')){
+        queries.Comercio= Comercio;
+      }
       if (Tipo_operacion) {
         queries.Tipo_operacion = Tipo_operacion;
       }
@@ -41,8 +43,10 @@ const Transacciones = () => {
         queries.date_ini = date_ini;
         queries.date_end = date_end;
       }
+      console.log(queries)
       fetchData(url, "GET", queries)
         .then((res) => {
+          console.log(res)
           if (res?.status) {
             setMaxPages(res?.obj?.maxpages);
             setTrxs(res?.obj?.trxs);
@@ -84,7 +88,8 @@ const Transacciones = () => {
     tiposOperaciones();
     setIdComercio(roleInfo?.id_comercio || -1);
   }, [tiposOperaciones, roleInfo?.id_comercio]);
-
+  
+  
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Transacciones</h1>
@@ -141,6 +146,29 @@ const Transacciones = () => {
             );
           }}
         />
+        {userPermissions.map(({ id_permission }) => id_permission).includes(3) ?
+        <Input
+          id="id_comercio"
+          label="Id comercio"
+          type="numeric"
+          value={idComercio}
+          onChange={(e)=>{
+            setIdComercio(e.target.value)
+          }}
+          onLazyInput={{
+            callback: (e) => {
+              setPage(1);
+              if(tipoOp!==''){
+              transacciones(1, e.target.value, tipoOp, fechaInicial, fechaFinal);
+              }
+            },
+            timeOut: 500,
+          }}
+        />
+        :
+        ""
+        }
+        
         <ButtonBar className="col-span-1 md:col-span-2">
           <Button
             type="button"
@@ -185,13 +213,15 @@ const Transacciones = () => {
           <Table
             headers={["Fecha", "operacion", "Monto"]}
             data={trxs.map(({ Created_at, Tipo_operacion, Monto }) => {
+              const tempDate = new Date(Created_at);
+              tempDate.setHours(tempDate.getHours() + 5);
               Created_at = Intl.DateTimeFormat("es-CO", {
                 year: "numeric",
                 month: "numeric",
                 day: "numeric",
                 hour: "numeric",
-                minute: "numeric",
-              }).format(new Date(Created_at));
+                minute: "numeric"
+              }).format(tempDate);
               return {
                 Created_at,
                 Tipo_operacion,

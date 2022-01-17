@@ -87,6 +87,7 @@ const Recaudo = () => {
       </ButtonBar>
       {/* <HNavbar links={mostUsed} isIcon /> */}
       <InputSuggestions
+        id={"searchConv"}
         label={"Buscar convenio"}
         name={"nameConvenio"}
         type={"search"}

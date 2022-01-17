@@ -242,19 +242,19 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/recaudo",
-    label: <AppIcons Logo="" name={"Recaudo"} />,
+    label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
     component: Recaudo,
     permission: [1],
     subRoutes: [
       {
         link: "/recaudo/manual",
-        label: <AppIcons Logo="" name={"Recaudo manual"} />,
+        label: <AppIcons Logo={"RECAUDO"} name={"Recaudo manual"} />,
         component: RecaudoManual,
         permission: [1],
       },
       {
         link: "/recaudo/codigo",
-        label: <AppIcons Logo="" name={"Recaudo codigo de barras"} />,
+        label: <AppIcons Logo={"RECAUDO"} name={"Recaudo codigo de barras"} />,
         component: RecaudoCodigo,
         permission: [1],
       },
@@ -262,26 +262,26 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/trx-params",
-    label: <AppIcons Logo="" name={"Parametros transaccionales"} />,
+    label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales recaudo"} />,
     component: TrxParams,
     permission: [18, 19, 20, 21],
     subRoutes: [
       {
         link: "/trx-params/comisiones",
-        label: <AppIcons Logo="" name={"Comisiones"} />,
+        label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones"} />,
         component: Comisiones,
         permission: [18, 19],
         subRoutes: [
           {
             link: "/trx-params/comisiones/pagadas",
-            label: <AppIcons Logo="" name={"Comisiones a pagar"} />,
+            label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar"} />,
             component: Com2Pay,
             permission: [18],
             subRoutes: [
               {
                 link: "/trx-params/comisiones/pagadas/personalizadas",
                 label: (
-                  <AppIcons Logo="" name={"Comisiones a pagar por comercio"} />
+                  <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar por comercio"} />
                 ),
                 component: CreateComision,
                 permission: [18],
@@ -290,7 +290,7 @@ const allUrlsPrivateApps = [
           },
           {
             link: "/trx-params/comisiones/cobradas",
-            label: <AppIcons Logo="" name={"Comisiones a cobrar"} />,
+            label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a cobrar"} />,
             component: Com2Collect,
             permission: [19],
           },
@@ -298,13 +298,13 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/trx-params/convenios",
-        label: <AppIcons Logo="" name={"Convenios"} />,
+        label: <AppIcons Logo={"RETIRO"} name={"Convenios"} />,
         component: Convenios,
         permission: [20],
         subRoutes: [
           {
             link: "/trx-params/convenios/autorizadores",
-            label: <AppIcons Logo="" name={"Autorizadores de convenio"} />,
+            label: <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />,
             component: ConvAuto,
             permission: [20],
           },
@@ -312,7 +312,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/trx-params/autorizadores",
-        label: <AppIcons Logo="" name={"Autorizadores"} />,
+        label: <AppIcons Logo={"PRODUCTOS_FINANCIEROS"} name={"Autorizadores"} />,
         component: Autorizadores,
         permission: [21],
       },

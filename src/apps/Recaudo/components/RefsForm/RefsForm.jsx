@@ -12,7 +12,6 @@ const RefsForm = ({ data, onSubmit, btnName }) => {
             key={ind}
             id={key}
             label={key}
-            type={"text"}
             autoComplete="off"
             {...rest}
           />

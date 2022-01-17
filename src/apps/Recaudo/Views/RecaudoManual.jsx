@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import useQuery from "../../../hooks/useQuery";
 import fetchData from "../../../utils/fetchData";
 import FlujoRecaudo from "../components/FlujoRecaudo/FlujoRecaudo";
@@ -18,6 +18,7 @@ const RecaudoManual = () => {
         return {
           nombre_referencia,
           name: "referencias",
+          type: "text",
           minLength: min,
           maxLength: max,
           defaultValue: "",
@@ -27,29 +28,43 @@ const RecaudoManual = () => {
       {
         nombre_referencia: "Valor",
         name: "valor",
-        minLength: 4,
-        maxLength: 8,
+        type: "number",
+        min: 1000,
+        max: 99999999,
         defaultValue: "",
       },
     ];
   }, [dataConvenio]);
 
-  useEffect(() => {
-    fetchData(`${urlConvenios}/convenio_unique`, "GET", {
-      id_convenio,
-    })
-      .then((res) => {
-        if (res?.status) {
-          setDataConvenio(res?.obj?.results?.[0]);
-        } else {
-          setDataConvenio(null);
-          console.error(res?.msg);
-        }
+  useEffect(
+    () => {
+      
+      fetchData(`${urlConvenios}/convenio_unique`, "GET", {
+        id_convenio,
       })
-      .catch(() => {});
-  }, [id_convenio]);
+        .then((res) => {
+          if (res?.status) {
+            setDataConvenio(res?.obj?.results?.[0]);
+          } else {
+            setDataConvenio(null);
+            console.error(res?.msg);
+          }
+        })
+        .catch(() => {});
+    },
+    [id_convenio]
+  );
 
-  return <FlujoRecaudo foundRefs={foundRefs} />;
+  return (
+    <Fragment>
+      {dataConvenio && "nombre_convenio" in dataConvenio ? (
+        <h1 className="text-3xl mt-6">Recaudo {dataConvenio?.nombre_convenio}</h1>
+      ) : (
+        ""
+      )}
+      <FlujoRecaudo foundRefs={foundRefs} />
+    </Fragment>
+  );
 };
 
 export default RecaudoManual;

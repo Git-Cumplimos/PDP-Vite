@@ -19,7 +19,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 
 const pago_parcial = true;
 
-const FlujoRecaudo = ({ foundRefs, opts }) => {
+const FlujoRecaudo = ({ foundRefs }) => {
   const [{ id_convenio }] = useQuery();
 
   const navigate = useNavigate();
@@ -67,7 +67,6 @@ const FlujoRecaudo = ({ foundRefs, opts }) => {
                 valInput.value = res?.obj?.monto;
               }
               valInput.readOnly = !pago_parcial;
-              valInput.required = true;
               objTemp.push(["Valor", formatMoney.format(res?.obj?.monto)]);
               setSummaryTrx(objTemp);
             } else {
