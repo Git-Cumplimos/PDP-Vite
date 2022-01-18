@@ -1,4 +1,4 @@
-import { useState, useCallback} from "react";
+import { useState, useCallback, useEffect} from "react";
 import { useLoteria } from "../utils/LoteriaHooks";
 
 
@@ -120,35 +120,37 @@ const Premios = ({route}) => {
     isWinner(sorteo, billete, serie)
       .then((res) => {
         fracbill.length=0;
-        
+        console.log(res,'res')
         setDisabledBtns(false);
         
         
         if('msg' in res){
-          notify("El pago de premios de este sorteo ya esta vencido");
+          notifyError(res.msg);
           setWinner(false);
           setIsSelf(false);
         }
         if (res[0]['Estado'] === false) {
-          notify("No ganador");
+          notifyError("No ganador");
           setWinner(false);
           setIsSelf(false);
-        }else {
+        }
+        if (res[0]['Estado'] === true) {
             if(res[0]['Tipo']===2) {
-            notify("Ganador");
+            notify("Ganador con billete virtual");
             setTipopago(res[0]['Tipo'])
             setWinner(true);
             setIsSelf(true);
-        }else{
-          notify("Ganador con billete físico");
-          for(var i = 0; i<res[0].cantidad_frac_billete; i++){ 
-            fracbill.push(i+1)
-          }
-          setTipopago(res[0]['Tipo'])
-          setCheckedState(new Array(res[0].cantidad_frac_billete).fill(false))
-          setWinner(true);
-          setIsSelf(false);
-        }
+            }
+            else{
+            notify("Ganador con billete físico");
+            for(var i = 0; i<res[0].cantidad_frac_billete; i++){ 
+              fracbill.push(i+1)
+            }
+            setTipopago(res[0]['Tipo'])
+            setCheckedState(new Array(res[0].cantidad_frac_billete).fill(false))
+            setWinner(true);
+            setIsSelf(false);
+            }
         }
       })
       .catch(() => setDisabledBtns(false));
@@ -221,9 +223,13 @@ const Premios = ({route}) => {
         }
     }   
   }
-  
+  useEffect(() => {
+    if (pagoresponse!=null && 'msg' in pagoresponse){
+    notifyError(pagoresponse.msg)
+    }
+  }, [pagoresponse])
   return (
-    <SubPage label={label}>
+    <>
       <Form onSubmit={onSubmit} grid>
         <Input
           id="numSorteo"
@@ -361,7 +367,7 @@ const Premios = ({route}) => {
       {(respagar['msg']===undefined) && respagar?.Tipo!=0 ? <>
       <Modal show={showModal} num_tele={phone} handleClose={() => closeModal()}>
         
-        {pagoresponse===null ? <>
+        {pagoresponse===null || 'msg' in pagoresponse ? <>
           {tipopago===2? 
             (<PagarForm
               selected={respagar}
@@ -410,7 +416,7 @@ const Premios = ({route}) => {
         
       </Modal>
       </>: ""}
-    </SubPage>  
+    </>  
     
   );
 };

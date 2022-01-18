@@ -42,6 +42,8 @@ function createCard(
 }
 const url_reportVentas = `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`;
 
+
+
 const ReportVentasForm = ({ closeModal, oficina }) => {
   const [fecha_ini, setFecha_ini] = useState("");
   const [fecha_fin, setFecha_fin] = useState("");

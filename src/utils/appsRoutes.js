@@ -48,6 +48,10 @@ const ConsultarColCard = lazy(() =>
 const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
+const Premios = lazy(() =>
+  import("../apps/LoteriaBog/Views/Premios")
+);
+
 /**
  * Marketplace
  */
@@ -160,14 +164,13 @@ const allUrlsPrivateApps = [
         component: CrearSorteos,
         permission: [5],
       },
-
-      // {
-      //   link: "/loteria-de-bogota/premios",
-      //   label: <AppIcons Logo={"PAGO"} name="Premios" />,
-      //   component: Premios,
-      //   extern: false,
-      //   permission: [5],///////////////////////////////////////////////////////////////////
-      // },
+      {
+        link: "/loteria-de-bogota/premios",
+        label: <AppIcons Logo={"PAGO"} name="Premios" />,
+        component: Premios,
+        extern: false,
+        permission: [5],///////////////////////////////////////////////////////////////////
+      },
     ],
   },
   {
