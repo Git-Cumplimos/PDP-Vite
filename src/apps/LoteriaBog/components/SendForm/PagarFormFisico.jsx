@@ -50,6 +50,9 @@ const SendFormFisico = ({
     setDisabledBtns(true)
     handleSubmit()
   }
+  useEffect(() => {
+    setDisabledBtns(false)
+  }, [selected])
  
 
   return (
@@ -242,6 +245,7 @@ const SendFormFisico = ({
               type="button"
               onClick={() => {
                 closeModal();
+                setDisabledBtns(false)
                 setCustomer({
                   doc_id:"",
                   primer_nombre:"",
@@ -251,7 +255,7 @@ const SendFormFisico = ({
                   direccion:"",
                   telefono:"",
                   fracciones:"",
-                
+                                 
             
                 });
               }}
