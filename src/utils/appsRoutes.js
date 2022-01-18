@@ -38,7 +38,16 @@ const CrearSorteos = lazy(() =>
 const CargaArchivos = lazy(() =>
   import("../apps/LoteriaBog/Views/CargaArchivos")
 );
-
+/**
+ * ColCard
+ */
+const ColCard = lazy(() => import("../apps/ColCard/ColCard"));
+const ConsultarColCard = lazy(() =>
+  import("../apps/ColCard/Views/ConsultarColCard")
+);
+const RecargarColCard = lazy(() =>
+  import("../apps/ColCard/Views/RecargarColCard")
+);
 /**
  * Marketplace
  */
@@ -151,6 +160,7 @@ const allUrlsPrivateApps = [
         component: CrearSorteos,
         permission: [5],
       },
+
       // {
       //   link: "/loteria-de-bogota/premios",
       //   label: <AppIcons Logo={"PAGO"} name="Premios" />,
@@ -340,6 +350,26 @@ const allUrlsPrivateApps = [
         link: "/retirosdp",
         label: <AppIcons Logo={"MARKETPLACE"} name="Retiros" />,
         component: Retiro,
+        permission: [3],
+      },
+    ],
+  },
+  {
+    link: "/recargas-Colcard",
+    label: <AppIcons Logo={"LOTERIA"} name="Recargas ColCard" />,
+    component: ColCard,
+    permission: [3],
+    subRoutes: [
+      {
+        link: "/recargas-Colcard/recargar-tarjeta",
+        label: <AppIcons Logo={"SORTEOS"} name="Recargar tarjeta" />,
+        component: RecargarColCard,
+        permission: [3],
+      },
+      {
+        link: "/recargas-Colcard/consultar-tarjeta",
+        label: <AppIcons Logo={CARGAR} name="Consultar tarjeta" />,
+        component: ConsultarColCard,
         permission: [3],
       },
     ],
