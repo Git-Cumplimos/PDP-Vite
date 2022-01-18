@@ -7,6 +7,7 @@ import { Routes } from "react-router-dom";
 import { useUrls } from "./hooks/UrlsHooks";
 import SkeletonLoading from "./components/Base/SkeletonLoading/SkeletonLoading";
 import ContentBox from "./components/Base/SkeletonLoading/ContentBox/ContentBox";
+
 const AdminLayout = lazy(() => import("./layouts/AdminLayout/AdminLayout"));
 const LoginLayout = lazy(() => import("./layouts/LoginLayout/LoginLayout"));
 

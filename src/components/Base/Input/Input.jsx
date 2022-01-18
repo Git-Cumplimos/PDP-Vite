@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import classes from "./Input.module.css";
 
-const Input = ({ label, self = false, onLazyInput, ...input }) => {
+const Input = ({ label, self = false, onLazyInput, info = "", ...input }) => {
   const { formItem } = classes;
   const { id: _id, type } = input;
 
@@ -53,7 +53,10 @@ const Input = ({ label, self = false, onLazyInput, ...input }) => {
           {label}
         </label>
       )}
-      <input {...input} />
+      <div>
+        <input {...input} />
+        {info ? <p>{info}</p> : ""}
+      </div>
     </div>
   );
 };
