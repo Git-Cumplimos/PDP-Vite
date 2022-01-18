@@ -234,19 +234,19 @@ const allUrlsPrivateApps = [
     link: "/recaudo",
     label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
     component: Recaudo,
-    permission: [1],
+    permission: [22, 23],
     subRoutes: [
       {
         link: "/recaudo/manual",
         label: <AppIcons Logo={"RECAUDO"} name={"Recaudo manual"} />,
         component: RecaudoManual,
-        permission: [1],
+        permission: [22],
       },
       {
         link: "/recaudo/codigo",
         label: <AppIcons Logo={"RECAUDO"} name={"Recaudo codigo de barras"} />,
         component: RecaudoCodigo,
-        permission: [1],
+        permission: [23],
       },
     ],
   },
