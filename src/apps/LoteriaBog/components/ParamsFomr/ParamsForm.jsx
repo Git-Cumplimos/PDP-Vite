@@ -8,6 +8,11 @@ import { notify, notifyError } from "../../../../utils/notify";
 import { queries } from "@testing-library/react";
 //import { useAuth } from "../../../../hooks/AuthHooks";
 
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
 
 const url_cambioParams=`${process.env.REACT_APP_URL_LOTO_PREMIOS}/cambio_params`;
 
@@ -71,6 +76,7 @@ const ParamsForm = ({
             autoComplete="off"
             required='true'
             value={uvt}
+            info={formatMoney.format(uvt)}
             onInput={(e) => {
               if(!isNaN(e.target.value)){
                 const num = (e.target.value);
@@ -85,6 +91,7 @@ const ParamsForm = ({
             autoComplete="off"
             required='true'
             value={max_pago}
+            info={formatMoney.format(max_pago)}
             onInput={(e) => {
               if(!isNaN(e.target.value)){
                 const num = (e.target.value);
