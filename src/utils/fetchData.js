@@ -17,9 +17,7 @@ const fetchData = async (
     queries = params.toString();
   } else {
     queries = Object.entries(queries)
-      .map(([key, value]) => {
-        return `${key}=${value}`;
-      })
+      .map(([key, value]) => `${key}=${value}`)
       .join("&");
   }
   if (method !== "POST" && queries.length > 0) {
