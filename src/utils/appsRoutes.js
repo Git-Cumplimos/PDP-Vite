@@ -344,14 +344,14 @@ const allUrlsPrivateApps = [
     permission: [3],
     subRoutes: [
       {
-        link: "/depositosdp",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Depositos" />,
+        link: "/daviplata/depositos",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Depositos Daviplata" />,
         component: Deposito,
         permission: [3],
       },
       {
-        link: "/retirosdp",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Retiros" />,
+        link: "/daviplata/retiros",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Retiros Daviplata" />,
         component: Retiro,
         permission: [3],
       },
