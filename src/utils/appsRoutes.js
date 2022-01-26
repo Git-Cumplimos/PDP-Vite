@@ -372,31 +372,31 @@ const allUrlsPrivateApps = [
     link: "/API_SMS",
     label: <AppIcons Logo={"MARKETPLACE"} name="SMS" />,
     component: API_SMS,
-    permission: [8],
+    permission: [25],
     subRoutes: [
       {
         link: "/EnviarSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Enviar SMS" />,
         component: EnviarSMS,
-        permission: [8],
+        permission: [25],
       },
       {
         link: "/crearSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Crear SMS" />,
         component: CrearSMS,
-        permission: [8],
+        permission: [26],
       },
       {
         link: "/reporteSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Reporte" />,
         component: reporteSMS,
-        permission: [8],
+        permission: [26],
       },
       {
         link: "/BloquearNum",
         label: <AppIcons Logo={"MARKETPLACE"} name="Bloqueo de números" />,
         component: BloquearNum,
-        permission: [8],
+        permission: [26],
       },
 
 
