@@ -81,7 +81,7 @@ const ReconoSERID = () => {
       ) : (
         <iframe
           title="Hola"
-          src="https://demorcs.olimpiait.com:6319/#/redirect/fbc8ab99-95ba-40e7-b92f-f43a067baf42"
+          src="https://demorcs.olimpiait.com:6319/#/redirect/f02b426a-cae8-4d69-87be-3ae94ea94df7"
           className="border-2 border-blueGray-900 w-full"
           allow="camera"
           frameBorder="0"
