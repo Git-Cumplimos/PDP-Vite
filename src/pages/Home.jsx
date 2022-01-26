@@ -6,7 +6,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useMemo } from "react";
 import { useImgs } from "../hooks/ImgsHooks";
-import ReconoSERID from "../components/Compound/ReconoSERID/ReconoSERID";
+// import ReconoSERID from "../components/Compound/ReconoSERID/ReconoSERID";
 
 const Home = () => {
   const { urlsPrivateApps } = useUrls();
