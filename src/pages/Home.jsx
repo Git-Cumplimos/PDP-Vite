@@ -45,7 +45,7 @@ const Home = () => {
         })}
       </Carousel>
       <HNavbar links={urlsPrivateApps} isIcon />
-      <ReconoSERID />
+      {/* <ReconoSERID /> */}
     </>
   );
 };
