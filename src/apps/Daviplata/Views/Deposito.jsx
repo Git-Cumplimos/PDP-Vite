@@ -4,7 +4,13 @@ import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
 import Modal from "../../../components/Base/Modal/Modal";
 import useQuery from "../../../hooks/useQuery";
-import { Fragment, useState, useCallback } from "react";
+import { Fragment, useState, useCallback, useRef } from "react";
+import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
+import Tickets from "../../../components/Base/Tickets/Tickets";
+import { useReactToPrint } from "react-to-print";
+import { useNavigate } from "react-router-dom";
+import { postCashIn } from "../utils/fetchRevalDaviplata";
+import { notifyError } from "../../../utils/notify";
 
 const formatMoney = Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -12,8 +18,18 @@ const formatMoney = Intl.NumberFormat("es-CO", {
 });
 
 const Deposito = () => {
+  const [{ phone, valor, summary }, setQuery] = useQuery();
+
+  const navigate = useNavigate();
+
   const [showModal, setShowModal] = useState(false);
-  const [{ phone, valor }, setQuery] = useQuery();
+  const [paymentStatus, setPaymentStatus] = useState(null);
+
+  const printDiv = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -25,7 +41,11 @@ const Deposito = () => {
       const formData = new FormData(e.target);
       const phone = formData.get("numCliente");
       const valor = formData.get("valor");
-      setQuery({ phone, valor }, { replace: true });
+      const summary = {
+        "Numero celular": phone,
+        "Valor de deposito": valor,
+      };
+      setQuery({ phone, valor, summary }, { replace: true });
       setShowModal(true);
     },
     [setQuery]
@@ -44,6 +64,35 @@ const Deposito = () => {
     },
     [setQuery]
   );
+
+  const closeModal = useCallback(() => {
+    setShowModal(false);
+  }, []);
+
+  const goToRecaudo = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  const onMakePayment = useCallback(() => {
+    const body = {
+      idcliente: 22,
+      ipcliente: "155.0.0.55",
+      idpersona: 2,
+      NoidentificacionCajero: "100",
+      NumCelular: phone,
+      Valor: valor,
+    };
+
+    postCashIn(body)
+      .then((res) => {
+        console.log(res);
+        setPaymentStatus(true);
+      })
+      .catch((err) => {
+        console.error(err)
+        notifyError("Error en la transaccion");
+      });
+  }, [phone, valor]);
 
   return (
     <Fragment>
@@ -79,7 +128,24 @@ const Deposito = () => {
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={handleClose}>
-        Seguro?
+        {paymentStatus ? (
+          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+            <Tickets refPrint={printDiv} /* ticket={paymentStatus} */ />
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button onClick={goToRecaudo}>Cerrar</Button>
+            </ButtonBar>
+          </div>
+        ) : (
+          <PaymentSummary summaryTrx={summary}>
+            <ButtonBar>
+              <Button type="submit" onClick={onMakePayment}>
+                Aceptar
+              </Button>
+              <Button onClick={closeModal}>Cancelar</Button>
+            </ButtonBar>
+          </PaymentSummary>
+        )}
       </Modal>
     </Fragment>
   );
