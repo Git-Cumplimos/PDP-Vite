@@ -1,5 +1,6 @@
 import { lazy } from "react";
 
+
 /**
  * * Providers
  */
@@ -112,6 +113,16 @@ const Daviplata = lazy(() => import("../apps/Daviplata/DaviplataTrx"));
 const Retiro = lazy(() => import("../apps/Daviplata/Views/Retiro"));
 const Deposito = lazy(() => import("../apps/Daviplata/Views/Deposito"));
 
+/**
+ * API-SMS
+ */
+ const API_SMS = lazy(() => import("../apps/API-SMS/API_SMS"));
+ const EnviarSMS = lazy(() => import("../apps/API-SMS/Views/EnviarSMS"));
+ const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
+ const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
+ const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
+
+
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
 };
@@ -198,7 +209,7 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={"MARKETPLACE"} name="Marketplace" />,
     component: MarketPlace,
     extern: true,
-    permission: [0],
+    permission: [10],
   },
   {
     link: "/marketplace/payorder/:orden",
@@ -355,6 +366,40 @@ const allUrlsPrivateApps = [
         component: Retiro,
         permission: [3],
       },
+    ],
+  },
+  {
+    link: "/API_SMS",
+    label: <AppIcons Logo={"MARKETPLACE"} name="SMS" />,
+    component: API_SMS,
+    permission: [8],
+    subRoutes: [
+      {
+        link: "/EnviarSMS",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Enviar SMS" />,
+        component: EnviarSMS,
+        permission: [8],
+      },
+      {
+        link: "/crearSMS",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Crear SMS" />,
+        component: CrearSMS,
+        permission: [8],
+      },
+      {
+        link: "/reporteSMS",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Reporte" />,
+        component: reporteSMS,
+        permission: [8],
+      },
+      {
+        link: "/BloquearNum",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Bloqueo de números" />,
+        component: BloquearNum,
+        permission: [8],
+      },
+
+
     ],
   },
   {

@@ -67,7 +67,7 @@ const ParamsForm = ({
             <div
               className="flex flex-col justify-center items-center mx-auto container grid"
             >
-             ¿Desea cambiar algún parametro?              
+            <h1 className="text-2xl font-semibold">¿Desea cambiar algún parametro?</h1>               
             </div>
             <Input
             id="uvt"
