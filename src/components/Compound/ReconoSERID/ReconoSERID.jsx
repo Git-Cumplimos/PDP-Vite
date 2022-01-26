@@ -4,6 +4,44 @@ const ReconoSERID = () => {
   const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
+    function handlePermission() {
+      navigator.permissions.query({name:'geolocation'}).then(function(result) {
+        if (result.state === 'granted') {
+          report(result.state);
+          // geoBtn.style.display = 'none';
+        } else if (result.state === 'prompt') {
+          report(result.state);
+          // geoBtn.style.display = 'none';
+          // navigator.geolocation.getCurrentPosition(revealPosition,positionDenied,geoSettings);
+        } else if (result.state === 'denied') {
+          report(result.state);
+          // geoBtn.style.display = 'inline';
+        }
+        result.onchange = function() {
+          report(result.state);
+        }
+      });
+    }
+    
+    function report(state) {
+      console.log('Permission ' + state);
+    }
+    
+    handlePermission();
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: false,
+        video: { facingMode: { exact: "user" } },
+      })
+      .then((mediaStream) => {
+        /* usar el flujo de datos */
+        console.log(mediaStream);
+      })
+      .catch((err) => {
+        /* manejar el error */
+        console.log(err);
+        console.log(err.name);
+      });
     const receiver = (event) => {
       if (event.origin !== "https://demorcs.olimpiait.com:6319") {
         return;
@@ -57,4 +95,3 @@ const ReconoSERID = () => {
 };
 
 export default ReconoSERID;
-
