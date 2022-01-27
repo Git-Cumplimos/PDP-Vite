@@ -11,38 +11,46 @@
   @apply text-xl;
 }
 
-.formItem > input {
+.formItem > div > input {
   /* flex: 1 1 50%; */
   @apply px-4 py-2 rounded-md bg-secondary-light text-black;
 }
 
-.formItem > input[type="number"] {
+.formItem > div > input[type="number"] {
   -moz-appearance: textfield;
 }
 
-.formItem > input[type="checkbox"] {
+.formItem > div > input[type="checkbox"] {
   min-width: 100px;
 }
 
-.formItem > input:disabled {
+.formItem > div > input:disabled {
   @apply bg-gray-100;
 }
 
-.formItem > input[list]::-webkit-calendar-picker-indicator {
+.formItem > div > input[list]::-webkit-calendar-picker-indicator {
   width: 0;
   margin: 0;
   padding: 0;
   opacity: 0;
 }
 
-.formItem > input::-webkit-outer-spin-button,
-.formItem > input::-webkit-inner-spin-button {
+.formItem > div > input::-webkit-outer-spin-button,
+.formItem > div > input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.formItem > input::-webkit-search-cancel-button {
+.formItem > div > input::-webkit-search-cancel-button {
   -webkit-appearance: none;
   content: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-lg' viewBox='0 0 16 16'><path d='M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z'/></svg>");
   cursor: pointer;
+}
+
+.formItem > div {
+  @apply relative;
+}
+
+.formItem > div > input + p {
+  @apply text-sm absolute;
 }
