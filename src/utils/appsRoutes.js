@@ -48,6 +48,7 @@ const ConsultarColCard = lazy(() =>
 const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
+
 /**
  * Marketplace
  */
@@ -262,7 +263,9 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/trx-params",
-    label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales recaudo"} />,
+    label: (
+      <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales recaudo"} />
+    ),
     component: TrxParams,
     permission: [18, 19, 20, 21],
     subRoutes: [
@@ -281,7 +284,10 @@ const allUrlsPrivateApps = [
               {
                 link: "/trx-params/comisiones/pagadas/personalizadas",
                 label: (
-                  <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar por comercio"} />
+                  <AppIcons
+                    Logo={"IMPUESTO"}
+                    name={"Comisiones a pagar por comercio"}
+                  />
                 ),
                 component: CreateComision,
                 permission: [18],
@@ -304,7 +310,9 @@ const allUrlsPrivateApps = [
         subRoutes: [
           {
             link: "/trx-params/convenios/autorizadores",
-            label: <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />,
+            label: (
+              <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
+            ),
             component: ConvAuto,
             permission: [20],
           },
@@ -312,7 +320,9 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/trx-params/autorizadores",
-        label: <AppIcons Logo={"PRODUCTOS_FINANCIEROS"} name={"Autorizadores"} />,
+        label: (
+          <AppIcons Logo={"PRODUCTOS_FINANCIEROS"} name={"Autorizadores"} />
+        ),
         component: Autorizadores,
         permission: [21],
       },
