@@ -4,13 +4,13 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#e26a22" />
     <!-- <link rel="stylesheet" href="https://chatbot-wizard-files.s3.amazonaws.com/agentechat-application-scripts/support-widget/app.css"> -->
     <meta
       name="description"
       content="Web site created using create-react-app"
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/favicon.png" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/Color-logo-192.png" />
 
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -34,27 +34,6 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", function () {
-          navigator.serviceWorker
-            .register("%PUBLIC_URL%/sw.js")
-            .then(
-              function (registration) {
-                console.log('Worker registration successful', registration.scope);
-              },
-              function (err) {
-                console.log("Worker registration failed", err);
-              }
-            )
-            .catch(function (err) {
-              console.log(err);
-            });
-        });
-      } else {
-        console.log('Service Worker is not supported by browser.');
-      }
-    </script>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
