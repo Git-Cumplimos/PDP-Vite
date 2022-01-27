@@ -100,6 +100,21 @@ const Autorizadores = lazy(() =>
 );
 
 /**
+ * Solicitud Enrolamiento
+ */
+const SolicitudEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/SolicitudEnrolamiento")
+);
+const FormularioEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/FormularioEnrolamiento")
+);
+const ConsultaEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/ConsultaEnrolamiento")
+);
+const ReconoserID = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/ReconoserID")
+);
+/**
  * Recaudo
  */
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
@@ -349,6 +364,30 @@ const allUrlsPrivateApps = [
     ],
   },
   {
+    link: "/solicitud-enrolamiento",
+    label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
+    component: SolicitudEnrolamiento,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/solicitud-enrolamiento/formulario",
+        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
+        component: FormularioEnrolamiento,
+        permission: [1],
+      },
+      {
+        link: "/Solicitud-enrolamiento/consultar",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
+        ),
+        component: ConsultaEnrolamiento,
+        permission: [1],
+      },
+      {
+        link: "/Solicitud-enrolamiento/reconoserid",
+        label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
+        component: ReconoserID,
+        permission: [1],
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
     component: Daviplata,
