@@ -106,7 +106,7 @@ const Deposito = () => {
           autoComplete="off"
           minLength={"10"}
           maxLength={"10"}
-          value={phone}
+          value={phone ?? ""}
           onChange={() => {}}
           required
         />
@@ -118,7 +118,7 @@ const Deposito = () => {
           autoComplete="off"
           min={"5000"}
           max={"9999999.99"}
-          value={valor}
+          value={valor ?? ""}
           onChange={() => {}}
           info={`${formatMoney.format(valor ?? 0)}`}
           required

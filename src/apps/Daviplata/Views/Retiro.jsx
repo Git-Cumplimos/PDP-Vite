@@ -35,19 +35,22 @@ const Retiro = () => {
     setShowModal(false);
   }, []);
 
-  const onSubmitDeposit = useCallback((e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const phone = formData.get("numCliente");
-    const valor = formData.get("valor");
-    const otp = formData.get("OTP");
-    const summary = {
-      "Numero celular": phone,
-      "Valor de retiro": valor,
-    };
-    setQuery({ phone, valor, otp, summary }, { replace: true });
-    setShowModal(true);
-  }, [setQuery]);
+  const onSubmitDeposit = useCallback(
+    (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const phone = formData.get("numCliente");
+      const valor = formData.get("valor");
+      const otp = formData.get("OTP");
+      const summary = {
+        "Numero celular": phone,
+        "Valor de retiro": valor,
+      };
+      setQuery({ phone, valor, otp, summary }, { replace: true });
+      setShowModal(true);
+    },
+    [setQuery]
+  );
 
   const onChange = useCallback(
     (ev) => {
@@ -80,7 +83,7 @@ const Retiro = () => {
       NoidentificacionCajero: "100",
       NumCelular: phone,
       Valor: valor,
-      OTP: otp
+      OTP: otp,
     };
 
     postCashOut(body)
@@ -106,7 +109,7 @@ const Retiro = () => {
           autoComplete="off"
           minLength={"10"}
           maxLength={"10"}
-          value={phone}
+          value={phone ?? ""}
           onChange={() => {}}
           required
         />
@@ -118,7 +121,7 @@ const Retiro = () => {
           minLength="6"
           maxLength="6"
           autoComplete="off"
-          value={otp}
+          value={otp ?? ""}
           onChange={() => {}}
           required
         />
@@ -131,7 +134,7 @@ const Retiro = () => {
           autoComplete="off"
           min={"5000"}
           max={"9999999.99"}
-          value={valor}
+          value={valor ?? ""}
           onChange={() => {}}
           info={`${formatMoney.format(valor ?? 0)}`}
           required
@@ -141,7 +144,7 @@ const Retiro = () => {
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={handleClose}>
-      {paymentStatus ? (
+        {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <Tickets refPrint={printDiv} /* ticket={paymentStatus} */ />
             <ButtonBar>
