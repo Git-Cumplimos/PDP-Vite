@@ -2,3 +2,7 @@
   @apply p-4 rounded-lg bg-secondary-light cursor-pointer;
   @apply transition-transform duration-300 transform scale-100 hover:scale-105;
 }
+.Card > card {
+  @apply p-4 rounded-lg bg-secondary-light cursor-pointer;
+  @apply transition-transform duration-300 transform scale-100 hover:scale-105;
+}

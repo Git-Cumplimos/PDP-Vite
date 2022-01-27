@@ -86,6 +86,21 @@ const Autorizadores = lazy(() =>
 );
 
 /**
+ * Solicitud Enrolamiento
+ */
+const SolicitudEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/SolicitudEnrolamiento")
+);
+const FormularioEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/FormularioEnrolamiento")
+);
+const ConsultaEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/ConsultaEnrolamiento")
+);
+const ReconoserID = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/ReconoserID")
+);
+/**
  * Recaudo
  */
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
@@ -252,7 +267,9 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/trx-params",
-    label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales recaudo"} />,
+    label: (
+      <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales recaudo"} />
+    ),
     component: TrxParams,
     permission: [18, 19, 20, 21],
     subRoutes: [
@@ -271,7 +288,10 @@ const allUrlsPrivateApps = [
               {
                 link: "/trx-params/comisiones/pagadas/personalizadas",
                 label: (
-                  <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar por comercio"} />
+                  <AppIcons
+                    Logo={"IMPUESTO"}
+                    name={"Comisiones a pagar por comercio"}
+                  />
                 ),
                 component: CreateComision,
                 permission: [18],
@@ -294,7 +314,9 @@ const allUrlsPrivateApps = [
         subRoutes: [
           {
             link: "/trx-params/convenios/autorizadores",
-            label: <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />,
+            label: (
+              <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
+            ),
             component: ConvAuto,
             permission: [20],
           },
@@ -302,9 +324,39 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/trx-params/autorizadores",
-        label: <AppIcons Logo={"PRODUCTOS_FINANCIEROS"} name={"Autorizadores"} />,
+        label: (
+          <AppIcons Logo={"PRODUCTOS_FINANCIEROS"} name={"Autorizadores"} />
+        ),
         component: Autorizadores,
         permission: [21],
+      },
+    ],
+  },
+  {
+    link: "/solicitud-enrolamiento",
+    label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
+    component: SolicitudEnrolamiento,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/solicitud-enrolamiento/formulario",
+        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
+        component: FormularioEnrolamiento,
+        permission: [1],
+      },
+      {
+        link: "/Solicitud-enrolamiento/consultar",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
+        ),
+        component: ConsultaEnrolamiento,
+        permission: [1],
+      },
+      {
+        link: "/Solicitud-enrolamiento/reconoserid",
+        label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
+        component: ReconoserID,
+        permission: [1],
       },
     ],
   },
