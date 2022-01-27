@@ -1,6 +1,5 @@
 import { lazy } from "react";
 
-
 /**
  * * Providers
  */
@@ -49,9 +48,7 @@ const ConsultarColCard = lazy(() =>
 const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
-const Premios = lazy(() =>
-  import("../apps/LoteriaBog/Views/Premios")
-);
+const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
 
 /**
  * Marketplace
@@ -131,12 +128,11 @@ const Deposito = lazy(() => import("../apps/Daviplata/Views/Deposito"));
 /**
  * API-SMS
  */
- const API_SMS = lazy(() => import("../apps/API-SMS/API_SMS"));
- const EnviarSMS = lazy(() => import("../apps/API-SMS/Views/EnviarSMS"));
- const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
- const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
- const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
-
+const API_SMS = lazy(() => import("../apps/API-SMS/API_SMS"));
+const EnviarSMS = lazy(() => import("../apps/API-SMS/Views/EnviarSMS"));
+const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
+const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
+const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -195,7 +191,7 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"PAGO"} name="Premios" />,
         component: Premios,
         extern: false,
-        permission: [5],///////////////////////////////////////////////////////////////////
+        permission: [5], ///////////////////////////////////////////////////////////////////
       },
     ],
   },
@@ -388,6 +384,10 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
         component: ReconoserID,
         permission: [1],
+      },
+    ],
+  },
+  {
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
     component: Daviplata,
@@ -437,8 +437,6 @@ const allUrlsPrivateApps = [
         component: BloquearNum,
         permission: [26],
       },
-
-
     ],
   },
   {
