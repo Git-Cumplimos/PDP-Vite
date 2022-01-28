@@ -45,6 +45,7 @@ const Retiro = () => {
       const summary = {
         "Numero celular": phone,
         "Valor de retiro": valor,
+        "Token de seguridad": otp
       };
       setQuery({ phone, valor, otp, summary }, { replace: true });
       setShowModal(true);

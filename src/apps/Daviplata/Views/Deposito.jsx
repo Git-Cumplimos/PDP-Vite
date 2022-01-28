@@ -11,11 +11,7 @@ import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import { postCashIn } from "../utils/fetchRevalDaviplata";
 import { notifyError } from "../../../utils/notify";
-
-const formatMoney = Intl.NumberFormat("es-CO", {
-  style: "currency",
-  currency: "COP",
-});
+import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
 
 const Deposito = () => {
   const [{ phone, valor, summary }, setQuery] = useQuery();
@@ -57,9 +53,10 @@ const Deposito = () => {
       const phone = (
         (formData.get("numCliente") ?? "").match(/\d/g) ?? []
       ).join("");
-      const valor = (
-        (formData.get("valor") ?? "").match(/(\d+\.?\d*|\.\d+)/g) ?? []
-      ).join("");
+      // const valor = (
+      //   (formData.get("valor") ?? "").match(/(\d+\.?\d*|\.\d+)/g) ?? []
+      // ).join("");
+      const valor = ((formData.get("valor") ?? "").match(/\d/g) ?? []).join("");
       setQuery({ phone, valor }, { replace: true });
     },
     [setQuery]
@@ -89,7 +86,7 @@ const Deposito = () => {
         setPaymentStatus(true);
       })
       .catch((err) => {
-        console.error(err)
+        console.error(err);
         notifyError("Error en la transaccion");
       });
   }, [phone, valor]);
@@ -107,20 +104,28 @@ const Deposito = () => {
           minLength={"10"}
           maxLength={"10"}
           value={phone ?? ""}
-          onChange={() => {}}
+          onInput={() => {}}
           required
         />
         <Input
+          id="numCliente"
+          name="numCliente"
+          label="Número telefónico de cliente"
+          type="text"
+          autoComplete="off"
+          minLength={"10"}
+          maxLength={"10"}
+          value={phone ?? ""}
+          onInput={() => {}}
+          required
+        />
+        <MoneyInput
           id="valor"
           name="valor"
           label="Valor a depositar"
-          type="number"
           autoComplete="off"
-          min={"5000"}
-          max={"9999999.99"}
-          value={valor ?? ""}
-          onChange={() => {}}
-          info={`${formatMoney.format(valor ?? 0)}`}
+          min={5000}
+          onInput={(e, val) => setQuery({ valor: val }, { replace: true })}
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
