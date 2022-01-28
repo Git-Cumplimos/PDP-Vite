@@ -14,7 +14,7 @@ import { notifyError } from "../../../utils/notify";
 import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
 
 const Deposito = () => {
-  const [{ phone, valor, summary }, setQuery] = useQuery();
+  const [{ phone, userDoc, valor, summary }, setQuery] = useQuery();
 
   const navigate = useNavigate();
 
@@ -49,17 +49,29 @@ const Deposito = () => {
 
   const onChange = useCallback(
     (ev) => {
-      const formData = new FormData(ev.target.form);
-      const phone = (
-        (formData.get("numCliente") ?? "").match(/\d/g) ?? []
-      ).join("");
-      // const valor = (
-      //   (formData.get("valor") ?? "").match(/(\d+\.?\d*|\.\d+)/g) ?? []
-      // ).join("");
-      const valor = ((formData.get("valor") ?? "").match(/\d/g) ?? []).join("");
-      setQuery({ phone, valor }, { replace: true });
+      if (ev.target.name !== "valor") {
+        // console.log(ev.target.validationMessage);
+        const formData = new FormData(ev.target.form);
+        const phone = (
+          (formData.get("numCliente") ?? "").match(/\d/g) ?? []
+        ).join("");
+        const userDoc = (
+          (formData.get("docCliente") ?? "").match(/\d/g) ?? []
+        ).join("");
+        setQuery({ phone, userDoc, valor: valor ?? "" }, { replace: true });
+      }
     },
-    [setQuery]
+    [setQuery, valor]
+  );
+
+  const onMoneyChange = useCallback(
+    (e, valor) => {
+      setQuery(
+        { phone: phone ?? "", userDoc: userDoc ?? "", valor },
+        { replace: true }
+      );
+    },
+    [setQuery, phone, userDoc]
   );
 
   const closeModal = useCallback(() => {
@@ -108,14 +120,14 @@ const Deposito = () => {
           required
         />
         <Input
-          id="numCliente"
-          name="numCliente"
-          label="Número telefónico de cliente"
+          id="docCliente"
+          name="docCliente"
+          label="CC de quien deposita"
           type="text"
           autoComplete="off"
-          minLength={"10"}
-          maxLength={"10"}
-          value={phone ?? ""}
+          minLength={"7"}
+          maxLength={"13"}
+          value={userDoc ?? ""}
           onInput={() => {}}
           required
         />
@@ -125,7 +137,7 @@ const Deposito = () => {
           label="Valor a depositar"
           autoComplete="off"
           min={5000}
-          onInput={(e, val) => setQuery({ valor: val }, { replace: true })}
+          onInput={onMoneyChange}
           required
         />
         <ButtonBar className={"lg:col-span-2"}>

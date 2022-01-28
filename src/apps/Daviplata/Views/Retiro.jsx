@@ -11,11 +11,7 @@ import { postCashOut } from "../utils/fetchRevalDaviplata";
 import { notifyError } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
-
-const formatMoney = Intl.NumberFormat("es-CO", {
-  style: "currency",
-  currency: "COP",
-});
+import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
 
 const Retiro = () => {
   const [{ phone, valor, otp, summary }, setQuery] = useQuery();
@@ -126,18 +122,13 @@ const Retiro = () => {
           onChange={() => {}}
           required
         />
-        <Input
+        <MoneyInput
           id="valor"
           name="valor"
           label="Valor a depositar"
-          type="number"
-          step="any"
           autoComplete="off"
-          min={"5000"}
-          max={"9999999.99"}
-          value={valor ?? ""}
-          onChange={() => {}}
-          info={`${formatMoney.format(valor ?? 0)}`}
+          min={5000}
+          onInput={(e, val) => setQuery({ valor: val }, { replace: true })}
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
