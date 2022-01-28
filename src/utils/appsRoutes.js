@@ -1,6 +1,5 @@
 import { lazy } from "react";
 
-
 /**
  * * Providers
  */
@@ -49,9 +48,7 @@ const ConsultarColCard = lazy(() =>
 const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
-const Premios = lazy(() =>
-  import("../apps/LoteriaBog/Views/Premios")
-);
+const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
 
 /**
  * Marketplace
@@ -100,6 +97,21 @@ const Autorizadores = lazy(() =>
 );
 
 /**
+ * Solicitud Enrolamiento
+ */
+const SolicitudEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/SolicitudEnrolamiento")
+);
+const FormularioEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/FormularioEnrolamiento")
+);
+const ConsultaEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/ConsultaEnrolamiento")
+);
+const ReconoserID = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/ReconoserID")
+);
+/**
  * Recaudo
  */
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
@@ -116,12 +128,11 @@ const Deposito = lazy(() => import("../apps/Daviplata/Views/Deposito"));
 /**
  * API-SMS
  */
- const API_SMS = lazy(() => import("../apps/API-SMS/API_SMS"));
- const EnviarSMS = lazy(() => import("../apps/API-SMS/Views/EnviarSMS"));
- const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
- const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
- const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
-
+const API_SMS = lazy(() => import("../apps/API-SMS/API_SMS"));
+const EnviarSMS = lazy(() => import("../apps/API-SMS/Views/EnviarSMS"));
+const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
+const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
+const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -180,7 +191,7 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"PAGO"} name="Premios" />,
         component: Premios,
         extern: false,
-        permission: [5],///////////////////////////////////////////////////////////////////
+        permission: [5], ///////////////////////////////////////////////////////////////////
       },
     ],
   },
@@ -349,20 +360,48 @@ const allUrlsPrivateApps = [
     ],
   },
   {
+    link: "/solicitud-enrolamiento",
+    label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
+    component: SolicitudEnrolamiento,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/solicitud-enrolamiento/formulario",
+        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
+        component: FormularioEnrolamiento,
+        permission: [1],
+      },
+      {
+        link: "/Solicitud-enrolamiento/consultar",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
+        ),
+        component: ConsultaEnrolamiento,
+        permission: [1],
+      },
+      {
+        link: "/Solicitud-enrolamiento/reconoserid",
+        label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
+        component: ReconoserID,
+        permission: [1],
+      },
+    ],
+  },
+  {
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
     component: Daviplata,
     permission: [3],
     subRoutes: [
       {
-        link: "/depositosdp",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Depositos" />,
+        link: "/daviplata/depositos",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Depositos Daviplata" />,
         component: Deposito,
         permission: [3],
       },
       {
-        link: "/retirosdp",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Retiros" />,
+        link: "/daviplata/retiros",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Retiros Daviplata" />,
         component: Retiro,
         permission: [3],
       },
@@ -398,8 +437,6 @@ const allUrlsPrivateApps = [
         component: BloquearNum,
         permission: [26],
       },
-
-
     ],
   },
   {
