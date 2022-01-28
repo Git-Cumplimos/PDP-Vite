@@ -12,6 +12,7 @@ import { ExportToCsv } from "export-to-csv";
 
 function createCard(
   fecha,
+  fecha_envio,
   id_trx,
   tipo_operacion,
   sms,
@@ -20,6 +21,7 @@ function createCard(
 ) {
   return {
   fecha,
+  fecha_envio,
   id_trx,
   tipo_operacion,
   sms,
@@ -58,6 +60,7 @@ const ReporteSMS = () => {
       rows.push(
         createCard(
           row.fecha,
+          row.fecha_envio,
           row.id_trx,
           row.tipo_operacion,
           row.sms,
@@ -155,9 +158,9 @@ const ReporteSMS = () => {
     setFechaFinalDownload('')  
   });
 
-  const closeModal = useCallback(async (tipoOp) => {
+  const closeModal = useCallback(async (tipoOp,page,fechaInicial,fechaFinal) => {
     setShowModal(false);
-    console.log(tipoOp)
+    
     report(
       tipoOp,
       page,
@@ -340,7 +343,7 @@ const ReporteSMS = () => {
             headers={["Fecha", "Mensaje","Números","Creditos"]}
             data={trxs.map(({ fecha, sms, numeros,creditos }) => {
               const tempDate = new Date(fecha);
-              tempDate.setHours(tempDate.getHours() + 5);
+              tempDate.setHours(tempDate.getHours());
               fecha = Intl.DateTimeFormat("es-CO", {
                 year: "numeric",
                 month: "numeric",
@@ -367,7 +370,7 @@ const ReporteSMS = () => {
         ""
       )}
 
-      <Modal show={showModal} handleClose={()=>{closeModal(tipoOp)}}>
+      <Modal show={showModal} handleClose={()=>{closeModal(tipoOp,page,fechaInicial,fechaFinal)}}>
       <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
           <h1 className="text-2xl font-semibold">
             Desea actualizar el estado del envio con fecha de {' '}
@@ -386,7 +389,7 @@ const ReporteSMS = () => {
             <Button 
             type="submit" 
             onClick={() => {
-              closeModal(tipoOp)
+              closeModal(tipoOp,page,fechaInicial,fechaFinal)
               actualizar(
                 selected.id_trx
                 ).then((res) => {
