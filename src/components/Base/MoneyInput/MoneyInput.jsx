@@ -8,7 +8,7 @@ const moneyValidator = (value) => {
   return isNaN(val) ? "" : val;
 };
 
-const formatMoney = Intl.NumberFormat("es-CO", {
+export const formatMoney = Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
   maximumFractionDigits: 0,

@@ -11,7 +11,7 @@ import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import { postCashIn } from "../utils/fetchRevalDaviplata";
 import { notifyError } from "../../../utils/notify";
-import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput/MoneyInput";
 
 const Deposito = () => {
   const [{ phone, userDoc, valor, summary }, setQuery] = useQuery();
@@ -34,23 +34,30 @@ const Deposito = () => {
   const onSubmitDeposit = useCallback(
     (e) => {
       e.preventDefault();
-      const formData = new FormData(e.target);
-      const phone = formData.get("numCliente");
-      const valor = formData.get("valor");
-      const summary = {
-        "Numero celular": phone,
-        "Valor de deposito": valor,
-      };
-      setQuery({ phone, valor, summary }, { replace: true });
-      setShowModal(true);
+      if (valor >= 5000 && valor < 10000000) {
+        const formData = new FormData(e.target);
+        const phone = formData.get("numCliente");
+        const userDoc = formData.get("docCliente");
+        const valorFormat = formData.get("valor");
+        const summary = {
+          "Numero celular": phone,
+          "C.C. del depositante": userDoc,
+          "Valor de deposito": valorFormat,
+        };
+        setQuery({ phone, valor, summary }, { replace: true });
+        setShowModal(true);
+      } else {
+        notifyError(
+          "El valor del deposito debe estar entre $ 5.000 y $ 10.000.000"
+        );
+      }
     },
-    [setQuery]
+    [setQuery, valor]
   );
 
   const onChange = useCallback(
     (ev) => {
       if (ev.target.name !== "valor") {
-        // console.log(ev.target.validationMessage);
         const formData = new FormData(ev.target.form);
         const phone = (
           (formData.get("numCliente") ?? "").match(/\d/g) ?? []
@@ -95,13 +102,42 @@ const Deposito = () => {
     postCashIn(body)
       .then((res) => {
         console.log(res);
-        setPaymentStatus(true);
+        setPaymentStatus({
+          title: "Recibo de deposito",
+          timeInfo: {
+            "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+            }).format(new Date()),
+            Hora: Intl.DateTimeFormat("es-CO", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            }).format(new Date()),
+          },
+          commerceInfo: [
+            ["Id Comercio", 2],
+            ["No. terminal", 233],
+            ["Municipio", "Bogota"],
+            ["Dirección", "Calle 11 # 11 - 2"],
+            ["Id Trx", 233],
+            ["Id Transacción", 99],
+          ],
+          commerceName: "Daviplata",
+          trxInfo: [
+            ["Celular", phone],
+            ["C.C.", userDoc],
+            ["Valor de deposito", formatMoney.format(valor)],
+          ],
+          disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+        });
       })
       .catch((err) => {
         console.error(err);
         notifyError("Error en la transaccion");
       });
-  }, [phone, valor]);
+  }, [phone, valor, userDoc]);
 
   return (
     <Fragment>
@@ -134,7 +170,7 @@ const Deposito = () => {
         <MoneyInput
           id="valor"
           name="valor"
-          label="Valor a depositar"
+          label="Valor a retirar"
           autoComplete="off"
           min={5000}
           onInput={onMoneyChange}
@@ -144,10 +180,10 @@ const Deposito = () => {
           <Button type={"submit"}>Realizar deposito</Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal} handleClose={paymentStatus ? () => {} : handleClose}>
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} /* ticket={paymentStatus} */ />
+            <Tickets refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={goToRecaudo}>Cerrar</Button>

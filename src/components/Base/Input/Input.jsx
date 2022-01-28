@@ -51,7 +51,11 @@ const Input = ({
       : inputRef.current?.validity?.valid
       ? ""
       : inputRef.current?.validationMessage;
-  }, [invalid, inputRef.current?.validity?.valid]);
+  }, [
+    invalid,
+    inputRef.current?.validity?.valid,
+    inputRef.current?.validationMessage,
+  ]);
 
   return self ? (
     <>
