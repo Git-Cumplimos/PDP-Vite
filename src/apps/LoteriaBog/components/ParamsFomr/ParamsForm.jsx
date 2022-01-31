@@ -105,6 +105,7 @@ const ParamsForm = ({
             label="Nuevo UVT"
             autoComplete="off"
             max={10000000}
+            value={uvt}
             onInput={onMoneyChange2}
             required='true'
           />
