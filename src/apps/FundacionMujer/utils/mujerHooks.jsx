@@ -3,15 +3,19 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
-  consultapin: `${process.env.REACT_APP_URL_FDLM_CONSULTAPIN}/pin`,
-  cancelarpin: `${process.env.REACT_APP_URL_FDLM_CANCELARPIN}/cancel-pin`,
-  desembolso: `${process.env.REACT_APP_URL_FDLM_DESEMBOLSOS}`,
-  recaudo: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}/creditos`,
-  recaudo2: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}/creditos`,
-  pagorecaudo: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}`,
+  // consultapin: `${process.env.REACT_APP_URL_FDLM_CONSULTAPIN}/pin`,
+  // cancelarpin: `${process.env.REACT_APP_URL_FDLM_CANCELARPIN}/cancel-pin`,
+  // desembolso: `${process.env.REACT_APP_URL_FDLM_DESEMBOLSOS}`,
+  // recaudo: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}/creditos`,
+  // recaudo2: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}/creditos`,
+  // pagorecaudo: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}`,
+  mostrarcreditos: `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`,
+  ingresoreverso: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresoreversorecibo`,
+  ingresorecibo: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`,
+  valorcuota: `${process.env.REACT_APP_URL_FDLMWSDL}/valorcuota`,
 };
 
-export const LoteriaContext = createContext({
+export const FDLMContext = createContext({
   infoLoto: {
     respuestamujer: null,
     setRespuestamujer: null,
@@ -37,23 +41,17 @@ export const LoteriaContext = createContext({
     fechaFinal: null,
     setFechaFinal: null,
   },
-  searchModa: () => {},
-  getReportesVentas: () => {},
-  isWinner: () => {},
-  consultapin: () => {},
-  cancelarpin: () => {},
-  desembolsospin: () => {},
-  recaudo: () => {},
-  recaudo2: () => {},
-  pagorecaudo: () => {},
-  pagorecaudocedula: () => {},
+  mostrarcredito: () => {},
+  ingresoreversorecibo: () => {},
+  ingresorecibo: () => {},
+  valorcuota: () => {},
 });
 
-export const Usemujer = () => {
-  return useContext(LoteriaContext);
+export const useMujer = () => {
+  return useContext(FDLMContext);
 };
 
-export const useProvideLoteria = () => {
+export const useProvideFDLM = () => {
   // Datos consulta y compra
   const { roleInfo } = useAuth();
   const [RespuestaPagoRecaudo, setRespuestaPagoRecaudo] = useState(null);
@@ -70,125 +68,200 @@ export const useProvideLoteria = () => {
     setRespuestaconsultarecaudocreditos,
   ] = useState();
 
-
-  console.log(respuestaconsultarecaudo)
+  console.log(respuestaconsultarecaudo);
   console.log(respuestaconsultarecaudocreditos);
   //consulta del pin
-  const consultapin = useCallback(async (documento, pin) => {
-    try {
-      const res = await fetchData(urls.consultapin, "GET", {
-        documento: documento,
-        pin: pin,
-        id_comercio: roleInfo.id_comercio,
-      });
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, [roleInfo.id_comercio]);
+  const consultapin = useCallback(
+    async (documento, pin) => {
+      try {
+        const res = await fetchData(urls.consultapin, "GET", {
+          documento: documento,
+          pin: pin,
+          id_comercio: roleInfo?.id_comercio,
+        });
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [roleInfo?.id_comercio]
+  );
 
   //cancelar pin
-  const cancelarpin = useCallback(async (transaccion) => {
-    try {
-      const res = await fetchData(urls.cancelarpin, "GET", {
-        transaccion: "TFM102",
-        id_comercio: roleInfo.id_comercio,
-      });
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, [roleInfo.id_comercio]);
+  // const cancelarpin = useCallback(
+  //   async (transaccion) => {
+  //     try {
+  //       const res = await fetchData(urls.cancelarpin, "GET", {
+  //         transaccion: "TFM102",
+  //         id_comercio: roleInfo?.id_comercio,
+  //       });
+  //       return res;
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   },
+  //   [roleInfo?.id_comercio]
+  // );
 
   // desembolso
-  const desembolsospin = async (documento, pin) => {
-    const dato = {
-      id_trx: respuestamujer?.obj["id_trx"],
-      id_usuario: roleInfo.id_usuario,
-      id_comercio: roleInfo.id_comercio,
-    };
-    let control = await fetch(`${urls.desembolso}/desembolsos`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(dato),
-    });
-    let respuesta = await control.json();
-    console.log(respuesta);
-  };
+  // const desembolsospin = async (documento, pin) => {
+  //   const dato = {
+  //     id_trx: respuestamujer?.obj["id_trx"],
+  //     id_usuario: roleInfo?.id_usuario,
+  //     id_comercio: roleInfo?.id_comercio,
+  //   };
+  //   let control = await fetch(`${urls.desembolso}/desembolsos`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-type": "application/json",
+  //     },
+  //     body: JSON.stringify(dato),
+  //   });
+  //   let respuesta = await control.json();
+  //   console.log(respuesta);
+  // };
 
   // recaudos
-  const recaudo = useCallback(async (cedula, comercio) => {
-    try {
-      const res = await fetchData(urls.recaudo, "GET", {
-        cedula: cedula,
-        comercio: 2,
-      });
+  // const recaudo = useCallback(async (cedula, comercio) => {
+  //   try {
+  //     const res = await fetchData(urls.recaudo, "GET", {
+  //       cedula: cedula,
+  //       comercio: 2,
+  //     });
 
-      setRespuestaconsultarecaudo(res);
+  //     setRespuestaconsultarecaudo(res);
+  //     return res;
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // }, []);
+
+  const mostrarcredito = useCallback(async (numero, param) => {
+    const body = {
+      nroBusqueda: numero,
+      ParametroBusqueda: param,
+      Depto: 1,
+      Municipio: 1,
+    };
+    console.log(body);
+    try {
+      const res = await fetchData(urls.mostrarcreditos, "POST", {}, body);
+      console.log(res);
       return res;
     } catch (err) {
-      console.error(err);
+      console.log(err);
+      throw err;
+    }
+  }, []);
+
+  const ingresoreversorecibo = useCallback(async (values) => {
+    const body = {
+      Credito: parseInt(values?.Credito),
+      Valor: parseFloat(values?.Valor),
+      referenciaPago: values?.Referencia,
+    };
+    console.log(body);
+    try {
+      const res = await fetchData(urls.ingresoreverso, "POST", {}, body);
+      console.log(res);
+      return res;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }, []);
+
+  const ingresorecibo = useCallback(async (values) => {
+    const body = {
+      Credito: parseInt(values?.Credito),
+      Depto: 1,
+      Municipio: 1,
+      Valor: parseFloat(values?.Valor),
+      referenciaPago: values?.Referencia,
+    };
+    try {
+      const res = await fetchData(urls.ingresorecibo, "POST", {}, body);
+      console.log(res);
+      return res;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }, []);
+
+  const valorcuota = useCallback(async (numero) => {
+    const body = {
+      Credito: numero,
+      Depto: 1,
+      Municipio: 1,
+    };
+    console.log(body);
+    try {
+      const res = await fetchData(urls.valorcuota, "POST", {}, body);
+      console.log(res);
+      return res;
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
   }, []);
 
   //recaudos
-  const recaudo2 = useCallback(async (credito, comercio) => {
-    try {
-      const res = await fetchData(urls.recaudo2, "GET", {
-        credito: credito,
-        comercio: 2,
-      });
+  // const recaudo2 = useCallback(async (credito, comercio) => {
+  //   try {
+  //     const res = await fetchData(urls.recaudo2, "GET", {
+  //       credito: credito,
+  //       comercio: 2,
+  //     });
 
-      setRespuestaconsultarecaudocreditos(res);
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+  //     setRespuestaconsultarecaudocreditos(res);
+  //     return res;
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // }, []);
 
   //pago recaudo2
-  const pagorecaudo = async () => {
-    const dato = {
-      numero: respuestaconsultarecaudo.obj[0]["Credito"],
-      cedula: respuestaconsultarecaudo.obj[0]["Cedula"],
-      valor: respuestaconsultarecaudo.obj[0]["Valor a pagar"],
-      id_comercio: 1,
-      id_usuario: 2,
-    };
-    let control = await fetch(`${urls.pagorecaudo}/pago`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(dato),
-    });
-    let respuesta = await control.json();
-    console.log(respuesta);
-    ///
-    setRespuestaPagoRecaudo(respuesta);
-  };
+  // const pagorecaudo = async () => {
+  //   const dato = {
+  //     numero: respuestaconsultarecaudo.obj[0]["Credito"],
+  //     cedula: respuestaconsultarecaudo.obj[0]["Cedula"],
+  //     valor: respuestaconsultarecaudo.obj[0]["Valor a pagar"],
+  //     id_comercio: 1,
+  //     id_usuario: 2,
+  //   };
+  //   let control = await fetch(`${urls.pagorecaudo}/pago`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-type": "application/json",
+  //     },
+  //     body: JSON.stringify(dato),
+  //   });
+  //   let respuesta = await control.json();
+  //   console.log(respuesta);
+  //   ///
+  //   setRespuestaPagoRecaudo(respuesta);
+  // };
 
-  const pagorecaudocedula = async () => {
-    const dato = {
-      numero: respuestaconsultarecaudocreditos.obj[0]["Cedula"],
-      valor: respuestaconsultarecaudocreditos.obj[0]["Valor a pagar"],
-      id_comercio: 1,
-      id_usuario: 2,
-    };
-    let control = await fetch(`${urls.pagorecaudo}/pago`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(dato),
-    });
-    let respuesta = await control.json();
-    console.log(respuesta);
-    ///
-    setRespuestaPagoRecaudo(respuesta);
-  };
+  // const pagorecaudocedula = async () => {
+  //   const dato = {
+  //     numero: respuestaconsultarecaudocreditos.obj[0]["Cedula"],
+  //     valor: respuestaconsultarecaudocreditos.obj[0]["Valor a pagar"],
+  //     id_comercio: 1,
+  //     id_usuario: 2,
+  //   };
+  //   let control = await fetch(`${urls.pagorecaudo}/pago`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-type": "application/json",
+  //     },
+  //     body: JSON.stringify(dato),
+  //   });
+  //   let respuesta = await control.json();
+  //   console.log(respuesta);
+  //   ///
+  //   setRespuestaPagoRecaudo(respuesta);
+  // };
 
   return {
     infoLoto: {
@@ -207,12 +280,9 @@ export const useProvideLoteria = () => {
     },
     reportes: {},
     consultapin,
-    cancelarpin,
-    desembolsospin,
-    //recaudo
-    recaudo,
-    recaudo2,
-    pagorecaudo,
-    pagorecaudocedula,
+    mostrarcredito,
+    ingresoreversorecibo,
+    ingresorecibo,
+    valorcuota,
   };
 };

@@ -4,6 +4,7 @@ import { lazy } from "react";
  * * Providers
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
+import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 
 /**
  * * Logos
@@ -59,6 +60,8 @@ const MarketPlace = lazy(() => import("../apps/MarketPlace/MarketPlace"));
  * Fundacion de la mujer
  */
 const FunMujer = lazy(() => import("../apps/FundacionMujer/FunMujer"));
+const recMujer = lazy(() => import("../apps/FundacionMujer/Views/Recaudos"));
+const revMujer = lazy(() => import("../apps/FundacionMujer/Views/Reversos"));
 
 /**
  * IAM
@@ -229,10 +232,25 @@ const allUrlsPrivateApps = [
     permission: [10],
   },
   {
-    link: "/fundacion-mujer",
-    label: <AppIcons name="Fundacion de la mujer" />,
+    link: "/funmujer",
+    label: <AppIcons Logo={"RECAUDO"} name="Fundación de la mujer" />,
     component: FunMujer,
-    permission: [],
+    permission: [3],
+    provider: ProvideFundamujer,
+    subRoutes: [
+      {
+        link: "/funmujer/recaudo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
+        component: recMujer,
+        permission: [3],
+      },
+      {
+        link: "/funmujer/reversorecaudo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Reverso Manual"} />,
+        component: revMujer,
+        permission: [3],
+      },
+    ],
   },
   {
     link: "/iam",
