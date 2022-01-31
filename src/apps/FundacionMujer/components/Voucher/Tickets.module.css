@@ -7,3 +7,7 @@
   margin: 0;
   padding: 0.5rem 0;
 }
+
+@page {
+  size: 80mm 160mm;
+}

@@ -11,7 +11,7 @@ import { useMujer } from "../utils/mujerHooks";
 import { toast } from "react-toastify";
 import { useReactToPrint } from "react-to-print";
 import { notifyError } from "../../../utils/notify";
-import Tickets from "../../../components/Base/Tickets/Tickets";
+import Tickets from "../components/Voucher/Tickets";
 
 const Recaudo = () => {
   const {
@@ -94,7 +94,7 @@ const Recaudo = () => {
     };
     ingresorecibo(body)
       .then((res) => {
-        if (res?.obj?.Confirmacion != -1) {
+        if (res?.obj?.Confirmacion == -1) {
           setTicket(true);
         } else {
           notifyError(
@@ -132,7 +132,7 @@ const Recaudo = () => {
       });
     mostrarcredito(String(number), tipobusqueda)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setInfo(res);
         setDisabledBtn(false);
         if (res?.status == false) {
@@ -143,20 +143,20 @@ const Recaudo = () => {
         [res?.obj].map((row) => {
           setTable([
             {
-              Cedula: row.Cedula,
-              Mensaje: row.Mensaje,
-              Cliente: row.NombreCliente,
-              Producto: row.NombreProducto,
-              Credito: row.Nrocredito,
-              Valor: formatMoney.format(row.ValorPagar),
+              Cedula: row?.Cedula,
+              Mensaje: row?.Mensaje,
+              Cliente: row?.NombreCliente,
+              Producto: row?.NombreProducto,
+              Credito: row?.Nrocredito,
+              Valor: formatMoney.format(row?.ValorPagar),
             },
           ]);
-          setMoney(row.ValorPagar);
+          setMoney(row?.ValorPagar);
         });
       })
       .catch((err) => console.log("error", err));
   };
-
+  console.log(number, tipobusqueda);
   return (
     <>
       <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
@@ -276,11 +276,9 @@ const Recaudo = () => {
                 required
                 value={money}
                 onInput={(e, valor) => {
-                  console.log(e.target.value);
                   const num = valor || "";
                   setMoney(num);
                 }}
-                info={table[0]?.Valor}
               />
               <Input
                 id="refPago"
