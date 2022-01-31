@@ -167,7 +167,7 @@ const EditComission = () => {
         ))}
         {labelInputs.length === 1 ? <ButtonBar></ButtonBar> : ""}
       </Form>
-      <h1 className="text-3xl mt-8">Comision</h1>
+      <h1 className="text-3xl">Comision</h1>
       <FormComission
         outerState={[editedComission, setEditedComission]}
         onSubmit={onSubmit}
