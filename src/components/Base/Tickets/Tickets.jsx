@@ -6,9 +6,9 @@ const Tickets = ({
   type = "ORIGINAL",
   ticket = {
     title: "Recibo de pago",
-    timeInfo: { 
-      "Fecha de venta": "sdfs", 
-      Hora: "12:22:00" 
+    timeInfo: {
+      "Fecha de venta": "28/01/2022",
+      Hora: "12:22:00",
     },
     commerceInfo: [
       ["Id Comercio", 2],
@@ -81,7 +81,7 @@ const Tickets = ({
                           : "justify-end"
                       } flex-auto gap-2`}
                     >
-                      <h1 className="font-semibold">{key}:</h1>
+                      <h1 className="font-semibold">{key ? `${key}:` : ""}</h1>
                       <h1>{val}</h1>
                     </div>
                   );
@@ -120,7 +120,7 @@ const Tickets = ({
                           : "justify-end"
                       } flex-auto gap-2`}
                     >
-                      <h1 className="font-semibold">{key}:</h1>
+                      <h1 className="font-semibold">{key ? `${key}:` : ""}</h1>
                       <h1>{val}</h1>
                     </div>
                   );

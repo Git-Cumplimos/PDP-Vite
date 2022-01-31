@@ -109,7 +109,7 @@ const FlujoRecaudo = ({ foundRefs }) => {
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} />
+            <Tickets refPrint={printDiv} /* ticket={paymentStatus} */ />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={goToRecaudo}>Cerrar</Button>

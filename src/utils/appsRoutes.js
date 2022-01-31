@@ -4,6 +4,7 @@ import { lazy } from "react";
  * * Providers
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
+import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 
 /**
  * * Logos
@@ -48,6 +49,7 @@ const ConsultarColCard = lazy(() =>
 const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
+const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
 
 /**
  * Marketplace
@@ -58,6 +60,8 @@ const MarketPlace = lazy(() => import("../apps/MarketPlace/MarketPlace"));
  * Fundacion de la mujer
  */
 const FunMujer = lazy(() => import("../apps/FundacionMujer/FunMujer"));
+const recMujer = lazy(() => import("../apps/FundacionMujer/Views/Recaudos"));
+const revMujer = lazy(() => import("../apps/FundacionMujer/Views/Reversos"));
 
 /**
  * IAM
@@ -96,11 +100,42 @@ const Autorizadores = lazy(() =>
 );
 
 /**
+ * Solicitud Enrolamiento
+ */
+const SolicitudEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/SolicitudEnrolamiento")
+);
+const FormularioEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/FormularioEnrolamiento")
+);
+const ConsultaEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/ConsultaEnrolamiento")
+);
+const ReconoserID = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/ReconoserID")
+);
+/**
  * Recaudo
  */
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
 const RecaudoManual = lazy(() => import("../apps/Recaudo/Views/RecaudoManual"));
 const RecaudoCodigo = lazy(() => import("../apps/Recaudo/Views/RecaudoCodigo"));
+
+/**
+ * Daviplata
+ */
+const Daviplata = lazy(() => import("../apps/Daviplata/DaviplataTrx"));
+const Retiro = lazy(() => import("../apps/Daviplata/Views/Retiro"));
+const Deposito = lazy(() => import("../apps/Daviplata/Views/Deposito"));
+
+/**
+ * API-SMS
+ */
+const API_SMS = lazy(() => import("../apps/API-SMS/API_SMS"));
+const EnviarSMS = lazy(() => import("../apps/API-SMS/Views/EnviarSMS"));
+const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
+const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
+const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -154,14 +189,13 @@ const allUrlsPrivateApps = [
         component: CrearSorteos,
         permission: [5],
       },
-
-      // {
-      //   link: "/loteria-de-bogota/premios",
-      //   label: <AppIcons Logo={"PAGO"} name="Premios" />,
-      //   component: Premios,
-      //   extern: false,
-      //   permission: [5],///////////////////////////////////////////////////////////////////
-      // },
+      {
+        link: "/loteria-de-bogota/premios",
+        label: <AppIcons Logo={"PAGO"} name="Premios" />,
+        component: Premios,
+        extern: false,
+        permission: [5], ///////////////////////////////////////////////////////////////////
+      },
     ],
   },
   {
@@ -189,7 +223,7 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={"MARKETPLACE"} name="Marketplace" />,
     component: MarketPlace,
     extern: true,
-    permission: [0],
+    permission: [10],
   },
   {
     link: "/marketplace/payorder/:orden",
@@ -198,10 +232,25 @@ const allUrlsPrivateApps = [
     permission: [10],
   },
   {
-    link: "/fundacion-mujer",
-    label: <AppIcons name="Fundacion de la mujer" />,
+    link: "/funmujer",
+    label: <AppIcons Logo={"RECAUDO"} name="Fundación de la mujer" />,
     component: FunMujer,
-    permission: [],
+    permission: [3],
+    provider: ProvideFundamujer,
+    subRoutes: [
+      {
+        link: "/funmujer/recaudo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
+        component: recMujer,
+        permission: [3],
+      },
+      {
+        link: "/funmujer/reversorecaudo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Reverso Manual"} />,
+        component: revMujer,
+        permission: [3],
+      },
+    ],
   },
   {
     link: "/iam",
@@ -245,19 +294,19 @@ const allUrlsPrivateApps = [
     link: "/recaudo",
     label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
     component: Recaudo,
-    permission: [1],
+    permission: [22, 23],
     subRoutes: [
       {
         link: "/recaudo/manual",
         label: <AppIcons Logo={"RECAUDO"} name={"Recaudo manual"} />,
         component: RecaudoManual,
-        permission: [1],
+        permission: [22],
       },
       {
         link: "/recaudo/codigo",
         label: <AppIcons Logo={"RECAUDO"} name={"Recaudo codigo de barras"} />,
         component: RecaudoCodigo,
-        permission: [1],
+        permission: [23],
       },
     ],
   },
@@ -325,6 +374,86 @@ const allUrlsPrivateApps = [
         ),
         component: Autorizadores,
         permission: [21],
+      },
+    ],
+  },
+  {
+    link: "/solicitud-enrolamiento",
+    label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
+    component: SolicitudEnrolamiento,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/solicitud-enrolamiento/formulario",
+        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
+        component: FormularioEnrolamiento,
+        permission: [1],
+      },
+      {
+        link: "/Solicitud-enrolamiento/consultar",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
+        ),
+        component: ConsultaEnrolamiento,
+        permission: [1],
+      },
+      {
+        link: "/Solicitud-enrolamiento/reconoserid",
+        label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
+        component: ReconoserID,
+        permission: [1],
+      },
+    ],
+  },
+  {
+    link: "/daviplata",
+    label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
+    component: Daviplata,
+    permission: [3],
+    subRoutes: [
+      {
+        link: "/daviplata/depositos",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Depositos Daviplata" />,
+        component: Deposito,
+        permission: [3],
+      },
+      {
+        link: "/daviplata/retiros",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Retiros Daviplata" />,
+        component: Retiro,
+        permission: [3],
+      },
+    ],
+  },
+  {
+    link: "/API_SMS",
+    label: <AppIcons Logo={"MARKETPLACE"} name="SMS" />,
+    component: API_SMS,
+    permission: [25],
+    subRoutes: [
+      {
+        link: "/EnviarSMS",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Enviar SMS" />,
+        component: EnviarSMS,
+        permission: [25],
+      },
+      {
+        link: "/crearSMS",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Crear SMS" />,
+        component: CrearSMS,
+        permission: [26],
+      },
+      {
+        link: "/reporteSMS",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Reporte" />,
+        component: reporteSMS,
+        permission: [26],
+      },
+      {
+        link: "/BloquearNum",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Bloqueo de números" />,
+        component: BloquearNum,
+        permission: [26],
       },
     ],
   },

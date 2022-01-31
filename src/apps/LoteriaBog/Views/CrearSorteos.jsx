@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from "react";
-import { toast } from "react-toastify";
 import Form from "../../../components/Base/Form/Form";
 import AWS from "aws-sdk";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
@@ -10,11 +9,17 @@ import CloseForm from "../components/SortForm/CloseForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import { useAuth } from "../../../hooks/AuthHooks";
+import fetchData from "../../../utils/fetchData"
+import { notify, notifyError} from "../../../utils/notify"
+import ParamsForm from "../components/ParamsFomr/ParamsForm";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_accessKeyId,
   secretAccessKey: process.env.REACT_APP_secretAccessKey,
 });
+
+
+const url_consultaParams=`http://127.0.0.1:5000/con_params`;
 
 const CrearSorteos = ({ route }) => {
   const { label } = route;
@@ -24,12 +29,17 @@ const CrearSorteos = ({ route }) => {
   const [tip_sorteo, setTip_sorteo] = useState(null);
   const [sorteo, setSorteo] = useState(null);
   const [num_loteria, setNum_loteria] = useState(null);
+  const [params, setParams] = useState(null);
 
   const [showModal1, setShowModal1] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
+  const [showparams, setShowparams] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [disable_botoOrdinario, setDisable_botoOrdinario] = useState(false);
   const [disable_botoExtra, setDisable_botoExtra] = useState(false);
+  const [disabled_params, setDisabled_params] = useState(false);
+
+  
 
   const [day, setDay] = useState(null);
 
@@ -84,6 +94,23 @@ const CrearSorteos = ({ route }) => {
     setDisable_botoExtra(false);
   };
 
+
+  const con_params = useCallback(async () => {
+    try {     
+      const res = await fetchData(url_consultaParams, "GET", {});
+      console.log(res)
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  
+  const closeparams = useCallback(() => {
+    setShowparams(false);
+    setParams(null)
+    
+  });
   return (
     <>
       <div>
@@ -141,6 +168,26 @@ const CrearSorteos = ({ route }) => {
         ) : (
           ""
         )}
+        <ButtonBar>
+              <Button 
+              type="button"
+              onClick={() => {
+                con_params().then((res) => {
+                  if ("msg" in res) {
+                    notifyError(res.msg);
+                    setDisabledBtns(true);
+                  } else {
+                    setParams(res)
+                    console.log(res);
+                    setDisabled_params(false);
+                    setShowparams(true)
+                  }
+                });
+              }} 
+              disabled={disabled_params}>
+                Parametrización
+              </Button>
+            </ButtonBar>
         <Modal show={showModal1} handleClose={() => closeModal()}>
           <SortForm
             closeModal={closeModal}
@@ -155,6 +202,14 @@ const CrearSorteos = ({ route }) => {
             closeModal={closeModal2}
             tip_sorteo={tip_sorteo}
           ></CloseForm>
+        </Modal>
+        <Modal show={showparams} handleClose={() => closeparams()}>
+          <ParamsForm
+          closeModal={closeparams}
+          params={params}
+          setParams={setParams}          
+          >
+          </ParamsForm>
         </Modal>
       </div>
     </>

@@ -234,7 +234,6 @@ const Autorizadores = () => {
             autoComplete="off"
             value={selectedAuto?.["Nombre de autorizador"]}
             onChange={() => {}}
-            defaultValue=""
             required
           />
           <Input
@@ -245,7 +244,6 @@ const Autorizadores = () => {
             autoComplete="off"
             value={selectedAuto?.Nit}
             onChange={() => {}}
-            defaultValue=""
             required
           />
           <TextArea
@@ -256,7 +254,6 @@ const Autorizadores = () => {
             autoComplete="off"
             value={selectedAuto?.Descripcion ?? ""}
             onChange={() => {}}
-            defaultValue=""
           />
           {!selectedAuto?.["Id autorizador"] ? (
             <ButtonBar>
