@@ -11,7 +11,7 @@ import { postCashOut } from "../utils/fetchRevalDaviplata";
 import { notifyError } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
-import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput/MoneyInput";
 
 const Retiro = () => {
   const [{ phone, valor, otp, summary }, setQuery] = useQuery();
@@ -34,34 +34,49 @@ const Retiro = () => {
   const onSubmitDeposit = useCallback(
     (e) => {
       e.preventDefault();
-      const formData = new FormData(e.target);
-      const phone = formData.get("numCliente");
-      const valor = formData.get("valor");
-      const otp = formData.get("OTP");
-      const summary = {
-        "Numero celular": phone,
-        "Valor de retiro": valor,
-        "Token de seguridad": otp
-      };
-      setQuery({ phone, valor, otp, summary }, { replace: true });
-      setShowModal(true);
+      if (valor >= 5000 && valor < 10000000) {
+        const formData = new FormData(e.target);
+        const phone = formData.get("numCliente");
+        const valorFormat = formData.get("valor");
+        const otp = formData.get("OTP");
+        const summary = {
+          "Numero celular": phone,
+          "Valor de retiro": valorFormat,
+          "Token de seguridad": otp,
+        };
+        setQuery({ phone, valor, otp, summary }, { replace: true });
+        setShowModal(true);
+      } else {
+        notifyError(
+          "El valor del deposito debe estar entre $ 5.000 y $ 9.999.999"
+        );
+      }
     },
-    [setQuery]
+    [setQuery, valor]
   );
 
   const onChange = useCallback(
     (ev) => {
-      const formData = new FormData(ev.target.form);
-      const phone = (
-        (formData.get("numCliente") ?? "").match(/\d/g) ?? []
-      ).join("");
-      const valor = (
-        (formData.get("valor") ?? "").match(/(\d+\.?\d*|\.\d+)/g) ?? []
-      ).join("");
-      const otp = ((formData.get("OTP") ?? "").match(/\d/g) ?? []).join("");
-      setQuery({ phone, valor, otp }, { replace: true });
+      if (ev.target.name !== "valor") {
+        const formData = new FormData(ev.target.form);
+        const phone = (
+          (formData.get("numCliente") ?? "").match(/\d/g) ?? []
+        ).join("");
+        const otp = ((formData.get("OTP") ?? "").match(/\d/g) ?? []).join("");
+        setQuery({ phone, valor: valor ?? "", otp }, { replace: true });
+      }
     },
-    [setQuery]
+    [setQuery, valor]
+  );
+
+  const onMoneyChange = useCallback(
+    (e, valor) => {
+      setQuery(
+        { phone: phone ?? "", otp: otp ?? "", valor },
+        { replace: true }
+      );
+    },
+    [setQuery, phone, otp]
   );
 
   const closeModal = useCallback(() => {
@@ -86,7 +101,35 @@ const Retiro = () => {
     postCashOut(body)
       .then((res) => {
         console.log(res);
-        setPaymentStatus(true);
+        setPaymentStatus({
+          title: "Recibo de retiro",
+          timeInfo: {
+            "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+            }).format(new Date()),
+            Hora: Intl.DateTimeFormat("es-CO", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            }).format(new Date()),
+          },
+          commerceInfo: [
+            ["Id Comercio", 2],
+            ["No. terminal", 233],
+            ["Municipio", "Bogota"],
+            ["Dirección", "Calle 11 # 11 - 2"],
+            ["Id Trx", 233],
+            ["Id Transacción", 99],
+          ],
+          commerceName: "Daviplata",
+          trxInfo: [
+            ["Celular", phone],
+            ["Valor retiro", formatMoney.format(valor)],
+          ],
+          disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+        });
       })
       .catch((err) => {
         console.error(err);
@@ -125,20 +168,23 @@ const Retiro = () => {
         <MoneyInput
           id="valor"
           name="valor"
-          label="Valor a depositar"
+          label="Valor a retirar"
           autoComplete="off"
           min={5000}
-          onInput={(e, val) => setQuery({ valor: val }, { replace: true })}
+          onInput={onMoneyChange}
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
           <Button type={"submit"}>Realizar retiro</Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal
+        show={showModal}
+        handleClose={paymentStatus ? () => {} : handleClose}
+      >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} /* ticket={paymentStatus} */ />
+            <Tickets refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={goToRecaudo}>Cerrar</Button>
