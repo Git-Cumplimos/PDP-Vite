@@ -20,6 +20,8 @@ export const formatMoney = Intl.NumberFormat("es-CO", {
 // };
 
 const MoneyInput = ({ ...input }) => {
+  const [invalid, setInvalid] = useState("");
+
   const onInput = useMemo(() => {
     const inpFcn = input?.onInput;
     const chgFcn = input?.onChange;
@@ -39,13 +41,42 @@ const MoneyInput = ({ ...input }) => {
     return [minVal, maxVal];
   }, [input?.min, input?.max]);
 
-  const [invalid, setInvalid] = useState("");
+  const newValue = useMemo(() => {
+    const moneyValue = moneyValidator(`${input?.value ?? ""}`);
+    return moneyValue === "" ? "$ " : formatMoney.format(moneyValue);
+  }, [input?.value]);
 
   useEffect(() => {
     delete input.type;
   }, [input.type]);
 
-  return (
+  return "value" in input ? (
+    <Input
+      {...input}
+      value={newValue}
+      type={"text"}
+      onInput={(e) => {
+        let caret_pos = e.target.selectionStart;
+        const len = e.target.value.length;
+        const moneyValue = moneyValidator(e.target.value);
+        const [min, max] = inputLimits;
+        if (moneyValue < min) {
+          setInvalid(`El valor debe ser mayor a ${formatMoney.format(min)}`);
+        } else if (moneyValue > max) {
+          setInvalid(`El valor debe ser menor a ${formatMoney.format(max)}`);
+        } else {
+          setInvalid(e.target.validationMessage);
+        }
+        e.target.value =
+          moneyValue === "" ? "$ " : formatMoney.format(moneyValue);
+        e.target.focus();
+        caret_pos += e.target.value.length - len;
+        e.target.setSelectionRange(caret_pos, caret_pos);
+        onInput?.(e, moneyValue);
+      }}
+      invalid={invalid}
+    />
+  ) : (
     <Input
       {...input}
       type={"text"}

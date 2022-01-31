@@ -48,7 +48,7 @@ const Retiro = () => {
         setShowModal(true);
       } else {
         notifyError(
-          "El valor del deposito debe estar entre $ 5.000 y $ 10.000.000"
+          "El valor del deposito debe estar entre $ 5.000 y $ 9.999.999"
         );
       }
     },
@@ -102,7 +102,7 @@ const Retiro = () => {
       .then((res) => {
         console.log(res);
         setPaymentStatus({
-          title: "Recibo de deposito",
+          title: "Recibo de retiro",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -168,7 +168,7 @@ const Retiro = () => {
         <MoneyInput
           id="valor"
           name="valor"
-          label="Valor a depositar"
+          label="Valor a retirar"
           autoComplete="off"
           min={5000}
           onInput={onMoneyChange}
