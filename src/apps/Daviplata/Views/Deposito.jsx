@@ -48,7 +48,7 @@ const Deposito = () => {
         setShowModal(true);
       } else {
         notifyError(
-          "El valor del deposito debe estar entre $ 5.000 y $ 10.000.000"
+          "El valor del deposito debe estar entre $ 5.000 y $ 9.999.999"
         );
       }
     },
@@ -170,7 +170,7 @@ const Deposito = () => {
         <MoneyInput
           id="valor"
           name="valor"
-          label="Valor a retirar"
+          label="Valor a depositar"
           autoComplete="off"
           min={5000}
           onInput={onMoneyChange}
