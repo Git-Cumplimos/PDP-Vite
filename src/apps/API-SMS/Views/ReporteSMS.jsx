@@ -11,8 +11,8 @@ import fetchData from "../../../utils/fetchData";
 import { ExportToCsv } from "export-to-csv";
 
 function createCard(
-  fecha,
   fecha_envio,
+  fecha_actualizacion,
   id_trx,
   tipo_operacion,
   sms,
@@ -20,8 +20,8 @@ function createCard(
   creditos,
 ) {
   return {
-  fecha,
   fecha_envio,
+  fecha_actualizacion,
   id_trx,
   tipo_operacion,
   sms,
@@ -52,15 +52,14 @@ const ReporteSMS = () => {
   const [disabledBtn, setDisabledBtn] = useState(true)
 
   const exportdata = (e) => { 
-    console.log('Hola') 
     e.preventDefault();
     setShowModal2(false)  
     const rows = [];  
     Download.map((row) => {
       rows.push(
         createCard(
-          row.fecha,
           row.fecha_envio,
+          row.fecha_actualizacion,
           row.id_trx,
           row.tipo_operacion,
           row.sms,
@@ -344,7 +343,7 @@ const ReporteSMS = () => {
             data={trxs.map(({ fecha, sms, numeros,creditos }) => {
               const tempDate = new Date(fecha);
               tempDate.setHours(tempDate.getHours());
-              fecha = Intl.DateTimeFormat("es-CO", {
+                fecha= Intl.DateTimeFormat("es-CO", {
                 year: "numeric",
                 month: "numeric",
                 day: "numeric",
