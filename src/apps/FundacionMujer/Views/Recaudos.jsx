@@ -6,6 +6,7 @@ import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import Select from "../../../components/Base/Select/Select";
 import Table from "../../../components/Base/Table/Table";
+import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
 import { useMujer } from "../utils/mujerHooks";
 import { toast } from "react-toastify";
 import { useReactToPrint } from "react-to-print";
@@ -33,14 +34,12 @@ const Recaudo = () => {
   const [info, setInfo] = useState("");
   const [table, setTable] = useState("");
   const [cuota, setCuota] = useState("");
-  const [estadoPrueba] = useState(false);
+  const [creditStatus, setCreditStatus] = useState(false);
   const [money, setMoney] = useState("");
   const [referencia, setReferencia] = useState("");
   const [ticket, setTicket] = useState(false);
-  const [comercio] = useState("");
   const [selected, setSelected] = useState(true);
   const [showModal, setShowModal] = useState("");
-  const [recauditoss, setRecauditoss] = useState("");
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -123,6 +122,9 @@ const Recaudo = () => {
               cuota: formatMoney.format(row.ValorPagar),
             },
           ]);
+          if (row.ValorPagar !== 0) {
+            setCreditStatus(true);
+          }
         });
       })
       .catch((err) => {
@@ -207,10 +209,12 @@ const Recaudo = () => {
       </Form>
       {info?.status && (
         <>
-          <Table
-            headers={["Valor mínimo", "Valor máximo", "Valor a pagar"]}
-            data={cuota || []}
-          />
+          {creditStatus && (
+            <Table
+              headers={["Valor mínimo", "Valor máximo", "Valor a pagar"]}
+              data={cuota || []}
+            />
+          )}
           <br />
           <Table
             headers={[
@@ -236,7 +240,7 @@ const Recaudo = () => {
               Resumen de la transacción
             </h1>
             <h2 className="sm:text-center font-semibold">
-              Crédito {table[0]?.Credito}
+              Crédito # {table[0]?.Credito}
             </h2>
           </>
         )}
@@ -264,18 +268,19 @@ const Recaudo = () => {
             </div>
           ) : (
             <Form onSubmit={bankCollection}>
-              <Input
+              <MoneyInput
                 id="numPago"
                 label="Valor a pagar"
                 type="number"
                 autoComplete="off"
                 required
                 value={money}
-                onInput={(e) => {
-                  const num = e.target.value || "";
+                onInput={(e, valor) => {
+                  console.log(e.target.value);
+                  const num = valor || "";
                   setMoney(num);
                 }}
-                info={`${formatMoney.format(table[0]?.Valor ?? 0)}`}
+                info={table[0]?.Valor}
               />
               <Input
                 id="refPago"
