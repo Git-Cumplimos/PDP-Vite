@@ -7,7 +7,7 @@ import Input from "../../../components/Base/Input/Input";
 import Form from "../../../components/Base/Form/Form";
 import { useAuth } from "../../../hooks/AuthHooks";
 
-const url = process.env.REACT_APP_URL_IAM_PDP;
+const url = process.env.REACT_APP_URL_COLCARD;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -15,7 +15,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const ConsultarColCard = () => {
-  const { quotaInfo } = useAuth();
+  const { quotaInfo, roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [tarjeta, setTarjeta] = useState("");
   const [respuesta, setRespuesta] = useState("");
@@ -24,11 +24,13 @@ const ConsultarColCard = () => {
   const onChange = (e) => {
     e.preventDefault();
     fetchData(
-      "http://127.0.0.1:5000/puntoDePagoColCard/consultarTarjetaTranscaribe",
+      `${url}/puntoDePagoColCard/consultarTarjetaTranscaribe`,
       "POST",
       {},
       {
         numeroTarjeta: tarjeta,
+        id_comercio: 112,
+        // id_comercio: roleInfo?.id_comercio,
       }
     )
       .then((response) => {
@@ -50,6 +52,7 @@ const ConsultarColCard = () => {
   };
 
   console.log(respuesta);
+
   return (
     <>
       <h1 className="text-3xl">Consultar tarjeta Transcaribe</h1>
@@ -79,7 +82,12 @@ const ConsultarColCard = () => {
         </ButtonBar>
       </Form>
 
-      <Modal show={showModal} handleClose={() => {}}>
+      <Modal
+        show={showModal}
+        handleClose={() => {
+          setShowModal(false);
+        }}
+      >
         {/* {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <Tickets refPrint={printDiv} />
@@ -94,12 +102,11 @@ const ConsultarColCard = () => {
             <b>Consulta de tarjeta Transcaribe</b>
           </h1>
           {respuesta?.status == false ? (
-            <h2>{respuesta?.msg.error.mensaje}</h2>
+            // <h2>{respuesta?.msg.error.mensaje}</h2>
+            <h2 className="text-lg pb-2">{respuesta?.msg}</h2>
           ) : (
             <div className="text-base">
-              <h2>{respuesta.msg}</h2>
-              Tarjeta numero {tarjeta}
-              <h1>INFORMACION PROPIETARIO DE LA TARJETA</h1>
+              {/* <h1>INFORMACION PROPIETARIO DE LA TARJETA</h1>
               <h2>
                 Nombre usuario:
                 {respuesta?.obj?.results?.usuarioTarjetaTransporte?.nombre}
@@ -125,24 +132,16 @@ const ConsultarColCard = () => {
                   respuesta?.obj?.results?.usuarioTarjetaTransporte
                     ?.nombreCiudad
                 }
+              </h2> */}
+
+              <h2 className="text-xl pb-2">
+                {"Saldo:" +
+                  formatMoney.format(respuesta?.obj?.results?.Saldos[0].saldo)}
               </h2>
-              <h1>ESTADO DE LA TARJETA</h1>
-              <h2>Saldo: {respuesta?.obj?.results?.Saldos?.saldo}</h2>
-              <h2>
-                Valor maximo de recarga:
-                {respuesta?.obj?.results?.Saldos?.valorMaximoRecargas}
-              </h2>
-              <h2>
+              <h2 className="text-lg pb-2">Tarjeta numero: {tarjeta}</h2>
+              <h2 className="text-lg pb-2">
                 Fecha consulta de saldo:
-                {respuesta?.obj?.results?.Saldos?.fechaDeSaldo}
-              </h2>
-              <h2>
-                Recargas maximas:
-                {respuesta?.obj?.results?.Saldos?.cantidadDeRecargasMaximas}
-              </h2>
-              <h2>
-                Codigo de la tarjeta:
-                {respuesta?.obj?.results?.Saldos?.codigoTipoTarjetaTransporte}
+                {respuesta?.obj?.results?.Saldos[0].fechaDeSaldo}
               </h2>
             </div>
           )}
