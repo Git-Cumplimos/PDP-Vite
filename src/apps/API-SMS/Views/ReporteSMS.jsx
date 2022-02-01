@@ -379,7 +379,7 @@ const ReporteSMS = () => {
                 day: "numeric",
                 hour: "numeric",
                 minute: "numeric"
-              }).format((new Date(selected?.fecha)).setHours((new Date(selected?.fecha)).getHours()+5))
+              }).format((new Date(selected?.fecha)).setHours((new Date(selected?.fecha)).getHours()))
             :
             ''}
             

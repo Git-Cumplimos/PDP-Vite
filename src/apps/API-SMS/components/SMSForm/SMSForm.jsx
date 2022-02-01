@@ -89,9 +89,10 @@ const SMSForm = ({
             label="Mensaje"
             type="input"
             minLength="1"
-            maxLength="60"
+            maxLength="160"
             autoComplete="off"
             value={SMS}
+            info={`Cantidad de caracteres: ${SMS.length}`}
             onInput={(e) => {
               setSMS(e.target.value)        
             }}

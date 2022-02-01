@@ -30,8 +30,12 @@ const Reportes = lazy(() => import("../pages/Reportes"));
  */
 const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
 const Loteria = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
+const Descargas =  lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
 const DescargarArchivosS3 = lazy(() =>
-  import("../apps/LoteriaBog/Views/DescargarArchivosS3")
+  import("../apps/LoteriaBog/Views/Descargas/DescargarArchivosS3")
+);
+const BorrarBilletes = lazy(() =>
+  import("../apps/LoteriaBog/Views/Descargas/Borrado_billetes")
 );
 const CrearSorteos = lazy(() =>
   import("../apps/LoteriaBog/Views/CrearSorteos")
@@ -180,8 +184,22 @@ const allUrlsPrivateApps = [
       {
         link: "/loteria-de-bogota/descargar",
         label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
-        component: DescargarArchivosS3,
+        component: Descargas,
         permission: [6],
+        subRoutes: [
+          {
+            link: "/loteria-de-bogota/descargar/descarga_reportes",
+            label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+            component: DescargarArchivosS3,
+            permission: [6],
+          },
+          {
+            link: "/loteria-de-bogota/descargar/borrar_billetes",
+            label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
+            component: BorrarBilletes,
+            permission: [6],
+          }
+        ]
       },
       {
         link: "/loteria-de-bogota/sorteos",
@@ -432,25 +450,25 @@ const allUrlsPrivateApps = [
     permission: [25],
     subRoutes: [
       {
-        link: "/EnviarSMS",
+        link: "/API_SMS/EnviarSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Enviar SMS" />,
         component: EnviarSMS,
         permission: [25],
       },
       {
-        link: "/crearSMS",
+        link: "/API_SMS/crearSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Crear SMS" />,
         component: CrearSMS,
         permission: [26],
       },
       {
-        link: "/reporteSMS",
+        link: "/API_SMS/reporteSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Reporte" />,
         component: reporteSMS,
         permission: [26],
       },
       {
-        link: "/BloquearNum",
+        link: "/API_SMS/BloquearNum",
         label: <AppIcons Logo={"MARKETPLACE"} name="Bloqueo de números" />,
         component: BloquearNum,
         permission: [26],
