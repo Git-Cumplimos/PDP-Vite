@@ -137,6 +137,11 @@ const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
 const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
 const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 
+/**
+ * Editar parametros tipos de transacciones
+ */
+const ParamsOperations = lazy(() => import("../apps/ParamsOperations/ParamsOperations"));
+
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
 };
@@ -474,6 +479,22 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={CARGAR} name="Consultar tarjeta" />,
         component: ConsultarColCard,
         permission: [3],
+      },
+    ],
+  },
+  {
+    link: "/params-operations",
+    label: (
+      <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />
+    ),
+    component: ParamsOperations,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/params-operations/edit-params",
+        label: <AppIcons Logo={"IMPUESTO"} name={"Editar parametros"} />,
+        component: Comisiones,
+        permission: [1],
       },
     ],
   },
