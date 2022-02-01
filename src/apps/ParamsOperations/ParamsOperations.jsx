@@ -15,9 +15,9 @@ import { notify, notifyError } from "../../utils/notify";
 
 const url_types = process.env.REACT_APP_URL_TRXS_TIPOS_BASE;
 
-const fetchTrxTypesPages = (Nombre_operacion, page) => {
+const fetchTrxTypesPages = async (Nombre_operacion, page) => {
   try {
-    const res = fetchData(`${url_types}/tipos-operaciones-pagination`, "GET", {
+    const res = await fetchData(`${url_types}/tipos-operaciones-pagination`, "GET", {
       Nombre_operacion,
       page,
     });
