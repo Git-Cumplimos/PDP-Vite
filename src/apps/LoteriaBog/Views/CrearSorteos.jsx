@@ -19,7 +19,7 @@ AWS.config.update({
 });
 
 
-const url_consultaParams=`http://127.0.0.1:5000/con_params`;
+const url_consultaParams=`${process.env.REACT_APP_URL_LOTERIAS}/con_params`;
 
 const CrearSorteos = ({ route }) => {
   const { label } = route;

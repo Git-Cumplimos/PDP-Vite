@@ -13,10 +13,10 @@ import Input from "../../../components/Base/Input/Input";
 import Form from "../../../components/Base/Form/Form";
 
 
-const url_consultaBalance = `${process.env.REACT_APP_URL_APISMS_CONEXION_ONURIX}/consultaBalance`;
-const url_SMS = `${process.env.REACT_APP_URL_APISMS_SMS}/SMS_texto`;
-const url_buscarNum = `${process.env.REACT_APP_URL_APISMS_SMS}/buscar_celular`;
-const url_tipComercios = `${process.env.REACT_APP_URL_APISMS_SMS}/tip_comercio`;
+const url_consultaBalance = `${process.env.REACT_APP_URL_APISMS}/consultaBalance`;
+const url_SMS = `${process.env.REACT_APP_URL_APISMS}/SMS_texto`;
+const url_buscarNum = `${process.env.REACT_APP_URL_APISMS}/buscar_celular`;
+const url_tipComercios = `${process.env.REACT_APP_URL_APISMS}/tip_comercio`;
 
 
 const EnviarSMS = () => {

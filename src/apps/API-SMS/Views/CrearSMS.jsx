@@ -8,7 +8,7 @@ import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 
-const url_SMS = `${process.env.REACT_APP_URL_APISMS_SMS}/SMS_texto`;
+const url_SMS = `${process.env.REACT_APP_URL_APISMS}/SMS_texto`;
 
 
 const CrearSMS = () => {

@@ -15,7 +15,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const url_enviarSMS = `${process.env.REACT_APP_URL_APISMS_CONEXION_ONURIX}/envioSMS`;
+const url_enviarSMS = `${process.env.REACT_APP_URL_APISMS}/envioSMS`;
 
 const SMSForm = ({
 
