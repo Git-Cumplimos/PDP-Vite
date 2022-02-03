@@ -15,7 +15,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const url_enviarSMS = `${process.env.REACT_APP_URL_APISMS_CONEXION_ONURIX}/envioSMS`;
+const url_enviarSMS = `${process.env.REACT_APP_URL_APISMS}/envioSMS`;
 
 const SMSForm = ({
 
@@ -89,9 +89,10 @@ const SMSForm = ({
             label="Mensaje"
             type="input"
             minLength="1"
-            maxLength="60"
+            maxLength="160"
             autoComplete="off"
             value={SMS}
+            info={`Cantidad de caracteres: ${SMS.length}`}
             onInput={(e) => {
               setSMS(e.target.value)        
             }}

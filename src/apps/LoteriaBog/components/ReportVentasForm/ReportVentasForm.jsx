@@ -40,7 +40,7 @@ function createCard(
     fecha_venta,
   };
 }
-const url_reportVentas = `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`;
+const url_reportVentas = `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`;
 
 
 

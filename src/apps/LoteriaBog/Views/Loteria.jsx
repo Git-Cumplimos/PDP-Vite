@@ -13,7 +13,7 @@ import { useLoteria } from "../utils/LoteriaHooks";
 import fetchData from "../../../utils/fetchData";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 
-const urlLoto = `${process.env.REACT_APP_LOTO_SORTEOS}/contiploteria`;
+const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
 const Loteria = ({ route }) => {
   const { label } = route;

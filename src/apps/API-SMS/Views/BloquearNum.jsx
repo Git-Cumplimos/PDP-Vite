@@ -8,7 +8,7 @@ import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 
-const url_bloqueo = `${process.env.REACT_APP_URL_APISMS_CONEXION_ONURIX}/bloqueoCelular`;
+const url_bloqueo = `${process.env.REACT_APP_URL_APISMS}/bloqueoCelular`;
 
 
 const BloquearNum = () => {
