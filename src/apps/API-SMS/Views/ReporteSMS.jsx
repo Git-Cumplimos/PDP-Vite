@@ -10,9 +10,18 @@ import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 import { ExportToCsv } from "export-to-csv";
 
-function createCard(fecha, id_trx, tipo_operacion, sms, numeros, creditos) {
+function createCard(
+  fecha_envio,
+  fecha_actualizacion,
+  id_trx,
+  tipo_operacion,
+  sms,
+  numeros,
+  creditos
+) {
   return {
-    fecha,
+    fecha_envio,
+    fecha_actualizacion,
     id_trx,
     tipo_operacion,
     sms,
@@ -21,9 +30,9 @@ function createCard(fecha, id_trx, tipo_operacion, sms, numeros, creditos) {
   };
 }
 
-const url_Report = `${process.env.REACT_APP_URL_Report_SMS}/report`;
-const url_actualizar = `${process.env.REACT_APP_URL_Report_SMS}/actualizar_pendientes`;
-const url_Download = `${process.env.REACT_APP_URL_Report_SMS}/reportDownload`;
+const url_Report = `${process.env.REACT_APP_URL_APISMS}/report`;
+const url_actualizar = `${process.env.REACT_APP_URL_APISMS}/actualizar_pendientes`;
+const url_Download = `${process.env.REACT_APP_URL_APISMS}/reportDownload`;
 
 const ReporteSMS = () => {
   const [trxs, setTrxs] = useState([]);
@@ -41,14 +50,14 @@ const ReporteSMS = () => {
   const [disabledBtn, setDisabledBtn] = useState(true);
 
   const exportdata = (e) => {
-    console.log("Hola");
     e.preventDefault();
     setShowModal2(false);
     const rows = [];
     Download.map((row) => {
       rows.push(
         createCard(
-          row.fecha,
+          row.fecha_envio,
+          row.fecha_actualizacion,
           row.id_trx,
           row.tipo_operacion,
           row.sms,
@@ -142,19 +151,22 @@ const ReporteSMS = () => {
     setFechaFinalDownload("");
   });
 
-  const closeModal = useCallback(async (tipoOp) => {
-    setShowModal(false);
-    console.log(tipoOp);
-    report(tipoOp, page, fechaInicial, fechaFinal).then((res) => {
-      if (res.status === false) {
-        notifyError(res.msg);
-      } else {
-        setMaxPages(res?.obj?.maxPages);
-        setTrxs(res?.obj?.results);
-        console.log(res?.obj?.results);
-      }
-    });
-  }, []);
+  const closeModal = useCallback(
+    async (tipoOp, page, fechaInicial, fechaFinal) => {
+      setShowModal(false);
+
+      report(tipoOp, page, fechaInicial, fechaFinal).then((res) => {
+        if (res.status === false) {
+          notifyError(res.msg);
+        } else {
+          setMaxPages(res?.obj?.maxPages);
+          setTrxs(res?.obj?.results);
+          console.log(res?.obj?.results);
+        }
+      });
+    },
+    []
+  );
 
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
@@ -283,7 +295,7 @@ const ReporteSMS = () => {
             headers={["Fecha", "Mensaje", "Números", "Creditos"]}
             data={trxs.map(({ fecha, sms, numeros, creditos }) => {
               const tempDate = new Date(fecha);
-              tempDate.setHours(tempDate.getHours() + 5);
+              tempDate.setHours(tempDate.getHours());
               fecha = Intl.DateTimeFormat("es-CO", {
                 year: "numeric",
                 month: "numeric",
@@ -313,7 +325,7 @@ const ReporteSMS = () => {
       <Modal
         show={showModal}
         handleClose={() => {
-          closeModal(tipoOp);
+          closeModal(tipoOp, page, fechaInicial, fechaFinal);
         }}
       >
         <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
@@ -328,7 +340,7 @@ const ReporteSMS = () => {
                   minute: "numeric",
                 }).format(
                   new Date(selected?.fecha).setHours(
-                    new Date(selected?.fecha).getHours() + 5
+                    new Date(selected?.fecha).getHours()
                   )
                 )
               : ""}
@@ -337,7 +349,7 @@ const ReporteSMS = () => {
             <Button
               type="submit"
               onClick={() => {
-                closeModal(tipoOp);
+                closeModal(tipoOp, page, fechaInicial, fechaFinal);
                 actualizar(selected.id_trx).then((res) => {
                   if (res.status === false) {
                     notifyError(res?.obj?.msg);

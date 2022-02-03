@@ -1,11 +1,11 @@
 import classes from "./Tickets.module.css";
-import LogoPDP from "../LogoPDP/LogoPDP";
+import LogoPDP from "../../../../components/Base/LogoPDP/LogoPDP";
 
 const Tickets = ({
   refPrint,
   type = "ORIGINAL",
   ticket = {
-    title: "Recibo de pago",
+    title: "Recaudo",
     timeInfo: {
       "Fecha de venta": "28/01/2022",
       Hora: "12:22:00",
@@ -18,11 +18,10 @@ const Tickets = ({
       ["Id Trx", 233],
       ["Id Transacción", 99],
     ],
-    commerceName: "Loteria de bogotá",
+    commerceName: "Fundación de la mujer",
     trxInfo: [
-      ["Billete", "0222"],
-      ["Serie", "231"],
-      ["Valor pago", 20000.0],
+      ["# Crédito", ""],
+      ["Valor pago", 347893],
     ],
     disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
   },

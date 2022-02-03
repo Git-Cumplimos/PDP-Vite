@@ -1,11 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import classes from "./Input.module.css";
 
-const Input = ({ label, self = false, onLazyInput, info = "", invalid = "", ...input }) => {
-  const { formItem } = classes;
+const Input = ({
+  label,
+  self = false,
+  onLazyInput,
+  info = "",
+  invalid = "",
+  ...input
+}) => {
+  const { formItem, invalid: invalidCls } = classes;
   const { id: _id, type } = input;
 
   const [timer, setTimer] = useState(null);
+
+  const inputRef = useRef(null);
 
   useEffect(() => {
     if (type === "email") {
@@ -36,6 +45,18 @@ const Input = ({ label, self = false, onLazyInput, info = "", invalid = "", ...i
       };
     }
   }
+  
+  const invalidMsg = useMemo(() => {
+    return invalid
+      ? invalid
+      : inputRef.current?.validity?.valid
+      ? ""
+      : inputRef.current?.validationMessage;
+  }, [
+    invalid,
+    inputRef.current?.validity?.valid,
+    inputRef.current?.validationMessage,
+  ]);
 
   return self ? (
     <>
@@ -54,9 +75,13 @@ const Input = ({ label, self = false, onLazyInput, info = "", invalid = "", ...i
         </label>
       )}
       <div>
-        <input {...input} />
+        <input {...input} ref={inputRef} />
         {info ? <p>{info}</p> : ""}
-        {invalid ? <p className="text-red-600">{invalid}</p> : ""}
+        {invalidMsg && inputRef.current?.value !== "" ? (
+          <p className={`${invalidCls}`}>{invalidMsg}</p>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

@@ -11,27 +11,60 @@ import fetchData from "../../../utils/fetchData";
 
 const urls = {
 
-  ordinario: `${process.env.REACT_APP_URL_LOTO1}/consultas_loteria`,
-  ordinariofisico: `${process.env.REACT_APP_URL_LOTO1}/consultas_loteria_fisica`, 
-  ventaOrdinario: `${process.env.REACT_APP_URL_LOTO_VENTA}/venta`,
-  ventaOrdinariofisica: `${process.env.REACT_APP_URL_LOTO_VENTA}/ventafisica`,
-  moda: `${process.env.REACT_APP_URL_LOTO_MODA}/consurepmasbusca`,
-  con_distribuidor_venta:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_distribuidores`,
-  ventasReportes: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`,
-  pagosReportes:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_pago_premios`,
-  con_sort_ventas:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_sort_vendidos`,   
-  consultaPago: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/pagodepremios`,
-  premiohash: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/hash`,
-  premiofisico: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/fisico`,
-  pagopremio: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/premios_pagados`,
-  pagopremiofisico: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/premios_pagados1`,
-  ConsultaCrearSort: `${process.env.REACT_APP_LOTO_SORTEOS}/consulta_sorteos`,
-  CambiarSort: `${process.env.REACT_APP_LOTO_SORTEOS}/sorteo`, 
-  EstadoArchivos: `${process.env.REACT_APP_URL_LOTO1}/logs`,
-  cargueVentasExtra_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reporteVentaExtra_S3`, ////////
-  con_SortVentas_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_sort`, ////////
-  descargaVentas_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/descarga_reportes_S3`, ////////
-  reportVentas: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`, 
+  // ordinario: `${process.env.REACT_APP_URL_LOTO1}/consultas_loteria`,
+  // ordinariofisico: `${process.env.REACT_APP_URL_LOTO1}/consultas_loteria_fisica`, 
+  // ventaOrdinario: `${process.env.REACT_APP_URL_LOTO_VENTA}/venta`,
+  // ventaOrdinariofisica: `${process.env.REACT_APP_URL_LOTO_VENTA}/ventafisica`,
+  // moda: `${process.env.REACT_APP_URL_LOTO_MODA}/consurepmasbusca`,
+  // con_distribuidor_venta:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_distribuidores`,
+  // ventasReportes: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`,
+  // pagosReportes:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_pago_premios`,
+  // con_sort_ventas:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_sort_vendidos`,   
+  // consultaPago: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/pagodepremios`,
+  // premiohash: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/hash`,
+  // premiofisico: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/fisico`,
+  // pagopremio: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/premios_pagados`,
+  // pagopremiofisico: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/premios_pagados1`,
+  // ConsultaCrearSort: `${process.env.REACT_APP_LOTO_SORTEOS}/consulta_sorteos`,
+  // CambiarSort: `${process.env.REACT_APP_LOTO_SORTEOS}/sorteo`, 
+  // EstadoArchivos: `${process.env.REACT_APP_URL_LOTO1}/logs`,
+  // cargueVentasExtra_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reporteVentaExtra_S3`, ////////
+  // con_SortVentas_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_sort`, ////////
+  // descargaVentas_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/descarga_reportes_S3`, ////////
+  // reportVentas: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`,
+
+  ordinario: `${process.env.REACT_APP_URL_LOTERIAS}/billeteriaVirtual`,
+  ordinariofisico: `${process.env.REACT_APP_URL_LOTERIAS}/billeteriaFisica`,
+  EstadoArchivos: `${process.env.REACT_APP_URL_LOTERIAS}/logs`,
+
+  ventaOrdinario: `${process.env.REACT_APP_URL_LOTERIAS}/venta`,
+  ventaOrdinariofisica: `${process.env.REACT_APP_URL_LOTERIAS}/ventafisica`,
+
+  //moda: `${process.env.REACT_APP_URL_LOTO_MODA}/consurepmasbusca`,//// NO esta en uso
+
+  reportVentas: `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`, 
+  con_sort_ventas:`${process.env.REACT_APP_URL_LOTERIAS}/con_sort_vendidos`, 
+  con_distribuidor_venta:`${process.env.REACT_APP_URL_LOTERIAS}/con_distribuidores`,
+  cargueVentasExtra_S3: `${process.env.REACT_APP_URL_LOTERIAS}/reporteVentaExtra_S3`,
+  descargaVentas_S3: `${process.env.REACT_APP_URL_LOTERIAS}/descarga_reportes_S3`,
+  con_SortVentas_S3: `${process.env.REACT_APP_URL_LOTERIAS}/con_sort`,
+    
+  //ventasReportes: `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`,
+  //pagosReportes:`${process.env.REACT_APP_URL_LOTERIAS}/reportes_pago_premios`,
+    
+  consultaPago: `${process.env.REACT_APP_URL_LOTERIAS}/consultaPremio`,
+  premiohash: `${process.env.REACT_APP_URL_LOTERIAS}//estadoPremioVirtual`,
+  premiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioFisico`,
+  pagopremio: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioVirtual`,
+  pagopremiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioFisico`,
+  
+  ConsultaCrearSort: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_sorteos`,
+  CambiarSort: `${process.env.REACT_APP_URL_LOTERIAS}/sorteo`, 
+  
+   
+
+  
+      
 };
 export const LoteriaContext = createContext({
   infoLoto: {
@@ -66,8 +99,8 @@ export const LoteriaContext = createContext({
   },
   searchModa: () => {},
   con_distribuidor_venta: () => {},
-  getReportesVentas: () => {},
-  getReportesPagos: () => {},
+  // getReportesVentas: () => {},
+  // getReportesPagos: () => {},
   isWinner: () => {},
   makePayment: () => {},
   makePayment2: () => {},
@@ -311,74 +344,74 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-  const getReportesVentas = useCallback(async (sorteo,cod_distribuidor) => {
+  // const getReportesVentas = useCallback(async (sorteo,cod_distribuidor) => {
    
-    let fisico=false
-    let distribuidor=roleInfo.cod_oficina_lot
-      const sort = sorteo.split('-')
-      if(sort[1]==='true'){
-        fisico=true
-        distribuidor=cod_distribuidor
-      }
+  //   let fisico=false
+  //   let distribuidor=roleInfo.cod_oficina_lot
+  //     const sort = sorteo.split('-')
+  //     if(sort[1]==='true'){
+  //       fisico=true
+  //       distribuidor=cod_distribuidor
+  //     }
       
-    try {
-      const info = await fetchData(urls.ventasReportes, "GET", {
-        num_loteria:sort[2],
-        sorteo:sort[0],
-        fisico:fisico,
-        cod_distribuidor:distribuidor,
-        cod_sucursal:roleInfo.cod_sucursal_lot, /////////////////////////////////////////////////
-        cod_dane:roleInfo.codigo_dane
-      });
+  //   try {
+  //     const info = await fetchData(urls.ventasReportes, "GET", {
+  //       num_loteria:sort[2],
+  //       sorteo:sort[0],
+  //       fisico:fisico,
+  //       cod_distribuidor:distribuidor,
+  //       cod_sucursal:roleInfo.cod_sucursal_lot, /////////////////////////////////////////////////
+  //       cod_dane:roleInfo.codigo_dane
+  //     });
      
       
-      console.log(info)
-      if('msg' in info){
-        return info;
-      }
-      else{
-        const res = info[0];
-        var str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`
-        for (const venta of res.Campo5) {
-            const line = venta.split("-").join("").concat("\n");
-            str = str.concat(line);
-        }  
+  //     console.log(info)
+  //     if('msg' in info){
+  //       return info;
+  //     }
+  //     else{
+  //       const res = info[0];
+  //       var str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`
+  //       for (const venta of res.Campo5) {
+  //           const line = venta.split("-").join("").concat("\n");
+  //           str = str.concat(line);
+  //       }  
         
         
-        const data = new Blob([str], { type: "text/plain;charset=utf-8" });
-        const csv = window.URL.createObjectURL(data);
-        return {'archivo':csv};
-      }
+  //       const data = new Blob([str], { type: "text/plain;charset=utf-8" });
+  //       const csv = window.URL.createObjectURL(data);
+  //       return {'archivo':csv};
+  //     }
       
-    } catch (err) {
-      console.error(err);
-    }
-  }, [roleInfo?.cod_oficina_lot, roleInfo?.cod_sucursal_lot, roleInfo?.codigo_dane]);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // }, [roleInfo?.cod_oficina_lot, roleInfo?.cod_sucursal_lot, roleInfo?.codigo_dane]);
 
-  const getReportesPagos = useCallback(async () => {
+  // const getReportesPagos = useCallback(async () => {
    
   
     
-    try {
-      const info = await fetchData(urls.pagosReportes, "GET", {
-        sorteo_semana:'sorteo_semana',/////////////////////////////////////////////
-        cod_distribuidor:'PPAGO', /////////////////////////////////////////////////
-      });
+  //   try {
+  //     const info = await fetchData(urls.pagosReportes, "GET", {
+  //       sorteo_semana:'sorteo_semana',/////////////////////////////////////////////
+  //       cod_distribuidor:'PPAGO', /////////////////////////////////////////////////
+  //     });
 
-      const res = info[0];
+  //     const res = info[0];
      
-      let str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`;
-      for (const venta of res.Campo5) {
-        const line = venta.split("-").join("").concat("\n");
-        str = str.concat(line);
-      }
-      const data = new Blob([str], { type: "text/plain;charset=utf-8" });
-      const csv = window.URL.createObjectURL(data);
-      return csv;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+  //     let str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`;
+  //     for (const venta of res.Campo5) {
+  //       const line = venta.split("-").join("").concat("\n");
+  //       str = str.concat(line);
+  //     }
+  //     const data = new Blob([str], { type: "text/plain;charset=utf-8" });
+  //     const csv = window.URL.createObjectURL(data);
+  //     return csv;
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // }, []);
 
   const isWinner = useCallback(async (sorteo, billete, serie) => {
     try {
@@ -644,8 +677,8 @@ export const useProvideLoteria = () => {
     },
     searchModa,
     con_distribuidor_venta,
-    getReportesVentas,
-    getReportesPagos,
+    // getReportesVentas,
+    // getReportesPagos,
     isWinner,
     makePayment,
     makePayment2,

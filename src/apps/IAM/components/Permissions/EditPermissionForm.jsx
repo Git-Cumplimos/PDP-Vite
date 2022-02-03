@@ -9,7 +9,7 @@ import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
-const url_types = process.env.REACT_APP_URL_TRXS_TIPOS;
+const url_types = process.env.REACT_APP_URL_TRXS_TIPOS_BASE;
 
 const url_aliados = process.env.REACT_APP_URL_TRXS_ALIADOS;
 
@@ -29,7 +29,12 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
     //   return [];
     // }
     try {
-      const res = await fetchData(`${url_types}`, "GET", {});
+      const res = await fetchData(
+        `${url_types}/tipos-operaciones`,
+        // `${url_types}/tipos-operaciones-pagination`,
+        "GET",
+        {}
+      );
       if (res?.status) {
         res.obj = await Promise.all(
           res?.obj.map(async (type) => {

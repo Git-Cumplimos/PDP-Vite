@@ -19,7 +19,7 @@ AWS.config.update({
 });
 
 
-const url_consultaParams=`${process.env.REACT_APP_URL_LOTO_PREMIOS}/con_params`;
+const url_consultaParams=`${process.env.REACT_APP_URL_LOTERIAS}/con_params`;
 
 const CrearSorteos = ({ route }) => {
   const { label } = route;
@@ -108,6 +108,7 @@ const CrearSorteos = ({ route }) => {
   
   const closeparams = useCallback(() => {
     setShowparams(false);
+    setParams(null)
     
   });
   return (
@@ -205,7 +206,8 @@ const CrearSorteos = ({ route }) => {
         <Modal show={showparams} handleClose={() => closeparams()}>
           <ParamsForm
           closeModal={closeparams}
-          params={params}          
+          params={params}
+          setParams={setParams}          
           >
           </ParamsForm>
         </Modal>

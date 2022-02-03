@@ -4,6 +4,7 @@ import { lazy } from "react";
  * * Providers
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
+import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 
 /**
  * * Logos
@@ -29,8 +30,12 @@ const Reportes = lazy(() => import("../pages/Reportes"));
  */
 const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
 const Loteria = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
+const Descargas =  lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
 const DescargarArchivosS3 = lazy(() =>
-  import("../apps/LoteriaBog/Views/DescargarArchivosS3")
+  import("../apps/LoteriaBog/Views/Descargas/DescargarArchivosS3")
+);
+const BorrarBilletes = lazy(() =>
+  import("../apps/LoteriaBog/Views/Descargas/Borrado_billetes")
 );
 const CrearSorteos = lazy(() =>
   import("../apps/LoteriaBog/Views/CrearSorteos")
@@ -59,6 +64,8 @@ const MarketPlace = lazy(() => import("../apps/MarketPlace/MarketPlace"));
  * Fundacion de la mujer
  */
 const FunMujer = lazy(() => import("../apps/FundacionMujer/FunMujer"));
+const recMujer = lazy(() => import("../apps/FundacionMujer/Views/Recaudos"));
+const revMujer = lazy(() => import("../apps/FundacionMujer/Views/Reversos"));
 
 /**
  * IAM
@@ -139,6 +146,11 @@ const EnviarSMS = lazy(() => import("../apps/API-SMS/Views/EnviarSMS"));
 const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
 const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
 const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
+
+/**
+ * Editar parametros tipos de transacciones
+ */
+const ParamsOperations = lazy(() => import("../apps/ParamsOperations/ParamsOperations"));
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -222,8 +234,22 @@ const allUrlsPrivateApps = [
       {
         link: "/loteria-de-bogota/descargar",
         label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
-        component: DescargarArchivosS3,
+        component: Descargas,
         permission: [6],
+        subRoutes: [
+          {
+            link: "/loteria-de-bogota/descargar/descarga_reportes",
+            label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+            component: DescargarArchivosS3,
+            permission: [6],
+          },
+          {
+            link: "/loteria-de-bogota/descargar/borrar_billetes",
+            label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
+            component: BorrarBilletes,
+            permission: [6],
+          }
+        ]
       },
       {
         link: "/loteria-de-bogota/sorteos",
@@ -274,10 +300,25 @@ const allUrlsPrivateApps = [
     permission: [10],
   },
   {
-    link: "/fundacion-mujer",
-    label: <AppIcons name="Fundacion de la mujer" />,
+    link: "/funmujer",
+    label: <AppIcons Logo={"RECAUDO"} name="Fundación de la mujer" />,
     component: FunMujer,
-    permission: [],
+    permission: [3],
+    provider: ProvideFundamujer,
+    subRoutes: [
+      {
+        link: "/funmujer/recaudo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
+        component: recMujer,
+        permission: [3],
+      },
+      {
+        link: "/funmujer/reversorecaudo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Reverso Manual"} />,
+        component: revMujer,
+        permission: [3],
+      },
+    ],
   },
   {
     link: "/iam",
@@ -432,25 +473,25 @@ const allUrlsPrivateApps = [
     permission: [25],
     subRoutes: [
       {
-        link: "/EnviarSMS",
+        link: "/API_SMS/EnviarSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Enviar SMS" />,
         component: EnviarSMS,
         permission: [25],
       },
       {
-        link: "/crearSMS",
+        link: "/API_SMS/crearSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Crear SMS" />,
         component: CrearSMS,
         permission: [26],
       },
       {
-        link: "/reporteSMS",
+        link: "/API_SMS/reporteSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Reporte" />,
         component: reporteSMS,
         permission: [26],
       },
       {
-        link: "/BloquearNum",
+        link: "/API_SMS/BloquearNum",
         label: <AppIcons Logo={"MARKETPLACE"} name="Bloqueo de números" />,
         component: BloquearNum,
         permission: [26],
@@ -469,11 +510,27 @@ const allUrlsPrivateApps = [
         component: RecargarColCard,
         permission: [3],
       },
+      // {
+      //   link: "/recargas-Colcard/consultar-tarjeta",
+      //   label: <AppIcons Logo={CARGAR} name="Consultar tarjeta" />,
+      //   component: ConsultarColCard,
+      //   permission: [3],
+      // },
+    ],
+  },
+  {
+    link: "/params-operations",
+    label: (
+      <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />
+    ),
+    component: ParamsOperations,
+    permission: [1],
+    subRoutes: [
       {
-        link: "/recargas-Colcard/consultar-tarjeta",
-        label: <AppIcons Logo={CARGAR} name="Consultar tarjeta" />,
-        component: ConsultarColCard,
-        permission: [3],
+        link: "/params-operations/edit-params",
+        label: <AppIcons Logo={"IMPUESTO"} name={"Editar parametros"} />,
+        component: Comisiones,
+        permission: [1],
       },
     ],
   },

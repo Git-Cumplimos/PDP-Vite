@@ -8,7 +8,7 @@ import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 
-const url_SMS = `${process.env.REACT_APP_URL_APISMS_SMS}/SMS_texto`;
+const url_SMS = `${process.env.REACT_APP_URL_APISMS}/SMS_texto`;
 
 
 const CrearSMS = () => {
@@ -75,9 +75,10 @@ const CrearSMS = () => {
       label="Mensaje"
       type="input"
       minLength="1"
-      maxLength="60"
+      maxLength="160"
       autoComplete="off"
       value={SMS}
+      info={`Cantidad de caracteres: ${SMS.length}`}
       onInput={(e) => {
         setSMS(e.target.value)        
       }}
@@ -187,9 +188,10 @@ const CrearSMS = () => {
           label="Mensaje"
           type="input"
           minLength="1"
-          maxLength="60"
+          maxLength="160"
           autoComplete="off"
           value={SMS}
+          info={`Cantidad de caracteres: ${SMS.length}`}
           onInput={(e) => {
             setSMS(e.target.value)        
           }}

@@ -51,6 +51,14 @@
   @apply relative;
 }
 
+/* .formItem > div > input:invalid:not([value=""]) {
+  @apply border-2 border-red-600;
+} */
+
 .formItem > div > input + p {
-  @apply text-sm absolute;
+  @apply text-xs absolute text-left;
+}
+
+.formItem > div > input + p.invalid {
+  @apply text-red-600;
 }
