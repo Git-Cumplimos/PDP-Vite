@@ -13,10 +13,10 @@ import Input from "../../../components/Base/Input/Input";
 import Form from "../../../components/Base/Form/Form";
 
 
-const url_consultaBalance = `${process.env.REACT_APP_URL_APISMS_CONEXION_ONURIX}/consultaBalance`;
-const url_SMS = `${process.env.REACT_APP_URL_APISMS_SMS}/SMS_texto`;
-const url_buscarNum = `${process.env.REACT_APP_URL_APISMS_SMS}/buscar_celular`;
-const url_tipComercios = `${process.env.REACT_APP_URL_APISMS_SMS}/tip_comercio`;
+const url_consultaBalance = `${process.env.REACT_APP_URL_APISMS}/consultaBalance`;
+const url_SMS = `${process.env.REACT_APP_URL_APISMS}/SMS_texto`;
+const url_buscarNum = `${process.env.REACT_APP_URL_APISMS}/buscar_celular`;
+const url_tipComercios = `${process.env.REACT_APP_URL_APISMS}/tip_comercio`;
 
 
 const EnviarSMS = () => {
@@ -33,7 +33,7 @@ const EnviarSMS = () => {
   const [creditos, setCreditos] = useState(null)
   const [tipSelecNumber, setTipSelecNumber] = useState("")
   const [phones, setPhones] = useState(null)
-  const [phonesText, setPhonesText] = useState(null)
+  const [phonesText, setPhonesText] = useState('')
   const [optionsDisponibles, setOptionsDisponibles] = useState([])
 
 
@@ -121,6 +121,8 @@ const EnviarSMS = () => {
   
 
   const closeModal = useCallback(() => {
+    setPhones(null)
+    setPhonesText('')
     setShowModal(false);
     setSMS('')
     setResSMS(null)
@@ -131,7 +133,6 @@ const EnviarSMS = () => {
         notifyError(res.msg);
         
       } else {
-        console.log(res.obj.balance);
         setCreditos(res.obj.balance)
     
       }
@@ -139,7 +140,7 @@ const EnviarSMS = () => {
     
   });
 
-  console.log(tipComercio)
+  console.log(phonesText)
   return (
     <>
       <h1 className="text-3xl mb-6">Enviar SMS</h1>
@@ -161,13 +162,14 @@ const EnviarSMS = () => {
       />
       {tipSelecNumber==='ingresar'?
         <TextArea
-        id="SMS"
-        label="numeros"
+        id="Phone"
+        label="Números"
         type="input"
         autoComplete="off"
         value={phonesText}
         onInput={(e) => {
           const numeros=e.target.value.split(',')
+            console.log(e.target.value)
             console.log(e.target.value.length,(12+(12+1)*(numeros.length-1)))
             setPhonesText(e.target.value)
             if (e.target.value.length===(12+(12+1)*(numeros.length-1))){
@@ -227,9 +229,10 @@ const EnviarSMS = () => {
       label="Mensaje"
       type="input"
       minLength="1"
-      maxLength="60"
+      maxLength="160"
       autoComplete="off"
       value={SMS}
+      info={`Cantidad de caracteres: ${SMS.length}`}
       onInput={(e) => {
         setSMS(e.target.value)        
       }}

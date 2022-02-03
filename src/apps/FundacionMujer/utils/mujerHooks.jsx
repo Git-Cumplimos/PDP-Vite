@@ -68,8 +68,6 @@ export const useProvideFDLM = () => {
     setRespuestaconsultarecaudocreditos,
   ] = useState();
 
-  console.log(respuestaconsultarecaudo);
-  console.log(respuestaconsultarecaudocreditos);
   //consulta del pin
   const consultapin = useCallback(
     async (documento, pin) => {
@@ -81,7 +79,7 @@ export const useProvideFDLM = () => {
         });
         return res;
       } catch (err) {
-        console.error(err);
+        throw err;
       }
     },
     [roleInfo?.id_comercio]
@@ -143,13 +141,10 @@ export const useProvideFDLM = () => {
       Depto: 1,
       Municipio: 1,
     };
-    console.log(body);
     try {
       const res = await fetchData(urls.mostrarcreditos, "POST", {}, body);
-      console.log(res);
       return res;
     } catch (err) {
-      console.log(err);
       throw err;
     }
   }, []);
@@ -160,13 +155,10 @@ export const useProvideFDLM = () => {
       Valor: parseFloat(values?.Valor),
       referenciaPago: values?.Referencia,
     };
-    console.log(body);
     try {
       const res = await fetchData(urls.ingresoreverso, "POST", {}, body);
-      console.log(res);
       return res;
     } catch (err) {
-      console.log(err);
       throw err;
     }
   }, []);
@@ -181,10 +173,8 @@ export const useProvideFDLM = () => {
     };
     try {
       const res = await fetchData(urls.ingresorecibo, "POST", {}, body);
-      console.log(res);
       return res;
     } catch (err) {
-      console.log(err);
       throw err;
     }
   }, []);
@@ -195,13 +185,10 @@ export const useProvideFDLM = () => {
       Depto: 1,
       Municipio: 1,
     };
-    console.log(body);
     try {
       const res = await fetchData(urls.valorcuota, "POST", {}, body);
-      console.log(res);
       return res;
     } catch (err) {
-      console.log(err);
       throw err;
     }
   }, []);

@@ -15,7 +15,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const url_cambioParams=`http://127.0.0.1:5000/cambio_params`;
+const url_cambioParams=`${process.env.REACT_APP_URL_LOTERIAS}/cambio_params`;
 
 const ParamsForm = ({
 
@@ -105,6 +105,7 @@ const ParamsForm = ({
             label="Nuevo UVT"
             autoComplete="off"
             max={10000000}
+            value={uvt}
             onInput={onMoneyChange2}
             required='true'
           />

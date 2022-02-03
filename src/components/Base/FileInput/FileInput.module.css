@@ -8,24 +8,8 @@
   @apply text-xl md:w-full min-w-max;
 }
 
-.formItem > input {
-  /* flex: 1 1 50%; */
-  @apply px-4 py-2 rounded-md bg-secondary-light text-black md:w-full min-w-full md:min-w-max;
-}
-
-.formItem > input[type="file"] {
+.formItem input[type="file"] {
   @apply hidden absolute inset-0;
-}
-
-.formItem > input:disabled {
-  @apply bg-gray-100;
-}
-
-.formItem > input[list]::-webkit-calendar-picker-indicator {
-  width: 0;
-  margin: 0;
-  padding: 0;
-  opacity: 0;
 }
 
 .formItem.File {

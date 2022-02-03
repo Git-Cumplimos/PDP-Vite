@@ -6,11 +6,12 @@ import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import Select from "../../../components/Base/Select/Select";
 import Table from "../../../components/Base/Table/Table";
+import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
 import { useMujer } from "../utils/mujerHooks";
 import { toast } from "react-toastify";
 import { useReactToPrint } from "react-to-print";
 import { notifyError } from "../../../utils/notify";
-import Tickets from "../../../components/Base/Tickets/Tickets";
+import Tickets from "../components/Voucher/Tickets";
 
 const Recaudo = () => {
   const {
@@ -33,14 +34,12 @@ const Recaudo = () => {
   const [info, setInfo] = useState("");
   const [table, setTable] = useState("");
   const [cuota, setCuota] = useState("");
-  const [estadoPrueba] = useState(false);
+  const [creditStatus, setCreditStatus] = useState(false);
   const [money, setMoney] = useState("");
   const [referencia, setReferencia] = useState("");
   const [ticket, setTicket] = useState(false);
-  const [comercio] = useState("");
   const [selected, setSelected] = useState(true);
   const [showModal, setShowModal] = useState("");
-  const [recauditoss, setRecauditoss] = useState("");
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -95,7 +94,7 @@ const Recaudo = () => {
     };
     ingresorecibo(body)
       .then((res) => {
-        if (res?.obj?.Confirmacion != -1) {
+        if (res?.obj?.Confirmacion == -1) {
           setTicket(true);
         } else {
           notifyError(
@@ -123,6 +122,9 @@ const Recaudo = () => {
               cuota: formatMoney.format(row.ValorPagar),
             },
           ]);
+          if (row.ValorPagar !== 0) {
+            setCreditStatus(true);
+          }
         });
       })
       .catch((err) => {
@@ -130,7 +132,7 @@ const Recaudo = () => {
       });
     mostrarcredito(String(number), tipobusqueda)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setInfo(res);
         setDisabledBtn(false);
         if (res?.status == false) {
@@ -141,20 +143,20 @@ const Recaudo = () => {
         [res?.obj].map((row) => {
           setTable([
             {
-              Cedula: row.Cedula,
-              Mensaje: row.Mensaje,
-              Cliente: row.NombreCliente,
-              Producto: row.NombreProducto,
-              Credito: row.Nrocredito,
-              Valor: formatMoney.format(row.ValorPagar),
+              Cedula: row?.Cedula,
+              Mensaje: row?.Mensaje,
+              Cliente: row?.NombreCliente,
+              Producto: row?.NombreProducto,
+              Credito: row?.Nrocredito,
+              Valor: formatMoney.format(row?.ValorPagar),
             },
           ]);
-          setMoney(row.ValorPagar);
+          setMoney(row?.ValorPagar);
         });
       })
       .catch((err) => console.log("error", err));
   };
-
+  console.log(number, tipobusqueda);
   return (
     <>
       <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
@@ -207,10 +209,12 @@ const Recaudo = () => {
       </Form>
       {info?.status && (
         <>
-          <Table
-            headers={["Valor mínimo", "Valor máximo", "Valor a pagar"]}
-            data={cuota || []}
-          />
+          {creditStatus && (
+            <Table
+              headers={["Valor mínimo", "Valor máximo", "Valor a pagar"]}
+              data={cuota || []}
+            />
+          )}
           <br />
           <Table
             headers={[
@@ -236,7 +240,7 @@ const Recaudo = () => {
               Resumen de la transacción
             </h1>
             <h2 className="sm:text-center font-semibold">
-              Crédito {table[0]?.Credito}
+              Crédito # {table[0]?.Credito}
             </h2>
           </>
         )}
@@ -264,18 +268,17 @@ const Recaudo = () => {
             </div>
           ) : (
             <Form onSubmit={bankCollection}>
-              <Input
+              <MoneyInput
                 id="numPago"
                 label="Valor a pagar"
                 type="number"
                 autoComplete="off"
                 required
                 value={money}
-                onInput={(e) => {
-                  const num = e.target.value || "";
+                onInput={(e, valor) => {
+                  const num = valor || "";
                   setMoney(num);
                 }}
-                info={`${formatMoney.format(table[0]?.Valor ?? 0)}`}
               />
               <Input
                 id="refPago"

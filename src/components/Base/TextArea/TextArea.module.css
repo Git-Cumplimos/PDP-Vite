@@ -8,31 +8,39 @@
   @apply text-xl md:w-full min-w-max;
 }
 
-.formItem > textarea {
+.formItem > div > textarea {
   /* flex: 1 1 50%; */
   @apply px-4 py-2 rounded-md bg-secondary-light text-black md:w-full min-w-full md:min-w-max;
   @apply resize-y max-h-60;
 }
 
-.formItem > textarea:disabled {
+.formItem > div > textarea:disabled {
   @apply bg-gray-100;
 }
 
-.formItem > textarea[list]::-webkit-calendar-picker-indicator {
+.formItem > div > textarea[list]::-webkit-calendar-picker-indicator {
   width: 0;
   margin: 0;
   padding: 0;
   opacity: 0;
 }
 
-.formItem > textarea::-webkit-outer-spin-button,
-.formItem > textarea::-webkit-inner-spin-button {
+.formItem > div > textarea::-webkit-outer-spin-button,
+.formItem > div > textarea::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.formItem > textarea::-webkit-search-cancel-button {
+.formItem > div > textarea::-webkit-search-cancel-button {
   -webkit-appearance: none;
   content: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-lg' viewBox='0 0 16 16'><path d='M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z'/></svg>");
   cursor: pointer;
+}
+
+.formItem > div {
+  @apply relative;
+}
+
+.formItem > div > textarea + p {
+  @apply text-xs absolute text-left;
 }
