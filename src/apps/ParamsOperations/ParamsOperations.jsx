@@ -13,13 +13,37 @@ import useQuery from "../../hooks/useQuery";
 import fetchData from "../../utils/fetchData";
 import { notify, notifyError } from "../../utils/notify";
 
-const url_types = process.env.REACT_APP_URL_TRXS_TIPOS_BASE;
+// const url_types = process.env.REACT_APP_URL_TRXS_TIPOS_BASE;
+const url_types = "http://localhost:5000";
 
 const fetchTrxTypesPages = async (Nombre_operacion, page) => {
   try {
-    const res = await fetchData(`${url_types}/tipos-operaciones-pagination`, "GET", {
-      Nombre_operacion,
-      page,
+    const res = await fetchData(
+      `${url_types}/tipos-operaciones-pagination`,
+      "GET",
+      {
+        Nombre_operacion,
+        page,
+      }
+    );
+
+    if (res?.status) {
+      return res?.obj;
+    } else {
+      notifyError(res?.msg);
+    }
+  } catch (err) {
+    throw err;
+  }
+  return {};
+};
+
+const fetchAliadosPDPPages = async (nombre) => {
+  try {
+    const res = await fetchData(`${url_types}/aliados-pagination`, "GET", {
+      nombre,
+      page: 1,
+      limit: 5,
     });
 
     if (res?.status) {
@@ -51,13 +75,27 @@ const ParamsOperations = () => {
   }, [trxTypes]);
 
   const mapSuggestionsAliados = useMemo(
-    () => foundAliados.map((val) => val),
+    () => foundAliados.map(({ nombre }) => <h1 className="py-2">{nombre}</h1>),
     [foundAliados]
   );
 
-  const searchAliados = useCallback(() => {
-    setFoundAliados([]);
+  const searchAliados = useCallback((e) => {
+    fetchAliadosPDPPages(e.target.value ?? "")
+      .then((res) => setFoundAliados([...res?.results]))
+      .catch((err) => console.error(err));
   }, []);
+
+  const onSelectSuggestion = useCallback((i, el) => {
+    setSelected((old) => {
+      if (!old) {
+        return old;
+      }
+      const copy = { ...old }
+      copy.NewAliado = foundAliados[i];
+      copy.Aliado = foundAliados[i].nombre;
+      return { ...copy };
+    })
+  }, [foundAliados]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -83,7 +121,7 @@ const ParamsOperations = () => {
     [setQuery]
   );
 
-  const onSelectAutorizador = useCallback(
+  const onSelectType = useCallback(
     (e, i) => {
       setSelected({ ...trxTypes[i] });
       setShowModal(true);
@@ -94,7 +132,7 @@ const ParamsOperations = () => {
   const onChangeSelected = useCallback((e) => {
     const formData = new FormData(e.target.form);
 
-    const colsInputs = ["Parametros", "Nombre"];
+    const colsInputs = ["Parametros", "Nombre", "Aliado"];
     const colsParams = ["param_key", "param_value"];
 
     if (
@@ -196,7 +234,7 @@ const ParamsOperations = () => {
         <Table
           headers={Object.keys(tableTrxTypes[0])}
           data={tableTrxTypes}
-          onSelectRow={onSelectAutorizador}
+          onSelectRow={onSelectType}
         />
       ) : (
         ""
@@ -224,8 +262,8 @@ const ParamsOperations = () => {
                 readOnly={selected?.id_tipo_operacion}
               />
               <InputSuggestions
-                id="searchTrxType"
-                name="searchTrxType"
+                id="aliadoTrxType"
+                name="Aliado"
                 label={"Aliado"}
                 type="search"
                 autoComplete="off"
@@ -234,8 +272,8 @@ const ParamsOperations = () => {
                   callback: searchAliados,
                   timeOut: 500,
                 }}
-                // onSelectSuggestion={}
-                defaultValue={selected?.Aliado || ""}
+                onSelectSuggestion={onSelectSuggestion}
+                value={selected?.Aliado || ""}
                 readOnly={selected?.id_tipo_operacion}
               />
               <Fieldset legend={"Parametros"}>
