@@ -6,56 +6,81 @@ import { useState } from "react";
 import Card from "../../../components/Base/Card/Card";
 import Modal from "../../../components/Base/Modal/Modal";
 import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
+import classes from "../../SolicitudEnrolamiento/views/ConsultaEnrolamiento.module.css";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 const ConsultaEnrolamiento = () => {
   const [numconsultaProceso, setNumConsultaProceso] = useState("");
   const [respuestaProceso, setRespuestaProceso] = useState("");
 
+  const navigate = useNavigate();
+  const {
+    principalConsulta,
+    tituloConsultaInscripcion,
+    contenedorNumeroProceso,
+    contenedorForm,
+  } = classes;
+
   const funConsultaProceso = (e) => {
     e.preventDefault();
-    const datos = {
-      procesoConvenioGuid: numconsultaProceso,
-    };
-    fetch(`http://127.0.0.1:5000/consultavalidacion`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(datos),
-    })
+
+    fetch(
+      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?numDoc=${numconsultaProceso}`
+      /*  `http://127.0.0.1:5000/actualizacionestado?numDoc=${numconsultaProceso}` */
+    )
       .then((res) => res.json())
-      .then((respuesta) => setRespuestaProceso(respuesta.obj.data));
-    console.log(respuestaProceso);
+      .then((respuesta) => setRespuestaProceso(respuesta.obj.results));
+    /*  .then((respuesta) => console.log(respuesta.obj.results)); */
+  };
+  console.log(respuestaProceso);
+
+  const handleReconoser = async () => {
+    navigate(`/Solicitud-enrolamiento/reconoserid/${numconsultaProceso}`);
   };
   return (
-    <Form grid={true} onSubmit={(e) => funConsultaProceso(e)}>
-      <Input
-        label={"Ingrese su Numero de Proceso:"}
-        placeholder="Ej:88e68c46-9e5c-459c-99bd-298f51a59xxx"
-        onChange={(e) => setNumConsultaProceso(e.target.value)}
-      ></Input>
-      <ButtonBar className={"lg:col-span-2"} type="">
-        <Button type="submit" onClick={(e) => funConsultaProceso(e)}>
-          Consultar Proceso
-        </Button>
-      </ButtonBar>
-      {respuestaProceso ? (
-        <Modal show>
-          <Form grid={true}>
-            <LogoPDP></LogoPDP>
-            <h2>{`Primer Apellido: ${respuestaProceso.primerApellido}`}</h2>
-            <h2>{`Segundo Apellido: ${respuestaProceso.segundoApellido}`}</h2>
-            <h2>{`Primer Nombre: ${respuestaProceso.primerNombre}`}</h2>
-            <h2>{`Segundo Nombre: ${respuestaProceso.segundoNombre}`}</h2>
-            <h2>{`Cedula Ciudadania: ${respuestaProceso.numDoc}`}</h2>
-            <h2>{`Correo Electronico: ${respuestaProceso.email}`}</h2>
-            <h2>{`Celular: ${respuestaProceso.celular}`}</h2>
-            <h2>{`Porcentaje de Validación: ${respuestaProceso.scoreRostroDocumento}%`}</h2>
-          </Form>
-        </Modal>
-      ) : (
-        ""
-      )}
-    </Form>
+    <div className={principalConsulta}>
+      <span className={tituloConsultaInscripcion}>
+        Formulario de Inscripción
+      </span>
+      <Form onSubmit={(e) => funConsultaProceso(e)}>
+        <Input
+          label={"Ingrese Numero Proceso:"}
+          placeholder="Ej:1030652xxx"
+          onChange={(e) => setNumConsultaProceso(e.target.value)}
+        ></Input>
+
+        <ButtonBar className={"lg:col-span-2"} type="">
+          <Button type="submit" onClick={(e) => funConsultaProceso(e)}>
+            Consultar Proceso
+          </Button>
+        </ButtonBar>
+
+        {respuestaProceso ? (
+          <Modal show>
+            <div className={contenedorForm}>
+              <LogoPDP></LogoPDP>
+              <h2>{`Nombre: ${respuestaProceso[0]["nombre"]} ${respuestaProceso[0]["apellido"]}`}</h2>
+              <h2>{`Cedula Ciudadania: ${respuestaProceso[0]["numdoc"]}`}</h2>
+              <h2>{`Correo Electronico: ${respuestaProceso[0]["email"]}`}</h2>
+              <h2>{`Estado del Proceso: ${
+                respuestaProceso[0]["validation_state"] === "101"
+                  ? "Aprobado para Proceso ReconoserID"
+                  : "En Proceso de Validadción de Documentos"
+              }`}</h2>
+              {respuestaProceso[0].validation_state === "101" ? (
+                <ButtonBar className={"lg:col-span-2"} type="">
+                  <Button type="submit" onClick={() => handleReconoser()}>
+                    Comenzar ReconoserID
+                  </Button>
+                </ButtonBar>
+              ) : null}
+            </div>
+          </Modal>
+        ) : (
+          ""
+        )}
+      </Form>
+    </div>
   );
 };
 

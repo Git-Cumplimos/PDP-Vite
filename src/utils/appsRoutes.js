@@ -111,6 +111,12 @@ const ConsultaEnrolamiento = lazy(() =>
 const ReconoserID = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ReconoserID")
 );
+const ValidacionAsesorComercial = lazy(() =>
+  import("../apps/Validacion Enrolamiento/ValidacionAsesorComercial")
+);
+const VerificacionFormulario = lazy(() =>
+  import("../apps/Validacion Enrolamiento/views/VerificacionFormulario")
+);
 /**
  * Recaudo
  */
@@ -146,6 +152,45 @@ const DESCARGAR =
 const publicUrls = [
   { link: "/login", label: "Login", component: Login },
   { link: "*", exact: false, component: Error404 },
+  {
+    link: "/solicitud-enrolamiento",
+    label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
+    component: SolicitudEnrolamiento,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/solicitud-enrolamiento/formulario",
+        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
+        component: FormularioEnrolamiento,
+      },
+      {
+        link: "/Solicitud-enrolamiento/consultar",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
+        ),
+        component: ConsultaEnrolamiento,
+      },
+      {
+        link: "/Solicitud-enrolamiento/reconoserid/:numCedula",
+        label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
+        component: ReconoserID,
+      },
+      {
+        link: "/Solicitud-enrolamiento/validarformulario",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Validar Formulario Inscripción"} />
+        ),
+        component: ValidacionAsesorComercial,
+      },
+      {
+        link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Verificar Formulario Inscripción"} />
+        ),
+        component: VerificacionFormulario,
+      },
+    ],
+  },
 ];
 
 const allUrlsPrivateApps = [
@@ -359,34 +404,7 @@ const allUrlsPrivateApps = [
       },
     ],
   },
-  {
-    link: "/solicitud-enrolamiento",
-    label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
-    component: SolicitudEnrolamiento,
-    permission: [1],
-    subRoutes: [
-      {
-        link: "/solicitud-enrolamiento/formulario",
-        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
-        component: FormularioEnrolamiento,
-        permission: [1],
-      },
-      {
-        link: "/Solicitud-enrolamiento/consultar",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
-        ),
-        component: ConsultaEnrolamiento,
-        permission: [1],
-      },
-      {
-        link: "/Solicitud-enrolamiento/reconoserid",
-        label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
-        component: ReconoserID,
-        permission: [1],
-      },
-    ],
-  },
+
   {
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
