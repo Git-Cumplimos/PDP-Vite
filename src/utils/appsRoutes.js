@@ -469,12 +469,12 @@ const allUrlsPrivateApps = [
         component: RecargarColCard,
         permission: [3],
       },
-      {
-        link: "/recargas-Colcard/consultar-tarjeta",
-        label: <AppIcons Logo={CARGAR} name="Consultar tarjeta" />,
-        component: ConsultarColCard,
-        permission: [3],
-      },
+      // {
+      //   link: "/recargas-Colcard/consultar-tarjeta",
+      //   label: <AppIcons Logo={CARGAR} name="Consultar tarjeta" />,
+      //   component: ConsultarColCard,
+      //   permission: [3],
+      // },
     ],
   },
 ];
