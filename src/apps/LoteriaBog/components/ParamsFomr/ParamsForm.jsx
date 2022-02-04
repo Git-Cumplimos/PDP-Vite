@@ -15,7 +15,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const url_cambioParams=`http://127.0.0.1:5000/cambio_params`;
+const url_cambioParams=`${process.env.REACT_APP_URL_LOTERIAS}/cambio_params`;
 
 const ParamsForm = ({
 

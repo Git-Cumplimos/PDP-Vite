@@ -1,7 +1,7 @@
 import { useState } from "react";
 import classes from "./TextArea.module.css";
 
-const TextArea = ({ label, self = false, onLazyInput, ...input }) => {
+const TextArea = ({ label, self = false, onLazyInput, info='', ...input }) => {
   const { formItem } = classes;
   const { id: _id } = input;
 
@@ -45,7 +45,10 @@ const TextArea = ({ label, self = false, onLazyInput, ...input }) => {
           {label}
         </label>
       )}
+    <div>  
       <textarea {...input} />
+      {info ? <p>{info}</p> : ""}
+    </div>  
     </div>
   );
 }

@@ -30,8 +30,12 @@ const Reportes = lazy(() => import("../pages/Reportes"));
  */
 const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
 const Loteria = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
+const Descargas = lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
 const DescargarArchivosS3 = lazy(() =>
-  import("../apps/LoteriaBog/Views/DescargarArchivosS3")
+  import("../apps/LoteriaBog/Views/Descargas/DescargarArchivosS3")
+);
+const BorrarBilletes = lazy(() =>
+  import("../apps/LoteriaBog/Views/Descargas/Borrado_billetes")
 );
 const CrearSorteos = lazy(() =>
   import("../apps/LoteriaBog/Views/CrearSorteos")
@@ -114,6 +118,18 @@ const ConsultaEnrolamiento = lazy(() =>
 const ReconoserID = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ReconoserID")
 );
+const ValidacionAsesorComercial = lazy(() =>
+  import("../apps/Validacion Enrolamiento/ValidacionAsesorComercial")
+);
+const VerificacionFormulario = lazy(() =>
+  import("../apps/Validacion Enrolamiento/views/VerificacionFormulario")
+);
+const ValidacionApertura = lazy(() =>
+  import("../apps/ValidacionHellen/ValidacionApertura")
+);
+const VerificacionApertura = lazy(() =>
+  import("../apps/ValidacionHellen/views/VerificacionApertura")
+);
 /**
  * Recaudo
  */
@@ -137,6 +153,13 @@ const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
 const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
 const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 
+/**
+ * Editar parametros tipos de transacciones
+ */
+const ParamsOperations = lazy(() =>
+  import("../apps/ParamsOperations/ParamsOperations")
+);
+
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
 };
@@ -149,6 +172,57 @@ const DESCARGAR =
 const publicUrls = [
   { link: "/login", label: "Login", component: Login },
   { link: "*", exact: false, component: Error404 },
+  {
+    link: "/solicitud-enrolamiento",
+    label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
+    component: SolicitudEnrolamiento,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/solicitud-enrolamiento/formulario",
+        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
+        component: FormularioEnrolamiento,
+      },
+      {
+        link: "/Solicitud-enrolamiento/consultar",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
+        ),
+        component: ConsultaEnrolamiento,
+      },
+      {
+        link: "/Solicitud-enrolamiento/reconoserid/:numCedula",
+        label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
+        component: ReconoserID,
+      },
+      {
+        link: "/Solicitud-enrolamiento/validarformulario",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Validar Formulario Inscripción"} />
+        ),
+        component: ValidacionAsesorComercial,
+      },
+      {
+        link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Verificar Formulario Inscripción"} />
+        ),
+        component: VerificacionFormulario,
+      },
+      {
+        link: "/Solicitud-enrolamiento/validarformularioreconoserid",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
+        ),
+        component: ValidacionApertura,
+      },
+      {
+        link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
+        label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
+        component: VerificacionApertura,
+      },
+    ],
+  },
 ];
 
 const allUrlsPrivateApps = [
@@ -180,8 +254,22 @@ const allUrlsPrivateApps = [
       {
         link: "/loteria-de-bogota/descargar",
         label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
-        component: DescargarArchivosS3,
+        component: Descargas,
         permission: [6],
+        subRoutes: [
+          {
+            link: "/loteria-de-bogota/descargar/descarga_reportes",
+            label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+            component: DescargarArchivosS3,
+            permission: [6],
+          },
+          {
+            link: "/loteria-de-bogota/descargar/borrar_billetes",
+            label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
+            component: BorrarBilletes,
+            permission: [6],
+          },
+        ],
       },
       {
         link: "/loteria-de-bogota/sorteos",
@@ -377,34 +465,7 @@ const allUrlsPrivateApps = [
       },
     ],
   },
-  {
-    link: "/solicitud-enrolamiento",
-    label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
-    component: SolicitudEnrolamiento,
-    permission: [1],
-    subRoutes: [
-      {
-        link: "/solicitud-enrolamiento/formulario",
-        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
-        component: FormularioEnrolamiento,
-        permission: [1],
-      },
-      {
-        link: "/Solicitud-enrolamiento/consultar",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
-        ),
-        component: ConsultaEnrolamiento,
-        permission: [1],
-      },
-      {
-        link: "/Solicitud-enrolamiento/reconoserid",
-        label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
-        component: ReconoserID,
-        permission: [1],
-      },
-    ],
-  },
+
   {
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
@@ -432,25 +493,25 @@ const allUrlsPrivateApps = [
     permission: [25],
     subRoutes: [
       {
-        link: "/EnviarSMS",
+        link: "/API_SMS/EnviarSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Enviar SMS" />,
         component: EnviarSMS,
         permission: [25],
       },
       {
-        link: "/crearSMS",
+        link: "/API_SMS/crearSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Crear SMS" />,
         component: CrearSMS,
         permission: [26],
       },
       {
-        link: "/reporteSMS",
+        link: "/API_SMS/reporteSMS",
         label: <AppIcons Logo={"MARKETPLACE"} name="Reporte" />,
         component: reporteSMS,
         permission: [26],
       },
       {
-        link: "/BloquearNum",
+        link: "/API_SMS/BloquearNum",
         label: <AppIcons Logo={"MARKETPLACE"} name="Bloqueo de números" />,
         component: BloquearNum,
         permission: [26],
@@ -469,11 +530,25 @@ const allUrlsPrivateApps = [
         component: RecargarColCard,
         permission: [3],
       },
+      // {
+      //   link: "/recargas-Colcard/consultar-tarjeta",
+      //   label: <AppIcons Logo={CARGAR} name="Consultar tarjeta" />,
+      //   component: ConsultarColCard,
+      //   permission: [3],
+      // },
+    ],
+  },
+  {
+    link: "/params-operations",
+    label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />,
+    component: ParamsOperations,
+    permission: [1],
+    subRoutes: [
       {
-        link: "/recargas-Colcard/consultar-tarjeta",
-        label: <AppIcons Logo={CARGAR} name="Consultar tarjeta" />,
-        component: ConsultarColCard,
-        permission: [3],
+        link: "/params-operations/edit-params",
+        label: <AppIcons Logo={"IMPUESTO"} name={"Editar parametros"} />,
+        component: Comisiones,
+        permission: [1],
       },
     ],
   },

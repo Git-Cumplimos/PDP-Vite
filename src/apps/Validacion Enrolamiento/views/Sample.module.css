@@ -1,0 +1,6 @@
+.contenedorPrincipalDoc {
+  display: flex;
+  border: 1px solid #41404081;
+  justify-content: space-around;
+  flex-direction: row;
+}
