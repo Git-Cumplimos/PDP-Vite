@@ -25,11 +25,12 @@ const SolicitudEnrolamiento = ({ subRoutes }) => {
     }
   }, [backIcon, personas, backIconSecondary, clientWidth]);
   return (
-    <div class="flex flex-row justify-center">
+    <div className="flex flex-row justify-center">
       <Form>
         <HNavbar links={[subRoutes[0]]} isIcon />
         <HNavbar links={[subRoutes[1]]} isIcon />
         <HNavbar links={[subRoutes[3]]} isIcon />
+        <HNavbar links={[subRoutes[5]]} isIcon />
       </Form>
       {/*   <Table></Table> */}
     </div>

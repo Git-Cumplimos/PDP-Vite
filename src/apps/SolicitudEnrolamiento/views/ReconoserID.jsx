@@ -24,12 +24,12 @@ const ReconoserID = () => {
 
   useEffect(() => {
     if (datosUsuario?.length > 0) {
+      console.log(procesoConvenioGuid);
       const datos = {
         id_reconocer: procesoConvenioGuid,
-        id_proceso: datosUsuario[0]["id_proceso"],
       };
       fetch(
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${datosUsuario[0]["id_proceso"]}`,
+        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosUsuario[0]["id_proceso"]}`,
         {
           method: "PUT",
           headers: {

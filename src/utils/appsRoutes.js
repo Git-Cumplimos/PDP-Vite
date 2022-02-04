@@ -30,7 +30,7 @@ const Reportes = lazy(() => import("../pages/Reportes"));
  */
 const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
 const Loteria = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
-const Descargas =  lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
+const Descargas = lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
 const DescargarArchivosS3 = lazy(() =>
   import("../apps/LoteriaBog/Views/Descargas/DescargarArchivosS3")
 );
@@ -124,6 +124,12 @@ const ValidacionAsesorComercial = lazy(() =>
 const VerificacionFormulario = lazy(() =>
   import("../apps/Validacion Enrolamiento/views/VerificacionFormulario")
 );
+const ValidacionApertura = lazy(() =>
+  import("../apps/ValidacionHellen/ValidacionApertura")
+);
+const VerificacionApertura = lazy(() =>
+  import("../apps/ValidacionHellen/views/VerificacionApertura")
+);
 /**
  * Recaudo
  */
@@ -150,7 +156,9 @@ const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 /**
  * Editar parametros tipos de transacciones
  */
-const ParamsOperations = lazy(() => import("../apps/ParamsOperations/ParamsOperations"));
+const ParamsOperations = lazy(() =>
+  import("../apps/ParamsOperations/ParamsOperations")
+);
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -201,6 +209,18 @@ const publicUrls = [
         ),
         component: VerificacionFormulario,
       },
+      {
+        link: "/Solicitud-enrolamiento/validarformularioreconoserid",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
+        ),
+        component: ValidacionApertura,
+      },
+      {
+        link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
+        label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
+        component: VerificacionApertura,
+      },
     ],
   },
 ];
@@ -248,8 +268,8 @@ const allUrlsPrivateApps = [
             label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
             component: BorrarBilletes,
             permission: [6],
-          }
-        ]
+          },
+        ],
       },
       {
         link: "/loteria-de-bogota/sorteos",
@@ -520,9 +540,7 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/params-operations",
-    label: (
-      <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />
-    ),
+    label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />,
     component: ParamsOperations,
     permission: [1],
     subRoutes: [

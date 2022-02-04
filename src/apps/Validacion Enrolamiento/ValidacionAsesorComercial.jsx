@@ -43,11 +43,6 @@ function ValidacionAsesorComercial() {
           )
         }
       ></Table>
-      {/*        <ButtonBar className={"lg:col-span-2"} type="">
-          <Button type="submit" onClick={(e) => funConsultaProceso(e)}>
-            Consultar Proceso
-          </Button>
-        </ButtonBar> */}
     </div>
   );
 }

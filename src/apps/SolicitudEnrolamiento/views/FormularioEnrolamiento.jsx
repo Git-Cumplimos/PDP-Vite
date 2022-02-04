@@ -5,7 +5,7 @@ import Input from "../../../components/Base/Input/Input";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import MultipleInput from "../../../components/Base/MultipleInput/MultipleInput";
 import FileInput from "../../../components/Base/FileInput/FileInput";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "../../../components/Base/Select/Select";
 import { useImgs } from "../../../hooks/ImgsHooks";
@@ -14,6 +14,8 @@ import Fieldset from "../../../components/Base/Fieldset/Fieldset";
 import LocationForm from "../../../components/Compound/LocationForm/LocationForm";
 import InputSuggestions from "../../../components/Base/InputSuggestions/InputSuggestions";
 import fetchData from "../../../utils/fetchData";
+import { notify, notifyError } from "../../../utils/notify";
+import sendFormData from "../../../utils/sendFormData";
 
 const url = process.env.REACT_APP_URL_ACTIVIDADES;
 
@@ -49,6 +51,65 @@ const FormularioEnrolamiento = () => {
 
   const [commerceType, setCommerceType] = useState([]);
 
+  const [archivos1, setArchivos1] = useState([]);
+  const [archivos2, setArchivos2] = useState([]);
+
+  const onFileChange = useCallback((files) => {
+    if (Array.isArray(Array.from(files))) {
+      files = Array.from(files);
+      setArchivos1(files);
+    }
+  }, []);
+
+  const onFileChange2 = useCallback((files) => {
+    if (Array.isArray(Array.from(files))) {
+      files = Array.from(files);
+      setArchivos2(files);
+    }
+  }, []);
+  const onSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      const data = {
+        numdoc: 1030652074,
+      };
+      const formData = new FormData();
+
+      formData.set("rut", archivos1[0]);
+      /* formData.set("pdf-1-2", archivos1[1]); */
+
+      formData.set("cc", archivos2[0]);
+      /* formData.set("numdoc", 1030652074); */
+
+      notify("Se ha comenzado la carga");
+
+      console.log(Object.fromEntries(formData.entries()));
+
+      sendFormData(
+        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
+        "POST",
+        formData,
+        (xhr) => {
+          if (xhr.status === 200) {
+            const res = xhr.response;
+            if (!res?.status) {
+              notifyError(res?.msg);
+            } else {
+              console.log(res?.obj);
+              notify("Se han subido los archivos");
+              setEstadoForm(true);
+            }
+          }
+        },
+        (xhr) => {
+          notifyError("Error de red");
+        },
+        "json"
+      );
+    },
+    [archivos1, archivos2]
+  );
+
   const commerceLocation = {
     municipio: useState(""),
     departamento: useState(""),
@@ -67,19 +128,9 @@ const FormularioEnrolamiento = () => {
   };
 
   const navigate = useNavigate();
-  /* console.log(foundActivities); */
-  const handleSubmit = () => {
-    /*  console.log(commerceLocation.municipio[0]); */
-    /*  e.preventDefault(); */
-    const datos = {
-      /*   f_name: nombre,
-      lastname: apellido,
-      email: correos,
-      telefono: telefonos,
-      task_token: "token",
-      validation_state: "Iniciado",
-      completado: false, */
 
+  const handleSubmit = () => {
+    const datos = {
       asesor: "juan",
       nombre: `${nombre}`,
       apellido: `${apellido}`,
@@ -112,43 +163,8 @@ const FormularioEnrolamiento = () => {
       celular: telefonos[0],
       task_token: "token",
       validation_state: "En Proceso de Validación",
-      Id_Reconocer: "",
+      id_reconocer: "",
       responsable: "",
-
-      /*   asesor: "fabricio",
-      nombre: "pablo",
-      apellido: "galvis",
-      sede: "Bogota",
-      tipoDoc: "CC",
-      numDoc: "1030635010",
-      email: "pablo.galgis@cumplimos.co",
-      celular: "3016269510",
-      task_token: "token",
-      validation_state: "Iniciado",
-      Id_Reconocer: "qwe",
-      nombre_comercio: "qwe",
-      numnit: "qwe",
-      numcamycom: "eqw",
-      numrut: "eqw",
-      autosms: "wqe",
-      tipozona: "eqw",
-      unidad_negocio: "eqw",
-      responsable: "qew",
-      cod_localidad: "eqw",
-      asesor_comercial_localidad: "qwe",
-      actividad_economica: "eqw",
-      responsableiva: "eqw",
-      tipo_establecimiento: "qw",
-      direccion_comercio: "eqw",
-      departamento: "eqw",
-      municipio: "eqw",
-      localidad_bogota: "qwe",
-      barrio: "qwe",
-      direccion_correspondencia: "sdfaesd",
-      departamento_correspondencia: "wqeq",
-      municipio_correspondencia: "awe",
-      localidad_correspondencia: "qeqweqw",
-      barrio_correspondencia: "asdasd", */
     };
     fetch(
       `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/iniciarproceso`,
@@ -202,6 +218,8 @@ const FormularioEnrolamiento = () => {
           label={"Nombre Comercio"}
           placeholder="Ingrese Nombre Comercio"
           onChange={(e) => setNombreComercio(e.target.value)}
+          type="text"
+          required
         ></Input>
 
         <Fieldset
@@ -213,23 +231,30 @@ const FormularioEnrolamiento = () => {
             label={"Nombre"}
             placeholder="Ingrese su Nombre"
             onChange={(e) => setNombre(e.target.value)}
+            type={"text"}
+            required
           ></Input>
 
           <Input
             label={"Apellido"}
             placeholder="Ingrese su Apellido"
             onChange={(e) => setApellido(e.target.value)}
+            type={"text"}
+            required
           ></Input>
           <Input
             label={"N° Documento"}
             placeholder="Ingrese su Numero Documento"
             onChange={(e) => setNumDocumento(e.target.value)}
+            type={"number"}
+            required
           ></Input>
           <Select
             onChange={(event) => setTipoIdentificacion(event.target.value)}
             id="comissionType" /* para que es esto */
             name="comissionType"
             label="Tipo de Identificación"
+            required
             options={{
               "": "",
               "C.C Cedula de Ciudadania": "CC",
@@ -247,22 +272,29 @@ const FormularioEnrolamiento = () => {
             label={"N° NIT"}
             placeholder="Ingrese NIT"
             onChange={(e) => setNumNit(e.target.value)}
+            type={"number"}
+            required
           ></Input>
           <Input
             label={"N° Camara & Comercio"}
             placeholder="Ingrese Camara & Comercio"
             onChange={(e) => setNumCamaraComerci(e.target.value)}
+            type={"text"}
+            required
           ></Input>
           <Input
             label={"N° RUT"}
             placeholder="Ingrese RUT"
             onChange={(e) => setNumRut(e.target.value)}
+            type={"number"}
+            required
           ></Input>
           <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
             <InputSuggestions
               id="actividades_ec2"
               label={"Buscar Actividad Economica"}
               type={"search"}
+              required
               suggestions={
                 foundActivities.map((val) => {
                   const foundIdx = val
@@ -351,6 +383,7 @@ const FormularioEnrolamiento = () => {
             onChange={(event) => setResponsableIva(event.target.value)}
             id="comissionType" /* para que es esto */
             name="comissionType"
+            required
             label={`Responsable del iva "CAMPO 53 RUT"`}
             options={{
               "": "",
@@ -363,6 +396,7 @@ const FormularioEnrolamiento = () => {
             id="comissionType" /* para que es esto */
             name="comissionType"
             label={`Tipo de Establecimiento`}
+            required
             options={{
               "": "",
               Papeleria: "Papeleria",
@@ -389,6 +423,7 @@ const FormularioEnrolamiento = () => {
               else return `Correo electronico adicional ${idx}`;
             }}
             max={3}
+            type={"email"}
             required
           />
           <div className={autorizacionMensajes}>
@@ -404,6 +439,7 @@ const FormularioEnrolamiento = () => {
                 onChange={(event) => setAutorizacion(event.target.value)}
                 id="comissionType" /* para que es esto */
                 name="comissionType"
+                required
                 options={{
                   "": "",
                   SI: "SI",
@@ -414,27 +450,41 @@ const FormularioEnrolamiento = () => {
           </div>
         </Fieldset>
       </Form>
-      <LocationForm place="Comercio" location={commerceLocation} />
-      <LocationForm place="Correspondencia" location={homeLocation} />
+      <LocationForm place="Comercio" location={commerceLocation} required />
+      <LocationForm place="Correspondencia" location={homeLocation} required />
+
+      <Fragment>
+        <Form onSubmit={onSubmit} grid>
+          <FileInput
+            label={"Elige el archivo del Rut"}
+            onGetFile={onFileChange}
+            accept=".pdf"
+            allowDrop={false}
+          />
+          <FileInput
+            label={"Elige el archivo de la CC"}
+            onGetFile={onFileChange2}
+            accept=".pdf"
+            allowDrop={false}
+          />
+          <ButtonBar className="lg:col-span-2">
+            <Button type="submit">Subir archivos</Button>
+          </ButtonBar>
+        </Form>
+      </Fragment>
 
       <ButtonBar className={"lg:col-span-2"} type="">
-        {estadoFormulario ? null : (
-          <Button
-            type="submit"
-            onClick={() => /* setEstadoForm((old) => !old) */ handleSubmit()}
-          >
-            Enviar Formulario
-          </Button>
-        )}
+        {
+          /* archivos1.length > 0 && archivos2.length > 0  */ estadoFormulario ? (
+            <Button
+              type="submit"
+              onClick={() => /* setEstadoForm((old) => !old) */ handleSubmit()}
+            >
+              Enviar Formulario
+            </Button>
+          ) : null
+        }
       </ButtonBar>
-      {/* <ButtonBar className={"lg:col-span-2"} type="">
-        {estadoFormulario ? (
-          <Button type="submit" onClick={() => handleReconoser()}>
-            Comenzar ReconoserID
-          </Button>
-        ) : null}
-      </ButtonBar> */}
-      <FileInput self={true}></FileInput>
     </div>
   );
 };
