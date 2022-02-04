@@ -223,8 +223,8 @@ export const useProvideLoteria = () => {
       if(sort[1]==='true'){
         fisico=true
       }
-         
-
+        
+      console.log(roleInfo)
       const req = {
         num_sorteo: parseInt(sort[0]),
         num_billete: `${selected.Num_billete}`,

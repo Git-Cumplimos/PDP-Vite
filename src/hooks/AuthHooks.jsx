@@ -59,6 +59,7 @@ const fetchOficinaLoteria = async (id_comercio) => {
       },
       {}
     );
+    console.log(resp_cod)
     if (!("msg" in resp_cod)) {
       return {
         cod_oficina_lot: resp_cod.cod_oficina_lot,
