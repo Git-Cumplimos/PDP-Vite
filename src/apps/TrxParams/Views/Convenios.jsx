@@ -110,7 +110,7 @@ const Convenios = () => {
     });
     setSelectedConvenio((old) => ({
       "Id convenio": old?.["Id convenio"] || -1,
-      ...Object.fromEntries(newData)
+      ...Object.fromEntries(newData),
     }));
   }, []);
 
@@ -262,7 +262,7 @@ const Convenios = () => {
         ""
       )}
       <Modal show={showModal} handleClose={handleClose}>
-        <Form onSubmit={onSubmit} onChange={onChangeConv} grid>
+        <Form onSubmit={onSubmit} onChange={onChangeConv}>
           <Input
             id="Nombre de convenio"
             name="Nombre de convenio"

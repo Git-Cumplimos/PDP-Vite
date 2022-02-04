@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState, useRef, useMemo } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../components/Base/Form/Form";
@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { useReactToPrint } from "react-to-print";
 import { notifyError } from "../../../utils/notify";
 import Tickets from "../components/Voucher/Tickets";
+import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
 
 const Recaudo = () => {
   const {
@@ -30,17 +31,18 @@ const Recaudo = () => {
   const [label, setLabel] = useState("");
   const [tipobusqueda, setTiposBusqueda] = useState("");
   const [disabledBtn, setDisabledBtn] = useState(false);
+  const [stop, setStop] = useState("");
   const [number, setNumber] = useState("");
   const [info, setInfo] = useState("");
   const [table, setTable] = useState("");
   const [cuota, setCuota] = useState("");
   const [creditStatus, setCreditStatus] = useState(false);
-  const [money, setMoney] = useState("");
+  const [formatMon, setFormatMon] = useState("");
   const [referencia, setReferencia] = useState("");
   const [ticket, setTicket] = useState(false);
   const [selected, setSelected] = useState(true);
   const [showModal, setShowModal] = useState("");
-
+  const { roleInfo } = useAuth();
   const notify = (msg) => {
     toast.info(msg, {
       position: "top-center",
@@ -71,6 +73,35 @@ const Recaudo = () => {
   }
 `;
 
+  const tickets = useMemo(() => {
+    return {
+      title: "Recibo de pago(Recaudo)",
+      timeInfo: {
+        "Fecha de pago": "Fecha de pago",
+        Hora: "Hora",
+      },
+      commerceInfo: Object.entries({
+        "Id Comercio": roleInfo?.id_comercio,
+        "No. terminal": roleInfo?.id_dispositivo,
+        Municipio: roleInfo?.ciudad,
+        Dirección: roleInfo?.direccion,
+        "Id Trx": "Id devuelto cuando se ingresa el recibo",
+        "Id Confirmación": "Id FDLM",
+      }),
+      commerceName: "FUNDACIÓN DE LA MUJER",
+      trxInfo: Object.entries({
+        CRÉDITO: "",
+        VALOR: "$123.456",
+      }),
+      disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+    };
+  }, [
+    roleInfo?.ciudad,
+    roleInfo?.direccion,
+    roleInfo?.id_comercio,
+    roleInfo?.id_dispositivo,
+  ]);
+
   const printDiv = useRef();
 
   const handlePrint = useReactToPrint({
@@ -81,29 +112,38 @@ const Recaudo = () => {
   const closeModal = useCallback(async () => {
     setShowModal(false);
     setDisabledBtn(false);
+    setFormatMon("");
   }, []);
 
   const bankCollection = (e) => {
     e.preventDefault();
+    setStop(true);
+
     const body = {
+      Tipo: roleInfo?.tipo_comercio,
+      Usuario: roleInfo?.id_usuario,
+      Comercio: roleInfo?.id_comercio,
       Credito: table[0]?.Credito,
-      Depto: 1,
-      Municipio: 1,
-      Valor: parseFloat(money),
+      Depto: roleInfo?.codigo_dane.slice(0, 2),
+      Municipio: roleInfo?.codigo_dane.slice(2),
+      Valor: parseFloat(formatMon),
       referenciaPago: referencia,
     };
     ingresorecibo(body)
       .then((res) => {
-        if (res?.obj?.Confirmacion == -1) {
+        if (res?.obj?.Confirmacion != -1) {
+          console.log(res);
           setTicket(true);
+          setStop(false);
         } else {
           notifyError(
             "El crédito no pudo ser recaudado, error al realizar el proceso"
           );
+          setStop(false);
         }
       })
       .catch((err) => {
-        console.log(err);
+        notifyError("Se ha presentado un error, intente mas tarde", err);
       });
   };
 
@@ -111,7 +151,14 @@ const Recaudo = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    valorcuota(String(number))
+    setCreditStatus(false);
+    setShowModal(false);
+    const user = {
+      Comercio: roleInfo?.id_comercio,
+      Depto: roleInfo?.codigo_dane.slice(0, 2),
+      Municipio: roleInfo?.codigo_dane.slice(2),
+    };
+    valorcuota(String(number), user)
       .then((res) => {
         console.log(res);
         [res?.obj].map((row) => {
@@ -130,9 +177,9 @@ const Recaudo = () => {
       .catch((err) => {
         console.log(err);
       });
-    mostrarcredito(String(number), tipobusqueda)
+    mostrarcredito(String(number), tipobusqueda, user)
       .then((res) => {
-        // console.log(res);
+        console.log(res);
         setInfo(res);
         setDisabledBtn(false);
         if (res?.status == false) {
@@ -151,12 +198,12 @@ const Recaudo = () => {
               Valor: formatMoney.format(row?.ValorPagar),
             },
           ]);
-          setMoney(row?.ValorPagar);
+          setFormatMon(row?.ValorPagar);
         });
       })
       .catch((err) => console.log("error", err));
   };
-  console.log(number, tipobusqueda);
+
   return (
     <>
       <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
@@ -233,74 +280,77 @@ const Recaudo = () => {
           />
         </>
       )}
-      <Modal show={showModal} handleClose={() => closeModal()}>
-        {ticket !== true && (
-          <>
-            <h1 className="xl:text-center font-semibold">
-              Resumen de la transacción
-            </h1>
-            <h2 className="sm:text-center font-semibold">
-              Crédito # {table[0]?.Credito}
-            </h2>
-          </>
-        )}
-        <>
-          {ticket !== false ? (
-            <div className="flex flex-col justify-center items-center">
-              <Tickets refPrint={printDiv} />
-              <ButtonBar>
-                <Button
-                  onClick={() => {
-                    handlePrint();
-                  }}
-                >
-                  Imprimir
-                </Button>
-                <Button
-                  onClick={() => {
-                    closeModal();
-                    setTicket(false);
-                  }}
-                >
-                  Cerrar
-                </Button>
-              </ButtonBar>
-            </div>
-          ) : (
-            <Form onSubmit={bankCollection}>
-              <MoneyInput
-                id="numPago"
-                label="Valor a pagar"
-                type="number"
-                autoComplete="off"
-                required
-                value={money}
-                onInput={(e, valor) => {
-                  const num = valor || "";
-                  setMoney(num);
-                }}
-              />
-              <Input
-                id="refPago"
-                label="Referencia pago"
-                type="text"
-                maxLength="15"
-                autoComplete="off"
-                value={referencia}
-                onInput={(e) => {
-                  const ref = String(e.target.value) || "";
-                  setReferencia(ref);
-                }}
-              />
-              <ButtonBar>
-                <Button type="submit" disabled={disabledBtn}>
-                  Realizar pago
-                </Button>
-              </ButtonBar>
-            </Form>
+      {info?.obj?.NroMensaje === 1 && (
+        <Modal show={showModal} handleClose={() => closeModal()}>
+          {ticket !== true && (
+            <>
+              <h1 className="xl:text-center font-semibold">
+                Resumen de la transacción
+              </h1>
+              <h2 className="sm:text-center font-semibold">
+                Crédito # {table[0]?.Credito}
+              </h2>
+            </>
           )}
-        </>
-      </Modal>
+          <>
+            {ticket !== false ? (
+              <div className="flex flex-col justify-center items-center">
+                <Tickets refPrint={printDiv} ticket={tickets} />
+                <ButtonBar>
+                  <Button
+                    onClick={() => {
+                      handlePrint();
+                    }}
+                  >
+                    Imprimir
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      closeModal();
+                      setTicket(false);
+                    }}
+                  >
+                    Cerrar
+                  </Button>
+                </ButtonBar>
+              </div>
+            ) : (
+              <Form onSubmit={bankCollection}>
+                <MoneyInput
+                  id="numPago"
+                  label="Valor a pagar"
+                  type="number"
+                  autoComplete="off"
+                  required
+                  value={formatMon}
+                  onInput={(e, valor) => {
+                    console.log(valor);
+                    const num = valor || "";
+                    setFormatMon(num);
+                  }}
+                />
+                <Input
+                  id="refPago"
+                  label="Referencia pago"
+                  type="text"
+                  maxLength="15"
+                  autoComplete="off"
+                  value={referencia}
+                  onInput={(e) => {
+                    const ref = String(e.target.value) || "";
+                    setReferencia(ref);
+                  }}
+                />
+                <ButtonBar>
+                  <Button type="submit" disabled={stop}>
+                    Realizar pago
+                  </Button>
+                </ButtonBar>
+              </Form>
+            )}
+          </>
+        </Modal>
+      )}
     </>
   );
 };

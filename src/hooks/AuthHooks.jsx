@@ -11,10 +11,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
 import { notifyError } from "../utils/notify";
 
-//////////////////////Despliegue de estos servicios anterior
-// const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
-// const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
-
 const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`;
@@ -352,22 +348,19 @@ export const useProvideAuth = () => {
       .catch(() => {});
   }, [navigate]);
 
-  const handleSetupTOTP = useCallback(
-    async (user) => {
-      try {
-        const validartoken = await Auth.setupTOTP(user);
-        const str =
-          "otpauth://totp/AWSCognito:" +
-          "Punto de Pago Token" +
-          "?secret=" +
-          validartoken +
-          "&issuer=" +
-          "Punto de Pago Multibanco";
-        setQr(str);
-      } catch (err) {}
-    },
-    []
-  );
+  const handleSetupTOTP = useCallback(async (user) => {
+    try {
+      const validartoken = await Auth.setupTOTP(user);
+      const str =
+        "otpauth://totp/AWSCognito:" +
+        "Punto de Pago Token" +
+        "?secret=" +
+        validartoken +
+        "&issuer=" +
+        "Punto de Pago Multibanco";
+      setQr(str);
+    } catch (err) {}
+  }, []);
 
   const handleChangePass = useCallback(
     async (
