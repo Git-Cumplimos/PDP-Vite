@@ -1,39 +1,23 @@
 {
   "dev": {
     "awscloudformation": {
-<<<<<<< HEAD
-      "AuthRoleName": "amplify-puntodepago-dev-173427-authRole",
-      "UnauthRoleArn": "arn:aws:iam::161885268058:role/amplify-puntodepago-dev-173427-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::161885268058:role/amplify-puntodepago-dev-173427-authRole",
-      "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-puntodepago-dev-173427-deployment",
-      "UnauthRoleName": "amplify-puntodepago-dev-173427-unauthRole",
-      "StackName": "amplify-puntodepago-dev-173427",
-      "StackId": "arn:aws:cloudformation:us-east-1:161885268058:stack/amplify-puntodepago-dev-173427/da362350-4e3f-11ec-8a81-0a9a40def425",
-      "AmplifyAppId": "d1jalia3ua3wq7"
+      "AuthRoleName": "amplify-puntodepago-dev-75741-authRole",
+      "UnauthRoleArn": "arn:aws:iam::641955663261:role/amplify-puntodepago-dev-75741-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::641955663261:role/amplify-puntodepago-dev-75741-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-puntodepago-dev-75741-deployment",
+      "UnauthRoleName": "amplify-puntodepago-dev-75741-unauthRole",
+      "StackName": "amplify-puntodepago-dev-75741",
+      "StackId": "arn:aws:cloudformation:us-east-2:641955663261:stack/amplify-puntodepago-dev-75741/0ce7c590-85ba-11ec-8623-0240995231be",
+      "AmplifyAppId": "d3j5v3a43dylhr"
     },
     "categories": {
       "auth": {
-        "puntodepago8ff30837": {
-=======
-      "AuthRoleName": "amplify-puntodepagofront-dev-180622-authRole",
-      "UnauthRoleArn": "arn:aws:iam::161885268058:role/amplify-puntodepagofront-dev-180622-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::161885268058:role/amplify-puntodepagofront-dev-180622-authRole",
-      "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-puntodepagofront-dev-180622-deployment",
-      "UnauthRoleName": "amplify-puntodepagofront-dev-180622-unauthRole",
-      "StackName": "amplify-puntodepagofront-dev-180622",
-      "StackId": "arn:aws:cloudformation:us-east-1:161885268058:stack/amplify-puntodepagofront-dev-180622/504f9c20-4e44-11ec-a34a-0ed3f4e7b695",
-      "AmplifyAppId": "d32xcy5g0qtf87"
-    },
-    "categories": {
-      "auth": {
-        "puntodepagofront1795438b": {
->>>>>>> 6673f9c9e6bf66fc77804fe11e3d6236fa027001
-          "userPoolId": "us-east-1_3bdNhk1hg",
-          "userPoolName": "Formulario1",
-          "webClientId": "1elfntjkt0riasq92clr8na3q9",
-          "nativeClientId": "1elfntjkt0riasq92clr8na3q9"
+        "puntodepago20592b1f": {
+          "userPoolId": "us-east-2_jtr8cWC4d",
+          "userPoolName": "PuntoDePago_master_client",
+          "webClientId": "21ofldig7b4ios43hvs3f4c38b",
+          "nativeClientId": "21ofldig7b4ios43hvs3f4c38b"
         }
       }
     }

@@ -1,31 +1,7 @@
 import classes from "./Tickets.module.css";
 import LogoPDP from "../../../../components/Base/LogoPDP/LogoPDP";
 
-const Tickets = ({
-  refPrint,
-  type = "ORIGINAL",
-  ticket = {
-    title: "Recaudo",
-    timeInfo: {
-      "Fecha de venta": "28/01/2022",
-      Hora: "12:22:00",
-    },
-    commerceInfo: [
-      ["Id Comercio", 2],
-      ["No. terminal", 233],
-      ["Municipio", "Bogota"],
-      ["Dirección", "Calle 11 # 11 - 2"],
-      ["Id Trx", 233],
-      ["Id Transacción", 99],
-    ],
-    commerceName: "Fundación de la mujer",
-    trxInfo: [
-      ["# Crédito", ""],
-      ["Valor pago", 347893],
-    ],
-    disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
-  },
-}) => {
+const Tickets = ({ refPrint, type = "ORIGINAL", ticket }) => {
   const { divPrint } = classes;
   const { title, timeInfo, commerceInfo, commerceName, trxInfo, disclamer } =
     ticket;
