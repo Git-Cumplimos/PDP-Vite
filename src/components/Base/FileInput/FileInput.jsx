@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { Fragment, useCallback, useEffect, useRef } from "react";
 import { notifyError } from "../../../utils/notify";
 import classes from "./FileInput.module.css";
 
@@ -26,7 +26,7 @@ const allowDrag = (e) => {
   }
 };
 
-const FileInput = ({ label, self = false, onGetFile, ...input }) => {
+const FileInput = ({ label, onGetFile, allowDrop = true, ...input }) => {
   const { formItem, dropzone, File } = classes;
   const { id: _id, disabled } = input;
 
@@ -76,43 +76,59 @@ const FileInput = ({ label, self = false, onGetFile, ...input }) => {
     [onGetFile]
   );
 
-  useEffect(() => {
-    input.onChange = (e) => {
-      onGetFile?.(e.target.files);
-    };
-    window.addEventListener("dragenter", (e) => {
-      showDropZone(dropZoneRef, disabled);
-    });
+  const onChangeInput = useCallback(
+    (e) => onGetFile?.(e.target.files),
+    [onGetFile]
+  );
 
-    return () => {
-      window.removeEventListener("dragenter", (e) => {
+  useEffect(() => {
+    if (allowDrop) {
+      window.addEventListener("dragenter", (e) => {
         showDropZone(dropZoneRef, disabled);
       });
+    }
+
+    return () => {
+      if (allowDrop) {
+        window.removeEventListener("dragenter", (e) => {
+          showDropZone(dropZoneRef, disabled);
+        });
+      }
     };
-  }, [input, onGetFile, disabled]);
+  }, [input, onGetFile, allowDrop, disabled]);
 
   return (
     <div className={`${formItem} ${File}`}>
       {label && label !== "" && (
         <label htmlFor={_id} className={`${"text-center"}`}>
           {label}
+          <input
+            {...input}
+            type={"file"}
+            ref={inputRef}
+            onChange={onChangeInput}
+            onInput={() => {}}
+          />
         </label>
       )}
-      <input {...input} type={"file"} ref={inputRef} />
-      <h1>O</h1>
-      <h1>Arrasta los archivos</h1>
-      {!disabled ? (
-        <div
-          ref={dropZoneRef}
-          className={dropzone}
-          onDragEnter={allowDrag}
-          onDragOver={allowDrag}
-          onDragLeave={() => hideDropZone(dropZoneRef)}
-          onDrop={handleDrop}
-        ></div>
-      ) : (
-        ""
-      )}
+      {allowDrop ? (
+        <Fragment>
+          <h1>O</h1>
+          <h1>Arrasta los archivos</h1>
+          {!disabled ? (
+            <div
+              ref={dropZoneRef}
+              className={dropzone}
+              onDragEnter={allowDrag}
+              onDragOver={allowDrag}
+              onDragLeave={() => hideDropZone(dropZoneRef)}
+              onDrop={handleDrop}
+            ></div>
+          ) : (
+            ""
+          )}
+        </Fragment>
+      ) : ""}
     </div>
   );
 };

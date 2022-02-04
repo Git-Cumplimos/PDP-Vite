@@ -46,6 +46,11 @@ const MoneyInput = ({ ...input }) => {
     return moneyValue === "" ? "$ " : formatMoney.format(moneyValue);
   }, [input?.value]);
 
+  const newDefaultValue = useMemo(() => {
+    const moneyValue = moneyValidator(`${input?.defaultValue ?? ""}`);
+    return moneyValue === "" ? "$ " : formatMoney.format(moneyValue);
+  }, [input?.defaultValue]);
+
   useEffect(() => {
     delete input.type;
   }, [input.type]);
@@ -100,7 +105,7 @@ const MoneyInput = ({ ...input }) => {
         onInput?.(e, moneyValue);
       }}
       invalid={invalid}
-      defaultValue=""
+      defaultValue={newDefaultValue}
     />
   );
 };
