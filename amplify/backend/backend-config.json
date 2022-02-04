@@ -1,10 +1,6 @@
 {
   "auth": {
-<<<<<<< HEAD
-    "puntodepago8ff30837": {
-=======
-    "puntodepagofront1795438b": {
->>>>>>> 6673f9c9e6bf66fc77804fe11e3d6236fa027001
+    "puntodepago73c7d5d9": {
       "service": "Cognito",
       "serviceType": "imported",
       "providerPlugin": "awscloudformation",
@@ -12,8 +8,4 @@
       "customAuth": false
     }
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 6673f9c9e6bf66fc77804fe11e3d6236fa027001
