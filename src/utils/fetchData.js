@@ -1,12 +1,23 @@
+import { Auth } from "@aws-amplify/auth";
+
 const fetchData = async (
   url = "",
   method = "GET",
   queries = {},
   data = {},
-  Content_Type = "application/json"
+  headers = {}
 ) => {
   if (!["GET", "POST", "PUT", "DELETE"].includes(method)) {
     throw new Error("Method not suported");
+  }
+  let session = null;
+  try {
+    session = await Auth.currentSession();
+  } catch (err) {
+    throw new Error("No user autenticated");
+  }
+  if (!session) {
+    throw new Error("No user autenticated session");
   }
 
   if ("URLSearchParams" in window) {
@@ -26,7 +37,12 @@ const fetchData = async (
 
   const fetchOptions = { method: method };
   if (method === "POST" || method === "PUT") {
-    fetchOptions.headers = { "Content-Type": Content_Type };
+    fetchOptions.headers = { 
+      "Content-Type": "application/json", 
+      "Authorization": `Bearer ${session?.idToken?.jwtToken}`,
+      // "Authorization": `Bearer ${session?.accessToken?.jwtToken}`,
+      ...headers
+    };
     fetchOptions.body = JSON.stringify(data);
   }
 

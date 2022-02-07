@@ -439,23 +439,24 @@ export const useProvideAuth = () => {
 
   // Runs in first load
   useEffect(() => {
-    if (Auth.user === null || Auth.user === undefined) {
-      Auth.currentAuthenticatedUser()
-        .then((user) => {
-          dispatchAuth({
-            type: CONFIRM_SIGN_IN,
-            payload: { loggedUser: user, dispatch: dispatchAuth },
-          });
-        })
-        .catch(() => {
-          dispatchAuth({ type: SIGN_OUT });
+    Auth.currentAuthenticatedUser()
+      .then((user) => {
+        dispatchAuth({
+          type: CONFIRM_SIGN_IN,
+          payload: { loggedUser: user, dispatch: dispatchAuth },
         });
-    } else {
-      dispatchAuth({
-        type: CONFIRM_SIGN_IN,
-        payload: { loggedUser: Auth.user, dispatch: dispatchAuth },
+      })
+      .catch(() => {
+        dispatchAuth({ type: SIGN_OUT });
       });
-    }
+    // if (Auth.user === null || Auth.user === undefined) {
+    // } else {
+    //   dispatchAuth({ type: SIGN_OUT });
+    //   dispatchAuth({
+    //     type: CONFIRM_SIGN_IN,
+    //     payload: { loggedUser: Auth.user, dispatch: dispatchAuth },
+    //   });
+    // }
   }, []);
 
   // Runs when route change
