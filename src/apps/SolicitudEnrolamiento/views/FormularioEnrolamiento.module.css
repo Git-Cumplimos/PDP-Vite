@@ -1,0 +1,31 @@
+.principal {
+  display: flex;
+  flex-direction: row;
+}
+.tituloFormularioInscripcion {
+  font-size: x-large;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3vw;
+}
+.datos {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.datosCorreo {
+  margin-left: 1vw;
+}
+.autorizacionMensajes {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+.mensajeAutorizacion {
+  margin-left: 4vw;
+  margin-right: 1.6vw;
+}
+.textoMensajeAutorizacion {
+  font-size: large;
+}

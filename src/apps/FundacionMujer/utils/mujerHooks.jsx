@@ -3,12 +3,6 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
-  // consultapin: `${process.env.REACT_APP_URL_FDLM_CONSULTAPIN}/pin`,
-  // cancelarpin: `${process.env.REACT_APP_URL_FDLM_CANCELARPIN}/cancel-pin`,
-  // desembolso: `${process.env.REACT_APP_URL_FDLM_DESEMBOLSOS}`,
-  // recaudo: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}/creditos`,
-  // recaudo2: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}/creditos`,
-  // pagorecaudo: `${process.env.REACT_APP_URL_FDLM_PAGOCREDITO}`,
   mostrarcreditos: `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`,
   ingresoreverso: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresoreversorecibo`,
   ingresorecibo: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`,
@@ -16,20 +10,7 @@ const urls = {
 };
 
 export const FDLMContext = createContext({
-  infoLoto: {
-    respuestamujer: null,
-    setRespuestamujer: null,
-    arreglo: null,
-    setArreglo: null,
-    RespuestaPagoRecaudo: null,
-    setRespuestaPagoRecaudo: null,
-    respuestatipooperaciontransaccion: null,
-    setrespuestatipooperaciontransaccion: null,
-    respuestaconsultarecaudo: null,
-    setRespuestaconsultarecaudo: null,
-    respuestaconsultarecaudocreditos: null,
-    setRespuestaconsultarecaudocreditos: null,
-  },
+  infoLoto: {},
   searchLoteria: () => {},
   sellLoteria: () => {},
   reportes: {
@@ -68,78 +49,13 @@ export const useProvideFDLM = () => {
     setRespuestaconsultarecaudocreditos,
   ] = useState();
 
-  //consulta del pin
-  const consultapin = useCallback(
-    async (documento, pin) => {
-      try {
-        const res = await fetchData(urls.consultapin, "GET", {
-          documento: documento,
-          pin: pin,
-          id_comercio: roleInfo?.id_comercio,
-        });
-        return res;
-      } catch (err) {
-        throw err;
-      }
-    },
-    [roleInfo?.id_comercio]
-  );
-
-  //cancelar pin
-  // const cancelarpin = useCallback(
-  //   async (transaccion) => {
-  //     try {
-  //       const res = await fetchData(urls.cancelarpin, "GET", {
-  //         transaccion: "TFM102",
-  //         id_comercio: roleInfo?.id_comercio,
-  //       });
-  //       return res;
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   },
-  //   [roleInfo?.id_comercio]
-  // );
-
-  // desembolso
-  // const desembolsospin = async (documento, pin) => {
-  //   const dato = {
-  //     id_trx: respuestamujer?.obj["id_trx"],
-  //     id_usuario: roleInfo?.id_usuario,
-  //     id_comercio: roleInfo?.id_comercio,
-  //   };
-  //   let control = await fetch(`${urls.desembolso}/desembolsos`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-type": "application/json",
-  //     },
-  //     body: JSON.stringify(dato),
-  //   });
-  //   let respuesta = await control.json();
-  //   console.log(respuesta);
-  // };
-
-  // recaudos
-  // const recaudo = useCallback(async (cedula, comercio) => {
-  //   try {
-  //     const res = await fetchData(urls.recaudo, "GET", {
-  //       cedula: cedula,
-  //       comercio: 2,
-  //     });
-
-  //     setRespuestaconsultarecaudo(res);
-  //     return res;
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }, []);
-
-  const mostrarcredito = useCallback(async (numero, param) => {
+  const mostrarcredito = useCallback(async (numero, param, user) => {
     const body = {
+      Comercio: user?.Comercio,
       nroBusqueda: numero,
       ParametroBusqueda: param,
-      Depto: 1,
-      Municipio: 1,
+      Depto: parseInt(user?.Depto),
+      Municipio: parseInt(user?.Municipio),
     };
     try {
       const res = await fetchData(urls.mostrarcreditos, "POST", {}, body);
@@ -151,10 +67,15 @@ export const useProvideFDLM = () => {
 
   const ingresoreversorecibo = useCallback(async (values) => {
     const body = {
-      Credito: parseInt(values?.Credito),
-      Valor: parseFloat(values?.Valor),
-      referenciaPago: values?.Referencia,
+      Tipo: values?.tipo,
+      Usuario: values?.usuario,
+      Comercio: values?.comercio,
+      Credito: parseInt(values?.credit),
+      Valor: parseFloat(values?.val),
+      referenciaPago: values?.reference,
+      id_trx: values?.idtrx,
     };
+    console.log(body);
     try {
       const res = await fetchData(urls.ingresoreverso, "POST", {}, body);
       return res;
@@ -165,9 +86,12 @@ export const useProvideFDLM = () => {
 
   const ingresorecibo = useCallback(async (values) => {
     const body = {
+      Tipo: values?.Tipo,
+      Usuario: parseInt(values?.Usuario),
+      Comercio: values?.Comercio,
       Credito: parseInt(values?.Credito),
-      Depto: 1,
-      Municipio: 1,
+      Depto: parseInt(values?.Depto),
+      Municipio: parseInt(values?.Municipio),
       Valor: parseFloat(values?.Valor),
       referenciaPago: values?.Referencia,
     };
@@ -179,11 +103,12 @@ export const useProvideFDLM = () => {
     }
   }, []);
 
-  const valorcuota = useCallback(async (numero) => {
+  const valorcuota = useCallback(async (numero, user) => {
     const body = {
+      Comercio: user?.Comercio,
       Credito: numero,
-      Depto: 1,
-      Municipio: 1,
+      Depto: parseInt(user?.Depto),
+      Municipio: parseInt(user?.Municipio),
     };
     try {
       const res = await fetchData(urls.valorcuota, "POST", {}, body);
@@ -192,64 +117,7 @@ export const useProvideFDLM = () => {
       throw err;
     }
   }, []);
-
-  //recaudos
-  // const recaudo2 = useCallback(async (credito, comercio) => {
-  //   try {
-  //     const res = await fetchData(urls.recaudo2, "GET", {
-  //       credito: credito,
-  //       comercio: 2,
-  //     });
-
-  //     setRespuestaconsultarecaudocreditos(res);
-  //     return res;
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }, []);
-
-  //pago recaudo2
-  // const pagorecaudo = async () => {
-  //   const dato = {
-  //     numero: respuestaconsultarecaudo.obj[0]["Credito"],
-  //     cedula: respuestaconsultarecaudo.obj[0]["Cedula"],
-  //     valor: respuestaconsultarecaudo.obj[0]["Valor a pagar"],
-  //     id_comercio: 1,
-  //     id_usuario: 2,
-  //   };
-  //   let control = await fetch(`${urls.pagorecaudo}/pago`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-type": "application/json",
-  //     },
-  //     body: JSON.stringify(dato),
-  //   });
-  //   let respuesta = await control.json();
-  //   console.log(respuesta);
-  //   ///
-  //   setRespuestaPagoRecaudo(respuesta);
-  // };
-
-  // const pagorecaudocedula = async () => {
-  //   const dato = {
-  //     numero: respuestaconsultarecaudocreditos.obj[0]["Cedula"],
-  //     valor: respuestaconsultarecaudocreditos.obj[0]["Valor a pagar"],
-  //     id_comercio: 1,
-  //     id_usuario: 2,
-  //   };
-  //   let control = await fetch(`${urls.pagorecaudo}/pago`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-type": "application/json",
-  //     },
-  //     body: JSON.stringify(dato),
-  //   });
-  //   let respuesta = await control.json();
-  //   console.log(respuesta);
-  //   ///
-  //   setRespuestaPagoRecaudo(respuesta);
-  // };
-
+  console.log(roleInfo);
   return {
     infoLoto: {
       respuestamujer,
@@ -266,7 +134,6 @@ export const useProvideFDLM = () => {
       setRespuestaconsultarecaudocreditos,
     },
     reportes: {},
-    consultapin,
     mostrarcredito,
     ingresoreversorecibo,
     ingresorecibo,

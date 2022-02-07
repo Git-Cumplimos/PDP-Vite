@@ -5,6 +5,11 @@ import RightArrow from "../../components/Base/RightArrow/RightArrow";
 import { useImgs } from "../../hooks/ImgsHooks";
 import { useEffect } from "react";
 import { useWindowSize } from "../../hooks/WindowSizeHooks";
+import { useNavigate } from "react-router-dom";
+import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
+import { lazy } from "react";
+
+const Botton = lazy(() => import("../../components/Base/Button/Button"));
 
 const LoginLayout = ({ children }) => {
   const { loginLayout, wave, headerPDP, usrData } = classes;
@@ -15,6 +20,7 @@ const LoginLayout = ({ children }) => {
   } = useImgs();
 
   const [clientWidth] = useWindowSize();
+  let navigate = useNavigate();
 
   useEffect(() => {
     if (clientWidth > 768) {
@@ -28,6 +34,11 @@ const LoginLayout = ({ children }) => {
     }
   }, [backIcon, personas, backIconSecondary, clientWidth]);
 
+  const incribirComercio = async (event) => {
+    event.preventDefault();
+    navigate("/Solicitud-enrolamiento");
+  };
+
   return (
     <div className={loginLayout}>
       <div className={wave}>
@@ -40,7 +51,14 @@ const LoginLayout = ({ children }) => {
         </div>
         <h1 className="text-3xl mb-6">¡Bienvenido!</h1>
       </header>
-      <main className="container">{children}</main>
+      <main className="container">
+        {children}{" "}
+        <ButtonBar type="">
+          <Botton type={"submit"} onClick={(e) => incribirComercio(e)}>
+            Inscribirse
+          </Botton>
+        </ButtonBar>
+      </main>
     </div>
   );
 };
