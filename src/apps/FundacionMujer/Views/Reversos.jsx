@@ -83,7 +83,7 @@ const Reversos = () => {
 
   const reversosFDLM = useCallback(
     (page, Comercio, Tipo_operacion, date_ini, date_end, state) => {
-      const url = process.env.REACT_APP_URL_TRXS_TRX;
+      const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
       const queries = {};
       if (!(Comercio === -1 || Comercio === "")) {
         queries.Comercio = Comercio;

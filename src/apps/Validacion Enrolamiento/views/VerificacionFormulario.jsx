@@ -12,11 +12,11 @@ import { useNavigate } from "react-router-dom";
 import Input from "../../../components/Base/Input/Input";
 import Fieldset from "../../../components/Base/Fieldset/Fieldset";
 import Select from "../../../components/Base/Select/Select";
-import file from ".././certificado_movimiento.pdf";
-import file2 from ".././ced.pdf";
-import file3 from ".././rut.pdf";
+// import file from ".././certificado_movimiento.pdf";
+// import file2 from ".././ced.pdf";
+// import file3 from ".././rut.pdf";
 /* import { Document, Page } from "react-pdf"; */
-import Sample from "./Sample";
+// import Sample from "./Sample";
 
 const VerificacionFormulario = () => {
   const navigate = useNavigate();
@@ -400,9 +400,9 @@ const VerificacionFormulario = () => {
               disabled
             />
           </Fieldset>
+          {/* <Sample file={file2}></Sample>
           <Sample file={file2}></Sample>
-          <Sample file={file2}></Sample>
-          <Sample file={file3}></Sample>
+          <Sample file={file3}></Sample> */}
 
           <div className={contenedorBotones}>
             <Button

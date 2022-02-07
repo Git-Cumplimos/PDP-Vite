@@ -15,7 +15,7 @@ const Pagination = ({
 
   const onChange = useCallback((e) => _onChange?.(e), [_onChange]);
   const setPage = useCallback(
-    (val) => setQuery?.({ page: page + val }),
+    (val) => setQuery?.({ page: page + val }, { replace: true }),
     [setQuery, page]
   );
 

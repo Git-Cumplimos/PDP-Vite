@@ -15,7 +15,7 @@ const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
-const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;
+const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_permissions = process.env.REACT_APP_URL_IAM_PDP;
 
 const infoTicket = async (id_trx, Tipo_operacion, ticket) => {

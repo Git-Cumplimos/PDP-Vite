@@ -35,14 +35,15 @@ const fetchData = async (
     url += `?${queries}`;
   }
 
-  const fetchOptions = { method: method };
+  const fetchOptions = {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session?.idToken?.jwtToken}`,
+      ...headers,
+    },
+  };
   if (method === "POST" || method === "PUT") {
-    fetchOptions.headers = { 
-      "Content-Type": "application/json", 
-      "Authorization": `Bearer ${session?.idToken?.jwtToken}`,
-      // "Authorization": `Bearer ${session?.accessToken?.jwtToken}`,
-      ...headers
-    };
     fetchOptions.body = JSON.stringify(data);
   }
 

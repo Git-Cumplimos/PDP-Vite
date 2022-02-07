@@ -13,8 +13,7 @@ import useQuery from "../../hooks/useQuery";
 import fetchData from "../../utils/fetchData";
 import { notify, notifyError } from "../../utils/notify";
 
-// const url_types = process.env.REACT_APP_URL_TRXS_TIPOS_BASE;
-const url_types = "http://localhost:5000";
+const url_types = process.env.REACT_APP_URL_TRXS_TRX;
 
 const fetchTrxTypesPages = async (Nombre_operacion, page) => {
   try {
