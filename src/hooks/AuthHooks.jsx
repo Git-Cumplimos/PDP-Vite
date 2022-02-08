@@ -11,8 +11,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
 import { notifyError } from "../utils/notify";
 
-const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
-const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
+const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
+const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;

@@ -17,7 +17,7 @@ import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import sendFormData from "../../../utils/sendFormData";
 
-const url = process.env.REACT_APP_URL_ACTIVIDADES;
+const url = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actividad`;
 
 const FormularioEnrolamiento = () => {
   const {

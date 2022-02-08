@@ -9,11 +9,6 @@ import Modal from "../../../../components/Base/Modal/Modal";
 import { notify, notifyError } from "../../../../utils/notify";
 
 
-
-
-// const url_BorrarBilletes = `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/eliminar_asignacion`;
-// const url_BorrarBilletes = `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/num_sorteo`;
-
 const url_BorrarBilletes = `${process.env.REACT_APP_URL_LOTERIAS}/eliminar_asignacion`;
 const url_sorteos = `${process.env.REACT_APP_URL_LOTERIAS}/num_sorteo`;
 
