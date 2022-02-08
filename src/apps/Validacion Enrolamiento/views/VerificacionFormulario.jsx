@@ -15,8 +15,11 @@ import Select from "../../../components/Base/Select/Select";
 /* import file from ".././certificado_movimiento.pdf";
 import file2 from ".././ced.pdf";
 import file3 from ".././rut.pdf"; */
+// import file from ".././certificado_movimiento.pdf";
+// import file2 from ".././ced.pdf";
+// import file3 from ".././rut.pdf";
 /* import { Document, Page } from "react-pdf"; */
-import Sample from "./Sample";
+// import Sample from "./Sample";
 
 const VerificacionFormulario = () => {
   const navigate = useNavigate();

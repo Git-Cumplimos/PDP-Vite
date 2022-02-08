@@ -11,15 +11,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
 import { notifyError } from "../utils/notify";
 
-//////////////////////Despliegue de estos servicios anterior
-// const urlLog = "http://logconsulta.us-east-2.elasticbeanstalk.com/login";
-// const urlQuota = "http://logconsulta.us-east-2.elasticbeanstalk.com/cupo";
-
 const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
-const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX_BASE}`;
+const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_permissions = process.env.REACT_APP_URL_IAM_PDP;
 
 const infoTicket = async (id_trx, Tipo_operacion, ticket) => {
@@ -59,6 +55,7 @@ const fetchOficinaLoteria = async (id_comercio) => {
       },
       {}
     );
+    console.log(resp_cod)
     if (!("msg" in resp_cod)) {
       return {
         cod_oficina_lot: resp_cod.cod_oficina_lot,
@@ -351,22 +348,19 @@ export const useProvideAuth = () => {
       .catch(() => {});
   }, [navigate]);
 
-  const handleSetupTOTP = useCallback(
-    async (user) => {
-      try {
-        const validartoken = await Auth.setupTOTP(user);
-        const str =
-          "otpauth://totp/AWSCognito:" +
-          "Punto de Pago Token" +
-          "?secret=" +
-          validartoken +
-          "&issuer=" +
-          "Punto de Pago Multibanco";
-        setQr(str);
-      } catch (err) {}
-    },
-    []
-  );
+  const handleSetupTOTP = useCallback(async (user) => {
+    try {
+      const validartoken = await Auth.setupTOTP(user);
+      const str =
+        "otpauth://totp/AWSCognito:" +
+        "Punto de Pago Token" +
+        "?secret=" +
+        validartoken +
+        "&issuer=" +
+        "Punto de Pago Multibanco";
+      setQr(str);
+    } catch (err) {}
+  }, []);
 
   const handleChangePass = useCallback(
     async (
@@ -439,23 +433,24 @@ export const useProvideAuth = () => {
 
   // Runs in first load
   useEffect(() => {
-    if (Auth.user === null || Auth.user === undefined) {
-      Auth.currentAuthenticatedUser()
-        .then((user) => {
-          dispatchAuth({
-            type: CONFIRM_SIGN_IN,
-            payload: { loggedUser: user, dispatch: dispatchAuth },
-          });
-        })
-        .catch(() => {
-          dispatchAuth({ type: SIGN_OUT });
+    Auth.currentAuthenticatedUser()
+      .then((user) => {
+        dispatchAuth({
+          type: CONFIRM_SIGN_IN,
+          payload: { loggedUser: user, dispatch: dispatchAuth },
         });
-    } else {
-      dispatchAuth({
-        type: CONFIRM_SIGN_IN,
-        payload: { loggedUser: Auth.user, dispatch: dispatchAuth },
+      })
+      .catch(() => {
+        dispatchAuth({ type: SIGN_OUT });
       });
-    }
+    // if (Auth.user === null || Auth.user === undefined) {
+    // } else {
+    //   dispatchAuth({ type: SIGN_OUT });
+    //   dispatchAuth({
+    //     type: CONFIRM_SIGN_IN,
+    //     payload: { loggedUser: Auth.user, dispatch: dispatchAuth },
+    //   });
+    // }
   }, []);
 
   // Runs when route change

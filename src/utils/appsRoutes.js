@@ -47,9 +47,6 @@ const CargaArchivos = lazy(() =>
  * ColCard
  */
 const ColCard = lazy(() => import("../apps/ColCard/ColCard"));
-const ConsultarColCard = lazy(() =>
-  import("../apps/ColCard/Views/ConsultarColCard")
-);
 const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );

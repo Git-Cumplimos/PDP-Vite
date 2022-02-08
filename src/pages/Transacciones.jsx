@@ -12,7 +12,7 @@ import Tickets from "../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
 
 const Transacciones = () => {
-  const { roleInfo, userPermissions } = useAuth(); 
+  const { roleInfo, userPermissions } = useAuth();
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
 
@@ -28,10 +28,10 @@ const Transacciones = () => {
 
   const transacciones = useCallback(
     (page, Comercio, Tipo_operacion, date_ini, date_end) => {
-      const url = process.env.REACT_APP_URL_TRXS_TRX;
-      const queries={};
-      if (!(Comercio===-1 || Comercio==='')){
-        queries.Comercio= Comercio;
+      const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
+      const queries = {};
+      if (!(Comercio === -1 || Comercio === "")) {
+        queries.Comercio = Comercio;
       }
       if (Tipo_operacion) {
         queries.Tipo_operacion = Tipo_operacion;
@@ -43,10 +43,10 @@ const Transacciones = () => {
         queries.date_ini = date_ini;
         queries.date_end = date_end;
       }
-      console.log(queries)
+      console.log(queries);
       fetchData(url, "GET", queries)
         .then((res) => {
-          console.log(res)
+          console.log(res);
           if (res?.status) {
             setMaxPages(res?.obj?.maxpages);
             setTrxs(res?.obj?.trxs);
@@ -59,21 +59,6 @@ const Transacciones = () => {
     []
   );
 
-  const tiposOperaciones = useCallback(() => {
-    const url = process.env.REACT_APP_URL_TRXS_TIPOS;
-    fetchData(url, "GET", {
-      Aliado: 3,
-    })
-      .then((res) => {
-        if (res?.status) {
-          setTiposOp(res?.obj);
-        } else {
-          throw new Error(res?.msg);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
   const closeModal = useCallback(async () => {
     setShowModal(false);
   }, []);
@@ -85,11 +70,19 @@ const Transacciones = () => {
   });
 
   useEffect(() => {
-    tiposOperaciones();
+    const allTypes = [];
+    const tempArr = userPermissions
+      .filter(({ types_trx }) => types_trx.length > 0)
+      .map(({ types_trx }) => types_trx);
+
+    tempArr.forEach((types_trx) =>
+      types_trx.forEach((val) => allTypes.push(val))
+    );
+    setTiposOp([...allTypes]);
+
     setIdComercio(roleInfo?.id_comercio || -1);
-  }, [tiposOperaciones, roleInfo?.id_comercio]);
-  
-  
+  }, [userPermissions, roleInfo?.id_comercio]);
+
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Transacciones</h1>
@@ -103,8 +96,8 @@ const Transacciones = () => {
             setPage(1);
             setMaxPages(1);
             setFechaInicial(e.target.value);
-            if(fechaFinal!=='' && tipoOp!==""){
-            transacciones(1, idComercio, tipoOp, e.target.value, fechaFinal);
+            if (fechaFinal !== "" && tipoOp !== "") {
+              transacciones(1, idComercio, tipoOp, e.target.value, fechaFinal);
             }
           }}
         />
@@ -116,8 +109,14 @@ const Transacciones = () => {
           onInput={(e) => {
             setPage(1);
             setFechaFinal(e.target.value);
-            if(fechaInicial!=='' && tipoOp!==""){
-            transacciones(1, idComercio, tipoOp, fechaInicial, e.target.value);
+            if (fechaInicial !== "" && tipoOp !== "") {
+              transacciones(
+                1,
+                idComercio,
+                tipoOp,
+                fechaInicial,
+                e.target.value
+              );
             }
           }}
         />
@@ -146,29 +145,37 @@ const Transacciones = () => {
             );
           }}
         />
-        {userPermissions.map(({ id_permission }) => id_permission).includes(3) ?
-        <Input
-          id="id_comercio"
-          label="Id comercio"
-          type="numeric"
-          value={idComercio}
-          onChange={(e)=>{
-            setIdComercio(e.target.value)
-          }}
-          onLazyInput={{
-            callback: (e) => {
-              setPage(1);
-              if(tipoOp!==''){
-              transacciones(1, e.target.value, tipoOp, fechaInicial, fechaFinal);
-              }
-            },
-            timeOut: 500,
-          }}
-        />
-        :
-        ""
-        }
-        
+        {userPermissions
+          .map(({ id_permission }) => id_permission)
+          .includes(3) ? (
+          <Input
+            id="id_comercio"
+            label="Id comercio"
+            type="numeric"
+            value={idComercio}
+            onChange={(e) => {
+              setIdComercio(e.target.value);
+            }}
+            onLazyInput={{
+              callback: (e) => {
+                setPage(1);
+                if (tipoOp !== "") {
+                  transacciones(
+                    1,
+                    e.target.value,
+                    tipoOp,
+                    fechaInicial,
+                    fechaFinal
+                  );
+                }
+              },
+              timeOut: 500,
+            }}
+          />
+        ) : (
+          ""
+        )}
+
         <ButtonBar className="col-span-1 md:col-span-2">
           <Button
             type="button"
@@ -220,7 +227,7 @@ const Transacciones = () => {
                 month: "numeric",
                 day: "numeric",
                 hour: "numeric",
-                minute: "numeric"
+                minute: "numeric",
               }).format(tempDate);
               return {
                 Created_at,

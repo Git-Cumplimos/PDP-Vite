@@ -1,116 +1,94 @@
 import { useCallback, useEffect, useState } from "react";
 import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../../components/Base/Form/Form";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
 import Table from "../../../../components/Base/Table/Table";
 import fetchData from "../../../../utils/fetchData";
+import Pagination from "../../../../components/Compound/Pagination/Pagination";
+import useQuery from "../../../../hooks/useQuery";
 import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
-const url_types = process.env.REACT_APP_URL_TRXS_TIPOS_BASE;
+const url_types = process.env.REACT_APP_URL_TRXS_TRX;
 
-const url_aliados = process.env.REACT_APP_URL_TRXS_ALIADOS;
+const searchTypes = async (page = 1, limit = 5) => {
+  const queries = {};
+  if (page && page !== "") {
+    queries.page = page;
+  }
+  if (limit && limit !== "") {
+    queries.limit = limit;
+  }
+  try {
+    const res = await fetchData(
+      `${url_types}/tipos-operaciones-pagination`,
+      "GET",
+      queries
+    );
+    if (res?.status) {
+      return res?.obj;
+    } else {
+      notifyError(res?.msg);
+    }
+    return [];
+  } catch (err) {
+    notifyError(err);
+  }
+};
+
+const searchTypesByPermission = async (id_permission) => {
+  const temp_res = {};
+  try {
+    const typesOpPermission = await fetchData(
+      `${url_iam}/permissions-opstrx`,
+      "GET",
+      {
+        Permissions_id_permission: id_permission ?? 0,
+      }
+    );
+    if (typesOpPermission?.status) {
+      for (const typeOpPermission of typesOpPermission?.obj) {
+        try {
+          const typeOp = await fetchData(
+            `${url_types}/tipos-operaciones-pagination`,
+            "GET",
+            {
+              tipo_op: typeOpPermission.Tipos_operaciones_id_tipo_op,
+            }
+          );
+          if (typeOp?.status) {
+            for (const {
+              id_tipo_operacion,
+              Nombre,
+              Aliado_corto,
+            } of typeOp?.obj?.results) {
+              temp_res[
+                `${id_tipo_operacion}) ${Nombre} (${Aliado_corto})`
+              ] = true;
+            }
+          }
+        } catch (_err) {}
+      }
+      return temp_res;
+    } else {
+      notifyError(typesOpPermission?.msg);
+    }
+  } catch (err) {
+    notifyError(err);
+  }
+};
 
 const EditPermissionForm = ({ selected, onCloseModal }) => {
+  const [{ page = 1 }] = useQuery();
   const [typesByPermissions, setTypesByPermissions] = useState({});
-  const [typesDB, setTypesDB] = useState([]);
-
-  const searchTypes = useCallback(async (email, uname) => {
-    const queries = {};
-    if (email && email !== "") {
-      queries.email = email;
-    }
-    if (uname && uname !== "") {
-      queries.uname = uname;
-    }
-    // if (Object.keys(queries).length === 0) {
-    //   return [];
-    // }
-    try {
-      const res = await fetchData(
-        `${url_types}/tipos-operaciones`,
-        // `${url_types}/tipos-operaciones-pagination`,
-        "GET",
-        {}
-      );
-      if (res?.status) {
-        res.obj = await Promise.all(
-          res?.obj.map(async (type) => {
-            const _resAliados = await fetchData(`${url_aliados}`, "GET", {
-              aliado: type.Aliado,
-            });
-            if (_resAliados?.status) {
-              type.Aliado = _resAliados?.obj[0].nombre;
-              type.Aliado_corto = _resAliados?.obj[0].nombre_corto;
-            }
-            return type;
-          })
-        );
-        return res?.obj;
-      }
-      return [];
-    } catch (err) {
-      notifyError(err);
-    }
-  }, []);
-
-  const searchTypesByPermission = useCallback(async (id_permission) => {
-    const temp_res = {};
-    try {
-      const typesOpPermission = await fetchData(
-        `${url_iam}/permissions-opstrx`,
-        "GET",
-        {
-          Permissions_id_permission: id_permission ?? 0,
-        }
-      );
-      if (typesOpPermission?.status) {
-        for (const typeOpPermission of typesOpPermission?.obj) {
-          try {
-            const typeOp = await fetchData(`${url_types}`, "GET", {
-              tipo_op: typeOpPermission.Tipos_operaciones_id_tipo_op,
-            });
-            if (typeOp?.status) {
-              typeOp.obj = await Promise.all(
-                typeOp?.obj.map(async (type) => {
-                  const _resAliados = await fetchData(`${url_aliados}`, "GET", {
-                    aliado: type.Aliado,
-                  });
-                  if (_resAliados?.status) {
-                    type.Aliado = _resAliados?.obj[0].nombre;
-                    type.Aliado_corto = _resAliados?.obj[0].nombre_corto;
-                  }
-                  return type;
-                })
-              );
-              for (const {
-                id_tipo_operacion,
-                Nombre,
-                Aliado_corto,
-              } of typeOp?.obj) {
-                temp_res[
-                  `${id_tipo_operacion}) ${Nombre} (${Aliado_corto})`
-                ] = true;
-              }
-            }
-          } catch (_err) {}
-        }
-        return temp_res;
-      } else {
-        notifyError(typesOpPermission?.msg);
-      }
-    } catch (err) {
-      notifyError(err);
-    }
-  }, []);
+  const [typesDB, setTypesDB] = useState({});
 
   useEffect(() => {
     searchTypesByPermission(selected?.edit?.id_permission).then((res) => {
       setTypesByPermissions(res);
     });
-  }, [searchTypesByPermission, selected?.edit?.id_permission]);
+  }, [selected?.edit?.id_permission]);
 
   // const onChange = (e) => {
   //   const form = refFrom.current;
@@ -122,95 +100,94 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
   // };
 
   useEffect(() => {
-    searchTypes()
-      .then((res) => setTypesDB(res))
-      .catch((err) => {});
-  }, [searchTypes]);
+    searchTypes(page).then((res) => setTypesDB(res));
+  }, [page]);
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = useCallback(
+    async (e) => {
+      const relations = Object.entries(typesByPermissions);
 
-    const relations = Object.entries(typesByPermissions);
+      let edited = 0;
+      let allToEdit = 0;
 
-    let edited = 0;
-    let allToEdit = 0;
-
-    for (const [key, value] of relations) {
-      try {
-        const [id_tipo_operacion] = key.split(") ");
-        if (value) {
-          const usersGroups = await fetchData(
-            `${url_iam}/permissions-opstrx`,
-            "GET",
-            {
-              Permissions_id_permission: selected?.edit?.id_permission,
-              Tipos_operaciones_id_tipo_op: id_tipo_operacion,
-            }
-          );
-          if (usersGroups?.status) {
-            if (
-              Array.isArray(usersGroups?.obj) &&
-              usersGroups?.obj.length > 0
-            ) {
-            } else {
-              allToEdit++;
-              const addUser2Group = await fetchData(
-                `${url_iam}/permissions-opstrx`,
-                "POST",
-                {},
-                {
-                  Permissions_id_permission: selected?.edit?.id_permission,
-                  Tipos_operaciones_id_tipo_op: id_tipo_operacion,
+      for (const [key, value] of relations) {
+        try {
+          const [id_tipo_operacion] = key.split(") ");
+          if (value) {
+            const usersGroups = await fetchData(
+              `${url_iam}/permissions-opstrx`,
+              "GET",
+              {
+                Permissions_id_permission: selected?.edit?.id_permission,
+                Tipos_operaciones_id_tipo_op: id_tipo_operacion,
+              }
+            );
+            if (usersGroups?.status) {
+              if (
+                Array.isArray(usersGroups?.obj) &&
+                usersGroups?.obj.length > 0
+              ) {
+              } else {
+                allToEdit++;
+                const addUser2Group = await fetchData(
+                  `${url_iam}/permissions-opstrx`,
+                  "POST",
+                  {},
+                  {
+                    Permissions_id_permission: selected?.edit?.id_permission,
+                    Tipos_operaciones_id_tipo_op: id_tipo_operacion,
+                  }
+                );
+                if (addUser2Group?.status) {
+                  edited++;
                 }
-              );
-              if (addUser2Group?.status) {
-                edited++;
+              }
+            }
+          } else {
+            const usersGroups = await fetchData(
+              `${url_iam}/permissions-opstrx`,
+              "GET",
+              {
+                Permissions_id_permission: selected?.edit?.id_permission,
+                Tipos_operaciones_id_tipo_op: id_tipo_operacion,
+              }
+            );
+            if (usersGroups?.status) {
+              if (
+                Array.isArray(usersGroups?.obj) &&
+                usersGroups?.obj.length > 0
+              ) {
+                allToEdit++;
+                const addUser2Group = await fetchData(
+                  `${url_iam}/permissions-opstrx`,
+                  "DELETE",
+                  {
+                    Permissions_id_permission: selected?.edit?.id_permission,
+                    Tipos_operaciones_id_tipo_op: id_tipo_operacion,
+                  }
+                );
+                if (addUser2Group?.status) {
+                  edited++;
+                }
               }
             }
           }
-        } else {
-          const usersGroups = await fetchData(
-            `${url_iam}/permissions-opstrx`,
-            "GET",
-            {
-              Permissions_id_permission: selected?.edit?.id_permission,
-              Tipos_operaciones_id_tipo_op: id_tipo_operacion,
-            }
-          );
-          if (usersGroups?.status) {
-            if (
-              Array.isArray(usersGroups?.obj) &&
-              usersGroups?.obj.length > 0
-            ) {
-              allToEdit++;
-              const addUser2Group = await fetchData(
-                `${url_iam}/permissions-opstrx`,
-                "DELETE",
-                {
-                  Permissions_id_permission: selected?.edit?.id_permission,
-                  Tipos_operaciones_id_tipo_op: id_tipo_operacion,
-                }
-              );
-              if (addUser2Group?.status) {
-                edited++;
-              }
-            }
-          }
+        } catch (err) {
+          notifyError(err);
         }
-      } catch (err) {
-        notifyError(err);
       }
-    }
 
-    if (allToEdit === 0) {
-      notifyError("No hay tipos seleccionados para editar en el permiso");
-    } else {
-      notify(
-        `Se han editado ${edited} de ${allToEdit} tipos de operacion a editar en el permiso`
-      );
-      onCloseModal?.();
-    }
-  };
+      if (allToEdit === 0) {
+        notifyError("No hay tipos seleccionados para editar en el permiso");
+      } else {
+        notify(
+          `Se han editado ${edited} de ${allToEdit} tipos de operacion a editar en el permiso`
+        );
+        onCloseModal?.();
+      }
+    },
+    [onCloseModal, selected?.edit?.id_permission, typesByPermissions]
+  );
 
   return (
     <div className="flex flex-col justify-center items-center mx-auto">
@@ -230,7 +207,7 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
           ""
         );
       })}
-      <Form onSubmit={onSubmit} grid>
+      <Pagination maxPage={typesDB?.maxPages} lgButtons={false} grid>
         {Array.isArray(Object.keys(typesByPermissions)) &&
         Object.keys(typesByPermissions).length > 0 ? (
           <MultipleSelect
@@ -241,14 +218,17 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
         ) : (
           ""
         )}
-        {Array.isArray(typesDB) && typesDB.length > 0 ? (
+        {Array.isArray(typesDB?.results) && typesDB?.results.length > 0 ? (
           <Table
             headers={["Id", "Nombre operacion", "Aliado"]}
-            data={typesDB.map(({ id_tipo_operacion, Nombre, Aliado }) => {
-              return { id_tipo_operacion, Nombre, Aliado };
-            })}
+            data={typesDB?.results.map(
+              ({ id_tipo_operacion, Nombre, Aliado }) => {
+                return { id_tipo_operacion, Nombre, Aliado };
+              }
+            )}
             onSelectRow={(e, i) => {
-              const { id_tipo_operacion, Nombre, Aliado_corto } = typesDB[i];
+              const { id_tipo_operacion, Nombre, Aliado_corto } =
+                typesDB?.results[i];
               const copy = { ...typesByPermissions };
               copy[`${id_tipo_operacion}) ${Nombre} (${Aliado_corto})`] = true;
               setTypesByPermissions({ ...copy });
@@ -258,10 +238,12 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
         ) : (
           ""
         )}
-        <ButtonBar>
-          <Button type={"submit"}>Actualizar permiso</Button>
-        </ButtonBar>
-      </Form>
+      </Pagination>
+      <ButtonBar /* className={"lg:col-span-2"} */>
+        <Button type={"submit"} onClick={onSubmit}>
+          Actualizar permiso
+        </Button>
+      </ButtonBar>
     </div>
   );
 };
