@@ -454,9 +454,9 @@ const FormularioEnrolamiento = () => {
             </div>
           </div>
         </Fieldset>
+        <LocationForm place="Comercio" location={commerceLocation} />
+        <LocationForm place="Correspondencia" location={homeLocation} />
       </Form>
-      <LocationForm place="Comercio" location={commerceLocation} required />
-      <LocationForm place="Correspondencia" location={homeLocation} required />
 
       <Fragment>
         <Form /* onSubmit={onSubmit}  */ grid>
@@ -477,43 +477,6 @@ const FormularioEnrolamiento = () => {
           </ButtonBar> */}
         </Form>
       </Fragment>
-
-      {/* <Fieldset>
-        <div
-          className="w-full h-120" 
-        >
-          {true ? (
-            <object
-             
-              data={
-                "https://archivos-enrolamiento-comercios.s3.amazonaws.com/107/2022-02-07-17-38-46_15465222_CC.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAZK54KBWOWNXVY2V5%2F20220207%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20220207T211853Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=532471e11e45d6ce85ea37e20b1d011dabc2dae5c39638caab0674fdfe3c8910"
-              }
-              type="application/pdf"
-              width="100%"
-              height="100%"
-            ></object>
-          ) : (
-            ""
-          )}
-        </div>
-        <div
-          className="w-full h-120"
-        >
-          {true ? (
-            <object
-             
-              data={
-                "https://archivos-enrolamiento-comercios.s3.amazonaws.com/107/2022-02-07-17-38-46_15465222_Rut.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAZK54KBWOWNXVY2V5%2F20220207%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20220207T211853Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=f74d62f3fc4e81b343126542321380da499ec05ad34939dc6a2342316a293171"
-              }
-              type="application/pdf"
-              width="100%"
-              height="100%"
-            ></object>
-          ) : (
-            ""
-          )}
-        </div>
-      </Fieldset> */}
       <ButtonBar className={"lg:col-span-2"} type="">
         {
           /* archivos1.length > 0 && archivos2.length > 0  */ /* estadoFormulario ? ( */

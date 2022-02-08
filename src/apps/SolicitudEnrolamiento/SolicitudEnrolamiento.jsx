@@ -29,8 +29,8 @@ const SolicitudEnrolamiento = ({ subRoutes }) => {
       <Form>
         <HNavbar links={[subRoutes[0]]} isIcon />
         <HNavbar links={[subRoutes[1]]} isIcon />
-        <HNavbar links={[subRoutes[3]]} isIcon />
-        <HNavbar links={[subRoutes[5]]} isIcon />
+        {/*         <HNavbar links={[subRoutes[3]]} isIcon />
+        <HNavbar links={[subRoutes[5]]} isIcon /> */}
       </Form>
       {/*   <Table></Table> */}
     </div>

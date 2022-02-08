@@ -25,7 +25,7 @@ const ConsultaEnrolamiento = () => {
     e.preventDefault();
 
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?numDoc=${numconsultaProceso}`
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${numconsultaProceso}`
       /*  `http://127.0.0.1:5000/actualizacionestado?numDoc=${numconsultaProceso}` */
     )
       .then((res) => res.json())

@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import { useState } from "react";
 import { useEffect } from "react";
 import Card from "../../../components/Base/Card/Card";
-import classes from "../../Validacion Enrolamiento/views/VerificacionFormulario.module.css";
+import classes from "../../ValidacionEnrolamiento/views/VerificacionFormulario.module.css";
 import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
 import Button from "../../../components/Base/Button/Button";
 import Modal from "../../../components/Base/Modal/Modal";

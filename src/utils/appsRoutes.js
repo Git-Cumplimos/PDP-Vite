@@ -119,16 +119,19 @@ const ContinuarReconoserID = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ContinuarReconoserID")
 );
 const ValidacionAsesorComercial = lazy(() =>
-  import("../apps/Validacion Enrolamiento/ValidacionAsesorComercial")
+  import("../apps/ValidacionEnrolamiento/ValidacionAsesorComercial")
 );
 const VerificacionFormulario = lazy(() =>
-  import("../apps/Validacion Enrolamiento/views/VerificacionFormulario")
+  import("../apps/ValidacionEnrolamiento/views/VerificacionFormulario")
 );
 const ValidacionApertura = lazy(() =>
   import("../apps/ValidacionHellen/ValidacionApertura")
 );
 const VerificacionApertura = lazy(() =>
   import("../apps/ValidacionHellen/views/VerificacionApertura")
+);
+const VerificacionNuevosComercios = lazy(() =>
+  import("../apps/ValidacionEnrolamiento/VerificacionNuevosComercios")
 );
 /**
  * Recaudo
@@ -196,33 +199,33 @@ const publicUrls = [
         component: ReconoserID,
       },
 
-      {
+      /*      {
         link: "/Solicitud-enrolamiento/validarformulario",
         label: (
           <AppIcons Logo={"PAGO"} name={"Validar Formulario Inscripción"} />
         ),
         component: ValidacionAsesorComercial,
-      },
+      }, */
 
-      {
+      /* {
         link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
         label: (
           <AppIcons Logo={"PAGO"} name={"Verificar Formulario Inscripción"} />
         ),
         component: VerificacionFormulario,
-      },
-      {
+      }, */
+      /* {
         link: "/Solicitud-enrolamiento/validarformularioreconoserid",
         label: (
           <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
         ),
         component: ValidacionApertura,
-      },
-      {
+      }, */
+      /*   {
         link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
         label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
         component: VerificacionApertura,
-      },
+      }, */
       {
         link: "/Solicitud-enrolamiento/continuarreconoserid/:idreconoser",
         label: (
@@ -558,6 +561,51 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"IMPUESTO"} name={"Editar parametros"} />,
         component: Comisiones,
         permission: [1],
+      },
+    ],
+  },
+  {
+    link: "/verificacionnuevoscomercios",
+    label: <AppIcons Logo={"PAGO"} name={"Verificación Enrolamientos"} />,
+    component: VerificacionNuevosComercios,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/Solicitud-enrolamiento/validarformulario",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Validar Formulario Inscripción"} />
+        ),
+        component: ValidacionAsesorComercial,
+        permission: [1],
+        subRoutes: [
+          {
+            link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
+            label: (
+              <AppIcons
+                Logo={"PAGO"}
+                name={"Verificar Formulario Inscripción"}
+              />
+            ),
+            component: VerificacionFormulario,
+            permission: [1],
+          },
+        ],
+      },
+      {
+        link: "/Solicitud-enrolamiento/validarformularioreconoserid",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
+        ),
+        component: ValidacionApertura,
+        permission: [1],
+        subRoutes: [
+          {
+            link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
+            label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
+            component: VerificacionApertura,
+            permission: [1],
+          },
+        ],
       },
     ],
   },
