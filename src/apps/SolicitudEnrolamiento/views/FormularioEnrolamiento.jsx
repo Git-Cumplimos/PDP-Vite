@@ -109,7 +109,7 @@ const FormularioEnrolamiento = () => {
         responsable: "",
       };
       fetch(
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/iniciarproceso`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/iniciarproceso`,
         /* `http://127.0.0.1:5000/iniciarproceso`, */
         {
           method: "POST",
@@ -138,7 +138,7 @@ const FormularioEnrolamiento = () => {
           console.log(Object.fromEntries(formData.entries()));
 
           sendFormData(
-            `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
+            `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/uploadfile`,
             "POST",
             formData,
             (xhr) => {

@@ -13,7 +13,7 @@ function ValidacionAsesorComercial() {
   useEffect(() => {
     fetch(
       /*  `http://127.0.0.1:5000/actualizacionestado` */
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?validation_state=En Proceso de Validación`
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`
     )
       .then((response) => response.json())
       .then((respuesta) => setDatosEnrolamientos(respuesta.obj.results));

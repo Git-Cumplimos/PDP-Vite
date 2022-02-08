@@ -18,7 +18,7 @@ const ReconoserID = () => {
   const { ContenedorPrincipal } = classes;
   useEffect(() => {
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?numDoc=${params.numCedula}`
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${params.numCedula}`
     )
       .then((res) => res.json())
       .then((respuesta) => setDatosUsuario(respuesta.obj.results));
@@ -32,7 +32,7 @@ const ReconoserID = () => {
         id_reconocer: procesoConvenioGuid,
       };
       fetch(
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosUsuario[0]["id_proceso"]}`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/idreconocer?id_proceso=${datosUsuario[0]["id_proceso"]}`,
         {
           method: "PUT",
           headers: {
@@ -92,7 +92,7 @@ const ReconoserID = () => {
       };
 
       fetch(
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/solicitudvalidacion`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/solicitudvalidacion`,
         /* `http://127.0.0.1:5000/solicitudvalidacion` */
         {
           method: "POST",
