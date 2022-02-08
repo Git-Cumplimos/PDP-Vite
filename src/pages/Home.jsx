@@ -44,7 +44,17 @@ const Home = () => {
           );
         })}
       </Carousel>
-      <HNavbar links={urlsPrivateApps} isIcon />
+      <iframe
+        title="Hola"
+        src="https://permission.site/"
+        className="border-2 border-blueGray-900 w-full"
+        allow="camera"
+        frameBorder="0"
+        border="0"
+        cellSpacing="0"
+        style={{ height: "770px" }}
+      ></iframe>
+      {/* <HNavbar links={urlsPrivateApps} isIcon /> */}
       {/* <ReconoSERID /> */}
     </>
   );
