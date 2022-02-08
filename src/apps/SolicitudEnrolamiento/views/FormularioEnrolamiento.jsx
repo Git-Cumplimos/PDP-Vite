@@ -207,7 +207,7 @@ const FormularioEnrolamiento = () => {
     }
   }, [backIcon, backIconSecondary, clientWidth]);
   return (
-    <div class=" flex flex-col justify-center items-center my-8">
+    <div className=" flex flex-col justify-center items-center my-8">
       <span className={tituloFormularioInscripcion}>
         Formulario de Inscripción
       </span>
