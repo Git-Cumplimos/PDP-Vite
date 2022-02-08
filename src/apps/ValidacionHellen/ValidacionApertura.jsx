@@ -12,7 +12,7 @@ const ValidacionApertura = () => {
   useEffect(() => {
     fetch(
       /*  `http://127.0.0.1:5000/actualizacionestado` */
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado`
+      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_reconocer=-`
     )
       .then((response) => response.json())
       .then((respuesta) => setDatosEnrolamientos(respuesta.obj.results));
@@ -24,6 +24,17 @@ const ValidacionApertura = () => {
   const key = datosEnrolamientos.map((e) => Object.keys(e));
 
   console.log(datosEnrolamientos);
+  datosEnrolamientos.filter((e) => {
+    if (e.validation_state === "101") {
+      e.validation_state = "Habilitado Para ReconoserID";
+    } else if (e.validation_state === "102") {
+      e.validation_state = "Rechazado Para ReconoserID";
+    } else if (e.validation_state === "201") {
+      e.validation_state = "Aprobado Para Crear Comercio";
+    } else {
+      e.validation_state = "Rechazado Para Crear Comercio";
+    }
+  });
 
   return (
     <div>

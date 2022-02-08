@@ -37,6 +37,12 @@ const ConsultaEnrolamiento = () => {
   const handleReconoser = async () => {
     navigate(`/Solicitud-enrolamiento/reconoserid/${numconsultaProceso}`);
   };
+  const handleContinuarReconoser = async () => {
+    console.log(respuestaProceso[0].id_reconocer);
+    navigate(
+      `/Solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0].id_reconocer}`
+    );
+  };
   return (
     <div className={principalConsulta}>
       <span className={tituloConsultaInscripcion}>
@@ -65,15 +71,31 @@ const ConsultaEnrolamiento = () => {
               <h2>{`Estado del Proceso: ${
                 respuestaProceso[0]["validation_state"] === "101"
                   ? "Aprobado para Proceso ReconoserID"
-                  : "En Proceso de Validadción de Documentos"
+                  : respuestaProceso[0]["validation_state"] === "102"
+                  ? "Proceso Rechazado por el Asesor"
+                  : respuestaProceso[0]["validation_state"] === "201"
+                  ? "Enrolamiento Exitoso"
+                  : respuestaProceso[0]["validation_state"] === "202"
+                  ? "Proceso Rechazado por Hellen"
+                  : "Se Encuentra en Proceso de Validación"
               }`}</h2>
-              {respuestaProceso[0].validation_state === "101" ? (
+              {respuestaProceso[0].validation_state === "101" &&
+              respuestaProceso[0].id_reconocer === "None" ? (
                 <ButtonBar className={"lg:col-span-2"} type="">
                   <Button type="submit" onClick={() => handleReconoser()}>
                     Comenzar ReconoserID
                   </Button>
                 </ButtonBar>
-              ) : null}
+              ) : (
+                <ButtonBar className={"lg:col-span-2"} type="">
+                  <Button
+                    type="submit"
+                    onClick={() => handleContinuarReconoser()}
+                  >
+                    Continuar Proceso ReconoserID
+                  </Button>
+                </ButtonBar>
+              )}
             </div>
           </Modal>
         ) : (

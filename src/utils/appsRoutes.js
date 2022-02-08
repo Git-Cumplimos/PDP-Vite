@@ -118,6 +118,9 @@ const ConsultaEnrolamiento = lazy(() =>
 const ReconoserID = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ReconoserID")
 );
+const ContinuarReconoserID = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/ContinuarReconoserID")
+);
 const ValidacionAsesorComercial = lazy(() =>
   import("../apps/Validacion Enrolamiento/ValidacionAsesorComercial")
 );
@@ -195,6 +198,7 @@ const publicUrls = [
         label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
         component: ReconoserID,
       },
+
       {
         link: "/Solicitud-enrolamiento/validarformulario",
         label: (
@@ -202,6 +206,7 @@ const publicUrls = [
         ),
         component: ValidacionAsesorComercial,
       },
+
       {
         link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
         label: (
@@ -220,6 +225,13 @@ const publicUrls = [
         link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
         label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
         component: VerificacionApertura,
+      },
+      {
+        link: "/Solicitud-enrolamiento/continuarreconoserid/:idreconoser",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
+        ),
+        component: ContinuarReconoserID,
       },
     ],
   },
