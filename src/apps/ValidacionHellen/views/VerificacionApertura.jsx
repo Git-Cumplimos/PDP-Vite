@@ -27,7 +27,7 @@ const VerificacionApertura = () => {
   const [codigoLocalidad, setCodigoLocalidad] = useState("");
   const [tipoZona, setTipoZona] = useState("");
   const [datosReconoserID, setDatosReconoserID] = useState([]);
-  const [urlPdfs, setUrlPdfs] = useState([]);
+  const [urlPdfs, setUrlPdfs] = useState({});
   const params = useParams();
   useEffect(() => {
     if (datosParams?.length > 0) {
@@ -78,18 +78,10 @@ const VerificacionApertura = () => {
         id_proceso: datosParams[0]["id_proceso"].toString(),
       };
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile`,
-
-        {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify(datos),
-        }
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile?id_proceso=${datos["id_proceso"]}`
       )
         .then((res) => res.json())
-        .then((respuesta /* console.log(respuesta.obj) */) =>
+        .then((respuesta /* console.log(respuesta) */) =>
           setUrlPdfs(respuesta.obj)
         );
     }
@@ -148,8 +140,8 @@ const VerificacionApertura = () => {
     <div>
       {datosParams ? (
         <Form
-          /* gird={false} */
-          grid
+        /* gird={false} */
+        /* grid */
         >
           <Input
             label={"Nombre Comercio"}
@@ -441,7 +433,7 @@ const VerificacionApertura = () => {
               {true ? (
                 <object
                   // data={`data:application/pdf;base64,${archivo}`}
-                  data={`${urlPdfs[0]}`}
+                  data={`${urlPdfs["cc"]}`}
                   type="application/pdf"
                   width="100%"
                   height="100%"
@@ -456,7 +448,7 @@ const VerificacionApertura = () => {
               {true ? (
                 <object
                   // data={`data:application/pdf;base64,${archivo}`}
-                  data={`${urlPdfs[1]}`}
+                  data={`${urlPdfs["rut"]}`}
                   type="application/pdf"
                   width="100%"
                   height="100%"

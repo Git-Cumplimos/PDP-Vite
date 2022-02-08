@@ -110,7 +110,7 @@ const FormularioEnrolamiento = () => {
       };
       fetch(
         `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/iniciarproceso`,
-        /* `http://127.0.0.1:5000/iniciarproceso`, */
+
         {
           method: "POST",
           headers: {
@@ -132,7 +132,7 @@ const FormularioEnrolamiento = () => {
           formData.set("numdoc", numDocumento);
 
           formData.set("id_proceso", respuesta.body.id_proceso);
-
+          console.log(formData);
           notify("Se ha comenzado la carga");
 
           console.log(Object.fromEntries(formData.entries()));
@@ -159,11 +159,6 @@ const FormularioEnrolamiento = () => {
             "json"
           );
         });
-      /*    setNombre("");
-      setApellido("");
-      setTelefono("");
-      setCorreo(""); */
-      /*  setEstadoForm((old) => !old); */
     },
     [archivos1, archivos2]
   );
@@ -459,9 +454,9 @@ const FormularioEnrolamiento = () => {
             </div>
           </div>
         </Fieldset>
-        <LocationForm place="Comercio" location={commerceLocation} />
-        <LocationForm place="Correspondencia" location={homeLocation} />
       </Form>
+      <LocationForm place="Comercio" location={commerceLocation} required />
+      <LocationForm place="Correspondencia" location={homeLocation} required />
 
       <Fragment>
         <Form /* onSubmit={onSubmit}  */ grid>

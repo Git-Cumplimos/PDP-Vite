@@ -86,7 +86,8 @@ const ConsultaEnrolamiento = () => {
                     Comenzar ReconoserID
                   </Button>
                 </ButtonBar>
-              ) : (
+              ) : respuestaProceso[0].validation_state ===
+                "En Proceso de Validación" ? null : (
                 <ButtonBar className={"lg:col-span-2"} type="">
                   <Button
                     type="submit"
