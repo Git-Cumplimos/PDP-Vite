@@ -167,7 +167,9 @@ const FormularioEnrolamiento = () => {
     },
     [archivos1, archivos2]
   );
-
+  const capitalize = (word) => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  };
   const commerceLocation = {
     municipio: useState(""),
     departamento: useState(""),
@@ -222,7 +224,8 @@ const FormularioEnrolamiento = () => {
         <Input
           label={"Nombre Comercio"}
           placeholder="Ingrese Nombre Comercio"
-          onChange={(e) => setNombreComercio(e.target.value)}
+          value={nombreComercio}
+          onChange={(e) => setNombreComercio(capitalize(e.target.value))}
           type="text"
           required
         ></Input>
@@ -233,17 +236,19 @@ const FormularioEnrolamiento = () => {
         "
         >
           <Input
-            label={"Nombre"}
-            placeholder="Ingrese su Nombre"
-            onChange={(e) => setNombre(e.target.value)}
+            label={"Nombres"}
+            placeholder="Ingrese sus Nombres"
+            value={nombre}
+            onChange={(e) => setNombre(capitalize(e.target.value))}
             type={"text"}
             required
           ></Input>
 
           <Input
-            label={"Apellido"}
-            placeholder="Ingrese su Apellido"
-            onChange={(e) => setApellido(e.target.value)}
+            label={"Apellidos"}
+            placeholder="Ingrese sus Apellidos"
+            value={apellido}
+            onChange={(e) => setApellido(capitalize(e.target.value))}
             type={"text"}
             required
           ></Input>
