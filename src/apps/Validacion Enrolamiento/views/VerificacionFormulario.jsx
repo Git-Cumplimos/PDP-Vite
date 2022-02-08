@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { useParams } from "react-router";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -12,6 +12,9 @@ import { useNavigate } from "react-router-dom";
 import Input from "../../../components/Base/Input/Input";
 import Fieldset from "../../../components/Base/Fieldset/Fieldset";
 import Select from "../../../components/Base/Select/Select";
+/* import file from ".././certificado_movimiento.pdf";
+import file2 from ".././ced.pdf";
+import file3 from ".././rut.pdf"; */
 // import file from ".././certificado_movimiento.pdf";
 // import file2 from ".././ced.pdf";
 // import file3 from ".././rut.pdf";
@@ -28,6 +31,7 @@ const VerificacionFormulario = () => {
     titulosSecundarios,
     valores,
     contenedorBotones,
+    contenedorPrincipalBotones,
     contenedorImagenPDP,
   } = classes;
   const [datosParams, setDatosParams] = useState(0);
@@ -36,17 +40,12 @@ const VerificacionFormulario = () => {
   const [asesorComercialLocalidad, setAsesorComercialLocalidad] = useState("");
   const [codigoLocalidad, setCodigoLocalidad] = useState("");
   const [tipoZona, setTipoZona] = useState("");
-  const params = useParams();
-  /*  useEffect(() => {
-    fetch(
-      `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` `http://conexion-reconoserid-dev.us-east-2.elasticbeanstalk.com/actualizacionestado` 
-    )
-      .then((response) => response.json())
-      .then((respuesta) => setDatosParams(respuesta.obj.results));
-  }, []); */
+  const [guardarDatosAsesor, setGuardarDatosAsesor] = useState(false);
 
+  const params = useParams();
   useEffect(() => {
     /* const updateWidth = () => { */
+
     fetch(
       `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */
@@ -135,6 +134,7 @@ const VerificacionFormulario = () => {
       .then((res) => res.json())
       .then((respuesta) => console.log(respuesta.obj.data));
     alert("Los Datos Del Usuario Han Sido Actualizados");
+    setGuardarDatosAsesor(true);
   };
 
   return (
@@ -403,38 +403,108 @@ const VerificacionFormulario = () => {
           {/* <Sample file={file2}></Sample>
           <Sample file={file2}></Sample>
           <Sample file={file3}></Sample> */}
+          <Fieldset className={"lg:col-span-2"}>
+            <div
+              className="w-full h-120" /* style={{ width: "100%", height: "100%" }} */
+            >
+              {true ? (
+                <object
+                  // data={`data:application/pdf;base64,${archivo}`}
+                  data={
+                    "https://archivos-enrolamiento-comercios.s3.amazonaws.com/107/2022-02-07-17-38-46_15465222_CC.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAZK54KBWOWNXVY2V5%2F20220207%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20220207T215318Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=5d496645677993eec8508af8d1752b3dfe97147f3cdceccca3fa976d8e2ed490"
+                  }
+                  type="application/pdf"
+                  width="100%"
+                  height="100%"
+                ></object>
+              ) : (
+                ""
+              )}
+            </div>
+            <div
+              className="w-full h-120" /* style={{ width: "100%", height: "100%" }} */
+            >
+              {true ? (
+                <object
+                  // data={`data:application/pdf;base64,${archivo}`}
+                  data={
+                    "https://archivos-enrolamiento-comercios.s3.amazonaws.com/107/2022-02-07-17-38-46_15465222_Rut.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAZK54KBWOWNXVY2V5%2F20220207%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20220207T215319Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=5bae4b25e8a2a2420ede5c61b87e0b3e9ff943755de1b073f200f0dbb44c7e64"
+                  }
+                  type="application/pdf"
+                  width="100%"
+                  height="100%"
+                ></object>
+              ) : (
+                ""
+              )}
+            </div>
+          </Fieldset>
+          {guardarDatosAsesor ? (
+            <Fragment>
+              <div className={contenedorBotones}>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    aprobacionFormulario(e);
+                  }}
+                >
+                  Aprobar Comercio
+                </Button>
+              </div>
 
-          <div className={contenedorBotones}>
-            <Button
-              type="submit"
-              onClick={(e) => {
-                aprobacionFormulario(e);
-              }}
-            >
-              Aprobar Comercio
-            </Button>
-          </div>
+              <div className={contenedorBotones}>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    rechazarFormulario(e);
+                  }}
+                >
+                  Rechazar Comercio
+                </Button>
+              </div>
+            </Fragment>
+          ) : datosParams[0]["tipozona"] &&
+            datosParams[0]["unidad_negocio"] &&
+            datosParams[0]["responsable"] &&
+            datosParams[0]["cod_localidad"] &&
+            datosParams[0]["asesor_comercial_localidad"] &&
+            datosParams[0]["asesor_comercial_localidad"] &&
+            datosParams[0]["asesor"] ? (
+            <div className={contenedorPrincipalBotones}>
+              <div className={contenedorBotones}>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    aprobacionFormulario(e);
+                  }}
+                >
+                  Aprobar Comercio
+                </Button>
+              </div>
 
-          <div className={contenedorBotones}>
-            <Button
-              type="submit"
-              onClick={(e) => {
-                guardarDatos(e);
-              }}
-            >
-              Guardar Datos
-            </Button>
-          </div>
-          <div className={contenedorBotones}>
-            <Button
-              type="submit"
-              onClick={(e) => {
-                rechazarFormulario(e);
-              }}
-            >
-              Rechazar Comercio
-            </Button>
-          </div>
+              <div className={contenedorBotones}>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    rechazarFormulario(e);
+                  }}
+                >
+                  Rechazar Comercio
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className={contenedorBotones}>
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  guardarDatos(e);
+                }}
+              >
+                Guardar Datos
+              </Button>
+            </div>
+          )}
         </Form>
       ) : (
         ""

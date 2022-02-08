@@ -13,7 +13,7 @@ function ValidacionAsesorComercial() {
   useEffect(() => {
     fetch(
       /*  `http://127.0.0.1:5000/actualizacionestado` */
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado`
+      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?validation_state=En Proceso de Validación`
     )
       .then((response) => response.json())
       .then((respuesta) => setDatosEnrolamientos(respuesta.obj.results));
@@ -23,6 +23,14 @@ function ValidacionAsesorComercial() {
   datosEnrolamientos.map((e) => delete e.id_reconocer);
   const datosFiltrados = datosEnrolamientos.map((e) => Object.values(e));
   const key = datosEnrolamientos.map((e) => Object.keys(e));
+
+  datosEnrolamientos.filter((e) => {
+    if (e.validation_state === "101") {
+      e.validation_state = "Validado Para reconoser";
+    } else if (e.validation_state === "102") {
+      e.validation_state = "Rechazado Para reconoser";
+    }
+  });
 
   console.log(datosEnrolamientos);
 
@@ -34,6 +42,7 @@ function ValidacionAsesorComercial() {
           ({ id_proceso, nombre, apellido, validation_state }) => ({
             id_proceso,
             nombre: `${nombre} ${apellido}`,
+
             validation_state,
           })
         )}

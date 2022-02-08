@@ -67,45 +67,103 @@ const FormularioEnrolamiento = () => {
       setArchivos2(files);
     }
   }, []);
-  const onSubmit = useCallback(
+  const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
-      const data = {
-        numdoc: 1030652074,
+
+      const datos = {
+        asesor: "juan",
+        nombre: `${nombre}`,
+        apellido: `${apellido}`,
+        nombre_comercio: nombreComercio,
+        numnit: numNit,
+        numcamycom: numCamaraComercio,
+        numrut: numRut,
+        autosms: autorizacion,
+        tipozona: "",
+        unidad_negocio: "",
+        responsableiva: responsableIva,
+        cod_localidad: "",
+        asesor_comercial_localidad: "",
+        actividad_economica: commerceType.toString(),
+        tipo_establecimiento: tipoComercio,
+        sede: "Bogotá",
+        direccion_comercio: `${commerceLocation.direccion[0]}`,
+        departamento: `${commerceLocation.departamento[0]}`,
+        municipio: `${commerceLocation.municipio[0]}`,
+        localidad_bogota: `${commerceLocation.localidad[0]}`,
+        barrio: `${commerceLocation.barrio[0]}`,
+        direccion_correspondencia: `${homeLocation.direccion[0]}`,
+        departamento_correspondencia: `${homeLocation.departamento[0]}`,
+        municipio_correspondencia: `${homeLocation.municipio[0]}`,
+        localidad_correspondencia: `${homeLocation.localidad[0]}`,
+        barrio_correspondencia: `${homeLocation.barrio[0]}`,
+        tipoDoc: tipoIdentificacion,
+        numDoc: numDocumento,
+        email: correos[0],
+        celular: telefonos[0],
+        task_token: "token",
+        validation_state: "En Proceso de Validación",
+        id_name: "id_proceso",
+        /*  id_reconocer: "", */
+        responsable: "",
       };
-      const formData = new FormData();
+      fetch(
+        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/iniciarproceso`,
+        /* `http://127.0.0.1:5000/iniciarproceso`, */
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify(datos),
+        }
+      )
+        .then((res) => res.json())
+        .then((respuesta) => {
+          console.log(respuesta);
+          const formData = new FormData();
 
-      formData.set("rut", archivos1[0]);
-      /* formData.set("pdf-1-2", archivos1[1]); */
+          formData.set("rut", archivos1[0]);
+          /* formData.set("pdf-1-2", archivos1[1]); */
 
-      formData.set("cc", archivos2[0]);
-      /* formData.set("numdoc", 1030652074); */
+          formData.set("cc", archivos2[0]);
 
-      notify("Se ha comenzado la carga");
+          formData.set("numdoc", numDocumento);
 
-      console.log(Object.fromEntries(formData.entries()));
+          formData.set("id_proceso", respuesta.body.id_proceso);
 
-      sendFormData(
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
-        "POST",
-        formData,
-        (xhr) => {
-          if (xhr.status === 200) {
-            const res = xhr.response;
-            if (!res?.status) {
-              notifyError(res?.msg);
-            } else {
-              console.log(res?.obj);
-              notify("Se han subido los archivos");
-              setEstadoForm(true);
-            }
-          }
-        },
-        (xhr) => {
-          notifyError("Error de red");
-        },
-        "json"
-      );
+          notify("Se ha comenzado la carga");
+
+          console.log(Object.fromEntries(formData.entries()));
+
+          sendFormData(
+            `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
+            "POST",
+            formData,
+            (xhr) => {
+              if (xhr.status === 200) {
+                const res = xhr.response;
+                if (!res?.status) {
+                  notifyError(res?.msg);
+                } else {
+                  console.log(res?.obj);
+                  notify("Se han subido los archivos");
+                  setEstadoForm(true);
+                }
+              }
+            },
+            (xhr) => {
+              notifyError("Error de red");
+            },
+            "json"
+          );
+        });
+      /*    setNombre("");
+      setApellido("");
+      setTelefono("");
+      setCorreo(""); */
+      /*  setEstadoForm((old) => !old); */
     },
     [archivos1, archivos2]
   );
@@ -129,62 +187,9 @@ const FormularioEnrolamiento = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    const datos = {
-      asesor: "juan",
-      nombre: `${nombre}`,
-      apellido: `${apellido}`,
-      nombre_comercio: nombreComercio,
-      numnit: numNit,
-      numcamycom: numCamaraComercio,
-      numrut: numRut,
-      autosms: autorizacion,
-      tipozona: "",
-      unidad_negocio: "",
-      responsableiva: responsableIva,
-      cod_localidad: "",
-      asesor_comercial_localidad: "",
-      actividad_economica: commerceType.toString(),
-      tipo_establecimiento: tipoComercio,
-      sede: "Bogotá",
-      direccion_comercio: `${commerceLocation.direccion[0]}`,
-      departamento: `${commerceLocation.departamento[0]}`,
-      municipio: `${commerceLocation.municipio[0]}`,
-      localidad_bogota: `${commerceLocation.localidad[0]}`,
-      barrio: `${commerceLocation.barrio[0]}`,
-      direccion_correspondencia: `${homeLocation.direccion[0]}`,
-      departamento_correspondencia: `${homeLocation.departamento[0]}`,
-      municipio_correspondencia: `${homeLocation.municipio[0]}`,
-      localidad_correspondencia: `${homeLocation.localidad[0]}`,
-      barrio_correspondencia: `${homeLocation.barrio[0]}`,
-      tipoDoc: tipoIdentificacion,
-      numDoc: numDocumento,
-      email: correos[0],
-      celular: telefonos[0],
-      task_token: "token",
-      validation_state: "En Proceso de Validación",
-      id_reconocer: "",
-      responsable: "",
-    };
-    fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/iniciarproceso`,
-      /* `http://127.0.0.1:5000/iniciarproceso`, */
-      {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
-      }
-    )
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta));
-    /*    setNombre("");
-    setApellido("");
-    setTelefono("");
-    setCorreo(""); */
-    setEstadoForm((old) => !old);
-  };
+  /*  const handleSubmit = () => {
+   
+  }; */
   const handleReconoser = async () => {
     navigate("/Solicitud-enrolamiento/reconoserid");
   };
@@ -454,7 +459,7 @@ const FormularioEnrolamiento = () => {
       <LocationForm place="Correspondencia" location={homeLocation} required />
 
       <Fragment>
-        <Form onSubmit={onSubmit} grid>
+        <Form /* onSubmit={onSubmit}  */ grid>
           <FileInput
             label={"Elige el archivo del Rut"}
             onGetFile={onFileChange}
@@ -467,22 +472,58 @@ const FormularioEnrolamiento = () => {
             accept=".pdf"
             allowDrop={false}
           />
-          <ButtonBar className="lg:col-span-2">
+          {/*   <ButtonBar className="lg:col-span-2">
             <Button type="submit">Subir archivos</Button>
-          </ButtonBar>
+          </ButtonBar> */}
         </Form>
       </Fragment>
 
+      {/* <Fieldset>
+        <div
+          className="w-full h-120" 
+        >
+          {true ? (
+            <object
+             
+              data={
+                "https://archivos-enrolamiento-comercios.s3.amazonaws.com/107/2022-02-07-17-38-46_15465222_CC.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAZK54KBWOWNXVY2V5%2F20220207%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20220207T211853Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=532471e11e45d6ce85ea37e20b1d011dabc2dae5c39638caab0674fdfe3c8910"
+              }
+              type="application/pdf"
+              width="100%"
+              height="100%"
+            ></object>
+          ) : (
+            ""
+          )}
+        </div>
+        <div
+          className="w-full h-120"
+        >
+          {true ? (
+            <object
+             
+              data={
+                "https://archivos-enrolamiento-comercios.s3.amazonaws.com/107/2022-02-07-17-38-46_15465222_Rut.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAZK54KBWOWNXVY2V5%2F20220207%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20220207T211853Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=f74d62f3fc4e81b343126542321380da499ec05ad34939dc6a2342316a293171"
+              }
+              type="application/pdf"
+              width="100%"
+              height="100%"
+            ></object>
+          ) : (
+            ""
+          )}
+        </div>
+      </Fieldset> */}
       <ButtonBar className={"lg:col-span-2"} type="">
         {
-          /* archivos1.length > 0 && archivos2.length > 0  */ estadoFormulario ? (
-            <Button
-              type="submit"
-              onClick={() => /* setEstadoForm((old) => !old) */ handleSubmit()}
-            >
-              Enviar Formulario
-            </Button>
-          ) : null
+          /* archivos1.length > 0 && archivos2.length > 0  */ /* estadoFormulario ? ( */
+          <Button
+            type="submit"
+            onClick={(e) => /* setEstadoForm((old) => !old) */ handleSubmit(e)}
+          >
+            Enviar Formulario
+          </Button>
+          /*  ) : null */
         }
       </ButtonBar>
     </div>
