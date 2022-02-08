@@ -1,7 +1,7 @@
 import { Amplify } from "aws-amplify";
 import awsconfig from "./aws-exports";
 
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { useAuth } from "./hooks/AuthHooks";
 import { Routes } from "react-router-dom";
 import { useUrls } from "./hooks/UrlsHooks";
@@ -16,6 +16,13 @@ Amplify.configure(awsconfig);
 function App() {
   const { cognitoUser, isSignedIn } = useAuth();
   const { allRoutes } = useUrls();
+
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
     <Suspense fallback={<SkeletonLoading />}>
