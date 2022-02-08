@@ -47,7 +47,7 @@ const VerificacionFormulario = () => {
     /* const updateWidth = () => { */
 
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */
     )
       .then((response) => response.json())
@@ -70,7 +70,7 @@ const VerificacionFormulario = () => {
       validation_state: "101",
     };
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
         method: "PUT",
         headers: {
@@ -94,7 +94,7 @@ const VerificacionFormulario = () => {
       validation_state: "102",
     };
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com//actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
         method: "PUT",
         headers: {
@@ -122,7 +122,7 @@ const VerificacionFormulario = () => {
       tipozona: tipoZona,
     };
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
         method: "PUT",
         headers: {

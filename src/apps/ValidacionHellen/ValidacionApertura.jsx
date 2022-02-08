@@ -12,7 +12,7 @@ const ValidacionApertura = () => {
   useEffect(() => {
     fetch(
       /*  `http://127.0.0.1:5000/actualizacionestado` */
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_reconocer=-`
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_reconocer=-`
     )
       .then((response) => response.json())
       .then((respuesta) => setDatosEnrolamientos(respuesta.obj.results));

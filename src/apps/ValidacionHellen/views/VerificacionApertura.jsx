@@ -36,7 +36,7 @@ const VerificacionApertura = () => {
         procesoConvenioGuid: datosParams[0]["id_reconocer"],
       };
       fetch(
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/consultavalidacion`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/consultavalidacion`,
         {
           method: "POST",
           headers: {
@@ -55,7 +55,7 @@ const VerificacionApertura = () => {
     /* const updateWidth = () => { */
 
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */
     )
       .then((response) => response.json())
@@ -78,7 +78,7 @@ const VerificacionApertura = () => {
         id_proceso: datosParams[0]["id_proceso"].toString(),
       };
       fetch(
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/urlfile`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile`,
 
         {
           method: "POST",
@@ -102,7 +102,7 @@ const VerificacionApertura = () => {
       validation_state: "201",
     };
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
         method: "PUT",
         headers: {
@@ -126,7 +126,7 @@ const VerificacionApertura = () => {
       validation_state: "202",
     };
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
         method: "PUT",
         headers: {
