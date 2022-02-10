@@ -9,6 +9,8 @@ import Modal from "../../../components/Base/Modal/Modal";
 import Form from "../../../components/Base/Form/Form";
 import { useNavigate } from "react-router-dom";
 import Input from "../../../components/Base/Input/Input";
+/* import ToggleInput from "../../../components/Base/ToggleInput/ToggleInput"; */
+import TextArea from "../../../components/Base/TextArea/TextArea";
 import Fieldset from "../../../components/Base/Fieldset/Fieldset";
 import Select from "../../../components/Base/Select/Select";
 /* import file from ".././certificado_movimiento.pdf";
@@ -31,6 +33,7 @@ const VerificacionFormulario = () => {
     valores,
     contenedorBotones,
     contenedorPrincipalBotones,
+    contenedorCausalRechazo,
     contenedorImagenPDP,
   } = classes;
   const [datosParams, setDatosParams] = useState(0);
@@ -41,6 +44,7 @@ const VerificacionFormulario = () => {
   const [tipoZona, setTipoZona] = useState("");
   const [guardarDatosAsesor, setGuardarDatosAsesor] = useState(false);
   const [urlPdfs, setUrlPdfs] = useState({});
+  const [causal, setCausal] = useState("");
 
   const params = useParams();
   useEffect(() => {
@@ -73,9 +77,10 @@ const VerificacionFormulario = () => {
         `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile?id_proceso=${datos["id_proceso"]}`
       )
         .then((res) => res.json())
-        .then((respuesta /* console.log(respuesta) */) =>
-          setUrlPdfs(respuesta.obj)
-        );
+        .then((respuesta) => {
+          console.log(respuesta.obj["rut"]);
+          setUrlPdfs(respuesta.obj);
+        });
     }
   }, [datosParams]);
   const aprobacionFormulario = (e) => {
@@ -135,6 +140,7 @@ const VerificacionFormulario = () => {
       asesor_comercial_localidad: asesorComercialLocalidad,
       cod_localidad: codigoLocalidad,
       tipozona: tipoZona,
+      causal_rechazo: causal,
     };
     fetch(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
@@ -211,10 +217,19 @@ const VerificacionFormulario = () => {
                 name="comissionType"
                 label={`Cod Localidad`}
                 options={{
-                  "": "",
+                  "No Aplica": "No Aplica",
                   "01 Kennedy": "01 Kennedy",
                   "02 Engativa": "02 Engativa",
                   "03 Bosa": "03 Bosa",
+                  "04 Ciudad Bolivar": "04 Ciudad Bolivar",
+                  "05 Suba": "05 Suba",
+                  "06 Usaquen": "06 Usaquen",
+                  "07 Usme": "07 Usme",
+                  "08 Rafael Uribe Uribe": "08 Rafael Uribe Uribe",
+                  "09 Puente Aranda": "09 Puente Aranda",
+                  "10 Fontibon": "10 Fontibon",
+                  "11 San Cristobal": "11 San Cristobal",
+                  "11 San Cristobal": "11 San Cristobal",
                 }}
               ></Select>
             )}
@@ -420,7 +435,7 @@ const VerificacionFormulario = () => {
           <Sample file={file3}></Sample> */}
           <Fieldset className={"lg:col-span-2"}>
             <div
-              className="w-full h-120" /* style={{ width: "100%", height: "100%" }} */
+              className="w-full h-120 " /* style={{ width: "100%", height: "100%" }} */
             >
               {true ? (
                 <object
@@ -435,7 +450,7 @@ const VerificacionFormulario = () => {
               )}
             </div>
             <div
-              className="w-full h-120" /* style={{ width: "100%", height: "100%" }} */
+              className="w-full h-120  " /* style={{ width: "100%", height: "100%" }} */
             >
               {true ? (
                 <object
@@ -448,6 +463,26 @@ const VerificacionFormulario = () => {
               ) : (
                 ""
               )}
+            </div>
+          </Fieldset>
+          <Fieldset>
+            <div className={contenedorCausalRechazo}>
+              <h2>
+                Si el Comercio no cumple con los requisitos, por favor agrege un
+                causal de rechazo.
+              </h2>
+              <TextArea
+                className={"flex lg:row-span-0"}
+                type="input"
+                minLength="1"
+                maxLength="160"
+                autoComplete="off"
+                value={causal}
+                info={`Cantidad de caracteres: ${causal.length}`}
+                onInput={(e) => {
+                  setCausal(e.target.value);
+                }}
+              ></TextArea>
             </div>
           </Fieldset>
 
