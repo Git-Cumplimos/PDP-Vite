@@ -162,6 +162,7 @@ const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 const ParamsOperations = lazy(() =>
   import("../apps/ParamsOperations/ParamsOperations")
 );
+const TypesTrxs = lazy(() => import("../apps/ParamsOperations/Views/TypesTrxs"));
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -557,10 +558,67 @@ const allUrlsPrivateApps = [
     permission: [1],
     subRoutes: [
       {
-        link: "/params-operations/edit-params",
-        label: <AppIcons Logo={"IMPUESTO"} name={"Editar parametros"} />,
-        component: Comisiones,
+        link: '/params-operations/types-trxs',
+        label: <AppIcons Logo={"RECAUDO"} name={"Tipos de transacciones"} />,
+        component: TypesTrxs,
         permission: [1],
+      },
+      {
+        link: "/params-operations/comisiones",
+        label: <AppIcons Logo={"IMPUESTO"} name={"Tarifas / Comisiones"} />,
+        component: Comisiones,
+        permission: [18, 19],
+        subRoutes: [
+          {
+            link: "/params-operations/comisiones/pagadas",
+            label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar"} />,
+            component: Com2Pay,
+            permission: [18],
+            subRoutes: [
+              {
+                link: "/params-operations/comisiones/pagadas/personalizadas",
+                label: (
+                  <AppIcons
+                    Logo={"IMPUESTO"}
+                    name={"Comisiones a pagar por comercio"}
+                  />
+                ),
+                component: CreateComision,
+                permission: [18],
+              },
+            ],
+          },
+          {
+            link: "/params-operations/comisiones/cobradas",
+            label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a cobrar"} />,
+            component: Com2Collect,
+            permission: [19],
+          },
+        ],
+      },
+      {
+        link: "/params-operations/convenios",
+        label: <AppIcons Logo={"RETIRO"} name={"Convenios"} />,
+        component: Convenios,
+        permission: [20],
+        subRoutes: [
+          {
+            link: "/params-operations/convenios/autorizadores",
+            label: (
+              <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
+            ),
+            component: ConvAuto,
+            permission: [20],
+          },
+        ],
+      },
+      {
+        link: "/params-operations/autorizadores",
+        label: (
+          <AppIcons Logo={"PRODUCTOS_FINANCIEROS"} name={"Proveedores / Autorizadores"} />
+        ),
+        component: Autorizadores,
+        permission: [21],
       },
     ],
   },
