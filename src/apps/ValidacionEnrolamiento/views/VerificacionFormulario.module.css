@@ -47,3 +47,9 @@
   display: flex;
   justify-content: center;
 }
+.contenedorCausalRechazo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

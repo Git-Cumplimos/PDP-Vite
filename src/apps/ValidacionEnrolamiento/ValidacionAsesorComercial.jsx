@@ -18,7 +18,7 @@ function ValidacionAsesorComercial() {
       .then((response) => response.json())
       .then((respuesta) => setDatosEnrolamientos(respuesta.obj.results));
   }, []);
-  console.log(datosOrdenados);
+  /*   console.log(datosOrdenados); */
   datosEnrolamientos.map((e) => delete e.task_token);
   datosEnrolamientos.map((e) => delete e.id_reconocer);
   const datosFiltrados = datosEnrolamientos.map((e) => Object.values(e));
@@ -33,6 +33,7 @@ function ValidacionAsesorComercial() {
   });
 
   console.log(datosEnrolamientos);
+  console.log(datosFiltrados);
 
   return (
     <div>
@@ -48,7 +49,7 @@ function ValidacionAsesorComercial() {
         )}
         onSelectRow={(e, i) =>
           navigate(
-            `/Solicitud-enrolamiento/validarformulario/verificaciondatos/${datosFiltrados[i][14]}`
+            `/Solicitud-enrolamiento/validarformulario/verificaciondatos/${datosFiltrados[i][15]}`
           )
         }
       ></Table>
