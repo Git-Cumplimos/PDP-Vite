@@ -74,6 +74,8 @@ export const useProvideFDLM = () => {
       Valor: parseFloat(values?.val),
       referenciaPago: values?.reference,
       id_trx: values?.idtrx,
+      motivo:values?.motivo,
+      
     };
     console.log(body);
     try {
@@ -94,6 +96,9 @@ export const useProvideFDLM = () => {
       Municipio: parseInt(values?.Municipio),
       Valor: parseFloat(values?.Valor),
       referenciaPago: values?.Referencia,
+      cedula:values?.cedula,
+      cliente:values?.cliente,
+      nombre_comercio:values?.nombre_comercio
     };
     try {
       const res = await fetchData(urls.ingresorecibo, "POST", {}, body);

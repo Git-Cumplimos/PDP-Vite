@@ -1,0 +1,423 @@
+import { useCallback, useState, useRef } from "react";
+import Button from "../../../components/Base/Button/Button";
+import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
+import Modal from "../../../components/Base/Modal/Modal";
+import Form from "../../../components/Base/Form/Form";
+import Input from "../../../components/Base/Input/Input";
+import Select from "../../../components/Base/Select/Select";
+import Table from "../../../components/Base/Table/Table";
+import Tickets from "../../../components/Base/Tickets/Tickets";
+import { notify, notifyError } from "../../../utils/notify";
+import fetchData from "../../../utils/fetchData";
+import { ExportToCsv } from "export-to-csv";
+
+function createCard(
+  codigo_punto,
+  punto,
+  credito,
+  estado,
+  motivo,
+  cliente,
+  cedula,
+  total,
+  fecha,
+  hora
+) {
+  return {
+    codigo_punto,
+    punto,
+    credito,
+    estado,
+    motivo,
+    cliente,
+    cedula,
+    total,
+    fecha,
+    hora
+  };
+}
+
+const url_Report = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
+const url_Download = `${process.env.REACT_APP_URL_FDLMWSDL}/report`;
+
+//const printDiv = useRef();
+
+const Reporte = () => {
+  const [trxs, setTrxs] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [page, setPage] = useState(1);
+  const [maxPages, setMaxPages] = useState(1);
+  const [tipoOp, setTipoOp] = useState("");
+  const [fechaInicial, setFechaInicial] = useState("");
+  const [fechaFinal, setFechaFinal] = useState("");
+  const [fechaInicialDownload, setFechaInicialDownload] = useState("");
+  const [fechaFinalDownload, setFechaFinalDownload] = useState("");
+  const [Download, setDownload] = useState(null);
+  const [showModal2, setShowModal2] = useState(false);
+  const [disabledBtn, setDisabledBtn] = useState(true);
+
+  const exportdata = (e) => {
+    e.preventDefault();
+    setShowModal2(false);
+    setFechaInicialDownload('')
+    setFechaFinalDownload('')
+    setDisabledBtn(true)
+    const rows = [];
+    Download.map((row) => {
+      rows.push(
+        createCard(
+          row.codigo_punto,
+          row.punto,
+          row.credito,
+          row.estado,
+          row.motivo,
+          row.cliente,
+          row.cedula,
+          row.total,
+          row.fecha,
+          row.hora
+        )
+      );
+      return null;
+    });
+    const options = {
+      fieldSeparator: ";",
+      quoteStrings: '"',
+      decimalSeparator: ".",
+      showLabels: true,
+      showTitle: true,
+      title: "Reporte FDLM",
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+      filename: "REPORTE DIARIO CONCILIACION",
+    };
+    const csvExporter = new ExportToCsv(options);
+    if (rows.length > 0) {
+      csvExporter.generateCsv(rows);
+    }
+    setDownload(null);
+    return null;
+  };
+
+  const options = [
+    { value: "", label: "" },
+    { value: "5", label: "Recaudos" },
+    { value: "6", label: "Reversos" },
+  ];
+
+  /*Buscar report*/
+  const report = useCallback(
+    async(Tipo_operacion,page, date_ini, date_end) => {
+      const url = url_Report;
+      const queries = {};
+      // if (!(Comercio === -1 || Comercio === "")) {
+      //   queries.Comercio = Comercio;
+      // }
+      if (Tipo_operacion) {
+        queries.Tipo_operacion = Tipo_operacion;
+      }
+      if (page) {
+        queries.page = page;
+      }
+      if (date_ini && date_end) {
+        queries.date_ini = date_ini;
+        queries.date_end = date_end;
+      }
+      console.log(queries);
+      try {
+        const res = await fetchData(url, "GET", queries);
+        console.log(res);
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
+
+  /*Download*/
+  const download = useCallback(async (fecha_ini, fecha_fin) => {
+    const query = {};
+    query.fecha_ini = fecha_ini;
+    query.fecha_fin = fecha_fin;
+    try {
+      const res = await fetchData(url_Download, "GET", query);
+      console.log(res);
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    setShowModal2(true);
+  };
+
+  const closeModal2 = useCallback(() => {
+    setShowModal2(false);
+    setDisabledBtn(true);
+    setDownload(null);
+    setFechaInicialDownload("");
+    setFechaFinalDownload("");
+  });
+
+  const closeModal = useCallback(() => {
+    setShowModal(false);
+  });
+ 
+  return (
+    <div className="w-full flex flex-col justify-center items-center my-8">
+      <h1 className="text-3xl">Reporte</h1>
+      <Form onSubmit={onSubmit} grid>
+        <ButtonBar className="col-span-1 md:col-span-2">
+          <Button type="submit" onClick={() => {}}>
+            Descargar reporte
+          </Button>
+        </ButtonBar>
+        <Input
+          id="dateInit"
+          label="Fecha inicial"
+          type="date"
+          value={fechaInicial}
+          onInput={(e) => {
+            setPage(1);
+            setMaxPages(1);
+            setFechaInicial(e.target.value);
+            if (fechaFinal !== "") {
+              if (tipoOp !== "") {
+                report(tipoOp, 1, e.target.value, fechaFinal).then((res) => {
+                  if (res.status === false) {
+                    notifyError(res.msg);
+                  } else {
+                    setMaxPages(res?.obj?.maxpages);
+                    setTrxs(res?.obj?.trxs);
+                    
+                  }
+                });
+              }
+            }
+          }}
+        />
+        <Input
+          id="dateEnd"
+          label="Fecha final"
+          type="date"
+          value={fechaFinal}
+          onInput={(e) => {
+            setPage(1);
+            setFechaFinal(e.target.value);
+            if (fechaInicial !== "") {
+              if (tipoOp !== "") {
+                report(tipoOp, 1, fechaInicial, e.target.value).then((res) => {
+                  if (res.status === false) {
+                    notifyError(res.msg);
+                  } else {
+                    setMaxPages(res?.obj?.maxpages);
+                    setTrxs(res?.obj?.trxs);
+
+                  }
+                });
+              }
+            }
+          }}
+        />
+        <Select
+          id="searchBySorteo"
+          label="Tipo de busqueda"
+          options={options}
+          value={tipoOp}
+          onChange={(e) => {
+            setPage(1);
+            setTipoOp(parseInt(e.target.value));
+            if (!(e.target.value === null || e.target.value === "")) {
+              report(e.target.value, 1, fechaInicial, fechaFinal).then(
+                (res) => {
+                  console.log(res)
+                  if (res?.status === false) {
+                    notifyError(res.msg);
+                  } else {
+                    setMaxPages(res?.obj?.maxpages);
+                    console.log(res?.obj?.trxs);
+                    setTrxs(res?.obj?.trxs);
+                    
+                  }
+                }
+              );
+            }
+          }}
+        />
+
+        <ButtonBar className="col-span-1 md:col-span-2">
+          <Button
+            type="button"
+            disabled={page < 2}
+            onClick={() => {
+              setPage(page - 1);
+              report(tipoOp, page - 1, fechaInicial, fechaFinal).then((res) => {
+                if (res.status === false) {
+                  notifyError(res.msg);
+                } else {
+                  setTrxs(res?.obj?.trxs);
+                  
+                }
+              });
+            }}
+          >
+            Anterior
+          </Button>
+          <Button
+            type="button"
+            disabled={page >= maxPages}
+            onClick={() => {
+              setPage(page + 1);
+              report(tipoOp, page + 1, fechaInicial, fechaFinal).then((res) => {
+                if (res.status === false) {
+                  notifyError(res.msg);
+                } else {
+                  setTrxs(res?.obj?.trxs);
+                  
+                }
+              });
+            }}
+          >
+            Siguiente
+          </Button>
+        </ButtonBar>
+      </Form>
+      {Array.isArray(trxs) && trxs.length > 0 ? (
+        <>
+          <div className="flex flex-row justify-evenly w-full my-4">
+            <h1>Pagina: {page}</h1>
+            <h1>Ultima pagina: {maxPages}</h1>
+          </div>
+          <Table
+            headers={["Fecha", "Mensaje", "Monto"]}
+            data={trxs.map(({ Created_at, Response_obj:{Mensaje}={Mensaje:''}, Monto}) => {
+              const tempDate = new Date(Created_at);
+              tempDate.setHours(tempDate.getHours() + 5);
+              Created_at = Intl.DateTimeFormat("es-CO", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              }).format(tempDate);
+              return {
+                Created_at,
+                Mensaje,
+                Monto
+              };
+            })}
+            onSelectRow={(_e, index) => {
+            
+                setSelected(trxs[index]);
+                setShowModal(true);
+              
+            }}
+          />
+        </>
+      ) : (
+        ""
+      )}
+       <Modal show={showModal} handleClose={closeModal}>
+        {selected?.Ticket ? (
+          <div className="flex flex-col justify-center items-center">
+            <Tickets
+              //refPrint={printDiv}
+              type="Visualización"
+              ticket={selected?.Ticket}
+            />
+            <ButtonBar>
+              {/* <Button onClick={handlePrint}>Imprimir</Button> */}
+              <Button
+                onClick={() => {
+                  closeModal();
+                  setSelected(null);
+                }}
+              >
+                Cerrar
+              </Button>
+            </ButtonBar>
+          </div>
+        ) : (
+          <div className="flex flex-col justify-center items-center mx-auto container">
+          <h1 className="text-3xl mt-6 text-aling">No hay ticket registrado</h1>
+          </div>
+        )}
+      </Modal>
+      <Modal show={showModal2} handleClose={closeModal2}>
+        <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+          <h1 className="text-2xl font-semibold">
+            Seleccione el rango de fechas para realizar la descarga
+          </h1>
+          <Form onSubmit={exportdata}>
+            <Input
+              id="dateInit"
+              label="Fecha inicial"
+              type="date"
+              value={fechaInicialDownload}
+              onInput={(e) => {
+                setPage(1);
+                setMaxPages(1);
+                setFechaInicialDownload(e.target.value);
+                if (fechaFinalDownload !== "") {
+                  download(e.target.value, fechaFinalDownload).then((res) => {
+                    if (res.status === false) {
+                      setDownload(null);
+                      notifyError(res.msg);
+                    } else {
+                      
+                      setDisabledBtn(false);
+                      setDownload(res?.obj);
+                    }
+                  });
+                }
+              }}
+            />
+            <Input
+              id="dateEnd"
+              label="Fecha final"
+              type="date"
+              value={fechaFinalDownload}
+              onInput={(e) => {
+                setPage(1);
+                setFechaFinalDownload(e.target.value);
+                if (fechaInicialDownload !== "") {
+                  download(fechaInicialDownload, e.target.value).then((res) => {
+                    if (res.status === false) {
+                      setDownload(null);
+                      notifyError(res.msg);
+                    } else {
+                      setDownload(res?.obj?.results);
+                      setDisabledBtn(false);
+                      
+                    }
+                  });
+                }
+              }}
+            />
+
+            <ButtonBar>
+              <Button type="submit" disabled={disabledBtn}>
+                Descargar
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  closeModal2();
+                }}
+              >
+                Cancelar
+              </Button>
+            </ButtonBar>
+          </Form>
+        </div>
+      </Modal>
+    </div>
+  );
+};
+
+export default Reporte;

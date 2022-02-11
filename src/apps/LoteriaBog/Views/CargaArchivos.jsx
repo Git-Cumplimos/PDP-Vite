@@ -33,16 +33,18 @@ const CargaArchivos = ({ route }) => {
     { value: "Extra/", label: "Sorteo Extraordinario" },
   ];
 
-  const optionsFisiVir = [
-    { value: "", label: "" },
-    { value: "Fisico/", label: "Asignación Fisica" },
-    { value: "Virtual/", label: "Asignación Virtual" },
-  ];
+  
   const [archivo, setArchivo] = useState("");
   const [tipoSorteo, setTipoSorteo] = useState("");
   const [fisiVirtual, setFisiVirtual] = useState("");
   const [file, setFile] = useState("");
   const [fileName, setFileName] = useState("");
+
+  const optionsFisiVir = [
+    { value: "", label: "" },
+    { value: "Fisico/", label: `${archivo} Fisicos` },
+    { value: "Virtual/", label: `${archivo} Virtuales`},
+  ];
 
   const [showModal, setShowModal] = useState(false);
 
@@ -174,7 +176,7 @@ const CargaArchivos = ({ route }) => {
             setFisiVirtual("");
           }}
         />
-        {archivo === "PlanDePremios" || archivo === "Asignacion" ? (
+        {archivo === "PlanDePremios" || archivo === "Asignacion" || archivo === "Resultados"? (
           <Select
             id="tip_sorteo"
             label={`Tipo de sorteo para ${archivo}`}
@@ -188,10 +190,10 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {archivo === "Asignacion" && tipoSorteo !== "" ? (
+        {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
           <Select
             id="FisiVir"
-            label={`Asignación fisica o Virtual`}
+            label={`${archivo} fisicos/Virtuales`}
             options={optionsFisiVir}
             disabled={progress !== 0 && progress !== 100}
             value={fisiVirtual}
@@ -202,10 +204,8 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {(archivo !== "" &&
-          archivo !== "PlanDePremios" &&
-          archivo !== "Asignacion") ||
-        (archivo == "PlanDePremios" && tipoSorteo !== "") ||
+        {
+        (archivo === "PlanDePremios" && tipoSorteo !== "") ||
         fisiVirtual !== "" ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <InputX
