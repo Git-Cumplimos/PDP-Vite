@@ -1,17 +1,21 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { useParams } from "react-router";
 import { useState } from "react";
 import { useEffect } from "react";
-import Card from "../../../components/Base/Card/Card";
-import classes from "../../Validacion Enrolamiento/views/VerificacionFormulario.module.css";
+import classes from "../../ValidacionEnrolamiento/views/VerificacionFormulario.module.css";
 import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
 import Button from "../../../components/Base/Button/Button";
 import Modal from "../../../components/Base/Modal/Modal";
 import Form from "../../../components/Base/Form/Form";
 import { useNavigate } from "react-router-dom";
 import Input from "../../../components/Base/Input/Input";
+/* import ToggleInput from "../../../components/Base/ToggleInput/ToggleInput"; */
+import TextArea from "../../../components/Base/TextArea/TextArea";
 import Fieldset from "../../../components/Base/Fieldset/Fieldset";
 import Select from "../../../components/Base/Select/Select";
+/* import file from ".././certificado_movimiento.pdf";
+import file2 from ".././ced.pdf";
+import file3 from ".././rut.pdf"; */
 // import file from ".././certificado_movimiento.pdf";
 // import file2 from ".././ced.pdf";
 // import file3 from ".././rut.pdf";
@@ -28,6 +32,8 @@ const VerificacionFormulario = () => {
     titulosSecundarios,
     valores,
     contenedorBotones,
+    contenedorPrincipalBotones,
+    contenedorCausalRechazo,
     contenedorImagenPDP,
   } = classes;
   const [datosParams, setDatosParams] = useState(0);
@@ -36,19 +42,16 @@ const VerificacionFormulario = () => {
   const [asesorComercialLocalidad, setAsesorComercialLocalidad] = useState("");
   const [codigoLocalidad, setCodigoLocalidad] = useState("");
   const [tipoZona, setTipoZona] = useState("");
-  const params = useParams();
-  /*  useEffect(() => {
-    fetch(
-      `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` `http://conexion-reconoserid-dev.us-east-2.elasticbeanstalk.com/actualizacionestado` 
-    )
-      .then((response) => response.json())
-      .then((respuesta) => setDatosParams(respuesta.obj.results));
-  }, []); */
+  const [guardarDatosAsesor, setGuardarDatosAsesor] = useState(false);
+  const [urlPdfs, setUrlPdfs] = useState({});
+  const [causal, setCausal] = useState("");
 
+  const params = useParams();
   useEffect(() => {
     /* const updateWidth = () => { */
+
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */
     )
       .then((response) => response.json())
@@ -64,6 +67,22 @@ const VerificacionFormulario = () => {
 
   console.log(datosParams);
 
+  useEffect(() => {
+    if (datosParams?.length > 0) {
+      /* console.log(typeof  datosParams[0]["id_proceso"].toString()); */
+      const datos = {
+        id_proceso: datosParams[0]["id_proceso"].toString(),
+      };
+      fetch(
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile?id_proceso=${datos["id_proceso"]}`
+      )
+        .then((res) => res.json())
+        .then((respuesta) => {
+          console.log(respuesta.obj["rut"]);
+          setUrlPdfs(respuesta.obj);
+        });
+    }
+  }, [datosParams]);
   const aprobacionFormulario = (e) => {
     e.preventDefault();
     const datos = {
@@ -71,7 +90,7 @@ const VerificacionFormulario = () => {
       validation_state: "101",
     };
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
         method: "PUT",
         headers: {
@@ -95,7 +114,7 @@ const VerificacionFormulario = () => {
       validation_state: "102",
     };
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com//actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
         method: "PUT",
         headers: {
@@ -121,9 +140,10 @@ const VerificacionFormulario = () => {
       asesor_comercial_localidad: asesorComercialLocalidad,
       cod_localidad: codigoLocalidad,
       tipozona: tipoZona,
+      causal_rechazo: causal,
     };
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
         method: "PUT",
         headers: {
@@ -135,14 +155,15 @@ const VerificacionFormulario = () => {
       .then((res) => res.json())
       .then((respuesta) => console.log(respuesta.obj.data));
     alert("Los Datos Del Usuario Han Sido Actualizados");
+    setGuardarDatosAsesor(true);
   };
 
   return (
     <div>
       {datosParams ? (
         <Form
-          /* gird={false} */
-          grid
+        /*   flex={false} */
+        /*  grid */
         >
           <Input
             label={"Nombre Comercio"}
@@ -196,10 +217,19 @@ const VerificacionFormulario = () => {
                 name="comissionType"
                 label={`Cod Localidad`}
                 options={{
-                  "": "",
+                  "No Aplica": "No Aplica",
                   "01 Kennedy": "01 Kennedy",
                   "02 Engativa": "02 Engativa",
                   "03 Bosa": "03 Bosa",
+                  "04 Ciudad Bolivar": "04 Ciudad Bolivar",
+                  "05 Suba": "05 Suba",
+                  "06 Usaquen": "06 Usaquen",
+                  "07 Usme": "07 Usme",
+                  "08 Rafael Uribe Uribe": "08 Rafael Uribe Uribe",
+                  "09 Puente Aranda": "09 Puente Aranda",
+                  "10 Fontibon": "10 Fontibon",
+                  "11 San Cristobal": "11 San Cristobal",
+                  "11 San Cristobal": "11 San Cristobal",
                 }}
               ></Select>
             )}
@@ -403,37 +433,126 @@ const VerificacionFormulario = () => {
           {/* <Sample file={file2}></Sample>
           <Sample file={file2}></Sample>
           <Sample file={file3}></Sample> */}
+          <Fieldset className={"lg:col-span-2"}>
+            <div
+              className="w-full h-120 " /* style={{ width: "100%", height: "100%" }} */
+            >
+              {true ? (
+                <object
+                  // data={`data:application/pdf;base64,${archivo}`}
+                  data={`${urlPdfs["cc"]}`}
+                  type="application/pdf"
+                  width="100%"
+                  height="100%"
+                ></object>
+              ) : (
+                ""
+              )}
+            </div>
+            <div
+              className="w-full h-120  " /* style={{ width: "100%", height: "100%" }} */
+            >
+              {true ? (
+                <object
+                  // data={`data:application/pdf;base64,${archivo}`}
+                  data={`${urlPdfs["rut"]}`}
+                  type="application/pdf"
+                  width="100%"
+                  height="100%"
+                ></object>
+              ) : (
+                ""
+              )}
+            </div>
+          </Fieldset>
+          <Fieldset>
+            <div className={contenedorCausalRechazo}>
+              <h2>
+                Si el Comercio no cumple con los requisitos, por favor agrege un
+                causal de rechazo.
+              </h2>
+              <TextArea
+                className={"flex lg:row-span-0"}
+                type="input"
+                minLength="1"
+                maxLength="160"
+                autoComplete="off"
+                value={causal}
+                info={`Cantidad de caracteres: ${causal.length}`}
+                onInput={(e) => {
+                  setCausal(e.target.value);
+                }}
+              ></TextArea>
+            </div>
+          </Fieldset>
 
-          <div className={contenedorBotones}>
-            <Button
-              type="submit"
-              onClick={(e) => {
-                aprobacionFormulario(e);
-              }}
-            >
-              Aprobar Comercio
-            </Button>
-          </div>
+          <div>
+            {guardarDatosAsesor ? (
+              <div className={contenedorPrincipalBotones}>
+                <div className={contenedorBotones}>
+                  <Button
+                    type="submit"
+                    onClick={(e) => {
+                      aprobacionFormulario(e);
+                    }}
+                  >
+                    Aprobar Comercio
+                  </Button>
+                </div>
 
-          <div className={contenedorBotones}>
-            <Button
-              type="submit"
-              onClick={(e) => {
-                guardarDatos(e);
-              }}
-            >
-              Guardar Datos
-            </Button>
-          </div>
-          <div className={contenedorBotones}>
-            <Button
-              type="submit"
-              onClick={(e) => {
-                rechazarFormulario(e);
-              }}
-            >
-              Rechazar Comercio
-            </Button>
+                <div className={contenedorBotones}>
+                  <Button
+                    type="submit"
+                    onClick={(e) => {
+                      rechazarFormulario(e);
+                    }}
+                  >
+                    Rechazar Comercio
+                  </Button>
+                </div>
+              </div>
+            ) : datosParams[0]["tipozona"] &&
+              datosParams[0]["unidad_negocio"] &&
+              datosParams[0]["responsable"] &&
+              datosParams[0]["cod_localidad"] &&
+              datosParams[0]["asesor_comercial_localidad"] &&
+              datosParams[0]["asesor_comercial_localidad"] &&
+              datosParams[0]["asesor"] ? (
+              <div>
+                <div className={contenedorBotones}>
+                  <Button
+                    type="submit"
+                    onClick={(e) => {
+                      aprobacionFormulario(e);
+                    }}
+                  >
+                    Aprobar Comercio
+                  </Button>
+                </div>
+
+                <div className={contenedorBotones}>
+                  <Button
+                    type="submit"
+                    onClick={(e) => {
+                      rechazarFormulario(e);
+                    }}
+                  >
+                    Rechazar Comercio
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className={contenedorBotones}>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    guardarDatos(e);
+                  }}
+                >
+                  Guardar Datos
+                </Button>
+              </div>
+            )}
           </div>
         </Form>
       ) : (

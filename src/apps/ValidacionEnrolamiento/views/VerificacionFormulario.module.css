@@ -38,7 +38,18 @@
   margin-left: 3vw;
   font-size: large;
 }
+.contenedorPrincipalBotones {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
 .contenedorBotones {
   display: flex;
   justify-content: center;
+}
+.contenedorCausalRechazo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

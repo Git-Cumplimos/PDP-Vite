@@ -11,8 +11,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
 import { notifyError } from "../utils/notify";
 
-const urlLog = `${process.env.REACT_APP_URL_LOGIN}/login`;
-const urlQuota = `${process.env.REACT_APP_URL_LOGIN}/cupo`;
+const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
+const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
@@ -39,7 +39,9 @@ const fetchDane = async (codigo_dane) => {
       {
         c_digo_dane_del_municipio: codigo_dane,
       },
-      {}
+      {},
+      {},
+      false,
     );
     return resp_ciudad[0].municipio;
   } catch (err) {}
@@ -55,7 +57,6 @@ const fetchOficinaLoteria = async (id_comercio) => {
       },
       {}
     );
-    console.log(resp_cod)
     if (!("msg" in resp_cod)) {
       return {
         cod_oficina_lot: resp_cod.cod_oficina_lot,

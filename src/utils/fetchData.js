@@ -5,7 +5,8 @@ const fetchData = async (
   method = "GET",
   queries = {},
   data = {},
-  headers = {}
+  headers = {},
+  authenticate = true
 ) => {
   if (!["GET", "POST", "PUT", "DELETE"].includes(method)) {
     throw new Error("Method not suported");
@@ -35,13 +36,16 @@ const fetchData = async (
     url += `?${queries}`;
   }
 
-  const fetchOptions = {
-    method: method,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session?.idToken?.jwtToken}`,
-      ...headers,
-    },
+  const fetchOptions = { method: method };
+  const _headers = {
+    "Content-Type": "application/json",
+  };
+  if (authenticate) {
+    _headers.Authorization = `Bearer ${session?.idToken?.jwtToken}`;
+  }
+  fetchOptions.headers = {
+    ..._headers,
+    ...headers,
   };
   if (method === "POST" || method === "PUT") {
     fetchOptions.body = JSON.stringify(data);

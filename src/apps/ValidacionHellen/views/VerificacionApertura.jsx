@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../../components/Base/Button/Button";
 import Fieldset from "../../../components/Base/Fieldset/Fieldset";
 import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
 import Select from "../../../components/Base/Select/Select";
-import classes from "../../Validacion Enrolamiento/views/VerificacionFormulario.module.css";
+import classes from "../../ValidacionHellen/views/VerificacionApertura.module.css";
+import { notify } from "../../../utils/notify";
 
 const VerificacionApertura = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const VerificacionApertura = () => {
     titulosSecundarios,
     valores,
     contenedorBotones,
-    contenedorImagenPDP,
+    contenedorPrincipalBotones,
   } = classes;
   const [datosParams, setDatosParams] = useState(0);
   const [personaResponsable, setPersonaResponsable] = useState("");
@@ -26,6 +27,7 @@ const VerificacionApertura = () => {
   const [codigoLocalidad, setCodigoLocalidad] = useState("");
   const [tipoZona, setTipoZona] = useState("");
   const [datosReconoserID, setDatosReconoserID] = useState([]);
+  const [urlPdfs, setUrlPdfs] = useState({});
   const params = useParams();
   useEffect(() => {
     if (datosParams?.length > 0) {
@@ -34,7 +36,7 @@ const VerificacionApertura = () => {
         procesoConvenioGuid: datosParams[0]["id_reconocer"],
       };
       fetch(
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/consultavalidacion`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/consultavalidacion`,
         {
           method: "POST",
           headers: {
@@ -47,13 +49,13 @@ const VerificacionApertura = () => {
         .then((respuesta) => setDatosReconoserID(respuesta.obj.data));
     }
   }, [datosParams]);
-  console.log(datosReconoserID);
+  /* console.log(datosReconoserID); */
 
   useEffect(() => {
     /* const updateWidth = () => { */
 
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */
     )
       .then((response) => response.json())
@@ -67,7 +69,23 @@ const VerificacionApertura = () => {
     /*   window.addEventListener("resize", updateWidth); */
   }, []);
 
-  console.log(datosParams);
+  /*   console.log(datosParams); */
+
+  useEffect(() => {
+    if (datosParams?.length > 0) {
+      /* console.log(typeof  datosParams[0]["id_proceso"].toString()); */
+      const datos = {
+        id_proceso: datosParams[0]["id_proceso"].toString(),
+      };
+      fetch(
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile?id_proceso=${datos["id_proceso"]}`
+      )
+        .then((res) => res.json())
+        .then((respuesta /* console.log(respuesta) */) =>
+          setUrlPdfs(respuesta.obj)
+        );
+    }
+  }, [datosParams]);
 
   const aprobacionFormulario = (e) => {
     e.preventDefault();
@@ -76,7 +94,7 @@ const VerificacionApertura = () => {
       validation_state: "201",
     };
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
         method: "PUT",
         headers: {
@@ -87,10 +105,10 @@ const VerificacionApertura = () => {
     )
       .then((res) => res.json())
       .then((respuesta) => console.log(respuesta.obj.data));
-    alert("El Usuario ha sido Aprobado para ReconoserID");
+    notify("El Usuario ha sido Aprobado para ReconoserID");
     setTimeout(
-      () => navigate("/Solicitud-enrolamiento/validarformulario"),
-      2500
+      () => navigate("/Solicitud-enrolamiento/validarformularioreconoserid"),
+      3000
     );
   };
   const rechazarFormulario = (e) => {
@@ -100,7 +118,7 @@ const VerificacionApertura = () => {
       validation_state: "202",
     };
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
         method: "PUT",
         headers: {
@@ -111,43 +129,19 @@ const VerificacionApertura = () => {
     )
       .then((res) => res.json())
       .then((respuesta) => console.log(respuesta.obj.data));
-    alert("El Usuario ha sido Rechazado para ReconoserID");
+    notify("El Usuario ha sido Rechazado para ReconoserID");
     setTimeout(
-      () => navigate("/Solicitud-enrolamiento/validarformulario"),
-      2500
+      () => navigate("/Solicitud-enrolamiento/validarformularioreconoserid"),
+      3000
     );
-  };
-
-  const guardarDatos = (e) => {
-    e.preventDefault();
-    const datos = {
-      responsable: personaResponsable,
-      unidad_negocio: unidadNegocio,
-      asesor_comercial_localidad: asesorComercialLocalidad,
-      cod_localidad: codigoLocalidad,
-      tipozona: tipoZona,
-    };
-    fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?id_proceso=${params.id}`,
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
-      }
-    )
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
-    alert("Los Datos Del Usuario Han Sido Actualizados");
   };
 
   return (
     <div>
       {datosParams ? (
         <Form
-          /* gird={false} */
-          grid
+        /* gird={false} */
+        /* grid */
         >
           <Input
             label={"Nombre Comercio"}
@@ -432,42 +426,64 @@ const VerificacionApertura = () => {
               ></Select>
             )}
           </Fieldset>
-
-          <div className={contenedorBotones}>
-            <Button
-              type="submit"
-              onClick={(e) => {
-                aprobacionFormulario(e);
-              }}
+          <Fieldset className={"lg:col-span-2"}>
+            <div
+              className="w-full h-120" /* style={{ width: "100%", height: "100%" }} */
             >
-              Aprobar ReconoserID
-            </Button>
-          </div>
-
-          {/* <div className={contenedorBotones}>
-            <Button
-              type="submit"
-              onClick={(e) => {
-                guardarDatos(e);
-              }}
+              {true ? (
+                <object
+                  // data={`data:application/pdf;base64,${archivo}`}
+                  data={`${urlPdfs["cc"]}`}
+                  type="application/pdf"
+                  width="100%"
+                  height="100%"
+                ></object>
+              ) : (
+                ""
+              )}
+            </div>
+            <div
+              className="w-full h-120" /* style={{ width: "100%", height: "100%" }} */
             >
-              Guardar Datos
-            </Button>
-          </div> */}
-          <div className={contenedorBotones}>
-            <Button
-              type="submit"
-              onClick={(e) => {
-                rechazarFormulario(e);
-              }}
-            >
-              Rechazar ReconoserID
-            </Button>
-          </div>
+              {true ? (
+                <object
+                  // data={`data:application/pdf;base64,${archivo}`}
+                  data={`${urlPdfs["rut"]}`}
+                  type="application/pdf"
+                  width="100%"
+                  height="100%"
+                ></object>
+              ) : (
+                ""
+              )}
+            </div>
+          </Fieldset>
         </Form>
       ) : (
         ""
       )}
+      <div className={contenedorPrincipalBotones}>
+        <div className={contenedorBotones}>
+          <Button
+            type="submit"
+            onClick={(e) => {
+              aprobacionFormulario(e);
+            }}
+          >
+            Aprobar ReconoserID
+          </Button>
+        </div>
+        <div className={contenedorBotones}>
+          <Button
+            type="submit"
+            onClick={(e) => {
+              rechazarFormulario(e);
+            }}
+          >
+            Rechazar ReconoserID
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

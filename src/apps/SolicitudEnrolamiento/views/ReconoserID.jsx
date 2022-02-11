@@ -4,6 +4,7 @@ import Form from "../../../components/Base/Form/Form";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
+import classes from "./ReconoserID.module.css";
 
 const ReconoserID = () => {
   const [procesoConvenioGuid, setProcesoConvenioGuid] = useState("");
@@ -13,9 +14,11 @@ const ReconoserID = () => {
   let navigate = useNavigate();
   const params = useParams();
   /* console.log(params.numCedula); */
+
+  const { ContenedorPrincipal } = classes;
   useEffect(() => {
     fetch(
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/actualizacionestado?numDoc=${params.numCedula}`
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${params.numCedula}`
     )
       .then((res) => res.json())
       .then((respuesta) => setDatosUsuario(respuesta.obj.results));
@@ -29,7 +32,7 @@ const ReconoserID = () => {
         id_reconocer: procesoConvenioGuid,
       };
       fetch(
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosUsuario[0]["id_proceso"]}`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/idreconocer?id_proceso=${datosUsuario[0]["id_proceso"]}`,
         {
           method: "PUT",
           headers: {
@@ -89,7 +92,7 @@ const ReconoserID = () => {
       };
 
       fetch(
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/solicitudvalidacion`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/solicitudvalidacion`,
         /* `http://127.0.0.1:5000/solicitudvalidacion` */
         {
           method: "POST",
@@ -109,30 +112,31 @@ const ReconoserID = () => {
   }, [datosUsuario]);
 
   return (
-    <Form grid={true} className="flex flex-col justify-center items-center">
-      {/*       <Button type={"submit"} onClick={(e) => comenzarValidacion(e)}>
+    <Form grid={true}>
+      <div className={ContenedorPrincipal}>
+        {/*       <Button type={"submit"} onClick={(e) => comenzarValidacion(e)}>
         comenzar validacion
       </Button> */}
-
-      {procesoConvenioGuid ? (
-        <iframe
-          src={`https://demorcs.olimpiait.com:6319/#/redirect/${procesoConvenioGuid}`}
-          /* src="https://demorcs.olimpiait.com:6319/#/redirect/abe5e217-d3e3-4922-89cd-efd53ec473cd" */
-          className="border-2 border-blueGray-900 "
-          allow="camera"
-          title="iframe Example 1"
-          frameBorder="0"
-          border="0"
-          cellSpacing="0"
-          width="60%"
-          height="650"
-        >
-          <p>Your browser does not support iframes.</p>
-        </iframe>
-      ) : (
-        ""
-      )}
-      {isSuccess ? <h1>hola mundo</h1> : ""}
+        {procesoConvenioGuid ? (
+          <iframe
+            src={`https://demorcs.olimpiait.com:6319/#/redirect/${procesoConvenioGuid}`}
+            /* src="https://demorcs.olimpiait.com:6319/#/redirect/abe5e217-d3e3-4922-89cd-efd53ec473cd" */
+            className="border-2 border-blueGray-900 "
+            allow="camera"
+            title="iframe Example 1"
+            frameBorder="0"
+            border="0"
+            cellSpacing="0"
+            width="60%"
+            height="650"
+          >
+            <p>Your browser does not support iframes.</p>
+          </iframe>
+        ) : (
+          ""
+        )}
+        {isSuccess ? <h1>hola mundo</h1> : ""}
+      </div>
     </Form>
   );
 };

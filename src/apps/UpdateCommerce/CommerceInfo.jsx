@@ -46,7 +46,7 @@ const ViewUbication = ({ location }) => {
   );
 };
 
-const url_form = process.env.REACT_APP_URL_FORM_COMMERCE;
+const url_form = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 const CommerceInfo = () => {
   const [page, setPage] = useState(1);

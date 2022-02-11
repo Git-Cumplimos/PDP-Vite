@@ -97,7 +97,6 @@ const LocationForm = ({ place = "", location }) => {
           id={`buscar_${place}`}
           label="Busqueda por municipio"
           type="search"
-          minLength="4"
           autoComplete="off"
           value={simpleSearch}
           onInput={(e) => setSimpleSearch(capitalize(e.target.value))}
@@ -105,13 +104,21 @@ const LocationForm = ({ place = "", location }) => {
             callback: (e) => {
               const query = capitalize(e.target.value);
               if (query.length > 1) {
-                fetchData(url, "GET", {
-                  $where: `municipio LIKE '%${query}%'`,
-                  $limit: 5,
-                })
+                fetchData(
+                  url,
+                  "GET",
+                  {
+                    $where: `municipio LIKE '%${query}%'`,
+                    $limit: 5,
+                  },
+                  {},
+                  {},
+                  false
+                )
                   .then((res) => {
                     setFoundMuni(res);
-                  }).catch(() => {})
+                  })
+                  .catch(() => {});
               } else {
                 setFoundMuni([]);
               }

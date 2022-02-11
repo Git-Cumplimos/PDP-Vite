@@ -7,7 +7,7 @@ import Select from "../../../../components/Base/Select/Select";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 
-const url_types = process.env.REACT_APP_URL_TYPES_FORM_COMMERCE;
+const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
 const UserForm = ({ onCloseModal }) => {

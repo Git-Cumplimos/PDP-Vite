@@ -10,37 +10,12 @@ import fetchData from "../../../utils/fetchData";
 //import Loteria from "../Views/Loteria";
 
 const urls = {
-
-  // ordinario: `${process.env.REACT_APP_URL_LOTO1}/consultas_loteria`,
-  // ordinariofisico: `${process.env.REACT_APP_URL_LOTO1}/consultas_loteria_fisica`, 
-  // ventaOrdinario: `${process.env.REACT_APP_URL_LOTO_VENTA}/venta`,
-  // ventaOrdinariofisica: `${process.env.REACT_APP_URL_LOTO_VENTA}/ventafisica`,
-  // moda: `${process.env.REACT_APP_URL_LOTO_MODA}/consurepmasbusca`,
-  // con_distribuidor_venta:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_distribuidores`,
-  // ventasReportes: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`,
-  // pagosReportes:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_pago_premios`,
-  // con_sort_ventas:`${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_sort_vendidos`,   
-  // consultaPago: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/pagodepremios`,
-  // premiohash: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/hash`,
-  // premiofisico: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/fisico`,
-  // pagopremio: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/premios_pagados`,
-  // pagopremiofisico: `${process.env.REACT_APP_URL_LOTO_PREMIOS}/premios_pagados1`,
-  // ConsultaCrearSort: `${process.env.REACT_APP_LOTO_SORTEOS}/consulta_sorteos`,
-  // CambiarSort: `${process.env.REACT_APP_LOTO_SORTEOS}/sorteo`, 
-  // EstadoArchivos: `${process.env.REACT_APP_URL_LOTO1}/logs`,
-  // cargueVentasExtra_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reporteVentaExtra_S3`, ////////
-  // con_SortVentas_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/con_sort`, ////////
-  // descargaVentas_S3: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/descarga_reportes_S3`, ////////
-  // reportVentas: `${process.env.REACT_APP_URL_LOTO_VENTA_REPORTES}/reportes_ventas`,
-
   ordinario: `${process.env.REACT_APP_URL_LOTERIAS}/billeteriaVirtual`,
   ordinariofisico: `${process.env.REACT_APP_URL_LOTERIAS}/billeteriaFisica`,
   EstadoArchivos: `${process.env.REACT_APP_URL_LOTERIAS}/logs`,
 
   ventaOrdinario: `${process.env.REACT_APP_URL_LOTERIAS}/venta`,
   ventaOrdinariofisica: `${process.env.REACT_APP_URL_LOTERIAS}/ventafisica`,
-
-  //moda: `${process.env.REACT_APP_URL_LOTO_MODA}/consurepmasbusca`,//// NO esta en uso
 
   reportVentas: `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`, 
   con_sort_ventas:`${process.env.REACT_APP_URL_LOTERIAS}/con_sort_vendidos`, 
