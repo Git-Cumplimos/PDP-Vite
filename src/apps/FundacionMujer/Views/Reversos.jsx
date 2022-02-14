@@ -13,6 +13,7 @@ import Tickets from "../../../components/Base/Tickets/Tickets";
 import Table from "../../../components/Base/Table/Table";
 import useForm from "../../../hooks/useForm";
 import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
+import TextArea from "../../../components/Base/TextArea/TextArea";
 import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
 
 const Reversos = () => {
@@ -38,6 +39,7 @@ const Reversos = () => {
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [trxs, setTrxs] = useState([]);
+  const [motivo, setMotivo] = useState('');
 
   const [data, handleChange] = useForm({
     credit: "",
@@ -101,11 +103,14 @@ const Reversos = () => {
       if (state !== undefined || state !== null) {
         queries.response_status = state;
       }
-
+      console.log(queries)
       fetchData(url, "GET", queries)
         .then((res) => {
           console.log(res);
           if (res?.status) {
+            if (res?.obj?.trxs.length<1){
+              notifyError('No se encontraron transacciones en el rango de fechas')
+            }
             setMaxPages(res?.obj?.maxpages);
             setTrxs(res?.obj?.trxs);
           } else {
@@ -116,28 +121,41 @@ const Reversos = () => {
     },
     []
   );
-
+  console.log(selected)
   const tickets = useMemo(() => {
     return {
       title: "Recibo de pago(Reverso recaudo)",
       timeInfo: {
-        "Fecha de pago": "Fecha de pago",
-        Hora: "Hora",
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: false,
+        }).format(new Date()),
       },
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
-        "Id Trx": "Id devuelto cuando se ingresa el recibo",
+        "Id Trx": selected.id_transaccion,
         "Id Confirmación": "Id FDLM",
       }),
       commerceName: "FUNDACIÓN DE LA MUJER",
-      trxInfo: Object.entries({
-        CRÉDITO: "",
-        VALOR: "$123.456",
-      }),
-      disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+      trxInfo: [
+        ['CRÉDITO', selected?.Response_obj?.info?.credito],
+        ['VALOR', formatMoney.format(value)],
+        ['Cliente', selected?.Response_obj?.info?.cliente],
+        ["",""],
+        ['Cédula', selected?.Response_obj?.info?.cedula],
+        ["",""]  
+      ],
+      disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [
     roleInfo?.ciudad,
@@ -164,26 +182,27 @@ const Reversos = () => {
       comercio: roleInfo?.id_comercio,
       idtrx: selected?.id_transaccion,
       val: value,
+      motivo:motivo,
       ...data,
     };
     console.log(values);
     ingresoreversorecibo(values)
       .then((res) => {
         console.log(res);
-        notify("Reverso aplicado dentro de Punto De Pago y FDLM");
         setTicket(true);
         if (res?.status === false) {
           setTicket(false);
           console.log(res);
-          if (res?.codigo === 420) {
-            notifyError(
-              "Reverso ya aplicado a el respectivo ID de transacción"
-            );
-          } else {
-            notifyError(
-              "Consulte soporte, servicio de Fundación de la mujer presenta fallas"
-            );
-          }
+          notifyError(res?.obj?.Mensaje)
+          // if (res?.codigo === 420) {
+          //   notifyError(
+          //     "Reverso ya aplicado a el respectivo ID de transacción"
+          //   );
+          // } else {
+          //   notifyError(
+          //     "Consulte soporte, servicio de Fundación de la mujer presenta fallas"
+          //   );
+          // }
         }
       })
       .catch((err) => {
@@ -203,7 +222,7 @@ const Reversos = () => {
           onInput={(e) => {
             setFechaInicial(e.target.value);
             if (fechaFinal !== "") {
-              reversosFDLM(page, comercio, 5, e.target.value, fechaFinal, true);
+              reversosFDLM(page, roleInfo?.id_comercio, 5, e.target.value, fechaFinal, true);
             }
           }}
         />
@@ -217,7 +236,7 @@ const Reversos = () => {
             if (fechaFinal !== "") {
               reversosFDLM(
                 page,
-                comercio,
+                roleInfo?.id_comercio,
                 5,
                 fechaInicial,
                 e.target.value,
@@ -226,7 +245,7 @@ const Reversos = () => {
             }
           }}
         />
-        <Input
+        {/* <Input
           id="nroComercio"
           label="ID Comercio"
           type="text"
@@ -244,7 +263,7 @@ const Reversos = () => {
               );
             }
           }}
-        />
+        /> */}
       </Form>
       <Modal show={showModal} handleClose={() => closeModal()}>
         {ticket !== false ? (
@@ -319,6 +338,17 @@ const Reversos = () => {
                   value={data?.reference ?? ""}
                   onInput={handleChange}
                 ></Input>
+                <TextArea
+                id="motivo"
+                label="Motivo"
+                type="text"
+                autoComplete="off"
+                value={motivo}
+                required
+                onInput={(e) => {
+                    setMotivo(e.target.value)          
+                }}                 
+                /> 
                 <ButtonBar>
                   <Button type="submit">Aceptar</Button>
                 </ButtonBar>
@@ -345,7 +375,7 @@ const Reversos = () => {
                   5,
                   fechaInicial,
                   fechaFinal,
-                  false
+                  true
                 );
               }}
             >
@@ -362,7 +392,7 @@ const Reversos = () => {
                   5,
                   fechaInicial,
                   fechaFinal,
-                  false
+                  true
                 );
               }}
             >

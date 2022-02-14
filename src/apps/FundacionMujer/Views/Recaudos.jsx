@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef, useMemo } from "react";
+import { useCallback, useState, useRef, useMemo, useEffect } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../components/Base/Form/Form";
@@ -42,6 +42,7 @@ const Recaudo = () => {
   const [ticket, setTicket] = useState(false);
   const [selected, setSelected] = useState(true);
   const [showModal, setShowModal] = useState("");
+  const [response, setResponse] = useState("");
   const { roleInfo } = useAuth();
   const notify = (msg) => {
     toast.info(msg, {
@@ -77,30 +78,52 @@ const Recaudo = () => {
     return {
       title: "Recibo de pago(Recaudo)",
       timeInfo: {
-        "Fecha de pago": "Fecha de pago",
-        Hora: "Hora",
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: false,
+        }).format(new Date()),
       },
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
-        "Id Trx": "Id devuelto cuando se ingresa el recibo",
-        "Id Confirmación": "Id FDLM",
+        "Id Trx": response.id_trx,
+        "Id Confirmación": response.Confirmacion,
       }),
       commerceName: "FUNDACIÓN DE LA MUJER",
-      trxInfo: Object.entries({
-        CRÉDITO: "",
-        VALOR: "$123.456",
-      }),
-      disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+      trxInfo: [
+        ['CRÉDITO', selected?.Credito],
+        ['VALOR', formatMoney.format(formatMon)],
+        ['Cliente', selected?.Cliente],
+        ["",""],
+        ['Cédula', selected?.Cedula],
+        ["",""]  
+      ],
+      disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [
     roleInfo?.ciudad,
     roleInfo?.direccion,
     roleInfo?.id_comercio,
     roleInfo?.id_dispositivo,
+    response,
+    formatMon,
+    table
   ]);
+
+  const { infoTicket } = useAuth();
+
+  useEffect(() => {
+    infoTicket(response?.id_trx, 5, tickets);
+  }, [infoTicket, response]);
 
   const printDiv = useRef();
 
@@ -113,6 +136,8 @@ const Recaudo = () => {
     setShowModal(false);
     setDisabledBtn(false);
     setFormatMon("");
+    setCreditStatus(false)
+    setInfo('');
   }, []);
 
   const bankCollection = (e) => {
@@ -123,22 +148,27 @@ const Recaudo = () => {
       Tipo: roleInfo?.tipo_comercio,
       Usuario: roleInfo?.id_usuario,
       Comercio: roleInfo?.id_comercio,
-      Credito: table[0]?.Credito,
+      Credito: selected?.Credito,
       Depto: roleInfo?.codigo_dane.slice(0, 2),
       Municipio: roleInfo?.codigo_dane.slice(2),
       Valor: parseFloat(formatMon),
       referenciaPago: referencia,
+      cliente: selected?.Cliente,
+      cedula: selected?.Cedula,
+      nombre_comercio:roleInfo?.['nombre comercio']
+
     };
+    console.log(body)
     ingresorecibo(body)
       .then((res) => {
-        if (res?.obj?.Confirmacion != -1) {
+        if (res?.status==true) {
           console.log(res);
+          setResponse(res?.obj)
           setTicket(true);
           setStop(false);
         } else {
-          notifyError(
-            "El crédito no pudo ser recaudado, error al realizar el proceso"
-          );
+          console.log(res)
+          notifyError(res?.obj?.Mensaje);
           setStop(false);
         }
       })
@@ -152,7 +182,7 @@ const Recaudo = () => {
     e.preventDefault();
     setDisabledBtn(true);
     setCreditStatus(false);
-    setShowModal(false);
+    setInfo('');
     const user = {
       Comercio: roleInfo?.id_comercio,
       Depto: roleInfo?.codigo_dane.slice(0, 2),
@@ -203,7 +233,7 @@ const Recaudo = () => {
       })
       .catch((err) => console.log("error", err));
   };
-
+  console.log(roleInfo?.['nombre comercio'])
   return (
     <>
       <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
@@ -324,7 +354,6 @@ const Recaudo = () => {
                   required
                   value={formatMon}
                   onInput={(e, valor) => {
-                    console.log(valor);
                     const num = valor || "";
                     setFormatMon(num);
                   }}

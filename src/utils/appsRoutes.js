@@ -63,6 +63,7 @@ const MarketPlace = lazy(() => import("../apps/MarketPlace/MarketPlace"));
 const FunMujer = lazy(() => import("../apps/FundacionMujer/FunMujer"));
 const recMujer = lazy(() => import("../apps/FundacionMujer/Views/Recaudos"));
 const revMujer = lazy(() => import("../apps/FundacionMujer/Views/Reversos"));
+const reportFDLM = lazy(() => import("../apps/FundacionMujer/Views/Reporte"));
 
 /**
  * IAM
@@ -336,20 +337,26 @@ const allUrlsPrivateApps = [
     link: "/funmujer",
     label: <AppIcons Logo={"RECAUDO"} name="Fundación de la mujer" />,
     component: FunMujer,
-    permission: [3],
+    permission: [17, 27, 28],
     provider: ProvideFundamujer,
     subRoutes: [
       {
         link: "/funmujer/recaudo",
         label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
         component: recMujer,
-        permission: [3],
+        permission: [17],
       },
       {
         link: "/funmujer/reversorecaudo",
         label: <AppIcons Logo={"RECAUDO"} name={"Reverso Manual"} />,
         component: revMujer,
-        permission: [3],
+        permission: [27],
+      },
+      {
+        link: "/funmujer/reporte",
+        label: <AppIcons Logo={"RECAUDO"} name={"Reporte"} />,
+        component: reportFDLM,
+        permission: [28],
       },
     ],
   },
