@@ -15,10 +15,10 @@ const fetchData = async (
   try {
     session = await Auth.currentSession();
   } catch (err) {
-    throw new Error("No user autenticated");
+    throw new Error(`No user autenticated: ${err}`);
   }
   if (!session) {
-    throw new Error("No user autenticated session");
+    throw new Error("No session for autenticated user");
   }
 
   if ("URLSearchParams" in window) {
