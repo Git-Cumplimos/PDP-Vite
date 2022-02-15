@@ -12,13 +12,15 @@ const fetchData = async (
     throw new Error("Method not suported");
   }
   let session = null;
-  try {
-    session = await Auth.currentSession();
-  } catch (err) {
-    throw new Error(`No user autenticated: ${err}`);
-  }
-  if (!session) {
-    throw new Error("No session for autenticated user");
+  if (authenticate) {
+    try {
+      session = await Auth.currentSession();
+    } catch (err) {
+      throw new Error(`No user autenticated: ${err}`);
+    }
+    if (!session) {
+      throw new Error("No session for autenticated user");
+    }
   }
 
   if ("URLSearchParams" in window) {
