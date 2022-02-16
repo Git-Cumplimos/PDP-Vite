@@ -32,7 +32,7 @@ const ReconoserID = () => {
         id_reconocer: procesoConvenioGuid,
       };
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/idreconocer?id_proceso=${datosUsuario[0]["id_proceso"]}`,
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/edit-reconoserid?id_proceso=${datosUsuario[0]["id_proceso"]}`,
         {
           method: "PUT",
           headers: {
@@ -92,7 +92,7 @@ const ReconoserID = () => {
       };
 
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/solicitudvalidacion`,
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/solicitud-validacion-reconoserid`,
         /* `http://127.0.0.1:5000/solicitudvalidacion` */
         {
           method: "POST",

@@ -17,7 +17,7 @@ import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import sendFormData from "../../../utils/sendFormData";
 
-const url = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actividad`;
+const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
 
 const FormularioEnrolamiento = () => {
   const {
@@ -54,6 +54,7 @@ const FormularioEnrolamiento = () => {
 
   const [archivos1, setArchivos1] = useState([]);
   const [archivos2, setArchivos2] = useState([]);
+  const [archivos3, setArchivos3] = useState([]);
 
   const onFileChange = useCallback((files) => {
     if (Array.isArray(Array.from(files))) {
@@ -66,6 +67,12 @@ const FormularioEnrolamiento = () => {
     if (Array.isArray(Array.from(files))) {
       files = Array.from(files);
       setArchivos2(files);
+    }
+  }, []);
+  const onFileChange3 = useCallback((files) => {
+    if (Array.isArray(Array.from(files))) {
+      files = Array.from(files);
+      setArchivos3(files);
     }
   }, []);
   const handleSubmit = useCallback(
@@ -110,7 +117,7 @@ const FormularioEnrolamiento = () => {
         responsable: "",
       };
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/iniciarproceso`,
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/iniciar-proceso-enrolamiento`,
 
         {
           method: "POST",
@@ -130,6 +137,8 @@ const FormularioEnrolamiento = () => {
 
           formData.set("cc", archivos2[0]);
 
+          formData.set("camaracomercio", archivos3[0]);
+
           formData.set("numdoc", numDocumento);
 
           formData.set("id_proceso", respuesta.body.id_proceso);
@@ -140,7 +149,7 @@ const FormularioEnrolamiento = () => {
           console.log(Object.fromEntries(formData.entries()));
 
           fetch(
-            `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/uploadfile`,
+            `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/upload-file`,
 
             {
               method: "POST",
@@ -183,7 +192,7 @@ const FormularioEnrolamiento = () => {
           ); */
         });
     },
-    [archivos1, archivos2]
+    [archivos1, archivos2, archivos3]
   );
   const capitalize = (word) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
@@ -442,7 +451,7 @@ const FormularioEnrolamiento = () => {
                   if (idx === 0) return "Numero de celular";
                   else return `Numero de celular adicional ${idx}`;
                 }}
-                max={3}
+                max={0}
                 required
               />
 
@@ -452,7 +461,7 @@ const FormularioEnrolamiento = () => {
                   if (idx === 0) return "Correo electronico";
                   else return `Correo electronico adicional ${idx}`;
                 }}
-                max={3}
+                max={0}
                 type={"email"}
                 required
               />
@@ -476,6 +485,12 @@ const FormularioEnrolamiento = () => {
               <FileInput
                 label={"Elige el archivo de la CC"}
                 onGetFile={onFileChange2}
+                accept=".pdf"
+                allowDrop={false}
+              />
+              <FileInput
+                label={"Elige el archivo de la Camara & Comercio"}
+                onGetFile={onFileChange3}
                 accept=".pdf"
                 allowDrop={false}
               />

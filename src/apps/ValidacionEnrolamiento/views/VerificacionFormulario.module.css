@@ -28,11 +28,15 @@
   font-weight: bold;
 }
 .titulosSecundarios {
-  margin-bottom: 1.5vw;
-  margin-left: 2vw;
+  margin-bottom: 0.5vw;
+  margin-top: 1.2vw;
   font-size: large;
 }
-
+.autorizacionMensajes {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
 .valores {
   margin-bottom: 1.5vw;
   margin-left: 3vw;
@@ -52,4 +56,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+.textTarea {
+  display: flex;
+  justify-content: center;
+  width: 80%;
+  @apply grid gap-4 mx-auto xl:w-full border border-solid border-gray-500 p-3;
 }

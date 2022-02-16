@@ -32,8 +32,8 @@ function ValidacionAsesorComercial() {
     }
   });
 
-  console.log(datosEnrolamientos);
-  console.log(datosFiltrados);
+  /*   console.log(datosEnrolamientos);
+  console.log(datosFiltrados); */
 
   return (
     <div>

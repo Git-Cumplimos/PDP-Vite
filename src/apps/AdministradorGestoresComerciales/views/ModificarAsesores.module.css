@@ -1,0 +1,19 @@
+.contenedorPrincipal {
+  display: grid;
+  justify-content: center;
+  flex-direction: column;
+}
+.contenedorNombreAsesor {
+  display: flex;
+  justify-content: center;
+}
+.contenedorItems {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.contenedorResponsable {
+  display: flex;
+  flex-direction: row;
+}

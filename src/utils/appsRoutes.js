@@ -133,6 +133,33 @@ const VerificacionApertura = lazy(() =>
 const VerificacionNuevosComercios = lazy(() =>
   import("../apps/ValidacionEnrolamiento/VerificacionNuevosComercios")
 );
+const AdministradorGestoresComerciales = lazy(() =>
+  import(
+    "../apps/AdministradorGestoresComerciales/AdministradorGestoresComerciales"
+  )
+);
+const GestoresComerciales = lazy(() =>
+  import("../apps/AdministradorGestoresComerciales/views/GestoresComerciales")
+);
+const ModificarAsesor = lazy(() =>
+  import("../apps/AdministradorGestoresComerciales/views/ModificarAsesor")
+);
+const CrearAsesor = lazy(() =>
+  import("../apps/AdministradorGestoresComerciales/views/CrearAsesor")
+);
+const AdministradorResponsablesComerciales = lazy(() =>
+  import(
+    "../apps/AdministradorResponsablesComerciales/AdministradorResponsablesComerciales"
+  )
+);
+const AdministradorUnidadesNegocio = lazy(() =>
+  import("../apps/AdministradorUnidadesNegocio/AdministradorUnidadesNegocio")
+);
+const ModificarResponsables = lazy(() =>
+  import(
+    "../apps/AdministradorResponsablesComerciales/views/ModificarResponsables"
+  )
+);
 /**
  * Recaudo
  */
@@ -598,14 +625,80 @@ const allUrlsPrivateApps = [
         ),
         component: ValidacionApertura,
         permission: [1],
+      },
+    ],
+  },
+  {
+    link: "/administradorgestorcomercial",
+    label: (
+      <AppIcons Logo={"RECAUDO"} name={"Administrar Gestores Comerciales"} />
+    ),
+    component: AdministradorGestoresComerciales,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/administradorgestorcomercial/admin",
+        label: (
+          <AppIcons
+            Logo={"IMPUESTO"}
+            name={"Administrar Gestores Comerciales"}
+          />
+        ),
+        component: GestoresComerciales,
+        permission: [1],
         subRoutes: [
           {
-            link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
-            label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
-            component: VerificacionApertura,
+            link: "/administradorgestorcomercial/admin/modificarasesor/:id",
+            label: (
+              <AppIcons
+                Logo={"IMPUESTO"}
+                name={"Modificar Gestores Comerciales"}
+              />
+            ),
+            component: ModificarAsesor,
+            permission: [1],
+          },
+          {
+            link: "/administradorgestorcomercial/admin/crearasesor",
+            label: (
+              <AppIcons Logo={"IMPUESTO"} name={"Crear Gestores Comerciales"} />
+            ),
+            component: CrearAsesor,
             permission: [1],
           },
         ],
+      },
+      {
+        link: "/administradorresponsablecomercial",
+        label: (
+          <AppIcons
+            Logo={"RECAUDO"}
+            name={"Administrar Responsables Comerciales"}
+          />
+        ),
+        component: AdministradorResponsablesComerciales,
+        permission: [1],
+        subRoutes: [
+          {
+            link: "/administradorresponsablecomercial/modificarresponsable/:id",
+            label: (
+              <AppIcons
+                Logo={"IMPUESTO"}
+                name={"Modificar Responsables Comerciales"}
+              />
+            ),
+            component: ModificarResponsables,
+            permission: [1],
+          },
+        ],
+      },
+      {
+        link: "/administradorunidadesnegocio",
+        label: (
+          <AppIcons Logo={"RECAUDO"} name={"Administrar Unidades de Negocio"} />
+        ),
+        component: AdministradorUnidadesNegocio,
+        permission: [1],
       },
     ],
   },

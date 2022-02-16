@@ -36,7 +36,7 @@ const VerificacionApertura = () => {
         procesoConvenioGuid: datosParams[0]["id_reconocer"],
       };
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/consultavalidacion`,
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/consulta-validacion-reconoserid`,
         {
           method: "POST",
           headers: {
@@ -457,6 +457,25 @@ const VerificacionApertura = () => {
                 ""
               )}
             </div>
+            {urlPdfs["camara"] ? (
+              <div
+                className="w-full h-120  " /* style={{ width: "100%", height: "100%" }} */
+              >
+                {true ? (
+                  <object
+                    // data={`data:application/pdf;base64,${archivo}`}
+                    data={`${urlPdfs["camara"]}`}
+                    type="application/pdf"
+                    width="100%"
+                    height="100%"
+                  ></object>
+                ) : (
+                  ""
+                )}
+              </div>
+            ) : (
+              ""
+            )}
           </Fieldset>
         </Form>
       ) : (
