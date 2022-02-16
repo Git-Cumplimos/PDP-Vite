@@ -16,26 +16,6 @@ const GestoresComerciales = () => {
   const navigate = useNavigate();
 
   const [asesoresComerciales, setAsesoresComerciales] = useState([]);
-  /* const datosAsesores = [
-    {
-      codigo_asesor: "0001",
-      nombre_asesor: "Cristhian Muñoz",
-      responsable: "Alejandra Suarez",
-      asesor: "Asesor001",
-    },
-    {
-      codigo_asesor: "0002",
-      nombre_asesor: "Pablo Galvis",
-      responsable: "Carolina Figueroa",
-      asesor: "Asesor002",
-    },
-    {
-      codigo_asesor: "0003",
-      nombre_asesor: "Nicholas Carreño",
-      responsable: "Maria Fernanda Valero",
-      asesor: "Asesor003",
-    },
-  ]; */
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesor`)
