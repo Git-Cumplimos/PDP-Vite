@@ -82,7 +82,7 @@ const Transacciones = () => {
 
     setIdComercio(roleInfo?.id_comercio || -1);
   }, [userPermissions, roleInfo?.id_comercio]);
-
+  
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Transacciones</h1>
@@ -246,7 +246,7 @@ const Transacciones = () => {
       )}
 
       <Modal show={showModal} handleClose={closeModal}>
-        {selected ? (
+        {selected?.Ticket ? (
           <div className="flex flex-col justify-center items-center">
             <Tickets
               refPrint={printDiv}
@@ -266,7 +266,9 @@ const Transacciones = () => {
             </ButtonBar>
           </div>
         ) : (
-          ""
+          <div className="flex flex-col justify-center items-center mx-auto container">
+          <h1 className="text-3xl mt-6 text-aling">No hay ticket registrado</h1>
+          </div>
         )}
       </Modal>
     </div>

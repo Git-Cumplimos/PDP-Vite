@@ -39,7 +39,9 @@ const fetchDane = async (codigo_dane) => {
       {
         c_digo_dane_del_municipio: codigo_dane,
       },
-      {}
+      {},
+      {},
+      false,
     );
     return resp_ciudad[0].municipio;
   } catch (err) {}
@@ -55,7 +57,6 @@ const fetchOficinaLoteria = async (id_comercio) => {
       },
       {}
     );
-    console.log(resp_cod)
     if (!("msg" in resp_cod)) {
       return {
         cod_oficina_lot: resp_cod.cod_oficina_lot,
