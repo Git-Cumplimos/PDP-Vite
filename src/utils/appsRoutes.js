@@ -296,7 +296,7 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"PAGO"} name="Premios" />,
         component: Premios,
         extern: false,
-        permission: [5], ///////////////////////////////////////////////////////////////////
+        permission: [3], ///////////////////////////////////////////////////////////////////
       },
     ],
   },
@@ -356,7 +356,7 @@ const allUrlsPrivateApps = [
         link: "/funmujer/reporte",
         label: <AppIcons Logo={"RECAUDO"} name={"Reporte"} />,
         component: reportFDLM,
-        permission: [28],
+        permission: [28,17],
       },
     ],
   },
