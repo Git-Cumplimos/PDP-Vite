@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { notify } from "../../../utils/notify";
+import fetchData from "../../../utils/fetchData";
 function ModificarAsesor() {
   const {
     contenedorPrincipal,
@@ -24,38 +25,32 @@ function ModificarAsesor() {
   const params = useParams();
   const navigate = useNavigate();
   useEffect(() => {
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesor?id_asesor=${params.id}`
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?id_asesor=${params.id}`,
+      "GET",
+      {}
     )
-      .then((response) => response.json())
-      .then((respuesta) => setDatosAsesores(respuesta.obj.results));
+      .then((respuesta) => setDatosAsesores(respuesta.obj.results))
+      .catch(() => {});
   }, []);
-  console.log(datosAsesores);
+  /*   console.log(datosAsesores); */
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_URL_SERVICE_COMMERCE}/responsable`)
-      .then((response) => response.json())
-      .then((respuesta) => setResponsables(respuesta.obj.results));
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/responsables`,
+      "GET"
+    ).then((respuesta) => setResponsables(respuesta.obj.results));
   }, []);
 
   const ActualizarDatosAsesor = (e) => {
     e.preventDefault();
-    const datos = {
-      estado: estadoAsesor,
-      id_responsable: parseInt(cambioResponsable),
-    };
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/modifyasesor?id_asesor=${params.id}`,
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
-      }
-    )
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?id_asesor=${params.id}`,
+      "PUT",
+      {},
+      { estado: estadoAsesor, id_responsable: parseInt(cambioResponsable) },
+      { "Content-type": "application/json" }
+    ).then((respuesta) => console.log(respuesta /* .obj.data */));
     notify("El Asesor ha sido Actualizado con Exito.");
     setTimeout(() => navigate("/administradorgestorcomercial/admin"), 2500);
   };

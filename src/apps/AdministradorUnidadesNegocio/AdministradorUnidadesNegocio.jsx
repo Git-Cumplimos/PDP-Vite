@@ -3,15 +3,26 @@ import { useState } from "react";
 import { useEffect } from "react";
 import Button from "../../components/Base/Button/Button";
 import Table from "../../components/Base/Table/Table";
+import fetchData from "../../utils/fetchData";
 import classes from "./AdministradorUnidadesNegocio.module.css";
+import { useNavigate } from "react-router-dom";
 const AdministradorUnidadesNegocio = () => {
+  const navigate = useNavigate();
   const { contenedorPrincipal } = classes;
   const [unidadesDeNegocio, setUnidadesDeNegocio] = useState([]);
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_URL_SERVICE_COMMERCE}/seachunidad`)
-      .then((response) => response.json())
-      .then((respuesta) => setUnidadesDeNegocio(respuesta.obj.results));
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/unidades-de-negocio`,
+      "GET",
+      {}
+    )
+      /*   .then((response) => response.json()) */
+      .then((respuesta) => setUnidadesDeNegocio(respuesta.obj.results))
+      .catch(() => {});
   }, []);
+  const AgregarUnidadNegocio = () => {
+    navigate(`/administradorunidadesnegocio/crearunidadnegocio`);
+  };
   return (
     <div className={contenedorPrincipal}>
       <Table
@@ -38,7 +49,7 @@ const AdministradorUnidadesNegocio = () => {
       ></Table>
       <Button
         type="" /* setEstadoForm((old) => !old) */ /*  handleSubmit()} */
-        /* onClick={() => */
+        onClick={() => AgregarUnidadNegocio()}
       >
         Agregar Unidad De Negocio
       </Button>

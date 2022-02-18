@@ -8,7 +8,7 @@ const AdministradorResponsablesComerciales = () => {
   const navigate = useNavigate();
   const [responsables, setResponsables] = useState([]);
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_URL_SERVICE_COMMERCE}/responsable`)
+    fetch(`${process.env.REACT_APP_URL_SERVICE_COMMERCE}/responsables`)
       .then((response) => response.json())
       .then((respuesta) =>
         /*  console.log(
@@ -33,7 +33,9 @@ const AdministradorResponsablesComerciales = () => {
           estado,
         }))}
         onSelectRow={(e, i) =>
-          navigate(`/administradorgestorcomercial/admin/modificarasesor`)
+          navigate(
+            `/administradorresponsablecomercial/modificarresponsable/${responsables[i]["id_responsable"]}`
+          )
         }
       ></Table>
       <Button type="" /* onClick={() => handleSubmit()} */>

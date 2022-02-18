@@ -16,6 +16,7 @@ import InputSuggestions from "../../../components/Base/InputSuggestions/InputSug
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import sendFormData from "../../../utils/sendFormData";
+import MultipleSelect from "../../../components/Base/MultipleSelect/MultipleSelect";
 
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
 
@@ -78,8 +79,90 @@ const FormularioEnrolamiento = () => {
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
+      fetchData(
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/iniciar-proceso-enrolamiento`,
+        "POST",
+        {},
+        {
+          asesor: "juan",
+          nombre: `${nombre}`,
+          apellido: `${apellido}`,
+          nombre_comercio: nombreComercio,
+          numnit: numNit,
+          numcamycom: numCamaraComercio,
+          numrut: numRut,
+          autosms: autorizacion,
+          tipozona: "",
+          unidad_negocio: "",
+          responsableiva: responsableIva,
+          cod_localidad: "",
+          asesor_comercial_localidad: "",
+          actividad_economica: commerceType.toString(),
+          tipo_establecimiento: tipoComercio,
+          sede: "Bogotá",
+          direccion_comercio: `${commerceLocation.direccion[0]}`,
+          departamento: `${commerceLocation.departamento[0]}`,
+          municipio: `${commerceLocation.municipio[0]}`,
+          localidad_bogota: `${commerceLocation.localidad[0]}`,
+          barrio: `${commerceLocation.barrio[0]}`,
+          direccion_correspondencia: `${homeLocation.direccion[0]}`,
+          departamento_correspondencia: `${homeLocation.departamento[0]}`,
+          municipio_correspondencia: `${homeLocation.municipio[0]}`,
+          localidad_correspondencia: `${homeLocation.localidad[0]}`,
+          barrio_correspondencia: `${homeLocation.barrio[0]}`,
+          tipoDoc: tipoIdentificacion,
+          numDoc: numDocumento,
+          email: correos[0],
+          celular: telefonos[0],
+          task_token: "token",
+          validation_state: "En Proceso de Validación",
+          id_name: "id_proceso",
 
-      const datos = {
+          responsable: "",
+        },
+
+        {},
+        false
+      )
+        .then((respuesta) => {
+          console.log(respuesta);
+          const formData = new FormData();
+
+          formData.set("rut", archivos1[0]);
+
+          formData.set("cc", archivos2[0]);
+
+          formData.set("camaracomercio", archivos3[0]);
+
+          formData.set("numdoc", numDocumento);
+
+          formData.set("id_proceso", respuesta.body.id_proceso);
+
+          notify("Se ha comenzado la carga");
+
+          console.log(Object.fromEntries(formData.entries()));
+          fetchData(
+            `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/upload-file`,
+            "POST",
+            {},
+            {
+              body: formData,
+            },
+            {},
+            false
+          )
+            .then((respuesta) => {
+              if (!respuesta?.status) {
+                notifyError(respuesta?.msg);
+              } else {
+                console.log(respuesta?.obj);
+                notify("Se han subido los archivos");
+                setEstadoForm(true);
+              }
+            })
+            .catch(() => {});
+
+          /* const datos = {
         asesor: "juan",
         nombre: `${nombre}`,
         apellido: `${apellido}`,
@@ -113,7 +196,6 @@ const FormularioEnrolamiento = () => {
         task_token: "token",
         validation_state: "En Proceso de Validación",
         id_name: "id_proceso",
-        /*  id_reconocer: "", */
         responsable: "",
       };
       fetch(
@@ -133,7 +215,7 @@ const FormularioEnrolamiento = () => {
           const formData = new FormData();
 
           formData.set("rut", archivos1[0]);
-          /* formData.set("pdf-1-2", archivos1[1]); */
+    
 
           formData.set("cc", archivos2[0]);
 
@@ -142,8 +224,7 @@ const FormularioEnrolamiento = () => {
           formData.set("numdoc", numDocumento);
 
           formData.set("id_proceso", respuesta.body.id_proceso);
-          /*   console.log(archivos1[0]);
-          console.log(archivos2[0]); */
+
           notify("Se ha comenzado la carga");
 
           console.log(Object.fromEntries(formData.entries()));
@@ -153,9 +234,7 @@ const FormularioEnrolamiento = () => {
 
             {
               method: "POST",
-              /*   headers: {
-                "Content-type": "application/json",
-              }, */
+              
               body: formData,
             }
           )
@@ -168,29 +247,9 @@ const FormularioEnrolamiento = () => {
                 notify("Se han subido los archivos");
                 setEstadoForm(true);
               }
-            });
-          /* sendFormData(
-            `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/uploadfile`,
-            "POST",
-            formData,
-            (xhr) => {
-              if (xhr.status === 200) {
-                const res = xhr.response;
-                if (!res?.status) {
-                  notifyError(res?.msg);
-                } else {
-                  console.log(res?.obj);
-                  notify("Se han subido los archivos");
-                  setEstadoForm(true);
-                }
-              }
-            },
-            (xhr) => {
-              notifyError("Error de red");
-            },
-            "json"
-          ); */
-        });
+            });*/
+        })
+        .catch(() => {});
     },
     [archivos1, archivos2, archivos3]
   );
@@ -331,9 +390,8 @@ const FormularioEnrolamiento = () => {
               <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
                 <InputSuggestions
                   id="actividades_ec2"
-                  label={"Buscar Actividad Economica"}
+                  label={"Buscar tipo de negocio"}
                   type={"search"}
-                  required
                   suggestions={
                     foundActivities.map((val) => {
                       const foundIdx = val
@@ -349,11 +407,13 @@ const FormularioEnrolamiento = () => {
                       );
                       const str3 = val.substring(foundIdx + actividad.length);
                       return (
-                        <h1 className="text-xs">
-                          {str1}
-                          <strong>{str2}</strong>
-                          {str3}
-                        </h1>
+                        <div className="grid grid-cols-1 place-items-center px-4 py-2">
+                          <h1 className="text-xs">
+                            {str1}
+                            <strong>{str2}</strong>
+                            {str3}
+                          </h1>
+                        </div>
                       );
                     }) || []
                   }
@@ -372,11 +432,19 @@ const FormularioEnrolamiento = () => {
                     callback: (e) => {
                       const _actividad = e.target.value;
                       if (_actividad.length > 1) {
-                        fetchData(url, "GET", {
-                          q: _actividad,
-                          limit: 5,
-                        })
+                        fetchData(
+                          url,
+                          "GET",
+                          {
+                            q: _actividad,
+                            limit: 3,
+                          },
+                          {},
+                          {},
+                          false
+                        )
                           .then((res) => {
+                            console.log("respuesta Positiva");
                             if (res?.status) {
                               setFoundActivities(
                                 res?.obj.map(

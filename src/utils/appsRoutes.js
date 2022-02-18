@@ -161,6 +161,9 @@ const ModificarResponsables = lazy(() =>
     "../apps/AdministradorResponsablesComerciales/views/ModificarResponsables"
   )
 );
+const CrearUnidadNegocio = lazy(() =>
+  import("../apps/AdministradorUnidadesNegocio/views/CrearUnidadNegocio")
+);
 /**
  * Recaudo
  */
@@ -190,7 +193,9 @@ const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 const ParamsOperations = lazy(() =>
   import("../apps/ParamsOperations/ParamsOperations")
 );
-const TypesTrxs = lazy(() => import("../apps/ParamsOperations/Views/TypesTrxs"));
+const TypesTrxs = lazy(() =>
+  import("../apps/ParamsOperations/Views/TypesTrxs")
+);
 
 const emptyComp = () => {
   return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
@@ -592,7 +597,7 @@ const allUrlsPrivateApps = [
     permission: [1],
     subRoutes: [
       {
-        link: '/params-operations/types-trxs',
+        link: "/params-operations/types-trxs",
         label: <AppIcons Logo={"RECAUDO"} name={"Tipos de transacciones"} />,
         component: TypesTrxs,
         permission: [1],
@@ -649,7 +654,10 @@ const allUrlsPrivateApps = [
       {
         link: "/params-operations/autorizadores",
         label: (
-          <AppIcons Logo={"PRODUCTOS_FINANCIEROS"} name={"Proveedores / Autorizadores"} />
+          <AppIcons
+            Logo={"PRODUCTOS_FINANCIEROS"}
+            name={"Proveedores / Autorizadores"}
+          />
         ),
         component: Autorizadores,
         permission: [21],
@@ -764,6 +772,16 @@ const allUrlsPrivateApps = [
         ),
         component: AdministradorUnidadesNegocio,
         permission: [1],
+        subRoutes: [
+          {
+            link: "/administradorunidadesnegocio/crearunidadnegocio",
+            label: (
+              <AppIcons Logo={"IMPUESTO"} name={"Crear Unidad de Negocio"} />
+            ),
+            component: CrearUnidadNegocio,
+            permission: [1],
+          },
+        ],
       },
     ],
   },

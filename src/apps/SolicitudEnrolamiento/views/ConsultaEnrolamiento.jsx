@@ -2,7 +2,7 @@ import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Card from "../../../components/Base/Card/Card";
 import Modal from "../../../components/Base/Modal/Modal";
 import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
@@ -13,6 +13,7 @@ const ConsultaEnrolamiento = () => {
   const [numconsultaProceso, setNumConsultaProceso] = useState("");
   const [respuestaProceso, setRespuestaProceso] = useState("");
   const [estado, setEstado] = useState(false);
+  /* const [showModal, setShowModal] = useState(false); */
 
   const navigate = useNavigate();
   const {
@@ -30,6 +31,7 @@ const ConsultaEnrolamiento = () => {
 
   const funConsultaProceso = (e) => {
     e.preventDefault();
+    setEstado(true);
     if (numconsultaProceso) {
       fetch(
         `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${numconsultaProceso}`
@@ -39,11 +41,6 @@ const ConsultaEnrolamiento = () => {
         .then((respuesta) => setRespuestaProceso(respuesta.obj.results))
         .catch(setEstado(true));
     }
-
-    /* setEstado(true); */
-
-    /*  console.log("Hubo un problema con la petición Fetch:" + error.message); */
-    /*  .then((respuesta) => console.log(respuesta.obj.results)); */
   };
   /*  console.log(respuestaProceso); */
 
@@ -56,6 +53,9 @@ const ConsultaEnrolamiento = () => {
       `/Solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0].id_reconocer}`
     );
   };
+  const handleClose = useCallback(() => {
+    setEstado(false);
+  }, []);
   return (
     <div className={principalConsulta}>
       <span className={tituloConsultaInscripcion}>
@@ -78,8 +78,9 @@ const ConsultaEnrolamiento = () => {
         </ButtonBar>
 
         {respuestaProceso.length <= 0 && estado ? (
-          <Modal show>
+          <Modal show={estado} handleClose={handleClose}>
             <LogoPDP></LogoPDP>
+
             <h1>
               El número ingresado no se encuentra en proceso de enrolamiento,
               por favor revise si esta bien escrito o realice el proceso de

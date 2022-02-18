@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { notify } from "../../../utils/notify";
 import { useNavigate } from "react-router-dom";
+import fetchData from "../../../utils/fetchData";
 const CrearAsesor = () => {
   const navigate = useNavigate();
   const {
@@ -22,9 +23,11 @@ const CrearAsesor = () => {
   const [cambioResponsable, setCambioResponsable] = useState(0);
   const [nombreAsesor, setNombreAsesor] = useState("");
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_URL_SERVICE_COMMERCE}/responsable`)
-      .then((response) => response.json())
-      .then((respuesta) => setResponsables(respuesta.obj.results));
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/responsables`,
+      "GET",
+      {}
+    ).then((respuesta) => setResponsables(respuesta.obj.results));
   }, []);
 
   const CrearAsesor = (e) => {
@@ -34,18 +37,17 @@ const CrearAsesor = () => {
       estado: estadoAsesor,
       id_responsable: parseInt(cambioResponsable),
     };
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/crearasesor`,
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores`,
+      "POST",
+      {},
+      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */
+      {
+        nom_asesor: nombreAsesor,
+        estado: estadoAsesor,
+        id_responsable: parseInt(cambioResponsable),
       }
-    )
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta));
+    ).then((respuesta) => console.log(respuesta));
     notify("El Asesor Ha Sido Creado Con Exito.");
     setTimeout(() => navigate("/administradorgestorcomercial/admin"), 2500);
   };
