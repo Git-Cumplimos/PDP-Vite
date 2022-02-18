@@ -13,6 +13,7 @@ import Input from "../../../components/Base/Input/Input";
 import TextArea from "../../../components/Base/TextArea/TextArea";
 import Fieldset from "../../../components/Base/Fieldset/Fieldset";
 import Select from "../../../components/Base/Select/Select";
+import { notify } from "../../../utils/notify";
 /* import file from ".././certificado_movimiento.pdf";
 import file2 from ".././ced.pdf";
 import file3 from ".././rut.pdf"; */
@@ -30,11 +31,12 @@ const VerificacionFormulario = () => {
     contenedorTercero,
     tituloPrincipal,
     titulosSecundarios,
-    valores,
+    autorizacionMensajes,
     contenedorBotones,
     contenedorPrincipalBotones,
     contenedorCausalRechazo,
     contenedorImagenPDP,
+    textTarea,
   } = classes;
   const [datosParams, setDatosParams] = useState(0);
   const [personaResponsable, setPersonaResponsable] = useState("");
@@ -44,7 +46,8 @@ const VerificacionFormulario = () => {
   const [tipoZona, setTipoZona] = useState("");
   const [guardarDatosAsesor, setGuardarDatosAsesor] = useState(false);
   const [urlPdfs, setUrlPdfs] = useState({});
-  const [causal, setCausal] = useState("");
+  const [causal, setCausal] = useState(false);
+  const [mensajeCausal, setMensajeCausal] = useState("");
 
   const params = useParams();
   useEffect(() => {
@@ -64,8 +67,6 @@ const VerificacionFormulario = () => {
     // nos suscribimos al evento resize de window
     /*   window.addEventListener("resize", updateWidth); */
   }, []);
-
-  console.log(datosParams);
 
   useEffect(() => {
     if (datosParams?.length > 0) {
@@ -88,6 +89,12 @@ const VerificacionFormulario = () => {
     const datos = {
       task_token: datosParams[0]["task_token"],
       validation_state: "101",
+      responsable: personaResponsable,
+      unidad_negocio: unidadNegocio,
+      asesor_comercial_localidad: asesorComercialLocalidad,
+      cod_localidad: codigoLocalidad,
+      tipozona: tipoZona,
+      causal_rechazo: mensajeCausal,
     };
     fetch(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
@@ -101,7 +108,7 @@ const VerificacionFormulario = () => {
     )
       .then((res) => res.json())
       .then((respuesta) => console.log(respuesta.obj.data));
-    alert("El Usuario ha sido Aprobado para ReconoserID");
+    notify("El Usuario ha sido Aprobado para ReconoserID");
     setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformulario"),
       2500
@@ -112,6 +119,12 @@ const VerificacionFormulario = () => {
     const datos = {
       task_token: datosParams[0]["task_token"],
       validation_state: "102",
+      responsable: personaResponsable,
+      unidad_negocio: unidadNegocio,
+      asesor_comercial_localidad: asesorComercialLocalidad,
+      cod_localidad: codigoLocalidad,
+      tipozona: tipoZona,
+      causal_rechazo: mensajeCausal,
     };
     fetch(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
@@ -125,14 +138,14 @@ const VerificacionFormulario = () => {
     )
       .then((res) => res.json())
       .then((respuesta) => console.log(respuesta.obj.data));
-    alert("El Usuario ha sido Rechazado para ReconoserID");
+    notify("El Usuario ha sido Rechazado para ReconoserID");
     setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformulario"),
       2500
     );
   };
 
-  const guardarDatos = (e) => {
+  /* const guardarDatos = (e) => {
     e.preventDefault();
     const datos = {
       responsable: personaResponsable,
@@ -140,11 +153,11 @@ const VerificacionFormulario = () => {
       asesor_comercial_localidad: asesorComercialLocalidad,
       cod_localidad: codigoLocalidad,
       tipozona: tipoZona,
-      causal_rechazo: causal,
+      causal_rechazo: mensajeCausal,
     };
     fetch(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
+       `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` {
         method: "PUT",
         headers: {
           "Content-type": "application/json",
@@ -156,8 +169,11 @@ const VerificacionFormulario = () => {
       .then((respuesta) => console.log(respuesta.obj.data));
     alert("Los Datos Del Usuario Han Sido Actualizados");
     setGuardarDatosAsesor(true);
+  }; */
+  const fCausalRechazo = (e) => {
+    e.preventDefault();
+    setCausal(true);
   };
-
   return (
     <div>
       {datosParams ? (
@@ -430,9 +446,7 @@ const VerificacionFormulario = () => {
               disabled
             />
           </Fieldset>
-          {/* <Sample file={file2}></Sample>
-          <Sample file={file2}></Sample>
-          <Sample file={file3}></Sample> */}
+
           <Fieldset className={"lg:col-span-2"}>
             <div
               className="w-full h-120 " /* style={{ width: "100%", height: "100%" }} */
@@ -464,30 +478,71 @@ const VerificacionFormulario = () => {
                 ""
               )}
             </div>
+            {urlPdfs["camara"] ? (
+              <div
+                className="w-full h-120  " /* style={{ width: "100%", height: "100%" }} */
+              >
+                {true ? (
+                  <object
+                    // data={`data:application/pdf;base64,${archivo}`}
+                    data={`${urlPdfs["camara"]}`}
+                    type="application/pdf"
+                    width="100%"
+                    height="100%"
+                  ></object>
+                ) : (
+                  ""
+                )}
+              </div>
+            ) : (
+              ""
+            )}
           </Fieldset>
-          <Fieldset>
+          {/*  <Fieldset>
             <div className={contenedorCausalRechazo}>
               <h2>
                 Si el Comercio no cumple con los requisitos, por favor agrege un
                 causal de rechazo.
               </h2>
-              <TextArea
+              <textarea
                 className={"flex lg:row-span-0"}
                 type="input"
                 minLength="1"
                 maxLength="160"
                 autoComplete="off"
                 value={causal}
-                info={`Cantidad de caracteres: ${causal.length}`}
                 onInput={(e) => {
                   setCausal(e.target.value);
                 }}
-              ></TextArea>
+              ></textarea>
             </div>
-          </Fieldset>
+          </Fieldset> */}
 
           <div>
-            {guardarDatosAsesor ? (
+            <div className={contenedorPrincipalBotones}>
+              <div className={contenedorBotones}>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    aprobacionFormulario(e);
+                  }}
+                >
+                  Aprobar Comercio
+                </Button>
+              </div>
+
+              <div className={contenedorBotones}>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    fCausalRechazo(e);
+                  }}
+                >
+                  Rechazar Comercio
+                </Button>
+              </div>
+            </div>
+            {/* {guardarDatosAsesor ? (
               <div className={contenedorPrincipalBotones}>
                 <div className={contenedorBotones}>
                   <Button
@@ -505,6 +560,7 @@ const VerificacionFormulario = () => {
                     type="submit"
                     onClick={(e) => {
                       rechazarFormulario(e);
+                      setCausal(true);
                     }}
                   >
                     Rechazar Comercio
@@ -518,7 +574,7 @@ const VerificacionFormulario = () => {
               datosParams[0]["asesor_comercial_localidad"] &&
               datosParams[0]["asesor_comercial_localidad"] &&
               datosParams[0]["asesor"] ? (
-              <div>
+              <div className={contenedorPrincipalBotones}>
                 <div className={contenedorBotones}>
                   <Button
                     type="submit"
@@ -535,6 +591,7 @@ const VerificacionFormulario = () => {
                     type="submit"
                     onClick={(e) => {
                       rechazarFormulario(e);
+                      setCausal(true);
                     }}
                   >
                     Rechazar Comercio
@@ -552,6 +609,43 @@ const VerificacionFormulario = () => {
                   Guardar Datos
                 </Button>
               </div>
+            )} */}
+            {causal ? (
+              <Modal show>
+                <LogoPDP></LogoPDP>
+
+                <div className={contenedorCausalRechazo}>
+                  <div className={autorizacionMensajes}>
+                    <span className={titulosSecundarios}>
+                      Si el Comercio no cumple con los requisitos, por favor
+                      agrege un causal de rechazo.
+                    </span>
+                  </div>
+                  <textarea
+                    className={textTarea}
+                    type="input"
+                    minLength="1"
+                    maxLength="160"
+                    autoComplete="off"
+                    value={mensajeCausal}
+                    onInput={(e) => {
+                      setMensajeCausal(e.target.value);
+                    }}
+                  ></textarea>
+                  <div className={contenedorBotones}>
+                    <Button
+                      type="submit"
+                      onClick={(e) => {
+                        rechazarFormulario(e);
+                      }}
+                    >
+                      Enviar Mensaje y Rechazar
+                    </Button>
+                  </div>
+                </div>
+              </Modal>
+            ) : (
+              ""
             )}
           </div>
         </Form>

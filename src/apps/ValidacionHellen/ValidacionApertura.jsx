@@ -49,7 +49,7 @@ const ValidacionApertura = () => {
         )}
         onSelectRow={(e, i) =>
           navigate(
-            `/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/${datosFiltrados[i][14]}`
+            `/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/${datosFiltrados[i][15]}`
           )
         }
       ></Table>
