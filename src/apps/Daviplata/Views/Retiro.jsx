@@ -8,15 +8,23 @@ import useQuery from "../../../hooks/useQuery";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { postCashOut } from "../utils/fetchRevalDaviplata";
-import { notifyError } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
-import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput/MoneyInput";
+import MoneyInput, {
+  formatMoney,
+} from "../../../components/Base/MoneyInput/MoneyInput";
+import { useFetch } from "../../../hooks/useFetch";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 const Retiro = () => {
-  const [{ phone, valor, otp, summary }, setQuery] = useQuery();
-
   const navigate = useNavigate();
+
+  const [{ phone, userDoc, valor, otp, summary }, setQuery] = useQuery();
+
+  const { roleInfo } = useAuth();
+
+  const [loadingCashOut, fetchCashOut] = useFetch(postCashOut);
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -41,6 +49,7 @@ const Retiro = () => {
         const otp = formData.get("OTP");
         const summary = {
           "Numero celular": phone,
+          "C.C. de quien retira": userDoc,
           "Valor de retiro": valorFormat,
           "Token de seguridad": otp,
         };
@@ -52,7 +61,7 @@ const Retiro = () => {
         );
       }
     },
-    [setQuery, valor]
+    [setQuery, valor, userDoc]
   );
 
   const onChange = useCallback(
@@ -63,7 +72,13 @@ const Retiro = () => {
           (formData.get("numCliente") ?? "").match(/\d/g) ?? []
         ).join("");
         const otp = ((formData.get("OTP") ?? "").match(/\d/g) ?? []).join("");
-        setQuery({ phone, valor: valor ?? "", otp }, { replace: true });
+        const userDoc = (
+          (formData.get("docCliente") ?? "").match(/\d/g) ?? []
+        ).join("");
+        setQuery(
+          { phone, userDoc, valor: valor ?? "", otp },
+          { replace: true }
+        );
       }
     },
     [setQuery, valor]
@@ -72,16 +87,12 @@ const Retiro = () => {
   const onMoneyChange = useCallback(
     (e, valor) => {
       setQuery(
-        { phone: phone ?? "", otp: otp ?? "", valor },
+        { phone: phone ?? "", userDoc: userDoc ?? "", otp: otp ?? "", valor },
         { replace: true }
       );
     },
-    [setQuery, phone, otp]
+    [setQuery, phone, otp, userDoc]
   );
-
-  const closeModal = useCallback(() => {
-    setShowModal(false);
-  }, []);
 
   const goToRecaudo = useCallback(() => {
     navigate(-1);
@@ -89,18 +100,23 @@ const Retiro = () => {
 
   const onMakePayment = useCallback(() => {
     const body = {
-      idcliente: 22,
-      ipcliente: "155.0.0.55",
-      idpersona: 2,
-      NoidentificacionCajero: "100",
+      idcliente: 5,
+      ipcliente: "172.17.0.4",
+      idpersona: 240,
+      NoidentificacionCajero: "1022424095",
+      NoIdentificacionUsuario: userDoc,
       NumCelular: phone,
       Valor: valor,
       OTP: otp,
     };
 
-    postCashOut(body)
+    fetchCashOut(body)
       .then((res) => {
-        console.log(res);
+        if (!res?.status) {
+          notifyError(res?.msg);
+          return;
+        }
+        notify("Transaccion satisfactoria");
         setPaymentStatus({
           title: "Recibo de retiro",
           timeInfo: {
@@ -118,10 +134,10 @@ const Retiro = () => {
           commerceInfo: [
             ["Id Comercio", 2],
             ["No. terminal", 233],
-            ["Municipio", "Bogota"],
+            ["Municipio", roleInfo?.ciudad ?? "Bogota"],
             ["Dirección", "Calle 11 # 11 - 2"],
             ["Id Trx", 233],
-            ["Id Transacción", 99],
+            ["Id Transacción", res?.obj?.IdTransaccion],
           ],
           commerceName: "Daviplata",
           trxInfo: [
@@ -135,7 +151,7 @@ const Retiro = () => {
         console.error(err);
         notifyError("Error en la transaccion");
       });
-  }, [otp, phone, valor]);
+  }, [userDoc, otp, phone, valor, fetchCashOut, roleInfo?.ciudad]);
 
   return (
     <Fragment>
@@ -151,6 +167,18 @@ const Retiro = () => {
           maxLength={"10"}
           value={phone ?? ""}
           onChange={() => {}}
+          required
+        />
+        <Input
+          id="docCliente"
+          name="docCliente"
+          label="CC de quien retira"
+          type="text"
+          autoComplete="off"
+          minLength={"7"}
+          maxLength={"13"}
+          value={userDoc ?? ""}
+          onInput={() => {}}
           required
         />
         <Input
@@ -180,7 +208,9 @@ const Retiro = () => {
       </Form>
       <Modal
         show={showModal}
-        handleClose={paymentStatus ? () => {} : handleClose}
+        handleClose={
+          paymentStatus ? () => {} : loadingCashOut ? () => {} : handleClose
+        }
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
@@ -193,10 +223,16 @@ const Retiro = () => {
         ) : (
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
-              <Button type="submit" onClick={onMakePayment}>
+              <Button
+                type="submit"
+                onClick={onMakePayment}
+                disabled={loadingCashOut}
+              >
                 Aceptar
               </Button>
-              <Button onClick={closeModal}>Cancelar</Button>
+              <Button onClick={handleClose} disabled={loadingCashOut}>
+                Cancelar
+              </Button>
             </ButtonBar>
           </PaymentSummary>
         )}

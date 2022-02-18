@@ -84,7 +84,7 @@ const IAMPermissions = () => {
             const { id_permission, name_permission } = permisosDB[i];
             const userMapped = {
               "ID grupo": id_permission,
-              "Nombre del grupo": name_permission,
+              "Nombre del permiso": name_permission,
               edit: {
                 id_permission,
               },
