@@ -190,6 +190,7 @@ const SendForm = ({
                 setCheckedState(new Array(selected?.Fracciones?.length).fill(false))
                 setSelected(null)
                 setSelecFrac([])
+                setDisabledBtns(false)
               }}
             >  Cancelar
             </Button>
