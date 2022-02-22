@@ -751,7 +751,7 @@ const allUrlsPrivateApps = [
         link: "/administradorresponsablecomercial",
         label: (
           <AppIcons
-            Logo={"RECAUDO"}
+            Logo={"ACTUALIZACION"}
             name={"Administrar Responsables Comerciales"}
           />
         ),

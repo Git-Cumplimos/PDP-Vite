@@ -15,7 +15,12 @@ import Table from "../../../components/Base/Table/Table";
 import classes from "./ModificarResponsables.module.css";
 
 const ModificarResponsables = () => {
-  const { contenedorPrincipal } = classes;
+  const {
+    contenedorPrincipal,
+    contenedorTablas,
+    contenedorZonaEstado,
+    espaciosFieldset,
+  } = classes;
   const params = useParams();
   const navigate = useNavigate();
   const [datosResponsable, SetDatosResponsable] = useState(0);
@@ -182,135 +187,157 @@ const ModificarResponsables = () => {
                   type={"text"}
                   disabled
                 ></Input>
-                <Select
-                  onChange={(event) => setAsignarZona(event.target.value)}
-                  id="comissionType"
-                  name="comissionType"
-                  value={asignarZona}
-                  label={`Modificar Zona`}
-                  options={
-                    Object.fromEntries([
-                      ["", ""],
-                      ...zonas.map(({ zona }) => {
-                        return [zona];
-                      }),
-                    ]) || { "": "" }
-                  }
-                ></Select>
+                <div className={contenedorZonaEstado}>
+                  <Select
+                    onChange={(event) => setAsignarZona(event.target.value)}
+                    id="comissionType"
+                    name="comissionType"
+                    value={asignarZona}
+                    label={`Modificar Zona`}
+                    options={
+                      Object.fromEntries([
+                        ["", ""],
+                        ...zonas.map(({ zona }) => {
+                          return [zona];
+                        }),
+                      ]) || { "": "" }
+                    }
+                  ></Select>
 
-                <Select
-                  onChange={(event) =>
-                    setEstadoResponsable(
-                      event.target.value === "true" ? true : false
-                    )
-                  }
-                  id="comissionType"
-                  name="comissionType"
-                  value={estadoResponsable}
-                  label={`Modificar Estado`}
-                  options={{
-                    "": "",
-                    Activo: "true",
-                    Inactivo: "false",
-                  }}
-                ></Select>
-                <Select
-                  onChange={(event) => setAsignarAsesores(event.target.value)}
-                  id="comissionType"
-                  name="comissionType"
-                  value={asignarAsesores}
-                  label={`Asignar Asesor`}
-                  options={
-                    Object.fromEntries([
-                      ["", ""],
-                      ...asesores.map(({ nom_asesor, id_asesor }) => {
-                        return [nom_asesor, id_asesor];
-                      }),
-                    ]) || { "": "" }
-                  }
-                ></Select>
-                {asignarAsesores ? (
-                  <ButtonBar /* className={"lg:col-span-2"} */>
-                    <Button onClick={(e) => asignarAsesor(e)}>Agregar</Button>
-                  </ButtonBar>
-                ) : (
-                  ""
-                )}
-                <Select
-                  onChange={(event) =>
-                    setAsignarUnidadNegocio(event.target.value)
-                  }
-                  id="comissionType"
-                  name="comissionType"
-                  value={asignarUnidadNegocio}
-                  label={`Agregar Unidad Negocio`}
-                  options={
-                    Object.fromEntries([
-                      ["", ""],
-                      ...unidadesNegocio.map(
-                        ({ nom_unidad_neg, id_negocio }) => {
-                          return [nom_unidad_neg, id_negocio];
-                        }
-                      ),
-                    ]) || { "": "" }
-                  }
-                ></Select>
-                {asignarUnidadNegocio ? (
-                  <ButtonBar /* className={"lg:col-span-2"} */>
-                    <Button onClick={(e) => fAsignarUnidadNegocio(e)}>
-                      Agregar
-                    </Button>
-                  </ButtonBar>
-                ) : (
-                  ""
-                )}
+                  <Select
+                    onChange={(event) =>
+                      setEstadoResponsable(
+                        event.target.value === "true" ? true : false
+                      )
+                    }
+                    id="comissionType"
+                    name="comissionType"
+                    value={estadoResponsable}
+                    label={`Modificar Estado`}
+                    options={{
+                      "": "",
+                      Activo: "true",
+                      Inactivo: "false",
+                    }}
+                  ></Select>
+                </div>
+
+                <div className={contenedorTablas}>
+                  <Fieldset legend="Asesores Asignados">
+                    <Select
+                      onChange={(event) =>
+                        setAsignarAsesores(event.target.value)
+                      }
+                      id="comissionType"
+                      name="comissionType"
+                      value={asignarAsesores}
+                      label={`Asignar Asesor Comercial`}
+                      options={
+                        Object.fromEntries([
+                          ["", ""],
+                          ...asesores.map(({ nom_asesor, id_asesor }) => {
+                            return [nom_asesor, id_asesor];
+                          }),
+                        ]) || { "": "" }
+                      }
+                    ></Select>
+                    {asignarAsesores ? (
+                      <ButtonBar /* className={"lg:col-span-2"} */>
+                        <Button onClick={(e) => asignarAsesor(e)}>
+                          Agregar Asesor Comercial
+                        </Button>
+                      </ButtonBar>
+                    ) : (
+                      ""
+                    )}
+                    {asesoresACargo.length > 0 ? (
+                      <div>
+                        {/* <h2>Asesores Asignados</h2> */}
+
+                        <Table
+                          headers={["Id Asesor", "Nombre Asesor", "Estado"]}
+                          data={asesoresACargo.map(
+                            ({ id_asesor, nom_asesor, estado }) => {
+                              return {
+                                id_asesor,
+                                nom_asesor,
+                                estado,
+                                /*      responsable: responsable["nombre"], */
+                              };
+                            }
+                          )}
+                        ></Table>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </Fieldset>
+                  <Fieldset
+                    className={espaciosFieldset}
+                    legend="Unidades Negocio Asignado"
+                  >
+                    <Select
+                      onChange={(event) =>
+                        setAsignarUnidadNegocio(event.target.value)
+                      }
+                      id="comissionType"
+                      name="comissionType"
+                      value={asignarUnidadNegocio}
+                      label={`Agregar Unidad Negocio`}
+                      options={
+                        Object.fromEntries([
+                          ["", ""],
+                          ...unidadesNegocio.map(
+                            ({ nom_unidad_neg, id_negocio }) => {
+                              return [nom_unidad_neg, id_negocio];
+                            }
+                          ),
+                        ]) || { "": "" }
+                      }
+                    ></Select>
+                    {asignarUnidadNegocio ? (
+                      <ButtonBar /* className={"lg:col-span-2"} */>
+                        <Button
+                          type=""
+                          onClick={(e) => fAsignarUnidadNegocio(e)}
+                        >
+                          Agregar Unidad De Negocio
+                        </Button>
+                      </ButtonBar>
+                    ) : (
+                      ""
+                    )}
+                    {datosResponsable[0].unidades_de_negocio.length > 0 ? (
+                      <div>
+                        {/* <h2>Unidades Negocio Asignado</h2> */}
+
+                        <Table
+                          headers={[
+                            "Id Negocio",
+                            "Nombre Unidad Negocio",
+                            "Codigo",
+                          ]}
+                          data={datosResponsable[0].unidades_de_negocio.map(
+                            ({
+                              id_negocio,
+                              nom_unidad_neg,
+                              cod_unidad_d_negocio,
+                            }) => {
+                              return {
+                                id_negocio,
+                                nom_unidad_neg,
+                                cod_unidad_d_negocio,
+                              };
+                            }
+                          )}
+                        ></Table>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </Fieldset>
+                </div>
               </div>
-
-              {datosResponsable[0].unidades_de_negocio.length > 0 ? (
-                <div>
-                  <h2>Unidades Negocio Asignado</h2>
-
-                  <Table
-                    headers={["Id Negocio", "Nombre Unidad Negocio", "Codigo"]}
-                    data={datosResponsable[0].unidades_de_negocio.map(
-                      ({
-                        id_negocio,
-                        nom_unidad_neg,
-                        cod_unidad_d_negocio,
-                      }) => {
-                        return {
-                          id_negocio,
-                          nom_unidad_neg,
-                          cod_unidad_d_negocio,
-                        };
-                      }
-                    )}
-                  ></Table>
-                </div>
-              ) : (
-                ""
-              )}
-              {asesoresACargo.length > 0 ? (
-                <div>
-                  <h2>Asesores Asignados</h2>
-
-                  <Table
-                    headers={["Id Asesor", "Nombre Asesor", "Estado"]}
-                    data={asesoresACargo.map(
-                      ({ id_asesor, nom_asesor, estado }) => {
-                        return {
-                          id_asesor,
-                          nom_asesor,
-                          estado,
-                          /*      responsable: responsable["nombre"], */
-                        };
-                      }
-                    )}
-                  ></Table>
-                </div>
-              ) : (
-                ""
-              )}
             </Fieldset>
           </Form>
           <div>

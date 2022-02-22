@@ -10,8 +10,16 @@ import Input from "../../../components/Base/Input/Input";
 import Select from "../../../components/Base/Select/Select";
 import fetchData from "../../../utils/fetchData";
 import { notify } from "../../../utils/notify";
+import classes from "../views/CrearResponsable.module.css";
 const CrearResponsable = () => {
   const navigate = useNavigate();
+
+  const {
+    contenedorPrincipal,
+    contenedorNombreAsesor,
+    contenedorItems,
+    contenedorResponsable,
+  } = classes;
   const [nombreResponsable, setNombreResponsable] = useState("");
   const [estadoResponsable, setEstadoResponsable] = useState();
   const [datosZonas, setDatosZonas] = useState(0);
@@ -49,45 +57,23 @@ const CrearResponsable = () => {
     setTimeout(() => navigate("/administradorgestorcomercial/admin"), 2500); */
   };
 
-  /*   useEffect(() => {
-    fetchData(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/unidades-de-negocio`,
-      "GET"
-    ).then((respuesta) => setUnidadesNegocio(respuesta.obj.results));
-  }, []); */
-
-  /* const fAsignarUnidadNegocio = (e) => {
-    e.preventDefault();
-    console.log(datosResponsables.length + 1);
-    fetchData(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/reponsable-negocio`,
-      "POST",
-      {},
-      {
-        responsable_id_responsable: 9,
-        negocio_id_negocio: asignarUnidadNegocio,
-      },
-      { "Content-type": "application/json" }
-    ).then((respuesta) => console.log(respuesta));
-  }; */
-
   return (
-    <div /* className={contenedorPrincipal} */>
+    <div className={contenedorPrincipal}>
       {datosZonas ? (
-        <div /* className={contenedorItems} */>
+        <div className={contenedorItems}>
           <Form>
-            <div /* className={contenedorNombreAsesor} */>
+            <div className={contenedorNombreAsesor}>
               <Fieldset legend="Crear Responsable">
-                <div /* className={contenedorNombreAsesor} */>
+                <div className={contenedorNombreAsesor}>
                   <Input
                     label={"Nombre Responsable"}
-                    placeholder=" Nombre Completo"
+                    placeholder="Nombre Completo"
                     value={nombreResponsable}
                     onChange={(e) => setNombreResponsable(e.target.value)}
                     type={"text"}
                   ></Input>
                 </div>
-                <div /* className={contenedorItems} */>
+                <div className={contenedorItems}>
                   <Select
                     onChange={(event) =>
                       setEstadoResponsable(
