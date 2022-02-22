@@ -94,7 +94,7 @@ const FormularioEnrolamiento = () => {
         "POST",
         {},
         {
-          asesor: asignarAsesores.toString(),
+          asesor: asignarAsesores,
           nombre: `${nombre}`,
           apellido: `${apellido}`,
           nombre_comercio: nombreComercio,
@@ -151,16 +151,16 @@ const FormularioEnrolamiento = () => {
           notify("Se ha comenzado la carga");
 
           console.log(Object.fromEntries(formData.entries()));
-          fetchData(
+          fetch(
             `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
-            "POST",
-            {},
+
             {
+              method: "POST",
+
               body: formData,
-            },
-            {},
-            false
+            }
           )
+            .then((res) => res.json())
             .then((respuesta) => {
               if (!respuesta?.status) {
                 notifyError(respuesta?.msg);
@@ -286,8 +286,8 @@ const FormularioEnrolamiento = () => {
               options={
                 Object.fromEntries([
                   ["", ""],
-                  ...asesores.map(({ nom_asesor, id_asesor }) => {
-                    return [nom_asesor, id_asesor];
+                  ...asesores.map(({ /* id_asesor, */ nom_asesor }) => {
+                    return [/* id_asesor, */ nom_asesor];
                   }),
                 ]) || { "": "" }
               }
