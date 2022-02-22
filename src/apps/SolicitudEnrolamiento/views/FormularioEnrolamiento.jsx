@@ -15,8 +15,6 @@ import LocationForm from "../../../components/Compound/LocationForm/LocationForm
 import InputSuggestions from "../../../components/Base/InputSuggestions/InputSuggestions";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
-import sendFormData from "../../../utils/sendFormData";
-import MultipleSelect from "../../../components/Base/MultipleSelect/MultipleSelect";
 
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
 
@@ -41,12 +39,13 @@ const FormularioEnrolamiento = () => {
   const [numNit, setNumNit] = useState("");
   const [numCamaraComercio, setNumCamaraComerci] = useState("");
   const [numRut, setNumRut] = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [ciudad, setCiudad] = useState("");
   const [estadoFormulario, setEstadoForm] = useState(false);
   const [autorizacion, setAutorizacion] = useState("");
   const [tratamientoDatos, setTratamientoDatos] = useState("");
   const [responsableIva, setResponsableIva] = useState("");
+
+  const [asesores, setAsesores] = useState(0);
+  const [asignarAsesores, setAsignarAsesores] = useState(0);
 
   const [actividad, setActividad] = useState("");
   const [foundActivities, setFoundActivities] = useState([]);
@@ -56,6 +55,17 @@ const FormularioEnrolamiento = () => {
   const [archivos1, setArchivos1] = useState([]);
   const [archivos2, setArchivos2] = useState([]);
   const [archivos3, setArchivos3] = useState([]);
+
+  useEffect(() => {
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?limit=${14}`,
+      "GET",
+      {},
+      {},
+      {},
+      false
+    ).then((respuesta) => setAsesores(respuesta.obj.results));
+  }, []);
 
   const onFileChange = useCallback((files) => {
     if (Array.isArray(Array.from(files))) {
@@ -84,7 +94,7 @@ const FormularioEnrolamiento = () => {
         "POST",
         {},
         {
-          asesor: "juan",
+          asesor: asignarAsesores.toString(),
           nombre: `${nombre}`,
           apellido: `${apellido}`,
           nombre_comercio: nombreComercio,
@@ -142,7 +152,7 @@ const FormularioEnrolamiento = () => {
 
           console.log(Object.fromEntries(formData.entries()));
           fetchData(
-            `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/upload-file`,
+            `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
             "POST",
             {},
             {
@@ -161,80 +171,14 @@ const FormularioEnrolamiento = () => {
               }
             })
             .catch(() => {});
-
-          /* const datos = {
-        asesor: "juan",
-        nombre: `${nombre}`,
-        apellido: `${apellido}`,
-        nombre_comercio: nombreComercio,
-        numnit: numNit,
-        numcamycom: numCamaraComercio,
-        numrut: numRut,
-        autosms: autorizacion,
-        tipozona: "",
-        unidad_negocio: "",
-        responsableiva: responsableIva,
-        cod_localidad: "",
-        asesor_comercial_localidad: "",
-        actividad_economica: commerceType.toString(),
-        tipo_establecimiento: tipoComercio,
-        sede: "Bogotá",
-        direccion_comercio: `${commerceLocation.direccion[0]}`,
-        departamento: `${commerceLocation.departamento[0]}`,
-        municipio: `${commerceLocation.municipio[0]}`,
-        localidad_bogota: `${commerceLocation.localidad[0]}`,
-        barrio: `${commerceLocation.barrio[0]}`,
-        direccion_correspondencia: `${homeLocation.direccion[0]}`,
-        departamento_correspondencia: `${homeLocation.departamento[0]}`,
-        municipio_correspondencia: `${homeLocation.municipio[0]}`,
-        localidad_correspondencia: `${homeLocation.localidad[0]}`,
-        barrio_correspondencia: `${homeLocation.barrio[0]}`,
-        tipoDoc: tipoIdentificacion,
-        numDoc: numDocumento,
-        email: correos[0],
-        celular: telefonos[0],
-        task_token: "token",
-        validation_state: "En Proceso de Validación",
-        id_name: "id_proceso",
-        responsable: "",
-      };
-      fetch(
-        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/iniciar-proceso-enrolamiento`,
-
-        {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify(datos),
-        }
-      )
-        .then((res) => res.json())
-        .then((respuesta) => {
-          console.log(respuesta);
-          const formData = new FormData();
-
-          formData.set("rut", archivos1[0]);
-    
-
-          formData.set("cc", archivos2[0]);
-
-          formData.set("camaracomercio", archivos3[0]);
-
-          formData.set("numdoc", numDocumento);
-
-          formData.set("id_proceso", respuesta.body.id_proceso);
-
-          notify("Se ha comenzado la carga");
-
-          console.log(Object.fromEntries(formData.entries()));
-
-          fetch(
+          /* fetch(
             `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/upload-file`,
 
             {
               method: "POST",
-              
+                headers: {
+                "Content-type": "application/json",
+              },
               body: formData,
             }
           )
@@ -247,7 +191,26 @@ const FormularioEnrolamiento = () => {
                 notify("Se han subido los archivos");
                 setEstadoForm(true);
               }
-            });*/
+            }).catch(() => {}); */
+          /* fetch(
+            `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
+            {
+              method: "POST",
+              body: formData,
+              mode: "no-cors",
+            }
+          )
+            .then((res) => res.json())
+            .then((respuesta) => {
+              if (!respuesta?.status) {
+                notifyError(respuesta?.msg);
+              } else {
+                console.log(respuesta?.obj);
+                notify("Se han subido los archivos");
+                setEstadoForm(true);
+              }
+            })
+            .catch((err) => console.error(err)); */
         })
         .catch(() => {});
     },
@@ -275,9 +238,6 @@ const FormularioEnrolamiento = () => {
 
   const navigate = useNavigate();
 
-  /*  const handleSubmit = () => {
-   
-  }; */
   const handleReconoser = async () => {
     navigate("/Solicitud-enrolamiento/reconoserid");
   };
@@ -317,7 +277,21 @@ const FormularioEnrolamiento = () => {
               type="text"
               required
             ></Input>
-
+            <Select
+              onChange={(event) => setAsignarAsesores(event.target.value)}
+              id="comissionType"
+              name="comissionType"
+              value={asignarAsesores}
+              label={`Asignar Asesor`}
+              options={
+                Object.fromEntries([
+                  ["", ""],
+                  ...asesores.map(({ nom_asesor, id_asesor }) => {
+                    return [nom_asesor, id_asesor];
+                  }),
+                ]) || { "": "" }
+              }
+            ></Select>
             <Fieldset
               legend="Representante legal"
               className="lg:col-span-3
