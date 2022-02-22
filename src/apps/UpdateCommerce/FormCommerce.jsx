@@ -324,11 +324,13 @@ const FormCommerce = () => {
                 );
                 const str3 = val.substring(foundIdx + actividad.length);
                 return (
-                  <h1 className="text-xs">
-                    {str1}
-                    <strong>{str2}</strong>
-                    {str3}
-                  </h1>
+                  <div className="grid grid-cols-1 place-items-center px-4 py-2">
+                    <h1 className="text-xs">
+                      {str1}
+                      <strong>{str2}</strong>
+                      {str3}
+                    </h1>
+                  </div>
                 );
               }) || []
             }
@@ -349,7 +351,7 @@ const FormCommerce = () => {
                 if (_actividad.length > 1) {
                   fetchData(url, "GET", {
                     q: _actividad,
-                    limit: 5,
+                    limit: 3,
                   })
                     .then((res) => {
                       if (res?.status) {

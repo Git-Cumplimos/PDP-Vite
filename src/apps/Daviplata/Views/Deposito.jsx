@@ -10,13 +10,20 @@ import Tickets from "../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import { postCashIn } from "../utils/fetchRevalDaviplata";
-import { notifyError } from "../../../utils/notify";
-import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput/MoneyInput";
+import { notify, notifyError } from "../../../utils/notify";
+import MoneyInput, {
+  formatMoney,
+} from "../../../components/Base/MoneyInput/MoneyInput";
+import { useFetch } from "../../../hooks/useFetch";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 const Deposito = () => {
+  const navigate = useNavigate();
   const [{ phone, userDoc, valor, summary }, setQuery] = useQuery();
 
-  const navigate = useNavigate();
+  const { roleInfo, infoTicket } = useAuth();
+
+  const [loadingCashIn, fetchCashIn] = useFetch(postCashIn);
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -81,28 +88,30 @@ const Deposito = () => {
     [setQuery, phone, userDoc]
   );
 
-  const closeModal = useCallback(() => {
-    setShowModal(false);
-  }, []);
-
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
 
   const onMakePayment = useCallback(() => {
     const body = {
-      idcliente: 22,
-      ipcliente: "155.0.0.55",
-      idpersona: 2,
-      NoidentificacionCajero: "100",
+      idcliente: 5,
+      ipcliente: "172.17.0.4",
+      idpersona: 240,
+      NoidentificacionCajero: "1022424095",
+      NoIdentificacionUsuario: userDoc,
       NumCelular: phone,
       Valor: valor,
     };
 
-    postCashIn(body)
+    fetchCashIn(body)
       .then((res) => {
-        console.log(res);
-        setPaymentStatus({
+        if (!res?.status) {
+          notifyError(res?.msg);
+          return;
+        }
+        notify("Transaccion satisfactoria");
+        const trx_id = res?.obj?.trxId ?? 0;
+        const tempTicket = {
           title: "Recibo de deposito",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
@@ -119,10 +128,10 @@ const Deposito = () => {
           commerceInfo: [
             ["Id Comercio", 2],
             ["No. terminal", 233],
-            ["Municipio", "Bogota"],
+            ["Municipio", roleInfo?.ciudad ?? "Bogota"],
             ["Dirección", "Calle 11 # 11 - 2"],
             ["Id Trx", 233],
-            ["Id Transacción", 99],
+            ["Id Transacción", res?.obj?.IdTransaccion],
           ],
           commerceName: "Daviplata",
           trxInfo: [
@@ -131,13 +140,22 @@ const Deposito = () => {
             ["Valor de deposito", formatMoney.format(valor)],
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
-        });
+        };
+        setPaymentStatus(tempTicket);
+        infoTicket(trx_id, 12, tempTicket)
+          .then((resTicket) => {
+            console.log(resTicket);
+          })
+          .catch((err) => {
+            console.error(err);
+            notifyError("Error guardando el ticket");
+          });
       })
       .catch((err) => {
         console.error(err);
         notifyError("Error en la transaccion");
       });
-  }, [phone, valor, userDoc]);
+  }, [phone, valor, userDoc, fetchCashIn, roleInfo?.ciudad, infoTicket]);
 
   return (
     <Fragment>
@@ -180,7 +198,12 @@ const Deposito = () => {
           <Button type={"submit"}>Realizar deposito</Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={paymentStatus ? () => {} : handleClose}>
+      <Modal
+        show={showModal}
+        handleClose={
+          paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
+        }
+      >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <Tickets refPrint={printDiv} ticket={paymentStatus} />
@@ -192,10 +215,16 @@ const Deposito = () => {
         ) : (
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
-              <Button type="submit" onClick={onMakePayment}>
+              <Button
+                type="submit"
+                onClick={onMakePayment}
+                disabled={loadingCashIn}
+              >
                 Aceptar
               </Button>
-              <Button onClick={closeModal}>Cancelar</Button>
+              <Button onClick={handleClose} disabled={loadingCashIn}>
+                Cancelar
+              </Button>
             </ButtonBar>
           </PaymentSummary>
         )}

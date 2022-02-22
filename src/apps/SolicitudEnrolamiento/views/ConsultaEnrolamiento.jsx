@@ -2,7 +2,7 @@ import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Card from "../../../components/Base/Card/Card";
 import Modal from "../../../components/Base/Modal/Modal";
 import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
@@ -13,6 +13,7 @@ const ConsultaEnrolamiento = () => {
   const [numconsultaProceso, setNumConsultaProceso] = useState("");
   const [respuestaProceso, setRespuestaProceso] = useState("");
   const [estado, setEstado] = useState(false);
+  /* const [showModal, setShowModal] = useState(false); */
 
   const navigate = useNavigate();
   const {
@@ -20,10 +21,17 @@ const ConsultaEnrolamiento = () => {
     tituloConsultaInscripcion,
     contenedorNumeroProceso,
     contenedorForm,
+    contenedorBotones,
+    estadoConsulta,
+    contenedorDatos,
+    contenedorTitulos,
+    tituloDatos,
+    contenedorValoresTitulos,
   } = classes;
 
   const funConsultaProceso = (e) => {
     e.preventDefault();
+    setEstado(true);
     if (numconsultaProceso) {
       fetch(
         `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${numconsultaProceso}`
@@ -33,11 +41,6 @@ const ConsultaEnrolamiento = () => {
         .then((respuesta) => setRespuestaProceso(respuesta.obj.results))
         .catch(setEstado(true));
     }
-
-    /* setEstado(true); */
-
-    /*  console.log("Hubo un problema con la petición Fetch:" + error.message); */
-    /*  .then((respuesta) => console.log(respuesta.obj.results)); */
   };
   /*  console.log(respuestaProceso); */
 
@@ -50,11 +53,15 @@ const ConsultaEnrolamiento = () => {
       `/Solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0].id_reconocer}`
     );
   };
+  const handleClose = useCallback(() => {
+    setEstado(false);
+  }, []);
   return (
     <div className={principalConsulta}>
       <span className={tituloConsultaInscripcion}>
-        Formulario de Inscripción
+        Consultar Proceso de Inscripción
       </span>
+
       <Form onSubmit={(e) => funConsultaProceso(e)}>
         <Input
           label={"Ingrese Numero Proceso:"}
@@ -64,15 +71,16 @@ const ConsultaEnrolamiento = () => {
           onChange={(e) => setNumConsultaProceso(e.target.value)}
         ></Input>
 
-        <ButtonBar className={"lg:col-span-2"} type="">
+        <ButtonBar className={contenedorBotones} type="">
           <Button type="submit" onClick={(e) => funConsultaProceso(e)}>
             Consultar Proceso
           </Button>
         </ButtonBar>
 
         {respuestaProceso.length <= 0 && estado ? (
-          <Modal show>
+          <Modal show={estado} handleClose={handleClose}>
             <LogoPDP></LogoPDP>
+
             <h1>
               El número ingresado no se encuentra en proceso de enrolamiento,
               por favor revise si esta bien escrito o realice el proceso de
@@ -87,10 +95,34 @@ const ConsultaEnrolamiento = () => {
           <Modal show>
             <div className={contenedorForm}>
               <LogoPDP></LogoPDP>
-              <h2>{`Nombre: ${respuestaProceso[0]["nombre"]} ${respuestaProceso[0]["apellido"]}`}</h2>
-              <h2>{`Cedula Ciudadania: ${respuestaProceso[0]["numdoc"]}`}</h2>
-              <h2>{`Correo Electronico: ${respuestaProceso[0]["email"]}`}</h2>
-              <h2>{`Estado del Proceso: ${
+              <div className={contenedorDatos}>
+                <div className={contenedorTitulos}>
+                  <h2 className={tituloDatos}>{`Nombre: `}</h2>
+                  <h2 className={tituloDatos}>{`Cedula Ciudadania: `}</h2>
+                  <h2 className={tituloDatos}>{`Correo Electronico: `}</h2>
+                </div>
+                <div className={contenedorValoresTitulos}>
+                  <h2
+                    className={tituloDatos}
+                  >{`${respuestaProceso[0]["nombre"]} ${respuestaProceso[0]["apellido"]}`}</h2>
+                  <h2
+                    className={tituloDatos}
+                  >{` ${respuestaProceso[0]["numdoc"]}`}</h2>
+                  <h2
+                    className={tituloDatos}
+                  >{`${respuestaProceso[0]["email"]}`}</h2>
+                </div>
+                {/* <h2
+                  className={tituloDatos}
+                >{`Nombre: ${respuestaProceso[0]["nombre"]} ${respuestaProceso[0]["apellido"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{`Cedula Ciudadania: ${respuestaProceso[0]["numdoc"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{`Correo Electronico: ${respuestaProceso[0]["email"]}`}</h2> */}
+              </div>
+              <h2 className={estadoConsulta}>{`Estado del Proceso: ${
                 respuestaProceso[0]["validation_state"] === "101"
                   ? "Señor usuario ha sido aprobado para realizar la prueba biometrica, lo invitamos a darle click en el botón para realizar el proceso."
                   : respuestaProceso[0]["validation_state"] === "102"
@@ -101,6 +133,7 @@ const ConsultaEnrolamiento = () => {
                   ? "Proceso Rechazado por Hellen"
                   : "Señor usuario su Proceso se encuentra en Validación de documentos."
               }`}</h2>
+
               {respuestaProceso[0].validation_state === "101" &&
               respuestaProceso[0].id_reconocer === "None" ? (
                 <ButtonBar className={"lg:col-span-2"} type="">
@@ -109,15 +142,19 @@ const ConsultaEnrolamiento = () => {
                   </Button>
                 </ButtonBar>
               ) : respuestaProceso[0].validation_state ===
-                "En Proceso de Validación" ? null : (
-                <ButtonBar className={"lg:col-span-2"} type="">
+                "En Proceso de Validación" ? null : respuestaProceso[0]
+                  .id_reconocer !== "None" ? (
+                <ButtonBar type="">
                   <Button
+                    className={contenedorBotones}
                     type="submit"
                     onClick={() => handleContinuarReconoser()}
                   >
                     Continuar Proceso ReconoserID
                   </Button>
                 </ButtonBar>
+              ) : (
+                ""
               )}
             </div>
           </Modal>

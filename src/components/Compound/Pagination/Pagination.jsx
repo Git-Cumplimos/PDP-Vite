@@ -10,6 +10,7 @@ const Pagination = ({
   lgButtons = true,
   children,
   grid = false,
+  onSubmit = (e) => e.preventDefault()
 }) => {
   const [{ page = 1 }, setQuery] = useQuery();
 
@@ -20,7 +21,7 @@ const Pagination = ({
   );
 
   return (
-    <Form onLazyChange={{ callback: onChange, timeOut: 300 }} grid={grid}>
+    <Form onLazyChange={{ callback: onChange, timeOut: 300 }} onSubmit={onSubmit} grid={grid}>
       {children}
       {maxPage !== 1 && maxPage !== 0 ? (
         <ButtonBar className={`${lgButtons ? "lg:col-span-2" : ""}`}>
