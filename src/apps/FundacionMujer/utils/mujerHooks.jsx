@@ -77,7 +77,6 @@ export const useProvideFDLM = () => {
       motivo:values?.motivo,
       
     };
-    console.log(body);
     try {
       const res = await fetchData(urls.ingresoreverso, "POST", {}, body);
       return res;
@@ -115,6 +114,7 @@ export const useProvideFDLM = () => {
       Depto: parseInt(user?.Depto),
       Municipio: parseInt(user?.Municipio),
     };
+    console.log(body)
     try {
       const res = await fetchData(urls.valorcuota, "POST", {}, body);
       return res;

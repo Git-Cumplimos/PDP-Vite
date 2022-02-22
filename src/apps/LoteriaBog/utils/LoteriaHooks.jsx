@@ -27,11 +27,11 @@ const urls = {
   //ventasReportes: `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`,
   //pagosReportes:`${process.env.REACT_APP_URL_LOTERIAS}/reportes_pago_premios`,
     
-  consultaPago: `http://127.0.0.1:5000/consultaPremio`,
-  premiohash: `http://127.0.0.1:5000/estadoPremioVirtual`,
-  premiofisico: `http://127.0.0.1:5000/estadoPremioFisico`,
-  pagopremio: `http://127.0.0.1:5000/pagoPremioVirtual`,
-  pagopremiofisico: `http://127.0.0.1:5000/pagoPremioFisico`,
+  consultaPago: `${process.env.REACT_APP_URL_LOTERIAS}/consultaPremio`,
+  premiohash: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioVirtual`,
+  premiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioFisico`,
+  pagopremio: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioVirtual`,
+  pagopremiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioFisico`,
   
   ConsultaCrearSort: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_sorteos`,
   CambiarSort: `${process.env.REACT_APP_URL_LOTERIAS}/sorteo`, 
