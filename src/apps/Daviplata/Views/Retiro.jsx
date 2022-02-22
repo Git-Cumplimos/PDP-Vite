@@ -22,7 +22,7 @@ const Retiro = () => {
 
   const [{ phone, userDoc, valor, otp, summary }, setQuery] = useQuery();
 
-  const { roleInfo } = useAuth();
+  const { roleInfo, infoTicket } = useAuth();
 
   const [loadingCashOut, fetchCashOut] = useFetch(postCashOut);
 
@@ -100,6 +100,9 @@ const Retiro = () => {
 
   const onMakePayment = useCallback(() => {
     const body = {
+      id_comercio: roleInfo?.id_comercio,
+      id_usuario: roleInfo?.id_usuario,
+      oficina_propia: false,
       idcliente: 5,
       ipcliente: "172.17.0.4",
       idpersona: 240,
@@ -117,7 +120,8 @@ const Retiro = () => {
           return;
         }
         notify("Transaccion satisfactoria");
-        setPaymentStatus({
+        const trx_id = res?.obj?.trxId ?? 0;
+        const tempTicket = {
           title: "Recibo de retiro",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
@@ -132,26 +136,36 @@ const Retiro = () => {
             }).format(new Date()),
           },
           commerceInfo: [
-            ["Id Comercio", 2],
-            ["No. terminal", 233],
-            ["Municipio", roleInfo?.ciudad ?? "Bogota"],
-            ["Dirección", "Calle 11 # 11 - 2"],
-            ["Id Trx", 233],
+            ["Id Comercio", roleInfo?.id_comercio],
+            ["No. terminal", roleInfo?.id_dispositivo],
+            ["Municipio", roleInfo?.ciudad || "Bogota"],
+            ["Dirección", roleInfo?.ciudad || "Calle 11 # 11 - 2"],
+            ["Id Trx", trx_id],
             ["Id Transacción", res?.obj?.IdTransaccion],
           ],
           commerceName: "Daviplata",
           trxInfo: [
             ["Celular", phone],
+            ["C.C.", userDoc],
             ["Valor retiro", formatMoney.format(valor)],
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
-        });
+        };
+        setPaymentStatus(tempTicket);
+        infoTicket(trx_id, 21, tempTicket)
+          .then((resTicket) => {
+            console.log(resTicket);
+          })
+          .catch((err) => {
+            console.error(err);
+            notifyError("Error guardando el ticket");
+          });
       })
       .catch((err) => {
         console.error(err);
         notifyError("Error en la transaccion");
       });
-  }, [userDoc, otp, phone, valor, fetchCashOut, roleInfo?.ciudad]);
+  }, [userDoc, otp, phone, valor, fetchCashOut, roleInfo, infoTicket]);
 
   return (
     <Fragment>
