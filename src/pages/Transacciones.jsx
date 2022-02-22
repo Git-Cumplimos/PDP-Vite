@@ -82,11 +82,11 @@ const Transacciones = () => {
 
     setIdComercio(roleInfo?.id_comercio || -1);
   }, [userPermissions, roleInfo?.id_comercio]);
-  
+
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Transacciones</h1>
-      <Form grid>
+      <Form onSubmit={(e) => e.preventDefault()} grid>
         <Input
           id="dateInit"
           label="Fecha inicial"
@@ -176,40 +176,44 @@ const Transacciones = () => {
           ""
         )}
 
-        <ButtonBar className="col-span-1 md:col-span-2">
-          <Button
-            type="button"
-            disabled={page < 2}
-            onClick={() => {
-              setPage(page - 1);
-              transacciones(
-                page - 1,
-                idComercio,
-                tipoOp,
-                fechaInicial,
-                fechaFinal
-              );
-            }}
-          >
-            Anterior
-          </Button>
-          <Button
-            type="button"
-            disabled={page >= maxPages}
-            onClick={() => {
-              setPage(page + 1);
-              transacciones(
-                page + 1,
-                idComercio,
-                tipoOp,
-                fechaInicial,
-                fechaFinal
-              );
-            }}
-          >
-            Siguiente
-          </Button>
-        </ButtonBar>
+        {maxPages > 1 ? (
+          <ButtonBar className="col-span-1 md:col-span-2">
+            <Button
+              type="button"
+              disabled={page < 2}
+              onClick={() => {
+                setPage(page - 1);
+                transacciones(
+                  page - 1,
+                  idComercio,
+                  tipoOp,
+                  fechaInicial,
+                  fechaFinal
+                );
+              }}
+            >
+              Anterior
+            </Button>
+            <Button
+              type="button"
+              disabled={page >= maxPages}
+              onClick={() => {
+                setPage(page + 1);
+                transacciones(
+                  page + 1,
+                  idComercio,
+                  tipoOp,
+                  fechaInicial,
+                  fechaFinal
+                );
+              }}
+            >
+              Siguiente
+            </Button>
+          </ButtonBar>
+        ) : (
+          ""
+        )}
       </Form>
       {Array.isArray(trxs) && trxs.length > 0 ? (
         <>
@@ -267,7 +271,9 @@ const Transacciones = () => {
           </div>
         ) : (
           <div className="flex flex-col justify-center items-center mx-auto container">
-          <h1 className="text-3xl mt-6 text-aling">No hay ticket registrado</h1>
+            <h1 className="text-3xl mt-6 text-aling">
+              No hay ticket registrado
+            </h1>
           </div>
         )}
       </Modal>

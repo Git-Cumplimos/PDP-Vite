@@ -13,9 +13,7 @@ export const postCashIn = async (bodyObj) => {
       `${urlDaviplata}/cash-in`,
       "POST",
       {},
-      bodyObj,
-      {},
-      false
+      bodyObj
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -37,9 +35,7 @@ export const postCashOut = async (bodyObj) => {
       `${urlDaviplata}/cash-out`,
       "POST",
       {},
-      bodyObj,
-      {},
-      false
+      bodyObj
     );
     if (!res?.status) {
       console.error(res?.msg);

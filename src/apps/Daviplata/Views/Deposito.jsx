@@ -94,6 +94,9 @@ const Deposito = () => {
 
   const onMakePayment = useCallback(() => {
     const body = {
+      id_comercio: roleInfo?.id_comercio,
+      id_usuario: roleInfo?.id_usuario,
+      oficina_propia: false,
       idcliente: 5,
       ipcliente: "172.17.0.4",
       idpersona: 240,
@@ -126,11 +129,11 @@ const Deposito = () => {
             }).format(new Date()),
           },
           commerceInfo: [
-            ["Id Comercio", 2],
-            ["No. terminal", 233],
-            ["Municipio", roleInfo?.ciudad ?? "Bogota"],
-            ["Dirección", "Calle 11 # 11 - 2"],
-            ["Id Trx", 233],
+            ["Id Comercio", roleInfo?.id_comercio],
+            ["No. terminal", roleInfo?.id_dispositivo],
+            ["Municipio", roleInfo?.ciudad || "Bogota"],
+            ["Dirección", roleInfo?.ciudad || "Calle 11 # 11 - 2"],
+            ["Id Trx", trx_id],
             ["Id Transacción", res?.obj?.IdTransaccion],
           ],
           commerceName: "Daviplata",
@@ -142,7 +145,7 @@ const Deposito = () => {
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
         setPaymentStatus(tempTicket);
-        infoTicket(trx_id, 12, tempTicket)
+        infoTicket(trx_id, 21, tempTicket)
           .then((resTicket) => {
             console.log(resTicket);
           })
@@ -153,9 +156,9 @@ const Deposito = () => {
       })
       .catch((err) => {
         console.error(err);
-        notifyError("Error en la transaccion");
+        notifyError("Error interno en la transaccion");
       });
-  }, [phone, valor, userDoc, fetchCashIn, roleInfo?.ciudad, infoTicket]);
+  }, [phone, valor, userDoc, fetchCashIn, roleInfo, infoTicket]);
 
   return (
     <Fragment>

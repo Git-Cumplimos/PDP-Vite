@@ -48,6 +48,7 @@ const LoginForm = () => {
           notifyError("Codigo TOTP invalido");
         } else if (err.code === "NotAuthorizedException") {
           notifyError("La sesion ha expirado");
+          setPassword("");
         } else {
           notifyError(err.message);
         }

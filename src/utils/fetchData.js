@@ -50,7 +50,11 @@ const fetchData = async (
     ...headers,
   };
   if (method === "POST" || method === "PUT") {
-    fetchOptions.body = JSON.stringify(data);
+    if (data instanceof FormData) {
+      fetchOptions.body = data;
+    } else {
+      fetchOptions.body = JSON.stringify(data);
+    }
   }
 
   const response = await fetch(url, fetchOptions);
