@@ -23,6 +23,9 @@ const AdministradorResponsablesComerciales = () => {
       e.estado = "Inactivo";
     }
   });
+  const handleSubmit = () => {
+    navigate(`/administradorresponsablecomercial/crearresponsable`);
+  };
   return (
     <div className={contenedorPrincipal}>
       <Table
@@ -38,7 +41,7 @@ const AdministradorResponsablesComerciales = () => {
           )
         }
       ></Table>
-      <Button type="" /* onClick={() => handleSubmit()} */>
+      <Button type="" onClick={() => handleSubmit()}>
         Agregar Responsable
       </Button>
     </div>

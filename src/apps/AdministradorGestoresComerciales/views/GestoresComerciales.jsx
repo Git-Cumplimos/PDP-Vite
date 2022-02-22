@@ -37,18 +37,6 @@ const GestoresComerciales = () => {
   const handleSubmit = () => {
     navigate(`/administradorgestorcomercial/admin/crearasesor`);
   };
-  const AgregarComercio = () => {
-    const spanResult = document.getElementById("result");
-    spanResult.value = "";
-    const x = document.getElementById("cars");
-    for (let i = 0; i < x.option.length; i++) {
-      if (x.option[i].selected === true) {
-        spanResult.value += x.option[i].value + " ";
-        document.getElementById("result").innerHTML = spanResult.value;
-        document.getElementById("result").style.color = "green";
-      }
-    }
-  };
 
   asesoresComerciales.filter((e) => {
     if (e.estado == true) {
@@ -59,48 +47,32 @@ const GestoresComerciales = () => {
   });
   return (
     <div className={ContenedorTabla}>
-      <Pagination maxPage={cantidadPaginas} lgButtons={false} grid>
-        {Array.isArray(asesoresComerciales) &&
-        asesoresComerciales.length > 0 ? (
-          <Table
-            headers={["Id Asesor", "Nombre Asesor", "Estado", "Responsable"]}
-            data={asesoresComerciales.map(
-              ({ id_asesor, nom_asesor, estado, responsable }) => {
-                return {
-                  id_asesor,
-                  nom_asesor,
-                  estado,
-                  responsable: responsable["nombre"],
-                };
-              }
-            )}
-            onSelectRow={(e, i) =>
-              navigate(
-                `/administradorgestorcomercial/admin/modificarasesor/${asesoresComerciales[i]["id_asesor"]}`
-              )
-            }
-          ></Table>
-        ) : (
-          ""
-        )}
+      <Pagination maxPage={cantidadPaginas} lgButtons={true} grid>
+        {Array.isArray(asesoresComerciales) && asesoresComerciales.length > 0
+          ? ""
+          : ""}
       </Pagination>
+      <Table
+        headers={["Id Asesor", "Nombre Asesor", "Estado", "Responsable"]}
+        data={asesoresComerciales.map(
+          ({ id_asesor, nom_asesor, estado, responsable }) => {
+            return {
+              id_asesor,
+              nom_asesor,
+              estado,
+              responsable: responsable["nombre"],
+            };
+          }
+        )}
+        onSelectRow={(e, i) =>
+          navigate(
+            `/administradorgestorcomercial/admin/modificarasesor/${asesoresComerciales[i]["id_asesor"]}`
+          )
+        }
+      ></Table>
       <Button type="" onClick={() => handleSubmit()}>
         Agregar Asesor
       </Button>
-
-      <select name="cars" id="cars" multiple="multiple">
-        <option value="volvo">Volvo</option>
-        <option value="saab">Saab</option>
-        <option value="opel">Opel</option>
-        <option value="audi">Audi</option>
-      </select>
-      <span id="result"></span>
-      <input
-        type="button"
-        id="but1"
-        value="Click"
-        onClick={() => AgregarComercio}
-      />
     </div>
   );
 };
