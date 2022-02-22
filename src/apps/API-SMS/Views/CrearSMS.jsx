@@ -99,58 +99,62 @@ const CrearSMS = () => {
         timeOut: 500,
       }}
       />
+      {SMS !== '' ?
       <ButtonBar>
-        <Button type='submit' onClick={() => setShowModal(!showModal)}>
-          Crear
-        </Button>
+      <Button type='submit' onClick={() => setShowModal(!showModal)}>
+        Crear
+      </Button>
       </ButtonBar>
-      <ButtonBar>
-          <Button
-            type="button"
-            disabled={page < 2}
-            onClick={() => {
-              if (page > 1) {
-                setPage(page - 1);
-                buscarSMS(SMS,page-1).then((res) => {
-                  if (res.status===false) {
-                    notifyError(res.msg);
-                    
-                  } else {
-                    console.log(res.obj);
-                    setResSMS(res.obj.results)
-                    setMaxPages(res.obj.maxPages)
-                  }
-                });
-              }
-            }}
-          >
-            Anterior
-          </Button>
-          <Button
-            type="button"
-            disabled={page >= maxPages || resSMS?.length === 0}
-            onClick={() => {
-              if (page < maxPages) {
-                setPage(page + 1);
-                buscarSMS(SMS,page+1).then((res) => {
-                  if (res.status===false) {
-                    notifyError(res.msg);
-                    
-                  } else {
-                    console.log(res.obj);
-                    setResSMS(res.obj.results)
-                    setMaxPages(res.obj.maxPages)
-                  }
-                });
-              }
-            }}
-          >
-            Siguiente
-          </Button>
-        </ButtonBar>
+      :
+      ''} 
+      
 
       {Array.isArray(resSMS) && resSMS.length > 0 ? (
         <>
+            <ButtonBar>
+            <Button
+              type="button"
+              disabled={page < 2}
+              onClick={() => {
+                if (page > 1) {
+                  setPage(page - 1);
+                  buscarSMS(SMS,page-1).then((res) => {
+                    if (res.status===false) {
+                      notifyError(res.msg);
+                      
+                    } else {
+                      console.log(res.obj);
+                      setResSMS(res.obj.results)
+                      setMaxPages(res.obj.maxPages)
+                    }
+                  });
+                }
+              }}
+            >
+              Anterior
+            </Button>
+            <Button
+              type="button"
+              disabled={page >= maxPages || resSMS?.length === 0}
+              onClick={() => {
+                if (page < maxPages) {
+                  setPage(page + 1);
+                  buscarSMS(SMS,page+1).then((res) => {
+                    if (res.status===false) {
+                      notifyError(res.msg);
+                      
+                    } else {
+                      console.log(res.obj);
+                      setResSMS(res.obj.results)
+                      setMaxPages(res.obj.maxPages)
+                    }
+                  });
+                }
+              }}
+            >
+              Siguiente
+            </Button>
+          </ButtonBar>
           <div className="flex flex-row justify-evenly w-full my-4">
             <h1>Pagina: {page}</h1>
             <h1>Ultima pagina: {maxPages}</h1>
