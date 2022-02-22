@@ -8,7 +8,7 @@
 
 /* Modal Content/Box */
 .modalContent {
-  @apply relative bg-white border-black text-black m-auto border-2;
+  @apply relative bg-white text-black m-auto shadow-xl;
 }
 
 /* The Close Button */

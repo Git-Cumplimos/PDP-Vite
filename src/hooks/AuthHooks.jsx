@@ -32,6 +32,9 @@ const infoTicket = async (id_trx, Tipo_operacion, ticket) => {
 };
 
 const fetchDane = async (codigo_dane) => {
+  if (!codigo_dane) {
+    return ""
+  }
   try {
     const resp_ciudad = await fetchData(
       urlCiudad_dane,
@@ -48,6 +51,12 @@ const fetchDane = async (codigo_dane) => {
 };
 
 const fetchOficinaLoteria = async (id_comercio) => {
+  if (!id_comercio) {
+    return {
+      cod_oficina_lot: "",
+      cod_sucursal_lot: "",
+    };
+  }
   try {
     const resp_cod = await fetchData(
       urlCod_loteria_oficina,
@@ -119,7 +128,6 @@ const initialUser = {
   userInfo: null,
   roleInfo: null,
   quotaInfo: null,
-  userSession: null,
   pdpUser: null,
   userPermissions: null,
 };
@@ -134,7 +142,6 @@ const SET_USERINFO = "SET_USERINFO";
 const SET_ROLEINFO = "SET_ROLEINFO";
 const SET_PERMISSIONS = "SET_PERMISSIONS";
 const SET_PDPUSER = "SET_PDPUSER";
-const SET_SESSION = "SET_SESSION";
 const SET_QUOTA = "SET_QUOTA";
 
 const reducerAuth = (userState, action) => {
@@ -170,10 +177,6 @@ const reducerAuth = (userState, action) => {
     case SET_PDPUSER:
       const { pdpU } = payload;
       return { ...userState, pdpUser: pdpU };
-
-    case SET_SESSION:
-      const { uSession } = payload;
-      return { ...userState, userSession: uSession };
 
     case SET_QUOTA:
       const { quota } = payload;
@@ -227,7 +230,9 @@ const reducerAuth = (userState, action) => {
           // Fetch suser info
           fetchData(urlLog, "GET", { correo: email }, {})
             .then((suserInfo) => {
-              dispatch?.({ type: SET_ROLEINFO, payload: suserInfo });
+              if (!("msg" in suserInfo)) {
+                dispatch?.({ type: SET_ROLEINFO, payload: suserInfo });
+              }
               fetchDane(suserInfo.codigo_dane)
                 .then((ciudad) => {
                   dispatch?.({
@@ -254,12 +259,6 @@ const reducerAuth = (userState, action) => {
           });
         })
         .catch(() => {});
-
-      Auth.currentSession()
-        .then((uSession) =>
-          dispatch?.({ type: SET_SESSION, payload: { uSession } })
-        )
-        .catch(() => {});
       return { ...userState, cognitoUser: loggedUser, isSignedIn: true };
 
     default:
@@ -271,7 +270,7 @@ export const AuthContext = createContext({
   signIn: () => {},
   confirmSignIn: () => {},
   signOut: () => {},
-  infoTicket: () => {},
+  infoTicket,
   handleverifyTotpToken: () => {},
   handleChangePass: () => {},
   parameters: null,
@@ -432,7 +431,7 @@ export const useProvideAuth = () => {
     [cognitoUser, handlesetPreferredMFA]
   );
 
-  // Runs in first load
+  // Runs only when route change
   useEffect(() => {
     Auth.currentAuthenticatedUser()
       .then((user) => {
@@ -452,7 +451,7 @@ export const useProvideAuth = () => {
     //     payload: { loggedUser: Auth.user, dispatch: dispatchAuth },
     //   });
     // }
-  }, []);
+  }, [pathname]);
 
   // Runs when route change
   useEffect(() => {

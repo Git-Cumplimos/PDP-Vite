@@ -220,7 +220,7 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
         )}
         {Array.isArray(typesDB?.results) && typesDB?.results.length > 0 ? (
           <Table
-            headers={["Id", "Nombre operacion", "Aliado"]}
+            headers={["Id", "Nombre tipo transaccion", "Aliado"]}
             data={typesDB?.results.map(
               ({ id_tipo_operacion, Nombre, Aliado }) => {
                 return { id_tipo_operacion, Nombre, Aliado };
