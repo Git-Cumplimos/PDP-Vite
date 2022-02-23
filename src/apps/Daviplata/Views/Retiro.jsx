@@ -139,7 +139,7 @@ const Retiro = () => {
             ["Id Comercio", roleInfo?.id_comercio],
             ["No. terminal", roleInfo?.id_dispositivo],
             ["Municipio", roleInfo?.ciudad || "Bogota"],
-            ["Dirección", roleInfo?.ciudad || "Calle 11 # 11 - 2"],
+            ["Dirección", roleInfo?.direccion || "Calle 11 # 11 - 2"],
             ["Id Trx", trx_id],
             ["Id Transacción", res?.obj?.IdTransaccion],
           ],
