@@ -2,7 +2,7 @@ import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
-import { Fragment, useCallback, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Modal from "../../../components/Base/Modal/Modal";
 import useQuery from "../../../hooks/useQuery";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +30,34 @@ const Retiro = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
 
   const printDiv = useRef();
+
+  useEffect(() => {
+    if (Object.keys(roleInfo).length === 0) {
+      navigate(-1);
+    } else {
+      let hasKeys = true;
+      const keys = [
+        "id_comercio",
+        "id_usuario",
+        "tipo_comercio",
+        "id_dispositivo",
+        "ciudad",
+        "direccion",
+      ];
+      for (const key of keys) {
+        if (!(key in roleInfo)) {
+          hasKeys = false;
+          break;
+        }
+      }
+      if (!hasKeys) {
+        notifyError(
+          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+        );
+        navigate(-1);
+      }
+    }
+  }, [roleInfo, navigate]);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -102,7 +130,7 @@ const Retiro = () => {
     const body = {
       id_comercio: roleInfo?.id_comercio,
       id_usuario: roleInfo?.id_usuario,
-      oficina_propia: false,
+      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
       idcliente: 5,
       ipcliente: "172.17.0.4",
       idpersona: 240,

@@ -4,7 +4,7 @@ import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
 import Modal from "../../../components/Base/Modal/Modal";
 import useQuery from "../../../hooks/useQuery";
-import { Fragment, useState, useCallback, useRef } from "react";
+import { Fragment, useState, useCallback, useRef, useEffect } from "react";
 import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
 import Tickets from "../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
@@ -29,6 +29,34 @@ const Deposito = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
 
   const printDiv = useRef();
+
+  useEffect(() => {
+    if (Object.keys(roleInfo).length === 0) {
+      navigate(-1);
+    } else {
+      let hasKeys = true;
+      const keys = [
+        "id_comercio",
+        "id_usuario",
+        "tipo_comercio",
+        "id_dispositivo",
+        "ciudad",
+        "direccion",
+      ];
+      for (const key of keys) {
+        if (!(key in roleInfo)) {
+          hasKeys = false;
+          break;
+        }
+      }
+      if (!hasKeys) {
+        notifyError(
+          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+        );
+        navigate(-1);
+      }
+    }
+  }, [roleInfo, navigate]);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -96,7 +124,7 @@ const Deposito = () => {
     const body = {
       id_comercio: roleInfo?.id_comercio,
       id_usuario: roleInfo?.id_usuario,
-      oficina_propia: false,
+      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
       idcliente: 5,
       ipcliente: "172.17.0.4",
       idpersona: 240,
