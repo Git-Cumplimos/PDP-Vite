@@ -1,3 +1,15 @@
 .contenedorPrincipal {
   display: contents;
 }
+.contenedorTablas {
+  display: grid;
+}
+.espaciosFieldset {
+  margin-top: 1vw;
+}
+
+.contenedorZonaEstado {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}

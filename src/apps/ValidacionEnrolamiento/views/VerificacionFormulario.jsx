@@ -14,6 +14,7 @@ import TextArea from "../../../components/Base/TextArea/TextArea";
 import Fieldset from "../../../components/Base/Fieldset/Fieldset";
 import Select from "../../../components/Base/Select/Select";
 import { notify } from "../../../utils/notify";
+import fetchData from "../../../utils/fetchData";
 /* import file from ".././certificado_movimiento.pdf";
 import file2 from ".././ced.pdf";
 import file3 from ".././rut.pdf"; */
@@ -53,11 +54,12 @@ const VerificacionFormulario = () => {
   useEffect(() => {
     /* const updateWidth = () => { */
 
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
+      "GET"
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */
     )
-      .then((response) => response.json())
+      /* .then((response) => response.json()) */
       .then((respuesta) => setDatosParams(respuesta.obj.results));
     /*  }; */
 
@@ -74,10 +76,11 @@ const VerificacionFormulario = () => {
       const datos = {
         id_proceso: datosParams[0]["id_proceso"].toString(),
       };
-      fetch(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile?id_proceso=${datos["id_proceso"]}`
+      fetchData(
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile?id_proceso=${datos["id_proceso"]}`,
+        "GET"
       )
-        .then((res) => res.json())
+        /* .then((res) => res.json()) */
         .then((respuesta) => {
           console.log(respuesta.obj["rut"]);
           setUrlPdfs(respuesta.obj);
