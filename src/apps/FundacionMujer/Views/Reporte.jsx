@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Modal from "../../../components/Base/Modal/Modal";
@@ -10,6 +10,7 @@ import Tickets from "../../../components/Base/Tickets/Tickets";
 import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 import { ExportToCsv } from "export-to-csv";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 function createCard(
   codigo_punto,
@@ -37,15 +38,21 @@ function createCard(
   };
 }
 
+
+
 const url_Report = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
 const url_Download = `${process.env.REACT_APP_URL_FDLMWSDL}/report`;
 
 //const printDiv = useRef();
 
 const Reporte = () => {
+
+  const {userPermissions, roleInfo} = useAuth();
+
   const [trxs, setTrxs] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [comercio, setComercio] = useState(-1);
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [tipoOp, setTipoOp] = useState("");
@@ -56,6 +63,7 @@ const Reporte = () => {
   const [Download, setDownload] = useState(null);
   const [showModal2, setShowModal2] = useState(false);
   const [disabledBtn, setDisabledBtn] = useState(true);
+
 
   const exportdata = (e) => {
     e.preventDefault();
@@ -107,14 +115,18 @@ const Reporte = () => {
     { value: "6", label: "Reversos" },
   ];
 
+  useEffect(() => {
+    setComercio(roleInfo?.id_comercio || -1);
+  }, [userPermissions, roleInfo?.id_comercio]);
+
   /*Buscar report*/
   const report = useCallback(
-    async(Tipo_operacion,page, date_ini, date_end) => {
+    async(Comercio,Tipo_operacion,page, date_ini, date_end) => {
       const url = url_Report;
       const queries = {};
-      // if (!(Comercio === -1 || Comercio === "")) {
-      //   queries.Comercio = Comercio;
-      // }
+      if (!(Comercio === -1 || Comercio === "")) {
+        queries.Comercio = parseInt(Comercio);
+      }
       if (Tipo_operacion) {
         queries.Tipo_operacion = Tipo_operacion;
       }
@@ -129,7 +141,12 @@ const Reporte = () => {
       try {
         const res = await fetchData(url, "GET", queries);
         console.log(res);
-        return res;
+        if (res.status === false) {
+          notifyError(res.msg);
+        } else {
+          setMaxPages(res?.obj?.maxpages);
+          setTrxs(res?.obj?.trxs);          
+        }
       } catch (err) {
         console.error(err);
       }
@@ -167,16 +184,22 @@ const Reporte = () => {
   const closeModal = useCallback(() => {
     setShowModal(false);
   });
- 
+  
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Reporte</h1>
       <Form onSubmit={onSubmit} grid>
+        {userPermissions
+        .map(({ id_permission }) => id_permission)
+        .includes(28) ? 
         <ButtonBar className="col-span-1 md:col-span-2">
           <Button type="submit" onClick={() => {}}>
             Descargar reporte
           </Button>
-        </ButtonBar>
+        </ButtonBar> :
+        ""
+        }
+        
         <Input
           id="dateInit"
           label="Fecha inicial"
@@ -188,15 +211,7 @@ const Reporte = () => {
             setFechaInicial(e.target.value);
             if (fechaFinal !== "") {
               if (tipoOp !== "") {
-                report(tipoOp, 1, e.target.value, fechaFinal).then((res) => {
-                  if (res.status === false) {
-                    notifyError(res.msg);
-                  } else {
-                    setMaxPages(res?.obj?.maxpages);
-                    setTrxs(res?.obj?.trxs);
-                    
-                  }
-                });
+                report(comercio,tipoOp, 1, e.target.value, fechaFinal)
               }
             }
           }}
@@ -211,19 +226,12 @@ const Reporte = () => {
             setFechaFinal(e.target.value);
             if (fechaInicial !== "") {
               if (tipoOp !== "") {
-                report(tipoOp, 1, fechaInicial, e.target.value).then((res) => {
-                  if (res.status === false) {
-                    notifyError(res.msg);
-                  } else {
-                    setMaxPages(res?.obj?.maxpages);
-                    setTrxs(res?.obj?.trxs);
-
-                  }
-                });
+                report(comercio,tipoOp, 1, fechaInicial, e.target.value)
               }
             }
           }}
         />
+        
         <Select
           id="searchBySorteo"
           label="Tipo de busqueda"
@@ -233,22 +241,40 @@ const Reporte = () => {
             setPage(1);
             setTipoOp(parseInt(e.target.value));
             if (!(e.target.value === null || e.target.value === "")) {
-              report(e.target.value, 1, fechaInicial, fechaFinal).then(
-                (res) => {
-                  console.log(res)
-                  if (res?.status === false) {
-                    notifyError(res.msg);
-                  } else {
-                    setMaxPages(res?.obj?.maxpages);
-                    console.log(res?.obj?.trxs);
-                    setTrxs(res?.obj?.trxs);
-                    
-                  }
-                }
-              );
+              report(comercio,e.target.value, 1, fechaInicial, fechaFinal)
             }
           }}
         />
+        {userPermissions
+          .map(({ id_permission }) => id_permission)
+          .includes(28) ? (
+          <Input
+            id="id_comercio"
+            label="Id comercio"
+            type="numeric"
+            value={comercio}
+            onChange={(e) => {
+              setComercio(e.target.value);
+            }}
+            onLazyInput={{
+              callback: (e) => {
+                setPage(1);
+                if (tipoOp !== "") {
+                  report(
+                    e.target.value,                   
+                    tipoOp,
+                    1, 
+                    fechaInicial,
+                    fechaFinal
+                  );
+                }
+              },
+              timeOut: 500,
+            }}
+          />
+        ) : (
+          ""
+        )}
 
         <ButtonBar className="col-span-1 md:col-span-2">
           <Button
@@ -256,14 +282,7 @@ const Reporte = () => {
             disabled={page < 2}
             onClick={() => {
               setPage(page - 1);
-              report(tipoOp, page - 1, fechaInicial, fechaFinal).then((res) => {
-                if (res.status === false) {
-                  notifyError(res.msg);
-                } else {
-                  setTrxs(res?.obj?.trxs);
-                  
-                }
-              });
+              report(comercio,tipoOp, page - 1, fechaInicial, fechaFinal)
             }}
           >
             Anterior
@@ -273,14 +292,7 @@ const Reporte = () => {
             disabled={page >= maxPages}
             onClick={() => {
               setPage(page + 1);
-              report(tipoOp, page + 1, fechaInicial, fechaFinal).then((res) => {
-                if (res.status === false) {
-                  notifyError(res.msg);
-                } else {
-                  setTrxs(res?.obj?.trxs);
-                  
-                }
-              });
+              report(comercio,tipoOp, page + 1, fechaInicial, fechaFinal)
             }}
           >
             Siguiente

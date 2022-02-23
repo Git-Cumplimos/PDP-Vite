@@ -4,7 +4,7 @@ import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
 import Modal from "../../../components/Base/Modal/Modal";
 import useQuery from "../../../hooks/useQuery";
-import { Fragment, useState, useCallback, useRef } from "react";
+import { Fragment, useState, useCallback, useRef, useEffect } from "react";
 import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
 import Tickets from "../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
@@ -29,6 +29,34 @@ const Deposito = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
 
   const printDiv = useRef();
+
+  useEffect(() => {
+    if (Object.keys(roleInfo).length === 0) {
+      navigate(-1);
+    } else {
+      let hasKeys = true;
+      const keys = [
+        "id_comercio",
+        "id_usuario",
+        "tipo_comercio",
+        "id_dispositivo",
+        "ciudad",
+        "direccion",
+      ];
+      for (const key of keys) {
+        if (!(key in roleInfo)) {
+          hasKeys = false;
+          break;
+        }
+      }
+      if (!hasKeys) {
+        notifyError(
+          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+        );
+        navigate(-1);
+      }
+    }
+  }, [roleInfo, navigate]);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -94,6 +122,9 @@ const Deposito = () => {
 
   const onMakePayment = useCallback(() => {
     const body = {
+      id_comercio: roleInfo?.id_comercio,
+      id_usuario: roleInfo?.id_usuario,
+      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
       idcliente: 5,
       ipcliente: "172.17.0.4",
       idpersona: 240,
@@ -126,11 +157,11 @@ const Deposito = () => {
             }).format(new Date()),
           },
           commerceInfo: [
-            ["Id Comercio", 2],
-            ["No. terminal", 233],
-            ["Municipio", roleInfo?.ciudad ?? "Bogota"],
-            ["Dirección", "Calle 11 # 11 - 2"],
-            ["Id Trx", 233],
+            ["Id Comercio", roleInfo?.id_comercio],
+            ["No. terminal", roleInfo?.id_dispositivo],
+            ["Municipio", roleInfo?.ciudad || "Bogota"],
+            ["Dirección", roleInfo?.direccion || "Calle 11 # 11 - 2"],
+            ["Id Trx", trx_id],
             ["Id Transacción", res?.obj?.IdTransaccion],
           ],
           commerceName: "Daviplata",
@@ -142,7 +173,7 @@ const Deposito = () => {
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
         setPaymentStatus(tempTicket);
-        infoTicket(trx_id, 12, tempTicket)
+        infoTicket(trx_id, 20, tempTicket)
           .then((resTicket) => {
             console.log(resTicket);
           })
@@ -153,9 +184,9 @@ const Deposito = () => {
       })
       .catch((err) => {
         console.error(err);
-        notifyError("Error en la transaccion");
+        notifyError("Error interno en la transaccion");
       });
-  }, [phone, valor, userDoc, fetchCashIn, roleInfo?.ciudad, infoTicket]);
+  }, [phone, valor, userDoc, fetchCashIn, roleInfo, infoTicket]);
 
   return (
     <Fragment>

@@ -140,7 +140,7 @@ const EnviarSMS = () => {
     
   });
 
-  console.log(phonesText)
+  console.log(phones?.length)
   return (
     <>
       <h1 className="text-3xl mb-6">Enviar SMS</h1>
@@ -157,7 +157,9 @@ const EnviarSMS = () => {
           options={options}
           value={tipSelecNumber}
           onChange={(e) => {
-            setTipSelecNumber(e.target.value)            
+            setTipSelecNumber(e.target.value)
+            setPhones(null)
+            setPhonesText('')            
           }}
       />
       {tipSelecNumber==='ingresar'?
@@ -223,7 +225,7 @@ const EnviarSMS = () => {
       >
       Mensajes: {phones?.length || "0"}
       </div>
-     
+      {phones?.length>0 && phones!==0 ?
       <TextArea
       id="SMS"
       label="Mensaje"
@@ -252,7 +254,9 @@ const EnviarSMS = () => {
         },
         timeOut: 500,
       }}
-      />
+      />:
+      "" }
+      
       {SMS !=='' && phones!==null ?
       <>
       <ButtonBar>

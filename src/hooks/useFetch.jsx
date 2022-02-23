@@ -6,10 +6,15 @@ export const useFetch = (mockFunc = fetchData) => {
 
   const fetchFunc = useCallback(
     async (...params) => {
-      setState(true);
-      const y = await mockFunc(...params);
-      setState(false);
-      return y;
+      try {
+        setState(true);
+        const y = await mockFunc(...params);
+        setState(false);
+        return y;
+      } catch (err) {
+        setState(false);
+        throw err;
+      }
     },
     [mockFunc, setState]
   );

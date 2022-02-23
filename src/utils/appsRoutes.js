@@ -168,6 +168,9 @@ const ModificarResponsables = lazy(() =>
 const CrearUnidadNegocio = lazy(() =>
   import("../apps/AdministradorUnidadesNegocio/views/CrearUnidadNegocio")
 );
+const CrearResponsable = lazy(() =>
+  import("../apps/AdministradorResponsablesComerciales/views/CrearResponsable")
+);
 /**
  * Recaudo
  */
@@ -259,11 +262,7 @@ const publicUrls = [
         ),
         component: ValidacionApertura,
       }, */
-      /*   {
-        link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
-        label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
-        component: VerificacionApertura,
-      }, */
+
       {
         link: "/Solicitud-enrolamiento/continuarreconoserid/:idreconoser",
         label: (
@@ -332,7 +331,7 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"PAGO"} name='Premios' />,
         component: Premios,
         extern: false,
-        permission: [5], ///////////////////////////////////////////////////////////////////
+        permission: [3], ///////////////////////////////////////////////////////////////////
       },
     ],
   },
@@ -392,7 +391,7 @@ const allUrlsPrivateApps = [
         link: "/funmujer/reporte",
         label: <AppIcons Logo={"RECAUDO"} name={"Reporte"} />,
         component: reportFDLM,
-        permission: [28],
+        permission: [28,17],
       },
     ],
   },
@@ -738,12 +737,19 @@ const allUrlsPrivateApps = [
           },
         ],
       },
+
       {
         link: "/Solicitud-enrolamiento/validarformularioreconoserid",
         label: (
           <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
         ),
         component: ValidacionApertura,
+        permission: [1],
+      },
+      {
+        link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
+        label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
+        component: VerificacionApertura,
         permission: [1],
       },
     ],
@@ -792,7 +798,7 @@ const allUrlsPrivateApps = [
         link: "/administradorresponsablecomercial",
         label: (
           <AppIcons
-            Logo={"RECAUDO"}
+            Logo={"ACTUALIZACION"}
             name={"Administrar Responsables Comerciales"}
           />
         ),
@@ -808,6 +814,17 @@ const allUrlsPrivateApps = [
               />
             ),
             component: ModificarResponsables,
+            permission: [1],
+          },
+          {
+            link: "/administradorresponsablecomercial/crearresponsable",
+            label: (
+              <AppIcons
+                Logo={"IMPUESTO"}
+                name={"Crear Responsable Comercial"}
+              />
+            ),
+            component: CrearResponsable,
             permission: [1],
           },
         ],

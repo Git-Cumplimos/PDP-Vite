@@ -3,6 +3,7 @@ import Table from "../../components/Base/Table/Table";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import fetchData from "../../utils/fetchData";
 
 function ValidacionAsesorComercial() {
   const navigate = useNavigate();
@@ -11,11 +12,12 @@ function ValidacionAsesorComercial() {
   const [keys, setKey] = useState(0);
   /* const [datosFiltrados, setDatosFiltrados] = useState(["perro"]);  */
   useEffect(() => {
-    fetch(
+    fetchData(
       /*  `http://127.0.0.1:5000/actualizacionestado` */
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`,
+      "GET"
     )
-      .then((response) => response.json())
+      /* .then((response) => response.json()) */
       .then((respuesta) => setDatosEnrolamientos(respuesta.obj.results));
   }, []);
   /*   console.log(datosOrdenados); */
