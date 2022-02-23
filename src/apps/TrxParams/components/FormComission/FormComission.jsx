@@ -18,7 +18,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
       } else {
         setComissionData((oldComission) => {
           const name = ev.target.name.split("|")[0];
-          const ind = parseInt(ev.target.name.split("|")[1]);
+          const ind = parseInt(ev.target.name.split("|")[1]) ?? "";
           if (isNaN(ind)) {
             return { ...oldComission };
           }
@@ -43,9 +43,9 @@ const FormComission = ({ outerState, onSubmit, children }) => {
       {comissionData ? (
         <Form onSubmit={onSubmit} onChange={onChange} grid>
           <Select
-            id="comissionType"
-            name="comissionType"
-            label="Tipo de comision"
+            id='comissionType'
+            name='comissionType'
+            label='Tipo de comision'
             options={{ "": "", Transacciones: "trx", Monto: "monto" }}
             defaultValue={comissionData?.type}
             required
@@ -55,8 +55,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
               <Fieldset
                 legend={`Rango ${ind + 1}`}
                 key={ind}
-                className="lg:col-span-2"
-              >
+                className='lg:col-span-2'>
                 {Object.entries(_comission).map(([key, val], idx) => {
                   return (
                     <Input
@@ -71,9 +70,9 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           ? "1"
                           : "0.01"
                       }
-                      value={val}
+                      value={isNaN(val) ? "" : val}
                       onChange={() => {}}
-                      autoComplete="off"
+                      autoComplete='off'
                       required={
                         comissionData?.ranges.length === ind + 1 &&
                         key === "Rango maximo"
@@ -83,17 +82,16 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                     />
                   );
                 })}
-                <ButtonBar className="lg:col-span-2">
+                <ButtonBar className='lg:col-span-2'>
                   <Button
-                    type="button"
+                    type='button'
                     onClick={() => {
                       setComissionData((oldComission) => {
                         const copy = { ...oldComission };
                         copy?.ranges.splice(ind, 1);
                         return { ...copy };
                       });
-                    }}
-                  >
+                    }}>
                     Eliminar rango
                   </Button>
                 </ButtonBar>
@@ -101,9 +99,9 @@ const FormComission = ({ outerState, onSubmit, children }) => {
             );
           })}
 
-          <ButtonBar className="lg:col-span-2">
+          <ButtonBar className='lg:col-span-2'>
             <Button
-              type="button"
+              type='button'
               onClick={() => {
                 setComissionData((oldComission) => {
                   const copy = { ...oldComission };
@@ -116,8 +114,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                   });
                   return { ...copy };
                 });
-              }}
-            >
+              }}>
               Agregar rango
             </Button>
             {children}

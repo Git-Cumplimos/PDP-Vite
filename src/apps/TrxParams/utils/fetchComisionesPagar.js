@@ -1,14 +1,18 @@
 import fetchData from "../../../utils/fetchData";
+import { fetchAutorizadores } from "./fetchRevalAutorizadores";
 
-const urlAutorizadores = process.env.REACT_APP_URL_COMISIONES;
+const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
+const urlAutorizadores = process.env.REACT_APP_URL_REVAL_AUTORIZADOR;
 
-export const postAutorizadores = async (bodyObj) => {
+const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
+
+export const postComisionesPagar = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlAutorizadores}/autorizador/crear`,
+      `${urlComisiones}/comision/crear`,
       "POST",
       {},
       bodyObj
@@ -22,13 +26,10 @@ export const postAutorizadores = async (bodyObj) => {
   }
 };
 
-export const fetchAutorizadores = async (obj) => {
-  // if (!nombre_autorizador) {
-  //   return { maxPages: 0, results: [] };
-  // }
+export const fetchComisionesPagar = async (obj) => {
   try {
     const res = await fetchData(
-      `${urlAutorizadores}/autorizador/consultar_autorizadores`,
+      `${urlComisiones}/comision/consultar_comisiones`,
       "POST",
       {},
       obj
@@ -43,14 +44,13 @@ export const fetchAutorizadores = async (obj) => {
     throw err;
   }
 };
-
-export const putAutorizadores = async (argsObj, bodyObj) => {
+export const putComisionesPagar = async (argsObj, bodyObj) => {
   if (!argsObj || !bodyObj) {
     return "Sin datos de url ni body";
   }
   try {
     const res = await fetchData(
-      `${urlAutorizadores}/autorizador/modificar`,
+      `${urlComisiones}/comision/modificar`,
       "PUT",
       argsObj,
       bodyObj

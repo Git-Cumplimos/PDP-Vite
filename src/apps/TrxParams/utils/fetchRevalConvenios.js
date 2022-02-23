@@ -22,17 +22,24 @@ export const postConvenios = async (bodyObj) => {
   } catch (err) {
     throw err;
   }
-}
+};
 
 export const fetchConveniosMany = async (tags, page = 1) => {
-  if (!tags) {
-    return { maxPages: 0, results: [] };
-  }
+  // if (!tags) {
+  //   return { maxPages: 0, results: [] };
+  // }
   try {
-    const res = await fetchData(`${urlConvenios}/convenio_many`, "GET", {
-      tags,
-      page: isNaN(parseInt(page)) ? 1 : parseInt(page),
-    });
+    const res = await fetchData(
+      `${urlConvenios}/convenio_many`,
+      "GET",
+      {
+        tags,
+        page: isNaN(parseInt(page)) ? 1 : parseInt(page),
+      },
+      {},
+      {},
+      false
+    );
     if (res?.status) {
       return { ...res?.obj };
     } else {
@@ -113,7 +120,7 @@ export const fetchAutosPerConv = async (convenios_id_convenio) => {
   } catch (err) {
     throw err;
   }
-}
+};
 
 export const putConvenios = async (argsObj, bodyObj) => {
   if (!argsObj || !bodyObj) {

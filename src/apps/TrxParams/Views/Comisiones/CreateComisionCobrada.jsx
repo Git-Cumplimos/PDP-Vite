@@ -2,19 +2,16 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 
 import useQuery from "../../../../hooks/useQuery";
 
-import SearchComissions from "../../components/SearchComissions/SearchComissions";
 import Button from "../../../../components/Base/Button/Button";
 import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
-import { postComission } from "../../utils/fetchRevalComissions";
 import FormComission from "../../components/FormComission/FormComission";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 import Form from "../../../../components/Base/Form/Form";
 import Select from "../../../../components/Base/Select/Select";
-import Input from "../../../../components/Base/Input/Input";
-import { fetchTiposContratosComisiones } from "../../utils/fetchTiposContratosComisiones";
 import { fetchConveniosMany } from "../../utils/fetchRevalConvenios";
-import { postComisionesPagar } from "../../utils/fetchComisionesPagar";
+import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
+import { postComisionesCobrar } from "../../utils/fetchComisionesCobrar";
 
 const initComissionData = {
   type: "",
@@ -28,7 +25,7 @@ const initComissionData = {
   ],
 };
 
-const CreateComision = () => {
+const CreateComisionCobrada = () => {
   const navigate = useNavigate();
 
   const [{ comercios_id_comercio, convenios_id_convenio, comercio }, setQuery] =
@@ -37,7 +34,7 @@ const CreateComision = () => {
   const [selectecConv, setSelectecConv] = useState(null);
   const [comissionData, setComissionData] = useState(initComissionData);
   const [newComision, setNewComision] = useState([]);
-  const [tiposContratosComisiones, setTiposContratosComisiones] = useState([]);
+  const [autorizadores, setAutorizadores] = useState([]);
 
   const onSelectItem = useCallback(
     (selected) => setSelectecConv(selected.Convenio),
@@ -50,18 +47,14 @@ const CreateComision = () => {
 
       let errRang = comissionData?.ranges?.length === 0;
 
-      if (
-        !newComision["Convenio"] &&
-        !newComision["Tipo de transaccion"] &&
-        !newComision["Id comercio"]
-      ) {
+      if (!newComision["Convenio"] && !newComision["Tipo de transaccion"]) {
         notifyError(
-          "Se debe agregar al menos un convenio o un tipo de transaccion o un id de comercio"
+          "Se debe agregar al menos un convenio o un tipo de transaccion"
         );
         return;
       }
-      if (!newComision["Tipo contrato"]) {
-        notifyError("Se debe agregar el tipo de contrato");
+      if (!newComision["Autorizador"]) {
+        notifyError("Se debe agregar el autorizador");
         return;
       }
 
@@ -84,25 +77,16 @@ const CreateComision = () => {
         return;
       }
       let obj = {};
-      if (parseInt(newComision["Id comercio"])) {
-        obj["id_comercio"] = parseInt(newComision["Id comercio"]);
-      }
       if (parseInt(newComision["Convenio"])) {
         obj["id_convenio"] = parseInt(newComision["Convenio"]);
       }
       if (parseInt(newComision["Tipo de transaccion"])) {
         obj["id_tipo_op"] = parseInt(newComision["Tipo de transaccion"]);
       }
-      if (parseInt(newComision["Tipo contrato"])) {
-        obj["id_tipo_contrato"] = parseInt(newComision["Tipo contrato"]);
+      if (parseInt(newComision["Autorizador"])) {
+        obj["id_autorizador"] = parseInt(newComision["Autorizador"]);
       }
-      if (newComision["Fecha inicio"] !== "") {
-        obj["fecha_inicio"] = newComision["Fecha inicio"];
-      }
-      if (newComision["Fecha fin"] !== "") {
-        obj["fecha_fin"] = newComision["Fecha fin"];
-      }
-      postComisionesPagar({
+      postComisionesCobrar({
         ...obj,
         comisiones: {
           ...comissionData,
@@ -138,69 +122,38 @@ const CreateComision = () => {
   const onChangeNewComision = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
     const newData = [];
-    [
-      "Convenio",
-      "Tipo de transaccion",
-      "Tipo contrato",
-      "Id comercio",
-      "Fecha inicio",
-      "Fecha fin",
-    ].forEach((col) => {
-      let data = null;
-      data = formData.get(col);
-      newData.push([col, data]);
-    });
+    ["Convenio", "Tipo de transaccion", "Autorizador", "Enlazado"].forEach(
+      (col) => {
+        let data = null;
+        data = formData.get(col);
+        newData.push([col, data]);
+      }
+    );
+    let obj = Object.fromEntries(newData);
+    if (obj["Enlazado"] === 1) {
+      obj["Tipo de transaccion"] = "";
+    } else if (obj["Enlazado"] === 2) {
+      obj["Convenio"] = "";
+    }
     setNewComision((old) => ({
-      ...Object.fromEntries(newData),
+      ...obj,
     }));
   }, []);
-  // useEffect(() => {
-  //   if (comercio && selectecConv) {
-  //     const _id_comercio = parseInt(comercio) ?? 0;
-  //     const _id_convenio = selectecConv[0];
-  //     setQuery(
-  //       {
-  //         comercios_id_comercio: _id_comercio,
-  //         convenios_id_convenio: _id_convenio,
-  //       },
-  //       { replace: true }
-  //     );
-  //   } else if (comercio) {
-  //     const _id_comercio = parseInt(comercio) ?? 0;
-  //     setQuery(
-  //       {
-  //         comercios_id_comercio: _id_comercio,
-  //       },
-  //       { replace: true },
-  //       ["convenios_id_convenio"]
-  //     );
-  //   } else if (selectecConv) {
-  //     const _id_convenio = selectecConv[0];
-  //     setQuery(
-  //       {
-  //         convenios_id_convenio: _id_convenio,
-  //       },
-  //       { replace: true },
-  //       ["comercios_id_comercio"]
-  //     );
-  //   }
-  // }, [selectecConv, comercio, setQuery]);
-
   useEffect(() => {
-    fetchTiposContratosComisionesFunc();
+    fetchAutorizadoresFunc();
     // fetchConveniosFunc();
   }, []);
-  const fetchTiposContratosComisionesFunc = () => {
-    fetchTiposContratosComisiones({})
+  const fetchAutorizadoresFunc = () => {
+    fetchAutorizadores({})
       .then((res) => {
         let obj = { "": "" };
-        [...res?.results].map(({ id_tipo_contrato, nombre_contrato }) => {
-          obj[nombre_contrato] = id_tipo_contrato;
+        [...res?.results].map(({ id_autorizador, nombre_autorizador }) => {
+          obj[nombre_autorizador] = id_autorizador;
           return {
-            nombre_contrato: nombre_contrato,
+            nombre_autorizador: nombre_autorizador,
           };
         });
-        setTiposContratosComisiones(obj);
+        setAutorizadores(obj);
       })
       .catch((err) => console.error(err));
   };
@@ -237,52 +190,40 @@ const CreateComision = () => {
       )}
       <Form onChange={onChangeNewComision} grid>
         <Select
-          id='Convenio'
-          name='Convenio'
-          label='Convenio'
-          options={{ "": "", Transacciones: 1, Monto: 2 }}
-          defaultValue={newComision?.["Convenio"]}
-          required
+          id='Autorizador'
+          name='Autorizador'
+          label='Autorizador'
+          options={autorizadores}
+          defaultValue={newComision?.["Autorizador"]}
         />
         <Select
-          id='Tipo de transaccion'
-          name='Tipo de transaccion'
-          label='Tipo de transaccion'
-          options={{ "": "", Transacciones: 1, Monto: 2 }}
-          defaultValue={newComision?.["Tipo de transaccion"]}
+          id='Enlazado'
+          name='Enlazado'
+          label='Enlazado con:'
+          options={{ "": "", Convenio: 1, "Tipo de transaccion": 2 }}
+          defaultValue={newComision?.["Enlazado"]}
           required
         />
-        <Select
-          id='Tipo contrato'
-          name='Tipo contrato'
-          label='Tipo contrato'
-          options={tiposContratosComisiones}
-          defaultValue={newComision?.["Tipo contrato"]}
-        />
-        <Input
-          id='Id comercio'
-          name='Id comercio'
-          label={"Id comercio"}
-          type='text'
-          autoComplete='off'
-          defaultValue={newComision?.["Id comercio"]}
-        />
-        <Input
-          id='Fecha inicio'
-          name='Fecha inicio'
-          label={"Fecha inicio"}
-          type='date'
-          autoComplete='off'
-          defaultValue={newComision?.["Fecha inicio"]}
-        />
-        <Input
-          id='Fecha fin'
-          name='Fecha fin'
-          label={"Fecha fin"}
-          type='date'
-          autoComplete='off'
-          defaultValue={newComision?.["Fecha fin"]}
-        />
+        {newComision?.["Enlazado"] == 1 && (
+          <Select
+            id='Convenio'
+            name='Convenio'
+            label='Convenio'
+            options={{ "": "", Transacciones: 1, Monto: 2 }}
+            defaultValue={newComision?.["Convenio"]}
+            required
+          />
+        )}
+        {newComision?.["Enlazado"] == 2 && (
+          <Select
+            id='Tipo de transaccion'
+            name='Tipo de transaccion'
+            label='Tipo de transaccion'
+            options={{ "": "", Transacciones: 1, Monto: 2 }}
+            defaultValue={newComision?.["Tipo de transaccion"]}
+            required
+          />
+        )}
       </Form>
       <FormComission outerState={[comissionData, setComissionData]}>
         <Button type='submit' onClick={createComission}>
@@ -293,4 +234,4 @@ const CreateComision = () => {
   );
 };
 
-export default CreateComision;
+export default CreateComisionCobrada;

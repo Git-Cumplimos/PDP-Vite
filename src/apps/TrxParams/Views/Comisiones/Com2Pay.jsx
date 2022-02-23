@@ -9,21 +9,20 @@ import Button from "../../../../components/Base/Button/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 
 const Com2Pay = () => {
-  const [{ id_tipo_trx, comercios_id_comercio, convenios_id_convenio }] =
-    useQuery();
+  const [{ id_comision_pagada }] = useQuery();
 
   const navigate = useNavigate();
 
   return (
     <Fragment>
-      {!(id_tipo_trx || comercios_id_comercio || convenios_id_convenio) ? (
+      {!id_comision_pagada ? (
         <Fragment>
           <ButtonBar>
             <Button onClick={() => navigate("personalizadas")}>
               Crear comision
             </Button>
           </ButtonBar>
-          <SearchComissions comissionFace="pay" />
+          <SearchComissions comissionFace='pay' />
         </Fragment>
       ) : (
         <EditComission />
