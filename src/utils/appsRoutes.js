@@ -521,19 +521,19 @@ const allUrlsPrivateApps = [
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
     component: Daviplata,
-    permission: [3],
+    permission: [29, 30],
     subRoutes: [
       {
         link: "/daviplata/depositos",
         label: <AppIcons Logo={"MARKETPLACE"} name="Depositos Daviplata" />,
         component: Deposito,
-        permission: [3],
+        permission: [29],
       },
       {
         link: "/daviplata/retiros",
         label: <AppIcons Logo={"MARKETPLACE"} name="Retiros Daviplata" />,
         component: Retiro,
-        permission: [3],
+        permission: [30],
       },
     ],
   },
