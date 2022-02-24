@@ -39,9 +39,7 @@ const fetchData = async (
   }
 
   const fetchOptions = { method: method };
-  const _headers = {
-    "Content-Type": "application/json",
-  };
+  const _headers = {};
   if (authenticate) {
     _headers.Authorization = `Bearer ${session?.idToken?.jwtToken}`;
   }
@@ -53,6 +51,7 @@ const fetchData = async (
     if (data instanceof FormData) {
       fetchOptions.body = data;
     } else {
+      fetchOptions.headers["Content-Type"] = "application/json"
       fetchOptions.body = JSON.stringify(data);
     }
   }

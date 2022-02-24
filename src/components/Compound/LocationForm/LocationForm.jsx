@@ -14,7 +14,7 @@ const capitalize = (word) => {
 
 const url = process.env.REACT_APP_URL_DANE_MUNICIPIOS;
 
-const LocationForm = ({ place = "", location }) => {
+const LocationForm = ({ place = "", location, LocalidadComponent = null }) => {
   const {
     municipio: munState,
     departamento: depState,
@@ -71,15 +71,19 @@ const LocationForm = ({ place = "", location }) => {
       {Array.isArray(foundMuni) &&
       foundMuni.length === 1 &&
       parseInt(foundMuni[0].c_digo_dane_del_departamento) === 11 ? (
-        <Input
-          id={`localidad_${place}`}
-          label="Localidad"
-          type="search"
-          autoComplete="off"
-          value={localidad}
-          onInput={(e) => setLocalidad(capitalize(e.target.value))}
-          required
-        />
+        LocalidadComponent ? (
+          LocalidadComponent
+        ) : (
+          <Input
+            id={`localidad_${place}`}
+            label="Localidad"
+            type="search"
+            autoComplete="off"
+            value={localidad}
+            onInput={(e) => setLocalidad(capitalize(e.target.value))}
+            required
+          />
+        )
       ) : (
         ""
       )}
