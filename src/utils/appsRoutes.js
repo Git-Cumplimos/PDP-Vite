@@ -593,13 +593,13 @@ const allUrlsPrivateApps = [
     link: "/params-operations",
     label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />,
     component: ParamsOperations,
-    permission: [1],
+    permission: [18, 19, 20, 21, 31],
     subRoutes: [
       {
         link: "/params-operations/types-trxs",
         label: <AppIcons Logo={"RECAUDO"} name={"Tipos de transacciones"} />,
         component: TypesTrxs,
-        permission: [1],
+        permission: [31],
       },
       {
         link: "/params-operations/comisiones",
