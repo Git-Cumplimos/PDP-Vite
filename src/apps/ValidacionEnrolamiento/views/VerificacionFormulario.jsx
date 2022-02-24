@@ -45,10 +45,11 @@ const VerificacionFormulario = () => {
   const [asesorComercialLocalidad, setAsesorComercialLocalidad] = useState("");
   const [codigoLocalidad, setCodigoLocalidad] = useState("");
   const [tipoZona, setTipoZona] = useState("");
-  const [guardarDatosAsesor, setGuardarDatosAsesor] = useState(false);
   const [urlPdfs, setUrlPdfs] = useState({});
   const [causal, setCausal] = useState(false);
   const [mensajeCausal, setMensajeCausal] = useState("");
+
+  const [datosAsesor, SetDatosAsesor] = useState(0);
 
   const params = useParams();
   useEffect(() => {
@@ -148,38 +149,30 @@ const VerificacionFormulario = () => {
     );
   };
 
-  /* const guardarDatos = (e) => {
-    e.preventDefault();
-    const datos = {
-      responsable: personaResponsable,
-      unidad_negocio: unidadNegocio,
-      asesor_comercial_localidad: asesorComercialLocalidad,
-      cod_localidad: codigoLocalidad,
-      tipozona: tipoZona,
-      causal_rechazo: mensajeCausal,
-    };
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-       `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
-      }
-    )
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
-    alert("Los Datos Del Usuario Han Sido Actualizados");
-    setGuardarDatosAsesor(true);
-  }; */
+  useEffect(() => {
+    if (datosParams?.length > 0) {
+      console.log(datosParams[0]["asesor"]);
+      const datos = {
+        asesor: datosParams[0]["asesor"],
+      };
+      fetchData(
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?nom_asesor=${datos["asesor"]}`,
+        "GET"
+      )
+        /* .then((res) => res.json()) */
+        .then((respuesta) => {
+          SetDatosAsesor(respuesta.obj.results);
+        });
+    }
+  }, [datosParams]);
+
   const fCausalRechazo = (e) => {
     e.preventDefault();
     setCausal(true);
   };
   return (
     <div>
-      {datosParams ? (
+      {datosParams && datosAsesor ? (
         <Form
         /*   flex={false} */
         /*  grid */
@@ -253,67 +246,47 @@ const VerificacionFormulario = () => {
               ></Select>
             )}
 
-            {datosParams[0]["responsable"].length != "" ? (
+            {datosAsesor[0].length != "" ? (
               <Input
                 label={"Responsable"}
-                placeholder={datosParams[0]["responsable"]}
+                placeholder={datosAsesor[0].responsable["nombre"]}
                 disabled
               ></Input>
             ) : (
-              <Select
-                onChange={(event) => setPersonaResponsable(event.target.value)}
-                id="comissionType"
-                name="comissionType"
-                label={`Seleccione Responsable`}
-                options={{
-                  "": "",
-                  "Isabel Perez": "Isabel Perez",
-                  "Alejandra Suarez": "Alejandra Suarez",
-                }}
-              ></Select>
+              ""
             )}
 
-            {datosParams[0]["unidad_negocio"].length != "" ? (
-              <Input
-                label={"Unidad De Negocio"}
-                placeholder={datosParams[0]["unidad_negocio"]}
-                disabled
-              ></Input>
-            ) : (
+            {datosAsesor[0]["unidades_de_negocio"].length != "" ? (
               <Select
                 onChange={(event) => setUnidadNegocio(event.target.value)}
                 id="comissionType"
                 name="comissionType"
+                value={unidadNegocio}
                 label={`Unidad De Negocio`}
-                options={{
-                  "": ``,
-                  Comercios: "Comercios",
-                  Mayoristas: "Mayoristas",
-                  CEAS: "CEAS",
-                }}
+                options={
+                  Object.fromEntries([
+                    ["", ""],
+                    ...datosAsesor[0].unidades_de_negocio.map(
+                      ({ nom_unidad_neg }) => {
+                        return [nom_unidad_neg];
+                      }
+                    ),
+                  ]) || { "": "" }
+                }
               ></Select>
+            ) : (
+              ""
             )}
+
             {/* {datosParams[0]["tipozona"] != null */}
-            {datosParams[0]["tipozona"].length != "" ? (
+            {datosAsesor[0]["responsable"].length != "" ? (
               <Input
                 label={"Tipo Zona"}
-                placeholder={datosParams[0]["tipozona"]}
+                placeholder={datosAsesor[0].responsable["zona"]}
                 disabled
               ></Input>
             ) : (
-              <Select
-                onChange={(event) => setTipoZona(event.target.value)}
-                id="comissionType" /* para que es esto */
-                name="comissionType"
-                label={`Tipo De Zona`}
-                options={{
-                  "": "",
-                  Centro: "Centro",
-                  Norte: "Norte",
-                  Occidente: "Occidente",
-                  Oriente: "Oriente",
-                }}
-              ></Select>
+              ""
             )}
           </Fieldset>
           <Fieldset

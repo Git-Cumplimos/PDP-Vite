@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
 import classes from "./ContinuarReconoserID.module.css";
 const ReconoserID = () => {
-  const [procesoConvenioGuid, setProcesoConvenioGuid] = useState("");
+  /*   const [procesoConvenioGuid, setProcesoConvenioGuid] = useState(""); */
   const [isSuccess, setIsSuccess] = useState(false);
   const [datosUsuario, setDatosUsuario] = useState([]);
 

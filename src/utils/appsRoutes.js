@@ -236,6 +236,14 @@ const publicUrls = [
         component: ReconoserID,
       },
 
+      {
+        link: "/Solicitud-enrolamiento/continuarreconoserid/:idreconoser",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
+        ),
+        component: ContinuarReconoserID,
+      },
+
       /*      {
         link: "/Solicitud-enrolamiento/validarformulario",
         label: (
@@ -258,14 +266,6 @@ const publicUrls = [
         ),
         component: ValidacionApertura,
       }, */
-
-      {
-        link: "/Solicitud-enrolamiento/continuarreconoserid/:idreconoser",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
-        ),
-        component: ContinuarReconoserID,
-      },
     ],
   },
 ];
@@ -387,7 +387,7 @@ const allUrlsPrivateApps = [
         link: "/funmujer/reporte",
         label: <AppIcons Logo={"RECAUDO"} name={"Reporte"} />,
         component: reportFDLM,
-        permission: [28,17],
+        permission: [28, 17],
       },
     ],
   },
