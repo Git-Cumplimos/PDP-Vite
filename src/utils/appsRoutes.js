@@ -117,6 +117,9 @@ const FormularioEnrolamiento = lazy(() =>
 const ConsultaEnrolamiento = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ConsultaEnrolamiento")
 );
+const CorreccionFormulario = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/CorreccionFormulario")
+);
 const ReconoserID = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ReconoserID")
 );
@@ -246,6 +249,11 @@ const publicUrls = [
           <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
         ),
         component: ContinuarReconoserID,
+      },
+      {
+        link: "/Solicitud-enrolamiento/correccionformulario/:numCedula",
+        label: <AppIcons Logo={"PAGO"} name={"Corrección De Formulario"} />,
+        component: CorreccionFormulario,
       },
 
       /*      {
