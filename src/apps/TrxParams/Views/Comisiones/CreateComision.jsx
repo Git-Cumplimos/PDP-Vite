@@ -37,35 +37,20 @@ const initComissionData = {
 const CreateComision = () => {
   const navigate = useNavigate();
 
-  const [
-    {
-      comercios_id_comercio,
-      convenios_id_convenio,
-      comercio,
-      page = 1,
-      selectedOpt,
-    },
-    setQuery,
-  ] = useQuery();
+  const [{ page = 1, selectedOpt }, setQuery] = useQuery();
 
   const [selectecConv, setSelectecConv] = useState(null);
   const [comissionData, setComissionData] = useState(initComissionData);
   const [newComision, setNewComision] = useState([]);
-  const [tiposContratosComisiones, setTiposContratosComisiones] = useState([]);
   const [data, setdata] = useState([]);
-  const [autorizadores, setAutorizadores] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
     setShowModal(false);
     setQuery({ ["page"]: 1 }, { replace: true });
+    setQuery({ ["selectedOpt"]: "" }, { replace: true });
   }, []);
-
-  const onSelectItem = useCallback(
-    (selected) => setSelectecConv(selected.Convenio),
-    []
-  );
 
   const createComission = useCallback(
     (ev) => {
@@ -188,6 +173,8 @@ const CreateComision = () => {
       fetchTiposContratosComisionesFunc();
     } else if (selectedOpt === "Tipo de transaccion") {
       fetchTiposTransaccionFunc();
+    } else {
+      setdata([]);
     }
   }, [selectedOpt, page]);
   const fetchTiposContratosComisionesFunc = () => {
@@ -280,7 +267,7 @@ const CreateComision = () => {
       }
       handleClose();
     },
-    [data, newComision, data, selectedOpt, handleClose]
+    [data, selectedOpt, handleClose]
   );
   return (
     <Fragment>
@@ -306,6 +293,7 @@ const CreateComision = () => {
             type='text'
             autoComplete='off'
             defaultValue={newComision?.["Convenio"]}
+            value={newComision?.["Convenio"]}
             disabled
           />
         )}
@@ -317,6 +305,7 @@ const CreateComision = () => {
             type='text'
             autoComplete='off'
             defaultValue={newComision?.["Autorizador"]}
+            value={newComision?.["Autorizador"]}
             disabled
           />
         )}
@@ -328,6 +317,7 @@ const CreateComision = () => {
             type='text'
             autoComplete='off'
             defaultValue={newComision?.["Tipo de transaccion"]}
+            value={newComision?.["Tipo de transaccion"]}
             disabled
           />
         )}
@@ -339,6 +329,7 @@ const CreateComision = () => {
             type='text'
             autoComplete='off'
             defaultValue={newComision?.["Tipo contrato"]}
+            value={newComision?.["Tipo contrato"]}
             disabled
           />
         )}
@@ -374,7 +365,7 @@ const CreateComision = () => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "convenio" }, { replace: true });
           }}>
-          {newComision?.["Convenio"] ? "Edicar convenio" : "Agregar convenio"}
+          {newComision?.["Convenio"] ? "Editar convenio" : "Agregar convenio"}
         </Button>
         <Button
           type='button'
