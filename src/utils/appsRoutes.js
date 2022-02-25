@@ -240,6 +240,14 @@ const publicUrls = [
         component: ReconoserID,
       },
 
+      {
+        link: "/Solicitud-enrolamiento/continuarreconoserid/:idreconoser",
+        label: (
+          <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
+        ),
+        component: ContinuarReconoserID,
+      },
+
       /*      {
         link: "/Solicitud-enrolamiento/validarformulario",
         label: (
@@ -262,14 +270,6 @@ const publicUrls = [
         ),
         component: ValidacionApertura,
       }, */
-
-      {
-        link: "/Solicitud-enrolamiento/continuarreconoserid/:idreconoser",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
-        ),
-        component: ContinuarReconoserID,
-      },
     ],
   },
 ];
@@ -391,7 +391,7 @@ const allUrlsPrivateApps = [
         link: "/funmujer/reporte",
         label: <AppIcons Logo={"RECAUDO"} name={"Reporte"} />,
         component: reportFDLM,
-        permission: [28,17],
+        permission: [28, 17],
       },
     ],
   },
@@ -538,19 +538,19 @@ const allUrlsPrivateApps = [
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name='Daviplata' />,
     component: Daviplata,
-    permission: [3],
+    permission: [29, 30],
     subRoutes: [
       {
         link: "/daviplata/depositos",
         label: <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />,
         component: Deposito,
-        permission: [3],
+        permission: [29],
       },
       {
         link: "/daviplata/retiros",
         label: <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />,
         component: Retiro,
-        permission: [3],
+        permission: [30],
       },
     ],
   },
@@ -610,13 +610,13 @@ const allUrlsPrivateApps = [
     link: "/params-operations",
     label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />,
     component: ParamsOperations,
-    permission: [1],
+    permission: [18, 19, 20, 21, 31],
     subRoutes: [
       {
         link: "/params-operations/types-trxs",
         label: <AppIcons Logo={"RECAUDO"} name={"Tipos de transacciones"} />,
         component: TypesTrxs,
-        permission: [1],
+        permission: [31],
       },
       {
         link: "/params-operations/comisiones",

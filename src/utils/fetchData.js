@@ -48,10 +48,10 @@ const fetchData = async (
     ...headers,
   };
   if (method === "POST" || method === "PUT") {
-    fetchOptions.headers["Content-Type"] = "application/json"
     if (data instanceof FormData) {
       fetchOptions.body = data;
     } else {
+      fetchOptions.headers["Content-Type"] = "application/json"
       fetchOptions.body = JSON.stringify(data);
     }
   }

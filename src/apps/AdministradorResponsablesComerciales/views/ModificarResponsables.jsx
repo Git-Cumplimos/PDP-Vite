@@ -101,7 +101,7 @@ const ModificarResponsables = () => {
         respuesta.obj.results[0].unidades_de_negocio
       )
     );
-  });
+  }, []);
 
   const ActualizarDatosResponsable = (e) => {
     e.preventDefault();

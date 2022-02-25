@@ -7,6 +7,7 @@ import Input from "../../../components/Base/Input/Input";
 import Select from "../../../components/Base/Select/Select";
 import Table from "../../../components/Base/Table/Table";
 import Tickets from "../../../components/Base/Tickets/Tickets";
+import { useReactToPrint } from "react-to-print";
 import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 import { ExportToCsv } from "export-to-csv";
@@ -38,12 +39,29 @@ function createCard(
   };
 }
 
+const pageStyle = `
+  @page {
+    size: 80mm 50mm;
+  }
+
+  @media all {
+    .pagebreak {
+      display: none;
+    }
+  }
+
+  @media print {
+    .pagebreak {
+      page-break-before: always;
+    }
+  }
+`;
 
 
 const url_Report = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
 const url_Download = `${process.env.REACT_APP_URL_FDLMWSDL}/report`;
 
-//const printDiv = useRef();
+
 
 const Reporte = () => {
 
@@ -64,6 +82,12 @@ const Reporte = () => {
   const [showModal2, setShowModal2] = useState(false);
   const [disabledBtn, setDisabledBtn] = useState(true);
 
+  const printDiv = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+    pageStyle: pageStyle,
+  });
 
   const exportdata = (e) => {
     e.preventDefault();
@@ -338,12 +362,12 @@ const Reporte = () => {
         {selected?.Ticket ? (
           <div className="flex flex-col justify-center items-center">
             <Tickets
-              //refPrint={printDiv}
-              type="Visualización"
+              refPrint={printDiv}
+              type="Reimpresión"
               ticket={selected?.Ticket}
             />
             <ButtonBar>
-              {/* <Button onClick={handlePrint}>Imprimir</Button> */}
+              <Button onClick={handlePrint}>Imprimir</Button>
               <Button
                 onClick={() => {
                   closeModal();

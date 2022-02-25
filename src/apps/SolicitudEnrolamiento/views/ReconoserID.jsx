@@ -18,7 +18,7 @@ const ReconoserID = () => {
   const { ContenedorPrincipal } = classes;
   useEffect(() => {
     fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${params.numCedula}`
+      `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actualizacion-estado?numDoc=${params.numCedula}`
     )
       .then((res) => res.json())
       .then((respuesta) => setDatosUsuario(respuesta.obj.results));
@@ -90,9 +90,10 @@ const ReconoserID = () => {
         email: datosUsuario[0]["email"],
         celular: datosUsuario[0]["celular"],
       };
-
+      console.log(datos);
       fetch(
         `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/solicitud-validacion-reconoserid`,
+        /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/solicitud-validacion-reconoserid`, */
         /* `http://127.0.0.1:5000/solicitudvalidacion` */
         {
           method: "POST",

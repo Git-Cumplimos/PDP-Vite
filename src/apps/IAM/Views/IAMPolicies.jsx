@@ -5,6 +5,7 @@ import Modal from "../../../components/Base/Modal/Modal";
 import Table from "../../../components/Base/Table/Table";
 import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 import fetchData from "../../../utils/fetchData";
+import { notifyError } from "../../../utils/notify";
 import EditPolicyForm from "../components/Policies/EditPolicyForm";
 import PolicyForm from "../components/Policies/PolicyForm";
 
@@ -22,10 +23,7 @@ const IAMPolicies = () => {
     setShowModal(false);
     setSelected(null);
 
-    searchPolicies(
-      formData.get("gnameSearch"),
-      formData.get("rnameSearch")
-    )
+    searchPolicies(formData.get("gnameSearch"), formData.get("rnameSearch"))
       .then((res) => {
         setPoliciesDB(res);
       })
@@ -37,28 +35,26 @@ const IAMPolicies = () => {
       return [];
     }
     try {
-      const groups = await fetchData(`${url}/groups`, "GET", { name_group, limit: 0 });
-      const roles = await fetchData(`${url}/roles`, "GET", { name_role, limit: 0 });
+      const _policies = await fetchData(`${url}/politicas`, "GET", {
+        name_group,
+        name_role,
+      });
 
-      const temp_policies = [];
-      if (groups?.status && roles?.status) {
-        for (const group of groups?.obj?.results) {
-          for (const role of roles?.obj?.results) {
-            const { id_group, name_group: _name_group } = group;
-            const { id_role, name_role: _name_role } = role;
-            const groupRole = await fetchData(`${url}/groups-roles`, "GET", {
-              Groups_id_group: id_group,
-              Roles_id_role: id_role,
-            });
-            if (groupRole?.status && groupRole?.obj?.length > 0) {
-              temp_policies.push({
-                group: `${id_group}) ${_name_group}`,
-                role: `${id_role}) ${_name_role}`,
-              });
-            }
-          }
-        }
+      if (!_policies?.status) {
+        notifyError(_policies?.msg);
+        return [];
       }
+      const temp_policies = [
+        ...(_policies?.obj || []).map(
+          ({
+            group: { id_group = 0, name_group = "" },
+            role: { id_role = 0, name_role = "" },
+          }) => ({
+            group: `${id_group}) ${name_group}`,
+            role: `${id_role}) ${name_role}`,
+          })
+        ),
+      ];
       return temp_policies;
     } catch {
       setPoliciesDB([]);
@@ -68,10 +64,7 @@ const IAMPolicies = () => {
   const onChange = useCallback(
     (_formData) => {
       setFormData(_formData);
-      searchPolicies(
-        _formData.get("gnameSearch"),
-        _formData.get("rnameSearch")
-      )
+      searchPolicies(_formData.get("gnameSearch"), _formData.get("rnameSearch"))
         .then((res) => {
           setPoliciesDB(res);
         })

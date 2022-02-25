@@ -94,7 +94,7 @@ const FormularioEnrolamiento = () => {
         "POST",
         {},
         {
-          asesor: asignarAsesores,
+          asesor: asignarAsesores.toString(),
           nombre: `${nombre}`,
           apellido: `${apellido}`,
           nombre_comercio: nombreComercio,
@@ -286,8 +286,8 @@ const FormularioEnrolamiento = () => {
               options={
                 Object.fromEntries([
                   ["", ""],
-                  ...asesores.map(({ /* id_asesor, */ nom_asesor }) => {
-                    return [/* id_asesor, */ nom_asesor];
+                  ...asesores.map(({ nom_asesor /* , id_asesor */ }) => {
+                    return [nom_asesor /* , id_asesor */];
                   }),
                 ]) || { "": "" }
               }
@@ -509,7 +509,11 @@ const FormularioEnrolamiento = () => {
               />
             </Fieldset>
           </Form>
-          <LocationForm place="Comercio" location={commerceLocation} required />
+          <LocationForm
+            place="Comercio"
+            location={commerceLocation}
+            required /* LocationComponent={} */
+          />
           <LocationForm
             place="Correspondencia"
             location={homeLocation}
