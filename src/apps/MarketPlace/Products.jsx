@@ -7,7 +7,7 @@ const Products = () => {
   } = useMarketPlace();
   return (
     <>
-      {consulta?.obj?.productos.map((row) => {
+      {consulta?.obj?.productos?.map((row) => {
         return (
           <>
             <ul>
