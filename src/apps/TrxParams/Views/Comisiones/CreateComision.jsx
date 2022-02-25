@@ -114,17 +114,17 @@ const CreateComision = () => {
       if (parseInt(newComision["Id comercio"])) {
         obj["id_comercio"] = parseInt(newComision["Id comercio"]);
       }
-      if (parseInt(newComision["Autorizador"])) {
-        obj["id_autorizador"] = parseInt(newComision["Autorizador"]);
+      if (newComision["Autorizador"]) {
+        obj["id_autorizador"] = parseInt(newComision["Id autorizador"]);
       }
-      if (parseInt(newComision["Convenio"])) {
-        obj["id_convenio"] = parseInt(newComision["Convenio"]);
+      if (newComision["Convenio"]) {
+        obj["id_convenio"] = parseInt(newComision["Id convenio"]);
       }
-      if (parseInt(newComision["Tipo de transaccion"])) {
-        obj["id_tipo_op"] = parseInt(newComision["Tipo de transaccion"]);
+      if (newComision["Tipo de transaccion"]) {
+        obj["id_tipo_op"] = parseInt(newComision["Id tipo operacion"]);
       }
-      if (parseInt(newComision["Tipo contrato"])) {
-        obj["id_tipo_contrato"] = parseInt(newComision["Tipo contrato"]);
+      if (newComision["Tipo contrato"]) {
+        obj["id_tipo_contrato"] = parseInt(newComision["Id contrato"]);
       }
       if (newComision["Fecha inicio"] !== "") {
         obj["fecha_inicio"] = newComision["Fecha inicio"];
@@ -168,20 +168,13 @@ const CreateComision = () => {
   const onChangeNewComision = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
     const newData = [];
-    [
-      "Convenio",
-      "Tipo de transaccion",
-      "Tipo contrato",
-      "Id comercio",
-      "Fecha inicio",
-      "Fecha fin",
-      "Autorizador",
-    ].forEach((col) => {
+    ["Id comercio", "Fecha inicio", "Fecha fin"].forEach((col) => {
       let data = null;
       data = formData.get(col);
       newData.push([col, data]);
     });
     setNewComision((old) => ({
+      ...old,
       ...Object.fromEntries(newData),
     }));
   }, []);
@@ -261,21 +254,33 @@ const CreateComision = () => {
     (e, i) => {
       setShowModal(true);
       if (selectedOpt === "convenio") {
-        setNewComision((old) => {
-          return { ...old, "Id convenio": data[i]?.["Id convenio"] };
-        });
-        console.log(newComision);
-        console.log(data[i]?.["Id convenio"]);
+        setNewComision((old) => ({
+          ...old,
+          "Id convenio": data[i]?.["Id convenio"],
+          Convenio: data[i]?.["Nombre convenio"],
+        }));
       } else if (selectedOpt === "autorizador") {
-        console.log(data[i]?.["Id autorizador"]);
+        setNewComision((old) => ({
+          ...old,
+          "Id autorizador": data[i]?.["Id autorizador"],
+          Autorizador: data[i]?.["Nombre autorizador"],
+        }));
       } else if (selectedOpt === "tipoContrato") {
-        console.log(data[i]?.["Id contrato"]);
+        setNewComision((old) => ({
+          ...old,
+          "Id contrato": data[i]?.["Id contrato"],
+          "Tipo contrato": data[i]?.["Nombre contrato"],
+        }));
       } else if (selectedOpt === "Tipo de transaccion") {
-        console.log(data[i]?.["Id tipo operacion"]);
+        setNewComision((old) => ({
+          ...old,
+          "Id tipo operacion": data[i]?.["Id tipo operacion"],
+          "Tipo de transaccion": data[i]?.["Nombre transaccion"],
+        }));
       }
       handleClose();
     },
-    [data, newComision, data]
+    [data, newComision, data, selectedOpt, handleClose]
   );
   return (
     <Fragment>
@@ -369,9 +374,7 @@ const CreateComision = () => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "convenio" }, { replace: true });
           }}>
-          {newComision?.["Id comercio"]
-            ? "Edicar convenio"
-            : "Agregar convenio"}
+          {newComision?.["Convenio"] ? "Edicar convenio" : "Agregar convenio"}
         </Button>
         <Button
           type='button'
