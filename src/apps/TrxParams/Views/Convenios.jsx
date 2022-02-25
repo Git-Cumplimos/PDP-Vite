@@ -79,6 +79,7 @@ const Convenios = () => {
   );
 
   const onChangeConv = useCallback((ev) => {
+    console.log(ev)
     const formData = new FormData(ev.target.form);
     const colsRefs = [
       "Nombre de Referencia",

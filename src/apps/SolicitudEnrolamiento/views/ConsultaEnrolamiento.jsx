@@ -13,6 +13,7 @@ const ConsultaEnrolamiento = () => {
   const [numconsultaProceso, setNumConsultaProceso] = useState("");
   const [respuestaProceso, setRespuestaProceso] = useState("");
   const [estado, setEstado] = useState(false);
+  const [cantNum, setCantNum] = useState("");
   /* const [showModal, setShowModal] = useState(false); */
 
   const navigate = useNavigate();
@@ -39,10 +40,10 @@ const ConsultaEnrolamiento = () => {
       )
         .then((res) => res.json())
         .then((respuesta) => setRespuestaProceso(respuesta.obj.results))
-        .catch(setEstado(true));
+        .catch(() => {});
     }
   };
-  /*  console.log(respuestaProceso); */
+  console.log(respuestaProceso);
 
   const handleReconoser = async () => {
     navigate(`/Solicitud-enrolamiento/reconoserid/${numconsultaProceso}`);
@@ -55,7 +56,23 @@ const ConsultaEnrolamiento = () => {
   };
   const handleClose = useCallback(() => {
     setEstado(false);
+    setNumConsultaProceso("");
+    setRespuestaProceso("");
   }, []);
+
+  useEffect(() => {
+    cantidadNumero(numconsultaProceso);
+  }, [numconsultaProceso]);
+  function cantidadNumero(numero) {
+    let contador = 1;
+    while (numero >= 1) {
+      contador += 1;
+      numero = numero / 10;
+    }
+    setCantNum(contador);
+    /* console.log(cantNum); */
+  }
+
   return (
     <div className={principalConsulta}>
       <span className={tituloConsultaInscripcion}>
@@ -77,102 +94,100 @@ const ConsultaEnrolamiento = () => {
           </Button>
         </ButtonBar>
 
-        {respuestaProceso.length <= 0 && estado ? (
-          <Modal show={estado} handleClose={handleClose}>
-            <LogoPDP></LogoPDP>
-
-            <h1>
-              El número ingresado no se encuentra en proceso de enrolamiento,
-              por favor revise si esta bien escrito o realice el proceso de
-              inscripción.
-            </h1>
-          </Modal>
-        ) : /*  "" */
-        respuestaProceso &&
-          respuestaProceso.filter(
-            (element) => element["numdoc"] === numconsultaProceso
-          )[0]["numdoc"] === numconsultaProceso ? (
-          <Modal show>
-            <div className={contenedorForm}>
+        {
+          /* console.log(respuestaProceso.length) &&
+        respuestaProceso.length <= 0 && */
+          estado && cantNum < 5 ? (
+            <Modal show={estado} handleClose={() => handleClose()}>
               <LogoPDP></LogoPDP>
-              <div className={contenedorDatos}>
-                <div className={contenedorTitulos}>
-                  <h2 className={tituloDatos}>{`Nombre: `}</h2>
-                  <h2 className={tituloDatos}>{`Cedula Ciudadania: `}</h2>
-                  <h2 className={tituloDatos}>{`Correo Electronico: `}</h2>
-                </div>
-                <div className={contenedorValoresTitulos}>
-                  <h2
-                    className={tituloDatos}
-                  >{`${respuestaProceso[0]["nombre"]} ${respuestaProceso[0]["apellido"]}`}</h2>
-                  <h2
-                    className={tituloDatos}
-                  >{` ${respuestaProceso[0]["numdoc"]}`}</h2>
-                  <h2
-                    className={tituloDatos}
-                  >{`${respuestaProceso[0]["email"]}`}</h2>
-                </div>
-                {/* <h2
-                  className={tituloDatos}
-                >{`Nombre: ${respuestaProceso[0]["nombre"]} ${respuestaProceso[0]["apellido"]}`}</h2>
-                <h2
-                  className={tituloDatos}
-                >{`Cedula Ciudadania: ${respuestaProceso[0]["numdoc"]}`}</h2>
-                <h2
-                  className={tituloDatos}
-                >{`Correo Electronico: ${respuestaProceso[0]["email"]}`}</h2> */}
-              </div>
-              <h2 className={estadoConsulta}>{`Estado del Proceso: ${
-                respuestaProceso[0]["validation_state"] === "101"
-                  ? "Señor usuario ha sido aprobado para realizar la prueba biometrica, lo invitamos a darle click en el botón para realizar el proceso."
-                  : respuestaProceso[0]["validation_state"] === "102"
-                  ? `Proceso Rechazado por el Asesor por el siguiente motivo, ${respuestaProceso[0]["causal_rechazo"]}`
-                  : respuestaProceso[0]["validation_state"] === "201"
-                  ? "Señor usuario su en enrolamiento ha Exitoso, gracias por confiar en nosotros."
-                  : respuestaProceso[0]["validation_state"] === "202"
-                  ? "Proceso Rechazado por Hellen"
-                  : "Señor usuario su Proceso se encuentra en Validación de documentos."
-              }`}</h2>
 
-              {respuestaProceso[0].validation_state === "101" &&
-              respuestaProceso[0].id_reconocer === "None" ? (
-                <ButtonBar className={"lg:col-span-2"} type="">
-                  <Button type="submit" onClick={() => handleReconoser()}>
-                    Comenzar ReconoserID
-                  </Button>
-                </ButtonBar>
-              ) : respuestaProceso[0].validation_state ===
-                "En Proceso de Validación" ? null : respuestaProceso[0]
-                  .id_reconocer !== "None" ? (
-                <ButtonBar type="">
-                  <Button
-                    className={contenedorBotones}
-                    type="submit"
-                    onClick={() => handleContinuarReconoser()}
-                  >
-                    Continuar Proceso ReconoserID
-                  </Button>
-                </ButtonBar>
-              ) : (
-                ""
-              )}
-            </div>
-          </Modal>
-        ) : respuestaProceso &&
-          respuestaProceso.filter(
-            (element) => element["numdoc"] === numconsultaProceso
-          )[0]["numdoc"] !== numconsultaProceso ? (
-          <Modal show>
-            <LogoPDP></LogoPDP>
-            <h1>
-              El número ingresado no se encuentra en proceso de enrolamiento,
-              por favor revise si esta bien escrito o realice el proceso de
-              inscripción.
-            </h1>
-          </Modal>
-        ) : (
-          ""
-        )}
+              <h1>
+                El número ingresado no se encuentra en proceso de enrolamiento,
+                por favor revise si esta bien escrito o realice el proceso de
+                inscripción.
+              </h1>
+            </Modal>
+          ) : /*  "" */
+          /* console.log("hola") && */
+          cantNum >= 5 &&
+            respuestaProceso &&
+            respuestaProceso.filter(
+              (element) => element["numdoc"] === numconsultaProceso
+            )[0]["numdoc"] === numconsultaProceso ? (
+            <Modal show={estado} handleClose={() => handleClose()}>
+              <div className={contenedorForm}>
+                <LogoPDP></LogoPDP>
+                <div className={contenedorDatos}>
+                  <div className={contenedorTitulos}>
+                    <h2 className={tituloDatos}>{`Nombre: `}</h2>
+                    <h2 className={tituloDatos}>{`Cedula Ciudadania: `}</h2>
+                    <h2 className={tituloDatos}>{`Correo Electronico: `}</h2>
+                  </div>
+                  <div className={contenedorValoresTitulos}>
+                    <h2
+                      className={tituloDatos}
+                    >{`${respuestaProceso[0]["nombre"]} ${respuestaProceso[0]["apellido"]}`}</h2>
+                    <h2
+                      className={tituloDatos}
+                    >{` ${respuestaProceso[0]["numdoc"]}`}</h2>
+                    <h2
+                      className={tituloDatos}
+                    >{`${respuestaProceso[0]["email"]}`}</h2>
+                  </div>
+                </div>
+                <h2 className={estadoConsulta}>{`Estado del Proceso: ${
+                  respuestaProceso[0]["validation_state"] === "101"
+                    ? "Señor usuario ha sido aprobado para realizar la prueba biometrica, lo invitamos a darle click en el botón para realizar el proceso."
+                    : respuestaProceso[0]["validation_state"] === "102"
+                    ? `Proceso Rechazado por el Asesor Comercial por el siguiente motivo, ${respuestaProceso[0]["causal_rechazo"]}`
+                    : respuestaProceso[0]["validation_state"] === "201"
+                    ? "Señor usuario su en enrolamiento ha Exitoso, gracias por confiar en nosotros."
+                    : respuestaProceso[0]["validation_state"] === "202"
+                    ? "Proceso Rechazado por Hellen"
+                    : "Señor usuario su Proceso se encuentra en Validación de documentos por parte del Asesor Comercial."
+                }`}</h2>
+
+                {respuestaProceso[0].validation_state === "101" &&
+                respuestaProceso[0].id_reconocer === "None" ? (
+                  <ButtonBar className={"lg:col-span-2"} type="">
+                    <Button type="submit" onClick={() => handleReconoser()}>
+                      Comenzar ReconoserID
+                    </Button>
+                  </ButtonBar>
+                ) : respuestaProceso[0].validation_state ===
+                  "En Proceso de Validación" ? null : respuestaProceso[0]
+                    .id_reconocer !== "None" ? (
+                  <ButtonBar type="">
+                    <Button
+                      className={contenedorBotones}
+                      type="submit"
+                      onClick={() => handleContinuarReconoser()}
+                    >
+                      Continuar Proceso ReconoserID
+                    </Button>
+                  </ButtonBar>
+                ) : (
+                  ""
+                )}
+              </div>
+            </Modal>
+          ) : /*  respuestaProceso && */
+          respuestaProceso.lenth > 1 &&
+            respuestaProceso.filter(
+              (element) => element["numdoc"] === numconsultaProceso
+            )[0]["numdoc"] !== numconsultaProceso ? (
+            <Modal show={estado} handleClose={() => handleClose()}>
+              <LogoPDP></LogoPDP>
+              <h1>
+                El número ingresado no se encuentra en proceso de enrolamiento,
+                por favor revise si esta bien escrito o realice el proceso de
+                inscripción.
+              </h1>
+            </Modal>
+          ) : (
+            ""
+          )
+        }
       </Form>
     </div>
   );
