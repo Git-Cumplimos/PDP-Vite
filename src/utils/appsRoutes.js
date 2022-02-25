@@ -352,7 +352,7 @@ const allUrlsPrivateApps = [
     permission: [9],
   },
   {
-    link: "/marketplace",
+    link: "https://www.puntodecompra.com.co/",
     label: <AppIcons Logo={"MARKETPLACE"} name="Marketplace" />,
     component: MarketPlace,
     extern: true,
@@ -387,7 +387,7 @@ const allUrlsPrivateApps = [
         link: "/funmujer/reporte",
         label: <AppIcons Logo={"RECAUDO"} name={"Reporte"} />,
         component: reportFDLM,
-        permission: [28,17],
+        permission: [28, 17],
       },
     ],
   },

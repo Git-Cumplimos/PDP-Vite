@@ -3,8 +3,8 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
-  consultaOrden: `${process.env.REACT_APP_URL_MARKETPLACE}/consultorder`,
-  pagoOrden: `${process.env.REACT_APP_URL_MARKETPLACE}/consultorder`,
+  consultaOrden: `${process.env.REACT_APP_URL_MARKETPLACE}consultorder`,
+  pagoOrden: `${process.env.REACT_APP_URL_MARKETPLACE}payorder`,
 };
 
 export const MarketContext = createContext({
@@ -22,27 +22,30 @@ export const useMarketPlace = () => {
 
 export const useProvideMarketPlace = () => {
   // Datos consulta y compra
-  const { roleInfo } = useAuth();
   const [consulta, setConsulta] = useState([]);
-
+  const { roleInfo } = useAuth();
   const payOrder = useCallback(async (idCompra) => {
     const req = {
       idCompra: idCompra,
       idComercio: 4,
+      tipoComercio: roleInfo?.tipo_comercio,
+      idTienda: roleInfo?.id_comercio,
+      idDispositivo: roleInfo?.id_dispositivo,
+      idUsuario: roleInfo?.id_usuario,
     };
     try {
       const res = await fetchData(urls.pagoOrden, "POST", {}, req);
-      console.log(res);
+      return res;
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   });
 
   const searchsOrder = useCallback(async (idCompra) => {
+    console.log(idCompra);
     try {
       const res = await fetchData(urls.consultaOrden, "GET", {
         idCompra: idCompra,
-        idComercio: 4,
       });
       setConsulta(res);
       console.log(res);
@@ -51,7 +54,7 @@ export const useProvideMarketPlace = () => {
       console.error(err);
     }
   });
-
+  console.log(`${process.env.REACT_APP_URL_MARKETPLACE}consultorder`);
   return {
     payOrder,
     searchsOrder,
