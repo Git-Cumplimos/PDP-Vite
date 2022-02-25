@@ -111,7 +111,7 @@ const EditComission = () => {
       }
       if (id_comision_pagada) {
         putComisionesPagar(
-          { id_comision: id_comision_pagada },
+          { id_comision_pagada },
           {
             comisiones: {
               ...editedComission,
@@ -144,7 +144,7 @@ const EditComission = () => {
           .catch((err) => console.error(err));
       } else if (id_comision_cobrada) {
         putComisionesCobrada(
-          { id_convenio_tipo_op_autorizador: id_comision_cobrada },
+          { id_comision_cobrada },
           {
             comisiones: {
               ...editedComission,
@@ -209,7 +209,7 @@ const EditComission = () => {
   }, []);
 
   const fecthComisionesPagarFunc = () => {
-    fetchComisionesPagar({ id_comision: id_comision_pagada })
+    fetchComisionesPagar({ id_comision_pagada })
       .then((res) => {
         setComissions(res?.results);
         setEditedComission({
@@ -232,7 +232,7 @@ const EditComission = () => {
   };
   const fecthComisionesCobrarFunc = () => {
     fetchComisionesCobrar({
-      id_convenio_tipo_op_autorizador: id_comision_cobrada,
+      id_comision_cobrada,
     })
       .then((res) => {
         setComissions(res?.results);

@@ -12,6 +12,7 @@ import Select from "../../../../components/Base/Select/Select";
 import { fetchConveniosMany } from "../../utils/fetchRevalConvenios";
 import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
 import { postComisionesCobrar } from "../../utils/fetchComisionesCobrar";
+import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
 
 const initComissionData = {
   type: "",
@@ -35,6 +36,7 @@ const CreateComisionCobrada = () => {
   const [comissionData, setComissionData] = useState(initComissionData);
   const [newComision, setNewComision] = useState([]);
   const [autorizadores, setAutorizadores] = useState([]);
+  const [convenios, setConvenios] = useState([]);
 
   const onSelectItem = useCallback(
     (selected) => setSelectecConv(selected.Convenio),
@@ -141,7 +143,8 @@ const CreateComisionCobrada = () => {
   }, []);
   useEffect(() => {
     fetchAutorizadoresFunc();
-    // fetchConveniosFunc();
+    fetchConveniosFunc();
+    fetchTiposTransaccionFunc();
   }, []);
   const fetchAutorizadoresFunc = () => {
     fetchAutorizadores({})
@@ -161,18 +164,31 @@ const CreateComisionCobrada = () => {
     fetchConveniosMany("")
       .then((res) => {
         let obj = { "": "" };
-        console.log(res);
-        // [...res?.results].map(({ id_tipo_contrato, nombre_contrato }) => {
-        //   obj[nombre_contrato] = id_tipo_contrato;
-        //   return {
-        //     nombre_contrato: nombre_contrato,
-        //   };
-        // });
-        // setTiposContratosComisiones(obj);
+        [...res?.results].map(({ id_convenio, nombre_convenio }) => {
+          obj[nombre_convenio] = id_convenio;
+          return {
+            nombre_convenio: nombre_convenio,
+          };
+        });
+        setConvenios(obj);
       })
       .catch((err) => console.error(err));
   };
-
+  const fetchTiposTransaccionFunc = () => {
+    fetchTrxTypesPages("", 1)
+      .then((res) => {
+        console.log(res);
+        // let obj = { "": "" };
+        // [...res?.results].map(({ id_convenio, nombre_convenio }) => {
+        //   obj[nombre_convenio] = id_convenio;
+        //   return {
+        //     nombre_convenio: nombre_convenio,
+        //   };
+        // });
+        // setConvenios(obj);
+      })
+      .catch((err) => console.error(err));
+  };
   return (
     <Fragment>
       {/* <SearchComissions comissionFace="pay" onSelectItem={onSelectItem} /> */}
@@ -209,7 +225,7 @@ const CreateComisionCobrada = () => {
             id='Convenio'
             name='Convenio'
             label='Convenio'
-            options={{ "": "", Transacciones: 1, Monto: 2 }}
+            options={convenios}
             defaultValue={newComision?.["Convenio"]}
             required
           />

@@ -35,11 +35,11 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     }
     const headers = Object.keys(comissions[0]);
     let newHeaders = [];
-    if (headers.includes("id_comision")) {
+    if (headers.includes("id_comision_pagada")) {
       newHeaders.push("Id comisión");
     }
-    if (headers.includes("id_convenio_tipo_op_autorizador")) {
-      newHeaders.push("Id comisión cobrada");
+    if (headers.includes("id_comision_cobrada")) {
+      newHeaders.push("Id comisión");
     }
     if (headers.includes("nombre_convenio")) {
       newHeaders.push("Convenio");
@@ -66,11 +66,12 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     if (comissionFace === "pay") {
       return comissions.map(
         ({
-          id_comision,
+          id_comision_pagada,
           id_tipo_op,
           id_convenio,
           id_tipo_contrato,
           id_comercio,
+          id_autorizador,
           comisiones,
           fecha_inicio,
           fecha_fin,
@@ -78,13 +79,15 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           nombre_operacion,
           nombre_convenio,
           nombre_contrato,
+          nombre_autorizador,
         }) => {
           return {
-            "Id Comision": id_comision,
+            "Id Comision": id_comision_pagada,
             Convenio: nombre_convenio,
             Operacion: nombre_operacion,
             "Id comercio": id_comercio,
-            "Nombre contrato": nombre_contrato,
+            Contrato: nombre_contrato,
+            Autorizador: nombre_autorizador,
             Estado: estado ? "Activo" : "Inactivo",
           };
         }
@@ -96,7 +99,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           estado,
           id_autorizador,
           id_convenio,
-          id_convenio_tipo_op_autorizador,
+          id_comision_cobrada,
           id_tipo_op,
           id_comercio,
           nombre_autorizador,
@@ -104,7 +107,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           nombre_convenio,
         }) => {
           return {
-            "Id comision cobrada": id_convenio_tipo_op_autorizador,
+            "Id comision cobrada": id_comision_cobrada,
             Convenio: nombre_convenio,
             Operacion: nombre_operacion,
             Autorizador: nombre_autorizador,
@@ -122,9 +125,8 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
 
   const onSelectRow = useCallback(
     (ev, indx) => {
-      const _id_comision_pagada = comissions?.[indx]?.["id_comision"];
-      const _id_comision_cobrada =
-        comissions?.[indx]?.["id_convenio_tipo_op_autorizador"];
+      const _id_comision_pagada = comissions?.[indx]?.["id_comision_pagada"];
+      const _id_comision_cobrada = comissions?.[indx]?.["id_comision_cobrada"];
       // const _id_tipo_trx = comissions?.[indx]?.["id_tipo_op"];
       // const _id_comercio = comissions?.[indx]?.["id_comercio"];
       // const _id_autorizador = comissions?.[indx]?.Autorizador;
@@ -177,6 +179,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     let obj = { page };
     if (convenio !== "") obj["nombre_convenio"] = convenio;
     if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
+    if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
     if (comercio !== "") obj["id_comercio"] = parseInt(comercio);
     fetchComisionesPagar(obj)
       .then((res) => {
@@ -189,7 +192,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     let obj = { page };
     if (convenio !== "") obj["nombre_convenio"] = convenio;
     if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
-    if (autorizador !== "") obj["nombre_autorizador"] = parseInt(autorizador);
+    if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
     fetchComisionesCobrar(obj)
       .then((res) => {
         setComissions(res?.results);
@@ -218,15 +221,25 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           defaultValue={tipoTrx}
         />
         {comissionFace === "pay" ? (
-          <Input
-            id={"comercioComissions"}
-            label={"Id comercio"}
-            name={"comercio"}
-            type='number'
-            step={"1"}
-            autoComplete='off'
-            defaultValue={comercio}
-          />
+          <Fragment>
+            <Input
+              id={"comercioComissions"}
+              label={"Id comercio"}
+              name={"comercio"}
+              type='number'
+              step={"1"}
+              autoComplete='off'
+              defaultValue={comercio}
+            />
+            <Input
+              id={"autorizadorComissions"}
+              label={"Autorizador"}
+              name={"autorizador"}
+              type={"text"}
+              autoComplete='off'
+              defaultValue={autorizador}
+            />
+          </Fragment>
         ) : comissionFace === "collect" ? (
           <Input
             id={"autorizadorComissions"}
