@@ -45,25 +45,3 @@ export const postCashOut = async (bodyObj) => {
     throw err;
   }
 }
-
-export const parametrosTipo = async bodyObj => {
-  if (true) {
-    return new Promise((resolve, reject) => {
-      resolve("Sin datos body");
-    });
-  }
-  try {
-    const res = await fetchData(
-      `${urlDaviplata}/cash-out`,
-      "POST",
-      {},
-      bodyObj
-    );
-    if (!res?.status) {
-      console.error(res?.msg);
-    }
-    return res;
-  } catch (err) {
-    throw err;
-  }
-}
