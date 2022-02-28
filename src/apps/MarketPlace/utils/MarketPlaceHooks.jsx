@@ -51,10 +51,11 @@ export const useProvideMarketPlace = () => {
       console.log(res);
       return res;
     } catch (err) {
-      console.error(err);
+      console.log(err);
+      throw err;
     }
   });
-  console.log(`${process.env.REACT_APP_URL_MARKETPLACE}consultorder`);
+
   return {
     payOrder,
     searchsOrder,

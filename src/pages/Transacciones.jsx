@@ -26,6 +26,12 @@ const Transacciones = () => {
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
 
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
+
   const transacciones = useCallback(
     (page, Comercio, Tipo_operacion, date_ini, date_end) => {
       const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
@@ -222,7 +228,7 @@ const Transacciones = () => {
             <h1>Ultima pagina: {maxPages}</h1>
           </div>
           <Table
-            headers={["Fecha", "operacion", "Monto"]}
+            headers={["Fecha", "Operación", "Monto"]}
             data={trxs.map(({ Created_at, Tipo_operacion, Monto }) => {
               const tempDate = new Date(Created_at);
               tempDate.setHours(tempDate.getHours() + 5);
@@ -233,10 +239,11 @@ const Transacciones = () => {
                 hour: "numeric",
                 minute: "numeric",
               }).format(tempDate);
+              const money = formatMoney.format(Monto);
               return {
                 Created_at,
                 Tipo_operacion,
-                Monto,
+                money,
               };
             })}
             onSelectRow={(_e, index) => {
