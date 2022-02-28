@@ -9,6 +9,7 @@ import { useMarketPlace } from "./utils/MarketPlaceHooks";
 import Input from "../../components/Base/Input/Input";
 import MoneyInput from "../../components/Base/MoneyInput/MoneyInput";
 import Products from "./Products";
+import { notifyError } from "../../utils/notify";
 
 const OrdenMarket = () => {
   const [summary, setSummary] = useState({});
@@ -27,9 +28,13 @@ const OrdenMarket = () => {
   });
 
   useEffect(() => {
-    searchsOrder(params.orden).then((res) => {
-      console.log(res);
-    });
+    searchsOrder(params.orden)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        notifyError("Fallas en la consulta de la orden, consulte soporte", err);
+      });
   }, []);
 
   const loadModal = (e) => {
@@ -46,7 +51,7 @@ const OrdenMarket = () => {
   const closeModal = () => {
     setShowModal(false);
   };
-  console.log(summary);
+
   return (
     <div className="w-full flex flex-col justify-center items-center">
       {consulta?.EstadoTrx === "Aprobado" ? (
