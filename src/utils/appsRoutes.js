@@ -764,22 +764,14 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/administrador-gestion-comercial/asesores",
-        label: (
-          <AppIcons
-            Logo={"IMPUESTO"}
-            name={"Administrar Asesores Comerciales"}
-          />
-        ),
+        label: <AppIcons Logo={"IMPUESTO"} name={"Administrar Asesores"} />,
         component: AsesoresComerciales,
         permission: [34],
       },
       {
         link: "/administrador-gestion-comercial/responsables",
         label: (
-          <AppIcons
-            Logo={"ACTUALIZACION"}
-            name={"Administrar Responsables Comerciales"}
-          />
+          <AppIcons Logo={"ACTUALIZACION"} name={"Administrar Responsables"} />
         ),
         component: ResponsablesComerciales,
         permission: [33],
