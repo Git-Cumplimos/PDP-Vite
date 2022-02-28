@@ -51,7 +51,7 @@ const fetchData = async (
     if (data instanceof FormData) {
       fetchOptions.body = data;
     } else {
-      fetchOptions.headers["Content-Type"] = "application/json"
+      fetchOptions.headers["Content-Type"] = "application/json";
       fetchOptions.body = JSON.stringify(data);
     }
   }

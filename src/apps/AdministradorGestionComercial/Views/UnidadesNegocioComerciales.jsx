@@ -120,7 +120,7 @@ const UnidadesNegocioComerciales = () => {
             {selectedResponsable.map((el, idx) => {
               return (
                 <li key={idx} className="grid grid-cols-8">
-                  <span className="bi bi-person-fill" />
+                  <span className="bi bi-person-fill text-xl" />
                   <h1 className="col-span-6">{el}</h1>
                   <span
                     onClick={() => {

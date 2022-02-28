@@ -147,19 +147,13 @@ const VerificacionNuevosComercios = lazy(() =>
  */
 
 const AdministradorGestionComercial = lazy(() =>
-  import(
-    "../apps/AdministradorGestionComercial/AdministradorGestionComercial"
-  )
+  import("../apps/AdministradorGestionComercial/AdministradorGestionComercial")
 );
 const AsesoresComerciales = lazy(() =>
-  import(
-    "../apps/AdministradorGestionComercial/Views/AsesoresComerciales"
-  )
+  import("../apps/AdministradorGestionComercial/Views/AsesoresComerciales")
 );
 const ResponsablesComerciales = lazy(() =>
-  import(
-    "../apps/AdministradorGestionComercial/Views/ResponsablesComerciales"
-  )
+  import("../apps/AdministradorGestionComercial/Views/ResponsablesComerciales")
 );
 const UnidadesNegocioComerciales = lazy(() =>
   import(
@@ -167,34 +161,10 @@ const UnidadesNegocioComerciales = lazy(() =>
   )
 );
 const ZonasComerciales = lazy(() =>
-  import(
-    "../apps/AdministradorGestionComercial/Views/ZonasComerciales"
-  )
+  import("../apps/AdministradorGestionComercial/Views/ZonasComerciales")
 );
-const ModificarAsesor = lazy(() =>
-  import("../apps/AdministradorGestoresComerciales/views/ModificarAsesor")
-);
-const CrearAsesor = lazy(() =>
-  import("../apps/AdministradorGestoresComerciales/views/CrearAsesor")
-);
-const AdministradorResponsablesComerciales = lazy(() =>
-  import(
-    "../apps/AdministradorResponsablesComerciales/AdministradorResponsablesComerciales"
-  )
-);
-const AdministradorUnidadesNegocio = lazy(() =>
-  import("../apps/AdministradorUnidadesNegocio/AdministradorUnidadesNegocio")
-);
-const ModificarResponsables = lazy(() =>
-  import(
-    "../apps/AdministradorResponsablesComerciales/views/ModificarResponsables"
-  )
-);
-const CrearUnidadNegocio = lazy(() =>
-  import("../apps/AdministradorUnidadesNegocio/views/CrearUnidadNegocio")
-);
-const CrearResponsable = lazy(() =>
-  import("../apps/AdministradorResponsablesComerciales/views/CrearResponsable")
+const LocalidadesComerciales = lazy(() =>
+  import("../apps/AdministradorGestionComercial/Views/LocalidadesComerciales")
 );
 
 /**
@@ -564,7 +534,6 @@ const allUrlsPrivateApps = [
       },
     ],
   },
-
   {
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
@@ -791,7 +760,7 @@ const allUrlsPrivateApps = [
       <AppIcons Logo={"RECAUDO"} name={"Administrador Gestion Comercial"} />
     ),
     component: AdministradorGestionComercial,
-    permission: [32, 33, 34],
+    permission: [32, 33, 34, 35, 36],
     subRoutes: [
       {
         link: "/administrador-gestion-comercial/asesores",
@@ -825,11 +794,15 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/administrador-gestion-comercial/zonas",
-        label: (
-          <AppIcons Logo={"RECAUDO"} name={"Administrar Zonas"} />
-        ),
+        label: <AppIcons Logo={"RECAUDO"} name={"Administrar Zonas"} />,
         component: ZonasComerciales,
-        permission: [32],
+        permission: [35],
+      },
+      {
+        link: "/administrador-gestion-comercial/localidades",
+        label: <AppIcons Logo={"RECAUDO"} name={"Administrar Localidades"} />,
+        component: LocalidadesComerciales,
+        permission: [36],
       },
     ],
   },
