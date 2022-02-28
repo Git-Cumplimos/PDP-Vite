@@ -8,7 +8,7 @@ import classes from "./ContinuarReconoserID.module.css";
 const ReconoserID = () => {
   /*   const [procesoConvenioGuid, setProcesoConvenioGuid] = useState(""); */
   const [isSuccess, setIsSuccess] = useState(false);
-  const [datosUsuario, setDatosUsuario] = useState([]);
+  /* const [datosUsuario, setDatosUsuario] = useState([]); */
 
   let navigate = useNavigate();
   const params = useParams();

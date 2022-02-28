@@ -56,6 +56,20 @@ const FormularioEnrolamiento = () => {
   const [archivos2, setArchivos2] = useState([]);
   const [archivos3, setArchivos3] = useState([]);
 
+  const [localidadBogota, setLocalidadBogota] = useState(0);
+  useEffect(() => {
+    fetchData(
+      `${
+        process.env.REACT_APP_URL_SERVICE_COMMERCE
+      }/localidades?cod_dane=${11001}&limit=${0}`,
+      "GET",
+      {},
+      {},
+      {},
+      false
+    ).then((respuesta) => setLocalidadBogota(respuesta.obj.results));
+  }, []);
+
   useEffect(() => {
     fetchData(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?limit=${14}`,
@@ -472,18 +486,6 @@ const FormularioEnrolamiento = () => {
                   NO: "NO",
                 }}
               ></Select>
-              <Select
-                onChange={(event) => setTipoComercio(event.target.value)}
-                id="comissionType" /* para que es esto */
-                name="comissionType"
-                label={`Tipo de Establecimiento`}
-                required
-                options={{
-                  "": "",
-                  Papeleria: "Papeleria",
-                  " Tienda De Mascotas": " Tienda De Mascotas",
-                }}
-              ></Select>
             </Fieldset>
 
             <Fieldset legend="Contacto" className="lg:col-span-3">
@@ -512,12 +514,50 @@ const FormularioEnrolamiento = () => {
           <LocationForm
             place="Comercio"
             location={commerceLocation}
-            required /* LocationComponent={} */
+            required
+            LocalidadComponent={
+              <Select
+                onChange={(event) =>
+                  commerceLocation.localidad[1](event.target.value)
+                }
+                id="comissionType"
+                name="comissionType"
+                value={commerceLocation.localidad[0]}
+                label={`Localidad`}
+                options={
+                  Object.fromEntries([
+                    ["", ""],
+                    ...localidadBogota.map(({ nom_localidad }) => {
+                      return [nom_localidad];
+                    }),
+                  ]) || { "": "" }
+                }
+              ></Select>
+            }
           />
           <LocationForm
             place="Correspondencia"
             location={homeLocation}
             required
+            LocalidadComponent={
+              <Select
+                onChange={(event) =>
+                  homeLocation.localidad[1](event.target.value)
+                }
+                id="comissionType"
+                name="comissionType"
+                value={homeLocation.localidad[0]}
+                label={`Localidad`}
+                options={
+                  Object.fromEntries([
+                    ["", ""],
+                    ...localidadBogota.map(({ nom_localidad }) => {
+                      return [nom_localidad];
+                    }),
+                  ]) || { "": "" }
+                }
+              ></Select>
+            }
           />
 
           <Fragment>

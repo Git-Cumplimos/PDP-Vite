@@ -44,6 +44,7 @@ const Recaudo = () => {
   const [showModal, setShowModal] = useState("");
   const [response, setResponse] = useState("");
   const { roleInfo } = useAuth();
+
   const notify = (msg) => {
     toast.info(msg, {
       position: "top-center",
@@ -100,14 +101,15 @@ const Recaudo = () => {
       }),
       commerceName: "FUNDACIÓN DE LA MUJER",
       trxInfo: [
-        ['CRÉDITO', selected?.Credito],
-        ['VALOR', formatMoney.format(formatMon)],
-        ['Cliente', selected?.Cliente],
-        ["",""],
-        ['Cédula', selected?.Cedula],
-        ["",""]  
+        ["CRÉDITO", selected?.Credito],
+        ["VALOR", formatMoney.format(formatMon)],
+        ["Cliente", selected?.Cliente],
+        ["", ""],
+        ["Cédula", selected?.Cedula],
+        ["", ""],
       ],
-      disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+      disclamer:
+        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [
     roleInfo?.ciudad,
@@ -116,7 +118,7 @@ const Recaudo = () => {
     roleInfo?.id_dispositivo,
     response,
     formatMon,
-    table
+    table,
   ]);
 
   const { infoTicket } = useAuth();
@@ -136,8 +138,8 @@ const Recaudo = () => {
     setShowModal(false);
     setDisabledBtn(false);
     setFormatMon("");
-    setCreditStatus(false)
-    setInfo('');
+    setCreditStatus(false);
+    setInfo("");
   }, []);
 
   const bankCollection = (e) => {
@@ -155,19 +157,18 @@ const Recaudo = () => {
       referenciaPago: referencia,
       cliente: selected?.Cliente,
       cedula: selected?.Cedula,
-      nombre_comercio:roleInfo?.['nombre comercio']
-
+      nombre_comercio: roleInfo?.["nombre comercio"],
     };
-    console.log(body)
+    console.log(body);
     ingresorecibo(body)
       .then((res) => {
-        if (res?.status==true) {
+        if (res?.status == true) {
           console.log(res);
-          setResponse(res?.obj)
+          setResponse(res?.obj);
           setTicket(true);
           setStop(false);
         } else {
-          console.log(res)
+          console.log(res);
           notifyError(res?.obj?.Mensaje);
           setStop(false);
         }
@@ -182,7 +183,7 @@ const Recaudo = () => {
     e.preventDefault();
     setDisabledBtn(true);
     setCreditStatus(false);
-    setInfo('');
+    setInfo("");
     const user = {
       Comercio: roleInfo?.id_comercio,
       Depto: roleInfo?.codigo_dane.slice(0, 2),
@@ -233,7 +234,7 @@ const Recaudo = () => {
       })
       .catch((err) => console.log("error", err));
   };
-  console.log(roleInfo?.['nombre comercio'])
+  console.log(roleInfo?.["nombre comercio"]);
   return (
     <>
       <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>

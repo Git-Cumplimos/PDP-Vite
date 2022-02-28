@@ -48,6 +48,12 @@ const ConsultaEnrolamiento = () => {
   const handleReconoser = async () => {
     navigate(`/Solicitud-enrolamiento/reconoserid/${numconsultaProceso}`);
   };
+  const handleCorregir = async () => {
+    navigate(
+      `/Solicitud-enrolamiento/correccionformulario/${numconsultaProceso}`
+    );
+  };
+
   const handleContinuarReconoser = async () => {
     console.log(respuestaProceso[0].id_reconocer);
     navigate(
@@ -107,10 +113,8 @@ const ConsultaEnrolamiento = () => {
                 inscripción.
               </h1>
             </Modal>
-          ) : /*  "" */
-          /* console.log("hola") && */
-          cantNum >= 5 &&
-            respuestaProceso &&
+          ) : cantNum >= 5 &&
+            respuestaProceso?.length > 0 &&
             respuestaProceso.filter(
               (element) => element["numdoc"] === numconsultaProceso
             )[0]["numdoc"] === numconsultaProceso ? (
@@ -146,17 +150,29 @@ const ConsultaEnrolamiento = () => {
                     ? "Proceso Rechazado por Hellen"
                     : "Señor usuario su Proceso se encuentra en Validación de documentos por parte del Asesor Comercial."
                 }`}</h2>
+                {respuestaProceso[0]["validation_state"] === "102" ? (
+                  <ButtonBar className={"lg:col-span-2"} type="">
+                    <Button type="submit" onClick={() => handleCorregir()}>
+                      Corregir Formulario
+                    </Button>
+                  </ButtonBar>
+                ) : (
+                  ""
+                )}
 
-                {respuestaProceso[0].validation_state === "101" &&
-                respuestaProceso[0].id_reconocer === "None" ? (
+                {(respuestaProceso[0].validation_state === "101" &&
+                  respuestaProceso[0].id_reconocer === "None") ||
+                (respuestaProceso[0].validation_state === "101" &&
+                  respuestaProceso[0].id_reconocer === "") ? (
                   <ButtonBar className={"lg:col-span-2"} type="">
                     <Button type="submit" onClick={() => handleReconoser()}>
                       Comenzar ReconoserID
                     </Button>
                   </ButtonBar>
-                ) : respuestaProceso[0].validation_state ===
-                  "En Proceso de Validación" ? null : respuestaProceso[0]
-                    .id_reconocer !== "None" ? (
+                ) : (respuestaProceso[0].validation_state === "101" &&
+                    respuestaProceso[0].id_reconocer !== "None") ||
+                  (respuestaProceso[0].validation_state === "101" &&
+                    respuestaProceso[0].id_reconocer !== "") ? (
                   <ButtonBar type="">
                     <Button
                       className={contenedorBotones}
@@ -185,7 +201,14 @@ const ConsultaEnrolamiento = () => {
               </h1>
             </Modal>
           ) : (
-            ""
+            <Modal show={estado} handleClose={() => handleClose()}>
+              <LogoPDP></LogoPDP>
+              <h1>
+                El número ingresado no se encuentra en proceso de enrolamiento,
+                por favor revise si esta bien escrito o realice el proceso de
+                inscripción.
+              </h1>
+            </Modal>
           )
         }
       </Form>

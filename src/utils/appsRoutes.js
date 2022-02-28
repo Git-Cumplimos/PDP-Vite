@@ -5,6 +5,7 @@ import { lazy } from "react";
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
+import CreateComisionCobrada from "../apps/TrxParams/Views/Comisiones/CreateComisionCobrada";
 
 /**
  * * Logos
@@ -84,6 +85,9 @@ const CommerceInfo = lazy(() => import("../apps/UpdateCommerce/CommerceInfo"));
 /**
  * Trx params
  */
+const TipoContratoComisiones = lazy(() =>
+  import("../apps/TrxParams/Views/TipoContratoComisiones")
+);
 const TrxParams = lazy(() => import("../apps/TrxParams/TrxParams"));
 const Comisiones = lazy(() => import("../apps/TrxParams/Views/Comisiones"));
 const Com2Pay = lazy(() =>
@@ -112,6 +116,9 @@ const FormularioEnrolamiento = lazy(() =>
 );
 const ConsultaEnrolamiento = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ConsultaEnrolamiento")
+);
+const CorreccionFormulario = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/CorreccionFormulario")
 );
 const ReconoserID = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ReconoserID")
@@ -266,6 +273,11 @@ const publicUrls = [
         ),
         component: ContinuarReconoserID,
       },
+      {
+        link: "/Solicitud-enrolamiento/correccionformulario/:numCedula",
+        label: <AppIcons Logo={"PAGO"} name={"Corrección De Formulario"} />,
+        component: CorreccionFormulario,
+      },
 
       /*      {
         link: "/Solicitud-enrolamiento/validarformulario",
@@ -375,7 +387,7 @@ const allUrlsPrivateApps = [
     permission: [9],
   },
   {
-    link: "/marketplace",
+    link: "https://www.puntodecompra.com.co/",
     label: <AppIcons Logo={"MARKETPLACE"} name="Marketplace" />,
     component: MarketPlace,
     extern: true,
@@ -510,6 +522,19 @@ const allUrlsPrivateApps = [
             label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a cobrar"} />,
             component: Com2Collect,
             permission: [19],
+            subRoutes: [
+              {
+                link: "/trx-params/comisiones/cobradas/crear",
+                label: (
+                  <AppIcons
+                    Logo={"IMPUESTO"}
+                    name={"Comisiones a cobrar por autorizador"}
+                  />
+                ),
+                component: CreateComision,
+                permission: [19],
+              },
+            ],
           },
         ],
       },
@@ -654,6 +679,19 @@ const allUrlsPrivateApps = [
             label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a cobrar"} />,
             component: Com2Collect,
             permission: [19],
+            subRoutes: [
+              {
+                link: "/params-operations/comisiones/cobradas/crear",
+                label: (
+                  <AppIcons
+                    Logo={"IMPUESTO"}
+                    name={"Comisiones a cobrar por autorizador"}
+                  />
+                ),
+                component: CreateComisionCobrada,
+                permission: [19],
+              },
+            ],
           },
         ],
       },
@@ -673,6 +711,7 @@ const allUrlsPrivateApps = [
           },
         ],
       },
+
       {
         link: "/params-operations/autorizadores",
         label: (
@@ -683,6 +722,22 @@ const allUrlsPrivateApps = [
         ),
         component: Autorizadores,
         permission: [21],
+      },
+      {
+        link: "/params-operations/tipo_contrato_comisiones",
+        label: <AppIcons Logo={"RETIRO"} name={"Contratos comisiones"} />,
+        component: TipoContratoComisiones,
+        permission: [20],
+        subRoutes: [
+          {
+            link: "/params-operations/convenios/autorizadores",
+            label: (
+              <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
+            ),
+            component: ConvAuto,
+            permission: [20],
+          },
+        ],
       },
     ],
   },
