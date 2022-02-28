@@ -18,7 +18,7 @@ const ReconoserID = () => {
   const { ContenedorPrincipal } = classes;
   useEffect(() => {
     fetch(
-      `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actualizacion-estado?numDoc=${params.numCedula}`
+      `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actualizacionestado?numDoc=${params.numCedula}`
     )
       .then((res) => res.json())
       .then((respuesta) => setDatosUsuario(respuesta.obj.results));

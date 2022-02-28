@@ -57,12 +57,22 @@ const CorreccionFormulario = () => {
   const [actividad, setActividad] = useState("");
   const [foundActivities, setFoundActivities] = useState([]);
   const [commerceType, setCommerceType] = useState([]);
-  //Datos Ubicacion Comercio
+  //Datos Ubicacion Correspondencia
   const [municipioCorr, setMunicipioCorr] = useState("");
   const [departamentoCorr, setDepartamentoCorr] = useState("");
   const [localidadCorr, setLocalidadCorr] = useState("");
   const [barrioCorr, setBarrioCorr] = useState("");
   const [direccionCorr, setDireccionCorr] = useState("");
+  //Datos Ubicacion Comercio
+  const [municipioCom, setMunicipioCom] = useState("");
+  const [departamentoCom, setDepartamentoCom] = useState("");
+  const [localidadCom, setLocalidadCom] = useState("");
+  const [barrioCom, setBarrioCom] = useState("");
+  const [direccionCom, setDireccionCom] = useState("");
+
+  //Autorizacion
+  const [responsableIva, setResponsableIva] = useState("");
+  const [autorizacion, setAutorizacion] = useState("");
   useEffect(() => {
     fetch(
       `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actualizacion-estado?numDoc=${params.numCedula}`
@@ -101,12 +111,67 @@ const CorreccionFormulario = () => {
         dirCorr: setDireccionCorr(
           respuesta.obj.results[0]["direccion_correspondencia"]
         );
+        dirCom: setMunicipioCom(respuesta.obj.results[0]["municipio"]);
+        depacom: setDepartamentoCom(respuesta.obj.results[0]["departamento"]);
+        locacom: setLocalidadCom(respuesta.obj.results[0]["localidad_bogota"]);
+        dircom: setDireccionCom(respuesta.obj.results[0]["direccion_comercio"]);
+        barrcom: setBarrioCom(respuesta.obj.results[0]["barrio"]);
+        respoIva: setResponsableIva(respuesta.obj.results[0]["responsableiva"]);
+        autosms: setAutorizacion(respuesta.obj.results[0]["autosms"]);
       });
   }, []);
   console.log(datosParams);
 
   const capitalize = (word) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
+  };
+  const corregirEnviar = (e) => {
+    e.preventDefault();
+    fetchData(
+      /* `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/idreconocer?id_proceso=26`, */
+      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`,
+      "PUT",
+      {},
+      {
+        asesor: asignarAsesores,
+        nombre: `${nombre}`,
+        apellido: `${apellido}`,
+        nombre_comercio: nombreComercio,
+        numnit: numNit,
+        numcamycom: numCamaraComercio,
+        numrut: numRut,
+        autosms: autorizacion,
+        tipozona: "",
+        unidad_negocio: "",
+        responsableiva: responsableIva,
+        cod_localidad: "",
+        asesor_comercial_localidad: "",
+        actividad_economica: commerceType.toString(),
+        tipo_establecimiento: "",
+        sede: "Bogotá",
+        direccion_comercio: direccionCom,
+        departamento: departamentoCom,
+        municipio: municipioCom,
+        localidad_bogota: localidadCom,
+        barrio: barrioCom,
+        direccion_correspondencia: direccionCorr,
+        departamento_correspondencia: departamentoCorr,
+        municipio_correspondencia: municipioCorr,
+        localidad_correspondencia: localidadCorr,
+        barrio_correspondencia: barrioCorr,
+        tipoDoc: tipoIdentificacion,
+        numDoc: numDocumento,
+        email: correos[0],
+        celular: telefonos[0],
+        /* task_token: datosParams[0]["task_token"], */
+        validation_state: "En Proceso de Validación",
+        /* id_name: "id_proceso", */
+        responsable: "",
+      },
+
+      {},
+      false
+    ).then((respuesta) => console.log(respuesta));
   };
   return (
     <div>
@@ -322,17 +387,33 @@ const CorreccionFormulario = () => {
             <Input
               label={"Municipio"}
               placeholder={datosParams[0]["municipio"]}
+              value={municipioCom /* ?? datosParams[0]["nombre_comercio"] */}
+              onChange={(e) => setMunicipioCom(capitalize(e.target.value))}
+              type="text"
             />
 
             <Input
               label={"Departamento"}
               placeholder={datosParams[0]["departamento"]}
+              value={departamentoCom /* ?? datosParams[0]["nombre_comercio"] */}
+              onChange={(e) => setDepartamentoCom(capitalize(e.target.value))}
+              type="text"
             />
-            <Input label={"Barrio"} placeholder={datosParams[0]["barrio"]} />
+            <Input
+              label={"Barrio"}
+              placeholder={datosParams[0]["barrio"]}
+              value={barrioCom /* ?? datosParams[0]["nombre_comercio"] */}
+              onChange={(e) => setBarrioCom(capitalize(e.target.value))}
+              type="text"
+            />
+
             {datosParams[0]["localidad_bogota"].length > 0 ? (
               <Input
                 label={"Localidad"}
                 placeholder={datosParams[0]["localidad_bogota"]}
+                value={localidadCom /* ?? datosParams[0]["nombre_comercio"] */}
+                onChange={(e) => setLocalidadCom(capitalize(e.target.value))}
+                type="text"
               />
             ) : (
               ""
@@ -341,6 +422,9 @@ const CorreccionFormulario = () => {
             <Input
               label={"Direccion"}
               placeholder={datosParams[0]["direccion_comercio"]}
+              value={direccionCom /* ?? datosParams[0]["nombre_comercio"] */}
+              onChange={(e) => setDireccionCom(capitalize(e.target.value))}
+              type="text"
             />
           </Fieldset>
           <Fieldset
@@ -391,18 +475,18 @@ const CorreccionFormulario = () => {
             />
           </Fieldset>
 
+          <div /* className={contenedorBotones} */>
+            <Button
+              type=""
+              onClick={(e) => {
+                corregirEnviar(e);
+              }}
+            >
+              Guardar y Enviar
+            </Button>
+          </div>
           {/*   <div>
             <div className={contenedorPrincipalBotones}>
-              <div className={contenedorBotones}>
-                <Button
-                  type="submit"
-                  onClick={(e) => {
-                    aprobacionFormulario(e);
-                  }}
-                >
-                  Aprobar Comercio
-                </Button>
-              </div>
 
               <div className={contenedorBotones}>
                 <Button
