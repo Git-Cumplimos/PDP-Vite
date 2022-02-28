@@ -134,13 +134,35 @@ const VerificacionApertura = lazy(() =>
 const VerificacionNuevosComercios = lazy(() =>
   import("../apps/ValidacionEnrolamiento/VerificacionNuevosComercios")
 );
-const AdministradorGestoresComerciales = lazy(() =>
+
+/**
+ * AdministradorGestionComercial
+ */
+
+const AdministradorGestionComercial = lazy(() =>
   import(
-    "../apps/AdministradorGestoresComerciales/AdministradorGestoresComerciales"
+    "../apps/AdministradorGestionComercial/AdministradorGestionComercial"
   )
 );
-const GestoresComerciales = lazy(() =>
-  import("../apps/AdministradorGestoresComerciales/views/GestoresComerciales")
+const AsesoresComerciales = lazy(() =>
+  import(
+    "../apps/AdministradorGestionComercial/Views/AsesoresComerciales"
+  )
+);
+const ResponsablesComerciales = lazy(() =>
+  import(
+    "../apps/AdministradorGestionComercial/Views/ResponsablesComerciales"
+  )
+);
+const UnidadesNegocioComerciales = lazy(() =>
+  import(
+    "../apps/AdministradorGestionComercial/Views/UnidadesNegocioComerciales"
+  )
+);
+const ZonasComerciales = lazy(() =>
+  import(
+    "../apps/AdministradorGestionComercial/Views/ZonasComerciales"
+  )
 );
 const ModificarAsesor = lazy(() =>
   import("../apps/AdministradorGestoresComerciales/views/ModificarAsesor")
@@ -167,6 +189,7 @@ const CrearUnidadNegocio = lazy(() =>
 const CrearResponsable = lazy(() =>
   import("../apps/AdministradorResponsablesComerciales/views/CrearResponsable")
 );
+
 /**
  * Recaudo
  */
@@ -708,97 +731,50 @@ const allUrlsPrivateApps = [
     ],
   },
   {
-    link: "/administradorgestorcomercial",
+    link: "/administrador-gestion-comercial",
     label: (
-      <AppIcons Logo={"RECAUDO"} name={"Administrar Gestores Comerciales"} />
+      <AppIcons Logo={"RECAUDO"} name={"Administrador Gestion Comercial"} />
     ),
-    component: AdministradorGestoresComerciales,
-    permission: [1],
+    component: AdministradorGestionComercial,
+    permission: [32, 33, 34],
     subRoutes: [
       {
-        link: "/administradorgestorcomercial/admin",
+        link: "/administrador-gestion-comercial/asesores",
         label: (
           <AppIcons
             Logo={"IMPUESTO"}
-            name={"Administrar Gestores Comerciales"}
+            name={"Administrar Asesores Comerciales"}
           />
         ),
-        component: GestoresComerciales,
-        permission: [1],
-        subRoutes: [
-          {
-            link: "/administradorgestorcomercial/admin/modificarasesor/:id",
-            label: (
-              <AppIcons
-                Logo={"IMPUESTO"}
-                name={"Modificar Gestores Comerciales"}
-              />
-            ),
-            component: ModificarAsesor,
-            permission: [1],
-          },
-          {
-            link: "/administradorgestorcomercial/admin/crearasesor",
-            label: (
-              <AppIcons Logo={"IMPUESTO"} name={"Crear Gestores Comerciales"} />
-            ),
-            component: CrearAsesor,
-            permission: [1],
-          },
-        ],
+        component: AsesoresComerciales,
+        permission: [34],
       },
       {
-        link: "/administradorresponsablecomercial",
+        link: "/administrador-gestion-comercial/responsables",
         label: (
           <AppIcons
             Logo={"ACTUALIZACION"}
             name={"Administrar Responsables Comerciales"}
           />
         ),
-        component: AdministradorResponsablesComerciales,
-        permission: [1],
-        subRoutes: [
-          {
-            link: "/administradorresponsablecomercial/modificarresponsable/:id",
-            label: (
-              <AppIcons
-                Logo={"IMPUESTO"}
-                name={"Modificar Responsables Comerciales"}
-              />
-            ),
-            component: ModificarResponsables,
-            permission: [1],
-          },
-          {
-            link: "/administradorresponsablecomercial/crearresponsable",
-            label: (
-              <AppIcons
-                Logo={"IMPUESTO"}
-                name={"Crear Responsable Comercial"}
-              />
-            ),
-            component: CrearResponsable,
-            permission: [1],
-          },
-        ],
+        component: ResponsablesComerciales,
+        permission: [33],
       },
       {
-        link: "/administradorunidadesnegocio",
+        link: "/administrador-gestion-comercial/unidades-de-negocio",
         label: (
           <AppIcons Logo={"RECAUDO"} name={"Administrar Unidades de Negocio"} />
         ),
-        component: AdministradorUnidadesNegocio,
-        permission: [1],
-        subRoutes: [
-          {
-            link: "/administradorunidadesnegocio/crearunidadnegocio",
-            label: (
-              <AppIcons Logo={"IMPUESTO"} name={"Crear Unidad de Negocio"} />
-            ),
-            component: CrearUnidadNegocio,
-            permission: [1],
-          },
-        ],
+        component: UnidadesNegocioComerciales,
+        permission: [32],
+      },
+      {
+        link: "/administrador-gestion-comercial/zonas",
+        label: (
+          <AppIcons Logo={"RECAUDO"} name={"Administrar Zonas"} />
+        ),
+        component: ZonasComerciales,
+        permission: [32],
       },
     ],
   },

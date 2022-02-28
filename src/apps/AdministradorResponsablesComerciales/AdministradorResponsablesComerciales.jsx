@@ -24,7 +24,7 @@ const AdministradorResponsablesComerciales = () => {
     }
   });
   const handleSubmit = () => {
-    navigate(`/administradorresponsablecomercial/crearresponsable`);
+    navigate(`crear-responsable`);
   };
   return (
     <div className={contenedorPrincipal}>
@@ -37,7 +37,7 @@ const AdministradorResponsablesComerciales = () => {
         }))}
         onSelectRow={(e, i) =>
           navigate(
-            `/administradorresponsablecomercial/modificarresponsable/${responsables[i]["id_responsable"]}`
+            `modificar-responsable/${responsables[i]["id_responsable"]}`
           )
         }
       ></Table>
