@@ -37,7 +37,11 @@ const ZonasComerciales = () => {
           .toLowerCase()
           .indexOf(searchMunicipios.toLowerCase());
         if (foundIdx === -1) {
-          return <h1 className="text-sm">{val}</h1>;
+          return (
+            <div className="grid grid-cols-1 place-items-center px-4 py-2">
+              <h1 className="text-sm">{val}</h1>
+            </div>
+          );
         }
         const str1 = val.substring(0, foundIdx);
         const str2 = val.substring(
@@ -63,8 +67,8 @@ const ZonasComerciales = () => {
       const copy = [...selectedMunicipios];
       if (
         !copy
-          .map((val) => parseInt(val.split(") ")[0]))
-          .includes(parseInt(foundMunicipios[index].split(") ")[0]))
+          .map((val) => val.split(") ")[0])
+          .includes(foundMunicipios[index].split(") ")[0])
       ) {
         copy.push(foundMunicipios[index]);
         setSelectedMunicipios([...copy]);
@@ -77,7 +81,7 @@ const ZonasComerciales = () => {
 
   const inputSuggResp = useMemo(() => {
     return (
-      <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
+      <div className="grid grid-cols-1 place-items-center text-center gap-4">
         <InputSuggestions
           id="municipiosZonas"
           label={"Buscar municipios"}
@@ -128,7 +132,7 @@ const ZonasComerciales = () => {
             {selectedMunicipios.map((el, idx) => {
               return (
                 <li key={idx} className="grid grid-cols-8">
-                  <span className="bi bi-person-fill" />
+                  <span className="bi bi-pin-map-fill text-xl" />
                   <h1 className="col-span-6">{el}</h1>
                   <span
                     onClick={() => {
@@ -151,10 +155,10 @@ const ZonasComerciales = () => {
 
   const getDataFromCodes = useCallback(async (codes) => {
     if (!Array.isArray(codes) || codes.length < 1) {
-      return new Promise((resolve, reject) => resolve([]))
+      return new Promise((resolve, reject) => resolve([]));
     }
     try {
-      const newData = []
+      const newData = [];
       for (const code of codes) {
         const res = await fetchData(
           process.env.REACT_APP_URL_DANE_MUNICIPIOS,
@@ -166,14 +170,14 @@ const ZonasComerciales = () => {
           {},
           false
         );
-        newData.push(...res)
+        newData.push(...res);
       }
       return newData;
     } catch (err) {
       console.error(err);
       throw err;
     }
-  }, [])
+  }, []);
   /**
    * End
    */
@@ -209,7 +213,7 @@ const ZonasComerciales = () => {
         {},
         {
           ...Object.fromEntries(formData.entries()),
-          municipios: selectedMunicipios,
+          municipios: selectedMunicipios.map((val) => val.split(") ")[0]),
         }
       ).then((res) => {
         if (!res?.status) {
@@ -231,29 +235,31 @@ const ZonasComerciales = () => {
       const formData = new FormData(ev.target);
 
       const body = Object.fromEntries(formData.entries());
-      const { id_negocio } = body;
-      delete body.id_negocio;
+      const { id_zona } = body;
+      delete body.id_zona;
 
       fetchData(
         `${url}/zonas`,
         "PUT",
         {
-          id_negocio,
+          id_zona,
         },
         {
           ...body,
-          municipios: selectedMunicipios,
+          municipios: selectedMunicipios.map((val) => val.split(") ")[0]),
         }
-      ).then((res) => {
-        if (!res?.status) {
-          notifyError(res?.msg);
-          return;
-        }
-        ev.target.reset();
-        notify("La Zona Ha Sido Editada Con Exito.");
-        fetchZonas();
-        handleClose();
-      });
+      )
+        .then((res) => {
+          if (!res?.status) {
+            notifyError(res?.msg);
+            return;
+          }
+          ev.target.reset();
+          notify("La Zona Ha Sido Editada Con Exito.");
+          fetchZonas();
+          handleClose();
+        })
+        .catch((err) => console.error(err));
     },
     [handleClose, fetchZonas, selectedMunicipios]
   );
@@ -279,8 +285,16 @@ const ZonasComerciales = () => {
           }))}
           onSelectRow={(e, i) => {
             setSelected(zonas[i]);
-            getDataFromCodes()
-            setSelectedMunicipios(zonas[i]?.municipios);
+            getDataFromCodes(zonas[i]?.municipios)
+              .then((res) => {
+                setSelectedMunicipios([
+                  ...res?.map(
+                    ({ departamento, municipio, c_digo_dane_del_municipio }) =>
+                      `${c_digo_dane_del_municipio}) ${municipio} (${departamento})`
+                  ),
+                ]);
+              })
+              .catch(() => {});
             setShowModal(true);
           }}
         />
