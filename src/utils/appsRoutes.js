@@ -6,6 +6,7 @@ import { lazy } from "react";
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 import CreateComisionCobrada from "../apps/TrxParams/Views/Comisiones/CreateComisionCobrada";
+import ConfiguracionComercios from "../apps/TrxParams/Views/ConfiguracionComercios";
 
 /**
  * * Logos
@@ -690,6 +691,12 @@ const allUrlsPrivateApps = [
           />
         ),
         component: Autorizadores,
+        permission: [21],
+      },
+      {
+        link: "/params-operations/configuracion_comercios",
+        label: <AppIcons Logo={"RETIRO"} name={"Configuración comercios"} />,
+        component: ConfiguracionComercios,
         permission: [21],
       },
       {
