@@ -85,15 +85,10 @@ const PayForm = ({ selected, summary }) => {
         "No. terminal": roleInfo?.id_dispositivo,
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
-        "Id Trx": summary?.Trx,
+        "Id Transacción": summary?.Trx,
       }),
       commerceName: "MARKETPLACE PUNTO DE COMPRA",
-      trxInfo: [
-        ["Articulos", <Products />],
-        ["", ""],
-        ["Total compra", summary?.Valor],
-        ["", ""],
-      ],
+      trxInfo: [, ["", ""], ["Total compra", summary?.Valor], ["", ""]],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
