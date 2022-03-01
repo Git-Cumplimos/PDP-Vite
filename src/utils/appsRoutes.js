@@ -57,6 +57,7 @@ const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
  * Marketplace
  */
 const MarketPlace = lazy(() => import("../apps/MarketPlace/MarketPlace"));
+const ReporteGral = lazy(() => import("../apps/MarketPlace/Records/Crossval"));
 
 /**
  * Fundacion de la mujer
@@ -147,19 +148,13 @@ const VerificacionNuevosComercios = lazy(() =>
  */
 
 const AdministradorGestionComercial = lazy(() =>
-  import(
-    "../apps/AdministradorGestionComercial/AdministradorGestionComercial"
-  )
+  import("../apps/AdministradorGestionComercial/AdministradorGestionComercial")
 );
 const AsesoresComerciales = lazy(() =>
-  import(
-    "../apps/AdministradorGestionComercial/Views/AsesoresComerciales"
-  )
+  import("../apps/AdministradorGestionComercial/Views/AsesoresComerciales")
 );
 const ResponsablesComerciales = lazy(() =>
-  import(
-    "../apps/AdministradorGestionComercial/Views/ResponsablesComerciales"
-  )
+  import("../apps/AdministradorGestionComercial/Views/ResponsablesComerciales")
 );
 const UnidadesNegocioComerciales = lazy(() =>
   import(
@@ -167,9 +162,7 @@ const UnidadesNegocioComerciales = lazy(() =>
   )
 );
 const ZonasComerciales = lazy(() =>
-  import(
-    "../apps/AdministradorGestionComercial/Views/ZonasComerciales"
-  )
+  import("../apps/AdministradorGestionComercial/Views/ZonasComerciales")
 );
 const ModificarAsesor = lazy(() =>
   import("../apps/AdministradorGestoresComerciales/views/ModificarAsesor")
@@ -398,6 +391,12 @@ const allUrlsPrivateApps = [
     label: null,
     component: MarketPlace,
     permission: [10],
+  },
+  {
+    link: "/reporte_general",
+    label: <AppIcons Logo={"MARKETPLACE"} name="Reporte Punto De Compra" />,
+    component: ReporteGral,
+    permission: [8],
   },
   {
     link: "/funmujer",
@@ -825,9 +824,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/administrador-gestion-comercial/zonas",
-        label: (
-          <AppIcons Logo={"RECAUDO"} name={"Administrar Zonas"} />
-        ),
+        label: <AppIcons Logo={"RECAUDO"} name={"Administrar Zonas"} />,
         component: ZonasComerciales,
         permission: [32],
       },
