@@ -6,10 +6,13 @@ import Modal from "../../components/Base/Modal/Modal";
 import Form from "../../components/Base/Form/Form";
 import PayForm from "./PaymentForm/PayForm";
 import { useMarketPlace } from "./utils/MarketPlaceHooks";
-const urlConsulta = "http://127.0.0.1:9000/consultorder";
+import Input from "../../components/Base/Input/Input";
+import MoneyInput from "../../components/Base/MoneyInput/MoneyInput";
+import Products from "./Products";
+import { notifyError } from "../../utils/notify";
 
 const OrdenMarket = () => {
-  const [consultas, setConsultas] = useState([]);
+  const [summary, setSummary] = useState({});
   const [showModal, setShowModal] = useState(false);
   const params = useParams();
 
@@ -18,15 +21,29 @@ const OrdenMarket = () => {
     searchsOrder,
   } = useMarketPlace();
 
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
+
   useEffect(() => {
-    console.log(consulta);
-    searchsOrder(params.orden).then((res) => {
-      console.log(res);
-    });
+    searchsOrder(params.orden)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        notifyError("Fallas en la consulta de la orden, consulte soporte", err);
+      });
   }, []);
 
   const loadModal = (e) => {
     e.preventDefault();
+    setSummary({
+      Trx: consulta?.obj?.Id_Trx,
+      Estado: consulta?.EstadoTrx,
+      Valor: formatMoney.format(consulta?.obj?.valor),
+    });
     setShowModal(true);
   };
 
@@ -36,20 +53,38 @@ const OrdenMarket = () => {
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
-      {consulta.EstadoTrx === "Aprobado" ? (
+      {consulta?.EstadoTrx === "Aprobado" ? (
         <h1>Esta transacción ya ha sido efectuada</h1>
+      ) : consulta?.EstadoTrx === "Cancelada" ? (
+        <h1>Esta transacción fue denegada</h1>
       ) : (
         <div>
-          <h1>Orden de compra: {params.orden}</h1>
           <Form onSubmit={loadModal}>
+            <Input
+              id="orden"
+              label="Orden de compra:"
+              type="text"
+              value={params.orden}
+              disabled={true}
+            />
             {[consulta].map((row) => {
               return (
-                <div>
-                  <h1>Mensaje del servicio: {row.msg}</h1>
-                  <h1>Estado de la transacción: {row.EstadoTrx}</h1>
-                  <h1>Valor de la transacción: {row?.obj?.valor}</h1>
-                  <h1>Punto de pago &copy;</h1>
-                </div>
+                <>
+                  <Input
+                    id="mensaje"
+                    label="Estado de la transacción:"
+                    type="text"
+                    value={row.EstadoTrx}
+                    disabled={true}
+                  />
+                  <MoneyInput
+                    id="mensaje"
+                    label="Valor de la transacción:"
+                    type="text"
+                    value={row?.obj?.valor}
+                    disabled={true}
+                  />
+                </>
               );
             })}
           </Form>
@@ -61,7 +96,7 @@ const OrdenMarket = () => {
         </div>
       )}
       <Modal show={showModal} handleClose={() => closeModal()}>
-        <PayForm selected={consulta} />
+        <PayForm selected={consulta} summary={summary} />
       </Modal>
     </div>
   );

@@ -1,7 +1,7 @@
 const PaymentSummary = ({
   title = "¿Esta seguro de realizar el transaccion?",
   subtitle = "Resumen de transaccion",
-  summaryTrx,
+  summaryTrx = {},
   children,
 }) => {
   return (

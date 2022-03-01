@@ -348,11 +348,11 @@ const VerificacionFormulario = () => {
               placeholder={datosParams[0]["responsableiva"]}
               disabled
             ></Input>
-            <Input
+            {/*   <Input
               label={"Tipo de Establecimiento"}
               placeholder={datosParams[0]["tipo_establecimiento"]}
               disabled
-            ></Input>
+            ></Input> */}
           </Fieldset>
 
           <Fieldset legend="Contacto" className="lg:col-span-3">
@@ -390,6 +390,16 @@ const VerificacionFormulario = () => {
               placeholder={datosParams[0]["barrio"]}
               disabled
             />
+            {datosParams[0]["localidad_bogota"].length > 0 ? (
+              <Input
+                label={"Localidad"}
+                placeholder={datosParams[0]["localidad_bogota"]}
+                disabled
+              />
+            ) : (
+              ""
+            )}
+
             <Input
               label={"Direccion"}
               placeholder={datosParams[0]["direccion_comercio"]}
@@ -416,6 +426,15 @@ const VerificacionFormulario = () => {
               placeholder={datosParams[0]["barrio_correspondencia"]}
               disabled
             />
+            {datosParams[0]["localidad_correspondencia"].length > 0 ? (
+              <Input
+                label={"Localidad"}
+                placeholder={datosParams[0]["localidad_correspondencia"]}
+                disabled
+              />
+            ) : (
+              ""
+            )}
             <Input
               label={"Direccion"}
               placeholder={datosParams[0]["direccion_correspondencia"]}

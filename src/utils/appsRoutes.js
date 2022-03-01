@@ -58,6 +58,7 @@ const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
  * Marketplace
  */
 const MarketPlace = lazy(() => import("../apps/MarketPlace/MarketPlace"));
+const ReporteGral = lazy(() => import("../apps/MarketPlace/Records/Crossval"));
 
 /**
  * Fundacion de la mujer
@@ -118,6 +119,9 @@ const FormularioEnrolamiento = lazy(() =>
 const ConsultaEnrolamiento = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ConsultaEnrolamiento")
 );
+const CorreccionFormulario = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/CorreccionFormulario")
+);
 const ReconoserID = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ReconoserID")
 );
@@ -139,39 +143,32 @@ const VerificacionApertura = lazy(() =>
 const VerificacionNuevosComercios = lazy(() =>
   import("../apps/ValidacionEnrolamiento/VerificacionNuevosComercios")
 );
-const AdministradorGestoresComerciales = lazy(() =>
+
+/**
+ * AdministradorGestionComercial
+ */
+
+const AdministradorGestionComercial = lazy(() =>
+  import("../apps/AdministradorGestionComercial/AdministradorGestionComercial")
+);
+const AsesoresComerciales = lazy(() =>
+  import("../apps/AdministradorGestionComercial/Views/AsesoresComerciales")
+);
+const ResponsablesComerciales = lazy(() =>
+  import("../apps/AdministradorGestionComercial/Views/ResponsablesComerciales")
+);
+const UnidadesNegocioComerciales = lazy(() =>
   import(
-    "../apps/AdministradorGestoresComerciales/AdministradorGestoresComerciales"
+    "../apps/AdministradorGestionComercial/Views/UnidadesNegocioComerciales"
   )
 );
-const GestoresComerciales = lazy(() =>
-  import("../apps/AdministradorGestoresComerciales/views/GestoresComerciales")
+const ZonasComerciales = lazy(() =>
+  import("../apps/AdministradorGestionComercial/Views/ZonasComerciales")
 );
-const ModificarAsesor = lazy(() =>
-  import("../apps/AdministradorGestoresComerciales/views/ModificarAsesor")
+const LocalidadesComerciales = lazy(() =>
+  import("../apps/AdministradorGestionComercial/Views/LocalidadesComerciales")
 );
-const CrearAsesor = lazy(() =>
-  import("../apps/AdministradorGestoresComerciales/views/CrearAsesor")
-);
-const AdministradorResponsablesComerciales = lazy(() =>
-  import(
-    "../apps/AdministradorResponsablesComerciales/AdministradorResponsablesComerciales"
-  )
-);
-const AdministradorUnidadesNegocio = lazy(() =>
-  import("../apps/AdministradorUnidadesNegocio/AdministradorUnidadesNegocio")
-);
-const ModificarResponsables = lazy(() =>
-  import(
-    "../apps/AdministradorResponsablesComerciales/views/ModificarResponsables"
-  )
-);
-const CrearUnidadNegocio = lazy(() =>
-  import("../apps/AdministradorUnidadesNegocio/views/CrearUnidadNegocio")
-);
-const CrearResponsable = lazy(() =>
-  import("../apps/AdministradorResponsablesComerciales/views/CrearResponsable")
-);
+
 /**
  * Recaudo
  */
@@ -206,7 +203,7 @@ const TypesTrxs = lazy(() =>
 );
 
 const emptyComp = () => {
-  return <h1 className='text-3xl text-center my-4'>En mantenimiento</h1>;
+  return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
 };
 
 const CARGAR =
@@ -248,6 +245,11 @@ const publicUrls = [
         ),
         component: ContinuarReconoserID,
       },
+      {
+        link: "/Solicitud-enrolamiento/correccionformulario/:numCedula",
+        label: <AppIcons Logo={"PAGO"} name={"Corrección De Formulario"} />,
+        component: CorreccionFormulario,
+      },
 
       /*      {
         link: "/Solicitud-enrolamiento/validarformulario",
@@ -278,44 +280,44 @@ const publicUrls = [
 const allUrlsPrivateApps = [
   {
     link: "https://portal.solucionesenred.co/",
-    label: <AppIcons Logo={"SUSER"} name='SUSER' />,
+    label: <AppIcons Logo={"SUSER"} name="SUSER" />,
     extern: true,
     permission: [1],
   },
   {
     link: "/loteria-de-bogota",
-    label: <AppIcons Logo={"LOTERIA"} name='Loteria de bogota' />,
+    label: <AppIcons Logo={"LOTERIA"} name="Loteria de bogota" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
     permission: [3, 4, 5, 6],
     subRoutes: [
       {
         link: "/loteria-de-bogota/ventas",
-        label: <AppIcons Logo={"SORTEOS"} name='Ventas' />,
+        label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
         component: Loteria,
         permission: [3],
       },
       {
         link: "/loteria-de-bogota/cargar",
-        label: <AppIcons Logo={CARGAR} name='Carga de archivos' />,
+        label: <AppIcons Logo={CARGAR} name="Carga de archivos" />,
         component: CargaArchivos,
         permission: [4],
       },
       {
         link: "/loteria-de-bogota/descargar",
-        label: <AppIcons Logo={DESCARGAR} name='Descarga de archivos' />,
+        label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
         component: Descargas,
         permission: [6],
         subRoutes: [
           {
             link: "/loteria-de-bogota/descargar/descarga_reportes",
-            label: <AppIcons Logo={DESCARGAR} name='Descarga de archivos' />,
+            label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
             component: DescargarArchivosS3,
             permission: [6],
           },
           {
             link: "/loteria-de-bogota/descargar/borrar_billetes",
-            label: <AppIcons Logo={"REPORTE"} name='Eliminar Billeteria' />,
+            label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
             component: BorrarBilletes,
             permission: [6],
           },
@@ -323,13 +325,13 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/loteria-de-bogota/sorteos",
-        label: <AppIcons Logo={"REPORTE"} name='Sorteos' />,
+        label: <AppIcons Logo={"REPORTE"} name="Sorteos" />,
         component: CrearSorteos,
         permission: [5],
       },
       {
         link: "/loteria-de-bogota/premios",
-        label: <AppIcons Logo={"PAGO"} name='Premios' />,
+        label: <AppIcons Logo={"PAGO"} name="Premios" />,
         component: Premios,
         extern: false,
         permission: [3], ///////////////////////////////////////////////////////////////////
@@ -338,27 +340,27 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/transacciones",
-    label: <AppIcons Logo={"MARKETPLACE"} name='Transacciones' />,
+    label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones" />,
     component: Transacciones,
     permission: [8],
   },
   {
     link: "/update-commerce",
-    label: <AppIcons Logo={"ACTUALIZACION"} name='Actualizacion de datos' />,
+    label: <AppIcons Logo={"ACTUALIZACION"} name="Actualizacion de datos" />,
     component: FormCommerce,
     permission: [7],
   },
   {
     link: "/review-commerce-forms",
     label: (
-      <AppIcons Logo={"ACTUALIZACION"} name='Revisar actualizacion de datos' />
+      <AppIcons Logo={"ACTUALIZACION"} name="Revisar actualizacion de datos" />
     ),
     component: CommerceInfo,
     permission: [9],
   },
   {
-    link: "/marketplace",
-    label: <AppIcons Logo={"MARKETPLACE"} name='Marketplace' />,
+    link: "https://www.puntodecompra.com.co/",
+    label: <AppIcons Logo={"MARKETPLACE"} name="Marketplace" />,
     component: MarketPlace,
     extern: true,
     permission: [10],
@@ -370,8 +372,14 @@ const allUrlsPrivateApps = [
     permission: [10],
   },
   {
+    link: "/reporte_general",
+    label: <AppIcons Logo={"MARKETPLACE"} name="Reporte Punto De Compra" />,
+    component: ReporteGral,
+    permission: [8],
+  },
+  {
     link: "/funmujer",
-    label: <AppIcons Logo={"RECAUDO"} name='Fundación de la mujer' />,
+    label: <AppIcons Logo={"RECAUDO"} name="Fundación de la mujer" />,
     component: FunMujer,
     permission: [17, 27, 28],
     provider: ProvideFundamujer,
@@ -398,37 +406,37 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/iam",
-    label: <AppIcons Logo={"MARKETPLACE"} name='IAM' />,
+    label: <AppIcons Logo={"MARKETPLACE"} name="IAM" />,
     component: IAMIndex,
     permission: [12, 13, 14, 15, 16],
     subRoutes: [
       {
         link: "/iam/users",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Usuarios' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Usuarios" />,
         component: IAMUsers,
         permission: [13],
       },
       {
         link: "/iam/groups",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Grupos' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Grupos" />,
         component: IAMGroups,
         permission: [12],
       },
       {
         link: "/iam/policies",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Politicas' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Politicas" />,
         component: IAMPolicies,
         permission: [16],
       },
       {
         link: "/iam/roles",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Roles' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Roles" />,
         component: IAMRoles,
         permission: [14],
       },
       {
         link: "/iam/permissions",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Permisos' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Permisos" />,
         component: IAMPermissions,
         permission: [15],
       },
@@ -534,22 +542,21 @@ const allUrlsPrivateApps = [
       },
     ],
   },
-
   {
     link: "/daviplata",
-    label: <AppIcons Logo={"MARKETPLACE"} name='Daviplata' />,
+    label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
     component: Daviplata,
     permission: [29, 30],
     subRoutes: [
       {
         link: "/daviplata/depositos",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Depositos Daviplata" />,
         component: Deposito,
         permission: [29],
       },
       {
         link: "/daviplata/retiros",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Retiros Daviplata" />,
         component: Retiro,
         permission: [30],
       },
@@ -557,31 +564,31 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/API_SMS",
-    label: <AppIcons Logo={"MARKETPLACE"} name='SMS' />,
+    label: <AppIcons Logo={"MARKETPLACE"} name="SMS" />,
     component: API_SMS,
     permission: [25],
     subRoutes: [
       {
         link: "/API_SMS/EnviarSMS",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Enviar SMS' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Enviar SMS" />,
         component: EnviarSMS,
         permission: [25],
       },
       {
         link: "/API_SMS/crearSMS",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Crear SMS' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Crear SMS" />,
         component: CrearSMS,
         permission: [26],
       },
       {
         link: "/API_SMS/reporteSMS",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Reporte' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Reporte" />,
         component: reporteSMS,
         permission: [26],
       },
       {
         link: "/API_SMS/BloquearNum",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Bloqueo de números' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Bloqueo de números" />,
         component: BloquearNum,
         permission: [26],
       },
@@ -589,13 +596,13 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/recargas-Colcard",
-    label: <AppIcons Logo={"LOTERIA"} name='Recargas ColCard' />,
+    label: <AppIcons Logo={"LOTERIA"} name="Recargas ColCard" />,
     component: ColCard,
     permission: [3],
     subRoutes: [
       {
         link: "/recargas-Colcard/recargar-tarjeta",
-        label: <AppIcons Logo={"SORTEOS"} name='Recargar tarjeta' />,
+        label: <AppIcons Logo={"SORTEOS"} name="Recargar tarjeta" />,
         component: RecargarColCard,
         permission: [3],
       },
@@ -762,97 +769,46 @@ const allUrlsPrivateApps = [
     ],
   },
   {
-    link: "/administradorgestorcomercial",
+    link: "/administrador-gestion-comercial",
     label: (
-      <AppIcons Logo={"RECAUDO"} name={"Administrar Gestores Comerciales"} />
+      <AppIcons Logo={"RECAUDO"} name={"Administrador Gestion Comercial"} />
     ),
-    component: AdministradorGestoresComerciales,
-    permission: [1],
+    component: AdministradorGestionComercial,
+    permission: [32, 33, 34, 35, 36],
     subRoutes: [
       {
-        link: "/administradorgestorcomercial/admin",
-        label: (
-          <AppIcons
-            Logo={"IMPUESTO"}
-            name={"Administrar Gestores Comerciales"}
-          />
-        ),
-        component: GestoresComerciales,
-        permission: [1],
-        subRoutes: [
-          {
-            link: "/administradorgestorcomercial/admin/modificarasesor/:id",
-            label: (
-              <AppIcons
-                Logo={"IMPUESTO"}
-                name={"Modificar Gestores Comerciales"}
-              />
-            ),
-            component: ModificarAsesor,
-            permission: [1],
-          },
-          {
-            link: "/administradorgestorcomercial/admin/crearasesor",
-            label: (
-              <AppIcons Logo={"IMPUESTO"} name={"Crear Gestores Comerciales"} />
-            ),
-            component: CrearAsesor,
-            permission: [1],
-          },
-        ],
+        link: "/administrador-gestion-comercial/asesores",
+        label: <AppIcons Logo={"IMPUESTO"} name={"Administrar Asesores"} />,
+        component: AsesoresComerciales,
+        permission: [34],
       },
       {
-        link: "/administradorresponsablecomercial",
+        link: "/administrador-gestion-comercial/responsables",
         label: (
-          <AppIcons
-            Logo={"ACTUALIZACION"}
-            name={"Administrar Responsables Comerciales"}
-          />
+          <AppIcons Logo={"ACTUALIZACION"} name={"Administrar Responsables"} />
         ),
-        component: AdministradorResponsablesComerciales,
-        permission: [1],
-        subRoutes: [
-          {
-            link: "/administradorresponsablecomercial/modificarresponsable/:id",
-            label: (
-              <AppIcons
-                Logo={"IMPUESTO"}
-                name={"Modificar Responsables Comerciales"}
-              />
-            ),
-            component: ModificarResponsables,
-            permission: [1],
-          },
-          {
-            link: "/administradorresponsablecomercial/crearresponsable",
-            label: (
-              <AppIcons
-                Logo={"IMPUESTO"}
-                name={"Crear Responsable Comercial"}
-              />
-            ),
-            component: CrearResponsable,
-            permission: [1],
-          },
-        ],
+        component: ResponsablesComerciales,
+        permission: [33],
       },
       {
-        link: "/administradorunidadesnegocio",
+        link: "/administrador-gestion-comercial/unidades-de-negocio",
         label: (
           <AppIcons Logo={"RECAUDO"} name={"Administrar Unidades de Negocio"} />
         ),
-        component: AdministradorUnidadesNegocio,
-        permission: [1],
-        subRoutes: [
-          {
-            link: "/administradorunidadesnegocio/crearunidadnegocio",
-            label: (
-              <AppIcons Logo={"IMPUESTO"} name={"Crear Unidad de Negocio"} />
-            ),
-            component: CrearUnidadNegocio,
-            permission: [1],
-          },
-        ],
+        component: UnidadesNegocioComerciales,
+        permission: [32],
+      },
+      {
+        link: "/administrador-gestion-comercial/zonas",
+        label: <AppIcons Logo={"RECAUDO"} name={"Administrar Zonas"} />,
+        component: ZonasComerciales,
+        permission: [35],
+      },
+      {
+        link: "/administrador-gestion-comercial/localidades",
+        label: <AppIcons Logo={"RECAUDO"} name={"Administrar Localidades"} />,
+        component: LocalidadesComerciales,
+        permission: [36],
       },
     ],
   },
