@@ -68,9 +68,13 @@ const LocationForm = ({ place = "", location, LocalidadComponent = null }) => {
         onInput={(e) => setBarrio(capitalize(e.target.value))}
         required
       />
-      {Array.isArray(foundMuni) &&
-      foundMuni.length === 1 &&
-      parseInt(foundMuni[0].c_digo_dane_del_departamento) === 11 ? (
+      {(Array.isArray(foundMuni) &&
+        foundMuni.length === 1 &&
+        parseInt(foundMuni[0].c_digo_dane_del_departamento) === 11) ||
+      (foundMuni.length === 1 &&
+        parseInt(foundMuni[0].c_digo_dane_del_departamento) === 13) ||
+      (foundMuni.length === 1 &&
+        parseInt(foundMuni[0].c_digo_dane_del_departamento) === 8) ? (
         LocalidadComponent ? (
           LocalidadComponent
         ) : (
