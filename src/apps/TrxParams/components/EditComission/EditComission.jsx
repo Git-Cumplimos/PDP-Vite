@@ -256,10 +256,10 @@ const EditComission = () => {
   };
   return (
     <Fragment>
+      <h1 className="text-3xl">Editando comisiones a pagar:</h1>
       <Form grid>
         {id_comision_pagada && (
           <Fragment>
-            <h1 className="text-3xl">Editando comisiones a pagar:</h1>
             {comissions?.[0]?.["nombre_convenio"] && (
               <Input
                 id="Nombre convenio"

@@ -25,11 +25,30 @@ const Convenios = () => {
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setSelectedConvenio(null);
+    setSelectedConvenio({
+      Tags: [""],
+      Referencias: [
+        {
+          "Nombre de Referencia": "",
+          "Longitud minima": "",
+          "Longitud maxima": "",
+        },
+      ],
+    });
+    fetchConveniosManyFunc();
   }, []);
 
   const [convenios, setConvenios] = useState([]);
-  const [selectedConvenio, setSelectedConvenio] = useState(null);
+  const [selectedConvenio, setSelectedConvenio] = useState({
+    Tags: [""],
+    Referencias: [
+      {
+        "Nombre de Referencia": "",
+        "Longitud minima": "",
+        "Longitud maxima": "",
+      },
+    ],
+  });
   const [maxPages, setMaxPages] = useState(0);
 
   const onSelectConvenio = useCallback(
@@ -66,7 +85,6 @@ const Convenios = () => {
     },
     [convenios]
   );
-
   const onChange = useCallback(
     (ev) => {
       if (ev.target.name === "searchConvenio") {
@@ -79,7 +97,6 @@ const Convenios = () => {
   );
 
   const onChangeConv = useCallback((ev) => {
-    console.log(ev);
     const formData = new FormData(ev.target.form);
     const colsRefs = [
       "Nombre de Referencia",
@@ -104,6 +121,8 @@ const Convenios = () => {
         });
       } else if (col === "Tags") {
         data = formData.getAll(col);
+      } else if (col === "Ean13") {
+        data = ((formData.get(col) ?? "").match(/\d/g) ?? []).join("");
       } else {
         data = formData.get(col);
       }
@@ -118,14 +137,16 @@ const Convenios = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-
-      if (selectedConvenio?.["Id convenio"]) {
+      if (selectedConvenio?.Referencias[0]["Nombre de Referencia"] === "") {
+        notifyError("Se deben ingresar todos los campos de referecia");
+        return;
+      }
+      if (selectedConvenio?.["Id convenio"] !== -1) {
         putConvenios(
           { id_convenio: selectedConvenio?.["Id convenio"] },
           {
             ean13: selectedConvenio?.Ean13,
             nombre_convenio: selectedConvenio?.["Nombre de convenio"],
-            descripcion: "",
             tags: selectedConvenio?.Tags.join(","),
             referencias: [
               ...selectedConvenio?.Referencias.map(
@@ -147,7 +168,7 @@ const Convenios = () => {
           .then((res) => {
             if (res?.status) {
               notify(res?.msg);
-              setShowModal(false);
+              handleClose();
             } else {
               notifyError(res?.msg);
             }
@@ -157,7 +178,6 @@ const Convenios = () => {
         postConvenios({
           ean13: selectedConvenio?.Ean13,
           nombre_convenio: selectedConvenio?.["Nombre de convenio"],
-          descripcion: "",
           tags: selectedConvenio?.Tags.join(","),
           referencias: [
             ...selectedConvenio?.Referencias.map(
@@ -174,15 +194,11 @@ const Convenios = () => {
               }
             ),
           ],
-          comision_pagada: {
-            type: "monto",
-            ranges: [{ Minimo: 0, Maximo: -1, Porcentaje: 0, Fija: 0 }],
-          },
         })
           .then((res) => {
             if (res?.status) {
               notify(res?.msg);
-              setShowModal(false);
+              handleClose();
             } else {
               notifyError(res?.msg);
             }
@@ -224,6 +240,21 @@ const Convenios = () => {
       })
       .catch((err) => console.error(err));
   }, [ean13Convenio]);
+  const fetchConveniosManyFunc = () => {
+    fetchConveniosMany(searchConvenio, page)
+      .then((res) => {
+        setConvenios(
+          [...res?.results].map(({ id_convenio, nombre_convenio }) => {
+            return {
+              "Id convenio": id_convenio,
+              "Nombre de convenio": nombre_convenio,
+            };
+          })
+        );
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
 
   return (
     <Fragment>
@@ -239,7 +270,7 @@ const Convenios = () => {
         <Input
           id="searchConvenio"
           name="searchConvenio"
-          label={"Buscar convenio"}
+          label={"Tag convenio"}
           type="text"
           autoComplete="off"
           defaultValue={searchConvenio}
@@ -277,16 +308,19 @@ const Convenios = () => {
             id="Ean13"
             name="Ean13"
             label={"Ean13"}
-            type="number"
-            step="1"
+            type="text"
+            // step='1'
+            minLength="13"
+            maxLength="13"
             autoComplete="off"
-            defaultValue={selectedConvenio?.Ean13}
+            value={selectedConvenio?.Ean13}
+            onChange={() => {}}
             required
           />
           <Fieldset legend={"Tags"}>
-            {selectedConvenio?.Tags.map((val, ind) => {
+            {selectedConvenio?.Tags?.map((val, ind) => {
               return (
-                <div className="grid grid-cols-2">
+                <div className="grid grid-cols-2" key={ind}>
                   <Input
                     id={`tagsConvenio_${ind}`}
                     name="Tags"
@@ -329,7 +363,7 @@ const Convenios = () => {
             </ButtonBar>
           </Fieldset>
           <Fieldset legend={"Referencias"}>
-            {selectedConvenio?.Referencias.map((val, index) => {
+            {selectedConvenio?.Referencias?.map((val, index) => {
               return (
                 <div className="grid grid-cols-auto-fit-md place-items-center place-content-end">
                   {Object.entries(val).map(([key, valRef]) => {
@@ -388,18 +422,19 @@ const Convenios = () => {
               </Button>
             </ButtonBar>
           </Fieldset>
-          {!selectedConvenio?.["Id convenio"] ? (
+          {!selectedConvenio?.["Id convenio"] ||
+          selectedConvenio?.["Id convenio"] === -1 ? (
             <ButtonBar>
-              <Button type="submit">Crear autorizador</Button>
               <Button type="button" onClick={handleClose}>
                 Cancelar
               </Button>
+              <Button type="submit">Crear autorizador</Button>
             </ButtonBar>
           ) : (
             <Fragment>
               <ButtonBar>
-                <Button
-                  type="button"
+                {/* <Button
+                  type='button'
                   onClick={() => {
                     const urlParams = new URLSearchParams();
                     urlParams.append(
@@ -409,12 +444,11 @@ const Convenios = () => {
                     navigate(
                       `/trx-params/comisiones/pagadas?${urlParams.toString()}`
                     );
-                  }}
-                >
+                  }}>
                   Editar comisiones a pagar
                 </Button>
                 <Button
-                  type="button"
+                  type='button'
                   onClick={() => {
                     const urlParams = new URLSearchParams();
                     urlParams.append(
@@ -422,16 +456,15 @@ const Convenios = () => {
                       selectedConvenio?.["Id convenio"]
                     );
                     navigate(`autorizadores?${urlParams.toString()}`);
-                  }}
-                >
+                  }}>
                   Editar autorizadores del convenio
-                </Button>
+                </Button> */}
               </ButtonBar>
               <ButtonBar>
-                <Button type="submit">Editar convenio</Button>
                 <Button type="button" onClick={handleClose}>
                   Cancelar
                 </Button>
+                <Button type="submit">Editar convenio</Button>
               </ButtonBar>
             </Fragment>
           )}

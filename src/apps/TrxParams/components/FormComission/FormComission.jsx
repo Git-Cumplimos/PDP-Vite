@@ -47,7 +47,9 @@ const FormComission = ({ outerState, onSubmit, children }) => {
             name="comissionType"
             label="Tipo de comision"
             options={{ "": "", Transacciones: "trx", Monto: "monto" }}
-            defaultValue={comissionData?.type}
+            value={comissionData?.type}
+            onChange={() => {}}
+            // defaultValue={comissionData?.type}
             required
           />
           {comissionData?.ranges.map((_comission, ind) => {
