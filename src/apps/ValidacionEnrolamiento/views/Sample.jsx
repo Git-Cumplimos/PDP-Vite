@@ -34,7 +34,7 @@ import { Document, Page } from "react-pdf/dist/esm/entry.webpack";
 /* import file from ".././certificado_movimiento.pdf"; */
 /* import file2 from ".././ced.pdf";
 import file3 from ".././rut.pdf"; */
-import Form from "../../../components/Base/Form/Form";
+import Form from "../../../components/Base/Form";
 import classes from "./Sample.module.css";
 export default function Sample({ file }) {
   const [numPages, setNumPages] = useState(null);

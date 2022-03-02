@@ -10,7 +10,7 @@ import CreateComisionCobrada from "../apps/TrxParams/Views/Comisiones/CreateComi
 /**
  * * Logos
  */
-const AppIcons = lazy(() => import("../components/Base/AppIcons/AppIcons"));
+const AppIcons = lazy(() => import("../components/Base/AppIcons"));
 
 /**
  * * Paginas
@@ -22,7 +22,7 @@ const AppIcons = lazy(() => import("../components/Base/AppIcons/AppIcons"));
 const Login = lazy(() => import("../pages/Login"));
 const Home = lazy(() => import("../pages/Home"));
 const Transacciones = lazy(() => import("../pages/Transacciones"));
-const AuthButton = lazy(() => import("../components/Compound/Signout/Signout"));
+const AuthButton = lazy(() => import("../components/Compound/Signout"));
 const Error404 = lazy(() => import("../pages/Error404"));
 const Reportes = lazy(() => import("../pages/Reportes"));
 
@@ -209,8 +209,9 @@ const CARGAR =
 const DESCARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU";
 
+const loginUrls = [{ link: "/login", label: "Login", component: Login }];
+
 const publicUrls = [
-  { link: "/login", label: "Login", component: Login },
   { link: "*", exact: false, component: Error404 },
   {
     link: "/solicitud-enrolamiento",
@@ -810,4 +811,4 @@ const privateUrls = [
   { label: <AuthButton /> },
 ];
 
-export { allUrlsPrivateApps, privateUrls, publicUrls };
+export { allUrlsPrivateApps, privateUrls, publicUrls, loginUrls };

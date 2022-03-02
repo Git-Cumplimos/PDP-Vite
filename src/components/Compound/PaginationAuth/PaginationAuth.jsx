@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
-import Button from "../../Base/Button/Button";
-import ButtonBar from "../../Base/ButtonBar/ButtonBar";
+import Button from "../../Base/Button";
+import ButtonBar from "../../Base/ButtonBar";
 import FileInput from "../../Base/FileInput/FileInput";
-import Form from "../../Base/Form/Form";
-import Input from "../../Base/Input/Input";
-import Select from "../../Base/Select/Select";
+import Form from "../../Base/Form";
+import Input from "../../Base/Input";
+import Select from "../../Base/Select";
 
 const PaginationAuth = ({
   filters,

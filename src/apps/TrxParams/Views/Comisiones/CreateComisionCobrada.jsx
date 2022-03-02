@@ -2,13 +2,13 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 
 import useQuery from "../../../../hooks/useQuery";
 
-import Button from "../../../../components/Base/Button/Button";
-import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
+import Button from "../../../../components/Base/Button";
+import MultipleSelect from "../../../../components/Base/MultipleSelect";
 import FormComission from "../../components/FormComission/FormComission";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useNavigate } from "react-router-dom";
-import Form from "../../../../components/Base/Form/Form";
-import Select from "../../../../components/Base/Select/Select";
+import Form from "../../../../components/Base/Form";
+import Select from "../../../../components/Base/Select";
 import { fetchConveniosMany } from "../../utils/fetchRevalConvenios";
 import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
 import { postComisionesCobrar } from "../../utils/fetchComisionesCobrar";
@@ -206,25 +206,25 @@ const CreateComisionCobrada = () => {
       )}
       <Form onChange={onChangeNewComision} grid>
         <Select
-          id='Autorizador'
-          name='Autorizador'
-          label='Autorizador'
+          id="Autorizador"
+          name="Autorizador"
+          label="Autorizador"
           options={autorizadores}
           defaultValue={newComision?.["Autorizador"]}
         />
         <Select
-          id='Enlazado'
-          name='Enlazado'
-          label='Enlazado con:'
+          id="Enlazado"
+          name="Enlazado"
+          label="Enlazado con:"
           options={{ "": "", Convenio: 1, "Tipo de transaccion": 2 }}
           defaultValue={newComision?.["Enlazado"]}
           required
         />
         {newComision?.["Enlazado"] == 1 && (
           <Select
-            id='Convenio'
-            name='Convenio'
-            label='Convenio'
+            id="Convenio"
+            name="Convenio"
+            label="Convenio"
             options={convenios}
             defaultValue={newComision?.["Convenio"]}
             required
@@ -232,9 +232,9 @@ const CreateComisionCobrada = () => {
         )}
         {newComision?.["Enlazado"] == 2 && (
           <Select
-            id='Tipo de transaccion'
-            name='Tipo de transaccion'
-            label='Tipo de transaccion'
+            id="Tipo de transaccion"
+            name="Tipo de transaccion"
+            label="Tipo de transaccion"
             options={{ "": "", Transacciones: 1, Monto: 2 }}
             defaultValue={newComision?.["Tipo de transaccion"]}
             required
@@ -242,7 +242,7 @@ const CreateComisionCobrada = () => {
         )}
       </Form>
       <FormComission outerState={[comissionData, setComissionData]}>
-        <Button type='submit' onClick={createComission}>
+        <Button type="submit" onClick={createComission}>
           Crear comision
         </Button>
       </FormComission>

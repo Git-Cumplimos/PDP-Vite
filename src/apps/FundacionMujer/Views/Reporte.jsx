@@ -1,12 +1,12 @@
 import { useCallback, useState, useRef, useEffect } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Modal from "../../../components/Base/Modal/Modal";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Select from "../../../components/Base/Select/Select";
-import Table from "../../../components/Base/Table/Table";
-import Tickets from "../../../components/Base/Tickets/Tickets";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Modal from "../../../components/Base/Modal";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Select from "../../../components/Base/Select";
+import Table from "../../../components/Base/Table";
+import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
@@ -35,7 +35,7 @@ function createCard(
     cedula,
     total,
     fecha,
-    hora
+    hora,
   };
 }
 
@@ -57,15 +57,11 @@ const pageStyle = `
   }
 `;
 
-
 const url_Report = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
 const url_Download = `${process.env.REACT_APP_URL_FDLMWSDL}/report`;
 
-
-
 const Reporte = () => {
-
-  const {userPermissions, roleInfo} = useAuth();
+  const { userPermissions, roleInfo } = useAuth();
 
   const [trxs, setTrxs] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -92,9 +88,9 @@ const Reporte = () => {
   const exportdata = (e) => {
     e.preventDefault();
     setShowModal2(false);
-    setFechaInicialDownload('')
-    setFechaFinalDownload('')
-    setDisabledBtn(true)
+    setFechaInicialDownload("");
+    setFechaFinalDownload("");
+    setDisabledBtn(true);
     const rows = [];
     Download.map((row) => {
       rows.push(
@@ -145,7 +141,7 @@ const Reporte = () => {
 
   /*Buscar report*/
   const report = useCallback(
-    async(Comercio,Tipo_operacion,page, date_ini, date_end) => {
+    async (Comercio, Tipo_operacion, page, date_ini, date_end) => {
       const url = url_Report;
       const queries = {};
       if (!(Comercio === -1 || Comercio === "")) {
@@ -169,7 +165,7 @@ const Reporte = () => {
           notifyError(res.msg);
         } else {
           setMaxPages(res?.obj?.maxpages);
-          setTrxs(res?.obj?.trxs);          
+          setTrxs(res?.obj?.trxs);
         }
       } catch (err) {
         console.error(err);
@@ -208,22 +204,23 @@ const Reporte = () => {
   const closeModal = useCallback(() => {
     setShowModal(false);
   });
-  
+
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Reporte</h1>
       <Form onSubmit={onSubmit} grid>
         {userPermissions
-        .map(({ id_permission }) => id_permission)
-        .includes(28) ? 
-        <ButtonBar className="col-span-1 md:col-span-2">
-          <Button type="submit" onClick={() => {}}>
-            Descargar reporte
-          </Button>
-        </ButtonBar> :
-        ""
-        }
-        
+          .map(({ id_permission }) => id_permission)
+          .includes(28) ? (
+          <ButtonBar className="col-span-1 md:col-span-2">
+            <Button type="submit" onClick={() => {}}>
+              Descargar reporte
+            </Button>
+          </ButtonBar>
+        ) : (
+          ""
+        )}
+
         <Input
           id="dateInit"
           label="Fecha inicial"
@@ -235,7 +232,7 @@ const Reporte = () => {
             setFechaInicial(e.target.value);
             if (fechaFinal !== "") {
               if (tipoOp !== "") {
-                report(comercio,tipoOp, 1, e.target.value, fechaFinal)
+                report(comercio, tipoOp, 1, e.target.value, fechaFinal);
               }
             }
           }}
@@ -250,12 +247,12 @@ const Reporte = () => {
             setFechaFinal(e.target.value);
             if (fechaInicial !== "") {
               if (tipoOp !== "") {
-                report(comercio,tipoOp, 1, fechaInicial, e.target.value)
+                report(comercio, tipoOp, 1, fechaInicial, e.target.value);
               }
             }
           }}
         />
-        
+
         <Select
           id="searchBySorteo"
           label="Tipo de busqueda"
@@ -265,7 +262,7 @@ const Reporte = () => {
             setPage(1);
             setTipoOp(parseInt(e.target.value));
             if (!(e.target.value === null || e.target.value === "")) {
-              report(comercio,e.target.value, 1, fechaInicial, fechaFinal)
+              report(comercio, e.target.value, 1, fechaInicial, fechaFinal);
             }
           }}
         />
@@ -284,13 +281,7 @@ const Reporte = () => {
               callback: (e) => {
                 setPage(1);
                 if (tipoOp !== "") {
-                  report(
-                    e.target.value,                   
-                    tipoOp,
-                    1, 
-                    fechaInicial,
-                    fechaFinal
-                  );
+                  report(e.target.value, tipoOp, 1, fechaInicial, fechaFinal);
                 }
               },
               timeOut: 500,
@@ -306,7 +297,7 @@ const Reporte = () => {
             disabled={page < 2}
             onClick={() => {
               setPage(page - 1);
-              report(comercio,tipoOp, page - 1, fechaInicial, fechaFinal)
+              report(comercio, tipoOp, page - 1, fechaInicial, fechaFinal);
             }}
           >
             Anterior
@@ -316,7 +307,7 @@ const Reporte = () => {
             disabled={page >= maxPages}
             onClick={() => {
               setPage(page + 1);
-              report(comercio,tipoOp, page + 1, fechaInicial, fechaFinal)
+              report(comercio, tipoOp, page + 1, fechaInicial, fechaFinal);
             }}
           >
             Siguiente
@@ -331,34 +322,38 @@ const Reporte = () => {
           </div>
           <Table
             headers={["Fecha", "Mensaje", "Monto"]}
-            data={trxs.map(({ Created_at, Response_obj:{Mensaje}={Mensaje:''}, Monto}) => {
-              const tempDate = new Date(Created_at);
-              tempDate.setHours(tempDate.getHours() + 5);
-              Created_at = Intl.DateTimeFormat("es-CO", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-              }).format(tempDate);
-              return {
+            data={trxs.map(
+              ({
                 Created_at,
-                Mensaje,
-                Monto
-              };
-            })}
+                Response_obj: { Mensaje } = { Mensaje: "" },
+                Monto,
+              }) => {
+                const tempDate = new Date(Created_at);
+                tempDate.setHours(tempDate.getHours() + 5);
+                Created_at = Intl.DateTimeFormat("es-CO", {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                }).format(tempDate);
+                return {
+                  Created_at,
+                  Mensaje,
+                  Monto,
+                };
+              }
+            )}
             onSelectRow={(_e, index) => {
-            
-                setSelected(trxs[index]);
-                setShowModal(true);
-              
+              setSelected(trxs[index]);
+              setShowModal(true);
             }}
           />
         </>
       ) : (
         ""
       )}
-       <Modal show={showModal} handleClose={closeModal}>
+      <Modal show={showModal} handleClose={closeModal}>
         {selected?.Ticket ? (
           <div className="flex flex-col justify-center items-center">
             <Tickets
@@ -380,7 +375,9 @@ const Reporte = () => {
           </div>
         ) : (
           <div className="flex flex-col justify-center items-center mx-auto container">
-          <h1 className="text-3xl mt-6 text-aling">No hay ticket registrado</h1>
+            <h1 className="text-3xl mt-6 text-aling">
+              No hay ticket registrado
+            </h1>
           </div>
         )}
       </Modal>
@@ -405,7 +402,6 @@ const Reporte = () => {
                       setDownload(null);
                       notifyError(res.msg);
                     } else {
-                      
                       setDisabledBtn(false);
                       setDownload(res?.obj);
                     }
@@ -429,7 +425,6 @@ const Reporte = () => {
                     } else {
                       setDownload(res?.obj?.results);
                       setDisabledBtn(false);
-                      
                     }
                   });
                 }

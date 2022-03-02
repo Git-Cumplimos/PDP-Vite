@@ -1,9 +1,9 @@
 import { useState } from "react";
-import HNavbar from "../../components/Base/HNavbar/HNavbar";
+import HNavbar from "../../components/Base/HNavbar";
 import { useWindowSize } from "../../hooks/WindowSizeHooks";
 import { useEffect } from "react";
 import { useImgs } from "../../hooks/ImgsHooks";
-import Form from "../../components/Base/Form/Form";
+import Form from "../../components/Base/Form";
 
 const SolicitudEnrolamiento = ({ subRoutes }) => {
   const [temporal, setTemporal] = useState(true);

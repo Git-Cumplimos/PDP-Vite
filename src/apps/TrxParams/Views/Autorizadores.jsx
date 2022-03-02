@@ -1,13 +1,13 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Modal from "../../../components/Base/Modal/Modal";
-import Table from "../../../components/Base/Table/Table";
-import TextArea from "../../../components/Base/TextArea/TextArea";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Modal from "../../../components/Base/Modal";
+import Table from "../../../components/Base/Table";
+import TextArea from "../../../components/Base/TextArea";
+import Pagination from "../../../components/Compound/Pagination";
 import useQuery from "../../../hooks/useQuery";
 import { notify, notifyError } from "../../../utils/notify";
 import {
@@ -190,7 +190,7 @@ const Autorizadores = () => {
     <Fragment>
       <ButtonBar>
         <Button
-          type='submit'
+          type="submit"
           onClick={() => {
             setShowModal(true);
             setSelectedAuto({
@@ -198,17 +198,18 @@ const Autorizadores = () => {
               Nit: "",
               Descripcion: "",
             });
-          }}>
+          }}
+        >
           Crear autorizador
         </Button>
       </ButtonBar>
       <Pagination maxPage={maxPages} onChange={onChange} grid>
         <Input
-          id='searchAuto'
-          name='searchAuto'
+          id="searchAuto"
+          name="searchAuto"
           label={"Buscar autorizador"}
-          type='text'
-          autoComplete='off'
+          type="text"
+          autoComplete="off"
           defaultValue={searchAuto}
         />
         <ButtonBar></ButtonBar>
@@ -225,38 +226,38 @@ const Autorizadores = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={formatNit} grid>
           <Input
-            id='nameAuto'
-            name='Nombre de autorizador'
+            id="nameAuto"
+            name="Nombre de autorizador"
             label={"Nombre de autorizador"}
-            type='text'
-            autoComplete='off'
+            type="text"
+            autoComplete="off"
             value={selectedAuto?.["Nombre de autorizador"]}
             onChange={() => {}}
             required
           />
           <Input
-            id='nitAuto'
-            name='Nit'
+            id="nitAuto"
+            name="Nit"
             label={"Nit"}
-            type='text'
-            autoComplete='off'
+            type="text"
+            autoComplete="off"
             value={selectedAuto?.Nit}
             onChange={() => {}}
             required
           />
           <TextArea
-            id='textAuto'
-            name='Descripcion'
+            id="textAuto"
+            name="Descripcion"
             label={"Descripcion"}
-            autoCapitalize='sentences'
-            autoComplete='off'
+            autoCapitalize="sentences"
+            autoComplete="off"
             value={selectedAuto?.Descripcion ?? ""}
             onChange={() => {}}
           />
           {!selectedAuto?.["Id autorizador"] ? (
             <ButtonBar>
-              <Button type='submit'>Crear autorizador</Button>
-              <Button type='button' onClick={handleClose}>
+              <Button type="submit">Crear autorizador</Button>
+              <Button type="button" onClick={handleClose}>
                 Cancelar
               </Button>
             </ButtonBar>
@@ -264,7 +265,7 @@ const Autorizadores = () => {
             <Fragment>
               <ButtonBar>
                 <Button
-                  type='button'
+                  type="button"
                   onClick={() => {
                     const urlParams = new URLSearchParams();
                     urlParams.append(
@@ -278,13 +279,14 @@ const Autorizadores = () => {
                     navigate(
                       `/trx-params/comisiones/cobradas?${urlParams.toString()}`
                     );
-                  }}>
+                  }}
+                >
                   Editar comisiones a cobrar
                 </Button>
               </ButtonBar>
               <ButtonBar>
-                <Button type='submit'>Editar autorizador</Button>
-                <Button type='button' onClick={handleClose}>
+                <Button type="submit">Editar autorizador</Button>
+                <Button type="button" onClick={handleClose}>
                   Cancelar
                 </Button>
               </ButtonBar>

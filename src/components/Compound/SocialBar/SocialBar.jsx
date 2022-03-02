@@ -1,50 +1,56 @@
 import classes from "./SocialBar.module.css";
 
+const socialUrls = [
+  {
+    href: {
+      href: "https://twitter.com/",
+      "aria-label": "Twitter",
+    },
+    span: {
+      className: "bi bi-twitter",
+    },
+  },
+  {
+    href: {
+      href: "https://www.facebook.com/PDPmultibanco/",
+      "aria-label": "Facebook",
+    },
+    span: {
+      className: "bi bi-facebook",
+    },
+  },
+  {
+    href: {
+      href: "https://www.instagram.com/",
+      "aria-label": "Instagram",
+    },
+    span: {
+      className: "bi bi-instagram",
+    },
+  },
+  {
+    href: {
+      href: "https://youtube.com",
+      "aria-label": "Youtube",
+    },
+    span: {
+      className: "bi bi-youtube",
+    },
+  },
+];
+
 const SocialBar = () => {
   const { socials } = classes;
   return (
     <div className={socials}>
       <ul>
-        <li>
-          <a
-            href="https://twitter.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Twitter"
-          >
-            <span className="bi bi-twitter" />
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://www.facebook.com/PDPmultibanco/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Facebook"
-          >
-            <span className="bi bi-facebook" />
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://www.instagram.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-          >
-            <span className="bi bi-instagram" />
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://youtube.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Youtube"
-          >
-            <span className="bi bi-youtube" />
-          </a>
-        </li>
+        {socialUrls.map(({ href, span }) => (
+          <li>
+            <a {...href} target="_blank" rel="noopener noreferrer">
+              <span {...span} />
+            </a>
+          </li>
+        ))}
       </ul>
     </div>
   );

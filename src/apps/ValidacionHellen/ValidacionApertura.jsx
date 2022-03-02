@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Table from "../../components/Base/Table/Table";
+import Table from "../../components/Base/Table";
 const ValidacionApertura = () => {
   const navigate = useNavigate();
   const [datosEnrolamientos, setDatosEnrolamientos] = useState([]);

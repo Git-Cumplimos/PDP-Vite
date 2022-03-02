@@ -1,10 +1,10 @@
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
 import { useCallback, useState } from "react";
-import Card from "../../../components/Base/Card/Card";
-import Modal from "../../../components/Base/Modal/Modal";
+import Card from "../../../components/Base/Card";
+import Modal from "../../../components/Base/Modal";
 import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
 import classes from "../../SolicitudEnrolamiento/views/ConsultaEnrolamiento.module.css";
 import { useNavigate } from "react-router-dom";

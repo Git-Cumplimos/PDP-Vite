@@ -1,13 +1,13 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Fieldset from "../../../components/Base/Fieldset/Fieldset";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Modal from "../../../components/Base/Modal/Modal";
-import Table from "../../../components/Base/Table/Table";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Fieldset from "../../../components/Base/Fieldset";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Modal from "../../../components/Base/Modal";
+import Table from "../../../components/Base/Table";
+import Pagination from "../../../components/Compound/Pagination";
 import useQuery from "../../../hooks/useQuery";
 import { notify, notifyError } from "../../../utils/notify";
 import {
@@ -79,7 +79,7 @@ const Convenios = () => {
   );
 
   const onChangeConv = useCallback((ev) => {
-    console.log(ev)
+    console.log(ev);
     const formData = new FormData(ev.target.form);
     const colsRefs = [
       "Nombre de Referencia",

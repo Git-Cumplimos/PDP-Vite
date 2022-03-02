@@ -1,13 +1,13 @@
 import { useCallback, useState, useRef } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Modal from "../../../components/Base/Modal/Modal";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Modal from "../../../components/Base/Modal";
 import { useAuth } from "../../../hooks/AuthHooks";
-import Input from "../../../components/Base/Input/Input";
-import Form from "../../../components/Base/Form/Form";
+import Input from "../../../components/Base/Input";
+import Form from "../../../components/Base/Form";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
-import Tickets from "../../../components/Base/Tickets/Tickets";
+import Tickets from "../../../components/Base/Tickets";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 

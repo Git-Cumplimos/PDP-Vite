@@ -47,7 +47,7 @@
 
 .tooltip::before {
   /* content: url("data:image/svg+xml,<svg width='250' height='250' viewBox='-50 -50 300 300'><polygon fill='#0f0' stroke='#0f0' stroke-width='10' stroke-linejoin='round' points='100,0 0,200 200,200'/></svg>"); */
-  
+
   /* @apply block absolute bg-red-700 -right-5; */
 
   content: " ";
@@ -64,7 +64,8 @@
   /* clip-path: polygon(0 50%, 100% 100%, 100% 0); */
 }
 .tooltip {
-  @apply hidden absolute left-14 bottom-2 bg-gray-900 text-white text-xs px-2 py-2 rounded font-medium;
+  top: 15%;
+  @apply hidden absolute left-14 bg-gray-900 text-white text-xs px-2 py-2 rounded font-medium;
 }
 
 .contactIcons > a.waClass,

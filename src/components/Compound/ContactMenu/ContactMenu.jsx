@@ -77,15 +77,13 @@ const ContactMenu = ({ wa, tl, msg }) => {
           setVisible(!visible);
         }}
       >
-        <div className={tooltip}>
-          Ayuda
-        </div>
+        <div className={tooltip}>Ayuda</div>
         <div ref={xIcon}>
           <span className={`bi bi-x-lg ${visible ? "block" : "hidden"}`} />
         </div>
         <div ref={cIcon}>
           <span
-            className={`bi bi-chat-left-text-fill ${
+            className={`bi bi-chat-right-text-fill ${
               visible ? "hidden" : "block"
             }`}
           />

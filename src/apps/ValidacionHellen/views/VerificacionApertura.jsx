@@ -1,10 +1,10 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Button from "../../../components/Base/Button/Button";
-import Fieldset from "../../../components/Base/Fieldset/Fieldset";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Select from "../../../components/Base/Select/Select";
+import Button from "../../../components/Base/Button";
+import Fieldset from "../../../components/Base/Fieldset";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Select from "../../../components/Base/Select";
 import classes from "../../ValidacionHellen/views/VerificacionApertura.module.css";
 import { notify } from "../../../utils/notify";
 

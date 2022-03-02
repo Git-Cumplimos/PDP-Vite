@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import classes from "./Input.module.css";
 
 const Input = ({
@@ -45,18 +45,6 @@ const Input = ({
       };
     }
   }
-  
-  const invalidMsg = useMemo(() => {
-    return invalid
-      ? invalid
-      : inputRef.current?.validity?.valid
-      ? ""
-      : inputRef.current?.validationMessage;
-  }, [
-    invalid,
-    inputRef.current?.validity?.valid,
-    inputRef.current?.validationMessage,
-  ]);
 
   return self ? (
     <>
@@ -77,8 +65,16 @@ const Input = ({
       <div>
         <input {...input} ref={inputRef} />
         {info ? <p>{info}</p> : ""}
-        {invalidMsg && inputRef.current?.value !== "" ? (
-          <p className={`${invalidCls}`}>{invalidMsg}</p>
+        {inputRef.current?.value !== "" ? (
+          invalid ? (
+            <p className={`${invalidCls}`}>{invalid}</p>
+          ) : inputRef.current?.validity?.valid ? (
+            ""
+          ) : (
+            <p className={`${invalidCls}`}>
+              {inputRef.current?.validationMessage}
+            </p>
+          )
         ) : (
           ""
         )}

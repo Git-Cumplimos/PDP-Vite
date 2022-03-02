@@ -4,15 +4,15 @@ import { useState } from "react";
 import { useEffect } from "react";
 import classes from "../../ValidacionEnrolamiento/views/VerificacionFormulario.module.css";
 import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
-import Button from "../../../components/Base/Button/Button";
-import Modal from "../../../components/Base/Modal/Modal";
-import Form from "../../../components/Base/Form/Form";
+import Button from "../../../components/Base/Button";
+import Modal from "../../../components/Base/Modal";
+import Form from "../../../components/Base/Form";
 import { useNavigate } from "react-router-dom";
-import Input from "../../../components/Base/Input/Input";
-/* import ToggleInput from "../../../components/Base/ToggleInput/ToggleInput"; */
-import TextArea from "../../../components/Base/TextArea/TextArea";
-import Fieldset from "../../../components/Base/Fieldset/Fieldset";
-import Select from "../../../components/Base/Select/Select";
+import Input from "../../../components/Base/Input";
+/* import ToggleInput from "../../../components/Base/ToggleInput"; */
+import TextArea from "../../../components/Base/TextArea";
+import Fieldset from "../../../components/Base/Fieldset";
+import Select from "../../../components/Base/Select";
 import { notify } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 /* import file from ".././certificado_movimiento.pdf";

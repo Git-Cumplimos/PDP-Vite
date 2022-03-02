@@ -1,8 +1,8 @@
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../../components/Base/Form/Form";
-import Input from "../../../../components/Base/Input/Input";
-import ToggleInput from "../../../../components/Base/ToggleInput/ToggleInput";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import ToggleInput from "../../../../components/Base/ToggleInput";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 
@@ -56,7 +56,7 @@ const EditUserForm = ({ selected, onCloseModal }) => {
           ""
         );
       })}
-      <Form onSubmit={onSubmit} grid>        
+      <Form onSubmit={onSubmit} grid>
         <Input
           id={`direccion_edit`}
           name={`direccion_edit`}

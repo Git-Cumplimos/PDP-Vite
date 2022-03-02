@@ -1,11 +1,11 @@
 import { useMemo, useRef } from "react";
-import Button from "../../../../components/Base/Button/Button";
+import Button from "../../../../components/Base/Button";
 import VoucherPago from "../Voucher/VoucherPago";
 import { useReactToPrint } from "react-to-print";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
+import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useEffect } from "react";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import Tickets from "../../../../components/Base/Tickets/Tickets";
+import Tickets from "../../../../components/Base/Tickets";
 import { notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -13,7 +13,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
-const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
+const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
   const pageStyle = `
   @page {
     size: 80mm 50mm;
@@ -32,7 +32,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
   }
 `;
   const printDiv = useRef();
-  
+
   const { getQuota } = useAuth();
 
   const { infoTicket } = useAuth();
@@ -43,7 +43,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
   });
 
   //const voucherPagoInfo = {};
-  
+
   const { roleInfo } = useAuth();
 
   const voucherInfo = useMemo(() => {
@@ -70,11 +70,15 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
       vinfo["Id Transacción"] = pagoresponse.id_Transaccion;
       vinfo["Numero de billete"] = pagoresponse.num_billete;
       vinfo.ciudad = roleInfo.ciudad;
-      vinfo.Serie = pagoresponse.serie;          
-      vinfo["valor ganado"]=formatMoney.format(pagoresponse["valor bruto"]);
-      vinfo["valor 17percent"]=formatMoney.format(pagoresponse["valor 17percent"]);
-      vinfo["valor 20percent"]=formatMoney.format(pagoresponse["valor 20percent"]);
-      vinfo["Total"]= formatMoney.format(pagoresponse["valor ganado"]);
+      vinfo.Serie = pagoresponse.serie;
+      vinfo["valor ganado"] = formatMoney.format(pagoresponse["valor bruto"]);
+      vinfo["valor 17percent"] = formatMoney.format(
+        pagoresponse["valor 17percent"]
+      );
+      vinfo["valor 20percent"] = formatMoney.format(
+        pagoresponse["valor 20percent"]
+      );
+      vinfo["Total"] = formatMoney.format(pagoresponse["valor ganado"]);
       vinfo.id_trx = pagoresponse["id_trx"];
       vinfo["No.terminal"] = roleInfo.id_dispositivo;
 
@@ -96,7 +100,6 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
   //   voucherPagoInfo["Hora"] = Intl.DateTimeFormat('es-CO', {
   //      hour: "numeric", minute: "numeric", second: "numeric", hour12: false}).format(new Date());
 
-    
   //   voucherPagoInfo["Nombre de loteria"] ='Lotería de Bogotá'; //pagoresponse.nom_loteria;
   //   voucherPagoInfo.Comercio = roleInfo['nombre comercio'];
   //   voucherPagoInfo["Dirección"] = roleInfo.direccion;
@@ -130,14 +133,14 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
       }),
       commerceName: pagoresponse.nom_loteria,
       trxInfo: Object.entries({
-        Sorteo:pagoresponse["Numero sorteo"],
+        Sorteo: pagoresponse["Numero sorteo"],
         Billete: pagoresponse.num_billete,
         Serie: pagoresponse.serie,
-        Fracciones: pagoresponse.fracciones,           
-        "Premio": formatMoney.format(pagoresponse["valor bruto"]),
-        "valor 17%":formatMoney.format(pagoresponse["valor 17percent"]),
-        "valor 20%":formatMoney.format(pagoresponse["valor 20percent"]),
-        "Total": formatMoney.format(pagoresponse["valor ganado"]),   
+        Fracciones: pagoresponse.fracciones,
+        Premio: formatMoney.format(pagoresponse["valor bruto"]),
+        "valor 17%": formatMoney.format(pagoresponse["valor 17percent"]),
+        "valor 20%": formatMoney.format(pagoresponse["valor 20percent"]),
+        Total: formatMoney.format(pagoresponse["valor ganado"]),
       }),
       disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
     };
@@ -150,9 +153,9 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
     voucherInfo,
   ]);
   useEffect(() => {
-    infoTicket(pagoresponse["id_trx"],13,ticket);
+    infoTicket(pagoresponse["id_trx"], 13, ticket);
   }, [infoTicket, pagoresponse, ticket]);
-  console.log(pagoresponse)
+  console.log(pagoresponse);
   //////////////////////////////////////////
   return "msg" in pagoresponse ? (
     <div className="flex flex-col justify-center items-center">
@@ -167,10 +170,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal}) => {
     </div>
   ) : (
     <div className="flex flex-col justify-center items-center">
-      <Tickets
-              refPrint={printDiv}
-              ticket={ticket}
-            />      
+      <Tickets refPrint={printDiv} ticket={ticket} />
       {/* <VoucherPago {...voucherPagoInfo} refPrint={printDiv} /> */}
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>

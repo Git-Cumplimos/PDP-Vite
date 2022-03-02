@@ -1,6 +1,6 @@
 import React from "react";
-import Button from "../../../components/Base/Button/Button";
-import Form from "../../../components/Base/Form/Form";
+import Button from "../../../components/Base/Button";
+import Form from "../../../components/Base/Form";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router";

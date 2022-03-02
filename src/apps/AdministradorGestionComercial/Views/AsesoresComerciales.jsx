@@ -1,17 +1,17 @@
 import { useState, useEffect, Fragment, useCallback } from "react";
-import Table from "../../../components/Base/Table/Table";
-import Button from "../../../components/Base/Button/Button";
+import Table from "../../../components/Base/Table";
+import Button from "../../../components/Base/Button";
 import fetchData from "../../../utils/fetchData";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Modal from "../../../components/Base/Modal/Modal";
+import Pagination from "../../../components/Compound/Pagination";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Modal from "../../../components/Base/Modal";
 import { notify, notifyError } from "../../../utils/notify";
-import Form from "../../../components/Base/Form/Form";
-import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
-import Input from "../../../components/Base/Input/Input";
-import Select from "../../../components/Base/Select/Select";
+import Form from "../../../components/Base/Form";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
+import Input from "../../../components/Base/Input";
+import Select from "../../../components/Base/Select";
 import useQuery from "../../../hooks/useQuery";
-import ToggleInput from "../../../components/Base/ToggleInput/ToggleInput";
+import ToggleInput from "../../../components/Base/ToggleInput";
 
 const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
@@ -109,7 +109,7 @@ const AsesoresComerciales = () => {
 
   useEffect(() => {
     fetchData(`${url}/responsables`, "GET", {
-      limit: 0
+      limit: 0,
     }).then((respuesta) =>
       setResponsables(
         Object.fromEntries([

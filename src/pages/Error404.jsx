@@ -1,7 +1,7 @@
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/AuthHooks";
-import Button from "../components/Base/Button/Button";
-import ButtonBar from "../components/Base/ButtonBar/ButtonBar";
+import Button from "../components/Base/Button";
+import ButtonBar from "../components/Base/ButtonBar";
 
 const Error404 = () => {
   const navigate = useNavigate();
@@ -16,18 +16,16 @@ const Error404 = () => {
         <p className="text-2xl">Not found</p>
         <ButtonBar>
           <Button onClick={() => navigate(-1)}>Volver</Button>
-          <Button onClick={() => navigate("/", { replace: true })}>Ir a inicio</Button>
+          <Button onClick={() => navigate("/", { replace: true })}>
+            Ir a inicio
+          </Button>
         </ButtonBar>
       </div>
     ) : (
       ""
     )
   ) : (
-    <Navigate
-      to={"/login"}
-      replace
-      state={{ from: location }}
-    />
+    <Navigate to={"/login"} replace state={{ from: location }} />
   );
 };
 

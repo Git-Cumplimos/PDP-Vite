@@ -1,6 +1,6 @@
-import HNavbar from "../../components/Base/HNavbar/HNavbar";
+import HNavbar from "../../components/Base/HNavbar";
 
-import Form from "../../components/Base/Form/Form";
+import Form from "../../components/Base/Form";
 
 const VerificacionNuevosComercios = ({ subRoutes }) => {
   return (

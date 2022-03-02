@@ -1,7 +1,7 @@
 import { Fragment } from "react";
-import Button from "../Button/Button";
-import ButtonBar from "../ButtonBar/ButtonBar";
-import Input from "../Input/Input";
+import Button from "../Button";
+import ButtonBar from "../ButtonBar";
+import Input from "../Input";
 
 const MultipleInput = ({ arrState, label, min = 1, max, required = false }) => {
   const [arrData, setArrData] = arrState;
@@ -15,7 +15,7 @@ const MultipleInput = ({ arrState, label, min = 1, max, required = false }) => {
         return (
           <Fragment key={index}>
             <Input
-              id={`arrData_${index}`}            
+              id={`arrData_${index}`}
               label={`${label(index)}`}
               type="text"
               autoComplete="off"
@@ -29,7 +29,7 @@ const MultipleInput = ({ arrState, label, min = 1, max, required = false }) => {
             />
             <ButtonBar key={`btnBar_key_${index}`}>
               <Button
-                disabled={arrData.length < (min + 1)}
+                disabled={arrData.length < min + 1}
                 type="button"
                 onClick={() => {
                   const arrData_copy = [...arrData];

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import fetchData from "../../../utils/fetchData";
 import AddressInput from "../../Base/AddressInput/AddressInput";
-import Button from "../../Base/Button/Button";
-import ButtonBar from "../../Base/ButtonBar/ButtonBar";
-import Fieldset from "../../Base/Fieldset/Fieldset";
-import Input from "../../Base/Input/Input";
-import Modal from "../../Base/Modal/Modal";
-import Table from "../../Base/Table/Table";
+import Button from "../../Base/Button";
+import ButtonBar from "../../Base/ButtonBar";
+import Fieldset from "../../Base/Fieldset";
+import Input from "../../Base/Input";
+import Modal from "../../Base/Modal";
+import Table from "../../Base/Table";
 
 const capitalize = (word) => {
   return word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);

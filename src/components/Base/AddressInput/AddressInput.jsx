@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import Input from "../Input/Input";
-import Select from "../Select/Select";
+import Input from "../Input";
+import Select from "../Select";
 import classes from "./AddressInput.module.css";
 import ViaInputs from "./ViaInputs";
 
@@ -21,8 +21,8 @@ const AddressInput = ({ label, place, getAddress }) => {
     streetSuffix: useState(""),
     streetQuadrant: useState(""),
   };
-  
-  const diffTypes = useMemo(() => ["VI"], [])
+
+  const diffTypes = useMemo(() => ["VI"], []);
 
   const [thirdStreetNum, setThirdStreetNum] = useState("");
   const [detailsStreet, setDetailsStreet] = useState("");
