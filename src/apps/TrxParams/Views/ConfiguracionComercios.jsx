@@ -1,15 +1,21 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../components/Base/Button";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import Modal from "../../../components/Base/Modal";
-import Table from "../../../components/Base/Table";
-import TextArea from "../../../components/Base/TextArea";
-import Pagination from "../../../components/Compound/Pagination";
+import Button from "../../../components/Base/Button/Button";
+import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
+import Form from "../../../components/Base/Form/Form";
+import Input from "../../../components/Base/Input/Input";
+import Modal from "../../../components/Base/Modal/Modal";
+import Select from "../../../components/Base/Select/Select";
+import Table from "../../../components/Base/Table/Table";
+import TextArea from "../../../components/Base/TextArea/TextArea";
+import Pagination from "../../../components/Compound/Pagination/Pagination";
 import useQuery from "../../../hooks/useQuery";
 import { notify, notifyError } from "../../../utils/notify";
+import {
+  fetchConfiguracionComercios,
+  postConfiguracionComercios,
+  putConfiguracionComercios,
+} from "../utils/fetchConfiguracionComercios";
 import {
   fetchAutorizadores,
   postAutorizadores,
@@ -45,7 +51,7 @@ const calcularDigitoVerificacion = (myNit) => {
   return y > 1 ? 11 - y : y;
 };
 
-const Autorizadores = () => {
+const ConfiguracionComercios = () => {
   const navigate = useNavigate();
   const [{ searchAuto = "", page = 1, openTipoContrato = false }, setQuery] =
     useQuery();
@@ -54,7 +60,7 @@ const Autorizadores = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelectedAuto(null);
-    fecthAutorizadoresFunc();
+    fecthConfiguracionComerciosFunc();
   }, []);
   const [showModal2, setShowModal2] = useState(false);
   const handleClose2 = useCallback(() => {
@@ -62,40 +68,38 @@ const Autorizadores = () => {
     setQuery({ ["openTipoContrato"]: false }, { replace: true });
   }, []);
 
-  const [autorizadores, setAutorizadores] = useState([]);
+  const [configuracionComercios, setConfiguracionComercios] = useState([]);
   const [selectedAuto, setSelectedAuto] = useState(null);
   const [maxPages, setMaxPages] = useState(0);
   const [data, setdata] = useState([]);
 
-  const tableAutorizadores = useMemo(() => {
+  const tableConfiguracionComercios = useMemo(() => {
     return [
-      ...autorizadores.map(
+      ...configuracionComercios.map(
         ({
-          id_autorizador,
-          nombre_autorizador,
-          nit,
-          descripcion,
+          id_configuracion_comercio,
+          id_comercio,
           id_tipo_contrato,
+          tipo_pago_comision,
           nombre_contrato,
         }) => {
           return {
-            "Id autorizador": id_autorizador,
-            Autorizador: nombre_autorizador,
-            Nit: nit,
-            Descripcion: descripcion,
+            "Id configuracion": id_configuracion_comercio,
+            "Id comercio": id_comercio,
             Contrato: nombre_contrato,
+            "Pago comision": tipo_pago_comision,
           };
         }
       ),
     ];
-  }, [autorizadores]);
+  }, [configuracionComercios]);
 
-  const onSelectAutorizador = useCallback(
+  const onSelectConfiguracionComercios = useCallback(
     (e, i) => {
       setShowModal(true);
-      setSelectedAuto(tableAutorizadores[i]);
+      setSelectedAuto(tableConfiguracionComercios[i]);
     },
-    [tableAutorizadores]
+    [tableConfiguracionComercios]
   );
 
   const onChange = useCallback(
@@ -116,62 +120,34 @@ const Autorizadores = () => {
       }));
       handleClose2();
     },
-    [data, handleClose]
+    [data, handleClose2]
   );
-  const formatNit = useCallback((ev) => {
-    if (ev.target.name === "Nit") {
-      let nitInput = ev.target.value;
-
-      let caret_pos = ev.target.selectionStart;
-      const len = ev.target.value.length;
-
-      nitInput = nitInput.replace(/\s/g, ""); // Espacios
-      nitInput = nitInput.replace(/,/g, ""); // Comas
-      nitInput = nitInput.replace(/\./g, ""); // Puntos
-      // nitInput = nitInput.replace(/-/g, ""); // Guiones
-
-      const matches = nitInput.match(/(\d{3})/g);
-      let newStr = "";
-      if (matches) {
-        if (matches[0]) {
-          newStr = `${newStr}${matches[0]}.`;
-          if (matches[1]) {
-            newStr = `${newStr}${matches[1]}.`;
-            if (matches[2] && nitInput.match(/(\d{3}-)/g)) {
-              newStr = `${newStr}${matches[2]}-${calcularDigitoVerificacion(
-                nitInput
-              )}`;
-            } else {
-              newStr = `${newStr}${nitInput.substring(6, 9)}`;
-            }
-          } else {
-            newStr = `${newStr}${nitInput.substring(3)}`;
-          }
-        }
-        ev.target.value = newStr;
-
-        ev.target.focus();
-        caret_pos += ev.target.value.length - len;
-        ev.target.setSelectionRange(caret_pos, caret_pos);
-      }
-    }
+  const onChangeFormat = useCallback((ev) => {
     setSelectedAuto((old) => {
       return { ...old, [ev.target.name]: ev.target.value };
     });
   }, []);
-
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-
-      if (selectedAuto?.["Id autorizador"]) {
-        putAutorizadores(
-          { id_autorizador: selectedAuto?.["Id autorizador"] },
+      if (!selectedAuto?.["Id comercio"]) {
+        notifyError("Se debe agregar el id del comercio");
+        return;
+      }
+      if (!selectedAuto?.["Contrato"]) {
+        notifyError("Se debe agregar el contrato");
+        return;
+      }
+      if (!selectedAuto?.["Pago comision"]) {
+        notifyError("Se debe agregar el pago comisión");
+        return;
+      }
+      if (selectedAuto?.["Id configuracion"]) {
+        putConfiguracionComercios(
+          { id_configuracion_comercio: selectedAuto?.["Id configuracion"] },
           {
             id_tipo_contrato: selectedAuto?.["Id contrato"],
-            nombre_autorizador: selectedAuto?.["Nombre de autorizador"],
-            nit: selectedAuto?.["Nit"],
-            descripcion: selectedAuto?.["Descripcion"],
+            tipo_pago_comision: selectedAuto?.["Pago comision"],
           }
         )
           .then((res) => {
@@ -184,11 +160,10 @@ const Autorizadores = () => {
           })
           .catch((err) => console.error(err));
       } else {
-        postAutorizadores({
+        postConfiguracionComercios({
+          id_comercio: selectedAuto?.["Id comercio"],
           id_tipo_contrato: selectedAuto?.["Id contrato"],
-          nombre_autorizador: selectedAuto?.["Nombre de autorizador"],
-          nit: selectedAuto?.["Nit"],
-          descripcion: selectedAuto?.["Descripcion"],
+          tipo_pago_comision: selectedAuto?.["Pago comision"],
         })
           .then((res) => {
             if (res?.status) {
@@ -206,17 +181,19 @@ const Autorizadores = () => {
 
   useEffect(() => {
     if (!openTipoContrato) {
-      fecthAutorizadoresFunc();
+      fecthConfiguracionComerciosFunc();
     } else {
       fetchTiposContratosComisionesFunc();
     }
   }, [searchAuto, page, openTipoContrato]);
-
-  const fecthAutorizadoresFunc = () => {
-    fetchAutorizadores({ nombre_autorizador: searchAuto, page })
+  const fecthConfiguracionComerciosFunc = () => {
+    let obj = {};
+    if (parseInt(searchAuto))
+      obj["id_configuracion_comercios"] = parseInt(searchAuto);
+    fetchConfiguracionComercios({ ...obj, page })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
-        setAutorizadores(autoArr?.results);
+        setConfiguracionComercios(autoArr?.results);
       })
       .catch((err) => console.error(err));
   };
@@ -239,100 +216,89 @@ const Autorizadores = () => {
     <Fragment>
       <ButtonBar>
         <Button
-          type="submit"
+          type='submit'
           onClick={() => {
             setShowModal(true);
             setSelectedAuto({
-              "Nombre de autorizador": "",
-              Nit: "",
-              Descripcion: "",
+              "Id comercio": "",
+              "Pago comision": "",
             });
-          }}
-        >
-          Crear autorizador
+          }}>
+          Crear configuración comercio
         </Button>
       </ButtonBar>
       <Pagination maxPage={maxPages} onChange={onChange} grid>
         <Input
-          id="searchAuto"
-          name="searchAuto"
-          label={"Buscar autorizador"}
-          type="text"
-          autoComplete="off"
+          id='searchAuto'
+          name='searchAuto'
+          label={"Id comercio"}
+          type='number'
+          autoComplete='off'
           defaultValue={searchAuto}
         />
         <ButtonBar></ButtonBar>
       </Pagination>
-      {Array.isArray(tableAutorizadores) && tableAutorizadores.length > 0 ? (
+      {Array.isArray(tableConfiguracionComercios) &&
+      tableConfiguracionComercios.length > 0 ? (
         <Table
-          headers={Object.keys(tableAutorizadores[0])}
-          data={tableAutorizadores}
-          onSelectRow={onSelectAutorizador}
+          headers={Object.keys(tableConfiguracionComercios[0])}
+          data={tableConfiguracionComercios}
+          onSelectRow={onSelectConfiguracionComercios}
         />
       ) : (
         ""
       )}
       <Modal show={showModal} handleClose={handleClose}>
-        <Form onSubmit={onSubmit} onChange={formatNit} grid>
+        <Form onSubmit={onSubmit} onChange={onChangeFormat} grid>
           <Input
-            id="Autorizador"
-            name="Autorizador"
-            label={"Nombre de autorizador"}
-            type="text"
-            autoComplete="off"
-            // value={selectedAuto?.["Nombre de autorizador"]}
-            defaultValue={selectedAuto?.["Autorizador"]}
+            id='Id comercio'
+            name='Id comercio'
+            label={"Id comercio"}
+            type='text'
+            autoComplete='off'
+            value={selectedAuto?.["Id comercio"]}
+            // defaultValue={selectedAuto?.["Id comercio"] ?? ""}
+            disabled={selectedAuto?.["Id configuracion"]}
             required
           />
           {selectedAuto?.["Contrato"] && (
             <Input
-              id="Contrato"
-              name="Contrato"
+              id='Contrato'
+              name='Contrato'
               label={"Contrato"}
-              type="text"
-              autoComplete="off"
+              type='text'
+              autoComplete='off'
               value={selectedAuto?.["Contrato"]}
+              onChange={() => {}}
               // defaultValue={selectedAuto?.["Contrato"]}
               disabled
             />
           )}
-          <Input
-            id="nitAuto"
-            name="Nit"
-            label={"Nit"}
-            type="text"
-            autoComplete="off"
-            // value={selectedAuto?.Nit}
-            defaultValue={selectedAuto?.Nit}
+          <Select
+            id='Pago comision'
+            name='Pago comision'
+            label='Pago comision cada:'
+            options={{ "": "", Transacción: "Transaccion", Mensual: "Mensual" }}
+            value={selectedAuto?.["Pago comision"]}
+            onChange={() => {}}
             required
           />
-          <TextArea
-            id="textAuto"
-            name="Descripcion"
-            label={"Descripcion"}
-            autoCapitalize="sentences"
-            autoComplete="off"
-            // value={selectedAuto?.Descripcion ?? ""}
-            defaultValue={selectedAuto?.Descripcion ?? ""}
-            onChange={() => {}}
-          />
-          {!selectedAuto?.["Id autorizador"] ? (
+          {!selectedAuto?.["Id configuracion"] ? (
             <ButtonBar>
-              <Button type="submit">Crear autorizador</Button>
+              <Button type='button' onClick={handleClose}>
+                Cancelar
+              </Button>
               <Button
-                type="button"
+                type='button'
                 onClick={() => {
                   setShowModal2(true);
                   setQuery({ ["openTipoContrato"]: true }, { replace: true });
-                }}
-              >
+                }}>
                 {selectedAuto?.["Contrato"]
                   ? "Editar contrato"
                   : "Agregar contrato"}
               </Button>
-              <Button type="button" onClick={handleClose}>
-                Cancelar
-              </Button>
+              <Button type='submit'>Crear configuración</Button>
             </ButtonBar>
           ) : (
             <Fragment>
@@ -352,27 +318,25 @@ const Autorizadores = () => {
                     navigate(
                       `/trx-params/comisiones/cobradas?${urlParams.toString()}`
                     );
-                  }}
-                >
+                  }}>
                   Editar comisiones a cobrar
                 </Button> */}
               </ButtonBar>
               <ButtonBar>
-                <Button type="submit">Editar autorizador</Button>
+                <Button type='button' onClick={handleClose}>
+                  Cancelar
+                </Button>
                 <Button
-                  type="button"
+                  type='button'
                   onClick={() => {
                     setShowModal2(true);
                     setQuery({ ["openTipoContrato"]: true }, { replace: true });
-                  }}
-                >
+                  }}>
                   {selectedAuto?.["Contrato"]
                     ? "Editar contrato"
                     : "Agregar contrato"}
                 </Button>
-                <Button type="button" onClick={handleClose}>
-                  Cancelar
-                </Button>
+                <Button type='submit'>Editar configuración</Button>
               </ButtonBar>
             </Fragment>
           )}
@@ -380,10 +344,9 @@ const Autorizadores = () => {
         <Modal
           show={showModal2}
           handleClose={handleClose2}
-          className="flex align-middle"
-        >
+          className='flex align-middle'>
           <Fragment>
-            <h1 className="text-3xl">Seleccionar el contrato</h1>
+            <h1 className='text-3xl'>Seleccionar el contrato</h1>
             <Pagination maxPage={maxPages} grid></Pagination>
             {Array.isArray(data) && data.length > 0 && (
               <Table
@@ -399,4 +362,4 @@ const Autorizadores = () => {
   );
 };
 
-export default Autorizadores;
+export default ConfiguracionComercios;

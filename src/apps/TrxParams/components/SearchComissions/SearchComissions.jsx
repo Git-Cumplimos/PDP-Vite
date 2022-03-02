@@ -50,9 +50,6 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     if (headers.includes("id_comercio")) {
       newHeaders.push("Id comercio");
     }
-    if (headers.includes("nombre_contrato")) {
-      newHeaders.push("Contrato");
-    }
     if (headers.includes("nombre_autorizador")) {
       newHeaders.push("Autorizador");
     }
@@ -69,7 +66,6 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           id_comision_pagada,
           id_tipo_op,
           id_convenio,
-          id_tipo_contrato,
           id_comercio,
           id_autorizador,
           comisiones,
@@ -78,16 +74,14 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           estado,
           nombre_operacion,
           nombre_convenio,
-          nombre_contrato,
           nombre_autorizador,
         }) => {
           return {
             "Id Comision": id_comision_pagada,
-            Convenio: nombre_convenio,
-            Operacion: nombre_operacion,
-            "Id comercio": id_comercio,
-            Contrato: nombre_contrato,
-            Autorizador: nombre_autorizador,
+            Convenio: nombre_convenio ?? "",
+            Operacion: nombre_operacion ?? "",
+            "Id comercio": id_comercio ?? "",
+            Autorizador: nombre_autorizador ?? "",
             Estado: estado ? "Activo" : "Inactivo",
           };
         }
@@ -108,9 +102,9 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
         }) => {
           return {
             "Id comision cobrada": id_comision_cobrada,
-            Convenio: nombre_convenio,
-            Operacion: nombre_operacion,
-            Autorizador: nombre_autorizador,
+            Convenio: nombre_convenio ?? "",
+            Operacion: nombre_operacion ?? "",
+            Autorizador: nombre_autorizador ?? "",
             Estado: estado ? "Activo" : "Inactivo",
           };
         }
@@ -214,7 +208,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
         />
         <Input
           id={"tipoTrx"}
-          label={"Tipo de transaccion"}
+          label={"Tipo de operación"}
           name={"tipoTrx"}
           type={"text"}
           autoComplete="off"

@@ -15,14 +15,6 @@ import Fieldset from "../../../components/Base/Fieldset";
 import Select from "../../../components/Base/Select";
 import { notify } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
-/* import file from ".././certificado_movimiento.pdf";
-import file2 from ".././ced.pdf";
-import file3 from ".././rut.pdf"; */
-// import file from ".././certificado_movimiento.pdf";
-// import file2 from ".././ced.pdf";
-// import file3 from ".././rut.pdf";
-/* import { Document, Page } from "react-pdf"; */
-// import Sample from "./Sample";
 
 const VerificacionFormulario = () => {
   const navigate = useNavigate();
@@ -50,25 +42,21 @@ const VerificacionFormulario = () => {
   const [mensajeCausal, setMensajeCausal] = useState("");
 
   const [datosAsesor, SetDatosAsesor] = useState(0);
+  const [codDaneResponsable, SetCodDaneResponsable] = useState([]);
+  const [todosCodDane, SetTodosCodDane] = useState([]);
+  const [t, SetT] = useState([]);
+  const [p, SetP] = useState([]);
 
   const params = useParams();
+
+  const [zonas, setZonas] = useState([]);
+  const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
   useEffect(() => {
     /* const updateWidth = () => { */
 
-    fetchData(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-      "GET"
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */
-    )
-      /* .then((response) => response.json()) */
-      .then((respuesta) => setDatosParams(respuesta.obj.results));
-    /*  }; */
-
-    // actualizaremos el width al montar el componente
-    /*   updateWidth(); */
-
-    // nos suscribimos al evento resize de window
-    /*   window.addEventListener("resize", updateWidth); */
+    fetchData(`${url}/actualizacionestado?id_proceso=${params.id}`, "GET").then(
+      (respuesta) => setDatosParams(respuesta.obj.results)
+    );
   }, []);
 
   useEffect(() => {
@@ -77,15 +65,12 @@ const VerificacionFormulario = () => {
       const datos = {
         id_proceso: datosParams[0]["id_proceso"].toString(),
       };
-      fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile?id_proceso=${datos["id_proceso"]}`,
-        "GET"
-      )
-        /* .then((res) => res.json()) */
-        .then((respuesta) => {
-          console.log(respuesta.obj["rut"]);
+      fetchData(`${url}/urlfile?id_proceso=${datos["id_proceso"]}`, "GET").then(
+        (respuesta) => {
+          console.log(respuesta);
           setUrlPdfs(respuesta.obj);
-        });
+        }
+      );
     }
   }, [datosParams]);
   const aprobacionFormulario = (e) => {
@@ -100,16 +85,13 @@ const VerificacionFormulario = () => {
       tipozona: tipoZona,
       causal_rechazo: mensajeCausal,
     };
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
-      }
-    )
+    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(datos),
+    })
       .then((res) => res.json())
       .then((respuesta) => console.log(respuesta.obj.data));
     notify("El Usuario ha sido Aprobado para ReconoserID");
@@ -130,16 +112,13 @@ const VerificacionFormulario = () => {
       tipozona: tipoZona,
       causal_rechazo: mensajeCausal,
     };
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
-      }
-    )
+    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(datos),
+    })
       .then((res) => res.json())
       .then((respuesta) => console.log(respuesta.obj.data));
     notify("El Usuario ha sido Rechazado para ReconoserID");
@@ -151,18 +130,14 @@ const VerificacionFormulario = () => {
 
   useEffect(() => {
     if (datosParams?.length > 0) {
-      console.log(datosParams[0]["asesor"]);
       const datos = {
         asesor: datosParams[0]["asesor"],
       };
-      fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?nom_asesor=${datos["asesor"]}`,
-        "GET"
-      )
-        /* .then((res) => res.json()) */
-        .then((respuesta) => {
+      fetchData(`${url}/asesores?nom_asesor=${datos["asesor"]}`, "GET").then(
+        (respuesta) => {
           SetDatosAsesor(respuesta.obj.results);
-        });
+        }
+      );
     }
   }, [datosParams]);
 
@@ -170,13 +145,74 @@ const VerificacionFormulario = () => {
     e.preventDefault();
     setCausal(true);
   };
+  useEffect(() => {
+    fetchData(`${url}/zonas`, "GET", {
+      limit: 0,
+    }).then((respuesta) =>
+      setZonas(
+        Object.fromEntries([
+          ["", ""],
+          ...respuesta?.obj?.results?.map(({ zona, id_zona }) => [
+            zona,
+            id_zona,
+          ]),
+        ])
+      )
+    );
+  }, []);
+  console.log(zonas);
+
+  useEffect(() => {
+    if (datosAsesor) {
+      fetchData(
+        `${url}/responsables?nombre=${datosAsesor[0].responsable["nombre"]}`
+      ).then((respuesta) => {
+        if (respuesta.obj.results[0]["zona"]["municipios"]?.length > 0) {
+          const codResDane = [
+            ...respuesta.obj.results[0]["zona"]["municipios"].map((e) =>
+              parseInt(e)
+            ),
+          ];
+          SetCodDaneResponsable(codResDane);
+          const movie = [];
+          codResDane.forEach((element, i) => {
+            movie.push(
+              fetchData(
+                `${url}/localidades?cod_dane=${codResDane[i]}&limit=${0}`
+              ).then((res) => res)
+            );
+          });
+
+          Promise.all(movie).then((value) => {
+            console.log(value);
+            SetT(value);
+          });
+
+          SetP([
+            ...t.map((element, i) =>
+              t[i].obj.results.map(
+                ({ id_localidad, nom_localidad }) =>
+                  `${id_localidad}${nom_localidad}`
+              )
+            ),
+          ]);
+
+          /*  console.log(movie); */
+          /* SetTodosCodDane([
+            ...codDaneResponsable.map((e) => {
+              fetchData(`${url}/localidades?cod_dane=${e}&limit=${0}`).then(
+                (respuesta) => SetT([...respuesta.obj.results.map((e) => e)])
+              );
+            }),
+          ]); */
+        }
+      });
+    }
+  }, [datosAsesor]);
   return (
     <div>
       {datosParams && datosAsesor ? (
-        <Form
-        /*   flex={false} */
-        /*  grid */
-        >
+        <Form>
           <Input
             label={"Nombre Comercio"}
             placeholder={datosParams[0]["nombre_comercio"]}
@@ -282,7 +318,15 @@ const VerificacionFormulario = () => {
             {datosAsesor[0]["responsable"].length != "" ? (
               <Input
                 label={"Tipo Zona"}
-                placeholder={datosAsesor[0].responsable["zona"]}
+                placeholder={
+                  datosAsesor[0].responsable["zona_id_zona"] === 1
+                    ? "Centro"
+                    : datosAsesor[0].responsable["zona_id_zona"] === 2
+                    ? "Norte"
+                    : datosAsesor[0].responsable["zona_id_zona"] === 3
+                    ? "Occidente"
+                    : datosAsesor[0].responsable["zona_id_zona"]
+                }
                 disabled
               ></Input>
             ) : (

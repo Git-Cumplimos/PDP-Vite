@@ -311,7 +311,9 @@ const EditComission = () => {
                   minute: "numeric",
                 }).format(
                   new Date(comissions?.[0]?.["fecha_inicio"]).setHours(
-                    new Date(comissions?.[0]?.["fecha_inicio"]).getHours()
+                    new Date(
+                      comissions?.[0]?.["fecha_inicio"] + "-5"
+                    ).getHours()
                   )
                 )}
                 readOnly
@@ -333,7 +335,7 @@ const EditComission = () => {
                   minute: "numeric",
                 }).format(
                   new Date(comissions?.[0]?.["fecha_fin"]).setHours(
-                    new Date(comissions?.[0]?.["fecha_fin"]).getHours()
+                    new Date(comissions?.[0]?.["fecha_fin"] + "-5").getHours()
                   )
                 )}
                 readOnly

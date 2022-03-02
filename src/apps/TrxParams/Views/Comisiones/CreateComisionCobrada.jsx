@@ -13,6 +13,11 @@ import { fetchConveniosMany } from "../../utils/fetchRevalConvenios";
 import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
 import { postComisionesCobrar } from "../../utils/fetchComisionesCobrar";
 import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
+import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
+import Pagination from "../../../../components/Compound/Pagination/Pagination";
+import Table from "../../../../components/Base/Table/Table";
+import Modal from "../../../../components/Base/Modal/Modal";
+import Input from "../../../../components/Base/Input/Input";
 
 const initComissionData = {
   type: "",
@@ -29,32 +34,32 @@ const initComissionData = {
 const CreateComisionCobrada = () => {
   const navigate = useNavigate();
 
-  const [{ comercios_id_comercio, convenios_id_convenio, comercio }, setQuery] =
-    useQuery();
+  const [{ page = 1, selectedOpt }, setQuery] = useQuery();
 
   const [selectecConv, setSelectecConv] = useState(null);
   const [comissionData, setComissionData] = useState(initComissionData);
   const [newComision, setNewComision] = useState([]);
-  const [autorizadores, setAutorizadores] = useState([]);
-  const [convenios, setConvenios] = useState([]);
+  const [data, setdata] = useState([]);
+  const [maxPages, setMaxPages] = useState(0);
 
-  const onSelectItem = useCallback(
-    (selected) => setSelectecConv(selected.Convenio),
-    []
-  );
-
+  const [showModal, setShowModal] = useState(false);
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+    setQuery({ ["page"]: 1 }, { replace: true });
+    setQuery({ ["selectedOpt"]: "" }, { replace: true });
+  }, []);
   const createComission = useCallback(
     (ev) => {
       ev.preventDefault();
 
       let errRang = comissionData?.ranges?.length === 0;
 
-      if (!newComision["Convenio"] && !newComision["Tipo de transaccion"]) {
-        notifyError(
-          "Se debe agregar al menos un convenio o un tipo de transaccion"
-        );
-        return;
-      }
+      // if (!newComision["Convenio"] && !newComision["Tipo de transaccion"]) {
+      //   notifyError(
+      //     "Se debe agregar al menos un convenio o un tipo de transaccion"
+      //   );
+      //   return;
+      // }
       if (!newComision["Autorizador"]) {
         notifyError("Se debe agregar el autorizador");
         return;
@@ -79,14 +84,14 @@ const CreateComisionCobrada = () => {
         return;
       }
       let obj = {};
-      if (parseInt(newComision["Convenio"])) {
-        obj["id_convenio"] = parseInt(newComision["Convenio"]);
+      if (newComision["Convenio"]) {
+        obj["id_convenio"] = parseInt(newComision["Id convenio"]);
       }
-      if (parseInt(newComision["Tipo de transaccion"])) {
-        obj["id_tipo_op"] = parseInt(newComision["Tipo de transaccion"]);
+      if (newComision["Tipo de transaccion"]) {
+        obj["id_tipo_op"] = parseInt(newComision["Id tipo operacion"]);
       }
-      if (parseInt(newComision["Autorizador"])) {
-        obj["id_autorizador"] = parseInt(newComision["Autorizador"]);
+      if (newComision["Autorizador"]) {
+        obj["id_autorizador"] = parseInt(newComision["Id autorizador"]);
       }
       postComisionesCobrar({
         ...obj,
@@ -124,13 +129,11 @@ const CreateComisionCobrada = () => {
   const onChangeNewComision = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
     const newData = [];
-    ["Convenio", "Tipo de transaccion", "Autorizador", "Enlazado"].forEach(
-      (col) => {
-        let data = null;
-        data = formData.get(col);
-        newData.push([col, data]);
-      }
-    );
+    ["Enlazado"].forEach((col) => {
+      let data = null;
+      data = formData.get(col);
+      newData.push([col, data]);
+    });
     let obj = Object.fromEntries(newData);
     if (obj["Enlazado"] === 1) {
       obj["Tipo de transaccion"] = "";
@@ -138,57 +141,98 @@ const CreateComisionCobrada = () => {
       obj["Convenio"] = "";
     }
     setNewComision((old) => ({
+      ...old,
       ...obj,
     }));
   }, []);
   useEffect(() => {
-    fetchAutorizadoresFunc();
-    fetchConveniosFunc();
-    fetchTiposTransaccionFunc();
-  }, []);
-  const fetchAutorizadoresFunc = () => {
-    fetchAutorizadores({})
-      .then((res) => {
-        let obj = { "": "" };
-        [...res?.results].map(({ id_autorizador, nombre_autorizador }) => {
-          obj[nombre_autorizador] = id_autorizador;
-          return {
-            nombre_autorizador: nombre_autorizador,
-          };
-        });
-        setAutorizadores(obj);
-      })
-      .catch((err) => console.error(err));
-  };
+    if (selectedOpt === "convenio") {
+      fetchConveniosFunc();
+    } else if (selectedOpt === "autorizador") {
+      fetchAutorizadoresFunc();
+    } else if (selectedOpt === "Tipo de transaccion") {
+      fetchTiposTransaccionFunc();
+    } else {
+      setdata([]);
+    }
+  }, [selectedOpt, page]);
   const fetchConveniosFunc = () => {
     fetchConveniosMany("")
       .then((res) => {
-        let obj = { "": "" };
-        [...res?.results].map(({ id_convenio, nombre_convenio }) => {
-          obj[nombre_convenio] = id_convenio;
-          return {
-            nombre_convenio: nombre_convenio,
-          };
-        });
-        setConvenios(obj);
+        setdata(
+          [...res?.results].map(({ id_convenio, nombre_convenio }) => {
+            return {
+              "Id convenio": id_convenio,
+              "Nombre convenio": nombre_convenio,
+            };
+          })
+        );
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
+  const fetchAutorizadoresFunc = () => {
+    fetchAutorizadores({ page })
+      .then((res) => {
+        setdata(
+          [...res?.results].map(({ id_autorizador, nombre_autorizador }) => {
+            return {
+              "Id autorizador": id_autorizador,
+              "Nombre autorizador": nombre_autorizador,
+            };
+          })
+        );
+        setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
   };
   const fetchTiposTransaccionFunc = () => {
-    fetchTrxTypesPages("", 1)
+    fetchTrxTypesPages("", page)
       .then((res) => {
-        console.log(res);
-        // let obj = { "": "" };
-        // [...res?.results].map(({ id_convenio, nombre_convenio }) => {
-        //   obj[nombre_convenio] = id_convenio;
-        //   return {
-        //     nombre_convenio: nombre_convenio,
-        //   };
-        // });
-        // setConvenios(obj);
+        setdata(
+          [...res?.results].map(({ id_tipo_operacion, Nombre }) => {
+            return {
+              "Id tipo operacion": id_tipo_operacion,
+              "Nombre transaccion": Nombre,
+            };
+          })
+        );
+        setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
   };
+  const onSelectConvenio = useCallback(
+    (e, i) => {
+      setShowModal(true);
+      if (selectedOpt === "convenio") {
+        setNewComision((old) => ({
+          ...old,
+          "Id convenio": data[i]?.["Id convenio"],
+          Convenio: data[i]?.["Nombre convenio"],
+        }));
+      } else if (selectedOpt === "autorizador") {
+        setNewComision((old) => ({
+          ...old,
+          "Id autorizador": data[i]?.["Id autorizador"],
+          Autorizador: data[i]?.["Nombre autorizador"],
+        }));
+      } else if (selectedOpt === "tipoContrato") {
+        setNewComision((old) => ({
+          ...old,
+          "Id contrato": data[i]?.["Id contrato"],
+          "Tipo contrato": data[i]?.["Nombre contrato"],
+        }));
+      } else if (selectedOpt === "Tipo de transaccion") {
+        setNewComision((old) => ({
+          ...old,
+          "Id tipo operacion": data[i]?.["Id tipo operacion"],
+          "Tipo de transaccion": data[i]?.["Nombre transaccion"],
+        }));
+      }
+      handleClose();
+    },
+    [data, selectedOpt, handleClose]
+  );
   return (
     <Fragment>
       {/* <SearchComissions comissionFace="pay" onSelectItem={onSelectItem} /> */}
@@ -205,47 +249,125 @@ const CreateComisionCobrada = () => {
         ""
       )}
       <Form onChange={onChangeNewComision} grid>
-        <Select
-          id="Autorizador"
-          name="Autorizador"
-          label="Autorizador"
-          options={autorizadores}
-          defaultValue={newComision?.["Autorizador"]}
-        />
+        {newComision?.["Convenio"] && (
+          <Input
+            id="Convenio"
+            name="Convenio"
+            label={"Convenio"}
+            type="text"
+            autoComplete="off"
+            defaultValue={newComision?.["Convenio"]}
+            value={newComision?.["Convenio"]}
+            disabled
+          />
+        )}
+        {newComision?.["Autorizador"] && (
+          <Input
+            id="Autorizador"
+            name="Autorizador"
+            label={"Autorizador"}
+            type="text"
+            autoComplete="off"
+            defaultValue={newComision?.["Autorizador"]}
+            value={newComision?.["Autorizador"]}
+            disabled
+          />
+        )}
+        {newComision?.["Tipo de transaccion"] && (
+          <Input
+            id="Tipo de transaccion"
+            name="Tipo de transaccion"
+            label={"Tipo de transaccion"}
+            type="text"
+            autoComplete="off"
+            defaultValue={newComision?.["Tipo de transaccion"]}
+            value={newComision?.["Tipo de transaccion"]}
+            disabled
+          />
+        )}
         <Select
           id="Enlazado"
           name="Enlazado"
           label="Enlazado con:"
-          options={{ "": "", Convenio: 1, "Tipo de transaccion": 2 }}
+          options={{ Ninguno: "", Convenio: 1, "Tipo de transaccion": 2 }}
           defaultValue={newComision?.["Enlazado"]}
           required
         />
+      </Form>
+      <ButtonBar>
         {newComision?.["Enlazado"] == 1 && (
-          <Select
-            id="Convenio"
-            name="Convenio"
-            label="Convenio"
-            options={convenios}
-            defaultValue={newComision?.["Convenio"]}
-            required
-          />
+          <Button
+            type="button"
+            onClick={() => {
+              setShowModal(true);
+              setQuery({ ["selectedOpt"]: "convenio" }, { replace: true });
+            }}
+          >
+            {newComision?.["Convenio"] ? "Editar convenio" : "Agregar convenio"}
+          </Button>
         )}
         {newComision?.["Enlazado"] == 2 && (
-          <Select
-            id="Tipo de transaccion"
-            name="Tipo de transaccion"
-            label="Tipo de transaccion"
-            options={{ "": "", Transacciones: 1, Monto: 2 }}
-            defaultValue={newComision?.["Tipo de transaccion"]}
-            required
-          />
+          <Button
+            type="button"
+            onClick={() => {
+              setShowModal(true);
+              setQuery(
+                { ["selectedOpt"]: "Tipo de transaccion" },
+                { replace: true }
+              );
+            }}
+          >
+            {newComision?.["Tipo de transaccion"]
+              ? "Editar tipo transacción"
+              : "Agregar tipo transacción"}
+          </Button>
         )}
-      </Form>
+
+        <Button
+          type="button"
+          onClick={() => {
+            setShowModal(true);
+            setQuery({ ["selectedOpt"]: "autorizador" }, { replace: true });
+          }}
+        >
+          {newComision?.["Autorizador"]
+            ? "Editar autorizador"
+            : "Agregar autorizador"}
+        </Button>
+      </ButtonBar>
       <FormComission outerState={[comissionData, setComissionData]}>
         <Button type="submit" onClick={createComission}>
           Crear comision
         </Button>
       </FormComission>
+      <Modal
+        show={showModal}
+        handleClose={handleClose}
+        className="flex align-middle"
+      >
+        {/* {selectedOpt === "convenio" && */}
+        <Fragment>
+          {selectedOpt === "convenio" ? (
+            <h1 className="text-3xl">Seleccionar convenio</h1>
+          ) : selectedOpt === "autorizador" ? (
+            <h1 className="text-3xl">Seleccionar autorizador</h1>
+          ) : selectedOpt === "tipoContrato" ? (
+            <h1 className="text-3xl">Seleccionar contrato</h1>
+          ) : selectedOpt === "Tipo de transaccion" ? (
+            <h1 className="text-3xl">Seleccionar tipo de transaccion</h1>
+          ) : (
+            ""
+          )}
+          <Pagination maxPage={maxPages} grid></Pagination>
+          {Array.isArray(data) && data.length > 0 && (
+            <Table
+              headers={Object.keys(data[0])}
+              data={data}
+              onSelectRow={onSelectConvenio}
+            />
+          )}
+        </Fragment>
+      </Modal>
     </Fragment>
   );
 };

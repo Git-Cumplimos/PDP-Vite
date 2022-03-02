@@ -37,35 +37,20 @@ const initComissionData = {
 const CreateComision = () => {
   const navigate = useNavigate();
 
-  const [
-    {
-      comercios_id_comercio,
-      convenios_id_convenio,
-      comercio,
-      page = 1,
-      selectedOpt,
-    },
-    setQuery,
-  ] = useQuery();
+  const [{ page = 1, selectedOpt }, setQuery] = useQuery();
 
   const [selectecConv, setSelectecConv] = useState(null);
   const [comissionData, setComissionData] = useState(initComissionData);
   const [newComision, setNewComision] = useState([]);
-  const [tiposContratosComisiones, setTiposContratosComisiones] = useState([]);
   const [data, setdata] = useState([]);
-  const [autorizadores, setAutorizadores] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
     setShowModal(false);
     setQuery({ ["page"]: 1 }, { replace: true });
+    setQuery({ ["selectedOpt"]: "" }, { replace: true });
   }, []);
-
-  const onSelectItem = useCallback(
-    (selected) => setSelectecConv(selected.Convenio),
-    []
-  );
 
   const createComission = useCallback(
     (ev) => {
@@ -83,10 +68,6 @@ const CreateComision = () => {
         );
         return;
       }
-      if (!newComision["Tipo contrato"]) {
-        notifyError("Se debe agregar el tipo de contrato");
-        return;
-      }
       if (!newComision["Autorizador"]) {
         notifyError("Se debe agregar el autorizador");
         return;
@@ -95,6 +76,20 @@ const CreateComision = () => {
       if (errRang) {
         notifyError("Se debe agregar al menos una comision");
         return;
+      }
+      if (newComision["Fecha fin"] !== "") {
+        if (newComision["Fecha inicio"] !== "") {
+          if (
+            new Date(newComision["Fecha fin"]) <=
+            new Date(newComision["Fecha inicio"])
+          ) {
+            notifyError("La fecha final debe ser mayor a la inicial");
+            return;
+          }
+        } else {
+          notifyError("Debe existir una fecha inicial");
+          return;
+        }
       }
 
       comissionData?.ranges.reduce((prev, curr, indexR) => {
@@ -122,9 +117,6 @@ const CreateComision = () => {
       }
       if (newComision["Tipo de transaccion"]) {
         obj["id_tipo_op"] = parseInt(newComision["Id tipo operacion"]);
-      }
-      if (newComision["Tipo contrato"]) {
-        obj["id_tipo_contrato"] = parseInt(newComision["Id contrato"]);
       }
       if (newComision["Fecha inicio"] !== "") {
         obj["fecha_inicio"] = newComision["Fecha inicio"];
@@ -184,27 +176,12 @@ const CreateComision = () => {
       fetchConveniosFunc();
     } else if (selectedOpt === "autorizador") {
       fetchAutorizadoresFunc();
-    } else if (selectedOpt === "tipoContrato") {
-      fetchTiposContratosComisionesFunc();
     } else if (selectedOpt === "Tipo de transaccion") {
       fetchTiposTransaccionFunc();
+    } else {
+      setdata([]);
     }
   }, [selectedOpt, page]);
-  const fetchTiposContratosComisionesFunc = () => {
-    fetchTiposContratosComisiones({ page })
-      .then((res) => {
-        setdata(
-          [...res?.results].map(({ id_tipo_contrato, nombre_contrato }) => {
-            return {
-              "Id contrato": id_tipo_contrato,
-              "Nombre contrato": nombre_contrato,
-            };
-          })
-        );
-        setMaxPages(res?.maxPages);
-      })
-      .catch((err) => console.error(err));
-  };
   const fetchConveniosFunc = () => {
     fetchConveniosMany("")
       .then((res) => {
@@ -265,12 +242,6 @@ const CreateComision = () => {
           "Id autorizador": data[i]?.["Id autorizador"],
           Autorizador: data[i]?.["Nombre autorizador"],
         }));
-      } else if (selectedOpt === "tipoContrato") {
-        setNewComision((old) => ({
-          ...old,
-          "Id contrato": data[i]?.["Id contrato"],
-          "Tipo contrato": data[i]?.["Nombre contrato"],
-        }));
       } else if (selectedOpt === "Tipo de transaccion") {
         setNewComision((old) => ({
           ...old,
@@ -280,7 +251,7 @@ const CreateComision = () => {
       }
       handleClose();
     },
-    [data, newComision, data, selectedOpt, handleClose]
+    [data, selectedOpt, handleClose]
   );
   return (
     <Fragment>
@@ -305,7 +276,8 @@ const CreateComision = () => {
             label={"Convenio"}
             type="text"
             autoComplete="off"
-            defaultValue={newComision?.["Convenio"]}
+            // defaultValue={newComision?.["Convenio"]}
+            value={newComision?.["Convenio"]}
             disabled
           />
         )}
@@ -316,7 +288,8 @@ const CreateComision = () => {
             label={"Autorizador"}
             type="text"
             autoComplete="off"
-            defaultValue={newComision?.["Autorizador"]}
+            // defaultValue={newComision?.["Autorizador"]}
+            value={newComision?.["Autorizador"]}
             disabled
           />
         )}
@@ -327,18 +300,8 @@ const CreateComision = () => {
             label={"Tipo de transaccion"}
             type="text"
             autoComplete="off"
-            defaultValue={newComision?.["Tipo de transaccion"]}
-            disabled
-          />
-        )}
-        {newComision?.["Tipo contrato"] && (
-          <Input
-            id="Tipo contrato"
-            name="Tipo contrato"
-            label={"Tipo contrato"}
-            type="text"
-            autoComplete="off"
-            defaultValue={newComision?.["Tipo contrato"]}
+            // defaultValue={newComision?.["Tipo de transaccion"]}
+            value={newComision?.["Tipo de transaccion"]}
             disabled
           />
         )}
@@ -375,7 +338,7 @@ const CreateComision = () => {
             setQuery({ ["selectedOpt"]: "convenio" }, { replace: true });
           }}
         >
-          {newComision?.["Convenio"] ? "Edicar convenio" : "Agregar convenio"}
+          {newComision?.["Convenio"] ? "Editar convenio" : "Agregar convenio"}
         </Button>
         <Button
           type="button"
@@ -387,17 +350,6 @@ const CreateComision = () => {
           {newComision?.["Autorizador"]
             ? "Editar autorizador"
             : "Agregar autorizador"}
-        </Button>
-        <Button
-          type="button"
-          onClick={() => {
-            setShowModal(true);
-            setQuery({ ["selectedOpt"]: "tipoContrato" }, { replace: true });
-          }}
-        >
-          {newComision?.["Tipo contrato"]
-            ? "Editar contrato"
-            : "Agregar contrato"}
         </Button>
         <Button
           type="button"
@@ -430,8 +382,6 @@ const CreateComision = () => {
             <h1 className="text-3xl">Seleccionar convenio</h1>
           ) : selectedOpt === "autorizador" ? (
             <h1 className="text-3xl">Seleccionar autorizador</h1>
-          ) : selectedOpt === "tipoContrato" ? (
-            <h1 className="text-3xl">Seleccionar contrato</h1>
           ) : selectedOpt === "Tipo de transaccion" ? (
             <h1 className="text-3xl">Seleccionar tipo de transaccion</h1>
           ) : (
