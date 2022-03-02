@@ -1,19 +1,17 @@
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Button from "../../../components/Base/Button/Button";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Button from "../../../components/Base/Button";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import Modal from "../../../components/Base/Modal/Modal";
+import Modal from "../../../components/Base/Modal";
 import useQuery from "../../../hooks/useQuery";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { postCashOut } from "../utils/fetchRevalDaviplata";
 import { notify, notifyError } from "../../../utils/notify";
-import Tickets from "../../../components/Base/Tickets/Tickets";
-import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
-import MoneyInput, {
-  formatMoney,
-} from "../../../components/Base/MoneyInput/MoneyInput";
+import Tickets from "../../../components/Base/Tickets";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import { useFetch } from "../../../hooks/useFetch";
 import { useAuth } from "../../../hooks/AuthHooks";
 
@@ -100,7 +98,7 @@ const Retiro = () => {
         );
       }
     },
-    [setQuery, valor, userDoc,limitesMontos]
+    [setQuery, valor, userDoc, limitesMontos]
   );
 
   const onChange = useCallback(

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import Input from "../Input/Input";
+import Input from "../Input";
 
 const moneyValidator = (value) => {
   const floatMoney = value.replace(/[($\s).,\s]+/g, "");

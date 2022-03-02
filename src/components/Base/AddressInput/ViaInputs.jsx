@@ -1,5 +1,5 @@
-import Input from "../Input/Input";
-import Select from "../Select/Select";
+import Input from "../Input";
+import Select from "../Select";
 
 const capitalize = (word) => {
   return word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);

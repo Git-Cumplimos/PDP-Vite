@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Modal from "../../../components/Base/Modal/Modal";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Modal from "../../../components/Base/Modal";
 
 import Sellfundamujer from "../components/sellFundamujer/SellFundamujer";
 import SearchForm from "../components/SearchForm/SearchForm";
@@ -17,8 +17,6 @@ const Desembolsos = () => {
     cancelarpin,
     desembolsospin,
   } = Usemujer();
-
-
 
   const [documento, setDocumento] = useState("");
   const [pin, setPin] = useState("");
@@ -48,7 +46,7 @@ const Desembolsos = () => {
         if ("msg" in res) {
           notify("datos confirmados");
         }
-        setRespuestamujer(res)
+        setRespuestamujer(res);
         setShowModal(true);
       })
       .catch(() => setDisabledBtns(false));

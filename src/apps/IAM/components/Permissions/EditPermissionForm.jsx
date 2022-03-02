@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
-import Table from "../../../../components/Base/Table/Table";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import MultipleSelect from "../../../../components/Base/MultipleSelect";
+import Table from "../../../../components/Base/Table";
 import fetchData from "../../../../utils/fetchData";
-import Pagination from "../../../../components/Compound/Pagination/Pagination";
+import Pagination from "../../../../components/Compound/Pagination";
 import useQuery from "../../../../hooks/useQuery";
 import { notify, notifyError } from "../../../../utils/notify";
 
@@ -58,11 +58,8 @@ const searchTypesByPermission = async (id_permission) => {
             }
           );
           if (typeOp?.status) {
-            for (const {
-              id_tipo_operacion,
-              Nombre,
-              Aliado_corto,
-            } of typeOp?.obj?.results) {
+            for (const { id_tipo_operacion, Nombre, Aliado_corto } of typeOp
+              ?.obj?.results) {
               temp_res[
                 `${id_tipo_operacion}) ${Nombre} (${Aliado_corto})`
               ] = true;

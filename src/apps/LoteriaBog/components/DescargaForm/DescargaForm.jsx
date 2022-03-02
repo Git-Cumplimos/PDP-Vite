@@ -1,9 +1,9 @@
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../../components/Base/Form/Form";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Form from "../../../../components/Base/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { useState } from "react";
-import Table from "../../../../components/Base/Table/Table";
+import Table from "../../../../components/Base/Table";
 
 const DescargaForm = ({ closeModal, selected }) => {
   const { descargaVentas_S3 } = useLoteria();

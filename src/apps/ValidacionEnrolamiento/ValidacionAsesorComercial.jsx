@@ -1,5 +1,5 @@
 import React from "react";
-import Table from "../../components/Base/Table/Table";
+import Table from "../../components/Base/Table";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";

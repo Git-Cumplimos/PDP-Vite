@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 import fetchData from "../../../../utils/fetchData";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../../components/Base/Form/Form";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Form from "../../../../components/Base/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { useState, useEffect } from "react";
-import Input from "../../../../components/Base/Input/Input";
+import Input from "../../../../components/Base/Input";
 import { notify, notifyError } from "../../../../utils/notify";
 import { ExportToCsv } from "export-to-csv";
 
@@ -41,8 +41,6 @@ function createCard(
   };
 }
 const url_reportVentas = `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`;
-
-
 
 const ReportVentasForm = ({ closeModal, oficina }) => {
   const [fecha_ini, setFecha_ini] = useState("");

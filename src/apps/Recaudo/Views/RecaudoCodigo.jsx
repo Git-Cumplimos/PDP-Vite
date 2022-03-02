@@ -1,8 +1,8 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../components/Base/Form/Form";
-import TextArea from "../../../components/Base/TextArea/TextArea";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Form from "../../../components/Base/Form";
+import TextArea from "../../../components/Base/TextArea";
 import useQuery from "../../../hooks/useQuery";
 import fetchData from "../../../utils/fetchData";
 import { notifyError } from "../../../utils/notify";
@@ -127,7 +127,9 @@ const RecaudoCodigo = () => {
         </ButtonBar>
       </Form>
       {dataConvenio && "nombre_convenio" in dataConvenio ? (
-        <h1 className="text-3xl mt-6">Recaudo {dataConvenio?.nombre_convenio}</h1>
+        <h1 className="text-3xl mt-6">
+          Recaudo {dataConvenio?.nombre_convenio}
+        </h1>
       ) : (
         ""
       )}

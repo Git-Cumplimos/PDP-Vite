@@ -1,19 +1,17 @@
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Button from "../../../components/Base/Button/Button";
-import Modal from "../../../components/Base/Modal/Modal";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Button from "../../../components/Base/Button";
+import Modal from "../../../components/Base/Modal";
 import useQuery from "../../../hooks/useQuery";
 import { Fragment, useState, useCallback, useRef, useEffect } from "react";
-import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
-import Tickets from "../../../components/Base/Tickets/Tickets";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
+import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import { postCashIn } from "../utils/fetchRevalDaviplata";
 import { notify, notifyError } from "../../../utils/notify";
-import MoneyInput, {
-  formatMoney,
-} from "../../../components/Base/MoneyInput/MoneyInput";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import { useFetch } from "../../../hooks/useFetch";
 import { useAuth } from "../../../hooks/AuthHooks";
 

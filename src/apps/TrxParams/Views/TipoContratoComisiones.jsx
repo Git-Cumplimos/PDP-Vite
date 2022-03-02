@@ -1,15 +1,15 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Fieldset from "../../../components/Base/Fieldset/Fieldset";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Modal from "../../../components/Base/Modal/Modal";
-import Table from "../../../components/Base/Table/Table";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Fieldset from "../../../components/Base/Fieldset";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Modal from "../../../components/Base/Modal";
+import Table from "../../../components/Base/Table";
+import Pagination from "../../../components/Compound/Pagination";
 import useQuery from "../../../hooks/useQuery";
-import MultipleSelect from "../../../components/Base/MultipleSelect/MultipleSelect";
+import MultipleSelect from "../../../components/Base/MultipleSelect";
 import { notify, notifyError } from "../../../utils/notify";
 import {
   fetchTiposContratosComisiones,
@@ -217,7 +217,7 @@ const TipoContratoComisiones = () => {
   return (
     <Fragment>
       <ButtonBar>
-        <Button type='submit' onClick={() => setShowModal(true)}>
+        <Button type="submit" onClick={() => setShowModal(true)}>
           Crear contrato de comision
         </Button>
         {/* <Button type="submit" onClick={() => setShowModal(true)}>
@@ -226,11 +226,11 @@ const TipoContratoComisiones = () => {
       </ButtonBar>
       <Pagination maxPage={maxPages} onChange={onChange} grid>
         <Input
-          id='nombre_contrato'
-          name='nombre_contrato'
+          id="nombre_contrato"
+          name="nombre_contrato"
           label={"Buscar contrato comisión"}
-          type='text'
-          autoComplete='off'
+          type="text"
+          autoComplete="off"
           defaultValue={nombre_contrato}
         />
       </Pagination>
@@ -246,51 +246,51 @@ const TipoContratoComisiones = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={onChangeTipoContrato} grid>
           <Input
-            id='Nombre contrato'
-            name='Nombre contrato'
+            id="Nombre contrato"
+            name="Nombre contrato"
             label={"Nombre de contrato"}
-            type='text'
-            autoComplete='off'
+            type="text"
+            autoComplete="off"
             defaultValue={selectedTipoContrato?.["Nombre contrato"]}
             required
           />
           <MultipleSelect
-            label='Opciones de comisiones'
+            label="Opciones de comisiones"
             options={varComisiones}
             onChange={(e) => onChangeMultipleCheck(e)}
           />
           {varComisionesTemp?.["IVA"] && (
             <Input
-              id='IVA'
-              name='IVA'
+              id="IVA"
+              name="IVA"
               label={"IVA"}
-              type='number'
-              autoComplete='off'
-              step='any'
+              type="number"
+              autoComplete="off"
+              step="any"
               defaultValue={selectedTipoContrato?.["IVA"]}
               required
             />
           )}
           {varComisionesTemp?.["Rete_Fuente"] && (
             <Input
-              id='Rete Fuente'
-              name='Rete Fuente'
+              id="Rete Fuente"
+              name="Rete Fuente"
               label={"Rete Fuente"}
-              type='number'
-              step='any'
-              autoComplete='off'
+              type="number"
+              step="any"
+              autoComplete="off"
               defaultValue={selectedTipoContrato?.["Rete Fuente"]}
               required
             />
           )}
           {varComisionesTemp?.["Rete_ICA"] && (
             <Input
-              id='Rete ICA'
-              name='Rete ICA'
+              id="Rete ICA"
+              name="Rete ICA"
               label={"Rete ICA"}
-              type='number'
-              step='any'
-              autoComplete='off'
+              type="number"
+              step="any"
+              autoComplete="off"
               defaultValue={selectedTipoContrato?.["Rete ICA"]}
               required
             />
@@ -298,16 +298,16 @@ const TipoContratoComisiones = () => {
           {!selectedTipoContrato?.["Id contrato"] ||
           selectedTipoContrato?.["Id contrato"] === -1 ? (
             <ButtonBar>
-              <Button type='submit'>Crear contrato</Button>
-              <Button type='button' onClick={handleClose}>
+              <Button type="submit">Crear contrato</Button>
+              <Button type="button" onClick={handleClose}>
                 Cancelar
               </Button>
             </ButtonBar>
           ) : (
             <Fragment>
               <ButtonBar>
-                <Button type='submit'>Editar contrato</Button>
-                <Button type='button' onClick={handleClose}>
+                <Button type="submit">Editar contrato</Button>
+                <Button type="button" onClick={handleClose}>
                   Cancelar
                 </Button>
               </ButtonBar>

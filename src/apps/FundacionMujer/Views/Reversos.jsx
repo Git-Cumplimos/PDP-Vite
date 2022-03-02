@@ -1,19 +1,19 @@
 import { useCallback, useState, useRef, useEffect, useMemo } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Modal from "../../../components/Base/Modal/Modal";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Modal from "../../../components/Base/Modal";
 import fetchData from "../../../../src/utils/fetchData";
 import { useMujer } from "../utils/mujerHooks";
 import { toast } from "react-toastify";
 import { notifyError } from "../../../utils/notify";
 import { useReactToPrint } from "react-to-print";
-import Tickets from "../../../components/Base/Tickets/Tickets";
-import Table from "../../../components/Base/Table/Table";
+import Tickets from "../../../components/Base/Tickets";
+import Table from "../../../components/Base/Table";
 import useForm from "../../../hooks/useForm";
 import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
-import TextArea from "../../../components/Base/TextArea/TextArea";
+import TextArea from "../../../components/Base/TextArea";
 import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
 import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 
@@ -31,19 +31,20 @@ const Reversos = () => {
     ingresoreversorecibo,
   } = useMujer();
 
-  const { roleInfo, pdpUser} = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const formatMoney = new Intl.NumberFormat("es-CO", {
     style: "currency",
     currency: "COP",
     maximumFractionDigits: 0,
   });
 
-  const fecha = new Date()
+  const fecha = new Date();
   /* Fechas para consulta de transacciones del día */
-  const fecha_ini = Intl.DateTimeFormat("az").format(fecha)
-  const fecha_fin = Intl.DateTimeFormat("az").format(fecha.setDate(fecha.getDate() + 1))
- /*_________________________________________________________ */
-
+  const fecha_ini = Intl.DateTimeFormat("az").format(fecha);
+  const fecha_fin = Intl.DateTimeFormat("az").format(
+    fecha.setDate(fecha.getDate() + 1)
+  );
+  /*_________________________________________________________ */
 
   const [selected, setSelected] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -55,15 +56,13 @@ const Reversos = () => {
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [trxs, setTrxs] = useState([]);
-  const [motivo, setMotivo] = useState('');
-
+  const [motivo, setMotivo] = useState("");
 
   const [maxPageUsers, setMaxPageUsers] = useState(1);
   const [formData, setFormData] = useState(new FormData());
   const [usuariosDB, setUsuariosDB] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState("");
   const [municipio, setMunicipio] = useState("");
-
 
   const fetchDane = async (codigo_dane) => {
     try {
@@ -75,13 +74,12 @@ const Reversos = () => {
         },
         {},
         {},
-        false,
+        false
       );
-      setMunicipio(resp_ciudad[0].municipio)
+      setMunicipio(resp_ciudad[0].municipio);
     } catch (err) {}
   };
 
-  
   const searchUsers = useCallback((email, uname, _page) => {
     const queries = {};
     if (email && email !== "") {
@@ -97,7 +95,7 @@ const Reversos = () => {
       fetchData(`${url}/users`, "GET", queries)
         .then((res) => {
           if (res?.status) {
-            console.log(res)
+            console.log(res);
             setUsuariosDB(res?.obj?.results);
             setMaxPageUsers(res?.obj?.maxpages);
           }
@@ -106,12 +104,12 @@ const Reversos = () => {
     } else {
       setUsuariosDB([]);
     }
-  }, []);  
+  }, []);
 
   const onChange = useCallback(
     (_formData) => {
-      setTrxs([])
-      setComercio(null)
+      setTrxs([]);
+      setComercio(null);
       setFormData(_formData);
       searchUsers(
         _formData?.get("emailSearch"),
@@ -124,29 +122,19 @@ const Reversos = () => {
 
   /*Consulta datos del comercio*/
   const ConsultaComercio = useCallback(async (email) => {
-    const query={"correo":email}
-    try {     
-      const res = await fetchData(url_datosComercio, "GET",query);
-      console.log(res)
-      if ('id_comercio' in res){
-      setComercio(res)
-      reversosFDLM(
-        page,
-        res?.id_comercio,
-        5,
-        fecha_ini,
-        fecha_fin,
-        true
-      );
-      fetchDane(res?.codigo_dane)
-      
-    
+    const query = { correo: email };
+    try {
+      const res = await fetchData(url_datosComercio, "GET", query);
+      console.log(res);
+      if ("id_comercio" in res) {
+        setComercio(res);
+        reversosFDLM(page, res?.id_comercio, 5, fecha_ini, fecha_fin, true);
+        fetchDane(res?.codigo_dane);
       }
     } catch (err) {
       console.error(err);
     }
   }, []);
-
 
   const [data, handleChange] = useForm({
     credit: "",
@@ -172,11 +160,10 @@ const Reversos = () => {
 `;
   const { infoTicket } = useAuth();
 
-
   // Envio del ticket para guardarolo en transacciones
   useEffect(() => {
     infoTicket(selected?.id_transaccion, 6, tickets);
-  }, [infoTicket, selected,ticket]);
+  }, [infoTicket, selected, ticket]);
 
   // //  Consulta transacciones de recaudo del dia
   // useEffect(() => {
@@ -223,13 +210,15 @@ const Reversos = () => {
       if (state !== undefined || state !== null) {
         queries.response_status = state;
       }
-      console.log(queries)
+      console.log(queries);
       fetchData(url, "GET", queries)
         .then((res) => {
-          console.log(res)
+          console.log(res);
           if (res?.status) {
-            if (res?.obj?.trxs.length<1){
-              notifyError('No se encontraron transacciones en el rango de fechas')
+            if (res?.obj?.trxs.length < 1) {
+              notifyError(
+                "No se encontraron transacciones en el rango de fechas"
+              );
             }
             setMaxPages(res?.obj?.maxpages);
             setTrxs(res?.obj?.trxs);
@@ -241,8 +230,7 @@ const Reversos = () => {
     },
     []
   );
-  
-  
+
   const tickets = useMemo(() => {
     return {
       title: "Recibo de pago(Reverso recaudo)",
@@ -269,14 +257,15 @@ const Reversos = () => {
       }),
       commerceName: "FUNDACIÓN DE LA MUJER",
       trxInfo: [
-        ['CRÉDITO', selected?.Response_obj?.info?.credito],
-        ['VALOR', formatMoney.format(value)],
-        ['Cliente', selected?.Response_obj?.info?.cliente],
-        ["",""],
-        ['Cédula', selected?.Response_obj?.info?.cedula],
-        ["",""]  
+        ["CRÉDITO", selected?.Response_obj?.info?.credito],
+        ["VALOR", formatMoney.format(value)],
+        ["Cliente", selected?.Response_obj?.info?.cliente],
+        ["", ""],
+        ["Cédula", selected?.Response_obj?.info?.cedula],
+        ["", ""],
       ],
-      disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+      disclamer:
+        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [
     comercio?.ciudad,
@@ -284,30 +273,28 @@ const Reversos = () => {
     comercio?.id_comercio,
     comercio?.id_dispositivo,
     selected,
-    value
+    value,
   ]);
-
 
   const closeModal = useCallback(async (ticket) => {
     setShowModal(false);
     handleChange();
-    console.log(ticket)
+    console.log(ticket);
     // if (ticket===true){
-      
+
     //   deltetePermission(pdpUser?.uuid,9).then((res) => {
     //     if (res.status===false) {
     //       notifyError(res?.msg);
-    //       setTicket(false); 
-    //       window.location.replace('/funmujer');         
+    //       setTicket(false);
+    //       window.location.replace('/funmujer');
     //     } else {
     //       notify(res?.msg)
     //       setTicket(false);
-    //       window.location.replace('/funmujer');                          
+    //       window.location.replace('/funmujer');
     //     }
     //   });
-     
+
     // }
-    
   }, []);
 
   const onSubmit = (e) => {
@@ -315,13 +302,12 @@ const Reversos = () => {
     setShowModal(true);
   };
 
-
   /*Eliminar permiso de reversar*/
   // const deltetePermission = useCallback(async (id_user,id_group) => {
   //   const query={
   //     "Users_uuid":id_user,
   //     "Groups_id_group":id_group}
-  //   try {     
+  //   try {
   //     const res = await fetchData(url_permissions, "DELETE",query);
   //     console.log(res)
   //     return res;
@@ -338,7 +324,7 @@ const Reversos = () => {
       comercio: comercio?.id_comercio,
       idtrx: selected?.id_transaccion,
       val: value,
-      motivo:motivo,
+      motivo: motivo,
       ...data,
     };
     ingresoreversorecibo(values)
@@ -348,8 +334,8 @@ const Reversos = () => {
         if (res?.status === false) {
           setTicket(false);
           console.log(res);
-          notifyError(res?.obj?.Mensaje)
-        
+          notifyError(res?.obj?.Mensaje);
+
           // if (res?.codigo === 420) {
           //   notifyError(
           //     "Reverso ya aplicado a el respectivo ID de transacción"
@@ -365,7 +351,7 @@ const Reversos = () => {
         console.log(err);
       });
   };
-  console.log(selectedUsers)
+  console.log(selectedUsers);
   return (
     <>
       <h1 className="text-3xl mt-6">Reversos</h1>
@@ -432,16 +418,18 @@ const Reversos = () => {
             timeOut: 500,
           }}
         /> */}
-        </Form>
-        <PaginationAuth
+      </Form>
+      <PaginationAuth
         filters={{
           emailSearch: { label: "Email" },
           unameSearch: { label: "Nombre" },
         }}
         maxPage={maxPageUsers}
         onChange={onChange}
-        />
-        {Array.isArray(usuariosDB) && usuariosDB.length > 0 && comercio===null ? (
+      />
+      {Array.isArray(usuariosDB) &&
+      usuariosDB.length > 0 &&
+      comercio === null ? (
         <Table
           headers={["Id", "Nombre completo", "E-mail"]}
           data={usuariosDB.map(({ uuid, uname, email }) => {
@@ -449,14 +437,12 @@ const Reversos = () => {
           })}
           onSelectRow={(e, i) => {
             ConsultaComercio(usuariosDB[i].email);
-            
           }}
         />
       ) : (
         ""
       )}
-      
-      
+
       <Modal show={showModal} handleClose={() => closeModal(ticket)}>
         {ticket !== false ? (
           <div className="flex flex-col justify-center items-center">
@@ -530,16 +516,16 @@ const Reversos = () => {
                   onInput={handleChange}
                 ></Input>
                 <TextArea
-                id="motivo"
-                label="Motivo"
-                type="text"
-                autoComplete="off"
-                value={motivo}
-                required
-                onInput={(e) => {
-                    setMotivo(e.target.value)          
-                }}                 
-                /> 
+                  id="motivo"
+                  label="Motivo"
+                  type="text"
+                  autoComplete="off"
+                  value={motivo}
+                  required
+                  onInput={(e) => {
+                    setMotivo(e.target.value);
+                  }}
+                />
                 <ButtonBar>
                   <Button type="submit">Aceptar</Button>
                 </ButtonBar>
@@ -550,10 +536,10 @@ const Reversos = () => {
       </Modal>
       {Array.isArray(trxs) && trxs.length > 0 ? (
         <>
-          
-          <h1 className="text-2xl mt-6">Transacciones de {comercio['nombre comercio']}</h1>
-       
-          
+          <h1 className="text-2xl mt-6">
+            Transacciones de {comercio["nombre comercio"]}
+          </h1>
+
           <div className="flex flex-row justify-evenly w-full my-4">
             <h1>Pagina: {page}</h1>
             <h1>Ultima pagina: {maxPages}</h1>

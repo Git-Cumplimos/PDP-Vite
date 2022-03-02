@@ -1,15 +1,13 @@
 import classes from "./LoginLayout.module.css";
-import SocialBar from "../../components/Compound/SocialBar/SocialBar";
-import LogoPDP from "../../components/Base/LogoPDP/LogoPDP";
-import RightArrow from "../../components/Base/RightArrow/RightArrow";
+import SocialBar from "../../components/Compound/SocialBar";
+import LogoPDP from "../../components/Base/LogoPDP";
+import RightArrow from "../../components/Base/RightArrow";
 import { useImgs } from "../../hooks/ImgsHooks";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useWindowSize } from "../../hooks/WindowSizeHooks";
-import { useNavigate } from "react-router-dom";
-import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
-import { lazy } from "react";
-
-const Botton = lazy(() => import("../../components/Base/Button/Button"));
+import PublicNav from "../../components/Compound/PublicNav";
+import { Outlet } from "react-router-dom";
+import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
 
 const LoginLayout = ({ children }) => {
   const { loginLayout, wave, headerPDP, usrData } = classes;
@@ -20,7 +18,6 @@ const LoginLayout = ({ children }) => {
   } = useImgs();
 
   const [clientWidth] = useWindowSize();
-  let navigate = useNavigate();
 
   useEffect(() => {
     if (clientWidth > 768) {
@@ -34,15 +31,13 @@ const LoginLayout = ({ children }) => {
     }
   }, [backIcon, personas, backIconSecondary, clientWidth]);
 
-  const incribirComercio = async (event) => {
-    event.preventDefault();
-    navigate("/Solicitud-enrolamiento");
-  };
-
   return (
     <div className={loginLayout}>
-      <div className={wave}>
+      <div className={`${wave} top-4`}>
         <SocialBar />
+      </div>
+      <div className={`${wave} top-52`}>
+        <PublicNav />
       </div>
       <header className={headerPDP}>
         <div className={usrData}>
@@ -52,12 +47,9 @@ const LoginLayout = ({ children }) => {
         <h1 className="text-3xl mb-6">¡Bienvenido!</h1>
       </header>
       <main className="container">
-        {children}{" "}
-        <ButtonBar type="">
-          <Botton type={"submit"} onClick={(e) => incribirComercio(e)}>
-            Inscribirse
-          </Botton>
-        </ButtonBar>
+        <Suspense fallback={<ContentBox />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );

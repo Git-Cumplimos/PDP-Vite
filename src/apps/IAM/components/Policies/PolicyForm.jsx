@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../../components/Base/Form/Form";
-import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
-import Table from "../../../../components/Base/Table/Table";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Form from "../../../../components/Base/Form";
+import MultipleSelect from "../../../../components/Base/MultipleSelect";
+import Table from "../../../../components/Base/Table";
 import PaginationAuth from "../../../../components/Compound/PaginationAuth/PaginationAuth";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";

@@ -1,4 +1,4 @@
-import HNavbar from "../../components/Base/HNavbar/HNavbar";
+import HNavbar from "../../components/Base/HNavbar";
 
 const FunMujer = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;

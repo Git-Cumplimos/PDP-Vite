@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Button from "../../components/Base/Button/Button";
-import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
-import Modal from "../../components/Base/Modal/Modal";
-import Form from "../../components/Base/Form/Form";
+import Button from "../../components/Base/Button";
+import ButtonBar from "../../components/Base/ButtonBar";
+import Modal from "../../components/Base/Modal";
+import Form from "../../components/Base/Form";
 import PayForm from "./PaymentForm/PayForm";
 import { useMarketPlace } from "./utils/MarketPlaceHooks";
-import Input from "../../components/Base/Input/Input";
+import Input from "../../components/Base/Input";
 import MoneyInput from "../../components/Base/MoneyInput/MoneyInput";
 import Products from "./Products";
 import { notifyError } from "../../utils/notify";

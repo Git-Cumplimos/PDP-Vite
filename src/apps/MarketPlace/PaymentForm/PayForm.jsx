@@ -1,11 +1,11 @@
 import { useState, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../components/Base/Form/Form";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Form from "../../../components/Base/Form";
 import { useReactToPrint } from "react-to-print";
-import Tickets from "../../../components/Base/Tickets/Tickets";
-import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
+import Tickets from "../../../components/Base/Tickets";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useMarketPlace } from "../utils/MarketPlaceHooks";
 import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
 import Products from "../Products";

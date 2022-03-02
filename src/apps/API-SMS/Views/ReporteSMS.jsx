@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Modal from "../../../components/Base/Modal/Modal";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Select from "../../../components/Base/Select/Select";
-import Table from "../../../components/Base/Table/Table";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Modal from "../../../components/Base/Modal";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Select from "../../../components/Base/Select";
+import Table from "../../../components/Base/Table";
 import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 import { ExportToCsv } from "export-to-csv";

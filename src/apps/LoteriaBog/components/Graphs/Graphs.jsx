@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import Chart from "../../../../components/Base/Chart/Chart";
-import Input from "../../../../components/Base/Input/Input";
-import Table from "../../../../components/Base/Table/Table";
+import Input from "../../../../components/Base/Input";
+import Table from "../../../../components/Base/Table";
 
-const Graphs = ({ moda = { billete: [] , serie: []} }) => {
+const Graphs = ({ moda = { billete: [], serie: [] } }) => {
   const [graphs, setGraphs] = useState(false);
 
   const [graphBilletes, setGraphBilletes] = useState([]);

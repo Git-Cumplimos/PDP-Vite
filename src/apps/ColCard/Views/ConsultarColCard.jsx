@@ -1,10 +1,10 @@
 import { useCallback, useState, useEffect } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Modal from "../../../components/Base/Modal/Modal";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Modal from "../../../components/Base/Modal";
 import fetchData from "../../../utils/fetchData";
-import Input from "../../../components/Base/Input/Input";
-import Form from "../../../components/Base/Form/Form";
+import Input from "../../../components/Base/Input";
+import Form from "../../../components/Base/Form";
 import { useAuth } from "../../../hooks/AuthHooks";
 
 const url = process.env.REACT_APP_URL_COLCARD;

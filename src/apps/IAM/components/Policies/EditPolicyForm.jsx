@@ -1,6 +1,6 @@
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../../components/Base/Form/Form";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Form from "../../../../components/Base/Form";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 

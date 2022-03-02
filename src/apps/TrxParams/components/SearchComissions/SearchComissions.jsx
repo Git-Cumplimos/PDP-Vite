@@ -3,19 +3,19 @@ import { useNavigate } from "react-router-dom";
 
 import useQuery from "../../../../hooks/useQuery";
 
-import Table from "../../../../components/Base/Table/Table";
-import Input from "../../../../components/Base/Input/Input";
-import Pagination from "../../../../components/Compound/Pagination/Pagination";
+import Table from "../../../../components/Base/Table";
+import Input from "../../../../components/Base/Input";
+import Pagination from "../../../../components/Compound/Pagination";
 import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
 import {
   fetchConveniosMany,
   fetchConvsPerAuto,
 } from "../../utils/fetchRevalConvenios";
 import { fetchComisionesPagar } from "../../utils/fetchComisionesPagar";
-import Modal from "../../../../components/Base/Modal/Modal";
-import Form from "../../../../components/Base/Form/Form";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Button from "../../../../components/Base/Button/Button";
+import Modal from "../../../../components/Base/Modal";
+import Form from "../../../../components/Base/Form";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
 import { notifyError } from "../../../../utils/notify";
 import { fetchComisionesCobrar } from "../../utils/fetchComisionesCobrar";
 
@@ -203,7 +203,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           label={"Convenio"}
           name={"convenio"}
           type={"text"}
-          autoComplete='off'
+          autoComplete="off"
           defaultValue={convenio}
         />
         <Input
@@ -211,7 +211,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           label={"Tipo de operación"}
           name={"tipoTrx"}
           type={"text"}
-          autoComplete='off'
+          autoComplete="off"
           defaultValue={tipoTrx}
         />
         {comissionFace === "pay" ? (
@@ -220,9 +220,9 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               id={"comercioComissions"}
               label={"Id comercio"}
               name={"comercio"}
-              type='number'
+              type="number"
               step={"1"}
-              autoComplete='off'
+              autoComplete="off"
               defaultValue={comercio}
             />
             <Input
@@ -230,7 +230,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Autorizador"}
               name={"autorizador"}
               type={"text"}
-              autoComplete='off'
+              autoComplete="off"
               defaultValue={autorizador}
             />
           </Fragment>
@@ -240,7 +240,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
             label={"Autorizador"}
             name={"autorizador"}
             type={"text"}
-            autoComplete='off'
+            autoComplete="off"
             defaultValue={autorizador}
           />
         ) : (

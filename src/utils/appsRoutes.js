@@ -11,7 +11,7 @@ import ConfiguracionComercios from "../apps/TrxParams/Views/ConfiguracionComerci
 /**
  * * Logos
  */
-const AppIcons = lazy(() => import("../components/Base/AppIcons/AppIcons"));
+const AppIcons = lazy(() => import("../components/Base/AppIcons"));
 
 /**
  * * Paginas
@@ -20,10 +20,11 @@ const AppIcons = lazy(() => import("../components/Base/AppIcons/AppIcons"));
 /**
  * Base
  */
+const PublicHome = lazy(() => import("../pages/PublicHome"));
 const Login = lazy(() => import("../pages/Login"));
 const Home = lazy(() => import("../pages/Home"));
 const Transacciones = lazy(() => import("../pages/Transacciones"));
-const AuthButton = lazy(() => import("../components/Compound/Signout/Signout"));
+const AuthButton = lazy(() => import("../components/Compound/Signout"));
 const Error404 = lazy(() => import("../pages/Error404"));
 const Reportes = lazy(() => import("../pages/Reportes"));
 
@@ -108,7 +109,7 @@ const Autorizadores = lazy(() =>
 );
 
 /**
- * Solicitud Enrolamiento
+ * Solicitud Enrolamiento : publico
  */
 const SolicitudEnrolamiento = lazy(() =>
   import("../apps/SolicitudEnrolamiento/SolicitudEnrolamiento")
@@ -128,6 +129,10 @@ const ReconoserID = lazy(() =>
 const ContinuarReconoserID = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ContinuarReconoserID")
 );
+
+/**
+ * Solicitud Enrolamiento : privado
+ */
 const ValidacionAsesorComercial = lazy(() =>
   import("../apps/ValidacionEnrolamiento/ValidacionAsesorComercial")
 );
@@ -211,68 +216,50 @@ const CARGAR =
 const DESCARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU";
 
+const loginUrls = [{ link: "/login", label: "Login", component: Login }];
+
 const publicUrls = [
-  { link: "/login", label: "Login", component: Login },
   { link: "*", exact: false, component: Error404 },
+  { link: "", label: "Inicio", component: PublicHome },
   {
-    link: "/solicitud-enrolamiento",
+    link: "/public/solicitud-enrolamiento",
     label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
     component: SolicitudEnrolamiento,
     permission: [1],
     subRoutes: [
       {
-        link: "/solicitud-enrolamiento/formulario",
+        link: "/public/solicitud-enrolamiento/formulario",
         label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
         component: FormularioEnrolamiento,
       },
       {
-        link: "/Solicitud-enrolamiento/consultar",
+        link: "/public/solicitud-enrolamiento/consultar",
         label: (
           <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
         ),
         component: ConsultaEnrolamiento,
+        subRoutes: [
+          {
+            link: "/public/solicitud-enrolamiento/reconoserid/:numCedula",
+            label: (
+              <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />
+            ),
+            component: ReconoserID,
+          },
+          {
+            link: "/public/solicitud-enrolamiento/continuarreconoserid/:idreconoser",
+            label: (
+              <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
+            ),
+            component: ContinuarReconoserID,
+          },
+          {
+            link: "/public/solicitud-enrolamiento/correccionformulario/:numCedula",
+            label: <AppIcons Logo={"PAGO"} name={"Corrección De Formulario"} />,
+            component: CorreccionFormulario,
+          },
+        ],
       },
-      {
-        link: "/Solicitud-enrolamiento/reconoserid/:numCedula",
-        label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
-        component: ReconoserID,
-      },
-
-      {
-        link: "/Solicitud-enrolamiento/continuarreconoserid/:idreconoser",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
-        ),
-        component: ContinuarReconoserID,
-      },
-      {
-        link: "/Solicitud-enrolamiento/correccionformulario/:numCedula",
-        label: <AppIcons Logo={"PAGO"} name={"Corrección De Formulario"} />,
-        component: CorreccionFormulario,
-      },
-
-      /*      {
-        link: "/Solicitud-enrolamiento/validarformulario",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Validar Formulario Inscripción"} />
-        ),
-        component: ValidacionAsesorComercial,
-      }, */
-
-      /* {
-        link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Verificar Formulario Inscripción"} />
-        ),
-        component: VerificacionFormulario,
-      }, */
-      /* {
-        link: "/Solicitud-enrolamiento/validarformularioreconoserid",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
-        ),
-        component: ValidacionApertura,
-      }, */
     ],
   },
 ];
@@ -824,4 +811,4 @@ const privateUrls = [
   { label: <AuthButton /> },
 ];
 
-export { allUrlsPrivateApps, privateUrls, publicUrls };
+export { allUrlsPrivateApps, privateUrls, publicUrls, loginUrls };

@@ -1,22 +1,23 @@
-import Button from "../../../components/Base/Button/Button";
-import Form from "../../../components/Base/Form/Form";
+import Button from "../../../components/Base/Button";
+import Form from "../../../components/Base/Form";
 import classes from "../../SolicitudEnrolamiento/views/FormularioEnrolamiento.module.css";
-import Input from "../../../components/Base/Input/Input";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import MultipleInput from "../../../components/Base/MultipleInput/MultipleInput";
+import Input from "../../../components/Base/Input";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import MultipleInput from "../../../components/Base/MultipleInput";
 import FileInput from "../../../components/Base/FileInput/FileInput";
 import { useState, useEffect, useCallback, Fragment } from "react";
-import { useNavigate } from "react-router-dom";
-import Select from "../../../components/Base/Select/Select";
-import { useImgs } from "../../../hooks/ImgsHooks";
-import { useWindowSize } from "../../../hooks/WindowSizeHooks";
-import Fieldset from "../../../components/Base/Fieldset/Fieldset";
-import LocationForm from "../../../components/Compound/LocationForm/LocationForm";
-import InputSuggestions from "../../../components/Base/InputSuggestions/InputSuggestions";
+import Select from "../../../components/Base/Select";
+import Fieldset from "../../../components/Base/Fieldset";
+import LocationForm from "../../../components/Compound/LocationForm";
+import InputSuggestions from "../../../components/Base/InputSuggestions";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
+
+const capitalize = (word) => {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+};
 
 const FormularioEnrolamiento = () => {
   const {
@@ -269,31 +270,6 @@ const FormularioEnrolamiento = () => {
     },
     [archivos1, archivos2, archivos3]
   );
-  const capitalize = (word) => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  };
-
-  const navigate = useNavigate();
-
-  const handleReconoser = async () => {
-    navigate("/Solicitud-enrolamiento/reconoserid");
-  };
-  const [clientWidth] = useWindowSize();
-  const {
-    imgs: { personas },
-    svgs: { backIcon, backIconSecondary },
-  } = useImgs();
-  useEffect(() => {
-    if (clientWidth > 768) {
-      document.body.style.backgroundImage = `url(""), url("${backIcon}"), url("")`;
-      document.body.style.backgroundAttachment = "fixed";
-      document.body.style.backgroundRepeat = "no-repeat";
-      document.body.style.backgroundPosition = "2.5% 100%, center, center";
-      document.body.style.backgroundSize = "500px, cover, cover";
-    } else {
-      document.body.style.backgroundImage = "none";
-    }
-  }, [backIcon, backIconSecondary, clientWidth]);
 
   useEffect(() => {
     if (commerceLocation.municipio[0] != "") {
@@ -324,7 +300,7 @@ const FormularioEnrolamiento = () => {
           <Form
             /* gird={false} */
             grid
-            onSubmit={(e) => handleSubmit() || handleReconoser(e)}
+            onSubmit={(e) => handleSubmit()}
           >
             <Input
               label={"Nombre Comercio"}

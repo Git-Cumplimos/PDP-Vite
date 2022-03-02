@@ -1,16 +1,18 @@
 import { useUrls } from "../../hooks/UrlsHooks";
 
 import classes from "./AdminLayout.module.css";
-import LogoPDP from "../../components/Base/LogoPDP/LogoPDP";
-import BarIcon from "../../components/Base/BarIcon/BarIcon";
-import UserInfo from "../../components/Compound/UserInfo/UserInfo";
-import RightArrow from "../../components/Base/RightArrow/RightArrow";
+import LogoPDP from "../../components/Base/LogoPDP";
+import BarIcon from "../../components/Base/BarIcon";
+import UserInfo from "../../components/Compound/UserInfo";
+import RightArrow from "../../components/Base/RightArrow";
 import { useAuth } from "../../hooks/AuthHooks";
-import { useEffect, useMemo, useState } from "react";
-import HNavbar from "../../components/Base/HNavbar/HNavbar";
-import Modal from "../../components/Base/Modal/Modal";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import HNavbar from "../../components/Base/HNavbar";
+import Modal from "../../components/Base/Modal";
 import { useImgs } from "../../hooks/ImgsHooks";
 import { useWindowSize } from "../../hooks/WindowSizeHooks";
+import { Outlet } from "react-router-dom";
+import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -19,7 +21,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 });
 // image/png
 // max-age=86400,must-revalidate
-const AdminLayout = ({ children }) => {
+const AdminLayout = () => {
   const {
     adminLayout,
     headerPDP,
@@ -89,7 +91,11 @@ const AdminLayout = ({ children }) => {
           </div>
         </Modal>
       </header>
-      <main className="container">{children}</main>
+      <main className="container">
+        <Suspense fallback={<ContentBox />}>
+          <Outlet />
+        </Suspense>
+      </main>
     </div>
   );
 };

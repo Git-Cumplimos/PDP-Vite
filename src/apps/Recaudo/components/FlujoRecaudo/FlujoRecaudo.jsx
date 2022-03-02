@@ -1,10 +1,10 @@
 import { Fragment, useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Modal from "../../../../components/Base/Modal/Modal";
-import Tickets from "../../../../components/Base/Tickets/Tickets";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Modal from "../../../../components/Base/Modal";
+import Tickets from "../../../../components/Base/Tickets";
 import useQuery from "../../../../hooks/useQuery";
 import fetchData from "../../../../utils/fetchData";
 import { notifyError } from "../../../../utils/notify";

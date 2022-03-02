@@ -5,8 +5,8 @@ import useQuery from "../../../../hooks/useQuery";
 
 import EditComission from "../../components/EditComission/EditComission";
 import SearchComissions from "../../components/SearchComissions/SearchComissions";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
 
 const Com2Pay = () => {
   const [{ id_comision_pagada }] = useQuery();
@@ -22,7 +22,7 @@ const Com2Pay = () => {
               Crear comision
             </Button>
           </ButtonBar>
-          <SearchComissions comissionFace='pay' />
+          <SearchComissions comissionFace="pay" />
         </Fragment>
       ) : (
         <EditComission />

@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Modal from "../../../components/Base/Modal/Modal";
-import Table from "../../../components/Base/Table/Table";
-import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Modal from "../../../components/Base/Modal";
+import Table from "../../../components/Base/Table";
+import PaginationAuth from "../../../components/Compound/PaginationAuth";
 import fetchData from "../../../utils/fetchData";
 import EditRoleForm from "../components/Roles/EditRoleForm";
 import RoleForm from "../components/Roles/RoleForm";

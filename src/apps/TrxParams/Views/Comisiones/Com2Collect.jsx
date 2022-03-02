@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
 
 import useQuery from "../../../../hooks/useQuery";
 
@@ -18,7 +18,7 @@ const Com2Collect = () => {
           <ButtonBar>
             <Button onClick={() => navigate("crear")}>Crear comision</Button>
           </ButtonBar>
-          <SearchComissions comissionFace='collect' />
+          <SearchComissions comissionFace="collect" />
         </Fragment>
       ) : (
         <EditComission />

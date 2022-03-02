@@ -1,16 +1,16 @@
 import { useState, useEffect, Fragment, useCallback, useMemo } from "react";
-import Table from "../../../components/Base/Table/Table";
-import Button from "../../../components/Base/Button/Button";
+import Table from "../../../components/Base/Table";
+import Button from "../../../components/Base/Button";
 import fetchData from "../../../utils/fetchData";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Modal from "../../../components/Base/Modal/Modal";
+import Pagination from "../../../components/Compound/Pagination";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Modal from "../../../components/Base/Modal";
 import { notify, notifyError } from "../../../utils/notify";
-import Form from "../../../components/Base/Form/Form";
-import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
-import Input from "../../../components/Base/Input/Input";
+import Form from "../../../components/Base/Form";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
+import Input from "../../../components/Base/Input";
 import useQuery from "../../../hooks/useQuery";
-import InputSuggestions from "../../../components/Base/InputSuggestions/InputSuggestions";
+import InputSuggestions from "../../../components/Base/InputSuggestions";
 
 const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 

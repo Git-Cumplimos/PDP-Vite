@@ -10,10 +10,10 @@ import { fetchConveniosUnique } from "../../utils/fetchRevalConvenios";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 import FormComission from "../FormComission/FormComission";
-import Button from "../../../../components/Base/Button/Button";
-import Form from "../../../../components/Base/Form/Form";
-import Input from "../../../../components/Base/Input/Input";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import ButtonBar from "../../../../components/Base/ButtonBar";
 import {
   fetchComisionesPagar,
   putComisionesPagar,
@@ -256,16 +256,16 @@ const EditComission = () => {
   };
   return (
     <Fragment>
-      <h1 className='text-3xl'>Editando comisiones a pagar:</h1>
+      <h1 className="text-3xl">Editando comisiones a pagar:</h1>
       <Form grid>
         {id_comision_pagada && (
           <Fragment>
             {comissions?.[0]?.["nombre_convenio"] && (
               <Input
-                id='Nombre convenio'
-                name='Nombre convenio'
+                id="Nombre convenio"
+                name="Nombre convenio"
                 type={"text"}
-                autoComplete='off'
+                autoComplete="off"
                 label={"Nombre convenio"}
                 value={comissions?.[0]?.["nombre_convenio"]}
                 readOnly
@@ -274,11 +274,11 @@ const EditComission = () => {
             )}
             {comissions?.[0]?.["nombre_operacion"] && (
               <Input
-                id='Nombre operacion'
-                name='Nombre operacion'
+                id="Nombre operacion"
+                name="Nombre operacion"
                 type={"text"}
                 label={"Nombre transaccion"}
-                autoComplete='off'
+                autoComplete="off"
                 value={comissions?.[0]?.["nombre_operacion"]}
                 readOnly
                 disabled
@@ -286,11 +286,11 @@ const EditComission = () => {
             )}
             {comissions?.[0]?.["id_comercio"] && (
               <Input
-                id='Id comercio'
-                name='Id comercio'
+                id="Id comercio"
+                name="Id comercio"
                 type={"number"}
                 label={"Id comercio"}
-                autoComplete='off'
+                autoComplete="off"
                 value={comissions?.[0]?.["id_comercio"]}
                 readOnly
                 disabled
@@ -298,11 +298,11 @@ const EditComission = () => {
             )}
             {comissions?.[0]?.["fecha_inicio"] && (
               <Input
-                id='Fecha inicio'
-                name='Fecha inicio'
+                id="Fecha inicio"
+                name="Fecha inicio"
                 type={"text"}
                 label={"Fecha inicio"}
-                autoComplete='off'
+                autoComplete="off"
                 value={Intl.DateTimeFormat("es-CO", {
                   year: "numeric",
                   month: "numeric",
@@ -322,11 +322,11 @@ const EditComission = () => {
             )}
             {comissions?.[0]?.["fecha_fin"] && (
               <Input
-                id='Fecha_fin'
-                name='Fecha_fin'
+                id="Fecha_fin"
+                name="Fecha_fin"
                 type={"text"}
                 label={"Fecha_fin"}
-                autoComplete='off'
+                autoComplete="off"
                 value={Intl.DateTimeFormat("es-CO", {
                   year: "numeric",
                   month: "numeric",
@@ -344,11 +344,11 @@ const EditComission = () => {
             )}
             {comissions?.[0]?.["estado"] && (
               <Input
-                id='Estado'
-                name='Estado'
+                id="Estado"
+                name="Estado"
                 type={"text"}
                 label={"Estado"}
-                autoComplete='off'
+                autoComplete="off"
                 value={comissions?.[0]?.["estado"] ? "Activo" : "Inactivo"}
                 readOnly
                 disabled
@@ -358,14 +358,14 @@ const EditComission = () => {
         )}
         {id_comision_cobrada && (
           <Fragment>
-            <h1 className='text-3xl'>Editando comisiones a cobrar:</h1>
+            <h1 className="text-3xl">Editando comisiones a cobrar:</h1>
             {comissions?.[0]?.["nombre_autorizador"] && (
               <Input
-                id='Autorizador'
-                name='Autorizador'
+                id="Autorizador"
+                name="Autorizador"
                 type={"text"}
                 label={"Autorizador"}
-                autoComplete='off'
+                autoComplete="off"
                 value={comissions?.[0]?.["nombre_autorizador"]}
                 readOnly
                 disabled
@@ -373,10 +373,10 @@ const EditComission = () => {
             )}
             {comissions?.[0]?.["nombre_convenio"] && (
               <Input
-                id='Nombre convenio'
-                name='Nombre convenio'
+                id="Nombre convenio"
+                name="Nombre convenio"
                 type={"text"}
-                autoComplete='off'
+                autoComplete="off"
                 label={"Nombre convenio"}
                 value={comissions?.[0]?.["nombre_convenio"]}
                 readOnly
@@ -386,11 +386,11 @@ const EditComission = () => {
 
             {comissions?.[0]?.["nombre_operacion"] && (
               <Input
-                id='Nombre operacion'
-                name='Nombre operacion'
+                id="Nombre operacion"
+                name="Nombre operacion"
                 type={"text"}
                 label={"Nombre transaccion"}
-                autoComplete='off'
+                autoComplete="off"
                 value={comissions?.[0]?.["nombre_operacion"]}
                 readOnly
                 disabled
@@ -398,11 +398,11 @@ const EditComission = () => {
             )}
             {comissions?.[0]?.["estado"] && (
               <Input
-                id='Estado'
-                name='Estado'
+                id="Estado"
+                name="Estado"
                 type={"text"}
                 label={"Estado"}
-                autoComplete='off'
+                autoComplete="off"
                 value={comissions?.[0]?.["estado"] ? "Activo" : "Inactivo"}
                 readOnly
                 disabled
@@ -411,11 +411,12 @@ const EditComission = () => {
           </Fragment>
         )}
       </Form>
-      <h1 className='text-3xl'>Comision</h1>
+      <h1 className="text-3xl">Comision</h1>
       <FormComission
         outerState={[editedComission, setEditedComission]}
-        onSubmit={onSubmit}>
-        <Button type='submit'>Actualizar rangos</Button>
+        onSubmit={onSubmit}
+      >
+        <Button type="submit">Actualizar rangos</Button>
       </FormComission>
     </Fragment>
   );

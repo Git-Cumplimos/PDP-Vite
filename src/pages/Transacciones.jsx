@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import Button from "../components/Base/Button/Button";
-import ButtonBar from "../components/Base/ButtonBar/ButtonBar";
-import Form from "../components/Base/Form/Form";
-import Modal from "../components/Base/Modal/Modal";
-import Select from "../components/Base/Select/Select";
-import Table from "../components/Base/Table/Table";
-import Input from "../components/Base/Input/Input";
+import Button from "../components/Base/Button";
+import ButtonBar from "../components/Base/ButtonBar";
+import Form from "../components/Base/Form";
+import Modal from "../components/Base/Modal";
+import Select from "../components/Base/Select";
+import Table from "../components/Base/Table";
+import Input from "../components/Base/Input";
 import fetchData from "../utils/fetchData";
 import { useAuth } from "../hooks/AuthHooks";
-import Tickets from "../components/Base/Tickets/Tickets";
+import Tickets from "../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 
 const Transacciones = () => {

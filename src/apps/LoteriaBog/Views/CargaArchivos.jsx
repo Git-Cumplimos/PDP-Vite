@@ -1,13 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
-import Form from "../../../components/Base/Form/Form";
+import Form from "../../../components/Base/Form";
 import InputX from "../../../components/Base/InputX/InputX";
-import Select from "../../../components/Base/Select/Select";
+import Select from "../../../components/Base/Select";
 import AWS, { CostExplorer } from "aws-sdk";
 import ProgressBar from "../../../components/Base/ProgressBar/ProgressBar";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Button from "../../../components/Base/Button/Button";
-import Modal from "../../../components/Base/Modal/Modal";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Button from "../../../components/Base/Button";
+import Modal from "../../../components/Base/Modal";
 import CargarForm from "../components/CargarForm/CargarForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 import SubPage from "../../../components/Base/SubPage/SubPage";
@@ -33,7 +33,6 @@ const CargaArchivos = ({ route }) => {
     { value: "Extra/", label: "Sorteo Extraordinario" },
   ];
 
-  
   const [archivo, setArchivo] = useState("");
   const [tipoSorteo, setTipoSorteo] = useState("");
   const [fisiVirtual, setFisiVirtual] = useState("");
@@ -43,7 +42,7 @@ const CargaArchivos = ({ route }) => {
   const optionsFisiVir = [
     { value: "", label: "" },
     { value: "Fisico/", label: `${archivo} Fisicos` },
-    { value: "Virtual/", label: `${archivo} Virtuales`},
+    { value: "Virtual/", label: `${archivo} Virtuales` },
   ];
 
   const [showModal, setShowModal] = useState(false);
@@ -176,7 +175,9 @@ const CargaArchivos = ({ route }) => {
             setFisiVirtual("");
           }}
         />
-        {archivo === "PlanDePremios" || archivo === "Asignacion" || archivo === "Resultados"? (
+        {archivo === "PlanDePremios" ||
+        archivo === "Asignacion" ||
+        archivo === "Resultados" ? (
           <Select
             id="tip_sorteo"
             label={`Tipo de sorteo para ${archivo}`}
@@ -204,8 +205,7 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {
-        (archivo === "PlanDePremios" && tipoSorteo !== "") ||
+        {(archivo === "PlanDePremios" && tipoSorteo !== "") ||
         fisiVirtual !== "" ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <InputX

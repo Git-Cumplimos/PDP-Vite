@@ -1,10 +1,10 @@
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
 import { useCallback, useState } from "react";
-import Card from "../../../components/Base/Card/Card";
-import Modal from "../../../components/Base/Modal/Modal";
+import Card from "../../../components/Base/Card";
+import Modal from "../../../components/Base/Modal";
 import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
 import classes from "../../SolicitudEnrolamiento/views/ConsultaEnrolamiento.module.css";
 import { useNavigate } from "react-router-dom";
@@ -46,18 +46,20 @@ const ConsultaEnrolamiento = () => {
   console.log(respuestaProceso);
 
   const handleReconoser = async () => {
-    navigate(`/Solicitud-enrolamiento/reconoserid/${numconsultaProceso}`);
+    navigate(
+      `/public/solicitud-enrolamiento/reconoserid/${numconsultaProceso}`
+    );
   };
   const handleCorregir = async () => {
     navigate(
-      `/Solicitud-enrolamiento/correccionformulario/${numconsultaProceso}`
+      `/public/solicitud-enrolamiento/correccionformulario/${numconsultaProceso}`
     );
   };
 
   const handleContinuarReconoser = async () => {
     console.log(respuestaProceso[0].id_reconocer);
     navigate(
-      `/Solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0].id_reconocer}`
+      `/public/solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0].id_reconocer}`
     );
   };
   const handleClose = useCallback(() => {
