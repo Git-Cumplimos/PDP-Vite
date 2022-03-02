@@ -4,7 +4,6 @@ import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Form from "../../../components/Base/Form/Form";
 import { useReactToPrint } from "react-to-print";
-import VoucherMarket from "../Voucher/VoucherMarket";
 import Tickets from "../../../components/Base/Tickets/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
 import { useMarketPlace } from "../utils/MarketPlaceHooks";
@@ -86,15 +85,10 @@ const PayForm = ({ selected, summary }) => {
         "No. terminal": roleInfo?.id_dispositivo,
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
-        "Id Trx": summary?.Trx,
+        "Id Transacción": summary?.Trx,
       }),
       commerceName: "MARKETPLACE PUNTO DE COMPRA",
-      trxInfo: [
-        ["Articulos", <Products />],
-        ["", ""],
-        ["Total compra", summary?.Valor],
-        ["", ""],
-      ],
+      trxInfo: [, ["", ""], ["Total compra", summary?.Valor], ["", ""]],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };

@@ -42,7 +42,6 @@ const OrdenMarket = () => {
     setSummary({
       Trx: consulta?.obj?.Id_Trx,
       Estado: consulta?.EstadoTrx,
-      Productos: <Products />,
       Valor: formatMoney.format(consulta?.obj?.valor),
     });
     setShowModal(true);
