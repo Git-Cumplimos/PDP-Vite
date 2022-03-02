@@ -56,19 +56,58 @@ const FormularioEnrolamiento = () => {
   const [archivos2, setArchivos2] = useState([]);
   const [archivos3, setArchivos3] = useState([]);
 
-  const [localidadBogota, setLocalidadBogota] = useState(0);
+  const [codDaneMunicipioComercio, setCodDaneMunicipioComercio] = useState("");
+  const [codDaneMunicipioCorrespondencia, setCodDaneMunicipioCorrespondencia] =
+    useState("");
+
+  const commerceLocation = {
+    municipio: useState(""),
+    departamento: useState(""),
+    localidad: useState(""),
+    barrio: useState(""),
+    direccion: useState(""),
+    foundMunicipios: useState([]),
+  };
+  const homeLocation = {
+    municipio: useState(""),
+    departamento: useState(""),
+    localidad: useState(""),
+    barrio: useState(""),
+    direccion: useState(""),
+    foundMunicipios: useState([]),
+  };
+
+  const [LocalidadUbComercio, setLocalidadUbComercio] = useState(0);
+  const [LocalidadUbCorrespondencia, setLocalidadUbCorrespondencia] =
+    useState(0);
+
+  //Traer localidades Con codigo dane de la ubicacion del comercio
   useEffect(() => {
     fetchData(
       `${
         process.env.REACT_APP_URL_SERVICE_COMMERCE
-      }/localidades?cod_dane=${11001}&limit=${0}`,
+      }/localidades?cod_dane=${codDaneMunicipioComercio}&limit=${0}`,
       "GET",
       {},
       {},
       {},
       false
-    ).then((respuesta) => setLocalidadBogota(respuesta.obj.results));
-  }, []);
+    ).then((respuesta) => setLocalidadUbComercio(respuesta.obj.results));
+  }, [codDaneMunicipioComercio]);
+
+  //Traer localidades Con codigo dane de la ubicacion Correspondencia
+  useEffect(() => {
+    fetchData(
+      `${
+        process.env.REACT_APP_URL_SERVICE_COMMERCE
+      }/localidades?cod_dane=${codDaneMunicipioCorrespondencia}&limit=${0}`,
+      "GET",
+      {},
+      {},
+      {},
+      false
+    ).then((respuesta) => setLocalidadUbCorrespondencia(respuesta.obj.results));
+  }, [codDaneMunicipioCorrespondencia]);
 
   useEffect(() => {
     fetchData(
@@ -149,7 +188,7 @@ const FormularioEnrolamiento = () => {
         false
       )
         .then((respuesta) => {
-          console.log(respuesta);
+          /*  console.log(respuesta); */
           const formData = new FormData();
 
           formData.set("rut", archivos1[0]);
@@ -233,22 +272,6 @@ const FormularioEnrolamiento = () => {
   const capitalize = (word) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
   };
-  const commerceLocation = {
-    municipio: useState(""),
-    departamento: useState(""),
-    localidad: useState(""),
-    barrio: useState(""),
-    direccion: useState(""),
-    foundMunicipios: useState([]),
-  };
-  const homeLocation = {
-    municipio: useState(""),
-    departamento: useState(""),
-    localidad: useState(""),
-    barrio: useState(""),
-    direccion: useState(""),
-    foundMunicipios: useState([]),
-  };
 
   const navigate = useNavigate();
 
@@ -271,6 +294,26 @@ const FormularioEnrolamiento = () => {
       document.body.style.backgroundImage = "none";
     }
   }, [backIcon, backIconSecondary, clientWidth]);
+
+  useEffect(() => {
+    if (commerceLocation.municipio[0] != "") {
+      setCodDaneMunicipioComercio(
+        parseInt(
+          commerceLocation.foundMunicipios[0][0]["c_digo_dane_del_municipio"]
+        )
+      );
+    }
+  }, [commerceLocation]);
+  useEffect(() => {
+    if (homeLocation.municipio[0] != "") {
+      setCodDaneMunicipioCorrespondencia(
+        parseInt(
+          homeLocation.foundMunicipios[0][0]["c_digo_dane_del_municipio"]
+        )
+      );
+    }
+  }, [homeLocation]);
+
   return (
     <div className=" flex flex-col justify-center items-center text-justify my-8">
       <span className={tituloFormularioInscripcion}>
@@ -527,7 +570,7 @@ const FormularioEnrolamiento = () => {
                 options={
                   Object.fromEntries([
                     ["", ""],
-                    ...localidadBogota.map(({ nom_localidad }) => {
+                    ...LocalidadUbComercio.map(({ nom_localidad }) => {
                       return [nom_localidad];
                     }),
                   ]) || { "": "" }
@@ -551,7 +594,7 @@ const FormularioEnrolamiento = () => {
                 options={
                   Object.fromEntries([
                     ["", ""],
-                    ...localidadBogota.map(({ nom_localidad }) => {
+                    ...LocalidadUbCorrespondencia.map(({ nom_localidad }) => {
                       return [nom_localidad];
                     }),
                   ]) || { "": "" }
@@ -580,14 +623,10 @@ const FormularioEnrolamiento = () => {
                 accept=".pdf"
                 allowDrop={false}
               />
-              {/*   <ButtonBar className="lg:col-span-2">
-          <Button type="submit">Subir archivos</Button>
-        </ButtonBar> */}
             </Form>
           </Fragment>
           <ButtonBar className={"lg:col-span-2"} type="">
             {
-              /* archivos1.length > 0 && archivos2.length > 0  */ /* estadoFormulario ? ( */
               <Button
                 type="submit"
                 onClick={(e) =>

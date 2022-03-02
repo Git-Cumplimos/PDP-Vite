@@ -73,6 +73,13 @@ const CorreccionFormulario = () => {
   //Autorizacion
   const [responsableIva, setResponsableIva] = useState("");
   const [autorizacion, setAutorizacion] = useState("");
+
+  // Datos PDF
+  const [archivos1, setArchivos1] = useState([]);
+  const [archivos2, setArchivos2] = useState([]);
+  const [archivos3, setArchivos3] = useState([]);
+
+  // Traer Datos Del Comercio
   useEffect(() => {
     fetch(
       `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actualizacion-estado?numDoc=${params.numCedula}`
@@ -120,59 +127,123 @@ const CorreccionFormulario = () => {
         autosms: setAutorizacion(respuesta.obj.results[0]["autosms"]);
       });
   }, []);
-  console.log(datosParams);
+  /* console.log(datosParams); */
 
   const capitalize = (word) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
   };
-  const corregirEnviar = (e) => {
-    e.preventDefault();
-    fetchData(
-      /* `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/idreconocer?id_proceso=26`, */
-      `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`,
-      "PUT",
-      {},
-      {
-        asesor: asignarAsesores,
-        nombre: `${nombre}`,
-        apellido: `${apellido}`,
-        nombre_comercio: nombreComercio,
-        numnit: numNit,
-        numcamycom: numCamaraComercio,
-        numrut: numRut,
-        autosms: autorizacion,
-        tipozona: "",
-        unidad_negocio: "",
-        responsableiva: responsableIva,
-        cod_localidad: "",
-        asesor_comercial_localidad: "",
-        actividad_economica: commerceType.toString(),
-        tipo_establecimiento: "",
-        sede: "Bogotá",
-        direccion_comercio: direccionCom,
-        departamento: departamentoCom,
-        municipio: municipioCom,
-        localidad_bogota: localidadCom,
-        barrio: barrioCom,
-        direccion_correspondencia: direccionCorr,
-        departamento_correspondencia: departamentoCorr,
-        municipio_correspondencia: municipioCorr,
-        localidad_correspondencia: localidadCorr,
-        barrio_correspondencia: barrioCorr,
-        tipoDoc: tipoIdentificacion,
-        numDoc: numDocumento,
-        email: correos[0],
-        celular: telefonos[0],
-        /* task_token: datosParams[0]["task_token"], */
-        validation_state: "En Proceso de Validación",
-        /* id_name: "id_proceso", */
-        responsable: "",
-      },
 
-      {},
-      false
-    ).then((respuesta) => console.log(respuesta));
-  };
+  //Documentos PDF
+  const onFileChange = useCallback((files) => {
+    if (Array.isArray(Array.from(files))) {
+      files = Array.from(files);
+      setArchivos1(files);
+    }
+  }, []);
+
+  const onFileChange2 = useCallback((files) => {
+    if (Array.isArray(Array.from(files))) {
+      files = Array.from(files);
+      setArchivos2(files);
+    }
+  }, []);
+  const onFileChange3 = useCallback((files) => {
+    if (Array.isArray(Array.from(files))) {
+      files = Array.from(files);
+      setArchivos3(files);
+    }
+  }, []);
+
+  //Actualizar Y Corregir Datos
+  const corregirEnviar = useCallback(
+    (e) => {
+      e.preventDefault();
+      fetchData(
+        /* `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/idreconocer?id_proceso=26`, */
+        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`,
+        "PUT",
+        {},
+        {
+          asesor: asignarAsesores,
+          nombre: `${nombre}`,
+          apellido: `${apellido}`,
+          nombre_comercio: nombreComercio,
+          numnit: numNit,
+          numcamycom: numCamaraComercio,
+          numrut: numRut,
+          autosms: autorizacion,
+          tipozona: "",
+          unidad_negocio: "",
+          responsableiva: responsableIva,
+          cod_localidad: "",
+          asesor_comercial_localidad: "",
+          actividad_economica: commerceType.toString(),
+          tipo_establecimiento: "",
+          sede: "Bogotá",
+          direccion_comercio: direccionCom,
+          departamento: departamentoCom,
+          municipio: municipioCom,
+          localidad_bogota: localidadCom,
+          barrio: barrioCom,
+          direccion_correspondencia: direccionCorr,
+          departamento_correspondencia: departamentoCorr,
+          municipio_correspondencia: municipioCorr,
+          localidad_correspondencia: localidadCorr,
+          barrio_correspondencia: barrioCorr,
+          tipoDoc: tipoIdentificacion,
+          numDoc: numDocumento,
+          email: correos[0],
+          celular: telefonos[0],
+          /* task_token: datosParams[0]["task_token"], */
+          validation_state: "En Proceso de Validación",
+          /* id_name: "id_proceso", */
+          responsable: "",
+        },
+
+        {},
+        false
+      )
+        .then((respuesta) => {
+          const formData = new FormData();
+
+          formData.set("rut", archivos1[0]);
+
+          formData.set("cc", archivos2[0]);
+
+          formData.set("camaracomercio", archivos3[0]);
+
+          formData.set("numdoc", numDocumento);
+
+          formData.set("id_proceso", datosParams[0]["id_proceso"]);
+
+          notify("Se ha comenzado la carga");
+
+          console.log(Object.fromEntries(formData.entries()));
+          fetch(
+            `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
+
+            {
+              method: "POST",
+
+              body: formData,
+            }
+          )
+            .then((res) => res.json())
+            .then((respuesta) => {
+              if (!respuesta?.status) {
+                notifyError(respuesta?.msg);
+              } else {
+                console.log(respuesta?.obj);
+                notify("Se han subido los archivos");
+                /* setEstadoForm(true); */
+              }
+            })
+            .catch(() => {});
+        })
+        .catch(() => {});
+    },
+    [archivos1, archivos2, archivos3]
+  );
   return (
     <div>
       {datosParams ? (
@@ -477,7 +548,7 @@ const CorreccionFormulario = () => {
 
           <div /* className={contenedorBotones} */>
             <Button
-              type=""
+              type="submit"
               onClick={(e) => {
                 corregirEnviar(e);
               }}
@@ -500,6 +571,24 @@ const CorreccionFormulario = () => {
               </div>
             </div>
           </div> */}
+          <FileInput
+            label={"Elige el archivo del Rut"}
+            onGetFile={onFileChange}
+            accept=".pdf"
+            allowDrop={false}
+          />
+          <FileInput
+            label={"Elige el archivo de la CC"}
+            onGetFile={onFileChange2}
+            accept=".pdf"
+            allowDrop={false}
+          />
+          <FileInput
+            label={"Elige el archivo de la Camara & Comercio"}
+            onGetFile={onFileChange3}
+            accept=".pdf"
+            allowDrop={false}
+          />
         </Form>
       ) : (
         ""
