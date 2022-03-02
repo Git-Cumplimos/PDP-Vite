@@ -46,18 +46,20 @@ const ConsultaEnrolamiento = () => {
   console.log(respuestaProceso);
 
   const handleReconoser = async () => {
-    navigate(`/Solicitud-enrolamiento/reconoserid/${numconsultaProceso}`);
+    navigate(
+      `/public/solicitud-enrolamiento/reconoserid/${numconsultaProceso}`
+    );
   };
   const handleCorregir = async () => {
     navigate(
-      `/Solicitud-enrolamiento/correccionformulario/${numconsultaProceso}`
+      `/public/solicitud-enrolamiento/correccionformulario/${numconsultaProceso}`
     );
   };
 
   const handleContinuarReconoser = async () => {
     console.log(respuestaProceso[0].id_reconocer);
     navigate(
-      `/Solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0].id_reconocer}`
+      `/public/solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0].id_reconocer}`
     );
   };
   const handleClose = useCallback(() => {

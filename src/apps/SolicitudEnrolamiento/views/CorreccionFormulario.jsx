@@ -9,8 +9,6 @@ import FileInput from "../../../components/Base/FileInput/FileInput";
 import { useState, useEffect, useCallback, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "../../../components/Base/Select";
-import { useImgs } from "../../../hooks/ImgsHooks";
-import { useWindowSize } from "../../../hooks/WindowSizeHooks";
 import Fieldset from "../../../components/Base/Fieldset";
 import LocationForm from "../../../components/Compound/LocationForm";
 import InputSuggestions from "../../../components/Base/InputSuggestions";
@@ -19,22 +17,6 @@ import { notify, notifyError } from "../../../utils/notify";
 import { useParams } from "react-router";
 
 const CorreccionFormulario = () => {
-  const [clientWidth] = useWindowSize();
-  const {
-    imgs: { personas },
-    svgs: { backIcon, backIconSecondary },
-  } = useImgs();
-  useEffect(() => {
-    if (clientWidth > 768) {
-      document.body.style.backgroundImage = `url(""), url("${backIcon}"), url("")`;
-      document.body.style.backgroundAttachment = "fixed";
-      document.body.style.backgroundRepeat = "no-repeat";
-      document.body.style.backgroundPosition = "2.5% 100%, center, center";
-      document.body.style.backgroundSize = "500px, cover, cover";
-    } else {
-      document.body.style.backgroundImage = "none";
-    }
-  }, [backIcon, backIconSecondary, clientWidth]);
   const params = useParams();
   const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
   //Datos Comercio

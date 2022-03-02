@@ -54,7 +54,7 @@ const ReconoserID = () => {
       console.log(event);
       if (event.data.for === "resultData") {
         setIsSuccess(event.data.isSuccess);
-        setTimeout(() => navigate("/Solicitud-enrolamiento"), 2000);
+        setTimeout(() => navigate("/public/solicitud-enrolamiento"), 2000);
         /* 
         el mensaje que entrega el validador dentro de e.data contiene 
         un mensaje de la siguiente forma: 

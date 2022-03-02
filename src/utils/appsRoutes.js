@@ -20,6 +20,7 @@ const AppIcons = lazy(() => import("../components/Base/AppIcons"));
 /**
  * Base
  */
+const PublicHome = lazy(() => import("../pages/PublicHome"));
 const Login = lazy(() => import("../pages/Login"));
 const Home = lazy(() => import("../pages/Home"));
 const Transacciones = lazy(() => import("../pages/Transacciones"));
@@ -108,7 +109,7 @@ const Autorizadores = lazy(() =>
 );
 
 /**
- * Solicitud Enrolamiento
+ * Solicitud Enrolamiento : publico
  */
 const SolicitudEnrolamiento = lazy(() =>
   import("../apps/SolicitudEnrolamiento/SolicitudEnrolamiento")
@@ -128,6 +129,10 @@ const ReconoserID = lazy(() =>
 const ContinuarReconoserID = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ContinuarReconoserID")
 );
+
+/**
+ * Solicitud Enrolamiento : privado
+ */
 const ValidacionAsesorComercial = lazy(() =>
   import("../apps/ValidacionEnrolamiento/ValidacionAsesorComercial")
 );
@@ -215,65 +220,46 @@ const loginUrls = [{ link: "/login", label: "Login", component: Login }];
 
 const publicUrls = [
   { link: "*", exact: false, component: Error404 },
+  { link: "", label: "Inicio", component: PublicHome },
   {
-    link: "/solicitud-enrolamiento",
+    link: "/public/solicitud-enrolamiento",
     label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
     component: SolicitudEnrolamiento,
     permission: [1],
     subRoutes: [
       {
-        link: "/solicitud-enrolamiento/formulario",
+        link: "/public/solicitud-enrolamiento/formulario",
         label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
         component: FormularioEnrolamiento,
       },
       {
-        link: "/Solicitud-enrolamiento/consultar",
+        link: "/public/solicitud-enrolamiento/consultar",
         label: (
           <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
         ),
         component: ConsultaEnrolamiento,
+        subRoutes: [
+          {
+            link: "/public/solicitud-enrolamiento/reconoserid/:numCedula",
+            label: (
+              <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />
+            ),
+            component: ReconoserID,
+          },
+          {
+            link: "/public/solicitud-enrolamiento/continuarreconoserid/:idreconoser",
+            label: (
+              <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
+            ),
+            component: ContinuarReconoserID,
+          },
+          {
+            link: "/public/solicitud-enrolamiento/correccionformulario/:numCedula",
+            label: <AppIcons Logo={"PAGO"} name={"Corrección De Formulario"} />,
+            component: CorreccionFormulario,
+          },
+        ],
       },
-      {
-        link: "/Solicitud-enrolamiento/reconoserid/:numCedula",
-        label: <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />,
-        component: ReconoserID,
-      },
-
-      {
-        link: "/Solicitud-enrolamiento/continuarreconoserid/:idreconoser",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
-        ),
-        component: ContinuarReconoserID,
-      },
-      {
-        link: "/Solicitud-enrolamiento/correccionformulario/:numCedula",
-        label: <AppIcons Logo={"PAGO"} name={"Corrección De Formulario"} />,
-        component: CorreccionFormulario,
-      },
-
-      /*      {
-        link: "/Solicitud-enrolamiento/validarformulario",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Validar Formulario Inscripción"} />
-        ),
-        component: ValidacionAsesorComercial,
-      }, */
-
-      /* {
-        link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Verificar Formulario Inscripción"} />
-        ),
-        component: VerificacionFormulario,
-      }, */
-      /* {
-        link: "/Solicitud-enrolamiento/validarformularioreconoserid",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
-        ),
-        component: ValidacionApertura,
-      }, */
     ],
   },
 ];

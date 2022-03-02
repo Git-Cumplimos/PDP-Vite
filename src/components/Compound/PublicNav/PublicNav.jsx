@@ -29,8 +29,8 @@ const PublicNav = ({ wa, tl, msg }) => {
   return (
     <div className={socials}>
       <ul>
-        {publicLayouts.map(({ href, span, help }) => (
-          <li>
+        {publicLayouts.map(({ href, span, help }, idx) => (
+          <li key={idx}>
             <Link {...href}>
               <span {...span} />
             </Link>

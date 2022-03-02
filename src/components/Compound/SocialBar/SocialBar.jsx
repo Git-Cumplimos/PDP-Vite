@@ -44,8 +44,8 @@ const SocialBar = () => {
   return (
     <div className={socials}>
       <ul>
-        {socialUrls.map(({ href, span }) => (
-          <li>
+        {socialUrls.map(({ href, span }, idx) => (
+          <li key={idx}>
             <a {...href} target="_blank" rel="noopener noreferrer">
               <span {...span} />
             </a>
