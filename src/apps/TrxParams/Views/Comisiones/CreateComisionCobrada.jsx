@@ -11,7 +11,10 @@ import Form from "../../../../components/Base/Form/Form";
 import Select from "../../../../components/Base/Select/Select";
 import { fetchConveniosMany } from "../../utils/fetchRevalConvenios";
 import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
-import { postComisionesCobrar } from "../../utils/fetchComisionesCobrar";
+import {
+  fetchComisionesCobrar,
+  postComisionesCobrar,
+} from "../../utils/fetchComisionesCobrar";
 import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Pagination from "../../../../components/Compound/Pagination/Pagination";
@@ -34,7 +37,10 @@ const initComissionData = {
 const CreateComisionCobrada = () => {
   const navigate = useNavigate();
 
-  const [{ page = 1, selectedOpt }, setQuery] = useQuery();
+  const [
+    { page = 1, selectedOpt, tipoTrx = "", convenio = "", autorizador = "" },
+    setQuery,
+  ] = useQuery();
 
   const [selectecConv, setSelectecConv] = useState(null);
   const [comissionData, setComissionData] = useState(initComissionData);
@@ -45,8 +51,15 @@ const CreateComisionCobrada = () => {
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setQuery({ ["page"]: 1 }, { replace: true });
-    setQuery({ ["selectedOpt"]: "" }, { replace: true });
+    setQuery(
+      {
+        ["selectedOpt"]: "",
+        ["tipoTrx"]: "",
+        ["autorizador"]: "",
+        ["page"]: 1,
+      },
+      { replace: true }
+    );
   }, []);
   const createComission = useCallback(
     (ev) => {
@@ -152,6 +165,8 @@ const CreateComisionCobrada = () => {
       fetchAutorizadoresFunc();
     } else if (selectedOpt === "Tipo de transaccion") {
       fetchTiposTransaccionFunc();
+    } else if (selectedOpt === "comision") {
+      fecthComisionesCobrarFunc();
     } else {
       setdata([]);
     }
@@ -201,6 +216,34 @@ const CreateComisionCobrada = () => {
       })
       .catch((err) => console.error(err));
   };
+  const fecthComisionesCobrarFunc = () => {
+    let obj = { page };
+    if (convenio !== "") obj["nombre_convenio"] = convenio;
+    if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
+    if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
+    fetchComisionesCobrar(obj)
+      .then((res) => {
+        setdata(
+          [...res?.results].map(
+            ({
+              id_comision_cobrada,
+              nombre_operacion,
+              nombre_convenio,
+              nombre_autorizador,
+            }) => {
+              return {
+                "Id comision": id_comision_cobrada,
+                Transaccion: nombre_operacion,
+                Convenio: nombre_convenio,
+                Autorizador: nombre_autorizador,
+              };
+            }
+          )
+        );
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
   const onSelectConvenio = useCallback(
     (e, i) => {
       setShowModal(true);
@@ -228,13 +271,37 @@ const CreateComisionCobrada = () => {
           "Id tipo operacion": data[i]?.["Id tipo operacion"],
           "Tipo de transaccion": data[i]?.["Nombre transaccion"],
         }));
+      } else if (selectedOpt === "comision") {
+        fetchComisionesCobrar({ id_comision_cobrada: data[i]?.["Id comision"] })
+          .then((res) => {
+            setComissionData({
+              type: res?.results[0]?.comisiones?.type,
+              ranges: res?.results?.[0]?.comisiones?.ranges?.map(
+                ({ Fija, Maximo, Minimo, Porcentaje }) => {
+                  return {
+                    "Rango minimo": Minimo,
+                    "Rango maximo": Maximo === -1 ? "" : Maximo,
+                    "Comision porcentual": parseFloat(Porcentaje * 100),
+                    "Comision fija": parseFloat(Fija),
+                  };
+                }
+              ),
+            });
+          })
+          .catch((err) => console.error(err));
       }
       handleClose();
     },
     [data, selectedOpt, handleClose]
   );
+  const onChange = useCallback(
+    (ev) => setQuery({ [ev.target.name]: ev.target.value }, { replace: true }),
+    [setQuery]
+  );
+
   return (
     <Fragment>
+      <h1 className='text-3xl'>Crear comisión a cobrar:</h1>
       {/* <SearchComissions comissionFace="pay" onSelectItem={onSelectItem} /> */}
       {selectecConv ? (
         <Fragment>
@@ -331,6 +398,14 @@ const CreateComisionCobrada = () => {
             ? "Editar autorizador"
             : "Agregar autorizador"}
         </Button>
+        <Button
+          type='button'
+          onClick={() => {
+            setShowModal(true);
+            setQuery({ ["selectedOpt"]: "comision" }, { replace: true });
+          }}>
+          Agregar comisión existente
+        </Button>
       </ButtonBar>
       <FormComission outerState={[comissionData, setComissionData]}>
         <Button type='submit' onClick={createComission}>
@@ -351,10 +426,41 @@ const CreateComisionCobrada = () => {
             <h1 className='text-3xl'>Seleccionar contrato</h1>
           ) : selectedOpt === "Tipo de transaccion" ? (
             <h1 className='text-3xl'>Seleccionar tipo de transaccion</h1>
+          ) : selectedOpt === "comision" ? (
+            <h1 className='text-3xl'>Seleccionar comisión</h1>
           ) : (
             ""
           )}
-          <Pagination maxPage={maxPages} grid></Pagination>
+          <Pagination maxPage={maxPages} onChange={onChange} grid>
+            {selectedOpt === "comision" && (
+              <>
+                <Input
+                  id={"convenioComissions"}
+                  label={"Convenio"}
+                  name={"convenio"}
+                  type={"text"}
+                  autoComplete='off'
+                  defaultValue={convenio}
+                />
+                <Input
+                  id={"tipoTrx"}
+                  label={"Tipo de operación"}
+                  name={"tipoTrx"}
+                  type={"text"}
+                  autoComplete='off'
+                  defaultValue={tipoTrx}
+                />
+                <Input
+                  id={"autorizadorComissions"}
+                  label={"Autorizador"}
+                  name={"autorizador"}
+                  type={"text"}
+                  autoComplete='off'
+                  defaultValue={autorizador}
+                />
+              </>
+            )}
+          </Pagination>
           {Array.isArray(data) && data.length > 0 && (
             <Table
               headers={Object.keys(data[0])}
