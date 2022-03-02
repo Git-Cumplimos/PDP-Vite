@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Modal from "../../../components/Base/Modal/Modal";
-import Table from "../../../components/Base/Table/Table";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Modal from "../../../components/Base/Modal";
+import Table from "../../../components/Base/Table";
 import fetchData from "../../../utils/fetchData";
 import EditUserForm from "../components/Users/EditUserForm";
 import MassiveUpload from "../components/Users/MassiveUpload";

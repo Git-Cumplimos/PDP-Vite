@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Modal from "../../../components/Base/Modal/Modal";
-import Select from "../../../components/Base/Select/Select";
-import Table from "../../../components/Base/Table/Table";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Modal from "../../../components/Base/Modal";
+import Select from "../../../components/Base/Select";
+import Table from "../../../components/Base/Table";
 import SellResp from "../components/SellResp/SellResp";
 import SendForm from "../components/SendForm/SendForm";
 import { useLoteria } from "../utils/LoteriaHooks";
@@ -95,7 +95,7 @@ const Loteria = ({ route }) => {
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
   const [selecFrac, setSelecFrac] = useState([]);
-  const [tipoPago, setTipoPago] = useState('12');
+  const [tipoPago, setTipoPago] = useState("12");
 
   const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
     { value: "", label: "" },
@@ -109,7 +109,6 @@ const Loteria = ({ route }) => {
     setLoterias("");
     setPage(1);
     setMaxPages(1);
-    
 
     console.log(sorteoExtrafisico);
     const copy = [{ value: "", label: "" }];
@@ -157,7 +156,7 @@ const Loteria = ({ route }) => {
     setCustomer({ fracciones: "", phone: "", doc_id: "" });
     setSelected(null);
     setSelecFrac([]);
-    setTipoPago('12')
+    setTipoPago("12");
     sorteo.split("-")[1] === "true"
       ? searchLoteriafisica(sorteo, numero, serie, page)
       : searchLoteria(sorteo, numero, serie, page);
@@ -320,7 +319,7 @@ const Loteria = ({ route }) => {
         ""
       )}
       <Modal show={showModal} handleClose={() => closeModal()}>
-        {sellResponse === null? (
+        {sellResponse === null ? (
           <SendForm
             tipoPago={tipoPago}
             setTipoPago={setTipoPago}

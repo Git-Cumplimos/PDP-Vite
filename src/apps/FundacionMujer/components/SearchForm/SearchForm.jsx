@@ -1,16 +1,10 @@
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../../components/Base/Form/Form";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Form from "../../../../components/Base/Form";
 
-
-const SearchForm = ({
-  selected,
-  closeModal,
-  handleSubmit,
-  
-}) => {
+const SearchForm = ({ selected, closeModal, handleSubmit }) => {
   const details = {
-     ...selected?.obj
+    ...selected?.obj,
   };
 
   return (
@@ -31,8 +25,15 @@ const SearchForm = ({
       <div className="flex flex-col justify-center items-center mx-auto container">
         <Form onSubmit={handleSubmit} grid>
           <ButtonBar>
-            <Button type="submit" >Aceptar</Button>
-            <Button type="button"  onClick={() => { closeModal(); }} >Cancelar </Button>
+            <Button type="submit">Aceptar</Button>
+            <Button
+              type="button"
+              onClick={() => {
+                closeModal();
+              }}
+            >
+              Cancelar{" "}
+            </Button>
           </ButtonBar>
         </Form>
       </div>

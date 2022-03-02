@@ -2,40 +2,30 @@ import { useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import AppIcons from "../../../../components/Base/AppIcons/AppIcons";
 
-import Button from "../../../../components/Base/Button/Button";
+import Button from "../../../../components/Base/Button";
 
 // datos fundacion de la mujer
-import Desembolsos from  "../../Views/Desembolsos"; 
+import Desembolsos from "../../Views/Desembolsos";
 import Recaudo from "../../Views/Recaudos";
 
-
 const FundacionWomen = () => {
-
-
   const [desembolso, setDesembolso] = useState(null);
-  
+
   const [recaudo, setRecaudo] = useState(null);
 
-
-  
   const { page } = useParams();
   const { pathname } = useLocation();
 
-
-
   const SelectPage = () => {
     switch (page) {
-     
       case "Desembolso":
-        return <Desembolsos sorteo={desembolso}   sorteoExtra={setDesembolso}/>;
-         
+        return <Desembolsos sorteo={desembolso} sorteoExtra={setDesembolso} />;
 
-      case"Recaudo":
-        return  <Recaudo sorteo={recaudo} sorteoExtra={setRecaudo}/>
+      case "Recaudo":
+        return <Recaudo sorteo={recaudo} sorteoExtra={setRecaudo} />;
 
-default:
-  break;
-   
+      default:
+        break;
     }
   };
 
@@ -51,13 +41,26 @@ default:
   const options = [
     {
       value: "Desembolso",
-      label: <FundacionIcons name="Desembolso"  Logo={"https://w7.pngwing.com/pngs/663/975/png-transparent-systemic-lupus-erythematosus-lupus-foundation-of-america-computer-icons-others-purple-violet-text.png"} />,
+      label: (
+        <FundacionIcons
+          name="Desembolso"
+          Logo={
+            "https://w7.pngwing.com/pngs/663/975/png-transparent-systemic-lupus-erythematosus-lupus-foundation-of-america-computer-icons-others-purple-violet-text.png"
+          }
+        />
+      ),
     },
     {
       value: "Recaudo",
-      label: <FundacionIcons name="Recaudo"  Logo={"https://irp-cdn.multiscreensite.com/c82c664f/MOBILE/png/943810-tuerca_icono.png"}  />,
+      label: (
+        <FundacionIcons
+          name="Recaudo"
+          Logo={
+            "https://irp-cdn.multiscreensite.com/c82c664f/MOBILE/png/943810-tuerca_icono.png"
+          }
+        />
+      ),
     },
-   
   ];
 
   const posibles = ["Desembolso", "Recaudo"];

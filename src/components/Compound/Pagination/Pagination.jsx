@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import useQuery from "../../../hooks/useQuery";
-import Button from "../../Base/Button/Button";
-import ButtonBar from "../../Base/ButtonBar/ButtonBar";
-import Form from "../../Base/Form/Form";
+import Button from "../../Base/Button";
+import ButtonBar from "../../Base/ButtonBar";
+import Form from "../../Base/Form";
 
 const Pagination = ({
   maxPage = 0,
@@ -10,7 +10,7 @@ const Pagination = ({
   lgButtons = true,
   children,
   grid = false,
-  onSubmit = (e) => e.preventDefault()
+  onSubmit = (e) => e.preventDefault(),
 }) => {
   const [{ page = 1 }, setQuery] = useQuery();
 
@@ -21,7 +21,11 @@ const Pagination = ({
   );
 
   return (
-    <Form onLazyChange={{ callback: onChange, timeOut: 300 }} onSubmit={onSubmit} grid={grid}>
+    <Form
+      onLazyChange={{ callback: onChange, timeOut: 300 }}
+      onSubmit={onSubmit}
+      grid={grid}
+    >
       {children}
       {maxPage !== 1 && maxPage !== 0 ? (
         <ButtonBar className={`${lgButtons ? "lg:col-span-2" : ""}`}>

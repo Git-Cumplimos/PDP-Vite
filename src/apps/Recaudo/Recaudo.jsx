@@ -1,10 +1,10 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import AppIcons from "../../components/Base/AppIcons/AppIcons";
-import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
+import ButtonBar from "../../components/Base/ButtonBar";
 import ButtonLink from "../../components/Base/ButtonLink/ButtonLink";
-// import HNavbar from "../../components/Base/HNavbar/HNavbar";
-import InputSuggestions from "../../components/Base/InputSuggestions/InputSuggestions";
+// import HNavbar from "../../components/Base/HNavbar";
+import InputSuggestions from "../../components/Base/InputSuggestions";
 import fetchData from "../../utils/fetchData";
 
 const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;

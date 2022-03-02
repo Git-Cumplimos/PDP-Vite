@@ -1,6 +1,6 @@
 import React from "react";
-import Button from "../../../components/Base/Button/Button";
-import Form from "../../../components/Base/Form/Form";
+import Button from "../../../components/Base/Button";
+import Form from "../../../components/Base/Form";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
@@ -18,7 +18,7 @@ const ReconoserID = () => {
   const { ContenedorPrincipal } = classes;
   useEffect(() => {
     fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${params.numCedula}`
+      `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actualizacionestado?numDoc=${params.numCedula}`
     )
       .then((res) => res.json())
       .then((respuesta) => setDatosUsuario(respuesta.obj.results));
@@ -54,7 +54,7 @@ const ReconoserID = () => {
       console.log(event);
       if (event.data.for === "resultData") {
         setIsSuccess(event.data.isSuccess);
-        setTimeout(() => navigate("/Solicitud-enrolamiento"), 2000);
+        setTimeout(() => navigate("/public/solicitud-enrolamiento"), 2000);
         /* 
         el mensaje que entrega el validador dentro de e.data contiene 
         un mensaje de la siguiente forma: 
@@ -90,9 +90,10 @@ const ReconoserID = () => {
         email: datosUsuario[0]["email"],
         celular: datosUsuario[0]["celular"],
       };
-
+      console.log(datos);
       fetch(
         `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/solicitud-validacion-reconoserid`,
+        /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/solicitud-validacion-reconoserid`, */
         /* `http://127.0.0.1:5000/solicitudvalidacion` */
         {
           method: "POST",

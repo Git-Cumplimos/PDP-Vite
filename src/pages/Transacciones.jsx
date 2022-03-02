@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import Button from "../components/Base/Button/Button";
-import ButtonBar from "../components/Base/ButtonBar/ButtonBar";
-import Form from "../components/Base/Form/Form";
-import Modal from "../components/Base/Modal/Modal";
-import Select from "../components/Base/Select/Select";
-import Table from "../components/Base/Table/Table";
-import Input from "../components/Base/Input/Input";
+import Button from "../components/Base/Button";
+import ButtonBar from "../components/Base/ButtonBar";
+import Form from "../components/Base/Form";
+import Modal from "../components/Base/Modal";
+import Select from "../components/Base/Select";
+import Table from "../components/Base/Table";
+import Input from "../components/Base/Input";
 import fetchData from "../utils/fetchData";
 import { useAuth } from "../hooks/AuthHooks";
-import Tickets from "../components/Base/Tickets/Tickets";
+import Tickets from "../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 
 const Transacciones = () => {
@@ -25,6 +25,12 @@ const Transacciones = () => {
   const [tipoOp, setTipoOp] = useState("");
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
+
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
 
   const transacciones = useCallback(
     (page, Comercio, Tipo_operacion, date_ini, date_end) => {
@@ -222,7 +228,7 @@ const Transacciones = () => {
             <h1>Ultima pagina: {maxPages}</h1>
           </div>
           <Table
-            headers={["Fecha", "operacion", "Monto"]}
+            headers={["Fecha", "Operación", "Monto"]}
             data={trxs.map(({ Created_at, Tipo_operacion, Monto }) => {
               const tempDate = new Date(Created_at);
               tempDate.setHours(tempDate.getHours() + 5);
@@ -233,10 +239,11 @@ const Transacciones = () => {
                 hour: "numeric",
                 minute: "numeric",
               }).format(tempDate);
+              const money = formatMoney.format(Monto);
               return {
                 Created_at,
                 Tipo_operacion,
-                Monto,
+                money,
               };
             })}
             onSelectRow={(_e, index) => {

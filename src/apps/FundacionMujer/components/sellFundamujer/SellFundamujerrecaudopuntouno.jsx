@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import Button from "../../../../components/Base/Button/Button";
+import Button from "../../../../components/Base/Button";
 import Voucher from "../Voucher/Voucherrecaudopuntouno";
 import { useReactToPrint } from "react-to-print";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
+import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useAuth } from "../../../../hooks/AuthHooks";
 
 const Sellfundamujerrecaudo = ({
@@ -18,7 +18,7 @@ const Sellfundamujerrecaudo = ({
     content: () => printDiv.current,
   });
 
-/* 
+  /* 
 const ticket  = useCallback(async () => {
   try {
     const res = await fetchData(urls.ticket, "GET", {
@@ -35,9 +35,7 @@ const ticket  = useCallback(async () => {
 }, []);
 
  */
-const voucherInfo = {};
-
-
+  const voucherInfo = {};
 
   voucherInfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
     year: "numeric",
@@ -54,9 +52,6 @@ const voucherInfo = {};
   voucherInfo["Mensaje"] = respuestamujer["Mensaje"];
   voucherInfo["Estado"] = respuestamujer["Confirmacion"];
   voucherInfo["Referencia"] = respuestamujer["Referencia"];
-
-
-
 
   return "msg" ? (
     <div className="flex flex-col justify-center items-center">

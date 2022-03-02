@@ -1,14 +1,14 @@
 import React from "react";
-import Button from "../../../components/Base/Button/Button";
-import Form from "../../../components/Base/Form/Form";
+import Button from "../../../components/Base/Button";
+import Form from "../../../components/Base/Form";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
 import classes from "./ContinuarReconoserID.module.css";
 const ReconoserID = () => {
-  const [procesoConvenioGuid, setProcesoConvenioGuid] = useState("");
+  /*   const [procesoConvenioGuid, setProcesoConvenioGuid] = useState(""); */
   const [isSuccess, setIsSuccess] = useState(false);
-  const [datosUsuario, setDatosUsuario] = useState([]);
+  /* const [datosUsuario, setDatosUsuario] = useState([]); */
 
   let navigate = useNavigate();
   const params = useParams();
@@ -24,7 +24,7 @@ const ReconoserID = () => {
       console.log(event);
       if (event.data.for === "resultData") {
         setIsSuccess(event.data.isSuccess);
-        setTimeout(() => navigate("/Solicitud-enrolamiento"), 2000);
+        setTimeout(() => navigate("/public/solicitud-enrolamiento"), 2000);
         /* 
         el mensaje que entrega el validador dentro de e.data contiene 
         un mensaje de la siguiente forma: 

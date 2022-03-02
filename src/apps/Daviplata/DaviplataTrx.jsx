@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import HNavbar from "../../components/Base/HNavbar/HNavbar";
+import HNavbar from "../../components/Base/HNavbar";
 import { useAuth } from "../../hooks/AuthHooks";
 import { notifyError } from "../../utils/notify";
 
@@ -35,7 +35,7 @@ const DaviplataTrx = ({ subRoutes }) => {
       }
     }
   }, [roleInfo, navigate]);
-  
+
   return <HNavbar links={subRoutes} isIcon />;
 };
 

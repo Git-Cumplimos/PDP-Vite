@@ -1,16 +1,16 @@
 import { useEffect, useState, useCallback } from "react";
-import Form from "../../../components/Base/Form/Form";
+import Form from "../../../components/Base/Form";
 import AWS from "aws-sdk";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Button from "../../../components/Base/Button/Button";
-import Modal from "../../../components/Base/Modal/Modal";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Button from "../../../components/Base/Button";
+import Modal from "../../../components/Base/Modal";
 import SortForm from "../components/SortForm/SortForm";
 import CloseForm from "../components/SortForm/CloseForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import { useAuth } from "../../../hooks/AuthHooks";
-import fetchData from "../../../utils/fetchData"
-import { notify, notifyError} from "../../../utils/notify"
+import fetchData from "../../../utils/fetchData";
+import { notify, notifyError } from "../../../utils/notify";
 import ParamsForm from "../components/ParamsFomr/ParamsForm";
 
 AWS.config.update({
@@ -18,8 +18,7 @@ AWS.config.update({
   secretAccessKey: process.env.REACT_APP_secretAccessKey,
 });
 
-
-const url_consultaParams=`${process.env.REACT_APP_URL_LOTERIAS}/con_params`;
+const url_consultaParams = `${process.env.REACT_APP_URL_LOTERIAS}/con_params`;
 
 const CrearSorteos = ({ route }) => {
   const { label } = route;
@@ -38,8 +37,6 @@ const CrearSorteos = ({ route }) => {
   const [disable_botoOrdinario, setDisable_botoOrdinario] = useState(false);
   const [disable_botoExtra, setDisable_botoExtra] = useState(false);
   const [disabled_params, setDisabled_params] = useState(false);
-
-  
 
   const [day, setDay] = useState(null);
 
@@ -94,22 +91,19 @@ const CrearSorteos = ({ route }) => {
     setDisable_botoExtra(false);
   };
 
-
   const con_params = useCallback(async () => {
-    try {     
+    try {
       const res = await fetchData(url_consultaParams, "GET", {});
-      console.log(res)
+      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
     }
   }, []);
 
-  
   const closeparams = useCallback(() => {
     setShowparams(false);
-    setParams(null)
-    
+    setParams(null);
   });
   return (
     <>
@@ -169,25 +163,26 @@ const CrearSorteos = ({ route }) => {
           ""
         )}
         <ButtonBar>
-              <Button 
-              type="button"
-              onClick={() => {
-                con_params().then((res) => {
-                  if ("msg" in res) {
-                    notifyError(res.msg);
-                    setDisabledBtns(true);
-                  } else {
-                    setParams(res)
-                    console.log(res);
-                    setDisabled_params(false);
-                    setShowparams(true)
-                  }
-                });
-              }} 
-              disabled={disabled_params}>
-                Parametrización
-              </Button>
-            </ButtonBar>
+          <Button
+            type="button"
+            onClick={() => {
+              con_params().then((res) => {
+                if ("msg" in res) {
+                  notifyError(res.msg);
+                  setDisabledBtns(true);
+                } else {
+                  setParams(res);
+                  console.log(res);
+                  setDisabled_params(false);
+                  setShowparams(true);
+                }
+              });
+            }}
+            disabled={disabled_params}
+          >
+            Parametrización
+          </Button>
+        </ButtonBar>
         <Modal show={showModal1} handleClose={() => closeModal()}>
           <SortForm
             closeModal={closeModal}
@@ -205,11 +200,10 @@ const CrearSorteos = ({ route }) => {
         </Modal>
         <Modal show={showparams} handleClose={() => closeparams()}>
           <ParamsForm
-          closeModal={closeparams}
-          params={params}
-          setParams={setParams}          
-          >
-          </ParamsForm>
+            closeModal={closeparams}
+            params={params}
+            setParams={setParams}
+          ></ParamsForm>
         </Modal>
       </div>
     </>

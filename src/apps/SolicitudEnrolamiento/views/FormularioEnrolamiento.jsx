@@ -1,22 +1,23 @@
-import Button from "../../../components/Base/Button/Button";
-import Form from "../../../components/Base/Form/Form";
+import Button from "../../../components/Base/Button";
+import Form from "../../../components/Base/Form";
 import classes from "../../SolicitudEnrolamiento/views/FormularioEnrolamiento.module.css";
-import Input from "../../../components/Base/Input/Input";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import MultipleInput from "../../../components/Base/MultipleInput/MultipleInput";
+import Input from "../../../components/Base/Input";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import MultipleInput from "../../../components/Base/MultipleInput";
 import FileInput from "../../../components/Base/FileInput/FileInput";
 import { useState, useEffect, useCallback, Fragment } from "react";
-import { useNavigate } from "react-router-dom";
-import Select from "../../../components/Base/Select/Select";
-import { useImgs } from "../../../hooks/ImgsHooks";
-import { useWindowSize } from "../../../hooks/WindowSizeHooks";
-import Fieldset from "../../../components/Base/Fieldset/Fieldset";
-import LocationForm from "../../../components/Compound/LocationForm/LocationForm";
-import InputSuggestions from "../../../components/Base/InputSuggestions/InputSuggestions";
+import Select from "../../../components/Base/Select";
+import Fieldset from "../../../components/Base/Fieldset";
+import LocationForm from "../../../components/Compound/LocationForm";
+import InputSuggestions from "../../../components/Base/InputSuggestions";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
+
+const capitalize = (word) => {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+};
 
 const FormularioEnrolamiento = () => {
   const {
@@ -56,6 +57,59 @@ const FormularioEnrolamiento = () => {
   const [archivos2, setArchivos2] = useState([]);
   const [archivos3, setArchivos3] = useState([]);
 
+  const [codDaneMunicipioComercio, setCodDaneMunicipioComercio] = useState("");
+  const [codDaneMunicipioCorrespondencia, setCodDaneMunicipioCorrespondencia] =
+    useState("");
+
+  const commerceLocation = {
+    municipio: useState(""),
+    departamento: useState(""),
+    localidad: useState(""),
+    barrio: useState(""),
+    direccion: useState(""),
+    foundMunicipios: useState([]),
+  };
+  const homeLocation = {
+    municipio: useState(""),
+    departamento: useState(""),
+    localidad: useState(""),
+    barrio: useState(""),
+    direccion: useState(""),
+    foundMunicipios: useState([]),
+  };
+
+  const [LocalidadUbComercio, setLocalidadUbComercio] = useState(0);
+  const [LocalidadUbCorrespondencia, setLocalidadUbCorrespondencia] =
+    useState(0);
+
+  //Traer localidades Con codigo dane de la ubicacion del comercio
+  useEffect(() => {
+    fetchData(
+      `${
+        process.env.REACT_APP_URL_SERVICE_COMMERCE
+      }/localidades?cod_dane=${codDaneMunicipioComercio}&limit=${0}`,
+      "GET",
+      {},
+      {},
+      {},
+      false
+    ).then((respuesta) => setLocalidadUbComercio(respuesta.obj.results));
+  }, [codDaneMunicipioComercio]);
+
+  //Traer localidades Con codigo dane de la ubicacion Correspondencia
+  useEffect(() => {
+    fetchData(
+      `${
+        process.env.REACT_APP_URL_SERVICE_COMMERCE
+      }/localidades?cod_dane=${codDaneMunicipioCorrespondencia}&limit=${0}`,
+      "GET",
+      {},
+      {},
+      {},
+      false
+    ).then((respuesta) => setLocalidadUbCorrespondencia(respuesta.obj.results));
+  }, [codDaneMunicipioCorrespondencia]);
+
   useEffect(() => {
     fetchData(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?limit=${14}`,
@@ -94,7 +148,7 @@ const FormularioEnrolamiento = () => {
         "POST",
         {},
         {
-          asesor: asignarAsesores,
+          asesor: asignarAsesores.toString(),
           nombre: `${nombre}`,
           apellido: `${apellido}`,
           nombre_comercio: nombreComercio,
@@ -135,7 +189,7 @@ const FormularioEnrolamiento = () => {
         false
       )
         .then((respuesta) => {
-          console.log(respuesta);
+          /*  console.log(respuesta); */
           const formData = new FormData();
 
           formData.set("rut", archivos1[0]);
@@ -216,47 +270,26 @@ const FormularioEnrolamiento = () => {
     },
     [archivos1, archivos2, archivos3]
   );
-  const capitalize = (word) => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  };
-  const commerceLocation = {
-    municipio: useState(""),
-    departamento: useState(""),
-    localidad: useState(""),
-    barrio: useState(""),
-    direccion: useState(""),
-    foundMunicipios: useState([]),
-  };
-  const homeLocation = {
-    municipio: useState(""),
-    departamento: useState(""),
-    localidad: useState(""),
-    barrio: useState(""),
-    direccion: useState(""),
-    foundMunicipios: useState([]),
-  };
 
-  const navigate = useNavigate();
-
-  const handleReconoser = async () => {
-    navigate("/Solicitud-enrolamiento/reconoserid");
-  };
-  const [clientWidth] = useWindowSize();
-  const {
-    imgs: { personas },
-    svgs: { backIcon, backIconSecondary },
-  } = useImgs();
   useEffect(() => {
-    if (clientWidth > 768) {
-      document.body.style.backgroundImage = `url(""), url("${backIcon}"), url("")`;
-      document.body.style.backgroundAttachment = "fixed";
-      document.body.style.backgroundRepeat = "no-repeat";
-      document.body.style.backgroundPosition = "2.5% 100%, center, center";
-      document.body.style.backgroundSize = "500px, cover, cover";
-    } else {
-      document.body.style.backgroundImage = "none";
+    if (commerceLocation.municipio[0] != "") {
+      setCodDaneMunicipioComercio(
+        parseInt(
+          commerceLocation.foundMunicipios[0][0]["c_digo_dane_del_municipio"]
+        )
+      );
     }
-  }, [backIcon, backIconSecondary, clientWidth]);
+  }, [commerceLocation]);
+  useEffect(() => {
+    if (homeLocation.municipio[0] != "") {
+      setCodDaneMunicipioCorrespondencia(
+        parseInt(
+          homeLocation.foundMunicipios[0][0]["c_digo_dane_del_municipio"]
+        )
+      );
+    }
+  }, [homeLocation]);
+
   return (
     <div className=" flex flex-col justify-center items-center text-justify my-8">
       <span className={tituloFormularioInscripcion}>
@@ -267,7 +300,7 @@ const FormularioEnrolamiento = () => {
           <Form
             /* gird={false} */
             grid
-            onSubmit={(e) => handleSubmit() || handleReconoser(e)}
+            onSubmit={(e) => handleSubmit()}
           >
             <Input
               label={"Nombre Comercio"}
@@ -286,8 +319,8 @@ const FormularioEnrolamiento = () => {
               options={
                 Object.fromEntries([
                   ["", ""],
-                  ...asesores.map(({ /* id_asesor, */ nom_asesor }) => {
-                    return [/* id_asesor, */ nom_asesor];
+                  ...asesores.map(({ nom_asesor /* , id_asesor */ }) => {
+                    return [nom_asesor /* , id_asesor */];
                   }),
                 ]) || { "": "" }
               }
@@ -472,18 +505,6 @@ const FormularioEnrolamiento = () => {
                   NO: "NO",
                 }}
               ></Select>
-              <Select
-                onChange={(event) => setTipoComercio(event.target.value)}
-                id="comissionType" /* para que es esto */
-                name="comissionType"
-                label={`Tipo de Establecimiento`}
-                required
-                options={{
-                  "": "",
-                  Papeleria: "Papeleria",
-                  " Tienda De Mascotas": " Tienda De Mascotas",
-                }}
-              ></Select>
             </Fieldset>
 
             <Fieldset legend="Contacto" className="lg:col-span-3">
@@ -509,11 +530,53 @@ const FormularioEnrolamiento = () => {
               />
             </Fieldset>
           </Form>
-          <LocationForm place="Comercio" location={commerceLocation} required />
+          <LocationForm
+            place="Comercio"
+            location={commerceLocation}
+            required
+            LocalidadComponent={
+              <Select
+                onChange={(event) =>
+                  commerceLocation.localidad[1](event.target.value)
+                }
+                id="comissionType"
+                name="comissionType"
+                value={commerceLocation.localidad[0]}
+                label={`Localidad`}
+                options={
+                  Object.fromEntries([
+                    ["", ""],
+                    ...LocalidadUbComercio.map(({ nom_localidad }) => {
+                      return [nom_localidad];
+                    }),
+                  ]) || { "": "" }
+                }
+              ></Select>
+            }
+          />
           <LocationForm
             place="Correspondencia"
             location={homeLocation}
             required
+            LocalidadComponent={
+              <Select
+                onChange={(event) =>
+                  homeLocation.localidad[1](event.target.value)
+                }
+                id="comissionType"
+                name="comissionType"
+                value={homeLocation.localidad[0]}
+                label={`Localidad`}
+                options={
+                  Object.fromEntries([
+                    ["", ""],
+                    ...LocalidadUbCorrespondencia.map(({ nom_localidad }) => {
+                      return [nom_localidad];
+                    }),
+                  ]) || { "": "" }
+                }
+              ></Select>
+            }
           />
 
           <Fragment>
@@ -536,14 +599,10 @@ const FormularioEnrolamiento = () => {
                 accept=".pdf"
                 allowDrop={false}
               />
-              {/*   <ButtonBar className="lg:col-span-2">
-          <Button type="submit">Subir archivos</Button>
-        </ButtonBar> */}
             </Form>
           </Fragment>
           <ButtonBar className={"lg:col-span-2"} type="">
             {
-              /* archivos1.length > 0 && archivos2.length > 0  */ /* estadoFormulario ? ( */
               <Button
                 type="submit"
                 onClick={(e) =>

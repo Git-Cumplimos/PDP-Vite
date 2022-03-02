@@ -1,19 +1,17 @@
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Button from "../../../components/Base/Button/Button";
-import Modal from "../../../components/Base/Modal/Modal";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Button from "../../../components/Base/Button";
+import Modal from "../../../components/Base/Modal";
 import useQuery from "../../../hooks/useQuery";
 import { Fragment, useState, useCallback, useRef, useEffect } from "react";
-import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
-import Tickets from "../../../components/Base/Tickets/Tickets";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
+import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import { postCashIn } from "../utils/fetchRevalDaviplata";
 import { notify, notifyError } from "../../../utils/notify";
-import MoneyInput, {
-  formatMoney,
-} from "../../../components/Base/MoneyInput/MoneyInput";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import { useFetch } from "../../../hooks/useFetch";
 import { useAuth } from "../../../hooks/AuthHooks";
 
@@ -24,9 +22,15 @@ const Deposito = () => {
   const { roleInfo, infoTicket } = useAuth();
 
   const [loadingCashIn, fetchCashIn] = useFetch(postCashIn);
+  const [, fetchTypes] = useFetch();
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
+
+  const [limitesMontos, setLimitesMontos] = useState({
+    max: 9999999,
+    min: 5000,
+  });
 
   const printDiv = useRef();
 
@@ -69,7 +73,10 @@ const Deposito = () => {
   const onSubmitDeposit = useCallback(
     (e) => {
       e.preventDefault();
-      if (valor >= 5000 && valor < 10000000) {
+
+      const { min, max } = limitesMontos;
+
+      if (valor >= min && valor < max) {
         const formData = new FormData(e.target);
         const phone = formData.get("numCliente");
         const userDoc = formData.get("docCliente");
@@ -83,11 +90,13 @@ const Deposito = () => {
         setShowModal(true);
       } else {
         notifyError(
-          "El valor del deposito debe estar entre $ 5.000 y $ 9.999.999"
+          `El valor del deposito debe estar entre ${formatMoney.format(
+            min
+          )} y ${formatMoney.format(max)}`
         );
       }
     },
-    [setQuery, valor]
+    [setQuery, valor, limitesMontos]
   );
 
   const onChange = useCallback(
@@ -188,6 +197,29 @@ const Deposito = () => {
       });
   }, [phone, valor, userDoc, fetchCashIn, roleInfo, infoTicket]);
 
+  useEffect(() => {
+    fetchTypes(
+      `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`,
+      "GET",
+      { tipo_op: 20 }
+    )
+      .then((res) => {
+        if (!res?.status) {
+          notifyError(res?.msg);
+          return;
+        }
+        const _parametros = res?.obj?.[0]?.Parametros;
+        setLimitesMontos({
+          max: parseFloat(_parametros?.monto_maximo),
+          min: parseFloat(_parametros?.monto_minimo),
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        notifyError("Error consultando parametros de la transaccion");
+      });
+  }, [fetchTypes]);
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Depositos Daviplata</h1>
@@ -221,7 +253,8 @@ const Deposito = () => {
           name="valor"
           label="Valor a depositar"
           autoComplete="off"
-          min={5000}
+          min={limitesMontos?.min}
+          max={limitesMontos?.max}
           onInput={onMoneyChange}
           required
         />

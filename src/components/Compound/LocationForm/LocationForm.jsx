@@ -1,12 +1,12 @@
 import { useState } from "react";
 import fetchData from "../../../utils/fetchData";
 import AddressInput from "../../Base/AddressInput/AddressInput";
-import Button from "../../Base/Button/Button";
-import ButtonBar from "../../Base/ButtonBar/ButtonBar";
-import Fieldset from "../../Base/Fieldset/Fieldset";
-import Input from "../../Base/Input/Input";
-import Modal from "../../Base/Modal/Modal";
-import Table from "../../Base/Table/Table";
+import Button from "../../Base/Button";
+import ButtonBar from "../../Base/ButtonBar";
+import Fieldset from "../../Base/Fieldset";
+import Input from "../../Base/Input";
+import Modal from "../../Base/Modal";
+import Table from "../../Base/Table";
 
 const capitalize = (word) => {
   return word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);
@@ -14,7 +14,7 @@ const capitalize = (word) => {
 
 const url = process.env.REACT_APP_URL_DANE_MUNICIPIOS;
 
-const LocationForm = ({ place = "", location }) => {
+const LocationForm = ({ place = "", location, LocalidadComponent = null }) => {
   const {
     municipio: munState,
     departamento: depState,
@@ -68,18 +68,26 @@ const LocationForm = ({ place = "", location }) => {
         onInput={(e) => setBarrio(capitalize(e.target.value))}
         required
       />
-      {Array.isArray(foundMuni) &&
-      foundMuni.length === 1 &&
-      parseInt(foundMuni[0].c_digo_dane_del_departamento) === 11 ? (
-        <Input
-          id={`localidad_${place}`}
-          label="Localidad"
-          type="search"
-          autoComplete="off"
-          value={localidad}
-          onInput={(e) => setLocalidad(capitalize(e.target.value))}
-          required
-        />
+      {(Array.isArray(foundMuni) &&
+        foundMuni.length === 1 &&
+        parseInt(foundMuni[0].c_digo_dane_del_departamento) === 11) ||
+      (foundMuni.length === 1 &&
+        parseInt(foundMuni[0].c_digo_dane_del_departamento) === 13) ||
+      (foundMuni.length === 1 &&
+        parseInt(foundMuni[0].c_digo_dane_del_departamento) === 8) ? (
+        LocalidadComponent ? (
+          LocalidadComponent
+        ) : (
+          <Input
+            id={`localidad_${place}`}
+            label="Localidad"
+            type="search"
+            autoComplete="off"
+            value={localidad}
+            onInput={(e) => setLocalidad(capitalize(e.target.value))}
+            required
+          />
+        )
       ) : (
         ""
       )}

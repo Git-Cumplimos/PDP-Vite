@@ -1,19 +1,17 @@
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Button from "../../../components/Base/Button/Button";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Button from "../../../components/Base/Button";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import Modal from "../../../components/Base/Modal/Modal";
+import Modal from "../../../components/Base/Modal";
 import useQuery from "../../../hooks/useQuery";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { postCashOut } from "../utils/fetchRevalDaviplata";
 import { notify, notifyError } from "../../../utils/notify";
-import Tickets from "../../../components/Base/Tickets/Tickets";
-import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
-import MoneyInput, {
-  formatMoney,
-} from "../../../components/Base/MoneyInput/MoneyInput";
+import Tickets from "../../../components/Base/Tickets";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import { useFetch } from "../../../hooks/useFetch";
 import { useAuth } from "../../../hooks/AuthHooks";
 
@@ -25,9 +23,15 @@ const Retiro = () => {
   const { roleInfo, infoTicket } = useAuth();
 
   const [loadingCashOut, fetchCashOut] = useFetch(postCashOut);
+  const [, fetchTypes] = useFetch();
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
+
+  const [limitesMontos, setLimitesMontos] = useState({
+    max: 9999999,
+    min: 5000,
+  });
 
   const printDiv = useRef();
 
@@ -70,7 +74,10 @@ const Retiro = () => {
   const onSubmitDeposit = useCallback(
     (e) => {
       e.preventDefault();
-      if (valor >= 5000 && valor < 10000000) {
+
+      const { min, max } = limitesMontos;
+
+      if (valor >= min && valor < max) {
         const formData = new FormData(e.target);
         const phone = formData.get("numCliente");
         const valorFormat = formData.get("valor");
@@ -85,11 +92,13 @@ const Retiro = () => {
         setShowModal(true);
       } else {
         notifyError(
-          "El valor del deposito debe estar entre $ 5.000 y $ 9.999.999"
+          `El valor del deposito debe estar entre ${formatMoney.format(
+            min
+          )} y ${formatMoney.format(max)}`
         );
       }
     },
-    [setQuery, valor, userDoc]
+    [setQuery, valor, userDoc, limitesMontos]
   );
 
   const onChange = useCallback(
@@ -195,6 +204,29 @@ const Retiro = () => {
       });
   }, [userDoc, otp, phone, valor, fetchCashOut, roleInfo, infoTicket]);
 
+  useEffect(() => {
+    fetchTypes(
+      `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`,
+      "GET",
+      { tipo_op: 21 }
+    )
+      .then((res) => {
+        if (!res?.status) {
+          notifyError(res?.msg);
+          return;
+        }
+        const _parametros = res?.obj?.[0]?.Parametros;
+        setLimitesMontos({
+          max: parseFloat(_parametros?.monto_maximo),
+          min: parseFloat(_parametros?.monto_minimo),
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        notifyError("Error consultando parametros de la transaccion");
+      });
+  }, [fetchTypes]);
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Retiros Daviplata</h1>
@@ -240,7 +272,8 @@ const Retiro = () => {
           name="valor"
           label="Valor a retirar"
           autoComplete="off"
-          min={5000}
+          min={limitesMontos?.min}
+          max={limitesMontos?.max}
           onInput={onMoneyChange}
           required
         />

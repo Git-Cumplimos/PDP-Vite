@@ -3,12 +3,27 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import useQuery from "../../../../hooks/useQuery";
 
 import SearchComissions from "../../components/SearchComissions/SearchComissions";
-import Button from "../../../../components/Base/Button/Button";
-import MultipleSelect from "../../../../components/Base/MultipleSelect/MultipleSelect";
+import Button from "../../../../components/Base/Button";
+import MultipleSelect from "../../../../components/Base/MultipleSelect";
 import { postComission } from "../../utils/fetchRevalComissions";
 import FormComission from "../../components/FormComission/FormComission";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useNavigate } from "react-router-dom";
+import Form from "../../../../components/Base/Form";
+import Select from "../../../../components/Base/Select";
+import Input from "../../../../components/Base/Input";
+import { fetchTiposContratosComisiones } from "../../utils/fetchTiposContratosComisiones";
+import { fetchConveniosMany } from "../../utils/fetchRevalConvenios";
+import {
+  fetchComisionesPagar,
+  postComisionesPagar,
+} from "../../utils/fetchComisionesPagar";
+import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
+import Modal from "../../../../components/Base/Modal";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Table from "../../../../components/Base/Table";
+import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
+import Pagination from "../../../../components/Compound/Pagination";
 
 const initComissionData = {
   type: "",
@@ -25,26 +40,76 @@ const initComissionData = {
 const CreateComision = () => {
   const navigate = useNavigate();
 
-  const [{ comercios_id_comercio, convenios_id_convenio, comercio }, setQuery] =
-    useQuery();
+  const [
+    {
+      tipoTrx = "",
+      comercio = "",
+      convenio = "",
+      autorizador = "",
+      page = 1,
+      selectedOpt,
+    },
+    setQuery,
+  ] = useQuery();
 
   const [selectecConv, setSelectecConv] = useState(null);
   const [comissionData, setComissionData] = useState(initComissionData);
+  const [newComision, setNewComision] = useState([]);
+  const [data, setdata] = useState([]);
+  const [maxPages, setMaxPages] = useState(0);
 
-  const onSelectItem = useCallback(
-    (selected) => setSelectecConv(selected.Convenio),
-    []
-  );
-
+  const [showModal, setShowModal] = useState(false);
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+    setQuery(
+      {
+        ["selectedOpt"]: "",
+        ["tipoTrx"]: "",
+        ["comercio"]: "",
+        ["autorizador"]: "",
+        ["page"]: 1,
+      },
+      { replace: true }
+    );
+  }, []);
   const createComission = useCallback(
     (ev) => {
       ev.preventDefault();
 
       let errRang = comissionData?.ranges?.length === 0;
 
+      if (
+        !newComision["Convenio"] &&
+        !newComision["Tipo de transaccion"] &&
+        !newComision["Id comercio"]
+      ) {
+        notifyError(
+          "Se debe agregar al menos un convenio o un tipo de transaccion o un id de comercio"
+        );
+        return;
+      }
+      if (!newComision["Autorizador"]) {
+        notifyError("Se debe agregar el autorizador");
+        return;
+      }
+
       if (errRang) {
         notifyError("Se debe agregar al menos una comision");
         return;
+      }
+      if (newComision["Fecha fin"] !== "") {
+        if (newComision["Fecha inicio"] !== "") {
+          if (
+            new Date(newComision["Fecha fin"]) <=
+            new Date(newComision["Fecha inicio"])
+          ) {
+            notifyError("La fecha final debe ser mayor a la inicial");
+            return;
+          }
+        } else {
+          notifyError("Debe existir una fecha inicial");
+          return;
+        }
       }
 
       comissionData?.ranges.reduce((prev, curr, indexR) => {
@@ -60,25 +125,28 @@ const CreateComision = () => {
       if (errRang) {
         return;
       }
-
-      if (!comercios_id_comercio) {
-        notifyError("Se debe seleccionar el comercio para la comision");
-        return;
+      let obj = {};
+      if (parseInt(newComision["Id comercio"])) {
+        obj["id_comercio"] = parseInt(newComision["Id comercio"]);
       }
-      if (!convenios_id_convenio) {
-        notifyError("Se debe seleccionar el convenio para la comision");
-        return;
+      if (newComision["Autorizador"]) {
+        obj["id_autorizador"] = parseInt(newComision["Id autorizador"]);
       }
-
-      if (!comissionData?.type) {
-        notifyError("Se debe seleccionar el tipo de comision");
-        return;
+      if (newComision["Convenio"]) {
+        obj["id_convenio"] = parseInt(newComision["Id convenio"]);
       }
-
-      postComission({
-        convenios_id_convenio,
-        comercios_id_comercio,
-        comision_pagada: {
+      if (newComision["Tipo de transaccion"]) {
+        obj["id_tipo_op"] = parseInt(newComision["Id tipo operacion"]);
+      }
+      if (newComision["Fecha inicio"] !== "") {
+        obj["fecha_inicio"] = newComision["Fecha inicio"];
+      }
+      if (newComision["Fecha fin"] !== "") {
+        obj["fecha_fin"] = newComision["Fecha fin"];
+      }
+      postComisionesPagar({
+        ...obj,
+        comisiones: {
           ...comissionData,
           ranges: comissionData?.ranges.map(
             ({
@@ -107,44 +175,164 @@ const CreateComision = () => {
         })
         .catch((err) => console.error(err));
     },
-    [comissionData, comercios_id_comercio, convenios_id_convenio, navigate]
+    [comissionData, newComision, navigate]
   );
+  const onChangeNewComision = useCallback((ev) => {
+    const formData = new FormData(ev.target.form);
+    const newData = [];
+    ["Id comercio", "Fecha inicio", "Fecha fin"].forEach((col) => {
+      let data = null;
+      data = formData.get(col);
+      newData.push([col, data]);
+    });
+    setNewComision((old) => ({
+      ...old,
+      ...Object.fromEntries(newData),
+    }));
+  }, []);
 
   useEffect(() => {
-    if (comercio && selectecConv) {
-      const _id_comercio = parseInt(comercio) ?? 0;
-      const _id_convenio = selectecConv[0];
-      setQuery(
-        {
-          comercios_id_comercio: _id_comercio,
-          convenios_id_convenio: _id_convenio,
-        },
-        { replace: true }
-      );
-    } else if (comercio) {
-      const _id_comercio = parseInt(comercio) ?? 0;
-      setQuery(
-        {
-          comercios_id_comercio: _id_comercio,
-        },
-        { replace: true },
-        ["convenios_id_convenio"]
-      );
-    } else if (selectecConv) {
-      const _id_convenio = selectecConv[0];
-      setQuery(
-        {
-          convenios_id_convenio: _id_convenio,
-        },
-        { replace: true },
-        ["comercios_id_comercio"]
-      );
+    if (selectedOpt === "convenio") {
+      fetchConveniosFunc();
+    } else if (selectedOpt === "autorizador") {
+      fetchAutorizadoresFunc();
+    } else if (selectedOpt === "Tipo de transaccion") {
+      fetchTiposTransaccionFunc();
+    } else if (selectedOpt === "comision") {
+      fecthComisionesPagarFunc();
+    } else {
+      setdata([]);
     }
-  }, [selectecConv, comercio, setQuery]);
+  }, [selectedOpt, page, tipoTrx, comercio, convenio, autorizador]);
+  const fetchConveniosFunc = () => {
+    fetchConveniosMany("")
+      .then((res) => {
+        setdata(
+          [...res?.results].map(({ id_convenio, nombre_convenio }) => {
+            return {
+              "Id convenio": id_convenio,
+              "Nombre convenio": nombre_convenio,
+            };
+          })
+        );
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
+  const fetchAutorizadoresFunc = () => {
+    fetchAutorizadores({ page })
+      .then((res) => {
+        setdata(
+          [...res?.results].map(({ id_autorizador, nombre_autorizador }) => {
+            return {
+              "Id autorizador": id_autorizador,
+              "Nombre autorizador": nombre_autorizador,
+            };
+          })
+        );
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
+  const fetchTiposTransaccionFunc = () => {
+    fetchTrxTypesPages("", page)
+      .then((res) => {
+        setdata(
+          [...res?.results].map(({ id_tipo_operacion, Nombre }) => {
+            return {
+              "Id tipo operacion": id_tipo_operacion,
+              "Nombre transaccion": Nombre,
+            };
+          })
+        );
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
+  const fecthComisionesPagarFunc = () => {
+    let obj = { page };
+    if (convenio !== "") obj["nombre_convenio"] = convenio;
+    if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
+    if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
+    if (comercio !== "") obj["id_comercio"] = parseInt(comercio);
+    fetchComisionesPagar(obj)
+      .then((res) => {
+        setdata(
+          [...res?.results].map(
+            ({
+              id_comision_pagada,
+              id_comercio,
+              nombre_operacion,
+              nombre_convenio,
+              nombre_autorizador,
+            }) => {
+              return {
+                "Id comision": id_comision_pagada,
+                Transaccion: nombre_operacion,
+                Comercio: id_comercio,
+                Convenio: nombre_convenio,
+                Autorizador: nombre_autorizador,
+              };
+            }
+          )
+        );
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
+  const onSelectConvenio = useCallback(
+    (e, i) => {
+      setShowModal(true);
+      if (selectedOpt === "convenio") {
+        setNewComision((old) => ({
+          ...old,
+          "Id convenio": data[i]?.["Id convenio"],
+          Convenio: data[i]?.["Nombre convenio"],
+        }));
+      } else if (selectedOpt === "autorizador") {
+        setNewComision((old) => ({
+          ...old,
+          "Id autorizador": data[i]?.["Id autorizador"],
+          Autorizador: data[i]?.["Nombre autorizador"],
+        }));
+      } else if (selectedOpt === "Tipo de transaccion") {
+        setNewComision((old) => ({
+          ...old,
+          "Id tipo operacion": data[i]?.["Id tipo operacion"],
+          "Tipo de transaccion": data[i]?.["Nombre transaccion"],
+        }));
+      } else if (selectedOpt === "comision") {
+        fetchComisionesPagar({ id_comision_pagada: data[i]?.["Id comision"] })
+          .then((res) => {
+            setComissionData({
+              type: res?.results[0]?.comisiones?.type,
+              ranges: res?.results?.[0]?.comisiones?.ranges?.map(
+                ({ Fija, Maximo, Minimo, Porcentaje }) => {
+                  return {
+                    "Rango minimo": Minimo,
+                    "Rango maximo": Maximo === -1 ? "" : Maximo,
+                    "Comision porcentual": parseFloat(Porcentaje * 100),
+                    "Comision fija": parseFloat(Fija),
+                  };
+                }
+              ),
+            });
+          })
+          .catch((err) => console.error(err));
+      }
+      handleClose();
+    },
+    [data, selectedOpt, handleClose]
+  );
+  const onChange = useCallback(
+    (ev) => setQuery({ [ev.target.name]: ev.target.value }, { replace: true }),
+    [setQuery]
+  );
 
   return (
     <Fragment>
-      <SearchComissions comissionFace="pay" onSelectItem={onSelectItem} />
+      <h1 className="text-3xl">Crear comisión a pagar:</h1>
+      {/* <SearchComissions comissionFace="pay" onSelectItem={onSelectItem} /> */}
       {selectecConv ? (
         <Fragment>
           <MultipleSelect
@@ -157,11 +345,184 @@ const CreateComision = () => {
       ) : (
         ""
       )}
+      <Form onChange={onChangeNewComision} grid>
+        {newComision?.["Convenio"] && (
+          <Input
+            id="Convenio"
+            name="Convenio"
+            label={"Convenio"}
+            type="text"
+            autoComplete="off"
+            // defaultValue={newComision?.["Convenio"]}
+            value={newComision?.["Convenio"]}
+            disabled
+          />
+        )}
+        {newComision?.["Autorizador"] && (
+          <Input
+            id="Autorizador"
+            name="Autorizador"
+            label={"Autorizador"}
+            type="text"
+            autoComplete="off"
+            // defaultValue={newComision?.["Autorizador"]}
+            value={newComision?.["Autorizador"]}
+            disabled
+          />
+        )}
+        {newComision?.["Tipo de transaccion"] && (
+          <Input
+            id="Tipo de transaccion"
+            name="Tipo de transaccion"
+            label={"Tipo de transaccion"}
+            type="text"
+            autoComplete="off"
+            // defaultValue={newComision?.["Tipo de transaccion"]}
+            value={newComision?.["Tipo de transaccion"]}
+            disabled
+          />
+        )}
+        <Input
+          id="Id comercio"
+          name="Id comercio"
+          label={"Id comercio"}
+          type="text"
+          autoComplete="off"
+          defaultValue={newComision?.["Id comercio"]}
+        />
+        <Input
+          id="Fecha inicio"
+          name="Fecha inicio"
+          label={"Fecha inicio"}
+          type="date"
+          autoComplete="off"
+          defaultValue={newComision?.["Fecha inicio"]}
+        />
+        <Input
+          id="Fecha fin"
+          name="Fecha fin"
+          label={"Fecha fin"}
+          type="date"
+          autoComplete="off"
+          defaultValue={newComision?.["Fecha fin"]}
+        />
+      </Form>
+      <ButtonBar>
+        <Button
+          type="button"
+          onClick={() => {
+            setShowModal(true);
+            setQuery({ ["selectedOpt"]: "convenio" }, { replace: true });
+          }}
+        >
+          {newComision?.["Convenio"] ? "Editar convenio" : "Agregar convenio"}
+        </Button>
+        <Button
+          type="button"
+          onClick={() => {
+            setShowModal(true);
+            setQuery({ ["selectedOpt"]: "autorizador" }, { replace: true });
+          }}
+        >
+          {newComision?.["Autorizador"]
+            ? "Editar autorizador"
+            : "Agregar autorizador"}
+        </Button>
+        <Button
+          type="button"
+          onClick={() => {
+            setShowModal(true);
+            setQuery(
+              { ["selectedOpt"]: "Tipo de transaccion" },
+              { replace: true }
+            );
+          }}
+        >
+          {newComision?.["Tipo de transaccion"]
+            ? "Editar tipo transacción"
+            : "Agregar tipo transacción"}
+        </Button>
+        <Button
+          type="button"
+          onClick={() => {
+            setShowModal(true);
+            setQuery({ ["selectedOpt"]: "comision" }, { replace: true });
+          }}
+        >
+          Agregar comisión existente
+        </Button>
+      </ButtonBar>
       <FormComission outerState={[comissionData, setComissionData]}>
         <Button type="submit" onClick={createComission}>
           Crear comision
         </Button>
       </FormComission>
+      <Modal
+        show={showModal}
+        handleClose={handleClose}
+        className="flex align-middle"
+      >
+        {/* {selectedOpt === "convenio" && */}
+        <Fragment>
+          {selectedOpt === "convenio" ? (
+            <h1 className="text-3xl">Seleccionar convenio</h1>
+          ) : selectedOpt === "autorizador" ? (
+            <h1 className="text-3xl">Seleccionar autorizador</h1>
+          ) : selectedOpt === "Tipo de transaccion" ? (
+            <h1 className="text-3xl">Seleccionar tipo de transacción</h1>
+          ) : selectedOpt === "comision" ? (
+            <h1 className="text-3xl">Seleccionar comisión</h1>
+          ) : (
+            ""
+          )}
+          <Pagination maxPage={maxPages} onChange={onChange} grid>
+            {selectedOpt === "comision" && (
+              <>
+                <Input
+                  id={"convenioComissions"}
+                  label={"Convenio"}
+                  name={"convenio"}
+                  type={"text"}
+                  autoComplete="off"
+                  defaultValue={convenio}
+                />
+                <Input
+                  id={"tipoTrx"}
+                  label={"Tipo de operación"}
+                  name={"tipoTrx"}
+                  type={"text"}
+                  autoComplete="off"
+                  defaultValue={tipoTrx}
+                />
+                <Input
+                  id={"comercioComissions"}
+                  label={"Id comercio"}
+                  name={"comercio"}
+                  type="number"
+                  step={"1"}
+                  autoComplete="off"
+                  defaultValue={comercio}
+                />
+                <Input
+                  id={"autorizadorComissions"}
+                  label={"Autorizador"}
+                  name={"autorizador"}
+                  type={"text"}
+                  autoComplete="off"
+                  defaultValue={autorizador}
+                />
+              </>
+            )}
+          </Pagination>
+          {Array.isArray(data) && data.length > 0 && (
+            <Table
+              headers={Object.keys(data[0])}
+              data={data}
+              onSelectRow={onSelectConvenio}
+            />
+          )}
+        </Fragment>
+      </Modal>
     </Fragment>
   );
 };

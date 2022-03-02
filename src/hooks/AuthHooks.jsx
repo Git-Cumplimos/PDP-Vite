@@ -33,7 +33,7 @@ const infoTicket = async (id_trx, Tipo_operacion, ticket) => {
 
 const fetchDane = async (codigo_dane) => {
   if (!codigo_dane) {
-    return ""
+    return "";
   }
   try {
     const resp_ciudad = await fetchData(
@@ -44,7 +44,7 @@ const fetchDane = async (codigo_dane) => {
       },
       {},
       {},
-      false,
+      false
     );
     return resp_ciudad[0].municipio;
   } catch (err) {}
@@ -325,7 +325,13 @@ export const useProvideAuth = () => {
           type: CONFIRM_SIGN_IN,
           payload: { loggedUser, dispatch: dispatchAuth },
         });
-        navigate(state?.from || pathname === "/login" ? "/" : pathname);
+        navigate(
+          state?.from?.pathname
+            ? state?.from?.pathname
+            : pathname === "/login"
+            ? "/"
+            : pathname
+        );
         if (timer) {
           clearTimeout(timer);
         }

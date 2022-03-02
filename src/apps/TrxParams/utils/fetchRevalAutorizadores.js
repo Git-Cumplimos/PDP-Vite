@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlAutorizadores = process.env.REACT_APP_URL_REVAL_AUTORIZADOR;
+const urlAutorizadores = process.env.REACT_APP_URL_COMISIONES;
 
 export const postAutorizadores = async (bodyObj) => {
   if (!bodyObj) {
@@ -8,7 +8,7 @@ export const postAutorizadores = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAutorizadores}/autorizador`,
+      `${urlAutorizadores}/autorizador/crear`,
       "POST",
       {},
       bodyObj
@@ -20,17 +20,19 @@ export const postAutorizadores = async (bodyObj) => {
   } catch (err) {
     throw err;
   }
-}
+};
 
-export const fetchAutorizadores = async (nombre_autorizador, page) => {
-  if (!nombre_autorizador) {
-    return { maxPages: 0, results: [] };
-  }
+export const fetchAutorizadores = async (obj) => {
+  // if (!nombre_autorizador) {
+  //   return { maxPages: 0, results: [] };
+  // }
   try {
-    const res = await fetchData(`${urlAutorizadores}/infoauto`, "GET", {
-      nombre_autorizador,
-      page: isNaN(page) ? 1 : page,
-    });
+    const res = await fetchData(
+      `${urlAutorizadores}/autorizador/consultar_autorizadores`,
+      "POST",
+      {},
+      obj
+    );
     if (res?.status) {
       return { ...res?.obj };
     } else {
@@ -48,7 +50,7 @@ export const putAutorizadores = async (argsObj, bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAutorizadores}/autorizador`,
+      `${urlAutorizadores}/autorizador/modificar`,
       "PUT",
       argsObj,
       bodyObj

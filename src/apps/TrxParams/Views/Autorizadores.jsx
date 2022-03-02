@@ -1,13 +1,13 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Modal from "../../../components/Base/Modal/Modal";
-import Table from "../../../components/Base/Table/Table";
-import TextArea from "../../../components/Base/TextArea/TextArea";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import Modal from "../../../components/Base/Modal";
+import Table from "../../../components/Base/Table";
+import TextArea from "../../../components/Base/TextArea";
+import Pagination from "../../../components/Compound/Pagination";
 import useQuery from "../../../hooks/useQuery";
 import { notify, notifyError } from "../../../utils/notify";
 import {
@@ -15,6 +15,7 @@ import {
   postAutorizadores,
   putAutorizadores,
 } from "../utils/fetchRevalAutorizadores";
+import { fetchTiposContratosComisiones } from "../utils/fetchTiposContratosComisiones";
 
 const calcularDigitoVerificacion = (myNit) => {
   let vpri, z;
@@ -46,27 +47,43 @@ const calcularDigitoVerificacion = (myNit) => {
 
 const Autorizadores = () => {
   const navigate = useNavigate();
-  const [{ searchAuto = "", page = 1 }, setQuery] = useQuery();
+  const [{ searchAuto = "", page = 1, openTipoContrato = false }, setQuery] =
+    useQuery();
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelectedAuto(null);
+    fecthAutorizadoresFunc();
+  }, []);
+  const [showModal2, setShowModal2] = useState(false);
+  const handleClose2 = useCallback(() => {
+    setShowModal2(false);
+    setQuery({ ["openTipoContrato"]: false }, { replace: true });
   }, []);
 
   const [autorizadores, setAutorizadores] = useState([]);
   const [selectedAuto, setSelectedAuto] = useState(null);
   const [maxPages, setMaxPages] = useState(0);
+  const [data, setdata] = useState([]);
 
   const tableAutorizadores = useMemo(() => {
     return [
       ...autorizadores.map(
-        ({ id_autorizador, nombre_autorizador, nit, descripcion }) => {
+        ({
+          id_autorizador,
+          nombre_autorizador,
+          nit,
+          descripcion,
+          id_tipo_contrato,
+          nombre_contrato,
+        }) => {
           return {
             "Id autorizador": id_autorizador,
-            "Nombre de autorizador": nombre_autorizador,
+            Autorizador: nombre_autorizador,
             Nit: nit,
             Descripcion: descripcion,
+            Contrato: nombre_contrato,
           };
         }
       ),
@@ -89,7 +106,18 @@ const Autorizadores = () => {
     },
     [setQuery]
   );
-
+  const onSelectTipoContrato = useCallback(
+    (e, i) => {
+      setShowModal2(true);
+      setSelectedAuto((old) => ({
+        ...old,
+        "Id contrato": data[i]?.["Id contrato"],
+        Contrato: data[i]?.["Contrato"],
+      }));
+      handleClose2();
+    },
+    [data, handleClose]
+  );
   const formatNit = useCallback((ev) => {
     if (ev.target.name === "Nit") {
       let nitInput = ev.target.value;
@@ -140,6 +168,7 @@ const Autorizadores = () => {
         putAutorizadores(
           { id_autorizador: selectedAuto?.["Id autorizador"] },
           {
+            id_tipo_contrato: selectedAuto?.["Id contrato"],
             nombre_autorizador: selectedAuto?.["Nombre de autorizador"],
             nit: selectedAuto?.["Nit"],
             descripcion: selectedAuto?.["Descripcion"],
@@ -148,7 +177,7 @@ const Autorizadores = () => {
           .then((res) => {
             if (res?.status) {
               notify(res?.msg);
-              setShowModal(false);
+              handleClose();
             } else {
               notifyError(res?.msg);
             }
@@ -156,18 +185,15 @@ const Autorizadores = () => {
           .catch((err) => console.error(err));
       } else {
         postAutorizadores({
+          id_tipo_contrato: selectedAuto?.["Id contrato"],
           nombre_autorizador: selectedAuto?.["Nombre de autorizador"],
           nit: selectedAuto?.["Nit"],
           descripcion: selectedAuto?.["Descripcion"],
-          comision_cobrada: {
-            type: "monto",
-            ranges: [{ Minimo: 0, Maximo: -1, Porcentaje: 0, Fija: 0 }],
-          },
         })
           .then((res) => {
             if (res?.status) {
               notify(res?.msg);
-              setShowModal(false);
+              handleClose();
             } else {
               notifyError(res?.msg);
             }
@@ -179,14 +205,36 @@ const Autorizadores = () => {
   );
 
   useEffect(() => {
-    fetchAutorizadores(searchAuto, page)
+    if (!openTipoContrato) {
+      fecthAutorizadoresFunc();
+    } else {
+      fetchTiposContratosComisionesFunc();
+    }
+  }, [searchAuto, page, openTipoContrato]);
+
+  const fecthAutorizadoresFunc = () => {
+    fetchAutorizadores({ nombre_autorizador: searchAuto, page })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
         setAutorizadores(autoArr?.results);
       })
       .catch((err) => console.error(err));
-  }, [searchAuto, page]);
-
+  };
+  const fetchTiposContratosComisionesFunc = () => {
+    fetchTiposContratosComisiones({ page })
+      .then((res) => {
+        setdata(
+          [...res?.results].map(({ id_tipo_contrato, nombre_contrato }) => {
+            return {
+              "Id contrato": id_tipo_contrato,
+              Contrato: nombre_contrato,
+            };
+          })
+        );
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
   return (
     <Fragment>
       <ButtonBar>
@@ -227,23 +275,35 @@ const Autorizadores = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={formatNit} grid>
           <Input
-            id="nameAuto"
-            name="Nombre de autorizador"
+            id="Autorizador"
+            name="Autorizador"
             label={"Nombre de autorizador"}
             type="text"
             autoComplete="off"
-            value={selectedAuto?.["Nombre de autorizador"]}
-            onChange={() => {}}
+            // value={selectedAuto?.["Nombre de autorizador"]}
+            defaultValue={selectedAuto?.["Autorizador"]}
             required
           />
+          {selectedAuto?.["Contrato"] && (
+            <Input
+              id="Contrato"
+              name="Contrato"
+              label={"Contrato"}
+              type="text"
+              autoComplete="off"
+              value={selectedAuto?.["Contrato"]}
+              // defaultValue={selectedAuto?.["Contrato"]}
+              disabled
+            />
+          )}
           <Input
             id="nitAuto"
             name="Nit"
             label={"Nit"}
             type="text"
             autoComplete="off"
-            value={selectedAuto?.Nit}
-            onChange={() => {}}
+            // value={selectedAuto?.Nit}
+            defaultValue={selectedAuto?.Nit}
             required
           />
           <TextArea
@@ -252,12 +312,24 @@ const Autorizadores = () => {
             label={"Descripcion"}
             autoCapitalize="sentences"
             autoComplete="off"
-            value={selectedAuto?.Descripcion ?? ""}
+            // value={selectedAuto?.Descripcion ?? ""}
+            defaultValue={selectedAuto?.Descripcion ?? ""}
             onChange={() => {}}
           />
           {!selectedAuto?.["Id autorizador"] ? (
             <ButtonBar>
               <Button type="submit">Crear autorizador</Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  setShowModal2(true);
+                  setQuery({ ["openTipoContrato"]: true }, { replace: true });
+                }}
+              >
+                {selectedAuto?.["Contrato"]
+                  ? "Editar contrato"
+                  : "Agregar contrato"}
+              </Button>
               <Button type="button" onClick={handleClose}>
                 Cancelar
               </Button>
@@ -265,8 +337,8 @@ const Autorizadores = () => {
           ) : (
             <Fragment>
               <ButtonBar>
-                <Button
-                  type="button"
+                {/* <Button
+                  type='button'
                   onClick={() => {
                     const urlParams = new URLSearchParams();
                     urlParams.append(
@@ -283,10 +355,21 @@ const Autorizadores = () => {
                   }}
                 >
                   Editar comisiones a cobrar
-                </Button>
+                </Button> */}
               </ButtonBar>
               <ButtonBar>
                 <Button type="submit">Editar autorizador</Button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setShowModal2(true);
+                    setQuery({ ["openTipoContrato"]: true }, { replace: true });
+                  }}
+                >
+                  {selectedAuto?.["Contrato"]
+                    ? "Editar contrato"
+                    : "Agregar contrato"}
+                </Button>
                 <Button type="button" onClick={handleClose}>
                   Cancelar
                 </Button>
@@ -294,6 +377,23 @@ const Autorizadores = () => {
             </Fragment>
           )}
         </Form>
+        <Modal
+          show={showModal2}
+          handleClose={handleClose2}
+          className="flex align-middle"
+        >
+          <Fragment>
+            <h1 className="text-3xl">Seleccionar el contrato</h1>
+            <Pagination maxPage={maxPages} grid></Pagination>
+            {Array.isArray(data) && data.length > 0 && (
+              <Table
+                headers={Object.keys(data[0])}
+                data={data}
+                onSelectRow={onSelectTipoContrato}
+              />
+            )}
+          </Fragment>
+        </Modal>
       </Modal>
     </Fragment>
   );

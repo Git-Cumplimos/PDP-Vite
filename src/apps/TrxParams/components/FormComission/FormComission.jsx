@@ -1,10 +1,10 @@
 import { Fragment, useCallback } from "react";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
-import Form from "../../../../components/Base/Form/Form";
-import Input from "../../../../components/Base/Input/Input";
-import Select from "../../../../components/Base/Select/Select";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Fieldset from "../../../../components/Base/Fieldset";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import Select from "../../../../components/Base/Select";
 
 const FormComission = ({ outerState, onSubmit, children }) => {
   const [comissionData, setComissionData] = outerState;
@@ -18,7 +18,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
       } else {
         setComissionData((oldComission) => {
           const name = ev.target.name.split("|")[0];
-          const ind = parseInt(ev.target.name.split("|")[1]);
+          const ind = parseInt(ev.target.name.split("|")[1]) ?? "";
           if (isNaN(ind)) {
             return { ...oldComission };
           }
@@ -47,7 +47,9 @@ const FormComission = ({ outerState, onSubmit, children }) => {
             name="comissionType"
             label="Tipo de comision"
             options={{ "": "", Transacciones: "trx", Monto: "monto" }}
-            defaultValue={comissionData?.type}
+            value={comissionData?.type}
+            onChange={() => {}}
+            // defaultValue={comissionData?.type}
             required
           />
           {comissionData?.ranges.map((_comission, ind) => {
@@ -71,7 +73,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           ? "1"
                           : "0.01"
                       }
-                      value={val}
+                      value={isNaN(val) ? "" : val}
                       onChange={() => {}}
                       autoComplete="off"
                       required={

@@ -4,25 +4,17 @@ import { useState } from "react";
 import { useEffect } from "react";
 import classes from "../../ValidacionEnrolamiento/views/VerificacionFormulario.module.css";
 import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
-import Button from "../../../components/Base/Button/Button";
-import Modal from "../../../components/Base/Modal/Modal";
-import Form from "../../../components/Base/Form/Form";
+import Button from "../../../components/Base/Button";
+import Modal from "../../../components/Base/Modal";
+import Form from "../../../components/Base/Form";
 import { useNavigate } from "react-router-dom";
-import Input from "../../../components/Base/Input/Input";
-/* import ToggleInput from "../../../components/Base/ToggleInput/ToggleInput"; */
-import TextArea from "../../../components/Base/TextArea/TextArea";
-import Fieldset from "../../../components/Base/Fieldset/Fieldset";
-import Select from "../../../components/Base/Select/Select";
+import Input from "../../../components/Base/Input";
+/* import ToggleInput from "../../../components/Base/ToggleInput"; */
+import TextArea from "../../../components/Base/TextArea";
+import Fieldset from "../../../components/Base/Fieldset";
+import Select from "../../../components/Base/Select";
 import { notify } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
-/* import file from ".././certificado_movimiento.pdf";
-import file2 from ".././ced.pdf";
-import file3 from ".././rut.pdf"; */
-// import file from ".././certificado_movimiento.pdf";
-// import file2 from ".././ced.pdf";
-// import file3 from ".././rut.pdf";
-/* import { Document, Page } from "react-pdf"; */
-// import Sample from "./Sample";
 
 const VerificacionFormulario = () => {
   const navigate = useNavigate();
@@ -45,29 +37,26 @@ const VerificacionFormulario = () => {
   const [asesorComercialLocalidad, setAsesorComercialLocalidad] = useState("");
   const [codigoLocalidad, setCodigoLocalidad] = useState("");
   const [tipoZona, setTipoZona] = useState("");
-  const [guardarDatosAsesor, setGuardarDatosAsesor] = useState(false);
   const [urlPdfs, setUrlPdfs] = useState({});
   const [causal, setCausal] = useState(false);
   const [mensajeCausal, setMensajeCausal] = useState("");
 
+  const [datosAsesor, SetDatosAsesor] = useState(0);
+  const [codDaneResponsable, SetCodDaneResponsable] = useState([]);
+  const [todosCodDane, SetTodosCodDane] = useState([]);
+  const [t, SetT] = useState([]);
+  const [p, SetP] = useState([]);
+
   const params = useParams();
+
+  const [zonas, setZonas] = useState([]);
+  const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
   useEffect(() => {
     /* const updateWidth = () => { */
 
-    fetchData(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-      "GET"
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */
-    )
-      /* .then((response) => response.json()) */
-      .then((respuesta) => setDatosParams(respuesta.obj.results));
-    /*  }; */
-
-    // actualizaremos el width al montar el componente
-    /*   updateWidth(); */
-
-    // nos suscribimos al evento resize de window
-    /*   window.addEventListener("resize", updateWidth); */
+    fetchData(`${url}/actualizacionestado?id_proceso=${params.id}`, "GET").then(
+      (respuesta) => setDatosParams(respuesta.obj.results)
+    );
   }, []);
 
   useEffect(() => {
@@ -76,15 +65,12 @@ const VerificacionFormulario = () => {
       const datos = {
         id_proceso: datosParams[0]["id_proceso"].toString(),
       };
-      fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile?id_proceso=${datos["id_proceso"]}`,
-        "GET"
-      )
-        /* .then((res) => res.json()) */
-        .then((respuesta) => {
-          console.log(respuesta.obj["rut"]);
+      fetchData(`${url}/urlfile?id_proceso=${datos["id_proceso"]}`, "GET").then(
+        (respuesta) => {
+          console.log(respuesta);
           setUrlPdfs(respuesta.obj);
-        });
+        }
+      );
     }
   }, [datosParams]);
   const aprobacionFormulario = (e) => {
@@ -99,16 +85,13 @@ const VerificacionFormulario = () => {
       tipozona: tipoZona,
       causal_rechazo: mensajeCausal,
     };
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
-      }
-    )
+    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(datos),
+    })
       .then((res) => res.json())
       .then((respuesta) => console.log(respuesta.obj.data));
     notify("El Usuario ha sido Aprobado para ReconoserID");
@@ -129,16 +112,13 @@ const VerificacionFormulario = () => {
       tipozona: tipoZona,
       causal_rechazo: mensajeCausal,
     };
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
-      }
-    )
+    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(datos),
+    })
       .then((res) => res.json())
       .then((respuesta) => console.log(respuesta.obj.data));
     notify("El Usuario ha sido Rechazado para ReconoserID");
@@ -148,42 +128,91 @@ const VerificacionFormulario = () => {
     );
   };
 
-  /* const guardarDatos = (e) => {
-    e.preventDefault();
-    const datos = {
-      responsable: personaResponsable,
-      unidad_negocio: unidadNegocio,
-      asesor_comercial_localidad: asesorComercialLocalidad,
-      cod_localidad: codigoLocalidad,
-      tipozona: tipoZona,
-      causal_rechazo: mensajeCausal,
-    };
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-       `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
-      }
-    )
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
-    alert("Los Datos Del Usuario Han Sido Actualizados");
-    setGuardarDatosAsesor(true);
-  }; */
+  useEffect(() => {
+    if (datosParams?.length > 0) {
+      const datos = {
+        asesor: datosParams[0]["asesor"],
+      };
+      fetchData(`${url}/asesores?nom_asesor=${datos["asesor"]}`, "GET").then(
+        (respuesta) => {
+          SetDatosAsesor(respuesta.obj.results);
+        }
+      );
+    }
+  }, [datosParams]);
+
   const fCausalRechazo = (e) => {
     e.preventDefault();
     setCausal(true);
   };
+  useEffect(() => {
+    fetchData(`${url}/zonas`, "GET", {
+      limit: 0,
+    }).then((respuesta) =>
+      setZonas(
+        Object.fromEntries([
+          ["", ""],
+          ...respuesta?.obj?.results?.map(({ zona, id_zona }) => [
+            zona,
+            id_zona,
+          ]),
+        ])
+      )
+    );
+  }, []);
+  console.log(zonas);
+
+  useEffect(() => {
+    if (datosAsesor) {
+      fetchData(
+        `${url}/responsables?nombre=${datosAsesor[0].responsable["nombre"]}`
+      ).then((respuesta) => {
+        if (respuesta.obj.results[0]["zona"]["municipios"]?.length > 0) {
+          const codResDane = [
+            ...respuesta.obj.results[0]["zona"]["municipios"].map((e) =>
+              parseInt(e)
+            ),
+          ];
+          SetCodDaneResponsable(codResDane);
+          const movie = [];
+          codResDane.forEach((element, i) => {
+            movie.push(
+              fetchData(
+                `${url}/localidades?cod_dane=${codResDane[i]}&limit=${0}`
+              ).then((res) => res)
+            );
+          });
+
+          Promise.all(movie).then((value) => {
+            console.log(value);
+            SetT(value);
+          });
+
+          SetP([
+            ...t.map((element, i) =>
+              t[i].obj.results.map(
+                ({ id_localidad, nom_localidad }) =>
+                  `${id_localidad}${nom_localidad}`
+              )
+            ),
+          ]);
+
+          /*  console.log(movie); */
+          /* SetTodosCodDane([
+            ...codDaneResponsable.map((e) => {
+              fetchData(`${url}/localidades?cod_dane=${e}&limit=${0}`).then(
+                (respuesta) => SetT([...respuesta.obj.results.map((e) => e)])
+              );
+            }),
+          ]); */
+        }
+      });
+    }
+  }, [datosAsesor]);
   return (
     <div>
-      {datosParams ? (
-        <Form
-        /*   flex={false} */
-        /*  grid */
-        >
+      {datosParams && datosAsesor ? (
+        <Form>
           <Input
             label={"Nombre Comercio"}
             placeholder={datosParams[0]["nombre_comercio"]}
@@ -253,67 +282,55 @@ const VerificacionFormulario = () => {
               ></Select>
             )}
 
-            {datosParams[0]["responsable"].length != "" ? (
+            {datosAsesor[0].length != "" ? (
               <Input
                 label={"Responsable"}
-                placeholder={datosParams[0]["responsable"]}
+                placeholder={datosAsesor[0].responsable["nombre"]}
                 disabled
               ></Input>
             ) : (
-              <Select
-                onChange={(event) => setPersonaResponsable(event.target.value)}
-                id="comissionType"
-                name="comissionType"
-                label={`Seleccione Responsable`}
-                options={{
-                  "": "",
-                  "Isabel Perez": "Isabel Perez",
-                  "Alejandra Suarez": "Alejandra Suarez",
-                }}
-              ></Select>
+              ""
             )}
 
-            {datosParams[0]["unidad_negocio"].length != "" ? (
-              <Input
-                label={"Unidad De Negocio"}
-                placeholder={datosParams[0]["unidad_negocio"]}
-                disabled
-              ></Input>
-            ) : (
+            {datosAsesor[0]["unidades_de_negocio"].length != "" ? (
               <Select
                 onChange={(event) => setUnidadNegocio(event.target.value)}
                 id="comissionType"
                 name="comissionType"
+                value={unidadNegocio}
                 label={`Unidad De Negocio`}
-                options={{
-                  "": ``,
-                  Comercios: "Comercios",
-                  Mayoristas: "Mayoristas",
-                  CEAS: "CEAS",
-                }}
+                options={
+                  Object.fromEntries([
+                    ["", ""],
+                    ...datosAsesor[0].unidades_de_negocio.map(
+                      ({ nom_unidad_neg }) => {
+                        return [nom_unidad_neg];
+                      }
+                    ),
+                  ]) || { "": "" }
+                }
               ></Select>
+            ) : (
+              ""
             )}
+
             {/* {datosParams[0]["tipozona"] != null */}
-            {datosParams[0]["tipozona"].length != "" ? (
+            {datosAsesor[0]["responsable"].length != "" ? (
               <Input
                 label={"Tipo Zona"}
-                placeholder={datosParams[0]["tipozona"]}
+                placeholder={
+                  datosAsesor[0].responsable["zona_id_zona"] === 1
+                    ? "Centro"
+                    : datosAsesor[0].responsable["zona_id_zona"] === 2
+                    ? "Norte"
+                    : datosAsesor[0].responsable["zona_id_zona"] === 3
+                    ? "Occidente"
+                    : datosAsesor[0].responsable["zona_id_zona"]
+                }
                 disabled
               ></Input>
             ) : (
-              <Select
-                onChange={(event) => setTipoZona(event.target.value)}
-                id="comissionType" /* para que es esto */
-                name="comissionType"
-                label={`Tipo De Zona`}
-                options={{
-                  "": "",
-                  Centro: "Centro",
-                  Norte: "Norte",
-                  Occidente: "Occidente",
-                  Oriente: "Oriente",
-                }}
-              ></Select>
+              ""
             )}
           </Fieldset>
           <Fieldset
@@ -375,11 +392,11 @@ const VerificacionFormulario = () => {
               placeholder={datosParams[0]["responsableiva"]}
               disabled
             ></Input>
-            <Input
+            {/*   <Input
               label={"Tipo de Establecimiento"}
               placeholder={datosParams[0]["tipo_establecimiento"]}
               disabled
-            ></Input>
+            ></Input> */}
           </Fieldset>
 
           <Fieldset legend="Contacto" className="lg:col-span-3">
@@ -417,6 +434,16 @@ const VerificacionFormulario = () => {
               placeholder={datosParams[0]["barrio"]}
               disabled
             />
+            {datosParams[0]["localidad_bogota"].length > 0 ? (
+              <Input
+                label={"Localidad"}
+                placeholder={datosParams[0]["localidad_bogota"]}
+                disabled
+              />
+            ) : (
+              ""
+            )}
+
             <Input
               label={"Direccion"}
               placeholder={datosParams[0]["direccion_comercio"]}
@@ -443,6 +470,15 @@ const VerificacionFormulario = () => {
               placeholder={datosParams[0]["barrio_correspondencia"]}
               disabled
             />
+            {datosParams[0]["localidad_correspondencia"].length > 0 ? (
+              <Input
+                label={"Localidad"}
+                placeholder={datosParams[0]["localidad_correspondencia"]}
+                disabled
+              />
+            ) : (
+              ""
+            )}
             <Input
               label={"Direccion"}
               placeholder={datosParams[0]["direccion_correspondencia"]}

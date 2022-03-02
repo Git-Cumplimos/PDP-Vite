@@ -1,11 +1,11 @@
 import { useState, useCallback } from "react";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import Form from "../../../../components/Base/Form/Form";
-import Table from "../../../../components/Base/Table/Table";
-import Input from "../../../../components/Base/Input/Input";
-import Modal from "../../../../components/Base/Modal/Modal";
+import Form from "../../../../components/Base/Form";
+import Table from "../../../../components/Base/Table";
+import Input from "../../../../components/Base/Input";
+import Modal from "../../../../components/Base/Modal";
 import DescargaForm from "../../components/DescargaForm/DescargaForm";
 import SubPage from "../../../../components/Base/SubPage/SubPage";
 import ReportVentasForm from "../../components/ReportVentasForm/ReportVentasForm";
@@ -26,11 +26,10 @@ const DescargarArchivosS3 = ({ route }) => {
 
   const { con_SortVentas_S3 } = useLoteria();
   const [showModal2, setShowModal2] = useState(false);
- 
+
   const onSubmit = (e) => {
     e.preventDefault();
-    setShowModal2(true)
-    
+    setShowModal2(true);
   };
   // const con_sort = (e) => {
 
@@ -229,16 +228,13 @@ const DescargarArchivosS3 = ({ route }) => {
           ""
         )}
         <Form formDir="col" onSubmit={onSubmit}>
-          <Button type='submit'>Reporte ventas</Button>  
+          <Button type="submit">Reporte ventas</Button>
         </Form>
         <Modal show={showModal} handleClose={closeModal}>
           <DescargaForm closeModal={closeModal} selected={selected} />
         </Modal>
         <Modal show={showModal2} handleClose={closeModal2}>
-          <ReportVentasForm 
-          closeModal={closeModal2}
-          Oficina=''
-          />
+          <ReportVentasForm closeModal={closeModal2} Oficina="" />
         </Modal>
       </div>
     </>

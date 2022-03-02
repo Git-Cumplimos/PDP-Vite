@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import Button from "../../components/Base/Button/Button";
-import ButtonBar from "../../components/Base/ButtonBar/ButtonBar";
-import Card from "../../components/Base/Card/Card";
-import Form from "../../components/Base/Form/Form";
-import Input from "../../components/Base/Input/Input";
-import Modal from "../../components/Base/Modal/Modal";
+import Button from "../../components/Base/Button";
+import ButtonBar from "../../components/Base/ButtonBar";
+import Card from "../../components/Base/Card";
+import Form from "../../components/Base/Form";
+import Input from "../../components/Base/Input";
+import Modal from "../../components/Base/Modal";
 import fetchData from "../../utils/fetchData";
 import { notifyError } from "../../utils/notify";
 

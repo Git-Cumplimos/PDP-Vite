@@ -1,13 +1,18 @@
-import { createContext, useContext, useMemo } from "react";
-import { Route } from "react-router-dom";
+import { createContext, lazy, useContext, useMemo } from "react";
+import { Route, Routes } from "react-router-dom";
 import { useAuth } from "./AuthHooks";
 import {
   allUrlsPrivateApps,
   privateUrls,
   publicUrls,
+  loginUrls,
 } from "../utils/appsRoutes";
-import PrivateRoute from "../components/Compound/PrivateRoute/PrivateRoute";
-import SubPage from "../components/Base/SubPage/SubPage";
+import PrivateRoute from "../components/Compound/PrivateRoute";
+import SubPage from "../components/Base/SubPage";
+
+const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
+const PublicLayout = lazy(() => import("../layouts/PublicLayout"));
+const LoginLayout = lazy(() => import("../layouts/LoginLayout"));
 
 const getAllRoutes = (urls) => {
   const allUrls = [];
@@ -129,11 +134,20 @@ export const useProvideUrls = () => {
   }, [userPermissions]);
 
   const allRoutes = useMemo(() => {
-    return [
-      ...toRoute(privateUrls),
-      ...toRoute(urlsPrivateApps, true, SubPage),
-      ...toRoute(publicUrls, false),
-    ];
+    return (
+      <Routes>
+        <Route path="/" element={<AdminLayout />}>
+          {toRoute(privateUrls)}
+          {toRoute(urlsPrivateApps, true, SubPage)}
+        </Route>
+        <Route path="/login" element={<LoginLayout />}>
+          {toRoute(loginUrls, false)}
+        </Route>
+        <Route path="/public" element={<PublicLayout />}>
+          {toRoute(publicUrls, false)}
+        </Route>
+      </Routes>
+    );
   }, [urlsPrivateApps]);
 
   return {

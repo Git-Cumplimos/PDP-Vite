@@ -1,0 +1,28 @@
+.socials {
+  @apply p-4 bg-primary text-white text-xl rounded-l-xl opacity-70 hover:opacity-100;
+}
+
+.socials > ul > li:hover {
+  @apply text-primary-extra-light;
+}
+
+.socials > ul > li {
+  @apply relative my-2;
+}
+
+.tooltip::before {
+  content: " ";
+  position: absolute;
+  top: 30%;
+  left: 100%;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgb(24, 24, 27);
+}
+.tooltip {
+  @apply hidden absolute right-10 top-0 bg-gray-900 text-white text-xs px-2 py-2 rounded font-medium;
+}
+
+.socials > ul > li:hover > .tooltip {
+  @apply block;
+}

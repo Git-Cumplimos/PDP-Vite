@@ -1,14 +1,14 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Fieldset from "../../../components/Base/Fieldset/Fieldset";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import InputSuggestions from "../../../components/Base/InputSuggestions/InputSuggestions";
-import Modal from "../../../components/Base/Modal/Modal";
-import Table from "../../../components/Base/Table/Table";
-import Pagination from "../../../components/Compound/Pagination/Pagination";
-import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Fieldset from "../../../components/Base/Fieldset";
+import Form from "../../../components/Base/Form";
+import Input from "../../../components/Base/Input";
+import InputSuggestions from "../../../components/Base/InputSuggestions";
+import Modal from "../../../components/Base/Modal";
+import Table from "../../../components/Base/Table";
+import Pagination from "../../../components/Compound/Pagination";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import useQuery from "../../../hooks/useQuery";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
@@ -84,17 +84,20 @@ const TypesTrxs = () => {
       .catch((err) => console.error(err));
   }, []);
 
-  const onSelectSuggestion = useCallback((i, el) => {
-    setSelected((old) => {
-      if (!old) {
-        return old;
-      }
-      const copy = { ...old }
-      copy.NewAliado = foundAliados[i];
-      copy.Aliado = foundAliados[i].nombre;
-      return { ...copy };
-    })
-  }, [foundAliados]);
+  const onSelectSuggestion = useCallback(
+    (i, el) => {
+      setSelected((old) => {
+        if (!old) {
+          return old;
+        }
+        const copy = { ...old };
+        copy.NewAliado = foundAliados[i];
+        copy.Aliado = foundAliados[i].nombre;
+        return { ...copy };
+      });
+    },
+    [foundAliados]
+  );
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -364,6 +367,6 @@ const TypesTrxs = () => {
       </Modal>
     </Fragment>
   );
-}
+};
 
-export default TypesTrxs
+export default TypesTrxs;
