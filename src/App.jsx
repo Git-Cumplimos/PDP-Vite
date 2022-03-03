@@ -10,6 +10,7 @@ import ProvideUrls from "./components/Compound/ProvideUrls";
 import ProvideImgs from "./components/Compound/ProvideImgs";
 import MessengerCustomerChat from "react-messenger-customer-chat";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // import ContactMenu from "./components/Compound/ContactMenu";
 
 Amplify.configure(awsconfig);

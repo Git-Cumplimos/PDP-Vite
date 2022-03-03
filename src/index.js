@@ -1,11 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
 import App from "./App";
-import "react-toastify/dist/ReactToastify.css";
 
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
+import "./index.css";
 import "./utils/LoadFonts";
 
 ReactDOM.render(
