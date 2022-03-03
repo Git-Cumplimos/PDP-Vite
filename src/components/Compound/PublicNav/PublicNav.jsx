@@ -15,12 +15,12 @@ const publicLayouts = [
   {
     href: {
       to: "/public",
-      "aria-label": "Inscripcion",
+      "aria-label": "Mas informacion",
     },
     span: {
-      className: "bi bi-ui-checks",
+      className: "bi bi-clipboard",
     },
-    help: "Inscribirse",
+    help: "Mas informacion",
   },
 ];
 
