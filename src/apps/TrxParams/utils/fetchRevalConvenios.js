@@ -37,8 +37,7 @@ export const fetchConveniosMany = async (tags, page = 1) => {
         page: isNaN(parseInt(page)) ? 1 : parseInt(page),
       },
       {},
-      {},
-      false
+      {}
     );
     if (res?.status) {
       return { ...res?.obj };
