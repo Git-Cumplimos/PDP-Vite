@@ -12,10 +12,15 @@ import Input from "../../../components/Base/Input";
 import Select from "../../../components/Base/Select";
 import useQuery from "../../../hooks/useQuery";
 import ToggleInput from "../../../components/Base/ToggleInput";
+import InputX from "../../../components/Base/InputX/InputX";
+import { button } from "aws-amplify";
+import React, { useRef } from "react";
+import classes from "../Views/AsesoresComerciales.module.css";
 
 const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 const AsesoresComerciales = () => {
+  const { contenedorPrincipal, contendorBoton } = classes;
   const [{ page = 1 }] = useQuery();
 
   const [asesoresComerciales, setAsesoresComerciales] = useState([]);
@@ -24,10 +29,12 @@ const AsesoresComerciales = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [linkAsesor, setLinkAsesor] = useState("");
 
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelected(null);
+    setLinkAsesor("");
   }, []);
 
   const fetchAsesores = useCallback(() => {
@@ -122,7 +129,32 @@ const AsesoresComerciales = () => {
       )
     );
   }, []);
+  const GenerarLinkAsesor = () => {
+    const link = `http://localhost:3000/public/solicitud-enrolamiento/formulario/${window.btoa(
+      selected.id_asesor
+    )}`;
+    setLinkAsesor(link);
+  };
 
+  /*  useEffect(() => {
+    const COPY = document.querySelector("#copy");
+    const VALUE = inputRef;
+    console.log(VALUE);
+    if (VALUE) {
+      COPY.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(VALUE.defaultValue);
+        alert("copiado");
+      });
+    }
+  }, [showModal]); */
+  let inputRef = HTMLInputElement | null;
+  const onClick = () => {
+    navigator.clipboard.writeText(inputRef.defaultValue);
+    alert("copiado");
+    /*    console.log("INPUT VALUE: ", inputRef?.value); */
+  };
+
+  console.log("Rendering");
   return (
     <Fragment>
       <ButtonBar>
@@ -189,12 +221,62 @@ const AsesoresComerciales = () => {
                 name="estado"
                 defaultChecked={selected?.estado ?? false}
               />
+
               <ButtonBar>
                 <Button type={"submit"}>Editar asesor</Button>
               </ButtonBar>
             </Form>
+            <ButtonBar>
+              <Button
+                onClick={() => {
+                  GenerarLinkAsesor();
+                }}
+              >
+                Generar Link
+              </Button>
+            </ButtonBar>
+            {linkAsesor ? (
+              /* <div className={" items-center justify-center"}>
+                <div className={"grid grid-cols-2 "}>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    className={"bg-orange-500 px-8 py-4 rounded-md"}
+                    id="link"
+                    defaultValue={linkAsesor}
+             
+                  />
+                  <button
+                    className={"rounded-md w-12 bg-orange-500 text-white "}
+                    id="copy"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div> */
+              <div className={contenedorPrincipal}>
+                <div>
+                  <InputX
+                    ref={(node) => {
+                      inputRef = node;
+                    }}
+                    type="text"
+                    id="link"
+                    defaultValue={linkAsesor}
+                  ></InputX>
+                </div>
+                <div>
+                  <button className={contendorBoton} onClick={onClick}>
+                    Copy
+                  </button>
+                </div>
+              </div>
+            ) : (
+              ""
+            )}
           </Fragment>
         ) : (
+          /* <InputX value={linkAsesor}></InputX> */
           <Fragment>
             <PaymentSummary
               title="Crear asesor"
@@ -215,6 +297,7 @@ const AsesoresComerciales = () => {
                 options={responsables}
                 required
               />
+
               <ButtonBar>
                 <Button type={"submit"}>Crear asesor</Button>
               </ButtonBar>

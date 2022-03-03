@@ -228,7 +228,7 @@ const publicUrls = [
     permission: [1],
     subRoutes: [
       {
-        link: "/public/solicitud-enrolamiento/formulario",
+        link: "/public/solicitud-enrolamiento/formulario/:idAsesor",
         label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
         component: FormularioEnrolamiento,
       },

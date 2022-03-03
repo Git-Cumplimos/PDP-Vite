@@ -292,7 +292,7 @@ const VerificacionFormulario = () => {
                 label={`Cod Localidad`}
                 options={
                   Object.fromEntries([
-                    ["", ""],
+                    ["N/A", "N/A"],
                     ...p.map(({ id_localidad, nom_localidad }) => {
                       return [`${id_localidad}${" "}${nom_localidad}`];
                     }),
