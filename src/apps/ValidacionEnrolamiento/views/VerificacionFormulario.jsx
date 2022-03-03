@@ -42,11 +42,11 @@ const VerificacionFormulario = () => {
   const [mensajeCausal, setMensajeCausal] = useState("");
 
   const [datosAsesor, SetDatosAsesor] = useState(0);
-  const [codDaneResponsable, SetCodDaneResponsable] = useState([]);
+  /* const [codDaneResponsable, SetCodDaneResponsable] = useState([]);
   const [todosCodDane, SetTodosCodDane] = useState([]);
   const [t, SetT] = useState([]);
+  const [p, SetP] = useState([]); */
   const [p, SetP] = useState([]);
-
   const params = useParams();
 
   const [zonas, setZonas] = useState([]);
@@ -162,7 +162,7 @@ const VerificacionFormulario = () => {
   }, []);
   console.log(zonas);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (datosAsesor) {
       fetchData(
         `${url}/responsables?nombre=${datosAsesor[0].responsable["nombre"]}`
@@ -197,18 +197,44 @@ const VerificacionFormulario = () => {
             ),
           ]);
 
-          /*  console.log(movie); */
-          /* SetTodosCodDane([
-            ...codDaneResponsable.map((e) => {
-              fetchData(`${url}/localidades?cod_dane=${e}&limit=${0}`).then(
-                (respuesta) => SetT([...respuesta.obj.results.map((e) => e)])
-              );
-            }),
-          ]); */
+     
         }
       });
     }
+  }, [datosAsesor]); */
+  useEffect(() => {
+    if (datosAsesor) {
+      gedCodsDaneResponsable().then(
+        (value) => SetP(value.map((datosCodLoc) => datosCodLoc)),
+        console.log(p)
+      );
+    }
   }, [datosAsesor]);
+
+  const gedCodsDaneResponsable = async () => {
+    try {
+      const consultaResponsable = await fetchData(
+        `${url}/responsables?nombre=${datosAsesor[0].responsable["nombre"]}`
+      );
+      const codsDaneResponsable = [
+        ...consultaResponsable.obj.results[0]["zona"]["municipios"].map(
+          (codigos) => parseInt(codigos)
+        ),
+      ];
+      const guardarFetch = [];
+      for (const codigoIterado of codsDaneResponsable) {
+        const respuestaLocalidad = await fetchData(
+          `${url}/localidades?cod_dane=${codigoIterado}&limit=${0}`
+        );
+        guardarFetch.push(...respuestaLocalidad.obj.results);
+      }
+
+      return guardarFetch;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div>
       {datosParams && datosAsesor ? (
@@ -229,7 +255,7 @@ const VerificacionFormulario = () => {
               disabled
             ></Input>
 
-            {datosParams[0]["asesor_comercial_localidad"].length != "" ? (
+            {/* {datosParams[0]["asesor_comercial_localidad"].length != "" ? (
               <Input
                 label={"Asesor Comercial Localidad"}
                 placeholder={datosParams[0]["asesor_comercial_localidad"]}
@@ -250,7 +276,7 @@ const VerificacionFormulario = () => {
                   "03 Asesor Bosa": "03 Asesor Bosa",
                 }}
               ></Select>
-            )}
+            )} */}
 
             {datosParams[0]["cod_localidad"].length != "" ? (
               <Input
@@ -264,21 +290,14 @@ const VerificacionFormulario = () => {
                 id="comissionType"
                 name="comissionType"
                 label={`Cod Localidad`}
-                options={{
-                  "No Aplica": "No Aplica",
-                  "01 Kennedy": "01 Kennedy",
-                  "02 Engativa": "02 Engativa",
-                  "03 Bosa": "03 Bosa",
-                  "04 Ciudad Bolivar": "04 Ciudad Bolivar",
-                  "05 Suba": "05 Suba",
-                  "06 Usaquen": "06 Usaquen",
-                  "07 Usme": "07 Usme",
-                  "08 Rafael Uribe Uribe": "08 Rafael Uribe Uribe",
-                  "09 Puente Aranda": "09 Puente Aranda",
-                  "10 Fontibon": "10 Fontibon",
-                  "11 San Cristobal": "11 San Cristobal",
-                  "11 San Cristobal": "11 San Cristobal",
-                }}
+                options={
+                  Object.fromEntries([
+                    ["", ""],
+                    ...p.map(({ id_localidad, nom_localidad }) => {
+                      return [`${id_localidad}${" "}${nom_localidad}`];
+                    }),
+                  ]) || { "": "" }
+                }
               ></Select>
             )}
 
