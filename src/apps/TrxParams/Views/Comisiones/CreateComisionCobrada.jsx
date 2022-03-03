@@ -170,7 +170,7 @@ const CreateComisionCobrada = () => {
     } else {
       setdata([]);
     }
-  }, [selectedOpt, page]);
+  }, [selectedOpt, page, tipoTrx, convenio, autorizador]);
   const fetchConveniosFunc = () => {
     fetchConveniosMany("")
       .then((res) => {
