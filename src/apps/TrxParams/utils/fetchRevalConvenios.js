@@ -29,17 +29,10 @@ export const fetchConveniosMany = async (tags, page = 1) => {
   //   return { maxPages: 0, results: [] };
   // }
   try {
-    const res = await fetchData(
-      `${urlConvenios}/convenio_many`,
-      "GET",
-      {
-        tags,
-        page: isNaN(parseInt(page)) ? 1 : parseInt(page),
-      },
-      {},
-      {},
-      false
-    );
+    const res = await fetchData(`${urlConvenios}/convenio_many`, "GET", {
+      tags,
+      page: isNaN(parseInt(page)) ? 1 : parseInt(page),
+    });
     if (res?.status) {
       return { ...res?.obj };
     } else {
