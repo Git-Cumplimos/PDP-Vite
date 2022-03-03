@@ -20,7 +20,7 @@
   border-color: transparent transparent transparent rgb(24, 24, 27);
 }
 .tooltip {
-  @apply hidden absolute right-10 top-0 bg-gray-900 text-white text-xs px-2 py-2 rounded font-medium;
+  @apply hidden absolute right-10 top-0 bg-gray-900 text-white text-xs text-center px-2 py-2 rounded font-medium;
 }
 
 .socials > ul > li:hover > .tooltip {
