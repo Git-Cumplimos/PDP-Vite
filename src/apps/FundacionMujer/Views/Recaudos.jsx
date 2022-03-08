@@ -306,7 +306,9 @@ const Recaudo = () => {
             data={table || []}
             onSelectRow={(e, index) => {
               setSelected(table[index]);
-              setShowModal(true);
+              if (info?.obj?.NroMensaje === 1) {
+                setShowModal(true);
+              }
             }}
           />
         </>
