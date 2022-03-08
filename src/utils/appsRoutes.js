@@ -117,6 +117,9 @@ const SolicitudEnrolamiento = lazy(() =>
 const FormularioEnrolamiento = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/FormularioEnrolamiento")
 );
+const FormularioAutoEnrolamiento = lazy(() =>
+  import("../apps/SolicitudEnrolamiento/views/FormularioAutoEnrolamiento")
+);
 const ConsultaEnrolamiento = lazy(() =>
   import("../apps/SolicitudEnrolamiento/views/ConsultaEnrolamiento")
 );
@@ -228,10 +231,11 @@ const publicUrls = [
     permission: [1],
     subRoutes: [
       {
-        link: "/public/solicitud-enrolamiento/formulario/:idAsesor",
+        link: "/public/solicitud-enrolamiento/formulario",
         label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
-        component: FormularioEnrolamiento,
+        component: FormularioAutoEnrolamiento,
       },
+
       {
         link: "/public/solicitud-enrolamiento/consultar",
         label: (
@@ -259,6 +263,11 @@ const publicUrls = [
             component: CorreccionFormulario,
           },
         ],
+      },
+      {
+        link: "/public/solicitud-enrolamiento/formulario/:idAsesor",
+        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
+        component: FormularioEnrolamiento,
       },
     ],
   },

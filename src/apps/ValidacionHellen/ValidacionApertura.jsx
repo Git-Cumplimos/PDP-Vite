@@ -31,8 +31,10 @@ const ValidacionApertura = () => {
       e.validation_state = "Rechazado Para ReconoserID";
     } else if (e.validation_state === "201") {
       e.validation_state = "Aprobado Para Crear Comercio";
-    } else {
+    } else if (e.validation_state === "202") {
       e.validation_state = "Rechazado Para Crear Comercio";
+    } else if (e.validation_state === "200") {
+      e.validation_state = "Pendiente De Aprobación";
     }
   });
 

@@ -527,32 +527,6 @@ const CorreccionFormulario = () => {
               type="text"
             />
           </Fieldset>
-
-          <div /* className={contenedorBotones} */>
-            <Button
-              type="submit"
-              onClick={(e) => {
-                corregirEnviar(e);
-              }}
-            >
-              Guardar y Enviar
-            </Button>
-          </div>
-          {/*   <div>
-            <div className={contenedorPrincipalBotones}>
-
-              <div className={contenedorBotones}>
-                <Button
-                  type="submit"
-                  onClick={(e) => {
-                    fCausalRechazo(e);
-                  }}
-                >
-                  Rechazar Comercio
-                </Button>
-              </div>
-            </div>
-          </div> */}
           <FileInput
             label={"Elige el archivo del Rut"}
             onGetFile={onFileChange}
@@ -571,6 +545,16 @@ const CorreccionFormulario = () => {
             accept=".pdf"
             allowDrop={false}
           />
+          <ButtonBar className={"lg:col-span-2"} type="">
+            <Button
+              type="submit"
+              onClick={(e) => {
+                corregirEnviar(e);
+              }}
+            >
+              Guardar y Enviar
+            </Button>
+          </ButtonBar>
         </Form>
       ) : (
         ""
