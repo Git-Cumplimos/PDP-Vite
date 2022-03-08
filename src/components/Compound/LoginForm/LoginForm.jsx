@@ -184,7 +184,9 @@ const LoginForm = () => {
                 autoComplete="off"
                 value={totp}
                 onChange={(e) => {
-                  setTotp(e.target.value);
+                  if (!isNaN(e.target.value)) {
+                    setTotp(e.target.value);
+                  }
                 }}
               />
             </div>

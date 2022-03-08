@@ -229,8 +229,10 @@ const Premios = ({ route }) => {
           autoComplete="off"
           value={sorteo}
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setSorteo(num);
+            if (!isNaN(e.target.value)) {
+              const num = e.target.value;
+              setSorteo(num);
+            }
           }}
         />
         <Input

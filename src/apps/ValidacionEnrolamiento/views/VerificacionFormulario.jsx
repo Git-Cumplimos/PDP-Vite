@@ -19,16 +19,11 @@ import fetchData from "../../../utils/fetchData";
 const VerificacionFormulario = () => {
   const navigate = useNavigate();
   const {
-    contenedorPrincipal,
-    contenedorSecundario,
-    contenedorTercero,
-    tituloPrincipal,
     titulosSecundarios,
     autorizacionMensajes,
     contenedorBotones,
     contenedorPrincipalBotones,
     contenedorCausalRechazo,
-    contenedorImagenPDP,
     textTarea,
   } = classes;
   const [datosParams, setDatosParams] = useState(0);
@@ -42,11 +37,7 @@ const VerificacionFormulario = () => {
   const [mensajeCausal, setMensajeCausal] = useState("");
 
   const [datosAsesor, SetDatosAsesor] = useState(0);
-  /* const [codDaneResponsable, SetCodDaneResponsable] = useState([]);
-  const [todosCodDane, SetTodosCodDane] = useState([]);
-  const [t, SetT] = useState([]);
-  const [p, SetP] = useState([]); */
-  const [p, SetP] = useState([]);
+  const [codigoDane, setCodigoDane] = useState([]);
   const params = useParams();
 
   const [zonas, setZonas] = useState([]);
@@ -55,7 +46,10 @@ const VerificacionFormulario = () => {
     /* const updateWidth = () => { */
 
     fetchData(`${url}/actualizacionestado?id_proceso=${params.id}`, "GET").then(
-      (respuesta) => setDatosParams(respuesta.obj.results)
+      (respuesta) => {
+        setDatosParams(respuesta.obj.results);
+        console.log("datos Params", datosParams);
+      }
     );
   }, []);
 
@@ -130,12 +124,14 @@ const VerificacionFormulario = () => {
 
   useEffect(() => {
     if (datosParams?.length > 0) {
+      console.log(datosParams);
       const datos = {
         asesor: datosParams[0]["asesor"],
       };
       fetchData(`${url}/asesores?nom_asesor=${datos["asesor"]}`, "GET").then(
         (respuesta) => {
           SetDatosAsesor(respuesta.obj.results);
+          console.log("datos asesor", datosAsesor);
         }
       );
     }
@@ -162,51 +158,11 @@ const VerificacionFormulario = () => {
   }, []);
   console.log(zonas);
 
-  /*   useEffect(() => {
-    if (datosAsesor) {
-      fetchData(
-        `${url}/responsables?nombre=${datosAsesor[0].responsable["nombre"]}`
-      ).then((respuesta) => {
-        if (respuesta.obj.results[0]["zona"]["municipios"]?.length > 0) {
-          const codResDane = [
-            ...respuesta.obj.results[0]["zona"]["municipios"].map((e) =>
-              parseInt(e)
-            ),
-          ];
-          SetCodDaneResponsable(codResDane);
-          const movie = [];
-          codResDane.forEach((element, i) => {
-            movie.push(
-              fetchData(
-                `${url}/localidades?cod_dane=${codResDane[i]}&limit=${0}`
-              ).then((res) => res)
-            );
-          });
-
-          Promise.all(movie).then((value) => {
-            console.log(value);
-            SetT(value);
-          });
-
-          SetP([
-            ...t.map((element, i) =>
-              t[i].obj.results.map(
-                ({ id_localidad, nom_localidad }) =>
-                  `${id_localidad}${nom_localidad}`
-              )
-            ),
-          ]);
-
-     
-        }
-      });
-    }
-  }, [datosAsesor]); */
   useEffect(() => {
     if (datosAsesor) {
       gedCodsDaneResponsable().then(
-        (value) => SetP(value.map((datosCodLoc) => datosCodLoc)),
-        console.log(p)
+        (value) => setCodigoDane(value.map((datosCodLoc) => datosCodLoc)),
+        console.log(codigoDane)
       );
     }
   }, [datosAsesor]);
@@ -244,39 +200,12 @@ const VerificacionFormulario = () => {
             placeholder={datosParams[0]["nombre_comercio"]}
             disabled
           ></Input>
-          <Fieldset
-            legend="Asesor"
-            className="lg:col-span-3
- "
-          >
+          <Fieldset legend="Asesor" className="lg:col-span-3">
             <Input
               label={"Nombre Asesor"}
               placeholder={datosParams[0]["asesor"]}
               disabled
             ></Input>
-
-            {/* {datosParams[0]["asesor_comercial_localidad"].length != "" ? (
-              <Input
-                label={"Asesor Comercial Localidad"}
-                placeholder={datosParams[0]["asesor_comercial_localidad"]}
-                disabled
-              ></Input>
-            ) : (
-              <Select
-                onChange={(event) =>
-                  setAsesorComercialLocalidad(event.target.value)
-                }
-                id="comissionType"
-                name="comissionType"
-                label={`Asesor Comercial Localidad`}
-                options={{
-                  "": "",
-                  "01 Asesor Kennedy": "01 Asesor Kennedy",
-                  "02 Asesor Engativa": "02 Asesor Engativa",
-                  "03 Asesor Bosa": "03 Asesor Bosa",
-                }}
-              ></Select>
-            )} */}
 
             {datosParams[0]["cod_localidad"].length != "" ? (
               <Input
@@ -292,8 +221,8 @@ const VerificacionFormulario = () => {
                 label={`Cod Localidad`}
                 options={
                   Object.fromEntries([
-                    ["", ""],
-                    ...p.map(({ id_localidad, nom_localidad }) => {
+                    ["N/A", "N/A"],
+                    ...codigoDane.map(({ id_localidad, nom_localidad }) => {
                       return [`${id_localidad}${" "}${nom_localidad}`];
                     }),
                   ]) || { "": "" }
@@ -411,11 +340,6 @@ const VerificacionFormulario = () => {
               placeholder={datosParams[0]["responsableiva"]}
               disabled
             ></Input>
-            {/*   <Input
-              label={"Tipo de Establecimiento"}
-              placeholder={datosParams[0]["tipo_establecimiento"]}
-              disabled
-            ></Input> */}
           </Fieldset>
 
           <Fieldset legend="Contacto" className="lg:col-span-3">
@@ -556,25 +480,6 @@ const VerificacionFormulario = () => {
               ""
             )}
           </Fieldset>
-          {/*  <Fieldset>
-            <div className={contenedorCausalRechazo}>
-              <h2>
-                Si el Comercio no cumple con los requisitos, por favor agrege un
-                causal de rechazo.
-              </h2>
-              <textarea
-                className={"flex lg:row-span-0"}
-                type="input"
-                minLength="1"
-                maxLength="160"
-                autoComplete="off"
-                value={causal}
-                onInput={(e) => {
-                  setCausal(e.target.value);
-                }}
-              ></textarea>
-            </div>
-          </Fieldset> */}
 
           <div>
             <div className={contenedorPrincipalBotones}>
@@ -600,74 +505,7 @@ const VerificacionFormulario = () => {
                 </Button>
               </div>
             </div>
-            {/* {guardarDatosAsesor ? (
-              <div className={contenedorPrincipalBotones}>
-                <div className={contenedorBotones}>
-                  <Button
-                    type="submit"
-                    onClick={(e) => {
-                      aprobacionFormulario(e);
-                    }}
-                  >
-                    Aprobar Comercio
-                  </Button>
-                </div>
 
-                <div className={contenedorBotones}>
-                  <Button
-                    type="submit"
-                    onClick={(e) => {
-                      rechazarFormulario(e);
-                      setCausal(true);
-                    }}
-                  >
-                    Rechazar Comercio
-                  </Button>
-                </div>
-              </div>
-            ) : datosParams[0]["tipozona"] &&
-              datosParams[0]["unidad_negocio"] &&
-              datosParams[0]["responsable"] &&
-              datosParams[0]["cod_localidad"] &&
-              datosParams[0]["asesor_comercial_localidad"] &&
-              datosParams[0]["asesor_comercial_localidad"] &&
-              datosParams[0]["asesor"] ? (
-              <div className={contenedorPrincipalBotones}>
-                <div className={contenedorBotones}>
-                  <Button
-                    type="submit"
-                    onClick={(e) => {
-                      aprobacionFormulario(e);
-                    }}
-                  >
-                    Aprobar Comercio
-                  </Button>
-                </div>
-
-                <div className={contenedorBotones}>
-                  <Button
-                    type="submit"
-                    onClick={(e) => {
-                      rechazarFormulario(e);
-                      setCausal(true);
-                    }}
-                  >
-                    Rechazar Comercio
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className={contenedorBotones}>
-                <Button
-                  type="submit"
-                  onClick={(e) => {
-                    guardarDatos(e);
-                  }}
-                >
-                  Guardar Datos
-                </Button>
-              </div>
-            )} */}
             {causal ? (
               <Modal show>
                 <LogoPDP></LogoPDP>
