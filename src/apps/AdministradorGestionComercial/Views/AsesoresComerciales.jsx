@@ -136,21 +136,10 @@ const AsesoresComerciales = () => {
     setLinkAsesor(link);
   };
 
-  /*  useEffect(() => {
-    const COPY = document.querySelector("#copy");
-    const VALUE = inputRef;
-    console.log(VALUE);
-    if (VALUE) {
-      COPY.addEventListener("click", async () => {
-        await navigator.clipboard.writeText(VALUE.defaultValue);
-        alert("copiado");
-      });
-    }
-  }, [showModal]); */
   let inputRef = HTMLInputElement | null;
-  const onClick = () => {
+  const copyLink = () => {
     navigator.clipboard.writeText(inputRef.defaultValue);
-    alert("copiado");
+    notify("Copia Exitosa.");
     /*    console.log("INPUT VALUE: ", inputRef?.value); */
   };
 
@@ -236,37 +225,20 @@ const AsesoresComerciales = () => {
               </Button>
             </ButtonBar>
             {linkAsesor ? (
-              /* <div className={" items-center justify-center"}>
-                <div className={"grid grid-cols-2 "}>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    className={"bg-orange-500 px-8 py-4 rounded-md"}
-                    id="link"
-                    defaultValue={linkAsesor}
-             
-                  />
-                  <button
-                    className={"rounded-md w-12 bg-orange-500 text-white "}
-                    id="copy"
-                  >
-                    Copy
-                  </button>
-                </div>
-              </div> */
               <div className={contenedorPrincipal}>
                 <div>
-                  <InputX
+                  <input
+                    size="58"
                     ref={(node) => {
                       inputRef = node;
                     }}
                     type="text"
                     id="link"
                     defaultValue={linkAsesor}
-                  ></InputX>
+                  />
                 </div>
                 <div>
-                  <button className={contendorBoton} onClick={onClick}>
+                  <button className={contendorBoton} onClick={copyLink}>
                     Copy
                   </button>
                 </div>

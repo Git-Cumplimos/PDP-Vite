@@ -13,6 +13,7 @@ import InputSuggestions from "../../../components/Base/InputSuggestions";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import { useParams } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
 
@@ -22,7 +23,7 @@ const capitalize = (word) => {
 
 const FormularioEnrolamiento = () => {
   const params = useParams();
-
+  const navigate = useNavigate();
   const {
     principal,
     tituloFormularioInscripcion,
@@ -228,6 +229,8 @@ const FormularioEnrolamiento = () => {
                 console.log(respuesta?.obj);
                 notify("Se han subido los archivos");
                 setEstadoForm(true);
+
+                navigate("/public/solicitud-enrolamiento/consultar");
               }
             })
             .catch(() => {});
@@ -582,9 +585,11 @@ const FormularioEnrolamiento = () => {
                 options={
                   Object.fromEntries([
                     ["", ""],
-                    ...LocalidadUbComercio.map(({ nom_localidad }) => {
-                      return [nom_localidad];
-                    }),
+                    ...LocalidadUbComercio.map(
+                      ({ nom_localidad, id_localidad }) => {
+                        return [nom_localidad, id_localidad];
+                      }
+                    ),
                   ]) || { "": "" }
                 }
               ></Select>
@@ -606,9 +611,11 @@ const FormularioEnrolamiento = () => {
                 options={
                   Object.fromEntries([
                     ["", ""],
-                    ...LocalidadUbCorrespondencia.map(({ nom_localidad }) => {
-                      return [nom_localidad];
-                    }),
+                    ...LocalidadUbCorrespondencia.map(
+                      ({ nom_localidad, id_localidad }) => {
+                        return [nom_localidad, id_localidad];
+                      }
+                    ),
                   ]) || { "": "" }
                 }
               ></Select>
@@ -639,12 +646,7 @@ const FormularioEnrolamiento = () => {
           </Fragment>
           <ButtonBar className={"lg:col-span-2"} type="">
             {
-              <Button
-                type="submit"
-                onClick={(e) =>
-                  /* setEstadoForm((old) => !old) */ handleSubmit(e)
-                }
-              >
+              <Button type="submit" onClick={(e) => handleSubmit(e)}>
                 Enviar Formulario
               </Button>
               /*  ) : null */

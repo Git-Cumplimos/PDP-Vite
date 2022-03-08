@@ -12,7 +12,7 @@ import LocationForm from "../../../components/Compound/LocationForm";
 import InputSuggestions from "../../../components/Base/InputSuggestions";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
-
+import { useNavigate } from "react-router-dom";
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
 
 const capitalize = (word) => {
@@ -20,6 +20,7 @@ const capitalize = (word) => {
 };
 
 const FormularioAutoEnrolamiento = () => {
+  const navigate = useNavigate();
   const {
     principal,
     tituloFormularioInscripcion,
@@ -148,7 +149,7 @@ const FormularioAutoEnrolamiento = () => {
         "POST",
         {},
         {
-          asesor: asignarAsesores.toString(),
+          asesor: "" /* asignarAsesores.toString() */,
           nombre: `${nombre}`,
           apellido: `${apellido}`,
           nombre_comercio: nombreComercio,
@@ -222,6 +223,7 @@ const FormularioAutoEnrolamiento = () => {
                 console.log(respuesta?.obj);
                 notify("Se han subido los archivos");
                 setEstadoForm(true);
+                navigate("/public/solicitud-enrolamiento/consultar");
               }
             })
             .catch(() => {});
@@ -310,7 +312,7 @@ const FormularioAutoEnrolamiento = () => {
               type="text"
               required
             ></Input>
-            <Select
+            {/*   <Select
               onChange={(event) => setAsignarAsesores(event.target.value)}
               id="comissionType"
               name="comissionType"
@@ -319,12 +321,12 @@ const FormularioAutoEnrolamiento = () => {
               options={
                 Object.fromEntries([
                   ["", ""],
-                  ...asesores.map(({ nom_asesor /* , id_asesor */ }) => {
-                    return [nom_asesor /* , id_asesor */];
+                  ...asesores.map(({ nom_asesor  , id_asesor  }) => {
+                    return [nom_asesor  , id_asesor ];
                   }),
                 ]) || { "": "" }
               }
-            ></Select>
+            ></Select> */}
             <Fieldset
               legend="Representante legal"
               className="lg:col-span-3
@@ -546,9 +548,11 @@ const FormularioAutoEnrolamiento = () => {
                 options={
                   Object.fromEntries([
                     ["", ""],
-                    ...LocalidadUbComercio.map(({ nom_localidad }) => {
-                      return [nom_localidad];
-                    }),
+                    ...LocalidadUbComercio.map(
+                      ({ nom_localidad, id_localidad }) => {
+                        return [nom_localidad, id_localidad];
+                      }
+                    ),
                   ]) || { "": "" }
                 }
               ></Select>
@@ -570,9 +574,11 @@ const FormularioAutoEnrolamiento = () => {
                 options={
                   Object.fromEntries([
                     ["", ""],
-                    ...LocalidadUbCorrespondencia.map(({ nom_localidad }) => {
-                      return [nom_localidad];
-                    }),
+                    ...LocalidadUbCorrespondencia.map(
+                      ({ nom_localidad, id_localidad }) => {
+                        return [nom_localidad, id_localidad];
+                      }
+                    ),
                   ]) || { "": "" }
                 }
               ></Select>
