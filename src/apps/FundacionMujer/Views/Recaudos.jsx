@@ -44,6 +44,7 @@ const Recaudo = () => {
   const [showModal, setShowModal] = useState("");
   const [response, setResponse] = useState("");
   const { roleInfo } = useAuth();
+  const [permiteCambio, setPermiteCambio] = useState("");
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -140,6 +141,7 @@ const Recaudo = () => {
     setFormatMon("");
     setCreditStatus(false);
     setInfo("");
+    setTicket(false);
   }, []);
 
   const bankCollection = (e) => {
@@ -192,6 +194,7 @@ const Recaudo = () => {
     valorcuota(String(number), user)
       .then((res) => {
         console.log(res);
+        setPermiteCambio(res?.obj?.PermiteCambio);
         [res?.obj].map((row) => {
           setCuota([
             {
@@ -234,7 +237,7 @@ const Recaudo = () => {
       })
       .catch((err) => console.log("error", err));
   };
-  console.log(roleInfo?.["nombre comercio"]);
+  console.log(permiteCambio == "N");
   return (
     <>
       <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
@@ -356,6 +359,7 @@ const Recaudo = () => {
                   autoComplete="off"
                   required
                   value={formatMon}
+                  disabled={permiteCambio == "N"}
                   onInput={(e, valor) => {
                     const num = valor || "";
                     setFormatMon(num);
