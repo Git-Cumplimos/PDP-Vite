@@ -2,18 +2,12 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 
 import useQuery from "../../../../hooks/useQuery";
 
-import {
-  fetchComissions,
-  putComissions,
-} from "../../utils/fetchRevalComissions";
-import { fetchConveniosUnique } from "../../utils/fetchRevalConvenios";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 import FormComission from "../FormComission/FormComission";
 import Button from "../../../../components/Base/Button";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import ButtonBar from "../../../../components/Base/ButtonBar";
 import {
   fetchComisionesPagar,
   putComisionesPagar,
@@ -22,68 +16,17 @@ import {
   fetchComisionesCobrar,
   putComisionesCobrada,
 } from "../../utils/fetchComisionesCobrar";
+import ActiveSelect from "../../../../components/Base/ActiveSelect";
 
 const EditComission = () => {
   const navigate = useNavigate();
 
-  const [
-    {
-      id_comision_pagada,
-      id_comision_cobrada,
-      id_tipo_trx,
-      comercios_id_comercio,
-      convenios_id_convenio,
-      autorizador_id_autorizador,
-      nombre_autorizador,
-    },
-    setQuery,
-  ] = useQuery();
+  const [{ id_comision_pagada, id_comision_cobrada }, setQuery] = useQuery();
 
   const [editedComission, setEditedComission] = useState(null);
-  const [labelInputs, setLabelInputs] = useState([]);
-  const [comissions, setComissions] = useState([]);
-
-  // const argsCom = useMemo(() => {
-  //   let args = {};
-  //   if (id_tipo_trx) {
-  //     args = { ...args, id_tipo_trx };
-  //   }
-  //   if (comercios_id_comercio) {
-  //     args = { ...args, comercios_id_comercio };
-  //   }
-  //   if (convenios_id_convenio) {
-  //     args = { ...args, convenios_id_convenio };
-  //   }
-  //   if (autorizador_id_autorizador) {
-  //     args = { ...args, autorizador_id_autorizador };
-  //   }
-  //   return Object.keys(args).length > 0 ? args : null;
-  // }, [
-  //   id_tipo_trx,
-  //   comercios_id_comercio,
-  //   convenios_id_convenio,
-  //   autorizador_id_autorizador,
-  // ]);
-
-  // const consultLabels = useCallback(async () => {
-  //   try {
-  //     let inputs = [];
-  //     if (convenios_id_convenio) {
-  //       const resConv = await fetchConveniosUnique(convenios_id_convenio);
-  //       inputs.push(["Convenio", resConv?.results?.[0]?.nombre_convenio]);
-  //     }
-  //     if (comercios_id_comercio) {
-  //       inputs.push(["Comercio", comercios_id_comercio]);
-  //     }
-  //     if (nombre_autorizador) {
-  //       inputs.push(["Autorizador", nombre_autorizador]);
-  //     }
-  //     return inputs;
-  //   } catch (err) {
-  //     console.error(err);
-  //     return [];
-  //   }
-  // }, [comercios_id_comercio, convenios_id_convenio, nombre_autorizador]);
+  const [comissions, setComissions] = useState({
+    nombre_comision: "",
+  });
 
   const onSubmit = useCallback(
     (ev) => {
@@ -97,10 +40,10 @@ const EditComission = () => {
       }
 
       editedComission?.ranges.reduce((prev, curr, indexR) => {
-        if (prev?.["Rango maximo"] > curr?.["Rango minimo"]) {
-          notifyError(`El rango maximo de un rango comision no puede 
-          ser mayor al rango minimo del siguiente 
-          rango de comision (Rango ${indexR} - Rango ${indexR + 1})`);
+        console.log(prev?.["Rango maximo"], curr?.["Rango minimo"]);
+        if (prev?.["Rango maximo"] !== curr?.["Rango minimo"]) {
+          notifyError(`El rango maximo debe ser igual al rango minimo siguiente 
+            rango de comision (Rango ${indexR} - Rango ${indexR + 1})`);
           errRang = true;
         }
         return curr;
@@ -113,6 +56,8 @@ const EditComission = () => {
         putComisionesPagar(
           { id_comision_pagada },
           {
+            nombre_comision: comissions?.["nombre_comision"],
+            estado: comissions?.["estado"],
             comisiones: {
               ...editedComission,
               ranges: editedComission?.ranges.map(
@@ -146,6 +91,8 @@ const EditComission = () => {
         putComisionesCobrada(
           { id_comision_cobrada },
           {
+            nombre_comision: comissions?.["nombre_comision"],
+            estado: comissions?.["estado"],
             comisiones: {
               ...editedComission,
               ranges: editedComission?.ranges.map(
@@ -177,29 +124,27 @@ const EditComission = () => {
           .catch((err) => console.error(err));
       }
     },
-    [editedComission, navigate, id_comision_pagada, id_comision_cobrada]
+    [
+      editedComission,
+      navigate,
+      id_comision_pagada,
+      id_comision_cobrada,
+      comissions,
+    ]
   );
-
-  // useEffect(() => {
-  //   if (argsCom) {
-  //     let args = { ...argsCom };
-  //     fetchComissions(args)
-  //       .then((res) => {
-  //         setEditedComission(res?.results);
-  //         if (res?.info === "comisiónXconvenio") {
-  //           if (args?.comercios_id_comercio) {
-  //             delete args.comercios_id_comercio;
-  //             setQuery(args, { replace: true }, ["comercios_id_comercio"]);
-  //           }
-  //         }
-  //       })
-  //       .catch((err) => console.error(err));
-  //   }
-  // }, [argsCom, setQuery]);
-
-  // useEffect(() => {
-  //   consultLabels().then((res) => setLabelInputs(res));
-  // }, [consultLabels]);
+  const onChangeNewComision = useCallback((ev) => {
+    const formData = new FormData(ev.target.form);
+    const newData = [];
+    ["nombre_comision"].forEach((col) => {
+      let data = null;
+      data = formData.get(col);
+      newData.push([col, data]);
+    });
+    setComissions((old) => ({
+      ...old,
+      ...Object.fromEntries(newData),
+    }));
+  }, []);
   useEffect(() => {
     if (id_comision_pagada) {
       fecthComisionesPagarFunc();
@@ -211,7 +156,7 @@ const EditComission = () => {
   const fecthComisionesPagarFunc = () => {
     fetchComisionesPagar({ id_comision_pagada })
       .then((res) => {
-        setComissions(res?.results);
+        setComissions(res?.results?.[0]);
         setEditedComission({
           type: res?.results[0]?.comisiones?.type,
           ranges: res?.results?.[0]?.comisiones?.ranges?.map(
@@ -225,8 +170,6 @@ const EditComission = () => {
             }
           ),
         });
-        // setEditedComission(res?.results?.[0].comisiones);
-        console.log(res);
       })
       .catch((err) => console.error(err));
   };
@@ -235,7 +178,7 @@ const EditComission = () => {
       id_comision_cobrada,
     })
       .then((res) => {
-        setComissions(res?.results);
+        setComissions(res?.results?.[0]);
         setEditedComission({
           type: res?.results[0]?.comisiones?.type,
           ranges: res?.results?.[0]?.comisiones?.ranges?.map(
@@ -256,53 +199,62 @@ const EditComission = () => {
   };
   return (
     <Fragment>
-      <h1 className="text-3xl">Editando comisiones a pagar:</h1>
-      <Form grid>
+      <h1 className='text-3xl'>Editando comisiones a pagar:</h1>
+      <Form onChange={onChangeNewComision} grid>
+        <Input
+          id='nombre_comision'
+          name='nombre_comision'
+          label={"Nombre comisión"}
+          type={"text"}
+          autoComplete='off'
+          value={comissions?.["nombre_comision"]}
+          onChange={() => {}}
+        />
         {id_comision_pagada && (
           <Fragment>
-            {comissions?.[0]?.["nombre_convenio"] && (
+            {comissions?.["nombre_convenio"] && (
               <Input
-                id="Nombre convenio"
-                name="Nombre convenio"
+                id='Nombre convenio'
+                name='Nombre convenio'
                 type={"text"}
-                autoComplete="off"
+                autoComplete='off'
                 label={"Nombre convenio"}
-                value={comissions?.[0]?.["nombre_convenio"]}
+                value={comissions?.["nombre_convenio"]}
                 readOnly
                 disabled
               />
             )}
-            {comissions?.[0]?.["nombre_operacion"] && (
+            {comissions?.["nombre_operacion"] && (
               <Input
-                id="Nombre operacion"
-                name="Nombre operacion"
+                id='Nombre operacion'
+                name='Nombre operacion'
                 type={"text"}
                 label={"Nombre transaccion"}
-                autoComplete="off"
-                value={comissions?.[0]?.["nombre_operacion"]}
+                autoComplete='off'
+                value={comissions?.["nombre_operacion"]}
                 readOnly
                 disabled
               />
             )}
-            {comissions?.[0]?.["id_comercio"] && (
+            {comissions?.["id_comercio"] && (
               <Input
-                id="Id comercio"
-                name="Id comercio"
+                id='Id comercio'
+                name='Id comercio'
                 type={"number"}
                 label={"Id comercio"}
-                autoComplete="off"
-                value={comissions?.[0]?.["id_comercio"]}
+                autoComplete='off'
+                value={comissions?.["id_comercio"]}
                 readOnly
                 disabled
               />
             )}
-            {comissions?.[0]?.["fecha_inicio"] && (
+            {comissions?.["fecha_inicio"] && (
               <Input
-                id="Fecha inicio"
-                name="Fecha inicio"
+                id='Fecha inicio'
+                name='Fecha inicio'
                 type={"text"}
                 label={"Fecha inicio"}
-                autoComplete="off"
+                autoComplete='off'
                 value={Intl.DateTimeFormat("es-CO", {
                   year: "numeric",
                   month: "numeric",
@@ -310,23 +262,21 @@ const EditComission = () => {
                   hour: "numeric",
                   minute: "numeric",
                 }).format(
-                  new Date(comissions?.[0]?.["fecha_inicio"]).setHours(
-                    new Date(
-                      comissions?.[0]?.["fecha_inicio"] + "-5"
-                    ).getHours()
+                  new Date(comissions?.["fecha_inicio"]).setHours(
+                    new Date(comissions?.["fecha_inicio"] + "-5").getHours()
                   )
                 )}
                 readOnly
                 disabled
               />
             )}
-            {comissions?.[0]?.["fecha_fin"] && (
+            {comissions?.["fecha_fin"] && (
               <Input
-                id="Fecha_fin"
-                name="Fecha_fin"
+                id='Fecha_fin'
+                name='Fecha_fin'
                 type={"text"}
                 label={"Fecha_fin"}
-                autoComplete="off"
+                autoComplete='off'
                 value={Intl.DateTimeFormat("es-CO", {
                   year: "numeric",
                   month: "numeric",
@@ -334,89 +284,83 @@ const EditComission = () => {
                   hour: "numeric",
                   minute: "numeric",
                 }).format(
-                  new Date(comissions?.[0]?.["fecha_fin"]).setHours(
-                    new Date(comissions?.[0]?.["fecha_fin"] + "-5").getHours()
+                  new Date(comissions?.["fecha_fin"]).setHours(
+                    new Date(comissions?.["fecha_fin"] + "-5").getHours()
                   )
                 )}
                 readOnly
                 disabled
               />
             )}
-            {comissions?.[0]?.["estado"] && (
-              <Input
-                id="Estado"
-                name="Estado"
-                type={"text"}
-                label={"Estado"}
-                autoComplete="off"
-                value={comissions?.[0]?.["estado"] ? "Activo" : "Inactivo"}
-                readOnly
-                disabled
-              />
-            )}
+            <ActiveSelect
+              label='Estado comisión'
+              value={comissions?.["estado"] ?? false}
+              onChange={(e) => {
+                setComissions((old) => ({
+                  ...old,
+                  estado: e,
+                }));
+              }}
+            />
           </Fragment>
         )}
         {id_comision_cobrada && (
           <Fragment>
-            <h1 className="text-3xl">Editando comisiones a cobrar:</h1>
-            {comissions?.[0]?.["nombre_autorizador"] && (
+            {comissions?.["nombre_autorizador"] && (
               <Input
-                id="Autorizador"
-                name="Autorizador"
+                id='Autorizador'
+                name='Autorizador'
                 type={"text"}
                 label={"Autorizador"}
-                autoComplete="off"
-                value={comissions?.[0]?.["nombre_autorizador"]}
+                autoComplete='off'
+                value={comissions?.["nombre_autorizador"]}
                 readOnly
                 disabled
               />
             )}
-            {comissions?.[0]?.["nombre_convenio"] && (
+            {comissions?.["nombre_convenio"] && (
               <Input
-                id="Nombre convenio"
-                name="Nombre convenio"
+                id='Nombre convenio'
+                name='Nombre convenio'
                 type={"text"}
-                autoComplete="off"
+                autoComplete='off'
                 label={"Nombre convenio"}
-                value={comissions?.[0]?.["nombre_convenio"]}
+                value={comissions?.["nombre_convenio"]}
                 readOnly
                 disabled
               />
             )}
 
-            {comissions?.[0]?.["nombre_operacion"] && (
+            {comissions?.["nombre_operacion"] && (
               <Input
-                id="Nombre operacion"
-                name="Nombre operacion"
+                id='Nombre operacion'
+                name='Nombre operacion'
                 type={"text"}
                 label={"Nombre transaccion"}
-                autoComplete="off"
-                value={comissions?.[0]?.["nombre_operacion"]}
+                autoComplete='off'
+                value={comissions?.["nombre_operacion"]}
                 readOnly
                 disabled
               />
             )}
-            {comissions?.[0]?.["estado"] && (
-              <Input
-                id="Estado"
-                name="Estado"
-                type={"text"}
-                label={"Estado"}
-                autoComplete="off"
-                value={comissions?.[0]?.["estado"] ? "Activo" : "Inactivo"}
-                readOnly
-                disabled
-              />
-            )}
+            <ActiveSelect
+              label='Estado comisión'
+              value={comissions?.["estado"] ?? false}
+              onChange={(e) => {
+                setComissions((old) => ({
+                  ...old,
+                  estado: e,
+                }));
+              }}
+            />
           </Fragment>
         )}
       </Form>
-      <h1 className="text-3xl">Comision</h1>
+      <h1 className='text-3xl'>Comision</h1>
       <FormComission
         outerState={[editedComission, setEditedComission]}
-        onSubmit={onSubmit}
-      >
-        <Button type="submit">Actualizar rangos</Button>
+        onSubmit={onSubmit}>
+        <Button type='submit'>Actualizar comisión</Button>
       </FormComission>
     </Fragment>
   );

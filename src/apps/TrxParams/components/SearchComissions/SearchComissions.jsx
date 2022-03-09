@@ -38,8 +38,12 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     if (headers.includes("id_comision_pagada")) {
       newHeaders.push("Id comisión");
     }
+
     if (headers.includes("id_comision_cobrada")) {
       newHeaders.push("Id comisión");
+    }
+    if (headers.includes("nombre_comision")) {
+      newHeaders.push("Nombre comisión");
     }
     if (headers.includes("nombre_convenio")) {
       newHeaders.push("Convenio");
@@ -72,12 +76,14 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           fecha_inicio,
           fecha_fin,
           estado,
+          nombre_comision,
           nombre_operacion,
           nombre_convenio,
           nombre_autorizador,
         }) => {
           return {
             "Id Comision": id_comision_pagada,
+            "Nombre comision": nombre_comision ?? "",
             Convenio: nombre_convenio ?? "",
             Operacion: nombre_operacion ?? "",
             "Id comercio": id_comercio ?? "",
@@ -99,9 +105,11 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           nombre_autorizador,
           nombre_operacion,
           nombre_convenio,
+          nombre_comision,
         }) => {
           return {
             "Id comision cobrada": id_comision_cobrada,
+            "Nombre comision": nombre_comision ?? "",
             Convenio: nombre_convenio ?? "",
             Operacion: nombre_operacion ?? "",
             Autorizador: nombre_autorizador ?? "",
@@ -203,7 +211,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           label={"Convenio"}
           name={"convenio"}
           type={"text"}
-          autoComplete="off"
+          autoComplete='off'
           defaultValue={convenio}
         />
         <Input
@@ -211,7 +219,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           label={"Tipo de operación"}
           name={"tipoTrx"}
           type={"text"}
-          autoComplete="off"
+          autoComplete='off'
           defaultValue={tipoTrx}
         />
         {comissionFace === "pay" ? (
@@ -220,9 +228,9 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               id={"comercioComissions"}
               label={"Id comercio"}
               name={"comercio"}
-              type="number"
+              type='number'
               step={"1"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={comercio}
             />
             <Input
@@ -230,7 +238,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Autorizador"}
               name={"autorizador"}
               type={"text"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={autorizador}
             />
           </Fragment>
@@ -240,7 +248,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
             label={"Autorizador"}
             name={"autorizador"}
             type={"text"}
-            autoComplete="off"
+            autoComplete='off'
             defaultValue={autorizador}
           />
         ) : (

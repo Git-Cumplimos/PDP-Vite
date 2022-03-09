@@ -54,7 +54,12 @@ const CreateComision = () => {
 
   const [selectecConv, setSelectecConv] = useState(null);
   const [comissionData, setComissionData] = useState(initComissionData);
-  const [newComision, setNewComision] = useState([]);
+  const [newComision, setNewComision] = useState({
+    "Id comercio": "",
+    "Nombre comision": "",
+    "Fecha inicio": "",
+    "Fecha fin": "",
+  });
   const [data, setdata] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
 
@@ -88,6 +93,10 @@ const CreateComision = () => {
         );
         return;
       }
+      if (newComision["Nombre comision"] === "") {
+        notifyError("Se debe agregar el nombre de la comision");
+        return;
+      }
       if (!newComision["Autorizador"]) {
         notifyError("Se debe agregar el autorizador");
         return;
@@ -113,9 +122,8 @@ const CreateComision = () => {
       }
 
       comissionData?.ranges.reduce((prev, curr, indexR) => {
-        if (prev?.["Rango maximo"] > curr?.["Rango minimo"]) {
-          notifyError(`El rango maximo de un rango comision no puede 
-            ser mayor al rango minimo del siguiente 
+        if (prev?.["Rango maximo"] !== curr?.["Rango minimo"]) {
+          notifyError(`El rango maximo debe ser igual al rango minimo siguiente 
             rango de comision (Rango ${indexR} - Rango ${indexR + 1})`);
           errRang = true;
         }
@@ -126,6 +134,9 @@ const CreateComision = () => {
         return;
       }
       let obj = {};
+      if (newComision["Nombre comision"]) {
+        obj["nombre_comision"] = newComision["Nombre comision"];
+      }
       if (parseInt(newComision["Id comercio"])) {
         obj["id_comercio"] = parseInt(newComision["Id comercio"]);
       }
@@ -180,11 +191,13 @@ const CreateComision = () => {
   const onChangeNewComision = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
     const newData = [];
-    ["Id comercio", "Fecha inicio", "Fecha fin"].forEach((col) => {
-      let data = null;
-      data = formData.get(col);
-      newData.push([col, data]);
-    });
+    ["Id comercio", "Fecha inicio", "Fecha fin", "Nombre comision"].forEach(
+      (col) => {
+        let data = null;
+        data = formData.get(col);
+        newData.push([col, data]);
+      }
+    );
     setNewComision((old) => ({
       ...old,
       ...Object.fromEntries(newData),
@@ -331,28 +344,16 @@ const CreateComision = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl">Crear comisión a pagar:</h1>
+      <h1 className='text-3xl'>Crear comisión a pagar:</h1>
       {/* <SearchComissions comissionFace="pay" onSelectItem={onSelectItem} /> */}
-      {selectecConv ? (
-        <Fragment>
-          <MultipleSelect
-            options={{
-              [`Convenio: ${selectecConv[0]}) ${selectecConv[1]}`]: true,
-            }}
-            disabled
-          />
-        </Fragment>
-      ) : (
-        ""
-      )}
       <Form onChange={onChangeNewComision} grid>
         {newComision?.["Convenio"] && (
           <Input
-            id="Convenio"
-            name="Convenio"
+            id='Convenio'
+            name='Convenio'
             label={"Convenio"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             // defaultValue={newComision?.["Convenio"]}
             value={newComision?.["Convenio"]}
             disabled
@@ -360,11 +361,11 @@ const CreateComision = () => {
         )}
         {newComision?.["Autorizador"] && (
           <Input
-            id="Autorizador"
-            name="Autorizador"
+            id='Autorizador'
+            name='Autorizador'
             label={"Autorizador"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             // defaultValue={newComision?.["Autorizador"]}
             value={newComision?.["Autorizador"]}
             disabled
@@ -372,106 +373,113 @@ const CreateComision = () => {
         )}
         {newComision?.["Tipo de transaccion"] && (
           <Input
-            id="Tipo de transaccion"
-            name="Tipo de transaccion"
+            id='Tipo de transaccion'
+            name='Tipo de transaccion'
             label={"Tipo de transaccion"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             // defaultValue={newComision?.["Tipo de transaccion"]}
             value={newComision?.["Tipo de transaccion"]}
             disabled
           />
         )}
         <Input
-          id="Id comercio"
-          name="Id comercio"
+          id='Nombre comision'
+          name='Nombre comision'
+          label={"Nombre comisión"}
+          type='text'
+          autoComplete='off'
+          value={newComision?.["Nombre comision"]}
+          onChange={() => {}}
+        />
+        <Input
+          id='Id comercio'
+          name='Id comercio'
           label={"Id comercio"}
-          type="text"
-          autoComplete="off"
-          defaultValue={newComision?.["Id comercio"]}
+          type='number'
+          autoComplete='off'
+          value={newComision?.["Id comercio"]}
+          onChange={() => {}}
         />
         <Input
-          id="Fecha inicio"
-          name="Fecha inicio"
+          id='Fecha inicio'
+          name='Fecha inicio'
           label={"Fecha inicio"}
-          type="date"
-          autoComplete="off"
-          defaultValue={newComision?.["Fecha inicio"]}
+          type='date'
+          autoComplete='off'
+          value={newComision?.["Fecha inicio"]}
+          onChange={() => {}}
         />
         <Input
-          id="Fecha fin"
-          name="Fecha fin"
+          id='Fecha fin'
+          name='Fecha fin'
           label={"Fecha fin"}
-          type="date"
-          autoComplete="off"
-          defaultValue={newComision?.["Fecha fin"]}
+          type='date'
+          autoComplete='off'
+          value={newComision?.["Fecha fin"]}
+          onChange={() => {}}
         />
       </Form>
       <ButtonBar>
         <Button
-          type="button"
+          type='button'
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "convenio" }, { replace: true });
-          }}
-        >
+          }}>
           {newComision?.["Convenio"] ? "Editar convenio" : "Agregar convenio"}
         </Button>
         <Button
-          type="button"
+          type='button'
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "autorizador" }, { replace: true });
-          }}
-        >
+          }}>
           {newComision?.["Autorizador"]
             ? "Editar autorizador"
             : "Agregar autorizador"}
         </Button>
         <Button
-          type="button"
+          type='button'
           onClick={() => {
             setShowModal(true);
             setQuery(
               { ["selectedOpt"]: "Tipo de transaccion" },
               { replace: true }
             );
-          }}
-        >
+          }}>
           {newComision?.["Tipo de transaccion"]
             ? "Editar tipo transacción"
             : "Agregar tipo transacción"}
         </Button>
         <Button
-          type="button"
+          type='button'
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "comision" }, { replace: true });
-          }}
-        >
+          }}>
           Agregar comisión existente
         </Button>
       </ButtonBar>
       <FormComission outerState={[comissionData, setComissionData]}>
-        <Button type="submit" onClick={createComission}>
+        <Button type='submit' onClick={createComission}>
           Crear comision
         </Button>
       </FormComission>
       <Modal
         show={showModal}
         handleClose={handleClose}
-        className="flex align-middle"
-      >
+        className='flex align-middle'>
         {/* {selectedOpt === "convenio" && */}
         <Fragment>
           {selectedOpt === "convenio" ? (
-            <h1 className="text-3xl">Seleccionar convenio</h1>
+            <h1 className='text-3xl'>Seleccionar convenio</h1>
           ) : selectedOpt === "autorizador" ? (
-            <h1 className="text-3xl">Seleccionar autorizador</h1>
+            <h1 className='text-3xl'>Seleccionar autorizador</h1>
           ) : selectedOpt === "Tipo de transaccion" ? (
-            <h1 className="text-3xl">Seleccionar tipo de transacción</h1>
+            <h1 className='text-3xl'>Seleccionar tipo de transacción</h1>
           ) : selectedOpt === "comision" ? (
-            <h1 className="text-3xl">Seleccionar comisión</h1>
+            <h1 className='text-3xl'>Seleccionar comisión</h1>
           ) : (
             ""
           )}
@@ -483,7 +491,7 @@ const CreateComision = () => {
                   label={"Convenio"}
                   name={"convenio"}
                   type={"text"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={convenio}
                 />
                 <Input
@@ -491,16 +499,16 @@ const CreateComision = () => {
                   label={"Tipo de operación"}
                   name={"tipoTrx"}
                   type={"text"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={tipoTrx}
                 />
                 <Input
                   id={"comercioComissions"}
                   label={"Id comercio"}
                   name={"comercio"}
-                  type="number"
+                  type='number'
                   step={"1"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={comercio}
                 />
                 <Input
@@ -508,7 +516,7 @@ const CreateComision = () => {
                   label={"Autorizador"}
                   name={"autorizador"}
                   type={"text"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={autorizador}
                 />
               </>
