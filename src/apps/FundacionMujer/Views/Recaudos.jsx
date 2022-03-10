@@ -13,6 +13,9 @@ import { useReactToPrint } from "react-to-print";
 import { notifyError } from "../../../utils/notify";
 import Tickets from "../components/Voucher/Tickets";
 import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
+import fetchData from "../../../utils/fetchData";
+
+const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 
 const Recaudo = () => {
   const {
@@ -45,6 +48,8 @@ const Recaudo = () => {
   const [response, setResponse] = useState("");
   const { roleInfo } = useAuth();
   const [permiteCambio, setPermiteCambio] = useState("");
+  const [paraMax, setParaMax] = useState(null);
+  const [paraMin, setParaMin] = useState(null);
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -123,6 +128,28 @@ const Recaudo = () => {
   ]);
 
   const { infoTicket } = useAuth();
+
+  const params = useCallback(async () => {
+    const queries = { tipo_op: 5 };
+    console.log(queries);
+    try {
+      const res = await fetchData(url_params, "GET", queries);
+      if ("Parametros" in res?.obj?.[0]) {
+        setParaMax(res?.obj?.[0].Parametros.monto_maximo);
+        setParaMin(res?.obj?.[0].Parametros.monto_minimo);
+      } else {
+        setParaMax(10000000);
+        setParaMin(0);
+      }
+
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+  useEffect(() => {
+    params();
+  }, [info]);
 
   useEffect(() => {
     infoTicket(response?.id_trx, 5, tickets);
@@ -357,11 +384,18 @@ const Recaudo = () => {
                   label="Valor a pagar"
                   type="number"
                   autoComplete="off"
+                  max={paraMax}
+                  min={paraMin}
                   required
                   value={formatMon}
                   disabled={permiteCambio == "N"}
                   onInput={(e, valor) => {
                     const num = valor || "";
+                    if (num > paraMax || num < paraMin) {
+                      setStop(true);
+                    } else {
+                      setStop(false);
+                    }
                     setFormatMon(num);
                   }}
                 />
