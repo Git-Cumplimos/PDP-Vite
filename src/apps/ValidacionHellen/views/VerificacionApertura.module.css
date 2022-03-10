@@ -47,3 +47,20 @@
   display: flex;
   justify-content: center;
 }
+.contenedorCausalRechazo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.textTarea {
+  display: flex;
+  justify-content: center;
+  width: 80%;
+  @apply grid gap-4 mx-auto xl:w-full border border-solid border-gray-500 p-3;
+}
+.autorizacionMensajes {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
