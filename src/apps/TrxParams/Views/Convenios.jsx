@@ -259,7 +259,7 @@ const Convenios = () => {
   return (
     <Fragment>
       <ButtonBar>
-        <Button type="submit" onClick={() => setShowModal(true)}>
+        <Button type='submit' onClick={() => setShowModal(true)}>
           Crear convenio
         </Button>
         {/* <Button type="submit" onClick={() => setShowModal(true)}>
@@ -268,19 +268,19 @@ const Convenios = () => {
       </ButtonBar>
       <Pagination maxPage={maxPages} onChange={onChange} grid>
         <Input
-          id="searchConvenio"
-          name="searchConvenio"
+          id='searchConvenio'
+          name='searchConvenio'
           label={"Tag convenio"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           defaultValue={searchConvenio}
         />
         <Input
-          id="ean13Convenio"
-          name="ean13Convenio"
+          id='ean13Convenio'
+          name='ean13Convenio'
           label={"Ean13"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           defaultValue={ean13Convenio}
         />
       </Pagination>
@@ -296,23 +296,23 @@ const Convenios = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={onChangeConv}>
           <Input
-            id="Nombre de convenio"
-            name="Nombre de convenio"
+            id='Nombre de convenio'
+            name='Nombre de convenio'
             label={"Nombre de convenio"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             defaultValue={selectedConvenio?.["Nombre de convenio"]}
             required
           />
           <Input
-            id="Ean13"
-            name="Ean13"
+            id='Ean13'
+            name='Ean13'
             label={"Ean13"}
-            type="text"
+            type='text'
             // step='1'
-            minLength="13"
-            maxLength="13"
-            autoComplete="off"
+            minLength='13'
+            maxLength='13'
+            autoComplete='off'
             value={selectedConvenio?.Ean13}
             onChange={() => {}}
             required
@@ -320,27 +320,26 @@ const Convenios = () => {
           <Fieldset legend={"Tags"}>
             {selectedConvenio?.Tags?.map((val, ind) => {
               return (
-                <div className="grid grid-cols-2" key={ind}>
+                <div className='grid grid-cols-2' key={ind}>
                   <Input
                     id={`tagsConvenio_${ind}`}
-                    name="Tags"
-                    type="text"
-                    autoComplete="off"
+                    name='Tags'
+                    type='text'
+                    autoComplete='off'
                     value={val}
                     onChange={() => {}}
                     required
                   />
                   <ButtonBar>
                     <Button
-                      type="button"
+                      type='button'
                       onClick={() => {
                         setSelectedConvenio((old) => {
                           const copy = { ...old };
                           copy?.Tags.splice(ind, 1);
                           return { ...copy };
                         });
-                      }}
-                    >
+                      }}>
                       Eliminar tag
                     </Button>
                   </ButtonBar>
@@ -349,15 +348,14 @@ const Convenios = () => {
             })}
             <ButtonBar>
               <Button
-                type="button"
+                type='button'
                 onClick={() => {
                   setSelectedConvenio((old) => {
                     const copy = { ...old };
                     copy?.Tags.push("");
                     return { ...copy };
                   });
-                }}
-              >
+                }}>
                 Añadir tag
               </Button>
             </ButtonBar>
@@ -365,7 +363,7 @@ const Convenios = () => {
           <Fieldset legend={"Referencias"}>
             {selectedConvenio?.Referencias?.map((val, index) => {
               return (
-                <div className="grid grid-cols-auto-fit-md place-items-center place-content-end">
+                <div className='grid grid-cols-auto-fit-md place-items-center place-content-end'>
                   {Object.entries(val).map(([key, valRef]) => {
                     return (
                       <Input
@@ -373,7 +371,7 @@ const Convenios = () => {
                         name={key}
                         label={key}
                         type={`${key.includes("Longitud") ? "number" : "text"}`}
-                        autoComplete="off"
+                        autoComplete='off'
                         value={valRef}
                         onChange={() => {}}
                         required
@@ -382,7 +380,7 @@ const Convenios = () => {
                   })}
                   <ButtonBar>
                     <Button
-                      type="button"
+                      type='button'
                       onClick={() =>
                         setSelectedConvenio((old) => {
                           if (old?.Referencias.length < 2) {
@@ -392,8 +390,7 @@ const Convenios = () => {
                           copy?.Referencias.splice(index, 1);
                           return { ...copy };
                         })
-                      }
-                    >
+                      }>
                       Eliminar referencia
                     </Button>
                   </ButtonBar>
@@ -402,7 +399,7 @@ const Convenios = () => {
             })}
             <ButtonBar>
               <Button
-                type="button"
+                type='button'
                 onClick={() =>
                   setSelectedConvenio((old) => {
                     if (old?.Referencias.length > 2) {
@@ -416,8 +413,7 @@ const Convenios = () => {
                     });
                     return { ...copy };
                   })
-                }
-              >
+                }>
                 Añadir referencia
               </Button>
             </ButtonBar>
@@ -425,10 +421,10 @@ const Convenios = () => {
           {!selectedConvenio?.["Id convenio"] ||
           selectedConvenio?.["Id convenio"] === -1 ? (
             <ButtonBar>
-              <Button type="button" onClick={handleClose}>
+              <Button type='button' onClick={handleClose}>
                 Cancelar
               </Button>
-              <Button type="submit">Crear autorizador</Button>
+              <Button type='submit'>Crear convenio</Button>
             </ButtonBar>
           ) : (
             <Fragment>
@@ -461,10 +457,10 @@ const Convenios = () => {
                 </Button> */}
               </ButtonBar>
               <ButtonBar>
-                <Button type="button" onClick={handleClose}>
+                <Button type='button' onClick={handleClose}>
                   Cancelar
                 </Button>
-                <Button type="submit">Editar convenio</Button>
+                <Button type='submit'>Editar convenio</Button>
               </ButtonBar>
             </Fragment>
           )}
