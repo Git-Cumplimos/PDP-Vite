@@ -163,7 +163,11 @@ const Autorizadores = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-
+      console.log(selectedAuto?.["Id contrato"]);
+      if (!selectedAuto?.["Id contrato"]) {
+        notifyError("Se debe agregar el contrato");
+        return;
+      }
       if (selectedAuto?.["Id autorizador"]) {
         putAutorizadores(
           { id_autorizador: selectedAuto?.["Id autorizador"] },

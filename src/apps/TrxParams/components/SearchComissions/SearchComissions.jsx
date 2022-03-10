@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import useQuery from "../../../../hooks/useQuery";
 
 import Table from "../../../../components/Base/Table";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Input from "../../../../components/Base/Input";
 import Pagination from "../../../../components/Compound/Pagination";
 import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
@@ -256,13 +257,86 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
         )}
       </Pagination>
       {Array.isArray(comissions) && comissions.length > 0 ? (
-        <Table
+        //   <TableEnterprise
+        //   title="Buscar usuarios"
+        //   maxPage={maxPage}
+        //   onChange={onChange}
+        //   headers={[
+        //     "Id",
+        //     "Nombre completo",
+        //     "E-mail",
+        //     "Id",
+        //     "Nombre completo",
+        //     "E-mail",
+        //     "Id",
+        //     "Nombre completo",
+        //     "E-mail",
+        //     "Nombre completo",
+        //     "E-mail",
+        //   ]}
+        //   data={usuariosDB.map(({ uuid, uname, email }) => {
+        //     return [
+        //       uuid,
+        //       uname,
+        //       email,
+        //       uuid,
+        //       uname,
+        //       email,
+        //       uuid,
+        //       uname,
+        //       email,
+        //       uname,
+        //       email,
+        //     ];
+        //   })}
+        //   onSelectRow={(e, i) => {
+        //     const {
+        //       active,
+        //       direccion,
+        //       doc_id,
+        //       email,
+        //       phone,
+        //       uname,
+        //       uuid,
+        //       doc_type: { "Nombre corto": _doc_type },
+        //     } = usuariosDB[i];
+        //     const userMapped = {
+        //       "Id usuario": uuid,
+        //       "Nombre completo": uname,
+        //       Identificacion: `${_doc_type} ${doc_id}`,
+        //       Email: email,
+        //       edit: {
+        //         uuid,
+        //         direccion,
+        //         phone,
+        //         active,
+        //       },
+        //     };
+        //     setSelected({ ...userMapped });
+        //     setShowModal(true);
+        //   }}
+        //   onSetPageData={setPageData}
+        // ></TableEnterprise>
+        <TableEnterprise
+          title={
+            comissionFace === "pay"
+              ? "Comisiones a pagar"
+              : "Comisiones a cobrar"
+          }
+          maxPage={maxPages}
+          onChange={onChange}
           headers={headersTable}
           data={dataTable}
           onSelectRow={onSelectItem ? passItem : onSelectRow}
-          // onSelectRow={onSelectTipoContrato}
+          // onSetPageData={setPageData}
         />
       ) : (
+        // <Table
+        //   headers={headersTable}
+        //   data={dataTable}
+        //   onSelectRow={onSelectItem ? passItem : onSelectRow}
+        //   // onSelectRow={onSelectTipoContrato}
+        // />
         ""
       )}
     </Fragment>

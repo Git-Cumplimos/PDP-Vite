@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import Fieldset from "../../../components/Base/Fieldset";
@@ -7,6 +7,8 @@ import Input from "../../../components/Base/Input";
 import Select from "../../../components/Base/Select";
 import classes from "../../ValidacionHellen/views/VerificacionApertura.module.css";
 import { notify } from "../../../utils/notify";
+import Modal from "../../../components/Base/Modal";
+import LogoPDP from "../../../components/Base/LogoPDP";
 
 const VerificacionApertura = () => {
   const navigate = useNavigate();
@@ -19,6 +21,9 @@ const VerificacionApertura = () => {
     valores,
     contenedorBotones,
     contenedorPrincipalBotones,
+    contenedorCausalRechazo,
+    autorizacionMensajes,
+    textTarea,
   } = classes;
   const [datosParams, setDatosParams] = useState(0);
   const [personaResponsable, setPersonaResponsable] = useState("");
@@ -28,6 +33,11 @@ const VerificacionApertura = () => {
   const [tipoZona, setTipoZona] = useState("");
   const [datosReconoserID, setDatosReconoserID] = useState([]);
   const [urlPdfs, setUrlPdfs] = useState({});
+
+  const [causal, setCausal] = useState(false);
+  const [mensajeCausal, setMensajeCausal] = useState("");
+  const [confirmarRechazo, setConfirmarRechazo] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const params = useParams();
   useEffect(() => {
     if (datosParams?.length > 0) {
@@ -87,6 +97,22 @@ const VerificacionApertura = () => {
     }
   }, [datosParams]);
 
+  //----------------Funcion Para Enviar Mensaje de Rechazo---------------------//
+
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+  }, []);
+
+  const fConfirmarRechazo = (e) => {
+    e.preventDefault();
+    setConfirmarRechazo(true);
+    setShowModal(true);
+  };
+  const fCausalRechazo = (e) => {
+    e.preventDefault();
+    setCausal(true);
+  };
+
   const aprobacionFormulario = (e) => {
     e.preventDefault();
     const datos = {
@@ -116,6 +142,7 @@ const VerificacionApertura = () => {
     const datos = {
       task_token: datosParams[0]["task_token"],
       validation_state: "202",
+      causal_rechazo: mensajeCausal,
     };
     fetch(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
@@ -145,39 +172,39 @@ const VerificacionApertura = () => {
         >
           <Input
             label={"Nombre Comercio"}
-            placeholder={datosParams[0]["nombre_comercio"]}
+            value={datosParams[0]["nombre_comercio"]}
             disabled
           ></Input>
           <Fieldset legend="ReconoserID" className="lg:col-span-3">
             <Input
               label={"Nombre"}
-              placeholder={`${datosReconoserID["primerNombre"]} ${datosReconoserID["segundoNombre"]}`}
+              value={`${datosReconoserID["primerNombre"]} ${datosReconoserID["segundoNombre"]}`}
               disabled
             ></Input>
 
             <Input
               label={"Apellido"}
-              placeholder={`${datosReconoserID["primerApellido"]} ${datosReconoserID["segundoApellido"]}`}
+              value={`${datosReconoserID["primerApellido"]} ${datosReconoserID["segundoApellido"]}`}
               disabled
             ></Input>
             <Input
               label={"N° Documento"}
-              placeholder={datosReconoserID["numDoc"]}
+              value={datosReconoserID["numDoc"]}
               disabled
             ></Input>
             <Input
               label={"Score Rostro Doc"}
-              placeholder={`${datosReconoserID["scoreRostroDocumento"]}`}
+              value={`${datosReconoserID["scoreRostroDocumento"]}`}
               disabled
             ></Input>
             <Input
               label={"Score Proceso"}
-              placeholder={`${datosReconoserID["scoreProceso"]}`}
+              value={`${datosReconoserID["scoreProceso"]}`}
               disabled
             ></Input>
             {/*    <Input
               label="Tipo de Identificación"
-              placeholder={datosReconoserID["tipoDoc"]}
+              value={datosReconoserID["tipoDoc"]}
               disabled
             ></Input> */}
           </Fieldset>
@@ -185,23 +212,23 @@ const VerificacionApertura = () => {
           <Fieldset legend="Representante legal" className="lg:col-span-3">
             <Input
               label={"Nombre"}
-              placeholder={datosParams[0]["nombre"]}
+              value={datosParams[0]["nombre"]}
               disabled
             ></Input>
 
             <Input
               label={"Apellido"}
-              placeholder={datosParams[0]["apellido"]}
+              value={datosParams[0]["apellido"]}
               disabled
             ></Input>
             <Input
               label={"N° Documento"}
-              placeholder={datosParams[0]["numdoc"]}
+              value={datosParams[0]["numdoc"]}
               disabled
             ></Input>
             <Input
               label="Tipo de Identificación"
-              placeholder={datosParams[0]["tipodoc"]}
+              value={datosParams[0]["tipodoc"]}
               disabled
             ></Input>
           </Fieldset>
@@ -213,76 +240,68 @@ const VerificacionApertura = () => {
           >
             <Input
               label={"N° NIT"}
-              placeholder={datosParams[0]["numnit"]}
+              value={datosParams[0]["numnit"]}
               disabled
             ></Input>
             <Input
               label={"N° Camara & Comercio"}
-              placeholder={datosParams[0]["numcamycom"]}
+              value={datosParams[0]["numcamycom"]}
               disabled
             ></Input>
             <Input
               label={"N° RUT"}
-              placeholder={datosParams[0]["numrut"]}
+              value={datosParams[0]["numrut"]}
               disabled
             ></Input>
 
             <Input
               label={"Actividad Economica"}
-              placeholder={datosParams[0]["actividad_economica"]}
+              value={datosParams[0]["actividad_economica"]}
               disabled
             ></Input>
 
             <Input
               label={"Responsable del iva"}
-              placeholder={datosParams[0]["responsableiva"]}
+              value={datosParams[0]["responsableiva"]}
               disabled
             ></Input>
-            <Input
+            {/*    <Input
               label={"Tipo de Establecimiento"}
-              placeholder={datosParams[0]["tipo_establecimiento"]}
+              value={datosParams[0]["tipo_establecimiento"]}
               disabled
-            ></Input>
+            ></Input> */}
           </Fieldset>
 
           <Fieldset legend="Contacto" className="lg:col-span-3">
             <Input
               label={"Celular"}
-              placeholder={datosParams[0]["celular"]}
+              value={datosParams[0]["celular"]}
               disabled
             />
 
-            <Input
-              label={"Email"}
-              placeholder={datosParams[0]["email"]}
-              disabled
-            />
+            <Input label={"Email"} value={datosParams[0]["email"]} disabled />
             <Input
               label={"Autoriza a Soluciones en Red de Enviar Mensajes"}
-              placeholder={datosParams[0]["autosms"]}
+              value={datosParams[0]["autosms"]}
               disabled
             />
           </Fieldset>
           <Fieldset legend="Ubicación Comercio" className="lg:col-span-3">
             <Input
               label={"Municipio"}
-              placeholder={datosParams[0]["municipio"]}
+              value={datosParams[0]["municipio"]}
               disabled
             />
 
             <Input
               label={"Departamento"}
-              placeholder={datosParams[0]["departamento"]}
+              value={datosParams[0]["departamento"]}
               disabled
             />
-            <Input
-              label={"Barrio"}
-              placeholder={datosParams[0]["barrio"]}
-              disabled
-            />
+            <Input label={"Barrio"} value={datosParams[0]["barrio"]} disabled />
             <Input
               label={"Direccion"}
-              placeholder={datosParams[0]["direccion_comercio"]}
+              value={datosParams[0]["direccion_comercio"]}
               disabled
             />
           </Fieldset>
@@ -292,37 +311,37 @@ const VerificacionApertura = () => {
           >
             <Input
               label={"Municipio"}
-              placeholder={datosParams[0]["municipio_correspondencia"]}
+              value={datosParams[0]["municipio_correspondencia"]}
               disabled
             />
 
             <Input
               label={"Departamento"}
-              placeholder={datosParams[0]["departamento_correspondencia"]}
+              value={datosParams[0]["departamento_correspondencia"]}
               disabled
             />
             <Input
               label={"Barrio"}
-              placeholder={datosParams[0]["barrio_correspondencia"]}
+              value={datosParams[0]["barrio_correspondencia"]}
               disabled
             />
             <Input
               label={"Direccion"}
-              placeholder={datosParams[0]["direccion_correspondencia"]}
+              value={datosParams[0]["direccion_correspondencia"]}
               disabled
             />
           </Fieldset>
           <Fieldset legend="Asesor" className="lg:col-span-3">
             <Input
               label={"Nombre Asesor"}
-              placeholder={datosParams[0]["asesor"]}
+              value={datosParams[0]["asesor"]}
               disabled
             ></Input>
 
-            {datosParams[0]["asesor_comercial_localidad"].length != "" ? (
+            {/* {datosParams[0]["asesor_comercial_localidad"].length != "" ? (
               <Input
                 label={"Asesor Comercial Localidad"}
-                placeholder={datosParams[0]["asesor_comercial_localidad"]}
+                value={datosParams[0]["asesor_comercial_localidad"]}
                 disabled
               ></Input>
             ) : (
@@ -340,12 +359,12 @@ const VerificacionApertura = () => {
                   "03 Asesor Bosa": "03 Asesor Bosa",
                 }}
               ></Select>
-            )}
+            )} */}
 
             {datosParams[0]["cod_localidad"].length != "" ? (
               <Input
                 label={"Cod Localidad"}
-                placeholder={datosParams[0]["cod_localidad"]}
+                value={datosParams[0]["cod_localidad"]}
                 disabled
               ></Input>
             ) : (
@@ -366,11 +385,11 @@ const VerificacionApertura = () => {
             {datosParams[0]["responsable"].length != "" ? (
               <Input
                 label={"Responsable"}
-                placeholder={datosParams[0]["responsable"]}
+                value={datosParams[0]["responsable"]}
                 disabled
               ></Input>
             ) : (
-              <Select
+              /*  <Select
                 onChange={(event) => setPersonaResponsable(event.target.value)}
                 id="comissionType"
                 name="comissionType"
@@ -380,13 +399,14 @@ const VerificacionApertura = () => {
                   "Isabel Perez": "Isabel Perez",
                   "Alejandra Suarez": "Alejandra Suarez",
                 }}
-              ></Select>
+              ></Select> */
+              ""
             )}
 
             {datosParams[0]["unidad_negocio"].length != "" ? (
               <Input
                 label={"Unidad De Negocio"}
-                placeholder={datosParams[0]["unidad_negocio"]}
+                value={datosParams[0]["unidad_negocio"]}
                 disabled
               ></Input>
             ) : (
@@ -404,10 +424,18 @@ const VerificacionApertura = () => {
               ></Select>
             )}
             {/* {datosParams[0]["tipozona"] != null */}
-            {datosParams[0]["tipozona"].length != "" ? (
+            {datosParams[0]["tipozona"] != "" ? (
               <Input
                 label={"Tipo Zona"}
-                placeholder={datosParams[0]["tipozona"]}
+                value={
+                  datosParams[0]["tipozona"] == 1
+                    ? "Centro"
+                    : datosParams[0]["tipozona"] == 2
+                    ? "Norte"
+                    : datosParams[0]["tipozona"] == 3
+                    ? "Occidente"
+                    : datosParams[0]["tipozona"]
+                }
                 disabled
               ></Input>
             ) : (
@@ -481,27 +509,102 @@ const VerificacionApertura = () => {
       ) : (
         ""
       )}
-      <div className={contenedorPrincipalBotones}>
-        <div className={contenedorBotones}>
-          <Button
-            type="submit"
-            onClick={(e) => {
-              aprobacionFormulario(e);
-            }}
-          >
-            Aprobar ReconoserID
-          </Button>
+      <div>
+        <div className={contenedorPrincipalBotones}>
+          <div className={contenedorBotones}>
+            <Button
+              type="submit"
+              onClick={(e) => {
+                aprobacionFormulario(e);
+              }}
+            >
+              Aprobar Comercio
+            </Button>
+          </div>
+
+          <div className={contenedorBotones}>
+            <Button
+              type="submit"
+              onClick={(e) => {
+                fConfirmarRechazo(e);
+              }}
+            >
+              Rechazar Comercio
+            </Button>
+          </div>
         </div>
-        <div className={contenedorBotones}>
-          <Button
-            type="submit"
-            onClick={(e) => {
-              rechazarFormulario(e);
-            }}
-          >
-            Rechazar ReconoserID
-          </Button>
-        </div>
+        {confirmarRechazo ? (
+          <Modal show={showModal} handleClose={handleClose}>
+            <LogoPDP></LogoPDP>
+
+            <div className={contenedorCausalRechazo}>
+              <div className={autorizacionMensajes}>
+                <span className={titulosSecundarios}>
+                  ¿Esta Seguro de Rechazar Este Comercio?
+                </span>
+              </div>
+
+              <div className={contenedorBotones}>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    fCausalRechazo(e);
+                  }}
+                >
+                  Si
+                </Button>
+                {/*      <Button
+                        type="submit"
+                        onClick={(e) => {
+                          rechazarFormulario(e);
+                        }}
+                      >
+                     No
+                      </Button> */}
+              </div>
+            </div>
+          </Modal>
+        ) : (
+          ""
+        )}
+
+        {causal ? (
+          <Modal show={showModal} handleClose={handleClose}>
+            <LogoPDP></LogoPDP>
+
+            <div className={contenedorCausalRechazo}>
+              <div className={autorizacionMensajes}>
+                <span className={titulosSecundarios}>
+                  Si el Comercio no cumple con los requisitos, por favor agrege
+                  un causal de rechazo.
+                </span>
+              </div>
+              <textarea
+                className={textTarea}
+                type="input"
+                minLength="1"
+                maxLength="160"
+                autoComplete="off"
+                value={mensajeCausal}
+                onInput={(e) => {
+                  setMensajeCausal(e.target.value);
+                }}
+              ></textarea>
+              <div className={contenedorBotones}>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    rechazarFormulario(e);
+                  }}
+                >
+                  Enviar Mensaje y Rechazar
+                </Button>
+              </div>
+            </div>
+          </Modal>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

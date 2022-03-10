@@ -66,15 +66,15 @@ const TypesTrxs = () => {
   const [foundAliados, setFoundAliados] = useState([]);
 
   const tableTrxTypes = useMemo(() => {
-    return trxTypes.map(({ id_tipo_operacion, Aliado, Nombre }) => ({
+    return trxTypes.map(({ id_tipo_operacion, Autorizador, Nombre }) => ({
       Id: id_tipo_operacion,
       "Tipo de transaccion": Nombre,
-      Aliado: Aliado,
+      Autorizador,
     }));
   }, [trxTypes]);
 
   const mapSuggestionsAliados = useMemo(
-    () => foundAliados.map(({ nombre }) => <h1 className="py-2">{nombre}</h1>),
+    () => foundAliados.map(({ nombre }) => <h1 className='py-2'>{nombre}</h1>),
     [foundAliados]
   );
 
@@ -208,7 +208,7 @@ const TypesTrxs = () => {
     <Fragment>
       <ButtonBar>
         <Button
-          type="submit"
+          type='submit'
           onClick={() => {
             setShowModal(true);
             setSelected({
@@ -216,18 +216,17 @@ const TypesTrxs = () => {
               Aliado: "",
               Parametros: {},
             });
-          }}
-        >
+          }}>
           Crear tipo de transaccion
         </Button>
       </ButtonBar>
       <Pagination maxPage={maxPages} onChange={onChange} grid>
         <Input
-          id="searchTrxType"
-          name="searchTrxType"
+          id='searchTrxType'
+          name='searchTrxType'
           label={"Buscar tipo de transaccion"}
-          type="search"
-          autoComplete="off"
+          type='search'
+          autoComplete='off'
           defaultValue={searchTrxType}
         />
         <ButtonBar></ButtonBar>
@@ -244,9 +243,9 @@ const TypesTrxs = () => {
       <Modal show={showModal} handleClose={handleClose}>
         {selected ? (
           <PaymentSummary
-            title="Editar parametros de tipo de transaccion"
+            title='Editar parametros de tipo de transaccion'
             // subtitle="Datos tipo de transaccion"
-            subtitle=""
+            subtitle=''
             // summaryTrx={{
             //   Id: selected?.id_tipo_operacion,
             //   Nombre: selected?.Nombre,
@@ -255,20 +254,20 @@ const TypesTrxs = () => {
           >
             <Form onChange={onChangeSelected} onSubmit={onSubmit} grid>
               <Input
-                id="nameTrxType"
-                name="Nombre"
+                id='nameTrxType'
+                name='Nombre'
                 label={"Nombre"}
-                type="search"
-                autoComplete="off"
+                type='search'
+                autoComplete='off'
                 value={selected?.Nombre || ""}
                 readOnly={selected?.id_tipo_operacion}
               />
               <InputSuggestions
-                id="aliadoTrxType"
-                name="Aliado"
+                id='aliadoTrxType'
+                name='Aliado'
                 label={"Aliado"}
-                type="search"
-                autoComplete="off"
+                type='search'
+                autoComplete='off'
                 suggestions={mapSuggestionsAliados || []}
                 onLazyInput={{
                   callback: searchAliados,
@@ -283,15 +282,14 @@ const TypesTrxs = () => {
                   ([key, val], index) => {
                     return (
                       <div
-                        className="grid grid-cols-auto-fit-md place-items-center place-content-end"
-                        key={index}
-                      >
+                        className='grid grid-cols-auto-fit-md place-items-center place-content-end'
+                        key={index}>
                         <Input
                           id={`${index}_key`}
                           name={`param_key`}
                           label={"Clave"}
-                          type="text"
-                          autoComplete="off"
+                          type='text'
+                          autoComplete='off'
                           value={key}
                           onInput={() => {}}
                         />
@@ -299,14 +297,14 @@ const TypesTrxs = () => {
                           id={`${index}_value`}
                           name={`param_value`}
                           label={"Valor"}
-                          type="text"
-                          autoComplete="off"
+                          type='text'
+                          autoComplete='off'
                           value={val}
                           onInput={() => {}}
                         />
                         <ButtonBar className={"lg:col-span-2"}>
                           <Button
-                            type="button"
+                            type='button'
                             onClick={() =>
                               setSelected((old) => {
                                 const copy = { ...old };
@@ -318,8 +316,7 @@ const TypesTrxs = () => {
                                   Object.fromEntries(paramsCopy);
                                 return { ...copy };
                               })
-                            }
-                          >
+                            }>
                             Eliminar parametro
                           </Button>
                         </ButtonBar>
@@ -329,7 +326,7 @@ const TypesTrxs = () => {
                 )}
                 <ButtonBar>
                   <Button
-                    type="button"
+                    type='button'
                     onClick={() =>
                       setSelected((old) => {
                         const copy = { ...old };
@@ -338,23 +335,22 @@ const TypesTrxs = () => {
                         copy.Parametros = Object.fromEntries(paramsCopy);
                         return { ...copy };
                       })
-                    }
-                  >
+                    }>
                     Añadir parametro
                   </Button>
                 </ButtonBar>
               </Fieldset>
               {!selected?.id_tipo_operacion ? (
                 <ButtonBar>
-                  <Button type="submit">Crear tipo de transaccion</Button>
-                  <Button type="button" onClick={handleClose}>
+                  <Button type='submit'>Crear tipo de transaccion</Button>
+                  <Button type='button' onClick={handleClose}>
                     Cancelar
                   </Button>
                 </ButtonBar>
               ) : (
                 <ButtonBar>
-                  <Button type="submit">Editar tipo de transaccion</Button>
-                  <Button type="button" onClick={handleClose}>
+                  <Button type='submit'>Editar tipo de transaccion</Button>
+                  <Button type='button' onClick={handleClose}>
                     Cancelar
                   </Button>
                 </ButtonBar>
