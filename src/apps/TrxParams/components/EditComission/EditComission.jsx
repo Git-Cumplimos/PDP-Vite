@@ -40,8 +40,9 @@ const EditComission = () => {
       }
 
       editedComission?.ranges.reduce((prev, curr, indexR) => {
-        if (prev?.["Rango maximo"] !== curr?.["Rango minimo"]) {
-          notifyError(`El rango maximo debe ser igual al rango minimo siguiente 
+        if (!(prev?.["Rango maximo"] + 1 === curr?.["Rango minimo"])) {
+          notifyError(`El rango maximo de un rango comision no puede 
+          ser mayor al rango minimo del siguiente 
             rango de comision (Rango ${indexR} - Rango ${indexR + 1})`);
           errRang = true;
         }
