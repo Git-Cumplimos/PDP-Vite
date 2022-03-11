@@ -130,6 +130,7 @@ const TableEnterprise = ({
             >
               {tableOpts.map(({ hide }, idx) => (
                 <div
+                  key={idx}
                   className={`px-4 py-2 hover:bg-secondary w-full text-xs ${
                     !hide ? "hidden" : "block"
                   } ${
@@ -295,8 +296,10 @@ const TableEnterprise = ({
             }))
           }
         >
-          {[5, 10, 20, 50].map((val) => (
-            <option value={val}>{val} items por pagina</option>
+          {[5, 10, 20, 50].map((val, idx) => (
+            <option value={val} key={idx}>
+              {val} items por pagina
+            </option>
           ))}
         </select>
         <div className="flex flex-row gap-6 items-center">
