@@ -29,7 +29,7 @@ const TableEnterprise = ({
   onSetPageData = () => {},
   children = null,
 }) => {
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [showHidden, setShowHidden] = useState(false);
   const [tableOpts, setTableOpts] = useState([]);
 
