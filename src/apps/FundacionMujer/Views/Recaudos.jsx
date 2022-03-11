@@ -178,6 +178,7 @@ const Recaudo = () => {
     const body = {
       Tipo: roleInfo?.tipo_comercio,
       Usuario: roleInfo?.id_usuario,
+      Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
       Credito: selected?.Credito,
       Depto: roleInfo?.codigo_dane.slice(0, 2),
@@ -214,6 +215,8 @@ const Recaudo = () => {
     setCreditStatus(false);
     setInfo("");
     const user = {
+      Usuario: roleInfo?.id_usuario,
+      Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
       Depto: roleInfo?.codigo_dane?.slice(0, 2),
       Municipio: roleInfo?.codigo_dane?.slice(2),
@@ -264,7 +267,7 @@ const Recaudo = () => {
       })
       .catch((err) => console.log("error", err));
   };
-  console.log(permiteCambio == "N");
+  console.log(roleInfo);
   return (
     <>
       {"id_comercio" in roleInfo ? (
