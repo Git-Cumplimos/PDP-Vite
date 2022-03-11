@@ -215,8 +215,8 @@ const Recaudo = () => {
     setInfo("");
     const user = {
       Comercio: roleInfo?.id_comercio,
-      Depto: roleInfo?.codigo_dane.slice(0, 2),
-      Municipio: roleInfo?.codigo_dane.slice(2),
+      Depto: roleInfo?.codigo_dane?.slice(0, 2),
+      Municipio: roleInfo?.codigo_dane?.slice(2),
     };
     valorcuota(String(number), user)
       .then((res) => {
@@ -267,54 +267,61 @@ const Recaudo = () => {
   console.log(permiteCambio == "N");
   return (
     <>
-      <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
-      <Form onSubmit={onSubmit} grid>
-        <Select
-          id="searchBySorteo"
-          label="Tipo de busqueda"
-          options={[
-            { value: "", label: "" },
-            {
-              value: 1,
-              label: `Documento`,
-            },
-            {
-              value: 2,
-              label: `Nº credito`,
-            },
-          ]}
-          value={tipobusqueda}
-          onChange={(e) => {
-            setTiposBusqueda(e.target.value);
-            if (e.target.value == 1) {
-              setLabel("Documento");
-            }
-            if (e.target.value == 2) {
-              setLabel("Número crédito");
-            }
-          }}
-        />
-        {tipobusqueda?.length > 0 && (
-          <Input
-            id="numpin"
-            label={label}
-            type="text"
-            minLength="7"
-            maxLength="12"
-            autoComplete="off"
-            value={number}
-            onInput={(e) => {
-              const num = parseInt(e.target.value) || "";
-              setNumber(num);
-            }}
-          />
-        )}
-        <ButtonBar className="col-auto md:col-span-2">
-          <Button type="submit" disabled={disabledBtn}>
-            Consultar recaudos
-          </Button>
-        </ButtonBar>
-      </Form>
+      {"id_comercio" in roleInfo ? (
+        <>
+          <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
+          <Form onSubmit={onSubmit} grid>
+            <Select
+              id="searchBySorteo"
+              label="Tipo de busqueda"
+              options={[
+                { value: "", label: "" },
+                {
+                  value: 1,
+                  label: `Documento`,
+                },
+                {
+                  value: 2,
+                  label: `Nº credito`,
+                },
+              ]}
+              value={tipobusqueda}
+              onChange={(e) => {
+                setTiposBusqueda(e.target.value);
+                if (e.target.value == 1) {
+                  setLabel("Documento");
+                }
+                if (e.target.value == 2) {
+                  setLabel("Número crédito");
+                }
+              }}
+            />
+            {tipobusqueda?.length > 0 && (
+              <Input
+                id="numpin"
+                label={label}
+                type="text"
+                minLength="7"
+                maxLength="12"
+                autoComplete="off"
+                value={number}
+                onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+                  setNumber(num);
+                }}
+              />
+            )}
+            <ButtonBar className="col-auto md:col-span-2">
+              <Button type="submit" disabled={disabledBtn}>
+                Consultar recaudos
+              </Button>
+            </ButtonBar>
+          </Form>
+        </>
+      ) : (
+        <h1 className="text-3xl mt-6">El usuario no tiene comercio asociado</h1>
+      )}
+
       {info?.status && (
         <>
           {creditStatus && (
