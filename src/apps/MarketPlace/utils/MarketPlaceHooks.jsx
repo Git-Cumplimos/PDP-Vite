@@ -27,7 +27,7 @@ export const useProvideMarketPlace = () => {
   const payOrder = useCallback(async (idCompra) => {
     const req = {
       idCompra: idCompra,
-      idComercio: 4,
+      idComercio: -1,
       tipoComercio: roleInfo?.tipo_comercio,
       idTienda: roleInfo?.id_comercio,
       idDispositivo: roleInfo?.id_dispositivo,
