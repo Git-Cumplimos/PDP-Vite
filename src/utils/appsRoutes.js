@@ -222,7 +222,6 @@ const DESCARGAR =
 const loginUrls = [{ link: "/login", label: "Login", component: Login }];
 
 const publicUrls = [
-  { link: "*", exact: false, component: Error404 },
   { link: "", label: "Inicio", component: PublicHome },
   {
     link: "/public/solicitud-enrolamiento",
@@ -731,6 +730,7 @@ const allUrlsPrivateApps = [
 ];
 
 const privateUrls = [
+  { link: "*", exact: false, component: Error404 },
   { link: "/", label: "Inicio", component: Home },
   { link: "/info", label: "Informacion general", component: emptyComp },
   { link: "/gestion", label: "Gestion", component: emptyComp },

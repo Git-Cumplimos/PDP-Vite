@@ -58,7 +58,7 @@ const pageStyle = `
 `;
 
 const url_Report = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
-const url_Download = `${process.env.REACT_APP_URL_FDLMWSDL}/report`;
+const url_Download = `http://127.0.0.1:5000/report`;
 
 const Reporte = () => {
   const { userPermissions, roleInfo } = useAuth();
@@ -148,7 +148,7 @@ const Reporte = () => {
         queries.Comercio = parseInt(Comercio);
       }
       if (Tipo_operacion) {
-        queries.Tipo_operacion = Tipo_operacion;
+        queries.id_tipo_transaccion = Tipo_operacion;
       }
       if (page) {
         queries.page = page;

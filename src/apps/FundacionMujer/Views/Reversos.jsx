@@ -320,6 +320,7 @@ const Reversos = () => {
     e.preventDefault();
     const values = {
       tipo: comercio?.tipo_comercio,
+      id_dispositivo: comercio?.id_dispositivo,
       usuario: comercio?.id_usuario,
       comercio: comercio?.id_comercio,
       idtrx: selected?.id_transaccion,
