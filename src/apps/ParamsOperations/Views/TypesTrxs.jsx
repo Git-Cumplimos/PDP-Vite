@@ -7,6 +7,7 @@ import Input from "../../../components/Base/Input";
 import InputSuggestions from "../../../components/Base/InputSuggestions";
 import Modal from "../../../components/Base/Modal";
 import Table from "../../../components/Base/Table";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 import Pagination from "../../../components/Compound/Pagination";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import useQuery from "../../../hooks/useQuery";
@@ -57,13 +58,17 @@ const fetchAliadosPDPPages = async (nombre) => {
 };
 
 const TypesTrxs = () => {
-  const [{ searchTrxType = "", page = 1 }, setQuery] = useQuery();
+  const [{ searchTrxType = "" }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
   const [maxPages, setMaxPages] = useState(0);
   const [trxTypes, setTrxTypes] = useState([]);
   const [selected, setSelected] = useState(null);
   const [foundAliados, setFoundAliados] = useState([]);
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
 
   const tableTrxTypes = useMemo(() => {
     return trxTypes.map(({ id_tipo_operacion, Autorizador, Nombre }) => ({
@@ -220,7 +225,14 @@ const TypesTrxs = () => {
           Crear tipo de transaccion
         </Button>
       </ButtonBar>
-      <Pagination maxPage={maxPages} onChange={onChange} grid>
+      <TableEnterprise
+        title='Convenios'
+        maxPage={maxPages}
+        onChange={onChange}
+        headers={["Id", "Tipo de transaccion", "Autorizador"]}
+        data={tableTrxTypes}
+        onSelectRow={onSelectType}
+        onSetPageData={setPageData}>
         <Input
           id='searchTrxType'
           name='searchTrxType'
@@ -229,17 +241,7 @@ const TypesTrxs = () => {
           autoComplete='off'
           defaultValue={searchTrxType}
         />
-        <ButtonBar></ButtonBar>
-      </Pagination>
-      {Array.isArray(tableTrxTypes) && tableTrxTypes.length > 0 ? (
-        <Table
-          headers={Object.keys(tableTrxTypes[0])}
-          data={tableTrxTypes}
-          onSelectRow={onSelectType}
-        />
-      ) : (
-        ""
-      )}
+      </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         {selected ? (
           <PaymentSummary

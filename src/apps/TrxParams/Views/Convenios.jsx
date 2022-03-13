@@ -7,6 +7,7 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import Table from "../../../components/Base/Table";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 import Pagination from "../../../components/Compound/Pagination";
 import useQuery from "../../../hooks/useQuery";
 import { notify, notifyError } from "../../../utils/notify";
@@ -19,8 +20,7 @@ import {
 
 const Convenios = () => {
   const navigate = useNavigate();
-  const [{ searchConvenio = "", ean13Convenio = "", page = 1 }, setQuery] =
-    useQuery();
+  const [{ searchConvenio = "", ean13Convenio = "" }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
@@ -37,7 +37,10 @@ const Convenios = () => {
     });
     fetchConveniosManyFunc();
   }, []);
-
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
   const [convenios, setConvenios] = useState([]);
   const [selectedConvenio, setSelectedConvenio] = useState({
     Tags: [""],
@@ -210,7 +213,7 @@ const Convenios = () => {
   );
 
   useEffect(() => {
-    fetchConveniosMany(searchConvenio, page)
+    fetchConveniosMany({ tags: searchConvenio, page, limit })
       .then((res) => {
         setConvenios(
           [...res?.results].map(({ id_convenio, nombre_convenio }) => {
@@ -241,7 +244,7 @@ const Convenios = () => {
       .catch((err) => console.error(err));
   }, [ean13Convenio]);
   const fetchConveniosManyFunc = () => {
-    fetchConveniosMany(searchConvenio, page)
+    fetchConveniosMany({ tags: searchConvenio, page, limit })
       .then((res) => {
         setConvenios(
           [...res?.results].map(({ id_convenio, nombre_convenio }) => {
@@ -266,7 +269,15 @@ const Convenios = () => {
           Crear convenio masivo
         </Button> */}
       </ButtonBar>
-      <Pagination maxPage={maxPages} onChange={onChange} grid>
+      {/* <Pagination maxPage={maxPages} onChange={onChange} grid></Pagination> */}
+      <TableEnterprise
+        title='Convenios'
+        maxPage={maxPages}
+        onChange={onChange}
+        headers={["Id convenio", "Nombre convenio"]}
+        data={convenios}
+        onSelectRow={onSelectConvenio}
+        onSetPageData={setPageData}>
         <Input
           id='searchConvenio'
           name='searchConvenio'
@@ -283,16 +294,8 @@ const Convenios = () => {
           autoComplete='off'
           defaultValue={ean13Convenio}
         />
-      </Pagination>
-      {Array.isArray(convenios) && convenios.length > 0 ? (
-        <Table
-          headers={Object.keys(convenios[0])}
-          data={convenios}
-          onSelectRow={onSelectConvenio}
-        />
-      ) : (
-        ""
-      )}
+      </TableEnterprise>
+
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={onChangeConv}>
           <Input
@@ -315,7 +318,6 @@ const Convenios = () => {
             autoComplete='off'
             value={selectedConvenio?.Ean13}
             onChange={() => {}}
-            required
           />
           <Fieldset legend={"Tags"}>
             {selectedConvenio?.Tags?.map((val, ind) => {
@@ -334,11 +336,12 @@ const Convenios = () => {
                     <Button
                       type='button'
                       onClick={() => {
-                        setSelectedConvenio((old) => {
-                          const copy = { ...old };
-                          copy?.Tags.splice(ind, 1);
-                          return { ...copy };
-                        });
+                        if (selectedConvenio?.Tags.length < 2) {
+                          return;
+                        }
+                        const copy = { ...selectedConvenio };
+                        copy?.Tags.splice(ind, 1);
+                        setSelectedConvenio({ ...copy });
                       }}>
                       Eliminar tag
                     </Button>
@@ -350,11 +353,9 @@ const Convenios = () => {
               <Button
                 type='button'
                 onClick={() => {
-                  setSelectedConvenio((old) => {
-                    const copy = { ...old };
-                    copy?.Tags.push("");
-                    return { ...copy };
-                  });
+                  const copy = { ...selectedConvenio };
+                  copy?.Tags.push("");
+                  setSelectedConvenio({ ...copy });
                 }}>
                 Añadir tag
               </Button>
@@ -381,16 +382,14 @@ const Convenios = () => {
                   <ButtonBar>
                     <Button
                       type='button'
-                      onClick={() =>
-                        setSelectedConvenio((old) => {
-                          if (old?.Referencias.length < 2) {
-                            return old;
-                          }
-                          const copy = { ...old };
-                          copy?.Referencias.splice(index, 1);
-                          return { ...copy };
-                        })
-                      }>
+                      onClick={() => {
+                        if (selectedConvenio?.Referencias.length < 2) {
+                          return;
+                        }
+                        const copy = { ...selectedConvenio };
+                        copy?.Referencias.splice(index, 1);
+                        setSelectedConvenio({ ...copy });
+                      }}>
                       Eliminar referencia
                     </Button>
                   </ButtonBar>
@@ -400,20 +399,18 @@ const Convenios = () => {
             <ButtonBar>
               <Button
                 type='button'
-                onClick={() =>
-                  setSelectedConvenio((old) => {
-                    if (old?.Referencias.length > 2) {
-                      return old;
-                    }
-                    const copy = { ...old };
-                    copy?.Referencias.push({
-                      "Nombre de Referencia": "",
-                      "Longitud minima": "",
-                      "Longitud maxima": "",
-                    });
-                    return { ...copy };
-                  })
-                }>
+                onClick={() => {
+                  if (selectedConvenio?.Referencias.length > 2) {
+                    return;
+                  }
+                  const copy = { ...selectedConvenio };
+                  copy?.Referencias.push({
+                    "Nombre de Referencia": "",
+                    "Longitud minima": "",
+                    "Longitud maxima": "",
+                  });
+                  setSelectedConvenio({ ...copy });
+                }}>
                 Añadir referencia
               </Button>
             </ButtonBar>

@@ -16,10 +16,11 @@ import {
   putTiposContratosComisiones,
   postTiposContratosComisiones,
 } from "../utils/fetchTiposContratosComisiones";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const TipoContratoComisiones = () => {
   const navigate = useNavigate();
-  const [{ nombre_contrato = "", page = 1 }, setQuery] = useQuery();
+  const [{ nombre_contrato = "" }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
@@ -42,6 +43,10 @@ const TipoContratoComisiones = () => {
     IVA: false,
     Rete_Fuente: false,
     Rete_ICA: false,
+  });
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
   });
 
   const onSelectTipoContrato = useCallback(
@@ -183,10 +188,10 @@ const TipoContratoComisiones = () => {
 
   useEffect(() => {
     fetchTiposContratosComisionesFunc();
-  }, [nombre_contrato, page]);
+  }, [nombre_contrato, page, limit]);
 
   const fetchTiposContratosComisionesFunc = () => {
-    fetchTiposContratosComisiones({ nombre_contrato, page })
+    fetchTiposContratosComisiones({ nombre_contrato, page, limit })
       .then((res) => {
         setTiposContrato(
           [...res?.results].map(
@@ -223,7 +228,20 @@ const TipoContratoComisiones = () => {
           Crear convenio masivo
         </Button> */}
       </ButtonBar>
-      <Pagination maxPage={maxPages} onChange={onChange} grid>
+      <TableEnterprise
+        title='Convenios'
+        maxPage={maxPages}
+        onChange={onChange}
+        headers={[
+          "Id contrato",
+          "Nombre contrato",
+          "IVA",
+          "Rete Fuente",
+          "Rete ICA",
+        ]}
+        data={tiposContrato}
+        onSelectRow={onSelectTipoContrato}
+        onSetPageData={setPageData}>
         <Input
           id='nombre_contrato'
           name='nombre_contrato'
@@ -232,16 +250,8 @@ const TipoContratoComisiones = () => {
           autoComplete='off'
           defaultValue={nombre_contrato}
         />
-      </Pagination>
-      {Array.isArray(tiposContrato) && tiposContrato.length > 0 ? (
-        <Table
-          headers={Object.keys(tiposContrato[0])}
-          data={tiposContrato}
-          onSelectRow={onSelectTipoContrato}
-        />
-      ) : (
-        ""
-      )}
+      </TableEnterprise>
+
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={onChangeTipoContrato} grid>
           <Input

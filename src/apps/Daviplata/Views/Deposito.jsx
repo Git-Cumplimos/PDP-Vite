@@ -133,6 +133,7 @@ const Deposito = () => {
     const body = {
       id_comercio: roleInfo?.id_comercio,
       id_usuario: roleInfo?.id_usuario,
+      id_terminal: roleInfo?.id_dispositivo,
       oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
       idcliente: 5,
       ipcliente: "172.17.0.4",
