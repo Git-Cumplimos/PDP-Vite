@@ -5,13 +5,13 @@ import Modal from "../../../components/Base/Modal";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Select from "../../../components/Base/Select";
-import Table from "../../../components/Base/Table";
 import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 import { ExportToCsv } from "export-to-csv";
 import { useAuth } from "../../../hooks/AuthHooks";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 function createCard(
   codigo_punto,
@@ -58,7 +58,7 @@ const pageStyle = `
 `;
 
 const url_Report = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
-const url_Download = `http://127.0.0.1:5000/report`;
+const url_Download = `${process.env.REACT_APP_URL_FDLMWSDL}/report`;
 
 const Reporte = () => {
   const { userPermissions, roleInfo } = useAuth();
@@ -67,7 +67,6 @@ const Reporte = () => {
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
   const [comercio, setComercio] = useState(-1);
-  const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [tipoOp, setTipoOp] = useState("");
   const [fechaInicial, setFechaInicial] = useState("");
@@ -77,6 +76,11 @@ const Reporte = () => {
   const [Download, setDownload] = useState(null);
   const [showModal2, setShowModal2] = useState(false);
   const [disabledBtn, setDisabledBtn] = useState(true);
+
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
 
   const printDiv = useRef();
 
@@ -139,9 +143,13 @@ const Reporte = () => {
     setComercio(roleInfo?.id_comercio || -1);
   }, [userPermissions, roleInfo?.id_comercio]);
 
+  useEffect(() => {
+    report(comercio, tipoOp, page, fechaInicial, fechaFinal, limit);
+  }, [page, limit]);
+
   /*Buscar report*/
   const report = useCallback(
-    async (Comercio, Tipo_operacion, page, date_ini, date_end) => {
+    async (Comercio, Tipo_operacion, page, date_ini, date_end, limit) => {
       const url = url_Report;
       const queries = {};
       if (!(Comercio === -1 || Comercio === "")) {
@@ -154,21 +162,26 @@ const Reporte = () => {
         queries.page = page;
       }
       if (date_ini && date_end) {
-        queries.date_ini = date_ini;
-        queries.date_end = date_end;
+        queries.date_ini = new Date(date_ini).toLocaleDateString();
+        queries.date_end = new Date(date_end).toLocaleDateString();
+      }
+      if (limit) {
+        queries.limit = limit;
       }
       console.log(queries);
-      try {
-        const res = await fetchData(url, "GET", queries);
-        console.log(res);
-        if (res.status === false) {
-          notifyError(res.msg);
-        } else {
-          setMaxPages(res?.obj?.maxpages);
-          setTrxs(res?.obj?.trxs);
+      if (Tipo_operacion) {
+        try {
+          const res = await fetchData(url, "GET", queries);
+          console.log(res);
+          if (res.status === false) {
+            notifyError(res.msg);
+          } else {
+            setMaxPages(res?.obj?.maxpages);
+            setTrxs(res?.obj?.trxs);
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
       }
     },
     []
@@ -227,12 +240,12 @@ const Reporte = () => {
           type="date"
           value={fechaInicial}
           onInput={(e) => {
-            setPage(1);
+            // setPage(1);
             setMaxPages(1);
             setFechaInicial(e.target.value);
             if (fechaFinal !== "") {
               if (tipoOp !== "") {
-                report(comercio, tipoOp, 1, e.target.value, fechaFinal);
+                report(comercio, tipoOp, 1, e.target.value, fechaFinal, limit);
               }
             }
           }}
@@ -243,11 +256,18 @@ const Reporte = () => {
           type="date"
           value={fechaFinal}
           onInput={(e) => {
-            setPage(1);
+            // setPage(1);
             setFechaFinal(e.target.value);
             if (fechaInicial !== "") {
               if (tipoOp !== "") {
-                report(comercio, tipoOp, 1, fechaInicial, e.target.value);
+                report(
+                  comercio,
+                  tipoOp,
+                  1,
+                  fechaInicial,
+                  e.target.value,
+                  limit
+                );
               }
             }
           }}
@@ -259,10 +279,17 @@ const Reporte = () => {
           options={options}
           value={tipoOp}
           onChange={(e) => {
-            setPage(1);
+            // setPage(1);
             setTipoOp(parseInt(e.target.value));
             if (!(e.target.value === null || e.target.value === "")) {
-              report(comercio, e.target.value, 1, fechaInicial, fechaFinal);
+              report(
+                comercio,
+                e.target.value,
+                1,
+                fechaInicial,
+                fechaFinal,
+                limit
+              );
             }
           }}
         />
@@ -279,9 +306,16 @@ const Reporte = () => {
             }}
             onLazyInput={{
               callback: (e) => {
-                setPage(1);
+                // setPage(1);
                 if (tipoOp !== "") {
-                  report(e.target.value, tipoOp, 1, fechaInicial, fechaFinal);
+                  report(
+                    e.target.value,
+                    tipoOp,
+                    1,
+                    fechaInicial,
+                    fechaFinal,
+                    limit
+                  );
                 }
               },
               timeOut: 500,
@@ -290,72 +324,48 @@ const Reporte = () => {
         ) : (
           ""
         )}
-
-        <ButtonBar className="col-span-1 md:col-span-2">
-          <Button
-            type="button"
-            disabled={page < 2}
-            onClick={() => {
-              setPage(page - 1);
-              report(comercio, tipoOp, page - 1, fechaInicial, fechaFinal);
-            }}
-          >
-            Anterior
-          </Button>
-          <Button
-            type="button"
-            disabled={page >= maxPages}
-            onClick={() => {
-              setPage(page + 1);
-              report(comercio, tipoOp, page + 1, fechaInicial, fechaFinal);
-            }}
-          >
-            Siguiente
-          </Button>
-        </ButtonBar>
       </Form>
       {Array.isArray(trxs) && trxs.length > 0 ? (
-        <>
-          <div className="flex flex-row justify-evenly w-full my-4">
-            <h1>Pagina: {page}</h1>
-            <h1>Ultima pagina: {maxPages}</h1>
-          </div>
-          <Table
-            headers={["Fecha", "Mensaje", "Monto"]}
-            data={trxs.map(
-              ({ created, res_obj: { Mensaje } = { Mensaje: "" }, monto }) => {
-                const tempDate = new Date(created);
-                tempDate.setHours(tempDate.getHours() + 5);
-                created = Intl.DateTimeFormat("es-CO", {
-                  year: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                }).format(tempDate);
-                return {
-                  created,
-                  Mensaje,
-                  monto,
-                };
-              }
-            )}
-            onSelectRow={(_e, index) => {
-              setSelected(trxs[index]);
-              setShowModal(true);
-            }}
-          />
-        </>
+        <TableEnterprise
+          title="Reportes"
+          maxPage={maxPages}
+          // onChange={onChangeRecaudos}
+          headers={["Fecha", "Mensaje", "Monto"]}
+          data={trxs.map(
+            ({ created, res_obj: { Mensaje } = { Mensaje: "" }, monto }) => {
+              const tempDate = new Date(created);
+              tempDate.setHours(tempDate.getHours() + 5);
+              created = Intl.DateTimeFormat("es-CO", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              }).format(tempDate);
+              return {
+                created,
+                Mensaje,
+                monto,
+              };
+            }
+          )}
+          onSelectRow={(_e, index) => {
+            setSelected(trxs[index]);
+            setShowModal(true);
+          }}
+          onSetPageData={setPageData}
+        ></TableEnterprise>
       ) : (
         ""
       )}
+
       <Modal show={showModal} handleClose={closeModal}>
-        {selected?.Ticket ? (
+        {selected?.ticket ? (
           <div className="flex flex-col justify-center items-center">
             <Tickets
               refPrint={printDiv}
               type="Reimpresión"
-              ticket={selected?.Ticket}
+              ticket={selected?.ticket}
             />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -389,7 +399,7 @@ const Reporte = () => {
               type="date"
               value={fechaInicialDownload}
               onInput={(e) => {
-                setPage(1);
+                // setPage(1);
                 setMaxPages(1);
                 setFechaInicialDownload(e.target.value);
                 if (fechaFinalDownload !== "") {
@@ -411,7 +421,7 @@ const Reporte = () => {
               type="date"
               value={fechaFinalDownload}
               onInput={(e) => {
-                setPage(1);
+                // setPage(1);
                 setFechaFinalDownload(e.target.value);
                 if (fechaInicialDownload !== "") {
                   download(fechaInicialDownload, e.target.value).then((res) => {

@@ -10,17 +10,17 @@ import { toast } from "react-toastify";
 import { notifyError } from "../../../utils/notify";
 import { useReactToPrint } from "react-to-print";
 import Tickets from "../../../components/Base/Tickets";
-import Table from "../../../components/Base/Table";
 import useForm from "../../../hooks/useForm";
 import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
 import TextArea from "../../../components/Base/TextArea";
 import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
-import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
+import useQuery from "../../../hooks/useQuery";
 
 const url_permissions = `${process.env.REACT_APP_URL_IAM_PDP}/users-groups`;
 
 /* URLS para consultar información de oficinas de donde hay que hacer el reverso*/
-const url = process.env.REACT_APP_URL_IAM_PDP;
+const url_USERS = process.env.REACT_APP_URL_IAM_PDP;
 const url_datosComercio = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 /**/
@@ -38,31 +38,38 @@ const Reversos = () => {
     maximumFractionDigits: 0,
   });
 
+  /*__________ Fechas para consulta de transacciones del día________________ */
   const fecha = new Date();
-  /* Fechas para consulta de transacciones del día */
-  const fecha_ini = Intl.DateTimeFormat("az").format(fecha);
-  const fecha_fin = Intl.DateTimeFormat("az").format(
-    fecha.setDate(fecha.getDate() + 1)
-  );
+  const fecha_ini = fecha.toLocaleDateString();
+
+  fecha.setDate(fecha.getDate() + 1);
+  const fecha_fin = fecha.toLocaleDateString();
   /*_________________________________________________________ */
 
   const [selected, setSelected] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [value, setValue] = useState("");
   const [ticket, setTicket] = useState(false);
-  const [fechaInicial, setFechaInicial] = useState("");
-  const [fechaFinal, setFechaFinal] = useState("");
   const [comercio, setComercio] = useState(null);
-  const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [trxs, setTrxs] = useState([]);
   const [motivo, setMotivo] = useState("");
-
   const [maxPageUsers, setMaxPageUsers] = useState(1);
-  const [formData, setFormData] = useState(new FormData());
   const [usuariosDB, setUsuariosDB] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState("");
   const [municipio, setMunicipio] = useState("");
+
+  const [{ page: pageUSER, limit: limitUSER }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  const [{ page, limit }, setPageDataRecaudos] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  const [{ email = "", nombre = "" }, setQuery] = useQuery();
 
   const fetchDane = async (codigo_dane) => {
     try {
@@ -80,7 +87,7 @@ const Reversos = () => {
     } catch (err) {}
   };
 
-  const searchUsers = useCallback((email, uname, _page) => {
+  const searchUsers = useCallback((email, uname, _page, limit) => {
     const queries = {};
     if (email && email !== "") {
       queries.email = email;
@@ -91,8 +98,11 @@ const Reversos = () => {
     if (_page) {
       queries.page = _page;
     }
+    if (limit) {
+      queries.limit = limit;
+    }
     if (Object.keys(queries).length > 0) {
-      fetchData(`${url}/users`, "GET", queries)
+      fetchData(`${url_USERS}/users`, "GET", queries)
         .then((res) => {
           if (res?.status) {
             console.log(res);
@@ -107,18 +117,24 @@ const Reversos = () => {
   }, []);
 
   const onChange = useCallback(
-    (_formData) => {
-      setTrxs([]);
-      setComercio(null);
-      setFormData(_formData);
-      searchUsers(
-        _formData?.get("emailSearch"),
-        _formData?.get("unameSearch"),
-        _formData?.get("page")
-      );
+    (ev) => {
+      if (ev.target.name === "email") {
+        setQuery({ email: ev.target.value }, { replace: true });
+      } else if (ev.target.name === "nombre") {
+        setQuery({ nombre: ev.target.value }, { replace: true });
+      }
     },
-    [searchUsers]
+    [setQuery]
   );
+
+  useEffect(() => {
+    searchUsers(email, nombre, pageUSER, limitUSER);
+  }, [nombre, email, pageUSER, limitUSER]);
+  console.log(pageUSER, limitUSER);
+
+  useEffect(() => {
+    reversosFDLM(page, comercio, 5, fecha_ini, fecha_fin, true, limit);
+  }, [page, limit]);
 
   /*Consulta datos del comercio*/
   const ConsultaComercio = useCallback(async (email) => {
@@ -128,7 +144,7 @@ const Reversos = () => {
       console.log(res);
       if ("id_comercio" in res) {
         setComercio(res);
-        reversosFDLM(page, res, 5, fecha_ini, fecha_fin, true);
+        reversosFDLM(page, res, 5, fecha_ini, fecha_fin, true, limit);
         fetchDane(res?.codigo_dane);
       }
     } catch (err) {
@@ -162,14 +178,8 @@ const Reversos = () => {
 
   // Envio del ticket para guardarolo en transacciones
   useEffect(() => {
-    infoTicket(selected?.id_transaccion, 6, tickets);
+    infoTicket(selected?.id_trx, 6, tickets);
   }, [infoTicket, selected, ticket]);
-
-  // //  Consulta transacciones de recaudo del dia
-  // useEffect(() => {
-  //   console.log(fecha_fin,fecha_ini)
-  //   reversosFDLM(page, roleInfo?.id_comercio, 5, fecha_ini, fecha_fin, true);
-  // },[ticket])
 
   const printDiv = useRef();
 
@@ -191,11 +201,11 @@ const Reversos = () => {
   };
 
   const reversosFDLM = useCallback(
-    (page, Comercio, Tipo_operacion, date_ini, date_end, state) => {
+    (page, Comercio, Tipo_operacion, date_ini, date_end, state, limit) => {
       const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
       const queries = {};
-      if (!(Comercio.id_comercio === -1 || Comercio.id_comercio === "")) {
-        queries.id_comercio = Comercio.id_comercio;
+      if (!(Comercio?.id_comercio === -1 || Comercio?.id_comercio === "")) {
+        queries.id_comercio = Comercio?.id_comercio;
       }
       if (Tipo_operacion) {
         queries.id_tipo_transaccion = Tipo_operacion;
@@ -209,6 +219,9 @@ const Reversos = () => {
       }
       if (state !== undefined || state !== null) {
         queries.status_trx = state;
+      }
+      if (limit !== undefined || limit !== null) {
+        queries.limit = limit;
       }
       console.log(queries);
       fetchData(url, "GET", queries)
@@ -252,16 +265,16 @@ const Reversos = () => {
         "No. terminal": comercio?.id_dispositivo,
         Municipio: municipio,
         Dirección: comercio?.direccion,
-        "Id Trx": selected.id_transaccion,
+        "Id Trx": selected.id_trx,
         "Id Confirmación": "Id FDLM",
       }),
       commerceName: "FUNDACIÓN DE LA MUJER",
       trxInfo: [
-        ["CRÉDITO", selected?.Response_obj?.info?.credito],
+        ["CRÉDITO", selected?.res_obj?.info?.credito],
         ["VALOR", formatMoney.format(value)],
-        ["Cliente", selected?.Response_obj?.info?.cliente],
+        ["Cliente", selected?.res_obj?.info?.cliente],
         ["", ""],
-        ["Cédula", selected?.Response_obj?.info?.cedula],
+        ["Cédula", selected?.res_obj?.info?.cedula],
         ["", ""],
       ],
       disclamer:
@@ -280,21 +293,6 @@ const Reversos = () => {
     setShowModal(false);
     handleChange();
     console.log(ticket);
-    // if (ticket===true){
-
-    //   deltetePermission(pdpUser?.uuid,9).then((res) => {
-    //     if (res.status===false) {
-    //       notifyError(res?.msg);
-    //       setTicket(false);
-    //       window.location.replace('/funmujer');
-    //     } else {
-    //       notify(res?.msg)
-    //       setTicket(false);
-    //       window.location.replace('/funmujer');
-    //     }
-    //   });
-
-    // }
   }, []);
 
   const onSubmit = (e) => {
@@ -302,28 +300,14 @@ const Reversos = () => {
     setShowModal(true);
   };
 
-  /*Eliminar permiso de reversar*/
-  // const deltetePermission = useCallback(async (id_user,id_group) => {
-  //   const query={
-  //     "Users_uuid":id_user,
-  //     "Groups_id_group":id_group}
-  //   try {
-  //     const res = await fetchData(url_permissions, "DELETE",query);
-  //     console.log(res)
-  //     return res;
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }, []);
-
   const reverse = (e) => {
     e.preventDefault();
     const values = {
       tipo: comercio?.tipo_comercio,
-      id_dispositivo: comercio?.id_dispositivo,
+      dispositivo: comercio?.id_dispositivo,
       usuario: comercio?.id_usuario,
       comercio: comercio?.id_comercio,
-      idtrx: selected?.id_transaccion,
+      idtrx: selected?.id_trx,
       val: value,
       motivo: motivo,
       ...data,
@@ -336,16 +320,6 @@ const Reversos = () => {
           setTicket(false);
           console.log(res);
           notifyError(res?.obj?.Mensaje);
-
-          // if (res?.codigo === 420) {
-          //   notifyError(
-          //     "Reverso ya aplicado a el respectivo ID de transacción"
-          //   );
-          // } else {
-          //   notifyError(
-          //     "Consulte soporte, servicio de Fundación de la mujer presenta fallas"
-          //   );
-          // }
         }
       })
       .catch((err) => {
@@ -356,93 +330,36 @@ const Reversos = () => {
   return (
     <>
       <h1 className="text-3xl mt-6">Reversos</h1>
-      <Form grid>
-        {/* <Input
-          id="dateInit"
-          label="Fecha inicial"
-          type="date"
-          value={fechaInicial}
-          onInput={(e) => {
-            setFechaInicial(e.target.value);
-            if (fechaFinal !== "") {
-              reversosFDLM(page, roleInfo?.id_comercio, 5, e.target.value, fechaFinal, true);
-            }
-          }}
-        />
-        <Input
-          id="dateInit"
-          label="Fecha final"
-          type="date"
-          value={fechaFinal}
-          onInput={(e) => {
-            setFechaFinal(e.target.value);
-            if (fechaInicial !== "") {
-              reversosFDLM(
-                page,
-                roleInfo?.id_comercio,
-                5,
-                fechaInicial,
-                e.target.value,
-                true
-              );
-            }
-          }}
-        /> */}
-        {/* <Input
-          id="nroComercio"
-          label="ID Comercio"
-          type="text"
-          value={comercio}
-          onInput={(e) => {
-            if (e.target.value !== NaN) {
-              setComercio(e.target.value);
-            }
-          }}
-          onLazyInput={{
-            callback: (e) => {
-              const num = !isNaN(e.target.value) ? e.target.value : "";
-              setPage(1);
-
-              if (num!=''){
-              reversosFDLM(
-                page,
-                num,
-                5,
-                fecha_ini,
-                fecha_fin,
-                true
-              );}
-              else{
-                setTrxs([]) 
-              }
-            },
-            timeOut: 500,
-          }}
-        /> */}
-      </Form>
-      <PaginationAuth
-        filters={{
-          emailSearch: { label: "Email" },
-          unameSearch: { label: "Nombre" },
-        }}
+      <TableEnterprise
+        title="Comercios"
         maxPage={maxPageUsers}
         onChange={onChange}
-      />
-      {Array.isArray(usuariosDB) &&
-      usuariosDB.length > 0 &&
-      comercio === null ? (
-        <Table
-          headers={["Id", "Nombre completo", "E-mail"]}
-          data={usuariosDB.map(({ uuid, uname, email }) => {
-            return { uuid, uname, email };
-          })}
-          onSelectRow={(e, i) => {
-            ConsultaComercio(usuariosDB[i].email);
-          }}
+        headers={["Id", "Nombre completo", "E-mail"]}
+        data={usuariosDB.map(({ uuid, uname, email }) => {
+          return { uuid, uname, email };
+        })}
+        onSelectRow={(e, i) => {
+          ConsultaComercio(usuariosDB[i].email);
+        }}
+        onSetPageData={setPageData}
+      >
+        <Input
+          id="email"
+          name="email"
+          label={"email"}
+          type="text"
+          autoComplete="off"
+          defaultValue={email}
         />
-      ) : (
-        ""
-      )}
+        <Input
+          id="nombre"
+          name="nombre"
+          label={"nombre"}
+          type="text"
+          autoComplete="off"
+          defaultValue={nombre}
+        />
+      </TableEnterprise>
 
       <Modal show={showModal} handleClose={() => closeModal(ticket)}>
         {ticket !== false ? (
@@ -478,7 +395,7 @@ const Reversos = () => {
                   label="ID de transacción"
                   type="text"
                   autoComplete="off"
-                  value={selected?.id_transaccion}
+                  value={selected?.id_trx}
                   disabled
                 ></Input>
                 <Input
@@ -540,75 +457,36 @@ const Reversos = () => {
           <h1 className="text-2xl mt-6">
             Transacciones de {comercio["nombre comercio"]}
           </h1>
-
-          <div className="flex flex-row justify-evenly w-full my-4">
-            <h1>Pagina: {page}</h1>
-            <h1>Ultima pagina: {maxPages}</h1>
-          </div>
-          <ButtonBar className="col-span-1 md:col-span-2">
-            <Button
-              type="button"
-              disabled={page < 2}
-              onClick={() => {
-                setPage(page - 1);
-                reversosFDLM(
-                  page - 1,
-                  comercio,
-                  5,
-                  fechaInicial,
-                  fechaFinal,
-                  true
-                );
-              }}
-            >
-              Anterior
-            </Button>
-            <Button
-              type="button"
-              disabled={page >= maxPages}
-              onClick={() => {
-                setPage(page + 1);
-                reversosFDLM(
-                  page + 1,
-                  comercio,
-                  5,
-                  fechaInicial,
-                  fechaFinal,
-                  true
-                );
-              }}
-            >
-              Siguiente
-            </Button>
-          </ButtonBar>
-          <Table
+          <TableEnterprise
+            title="Recaudos"
+            maxPage={maxPages}
+            // onChange={onChangeRecaudos}
             headers={["ID transacción", "Fecha", "Operación", "Monto"]}
-            data={trxs.map(
-              ({ id_transaccion, Created_at, Tipo_operacion, Monto }) => {
-                const tempDate = new Date(Created_at);
-                tempDate.setHours(tempDate.getHours() + 5);
-                Created_at = Intl.DateTimeFormat("es-CO", {
-                  year: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                }).format(tempDate);
-                Monto = formatMoney.format(Monto);
-                return {
-                  id_transaccion,
-                  Created_at,
-                  Tipo_operacion,
-                  Monto,
-                };
-              }
-            )}
+            data={trxs.map(({ id_trx, created, message_trx, monto }) => {
+              const tempDate = new Date(created);
+              tempDate.setHours(tempDate.getHours() + 5);
+              created = Intl.DateTimeFormat("es-CO", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              }).format(tempDate);
+              monto = formatMoney.format(monto);
+              return {
+                id_trx,
+                created,
+                message_trx,
+                monto,
+              };
+            })}
             onSelectRow={(_e, index) => {
               setSelected(trxs[index]);
               setShowModal(true);
-              setValue(trxs[index]?.Monto);
+              setValue(trxs[index]?.monto);
             }}
-          />
+            onSetPageData={setPageDataRecaudos}
+          ></TableEnterprise>
         </>
       ) : (
         ""
