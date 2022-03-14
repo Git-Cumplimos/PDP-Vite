@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import fetchData from "../../utils/fetchData";
+import TableEnterprise from "../../components/Base/TableEnterprise";
 
 function ValidacionAsesorComercial() {
   const navigate = useNavigate();
   const [datosEnrolamientos, setDatosEnrolamientos] = useState([]);
+  const [cantidadPaginas, setCantidadPaginas] = useState(0);
   const [datosOrdenados, setOrdenados] = useState(0);
   const [keys, setKey] = useState(0);
   /* const [datosFiltrados, setDatosFiltrados] = useState(["perro"]);  */
@@ -18,7 +20,10 @@ function ValidacionAsesorComercial() {
       "GET"
     )
       /* .then((response) => response.json()) */
-      .then((respuesta) => setDatosEnrolamientos(respuesta.obj.results));
+      .then((respuesta) => {
+        setDatosEnrolamientos(respuesta.obj.results);
+        setCantidadPaginas(respuesta?.obj?.maxPages);
+      });
   }, []);
   /*   console.log(datosOrdenados); */
   datosEnrolamientos.map((e) => delete e.task_token);
@@ -39,22 +44,31 @@ function ValidacionAsesorComercial() {
 
   return (
     <div>
-      <Table
-        headers={["Id_proceso", "Nombre", "Estado"]}
+      <TableEnterprise
+        maxPage={cantidadPaginas}
+        title="Enrolamiento de Comercios"
+        headers={["Id_proceso", "Nombre", "Estado", "Departamento"]}
         data={datosEnrolamientos.map(
-          ({ id_proceso, nombre, apellido, validation_state }) => ({
+          ({
+            id_proceso,
+            nombre,
+            apellido,
+            validation_state,
+            departamento,
+          }) => ({
             id_proceso,
             nombre: `${nombre} ${apellido}`,
 
             validation_state,
+            departamento,
           })
         )}
         onSelectRow={(e, i) =>
           navigate(
-            `/Solicitud-enrolamiento/validarformulario/verificaciondatos/${datosFiltrados[i][15]}`
+            `/Solicitud-enrolamiento/validarformulario/verificaciondatos/${datosEnrolamientos[i]["id_proceso"]}`
           )
         }
-      ></Table>
+      ></TableEnterprise>
     </div>
   );
 }

@@ -145,7 +145,7 @@ const Reporte = () => {
       const url = url_Report;
       const queries = {};
       if (!(Comercio === -1 || Comercio === "")) {
-        queries.Comercio = parseInt(Comercio);
+        queries.id_comercio = parseInt(Comercio);
       }
       if (Tipo_operacion) {
         queries.id_tipo_transaccion = Tipo_operacion;
@@ -323,14 +323,10 @@ const Reporte = () => {
           <Table
             headers={["Fecha", "Mensaje", "Monto"]}
             data={trxs.map(
-              ({
-                Created_at,
-                Response_obj: { Mensaje } = { Mensaje: "" },
-                Monto,
-              }) => {
-                const tempDate = new Date(Created_at);
+              ({ created, res_obj: { Mensaje } = { Mensaje: "" }, monto }) => {
+                const tempDate = new Date(created);
                 tempDate.setHours(tempDate.getHours() + 5);
-                Created_at = Intl.DateTimeFormat("es-CO", {
+                created = Intl.DateTimeFormat("es-CO", {
                   year: "numeric",
                   month: "numeric",
                   day: "numeric",
@@ -338,9 +334,9 @@ const Reporte = () => {
                   minute: "numeric",
                 }).format(tempDate);
                 return {
-                  Created_at,
+                  created,
                   Mensaje,
-                  Monto,
+                  monto,
                 };
               }
             )}

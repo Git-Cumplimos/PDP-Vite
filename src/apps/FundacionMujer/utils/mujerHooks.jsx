@@ -3,10 +3,10 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
-  mostrarcreditos: `http://127.0.0.1:5000/mostrarcreditos`,
+  mostrarcreditos: `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`,
   ingresoreverso: `http://127.0.0.1:5000/ingresoreversorecibo`,
   ingresorecibo: `http://127.0.0.1:5000/ingresorecibo`,
-  valorcuota: `http://127.0.0.1:5000/valorcuota`,
+  valorcuota: `${process.env.REACT_APP_URL_FDLMWSDL}/valorcuota`,
 };
 
 export const FDLMContext = createContext({

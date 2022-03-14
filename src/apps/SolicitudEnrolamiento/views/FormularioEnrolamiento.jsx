@@ -188,7 +188,6 @@ const FormularioEnrolamiento = () => {
           task_token: "token",
           validation_state: "En Proceso de Validación",
           id_name: "id_proceso",
-
           responsable: "",
         },
 
