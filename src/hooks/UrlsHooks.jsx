@@ -7,6 +7,9 @@ import {
   publicUrls,
   loginUrls,
 } from "../utils/appsRoutes";
+
+import { rutasGestion } from "../menu/gestion/Routes";
+
 import PrivateRoute from "../components/Compound/PrivateRoute";
 import SubPage from "../components/Base/SubPage";
 
@@ -116,6 +119,7 @@ export const UrlsContext = createContext({
   urlsPublic: [],
   urlsPrivateApps: [],
   allRoutes: [],
+  urlsGestion: [],
 });
 
 export const useUrls = () => {
@@ -133,12 +137,21 @@ export const useProvideUrls = () => {
     }
   }, [userPermissions]);
 
+  const urlsGestion = useMemo(() => {
+    if (Array.isArray(userPermissions) && userPermissions.length > 0) {
+      return [...filterPermissions(rutasGestion, userPermissions)];
+    } else {
+      return [];
+    }
+  }, [userPermissions]);
+
   const allRoutes = useMemo(() => {
     return (
       <Routes>
         <Route path="/" element={<AdminLayout />}>
           {toRoute(privateUrls)}
           {toRoute(urlsPrivateApps, true, SubPage)}
+          {toRoute(urlsGestion, true, SubPage)}
         </Route>
         <Route path="/login" element={<LoginLayout />}>
           {toRoute(loginUrls, false)}
@@ -148,12 +161,13 @@ export const useProvideUrls = () => {
         </Route>
       </Routes>
     );
-  }, [urlsPrivateApps]);
+  }, [urlsPrivateApps, urlsGestion]);
 
   return {
     urlsPrivate: privateUrls,
     urlsPublic: publicUrls,
     urlsPrivateApps,
     allRoutes,
+    urlsGestion,
   };
 };

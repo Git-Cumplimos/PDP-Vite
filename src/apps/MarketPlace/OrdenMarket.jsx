@@ -8,16 +8,17 @@ import PayForm from "./PaymentForm/PayForm";
 import { useMarketPlace } from "./utils/MarketPlaceHooks";
 import Input from "../../components/Base/Input";
 import MoneyInput from "../../components/Base/MoneyInput/MoneyInput";
-import Products from "./Products";
+import { useAuth } from "../../hooks/AuthHooks";
 import { notifyError } from "../../utils/notify";
 
 const OrdenMarket = () => {
   const [summary, setSummary] = useState({});
   const [showModal, setShowModal] = useState(false);
   const params = useParams();
+  const { roleInfo } = useAuth();
 
   const {
-    infoMarket: { consulta },
+    infoMarket: { consulta, setConsulta },
     searchsOrder,
   } = useMarketPlace();
 
@@ -29,9 +30,7 @@ const OrdenMarket = () => {
 
   useEffect(() => {
     searchsOrder(params.orden)
-      .then((res) => {
-        console.log(res);
-      })
+      .then(() => {})
       .catch((err) => {
         notifyError("Fallas en la consulta de la orden, consulte soporte", err);
       });
@@ -49,12 +48,21 @@ const OrdenMarket = () => {
 
   const closeModal = () => {
     setShowModal(false);
+    searchsOrder(params.orden)
+      .then((res) => {
+        setConsulta(res);
+      })
+      .catch((err) => {
+        notifyError("Fallas en la consulta de la orden, consulte soporte", err);
+      });
   };
-
-  return (
+  return roleInfo?.id_comercio !== undefined ? (
     <div className="w-full flex flex-col justify-center items-center">
       {consulta?.EstadoTrx === "Aprobado" ? (
-        <h1>Esta transacción ya ha sido efectuada</h1>
+        <h1>
+          Esta transacción ya ha sido efectuada y su estado es:{" "}
+          {consulta?.EstadoTrx}
+        </h1>
       ) : consulta?.EstadoTrx === "Cancelada" ? (
         <h1>Esta transacción fue denegada</h1>
       ) : (
@@ -99,6 +107,11 @@ const OrdenMarket = () => {
         <PayForm selected={consulta} summary={summary} />
       </Modal>
     </div>
+  ) : (
+    <h1>
+      Lo sentimos, el usuario actual no cuenta con permisos para realizar la
+      operación
+    </h1>
   );
 };
 

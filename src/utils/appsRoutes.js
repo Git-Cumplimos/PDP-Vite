@@ -7,6 +7,7 @@ import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 import CreateComisionCobrada from "../apps/TrxParams/Views/Comisiones/CreateComisionCobrada";
 import ConfiguracionComercios from "../apps/TrxParams/Views/ConfiguracionComercios";
+import Gestion from "../pages/Gestion";
 
 /**
  * * Logos
@@ -804,7 +805,7 @@ const allUrlsPrivateApps = [
 const privateUrls = [
   { link: "/", label: "Inicio", component: Home },
   { link: "/info", label: "Informacion general", component: emptyComp },
-  { link: "/gestion", label: "Gestion", component: emptyComp },
+  { link: "/gestion", label: "Gestión", component: Gestion },
   { link: "/reportes", label: "Reportes", component: Reportes },
   { link: "/seguridad", label: "Seguridad", component: emptyComp },
   { link: "/solicitudes", label: "Tus solicitudes", component: emptyComp },

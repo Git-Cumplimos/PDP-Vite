@@ -240,7 +240,7 @@ const Recaudo = () => {
       <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
       <Form onSubmit={onSubmit} grid>
         <Select
-          id="searchBySorteo"
+          id="searchByDocument"
           label="Tipo de busqueda"
           options={[
             { value: "", label: "" },

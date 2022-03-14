@@ -6,6 +6,7 @@ import Button from "../../../components/Base/Button/Button";
 import fetchData from "../../../utils/fetchData";
 import Table from "../../../components/Base/Table/Table";
 import { ExportToCsv } from "export-to-csv";
+import ConsultaEnrolamiento from "../../SolicitudEnrolamiento/views/ConsultaEnrolamiento";
 
 const Crossval = () => {
   const [page, setPage] = useState(1);
@@ -102,7 +103,7 @@ const Crossval = () => {
     setTrxs(null);
     return null;
   };
-
+  console.log(trxs);
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Movimientos Punto de Compra</h1>
