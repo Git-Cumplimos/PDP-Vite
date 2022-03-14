@@ -7,6 +7,7 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import Table from "../../../components/Base/Table";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 import Pagination from "../../../components/Compound/Pagination";
 import useQuery from "../../../hooks/useQuery";
 import { notify, notifyError } from "../../../utils/notify";
@@ -19,8 +20,7 @@ import {
 
 const Convenios = () => {
   const navigate = useNavigate();
-  const [{ searchConvenio = "", ean13Convenio = "", page = 1 }, setQuery] =
-    useQuery();
+  const [{ searchConvenio = "", ean13Convenio = "" }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
@@ -37,7 +37,10 @@ const Convenios = () => {
     });
     fetchConveniosManyFunc();
   }, []);
-
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
   const [convenios, setConvenios] = useState([]);
   const [selectedConvenio, setSelectedConvenio] = useState({
     Tags: [""],
@@ -210,7 +213,7 @@ const Convenios = () => {
   );
 
   useEffect(() => {
-    fetchConveniosMany(searchConvenio, page)
+    fetchConveniosMany({ tags: searchConvenio, page, limit })
       .then((res) => {
         setConvenios(
           [...res?.results].map(({ id_convenio, nombre_convenio }) => {
@@ -241,7 +244,7 @@ const Convenios = () => {
       .catch((err) => console.error(err));
   }, [ean13Convenio]);
   const fetchConveniosManyFunc = () => {
-    fetchConveniosMany(searchConvenio, page)
+    fetchConveniosMany({ tags: searchConvenio, page, limit })
       .then((res) => {
         setConvenios(
           [...res?.results].map(({ id_convenio, nombre_convenio }) => {
@@ -259,88 +262,87 @@ const Convenios = () => {
   return (
     <Fragment>
       <ButtonBar>
-        <Button type="submit" onClick={() => setShowModal(true)}>
+        <Button type='submit' onClick={() => setShowModal(true)}>
           Crear convenio
         </Button>
         {/* <Button type="submit" onClick={() => setShowModal(true)}>
           Crear convenio masivo
         </Button> */}
       </ButtonBar>
-      <Pagination maxPage={maxPages} onChange={onChange} grid>
+      {/* <Pagination maxPage={maxPages} onChange={onChange} grid></Pagination> */}
+      <TableEnterprise
+        title='Convenios'
+        maxPage={maxPages}
+        onChange={onChange}
+        headers={["Id convenio", "Nombre convenio"]}
+        data={convenios}
+        onSelectRow={onSelectConvenio}
+        onSetPageData={setPageData}>
         <Input
-          id="searchConvenio"
-          name="searchConvenio"
+          id='searchConvenio'
+          name='searchConvenio'
           label={"Tag convenio"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           defaultValue={searchConvenio}
         />
         <Input
-          id="ean13Convenio"
-          name="ean13Convenio"
+          id='ean13Convenio'
+          name='ean13Convenio'
           label={"Ean13"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           defaultValue={ean13Convenio}
         />
-      </Pagination>
-      {Array.isArray(convenios) && convenios.length > 0 ? (
-        <Table
-          headers={Object.keys(convenios[0])}
-          data={convenios}
-          onSelectRow={onSelectConvenio}
-        />
-      ) : (
-        ""
-      )}
+      </TableEnterprise>
+
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={onChangeConv}>
           <Input
-            id="Nombre de convenio"
-            name="Nombre de convenio"
+            id='Nombre de convenio'
+            name='Nombre de convenio'
             label={"Nombre de convenio"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             defaultValue={selectedConvenio?.["Nombre de convenio"]}
             required
           />
           <Input
-            id="Ean13"
-            name="Ean13"
+            id='Ean13'
+            name='Ean13'
             label={"Ean13"}
-            type="text"
+            type='text'
             // step='1'
-            minLength="13"
-            maxLength="13"
-            autoComplete="off"
+            minLength='13'
+            maxLength='13'
+            autoComplete='off'
             value={selectedConvenio?.Ean13}
             onChange={() => {}}
-            required
           />
           <Fieldset legend={"Tags"}>
             {selectedConvenio?.Tags?.map((val, ind) => {
               return (
-                <div className="grid grid-cols-2" key={ind}>
+                <div className='grid grid-cols-2' key={ind}>
                   <Input
                     id={`tagsConvenio_${ind}`}
-                    name="Tags"
-                    type="text"
-                    autoComplete="off"
+                    name='Tags'
+                    type='text'
+                    autoComplete='off'
                     value={val}
                     onChange={() => {}}
                     required
                   />
                   <ButtonBar>
                     <Button
-                      type="button"
+                      type='button'
                       onClick={() => {
-                        setSelectedConvenio((old) => {
-                          const copy = { ...old };
-                          copy?.Tags.splice(ind, 1);
-                          return { ...copy };
-                        });
-                      }}
-                    >
+                        if (selectedConvenio?.Tags.length < 2) {
+                          return;
+                        }
+                        const copy = { ...selectedConvenio };
+                        copy?.Tags.splice(ind, 1);
+                        setSelectedConvenio({ ...copy });
+                      }}>
                       Eliminar tag
                     </Button>
                   </ButtonBar>
@@ -349,15 +351,12 @@ const Convenios = () => {
             })}
             <ButtonBar>
               <Button
-                type="button"
+                type='button'
                 onClick={() => {
-                  setSelectedConvenio((old) => {
-                    const copy = { ...old };
-                    copy?.Tags.push("");
-                    return { ...copy };
-                  });
-                }}
-              >
+                  const copy = { ...selectedConvenio };
+                  copy?.Tags.push("");
+                  setSelectedConvenio({ ...copy });
+                }}>
                 Añadir tag
               </Button>
             </ButtonBar>
@@ -365,7 +364,7 @@ const Convenios = () => {
           <Fieldset legend={"Referencias"}>
             {selectedConvenio?.Referencias?.map((val, index) => {
               return (
-                <div className="grid grid-cols-auto-fit-md place-items-center place-content-end">
+                <div className='grid grid-cols-auto-fit-md place-items-center place-content-end'>
                   {Object.entries(val).map(([key, valRef]) => {
                     return (
                       <Input
@@ -373,7 +372,7 @@ const Convenios = () => {
                         name={key}
                         label={key}
                         type={`${key.includes("Longitud") ? "number" : "text"}`}
-                        autoComplete="off"
+                        autoComplete='off'
                         value={valRef}
                         onChange={() => {}}
                         required
@@ -382,18 +381,15 @@ const Convenios = () => {
                   })}
                   <ButtonBar>
                     <Button
-                      type="button"
-                      onClick={() =>
-                        setSelectedConvenio((old) => {
-                          if (old?.Referencias.length < 2) {
-                            return old;
-                          }
-                          const copy = { ...old };
-                          copy?.Referencias.splice(index, 1);
-                          return { ...copy };
-                        })
-                      }
-                    >
+                      type='button'
+                      onClick={() => {
+                        if (selectedConvenio?.Referencias.length < 2) {
+                          return;
+                        }
+                        const copy = { ...selectedConvenio };
+                        copy?.Referencias.splice(index, 1);
+                        setSelectedConvenio({ ...copy });
+                      }}>
                       Eliminar referencia
                     </Button>
                   </ButtonBar>
@@ -402,22 +398,19 @@ const Convenios = () => {
             })}
             <ButtonBar>
               <Button
-                type="button"
-                onClick={() =>
-                  setSelectedConvenio((old) => {
-                    if (old?.Referencias.length > 2) {
-                      return old;
-                    }
-                    const copy = { ...old };
-                    copy?.Referencias.push({
-                      "Nombre de Referencia": "",
-                      "Longitud minima": "",
-                      "Longitud maxima": "",
-                    });
-                    return { ...copy };
-                  })
-                }
-              >
+                type='button'
+                onClick={() => {
+                  if (selectedConvenio?.Referencias.length > 2) {
+                    return;
+                  }
+                  const copy = { ...selectedConvenio };
+                  copy?.Referencias.push({
+                    "Nombre de Referencia": "",
+                    "Longitud minima": "",
+                    "Longitud maxima": "",
+                  });
+                  setSelectedConvenio({ ...copy });
+                }}>
                 Añadir referencia
               </Button>
             </ButtonBar>
@@ -425,10 +418,10 @@ const Convenios = () => {
           {!selectedConvenio?.["Id convenio"] ||
           selectedConvenio?.["Id convenio"] === -1 ? (
             <ButtonBar>
-              <Button type="button" onClick={handleClose}>
+              <Button type='button' onClick={handleClose}>
                 Cancelar
               </Button>
-              <Button type="submit">Crear autorizador</Button>
+              <Button type='submit'>Crear convenio</Button>
             </ButtonBar>
           ) : (
             <Fragment>
@@ -461,10 +454,10 @@ const Convenios = () => {
                 </Button> */}
               </ButtonBar>
               <ButtonBar>
-                <Button type="button" onClick={handleClose}>
+                <Button type='button' onClick={handleClose}>
                   Cancelar
                 </Button>
-                <Button type="submit">Editar convenio</Button>
+                <Button type='submit'>Editar convenio</Button>
               </ButtonBar>
             </Fragment>
           )}

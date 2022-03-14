@@ -13,6 +13,10 @@ import { useReactToPrint } from "react-to-print";
 import { notifyError } from "../../../utils/notify";
 import Tickets from "../components/Voucher/Tickets";
 import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
+import fetchData from "../../../utils/fetchData";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
+
+const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 
 const Recaudo = () => {
   const {
@@ -44,6 +48,9 @@ const Recaudo = () => {
   const [showModal, setShowModal] = useState("");
   const [response, setResponse] = useState("");
   const { roleInfo } = useAuth();
+  const [permiteCambio, setPermiteCambio] = useState("");
+  const [paraMax, setParaMax] = useState(null);
+  const [paraMin, setParaMin] = useState(null);
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -123,6 +130,28 @@ const Recaudo = () => {
 
   const { infoTicket } = useAuth();
 
+  const params = useCallback(async () => {
+    const queries = { tipo_op: 5 };
+    console.log(queries);
+    try {
+      const res = await fetchData(url_params, "GET", queries);
+      if ("Parametros" in res?.obj?.[0]) {
+        setParaMax(res?.obj?.[0].Parametros.monto_maximo);
+        setParaMin(res?.obj?.[0].Parametros.monto_minimo);
+      } else {
+        setParaMax(10000000);
+        setParaMin(0);
+      }
+
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+  useEffect(() => {
+    params();
+  }, [info]);
+
   useEffect(() => {
     infoTicket(response?.id_trx, 5, tickets);
   }, [infoTicket, response]);
@@ -140,6 +169,7 @@ const Recaudo = () => {
     setFormatMon("");
     setCreditStatus(false);
     setInfo("");
+    setTicket(false);
   }, []);
 
   const bankCollection = (e) => {
@@ -149,6 +179,7 @@ const Recaudo = () => {
     const body = {
       Tipo: roleInfo?.tipo_comercio,
       Usuario: roleInfo?.id_usuario,
+      Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
       Credito: selected?.Credito,
       Depto: roleInfo?.codigo_dane.slice(0, 2),
@@ -185,29 +216,34 @@ const Recaudo = () => {
     setCreditStatus(false);
     setInfo("");
     const user = {
+      Usuario: roleInfo?.id_usuario,
+      Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
-      Depto: roleInfo?.codigo_dane.slice(0, 2),
-      Municipio: roleInfo?.codigo_dane.slice(2),
+      Depto: roleInfo?.codigo_dane?.slice(0, 2),
+      Municipio: roleInfo?.codigo_dane?.slice(2),
     };
-    valorcuota(String(number), user)
-      .then((res) => {
-        console.log(res);
-        [res?.obj].map((row) => {
-          setCuota([
-            {
-              min: formatMoney.format(row.ValorMin),
-              max: formatMoney.format(row.ValorMaximo),
-              cuota: formatMoney.format(row.ValorPagar),
-            },
-          ]);
-          if (row.ValorPagar !== 0) {
-            setCreditStatus(true);
-          }
+    if (tipobusqueda === "2") {
+      valorcuota(String(number), user)
+        .then((res) => {
+          console.log(res);
+          setPermiteCambio(res?.obj?.PermiteCambio);
+          [res?.obj].map((row) => {
+            setCuota([
+              {
+                min: formatMoney.format(row.ValorMin),
+                max: formatMoney.format(row.ValorMaximo),
+                cuota: formatMoney.format(row.ValorPagar),
+              },
+            ]);
+            if (row.ValorPagar !== 0) {
+              setCreditStatus(true);
+            }
+          });
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    }
     mostrarcredito(String(number), tipobusqueda, user)
       .then((res) => {
         console.log(res);
@@ -234,67 +270,80 @@ const Recaudo = () => {
       })
       .catch((err) => console.log("error", err));
   };
-  console.log(roleInfo?.["nombre comercio"]);
   return (
     <>
-      <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
-      <Form onSubmit={onSubmit} grid>
-        <Select
-          id="searchByDocument"
-          label="Tipo de busqueda"
-          options={[
-            { value: "", label: "" },
-            {
-              value: 1,
-              label: `Documento`,
-            },
-            {
-              value: 2,
-              label: `Nº credito`,
-            },
-          ]}
-          value={tipobusqueda}
-          onChange={(e) => {
-            setTiposBusqueda(e.target.value);
-            if (e.target.value == 1) {
-              setLabel("Documento");
-            }
-            if (e.target.value == 2) {
-              setLabel("Número crédito");
-            }
-          }}
-        />
-        {tipobusqueda?.length > 0 && (
-          <Input
-            id="numpin"
-            label={label}
-            type="text"
-            minLength="7"
-            maxLength="12"
-            autoComplete="off"
-            value={number}
-            onInput={(e) => {
-              const num = parseInt(e.target.value) || "";
-              setNumber(num);
-            }}
-          />
-        )}
-        <ButtonBar className="col-auto md:col-span-2">
-          <Button type="submit" disabled={disabledBtn}>
-            Consultar recaudos
-          </Button>
-        </ButtonBar>
-      </Form>
+      {"id_comercio" in roleInfo ? (
+        <>
+          <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
+          <Form onSubmit={onSubmit} grid>
+            <Select
+              id="searchBySorteo"
+              label="Tipo de busqueda"
+              options={[
+                { value: "", label: "" },
+                {
+                  value: 1,
+                  label: `Documento`,
+                },
+                {
+                  value: 2,
+                  label: `Nº credito`,
+                },
+              ]}
+              value={tipobusqueda}
+              onChange={(e) => {
+                setTiposBusqueda(e.target.value);
+                if (e.target.value == 1) {
+                  setLabel("Documento");
+                }
+                if (e.target.value == 2) {
+                  setLabel("Número crédito");
+                }
+              }}
+            />
+            {tipobusqueda?.length > 0 && (
+              <Input
+                id="numpin"
+                label={label}
+                type="text"
+                minLength="7"
+                maxLength="12"
+                autoComplete="off"
+                value={number}
+                onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+                  setNumber(num);
+                }}
+              />
+            )}
+            <ButtonBar className="col-auto md:col-span-2">
+              <Button type="submit" disabled={disabledBtn}>
+                Consultar recaudos
+              </Button>
+            </ButtonBar>
+          </Form>
+        </>
+      ) : (
+        <h1 className="text-3xl mt-6">El usuario no tiene comercio asociado</h1>
+      )}
+
       {info?.status && (
         <>
           {creditStatus && (
-            <Table
+            <TableEnterprise
+              title="Parametros"
+              // maxPage={maxPages}
+              // onChange={onChange}
               headers={["Valor mínimo", "Valor máximo", "Valor a pagar"]}
               data={cuota || []}
-            />
+              // onSetPageData={setPageData}
+            ></TableEnterprise>
           )}
           <br />
-          <Table
+          <TableEnterprise
+            title="Información de credito"
+            // maxPage={maxPages}
+            // onChange={onChange}
             headers={[
               "Cédula",
               "Mensaje",
@@ -306,9 +355,12 @@ const Recaudo = () => {
             data={table || []}
             onSelectRow={(e, index) => {
               setSelected(table[index]);
-              setShowModal(true);
+              if (info?.obj?.NroMensaje === 1) {
+                setShowModal(true);
+              }
             }}
-          />
+            // onSetPageData={setPageData}
+          ></TableEnterprise>
         </>
       )}
       {info?.obj?.NroMensaje === 1 && (
@@ -352,10 +404,18 @@ const Recaudo = () => {
                   label="Valor a pagar"
                   type="number"
                   autoComplete="off"
+                  max={paraMax}
+                  min={paraMin}
                   required
                   value={formatMon}
+                  disabled={permiteCambio == "N"}
                   onInput={(e, valor) => {
                     const num = valor || "";
+                    if (num > paraMax || num < paraMin) {
+                      setStop(true);
+                    } else {
+                      setStop(false);
+                    }
                     setFormatMon(num);
                   }}
                 />
@@ -367,8 +427,11 @@ const Recaudo = () => {
                   autoComplete="off"
                   value={referencia}
                   onInput={(e) => {
-                    const ref = String(e.target.value) || "";
-                    setReferencia(ref);
+                    if (!isNaN(e.target.value)) {
+                      setReferencia(e.target.value);
+                    }
+                    // const ref = String(e.target.value) || "";
+                    // setReferencia(ref);
                   }}
                 />
                 <ButtonBar>

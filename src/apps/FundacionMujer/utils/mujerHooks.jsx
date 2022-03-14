@@ -4,8 +4,8 @@ import fetchData from "../../../utils/fetchData";
 
 const urls = {
   mostrarcreditos: `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`,
-  ingresoreverso: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresoreversorecibo`,
-  ingresorecibo: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`,
+  ingresoreverso: `http://127.0.0.1:5000/ingresoreversorecibo`,
+  ingresorecibo: `http://127.0.0.1:5000/ingresorecibo`,
   valorcuota: `${process.env.REACT_APP_URL_FDLMWSDL}/valorcuota`,
 };
 
@@ -52,6 +52,8 @@ export const useProvideFDLM = () => {
   const mostrarcredito = useCallback(async (numero, param, user) => {
     const body = {
       Comercio: user?.Comercio,
+      Usuario: user?.Usuario,
+      Dispositivo: user?.Dispositivo,
       nroBusqueda: numero,
       ParametroBusqueda: param,
       Depto: parseInt(user?.Depto),
@@ -69,6 +71,7 @@ export const useProvideFDLM = () => {
     const body = {
       Tipo: values?.tipo,
       Usuario: values?.usuario,
+      Dispositivo: values?.dispositivo,
       Comercio: values?.comercio,
       Credito: parseInt(values?.credit),
       Valor: parseFloat(values?.val),
@@ -88,6 +91,7 @@ export const useProvideFDLM = () => {
     const body = {
       Tipo: values?.Tipo,
       Usuario: parseInt(values?.Usuario),
+      Dispositivo: values?.Dispositivo,
       Comercio: values?.Comercio,
       Credito: parseInt(values?.Credito),
       Depto: parseInt(values?.Depto),
@@ -108,6 +112,8 @@ export const useProvideFDLM = () => {
 
   const valorcuota = useCallback(async (numero, user) => {
     const body = {
+      Usuario: user?.Usuario,
+      Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,
       Credito: numero,
       Depto: parseInt(user?.Depto),

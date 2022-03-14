@@ -13,7 +13,13 @@ const Login = () => {
 
   return (
     <Navigate
-      to={state?.from || pathname === "/login" ? "/" : pathname}
+      to={
+        state?.from?.pathname
+          ? state?.from?.pathname
+          : pathname === "/login"
+          ? "/"
+          : pathname
+      }
     ></Navigate>
   );
 };

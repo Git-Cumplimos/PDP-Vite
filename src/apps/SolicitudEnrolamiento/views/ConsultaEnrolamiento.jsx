@@ -150,6 +150,8 @@ const ConsultaEnrolamiento = () => {
                     ? "Señor usuario su en enrolamiento ha Exitoso, gracias por confiar en nosotros."
                     : respuestaProceso[0]["validation_state"] === "202"
                     ? "Proceso Rechazado por Hellen"
+                    : respuestaProceso[0]["validation_state"] === "200"
+                    ? "Señor usuario su Proceso se encuentra en Validación de Identidad por parte del Asesor de Apertura De Comercios"
                     : "Señor usuario su Proceso se encuentra en Validación de documentos por parte del Asesor Comercial."
                 }`}</h2>
                 {respuestaProceso[0]["validation_state"] === "102" ? (

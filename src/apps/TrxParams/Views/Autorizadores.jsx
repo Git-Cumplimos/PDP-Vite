@@ -163,13 +163,17 @@ const Autorizadores = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-
+      console.log(selectedAuto?.["Id contrato"]);
+      if (!selectedAuto?.["Id contrato"]) {
+        notifyError("Se debe agregar el contrato");
+        return;
+      }
       if (selectedAuto?.["Id autorizador"]) {
         putAutorizadores(
           { id_autorizador: selectedAuto?.["Id autorizador"] },
           {
             id_tipo_contrato: selectedAuto?.["Id contrato"],
-            nombre_autorizador: selectedAuto?.["Nombre de autorizador"],
+            nombre_autorizador: selectedAuto?.["Autorizador"],
             nit: selectedAuto?.["Nit"],
             descripcion: selectedAuto?.["Descripcion"],
           }
@@ -186,7 +190,7 @@ const Autorizadores = () => {
       } else {
         postAutorizadores({
           id_tipo_contrato: selectedAuto?.["Id contrato"],
-          nombre_autorizador: selectedAuto?.["Nombre de autorizador"],
+          nombre_autorizador: selectedAuto?.["Autorizador"],
           nit: selectedAuto?.["Nit"],
           descripcion: selectedAuto?.["Descripcion"],
         })
@@ -239,7 +243,7 @@ const Autorizadores = () => {
     <Fragment>
       <ButtonBar>
         <Button
-          type="submit"
+          type='submit'
           onClick={() => {
             setShowModal(true);
             setSelectedAuto({
@@ -247,18 +251,17 @@ const Autorizadores = () => {
               Nit: "",
               Descripcion: "",
             });
-          }}
-        >
+          }}>
           Crear autorizador
         </Button>
       </ButtonBar>
       <Pagination maxPage={maxPages} onChange={onChange} grid>
         <Input
-          id="searchAuto"
-          name="searchAuto"
+          id='searchAuto'
+          name='searchAuto'
           label={"Buscar autorizador"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           defaultValue={searchAuto}
         />
         <ButtonBar></ButtonBar>
@@ -275,64 +278,63 @@ const Autorizadores = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={formatNit} grid>
           <Input
-            id="Autorizador"
-            name="Autorizador"
+            id='Autorizador'
+            name='Autorizador'
             label={"Nombre de autorizador"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             // value={selectedAuto?.["Nombre de autorizador"]}
             defaultValue={selectedAuto?.["Autorizador"]}
             required
           />
           {selectedAuto?.["Contrato"] && (
             <Input
-              id="Contrato"
-              name="Contrato"
+              id='Contrato'
+              name='Contrato'
               label={"Contrato"}
-              type="text"
-              autoComplete="off"
+              type='text'
+              autoComplete='off'
               value={selectedAuto?.["Contrato"]}
               // defaultValue={selectedAuto?.["Contrato"]}
               disabled
             />
           )}
           <Input
-            id="nitAuto"
-            name="Nit"
+            id='nitAuto'
+            name='Nit'
             label={"Nit"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             // value={selectedAuto?.Nit}
             defaultValue={selectedAuto?.Nit}
             required
           />
           <TextArea
-            id="textAuto"
-            name="Descripcion"
+            id='textAuto'
+            name='Descripcion'
             label={"Descripcion"}
-            autoCapitalize="sentences"
-            autoComplete="off"
+            autoCapitalize='sentences'
+            autoComplete='off'
             // value={selectedAuto?.Descripcion ?? ""}
             defaultValue={selectedAuto?.Descripcion ?? ""}
             onChange={() => {}}
           />
           {!selectedAuto?.["Id autorizador"] ? (
             <ButtonBar>
-              <Button type="submit">Crear autorizador</Button>
+              <Button type='button' onClick={handleClose}>
+                Cancelar
+              </Button>
               <Button
-                type="button"
+                type='button'
                 onClick={() => {
                   setShowModal2(true);
                   setQuery({ ["openTipoContrato"]: true }, { replace: true });
-                }}
-              >
+                }}>
                 {selectedAuto?.["Contrato"]
                   ? "Editar contrato"
                   : "Agregar contrato"}
               </Button>
-              <Button type="button" onClick={handleClose}>
-                Cancelar
-              </Button>
+              <Button type='submit'>Crear autorizador</Button>
             </ButtonBar>
           ) : (
             <Fragment>
@@ -358,21 +360,20 @@ const Autorizadores = () => {
                 </Button> */}
               </ButtonBar>
               <ButtonBar>
-                <Button type="submit">Editar autorizador</Button>
+                <Button type='button' onClick={handleClose}>
+                  Cancelar
+                </Button>
                 <Button
-                  type="button"
+                  type='button'
                   onClick={() => {
                     setShowModal2(true);
                     setQuery({ ["openTipoContrato"]: true }, { replace: true });
-                  }}
-                >
+                  }}>
                   {selectedAuto?.["Contrato"]
                     ? "Editar contrato"
                     : "Agregar contrato"}
                 </Button>
-                <Button type="button" onClick={handleClose}>
-                  Cancelar
-                </Button>
+                <Button type='submit'>Editar autorizador</Button>
               </ButtonBar>
             </Fragment>
           )}
@@ -380,10 +381,9 @@ const Autorizadores = () => {
         <Modal
           show={showModal2}
           handleClose={handleClose2}
-          className="flex align-middle"
-        >
+          className='flex align-middle'>
           <Fragment>
-            <h1 className="text-3xl">Seleccionar el contrato</h1>
+            <h1 className='text-3xl'>Seleccionar el contrato</h1>
             <Pagination maxPage={maxPages} grid></Pagination>
             {Array.isArray(data) && data.length > 0 && (
               <Table

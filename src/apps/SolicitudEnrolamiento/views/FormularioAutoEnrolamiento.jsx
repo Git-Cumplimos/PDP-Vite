@@ -12,17 +12,14 @@ import LocationForm from "../../../components/Compound/LocationForm";
 import InputSuggestions from "../../../components/Base/InputSuggestions";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
-import { useParams } from "react-router";
 import { useNavigate } from "react-router-dom";
-
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
 
 const capitalize = (word) => {
   return word.charAt(0).toUpperCase() + word.slice(1);
 };
 
-const FormularioEnrolamiento = () => {
-  const params = useParams();
+const FormularioAutoEnrolamiento = () => {
   const navigate = useNavigate();
   const {
     principal,
@@ -50,7 +47,7 @@ const FormularioEnrolamiento = () => {
   const [responsableIva, setResponsableIva] = useState("");
 
   const [asesores, setAsesores] = useState(0);
-  const [nombreAsesor, setNombreAsesor] = useState(0);
+  const [asignarAsesores, setAsignarAsesores] = useState(0);
 
   const [actividad, setActividad] = useState("");
   const [foundActivities, setFoundActivities] = useState([]);
@@ -85,9 +82,6 @@ const FormularioEnrolamiento = () => {
   const [LocalidadUbComercio, setLocalidadUbComercio] = useState(0);
   const [LocalidadUbCorrespondencia, setLocalidadUbCorrespondencia] =
     useState(0);
-
-  const [desencriptarIdAsesor, setDesencriptarIdAsesor] = useState({});
-  //Desencriptar Id Asesor
 
   //Traer localidades Con codigo dane de la ubicacion del comercio
   useEffect(() => {
@@ -155,7 +149,7 @@ const FormularioEnrolamiento = () => {
         "POST",
         {},
         {
-          asesor: nombreAsesor[0]["nom_asesor"],
+          asesor: "" /* asignarAsesores.toString() */,
           nombre: `${nombre}`,
           apellido: `${apellido}`,
           nombre_comercio: nombreComercio,
@@ -188,6 +182,7 @@ const FormularioEnrolamiento = () => {
           task_token: "token",
           validation_state: "En Proceso de Validación",
           id_name: "id_proceso",
+
           responsable: "",
         },
 
@@ -228,7 +223,6 @@ const FormularioEnrolamiento = () => {
                 console.log(respuesta?.obj);
                 notify("Se han subido los archivos");
                 setEstadoForm(true);
-
                 navigate("/public/solicitud-enrolamiento/consultar");
               }
             })
@@ -298,24 +292,6 @@ const FormularioEnrolamiento = () => {
     }
   }, [homeLocation]);
 
-  useEffect(() => {
-    const datoEncriptado = params.idAsesor.toString();
-    var decodedData = window.atob(datoEncriptado); // decode the string
-    setDesencriptarIdAsesor(parseInt(decodedData));
-  }, []);
-  useEffect(() => {
-    if (desencriptarIdAsesor) {
-      fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?id_asesor=${desencriptarIdAsesor}`,
-        "GET",
-        {},
-        {},
-        {},
-        false
-      ).then((res) => setNombreAsesor(res.obj.results));
-    }
-  }, [desencriptarIdAsesor]);
-
   return (
     <div className=" flex flex-col justify-center items-center text-justify my-8">
       <span className={tituloFormularioInscripcion}>
@@ -336,19 +312,7 @@ const FormularioEnrolamiento = () => {
               type="text"
               required
             ></Input>
-            {nombreAsesor ? (
-              <Input
-                label={"Asesor Comercial"}
-                placeholder={nombreAsesor[0]["nom_asesor"]}
-                /* value={asignarAsesores[0]["nom_asesor"]} */
-                type="text"
-                disabled
-              ></Input>
-            ) : (
-              ""
-            )}
-
-            {/*  <Select
+            {/*   <Select
               onChange={(event) => setAsignarAsesores(event.target.value)}
               id="comissionType"
               name="comissionType"
@@ -357,8 +321,8 @@ const FormularioEnrolamiento = () => {
               options={
                 Object.fromEntries([
                   ["", ""],
-                  ...asesores.map(({ nom_asesor  }) => {
-                    return [nom_asesor];
+                  ...asesores.map(({ nom_asesor  , id_asesor  }) => {
+                    return [nom_asesor  , id_asesor ];
                   }),
                 ]) || { "": "" }
               }
@@ -645,7 +609,12 @@ const FormularioEnrolamiento = () => {
           </Fragment>
           <ButtonBar className={"lg:col-span-2"} type="">
             {
-              <Button type="submit" onClick={(e) => handleSubmit(e)}>
+              <Button
+                type="submit"
+                onClick={(e) =>
+                  /* setEstadoForm((old) => !old) */ handleSubmit(e)
+                }
+              >
                 Enviar Formulario
               </Button>
               /*  ) : null */
@@ -713,4 +682,4 @@ const FormularioEnrolamiento = () => {
   );
 };
 
-export default FormularioEnrolamiento;
+export default FormularioAutoEnrolamiento;

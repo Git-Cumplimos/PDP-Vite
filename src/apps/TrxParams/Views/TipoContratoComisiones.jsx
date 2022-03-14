@@ -16,10 +16,11 @@ import {
   putTiposContratosComisiones,
   postTiposContratosComisiones,
 } from "../utils/fetchTiposContratosComisiones";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const TipoContratoComisiones = () => {
   const navigate = useNavigate();
-  const [{ nombre_contrato = "", page = 1 }, setQuery] = useQuery();
+  const [{ nombre_contrato = "" }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
@@ -42,6 +43,10 @@ const TipoContratoComisiones = () => {
     IVA: false,
     Rete_Fuente: false,
     Rete_ICA: false,
+  });
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
   });
 
   const onSelectTipoContrato = useCallback(
@@ -126,7 +131,6 @@ const TipoContratoComisiones = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-      console.log(selectedTipoContrato);
       if (
         selectedTipoContrato?.["Id contrato"] &&
         selectedTipoContrato?.["Id contrato"] !== -1
@@ -184,10 +188,10 @@ const TipoContratoComisiones = () => {
 
   useEffect(() => {
     fetchTiposContratosComisionesFunc();
-  }, [nombre_contrato, page]);
+  }, [nombre_contrato, page, limit]);
 
   const fetchTiposContratosComisionesFunc = () => {
-    fetchTiposContratosComisiones({ nombre_contrato, page })
+    fetchTiposContratosComisiones({ nombre_contrato, page, limit })
       .then((res) => {
         setTiposContrato(
           [...res?.results].map(
@@ -217,80 +221,85 @@ const TipoContratoComisiones = () => {
   return (
     <Fragment>
       <ButtonBar>
-        <Button type="submit" onClick={() => setShowModal(true)}>
+        <Button type='submit' onClick={() => setShowModal(true)}>
           Crear contrato de comision
         </Button>
         {/* <Button type="submit" onClick={() => setShowModal(true)}>
           Crear convenio masivo
         </Button> */}
       </ButtonBar>
-      <Pagination maxPage={maxPages} onChange={onChange} grid>
+      <TableEnterprise
+        title='Convenios'
+        maxPage={maxPages}
+        onChange={onChange}
+        headers={[
+          "Id contrato",
+          "Nombre contrato",
+          "IVA",
+          "Rete Fuente",
+          "Rete ICA",
+        ]}
+        data={tiposContrato}
+        onSelectRow={onSelectTipoContrato}
+        onSetPageData={setPageData}>
         <Input
-          id="nombre_contrato"
-          name="nombre_contrato"
+          id='nombre_contrato'
+          name='nombre_contrato'
           label={"Buscar contrato comisión"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           defaultValue={nombre_contrato}
         />
-      </Pagination>
-      {Array.isArray(tiposContrato) && tiposContrato.length > 0 ? (
-        <Table
-          headers={Object.keys(tiposContrato[0])}
-          data={tiposContrato}
-          onSelectRow={onSelectTipoContrato}
-        />
-      ) : (
-        ""
-      )}
+      </TableEnterprise>
+
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={onChangeTipoContrato} grid>
           <Input
-            id="Nombre contrato"
-            name="Nombre contrato"
+            id='Nombre contrato'
+            name='Nombre contrato'
             label={"Nombre de contrato"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             defaultValue={selectedTipoContrato?.["Nombre contrato"]}
             required
           />
           <MultipleSelect
-            label="Opciones de comisiones"
+            label='Opciones de comisiones'
             options={varComisiones}
             onChange={(e) => onChangeMultipleCheck(e)}
           />
           {varComisionesTemp?.["IVA"] && (
             <Input
-              id="IVA"
-              name="IVA"
+              id='IVA'
+              name='IVA'
               label={"IVA"}
-              type="number"
-              autoComplete="off"
-              step="any"
+              type='number'
+              autoComplete='off'
+              step='any'
               defaultValue={selectedTipoContrato?.["IVA"]}
               required
             />
           )}
           {varComisionesTemp?.["Rete_Fuente"] && (
             <Input
-              id="Rete Fuente"
-              name="Rete Fuente"
+              id='Rete Fuente'
+              name='Rete Fuente'
               label={"Rete Fuente"}
-              type="number"
-              step="any"
-              autoComplete="off"
+              type='number'
+              step='any'
+              autoComplete='off'
               defaultValue={selectedTipoContrato?.["Rete Fuente"]}
               required
             />
           )}
           {varComisionesTemp?.["Rete_ICA"] && (
             <Input
-              id="Rete ICA"
-              name="Rete ICA"
+              id='Rete ICA'
+              name='Rete ICA'
               label={"Rete ICA"}
-              type="number"
-              step="any"
-              autoComplete="off"
+              type='number'
+              step='any'
+              autoComplete='off'
               defaultValue={selectedTipoContrato?.["Rete ICA"]}
               required
             />
@@ -298,16 +307,16 @@ const TipoContratoComisiones = () => {
           {!selectedTipoContrato?.["Id contrato"] ||
           selectedTipoContrato?.["Id contrato"] === -1 ? (
             <ButtonBar>
-              <Button type="submit">Crear contrato</Button>
-              <Button type="button" onClick={handleClose}>
+              <Button type='submit'>Crear contrato</Button>
+              <Button type='button' onClick={handleClose}>
                 Cancelar
               </Button>
             </ButtonBar>
           ) : (
             <Fragment>
               <ButtonBar>
-                <Button type="submit">Editar contrato</Button>
-                <Button type="button" onClick={handleClose}>
+                <Button type='submit'>Editar contrato</Button>
+                <Button type='button' onClick={handleClose}>
                   Cancelar
                 </Button>
               </ButtonBar>

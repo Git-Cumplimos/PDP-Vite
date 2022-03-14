@@ -12,10 +12,15 @@ import Input from "../../../components/Base/Input";
 import Select from "../../../components/Base/Select";
 import useQuery from "../../../hooks/useQuery";
 import ToggleInput from "../../../components/Base/ToggleInput";
+import InputX from "../../../components/Base/InputX/InputX";
+import { button } from "aws-amplify";
+import React, { useRef } from "react";
+import classes from "../Views/AsesoresComerciales.module.css";
 
 const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 const AsesoresComerciales = () => {
+  const { contenedorPrincipal, contendorBoton } = classes;
   const [{ page = 1 }] = useQuery();
 
   const [asesoresComerciales, setAsesoresComerciales] = useState([]);
@@ -24,10 +29,12 @@ const AsesoresComerciales = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [linkAsesor, setLinkAsesor] = useState("");
 
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelected(null);
+    setLinkAsesor("");
   }, []);
 
   const fetchAsesores = useCallback(() => {
@@ -122,7 +129,21 @@ const AsesoresComerciales = () => {
       )
     );
   }, []);
+  const GenerarLinkAsesor = () => {
+    const link = `http://localhost:3000/public/solicitud-enrolamiento/formulario/${window.btoa(
+      selected.id_asesor
+    )}`;
+    setLinkAsesor(link);
+  };
 
+  let inputRef = HTMLInputElement | null;
+  const copyLink = () => {
+    navigator.clipboard.writeText(inputRef.defaultValue);
+    notify("Copia Exitosa.");
+    /*    console.log("INPUT VALUE: ", inputRef?.value); */
+  };
+
+  console.log("Rendering");
   return (
     <Fragment>
       <ButtonBar>
@@ -189,12 +210,45 @@ const AsesoresComerciales = () => {
                 name="estado"
                 defaultChecked={selected?.estado ?? false}
               />
+
               <ButtonBar>
                 <Button type={"submit"}>Editar asesor</Button>
               </ButtonBar>
             </Form>
+            <ButtonBar>
+              <Button
+                onClick={() => {
+                  GenerarLinkAsesor();
+                }}
+              >
+                Generar Link
+              </Button>
+            </ButtonBar>
+            {linkAsesor ? (
+              <div className={contenedorPrincipal}>
+                <div>
+                  <input
+                    size="58"
+                    ref={(node) => {
+                      inputRef = node;
+                    }}
+                    type="text"
+                    id="link"
+                    defaultValue={linkAsesor}
+                  />
+                </div>
+                <div>
+                  <button className={contendorBoton} onClick={copyLink}>
+                    Copy
+                  </button>
+                </div>
+              </div>
+            ) : (
+              ""
+            )}
           </Fragment>
         ) : (
+          /* <InputX value={linkAsesor}></InputX> */
           <Fragment>
             <PaymentSummary
               title="Crear asesor"
@@ -215,6 +269,7 @@ const AsesoresComerciales = () => {
                 options={responsables}
                 required
               />
+
               <ButtonBar>
                 <Button type={"submit"}>Crear asesor</Button>
               </ButtonBar>

@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useCallback } from "react";
 import { useParams } from "react-router";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -10,7 +10,6 @@ import Form from "../../../components/Base/Form";
 import { useNavigate } from "react-router-dom";
 import Input from "../../../components/Base/Input";
 /* import ToggleInput from "../../../components/Base/ToggleInput"; */
-import TextArea from "../../../components/Base/TextArea";
 import Fieldset from "../../../components/Base/Fieldset";
 import Select from "../../../components/Base/Select";
 import { notify } from "../../../utils/notify";
@@ -19,16 +18,11 @@ import fetchData from "../../../utils/fetchData";
 const VerificacionFormulario = () => {
   const navigate = useNavigate();
   const {
-    contenedorPrincipal,
-    contenedorSecundario,
-    contenedorTercero,
-    tituloPrincipal,
     titulosSecundarios,
     autorizacionMensajes,
     contenedorBotones,
     contenedorPrincipalBotones,
     contenedorCausalRechazo,
-    contenedorImagenPDP,
     textTarea,
   } = classes;
   const [datosParams, setDatosParams] = useState(0);
@@ -37,42 +31,54 @@ const VerificacionFormulario = () => {
   const [asesorComercialLocalidad, setAsesorComercialLocalidad] = useState("");
   const [codigoLocalidad, setCodigoLocalidad] = useState("");
   const [tipoZona, setTipoZona] = useState("");
+  const [tipoZonaLink, setTipoZonaLink] = useState("");
   const [urlPdfs, setUrlPdfs] = useState({});
   const [causal, setCausal] = useState(false);
   const [mensajeCausal, setMensajeCausal] = useState("");
+  const [confirmarRechazo, setConfirmarRechazo] = useState(false);
 
   const [datosAsesor, SetDatosAsesor] = useState(0);
-  /* const [codDaneResponsable, SetCodDaneResponsable] = useState([]);
-  const [todosCodDane, SetTodosCodDane] = useState([]);
-  const [t, SetT] = useState([]);
-  const [p, SetP] = useState([]); */
-  const [p, SetP] = useState([]);
+  const [codigoDane, setCodigoDane] = useState([]);
+  const [codigoDaneAutoEnr, setCodigoDaneAutoEnr] = useState([]);
+  const [asesores, SetAsesores] = useState(0);
+  const [nombreAsesor, SetNombreAsesor] = useState("");
+  const [datosNombreAsesor, SetDatosNombreAsesor] = useState("");
+
+  const [nombreLocalidadCorrespondencia, SetNombreLocalidadCorrespondencia] =
+    useState("");
+
+  const [nombreLocalidadComercio, SetNombreLocalidadComercio] = useState("");
+  const [showModal, setShowModal] = useState(false);
+
   const params = useParams();
 
   const [zonas, setZonas] = useState([]);
   const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
-  useEffect(() => {
-    /* const updateWidth = () => { */
 
+  //----------------Traer Datos Usuario Con los Parametros---------------------//
+  useEffect(() => {
     fetchData(`${url}/actualizacionestado?id_proceso=${params.id}`, "GET").then(
-      (respuesta) => setDatosParams(respuesta.obj.results)
+      (respuesta) => {
+        setDatosParams(respuesta.obj.results);
+      }
     );
   }, []);
 
+  //----------------Traer Url Para Traer los PDF ---------------------//
   useEffect(() => {
     if (datosParams?.length > 0) {
-      /* console.log(typeof  datosParams[0]["id_proceso"].toString()); */
       const datos = {
         id_proceso: datosParams[0]["id_proceso"].toString(),
       };
       fetchData(`${url}/urlfile?id_proceso=${datos["id_proceso"]}`, "GET").then(
         (respuesta) => {
-          console.log(respuesta);
           setUrlPdfs(respuesta.obj);
         }
       );
     }
   }, [datosParams]);
+
+  //----------------Funcion para Aprobar Formulario link Asesor---------------------//
   const aprobacionFormulario = (e) => {
     e.preventDefault();
     const datos = {
@@ -80,9 +86,9 @@ const VerificacionFormulario = () => {
       validation_state: "101",
       responsable: personaResponsable,
       unidad_negocio: unidadNegocio,
-      asesor_comercial_localidad: asesorComercialLocalidad,
+      asesor: datosAsesor[0]["nom_asesor"],
       cod_localidad: codigoLocalidad,
-      tipozona: tipoZona,
+      tipozona: tipoZonaLink.toString(),
       causal_rechazo: mensajeCausal,
     };
     fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
@@ -100,6 +106,8 @@ const VerificacionFormulario = () => {
       2500
     );
   };
+
+  //----------------Funcion para Rechazar Formulario---------------------//
   const rechazarFormulario = (e) => {
     e.preventDefault();
     const datos = {
@@ -109,7 +117,7 @@ const VerificacionFormulario = () => {
       unidad_negocio: unidadNegocio,
       asesor_comercial_localidad: asesorComercialLocalidad,
       cod_localidad: codigoLocalidad,
-      tipozona: tipoZona,
+      tipozona: tipoZonaLink.toString(),
       causal_rechazo: mensajeCausal,
     };
     fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
@@ -128,23 +136,123 @@ const VerificacionFormulario = () => {
     );
   };
 
+  //----------------Funcion para Aprobar Formulario AutoEnrolamiento Asesor---------------------//
+  const aprobacionFormularioAuto = (e) => {
+    e.preventDefault();
+    const datos = {
+      task_token: datosParams[0]["task_token"],
+      validation_state: "101",
+      responsable: personaResponsable,
+      unidad_negocio: unidadNegocio,
+      asesor: nombreAsesor,
+      cod_localidad: codigoLocalidad,
+      tipozona: tipoZona.toString(),
+      causal_rechazo: mensajeCausal,
+    };
+    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(datos),
+    })
+      .then((res) => res.json())
+      .then((respuesta) => console.log(respuesta.obj.data));
+    notify("El Usuario ha sido Aprobado para ReconoserID");
+    setTimeout(
+      () => navigate("/Solicitud-enrolamiento/validarformulario"),
+      2500
+    );
+  };
+
+  //----------------Funcion para Rechazar Formulario AutoEnrolamiento---------------------//
+  const rechazarFormularioAuto = (e) => {
+    e.preventDefault();
+    const datos = {
+      task_token: datosParams[0]["task_token"],
+      validation_state: "102",
+      responsable: personaResponsable,
+      unidad_negocio: unidadNegocio,
+      asesor: nombreAsesor,
+      cod_localidad: codigoLocalidad,
+      tipozona: tipoZona.toString(),
+      causal_rechazo: mensajeCausal,
+    };
+    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(datos),
+    })
+      .then((res) => res.json())
+      .then((respuesta) => console.log(respuesta.obj.data));
+    notify("El Usuario ha sido Rechazado para ReconoserID");
+    setTimeout(
+      () => navigate("/Solicitud-enrolamiento/validarformulario"),
+      2500
+    );
+  };
+  //----------------Traer Datos Asesor Cuando los parametros vienen en URL---------------------//
   useEffect(() => {
-    if (datosParams?.length > 0) {
+    if (datosParams?.length > 0 && datosParams[0]["asesor"] != "") {
+      console.log(datosParams);
       const datos = {
         asesor: datosParams[0]["asesor"],
       };
       fetchData(`${url}/asesores?nom_asesor=${datos["asesor"]}`, "GET").then(
         (respuesta) => {
-          SetDatosAsesor(respuesta.obj.results);
+          dato: SetDatosAsesor(respuesta.obj.results);
+          zon: setTipoZonaLink(
+            respuesta.obj.results[0]["responsable"]["zona_id_zona"]
+          );
         }
       );
     }
   }, [datosParams]);
 
+  //----------------Traer Todos los Asesores para Seleccionar cuando hay un AutoEnrolamiento---------------------//
+  useEffect(() => {
+    if (datosParams?.length > 0) {
+      fetchData(`${url}/asesores`, "GET").then((respuesta) => {
+        SetAsesores(respuesta.obj.results);
+      });
+    }
+  }, [datosParams]);
+
+  //----------------Traer Datos Asesor Seleccionado Cuando es por AutoEnrolamiento---------------------//
+  useEffect(() => {
+    if (nombreAsesor) {
+      fetchData(`${url}/asesores?nom_asesor=${nombreAsesor}`, "GET").then(
+        (respuesta) => {
+          data: SetDatosNombreAsesor(respuesta.obj.results);
+          respon: setPersonaResponsable(
+            respuesta.obj.results[0]["responsable"]["nombre"]
+          );
+          zona: setTipoZona(
+            respuesta.obj.results[0]["responsable"]["zona_id_zona"]
+          );
+        }
+      );
+    }
+  }, [nombreAsesor]);
+
+  //----------------Funcion Para Enviar Mensaje de Rechazo---------------------//
+
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+  }, []);
+
+  const fConfirmarRechazo = (e) => {
+    e.preventDefault();
+    setConfirmarRechazo(true);
+    setShowModal(true);
+  };
   const fCausalRechazo = (e) => {
     e.preventDefault();
     setCausal(true);
   };
+  //----------------Traer Zonas Verificar, No se Esta Usando ??---------------------//
   useEffect(() => {
     fetchData(`${url}/zonas`, "GET", {
       limit: 0,
@@ -160,57 +268,16 @@ const VerificacionFormulario = () => {
       )
     );
   }, []);
-  console.log(zonas);
 
-  /*   useEffect(() => {
-    if (datosAsesor) {
-      fetchData(
-        `${url}/responsables?nombre=${datosAsesor[0].responsable["nombre"]}`
-      ).then((respuesta) => {
-        if (respuesta.obj.results[0]["zona"]["municipios"]?.length > 0) {
-          const codResDane = [
-            ...respuesta.obj.results[0]["zona"]["municipios"].map((e) =>
-              parseInt(e)
-            ),
-          ];
-          SetCodDaneResponsable(codResDane);
-          const movie = [];
-          codResDane.forEach((element, i) => {
-            movie.push(
-              fetchData(
-                `${url}/localidades?cod_dane=${codResDane[i]}&limit=${0}`
-              ).then((res) => res)
-            );
-          });
-
-          Promise.all(movie).then((value) => {
-            console.log(value);
-            SetT(value);
-          });
-
-          SetP([
-            ...t.map((element, i) =>
-              t[i].obj.results.map(
-                ({ id_localidad, nom_localidad }) =>
-                  `${id_localidad}${nom_localidad}`
-              )
-            ),
-          ]);
-
-     
-        }
-      });
-    }
-  }, [datosAsesor]); */
+  //----------------Obtener Localidades Con El Codigo Dane Del Responsable---------------------//
   useEffect(() => {
     if (datosAsesor) {
-      gedCodsDaneResponsable().then(
-        (value) => SetP(value.map((datosCodLoc) => datosCodLoc)),
-        console.log(p)
+      gedCodsDaneResponsable().then((value) =>
+        setCodigoDane(value.map((datosCodLoc) => datosCodLoc))
       );
     }
   }, [datosAsesor]);
-
+  //----------------Traer Codigos Dane Del Responsable---------------------//
   const gedCodsDaneResponsable = async () => {
     try {
       const consultaResponsable = await fetchData(
@@ -235,315 +302,309 @@ const VerificacionFormulario = () => {
     }
   };
 
+  //----------------Traer Codigos Dane Del Responsable Por AutoEnrolamiento---------------------//
+  //----------------Obtener Localidades Con El Codigo Dane Del Responsable---------------------//
+  useEffect(() => {
+    console.log(nombreAsesor);
+    if (nombreAsesor) {
+      gedCodsDaneResponsableAutoEnr().then((value) =>
+        setCodigoDane(value.map((datosCodLoc) => datosCodLoc))
+      );
+    }
+  }, [datosNombreAsesor]);
+  //----------------Traer Codigos Dane Del Responsable---------------------//
+  const gedCodsDaneResponsableAutoEnr = async () => {
+    try {
+      const consultaResponsableAutoEn = await fetchData(
+        `${url}/responsables?nombre=${datosNombreAsesor[0].responsable["nombre"]}`
+      );
+      const codsDaneResponsableAutoEn = [
+        ...consultaResponsableAutoEn.obj.results[0]["zona"]["municipios"].map(
+          (codigos) => parseInt(codigos)
+        ),
+      ];
+      const guardarFetchAutoEn = [];
+      for (const codigoIterado of codsDaneResponsableAutoEn) {
+        const respuestaLocalidadAutoEn = await fetchData(
+          `${url}/localidades?cod_dane=${codigoIterado}&limit=${0}`
+        );
+        guardarFetchAutoEn.push(...respuestaLocalidadAutoEn.obj.results);
+      }
+
+      return guardarFetchAutoEn;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //----------------Traer Datos Localidad Correspondencia---------------------//
+  useEffect(() => {
+    if (datosParams) {
+      fetchData(
+        `${url}/localidades?id_localidad=${datosParams[0]["localidad_correspondencia"]}`,
+        "GET"
+      ).then((respuesta) =>
+        SetNombreLocalidadCorrespondencia(respuesta.obj.results)
+      );
+    }
+  }, [datosParams]);
+
+  //----------------Traer Datos Localidad Comercio---------------------//
+  useEffect(() => {
+    if (datosParams) {
+      fetchData(
+        `${url}/localidades?id_localidad=${datosParams[0]["localidad_bogota"]}`,
+        "GET"
+      ).then((respuesta) => SetNombreLocalidadComercio(respuesta.obj.results));
+    }
+  }, [datosParams]);
   return (
     <div>
-      {datosParams && datosAsesor ? (
-        <Form>
-          <Input
-            label={"Nombre Comercio"}
-            placeholder={datosParams[0]["nombre_comercio"]}
-            disabled
-          ></Input>
-          <Fieldset
-            legend="Asesor"
-            className="lg:col-span-3
- "
-          >
+      {datosParams != "" ? (
+        datosParams[0]["asesor"] != "" ? (
+          <Form>
             <Input
-              label={"Nombre Asesor"}
-              placeholder={datosParams[0]["asesor"]}
+              label={"Nombre Comercio"}
+              value={datosParams[0]["nombre_comercio"]}
               disabled
             ></Input>
-
-            {/* {datosParams[0]["asesor_comercial_localidad"].length != "" ? (
+            <Fieldset legend="Asesor" className="lg:col-span-3">
               <Input
-                label={"Asesor Comercial Localidad"}
-                placeholder={datosParams[0]["asesor_comercial_localidad"]}
+                label={"Nombre Asesor"}
+                value={datosParams[0]["asesor"]}
                 disabled
               ></Input>
-            ) : (
-              <Select
-                onChange={(event) =>
-                  setAsesorComercialLocalidad(event.target.value)
-                }
-                id="comissionType"
-                name="comissionType"
-                label={`Asesor Comercial Localidad`}
-                options={{
-                  "": "",
-                  "01 Asesor Kennedy": "01 Asesor Kennedy",
-                  "02 Asesor Engativa": "02 Asesor Engativa",
-                  "03 Asesor Bosa": "03 Asesor Bosa",
-                }}
-              ></Select>
-            )} */}
-
-            {datosParams[0]["cod_localidad"].length != "" ? (
-              <Input
-                label={"Cod Localidad"}
-                placeholder={datosParams[0]["cod_localidad"]}
-                disabled
-              ></Input>
-            ) : (
-              <Select
-                onChange={(event) => setCodigoLocalidad(event.target.value)}
-                id="comissionType"
-                name="comissionType"
-                label={`Cod Localidad`}
-                options={
-                  Object.fromEntries([
-                    ["", ""],
-                    ...p.map(({ id_localidad, nom_localidad }) => {
-                      return [`${id_localidad}${" "}${nom_localidad}`];
-                    }),
-                  ]) || { "": "" }
-                }
-              ></Select>
-            )}
-
-            {datosAsesor[0].length != "" ? (
-              <Input
-                label={"Responsable"}
-                placeholder={datosAsesor[0].responsable["nombre"]}
-                disabled
-              ></Input>
-            ) : (
-              ""
-            )}
-
-            {datosAsesor[0]["unidades_de_negocio"].length != "" ? (
-              <Select
-                onChange={(event) => setUnidadNegocio(event.target.value)}
-                id="comissionType"
-                name="comissionType"
-                value={unidadNegocio}
-                label={`Unidad De Negocio`}
-                options={
-                  Object.fromEntries([
-                    ["", ""],
-                    ...datosAsesor[0].unidades_de_negocio.map(
-                      ({ nom_unidad_neg }) => {
-                        return [nom_unidad_neg];
-                      }
-                    ),
-                  ]) || { "": "" }
-                }
-              ></Select>
-            ) : (
-              ""
-            )}
-
-            {/* {datosParams[0]["tipozona"] != null */}
-            {datosAsesor[0]["responsable"].length != "" ? (
-              <Input
-                label={"Tipo Zona"}
-                placeholder={
-                  datosAsesor[0].responsable["zona_id_zona"] === 1
-                    ? "Centro"
-                    : datosAsesor[0].responsable["zona_id_zona"] === 2
-                    ? "Norte"
-                    : datosAsesor[0].responsable["zona_id_zona"] === 3
-                    ? "Occidente"
-                    : datosAsesor[0].responsable["zona_id_zona"]
-                }
-                disabled
-              ></Input>
-            ) : (
-              ""
-            )}
-          </Fieldset>
-          <Fieldset
-            legend="Representante legal"
-            className="lg:col-span-3
- "
-          >
-            <Input
-              label={"Nombre"}
-              placeholder={datosParams[0]["nombre"]}
-              disabled
-            ></Input>
-
-            <Input
-              label={"Apellido"}
-              placeholder={datosParams[0]["apellido"]}
-            ></Input>
-            <Input
-              label={"N° Documento"}
-              placeholder={datosParams[0]["numdoc"]}
-              disabled
-            ></Input>
-            <Input
-              label="Tipo de Identificación"
-              placeholder={datosParams[0]["tipodoc"]}
-              disabled
-            ></Input>
-          </Fieldset>
-
-          <Fieldset
-            legend="Empresa"
-            className="lg:col-span-3
- "
-          >
-            <Input
-              label={"N° NIT"}
-              placeholder={datosParams[0]["numnit"]}
-              disabled
-            ></Input>
-            <Input
-              label={"N° Camara & Comercio"}
-              placeholder={datosParams[0]["numcamycom"]}
-              disabled
-            ></Input>
-            <Input
-              label={"N° RUT"}
-              placeholder={datosParams[0]["numrut"]}
-              disabled
-            ></Input>
-
-            <Input
-              label={"Actividad Economica"}
-              placeholder={datosParams[0]["actividad_economica"]}
-              disabled
-            ></Input>
-
-            <Input
-              label={"Responsable del iva"}
-              placeholder={datosParams[0]["responsableiva"]}
-              disabled
-            ></Input>
-            {/*   <Input
-              label={"Tipo de Establecimiento"}
-              placeholder={datosParams[0]["tipo_establecimiento"]}
-              disabled
-            ></Input> */}
-          </Fieldset>
-
-          <Fieldset legend="Contacto" className="lg:col-span-3">
-            <Input
-              label={"Celular"}
-              placeholder={datosParams[0]["celular"]}
-              disabled
-            />
-
-            <Input
-              label={"Email"}
-              placeholder={datosParams[0]["email"]}
-              disabled
-            />
-            <Input
-              label={"Autoriza a Soluciones en Red de Enviar Mensajes"}
-              placeholder={datosParams[0]["autosms"]}
-              disabled
-            />
-          </Fieldset>
-          <Fieldset legend="Ubicación Comercio" className="lg:col-span-3">
-            <Input
-              label={"Municipio"}
-              placeholder={datosParams[0]["municipio"]}
-              disabled
-            />
-
-            <Input
-              label={"Departamento"}
-              placeholder={datosParams[0]["departamento"]}
-              disabled
-            />
-            <Input
-              label={"Barrio"}
-              placeholder={datosParams[0]["barrio"]}
-              disabled
-            />
-            {datosParams[0]["localidad_bogota"].length > 0 ? (
-              <Input
-                label={"Localidad"}
-                placeholder={datosParams[0]["localidad_bogota"]}
-                disabled
-              />
-            ) : (
-              ""
-            )}
-
-            <Input
-              label={"Direccion"}
-              placeholder={datosParams[0]["direccion_comercio"]}
-              disabled
-            />
-          </Fieldset>
-          <Fieldset
-            legend="Ubicación Correspondencia"
-            className="lg:col-span-3"
-          >
-            <Input
-              label={"Municipio"}
-              placeholder={datosParams[0]["municipio_correspondencia"]}
-              disabled
-            />
-
-            <Input
-              label={"Departamento"}
-              placeholder={datosParams[0]["departamento_correspondencia"]}
-              disabled
-            />
-            <Input
-              label={"Barrio"}
-              placeholder={datosParams[0]["barrio_correspondencia"]}
-              disabled
-            />
-            {datosParams[0]["localidad_correspondencia"].length > 0 ? (
-              <Input
-                label={"Localidad"}
-                placeholder={datosParams[0]["localidad_correspondencia"]}
-                disabled
-              />
-            ) : (
-              ""
-            )}
-            <Input
-              label={"Direccion"}
-              placeholder={datosParams[0]["direccion_correspondencia"]}
-              disabled
-            />
-          </Fieldset>
-
-          <Fieldset className={"lg:col-span-2"}>
-            <div
-              className="w-full h-120 " /* style={{ width: "100%", height: "100%" }} */
-            >
-              {true ? (
-                <object
-                  // data={`data:application/pdf;base64,${archivo}`}
-                  data={`${urlPdfs["cc"]}`}
-                  type="application/pdf"
-                  width="100%"
-                  height="100%"
-                ></object>
+              {datosParams[0]["cod_localidad"] != "" ? (
+                <Input
+                  label={"Cod Localidad"}
+                  value={datosParams[0]["cod_localidad"]}
+                  disabled
+                ></Input>
+              ) : (
+                <Select
+                  onChange={(event) => setCodigoLocalidad(event.target.value)}
+                  id="comissionType"
+                  name="comissionType"
+                  label={`Cod Localidad`}
+                  options={
+                    Object.fromEntries([
+                      ["N/A", "N/A"],
+                      ...codigoDane.map(({ id_localidad, nom_localidad }) => {
+                        return [`${id_localidad}${" "}${nom_localidad}`];
+                      }),
+                    ]) || { "": "" }
+                  }
+                ></Select>
+              )}
+              {datosAsesor[0] && datosAsesor[0].responsable["nombre"] != "" ? (
+                <Input
+                  label={"Responsable"}
+                  value={datosAsesor[0].responsable["nombre"]}
+                  disabled
+                ></Input>
               ) : (
                 ""
               )}
-            </div>
-            <div
-              className="w-full h-120  " /* style={{ width: "100%", height: "100%" }} */
-            >
-              {true ? (
-                <object
-                  // data={`data:application/pdf;base64,${archivo}`}
-                  data={`${urlPdfs["rut"]}`}
-                  type="application/pdf"
-                  width="100%"
-                  height="100%"
-                ></object>
+              {datosAsesor[0] &&
+              datosAsesor[0]["unidades_de_negocio"] != "" &&
+              datosParams[0]["unidad_negocio"] == "" ? (
+                <Select
+                  onChange={(event) => setUnidadNegocio(event.target.value)}
+                  id="comissionType"
+                  name="comissionType"
+                  value={unidadNegocio}
+                  label={`Unidad De Negocio`}
+                  options={
+                    Object.fromEntries([
+                      ["", ""],
+                      ...datosAsesor[0].unidades_de_negocio.map(
+                        ({ nom_unidad_neg }) => {
+                          return [nom_unidad_neg];
+                        }
+                      ),
+                    ]) || { "": "" }
+                  }
+                ></Select>
+              ) : (
+                <Input
+                  label={"Unidad De Negocio"}
+                  value={datosParams[0]["unidad_negocio"]}
+                  disabled
+                ></Input>
+              )}
+              {datosAsesor[0] && datosAsesor[0]["responsable"] != "" ? (
+                <Input
+                  label={"Tipo Zona"}
+                  value={
+                    datosAsesor[0].responsable["zona_id_zona"] === 1
+                      ? "Centro"
+                      : datosAsesor[0].responsable["zona_id_zona"] === 2
+                      ? "Norte"
+                      : datosAsesor[0].responsable["zona_id_zona"] === 3
+                      ? "Occidente"
+                      : datosAsesor[0].responsable["zona_id_zona"]
+                  }
+                  disabled
+                ></Input>
               ) : (
                 ""
               )}
-            </div>
-            {urlPdfs["camara"] ? (
+            </Fieldset>
+            <Fieldset
+              legend="Representante legal"
+              className="lg:col-span-3
+ "
+            >
+              <Input
+                label={"Nombre"}
+                value={datosParams[0]["nombre"]}
+                disabled
+              ></Input>
+
+              <Input
+                label={"Apellido"}
+                value={datosParams[0]["apellido"]}
+                disabled
+              ></Input>
+              <Input
+                label={"N° Documento"}
+                value={datosParams[0]["numdoc"]}
+                disabled
+              ></Input>
+              <Input
+                label="Tipo de Identificación"
+                value={datosParams[0]["tipodoc"]}
+                disabled
+              ></Input>
+            </Fieldset>
+
+            <Fieldset
+              legend="Empresa"
+              className="lg:col-span-3
+ "
+            >
+              <Input
+                label={"N° NIT"}
+                value={datosParams[0]["numnit"]}
+                disabled
+              ></Input>
+              <Input
+                label={"N° Camara & Comercio"}
+                value={datosParams[0]["numcamycom"]}
+                disabled
+              ></Input>
+              <Input
+                label={"N° RUT"}
+                value={datosParams[0]["numrut"]}
+                disabled
+              ></Input>
+
+              <Input
+                label={"Actividad Economica"}
+                value={datosParams[0]["actividad_economica"]}
+                disabled
+              ></Input>
+
+              <Input
+                label={"Responsable del iva"}
+                value={datosParams[0]["responsableiva"]}
+                disabled
+              ></Input>
+            </Fieldset>
+
+            <Fieldset legend="Contacto" className="lg:col-span-3">
+              <Input
+                label={"Celular"}
+                value={datosParams[0]["celular"]}
+                disabled
+              />
+
+              <Input label={"Email"} value={datosParams[0]["email"]} disabled />
+              <Input
+                label={"Autoriza a Soluciones en Red de Enviar Mensajes"}
+                value={datosParams[0]["autosms"]}
+                disabled
+              />
+            </Fieldset>
+            <Fieldset legend="Ubicación Comercio" className="lg:col-span-3">
+              <Input
+                label={"Municipio"}
+                value={datosParams[0]["municipio"]}
+                disabled
+              />
+
+              <Input
+                label={"Departamento"}
+                value={datosParams[0]["departamento"]}
+                disabled
+              />
+              <Input
+                label={"Barrio"}
+                value={datosParams[0]["barrio"]}
+                disabled
+              />
+              {datosParams[0]["localidad_bogota"].length > 0 &&
+              nombreLocalidadComercio ? (
+                <Input
+                  label={"Localidad"}
+                  value={nombreLocalidadComercio[0]["nom_localidad"]}
+                  disabled
+                />
+              ) : (
+                ""
+              )}
+
+              <Input
+                label={"Direccion"}
+                value={datosParams[0]["direccion_comercio"]}
+                disabled
+              />
+            </Fieldset>
+            <Fieldset
+              legend="Ubicación Correspondencia"
+              className="lg:col-span-3"
+            >
+              <Input
+                label={"Municipio"}
+                value={datosParams[0]["municipio_correspondencia"]}
+                disabled
+              />
+
+              <Input
+                label={"Departamento"}
+                value={datosParams[0]["departamento_correspondencia"]}
+                disabled
+              />
+              <Input
+                label={"Barrio"}
+                value={datosParams[0]["barrio_correspondencia"]}
+                disabled
+              />
+              {datosParams[0]["localidad_correspondencia"].length > 0 &&
+              nombreLocalidadCorrespondencia ? (
+                <Input
+                  label={"Localidad"}
+                  value={nombreLocalidadCorrespondencia[0]["nom_localidad"]}
+                  disabled
+                />
+              ) : (
+                ""
+              )}
+              <Input
+                label={"Direccion"}
+                value={datosParams[0]["direccion_correspondencia"]}
+                disabled
+              />
+            </Fieldset>
+
+            <Fieldset className={"lg:col-span-2"}>
               <div
-                className="w-full h-120  " /* style={{ width: "100%", height: "100%" }} */
+                className="w-full h-120 " /* style={{ width: "100%", height: "100%" }} */
               >
                 {true ? (
                   <object
                     // data={`data:application/pdf;base64,${archivo}`}
-                    data={`${urlPdfs["camara"]}`}
+                    data={`${urlPdfs["cc"]}`}
                     type="application/pdf"
                     width="100%"
                     height="100%"
@@ -552,55 +613,43 @@ const VerificacionFormulario = () => {
                   ""
                 )}
               </div>
-            ) : (
-              ""
-            )}
-          </Fieldset>
-          {/*  <Fieldset>
-            <div className={contenedorCausalRechazo}>
-              <h2>
-                Si el Comercio no cumple con los requisitos, por favor agrege un
-                causal de rechazo.
-              </h2>
-              <textarea
-                className={"flex lg:row-span-0"}
-                type="input"
-                minLength="1"
-                maxLength="160"
-                autoComplete="off"
-                value={causal}
-                onInput={(e) => {
-                  setCausal(e.target.value);
-                }}
-              ></textarea>
-            </div>
-          </Fieldset> */}
-
-          <div>
-            <div className={contenedorPrincipalBotones}>
-              <div className={contenedorBotones}>
-                <Button
-                  type="submit"
-                  onClick={(e) => {
-                    aprobacionFormulario(e);
-                  }}
-                >
-                  Aprobar Comercio
-                </Button>
+              <div
+                className="w-full h-120  " /* style={{ width: "100%", height: "100%" }} */
+              >
+                {true ? (
+                  <object
+                    // data={`data:application/pdf;base64,${archivo}`}
+                    data={`${urlPdfs["rut"]}`}
+                    type="application/pdf"
+                    width="100%"
+                    height="100%"
+                  ></object>
+                ) : (
+                  ""
+                )}
               </div>
-
-              <div className={contenedorBotones}>
-                <Button
-                  type="submit"
-                  onClick={(e) => {
-                    fCausalRechazo(e);
-                  }}
+              {urlPdfs["camara"] ? (
+                <div
+                  className="w-full h-120  " /* style={{ width: "100%", height: "100%" }} */
                 >
-                  Rechazar Comercio
-                </Button>
-              </div>
-            </div>
-            {/* {guardarDatosAsesor ? (
+                  {true ? (
+                    <object
+                      // data={`data:application/pdf;base64,${archivo}`}
+                      data={`${urlPdfs["camara"]}`}
+                      type="application/pdf"
+                      width="100%"
+                      height="100%"
+                    ></object>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              ) : (
+                ""
+              )}
+            </Fieldset>
+
+            <div>
               <div className={contenedorPrincipalBotones}>
                 <div className={contenedorBotones}>
                   <Button
@@ -617,96 +666,475 @@ const VerificacionFormulario = () => {
                   <Button
                     type="submit"
                     onClick={(e) => {
-                      rechazarFormulario(e);
-                      setCausal(true);
+                      fConfirmarRechazo(e);
                     }}
                   >
                     Rechazar Comercio
                   </Button>
                 </div>
               </div>
-            ) : datosParams[0]["tipozona"] &&
-              datosParams[0]["unidad_negocio"] &&
-              datosParams[0]["responsable"] &&
-              datosParams[0]["cod_localidad"] &&
-              datosParams[0]["asesor_comercial_localidad"] &&
-              datosParams[0]["asesor_comercial_localidad"] &&
-              datosParams[0]["asesor"] ? (
-              <div className={contenedorPrincipalBotones}>
-                <div className={contenedorBotones}>
-                  <Button
-                    type="submit"
-                    onClick={(e) => {
-                      aprobacionFormulario(e);
-                    }}
-                  >
-                    Aprobar Comercio
-                  </Button>
-                </div>
+              {confirmarRechazo ? (
+                <Modal show={showModal} handleClose={handleClose}>
+                  <LogoPDP></LogoPDP>
 
-                <div className={contenedorBotones}>
-                  <Button
-                    type="submit"
-                    onClick={(e) => {
-                      rechazarFormulario(e);
-                      setCausal(true);
-                    }}
-                  >
-                    Rechazar Comercio
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className={contenedorBotones}>
-                <Button
-                  type="submit"
-                  onClick={(e) => {
-                    guardarDatos(e);
-                  }}
-                >
-                  Guardar Datos
-                </Button>
-              </div>
-            )} */}
-            {causal ? (
-              <Modal show>
-                <LogoPDP></LogoPDP>
+                  <div className={contenedorCausalRechazo}>
+                    <div className={autorizacionMensajes}>
+                      <span className={titulosSecundarios}>
+                        ¿Esta Seguro de Rechazar Este Comercio?
+                      </span>
+                    </div>
 
-                <div className={contenedorCausalRechazo}>
-                  <div className={autorizacionMensajes}>
-                    <span className={titulosSecundarios}>
-                      Si el Comercio no cumple con los requisitos, por favor
-                      agrege un causal de rechazo.
-                    </span>
+                    <div className={contenedorBotones}>
+                      <Button
+                        type="submit"
+                        onClick={(e) => {
+                          fCausalRechazo(e);
+                        }}
+                      >
+                        Si
+                      </Button>
+                      {/*      <Button
+                        type="submit"
+                        onClick={(e) => {
+                          rechazarFormulario(e);
+                        }}
+                      >
+                     No
+                      </Button> */}
+                    </div>
                   </div>
-                  <textarea
-                    className={textTarea}
-                    type="input"
-                    minLength="1"
-                    maxLength="160"
-                    autoComplete="off"
-                    value={mensajeCausal}
-                    onInput={(e) => {
-                      setMensajeCausal(e.target.value);
-                    }}
-                  ></textarea>
-                  <div className={contenedorBotones}>
-                    <Button
-                      type="submit"
-                      onClick={(e) => {
-                        rechazarFormulario(e);
+                </Modal>
+              ) : (
+                ""
+              )}
+
+              {causal ? (
+                <Modal show={showModal} handleClose={handleClose}>
+                  <LogoPDP></LogoPDP>
+
+                  <div className={contenedorCausalRechazo}>
+                    <div className={autorizacionMensajes}>
+                      <span className={titulosSecundarios}>
+                        Si el Comercio no cumple con los requisitos, por favor
+                        agrege un causal de rechazo.
+                      </span>
+                    </div>
+                    <textarea
+                      className={textTarea}
+                      type="input"
+                      minLength="1"
+                      maxLength="160"
+                      autoComplete="off"
+                      value={mensajeCausal}
+                      onInput={(e) => {
+                        setMensajeCausal(e.target.value);
                       }}
-                    >
-                      Enviar Mensaje y Rechazar
-                    </Button>
+                    ></textarea>
+                    <div className={contenedorBotones}>
+                      <Button
+                        type="submit"
+                        onClick={(e) => {
+                          rechazarFormulario(e);
+                        }}
+                      >
+                        Enviar Mensaje y Rechazar
+                      </Button>
+                    </div>
                   </div>
+                </Modal>
+              ) : (
+                ""
+              )}
+            </div>
+          </Form>
+        ) : asesores ? (
+          <Form>
+            <Input
+              label={"Nombre Comercio"}
+              value={datosParams[0]["nombre_comercio"]}
+              disabled
+            ></Input>
+            <Fieldset legend="Asesor" className="lg:col-span-3">
+              <Select
+                onChange={(event) => SetNombreAsesor(event.target.value)}
+                id="comissionType"
+                name="comissionType"
+                value={nombreAsesor}
+                label={`Nombre Asesor`}
+                options={
+                  Object.fromEntries([
+                    ["", ""],
+                    ...asesores.map(({ nom_asesor }) => {
+                      return [nom_asesor];
+                    }),
+                  ]) || { "": "" }
+                }
+              ></Select>
+              {nombreAsesor && datosNombreAsesor ? (
+                <Fragment>
+                  <Input
+                    label={"Responsable"}
+                    value={datosNombreAsesor[0]["responsable"]["nombre"]}
+                    disabled
+                  ></Input>
+                </Fragment>
+              ) : (
+                ""
+              )}
+              {datosNombreAsesor ? (
+                <Select
+                  onChange={(event) => setUnidadNegocio(event.target.value)}
+                  id="comissionType"
+                  name="comissionType"
+                  value={unidadNegocio}
+                  label={`Unidad De Negocio`}
+                  options={
+                    Object.fromEntries([
+                      ["", ""],
+                      ...datosNombreAsesor[0].unidades_de_negocio.map(
+                        ({ nom_unidad_neg }) => {
+                          return [nom_unidad_neg];
+                        }
+                      ),
+                    ]) || { "": "" }
+                  }
+                ></Select>
+              ) : (
+                ""
+              )}
+              {datosNombreAsesor ? (
+                <Fragment>
+                  <Input
+                    label={"Tipo Zona"}
+                    value={
+                      datosNombreAsesor[0].responsable["zona_id_zona"] === 1
+                        ? "Centro"
+                        : datosNombreAsesor[0].responsable["zona_id_zona"] === 2
+                        ? "Norte"
+                        : datosNombreAsesor[0].responsable["zona_id_zona"] === 3
+                        ? "Occidente"
+                        : datosNombreAsesor[0].responsable["zona_id_zona"]
+                    }
+                    disabled
+                  ></Input>
+                  <Select
+                    onChange={(event) => setCodigoLocalidad(event.target.value)}
+                    id="comissionType"
+                    name="comissionType"
+                    label={`Cod Localidad`}
+                    options={
+                      Object.fromEntries([
+                        ["N/A", "N/A"],
+                        ...codigoDane.map(({ id_localidad, nom_localidad }) => {
+                          return [`${id_localidad}${" "}${nom_localidad}`];
+                        }),
+                      ]) || { "": "" }
+                    }
+                  ></Select>
+                </Fragment>
+              ) : (
+                ""
+              )}
+            </Fieldset>
+            <Fieldset
+              legend="Representante legal"
+              className="lg:col-span-3
+"
+            >
+              <Input
+                label={"Nombre"}
+                value={datosParams[0]["nombre"]}
+                disabled
+              ></Input>
+
+              <Input
+                label={"Apellido"}
+                value={datosParams[0]["apellido"]}
+              ></Input>
+              <Input
+                label={"N° Documento"}
+                value={datosParams[0]["numdoc"]}
+                disabled
+              ></Input>
+              <Input
+                label="Tipo de Identificación"
+                value={datosParams[0]["tipodoc"]}
+                disabled
+              ></Input>
+            </Fieldset>
+
+            <Fieldset
+              legend="Empresa"
+              className="lg:col-span-3
+"
+            >
+              <Input
+                label={"N° NIT"}
+                value={datosParams[0]["numnit"]}
+                disabled
+              ></Input>
+              <Input
+                label={"N° Camara & Comercio"}
+                value={datosParams[0]["numcamycom"]}
+                disabled
+              ></Input>
+              <Input
+                label={"N° RUT"}
+                value={datosParams[0]["numrut"]}
+                disabled
+              ></Input>
+
+              <Input
+                label={"Actividad Economica"}
+                value={datosParams[0]["actividad_economica"]}
+                disabled
+              ></Input>
+
+              <Input
+                label={"Responsable del iva"}
+                value={datosParams[0]["responsableiva"]}
+                disabled
+              ></Input>
+            </Fieldset>
+
+            <Fieldset legend="Contacto" className="lg:col-span-3">
+              <Input
+                label={"Celular"}
+                value={datosParams[0]["celular"]}
+                disabled
+              />
+
+              <Input label={"Email"} value={datosParams[0]["email"]} disabled />
+              <Input
+                label={"Autoriza a Soluciones en Red de Enviar Mensajes"}
+                value={datosParams[0]["autosms"]}
+                disabled
+              />
+            </Fieldset>
+            <Fieldset legend="Ubicación Comercio" className="lg:col-span-3">
+              <Input
+                label={"Municipio"}
+                value={datosParams[0]["municipio"]}
+                disabled
+              />
+
+              <Input
+                label={"Departamento"}
+                value={datosParams[0]["departamento"]}
+                disabled
+              />
+              <Input
+                label={"Barrio"}
+                value={datosParams[0]["barrio"]}
+                disabled
+              />
+              {datosParams[0]["localidad_bogota"].length > 0 &&
+              nombreLocalidadComercio ? (
+                <Input
+                  label={"Localidad"}
+                  value={nombreLocalidadComercio[0]["nom_localidad"]}
+                  disabled
+                />
+              ) : (
+                ""
+              )}
+
+              <Input
+                label={"Direccion"}
+                value={datosParams[0]["direccion_comercio"]}
+                disabled
+              />
+            </Fieldset>
+            <Fieldset
+              legend="Ubicación Correspondencia"
+              className="lg:col-span-3"
+            >
+              <Input
+                label={"Municipio"}
+                value={datosParams[0]["municipio_correspondencia"]}
+                disabled
+              />
+
+              <Input
+                label={"Departamento"}
+                value={datosParams[0]["departamento_correspondencia"]}
+                disabled
+              />
+              <Input
+                label={"Barrio"}
+                value={datosParams[0]["barrio_correspondencia"]}
+                disabled
+              />
+              {datosParams[0]["localidad_correspondencia"].length > 0 &&
+              nombreLocalidadCorrespondencia ? (
+                <Input
+                  label={"Localidad"}
+                  value={nombreLocalidadCorrespondencia[0]["nom_localidad"]}
+                  disabled
+                />
+              ) : (
+                ""
+              )}
+              <Input
+                label={"Direccion"}
+                value={datosParams[0]["direccion_correspondencia"]}
+                disabled
+              />
+            </Fieldset>
+
+            <Fieldset className={"lg:col-span-2"}>
+              <div
+                className="w-full h-120 " /* style={{ width: "100%", height: "100%" }} */
+              >
+                {true ? (
+                  <object
+                    // data={`data:application/pdf;base64,${archivo}`}
+                    data={`${urlPdfs["cc"]}`}
+                    type="application/pdf"
+                    width="100%"
+                    height="100%"
+                  ></object>
+                ) : (
+                  ""
+                )}
+              </div>
+              <div
+                className="w-full h-120  " /* style={{ width: "100%", height: "100%" }} */
+              >
+                {true ? (
+                  <object
+                    // data={`data:application/pdf;base64,${archivo}`}
+                    data={`${urlPdfs["rut"]}`}
+                    type="application/pdf"
+                    width="100%"
+                    height="100%"
+                  ></object>
+                ) : (
+                  ""
+                )}
+              </div>
+              {urlPdfs["camara"] ? (
+                <div
+                  className="w-full h-120  " /* style={{ width: "100%", height: "100%" }} */
+                >
+                  {true ? (
+                    <object
+                      // data={`data:application/pdf;base64,${archivo}`}
+                      data={`${urlPdfs["camara"]}`}
+                      type="application/pdf"
+                      width="100%"
+                      height="100%"
+                    ></object>
+                  ) : (
+                    ""
+                  )}
                 </div>
-              </Modal>
-            ) : (
-              ""
-            )}
-          </div>
-        </Form>
+              ) : (
+                ""
+              )}
+            </Fieldset>
+
+            <div>
+              <div className={contenedorPrincipalBotones}>
+                <div className={contenedorBotones}>
+                  <Button
+                    type="submit"
+                    onClick={(e) => {
+                      aprobacionFormularioAuto(e);
+                    }}
+                  >
+                    Aprobar Comercio
+                  </Button>
+                </div>
+
+                <div className={contenedorBotones}>
+                  <Button
+                    type="submit"
+                    onClick={(e) => {
+                      fConfirmarRechazo(e);
+                    }}
+                  >
+                    Rechazar Comercio
+                  </Button>
+                </div>
+              </div>
+              {confirmarRechazo ? (
+                <Modal show={showModal} handleClose={handleClose}>
+                  <LogoPDP></LogoPDP>
+
+                  <div className={contenedorCausalRechazo}>
+                    <div className={autorizacionMensajes}>
+                      <span className={titulosSecundarios}>
+                        ¿Esta Seguro de Rechazar Este Comercio?
+                      </span>
+                    </div>
+
+                    <div className={contenedorBotones}>
+                      <Button
+                        type="submit"
+                        onClick={(e) => {
+                          fCausalRechazo(e);
+                        }}
+                      >
+                        Si
+                      </Button>
+                      {/*      <Button
+                        type="submit"
+                        onClick={(e) => {
+                          rechazarFormulario(e);
+                        }}
+                      >
+                     No
+                      </Button> */}
+                    </div>
+                  </div>
+                </Modal>
+              ) : (
+                ""
+              )}
+
+              {causal ? (
+                <Modal show={showModal} handleClose={handleClose}>
+                  <LogoPDP></LogoPDP>
+
+                  <div className={contenedorCausalRechazo}>
+                    <div className={autorizacionMensajes}>
+                      <span className={titulosSecundarios}>
+                        Si el Comercio no cumple con los requisitos, por favor
+                        agrege un causal de rechazo.
+                      </span>
+                    </div>
+                    <textarea
+                      className={textTarea}
+                      type="input"
+                      minLength="1"
+                      maxLength="160"
+                      autoComplete="off"
+                      value={mensajeCausal}
+                      onInput={(e) => {
+                        setMensajeCausal(e.target.value);
+                      }}
+                    ></textarea>
+                    <div className={contenedorBotones}>
+                      <Button
+                        type="submit"
+                        onClick={(e) => {
+                          rechazarFormularioAuto(e);
+                        }}
+                      >
+                        Enviar Mensaje y Rechazar
+                      </Button>
+                    </div>
+                  </div>
+                </Modal>
+              ) : (
+                ""
+              )}
+            </div>
+          </Form>
+        ) : (
+          ""
+        )
       ) : (
         ""
       )}

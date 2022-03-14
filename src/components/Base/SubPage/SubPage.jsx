@@ -13,7 +13,7 @@ const SubPage = ({ label, children }) => {
           </Button>
         </div>
       </div>
-      <div className="flex flex-col justify-center items-center flex-1">
+      <div className="grid grid-flow-row place-items-center flex-1">
         {children}
       </div>
     </div>

@@ -128,7 +128,7 @@ const Reversos = () => {
       console.log(res);
       if ("id_comercio" in res) {
         setComercio(res);
-        reversosFDLM(page, res?.id_comercio, 5, fecha_ini, fecha_fin, true);
+        reversosFDLM(page, res, 5, fecha_ini, fecha_fin, true);
         fetchDane(res?.codigo_dane);
       }
     } catch (err) {
@@ -194,11 +194,11 @@ const Reversos = () => {
     (page, Comercio, Tipo_operacion, date_ini, date_end, state) => {
       const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
       const queries = {};
-      if (!(Comercio === -1 || Comercio === "")) {
-        queries.Comercio = Comercio;
+      if (!(Comercio.id_comercio === -1 || Comercio.id_comercio === "")) {
+        queries.id_comercio = Comercio.id_comercio;
       }
       if (Tipo_operacion) {
-        queries.Tipo_operacion = Tipo_operacion;
+        queries.id_tipo_transaccion = Tipo_operacion;
       }
       if (page) {
         queries.page = page;
@@ -208,7 +208,7 @@ const Reversos = () => {
         queries.date_end = date_end;
       }
       if (state !== undefined || state !== null) {
-        queries.response_status = state;
+        queries.status_trx = state;
       }
       console.log(queries);
       fetchData(url, "GET", queries)
@@ -320,6 +320,7 @@ const Reversos = () => {
     e.preventDefault();
     const values = {
       tipo: comercio?.tipo_comercio,
+      id_dispositivo: comercio?.id_dispositivo,
       usuario: comercio?.id_usuario,
       comercio: comercio?.id_comercio,
       idtrx: selected?.id_transaccion,

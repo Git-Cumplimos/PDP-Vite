@@ -3,32 +3,24 @@ import { useNavigate } from "react-router-dom";
 
 import useQuery from "../../../../hooks/useQuery";
 
-import Table from "../../../../components/Base/Table";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Input from "../../../../components/Base/Input";
-import Pagination from "../../../../components/Compound/Pagination";
-import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
-import {
-  fetchConveniosMany,
-  fetchConvsPerAuto,
-} from "../../utils/fetchRevalConvenios";
 import { fetchComisionesPagar } from "../../utils/fetchComisionesPagar";
-import Modal from "../../../../components/Base/Modal";
-import Form from "../../../../components/Base/Form";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import Button from "../../../../components/Base/Button";
-import { notifyError } from "../../../../utils/notify";
 import { fetchComisionesCobrar } from "../../utils/fetchComisionesCobrar";
 
 const SearchComissions = ({ comissionFace, onSelectItem }) => {
   const [
-    { tipoTrx = "", comercio = "", convenio = "", autorizador = "", page },
+    { tipoTrx = "", comercio = "", convenio = "", autorizador = "" },
     setQuery,
   ] = useQuery();
   const navigate = useNavigate();
 
   const [comissions, setComissions] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
-
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
   const headersTable = useMemo(() => {
     if (comissions.length === 0) {
       return [];
@@ -38,8 +30,12 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     if (headers.includes("id_comision_pagada")) {
       newHeaders.push("Id comisión");
     }
+
     if (headers.includes("id_comision_cobrada")) {
       newHeaders.push("Id comisión");
+    }
+    if (headers.includes("nombre_comision")) {
+      newHeaders.push("Nombre comisión");
     }
     if (headers.includes("nombre_convenio")) {
       newHeaders.push("Convenio");
@@ -72,12 +68,14 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           fecha_inicio,
           fecha_fin,
           estado,
+          nombre_comision,
           nombre_operacion,
           nombre_convenio,
           nombre_autorizador,
         }) => {
           return {
             "Id Comision": id_comision_pagada,
+            "Nombre comision": nombre_comision ?? "",
             Convenio: nombre_convenio ?? "",
             Operacion: nombre_operacion ?? "",
             "Id comercio": id_comercio ?? "",
@@ -99,9 +97,11 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           nombre_autorizador,
           nombre_operacion,
           nombre_convenio,
+          nombre_comision,
         }) => {
           return {
             "Id comision cobrada": id_comision_cobrada,
+            "Nombre comision": nombre_comision ?? "",
             Convenio: nombre_convenio ?? "",
             Operacion: nombre_operacion ?? "",
             Autorizador: nombre_autorizador ?? "",
@@ -168,9 +168,9 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     } else if (comissionFace === "collect") {
       fecthComisionesCobrarFunc();
     }
-  }, [convenio, comercio, tipoTrx, autorizador, page]);
+  }, [convenio, comercio, tipoTrx, autorizador, page, limit]);
   const fecthComisionesPagarFunc = () => {
-    let obj = { page };
+    let obj = { page, limit };
     if (convenio !== "") obj["nombre_convenio"] = convenio;
     if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
     if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
@@ -183,7 +183,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
       .catch((err) => console.error(err));
   };
   const fecthComisionesCobrarFunc = () => {
-    let obj = { page };
+    let obj = { page, limit };
     if (convenio !== "") obj["nombre_convenio"] = convenio;
     if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
     if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
@@ -197,13 +197,23 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
 
   return (
     <Fragment>
-      <Pagination maxPage={maxPages} onChange={onChange} grid>
+      {/* <Pagination maxPage={maxPages} onChange={onChange} grid></Pagination> */}
+      <TableEnterprise
+        title={
+          comissionFace === "pay" ? "Comisiones a pagar" : "Comisiones a cobrar"
+        }
+        maxPage={maxPages}
+        onChange={onChange}
+        headers={headersTable}
+        data={dataTable}
+        onSelectRow={onSelectItem ? passItem : onSelectRow}
+        onSetPageData={setPageData}>
         <Input
           id={"convenioComissions"}
           label={"Convenio"}
           name={"convenio"}
           type={"text"}
-          autoComplete="off"
+          autoComplete='off'
           defaultValue={convenio}
         />
         <Input
@@ -211,7 +221,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           label={"Tipo de operación"}
           name={"tipoTrx"}
           type={"text"}
-          autoComplete="off"
+          autoComplete='off'
           defaultValue={tipoTrx}
         />
         {comissionFace === "pay" ? (
@@ -220,9 +230,9 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               id={"comercioComissions"}
               label={"Id comercio"}
               name={"comercio"}
-              type="number"
+              type='number'
               step={"1"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={comercio}
             />
             <Input
@@ -230,7 +240,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Autorizador"}
               name={"autorizador"}
               type={"text"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={autorizador}
             />
           </Fragment>
@@ -240,23 +250,13 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
             label={"Autorizador"}
             name={"autorizador"}
             type={"text"}
-            autoComplete="off"
+            autoComplete='off'
             defaultValue={autorizador}
           />
         ) : (
           ""
         )}
-      </Pagination>
-      {Array.isArray(comissions) && comissions.length > 0 ? (
-        <Table
-          headers={headersTable}
-          data={dataTable}
-          onSelectRow={onSelectItem ? passItem : onSelectRow}
-          // onSelectRow={onSelectTipoContrato}
-        />
-      ) : (
-        ""
-      )}
+      </TableEnterprise>
     </Fragment>
   );
 };

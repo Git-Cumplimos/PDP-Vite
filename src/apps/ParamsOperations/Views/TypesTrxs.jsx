@@ -7,15 +7,17 @@ import Input from "../../../components/Base/Input";
 import InputSuggestions from "../../../components/Base/InputSuggestions";
 import Modal from "../../../components/Base/Modal";
 import Table from "../../../components/Base/Table";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 import Pagination from "../../../components/Compound/Pagination";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import useQuery from "../../../hooks/useQuery";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
+import { fetchAutorizadores } from "../../TrxParams/utils/fetchRevalAutorizadores";
 
 const url_types = process.env.REACT_APP_URL_TRXS_TRX;
 
-const fetchTrxTypesPages = async (Nombre_operacion, page) => {
+const fetchTrxTypesPages = async (Nombre_operacion, page, limit) => {
   try {
     const res = await fetchData(
       `${url_types}/tipos-operaciones-pagination`,
@@ -23,6 +25,7 @@ const fetchTrxTypesPages = async (Nombre_operacion, page) => {
       {
         Nombre_operacion,
         page,
+        limit,
       }
     );
 
@@ -42,7 +45,7 @@ const fetchAliadosPDPPages = async (nombre) => {
     const res = await fetchData(`${url_types}/aliados-pagination`, "GET", {
       nombre,
       page: 1,
-      limit: 5,
+      limit: 10,
     });
 
     if (res?.status) {
@@ -57,30 +60,45 @@ const fetchAliadosPDPPages = async (nombre) => {
 };
 
 const TypesTrxs = () => {
-  const [{ searchTrxType = "", page = 1 }, setQuery] = useQuery();
+  const [{ searchTrxType = "" }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
   const [maxPages, setMaxPages] = useState(0);
   const [trxTypes, setTrxTypes] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [foundAliados, setFoundAliados] = useState([]);
+  const [autorizadores, setAutorizadores] = useState([]);
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
 
   const tableTrxTypes = useMemo(() => {
-    return trxTypes.map(({ id_tipo_operacion, Aliado, Nombre }) => ({
+    return trxTypes.map(({ id_tipo_operacion, Autorizador, Nombre }) => ({
       Id: id_tipo_operacion,
       "Tipo de transaccion": Nombre,
-      Aliado: Aliado,
+      Autorizador,
     }));
   }, [trxTypes]);
 
-  const mapSuggestionsAliados = useMemo(
-    () => foundAliados.map(({ nombre }) => <h1 className="py-2">{nombre}</h1>),
-    [foundAliados]
+  const mapSuggestionsAutorizadores = useMemo(
+    () =>
+      autorizadores.map(({ nombre_autorizador }) => (
+        <h1 className='py-2'>{nombre_autorizador}</h1>
+      )),
+    [autorizadores]
   );
 
+  const fecthAutorizadoresFunc = useCallback((e) => {
+    fetchAutorizadores({ nombre_autorizador: e.target.value ?? "" })
+      .then((autoArr) => {
+        setMaxPages(autoArr?.maxPages);
+        setAutorizadores(autoArr?.results);
+      })
+      .catch((err) => console.error(err));
+  }, []);
   const searchAliados = useCallback((e) => {
     fetchAliadosPDPPages(e.target.value ?? "")
-      .then((res) => setFoundAliados([...res?.results]))
+      .then((res) => setAutorizadores([...res?.results]))
       .catch((err) => console.error(err));
   }, []);
 
@@ -91,12 +109,12 @@ const TypesTrxs = () => {
           return old;
         }
         const copy = { ...old };
-        copy.NewAliado = foundAliados[i];
-        copy.Aliado = foundAliados[i].nombre;
+        copy.NewAutorizador = autorizadores[i];
+        copy.Autorizador = autorizadores[i].nombre_autorizador;
         return { ...copy };
       });
     },
-    [foundAliados]
+    [autorizadores]
   );
 
   const handleClose = useCallback(() => {
@@ -105,13 +123,13 @@ const TypesTrxs = () => {
   }, []);
 
   const setFoundTrxTypes = useCallback(() => {
-    fetchTrxTypesPages(searchTrxType, page)
+    fetchTrxTypesPages(searchTrxType, page, limit)
       .then((res) => {
         setTrxTypes([...res?.results]);
         setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
-  }, [searchTrxType, page]);
+  }, [searchTrxType, page, limit]);
 
   const onChange = useCallback(
     (e) => {
@@ -134,7 +152,7 @@ const TypesTrxs = () => {
   const onChangeSelected = useCallback((e) => {
     const formData = new FormData(e.target.form);
 
-    const colsInputs = ["Parametros", "Nombre", "Aliado"];
+    const colsInputs = ["Parametros", "Nombre", "Autorizador"];
     const colsParams = ["param_key", "param_value"];
 
     if (
@@ -208,7 +226,7 @@ const TypesTrxs = () => {
     <Fragment>
       <ButtonBar>
         <Button
-          type="submit"
+          type='submit'
           onClick={() => {
             setShowModal(true);
             setSelected({
@@ -216,37 +234,33 @@ const TypesTrxs = () => {
               Aliado: "",
               Parametros: {},
             });
-          }}
-        >
+          }}>
           Crear tipo de transaccion
         </Button>
       </ButtonBar>
-      <Pagination maxPage={maxPages} onChange={onChange} grid>
+      <TableEnterprise
+        title='Convenios'
+        maxPage={maxPages}
+        onChange={onChange}
+        headers={["Id", "Tipo de transaccion", "Autorizador"]}
+        data={tableTrxTypes}
+        onSelectRow={onSelectType}
+        onSetPageData={setPageData}>
         <Input
-          id="searchTrxType"
-          name="searchTrxType"
+          id='searchTrxType'
+          name='searchTrxType'
           label={"Buscar tipo de transaccion"}
-          type="search"
-          autoComplete="off"
+          type='search'
+          autoComplete='off'
           defaultValue={searchTrxType}
         />
-        <ButtonBar></ButtonBar>
-      </Pagination>
-      {Array.isArray(tableTrxTypes) && tableTrxTypes.length > 0 ? (
-        <Table
-          headers={Object.keys(tableTrxTypes[0])}
-          data={tableTrxTypes}
-          onSelectRow={onSelectType}
-        />
-      ) : (
-        ""
-      )}
+      </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         {selected ? (
           <PaymentSummary
-            title="Editar parametros de tipo de transaccion"
+            title='Editar parametros de tipo de transacción'
             // subtitle="Datos tipo de transaccion"
-            subtitle=""
+            subtitle=''
             // summaryTrx={{
             //   Id: selected?.id_tipo_operacion,
             //   Nombre: selected?.Nombre,
@@ -255,27 +269,27 @@ const TypesTrxs = () => {
           >
             <Form onChange={onChangeSelected} onSubmit={onSubmit} grid>
               <Input
-                id="nameTrxType"
-                name="Nombre"
+                id='nameTrxType'
+                name='Nombre'
                 label={"Nombre"}
-                type="search"
-                autoComplete="off"
+                type='search'
+                autoComplete='off'
                 value={selected?.Nombre || ""}
                 readOnly={selected?.id_tipo_operacion}
               />
               <InputSuggestions
-                id="aliadoTrxType"
-                name="Aliado"
-                label={"Aliado"}
-                type="search"
-                autoComplete="off"
-                suggestions={mapSuggestionsAliados || []}
+                id='Autorizador'
+                name='Autorizador'
+                label={"Autorizador"}
+                type='search'
+                autoComplete='off'
+                suggestions={mapSuggestionsAutorizadores || []}
                 onLazyInput={{
-                  callback: searchAliados,
+                  callback: fecthAutorizadoresFunc,
                   timeOut: 500,
                 }}
                 onSelectSuggestion={onSelectSuggestion}
-                value={selected?.Aliado || ""}
+                value={selected?.Autorizador || ""}
                 readOnly={selected?.id_tipo_operacion}
               />
               <Fieldset legend={"Parametros"}>
@@ -283,15 +297,14 @@ const TypesTrxs = () => {
                   ([key, val], index) => {
                     return (
                       <div
-                        className="grid grid-cols-auto-fit-md place-items-center place-content-end"
-                        key={index}
-                      >
+                        className='grid grid-cols-auto-fit-md place-items-center place-content-end'
+                        key={index}>
                         <Input
                           id={`${index}_key`}
                           name={`param_key`}
                           label={"Clave"}
-                          type="text"
-                          autoComplete="off"
+                          type='text'
+                          autoComplete='off'
                           value={key}
                           onInput={() => {}}
                         />
@@ -299,14 +312,14 @@ const TypesTrxs = () => {
                           id={`${index}_value`}
                           name={`param_value`}
                           label={"Valor"}
-                          type="text"
-                          autoComplete="off"
+                          type='text'
+                          autoComplete='off'
                           value={val}
                           onInput={() => {}}
                         />
                         <ButtonBar className={"lg:col-span-2"}>
                           <Button
-                            type="button"
+                            type='button'
                             onClick={() =>
                               setSelected((old) => {
                                 const copy = { ...old };
@@ -318,8 +331,7 @@ const TypesTrxs = () => {
                                   Object.fromEntries(paramsCopy);
                                 return { ...copy };
                               })
-                            }
-                          >
+                            }>
                             Eliminar parametro
                           </Button>
                         </ButtonBar>
@@ -329,7 +341,7 @@ const TypesTrxs = () => {
                 )}
                 <ButtonBar>
                   <Button
-                    type="button"
+                    type='button'
                     onClick={() =>
                       setSelected((old) => {
                         const copy = { ...old };
@@ -338,23 +350,22 @@ const TypesTrxs = () => {
                         copy.Parametros = Object.fromEntries(paramsCopy);
                         return { ...copy };
                       })
-                    }
-                  >
+                    }>
                     Añadir parametro
                   </Button>
                 </ButtonBar>
               </Fieldset>
               {!selected?.id_tipo_operacion ? (
                 <ButtonBar>
-                  <Button type="submit">Crear tipo de transaccion</Button>
-                  <Button type="button" onClick={handleClose}>
+                  <Button type='submit'>Crear tipo de transaccion</Button>
+                  <Button type='button' onClick={handleClose}>
                     Cancelar
                   </Button>
                 </ButtonBar>
               ) : (
                 <ButtonBar>
-                  <Button type="submit">Editar tipo de transaccion</Button>
-                  <Button type="button" onClick={handleClose}>
+                  <Button type='submit'>Editar tipo de transaccion</Button>
+                  <Button type='button' onClick={handleClose}>
                     Cancelar
                   </Button>
                 </ButtonBar>
