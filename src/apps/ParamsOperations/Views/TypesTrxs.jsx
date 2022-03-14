@@ -13,10 +13,11 @@ import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import useQuery from "../../../hooks/useQuery";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
+import { fetchAutorizadores } from "../../TrxParams/utils/fetchRevalAutorizadores";
 
 const url_types = process.env.REACT_APP_URL_TRXS_TRX;
 
-const fetchTrxTypesPages = async (Nombre_operacion, page) => {
+const fetchTrxTypesPages = async (Nombre_operacion, page, limit) => {
   try {
     const res = await fetchData(
       `${url_types}/tipos-operaciones-pagination`,
@@ -24,6 +25,7 @@ const fetchTrxTypesPages = async (Nombre_operacion, page) => {
       {
         Nombre_operacion,
         page,
+        limit,
       }
     );
 
@@ -43,7 +45,7 @@ const fetchAliadosPDPPages = async (nombre) => {
     const res = await fetchData(`${url_types}/aliados-pagination`, "GET", {
       nombre,
       page: 1,
-      limit: 5,
+      limit: 10,
     });
 
     if (res?.status) {
@@ -64,7 +66,7 @@ const TypesTrxs = () => {
   const [maxPages, setMaxPages] = useState(0);
   const [trxTypes, setTrxTypes] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [foundAliados, setFoundAliados] = useState([]);
+  const [autorizadores, setAutorizadores] = useState([]);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
@@ -78,14 +80,25 @@ const TypesTrxs = () => {
     }));
   }, [trxTypes]);
 
-  const mapSuggestionsAliados = useMemo(
-    () => foundAliados.map(({ nombre }) => <h1 className='py-2'>{nombre}</h1>),
-    [foundAliados]
+  const mapSuggestionsAutorizadores = useMemo(
+    () =>
+      autorizadores.map(({ nombre_autorizador }) => (
+        <h1 className='py-2'>{nombre_autorizador}</h1>
+      )),
+    [autorizadores]
   );
 
+  const fecthAutorizadoresFunc = useCallback((e) => {
+    fetchAutorizadores({ nombre_autorizador: e.target.value ?? "" })
+      .then((autoArr) => {
+        setMaxPages(autoArr?.maxPages);
+        setAutorizadores(autoArr?.results);
+      })
+      .catch((err) => console.error(err));
+  }, []);
   const searchAliados = useCallback((e) => {
     fetchAliadosPDPPages(e.target.value ?? "")
-      .then((res) => setFoundAliados([...res?.results]))
+      .then((res) => setAutorizadores([...res?.results]))
       .catch((err) => console.error(err));
   }, []);
 
@@ -96,12 +109,12 @@ const TypesTrxs = () => {
           return old;
         }
         const copy = { ...old };
-        copy.NewAliado = foundAliados[i];
-        copy.Aliado = foundAliados[i].nombre;
+        copy.NewAutorizador = autorizadores[i];
+        copy.Autorizador = autorizadores[i].nombre_autorizador;
         return { ...copy };
       });
     },
-    [foundAliados]
+    [autorizadores]
   );
 
   const handleClose = useCallback(() => {
@@ -110,13 +123,13 @@ const TypesTrxs = () => {
   }, []);
 
   const setFoundTrxTypes = useCallback(() => {
-    fetchTrxTypesPages(searchTrxType, page)
+    fetchTrxTypesPages(searchTrxType, page, limit)
       .then((res) => {
         setTrxTypes([...res?.results]);
         setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
-  }, [searchTrxType, page]);
+  }, [searchTrxType, page, limit]);
 
   const onChange = useCallback(
     (e) => {
@@ -139,7 +152,7 @@ const TypesTrxs = () => {
   const onChangeSelected = useCallback((e) => {
     const formData = new FormData(e.target.form);
 
-    const colsInputs = ["Parametros", "Nombre", "Aliado"];
+    const colsInputs = ["Parametros", "Nombre", "Autorizador"];
     const colsParams = ["param_key", "param_value"];
 
     if (
@@ -245,7 +258,7 @@ const TypesTrxs = () => {
       <Modal show={showModal} handleClose={handleClose}>
         {selected ? (
           <PaymentSummary
-            title='Editar parametros de tipo de transaccion'
+            title='Editar parametros de tipo de transacción'
             // subtitle="Datos tipo de transaccion"
             subtitle=''
             // summaryTrx={{
@@ -265,18 +278,18 @@ const TypesTrxs = () => {
                 readOnly={selected?.id_tipo_operacion}
               />
               <InputSuggestions
-                id='aliadoTrxType'
-                name='Aliado'
-                label={"Aliado"}
+                id='Autorizador'
+                name='Autorizador'
+                label={"Autorizador"}
                 type='search'
                 autoComplete='off'
-                suggestions={mapSuggestionsAliados || []}
+                suggestions={mapSuggestionsAutorizadores || []}
                 onLazyInput={{
-                  callback: searchAliados,
+                  callback: fecthAutorizadoresFunc,
                   timeOut: 500,
                 }}
                 onSelectSuggestion={onSelectSuggestion}
-                value={selected?.Aliado || ""}
+                value={selected?.Autorizador || ""}
                 readOnly={selected?.id_tipo_operacion}
               />
               <Fieldset legend={"Parametros"}>

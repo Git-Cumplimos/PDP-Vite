@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
@@ -54,15 +54,22 @@ const PayForm = ({ selected, summary }) => {
   const fetchOrder = () => {
     payOrder(params.orden)
       .then((res) => {
-        console.log(res);
-        setResOrder(res);
-        infoTicket(summary?.Trx, 10, tickets);
-        setShowVoucher(true);
+        if (res?.status != false) {
+          setResOrder(res);
+          infoTicket(summary?.Trx, 10, tickets);
+          setShowVoucher(true);
+        } else {
+          notifyError(
+            "Se ha presentado una falla en el servicio, la transacción no se puede realizar"
+          );
+        }
       })
       .catch((err) => {
         notifyError("Se ha presentado un error, intente mas tarde", err);
       });
   };
+
+  useEffect(() => {}, [resOrder]);
 
   const tickets = useMemo(() => {
     return {
@@ -98,7 +105,6 @@ const PayForm = ({ selected, summary }) => {
     roleInfo?.id_comercio,
     roleInfo?.id_dispositivo,
   ]);
-
   return (
     <div>
       {!showVoucher ? (
@@ -115,6 +121,15 @@ const PayForm = ({ selected, summary }) => {
           <Tickets refPrint={printDiv} ticket={tickets} />
           <ButtonBar>
             <Button onClick={handlePrint}>Imprimir</Button>
+            <a href={selected?.obj?.redirecciones?.success}>
+              <Button onClick={closeModal}>Cerrar</Button>
+            </a>
+          </ButtonBar>
+        </div>
+      ) : resOrder?.status & (resOrder?.codigo === 400) ? (
+        <div className="flex flex-col justify-center items-center">
+          <h1>Esta transacción ya fue efectuada</h1>
+          <ButtonBar>
             <a href={selected?.obj?.redirecciones?.success}>
               <Button onClick={closeModal}>Cerrar</Button>
             </a>
