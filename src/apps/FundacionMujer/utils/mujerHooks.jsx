@@ -4,8 +4,8 @@ import fetchData from "../../../utils/fetchData";
 
 const urls = {
   mostrarcreditos: `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`,
-  ingresoreverso: `http://127.0.0.1:5000/ingresoreversorecibo`,
-  ingresorecibo: `http://127.0.0.1:5000/ingresorecibo`,
+  ingresoreverso: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresoreversorecibo`,
+  ingresorecibo: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`,
   valorcuota: `${process.env.REACT_APP_URL_FDLMWSDL}/valorcuota`,
 };
 
@@ -97,7 +97,7 @@ export const useProvideFDLM = () => {
       Depto: parseInt(values?.Depto),
       Municipio: parseInt(values?.Municipio),
       Valor: parseFloat(values?.Valor),
-      referenciaPago: values?.Referencia,
+      referenciaPago: values?.referenciaPago,
       cedula: values?.cedula,
       cliente: values?.cliente,
       nombre_comercio: values?.nombre_comercio,
