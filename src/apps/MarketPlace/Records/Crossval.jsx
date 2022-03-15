@@ -26,7 +26,6 @@ const Crossval = () => {
     (page, Comercio, Tipo_operacion, date_ini, date_end) => {
       const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
       const queries = {};
-      console.log(Comercio);
       if (!(Comercio === -1 || Comercio === "")) {
         queries.id_comercio = Comercio;
       }
@@ -122,7 +121,6 @@ const Crossval = () => {
     setTrxs(null);
     return null;
   };
-  console.log(trxs, idComercio);
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Movimientos Punto de Compra</h1>
