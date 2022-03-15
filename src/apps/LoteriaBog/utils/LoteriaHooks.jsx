@@ -211,6 +211,7 @@ export const useProvideLoteria = () => {
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
+        id_terminal: roleInfo.id_dispositivo,
 
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
@@ -250,6 +251,7 @@ export const useProvideLoteria = () => {
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
+        id_terminal: roleInfo.id_dispositivo,
         fisico: fisico,
         frac_fisico_venta: selecFrac,
         frac_fisico_disponibles: selected?.Fracciones,
@@ -457,6 +459,7 @@ export const useProvideLoteria = () => {
         identificacion: customer.doc_id,
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
+        id_terminal: roleInfo.id_dispositivo,
         tipo_comercio: roleInfo.tipo_comercio,
         cod_distribuidor: roleInfo.cod_oficina_lot,
       };
@@ -498,6 +501,7 @@ export const useProvideLoteria = () => {
         fracciones: fracciones,
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
+        id_terminal: roleInfo.id_dispositivo,
         tipo_comercio: roleInfo.tipo_comercio,
         cod_distribuidor: roleInfo.cod_oficina_lot,
       };

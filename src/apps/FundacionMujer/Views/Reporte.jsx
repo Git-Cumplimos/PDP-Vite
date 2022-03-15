@@ -162,8 +162,23 @@ const Reporte = () => {
         queries.page = page;
       }
       if (date_ini && date_end) {
-        queries.date_ini = new Date(date_ini).toLocaleDateString();
-        queries.date_end = new Date(date_end).toLocaleDateString();
+        const fecha_ini = new Date(date_ini);
+        fecha_ini.setHours(fecha_ini.getHours() + 5);
+        date_ini = Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(fecha_ini);
+
+        const fecha_fin = new Date(date_end);
+        fecha_fin.setHours(fecha_fin.getHours() + 5);
+        date_end = Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(fecha_fin);
+        queries.date_ini = date_ini;
+        queries.date_end = date_end;
       }
       if (limit) {
         queries.limit = limit;
