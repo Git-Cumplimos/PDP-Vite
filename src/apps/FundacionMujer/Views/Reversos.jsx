@@ -290,6 +290,7 @@ const Reversos = () => {
   ]);
 
   const closeModal = useCallback(async (ticket) => {
+    setTicket(false);
     setShowModal(false);
     handleChange();
     console.log(ticket);
