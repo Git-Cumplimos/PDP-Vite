@@ -723,7 +723,7 @@ const allUrlsPrivateApps = [
     link: "/verificacionnuevoscomercios",
     label: <AppIcons Logo={"PAGO"} name={"Verificación Enrolamientos"} />,
     component: VerificacionNuevosComercios,
-    permission: [1],
+    permission: [38, 39],
     subRoutes: [
       {
         link: "/Solicitud-enrolamiento/validarformulario",
@@ -731,7 +731,7 @@ const allUrlsPrivateApps = [
           <AppIcons Logo={"PAGO"} name={"Validar Formulario Inscripción"} />
         ),
         component: ValidacionAsesorComercial,
-        permission: [1],
+        permission: [38],
         subRoutes: [
           {
             link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
@@ -742,7 +742,7 @@ const allUrlsPrivateApps = [
               />
             ),
             component: VerificacionFormulario,
-            permission: [1],
+            permission: [38],
           },
         ],
       },
@@ -753,13 +753,13 @@ const allUrlsPrivateApps = [
           <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
         ),
         component: ValidacionApertura,
-        permission: [1],
+        permission: [39],
       },
       {
         link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
         label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
         component: VerificacionApertura,
-        permission: [1],
+        permission: [39],
       },
     ],
   },
