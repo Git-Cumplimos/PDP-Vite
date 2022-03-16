@@ -32,8 +32,9 @@ const ValidacionApertura = () => {
   useEffect(() => {
     if (fechaInicial && fechaFinal && estadoProceso) {
       fetchData(
-        `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`,
+        /*  `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}` */
         /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`, */
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`,
         "GET"
       )
         /* .then((response) => response.json()) */
@@ -155,7 +156,7 @@ const ValidacionApertura = () => {
           )}
           onSelectRow={(e, i) =>
             navigate(
-              `/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/${datosFiltrados[i][15]}`
+              `/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/${datosEnrolamientos[i]["id_proceso"]}`
             )
           }
         >

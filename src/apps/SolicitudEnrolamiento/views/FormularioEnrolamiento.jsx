@@ -18,7 +18,8 @@ import { useNavigate } from "react-router-dom";
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
 
 const capitalize = (word) => {
-  return word.charAt(0).toUpperCase() + word.slice(1);
+  /*  return word.charAt(0).toUpperCase() + word.slice(1); */
+  return word.replace(/\b[a-n]/g || /\b[o-z]/g, (c) => c.toUpperCase());
 };
 
 const FormularioEnrolamiento = () => {
