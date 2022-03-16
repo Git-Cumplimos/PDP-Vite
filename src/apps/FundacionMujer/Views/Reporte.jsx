@@ -149,7 +149,7 @@ const Reporte = () => {
   useEffect(() => {
     setComercio(roleInfo?.id_comercio || -1);
     setUsuario(roleInfo?.id_usuario || -1);
-  }, [userPermissions, roleInfo?.id_comercio]);
+  }, [userPermissions, roleInfo]);
 
   useEffect(() => {
     report(comercio, usuario, tipoOp, page, fechaInicial, fechaFinal, limit);
