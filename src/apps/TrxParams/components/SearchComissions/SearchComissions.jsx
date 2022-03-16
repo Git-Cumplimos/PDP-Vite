@@ -3,33 +3,24 @@ import { useNavigate } from "react-router-dom";
 
 import useQuery from "../../../../hooks/useQuery";
 
-import Table from "../../../../components/Base/Table";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Input from "../../../../components/Base/Input";
-import Pagination from "../../../../components/Compound/Pagination";
-import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
-import {
-  fetchConveniosMany,
-  fetchConvsPerAuto,
-} from "../../utils/fetchRevalConvenios";
 import { fetchComisionesPagar } from "../../utils/fetchComisionesPagar";
-import Modal from "../../../../components/Base/Modal";
-import Form from "../../../../components/Base/Form";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import Button from "../../../../components/Base/Button";
-import { notifyError } from "../../../../utils/notify";
 import { fetchComisionesCobrar } from "../../utils/fetchComisionesCobrar";
 
 const SearchComissions = ({ comissionFace, onSelectItem }) => {
   const [
-    { tipoTrx = "", comercio = "", convenio = "", autorizador = "", page },
+    { tipoTrx = "", comercio = "", convenio = "", autorizador = "" },
     setQuery,
   ] = useQuery();
   const navigate = useNavigate();
 
   const [comissions, setComissions] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
-
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
   const headersTable = useMemo(() => {
     if (comissions.length === 0) {
       return [];
@@ -177,9 +168,9 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     } else if (comissionFace === "collect") {
       fecthComisionesCobrarFunc();
     }
-  }, [convenio, comercio, tipoTrx, autorizador, page]);
+  }, [convenio, comercio, tipoTrx, autorizador, page, limit]);
   const fecthComisionesPagarFunc = () => {
-    let obj = { page };
+    let obj = { page, limit };
     if (convenio !== "") obj["nombre_convenio"] = convenio;
     if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
     if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
@@ -192,7 +183,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
       .catch((err) => console.error(err));
   };
   const fecthComisionesCobrarFunc = () => {
-    let obj = { page };
+    let obj = { page, limit };
     if (convenio !== "") obj["nombre_convenio"] = convenio;
     if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
     if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
@@ -206,7 +197,17 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
 
   return (
     <Fragment>
-      <Pagination maxPage={maxPages} onChange={onChange} grid>
+      {/* <Pagination maxPage={maxPages} onChange={onChange} grid></Pagination> */}
+      <TableEnterprise
+        title={
+          comissionFace === "pay" ? "Comisiones a pagar" : "Comisiones a cobrar"
+        }
+        maxPage={maxPages}
+        onChange={onChange}
+        headers={headersTable}
+        data={dataTable}
+        onSelectRow={onSelectItem ? passItem : onSelectRow}
+        onSetPageData={setPageData}>
         <Input
           id={"convenioComissions"}
           label={"Convenio"}
@@ -255,90 +256,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
         ) : (
           ""
         )}
-      </Pagination>
-      {Array.isArray(comissions) && comissions.length > 0 ? (
-        //   <TableEnterprise
-        //   title="Buscar usuarios"
-        //   maxPage={maxPage}
-        //   onChange={onChange}
-        //   headers={[
-        //     "Id",
-        //     "Nombre completo",
-        //     "E-mail",
-        //     "Id",
-        //     "Nombre completo",
-        //     "E-mail",
-        //     "Id",
-        //     "Nombre completo",
-        //     "E-mail",
-        //     "Nombre completo",
-        //     "E-mail",
-        //   ]}
-        //   data={usuariosDB.map(({ uuid, uname, email }) => {
-        //     return [
-        //       uuid,
-        //       uname,
-        //       email,
-        //       uuid,
-        //       uname,
-        //       email,
-        //       uuid,
-        //       uname,
-        //       email,
-        //       uname,
-        //       email,
-        //     ];
-        //   })}
-        //   onSelectRow={(e, i) => {
-        //     const {
-        //       active,
-        //       direccion,
-        //       doc_id,
-        //       email,
-        //       phone,
-        //       uname,
-        //       uuid,
-        //       doc_type: { "Nombre corto": _doc_type },
-        //     } = usuariosDB[i];
-        //     const userMapped = {
-        //       "Id usuario": uuid,
-        //       "Nombre completo": uname,
-        //       Identificacion: `${_doc_type} ${doc_id}`,
-        //       Email: email,
-        //       edit: {
-        //         uuid,
-        //         direccion,
-        //         phone,
-        //         active,
-        //       },
-        //     };
-        //     setSelected({ ...userMapped });
-        //     setShowModal(true);
-        //   }}
-        //   onSetPageData={setPageData}
-        // ></TableEnterprise>
-        <TableEnterprise
-          title={
-            comissionFace === "pay"
-              ? "Comisiones a pagar"
-              : "Comisiones a cobrar"
-          }
-          maxPage={maxPages}
-          onChange={onChange}
-          headers={headersTable}
-          data={dataTable}
-          onSelectRow={onSelectItem ? passItem : onSelectRow}
-          // onSetPageData={setPageData}
-        />
-      ) : (
-        // <Table
-        //   headers={headersTable}
-        //   data={dataTable}
-        //   onSelectRow={onSelectItem ? passItem : onSelectRow}
-        //   // onSelectRow={onSelectTipoContrato}
-        // />
-        ""
-      )}
+      </TableEnterprise>
     </Fragment>
   );
 };

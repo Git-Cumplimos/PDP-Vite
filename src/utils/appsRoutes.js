@@ -7,6 +7,7 @@ import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 import CreateComisionCobrada from "../apps/TrxParams/Views/Comisiones/CreateComisionCobrada";
 import ConfiguracionComercios from "../apps/TrxParams/Views/ConfiguracionComercios";
+import Gestion from "../pages/Gestion";
 
 /**
  * * Logos
@@ -458,86 +459,6 @@ const allUrlsPrivateApps = [
     ],
   },
   {
-    link: "/trx-params",
-    label: (
-      <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales recaudo"} />
-    ),
-    component: TrxParams,
-    permission: [18, 19, 20, 21],
-    subRoutes: [
-      {
-        link: "/trx-params/comisiones",
-        label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones"} />,
-        component: Comisiones,
-        permission: [18, 19],
-        subRoutes: [
-          {
-            link: "/trx-params/comisiones/pagadas",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar"} />,
-            component: Com2Pay,
-            permission: [18],
-            subRoutes: [
-              {
-                link: "/trx-params/comisiones/pagadas/personalizadas",
-                label: (
-                  <AppIcons
-                    Logo={"IMPUESTO"}
-                    name={"Comisiones a pagar por comercio"}
-                  />
-                ),
-                component: CreateComision,
-                permission: [18],
-              },
-            ],
-          },
-          {
-            link: "/trx-params/comisiones/cobradas",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a cobrar"} />,
-            component: Com2Collect,
-            permission: [19],
-            subRoutes: [
-              {
-                link: "/trx-params/comisiones/cobradas/crear",
-                label: (
-                  <AppIcons
-                    Logo={"IMPUESTO"}
-                    name={"Comisiones a cobrar por autorizador"}
-                  />
-                ),
-                component: CreateComision,
-                permission: [19],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        link: "/trx-params/convenios",
-        label: <AppIcons Logo={"RETIRO"} name={"Convenios"} />,
-        component: Convenios,
-        permission: [20],
-        subRoutes: [
-          {
-            link: "/trx-params/convenios/autorizadores",
-            label: (
-              <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
-            ),
-            component: ConvAuto,
-            permission: [20],
-          },
-        ],
-      },
-      {
-        link: "/trx-params/autorizadores",
-        label: (
-          <AppIcons Logo={"PRODUCTOS_FINANCIEROS"} name={"Autorizadores"} />
-        ),
-        component: Autorizadores,
-        permission: [21],
-      },
-    ],
-  },
-  {
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
     component: Daviplata,
@@ -813,7 +734,7 @@ const privateUrls = [
   { link: "*", exact: false, component: Error404 },
   { link: "/", label: "Inicio", component: Home },
   { link: "/info", label: "Informacion general", component: emptyComp },
-  { link: "/gestion", label: "Gestion", component: emptyComp },
+  { link: "/gestion", label: "Gestión", component: emptyComp },
   { link: "/reportes", label: "Reportes", component: Reportes },
   { link: "/seguridad", label: "Seguridad", component: emptyComp },
   { link: "/solicitudes", label: "Tus solicitudes", component: emptyComp },

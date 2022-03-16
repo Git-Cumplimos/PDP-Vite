@@ -52,6 +52,8 @@ export const useProvideFDLM = () => {
   const mostrarcredito = useCallback(async (numero, param, user) => {
     const body = {
       Comercio: user?.Comercio,
+      Usuario: user?.Usuario,
+      Dispositivo: user?.Dispositivo,
       nroBusqueda: numero,
       ParametroBusqueda: param,
       Depto: parseInt(user?.Depto),
@@ -69,6 +71,7 @@ export const useProvideFDLM = () => {
     const body = {
       Tipo: values?.tipo,
       Usuario: values?.usuario,
+      Dispositivo: values?.dispositivo,
       Comercio: values?.comercio,
       Credito: parseInt(values?.credit),
       Valor: parseFloat(values?.val),
@@ -88,12 +91,13 @@ export const useProvideFDLM = () => {
     const body = {
       Tipo: values?.Tipo,
       Usuario: parseInt(values?.Usuario),
+      Dispositivo: values?.Dispositivo,
       Comercio: values?.Comercio,
       Credito: parseInt(values?.Credito),
       Depto: parseInt(values?.Depto),
       Municipio: parseInt(values?.Municipio),
       Valor: parseFloat(values?.Valor),
-      referenciaPago: values?.Referencia,
+      referenciaPago: values?.referenciaPago,
       cedula: values?.cedula,
       cliente: values?.cliente,
       nombre_comercio: values?.nombre_comercio,
@@ -108,6 +112,8 @@ export const useProvideFDLM = () => {
 
   const valorcuota = useCallback(async (numero, user) => {
     const body = {
+      Usuario: user?.Usuario,
+      Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,
       Credito: numero,
       Depto: parseInt(user?.Depto),

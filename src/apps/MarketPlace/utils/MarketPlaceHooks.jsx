@@ -1,4 +1,10 @@
-import { createContext, useCallback, useContext, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  useEffect,
+} from "react";
 import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
@@ -27,7 +33,7 @@ export const useProvideMarketPlace = () => {
   const payOrder = useCallback(async (idCompra) => {
     const req = {
       idCompra: idCompra,
-      idComercio: 4,
+      idComercio: -1,
       tipoComercio: roleInfo?.tipo_comercio,
       idTienda: roleInfo?.id_comercio,
       idDispositivo: roleInfo?.id_dispositivo,
@@ -42,16 +48,13 @@ export const useProvideMarketPlace = () => {
   });
 
   const searchsOrder = useCallback(async (idCompra) => {
-    console.log(idCompra);
     try {
       const res = await fetchData(urls.consultaOrden, "GET", {
         idCompra: idCompra,
       });
       setConsulta(res);
-      console.log(res);
       return res;
     } catch (err) {
-      console.log(err);
       throw err;
     }
   });
@@ -61,6 +64,7 @@ export const useProvideMarketPlace = () => {
     searchsOrder,
     infoMarket: {
       consulta,
+      setConsulta,
     },
   };
 };

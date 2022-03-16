@@ -1,6 +1,6 @@
 .formItem {
   /* @apply flex flex-col md:flex-row justify-center items-center; */
-  @apply relative text-center my-4 mx-auto md:mx-4 gap-4;
+  @apply relative text-center mx-auto md:mx-4 gap-4;
 
   @apply grid place-items-center place-content-end;
   grid-template-columns: repeat(auto-fit, minmax(var(--min-minmax-sm), 1fr));

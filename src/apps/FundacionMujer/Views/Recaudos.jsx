@@ -14,6 +14,7 @@ import { notifyError } from "../../../utils/notify";
 import Tickets from "../components/Voucher/Tickets";
 import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 
@@ -169,6 +170,7 @@ const Recaudo = () => {
     setCreditStatus(false);
     setInfo("");
     setTicket(false);
+    setReferencia("");
   }, []);
 
   const bankCollection = (e) => {
@@ -178,6 +180,7 @@ const Recaudo = () => {
     const body = {
       Tipo: roleInfo?.tipo_comercio,
       Usuario: roleInfo?.id_usuario,
+      Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
       Credito: selected?.Credito,
       Depto: roleInfo?.codigo_dane.slice(0, 2),
@@ -198,7 +201,7 @@ const Recaudo = () => {
           setStop(false);
         } else {
           console.log(res);
-          notifyError(res?.obj?.Mensaje);
+          notifyError(res?.msg);
           setStop(false);
         }
       })
@@ -214,30 +217,34 @@ const Recaudo = () => {
     setCreditStatus(false);
     setInfo("");
     const user = {
+      Usuario: roleInfo?.id_usuario,
+      Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
       Depto: roleInfo?.codigo_dane?.slice(0, 2),
       Municipio: roleInfo?.codigo_dane?.slice(2),
     };
-    valorcuota(String(number), user)
-      .then((res) => {
-        console.log(res);
-        setPermiteCambio(res?.obj?.PermiteCambio);
-        [res?.obj].map((row) => {
-          setCuota([
-            {
-              min: formatMoney.format(row.ValorMin),
-              max: formatMoney.format(row.ValorMaximo),
-              cuota: formatMoney.format(row.ValorPagar),
-            },
-          ]);
-          if (row.ValorPagar !== 0) {
-            setCreditStatus(true);
-          }
+    if (tipobusqueda === "2") {
+      valorcuota(String(number), user)
+        .then((res) => {
+          console.log(res);
+          setPermiteCambio(res?.obj?.PermiteCambio);
+          [res?.obj].map((row) => {
+            setCuota([
+              {
+                min: formatMoney.format(row.ValorMin),
+                max: formatMoney.format(row.ValorMaximo),
+                cuota: formatMoney.format(row.ValorPagar),
+              },
+            ]);
+            if (row.ValorPagar !== 0) {
+              setCreditStatus(true);
+            }
+          });
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    }
     mostrarcredito(String(number), tipobusqueda, user)
       .then((res) => {
         console.log(res);
@@ -264,7 +271,7 @@ const Recaudo = () => {
       })
       .catch((err) => console.log("error", err));
   };
-  console.log(permiteCambio == "N");
+
   return (
     <>
       {"id_comercio" in roleInfo ? (
@@ -325,13 +332,20 @@ const Recaudo = () => {
       {info?.status && (
         <>
           {creditStatus && (
-            <Table
+            <TableEnterprise
+              title="Parametros"
+              // maxPage={maxPages}
+              // onChange={onChange}
               headers={["Valor mínimo", "Valor máximo", "Valor a pagar"]}
               data={cuota || []}
-            />
+              // onSetPageData={setPageData}
+            ></TableEnterprise>
           )}
           <br />
-          <Table
+          <TableEnterprise
+            title="Información de credito"
+            // maxPage={maxPages}
+            // onChange={onChange}
             headers={[
               "Cédula",
               "Mensaje",
@@ -347,7 +361,8 @@ const Recaudo = () => {
                 setShowModal(true);
               }
             }}
-          />
+            // onSetPageData={setPageData}
+          ></TableEnterprise>
         </>
       )}
       {info?.obj?.NroMensaje === 1 && (

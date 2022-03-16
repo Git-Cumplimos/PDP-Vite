@@ -13,7 +13,7 @@ const Crossval = () => {
   const [idComercio, setIdComercio] = useState("");
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
-  const [tipoOp, setTipoOp] = useState("");
+  const [tipoOp, setTipoOp] = useState(10);
   const [trxs, setTrxs] = useState([]);
 
   const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -27,22 +27,35 @@ const Crossval = () => {
       const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
       const queries = {};
       if (!(Comercio === -1 || Comercio === "")) {
-        queries.Comercio = Comercio;
+        queries.id_comercio = Comercio;
       }
       if (Tipo_operacion) {
-        queries.Tipo_operacion = Tipo_operacion;
+        queries.id_tipo_transaccion = Tipo_operacion;
       }
       if (page) {
         queries.page = page;
       }
       if (date_ini && date_end) {
+        const tempDateIni = new Date(date_ini);
+        tempDateIni.setHours(tempDateIni.getHours() + 5);
+        date_ini = Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(tempDateIni);
+        const tempDateEnd = new Date(date_end);
+        tempDateEnd.setHours(tempDateEnd.getHours() + 5);
+        date_end = Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(tempDateEnd);
+
         queries.date_ini = date_ini;
         queries.date_end = date_end;
       }
-      console.log(queries);
       fetchData(url, "GET", queries)
         .then((res) => {
-          console.log(res);
           if (res?.status) {
             setMaxPages(res?.obj?.maxpages);
             setTrxs(res?.obj?.trxs);
@@ -72,13 +85,19 @@ const Crossval = () => {
     const rows = [];
     trxs.map(
       ({
-        Created_at,
-        Tipo_operacion,
+        created,
+        id_tipo_transaccion,
         Response_obj: { ID_Entrada = "", ID_Salida = "" },
-        Monto,
+        monto,
       }) => {
         rows.push(
-          dailyReport(Created_at, Tipo_operacion, ID_Salida, ID_Entrada, Monto)
+          dailyReport(
+            created,
+            id_tipo_transaccion,
+            ID_Salida,
+            ID_Entrada,
+            monto
+          )
         );
         return null;
       }
@@ -102,7 +121,6 @@ const Crossval = () => {
     setTrxs(null);
     return null;
   };
-
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Movimientos Punto de Compra</h1>
@@ -201,26 +219,26 @@ const Crossval = () => {
           </div>
           <Table
             headers={["Fecha", "Operación", "Debitado", "Acreditado", "Monto"]}
-            data={trxs.map(
+            data={trxs?.map(
               ({
-                Created_at,
-                Tipo_operacion,
-                Response_obj: { ID_Entrada = "", ID_Salida = "" },
-                Monto,
+                created,
+                id_tipo_transaccion,
+                res_obj: { ID_Entrada = "", ID_Salida = "" },
+                monto,
               }) => {
-                const tempDate = new Date(Created_at);
+                const tempDate = new Date(created);
                 tempDate.setHours(tempDate.getHours() + 5);
-                Created_at = Intl.DateTimeFormat("es-CO", {
+                created = Intl.DateTimeFormat("es-CO", {
                   year: "numeric",
                   month: "numeric",
                   day: "numeric",
                   hour: "numeric",
                   minute: "numeric",
                 }).format(tempDate);
-                const money = formatMoney.format(Monto);
+                const money = formatMoney.format(monto);
                 return {
-                  Created_at,
-                  Tipo_operacion,
+                  created,
+                  id_tipo_transaccion,
                   ID_Salida,
                   ID_Entrada,
                   money,

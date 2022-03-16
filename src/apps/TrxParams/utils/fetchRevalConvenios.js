@@ -24,15 +24,12 @@ export const postConvenios = async (bodyObj) => {
   }
 };
 
-export const fetchConveniosMany = async (tags, page = 1) => {
+export const fetchConveniosMany = async (obj) => {
   // if (!tags) {
   //   return { maxPages: 0, results: [] };
   // }
   try {
-    const res = await fetchData(`${urlConvenios}/convenio_many`, "GET", {
-      tags,
-      page: isNaN(parseInt(page)) ? 1 : parseInt(page),
-    });
+    const res = await fetchData(`${urlConvenios}/convenio_many`, "GET", obj);
     if (res?.status) {
       return { ...res?.obj };
     } else {

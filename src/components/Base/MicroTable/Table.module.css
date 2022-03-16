@@ -1,0 +1,40 @@
+table.table {
+  @apply w-11/12 mx-auto border-collapse;
+}
+
+table.table a {
+  @apply block p-2;
+}
+
+table.table th,
+table.table td {
+  @apply py-1 p-0.5;
+}
+
+table.table th {
+  @apply bg-primary-extra-light text-black text-xs font-medium;
+}
+
+table.table td {
+  @apply bg-secondary-light text-black text-center text-sm;
+}
+
+table.table tr:hover td {
+  @apply bg-secondary-dark text-white;
+}
+
+table thead th:first-child {
+  border-top-left-radius: 0.5rem;
+}
+
+table thead th:last-child {
+  border-top-right-radius: 0.5rem;
+}
+
+table tr:last-child td:first-child {
+  border-bottom-left-radius: 0.5rem;
+}
+
+table tr:last-child td:last-child {
+  border-bottom-right-radius: 0.5rem;
+}
