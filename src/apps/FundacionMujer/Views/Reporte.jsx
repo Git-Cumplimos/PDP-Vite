@@ -61,12 +61,19 @@ const url_Report = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
 const url_Download = `${process.env.REACT_APP_URL_FDLMWSDL}/report`;
 
 const Reporte = () => {
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
+
   const { userPermissions, roleInfo } = useAuth();
 
   const [trxs, setTrxs] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
   const [comercio, setComercio] = useState(-1);
+  const [usuario, setUsuario] = useState(-1);
   const [maxPages, setMaxPages] = useState(1);
   const [tipoOp, setTipoOp] = useState("");
   const [fechaInicial, setFechaInicial] = useState("");
@@ -141,22 +148,34 @@ const Reporte = () => {
 
   useEffect(() => {
     setComercio(roleInfo?.id_comercio || -1);
+    setUsuario(roleInfo?.id_usuario || -1);
   }, [userPermissions, roleInfo?.id_comercio]);
 
   useEffect(() => {
-    report(comercio, tipoOp, page, fechaInicial, fechaFinal, limit);
+    report(comercio, usuario, tipoOp, page, fechaInicial, fechaFinal, limit);
   }, [page, limit]);
 
   /*Buscar report*/
   const report = useCallback(
-    async (Comercio, Tipo_operacion, page, date_ini, date_end, limit) => {
+    async (
+      Comercio,
+      usuario,
+      Tipo_operacion,
+      page,
+      date_ini,
+      date_end,
+      limit
+    ) => {
       const url = url_Report;
       const queries = {};
       if (!(Comercio === -1 || Comercio === "")) {
         queries.id_comercio = parseInt(Comercio);
       }
+      if (!(usuario === -1 || usuario === "")) {
+        queries.id_usuario = parseInt(usuario);
+      }
       if (Tipo_operacion) {
-        queries.id_tipo_transaccion = Tipo_operacion;
+        queries.id_tipo_transaccion = parseInt(Tipo_operacion);
       }
       if (page) {
         queries.page = page;
@@ -260,7 +279,15 @@ const Reporte = () => {
             setFechaInicial(e.target.value);
             if (fechaFinal !== "") {
               if (tipoOp !== "") {
-                report(comercio, tipoOp, 1, e.target.value, fechaFinal, limit);
+                report(
+                  comercio,
+                  usuario,
+                  tipoOp,
+                  1,
+                  e.target.value,
+                  fechaFinal,
+                  limit
+                );
               }
             }
           }}
@@ -277,6 +304,7 @@ const Reporte = () => {
               if (tipoOp !== "") {
                 report(
                   comercio,
+                  usuario,
                   tipoOp,
                   1,
                   fechaInicial,
@@ -299,6 +327,7 @@ const Reporte = () => {
             if (!(e.target.value === null || e.target.value === "")) {
               report(
                 comercio,
+                usuario,
                 e.target.value,
                 1,
                 fechaInicial,
@@ -311,31 +340,60 @@ const Reporte = () => {
         {userPermissions
           .map(({ id_permission }) => id_permission)
           .includes(28) ? (
-          <Input
-            id="id_comercio"
-            label="Id comercio"
-            type="numeric"
-            value={comercio}
-            onChange={(e) => {
-              setComercio(e.target.value);
-            }}
-            onLazyInput={{
-              callback: (e) => {
-                // setPage(1);
-                if (tipoOp !== "") {
-                  report(
-                    e.target.value,
-                    tipoOp,
-                    1,
-                    fechaInicial,
-                    fechaFinal,
-                    limit
-                  );
-                }
-              },
-              timeOut: 500,
-            }}
-          />
+          <>
+            <Input
+              id="id_comercio"
+              label="Id comercio"
+              type="numeric"
+              value={comercio}
+              onChange={(e) => {
+                setComercio(e.target.value);
+              }}
+              onLazyInput={{
+                callback: (e) => {
+                  // setPage(1);
+                  if (tipoOp !== "") {
+                    report(
+                      e.target.value,
+                      usuario,
+                      tipoOp,
+                      1,
+                      fechaInicial,
+                      fechaFinal,
+                      limit
+                    );
+                  }
+                },
+                timeOut: 500,
+              }}
+            />
+            <Input
+              id="id_usuario"
+              label="Id usuario"
+              type="numeric"
+              value={usuario}
+              onChange={(e) => {
+                setUsuario(e.target.value);
+              }}
+              onLazyInput={{
+                callback: (e) => {
+                  // setPage(1);
+                  if (tipoOp !== "") {
+                    report(
+                      comercio,
+                      e.target.value,
+                      tipoOp,
+                      1,
+                      fechaInicial,
+                      fechaFinal,
+                      limit
+                    );
+                  }
+                },
+                timeOut: 500,
+              }}
+            />
+          </>
         ) : (
           ""
         )}
@@ -345,25 +403,37 @@ const Reporte = () => {
           title="Reportes"
           maxPage={maxPages}
           // onChange={onChangeRecaudos}
-          headers={["Fecha", "Mensaje", "Monto"]}
-          data={trxs.map(
-            ({ created, res_obj: { Mensaje } = { Mensaje: "" }, monto }) => {
-              const tempDate = new Date(created);
-              tempDate.setHours(tempDate.getHours() + 5);
-              created = Intl.DateTimeFormat("es-CO", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-              }).format(tempDate);
-              return {
-                created,
-                Mensaje,
-                monto,
-              };
-            }
-          )}
+          headers={[
+            "Fecha",
+            "Id transaccion",
+            "Mensaje",
+            "Credito",
+            "Motivo",
+            "Monto",
+          ]}
+          data={trxs.map(({ created, id_trx, res_obj, monto }) => {
+            const tempDate = new Date(created);
+            tempDate.setHours(tempDate.getHours() + 5);
+            created = Intl.DateTimeFormat("es-CO", {
+              year: "numeric",
+              month: "numeric",
+              day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+            }).format(tempDate);
+            const Mensaje = res_obj?.Mensaje;
+            const Credito = res_obj?.info?.credito;
+            const motivo = res_obj?.info?.motivo;
+            monto = formatMoney.format(monto);
+            return {
+              created,
+              id_trx,
+              Mensaje,
+              Credito,
+              motivo,
+              monto,
+            };
+          })}
           onSelectRow={(_e, index) => {
             setSelected(trxs[index]);
             setShowModal(true);
