@@ -7,7 +7,7 @@ import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 import CreateComisionCobrada from "../apps/TrxParams/Views/Comisiones/CreateComisionCobrada";
 import ConfiguracionComercios from "../apps/TrxParams/Views/ConfiguracionComercios";
-import Gestion from "../pages/Gestion";
+// import Gestion from "../pages/Gestion";
 
 /**
  * * Logos
@@ -92,7 +92,6 @@ const CommerceInfo = lazy(() => import("../apps/UpdateCommerce/CommerceInfo"));
 const TipoContratoComisiones = lazy(() =>
   import("../apps/TrxParams/Views/TipoContratoComisiones")
 );
-const TrxParams = lazy(() => import("../apps/TrxParams/TrxParams"));
 const Comisiones = lazy(() => import("../apps/TrxParams/Views/Comisiones"));
 const Com2Pay = lazy(() =>
   import("../apps/TrxParams/Views/Comisiones/Com2Pay")
@@ -667,7 +666,6 @@ const allUrlsPrivateApps = [
           },
         ],
       },
-
       {
         link: "/Solicitud-enrolamiento/validarformularioreconoserid",
         label: (
@@ -675,12 +673,14 @@ const allUrlsPrivateApps = [
         ),
         component: ValidacionApertura,
         permission: [39],
-      },
-      {
-        link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
-        label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
-        component: VerificacionApertura,
-        permission: [39],
+        subRoutes: [
+          {
+            link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
+            label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
+            component: VerificacionApertura,
+            permission: [39],
+          },
+        ],
       },
     ],
   },
