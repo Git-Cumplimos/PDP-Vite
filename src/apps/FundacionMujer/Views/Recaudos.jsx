@@ -170,6 +170,7 @@ const Recaudo = () => {
     setCreditStatus(false);
     setInfo("");
     setTicket(false);
+    setReferencia("");
   }, []);
 
   const bankCollection = (e) => {
@@ -200,7 +201,7 @@ const Recaudo = () => {
           setStop(false);
         } else {
           console.log(res);
-          notifyError(res?.obj?.Mensaje);
+          notifyError(res?.msg);
           setStop(false);
         }
       })
@@ -270,6 +271,7 @@ const Recaudo = () => {
       })
       .catch((err) => console.log("error", err));
   };
+
   return (
     <>
       {"id_comercio" in roleInfo ? (
@@ -427,11 +429,8 @@ const Recaudo = () => {
                   autoComplete="off"
                   value={referencia}
                   onInput={(e) => {
-                    if (!isNaN(e.target.value)) {
-                      setReferencia(e.target.value);
-                    }
-                    // const ref = String(e.target.value) || "";
-                    // setReferencia(ref);
+                    const ref = String(e.target.value) || "";
+                    setReferencia(ref);
                   }}
                 />
                 <ButtonBar>
