@@ -96,30 +96,23 @@ const TypesTrxs = () => {
       })
       .catch((err) => console.error(err));
   }, []);
-  const searchAliados = useCallback((e) => {
-    fetchAliadosPDPPages(e.target.value ?? "")
-      .then((res) => setAutorizadores([...res?.results]))
-      .catch((err) => console.error(err));
-  }, []);
 
   const onSelectSuggestion = useCallback(
     (i, el) => {
-      setSelected((old) => {
-        if (!old) {
-          return old;
-        }
-        const copy = { ...old };
-        copy.NewAutorizador = autorizadores[i];
-        copy.Autorizador = autorizadores[i].nombre_autorizador;
-        return { ...copy };
-      });
+      console.log(selected);
+      const copy = { ...selected };
+      copy.NewAutorizador = autorizadores[i];
+      copy.Autorizador = autorizadores[i].nombre_autorizador;
+      copy.id_autorizador = autorizadores[i].id_autorizador;
+      setSelected({ ...copy });
     },
-    [autorizadores]
+    [autorizadores, selected]
   );
 
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelected(null);
+    setFoundTrxTypes();
   }, []);
 
   const setFoundTrxTypes = useCallback(() => {
@@ -204,18 +197,35 @@ const TypesTrxs = () => {
           .then((res) => {
             if (res?.status) {
               notify(res?.msg);
-              setSelected(null);
-              setShowModal(false);
-              setFoundTrxTypes();
+              handleClose();
             } else {
               notifyError(res?.msg);
             }
           })
           .catch((err) => console.error(err));
       } else {
+        fetchData(
+          `${url_types}/tipos-operaciones`,
+          "POST",
+          {},
+          {
+            id_autorizador: selected?.id_autorizador,
+            Nombre_operacion: selected?.Nombre,
+            Parametros: selected?.Parametros,
+          }
+        )
+          .then((res) => {
+            if (res?.status) {
+              notify(res?.msg);
+              handleClose();
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => console.error(err));
       }
     },
-    [selected?.id_tipo_operacion, selected?.Parametros, setFoundTrxTypes]
+    [selected, selected?.Parametros, setFoundTrxTypes]
   );
 
   useEffect(() => {
@@ -231,7 +241,8 @@ const TypesTrxs = () => {
             setShowModal(true);
             setSelected({
               Nombre: "",
-              Aliado: "",
+              Autorizador: "",
+              id_autorizador: "",
               Parametros: {},
             });
           }}>
@@ -275,7 +286,8 @@ const TypesTrxs = () => {
                 type='search'
                 autoComplete='off'
                 value={selected?.Nombre || ""}
-                readOnly={selected?.id_tipo_operacion}
+                onChange={() => {}}
+                // readOnly={selected?.id_tipo_operacion}
               />
               <InputSuggestions
                 id='Autorizador'
@@ -290,7 +302,9 @@ const TypesTrxs = () => {
                 }}
                 onSelectSuggestion={onSelectSuggestion}
                 value={selected?.Autorizador || ""}
-                readOnly={selected?.id_tipo_operacion}
+                onChange={() => {}}
+                disabled={selected?.id_tipo_operacion ? true : false}
+                // readOnly={selected?.id_tipo_operacion}
               />
               <Fieldset legend={"Parametros"}>
                 {Object.entries(selected?.Parametros || {}).map(
@@ -307,6 +321,7 @@ const TypesTrxs = () => {
                           autoComplete='off'
                           value={key}
                           onInput={() => {}}
+                          onChange={() => {}}
                         />
                         <Input
                           id={`${index}_value`}
@@ -316,6 +331,7 @@ const TypesTrxs = () => {
                           autoComplete='off'
                           value={val}
                           onInput={() => {}}
+                          onChange={() => {}}
                         />
                         <ButtonBar className={"lg:col-span-2"}>
                           <Button

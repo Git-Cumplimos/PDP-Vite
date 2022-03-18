@@ -2,17 +2,12 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 
 import useQuery from "../../../../hooks/useQuery";
 
-import SearchComissions from "../../components/SearchComissions/SearchComissions";
 import Button from "../../../../components/Base/Button";
-import MultipleSelect from "../../../../components/Base/MultipleSelect";
-import { postComission } from "../../utils/fetchRevalComissions";
 import FormComission from "../../components/FormComission/FormComission";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 import Form from "../../../../components/Base/Form";
-import Select from "../../../../components/Base/Select";
 import Input from "../../../../components/Base/Input";
-import { fetchTiposContratosComisiones } from "../../utils/fetchTiposContratosComisiones";
 import { fetchConveniosMany } from "../../utils/fetchRevalConvenios";
 import {
   fetchComisionesPagar,
@@ -21,9 +16,9 @@ import {
 import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
 import Modal from "../../../../components/Base/Modal";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-import Table from "../../../../components/Base/Table";
 import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
 import Pagination from "../../../../components/Compound/Pagination";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
 const initComissionData = {
   type: "",
@@ -46,13 +41,12 @@ const CreateComision = () => {
       comercio = "",
       convenio = "",
       autorizador = "",
-      page = 1,
       selectedOpt,
     },
     setQuery,
   ] = useQuery();
 
-  const [selectecConv, setSelectecConv] = useState(null);
+  const [headersTable, setHeadersTable] = useState([]);
   const [comissionData, setComissionData] = useState(initComissionData);
   const [newComision, setNewComision] = useState({
     "Id comercio": "",
@@ -62,6 +56,10 @@ const CreateComision = () => {
   });
   const [data, setdata] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
@@ -72,7 +70,6 @@ const CreateComision = () => {
         ["tipoTrx"]: "",
         ["comercio"]: "",
         ["autorizador"]: "",
-        ["page"]: 1,
       },
       { replace: true }
     );
@@ -219,7 +216,7 @@ const CreateComision = () => {
     }
   }, [selectedOpt, page, tipoTrx, comercio, convenio, autorizador]);
   const fetchConveniosFunc = () => {
-    fetchConveniosMany("")
+    fetchConveniosMany({ tags: "", page })
       .then((res) => {
         setdata(
           [...res?.results].map(({ id_convenio, nombre_convenio }) => {
@@ -427,6 +424,7 @@ const CreateComision = () => {
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "convenio" }, { replace: true });
+            setHeadersTable(["Id convenio", "Nombre convenio"]);
           }}>
           {newComision?.["Convenio"] ? "Editar convenio" : "Agregar convenio"}
         </Button>
@@ -435,6 +433,7 @@ const CreateComision = () => {
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "autorizador" }, { replace: true });
+            setHeadersTable(["Id autorizador", "Nombre autorizador"]);
           }}>
           {newComision?.["Autorizador"]
             ? "Editar autorizador"
@@ -448,6 +447,7 @@ const CreateComision = () => {
               { ["selectedOpt"]: "Tipo de transaccion" },
               { replace: true }
             );
+            setHeadersTable(["Id tipo operacion", "Nombre transaccion"]);
           }}>
           {newComision?.["Tipo de transaccion"]
             ? "Editar tipo transacción"
@@ -458,6 +458,13 @@ const CreateComision = () => {
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "comision" }, { replace: true });
+            setHeadersTable([
+              "Id comision",
+              "Transaccion",
+              "Comercio",
+              "Convenio",
+              "Autorizador",
+            ]);
           }}>
           Agregar comisión existente
         </Button>
@@ -473,18 +480,24 @@ const CreateComision = () => {
         className='flex align-middle'>
         {/* {selectedOpt === "convenio" && */}
         <Fragment>
-          {selectedOpt === "convenio" ? (
-            <h1 className='text-3xl'>Seleccionar convenio</h1>
-          ) : selectedOpt === "autorizador" ? (
-            <h1 className='text-3xl'>Seleccionar autorizador</h1>
-          ) : selectedOpt === "Tipo de transaccion" ? (
-            <h1 className='text-3xl'>Seleccionar tipo de transacción</h1>
-          ) : selectedOpt === "comision" ? (
-            <h1 className='text-3xl'>Seleccionar comisión</h1>
-          ) : (
-            ""
-          )}
-          <Pagination maxPage={maxPages} onChange={onChange} grid>
+          <TableEnterprise
+            title={
+              selectedOpt === "convenio"
+                ? "Seleccionar convenio"
+                : selectedOpt === "autorizador"
+                ? "Seleccionar autorizador"
+                : selectedOpt === "Tipo de transaccion"
+                ? "Seleccionar tipo de transacción"
+                : selectedOpt === "comision"
+                ? "Seleccionar comisión"
+                : ""
+            }
+            maxPage={maxPages}
+            headers={headersTable}
+            data={data}
+            onSelectRow={onSelectConvenio}
+            onSetPageData={setPageData}
+            onChange={onChange}>
             {selectedOpt === "comision" && (
               <>
                 <Input
@@ -522,14 +535,7 @@ const CreateComision = () => {
                 />
               </>
             )}
-          </Pagination>
-          {Array.isArray(data) && data.length > 0 && (
-            <Table
-              headers={Object.keys(data[0])}
-              data={data}
-              onSelectRow={onSelectConvenio}
-            />
-          )}
+          </TableEnterprise>
         </Fragment>
       </Modal>
     </Fragment>
