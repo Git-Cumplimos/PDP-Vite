@@ -18,9 +18,9 @@ import {
 import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Pagination from "../../../../components/Compound/Pagination/Pagination";
-import Table from "../../../../components/Base/Table/Table";
 import Modal from "../../../../components/Base/Modal/Modal";
 import Input from "../../../../components/Base/Input/Input";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
 const initComissionData = {
   type: "",
@@ -38,7 +38,7 @@ const CreateComisionCobrada = () => {
   const navigate = useNavigate();
 
   const [
-    { page = 1, selectedOpt, tipoTrx = "", convenio = "", autorizador = "" },
+    { selectedOpt, tipoTrx = "", convenio = "", autorizador = "" },
     setQuery,
   ] = useQuery();
 
@@ -49,6 +49,11 @@ const CreateComisionCobrada = () => {
   });
   const [data, setdata] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
+  const [headersTable, setHeadersTable] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
@@ -181,7 +186,7 @@ const CreateComisionCobrada = () => {
     }
   }, [selectedOpt, page, tipoTrx, convenio, autorizador]);
   const fetchConveniosFunc = () => {
-    fetchConveniosMany("")
+    fetchConveniosMany({ tags: "", page })
       .then((res) => {
         setdata(
           [...res?.results].map(({ id_convenio, nombre_convenio }) => {
@@ -386,6 +391,7 @@ const CreateComisionCobrada = () => {
             onClick={() => {
               setShowModal(true);
               setQuery({ ["selectedOpt"]: "convenio" }, { replace: true });
+              setHeadersTable(["Id convenio", "Nombre convenio"]);
             }}>
             {newComision?.["Convenio"] ? "Editar convenio" : "Agregar convenio"}
           </Button>
@@ -399,6 +405,7 @@ const CreateComisionCobrada = () => {
                 { ["selectedOpt"]: "Tipo de transaccion" },
                 { replace: true }
               );
+              setHeadersTable(["Id tipo operacion", "Nombre transaccion"]);
             }}>
             {newComision?.["Tipo de transaccion"]
               ? "Editar tipo transacción"
@@ -411,6 +418,7 @@ const CreateComisionCobrada = () => {
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "autorizador" }, { replace: true });
+            setHeadersTable(["Id autorizador", "Nombre autorizador"]);
           }}>
           {newComision?.["Autorizador"]
             ? "Editar autorizador"
@@ -421,6 +429,12 @@ const CreateComisionCobrada = () => {
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "comision" }, { replace: true });
+            setHeadersTable([
+              "Id comision",
+              "Transaccion",
+              "Convenio",
+              "Autorizador",
+            ]);
           }}>
           Agregar comisión existente
         </Button>
@@ -436,20 +450,24 @@ const CreateComisionCobrada = () => {
         className='flex align-middle'>
         {/* {selectedOpt === "convenio" && */}
         <Fragment>
-          {selectedOpt === "convenio" ? (
-            <h1 className='text-3xl'>Seleccionar convenio</h1>
-          ) : selectedOpt === "autorizador" ? (
-            <h1 className='text-3xl'>Seleccionar autorizador</h1>
-          ) : selectedOpt === "tipoContrato" ? (
-            <h1 className='text-3xl'>Seleccionar contrato</h1>
-          ) : selectedOpt === "Tipo de transaccion" ? (
-            <h1 className='text-3xl'>Seleccionar tipo de transaccion</h1>
-          ) : selectedOpt === "comision" ? (
-            <h1 className='text-3xl'>Seleccionar comisión</h1>
-          ) : (
-            ""
-          )}
-          <Pagination maxPage={maxPages} onChange={onChange} grid>
+          <TableEnterprise
+            title={
+              selectedOpt === "convenio"
+                ? "Seleccionar convenio"
+                : selectedOpt === "autorizador"
+                ? "Seleccionar autorizador"
+                : selectedOpt === "Tipo de transaccion"
+                ? "Seleccionar tipo de transacción"
+                : selectedOpt === "comision"
+                ? "Seleccionar comisión"
+                : ""
+            }
+            maxPage={maxPages}
+            headers={headersTable}
+            data={data}
+            onSelectRow={onSelectConvenio}
+            onSetPageData={setPageData}
+            onChange={onChange}>
             {selectedOpt === "comision" && (
               <>
                 <Input
@@ -478,14 +496,7 @@ const CreateComisionCobrada = () => {
                 />
               </>
             )}
-          </Pagination>
-          {Array.isArray(data) && data.length > 0 && (
-            <Table
-              headers={Object.keys(data[0])}
-              data={data}
-              onSelectRow={onSelectConvenio}
-            />
-          )}
+          </TableEnterprise>
         </Fragment>
       </Modal>
     </Fragment>
