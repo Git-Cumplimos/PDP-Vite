@@ -207,7 +207,7 @@ const Reporte = () => {
         try {
           const res = await fetchData(url, "GET", queries);
           console.log(res);
-          if (res.status === false) {
+          if (res?.status === false) {
             notifyError(res.msg);
           } else {
             setMaxPages(res?.obj?.maxpages);
@@ -489,7 +489,7 @@ const Reporte = () => {
                 setFechaInicialDownload(e.target.value);
                 if (fechaFinalDownload !== "") {
                   download(e.target.value, fechaFinalDownload).then((res) => {
-                    if (res.status === false) {
+                    if (res?.status === false) {
                       setDownload(null);
                       notifyError(res.msg);
                     } else {
@@ -510,7 +510,7 @@ const Reporte = () => {
                 setFechaFinalDownload(e.target.value);
                 if (fechaInicialDownload !== "") {
                   download(fechaInicialDownload, e.target.value).then((res) => {
-                    if (res.status === false) {
+                    if (res?.status === false) {
                       setDownload(null);
                       notifyError(res.msg);
                     } else {
