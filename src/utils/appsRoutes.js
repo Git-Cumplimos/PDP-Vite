@@ -151,6 +151,9 @@ const VerificacionApertura = lazy(() =>
 const VerificacionNuevosComercios = lazy(() =>
   import("../apps/ValidacionEnrolamiento/VerificacionNuevosComercios")
 );
+const ReporteComercios = lazy(() =>
+  import("../apps/ValidacionEnrolamiento/views/ReporteComercios")
+);
 
 /**
  * AdministradorGestionComercial
@@ -678,6 +681,12 @@ const allUrlsPrivateApps = [
             link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
             label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
             component: VerificacionApertura,
+            permission: [39],
+          },
+          {
+            link: "/Solicitud-enrolamiento/reporte-comercios",
+            label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
+            component: ReporteComercios,
             permission: [39],
           },
         ],
