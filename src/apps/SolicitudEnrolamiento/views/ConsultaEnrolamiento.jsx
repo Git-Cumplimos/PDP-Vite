@@ -8,7 +8,6 @@ import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
 import classes from "../../SolicitudEnrolamiento/views/ConsultaEnrolamiento.module.css";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { ProgressBar } from "react-toastify/dist/components";
 
 const ConsultaEnrolamiento = () => {
   //------------------Estados Consulta---------------------//
