@@ -147,12 +147,24 @@ const ValidacionApertura = () => {
               apellido,
               validation_state,
               fecha_inicio,
-            }) => ({
-              id_proceso,
-              nombre: `${nombre} ${apellido}`,
-              validation_state,
-              fecha_inicio,
-            })
+            }) => {
+              const tempDate = new Date(fecha_inicio);
+              tempDate.setHours(tempDate.getHours() + 5);
+              fecha_inicio = Intl.DateTimeFormat("es-CO", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              }).format(tempDate);
+
+              return {
+                id_proceso,
+                nombre: `${nombre} ${apellido}`,
+                validation_state,
+                fecha_inicio,
+              };
+            }
           )}
           onSelectRow={(e, i) =>
             navigate(
