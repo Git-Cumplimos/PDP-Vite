@@ -1,14 +1,13 @@
 import { createContext, lazy, useContext, useMemo } from "react";
 import { Route, Routes } from "react-router-dom";
 import { useAuth } from "./AuthHooks";
-import {
-  allUrlsPrivateApps,
-  privateUrls,
-  publicUrls,
-  loginUrls,
-} from "../utils/appsRoutes";
+import { allUrlsPrivateApps } from "../utils/appsRoutes";
 
-import { rutasGestion } from "../menu/gestion/Routes";
+import { rutasGestion } from "../pages/Gestion/routes";
+import { rutasReportes } from "../pages/Reportes/routes";
+import { loginUrls } from "../pages/Login/routes";
+import { publicUrls } from "../pages/PublicHome/routes";
+import { privateUrls } from "../pages/routes";
 
 import PrivateRoute from "../components/Compound/PrivateRoute";
 import SubPage from "../components/Base/SubPage";
@@ -120,6 +119,7 @@ export const UrlsContext = createContext({
   urlsPrivateApps: [],
   allRoutes: [],
   urlsGestion: [],
+  urlsReportes: [],
 });
 
 export const useUrls = () => {
@@ -145,6 +145,14 @@ export const useProvideUrls = () => {
     }
   }, [userPermissions]);
 
+  const urlsReportes = useMemo(() => {
+    if (Array.isArray(userPermissions) && userPermissions.length > 0) {
+      return [...filterPermissions(rutasReportes, userPermissions)];
+    } else {
+      return [];
+    }
+  }, [userPermissions]);
+
   const allRoutes = useMemo(() => {
     return (
       <Routes>
@@ -152,6 +160,7 @@ export const useProvideUrls = () => {
           {toRoute(privateUrls)}
           {toRoute(urlsPrivateApps, true, SubPage)}
           {toRoute(urlsGestion, true, SubPage)}
+          {toRoute(urlsReportes, true, SubPage)}
         </Route>
         <Route path="/login" element={<LoginLayout />}>
           {toRoute(loginUrls, false)}
@@ -161,7 +170,7 @@ export const useProvideUrls = () => {
         </Route>
       </Routes>
     );
-  }, [urlsPrivateApps, urlsGestion]);
+  }, [urlsPrivateApps, urlsGestion, urlsReportes]);
 
   return {
     urlsPrivate: privateUrls,
@@ -169,5 +178,6 @@ export const useProvideUrls = () => {
     urlsPrivateApps,
     allRoutes,
     urlsGestion,
+    urlsReportes,
   };
 };
