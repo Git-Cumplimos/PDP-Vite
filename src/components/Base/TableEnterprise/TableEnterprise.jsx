@@ -27,6 +27,7 @@ const TableEnterprise = ({
   onChange = () => {},
   onSubmit = (e) => e.preventDefault(),
   onSetPageData = () => {},
+  onSetUtilsFuncs = () => {},
   children = null,
 }) => {
   const [showFilters, setShowFilters] = useState(true);
@@ -100,6 +101,12 @@ const TableEnterprise = ({
       setPaginationData(({ limit }) => ({ limit, page: 1 }));
     }
   }, [maxPage, page]);
+
+  useEffect(() => {
+    onSetUtilsFuncs({
+      resetPage: () => setPaginationData(({ limit }) => ({ limit, page: 1 })),
+    });
+  }, [onSetUtilsFuncs]);
 
   return (
     <div className={`${wrapper}`}>
@@ -258,27 +265,33 @@ const TableEnterprise = ({
             </tr>
           </thead>
           <tbody>
-            {sortedData.map((obj, index) => (
-              <tr
-                key={index}
-                onClick={onSelectRow ? (e) => onSelectRow(e, index) : null}
-              >
-                {obj.map(([key, value], idx) => {
-                  return (
-                    <td
-                      key={`${key}_${index}`}
-                      className={`${
-                        tableOpts?.[idx]?.hide ? "hidden" : "table-cell"
-                      } ${
-                        onSelectRow ? "cursor-pointer" : "cursor-auto"
-                      } whitespace-pre z-0`}
-                    >
-                      {value}
-                    </td>
-                  );
-                })}
+            {!sortedData?.length ? (
+              <tr>
+                <td colSpan={headers?.length}>No hay datos</td>
               </tr>
-            ))}
+            ) : (
+              sortedData.map((obj, index) => (
+                <tr
+                  key={index}
+                  onClick={onSelectRow ? (e) => onSelectRow(e, index) : null}
+                >
+                  {obj.map(([key, value], idx) => {
+                    return (
+                      <td
+                        key={`${key}_${index}`}
+                        className={`${
+                          tableOpts?.[idx]?.hide ? "hidden" : "table-cell"
+                        } ${
+                          onSelectRow ? "cursor-pointer" : "cursor-auto"
+                        } whitespace-pre z-0`}
+                      >
+                        {value}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -290,8 +303,8 @@ const TableEnterprise = ({
           className={`${limitsBtn} appearance-none`}
           value={limit}
           onChange={(e) =>
-            setPaginationData?.((old) => ({
-              ...old,
+            setPaginationData?.(({ page }) => ({
+              page,
               limit: Number(e.target.value),
             }))
           }
@@ -313,8 +326,8 @@ const TableEnterprise = ({
                 if (page < 2) {
                   return;
                 }
-                setPaginationData?.((old) => ({
-                  ...old,
+                setPaginationData?.(({ limit }) => ({
+                  limit,
                   page: page - 1,
                 }));
               }, [page])}
@@ -325,8 +338,8 @@ const TableEnterprise = ({
                 if (page >= maxPage) {
                   return;
                 }
-                setPaginationData?.((old) => ({
-                  ...old,
+                setPaginationData?.(({ limit }) => ({
+                  limit,
                   page: page + 1,
                 }));
               }, [page, maxPage])}

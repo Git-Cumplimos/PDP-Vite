@@ -16,20 +16,20 @@ import { useNavigate } from "react-router-dom";
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
 
 const capitalize = (word) => {
-  return word.replace(/\b[a-n]/g || /\b[o-z]/g, (c) => c.toUpperCase());
+  return word.toUpperCase();
+  /*  return word.replace(/\b[a-n]/g || /\b[o-z]/g, (c) => c.toUpperCase()); */
 };
 
 const FormularioAutoEnrolamiento = () => {
   const navigate = useNavigate();
+
+  //------------------Constantes para Dar Estilos---------------------//
   const {
-    principal,
     tituloFormularioInscripcion,
-    datos,
-    datosCorreo,
-    autorizacionMensajes,
     mensajeAutorizacion,
     textoMensajeAutorizacion,
   } = classes;
+  //------------------Estados Del Formulario---------------------//
   const [nombreComercio, setNombreComercio] = useState("");
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
@@ -46,22 +46,26 @@ const FormularioAutoEnrolamiento = () => {
   const [tratamientoDatos, setTratamientoDatos] = useState("");
   const [responsableIva, setResponsableIva] = useState("");
 
+  //------------------Estados Asesores---------------------//
   const [asesores, setAsesores] = useState(0);
-  const [asignarAsesores, setAsignarAsesores] = useState(0);
 
+  //------------------Estados Actividad Economica---------------------//
   const [actividad, setActividad] = useState("");
   const [foundActivities, setFoundActivities] = useState([]);
 
   const [commerceType, setCommerceType] = useState([]);
 
+  //------------------Estados Archivos PDF---------------------//
   const [archivos1, setArchivos1] = useState([]);
   const [archivos2, setArchivos2] = useState([]);
   const [archivos3, setArchivos3] = useState([]);
 
+  //------------------Estados Codigos Dane---------------------//
   const [codDaneMunicipioComercio, setCodDaneMunicipioComercio] = useState("");
   const [codDaneMunicipioCorrespondencia, setCodDaneMunicipioCorrespondencia] =
     useState("");
 
+  //------------------Estados Ubicacion Comercio---------------------//
   const commerceLocation = {
     municipio: useState(""),
     departamento: useState(""),
@@ -70,6 +74,7 @@ const FormularioAutoEnrolamiento = () => {
     direccion: useState(""),
     foundMunicipios: useState([]),
   };
+  //------------------Estados Ubicacion Correspondencia---------------------//
   const homeLocation = {
     municipio: useState(""),
     departamento: useState(""),
@@ -79,11 +84,12 @@ const FormularioAutoEnrolamiento = () => {
     foundMunicipios: useState([]),
   };
 
+  //------------------Estados Localidad Comercio y Correspondencia---------------------//
   const [LocalidadUbComercio, setLocalidadUbComercio] = useState(0);
   const [LocalidadUbCorrespondencia, setLocalidadUbCorrespondencia] =
     useState(0);
 
-  //Traer localidades Con codigo dane de la ubicacion del comercio
+  //------------------Traer localidades Con codigo dane de la ubicacion del comercio---------------------//
   useEffect(() => {
     fetchData(
       `${
@@ -94,10 +100,12 @@ const FormularioAutoEnrolamiento = () => {
       {},
       {},
       false
-    ).then((respuesta) => setLocalidadUbComercio(respuesta.obj.results));
+    )
+      .then((respuesta) => setLocalidadUbComercio(respuesta.obj.results))
+      .catch((err) => console.log(err));
   }, [codDaneMunicipioComercio]);
 
-  //Traer localidades Con codigo dane de la ubicacion Correspondencia
+  //------------------Traer localidades Con codigo dane de la ubicacion Correspondencia---------------------//
   useEffect(() => {
     fetchData(
       `${
@@ -108,9 +116,12 @@ const FormularioAutoEnrolamiento = () => {
       {},
       {},
       false
-    ).then((respuesta) => setLocalidadUbCorrespondencia(respuesta.obj.results));
+    )
+      .then((respuesta) => setLocalidadUbCorrespondencia(respuesta.obj.results))
+      .catch((err) => console.log(err));
   }, [codDaneMunicipioCorrespondencia]);
 
+  //------------------Traer Asesores---------------------//
   useEffect(() => {
     fetchData(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?limit=${14}`,
@@ -119,9 +130,12 @@ const FormularioAutoEnrolamiento = () => {
       {},
       {},
       false
-    ).then((respuesta) => setAsesores(respuesta.obj.results));
+    )
+      .then((respuesta) => setAsesores(respuesta.obj.results))
+      .catch((err) => console.log(err));
   }, []);
 
+  //------------------Guardar Archivos PDF---------------------//
   const onFileChange = useCallback((files) => {
     if (Array.isArray(Array.from(files))) {
       files = Array.from(files);
@@ -141,6 +155,8 @@ const FormularioAutoEnrolamiento = () => {
       setArchivos3(files);
     }
   }, []);
+
+  //------------------Funcion Para Subir El Formulario---------------------//
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
@@ -226,7 +242,7 @@ const FormularioAutoEnrolamiento = () => {
                 navigate("/public/solicitud-enrolamiento/consultar");
               }
             })
-            .catch(() => {});
+            .catch((err) => console.log(err));
           /* fetch(
             `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/upload-file`,
 
@@ -312,26 +328,7 @@ const FormularioAutoEnrolamiento = () => {
               type="text"
               required
             ></Input>
-            {/*   <Select
-              onChange={(event) => setAsignarAsesores(event.target.value)}
-              id="comissionType"
-              name="comissionType"
-              value={asignarAsesores}
-              label={`Asignar Asesor`}
-              options={
-                Object.fromEntries([
-                  ["", ""],
-                  ...asesores.map(({ nom_asesor  , id_asesor  }) => {
-                    return [nom_asesor  , id_asesor ];
-                  }),
-                ]) || { "": "" }
-              }
-            ></Select> */}
-            <Fieldset
-              legend="Representante legal"
-              className="lg:col-span-3
-      "
-            >
+            <Fieldset legend="Representante legal" className="lg:col-span-3">
               <Input
                 label={"Nombres"}
                 placeholder="Ingrese sus Nombres"

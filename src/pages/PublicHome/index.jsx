@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-import HNavbar from "../components/Base/HNavbar";
-import { useUrls } from "../hooks/UrlsHooks";
+
+import HNavbar from "../../components/Base/HNavbar";
+import { useUrls } from "../../hooks/UrlsHooks";
 
 const PublicHome = () => {
   const { urlsPublic } = useUrls();
