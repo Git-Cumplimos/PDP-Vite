@@ -178,8 +178,12 @@ const Convenios = () => {
           })
           .catch((err) => console.error(err));
       } else {
+        let obj = {};
+        if (selectedConvenio?.Ean13 != "") {
+          obj = { ...obj, ean13: selectedConvenio?.Ean13 };
+        }
         postConvenios({
-          ean13: selectedConvenio?.Ean13,
+          obj,
           nombre_convenio: selectedConvenio?.["Nombre de convenio"],
           tags: selectedConvenio?.Tags.join(","),
           referencias: [

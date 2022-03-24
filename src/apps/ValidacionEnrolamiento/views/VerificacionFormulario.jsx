@@ -360,7 +360,7 @@ const VerificacionFormulario = () => {
   }, [datosParams]);
   return (
     <div>
-      {datosParams != "" ? (
+      {datosParams /* != "" */ ? (
         datosParams[0]["asesor"] != "" ? (
           <Form>
             <Input

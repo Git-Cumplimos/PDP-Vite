@@ -18,22 +18,23 @@ import { useNavigate } from "react-router-dom";
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
 
 const capitalize = (word) => {
-  /*  return word.charAt(0).toUpperCase() + word.slice(1); */
-  return word.replace(/\b[a-n]/g || /\b[o-z]/g, (c) => c.toUpperCase());
+  return word.toUpperCase();
+
+  /* return word.charAt(0).toUpperCase() + word.slice(1); */
+  /* return word.replace(/\b[a-n]/g || /\b[o-z]/g, (c) => c.toUpperCase()); */
 };
 
 const FormularioEnrolamiento = () => {
   const params = useParams();
   const navigate = useNavigate();
+  //------------------Constantes para Dar Estilos---------------------//
   const {
-    principal,
     tituloFormularioInscripcion,
-    datos,
-    datosCorreo,
-    autorizacionMensajes,
     mensajeAutorizacion,
     textoMensajeAutorizacion,
   } = classes;
+
+  //------------------Estados Del Formulario---------------------//
   const [nombreComercio, setNombreComercio] = useState("");
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
@@ -50,22 +51,27 @@ const FormularioEnrolamiento = () => {
   const [tratamientoDatos, setTratamientoDatos] = useState("");
   const [responsableIva, setResponsableIva] = useState("");
 
+  //------------------Estados Asesores---------------------//
   const [asesores, setAsesores] = useState(0);
   const [nombreAsesor, setNombreAsesor] = useState(0);
 
+  //------------------Estados Actividad Economica---------------------//
   const [actividad, setActividad] = useState("");
   const [foundActivities, setFoundActivities] = useState([]);
 
   const [commerceType, setCommerceType] = useState([]);
 
+  //------------------Estados Archivos PDF---------------------//
   const [archivos1, setArchivos1] = useState([]);
   const [archivos2, setArchivos2] = useState([]);
   const [archivos3, setArchivos3] = useState([]);
 
+  //------------------Estados Codigos Dane---------------------//
   const [codDaneMunicipioComercio, setCodDaneMunicipioComercio] = useState("");
   const [codDaneMunicipioCorrespondencia, setCodDaneMunicipioCorrespondencia] =
     useState("");
 
+  //------------------Estados Ubicacion Comercio---------------------//
   const commerceLocation = {
     municipio: useState(""),
     departamento: useState(""),
@@ -74,6 +80,8 @@ const FormularioEnrolamiento = () => {
     direccion: useState(""),
     foundMunicipios: useState([]),
   };
+
+  //------------------Estados Ubicacion Correspondencia---------------------//
   const homeLocation = {
     municipio: useState(""),
     departamento: useState(""),
@@ -82,15 +90,15 @@ const FormularioEnrolamiento = () => {
     direccion: useState(""),
     foundMunicipios: useState([]),
   };
-
+  //------------------Estados Localidad Comercio y Correspondencia---------------------//
   const [LocalidadUbComercio, setLocalidadUbComercio] = useState(0);
   const [LocalidadUbCorrespondencia, setLocalidadUbCorrespondencia] =
     useState(0);
 
+  //------------------Estados Desencriptar Id Asesor---------------------//
   const [desencriptarIdAsesor, setDesencriptarIdAsesor] = useState({});
-  //Desencriptar Id Asesor
 
-  //Traer localidades Con codigo dane de la ubicacion del comercio
+  //------------------Traer localidades Con codigo dane de la ubicacion del comercio---------------------//
   useEffect(() => {
     fetchData(
       `${
@@ -104,7 +112,7 @@ const FormularioEnrolamiento = () => {
     ).then((respuesta) => setLocalidadUbComercio(respuesta.obj.results));
   }, [codDaneMunicipioComercio]);
 
-  //Traer localidades Con codigo dane de la ubicacion Correspondencia
+  //------------------Traer localidades Con codigo dane de la ubicacion Correspondencia---------------------//
   useEffect(() => {
     fetchData(
       `${
@@ -117,7 +125,7 @@ const FormularioEnrolamiento = () => {
       false
     ).then((respuesta) => setLocalidadUbCorrespondencia(respuesta.obj.results));
   }, [codDaneMunicipioCorrespondencia]);
-
+  //------------------Traer Asesores---------------------//
   useEffect(() => {
     fetchData(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?limit=${14}`,
@@ -128,7 +136,7 @@ const FormularioEnrolamiento = () => {
       false
     ).then((respuesta) => setAsesores(respuesta.obj.results));
   }, []);
-
+  //------------------Guardar Archivos PDF---------------------//
   const onFileChange = useCallback((files) => {
     if (Array.isArray(Array.from(files))) {
       files = Array.from(files);
@@ -148,6 +156,7 @@ const FormularioEnrolamiento = () => {
       setArchivos3(files);
     }
   }, []);
+  //------------------Funcion Para Subir El Formulario---------------------//
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
@@ -234,52 +243,12 @@ const FormularioEnrolamiento = () => {
               }
             })
             .catch(() => {});
-          /* fetch(
-            `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/upload-file`,
-
-            {
-              method: "POST",
-                headers: {
-                "Content-type": "application/json",
-              },
-              body: formData,
-            }
-          )
-            .then((res) => res.json())
-            .then((respuesta) => {
-              if (!respuesta?.status) {
-                notifyError(respuesta?.msg);
-              } else {
-                console.log(respuesta?.obj);
-                notify("Se han subido los archivos");
-                setEstadoForm(true);
-              }
-            }).catch(() => {}); */
-          /* fetch(
-            `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
-            {
-              method: "POST",
-              body: formData,
-              mode: "no-cors",
-            }
-          )
-            .then((res) => res.json())
-            .then((respuesta) => {
-              if (!respuesta?.status) {
-                notifyError(respuesta?.msg);
-              } else {
-                console.log(respuesta?.obj);
-                notify("Se han subido los archivos");
-                setEstadoForm(true);
-              }
-            })
-            .catch((err) => console.error(err)); */
         })
         .catch(() => {});
     },
     [archivos1, archivos2, archivos3]
   );
-
+  //------------------Asignar codigo dane de la ubicacion Comercio---------------------//
   useEffect(() => {
     if (commerceLocation.municipio[0] != "") {
       setCodDaneMunicipioComercio(
@@ -289,6 +258,7 @@ const FormularioEnrolamiento = () => {
       );
     }
   }, [commerceLocation]);
+  //------------------Asignar codigo dane de la ubicacion Correspondencia---------------------//
   useEffect(() => {
     if (homeLocation.municipio[0] != "") {
       setCodDaneMunicipioCorrespondencia(
@@ -299,11 +269,14 @@ const FormularioEnrolamiento = () => {
     }
   }, [homeLocation]);
 
+  //------------------Desencriptar Asesor URL---------------------//
   useEffect(() => {
     const datoEncriptado = params.idAsesor.toString();
     var decodedData = window.atob(datoEncriptado); // decode the string
     setDesencriptarIdAsesor(parseInt(decodedData));
   }, []);
+
+  //------------------Traer Asesor Desencriptado URL---------------------//
   useEffect(() => {
     if (desencriptarIdAsesor) {
       fetchData(

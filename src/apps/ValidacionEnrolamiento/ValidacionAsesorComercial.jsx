@@ -34,14 +34,15 @@ function ValidacionAsesorComercial() {
   useEffect(() => {
     if (fechaInicial && fechaFinal && estadoProceso) {
       fetchData(
-        `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`,
-        /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`, */
+        /* `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`, */
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`,
         "GET"
       )
         /* .then((response) => response.json()) */
         .then((respuesta) => {
           setDatosFiltradosFecha(respuesta.obj.results);
-        });
+        })
+        .catch((err) => console.log(err));
     }
   }, [fechaInicial, fechaFinal, estadoProceso]);
   /*   console.log(datosOrdenados); */
