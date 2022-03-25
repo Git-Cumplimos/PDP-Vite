@@ -1,22 +1,23 @@
 {
-  "dev": {
+  "prod": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-puntodepago-dev-100514-authRole",
-      "UnauthRoleArn": "arn:aws:iam::641955663261:role/amplify-puntodepago-dev-100514-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::641955663261:role/amplify-puntodepago-dev-100514-authRole",
-      "Region": "us-east-2",
-      "DeploymentBucketName": "amplify-puntodepago-dev-100514-deployment",
-      "UnauthRoleName": "amplify-puntodepago-dev-100514-unauthRole",
-      "StackName": "amplify-puntodepago-dev-100514",
-      "StackId": "arn:aws:cloudformation:us-east-2:641955663261:stack/amplify-puntodepago-dev-100514/ddbed850-85cb-11ec-a0be-023c397d9a40"
+      "AuthRoleName": "amplify-puntodepago-prod-205638-authRole",
+      "UnauthRoleArn": "arn:aws:iam::161885268058:role/amplify-puntodepago-prod-205638-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::161885268058:role/amplify-puntodepago-prod-205638-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-puntodepago-prod-205638-deployment",
+      "UnauthRoleName": "amplify-puntodepago-prod-205638-unauthRole",
+      "StackName": "amplify-puntodepago-prod-205638",
+      "StackId": "arn:aws:cloudformation:us-east-1:161885268058:stack/amplify-puntodepago-prod-205638/a6d25d70-ab15-11ec-8697-12e4e0376d8b",
+      "AmplifyAppId": "d1q7ew7tom3i58"
     },
     "categories": {
       "auth": {
-        "puntodepago87d16d6b": {
-          "userPoolId": "us-east-2_jtr8cWC4d",
-          "userPoolName": "PuntoDePago_master_client",
-          "webClientId": "21ofldig7b4ios43hvs3f4c38b",
-          "nativeClientId": "21ofldig7b4ios43hvs3f4c38b"
+        "puntodepago11bc3c89": {
+          "userPoolId": "us-east-1_3bdNhk1hg",
+          "userPoolName": "Formulario1",
+          "webClientId": "1elfntjkt0riasq92clr8na3q9",
+          "nativeClientId": "1elfntjkt0riasq92clr8na3q9"
         }
       }
     }

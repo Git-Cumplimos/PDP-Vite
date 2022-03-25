@@ -1,5 +1,7 @@
-import AppIcons from "../../components/Base/AppIcons";
 import { lazy } from "react";
+
+const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
+
 /**
  * COMPONENTES ROL CAJERO
  */
@@ -16,30 +18,25 @@ const ParametrizacionRecaudo = lazy(() =>
 export const rutasGestion = [
   {
     link: "/gestion/panel_transacciones",
-    label: <AppIcons Logo={"RECAUDO"} name="Panel de transacciones"></AppIcons>,
+    label: <AppIcons Logo={"RECAUDO"} name="Panel de transacciones" />,
     component: Panel,
     permission: [3],
   },
   {
     link: "/gestion/carga_comprobante",
-    label: <AppIcons Logo={"RECAUDO"} name="Cargar comprobantes"></AppIcons>,
+    label: <AppIcons Logo={"RECAUDO"} name="Cargar comprobantes" />,
     component: CargaComprobante,
     permission: [3],
   },
   {
     link: "/gestion/validar_comprobante",
-    label: <AppIcons Logo={"RECAUDO"} name="Validar comprobantes"></AppIcons>,
+    label: <AppIcons Logo={"RECAUDO"} name="Validar comprobantes" />,
     component: PanelConsignaciones,
     permission: [3],
   },
   {
     link: "/gestion/parametrizar_cuenta",
-    label: (
-      <AppIcons
-        Logo={"RECAUDO"}
-        name="Parametrizar cuenta(s) recaudo"
-      ></AppIcons>
-    ),
+    label: <AppIcons Logo={"RECAUDO"} name="Parametrizar cuenta(s) recaudo" />,
     component: ParametrizacionRecaudo,
     permission: [3],
   },

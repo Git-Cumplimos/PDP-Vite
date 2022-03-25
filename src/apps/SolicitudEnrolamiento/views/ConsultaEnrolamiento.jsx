@@ -8,6 +8,7 @@ import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
 import classes from "../../SolicitudEnrolamiento/views/ConsultaEnrolamiento.module.css";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import ProgressBar from "../../../components/Base/ProgressBar";
 
 const ConsultaEnrolamiento = () => {
   //------------------Estados Consulta---------------------//
@@ -201,7 +202,19 @@ const ConsultaEnrolamiento = () => {
                   ""
                 )}
               </div>
-              {/* <ProgressBar></ProgressBar> */}
+              {respuestaProceso[0].validation_state === "101" ? (
+                <ProgressBar value={25} self={false} max="100"></ProgressBar>
+              ) : respuestaProceso[0].validation_state === "200" ? (
+                <ProgressBar value={50} self={false} max="100"></ProgressBar>
+              ) : respuestaProceso[0].validation_state === "201" ? (
+                <ProgressBar value={100} self={false} max="100"></ProgressBar>
+              ) : respuestaProceso[0].validation_state === "102" ? (
+                <ProgressBar value={25} self={true} max="100"></ProgressBar>
+              ) : respuestaProceso[0].validation_state === "202" ? (
+                <ProgressBar value={100} self={true} max="100"></ProgressBar>
+              ) : (
+                <ProgressBar value={10} self={false} max="100"></ProgressBar>
+              )}
             </Modal>
           ) : /*  respuestaProceso && */
           respuestaProceso?.lenth > 1 /* &&
