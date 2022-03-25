@@ -1,11 +1,17 @@
 import { useState } from "react";
 import classes from "./TextArea.module.css";
 
-const TextArea = ({ label, self = false, onLazyInput, info='', ...input }) => {
+const TextArea = ({
+  label,
+  self = false,
+  onLazyInput,
+  info = "",
+  ...input
+}) => {
   const { formItem } = classes;
   const { id: _id } = input;
 
-  const [timer, setTimer] = useState(null);  
+  const [timer, setTimer] = useState(null);
 
   if (onLazyInput !== undefined) {
     const { callback, timeOut } = onLazyInput;
@@ -45,12 +51,12 @@ const TextArea = ({ label, self = false, onLazyInput, info='', ...input }) => {
           {label}
         </label>
       )}
-    <div>  
-      <textarea {...input} />
-      {info ? <p>{info}</p> : ""}
-    </div>  
+      <div>
+        <textarea {...input} />
+        {info ? <p>{info}</p> : ""}
+      </div>
     </div>
   );
-}
+};
 
-export default TextArea
+export default TextArea;

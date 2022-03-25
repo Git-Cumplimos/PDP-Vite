@@ -2,7 +2,10 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
+// import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
+import TextArea from "../../../components/Base/TextArea";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 import { useFetch } from "../../../hooks/useFetch";
 
@@ -10,16 +13,41 @@ import { notifyError } from "../../../utils/notify";
 
 const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
+const reportPermisions = {
+  "reporte-general-transacciones/": 41,
+};
+
+const filterPermissions = (permissionList) => {
+  const filteredReports = [
+    ...Object.entries(reportPermisions).filter(([, permission]) => {
+      if (permissionList.includes(permission)) {
+        return true;
+      }
+      return false;
+    }),
+  ].map(([path]) => path);
+  return filteredReports;
+};
+
 const Koncilia = () => {
+  const { userPermissions } = useAuth();
+
   const [fileList, setFileList] = useState([]);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(1);
-  // const [utilsTable, setUtilsTable] = useState({});
 
   const [route, setRoute] = useState("");
 
   const [loadingList, fetchList] = useFetch();
   const [loadingFile, fetchFile] = useFetch();
+
+  const mappedPermissions = useMemo(
+    () =>
+      filterPermissions(
+        userPermissions.map(({ id_permission }) => id_permission)
+      ),
+    [userPermissions]
+  );
 
   useEffect(() => {
     fetchList(`${url}/read-files`, "GET", { path: route, ...pageData })
@@ -28,8 +56,8 @@ const Koncilia = () => {
           notifyError(res?.msg);
           return;
         }
-        setFileList(
-          (res?.obj?.results || []).map(({ name, type, date }) => ({
+        const listOfFiles = (res?.obj?.results || []).map(
+          ({ name, type, date }) => ({
             name,
             type,
             date: date
@@ -42,16 +70,17 @@ const Koncilia = () => {
                   second: "numeric",
                 }).format(new Date(date))
               : "",
-          }))
+          })
         );
+        const filteredFiles = listOfFiles.filter(
+          ({ name }) =>
+            route !== "" || (route === "" && mappedPermissions.includes(name))
+        );
+        setFileList(filteredFiles);
         setMaxPages(res?.obj?.maxpages || 1);
       })
       .catch((err) => console.error(err));
-  }, [route, fetchList, pageData]);
-
-  // useEffect(() => {
-  //   utilsTable?.resetPage?.();
-  // }, [route, utilsTable]);
+  }, [route, fetchList, pageData, mappedPermissions]);
 
   const isLoading = useMemo(
     () => loadingList || loadingFile,
@@ -89,8 +118,26 @@ const Koncilia = () => {
           }
         }}
         onSetPageData={setPageData}
-        // onSetUtilsFuncs={setUtilsTable}
       >
+        {/* <Input
+          id={"date_report_koncilia_1"}
+          name={"date_ini"}
+          label={"Fecha inicial"}
+          type={"date"}
+        />
+        <Input
+          id={"date_report_koncilia_2"}
+          name={"date_end"}
+          label={"Fecha Final"}
+          type={"date"}
+        /> */}
+        <TextArea
+          id={"date_report_koncilia_2"}
+          label={"Ruta"}
+          value={route}
+          readOnly
+          rows={3}
+        />
         <ButtonBar>
           <Button
             disabled={!route}
@@ -102,7 +149,7 @@ const Koncilia = () => {
               })
             }
           >
-            Atras
+            Ir una carpeta atras
           </Button>
         </ButtonBar>
       </TableEnterprise>
