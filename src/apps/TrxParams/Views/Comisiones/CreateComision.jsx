@@ -17,7 +17,6 @@ import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
 import Modal from "../../../../components/Base/Modal";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
-import Pagination from "../../../../components/Compound/Pagination";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
 const initComissionData = {

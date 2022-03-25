@@ -37,7 +37,7 @@ const EnviarSMS = () => {
   const options = [
     { value: "", label: "" },
     { value: "ingresar", label: "Ingresar Números" },
-    { value: "seleccionar", label: "Tipo de comercios" },
+    //{ value: "seleccionar", label: "Tipo de comercios" },
   ];
 
   /*Buscar Mensaje*/
