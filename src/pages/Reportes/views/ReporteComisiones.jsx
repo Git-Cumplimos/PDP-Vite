@@ -134,6 +134,7 @@ const ReporteComisiones = () => {
             autoComplete='off'
             // defaultValue={newComision?.["Autorizador"]}
             value={report?.["Autorizador"]}
+            info={<button>sss</button>}
             disabled
           />
         )}
@@ -168,7 +169,7 @@ const ReporteComisiones = () => {
             ? "Editar autorizador"
             : "Agregar autorizador"}
         </Button>
-        <Button>Generar reporte</Button>
+        <Button type='submit'>Generar reporte</Button>
       </ButtonBar>
       <Modal
         show={showModal}
@@ -200,7 +201,7 @@ const ReporteComisiones = () => {
                 defaultValue={convenio}
               />
             )}
-            {selectedOpt === "convenio" && (
+            {selectedOpt === "autorizador" && (
               <Input
                 id={"autorizadorComissions"}
                 label={"Autorizador"}
