@@ -1,9 +1,4 @@
 import fetchData from "../../../utils/fetchData";
-import { fetchAutorizadores } from "./fetchRevalAutorizadores";
-
-const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
-const urlAutorizadores = process.env.REACT_APP_URL_REVAL_AUTORIZADOR;
-
 const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
 
 export const postComisionesPagar = async (bodyObj) => {
