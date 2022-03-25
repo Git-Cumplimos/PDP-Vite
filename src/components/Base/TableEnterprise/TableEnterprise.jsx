@@ -68,9 +68,9 @@ const TableEnterprise = ({
             const temp1 = dir ? a[ind][1] : b[ind][1];
             const temp2 = dir ? b[ind][1] : a[ind][1];
             sortRet.push(
-              temp1 instanceof String
-                ? temp1.localeCompare(temp2)
-                : temp1 - temp2
+              temp1 instanceof Number
+                ? temp1 - temp2
+                : temp1.localeCompare(temp2)
             );
           }
         }
@@ -194,13 +194,13 @@ const TableEnterprise = ({
                     onClick={() =>
                       setTableOpts((old) => {
                         const copy = [...old];
-                        copy[index] = {
+                        copy.splice(index, 1, {
                           ...copy[index],
                           sort: {
                             state: true,
                             dir: !copy[index]?.sort?.dir,
                           },
-                        };
+                        });
                         return [...copy];
                       })
                     }
@@ -216,14 +216,13 @@ const TableEnterprise = ({
                               e.stopPropagation();
                               setTableOpts((old) => {
                                 const copy = [...old];
-                                console.log("copy", copy[index]);
-                                copy[index] = {
+                                copy.splice(index, 1, {
                                   ...copy[index],
                                   sort: {
                                     state: !copy[index]?.sort?.state,
                                     dir: false,
                                   },
-                                };
+                                });
                                 return [...copy];
                               });
                             }}

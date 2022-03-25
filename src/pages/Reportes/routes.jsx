@@ -8,6 +8,6 @@ export const rutasReportes = [
     link: "/reportes/koncilia",
     label: <AppIcons Logo={"RECAUDO"} name="Reportes koncilia" />,
     component: Koncilia,
-    permission: [1],
+    permission: [40],
   },
 ];
