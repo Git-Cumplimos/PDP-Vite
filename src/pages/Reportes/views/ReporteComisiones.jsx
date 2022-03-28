@@ -6,8 +6,11 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import useQuery from "../../../hooks/useQuery";
+import { notify, notifyError } from "../../../utils/notify";
+import { postObtenerReporteComisionesAplicadas } from "../utils/fetchReportesComisiones";
 
 const ReporteComisiones = () => {
   const [{ selectedOpt, convenio = "", autorizador = "" }, setQuery] =
@@ -18,9 +21,16 @@ const ReporteComisiones = () => {
     limit: 10,
   });
   const [showModal, setShowModal] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [headersTable, setHeadersTable] = useState([]);
   const [data, setdata] = useState([]);
-  const [report, setReport] = useState({});
+  const [report, setReport] = useState({
+    "Id comercio": "",
+    "Fecha inicio": "",
+    "Fecha fin": new Date().toISOString().substring(0, 10),
+    // .replace("/", "-"),
+  });
+
   const handleClose = useCallback(() => {
     setShowModal(false);
     setQuery(
@@ -74,11 +84,12 @@ const ReporteComisiones = () => {
   const onChangeReport = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
     const newData = [];
-    ["Id comercio"].forEach((col) => {
+    ["Id comercio", "Fecha inicio", "Fecha fin"].forEach((col) => {
       let data = null;
       data = formData.get(col);
       newData.push([col, data]);
     });
+    console.log(report);
     setReport((old) => ({
       ...old,
       ...Object.fromEntries(newData),
@@ -108,8 +119,71 @@ const ReporteComisiones = () => {
     (ev) => setQuery({ [ev.target.name]: ev.target.value }, { replace: true }),
     [setQuery]
   );
+  const removeReport = useCallback(
+    (name) => (ev) => {
+      ev.preventDefault();
+      setReport((old) => {
+        return { ...old, [name]: "" };
+      });
+    },
+    []
+  );
+  const onSubmit = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      if (new Date(report["Fecha fin"]) > new Date()) {
+        notifyError("La fecha final no puede ser mayor al dia de hoy");
+        return;
+      }
+
+      if (report["Fecha fin"] !== "") {
+        if (report["Fecha inicio"] !== "") {
+          if (
+            new Date(report["Fecha fin"]) <= new Date(report["Fecha inicio"])
+          ) {
+            notifyError("La fecha final debe ser mayor a la inicial");
+            return;
+          }
+        } else {
+          notifyError("Debe existir una fecha inicial");
+          return;
+        }
+      }
+      let obj = {};
+      if (report["Id comercio"] !== "") {
+        obj["id_comercio"] = report["Id comercio"];
+      }
+      if (report["Autorizador"] !== "" && report["Autorizador"]) {
+        obj["id_autorizador"] = report["Id autorizador"];
+      }
+      if (report["Convenio"] !== "" && report["Convenio"]) {
+        obj["id_convenio"] = report["Id convenio"];
+      }
+      if (report["Fecha inicio"] !== "") {
+        obj["date_ini"] = report["Fecha inicio"];
+      }
+      if (report["Fecha fin"] !== "") {
+        obj["date_end"] = report["Fecha fin"];
+      }
+      setIsUploading(true);
+      postObtenerReporteComisionesAplicadas(obj)
+        .then((res) => {
+          if (res?.status) {
+            notify(res?.msg);
+            window.open(res?.obj?.url);
+            setIsUploading(false);
+          } else {
+            notifyError(res?.msg);
+            setIsUploading(false);
+          }
+        })
+        .catch((err) => console.error(err));
+    },
+    [report]
+  );
   return (
     <>
+      <SimpleLoading show={isUploading} />
       <h1 className='text-3xl'>Crear comisión a pagar:</h1>
       {/* <SearchComissions comissionFace="pay" onSelectItem={onSelectItem} /> */}
       <Form onChange={onChangeReport} grid>
@@ -123,6 +197,18 @@ const ReporteComisiones = () => {
             // defaultValue={newComision?.["Convenio"]}
             value={report?.["Convenio"]}
             disabled
+            info={
+              <button
+                className='bi bi-x'
+                style={{
+                  position: "absolute",
+                  top: "-35px",
+                  right: "-235px",
+                  fontSize: "30px",
+                  backgroundColor: "#f4f4f5",
+                }}
+                onClick={removeReport("Convenio")}></button>
+            }
           />
         )}
         {report?.["Autorizador"] && (
@@ -134,7 +220,18 @@ const ReporteComisiones = () => {
             autoComplete='off'
             // defaultValue={newComision?.["Autorizador"]}
             value={report?.["Autorizador"]}
-            info={<button>sss</button>}
+            info={
+              <button
+                className='bi bi-x'
+                style={{
+                  position: "absolute",
+                  top: "-35px",
+                  right: "-235px",
+                  fontSize: "30px",
+                  backgroundColor: "#f4f4f5",
+                }}
+                onClick={removeReport("Autorizador")}></button>
+            }
             disabled
           />
         )}
@@ -145,6 +242,24 @@ const ReporteComisiones = () => {
           type='number'
           autoComplete='off'
           value={report?.["Id comercio"]}
+          onChange={() => {}}
+        />
+        <Input
+          id='Fecha inicio'
+          name='Fecha inicio'
+          label={"Fecha inicio"}
+          type='date'
+          autoComplete='off'
+          value={report?.["Fecha inicio"]}
+          onChange={() => {}}
+        />
+        <Input
+          id='Fecha fin'
+          name='Fecha fin'
+          label={"Fecha fin"}
+          type='date'
+          autoComplete='off'
+          value={report?.["Fecha fin"]}
           onChange={() => {}}
         />
       </Form>
@@ -169,7 +284,9 @@ const ReporteComisiones = () => {
             ? "Editar autorizador"
             : "Agregar autorizador"}
         </Button>
-        <Button type='submit'>Generar reporte</Button>
+        <Button type='submit' onClick={onSubmit}>
+          Generar reporte
+        </Button>
       </ButtonBar>
       <Modal
         show={showModal}
