@@ -247,7 +247,7 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"PAGO"} name="Premios" />,
         component: Premios,
         extern: false,
-        permission: [3], ///////////////////////////////////////////////////////////////////
+        permission: [43], ///////////////////////////////////////////////////////////////////
       },
     ],
   },
