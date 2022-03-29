@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
@@ -11,20 +11,25 @@ const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
 const UserForm = ({ onCloseModal }) => {
-  const makeForm = useMemo(() => {
-    const temp = { "": "" };
+  const [docTypes, setDocTypes] = useState({ "": "" });
+
+  useEffect(() => {
     fetchData(`${url_types}/type-doc`, "GET", {}, {})
       .then((res) => {
+        const temp = { "": "" };
         if (res?.status) {
-          res?.obj.forEach(({ id_doc, Nombre, nombre_corto }) => {
+          for (const { id_doc, Nombre, nombre_corto } of res?.obj) {
             temp[`${Nombre} (${nombre_corto})`] = id_doc;
-          });
+          }
+          setDocTypes(temp);
         } else {
           notifyError(res?.msg);
         }
       })
       .catch(() => {});
+  }, []);
 
+  const makeForm = useMemo(() => {
     return {
       "Primer nombre": {},
       "Segundo nombre": {
@@ -35,7 +40,7 @@ const UserForm = ({ onCloseModal }) => {
         required: false,
       },
       "Tipo de documento": {
-        options: temp,
+        options: docTypes,
       },
       "Numero de documento": {},
       Email: {
@@ -44,7 +49,7 @@ const UserForm = ({ onCloseModal }) => {
       Telefono: {},
       Direccion: {},
     };
-  }, []);
+  }, [docTypes]);
 
   const onSubmit = (e) => {
     e.preventDefault();
