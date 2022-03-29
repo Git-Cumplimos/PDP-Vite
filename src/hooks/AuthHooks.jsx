@@ -40,7 +40,7 @@ const fetchDane = async (codigo_dane) => {
       urlCiudad_dane,
       "GET",
       {
-        c_digo_dane_del_municipio: codigo_dane,
+        c_digo_dane_del_municipio: codigo_dane.replace(/\d{2}/i, "$&."),
       },
       {},
       {},
