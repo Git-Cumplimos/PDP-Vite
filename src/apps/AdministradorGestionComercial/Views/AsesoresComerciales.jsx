@@ -132,18 +132,18 @@ const AsesoresComerciales = () => {
       )
     );
   }, []);
-  /*   const GenerarLinkAsesor = () => {
+  const GenerarLinkAsesor = () => {
     const link = `https://certificacion.puntodepagopruebas.com/solicitud-enrolamiento/formulario/${window.btoa(
       selected.id_asesor
     )}`;
     setLinkAsesor(link);
-  }; */
-  const GenerarLinkAsesor = () => {
+  };
+  /*   const GenerarLinkAsesor = () => {
     const link = `http://localhost:3000/public/solicitud-enrolamiento/formulario/${window.btoa(
       selected.id_asesor
     )}`;
     setLinkAsesor(link);
-  };
+  }; */
 
   let inputRef = HTMLInputElement | null;
   const copyLink = () => {
