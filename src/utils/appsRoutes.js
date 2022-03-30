@@ -5,9 +5,6 @@ import { lazy } from "react";
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
-import CreateComisionCobrada from "../apps/TrxParams/Views/Comisiones/CreateComisionCobrada";
-import ConfiguracionComercios from "../apps/TrxParams/Views/ConfiguracionComercios";
-// import Gestion from "../pages/Gestion";
 
 /**
  * * Logos
@@ -21,13 +18,7 @@ const AppIcons = lazy(() => import("../components/Base/AppIcons"));
 /**
  * Base
  */
-const PublicHome = lazy(() => import("../pages/PublicHome"));
-const Login = lazy(() => import("../pages/Login"));
-const Home = lazy(() => import("../pages/Home"));
 const Transacciones = lazy(() => import("../pages/Transacciones"));
-const AuthButton = lazy(() => import("../components/Compound/Signout"));
-const Error404 = lazy(() => import("../pages/Error404"));
-const Reportes = lazy(() => import("../pages/Reportes"));
 
 /**
  * Loteria
@@ -107,30 +98,11 @@ const ConvAuto = lazy(() => import("../apps/TrxParams/Views/ConvAuto"));
 const Autorizadores = lazy(() =>
   import("../apps/TrxParams/Views/Autorizadores")
 );
-
-/**
- * Solicitud Enrolamiento : publico
- */
-const SolicitudEnrolamiento = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/SolicitudEnrolamiento")
+const CreateComisionCobrada = lazy(() =>
+  import("../apps/TrxParams/Views/Comisiones/CreateComisionCobrada")
 );
-const FormularioEnrolamiento = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/FormularioEnrolamiento")
-);
-const FormularioAutoEnrolamiento = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/FormularioAutoEnrolamiento")
-);
-const ConsultaEnrolamiento = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/ConsultaEnrolamiento")
-);
-const CorreccionFormulario = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/CorreccionFormulario")
-);
-const ReconoserID = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/ReconoserID")
-);
-const ContinuarReconoserID = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/ContinuarReconoserID")
+const ConfiguracionComercios = lazy(() =>
+  import("../apps/TrxParams/Views/ConfiguracionComercios")
 );
 
 /**
@@ -213,67 +185,10 @@ const TypesTrxs = lazy(() =>
   import("../apps/ParamsOperations/Views/TypesTrxs")
 );
 
-const emptyComp = () => {
-  return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
-};
-
 const CARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_1-P9wrhr8RWkx5zt3f64Ogy-Yr5DoQ_5ww&usqp=CAU";
 const DESCARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU";
-
-const loginUrls = [{ link: "/login", label: "Login", component: Login }];
-
-const publicUrls = [
-  { link: "", label: "Inicio", component: PublicHome },
-  {
-    link: "/public/solicitud-enrolamiento",
-    label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
-    component: SolicitudEnrolamiento,
-    permission: [1],
-    subRoutes: [
-      {
-        link: "/public/solicitud-enrolamiento/formulario",
-        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
-        component: FormularioAutoEnrolamiento,
-      },
-
-      {
-        link: "/public/solicitud-enrolamiento/consultar",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
-        ),
-        component: ConsultaEnrolamiento,
-        subRoutes: [
-          {
-            link: "/public/solicitud-enrolamiento/reconoserid/:numCedula",
-            label: (
-              <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />
-            ),
-            component: ReconoserID,
-          },
-          {
-            link: "/public/solicitud-enrolamiento/continuarreconoserid/:idreconoser",
-            label: (
-              <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
-            ),
-            component: ContinuarReconoserID,
-          },
-          {
-            link: "/public/solicitud-enrolamiento/correccionformulario/:numCedula",
-            label: <AppIcons Logo={"PAGO"} name={"Corrección De Formulario"} />,
-            component: CorreccionFormulario,
-          },
-        ],
-      },
-      {
-        link: "/public/solicitud-enrolamiento/formulario/:idAsesor",
-        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
-        component: FormularioEnrolamiento,
-      },
-    ],
-  },
-];
 
 const allUrlsPrivateApps = [
   {
@@ -740,15 +655,4 @@ const allUrlsPrivateApps = [
   },
 ];
 
-const privateUrls = [
-  { link: "*", exact: false, component: Error404 },
-  { link: "/", label: "Inicio", component: Home },
-  { link: "/info", label: "Informacion general", component: emptyComp },
-  { link: "/gestion", label: "Gestión", component: emptyComp },
-  { link: "/reportes", label: "Reportes", component: Reportes },
-  { link: "/seguridad", label: "Seguridad", component: emptyComp },
-  { link: "/solicitudes", label: "Tus solicitudes", component: emptyComp },
-  { label: <AuthButton /> },
-];
-
-export { allUrlsPrivateApps, privateUrls, publicUrls, loginUrls };
+export { allUrlsPrivateApps };

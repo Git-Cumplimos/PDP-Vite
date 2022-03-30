@@ -82,6 +82,8 @@ const CargaArchivos = ({ route }) => {
                 } else {
                   notifyError(res[0]["Motivo"]);
                 }
+              } else {
+                notifyError("Consulte con soporte");
               }
             }
           });

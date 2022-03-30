@@ -27,6 +27,7 @@ const TableEnterprise = ({
   onChange = () => {},
   onSubmit = (e) => e.preventDefault(),
   onSetPageData = () => {},
+  onSetUtilsFuncs = () => {},
   children = null,
 }) => {
   const [showFilters, setShowFilters] = useState(true);
@@ -67,9 +68,9 @@ const TableEnterprise = ({
             const temp1 = dir ? a[ind][1] : b[ind][1];
             const temp2 = dir ? b[ind][1] : a[ind][1];
             sortRet.push(
-              temp1 instanceof String
-                ? temp1.localeCompare(temp2)
-                : temp1 - temp2
+              temp1 instanceof Number
+                ? temp1 - temp2
+                : temp1.localeCompare(temp2)
             );
           }
         }
@@ -100,6 +101,12 @@ const TableEnterprise = ({
       setPaginationData(({ limit }) => ({ limit, page: 1 }));
     }
   }, [maxPage, page]);
+
+  useEffect(() => {
+    onSetUtilsFuncs({
+      resetPage: () => setPaginationData(({ limit }) => ({ limit, page: 1 })),
+    });
+  }, [onSetUtilsFuncs]);
 
   return (
     <div className={`${wrapper}`}>
@@ -187,13 +194,13 @@ const TableEnterprise = ({
                     onClick={() =>
                       setTableOpts((old) => {
                         const copy = [...old];
-                        copy[index] = {
+                        copy.splice(index, 1, {
                           ...copy[index],
                           sort: {
                             state: true,
                             dir: !copy[index]?.sort?.dir,
                           },
-                        };
+                        });
                         return [...copy];
                       })
                     }
@@ -209,14 +216,13 @@ const TableEnterprise = ({
                               e.stopPropagation();
                               setTableOpts((old) => {
                                 const copy = [...old];
-                                console.log("copy", copy[index]);
-                                copy[index] = {
+                                copy.splice(index, 1, {
                                   ...copy[index],
                                   sort: {
                                     state: !copy[index]?.sort?.state,
                                     dir: false,
                                   },
-                                };
+                                });
                                 return [...copy];
                               });
                             }}
@@ -258,27 +264,33 @@ const TableEnterprise = ({
             </tr>
           </thead>
           <tbody>
-            {sortedData.map((obj, index) => (
-              <tr
-                key={index}
-                onClick={onSelectRow ? (e) => onSelectRow(e, index) : null}
-              >
-                {obj.map(([key, value], idx) => {
-                  return (
-                    <td
-                      key={`${key}_${index}`}
-                      className={`${
-                        tableOpts?.[idx]?.hide ? "hidden" : "table-cell"
-                      } ${
-                        onSelectRow ? "cursor-pointer" : "cursor-auto"
-                      } whitespace-pre z-0`}
-                    >
-                      {value}
-                    </td>
-                  );
-                })}
+            {!sortedData?.length ? (
+              <tr>
+                <td colSpan={headers?.length}>No hay datos</td>
               </tr>
-            ))}
+            ) : (
+              sortedData.map((obj, index) => (
+                <tr
+                  key={index}
+                  onClick={onSelectRow ? (e) => onSelectRow(e, index) : null}
+                >
+                  {obj.map(([key, value], idx) => {
+                    return (
+                      <td
+                        key={`${key}_${index}`}
+                        className={`${
+                          tableOpts?.[idx]?.hide ? "hidden" : "table-cell"
+                        } ${
+                          onSelectRow ? "cursor-pointer" : "cursor-auto"
+                        } whitespace-pre z-0`}
+                      >
+                        {value}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -290,8 +302,8 @@ const TableEnterprise = ({
           className={`${limitsBtn} appearance-none`}
           value={limit}
           onChange={(e) =>
-            setPaginationData?.((old) => ({
-              ...old,
+            setPaginationData?.(({ page }) => ({
+              page,
               limit: Number(e.target.value),
             }))
           }
@@ -313,8 +325,8 @@ const TableEnterprise = ({
                 if (page < 2) {
                   return;
                 }
-                setPaginationData?.((old) => ({
-                  ...old,
+                setPaginationData?.(({ limit }) => ({
+                  limit,
                   page: page - 1,
                 }));
               }, [page])}
@@ -325,8 +337,8 @@ const TableEnterprise = ({
                 if (page >= maxPage) {
                   return;
                 }
-                setPaginationData?.((old) => ({
-                  ...old,
+                setPaginationData?.(({ limit }) => ({
+                  limit,
                   page: page + 1,
                 }));
               }, [page, maxPage])}

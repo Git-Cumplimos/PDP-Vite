@@ -21,6 +21,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     page: 1,
     limit: 10,
   });
+
   const headersTable = useMemo(() => {
     if (comissions.length === 0) {
       return [];
