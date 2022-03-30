@@ -13,6 +13,7 @@ import InputSuggestions from "../../../components/Base/InputSuggestions";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import { useNavigate } from "react-router-dom";
+import Modal from "../../../components/Base/Modal";
 const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
 
 const capitalize = (word) => {
@@ -46,6 +47,11 @@ const FormularioAutoEnrolamiento = () => {
   const [tratamientoDatos, setTratamientoDatos] = useState("");
   const [responsableIva, setResponsableIva] = useState("");
 
+  //------------------Estados Usuarios Vinculados---------------------//
+  const [usuario, setUsuario] = useState(false);
+  const [numconsultaProceso, setNumConsultaProceso] = useState("");
+  const [respuestaProceso, setRespuestaProceso] = useState("");
+  const [verificarCedProceso, setVerificarCedProceso] = useState(false);
   //------------------Estados Asesores---------------------//
   const [asesores, setAsesores] = useState(0);
 
@@ -65,6 +71,8 @@ const FormularioAutoEnrolamiento = () => {
   const [codDaneMunicipioCorrespondencia, setCodDaneMunicipioCorrespondencia] =
     useState("");
 
+  //------------------Estados Modal---------------------//
+  const [showModal, setShowModal] = useState(false);
   //------------------Estados Ubicacion Comercio---------------------//
   const commerceLocation = {
     municipio: useState(""),
@@ -101,8 +109,13 @@ const FormularioAutoEnrolamiento = () => {
       {},
       false
     )
-      .then((respuesta) => setLocalidadUbComercio(respuesta.obj.results))
-      .catch((err) => console.log(err));
+      .then((respuesta) =>
+        setLocalidadUbComercio(respuesta?.obj?.results)
+      ) /* arreglar para todos OJO */
+      .catch((err) => {
+        console.log(err);
+        /* notifyError("Error al cargar Datos localidad ubicacion del comercio"); */
+      });
   }, [codDaneMunicipioComercio]);
 
   //------------------Traer localidades Con codigo dane de la ubicacion Correspondencia---------------------//
@@ -117,8 +130,13 @@ const FormularioAutoEnrolamiento = () => {
       {},
       false
     )
-      .then((respuesta) => setLocalidadUbCorrespondencia(respuesta.obj.results))
-      .catch((err) => console.log(err));
+      .then((respuesta) =>
+        setLocalidadUbCorrespondencia(respuesta?.obj?.results)
+      )
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al cargar Datos ubicacion Correspondencia");
+      });
   }, [codDaneMunicipioCorrespondencia]);
 
   //------------------Traer Asesores---------------------//
@@ -131,8 +149,11 @@ const FormularioAutoEnrolamiento = () => {
       {},
       false
     )
-      .then((respuesta) => setAsesores(respuesta.obj.results))
-      .catch((err) => console.log(err));
+      .then((respuesta) => setAsesores(respuesta?.obj?.results))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al cargar Datos Traer Asesores");
+      });
   }, []);
 
   //------------------Guardar Archivos PDF---------------------//
@@ -174,7 +195,7 @@ const FormularioAutoEnrolamiento = () => {
           numrut: numRut,
           autosms: autorizacion,
           tipozona: "",
-          unidad_negocio: "",
+          unidad_negocio: "Telemarketing",
           responsableiva: responsableIva,
           cod_localidad: "",
           asesor_comercial_localidad: "",
@@ -221,7 +242,7 @@ const FormularioAutoEnrolamiento = () => {
 
           notify("Se ha comenzado la carga");
 
-          console.log(Object.fromEntries(formData.entries()));
+          /* console.log(Object.fromEntries(formData.entries())); */
           fetch(
             `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
 
@@ -233,16 +254,21 @@ const FormularioAutoEnrolamiento = () => {
           )
             .then((res) => res.json())
             .then((respuesta) => {
+              console.log(respuesta);
               if (!respuesta?.status) {
+                console.log(respuesta);
                 notifyError(respuesta?.msg);
               } else {
-                console.log(respuesta?.obj);
+                /*  console.log(respuesta?.obj); */
                 notify("Se han subido los archivos");
                 setEstadoForm(true);
                 navigate("/public/solicitud-enrolamiento/consultar");
               }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+              console.log(err);
+              notifyError("Error al cargar Datos");
+            }); /* notify("Se ha comenzado la carga"); */
           /* fetch(
             `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/upload-file`,
 
@@ -284,7 +310,10 @@ const FormularioAutoEnrolamiento = () => {
             })
             .catch((err) => console.error(err)); */
         })
-        .catch(() => {});
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos");
+        }); /*  notify("Se ha comenzado la carga"); */
     },
     [archivos1, archivos2, archivos3]
   );
@@ -308,372 +337,451 @@ const FormularioAutoEnrolamiento = () => {
     }
   }, [homeLocation]);
 
+  //------------------Funcion Para Modal--------------------//
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+  }, []);
+  //------------------Funcion Para Consultar Proceso--------------------//
+  const funConsultaProceso = (e) => {
+    e.preventDefault();
+    setShowModal(true);
+
+    if (numconsultaProceso) {
+      fetch(
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${numconsultaProceso}`
+        /*  `http://127.0.0.1:5000/actualizacionestado?numDoc=${numconsultaProceso}` */
+      )
+        .then((res) => res.json())
+        .then((respuesta) => {
+          setRespuestaProceso(respuesta?.obj?.results);
+          console.log(respuesta.obj.results[0]);
+          if (respuesta?.obj?.results[0]?.validation_state === "201") {
+            console.log(true, "348"); //setear estado
+            setVerificarCedProceso(true);
+          } else {
+            console.log("error");
+
+            setVerificarCedProceso(false);
+          }
+        })
+        .catch((e) => console.log(e));
+    } else {
+      /*    else   OJOOOOO */
+      notifyError("Ingrese Valores");
+    }
+    setUsuario(true); /* REVISARRR */
+  };
+  /*  console.log(respuestaProceso); */
   return (
     <div className=" flex flex-col justify-center items-center text-justify my-8">
-      <span className={tituloFormularioInscripcion}>
-        Formulario de Inscripción
-      </span>
-      {autorizacion === "SI" && tratamientoDatos === "SI" ? (
-        <div>
-          <Form
-            /* gird={false} */
-            grid
-            onSubmit={(e) => handleSubmit()}
-          >
-            <Input
-              label={"Nombre Comercio"}
-              placeholder="Ingrese Nombre Comercio"
-              value={nombreComercio}
-              onChange={(e) => setNombreComercio(capitalize(e.target.value))}
-              type="text"
-              required
-            ></Input>
-            <Fieldset legend="Representante legal" className="lg:col-span-3">
-              <Input
-                label={"Nombres"}
-                placeholder="Ingrese sus Nombres"
-                value={nombre}
-                onChange={(e) => setNombre(capitalize(e.target.value))}
-                type={"text"}
-                required
-              ></Input>
-
-              <Input
-                label={"Apellidos"}
-                placeholder="Ingrese sus Apellidos"
-                value={apellido}
-                onChange={(e) => setApellido(capitalize(e.target.value))}
-                type={"text"}
-                required
-              ></Input>
-              <Input
-                label={"N° Documento"}
-                placeholder="Ingrese su Numero Documento"
-                onChange={(e) => setNumDocumento(e.target.value)}
-                type={"number"}
-                required
-              ></Input>
-              <Select
-                onChange={(event) => setTipoIdentificacion(event.target.value)}
-                id="comissionType" /* para que es esto */
-                name="comissionType"
-                label="Tipo de Identificación"
-                required
-                options={{
-                  "": "",
-                  "C.C Cedula de Ciudadania": "CC",
-                  "C.E Cedula de Extranjeria": "CE",
-                }}
-              ></Select>
-            </Fieldset>
-
-            <Fieldset
-              legend="Empresa"
-              className="lg:col-span-3
-      "
+      {usuario === false ? (
+        /*  <Modal show={showModal} handleClose={handleClose}></Modal> */
+        <Fragment>
+          <Input
+            label={"Ingrese Numero Cedula:"}
+            placeholder="Ej:1030652xxx"
+            value={numconsultaProceso}
+            type="number"
+            minlength="5"
+            onChange={(e) => setNumConsultaProceso(e.target.value)}
+            required
+          ></Input>
+          <ButtonBar /* className={contenedorBotones} */ type="">
+            <Button
+              /* type="submit" */ type=""
+              onClick={(e) => funConsultaProceso(e)}
             >
-              <Input
-                label={"N° NIT"}
-                placeholder="Ingrese NIT"
-                onChange={(e) => setNumNit(e.target.value)}
-                type={"number"}
-                required
-              ></Input>
-              <Input
-                label={"N° Camara & Comercio"}
-                placeholder="Ingrese Camara & Comercio"
-                onChange={(e) => setNumCamaraComerci(e.target.value)}
-                type={"text"}
-                required
-              ></Input>
-              <Input
-                label={"N° RUT"}
-                placeholder="Ingrese RUT"
-                onChange={(e) => setNumRut(e.target.value)}
-                type={"number"}
-                required
-              ></Input>
-              <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
-                <InputSuggestions
-                  id="actividades_ec2"
-                  label={"Buscar tipo de negocio"}
-                  type={"search"}
-                  suggestions={
-                    foundActivities.map((val) => {
-                      const foundIdx = val
-                        .toLowerCase()
-                        .indexOf(actividad.toLowerCase());
-                      if (foundIdx === -1) {
-                        return <h1 className="text-xs">{val}</h1>;
-                      }
-                      const str1 = val.substring(0, foundIdx);
-                      const str2 = val.substring(
-                        foundIdx,
-                        foundIdx + actividad.length
-                      );
-                      const str3 = val.substring(foundIdx + actividad.length);
-                      return (
-                        <div className="grid grid-cols-1 place-items-center px-4 py-2">
-                          <h1 className="text-xs">
-                            {str1}
-                            <strong>{str2}</strong>
-                            {str3}
-                          </h1>
-                        </div>
-                      );
-                    }) || []
-                  }
-                  onSelectSuggestion={(index) => {
-                    const copy = [...commerceType];
-                    copy.push(foundActivities[index]);
-                    setActividad("");
-                    setFoundActivities([]);
-                    setCommerceType([...copy]);
-                  }}
-                  minLength="4"
-                  autoComplete="off"
-                  value={actividad}
-                  onInput={(e) => setActividad(e.target.value)}
-                  onLazyInput={{
-                    callback: (e) => {
-                      const _actividad = e.target.value;
-                      if (_actividad.length > 1) {
-                        fetchData(
-                          url,
-                          "GET",
-                          {
-                            q: _actividad,
-                            limit: 3,
-                          },
-                          {},
-                          {},
-                          false
-                        )
-                          .then((res) => {
-                            console.log("respuesta Positiva");
-                            if (res?.status) {
-                              setFoundActivities(
-                                res?.obj.map(
-                                  ({ id_actividad, nombre_actividad }) => {
-                                    return `${id_actividad} - ${nombre_actividad}`;
-                                  }
-                                )
-                              );
-                            }
-                          })
-                          .catch(() => {});
-                      } else {
-                        setFoundActivities([]);
-                      }
-                    },
-                    timeOut: 500,
-                  }}
-                />
-                {commerceType.length > 0 ? (
-                  <ul className="flex flex-col gap-2">
-                    {commerceType.map((el, idx) => {
-                      return (
-                        <li key={idx} className="grid grid-cols-8">
-                          <span className="bi bi-card-list" />
-                          <h1 className="col-span-6">{el}</h1>
-                          <span
-                            onClick={() => {
-                              const copy = [...commerceType];
-                              copy.splice(idx, 1);
-                              setCommerceType([...copy]);
-                            }}
-                            className="bi bi-x text-3xl"
-                          />
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : (
-                  ""
-                )}
-              </div>
-              <Select
-                onChange={(event) => setResponsableIva(event.target.value)}
-                id="comissionType" /* para que es esto */
-                name="comissionType"
-                required
-                label={`Responsable del iva "CAMPO 53 RUT"`}
-                options={{
-                  "": "",
-                  SI: "SI",
-                  NO: "NO",
-                }}
-              ></Select>
-            </Fieldset>
-
-            <Fieldset legend="Contacto" className="lg:col-span-3">
-              <MultipleInput
-                arrState={[telefonos, setTelefonos]}
-                label={(idx) => {
-                  if (idx === 0) return "Numero de celular";
-                  else return `Numero de celular adicional ${idx}`;
-                }}
-                max={0}
-                required
-              />
-
-              <MultipleInput
-                arrState={[correos, setCorreos]}
-                label={(idx) => {
-                  if (idx === 0) return "Correo electronico";
-                  else return `Correo electronico adicional ${idx}`;
-                }}
-                max={0}
-                type={"email"}
-                required
-              />
-            </Fieldset>
-          </Form>
-          <LocationForm
-            place="Comercio"
-            location={commerceLocation}
-            required
-            LocalidadComponent={
-              <Select
-                onChange={(event) =>
-                  commerceLocation.localidad[1](event.target.value)
-                }
-                id="comissionType"
-                name="comissionType"
-                value={commerceLocation.localidad[0]}
-                label={`Localidad`}
-                options={
-                  Object.fromEntries([
-                    ["", ""],
-                    ...LocalidadUbComercio.map(
-                      ({ nom_localidad, id_localidad }) => {
-                        return [nom_localidad, id_localidad];
-                      }
-                    ),
-                  ]) || { "": "" }
-                }
-              ></Select>
-            }
-          />
-          <LocationForm
-            place="Correspondencia"
-            location={homeLocation}
-            required
-            LocalidadComponent={
-              <Select
-                onChange={(event) =>
-                  homeLocation.localidad[1](event.target.value)
-                }
-                id="comissionType"
-                name="comissionType"
-                value={homeLocation.localidad[0]}
-                label={`Localidad`}
-                options={
-                  Object.fromEntries([
-                    ["", ""],
-                    ...LocalidadUbCorrespondencia.map(
-                      ({ nom_localidad, id_localidad }) => {
-                        return [nom_localidad, id_localidad];
-                      }
-                    ),
-                  ]) || { "": "" }
-                }
-              ></Select>
-            }
-          />
-
-          <Fragment>
-            <Form /* onSubmit={onSubmit}  */ grid>
-              <FileInput
-                label={"Elige el archivo del Rut"}
-                onGetFile={onFileChange}
-                accept=".pdf"
-                allowDrop={false}
-              />
-              <FileInput
-                label={"Elige el archivo de la CC"}
-                onGetFile={onFileChange2}
-                accept=".pdf"
-                allowDrop={false}
-              />
-              <FileInput
-                label={"Elige el archivo de la Camara & Comercio"}
-                onGetFile={onFileChange3}
-                accept=".pdf"
-                allowDrop={false}
-              />
-            </Form>
-          </Fragment>
-          <ButtonBar className={"lg:col-span-2"} type="">
-            {
-              <Button
-                type="submit"
-                onClick={(e) =>
-                  /* setEstadoForm((old) => !old) */ handleSubmit(e)
-                }
-              >
-                Enviar Formulario
-              </Button>
-              /*  ) : null */
-            }
+              Crear Proceso
+            </Button>
           </ButtonBar>
-        </div>
+        </Fragment>
+      ) : usuario === true && respuestaProceso ? (
+        (respuestaProceso?.length >= 0 &&
+          respuestaProceso[0]?.validation_state === "201" &&
+          verificarCedProceso) ||
+        respuestaProceso?.length === 0 /* s / / ||
+         respuestaProceso.length >= 0 && Verificar que el numero de datos sea mayor a 5 y el numero de la consulta sea igual al que se esta bscando 
+          respuestaProceso[0].validation_state ===
+            "En Proceso de Validación" */ ? (
+          <Fragment>
+            <span className={tituloFormularioInscripcion}>
+              Formulario de Inscripción
+            </span>
+            {autorizacion === "SI" && tratamientoDatos === "SI" ? (
+              <div>
+                <Form
+                  /* gird={false} */
+                  grid
+                  onSubmit={(e) => handleSubmit(e)}
+                >
+                  <Input
+                    label={"Nombre Comercio"}
+                    placeholder="Ingrese Nombre Comercio"
+                    value={nombreComercio}
+                    onChange={(e) =>
+                      setNombreComercio(capitalize(e.target.value))
+                    }
+                    type="text"
+                    required
+                  ></Input>
+                  <Fieldset
+                    legend="Representante legal"
+                    className="lg:col-span-2"
+                  >
+                    <Input
+                      label={"Nombres"}
+                      placeholder="Ingrese sus Nombres"
+                      value={nombre}
+                      onChange={(e) => setNombre(capitalize(e.target.value))}
+                      type={"text"}
+                      required
+                    ></Input>
+
+                    <Input
+                      label={"Apellidos"}
+                      placeholder="Ingrese sus Apellidos"
+                      value={apellido}
+                      onChange={(e) => setApellido(capitalize(e.target.value))}
+                      type={"text"}
+                      required
+                    ></Input>
+                    <Input
+                      label={"N° Documento"}
+                      placeholder="Ingrese su Numero Documento"
+                      onChange={(e) => setNumDocumento(e.target.value)}
+                      type={"number"}
+                      required
+                    ></Input>
+                    <Select
+                      onChange={(event) =>
+                        setTipoIdentificacion(event.target.value)
+                      }
+                      id="comissionType" /* para que es esto */
+                      name="comissionType"
+                      label="Tipo de Identificación"
+                      required
+                      options={{
+                        "": "",
+                        "C.C Cedula de Ciudadania": "CC",
+                        "C.E Cedula de Extranjeria": "CE",
+                      }}
+                    ></Select>
+                  </Fieldset>
+
+                  <Fieldset legend="Empresa" className="lg:col-span-2">
+                    <Input
+                      label={"N° NIT"}
+                      placeholder="Ingrese NIT"
+                      onChange={(e) => setNumNit(e.target.value)}
+                      type={"number"}
+                      required
+                    ></Input>
+                    <Input
+                      label={"N° Camara & Comercio"}
+                      placeholder="Ingrese Camara & Comercio"
+                      onChange={(e) => setNumCamaraComerci(e.target.value)}
+                      type={"text"}
+                      required
+                    ></Input>
+                    <Input
+                      label={"N° RUT"}
+                      placeholder="Ingrese RUT"
+                      onChange={(e) => setNumRut(e.target.value)}
+                      type={"number"}
+                      required
+                    ></Input>
+                    <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
+                      <InputSuggestions
+                        id="actividades_ec2"
+                        label={"Buscar tipo de negocio"}
+                        type={"search"}
+                        suggestions={
+                          foundActivities.map((val) => {
+                            const foundIdx = val
+                              .toLowerCase()
+                              .indexOf(actividad.toLowerCase());
+                            if (foundIdx === -1) {
+                              return <h1 className="text-xs">{val}</h1>;
+                            }
+                            const str1 = val.substring(0, foundIdx);
+                            const str2 = val.substring(
+                              foundIdx,
+                              foundIdx + actividad.length
+                            );
+                            const str3 = val.substring(
+                              foundIdx + actividad.length
+                            );
+                            return (
+                              <div className="grid grid-cols-1 place-items-center px-4 py-2">
+                                <h1 className="text-xs">
+                                  {str1}
+                                  <strong>{str2}</strong>
+                                  {str3}
+                                </h1>
+                              </div>
+                            );
+                          }) || []
+                        }
+                        onSelectSuggestion={(index) => {
+                          const copy = [...commerceType];
+                          copy.push(foundActivities[index]);
+                          setActividad("");
+                          setFoundActivities([]);
+                          setCommerceType([...copy]);
+                        }}
+                        minLength="4"
+                        autoComplete="off"
+                        value={actividad}
+                        onInput={(e) => setActividad(e.target.value)}
+                        onLazyInput={{
+                          callback: (e) => {
+                            const _actividad = e.target.value;
+                            if (_actividad.length > 1) {
+                              fetchData(
+                                url,
+                                "GET",
+                                {
+                                  q: _actividad,
+                                  limit: 3,
+                                },
+                                {},
+                                {},
+                                false
+                              )
+                                .then((res) => {
+                                  console.log("respuesta Positiva");
+                                  if (res?.status) {
+                                    setFoundActivities(
+                                      res?.obj.map(
+                                        ({
+                                          id_actividad,
+                                          nombre_actividad,
+                                        }) => {
+                                          return `${id_actividad} - ${nombre_actividad}`;
+                                        }
+                                      )
+                                    );
+                                  }
+                                })
+                                .catch(() => {});
+                            } else {
+                              setFoundActivities([]);
+                            }
+                          },
+                          timeOut: 500,
+                        }}
+                      />
+                      {commerceType.length > 0 ? (
+                        <ul className="flex flex-col gap-2">
+                          {commerceType.map((el, idx) => {
+                            return (
+                              <li key={idx} className="grid grid-cols-8">
+                                <span className="bi bi-card-list" />
+                                <h1 className="col-span-6">{el}</h1>
+                                <span
+                                  onClick={() => {
+                                    const copy = [...commerceType];
+                                    copy.splice(idx, 1);
+                                    setCommerceType([...copy]);
+                                  }}
+                                  className="bi bi-x text-3xl"
+                                />
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                    <Select
+                      onChange={(event) =>
+                        setResponsableIva(event.target.value)
+                      }
+                      id="comissionType" /* para que es esto */
+                      name="comissionType"
+                      required
+                      label={`Responsable del iva "CAMPO 53 RUT"`}
+                      options={{
+                        "": "",
+                        SI: "SI",
+                        NO: "NO",
+                      }}
+                    ></Select>
+                  </Fieldset>
+
+                  <Fieldset legend="Contacto" className="lg:col-span-2">
+                    <MultipleInput
+                      arrState={[telefonos, setTelefonos]}
+                      label={(idx) => {
+                        if (idx === 0) return "Numero de celular";
+                        else return `Numero de celular adicional ${idx}`;
+                      }}
+                      max={1}
+                      required
+                    />
+
+                    <MultipleInput
+                      arrState={[correos, setCorreos]}
+                      label={(idx) => {
+                        if (idx === 0) return "Correo electronico";
+                        else return `Correo electronico adicional ${idx}`;
+                      }}
+                      max={1}
+                      type={"email"}
+                      required
+                    />
+                  </Fieldset>
+                  <LocationForm
+                    place="Comercio"
+                    location={commerceLocation}
+                    required
+                    LocalidadComponent={
+                      <Select
+                        onChange={(event) =>
+                          commerceLocation.localidad[1](event.target.value)
+                        }
+                        id="comissionType"
+                        name="comissionType"
+                        value={commerceLocation.localidad[0]}
+                        label={`Localidad`}
+                        options={
+                          Object.fromEntries([
+                            ["", ""],
+                            ...LocalidadUbComercio.map(
+                              ({ nom_localidad, id_localidad }) => {
+                                return [nom_localidad, id_localidad];
+                              }
+                            ),
+                          ]) || { "": "" }
+                        }
+                      ></Select>
+                    }
+                  />
+                  <LocationForm
+                    place="Correspondencia"
+                    location={homeLocation}
+                    required
+                    LocalidadComponent={
+                      <Select
+                        onChange={(event) =>
+                          homeLocation.localidad[1](event.target.value)
+                        }
+                        id="comissionType"
+                        name="comissionType"
+                        value={homeLocation.localidad[0]}
+                        label={`Localidad`}
+                        required
+                        options={
+                          Object.fromEntries([
+                            ["", ""],
+                            ...LocalidadUbCorrespondencia.map(
+                              ({ nom_localidad, id_localidad }) => {
+                                return [nom_localidad, id_localidad];
+                              }
+                            ),
+                          ]) || { "": "" }
+                        }
+                      ></Select>
+                    }
+                  />
+                  <FileInput
+                    className="lg:col-span-2"
+                    label={"Elige el archivo del Rut"}
+                    onGetFile={onFileChange}
+                    accept=".pdf"
+                    allowDrop={false}
+                    required
+                  />
+                  <FileInput
+                    className="lg:col-span-2"
+                    label={"Elige el archivo de la CC"}
+                    onGetFile={onFileChange2}
+                    accept=".pdf"
+                    allowDrop={false}
+                    required
+                  />
+                  <FileInput
+                    className="lg:col-span-2"
+                    label={"Elige el archivo de la Camara & Comercio"}
+                    onGetFile={onFileChange3}
+                    accept=".pdf"
+                    allowDrop={false}
+                  />
+                  <ButtonBar className={"lg:col-span-2"} type="">
+                    {
+                      <Button type="submit">Enviar Formulario</Button>
+                      /*  ) : null */
+                    }
+                  </ButtonBar>
+                </Form>
+              </div>
+            ) : (
+              <div className=" grid gap-4 grid-cols-0 mx-auto xl:w-full border border-solid border-gray-500 p-3">
+                <div className={mensajeAutorizacion}>
+                  <span className={textoMensajeAutorizacion}>
+                    SOLUCIONES EN RED Cumpliendo con la ley estructurada 1581 de
+                    2012, en la cual se establece el régimen general de
+                    protección de datos y decreto reglamentario 1377 del 2013,
+                    solicita respetuosamente su autorización de los datos que
+                    han sido suministrados en el presente formato, precisando
+                    las siguientes finalidades para el uso de su información: 1.
+                    Afiliación del establecimiento de comercio a los productos y
+                    servicios ofrecidos por Soluciones En Red 2. Realización de
+                    campañas de mercadeo 3. Notificación al establecimiento del
+                    comercio de productos y servicios de Red Platik El nombre y
+                    la foto asociados a tu cuenta de Google se registrarán
+                    cuando subas archivos y envíes este formulario. ¿No es tuya
+                    la dirección telemercadeo@puntodepago.com.co? Cambiar de
+                    cuenta Los archivos que se suban se compartirán fuera de la
+                    organización a la que pertenecen..
+                  </span>
+                </div>
+                <div>
+                  <Select
+                    onChange={(event) =>
+                      setTratamientoDatos(event.target.value)
+                    }
+                    id="comissionType" /* para que es esto */
+                    name="comissionType"
+                    value={tratamientoDatos}
+                    required
+                    options={{
+                      "": "",
+                      SI: "SI",
+                      NO: "NO",
+                    }}
+                  ></Select>
+                </div>
+                <div className={mensajeAutorizacion}>
+                  <span className={textoMensajeAutorizacion}>
+                    Autorizo a Soluciones En Red al envío de SMS al número
+                    celular registrado y el envío de correos electrónicos con
+                    información de los productos y servicios.
+                  </span>
+                </div>
+                <div>
+                  <Select
+                    onChange={(event) => setAutorizacion(event.target.value)}
+                    id="comissionType" /* para que es esto */
+                    name="comissionType"
+                    value={autorizacion}
+                    required
+                    options={{
+                      "": "",
+                      SI: "SI",
+                      NO: "NO",
+                    }}
+                  ></Select>
+                </div>
+              </div>
+            )}
+          </Fragment>
+        ) : (
+          <h1>Usuario se encunetra en proceso</h1>
+        )
       ) : (
-        <div className=" grid gap-4 grid-cols-0 mx-auto xl:w-full border border-solid border-gray-500 p-3">
-          <div className={mensajeAutorizacion}>
-            <span className={textoMensajeAutorizacion}>
-              SOLUCIONES EN RED Cumpliendo con la ley estructurada 1581 de 2012,
-              en la cual se establece el régimen general de protección de datos
-              y decreto reglamentario 1377 del 2013, solicita respetuosamente su
-              autorización de los datos que han sido suministrados en el
-              presente formato, precisando las siguientes finalidades para el
-              uso de su información: 1. Afiliación del establecimiento de
-              comercio a los productos y servicios ofrecidos por Soluciones En
-              Red 2. Realización de campañas de mercadeo 3. Notificación al
-              establecimiento del comercio de productos y servicios de Red
-              Platik El nombre y la foto asociados a tu cuenta de Google se
-              registrarán cuando subas archivos y envíes este formulario. ¿No es
-              tuya la dirección telemercadeo@puntodepago.com.co? Cambiar de
-              cuenta Los archivos que se suban se compartirán fuera de la
-              organización a la que pertenecen..
-            </span>
-          </div>
-          <div>
-            <Select
-              onChange={(event) => setTratamientoDatos(event.target.value)}
-              id="comissionType" /* para que es esto */
-              name="comissionType"
-              value={tratamientoDatos}
-              required
-              options={{
-                "": "",
-                SI: "SI",
-                NO: "NO",
-              }}
-            ></Select>
-          </div>
-          <div className={mensajeAutorizacion}>
-            <span className={textoMensajeAutorizacion}>
-              Autorizo a Soluciones En Red al envío de SMS al número celular
-              registrado y el envío de correos electrónicos con información de
-              los productos y servicios.
-            </span>
-          </div>
-          <div>
-            <Select
-              onChange={(event) => setAutorizacion(event.target.value)}
-              id="comissionType" /* para que es esto */
-              name="comissionType"
-              value={autorizacion}
-              required
-              options={{
-                "": "",
-                SI: "SI",
-                NO: "NO",
-              }}
-            ></Select>
-          </div>
-        </div>
+        ""
       )}
     </div>
   );

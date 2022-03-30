@@ -47,7 +47,10 @@ const AsesoresComerciales = () => {
         setAsesoresComerciales(res?.obj?.results);
         setCantidadPaginas(res?.obj?.maxPages);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al cargar Datos Asesores");
+      });
   }, [page]);
 
   const onCrearAsesor = useCallback(
@@ -129,6 +132,12 @@ const AsesoresComerciales = () => {
       )
     );
   }, []);
+  /*   const GenerarLinkAsesor = () => {
+    const link = `https://certificacion.puntodepagopruebas.com/solicitud-enrolamiento/formulario/${window.btoa(
+      selected.id_asesor
+    )}`;
+    setLinkAsesor(link);
+  }; */
   const GenerarLinkAsesor = () => {
     const link = `http://localhost:3000/public/solicitud-enrolamiento/formulario/${window.btoa(
       selected.id_asesor

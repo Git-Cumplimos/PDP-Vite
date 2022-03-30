@@ -670,6 +670,13 @@ const allUrlsPrivateApps = [
         ],
       },
       {
+        link: "/Solicitud-enrolamiento/ReporteComercios",
+        label: <AppIcons Logo={"PAGO"} name={"Reporte De Comercios"} />,
+        component: ReporteComercios,
+        permission: [38],
+        subRoutes: [],
+      },
+      {
         link: "/Solicitud-enrolamiento/validarformularioreconoserid",
         label: (
           <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
@@ -681,12 +688,6 @@ const allUrlsPrivateApps = [
             link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
             label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
             component: VerificacionApertura,
-            permission: [39],
-          },
-          {
-            link: "/Solicitud-enrolamiento/reporte-comercios",
-            label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
-            component: ReporteComercios,
             permission: [39],
           },
         ],

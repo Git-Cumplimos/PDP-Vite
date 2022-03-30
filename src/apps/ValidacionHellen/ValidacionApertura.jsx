@@ -7,6 +7,7 @@ import Select from "../../components/Base/Select";
 import Table from "../../components/Base/Table";
 import TableEnterprise from "../../components/Base/TableEnterprise";
 import fetchData from "../../utils/fetchData";
+import { notifyError } from "../../utils/notify";
 const ValidacionApertura = () => {
   const navigate = useNavigate();
   const [datosEnrolamientos, setDatosEnrolamientos] = useState([]);
@@ -25,8 +26,12 @@ const ValidacionApertura = () => {
     )
       .then((response) => response.json())
       .then((respuesta) => {
-        setDatosEnrolamientos(respuesta.obj.results);
+        setDatosEnrolamientos(respuesta?.obj?.results);
         setCantidadPaginas(respuesta?.obj?.maxPages);
+      })
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al cargar Datos ");
       });
   }, []);
   useEffect(() => {
@@ -140,7 +145,7 @@ const ValidacionApertura = () => {
           title="Verificación ReconoserID"
           maxPage={cantidadPaginas}
           headers={["Id_proceso", "Nombre", "Estado", "Fecha Inicio"]}
-          data={datosEnrolamientos.map(
+          data={datosEnrolamientos?.map(
             ({
               id_proceso,
               nombre,
@@ -174,7 +179,7 @@ const ValidacionApertura = () => {
         >
           <Input
             id="dateInit"
-            label="Fecha inicial"
+            label="Fecha Inicial"
             type="date"
             onInput={(e) => {
               setFechaInicial(e.target.value);
@@ -182,7 +187,7 @@ const ValidacionApertura = () => {
           />
           <Input
             id="dateEnd"
-            label="Fecha final"
+            label="Fecha Final"
             type="date"
             value={fechaFinal}
             onInput={(e) => {

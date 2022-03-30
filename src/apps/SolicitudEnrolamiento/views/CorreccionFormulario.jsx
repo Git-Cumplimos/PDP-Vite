@@ -68,49 +68,53 @@ const CorreccionFormulario = () => {
     )
       .then((res) => res.json())
       .then((respuesta) => {
-        dat: setDatosParams(respuesta?.obj.results);
+        dat: setDatosParams(respuesta?.obj?.results);
         nomComer: setNombreComercio(
-          respuesta?.obj.results[0]["nombre_comercio"]
+          respuesta?.obj?.results[0]["nombre_comercio"]
         );
-        nomAsesor: setAsignarAsesores(respuesta?.obj.results[0]["asesor"]);
-        nomRespo: setNombre(respuesta?.obj.results[0]["nombre"]);
-        apellidoRespo: setApellido(respuesta?.obj.results[0]["apellido"]);
-        numDoc: setNumDocumento(respuesta?.obj.results[0]["numdoc"]);
-        tipoDoc: setTipoIdentificacion(respuesta?.obj.results[0]["tipodoc"]);
-        numNit: setNumNit(respuesta?.obj.results[0]["numnit"]);
-        numCamara: setNumCamaraComerci(respuesta?.obj.results[0]["numcamycom"]);
-        numRut: setNumRut(respuesta?.obj.results[0]["numrut"]);
+        nomAsesor: setAsignarAsesores(respuesta?.obj?.results[0]["asesor"]);
+        nomRespo: setNombre(respuesta?.obj?.results[0]["nombre"]);
+        apellidoRespo: setApellido(respuesta?.obj?.results[0]["apellido"]);
+        numDoc: setNumDocumento(respuesta?.obj?.results[0]["numdoc"]);
+        tipoDoc: setTipoIdentificacion(respuesta?.obj?.results[0]["tipodoc"]);
+        numNit: setNumNit(respuesta?.obj?.results[0]["numnit"]);
+        numCamara: setNumCamaraComerci(
+          respuesta?.obj?.results[0]["numcamycom"]
+        );
+        numRut: setNumRut(respuesta?.obj?.results[0]["numrut"]);
         actividadEcono: setActividad(
-          respuesta?.obj.results[0]["actividad_economica"]
+          respuesta?.obj?.results[0]["actividad_economica"]
         );
-        telefono: setTelefonos(respuesta?.obj.results[0]["celular"]);
-        correo: setCorreos(respuesta?.obj.results[0]["email"]);
+        telefono: setTelefonos(respuesta?.obj?.results[0]["celular"]);
+        correo: setCorreos(respuesta?.obj?.results[0]["email"]);
         munCorr: setMunicipioCorr(
           respuesta?.obj.results[0]["municipio_correspondencia"]
         );
         depCorr: setDepartamentoCorr(
-          respuesta?.obj.results[0]["departamento_correspondencia"]
+          respuesta?.obj?.results[0]["departamento_correspondencia"]
         );
         barCorr: setBarrioCorr(
-          respuesta?.obj.results[0]["barrio_correspondencia"]
+          respuesta?.obj?.results[0]["barrio_correspondencia"]
         );
         localidadCorr: setLocalidadCorr(
-          respuesta?.obj.results[0]["localidad_correspondencia"]
+          respuesta?.obj?.results[0]["localidad_correspondencia"]
         );
         dirCorr: setDireccionCorr(
-          respuesta?.obj.results[0]["direccion_correspondencia"]
+          respuesta?.obj?.results[0]["direccion_correspondencia"]
         );
-        dirCom: setMunicipioCom(respuesta?.obj.results[0]["municipio"]);
-        depacom: setDepartamentoCom(respuesta?.obj.results[0]["departamento"]);
-        locacom: setLocalidadCom(respuesta?.obj.results[0]["localidad_bogota"]);
+        dirCom: setMunicipioCom(respuesta?.obj?.results[0]["municipio"]);
+        depacom: setDepartamentoCom(respuesta?.obj?.results[0]["departamento"]);
+        locacom: setLocalidadCom(
+          respuesta?.obj?.results[0]["localidad_bogota"]
+        );
         dircom: setDireccionCom(
-          respuesta?.obj.results[0]["direccion_comercio"]
+          respuesta?.obj?.results[0]["direccion_comercio"]
         );
-        barrcom: setBarrioCom(respuesta?.obj.results[0]["barrio"]);
+        barrcom: setBarrioCom(respuesta?.obj?.results[0]["barrio"]);
         respoIva: setResponsableIva(
-          respuesta?.obj.results[0]["responsableiva"]
+          respuesta?.obj?.results[0]["responsableiva"]
         );
-        autosms: setAutorizacion(respuesta?.obj.results[0]["autosms"]);
+        autosms: setAutorizacion(respuesta?.obj?.results[0]["autosms"]);
       });
   }, []);
   /* console.log(datosParams); */
@@ -512,7 +516,7 @@ const CorreccionFormulario = () => {
               onChange={(e) => setBarrioCorr(capitalize(e.target.value))}
               type="text"
             />
-            {datosParams[0]["localidad_correspondencia"].length > 0 ? (
+            {datosParams[0]["localidad_correspondencia"]?.length > 0 ? (
               <Input
                 label={"Localidad"}
                 placeholder={datosParams[0]["localidad_correspondencia"]}
