@@ -38,6 +38,9 @@ const CrearSorteos = lazy(() =>
 const CargaArchivos = lazy(() =>
   import("../apps/LoteriaBog/Views/CargaArchivos")
 );
+const ArqueoBilletes = lazy(() =>
+  import("../apps/LoteriaBog/Views/ArqueoBilletes")
+);
 /**
  * ColCard
  */
@@ -247,7 +250,14 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"PAGO"} name="Premios" />,
         component: Premios,
         extern: false,
-        permission: [3], ///////////////////////////////////////////////////////////////////
+        permission: [3],
+      },
+      {
+        link: "/loteria-de-bogota/arqueoBilletes",
+        label: <AppIcons Logo={"REPORTE"} name="Arqueo Billetes" />,
+        component: ArqueoBilletes,
+        extern: false,
+        permission: [2], ///////////////////////////////////////////////////////////////////
       },
     ],
   },

@@ -40,7 +40,7 @@ function createCard(
     fecha_venta,
   };
 }
-const url_reportVentas = `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`;
+const url_reportVentas = `http://127.0.0.1:5000/reportes_ventas`;
 
 const ReportVentasForm = ({ closeModal, oficina }) => {
   const [fecha_ini, setFecha_ini] = useState("");
