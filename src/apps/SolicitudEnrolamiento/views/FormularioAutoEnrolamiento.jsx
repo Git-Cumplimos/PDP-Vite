@@ -230,7 +230,7 @@ const FormularioAutoEnrolamiento = () => {
           /*  console.log(respuesta); */
           const formData = new FormData();
 
-          formData.set("rut", archivos1[0]);
+          /* formData.set("rut", archivos1[0]);
 
           formData.set("cc", archivos2[0]);
 
@@ -238,14 +238,16 @@ const FormularioAutoEnrolamiento = () => {
 
           formData.set("numdoc", numDocumento);
 
+          formData.set("id_proceso", respuesta.body.id_proceso); */
           formData.set("id_proceso", respuesta.body.id_proceso);
+          /* formData.set("numdoc", numDocumento); */
 
           notify("Se ha comenzado la carga");
 
           /* console.log(Object.fromEntries(formData.entries())); */
           fetch(
             /* `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`, */
-            `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/uploadfile`,
+            `${REACT_APP_URL_SERVICE_PUBLIC}/uploadfile2`,
 
             {
               method: "POST",
