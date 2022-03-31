@@ -58,10 +58,11 @@ const searchTypesByPermission = async (id_permission) => {
             }
           );
           if (typeOp?.status) {
-            for (const { id_tipo_operacion, Nombre, Aliado_corto } of typeOp
-              ?.obj?.results) {
+            console.log(typeOp?.obj?.results);
+            for (const { id_tipo_operacion, Nombre, Autorizador } of typeOp?.obj
+              ?.results) {
               temp_res[
-                `${id_tipo_operacion}) ${Nombre} (${Aliado_corto})`
+                `${id_tipo_operacion}) ${Nombre} (${Autorizador})`
               ] = true;
             }
           }
@@ -217,17 +218,17 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
         )}
         {Array.isArray(typesDB?.results) && typesDB?.results.length > 0 ? (
           <Table
-            headers={["Id", "Nombre tipo transaccion", "Aliado"]}
+            headers={["Id", "Nombre tipo transaccion", "Autorizador"]}
             data={typesDB?.results.map(
-              ({ id_tipo_operacion, Nombre, Aliado }) => {
-                return { id_tipo_operacion, Nombre, Aliado };
+              ({ id_tipo_operacion, Nombre, Autorizador }) => {
+                return { id_tipo_operacion, Nombre, Autorizador };
               }
             )}
             onSelectRow={(e, i) => {
-              const { id_tipo_operacion, Nombre, Aliado_corto } =
+              const { id_tipo_operacion, Nombre, Autorizador } =
                 typesDB?.results[i];
               const copy = { ...typesByPermissions };
-              copy[`${id_tipo_operacion}) ${Nombre} (${Aliado_corto})`] = true;
+              copy[`${id_tipo_operacion}) ${Nombre} (${Autorizador})`] = true;
               setTypesByPermissions({ ...copy });
               // setTypesDB([]);
             }}
