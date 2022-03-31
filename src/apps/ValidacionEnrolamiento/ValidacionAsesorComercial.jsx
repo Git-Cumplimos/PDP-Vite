@@ -7,6 +7,7 @@ import fetchData from "../../utils/fetchData";
 import TableEnterprise from "../../components/Base/TableEnterprise";
 import Input from "../../components/Base/Input";
 import Select from "../../components/Base/Select";
+import { notifyError } from "../../utils/notify";
 
 function ValidacionAsesorComercial() {
   const navigate = useNavigate();
@@ -27,8 +28,12 @@ function ValidacionAsesorComercial() {
     )
       /* .then((response) => response.json()) */
       .then((respuesta) => {
-        setDatosEnrolamientos(respuesta.obj.results);
+        setDatosEnrolamientos(respuesta?.obj?.results);
         setCantidadPaginas(respuesta?.obj?.maxPages);
+      })
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al cargar Datos ");
       });
   }, []);
   useEffect(() => {
@@ -40,18 +45,21 @@ function ValidacionAsesorComercial() {
       )
         /* .then((response) => response.json()) */
         .then((respuesta) => {
-          setDatosFiltradosFecha(respuesta.obj.results);
+          setDatosFiltradosFecha(respuesta?.obj?.results);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos Por Fecha y Estado");
+        });
     }
   }, [fechaInicial, fechaFinal, estadoProceso]);
   /*   console.log(datosOrdenados); */
-  datosEnrolamientos.map((e) => delete e.task_token);
-  datosEnrolamientos.map((e) => delete e.id_reconocer);
-  const datosFiltrados = datosEnrolamientos.map((e) => Object.values(e));
-  const key = datosEnrolamientos.map((e) => Object.keys(e));
+  datosEnrolamientos?.map((e) => delete e.task_token);
+  datosEnrolamientos?.map((e) => delete e.id_reconocer);
+  const datosFiltrados = datosEnrolamientos?.map((e) => Object.values(e));
+  const key = datosEnrolamientos?.map((e) => Object.keys(e));
 
-  datosEnrolamientos.filter((e) => {
+  datosEnrolamientos?.filter((e) => {
     if (e.validation_state === "101") {
       e.validation_state = "Validado Para reconoserID";
     } else if (e.validation_state === "102") {
@@ -59,7 +67,7 @@ function ValidacionAsesorComercial() {
     }
   });
 
-  datosFiltradosFecha.filter((e) => {
+  datosFiltradosFecha?.filter((e) => {
     if (e.validation_state === "101") {
       e.validation_state = "Validado Para ReconoserID";
     } else if (e.validation_state === "102") {
@@ -82,7 +90,7 @@ function ValidacionAsesorComercial() {
             "Departamento",
             "Fecha Inicio",
           ]}
-          data={datosFiltradosFecha.map(
+          data={datosFiltradosFecha?.map(
             ({
               id_proceso,
               nombre,
@@ -148,7 +156,7 @@ function ValidacionAsesorComercial() {
             "Departamento",
             "Fecha Inicio",
           ]}
-          data={datosEnrolamientos.map(
+          data={datosEnrolamientos?.map(
             ({
               id_proceso,
               nombre,
