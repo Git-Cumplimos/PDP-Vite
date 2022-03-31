@@ -181,6 +181,7 @@ const FormularioAutoEnrolamiento = () => {
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
+      console.log("hola");
       fetchData(
         `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/iniciar-proceso-enrolamiento`,
         "POST",
