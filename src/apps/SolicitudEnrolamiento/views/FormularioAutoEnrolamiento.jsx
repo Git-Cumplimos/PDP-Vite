@@ -388,7 +388,6 @@ const FormularioAutoEnrolamiento = () => {
             type="number"
             minlength="5"
             onChange={(e) => setNumConsultaProceso(e.target.value)}
-            required
           ></Input>
           <ButtonBar /* className={contenedorBotones} */ type="">
             <Button
@@ -426,7 +425,6 @@ const FormularioAutoEnrolamiento = () => {
                       setNombreComercio(capitalize(e.target.value))
                     }
                     type="text"
-                    required
                   ></Input>
                   <Fieldset
                     legend="Representante legal"
@@ -438,7 +436,6 @@ const FormularioAutoEnrolamiento = () => {
                       value={nombre}
                       onChange={(e) => setNombre(capitalize(e.target.value))}
                       type={"text"}
-                      required
                     ></Input>
 
                     <Input
@@ -447,14 +444,12 @@ const FormularioAutoEnrolamiento = () => {
                       value={apellido}
                       onChange={(e) => setApellido(capitalize(e.target.value))}
                       type={"text"}
-                      required
                     ></Input>
                     <Input
                       label={"N° Documento"}
                       placeholder="Ingrese su Numero Documento"
                       onChange={(e) => setNumDocumento(e.target.value)}
                       type={"number"}
-                      required
                     ></Input>
                     <Select
                       onChange={(event) =>
@@ -462,7 +457,6 @@ const FormularioAutoEnrolamiento = () => {
                       }
                       id="comissionType" /* para que es esto */
                       label="Tipo de Identificación"
-                      required
                       options={{
                         "": "",
                         "C.C Cedula de Ciudadania": "CC",
@@ -477,21 +471,18 @@ const FormularioAutoEnrolamiento = () => {
                       placeholder="Ingrese NIT"
                       onChange={(e) => setNumNit(e.target.value)}
                       type={"number"}
-                      required
                     ></Input>
                     <Input
                       label={"N° Camara & Comercio"}
                       placeholder="Ingrese Camara & Comercio"
                       onChange={(e) => setNumCamaraComerci(e.target.value)}
                       type={"text"}
-                      required
                     ></Input>
                     <Input
                       label={"N° RUT"}
                       placeholder="Ingrese RUT"
                       onChange={(e) => setNumRut(e.target.value)}
                       type={"number"}
-                      required
                     ></Input>
                     <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
                       <InputSuggestions
@@ -602,7 +593,6 @@ const FormularioAutoEnrolamiento = () => {
                         setResponsableIva(event.target.value)
                       }
                       id="comissionType" /* para que es esto */
-                      required
                       label={`Responsable del iva "CAMPO 53 RUT"`}
                       options={{
                         "": "",
@@ -620,7 +610,6 @@ const FormularioAutoEnrolamiento = () => {
                         else return `Numero de celular adicional ${idx}`;
                       }}
                       max={1}
-                      required
                     />
 
                     <MultipleInput
@@ -631,13 +620,11 @@ const FormularioAutoEnrolamiento = () => {
                       }}
                       max={1}
                       type={"email"}
-                      required
                     />
                   </Fieldset>
                   <LocationForm
                     place="Comercio"
                     location={commerceLocation}
-                    required
                     LocalidadComponent={
                       <Select
                         onChange={(event) =>
@@ -662,7 +649,6 @@ const FormularioAutoEnrolamiento = () => {
                   <LocationForm
                     place="Correspondencia"
                     location={homeLocation}
-                    required
                     LocalidadComponent={
                       <Select
                         onChange={(event) =>
@@ -671,7 +657,6 @@ const FormularioAutoEnrolamiento = () => {
                         id="comissionType"
                         value={homeLocation.localidad[0]}
                         label={`Localidad`}
-                        required
                         options={
                           Object.fromEntries([
                             ["", ""],
@@ -691,7 +676,6 @@ const FormularioAutoEnrolamiento = () => {
                     onGetFile={onFileChange}
                     accept=".pdf"
                     allowDrop={false}
-                    required
                   />
                   <FileInput
                     className="lg:col-span-2"
@@ -699,7 +683,6 @@ const FormularioAutoEnrolamiento = () => {
                     onGetFile={onFileChange2}
                     accept=".pdf"
                     allowDrop={false}
-                    required
                   />
                   <FileInput
                     className="lg:col-span-2"
@@ -744,7 +727,6 @@ const FormularioAutoEnrolamiento = () => {
                     }
                     id="comissionType" /* para que es esto */
                     value={tratamientoDatos}
-                    required
                     options={{
                       "": "",
                       SI: "SI",
@@ -764,7 +746,6 @@ const FormularioAutoEnrolamiento = () => {
                     onChange={(event) => setAutorizacion(event.target.value)}
                     id="comissionType" /* para que es esto */
                     value={autorizacion}
-                    required
                     options={{
                       "": "",
                       SI: "SI",
