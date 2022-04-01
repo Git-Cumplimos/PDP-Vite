@@ -246,15 +246,20 @@ const FormularioAutoEnrolamiento = () => {
           notify("Se ha comenzado la carga");
 
           /* console.log(Object.fromEntries(formData.entries())); */
-          fetch(
+          fetchData(
             /* `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`, */
             `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/uploadfile2`,
+            "POST",
+            {},
+            { formData },
+            {},
+            true
 
-            {
+            /*  {
               method: "POST",
 
               body: formData,
-            }
+            } */
           )
             .then((res) => res.json())
             .then((respuesta) => {
