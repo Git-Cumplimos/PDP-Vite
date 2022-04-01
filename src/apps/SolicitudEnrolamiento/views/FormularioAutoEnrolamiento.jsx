@@ -181,6 +181,7 @@ const FormularioAutoEnrolamiento = () => {
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
+      console.log("hola");
       fetchData(
         `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/iniciar-proceso-enrolamiento`,
         "POST",
@@ -227,30 +228,37 @@ const FormularioAutoEnrolamiento = () => {
         false
       )
         .then((respuesta) => {
-          /*  console.log(respuesta); */
+          console.log(respuesta.body.id_proceso);
           const formData = new FormData();
 
-          formData.set("rut", archivos1[0]);
+          formData.set("id_proceso", respuesta.body.id_proceso);
+
+          /* formData.set("rut", archivos1[0]);
 
           formData.set("cc", archivos2[0]);
 
           formData.set("camaracomercio", archivos3[0]);
 
           formData.set("numdoc", numDocumento);
-
-          formData.set("id_proceso", respuesta.body.id_proceso);
+          
+          formData.set("id_proceso", respuesta.body.id_proceso); */
+          /* formData.set("numdoc", numDocumento); */
 
           notify("Se ha comenzado la carga");
-
           /* console.log(Object.fromEntries(formData.entries())); */
           fetch(
             /* `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`, */
-            `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/uploadfile`,
+            `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/uploadfile2?id_proceso=${respuesta.body.id_proceso}`,
+            /*  "POST",
+            {},
+            { formData },
+            {},
+            false */
 
             {
-              method: "POST",
+              method: "GET",
 
-              body: formData,
+              /* body: formData, */
             }
           )
             .then((res) => res.json())
@@ -262,8 +270,26 @@ const FormularioAutoEnrolamiento = () => {
               } else {
                 /*  console.log(respuesta?.obj); */
                 notify("Se han subido los archivos");
+                console.log(respuesta?.obj[0]?.fields?.["x-amz-algorithm"]);
+                if (archivos1) {
+                  fetchData(
+                    `${respuesta?.obj[0]?.url}`,
+                    "POST",
+                    {},
+                    {
+                      key: `${respuesta?.obj[0]?.fields?.key}`,
+                      policy: `${respuesta?.obj[0]?.fields?.policy}`,
+                      "x-amz-algorithm": `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`,
+                      "x-amz-credential": `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`,
+                      "x-amz-date": `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`,
+                      "x-amz-signature": `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`,
+                    },
+                    {},
+                    false
+                  );
+                }
                 setEstadoForm(true);
-                navigate("/public/solicitud-enrolamiento/consultar");
+                /* navigate("/public/solicitud-enrolamiento/consultar"); */
               }
             })
             .catch((err) => {
@@ -385,7 +411,6 @@ const FormularioAutoEnrolamiento = () => {
             type="number"
             minlength="5"
             onChange={(e) => setNumConsultaProceso(e.target.value)}
-            required
           ></Input>
           <ButtonBar /* className={contenedorBotones} */ type="">
             <Button
@@ -423,7 +448,6 @@ const FormularioAutoEnrolamiento = () => {
                       setNombreComercio(capitalize(e.target.value))
                     }
                     type="text"
-                    required
                   ></Input>
                   <Fieldset
                     legend="Representante legal"
@@ -435,7 +459,6 @@ const FormularioAutoEnrolamiento = () => {
                       value={nombre}
                       onChange={(e) => setNombre(capitalize(e.target.value))}
                       type={"text"}
-                      required
                     ></Input>
 
                     <Input
@@ -444,23 +467,19 @@ const FormularioAutoEnrolamiento = () => {
                       value={apellido}
                       onChange={(e) => setApellido(capitalize(e.target.value))}
                       type={"text"}
-                      required
                     ></Input>
                     <Input
                       label={"N° Documento"}
                       placeholder="Ingrese su Numero Documento"
                       onChange={(e) => setNumDocumento(e.target.value)}
                       type={"number"}
-                      required
                     ></Input>
                     <Select
                       onChange={(event) =>
                         setTipoIdentificacion(event.target.value)
                       }
                       id="comissionType" /* para que es esto */
-                      name="comissionType"
                       label="Tipo de Identificación"
-                      required
                       options={{
                         "": "",
                         "C.C Cedula de Ciudadania": "CC",
@@ -475,21 +494,18 @@ const FormularioAutoEnrolamiento = () => {
                       placeholder="Ingrese NIT"
                       onChange={(e) => setNumNit(e.target.value)}
                       type={"number"}
-                      required
                     ></Input>
                     <Input
                       label={"N° Camara & Comercio"}
                       placeholder="Ingrese Camara & Comercio"
                       onChange={(e) => setNumCamaraComerci(e.target.value)}
                       type={"text"}
-                      required
                     ></Input>
                     <Input
                       label={"N° RUT"}
                       placeholder="Ingrese RUT"
                       onChange={(e) => setNumRut(e.target.value)}
                       type={"number"}
-                      required
                     ></Input>
                     <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
                       <InputSuggestions
@@ -600,8 +616,6 @@ const FormularioAutoEnrolamiento = () => {
                         setResponsableIva(event.target.value)
                       }
                       id="comissionType" /* para que es esto */
-                      name="comissionType"
-                      required
                       label={`Responsable del iva "CAMPO 53 RUT"`}
                       options={{
                         "": "",
@@ -619,7 +633,6 @@ const FormularioAutoEnrolamiento = () => {
                         else return `Numero de celular adicional ${idx}`;
                       }}
                       max={1}
-                      required
                     />
 
                     <MultipleInput
@@ -630,20 +643,17 @@ const FormularioAutoEnrolamiento = () => {
                       }}
                       max={1}
                       type={"email"}
-                      required
                     />
                   </Fieldset>
                   <LocationForm
                     place="Comercio"
                     location={commerceLocation}
-                    required
                     LocalidadComponent={
                       <Select
                         onChange={(event) =>
                           commerceLocation.localidad[1](event.target.value)
                         }
                         id="comissionType"
-                        name="comissionType"
                         value={commerceLocation.localidad[0]}
                         label={`Localidad`}
                         options={
@@ -662,17 +672,14 @@ const FormularioAutoEnrolamiento = () => {
                   <LocationForm
                     place="Correspondencia"
                     location={homeLocation}
-                    required
                     LocalidadComponent={
                       <Select
                         onChange={(event) =>
                           homeLocation.localidad[1](event.target.value)
                         }
                         id="comissionType"
-                        name="comissionType"
                         value={homeLocation.localidad[0]}
                         label={`Localidad`}
-                        required
                         options={
                           Object.fromEntries([
                             ["", ""],
@@ -692,7 +699,6 @@ const FormularioAutoEnrolamiento = () => {
                     onGetFile={onFileChange}
                     accept=".pdf"
                     allowDrop={false}
-                    required
                   />
                   <FileInput
                     className="lg:col-span-2"
@@ -700,7 +706,6 @@ const FormularioAutoEnrolamiento = () => {
                     onGetFile={onFileChange2}
                     accept=".pdf"
                     allowDrop={false}
-                    required
                   />
                   <FileInput
                     className="lg:col-span-2"
@@ -744,9 +749,7 @@ const FormularioAutoEnrolamiento = () => {
                       setTratamientoDatos(event.target.value)
                     }
                     id="comissionType" /* para que es esto */
-                    name="comissionType"
                     value={tratamientoDatos}
-                    required
                     options={{
                       "": "",
                       SI: "SI",
@@ -765,9 +768,7 @@ const FormularioAutoEnrolamiento = () => {
                   <Select
                     onChange={(event) => setAutorizacion(event.target.value)}
                     id="comissionType" /* para que es esto */
-                    name="comissionType"
                     value={autorizacion}
-                    required
                     options={{
                       "": "",
                       SI: "SI",
