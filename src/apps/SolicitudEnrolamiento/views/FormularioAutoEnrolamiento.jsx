@@ -228,8 +228,10 @@ const FormularioAutoEnrolamiento = () => {
         false
       )
         .then((respuesta) => {
-          /*  console.log(respuesta); */
+          console.log(respuesta.body.id_proceso);
           const formData = new FormData();
+
+          formData.set("id_proceso", respuesta.body.id_proceso);
 
           /* formData.set("rut", archivos1[0]);
 
@@ -238,28 +240,26 @@ const FormularioAutoEnrolamiento = () => {
           formData.set("camaracomercio", archivos3[0]);
 
           formData.set("numdoc", numDocumento);
-
+          
           formData.set("id_proceso", respuesta.body.id_proceso); */
-          formData.set("id_proceso", respuesta.body.id_proceso);
           /* formData.set("numdoc", numDocumento); */
 
           notify("Se ha comenzado la carga");
-
           /* console.log(Object.fromEntries(formData.entries())); */
-          fetchData(
+          fetch(
             /* `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`, */
-            `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/uploadfile2`,
-            "POST",
+            `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/uploadfile2?id_proceso=${respuesta.body.id_proceso}`,
+            /*  "POST",
             {},
             { formData },
             {},
-            false
+            false */
 
-            /*  {
-              method: "POST",
+            {
+              method: "GET",
 
-              body: formData,
-            } */
+              /* body: formData, */
+            }
           )
             .then((res) => res.json())
             .then((respuesta) => {
@@ -270,8 +270,26 @@ const FormularioAutoEnrolamiento = () => {
               } else {
                 /*  console.log(respuesta?.obj); */
                 notify("Se han subido los archivos");
+                console.log(respuesta?.obj[0]?.fields?.["x-amz-algorithm"]);
+                if (archivos1) {
+                  fetchData(
+                    `${respuesta?.obj[0]?.url}`,
+                    "POST",
+                    {},
+                    {
+                      key: `${respuesta?.obj[0]?.fields?.key}`,
+                      policy: `${respuesta?.obj[0]?.fields?.policy}`,
+                      "x-amz-algorithm": `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`,
+                      "x-amz-credential": `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`,
+                      "x-amz-date": `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`,
+                      "x-amz-signature": `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`,
+                    },
+                    {},
+                    false
+                  );
+                }
                 setEstadoForm(true);
-                navigate("/public/solicitud-enrolamiento/consultar");
+                /* navigate("/public/solicitud-enrolamiento/consultar"); */
               }
             })
             .catch((err) => {
