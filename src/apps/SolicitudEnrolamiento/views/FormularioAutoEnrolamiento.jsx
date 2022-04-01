@@ -272,17 +272,33 @@ const FormularioAutoEnrolamiento = () => {
                 notify("Se han subido los archivos");
                 console.log(respuesta?.obj[0]?.fields?.["x-amz-algorithm"]);
                 if (archivos1) {
+                  formData.set("key", `${respuesta?.obj[0]?.fields?.key}`);
+                  formData.set(
+                    "policy",
+                    `${respuesta?.obj[0]?.fields?.policy}`
+                  );
+                  formData.set(
+                    "x-amz-algorithm",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`
+                  );
+                  formData.set(
+                    "x-amz-credential",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`
+                  );
+                  formData.set(
+                    "x-amz-date",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`
+                  );
+                  formData.set(
+                    "x-amz-signature",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`
+                  );
                   fetchData(
                     `${respuesta?.obj[0]?.url}`,
                     "POST",
                     {},
                     {
-                      key: `${respuesta?.obj[0]?.fields?.key}`,
-                      policy: `${respuesta?.obj[0]?.fields?.policy}`,
-                      "x-amz-algorithm": `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`,
-                      "x-amz-credential": `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`,
-                      "x-amz-date": `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`,
-                      "x-amz-signature": `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`,
+                      formData,
                     },
                     {},
                     false
