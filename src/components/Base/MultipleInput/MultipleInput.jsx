@@ -3,7 +3,14 @@ import Button from "../Button";
 import ButtonBar from "../ButtonBar";
 import Input from "../Input";
 
-const MultipleInput = ({ arrState, label, min = 1, max, required = false }) => {
+const MultipleInput = ({
+  arrState,
+  label,
+  min = 1,
+  max,
+  required = false,
+  type = "text",
+}) => {
   const [arrData, setArrData] = arrState;
   if (!Array.isArray(arrData)) {
     throw Error("Se debe enviar un estado de un useState");
@@ -17,7 +24,7 @@ const MultipleInput = ({ arrState, label, min = 1, max, required = false }) => {
             <Input
               id={`arrData_${index}`}
               label={`${label(index)}`}
-              type="text"
+              type={type}
               autoComplete="off"
               value={value}
               onInput={(e) => {
