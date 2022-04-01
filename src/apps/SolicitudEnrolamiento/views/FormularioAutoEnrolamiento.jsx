@@ -248,7 +248,7 @@ const FormularioAutoEnrolamiento = () => {
           /* console.log(Object.fromEntries(formData.entries())); */
           fetch(
             /* `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`, */
-            `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/uploadfile2`,
+            `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/uploadfile2`,
 
             {
               method: "POST",
