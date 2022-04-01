@@ -184,7 +184,7 @@ const ReporteComisiones = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl'>Crear comisión a pagar:</h1>
+      <h1 className='text-3xl'>Reporte historico comisiones:</h1>
       {/* <SearchComissions comissionFace="pay" onSelectItem={onSelectItem} /> */}
       <Form onChange={onChangeReport} grid>
         {report?.["Convenio"] && (
