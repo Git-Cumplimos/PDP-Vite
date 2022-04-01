@@ -461,7 +461,6 @@ const FormularioAutoEnrolamiento = () => {
                         setTipoIdentificacion(event.target.value)
                       }
                       id="comissionType" /* para que es esto */
-                      name="comissionType"
                       label="Tipo de Identificación"
                       required
                       options={{
@@ -603,7 +602,6 @@ const FormularioAutoEnrolamiento = () => {
                         setResponsableIva(event.target.value)
                       }
                       id="comissionType" /* para que es esto */
-                      name="comissionType"
                       required
                       label={`Responsable del iva "CAMPO 53 RUT"`}
                       options={{
@@ -646,7 +644,6 @@ const FormularioAutoEnrolamiento = () => {
                           commerceLocation.localidad[1](event.target.value)
                         }
                         id="comissionType"
-                        name="comissionType"
                         value={commerceLocation.localidad[0]}
                         label={`Localidad`}
                         options={
@@ -672,7 +669,6 @@ const FormularioAutoEnrolamiento = () => {
                           homeLocation.localidad[1](event.target.value)
                         }
                         id="comissionType"
-                        name="comissionType"
                         value={homeLocation.localidad[0]}
                         label={`Localidad`}
                         required
@@ -747,7 +743,6 @@ const FormularioAutoEnrolamiento = () => {
                       setTratamientoDatos(event.target.value)
                     }
                     id="comissionType" /* para que es esto */
-                    name="comissionType"
                     value={tratamientoDatos}
                     required
                     options={{
@@ -768,7 +763,6 @@ const FormularioAutoEnrolamiento = () => {
                   <Select
                     onChange={(event) => setAutorizacion(event.target.value)}
                     id="comissionType" /* para que es esto */
-                    name="comissionType"
                     value={autorizacion}
                     required
                     options={{
