@@ -271,38 +271,34 @@ const FormularioAutoEnrolamiento = () => {
                 /*  console.log(respuesta?.obj); */
                 notify("Se han subido los archivos");
                 console.log(respuesta?.obj[0]?.fields?.["x-amz-algorithm"]);
+                const formData2 = new FormData();
                 if (archivos1) {
-                  formData.set("key", `${respuesta?.obj[0]?.fields?.key}`);
-                  formData.set(
+                  formData2.set("key", `${respuesta?.obj[0]?.fields?.key}`);
+                  formData2.set(
                     "policy",
                     `${respuesta?.obj[0]?.fields?.policy}`
                   );
-                  formData.set(
+                  formData2.set(
                     "x-amz-algorithm",
                     `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`
                   );
-                  formData.set(
+                  formData2.set(
                     "x-amz-credential",
                     `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`
                   );
-                  formData.set(
+                  formData2.set(
                     "x-amz-date",
                     `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`
                   );
-                  formData.set(
+                  formData2.set(
                     "x-amz-signature",
                     `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`
                   );
-                  fetchData(
-                    `${respuesta?.obj[0]?.url}`,
-                    "POST",
-                    {},
-                    {
-                      formData,
-                    },
-                    {},
-                    false
-                  );
+                  formData2.set("file", archivos1);
+                  fetch(`${respuesta?.obj[0]?.url}`, {
+                    method: "POST",
+                    body: formData2,
+                  });
                 }
                 setEstadoForm(true);
                 /* navigate("/public/solicitud-enrolamiento/consultar"); */
