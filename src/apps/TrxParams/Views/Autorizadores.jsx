@@ -6,6 +6,7 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import Table from "../../../components/Base/Table";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 import TextArea from "../../../components/Base/TextArea";
 import Pagination from "../../../components/Compound/Pagination";
 import useQuery from "../../../hooks/useQuery";
@@ -47,8 +48,7 @@ const calcularDigitoVerificacion = (myNit) => {
 
 const Autorizadores = () => {
   const navigate = useNavigate();
-  const [{ searchAuto = "", page = 1, openTipoContrato = false }, setQuery] =
-    useQuery();
+  const [{ searchAuto = "", openTipoContrato = false }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
@@ -57,6 +57,10 @@ const Autorizadores = () => {
     fecthAutorizadoresFunc();
   }, []);
   const [showModal2, setShowModal2] = useState(false);
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
   const handleClose2 = useCallback(() => {
     setShowModal2(false);
     setQuery({ ["openTipoContrato"]: false }, { replace: true });
@@ -214,10 +218,10 @@ const Autorizadores = () => {
     } else {
       fetchTiposContratosComisionesFunc();
     }
-  }, [searchAuto, page, openTipoContrato]);
+  }, [searchAuto, page, limit, openTipoContrato]);
 
   const fecthAutorizadoresFunc = () => {
-    fetchAutorizadores({ nombre_autorizador: searchAuto, page })
+    fetchAutorizadores({ nombre_autorizador: searchAuto, page, limit })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
         setAutorizadores(autoArr?.results);
@@ -255,7 +259,20 @@ const Autorizadores = () => {
           Crear autorizador
         </Button>
       </ButtonBar>
-      <Pagination maxPage={maxPages} onChange={onChange} grid>
+      <TableEnterprise
+        title='Autorizadores'
+        maxPage={maxPages}
+        headers={[
+          "Id autorizador",
+          "Autorizador",
+          "Nit",
+          "Descripción",
+          "Contrato",
+        ]}
+        data={tableAutorizadores}
+        onSelectRow={onSelectAutorizador}
+        onSetPageData={setPageData}
+        onChange={onChange}>
         <Input
           id='searchAuto'
           name='searchAuto'
@@ -264,9 +281,8 @@ const Autorizadores = () => {
           autoComplete='off'
           defaultValue={searchAuto}
         />
-        <ButtonBar></ButtonBar>
-      </Pagination>
-      {Array.isArray(tableAutorizadores) && tableAutorizadores.length > 0 ? (
+      </TableEnterprise>
+      {/* {Array.isArray(tableAutorizadores) && tableAutorizadores.length > 0 ? (
         <Table
           headers={Object.keys(tableAutorizadores[0])}
           data={tableAutorizadores}
@@ -274,7 +290,7 @@ const Autorizadores = () => {
         />
       ) : (
         ""
-      )}
+      )} */}
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={formatNit} grid>
           <Input
@@ -338,27 +354,6 @@ const Autorizadores = () => {
             </ButtonBar>
           ) : (
             <Fragment>
-              <ButtonBar>
-                {/* <Button
-                  type='button'
-                  onClick={() => {
-                    const urlParams = new URLSearchParams();
-                    urlParams.append(
-                      "autorizador_id_autorizador",
-                      selectedAuto?.["Id autorizador"]
-                    );
-                    urlParams.append(
-                      "nombre_autorizador",
-                      JSON.stringify(selectedAuto?.["Nombre de autorizador"])
-                    );
-                    navigate(
-                      `/trx-params/comisiones/cobradas?${urlParams.toString()}`
-                    );
-                  }}
-                >
-                  Editar comisiones a cobrar
-                </Button> */}
-              </ButtonBar>
               <ButtonBar>
                 <Button type='button' onClick={handleClose}>
                   Cancelar

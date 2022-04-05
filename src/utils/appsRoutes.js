@@ -212,65 +212,67 @@ const allUrlsPrivateApps = [
   //   permission: [3, 4, 5, 6],
   //   subRoutes: [
   {
-    link: "/loterias/loteria-de-bogota",
-    label: <AppIcons Logo={"LOTERIA"} name="Loteria de bogota" />,
+    link: "/loteria",
+    label: <AppIcons Logo={"LOTERIA"} name="Loteria" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
     permission: [3, 4, 5, 6],
     subRoutes: [
-      {
-        link: "/loterias/loteria-de-bogota/ventas",
-        label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
-        component: ventaBog,
-        permission: [3],
-      },
-      {
-        link: "/loterias/loteria-de-bogota/cargar",
-        label: <AppIcons Logo={CARGAR} name="Carga de archivos" />,
-        component: CargaArchivos,
-        permission: [4],
-      },
-      {
-        link: "/loterias/loteria-de-bogota/descargar",
-        label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
-        component: Descargas,
-        permission: [6],
-        subRoutes: [
-          {
-            link: "/loterias/loteria-de-bogota/descargar/descarga_reportes",
-            label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
-            component: DescargarArchivosS3,
-            permission: [6],
-          },
-          {
-            link: "/loterias/loteria-de-bogota/descargar/borrar_billetes",
-            label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
-            component: BorrarBilletes,
-            permission: [6],
-          },
-        ],
-      },
-      {
-        link: "/loterias/loteria-de-bogota/sorteos",
-        label: <AppIcons Logo={"REPORTE"} name="Sorteos" />,
-        component: CrearSorteos,
-        permission: [5],
-      },
-      {
-        link: "/loterias/loteria-de-bogota/premios",
-        label: <AppIcons Logo={"PAGO"} name="Premios" />,
-        component: Premios,
-        extern: false,
-        permission: [3],
-      },
-      {
-        link: "/loterias/loteria-de-bogota/arqueoBilletes",
-        label: <AppIcons Logo={"REPORTE"} name="Arqueo Billetes" />,
-        component: ArqueoBilletes,
-        extern: false,
-        permission: [2], ///////////////////////////////////////////////////////////////////
-      },
-    ],
+      { link: "loteria-de-bogota", label: "Loteria de bogota" },
+      { link: "loteria-del-tolima", label: "Loteria del tolima" },
+    ].map(({ link: name, label }) => ({
+      link: `/loteria/${name}`,
+      label: <AppIcons Logo={"LOTERIA"} name={label} />,
+      component: LoteriaBog,
+      permission: [3, 4, 5, 6],
+      subRoutes: [
+        {
+          link: `/loteria/${name}/ventas`,
+          label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
+          component: Loteria,
+          permission: [3],
+        },
+        {
+          link: `/loteria/${name}/cargar`,
+          label: <AppIcons Logo={CARGAR} name="Carga de archivos" />,
+          component: CargaArchivos,
+          permission: [4],
+        },
+        {
+          link: `/loteria/${name}/descargar`,
+          label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+          component: Descargas,
+          permission: [6],
+          subRoutes: [
+            {
+              link: `/loteria/${name}/descargar/descarga_reportes`,
+              label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+              component: DescargarArchivosS3,
+              permission: [6],
+            },
+            {
+              link: `/loteria/${name}/descargar/borrar_billetes`,
+              label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
+              component: BorrarBilletes,
+              permission: [6],
+            },
+          ],
+        },
+        {
+          link: `/loteria/${name}/sorteos`,
+          label: <AppIcons Logo={"REPORTE"} name="Sorteos" />,
+          component: CrearSorteos,
+          permission: [5],
+        },
+        {
+          link: `/loteria/${name}/premios`,
+          label: <AppIcons Logo={"PAGO"} name="Premios" />,
+          component: Premios,
+          extern: false,
+          permission: [3], ///////////////////////////////////////////////////////////////////
+        },
+      ],
+    })),
   },
   //   ],
   // },
@@ -609,6 +611,13 @@ const allUrlsPrivateApps = [
         ],
       },
       {
+        link: "/Solicitud-enrolamiento/ReporteComercios",
+        label: <AppIcons Logo={"PAGO"} name={"Reporte De Comercios"} />,
+        component: ReporteComercios,
+        permission: [38],
+        subRoutes: [],
+      },
+      {
         link: "/Solicitud-enrolamiento/validarformularioreconoserid",
         label: (
           <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
@@ -620,12 +629,6 @@ const allUrlsPrivateApps = [
             link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
             label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
             component: VerificacionApertura,
-            permission: [39],
-          },
-          {
-            link: "/Solicitud-enrolamiento/reporte-comercios",
-            label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
-            component: ReporteComercios,
             permission: [39],
           },
         ],

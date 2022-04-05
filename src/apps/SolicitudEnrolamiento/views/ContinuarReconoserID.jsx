@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
 import classes from "./ContinuarReconoserID.module.css";
+import { notify } from "../../../utils/notify";
 const ReconoserID = () => {
   /*   const [procesoConvenioGuid, setProcesoConvenioGuid] = useState(""); */
   const [isSuccess, setIsSuccess] = useState(false);
@@ -70,7 +71,7 @@ const ReconoserID = () => {
         >
           <p>Your browser does not support iframes.</p>
         </iframe>
-        {isSuccess ? <h1>hola mundo</h1> : ""}
+        {isSuccess ? notify("Proceso Exitoso") : ""}
       </div>
     </Form>
   );

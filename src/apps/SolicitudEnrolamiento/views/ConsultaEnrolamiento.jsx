@@ -9,6 +9,7 @@ import classes from "../../SolicitudEnrolamiento/views/ConsultaEnrolamiento.modu
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import ProgressBar from "../../../components/Base/ProgressBar";
+import { notifyError } from "../../../utils/notify";
 
 const ConsultaEnrolamiento = () => {
   //------------------Estados Consulta---------------------//
@@ -43,10 +44,13 @@ const ConsultaEnrolamiento = () => {
       )
         .then((res) => res.json())
         .then((respuesta) => {
-          setRespuestaProceso(respuesta.obj.results);
+          setRespuestaProceso(respuesta?.obj?.results);
           console.log(respuesta);
         })
-        .catch((e) => console.log(e));
+        .catch((e) => {
+          console.log(e);
+          notifyError("Error al cargar Datos Proceso");
+        });
     }
   };
 
@@ -67,7 +71,7 @@ const ConsultaEnrolamiento = () => {
   const handleContinuarReconoser = async () => {
     console.log(respuestaProceso[0].id_reconocer);
     navigate(
-      `/public/solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0].id_reconocer}`
+      `/public/solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0]?.id_reconocer}`
     );
   };
 
@@ -176,19 +180,19 @@ const ConsultaEnrolamiento = () => {
                   ""
                 )}
 
-                {(respuestaProceso[0].validation_state === "101" &&
-                  respuestaProceso[0].id_reconocer === "None") ||
-                (respuestaProceso[0].validation_state === "101" &&
-                  respuestaProceso[0].id_reconocer === "") ? (
+                {(respuestaProceso[0]?.validation_state === "101" &&
+                  respuestaProceso[0]?.id_reconocer === "None") ||
+                (respuestaProceso[0]?.validation_state === "101" &&
+                  respuestaProceso[0]?.id_reconocer === "") ? (
                   <ButtonBar className={"lg:col-span-2"} type="">
                     <Button type="submit" onClick={() => handleReconoser()}>
                       Comenzar ReconoserID
                     </Button>
                   </ButtonBar>
-                ) : (respuestaProceso[0].validation_state === "101" &&
-                    respuestaProceso[0].id_reconocer !== "None") ||
-                  (respuestaProceso[0].validation_state === "101" &&
-                    respuestaProceso[0].id_reconocer !== "") ? (
+                ) : (respuestaProceso[0]?.validation_state === "101" &&
+                    respuestaProceso[0]?.id_reconocer !== "None") ||
+                  (respuestaProceso[0]?.validation_state === "101" &&
+                    respuestaProceso[0]?.id_reconocer !== "") ? (
                   <ButtonBar type="">
                     <Button
                       className={contenedorBotones}
@@ -202,15 +206,15 @@ const ConsultaEnrolamiento = () => {
                   ""
                 )}
               </div>
-              {respuestaProceso[0].validation_state === "101" ? (
+              {respuestaProceso[0]?.validation_state === "101" ? (
                 <ProgressBar value={25} self={false} max="100"></ProgressBar>
-              ) : respuestaProceso[0].validation_state === "200" ? (
+              ) : respuestaProceso[0]?.validation_state === "200" ? (
                 <ProgressBar value={50} self={false} max="100"></ProgressBar>
-              ) : respuestaProceso[0].validation_state === "201" ? (
+              ) : respuestaProceso[0]?.validation_state === "201" ? (
                 <ProgressBar value={100} self={false} max="100"></ProgressBar>
-              ) : respuestaProceso[0].validation_state === "102" ? (
+              ) : respuestaProceso[0]?.validation_state === "102" ? (
                 <ProgressBar value={25} self={true} max="100"></ProgressBar>
-              ) : respuestaProceso[0].validation_state === "202" ? (
+              ) : respuestaProceso[0]?.validation_state === "202" ? (
                 <ProgressBar value={100} self={true} max="100"></ProgressBar>
               ) : (
                 <ProgressBar value={10} self={false} max="100"></ProgressBar>

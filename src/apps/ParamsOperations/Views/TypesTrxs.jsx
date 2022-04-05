@@ -99,7 +99,6 @@ const TypesTrxs = () => {
 
   const onSelectSuggestion = useCallback(
     (i, el) => {
-      console.log(selected);
       const copy = { ...selected };
       copy.NewAutorizador = autorizadores[i];
       copy.Autorizador = autorizadores[i].nombre_autorizador;

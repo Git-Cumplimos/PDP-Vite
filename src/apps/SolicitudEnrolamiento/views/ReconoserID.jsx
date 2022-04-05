@@ -52,7 +52,8 @@ const ReconoserID = () => {
         .then((res) => res.json())
         .then((respuesta) =>
           setProcesoConvenioGuid(respuesta.obj.data.procesoConvenioGuid)
-        );
+        )
+        .catch((err) => console.log(err));
     }
   }, [datosUsuario]);
 
@@ -73,7 +74,8 @@ const ReconoserID = () => {
         }
       )
         .then((res) => res.json())
-        .then((respuesta) => console.log(respuesta));
+        .then((respuesta) => console.log(respuesta))
+        .catch((err) => console.log(err));
     }
   }, [procesoConvenioGuid, datosUsuario]);
 

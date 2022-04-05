@@ -6,7 +6,7 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Select from "../../../components/Base/Select";
 import classes from "../../ValidacionHellen/views/VerificacionApertura.module.css";
-import { notify } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 import Modal from "../../../components/Base/Modal";
 import LogoPDP from "../../../components/Base/LogoPDP";
 
@@ -56,7 +56,7 @@ const VerificacionApertura = () => {
         }
       )
         .then((response) => response.json())
-        .then((respuesta) => setDatosReconoserID(respuesta.obj.data));
+        .then((respuesta) => setDatosReconoserID(respuesta?.obj?.data));
     }
   }, [datosParams]);
   /* console.log(datosReconoserID); */
@@ -69,17 +69,12 @@ const VerificacionApertura = () => {
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */
     )
       .then((response) => response.json())
-      .then((respuesta) => setDatosParams(respuesta.obj.results));
-    /*  }; */
-
-    // actualizaremos el width al montar el componente
-    /*   updateWidth(); */
-
-    // nos suscribimos al evento resize de window
-    /*   window.addEventListener("resize", updateWidth); */
+      .then((respuesta) => setDatosParams(respuesta?.obj?.results))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al cargar Datos ");
+      });
   }, []);
-
-  /*   console.log(datosParams); */
 
   useEffect(() => {
     if (datosParams?.length > 0) {
@@ -92,8 +87,12 @@ const VerificacionApertura = () => {
       )
         .then((res) => res.json())
         .then((respuesta /* console.log(respuesta) */) =>
-          setUrlPdfs(respuesta.obj)
-        );
+          setUrlPdfs(respuesta?.obj)
+        )
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar PDF");
+        });
     }
   }, [datosParams]);
 
@@ -130,7 +129,11 @@ const VerificacionApertura = () => {
       }
     )
       .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
+      .then((respuesta) => console.log(respuesta?.obj?.data))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al Actualizar Estado");
+      });
     notify("El Usuario ha sido Aprobado para ReconoserID");
     setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformularioreconoserid"),
@@ -155,7 +158,11 @@ const VerificacionApertura = () => {
       }
     )
       .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
+      .then((respuesta) => console.log(respuesta?.obj?.data))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al Actualizar Estado");
+      });
     notify("El Usuario ha sido Rechazado para ReconoserID");
     setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformularioreconoserid"),
@@ -361,7 +368,7 @@ const VerificacionApertura = () => {
               ></Select>
             )} */}
 
-            {datosParams[0]["cod_localidad"].length != "" ? (
+            {datosParams[0]["cod_localidad"]?.length != "" ? (
               <Input
                 label={"Cod Localidad"}
                 value={datosParams[0]["cod_localidad"]}
@@ -382,7 +389,7 @@ const VerificacionApertura = () => {
               ></Select>
             )}
 
-            {datosParams[0]["responsable"].length != "" ? (
+            {datosParams[0]["responsable"]?.length != "" ? (
               <Input
                 label={"Responsable"}
                 value={datosParams[0]["responsable"]}
@@ -403,7 +410,7 @@ const VerificacionApertura = () => {
               ""
             )}
 
-            {datosParams[0]["unidad_negocio"].length != "" ? (
+            {datosParams[0]["unidad_negocio"]?.length != "" ? (
               <Input
                 label={"Unidad De Negocio"}
                 value={datosParams[0]["unidad_negocio"]}

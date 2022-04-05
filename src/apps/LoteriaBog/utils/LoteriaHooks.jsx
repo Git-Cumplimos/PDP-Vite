@@ -5,9 +5,15 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 //import Loteria from "../Views/Loteria";
+
+const nitsLoterias = {
+  "loteria-de-bogota": "nit1",
+  "loteria-del-tolima": "nit2",
+};
 
 const urls = {
   ordinario: `${process.env.REACT_APP_URL_LOTERIAS}/billeteriaVirtual`,
@@ -91,6 +97,12 @@ export const useLoteria = () => {
 export const useProvideLoteria = () => {
   // Datos consulta y compra
   const { roleInfo } = useAuth();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const nit = nitsLoterias?.[pathname.split("/")?.[2]];
+    console.log(nit);
+  }, [pathname]);
 
   const [numero, setNumero] = useState("");
   const [serie, setSerie] = useState("");
