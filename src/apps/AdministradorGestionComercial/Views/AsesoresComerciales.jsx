@@ -133,7 +133,9 @@ const AsesoresComerciales = () => {
     );
   }, []);
   const GenerarLinkAsesor = () => {
-    const link = `https://certificacion.puntodepagopruebas.com/solicitud-enrolamiento/formulario/${window.btoa(
+    const link = `${
+      process.env.REACT_APP_URL_SERVICE_PUBLIC_ASESORES_FRONT
+    }public/solicitud-enrolamiento/formulario/${window.btoa(
       selected.id_asesor
     )}`;
     setLinkAsesor(link);
