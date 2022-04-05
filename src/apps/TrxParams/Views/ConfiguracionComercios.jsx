@@ -7,6 +7,7 @@ import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import Select from "../../../components/Base/Select/Select";
 import Table from "../../../components/Base/Table/Table";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 import TextArea from "../../../components/Base/TextArea/TextArea";
 import Pagination from "../../../components/Compound/Pagination/Pagination";
 import useQuery from "../../../hooks/useQuery";
@@ -53,8 +54,7 @@ const calcularDigitoVerificacion = (myNit) => {
 
 const ConfiguracionComercios = () => {
   const navigate = useNavigate();
-  const [{ searchAuto = "", page = 1, openTipoContrato = false }, setQuery] =
-    useQuery();
+  const [{ searchAuto = "", openTipoContrato = false }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
@@ -63,6 +63,10 @@ const ConfiguracionComercios = () => {
     fecthConfiguracionComerciosFunc();
   }, []);
   const [showModal2, setShowModal2] = useState(false);
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
   const handleClose2 = useCallback(() => {
     setShowModal2(false);
     setQuery({ ["openTipoContrato"]: false }, { replace: true });
@@ -185,12 +189,12 @@ const ConfiguracionComercios = () => {
     } else {
       fetchTiposContratosComisionesFunc();
     }
-  }, [searchAuto, page, openTipoContrato]);
+  }, [searchAuto, page, limit, openTipoContrato]);
   const fecthConfiguracionComerciosFunc = () => {
     let obj = {};
     if (parseInt(searchAuto))
       obj["id_configuracion_comercios"] = parseInt(searchAuto);
-    fetchConfiguracionComercios({ ...obj, page })
+    fetchConfiguracionComercios({ ...obj, page, limit })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
         setConfiguracionComercios(autoArr?.results);
@@ -227,7 +231,19 @@ const ConfiguracionComercios = () => {
           Crear configuración comercio
         </Button>
       </ButtonBar>
-      <Pagination maxPage={maxPages} onChange={onChange} grid>
+      <TableEnterprise
+        title='Comercios configurados'
+        maxPage={maxPages}
+        headers={[
+          "Id configuración",
+          "Id comercio",
+          "Contrato",
+          "Pago comisión",
+        ]}
+        data={tableConfiguracionComercios}
+        onSelectRow={onSelectConfiguracionComercios}
+        onSetPageData={setPageData}
+        onChange={onChange}>
         <Input
           id='searchAuto'
           name='searchAuto'
@@ -236,9 +252,8 @@ const ConfiguracionComercios = () => {
           autoComplete='off'
           defaultValue={searchAuto}
         />
-        <ButtonBar></ButtonBar>
-      </Pagination>
-      {Array.isArray(tableConfiguracionComercios) &&
+      </TableEnterprise>
+      {/* {Array.isArray(tableConfiguracionComercios) &&
       tableConfiguracionComercios.length > 0 ? (
         <Table
           headers={Object.keys(tableConfiguracionComercios[0])}
@@ -247,7 +262,7 @@ const ConfiguracionComercios = () => {
         />
       ) : (
         ""
-      )}
+      )} */}
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={onChangeFormat} grid>
           <Input
