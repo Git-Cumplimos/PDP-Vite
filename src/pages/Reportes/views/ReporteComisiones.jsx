@@ -89,7 +89,6 @@ const ReporteComisiones = () => {
       data = formData.get(col);
       newData.push([col, data]);
     });
-    console.log(report);
     setReport((old) => ({
       ...old,
       ...Object.fromEntries(newData),
