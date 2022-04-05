@@ -78,6 +78,7 @@ const VerificacionFormulario = () => {
       };
       fetchData(`${url}/urlfile?id_proceso=${datos["id_proceso"]}`, "GET")
         .then((respuesta) => {
+          console.log(respuesta?.obj);
           setUrlPdfs(respuesta?.obj);
         })
         .catch((err) => {
@@ -670,7 +671,7 @@ const VerificacionFormulario = () => {
               >
                 {true ? (
                   <object
-                    // data={`data:application/pdf;base64,${archivo}`}
+                    // data={`data:application/pdf;base64,${urlPdfs["cc"]}`}
                     data={`${urlPdfs["cc"]}`}
                     type="application/pdf"
                     width="100%"

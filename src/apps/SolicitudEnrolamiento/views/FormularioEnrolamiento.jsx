@@ -243,59 +243,45 @@ const FormularioEnrolamiento = () => {
                 const formData4 = new FormData();
 
                 if (archivos1 && archivos2 && !archivos3) {
-                  formData2.set("key", `${respuesta?.obj[0]?.fields?.key}`);
-                  formData2.set(
-                    "policy",
-                    `${respuesta?.obj[0]?.fields?.policy}`
-                  );
-                  formData2.set(
-                    "x-amz-algorithm",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`
-                  );
-                  formData2.set(
-                    "x-amz-credential",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`
-                  );
-                  formData2.set(
-                    "x-amz-date",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`
-                  );
-                  formData2.set(
-                    "x-amz-signature",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`
-                  );
+                  var cont_rut = 0;
+                  for (const datosS3 of respuesta?.obj) {
+                    if (cont_rut == 0) {
+                      for (const property in datosS3.fields) {
+                        /*  console.log(datosS3.fields[property]); */
+                        formData2.set(
+                          `${property}`,
+                          `${datosS3.fields[property]}`
+                        );
+                      }
+                    }
+                    cont_rut += 1;
+                  }
                   formData2.set("file", archivos1[0]);
                   fetch(`${respuesta?.obj[0]?.url}`, {
                     method: "POST",
+
                     body: formData2,
                   })
                     .then((res) => res?.status)
                     .catch((err) => {
-                      console.log(err);
+                      {
+                      }
                     });
 
                   //------fetch cc----//
-                  formData3.set("key", `${respuesta?.obj[1]?.fields?.key}`);
-                  formData3.set(
-                    "policy",
-                    `${respuesta?.obj[1]?.fields?.policy}`
-                  );
-                  formData3.set(
-                    "x-amz-algorithm",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-algorithm"]}`
-                  );
-                  formData3.set(
-                    "x-amz-credential",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-credential"]}`
-                  );
-                  formData3.set(
-                    "x-amz-date",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-date"]}`
-                  );
-                  formData3.set(
-                    "x-amz-signature",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-signature"]}`
-                  );
+                  var cont_Cc = 0;
+                  for (const datosS3 of respuesta?.obj) {
+                    if (cont_Cc == 1) {
+                      for (const property in datosS3.fields) {
+                        /* console.log(datosS3.fields[property]); */
+                        formData3.set(
+                          `${property}`,
+                          `${datosS3.fields[property]}`
+                        );
+                      }
+                    }
+                    cont_Cc += 1;
+                  }
                   formData3.set("file", archivos2[0]);
                   fetch(`${respuesta?.obj[1]?.url}`, {
                     method: "POST",
@@ -303,30 +289,23 @@ const FormularioEnrolamiento = () => {
                   })
                     .then((res) => res?.status)
                     .catch((err) => {
-                      console.log(err);
+                      {
+                      }
                     });
                 } else if (archivos1 && archivos2 && archivos3) {
-                  formData2.set("key", `${respuesta?.obj[0]?.fields?.key}`);
-                  formData2.set(
-                    "policy",
-                    `${respuesta?.obj[0]?.fields?.policy}`
-                  );
-                  formData2.set(
-                    "x-amz-algorithm",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`
-                  );
-                  formData2.set(
-                    "x-amz-credential",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`
-                  );
-                  formData2.set(
-                    "x-amz-date",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`
-                  );
-                  formData2.set(
-                    "x-amz-signature",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`
-                  );
+                  var cont_rut = 0;
+                  for (const datosS3 of respuesta?.obj) {
+                    if (cont_rut == 0) {
+                      for (const property in datosS3.fields) {
+                        /* console.log(datosS3.fields[property]); */
+                        formData2.set(
+                          `${property}`,
+                          `${datosS3.fields[property]}`
+                        );
+                      }
+                    }
+                    cont_rut += 1;
+                  }
                   formData2.set("file", archivos1[0]);
                   fetch(`${respuesta?.obj[0]?.url}`, {
                     method: "POST",
@@ -334,63 +313,50 @@ const FormularioEnrolamiento = () => {
                   })
                     .then((res) => res?.status)
                     .catch((err) => {
-                      console.log(err);
+                      {
+                      }
                     });
 
                   //------fetch cc----//
-                  formData3.set("key", `${respuesta?.obj[1]?.fields?.key}`);
-                  formData3.set(
-                    "policy",
-                    `${respuesta?.obj[1]?.fields?.policy}`
-                  );
-                  formData3.set(
-                    "x-amz-algorithm",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-algorithm"]}`
-                  );
-                  formData3.set(
-                    "x-amz-credential",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-credential"]}`
-                  );
-                  formData3.set(
-                    "x-amz-date",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-date"]}`
-                  );
-                  formData3.set(
-                    "x-amz-signature",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-signature"]}`
-                  );
+                  var cont_Cc = 0;
+                  for (const datosS3 of respuesta?.obj) {
+                    if (cont_Cc == 1) {
+                      for (const property in datosS3.fields) {
+                        /*  console.log(datosS3.fields[property]); */
+                        formData3.set(
+                          `${property}`,
+                          `${datosS3.fields[property]}`
+                        );
+                      }
+                    }
+                    cont_Cc += 1;
+                  }
                   formData3.set("file", archivos2[0]);
+
                   fetch(`${respuesta?.obj[1]?.url}`, {
                     method: "POST",
                     body: formData3,
                   })
                     .then((res) => res?.status)
                     .catch((err) => {
-                      console.log(err);
+                      {
+                      }
                     });
 
                   //------fetch Camara y Comercio----//
-                  formData4.set("key", `${respuesta?.obj[2]?.fields?.key}`);
-                  formData4.set(
-                    "policy",
-                    `${respuesta?.obj[2]?.fields?.policy}`
-                  );
-                  formData4.set(
-                    "x-amz-algorithm",
-                    `${respuesta?.obj[2]?.fields?.["x-amz-algorithm"]}`
-                  );
-                  formData4.set(
-                    "x-amz-credential",
-                    `${respuesta?.obj[2]?.fields?.["x-amz-credential"]}`
-                  );
-                  formData4.set(
-                    "x-amz-date",
-                    `${respuesta?.obj[2]?.fields?.["x-amz-date"]}`
-                  );
-                  formData4.set(
-                    "x-amz-signature",
-                    `${respuesta?.obj[2]?.fields?.["x-amz-signature"]}`
-                  );
+                  var cont_cam = 0;
+                  for (const datosS3 of respuesta?.obj) {
+                    if (cont_cam == 2) {
+                      for (const property in datosS3.fields) {
+                        /* console.log(datosS3.fields[property]); */
+                        formData4.set(
+                          `${property}`,
+                          `${datosS3.fields[property]}`
+                        );
+                      }
+                    }
+                    cont_cam += 1;
+                  }
                   formData4.set("file", archivos3[0]);
                   fetch(`${respuesta?.obj[2]?.url}`, {
                     method: "POST",
@@ -398,15 +364,22 @@ const FormularioEnrolamiento = () => {
                   })
                     .then((res) => res?.status)
                     .catch((err) => {
-                      console.log(err);
+                      {
+                      }
                     });
                 }
-                navigate("/public/solicitud-enrolamiento/consultar");
+                /*     setEstadoForm(true); */
+                /* navigate("/public/solicitud-enrolamiento/consultar"); */
               }
             })
-            .catch(() => {});
+            .catch((err) => {
+              notifyError("Error al cargar Datos");
+            }); /* notify("Se ha comenzado la carga"); */
         })
-        .catch(() => {});
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos");
+        }); /*  notify("Se ha comenzado la carga"); */
     },
     [archivos1, archivos2, archivos3]
   );
