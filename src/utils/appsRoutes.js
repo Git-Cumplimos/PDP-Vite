@@ -663,5 +663,5 @@ const allUrlsPrivateApps = [
     ],
   },
 ];
-// console.log(allUrlsPrivateApps);
+
 export { allUrlsPrivateApps };
