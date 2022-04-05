@@ -90,8 +90,8 @@ const filterPermissions = (urls, userAccess) => {
   }
 
   const filteredUrls = [
-    ...urls.filter(({ permission }) => {
-      if (permission[0] === -1) return true;
+    ...urls.filter(({ permission = [] }) => {
+      if (permission?.[0] === -1) return true;
       for (const per of permission) {
         if (
           userAccess.map(({ id_permission }) => id_permission).includes(per)
