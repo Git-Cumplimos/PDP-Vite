@@ -29,8 +29,8 @@ const CargaArchivos = ({ route }) => {
 
   const optionsTipoSorteo = [
     { value: "", label: "" },
-    { value: "Ordinario/", label: "Sorteo Ordinario" },
-    { value: "Extra/", label: "Sorteo Extraordinario" },
+    { value: "02_Ordinario/", label: "Sorteo Ordinario" },
+    { value: "064_Extra/", label: "Sorteo Extraordinario" },
   ];
 
   const [archivo, setArchivo] = useState("");

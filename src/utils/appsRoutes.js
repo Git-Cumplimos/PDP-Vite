@@ -23,8 +23,11 @@ const Transacciones = lazy(() => import("../pages/Transacciones"));
 /**
  * Loteria
  */
+
 const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
-const Loteria = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
+
+/** Loteria Bogota */
+const ventaBog = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
 const Descargas = lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
 const DescargarArchivosS3 = lazy(() =>
   import("../apps/LoteriaBog/Views/Descargas/DescargarArchivosS3")
@@ -41,6 +44,8 @@ const CargaArchivos = lazy(() =>
 const ArqueoBilletes = lazy(() =>
   import("../apps/LoteriaBog/Views/ArqueoBilletes")
 );
+const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
+
 /**
  * ColCard
  */
@@ -48,7 +53,6 @@ const ColCard = lazy(() => import("../apps/ColCard/ColCard"));
 const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
-const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
 
 /**
  * Marketplace
@@ -200,39 +204,46 @@ const allUrlsPrivateApps = [
     extern: true,
     permission: [1],
   },
+
+  // {
+  //   link: "/loterias",
+  //   label: <AppIcons Logo={"LOTERIA"} name="Loterias" />,
+  //   component: Loterias,
+  //   permission: [3, 4, 5, 6],
+  //   subRoutes: [
   {
-    link: "/loteria-de-bogota",
+    link: "/loterias/loteria-de-bogota",
     label: <AppIcons Logo={"LOTERIA"} name="Loteria de bogota" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
     permission: [3, 4, 5, 6],
     subRoutes: [
       {
-        link: "/loteria-de-bogota/ventas",
+        link: "/loterias/loteria-de-bogota/ventas",
         label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
-        component: Loteria,
+        component: ventaBog,
         permission: [3],
       },
       {
-        link: "/loteria-de-bogota/cargar",
+        link: "/loterias/loteria-de-bogota/cargar",
         label: <AppIcons Logo={CARGAR} name="Carga de archivos" />,
         component: CargaArchivos,
         permission: [4],
       },
       {
-        link: "/loteria-de-bogota/descargar",
+        link: "/loterias/loteria-de-bogota/descargar",
         label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
         component: Descargas,
         permission: [6],
         subRoutes: [
           {
-            link: "/loteria-de-bogota/descargar/descarga_reportes",
+            link: "/loterias/loteria-de-bogota/descargar/descarga_reportes",
             label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
             component: DescargarArchivosS3,
             permission: [6],
           },
           {
-            link: "/loteria-de-bogota/descargar/borrar_billetes",
+            link: "/loterias/loteria-de-bogota/descargar/borrar_billetes",
             label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
             component: BorrarBilletes,
             permission: [6],
@@ -240,20 +251,20 @@ const allUrlsPrivateApps = [
         ],
       },
       {
-        link: "/loteria-de-bogota/sorteos",
+        link: "/loterias/loteria-de-bogota/sorteos",
         label: <AppIcons Logo={"REPORTE"} name="Sorteos" />,
         component: CrearSorteos,
         permission: [5],
       },
       {
-        link: "/loteria-de-bogota/premios",
+        link: "/loterias/loteria-de-bogota/premios",
         label: <AppIcons Logo={"PAGO"} name="Premios" />,
         component: Premios,
         extern: false,
         permission: [3],
       },
       {
-        link: "/loteria-de-bogota/arqueoBilletes",
+        link: "/loterias/loteria-de-bogota/arqueoBilletes",
         label: <AppIcons Logo={"REPORTE"} name="Arqueo Billetes" />,
         component: ArqueoBilletes,
         extern: false,
@@ -261,6 +272,9 @@ const allUrlsPrivateApps = [
       },
     ],
   },
+  //   ],
+  // },
+
   {
     link: "/transacciones",
     label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones" />,

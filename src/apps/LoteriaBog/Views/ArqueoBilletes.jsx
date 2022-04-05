@@ -25,8 +25,9 @@ const url_Arqueobilletes = `http://127.0.0.1:5000/arqueobilletes`;
 const ArqueoBilletes = ({ route }) => {
   /*__________ Fechas para consulta de transacciones del día________________ */
   const fecha = new Date();
-  //fecha.setDate(fecha.getHours() - 5);
+  console.log(fecha);
   const fecha_ini = fecha.toISOString();
+  console.log(fecha_ini);
 
   fecha.setDate(fecha.getDate() + 1);
   const fecha_fin = fecha.toISOString();
@@ -42,6 +43,8 @@ const ArqueoBilletes = ({ route }) => {
   const [showModal, setShowModal] = useState(false);
   const [fracDisp, setFracDisp] = useState("");
   const [total, setTotal] = useState(null);
+  const [showArqueo, setShowArqueo] = useState(false);
+  const [id_arqueo, setId_arqueo] = useState("");
   const { roleInfo } = useAuth();
 
   console.log(roleInfo);
@@ -50,14 +53,37 @@ const ArqueoBilletes = ({ route }) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    crearArqueoBilletes(fecha_ini, fracDisp, total).then((res) => {
+    crearArqueoBilletes(fecha_ini, fracDisp, total, id_arqueo).then((res) => {
       if (res.status === false) {
         notifyError(res.msg);
+        setShowArqueo(false);
+        consultaArqueoBilletes(fecha_ini, fecha_fin).then((res) => {
+          if (res.status === false) {
+            notifyError(res.msg);
+            // setDisabledBtns(true);
+          } else {
+            console.log(res);
+            // setResp_report(res.data);
+            setId_arqueo(res?.obj?.data?.[0].id_arqueo);
+            // setDisabledBtns(false);
+          }
+        });
         // setDisabledBtns(true);
       } else {
-        console.log(res);
         // setResp_report(res.data);
+        setShowArqueo(true);
         notify(res.msg);
+        consultaArqueoBilletes(fecha_ini, fecha_fin).then((res) => {
+          if (res.status === false) {
+            notifyError(res.msg);
+            // setDisabledBtns(true);
+          } else {
+            console.log(res);
+            // setResp_report(res.data);
+            setId_arqueo(res?.obj?.data?.[0].id_arqueo);
+            // setDisabledBtns(false);
+          }
+        });
         // setDisabledBtns(false);
       }
     });
@@ -84,17 +110,25 @@ const ArqueoBilletes = ({ route }) => {
   }, []);
 
   const crearArqueoBilletes = useCallback(
-    async (fecha_ini, fracDisp, total) => {
+    async (fecha_ini, fracDisp, total, id_arqueo) => {
       try {
         const body = {
+          cod_distribuidor: roleInfo?.cod_oficina_lot,
+          cod_sucursal: roleInfo?.cod_sucursal_lot,
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
-          fecha: fecha_ini,
+          fecha: fecha_ini.substr(0, 10),
           frac_vendidas: total === null ? 0 : total?.total_frac,
           val_total: total === null ? 0 : total?.val_total,
           fracciones_restantes: fracDisp,
         };
+
+        if (id_arqueo) {
+          body.id_arqueo = id_arqueo;
+        } else {
+          body.id_arqueo = "";
+        }
 
         const res = await fetchData(url_Arqueobilletes, "POST", {}, body);
 
@@ -105,6 +139,23 @@ const ArqueoBilletes = ({ route }) => {
     },
     []
   );
+
+  const consultaArqueoBilletes = useCallback(async (fecha_ini, fecha_fin) => {
+    try {
+      const query = {
+        id_comercio: roleInfo?.id_comercio,
+        // id_usuario: roleInfo?.id_usuario,
+        // id_terminal: roleInfo?.id_dispositivo,
+        fecha_ini: fecha_ini.substr(0, 10),
+        fecha_fin: fecha_fin.substr(0, 10),
+      };
+      const res = await fetchData(url_Arqueobilletes, "GET", query);
+
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   useEffect(() => {
     reportVentas(fecha_ini, fecha_fin).then((res) => {
@@ -120,6 +171,20 @@ const ArqueoBilletes = ({ route }) => {
     });
   }, []);
 
+  useEffect(() => {
+    consultaArqueoBilletes(fecha_ini, fecha_fin).then((res) => {
+      if (res.status === false) {
+        notifyError(res.msg);
+        // setDisabledBtns(true);
+      } else {
+        console.log(res);
+        // setResp_report(res.data);
+        setId_arqueo(res?.obj?.data?.[0].id_arqueo);
+        // setDisabledBtns(false);
+      }
+    });
+  }, []);
+
   const closeModal = useCallback(async () => {
     setShowModal(false);
   }, []);
@@ -128,24 +193,30 @@ const ArqueoBilletes = ({ route }) => {
     setShowModal2(false);
   }, []);
 
-  console.log(fracDisp);
   return (
     <>
       <Form formDir="col" onSubmit={onSubmit}>
-        <Input
-          id="frac_venta"
-          label="Fracciones vendidas"
-          type="text"
-          required="true"
-          value={total === null ? 0 : total?.total_frac}
-        />
-        <Input
-          id="val_total"
-          label="Total ventas"
-          type="text"
-          required="true"
-          value={formatMoney.format(total === null ? 0 : total?.val_total)}
-        />
+        {showArqueo ? (
+          <>
+            <Input
+              id="frac_venta"
+              label="Fracciones vendidas"
+              type="text"
+              required="true"
+              value={total === null ? 0 : total?.total_frac}
+            />
+            <Input
+              id="val_total"
+              label="Total ventas"
+              type="text"
+              required="true"
+              value={formatMoney.format(total === null ? 0 : total?.val_total)}
+            />
+          </>
+        ) : (
+          ""
+        )}
+
         <Input
           id="frac_disponibles"
           label="Fracciones disponibles"

@@ -216,7 +216,7 @@ export const useProvideLoteria = () => {
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: roleInfo.tipo_comercio,
-        tipoPago: "12",
+        tipoPago: "15", /// Venta lotería de Bogotá - Virtual
       };
 
       try {
@@ -260,12 +260,11 @@ export const useProvideLoteria = () => {
         ),
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: roleInfo.tipo_comercio,
-        tipoPago: tipoPago,
+        tipoPago: tipoPago, /// Venta lotería de Bogotá - Intercambio[14]/Fisica[12]
       };
 
       try {
         const res = await fetchData(urls.ventaOrdinariofisica, "POST", {}, req);
-        console.log(res, "HOLOOOOOOOOOOOOOOOOO");
         setSellResponse(res);
       } catch (err) {
         setSellResponse(null);
@@ -517,10 +516,10 @@ export const useProvideLoteria = () => {
     [roleInfo]
   );
 
-  const ConsultaCrearSort = useCallback(async () => {
+  const ConsultaCrearSort = useCallback(async (cod_loteria) => {
     try {
       const res = await fetchData(urls.ConsultaCrearSort, "GET", {
-        //num_loteria:'02'/////////////////////////////////////////////////////////////////////
+        cod_loteria: cod_loteria,
       });
 
       return res;

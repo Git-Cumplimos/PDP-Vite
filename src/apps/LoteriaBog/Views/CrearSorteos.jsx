@@ -20,6 +20,10 @@ AWS.config.update({
 
 const url_consultaParams = `${process.env.REACT_APP_URL_LOTERIAS}/con_params`;
 
+const sorteoOrdi = "02";
+const sorteoExtra = "064";
+const sorteosLOT = `${sorteoOrdi},${sorteoExtra}`;
+
 const CrearSorteos = ({ route }) => {
   const { label } = route;
   //const { notifyError, notify } = useAuth();
@@ -41,7 +45,8 @@ const CrearSorteos = ({ route }) => {
   const [day, setDay] = useState(null);
 
   useEffect(() => {
-    ConsultaCrearSort().then((res) => {
+    //Consulta sorteos de Lotería de Bogotá
+    ConsultaCrearSort(sorteosLOT).then((res) => {
       setResp_con(res);
     });
     setDay(new Date().getDay());
@@ -61,14 +66,16 @@ const CrearSorteos = ({ route }) => {
 
   const closeModal = useCallback(() => {
     setShowModal1(false);
-    ConsultaCrearSort().then((res) => {
+    //Consulta sorteos de Lotería de Bogotá
+    ConsultaCrearSort(sorteosLOT).then((res) => {
       setResp_con(res);
     });
   });
 
   const closeModal2 = useCallback(() => {
     setShowModal2(false);
-    ConsultaCrearSort().then((res) => {
+    //Consulta sorteos de Lotería de Bogotá
+    ConsultaCrearSort(sorteosLOT).then((res) => {
       setResp_con(res);
     });
   });

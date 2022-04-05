@@ -45,7 +45,10 @@ const Loteria = ({ route }) => {
   const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
 
   useEffect(() => {
-    fetchData(urlLoto, "GET", {}, {})
+    const query = {
+      num_loteria: "02,064",
+    };
+    fetchData(urlLoto, "GET", query, {})
       .then((res) => {
         ////sorteo virtual
         const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
