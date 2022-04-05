@@ -208,26 +208,26 @@ const FormularioEnrolamiento = () => {
           /*  console.log(respuesta); */
           const formData = new FormData();
 
-          formData.set("rut", archivos1[0]);
+          /*  formData.set("rut", archivos1[0]);
 
           formData.set("cc", archivos2[0]);
 
           formData.set("camaracomercio", archivos3[0]);
 
-          formData.set("numdoc", numDocumento);
+          formData.set("numdoc", numDocumento); */
 
           formData.set("id_proceso", respuesta.body.id_proceso);
 
           notify("Se ha comenzado la carga");
 
-          console.log(Object.fromEntries(formData.entries()));
+          /* console.log(Object.fromEntries(formData.entries())); */
           fetch(
-            `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
-
+            /*  `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`, */
+            `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/uploadfile2?id_proceso=${respuesta.body.id_proceso}`,
             {
-              method: "POST",
+              method: "GET",
 
-              body: formData,
+              /* body: formData, */
             }
           )
             .then((res) => res.json())
@@ -238,7 +238,169 @@ const FormularioEnrolamiento = () => {
                 console.log(respuesta?.obj);
                 notify("Se han subido los archivos");
                 setEstadoForm(true);
+                const formData2 = new FormData();
+                const formData3 = new FormData();
+                const formData4 = new FormData();
 
+                if (archivos1 && archivos2 && !archivos3) {
+                  formData2.set("key", `${respuesta?.obj[0]?.fields?.key}`);
+                  formData2.set(
+                    "policy",
+                    `${respuesta?.obj[0]?.fields?.policy}`
+                  );
+                  formData2.set(
+                    "x-amz-algorithm",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`
+                  );
+                  formData2.set(
+                    "x-amz-credential",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`
+                  );
+                  formData2.set(
+                    "x-amz-date",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`
+                  );
+                  formData2.set(
+                    "x-amz-signature",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`
+                  );
+                  formData2.set("file", archivos1[0]);
+                  fetch(`${respuesta?.obj[0]?.url}`, {
+                    method: "POST",
+                    body: formData2,
+                  })
+                    .then((res) => res?.status)
+                    .catch((err) => {
+                      console.log(err);
+                    });
+
+                  //------fetch cc----//
+                  formData3.set("key", `${respuesta?.obj[1]?.fields?.key}`);
+                  formData3.set(
+                    "policy",
+                    `${respuesta?.obj[1]?.fields?.policy}`
+                  );
+                  formData3.set(
+                    "x-amz-algorithm",
+                    `${respuesta?.obj[1]?.fields?.["x-amz-algorithm"]}`
+                  );
+                  formData3.set(
+                    "x-amz-credential",
+                    `${respuesta?.obj[1]?.fields?.["x-amz-credential"]}`
+                  );
+                  formData3.set(
+                    "x-amz-date",
+                    `${respuesta?.obj[1]?.fields?.["x-amz-date"]}`
+                  );
+                  formData3.set(
+                    "x-amz-signature",
+                    `${respuesta?.obj[1]?.fields?.["x-amz-signature"]}`
+                  );
+                  formData3.set("file", archivos2[0]);
+                  fetch(`${respuesta?.obj[1]?.url}`, {
+                    method: "POST",
+                    body: formData3,
+                  })
+                    .then((res) => res?.status)
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                } else if (archivos1 && archivos2 && archivos3) {
+                  formData2.set("key", `${respuesta?.obj[0]?.fields?.key}`);
+                  formData2.set(
+                    "policy",
+                    `${respuesta?.obj[0]?.fields?.policy}`
+                  );
+                  formData2.set(
+                    "x-amz-algorithm",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`
+                  );
+                  formData2.set(
+                    "x-amz-credential",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`
+                  );
+                  formData2.set(
+                    "x-amz-date",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`
+                  );
+                  formData2.set(
+                    "x-amz-signature",
+                    `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`
+                  );
+                  formData2.set("file", archivos1[0]);
+                  fetch(`${respuesta?.obj[0]?.url}`, {
+                    method: "POST",
+                    body: formData2,
+                  })
+                    .then((res) => res?.status)
+                    .catch((err) => {
+                      console.log(err);
+                    });
+
+                  //------fetch cc----//
+                  formData3.set("key", `${respuesta?.obj[1]?.fields?.key}`);
+                  formData3.set(
+                    "policy",
+                    `${respuesta?.obj[1]?.fields?.policy}`
+                  );
+                  formData3.set(
+                    "x-amz-algorithm",
+                    `${respuesta?.obj[1]?.fields?.["x-amz-algorithm"]}`
+                  );
+                  formData3.set(
+                    "x-amz-credential",
+                    `${respuesta?.obj[1]?.fields?.["x-amz-credential"]}`
+                  );
+                  formData3.set(
+                    "x-amz-date",
+                    `${respuesta?.obj[1]?.fields?.["x-amz-date"]}`
+                  );
+                  formData3.set(
+                    "x-amz-signature",
+                    `${respuesta?.obj[1]?.fields?.["x-amz-signature"]}`
+                  );
+                  formData3.set("file", archivos2[0]);
+                  fetch(`${respuesta?.obj[1]?.url}`, {
+                    method: "POST",
+                    body: formData3,
+                  })
+                    .then((res) => res?.status)
+                    .catch((err) => {
+                      console.log(err);
+                    });
+
+                  //------fetch Camara y Comercio----//
+                  formData4.set("key", `${respuesta?.obj[2]?.fields?.key}`);
+                  formData4.set(
+                    "policy",
+                    `${respuesta?.obj[2]?.fields?.policy}`
+                  );
+                  formData4.set(
+                    "x-amz-algorithm",
+                    `${respuesta?.obj[2]?.fields?.["x-amz-algorithm"]}`
+                  );
+                  formData4.set(
+                    "x-amz-credential",
+                    `${respuesta?.obj[2]?.fields?.["x-amz-credential"]}`
+                  );
+                  formData4.set(
+                    "x-amz-date",
+                    `${respuesta?.obj[2]?.fields?.["x-amz-date"]}`
+                  );
+                  formData4.set(
+                    "x-amz-signature",
+                    `${respuesta?.obj[2]?.fields?.["x-amz-signature"]}`
+                  );
+                  formData4.set("file", archivos3[0]);
+                  fetch(`${respuesta?.obj[2]?.url}`, {
+                    method: "POST",
+                    body: formData4,
+                  })
+                    .then((res) => res?.status)
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                }
                 navigate("/public/solicitud-enrolamiento/consultar");
               }
             })
