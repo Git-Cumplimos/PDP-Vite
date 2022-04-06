@@ -18,6 +18,7 @@ import { useParams } from "react-router";
 
 const CorreccionFormulario = () => {
   const params = useParams();
+  const navigate = useNavigate();
   const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
   //Datos Comercio
   const [datosParams, setDatosParams] = useState(0);
