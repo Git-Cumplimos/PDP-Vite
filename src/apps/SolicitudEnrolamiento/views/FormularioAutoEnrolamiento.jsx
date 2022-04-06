@@ -384,7 +384,7 @@ const FormularioAutoEnrolamiento = () => {
                     });
                 }
                 setEstadoForm(true);
-                /* navigate("/public/solicitud-enrolamiento/consultar"); */
+                navigate("/public/solicitud-enrolamiento/consultar");
               }
             })
             .catch((err) => {
