@@ -186,55 +186,17 @@ const CorreccionFormulario = () => {
         responsable: "",
       };
       console.log(data?.validation_state);
-      fetchData(
+      fetch(
         /* `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/idreconocer?id_proceso=26`, */
         `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`,
         /* `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`, */
-        "PUT",
-        {},
         {
-          asesor: asignarAsesores,
-          nombre: `${nombre}`,
-          apellido: `${apellido}`,
-          nombre_comercio: nombreComercio,
-          numnit: numNit,
-          numcamycom: numCamaraComercio,
-          numrut: numRut,
-          autosms: autorizacion,
-          tipozona: "",
-          unidad_negocio: "",
-          responsableiva: responsableIva,
-          cod_localidad: "",
-          asesor_comercial_localidad: "",
-          actividad_economica: commerceType.toString(),
-          tipo_establecimiento: "",
-          sede: "Bogotá",
-          direccion_comercio: direccionCom,
-          departamento: departamentoCom,
-          municipio: municipioCom,
-          localidad_bogota: localidadCom,
-          barrio: barrioCom,
-          direccion_correspondencia: direccionCorr,
-          departamento_correspondencia: departamentoCorr,
-          municipio_correspondencia: municipioCorr,
-          localidad_correspondencia: localidadCorr,
-          barrio_correspondencia: barrioCorr,
-          tipoDoc: tipoIdentificacion,
-          numDoc: numDocumento,
-          email: correos[0],
-          celular: telefonos[0],
-          /* task_token: datosParams[0]["task_token"], */
-          validation_state: "En Proceso de Validación",
-          /* id_name: "id_proceso", */
-          responsable: "",
-        },
-        {},
-        false
-        /* {
           method: "PUT",
-
-          body: data,
-        } */
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       )
         .then((respuesta) => {
           const formData = new FormData();
