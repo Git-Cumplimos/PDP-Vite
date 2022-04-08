@@ -56,7 +56,9 @@ const VerificacionFormulario = () => {
   const params = useParams();
 
   const [zonas, setZonas] = useState([]);
-  const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+  /* const url = process.env.REACT_APP_URL_SERVICE_COMMERCE; */
+  const url = process.env.REACT_APP_URL_SERVICE_COMMERCE_SS;
+  /*  const url2 = process.env.REACT_APP_URL_SERVICE_PUBLIC_SS; */
 
   //----------------Traer Datos Usuario Con los Parametros---------------------//
   useEffect(() => {
@@ -76,7 +78,10 @@ const VerificacionFormulario = () => {
       const datos = {
         id_proceso: datosParams[0]["id_proceso"]?.toString(),
       };
-      fetchData(`${url}/urlfile?id_proceso=${datos["id_proceso"]}`, "GET")
+      fetchData(
+        `${url}/urlfile?id_proceso=${datosParams[0]["id_proceso"]?.toString()}`,
+        "GET"
+      )
         .then((respuesta) => {
           console.log(respuesta?.obj);
           setUrlPdfs(respuesta?.obj);
@@ -101,23 +106,42 @@ const VerificacionFormulario = () => {
       tipozona: tipoZonaLink.toString(),
       causal_rechazo: mensajeCausal,
     };
-    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
-      method: "PUT",
+    fetchData(
+      `${url}/actualizacionestado?id_proceso=${params.id}`,
+      /* {method: "PUT",
       headers: {
         "Content-type": "application/json",
       },
       body: JSON.stringify(datos),
-    })
-      .then((res) => res.json())
+    } */
+      "PUT",
+      {},
+      {
+        task_token: datosParams[0]["task_token"],
+        validation_state: "101",
+        responsable: personaResponsable,
+        unidad_negocio: unidadNegocio,
+        asesor: datosAsesor[0]["nom_asesor"],
+        /* asesor_comercial_localidad: asesorComercialLocalidad, */
+        cod_localidad: codigoLocalidad,
+        tipozona: tipoZonaLink.toString(),
+        causal_rechazo: mensajeCausal,
+      },
+
+      {},
+      true
+    )
+      /* .then((res) => res.json()) */
       .then((respuesta) => console.log(respuesta?.obj?.data))
       .catch((err) => {
         console.log(err);
         notifyError("Error al Aprobar Formulario");
       });
     notify("El Usuario ha sido Aprobado para ReconoserID");
+
     setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformulario"),
-      2500
+      1000
     );
   };
 
@@ -134,24 +158,42 @@ const VerificacionFormulario = () => {
       tipozona: tipoZonaLink.toString(),
       causal_rechazo: mensajeCausal,
     };
-    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
+    fetchData(
+      `${url}/actualizacionestado?id_proceso=${params.id}` /* {
       method: "PUT",
       headers: {
         "Content-type": "application/json",
       },
-      body: JSON.stringify(datos),
-    })
-      .then((res) => res.json())
+      body: JSON.stringify(datos), */,
+      "PUT",
+      {},
+      {
+        task_token: datosParams[0]["task_token"],
+        validation_state: "102",
+        responsable: personaResponsable,
+        unidad_negocio: unidadNegocio,
+        asesor_comercial_localidad: asesorComercialLocalidad,
+        cod_localidad: codigoLocalidad,
+        tipozona: tipoZonaLink.toString(),
+        causal_rechazo: mensajeCausal,
+      },
+
+      {},
+      true
+      /* } */
+    )
+      /* .then((res) => res.json()) */
       .then((respuesta) => console.log(respuesta?.obj?.data))
       .catch((err) => {
         console.log(err);
         notifyError("Error al Rechazar Formulario");
       });
     notify("El Usuario ha sido Rechazado para ReconoserID");
-    setTimeout(
+    navigate("/Solicitud-enrolamiento/validarformulario");
+    /* setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformulario"),
       2500
-    );
+    ); */
   };
 
   //----------------Funcion para Aprobar Formulario AutoEnrolamiento Asesor---------------------//
@@ -167,30 +209,48 @@ const VerificacionFormulario = () => {
       tipozona: datosResponsableTelemarketing[0]?.zona["id_zona"].toString(),
       causal_rechazo: mensajeCausal,
     };
-    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
+    fetchData(
+      `${url}/actualizacionestado?id_proceso=${params.id}` /* {
       method: "PUT",
       headers: {
         "Content-type": "application/json",
       },
       body: JSON.stringify(datos),
-    })
-      .then((res) => res.json())
+    } */,
+      "PUT",
+      {},
+      {
+        task_token: datosParams[0]["task_token"],
+        validation_state: "101",
+        responsable: datosResponsableTelemarketing[0]["nombre"],
+        unidad_negocio: datosParams[0]["unidad_negocio"],
+        asesor: datosAsesorTelemarketing,
+        cod_localidad: codigoLocalidad,
+        tipozona: datosResponsableTelemarketing[0]?.zona["id_zona"].toString(),
+        causal_rechazo: mensajeCausal,
+      },
+
+      {},
+      true
+    )
+      /* .then((res) => res.json()) */
       .then((respuesta) => console.log(respuesta?.obj?.data))
       .catch((err) => {
         console.log(err);
         notifyError("Error al Aprobar Formulario");
       });
     notify("El Usuario ha sido Aprobado para ReconoserID");
-    setTimeout(
+    navigate("/Solicitud-enrolamiento/validarformulario");
+    /*  setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformulario"),
       2500
-    );
+    ); */
   };
 
   //----------------Funcion para Rechazar Formulario AutoEnrolamiento---------------------//
   const rechazarFormularioAuto = (e) => {
     e.preventDefault();
-    const datos = {
+    /*     const datos = {
       task_token: datosParams[0]["task_token"],
       validation_state: "102",
       responsable: datosResponsableTelemarketing[0]["nombre"],
@@ -199,25 +259,45 @@ const VerificacionFormulario = () => {
       cod_localidad: codigoLocalidad,
       tipozona: datosResponsableTelemarketing[0]?.zona["id_zona"].toString(),
       causal_rechazo: mensajeCausal,
-    };
-    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-type": "application/json",
+    }; */
+    console.log(datosParams[0]["task_token"]);
+    fetchData(
+      `${url}/actualizacionestado?id_proceso=${params.id}` /* ,
+      {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(datos),
+      } */,
+      "PUT",
+      {},
+      {
+        task_token: datosParams[0]["task_token"],
+        validation_state: "102",
+        responsable: datosResponsableTelemarketing[0]["nombre"],
+        unidad_negocio: datosParams[0]["unidad_negocio"],
+        asesor: datosAsesorTelemarketing,
+        cod_localidad: codigoLocalidad,
+        tipozona: datosResponsableTelemarketing[0]?.zona["id_zona"].toString(),
+        causal_rechazo: mensajeCausal,
       },
-      body: JSON.stringify(datos),
-    })
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta?.obj?.data))
+
+      {},
+      true
+    )
+      /* .then((res) => res.json()) */
+      .then((respuesta) => console.log(respuesta?.obj, "res"))
       .catch((err) => {
         console.log(err);
         notifyError("Error al Rechazar Formulario");
       });
     notify("El Usuario ha sido Rechazado para ReconoserID");
-    setTimeout(
+    navigate("/Solicitud-enrolamiento/validarformulario");
+    /*  setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformulario"),
       2500
-    );
+    ); */
   };
   //----------------Traer Datos Asesor Cuando los parametros vienen en URL---------------------//
   useEffect(() => {

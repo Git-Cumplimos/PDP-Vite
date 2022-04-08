@@ -20,10 +20,10 @@ const ReconoserID = () => {
   useEffect(() => {
     console.log(params.numCedula);
     fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${params.numCedula}`
+      `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/actualizacionestado?numDoc=${params.numCedula}`
     )
       .then((res) => res.json())
-      .then((respuesta) => setDatosUsuario(respuesta.obj.results));
+      .then((respuesta) => setDatosUsuario(respuesta?.obj?.results));
   }, []);
   /* console.log(datosUsuario[0]["id_proceso"]); */
   useEffect(() => {
@@ -39,7 +39,7 @@ const ReconoserID = () => {
       };
       console.log(datos);
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/solicitud-validacion-reconoserid`,
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/solicitud-validacion-reconoserid`,
         /* `http://127.0.0.1:5000/solicitudvalidacion` */
         {
           method: "POST",
@@ -64,7 +64,7 @@ const ReconoserID = () => {
         id_reconocer: procesoConvenioGuid,
       };
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/edit-reconoserid?id_proceso=${datosUsuario[0]["id_proceso"]}`,
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/edit-reconoserid?id_proceso=${datosUsuario[0]["id_proceso"]}`,
         {
           method: "PUT",
           headers: {
@@ -123,7 +123,7 @@ const ReconoserID = () => {
       validation_state: "200",
     };
     fetch(
-      `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/edit-reconoserid?id_proceso=${datosUsuario[0]["id_proceso"]}`,
+      `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/edit-reconoserid?id_proceso=${datosUsuario[0]["id_proceso"]}`,
       {
         method: "PUT",
         headers: {
