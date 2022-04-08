@@ -1,13 +1,13 @@
-import { useCallback } from "react";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import fetchData from "../../../../utils/fetchData";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { useState, useEffect } from "react";
 import Input from "../../../../components/Base/Input";
 import { notify, notifyError } from "../../../../utils/notify";
 import { ExportToCsv } from "export-to-csv";
+import Select from "../../../../components/Base/Select";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -40,30 +40,161 @@ function createCard(
     fecha_venta,
   };
 }
-const url_reportVentas = `http://127.0.0.1:5000/reportes_ventas`;
+const url_reportVentas = `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`;
+const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
 const ReportVentasForm = ({ closeModal, oficina }) => {
+  const { codigos_lot, setCodigos_lot } = useLoteria();
+
+  const [sorteoOrdi, setSorteoOrdi] = useState(null);
+  const [sorteoExtra, setSorteoExtra] = useState(null);
+
+  const [sorteoOrdifisico, setSorteofisico] = useState(null);
+  const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
+
   const [fecha_ini, setFecha_ini] = useState("");
   const [fecha_fin, setFecha_fin] = useState("");
   const [disabledBtns, setDisabledBtns] = useState(true);
   const [resp_report, setResp_report] = useState(null);
   const [total, setTotal] = useState(null);
+  const [sorteo, setSorteo] = useState(null);
 
-  const reportVentas = useCallback(async (fecha_ini, fecha_fin) => {
-    try {
-      const query = { fecha_ini: fecha_ini, fecha_fin: fecha_fin };
-      if (oficina !== undefined) {
-        query.cod_distribuidor = oficina?.cod_oficina_lot;
-        query.cod_sucursal = oficina?.cod_sucursal_lot;
-      }
-
-      const res = await fetchData(url_reportVentas, "GET", query);
-
-      return res;
-    } catch (err) {
-      console.error(err);
+  const sorteosLOT = useMemo(() => {
+    var cod = "";
+    console.log(codigos_lot?.length);
+    if (codigos_lot?.length === 2) {
+      cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
+    } else {
+      cod = `${codigos_lot?.[0]?.cod_loteria}`;
     }
-  }, []);
+    console.log(cod);
+    return cod;
+  }, [codigos_lot]);
+
+  useEffect(() => {
+    setSorteo(null);
+    const query = {
+      num_loteria: sorteosLOT,
+    };
+    fetchData(urlLoto, "GET", query, {})
+      .then((res) => {
+        ////sorteo virtual
+        setSorteoOrdi(null);
+        setSorteoExtra(null);
+        setSorteofisico(null);
+        setSorteofisicoextraordinario(null);
+        console.log(res);
+        const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 1 && !fisico;
+        });
+        const sortExt = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 2 && !fisico;
+        });
+        if (sortOrd.length > 0) {
+          setSorteoOrdi(sortOrd[0]);
+        } else {
+          /*  notifyError("No se encontraron sorteos ordinarios"); */
+        }
+        if (sortExt.length > 0) {
+          setSorteoExtra(sortExt[0]);
+        } else {
+          /* notifyError("No se encontraron sorteos extraordinarios"); */
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ///sorteo fisico
+        const sortOrdfisico = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 1 && fisico;
+        });
+        const sortExtfisico = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 2 && fisico;
+        });
+
+        if (sortOrdfisico.length > 0) {
+          setSorteofisico(sortOrdfisico[0]);
+        } else {
+          /*    notifyError("No se encontraron extraordinarios fisicos"); */
+        }
+
+        if (sortExtfisico.length > 0) {
+          setSorteofisicoextraordinario(sortExtfisico[0]);
+        } else {
+          /*   notifyError("No se encontraron extraordinarios fisicos"); */
+        }
+      })
+      .catch((err) => console.error(err));
+  }, [codigos_lot, sorteosLOT]);
+
+  const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
+    { value: "", label: "" },
+  ]);
+  console.log(sorteo);
+  useEffect(() => {
+    console.log(sorteoOrdi);
+    const copy = [{ value: "", label: "" }];
+    if (sorteoOrdi !== null) {
+      copy.push({
+        value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
+        label: `Sorteo ordinario - ${sorteoOrdi.num_sorteo}`,
+      });
+    }
+    if (sorteoExtra !== null) {
+      copy.push({
+        value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}-${sorteoExtra.num_loteria}`,
+        label: `Sorteo extraordinario - ${sorteoExtra.num_sorteo}`,
+      });
+    }
+    if (sorteoOrdifisico !== null) {
+      copy.push({
+        value: `${sorteoOrdifisico.num_sorteo}-${sorteoOrdifisico.fisico}-${sorteoOrdifisico.num_loteria}`,
+        label: `Sorteo ordinario  fisico- ${sorteoOrdifisico.num_sorteo}`,
+      });
+    }
+
+    if (sorteoExtrafisico !== null) {
+      copy.push({
+        value: `${sorteoExtrafisico.num_sorteo}-${sorteoExtrafisico.fisico}-${sorteoExtrafisico.num_loteria}`,
+        label: `Sorteo extraordinario fisico - ${sorteoExtrafisico.num_sorteo}`,
+      });
+    }
+    SetOpcionesDisponibles([...copy]);
+  }, [
+    sorteoExtra,
+    sorteoExtrafisico,
+    sorteoOrdi,
+    sorteoOrdifisico,
+    sorteosLOT,
+    codigos_lot,
+  ]);
+
+  const reportVentas = useCallback(
+    async (fecha_ini, fecha_fin, sorteo) => {
+      setTotal(null);
+      try {
+        const query = {
+          fecha_ini: fecha_ini,
+          fecha_fin: fecha_fin,
+          num_loteria: sorteosLOT,
+        };
+        if (oficina !== undefined) {
+          query.cod_distribuidor = oficina?.cod_oficina_lot;
+          query.cod_sucursal = oficina?.cod_sucursal_lot;
+        }
+
+        if (sorteo !== null) {
+          query.sorteo = sorteo;
+        }
+
+        const res = await fetchData(url_reportVentas, "GET", query);
+
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [sorteosLOT]
+  );
 
   //const { reportVentas } = useLoteria();
 
@@ -114,8 +245,6 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
     setTotal(null);
     return null;
   };
-
-  console.log(resp_report, fecha_ini, fecha_fin);
   return (
     <>
       <div className="flex flex-col justify-center items-center mx-auto container">
@@ -148,7 +277,7 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
             onInput={(e) => {
               setFecha_ini(e.target.value);
               if (fecha_fin !== "") {
-                reportVentas(e.target.value, fecha_fin).then((res) => {
+                reportVentas(e.target.value, fecha_fin, sorteo).then((res) => {
                   if ("msg" in res) {
                     notifyError(res.msg);
                     setDisabledBtns(true);
@@ -171,7 +300,7 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
             onInput={(e) => {
               setFecha_fin(e.target.value);
               if (fecha_ini !== "") {
-                reportVentas(fecha_ini, e.target.value).then((res) => {
+                reportVentas(fecha_ini, e.target.value, sorteo).then((res) => {
                   if ("msg" in res) {
                     notifyError(res.msg);
                     setDisabledBtns(true);
@@ -182,6 +311,31 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
                     setDisabledBtns(false);
                   }
                 });
+              }
+            }}
+          />
+          <Select
+            // disabled={serie !== "" || numero !== ""}
+            id="selectSorteo"
+            label="Tipo de sorteo"
+            options={opcionesdisponibles}
+            value={sorteo}
+            onChange={(e) => {
+              setSorteo(e.target.value);
+              if (fecha_ini !== "" && fecha_fin !== "") {
+                reportVentas(fecha_ini, fecha_fin, e.target.value).then(
+                  (res) => {
+                    if ("msg" in res) {
+                      notifyError(res.msg);
+                      setDisabledBtns(true);
+                    } else {
+                      console.log(res);
+                      setResp_report(res.data);
+                      setTotal(res.total);
+                      setDisabledBtns(false);
+                    }
+                  }
+                );
               }
             }}
           />

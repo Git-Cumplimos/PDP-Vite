@@ -19,8 +19,8 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const url_reportVentas = `http://127.0.0.1:5000/reportes_ventas`;
-const url_Arqueobilletes = `http://127.0.0.1:5000/arqueobilletes`;
+const url_reportVentas = `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`;
+const url_Arqueobilletes = `${process.env.REACT_APP_URL_LOTERIAS}/arqueobilletes`;
 
 const ArqueoBilletes = ({ route }) => {
   /*__________ Fechas para consulta de transacciones del día________________ */

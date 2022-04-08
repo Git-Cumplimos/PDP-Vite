@@ -2,7 +2,8 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useLoteria } from "../../utils/LoteriaHooks";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -31,6 +32,12 @@ const SendForm = ({
     Serie: selected ? selected.serie : "",
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
   };
+
+  const { tiposOperaciones } = useLoteria();
+
+  const operacion = useMemo(() => {
+    return tiposOperaciones;
+  }, [tiposOperaciones]);
 
   const [checkedState, setCheckedState] = useState([]);
   useEffect(() => {
@@ -113,7 +120,7 @@ const SendForm = ({
                 Efectivo
                 <input
                   id="Efectivo"
-                  value={12}
+                  value={operacion?.Venta_Fisica}
                   name="pago"
                   type="radio"
                   onChange={(e) => formPago(e.target.value)}
@@ -121,7 +128,7 @@ const SendForm = ({
                 Bono
                 <input
                   id="Bono"
-                  value={14}
+                  value={operacion?.Venta_Intercambio}
                   name="pago"
                   type="radio"
                   onChange={(e) => formPago(e.target.value)}
@@ -136,6 +143,7 @@ const SendForm = ({
               max={selected ? `${selected.Fracciones_disponibles}` : "3"}
               min="1"
               value={fracciones}
+              required
               onInput={(e) => {
                 const cus = { fracciones, phone, doc_id };
                 cus.fracciones = e.target.value;

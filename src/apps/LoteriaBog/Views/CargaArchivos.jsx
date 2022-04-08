@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import Form from "../../../components/Base/Form";
 import InputX from "../../../components/Base/InputX/InputX";
@@ -18,6 +18,8 @@ AWS.config.update({
 });
 
 const CargaArchivos = ({ route }) => {
+  const { codigos_lot, setCodigos_lot } = useLoteria();
+
   const { label } = route;
   const options = [
     { value: "", label: "" },
@@ -27,11 +29,24 @@ const CargaArchivos = ({ route }) => {
     { value: "Liquidacion", label: "Liquidacion de premios" },
   ];
 
-  const optionsTipoSorteo = [
-    { value: "", label: "" },
-    { value: "02_Ordinario/", label: "Sorteo Ordinario" },
-    { value: "064_Extra/", label: "Sorteo Extraordinario" },
-  ];
+  const optionsTipoSorteo = useMemo(() => {
+    const options = [
+      { value: "", label: "" },
+      {
+        value: `${codigos_lot?.[0]?.cod_loteria}_Ordinario/`,
+        label: "Sorteo Ordinario",
+      },
+    ];
+
+    if (codigos_lot?.length === 2) {
+      options.push({
+        value: `${codigos_lot?.[1]?.cod_loteria}_Extra/`,
+        label: "Sorteo Extraordinario",
+      });
+    }
+
+    return options;
+  }, [codigos_lot]);
 
   const [archivo, setArchivo] = useState("");
   const [tipoSorteo, setTipoSorteo] = useState("");

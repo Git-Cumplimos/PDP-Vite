@@ -27,7 +27,7 @@ const Transacciones = lazy(() => import("../pages/Transacciones"));
 const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
 
 /** Loteria Bogota */
-const ventaBog = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
+const venta = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
 const Descargas = lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
 const DescargarArchivosS3 = lazy(() =>
   import("../apps/LoteriaBog/Views/Descargas/DescargarArchivosS3")
@@ -205,12 +205,6 @@ const allUrlsPrivateApps = [
     permission: [1],
   },
 
-  // {
-  //   link: "/loterias",
-  //   label: <AppIcons Logo={"LOTERIA"} name="Loterias" />,
-  //   component: Loterias,
-  //   permission: [3, 4, 5, 6],
-  //   subRoutes: [
   {
     link: "/loteria",
     label: <AppIcons Logo={"LOTERIA"} name="Loteria" />,
@@ -229,7 +223,7 @@ const allUrlsPrivateApps = [
         {
           link: `/loteria/${name}/ventas`,
           label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
-          component: Loteria,
+          component: venta,
           permission: [3],
         },
         {
@@ -274,8 +268,6 @@ const allUrlsPrivateApps = [
       ],
     })),
   },
-  //   ],
-  // },
 
   {
     link: "/transacciones",
