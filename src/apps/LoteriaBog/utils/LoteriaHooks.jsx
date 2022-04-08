@@ -345,7 +345,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [selected, customer, roleInfo]
+    [selected, customer, roleInfo, tiposOperaciones]
   );
 
   const sellLoteriafisica = useCallback(
@@ -583,6 +583,7 @@ export const useProvideLoteria = () => {
         id_terminal: roleInfo.id_dispositivo,
         tipo_comercio: roleInfo.tipo_comercio,
         cod_distribuidor: codigosOficina?.cod_oficina_lot,
+        tipo_Operacion: tiposOperaciones?.Pago, /// Pago premios
       };
       try {
         const res = await fetchData(urls.pagopremio, "POST", {}, req);
@@ -593,7 +594,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [roleInfo]
+    [roleInfo, tiposOperaciones]
   );
 
   const pagopremiofisico = useCallback(
@@ -625,6 +626,7 @@ export const useProvideLoteria = () => {
         id_terminal: roleInfo.id_dispositivo,
         tipo_comercio: roleInfo.tipo_comercio,
         cod_distribuidor: codigosOficina?.cod_oficina_lot,
+        tipo_Operacion: tiposOperaciones?.Pago, /// Pago premios
       };
 
       try {
@@ -635,7 +637,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [roleInfo]
+    [roleInfo, tiposOperaciones]
   );
 
   const ConsultaCrearSort = useCallback(async (cod_loteria) => {
