@@ -209,20 +209,22 @@ export const useProvideLoteria = () => {
       });
 
       //Consulta codigos de oficina y sucursal por lotería
-      consulta_codigos_oficina(nit).then((res) => {
-        if ("msg" in res) {
-          console.log(res.msg);
-          setCodigosOficina({
-            cod_oficina_lot: "PPVIR",
-            cod_sucursal_lot: "00",
-          });
-        } else {
-          setCodigosOficina(res);
-          console.log(res);
-        }
-      });
+      if (roleInfo?.id_comercio !== undefined) {
+        consulta_codigos_oficina(nit).then((res) => {
+          if ("msg" in res) {
+            console.log(res.msg);
+            setCodigosOficina({
+              cod_oficina_lot: "PPVIR",
+              cod_sucursal_lot: "00",
+            });
+          } else {
+            setCodigosOficina(res);
+            console.log(res);
+          }
+        });
+      }
     }
-  }, [pathname]);
+  }, [pathname, roleInfo]);
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
