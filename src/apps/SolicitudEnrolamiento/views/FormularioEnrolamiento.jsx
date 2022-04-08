@@ -15,7 +15,8 @@ import { notify, notifyError } from "../../../utils/notify";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router-dom";
 
-const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
+/* const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`; */
+const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/actividades-economicas`;
 
 const capitalize = (word) => {
   return word.toUpperCase();
@@ -161,7 +162,7 @@ const FormularioEnrolamiento = () => {
     (e) => {
       e.preventDefault();
       fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/iniciar-proceso-enrolamiento`,
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/iniciar-proceso-enrolamiento`,
         "POST",
         {},
         {

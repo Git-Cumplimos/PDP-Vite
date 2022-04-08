@@ -14,7 +14,8 @@ import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../../components/Base/Modal";
-const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
+/* const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`; */
+const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/actividades-economicas`;
 
 const capitalize = (word) => {
   return word.toUpperCase();
@@ -183,7 +184,7 @@ const FormularioAutoEnrolamiento = () => {
       e.preventDefault();
 
       fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/iniciar-proceso-enrolamiento`,
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/iniciar-proceso-enrolamiento`,
         "POST",
         {},
         {
@@ -220,7 +221,6 @@ const FormularioAutoEnrolamiento = () => {
           task_token: "token",
           validation_state: "En Proceso de Validación",
           id_name: "id_proceso",
-
           responsable: "",
         },
 
@@ -228,6 +228,7 @@ const FormularioAutoEnrolamiento = () => {
         false
       )
         .then((respuesta) => {
+          console.log(respuesta);
           console.log(respuesta.body.id_proceso);
           const formData = new FormData();
 
@@ -430,7 +431,7 @@ const FormularioAutoEnrolamiento = () => {
 
     if (numconsultaProceso) {
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${numconsultaProceso}`
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/actualizacionestado?numDoc=${numconsultaProceso}`
         /*  `http://127.0.0.1:5000/actualizacionestado?numDoc=${numconsultaProceso}` */
       )
         .then((res) => res.json())

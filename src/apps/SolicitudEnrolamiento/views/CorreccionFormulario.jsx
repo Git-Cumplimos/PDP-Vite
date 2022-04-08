@@ -20,6 +20,7 @@ const CorreccionFormulario = () => {
   const params = useParams();
   const navigate = useNavigate();
   const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
+  /* const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/actividades-economicas`; */
   //Datos Comercio
   const [datosParams, setDatosParams] = useState(0);
   const [nombreComercio, setNombreComercio] = useState("");
@@ -65,7 +66,7 @@ const CorreccionFormulario = () => {
   // Traer Datos Del Comercio
   useEffect(() => {
     fetch(
-      `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actualizacion-estado?numDoc=${params.numCedula}`
+      `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/actualizacionestado?numDoc=${params.numCedula}`
     )
       .then((res) => res.json())
       .then((respuesta) => {
@@ -178,8 +179,8 @@ const CorreccionFormulario = () => {
         barrio_correspondencia: barrioCorr,
         tipoDoc: tipoIdentificacion,
         numDoc: numDocumento,
-        email: correos[0],
-        celular: telefonos[0],
+        email: correos /* [0] */,
+        celular: telefonos /* [0] */,
         /* task_token: datosParams[0]["task_token"], */
         validation_state: "En Proceso de Validación",
         /* id_name: "id_proceso", */
@@ -188,8 +189,8 @@ const CorreccionFormulario = () => {
       console.log(data?.validation_state);
       fetch(
         /* `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/idreconocer?id_proceso=26`, */
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`,
-        /* `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`, */
+        /*  `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`, */
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`,
         {
           method: "PUT",
           body: JSON.stringify(data),

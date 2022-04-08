@@ -39,16 +39,22 @@ const ConsultaEnrolamiento = () => {
     setShowModal(true);
     if (numconsultaProceso) {
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${numconsultaProceso}`
+        /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${numconsultaProceso}` */
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/actualizacionestado?numDoc=${numconsultaProceso}`,
         /*  `http://127.0.0.1:5000/actualizacionestado?numDoc=${numconsultaProceso}` */
+        {
+          method: "GET",
+
+          /* body: formData, */
+        }
       )
         .then((res) => res.json())
         .then((respuesta) => {
           setRespuestaProceso(respuesta?.obj?.results);
-          console.log(respuesta);
+          /* console.log(respuesta); */
         })
         .catch((e) => {
-          console.log(e);
+          /* console.log(e); */
           notifyError("Error al cargar Datos Proceso");
         });
     }
