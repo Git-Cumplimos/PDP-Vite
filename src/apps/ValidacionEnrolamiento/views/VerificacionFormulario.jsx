@@ -131,7 +131,7 @@ const VerificacionFormulario = () => {
       {},
       true
     )
-      .then((res) => res.json())
+      /* .then((res) => res.json()) */
       .then((respuesta) => console.log(respuesta?.obj?.data))
       .catch((err) => {
         console.log(err);
