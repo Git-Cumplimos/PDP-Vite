@@ -181,7 +181,7 @@ const FormularioAutoEnrolamiento = () => {
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
-      console.log("hola");
+
       fetchData(
         `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/iniciar-proceso-enrolamiento`,
         "POST",
@@ -233,17 +233,6 @@ const FormularioAutoEnrolamiento = () => {
 
           formData.set("id_proceso", respuesta.body.id_proceso);
 
-          /* formData.set("rut", archivos1[0]);
-
-          formData.set("cc", archivos2[0]);
-
-          formData.set("camaracomercio", archivos3[0]);
-
-          formData.set("numdoc", numDocumento);
-          
-          formData.set("id_proceso", respuesta.body.id_proceso); */
-          /* formData.set("numdoc", numDocumento); */
-
           notify("Se ha comenzado la carga");
           /* console.log(Object.fromEntries(formData.entries())); */
           fetch(
@@ -270,35 +259,37 @@ const FormularioAutoEnrolamiento = () => {
               } else {
                 /*  console.log(respuesta?.obj); */
                 notify("Se han subido los archivos");
-                console.log(respuesta?.obj[0]?.fields?.["x-amz-algorithm"]);
+                /*  console.log(respuesta?.obj[0]?.fields?.["x-amz-algorithm"]); */
                 const formData2 = new FormData();
                 const formData3 = new FormData();
                 const formData4 = new FormData();
+                /*   for (const datosS3 of respuesta?.obj) {
+                  console.log(datosS3.fields);
+                  for (const property in datosS3.fields) {
+                    console.log(`${property}: ${datosS3.fields[property]}`);
+                    formData2.set(`${property}`, `${datosS3.fields[property]}`);
+                  }
+                }
+                for (const datosS3 of respuesta?.obj) {
+                  console.log(datosS3.fields);
+                  for (const property in datosS3.fields) {
+                    console.log(`${property}: ${datosS3.fields[property]}`);
+                    formData3.set(`${property}`, `${datosS3.fields[property]}`);
+                  }
+                }
+                for (const datosS3 of respuesta?.obj) {
+                  console.log(datosS3.fields);
+                  for (const property in datosS3.fields) {
+                    console.log(`${property}: ${datosS3.fields[property]}`);
+                    formData4.set(`${property}`, `${datosS3.fields[property]}`);
+                  }
+                } */
+
                 if (archivos1 && archivos2 && !archivos3) {
-                  formData2.set("key", `${respuesta?.obj[0]?.fields?.key}`);
-                  formData2.set(
-                    "policy",
-                    `${respuesta?.obj[0]?.fields?.policy}`
-                  );
-                  formData2.set(
-                    "x-amz-algorithm",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`
-                  );
-                  formData2.set(
-                    "x-amz-credential",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`
-                  );
-                  formData2.set(
-                    "x-amz-date",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`
-                  );
-                  formData2.set(
-                    "x-amz-signature",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`
-                  );
                   formData2.set("file", archivos1[0]);
                   fetch(`${respuesta?.obj[0]?.url}`, {
                     method: "POST",
+
                     body: formData2,
                   })
                     .then((res) => res?.status)
@@ -307,27 +298,7 @@ const FormularioAutoEnrolamiento = () => {
                     });
 
                   //------fetch cc----//
-                  formData3.set("key", `${respuesta?.obj[1]?.fields?.key}`);
-                  formData3.set(
-                    "policy",
-                    `${respuesta?.obj[1]?.fields?.policy}`
-                  );
-                  formData3.set(
-                    "x-amz-algorithm",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-algorithm"]}`
-                  );
-                  formData3.set(
-                    "x-amz-credential",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-credential"]}`
-                  );
-                  formData3.set(
-                    "x-amz-date",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-date"]}`
-                  );
-                  formData3.set(
-                    "x-amz-signature",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-signature"]}`
-                  );
+
                   formData3.set("file", archivos2[0]);
                   fetch(`${respuesta?.obj[1]?.url}`, {
                     method: "POST",
@@ -338,27 +309,21 @@ const FormularioAutoEnrolamiento = () => {
                       console.log(err);
                     });
                 } else if (archivos1 && archivos2 && archivos3) {
-                  formData2.set("key", `${respuesta?.obj[0]?.fields?.key}`);
-                  formData2.set(
-                    "policy",
-                    `${respuesta?.obj[0]?.fields?.policy}`
-                  );
-                  formData2.set(
-                    "x-amz-algorithm",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-algorithm"]}`
-                  );
-                  formData2.set(
-                    "x-amz-credential",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-credential"]}`
-                  );
-                  formData2.set(
-                    "x-amz-date",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-date"]}`
-                  );
-                  formData2.set(
-                    "x-amz-signature",
-                    `${respuesta?.obj[0]?.fields?.["x-amz-signature"]}`
-                  );
+                  console.log("3 archivos");
+
+                  var cont_rut = 0;
+                  for (const datosS3 of respuesta?.obj) {
+                    if (cont_rut == 0) {
+                      for (const property in datosS3.fields) {
+                        console.log(datosS3.fields[property]);
+                        formData2.set(
+                          `${property}`,
+                          `${datosS3.fields[property]}`
+                        );
+                      }
+                    }
+                    cont_rut += 1;
+                  }
                   formData2.set("file", archivos1[0]);
                   fetch(`${respuesta?.obj[0]?.url}`, {
                     method: "POST",
@@ -370,28 +335,21 @@ const FormularioAutoEnrolamiento = () => {
                     });
 
                   //------fetch cc----//
-                  formData3.set("key", `${respuesta?.obj[1]?.fields?.key}`);
-                  formData3.set(
-                    "policy",
-                    `${respuesta?.obj[1]?.fields?.policy}`
-                  );
-                  formData3.set(
-                    "x-amz-algorithm",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-algorithm"]}`
-                  );
-                  formData3.set(
-                    "x-amz-credential",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-credential"]}`
-                  );
-                  formData3.set(
-                    "x-amz-date",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-date"]}`
-                  );
-                  formData3.set(
-                    "x-amz-signature",
-                    `${respuesta?.obj[1]?.fields?.["x-amz-signature"]}`
-                  );
+                  var cont_Cc = 0;
+                  for (const datosS3 of respuesta?.obj) {
+                    if (cont_Cc == 1) {
+                      for (const property in datosS3.fields) {
+                        console.log(datosS3.fields[property]);
+                        formData3.set(
+                          `${property}`,
+                          `${datosS3.fields[property]}`
+                        );
+                      }
+                    }
+                    cont_Cc += 1;
+                  }
                   formData3.set("file", archivos2[0]);
+
                   fetch(`${respuesta?.obj[1]?.url}`, {
                     method: "POST",
                     body: formData3,
@@ -402,27 +360,19 @@ const FormularioAutoEnrolamiento = () => {
                     });
 
                   //------fetch Camara y Comercio----//
-                  formData4.set("key", `${respuesta?.obj[2]?.fields?.key}`);
-                  formData4.set(
-                    "policy",
-                    `${respuesta?.obj[2]?.fields?.policy}`
-                  );
-                  formData4.set(
-                    "x-amz-algorithm",
-                    `${respuesta?.obj[2]?.fields?.["x-amz-algorithm"]}`
-                  );
-                  formData4.set(
-                    "x-amz-credential",
-                    `${respuesta?.obj[2]?.fields?.["x-amz-credential"]}`
-                  );
-                  formData4.set(
-                    "x-amz-date",
-                    `${respuesta?.obj[2]?.fields?.["x-amz-date"]}`
-                  );
-                  formData4.set(
-                    "x-amz-signature",
-                    `${respuesta?.obj[2]?.fields?.["x-amz-signature"]}`
-                  );
+                  var cont_cam = 0;
+                  for (const datosS3 of respuesta?.obj) {
+                    if (cont_cam == 2) {
+                      for (const property in datosS3.fields) {
+                        console.log(datosS3.fields[property]);
+                        formData4.set(
+                          `${property}`,
+                          `${datosS3.fields[property]}`
+                        );
+                      }
+                    }
+                    cont_cam += 1;
+                  }
                   formData4.set("file", archivos3[0]);
                   fetch(`${respuesta?.obj[2]?.url}`, {
                     method: "POST",
@@ -434,53 +384,13 @@ const FormularioAutoEnrolamiento = () => {
                     });
                 }
                 setEstadoForm(true);
-                /* navigate("/public/solicitud-enrolamiento/consultar"); */
+                navigate("/public/solicitud-enrolamiento/consultar");
               }
             })
             .catch((err) => {
               console.log(err);
               notifyError("Error al cargar Datos");
             }); /* notify("Se ha comenzado la carga"); */
-          /* fetch(
-            `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/upload-file`,
-
-            {
-              method: "POST",
-                headers: {
-                "Content-type": "application/json",
-              },
-              body: formData,
-            }
-          )
-            .then((res) => res.json())
-            .then((respuesta) => {
-              if (!respuesta?.status) {
-                notifyError(respuesta?.msg);
-              } else {
-                console.log(respuesta?.obj);
-                notify("Se han subido los archivos");
-                setEstadoForm(true);
-              }
-            }).catch(() => {}); */
-          /* fetch(
-            `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
-            {
-              method: "POST",
-              body: formData,
-              mode: "no-cors",
-            }
-          )
-            .then((res) => res.json())
-            .then((respuesta) => {
-              if (!respuesta?.status) {
-                notifyError(respuesta?.msg);
-              } else {
-                console.log(respuesta?.obj);
-                notify("Se han subido los archivos");
-                setEstadoForm(true);
-              }
-            })
-            .catch((err) => console.error(err)); */
         })
         .catch((err) => {
           console.log(err);

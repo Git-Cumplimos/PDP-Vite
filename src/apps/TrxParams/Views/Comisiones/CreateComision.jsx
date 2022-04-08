@@ -18,6 +18,7 @@ import Modal from "../../../../components/Base/Modal";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
 
 const initComissionData = {
   type: "",
@@ -46,6 +47,7 @@ const CreateComision = () => {
   ] = useQuery();
 
   const [headersTable, setHeadersTable] = useState([]);
+  const [idComercios, setIdComercios] = useState([]);
   const [comissionData, setComissionData] = useState(initComissionData);
   const [newComision, setNewComision] = useState({
     "Id comercio": "",
@@ -134,8 +136,8 @@ const CreateComision = () => {
       if (newComision["Nombre comision"]) {
         obj["nombre_comision"] = newComision["Nombre comision"];
       }
-      if (parseInt(newComision["Id comercio"])) {
-        obj["id_comercio"] = parseInt(newComision["Id comercio"]);
+      if (idComercios?.length > 0) {
+        obj["id_comercios"] = idComercios;
       }
       if (newComision["Autorizador"]) {
         obj["id_autorizador"] = parseInt(newComision["Id autorizador"]);
@@ -183,7 +185,7 @@ const CreateComision = () => {
         })
         .catch((err) => console.error(err));
     },
-    [comissionData, newComision, navigate]
+    [comissionData, newComision, idComercios, navigate]
   );
   const onChangeNewComision = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -338,6 +340,29 @@ const CreateComision = () => {
     (ev) => setQuery({ [ev.target.name]: ev.target.value }, { replace: true }),
     [setQuery]
   );
+  const addComercio = useCallback(
+    (ev) => {
+      ev.preventDefault();
+
+      if (
+        !idComercios.find((a) => a === newComision["Id comercio"]) &&
+        newComision["Id comercio"] !== ""
+      ) {
+        setIdComercios((old) => {
+          return [...old, newComision["Id comercio"]];
+        });
+      }
+    },
+    [newComision, idComercios]
+  );
+  const onSelectComercio = useCallback(
+    (e, i) => {
+      let temp = [...idComercios];
+      temp?.splice(i, 1);
+      setIdComercios(temp);
+    },
+    [idComercios]
+  );
 
   return (
     <Fragment>
@@ -397,6 +422,22 @@ const CreateComision = () => {
           autoComplete='off'
           value={newComision?.["Id comercio"]}
           onChange={() => {}}
+          info={
+            <button
+              style={{
+                position: "absolute",
+                top: "-33px",
+                right: "-235px",
+                fontSize: "15px",
+                padding: "5px",
+                backgroundColor: "#e26c22",
+                color: "white",
+                borderRadius: "5px",
+              }}
+              onClick={addComercio}>
+              Agregar
+            </button>
+          }
         />
         <Input
           id='Fecha inicio'
@@ -417,6 +458,10 @@ const CreateComision = () => {
           onChange={() => {}}
         />
       </Form>
+
+      {idComercios?.length > 0 && (
+        <TagsAlongSide data={idComercios} onSelect={onSelectComercio} />
+      )}
       <ButtonBar>
         <Button
           type='button'
