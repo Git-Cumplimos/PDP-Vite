@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
@@ -36,6 +36,8 @@ const Loteria = ({ route }) => {
     searchLoteriafisica,
     sellLoteria,
     sellLoteriafisica,
+    codigos_lot,
+    setCodigos_lot,
   } = useLoteria();
 
   const [sorteoOrdi, setSorteoOrdi] = useState(null);
@@ -44,10 +46,30 @@ const Loteria = ({ route }) => {
   const [sorteoOrdifisico, setSorteofisico] = useState(null);
   const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
 
+  const sorteosLOT = useMemo(() => {
+    var cod = "";
+    console.log(codigos_lot?.length);
+    if (codigos_lot?.length === 2) {
+      cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
+    } else {
+      cod = `${codigos_lot?.[0]?.cod_loteria}`;
+    }
+    console.log(cod);
+    return cod;
+  }, [codigos_lot]);
+
   useEffect(() => {
-    fetchData(urlLoto, "GET", {}, {})
+    const query = {
+      num_loteria: sorteosLOT,
+    };
+    fetchData(urlLoto, "GET", query, {})
       .then((res) => {
         ////sorteo virtual
+        setSorteoOrdi(null);
+        setSorteoExtra(null);
+        setSorteofisico(null);
+        setSorteofisicoextraordinario(null);
+        console.log(res);
         const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
           return tip_sorteo === 1 && !fisico;
         });
@@ -88,7 +110,7 @@ const Loteria = ({ route }) => {
         }
       })
       .catch((err) => console.error(err));
-  }, []);
+  }, [codigos_lot, sorteosLOT]);
 
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
@@ -110,7 +132,7 @@ const Loteria = ({ route }) => {
     setPage(1);
     setMaxPages(1);
 
-    console.log(sorteoExtrafisico);
+    console.log(sorteoOrdi);
     const copy = [{ value: "", label: "" }];
     if (sorteoOrdi !== null) {
       copy.push({
@@ -148,6 +170,8 @@ const Loteria = ({ route }) => {
     sorteoExtrafisico,
     sorteoOrdi,
     sorteoOrdifisico,
+    sorteosLOT,
+    codigos_lot,
   ]);
 
   const closeModal = useCallback(() => {
@@ -171,8 +195,6 @@ const Loteria = ({ route }) => {
     setSellResponse,
     sorteo,
   ]);
-  console.log(selected);
-  console.log(sellResponse);
   return (
     <>
       <Form grid>

@@ -23,8 +23,11 @@ const Transacciones = lazy(() => import("../pages/Transacciones"));
 /**
  * Loteria
  */
+
 const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
-const Loteria = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
+
+/** Loteria Bogota */
+const venta = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
 const Descargas = lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
 const DescargarArchivosS3 = lazy(() =>
   import("../apps/LoteriaBog/Views/Descargas/DescargarArchivosS3")
@@ -38,6 +41,11 @@ const CrearSorteos = lazy(() =>
 const CargaArchivos = lazy(() =>
   import("../apps/LoteriaBog/Views/CargaArchivos")
 );
+const ArqueoBilletes = lazy(() =>
+  import("../apps/LoteriaBog/Views/ArqueoBilletes")
+);
+const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
+
 /**
  * ColCard
  */
@@ -45,7 +53,6 @@ const ColCard = lazy(() => import("../apps/ColCard/ColCard"));
 const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
-const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
 
 /**
  * Marketplace
@@ -197,6 +204,7 @@ const allUrlsPrivateApps = [
     extern: true,
     permission: [1],
   },
+
   {
     link: "/loteria",
     label: <AppIcons Logo={"LOTERIA"} name="Loteria" />,
@@ -215,7 +223,7 @@ const allUrlsPrivateApps = [
         {
           link: `/loteria/${name}/ventas`,
           label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
-          component: Loteria,
+          component: venta,
           permission: [3],
         },
         {
@@ -260,6 +268,7 @@ const allUrlsPrivateApps = [
       ],
     })),
   },
+
   {
     link: "/transacciones",
     label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones" />,

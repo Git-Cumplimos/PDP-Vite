@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Form from "../../../components/Base/Form";
 import AWS from "aws-sdk";
 import ButtonBar from "../../../components/Base/ButtonBar";
@@ -23,7 +23,7 @@ const url_consultaParams = `${process.env.REACT_APP_URL_LOTERIAS}/con_params`;
 const CrearSorteos = ({ route }) => {
   const { label } = route;
   //const { notifyError, notify } = useAuth();
-  const { ConsultaCrearSort } = useLoteria();
+  const { ConsultaCrearSort, codigos_lot, setCodigos_lot } = useLoteria();
   const [resp_con, setResp_con] = useState(null);
   const [tip_sorteo, setTip_sorteo] = useState(null);
   const [sorteo, setSorteo] = useState(null);
@@ -40,12 +40,27 @@ const CrearSorteos = ({ route }) => {
 
   const [day, setDay] = useState(null);
 
+  const sorteosLOT = useMemo(() => {
+    var cod = "";
+    console.log(codigos_lot?.length);
+    if (codigos_lot?.length === 2) {
+      cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
+    } else {
+      cod = `${codigos_lot?.[0]?.cod_loteria}`;
+    }
+    return cod;
+  }, [codigos_lot]);
+
+  // const sorteoOrdi = codigosLot[0];
+  // const sorteoExtra = codigosLot[1];
+  // const sorteosLOT = `${sorteoOrdi},${sorteoExtra}`;
   useEffect(() => {
-    ConsultaCrearSort().then((res) => {
+    //Consulta sorteos de Lotería de Bogotá
+    ConsultaCrearSort(sorteosLOT).then((res) => {
       setResp_con(res);
     });
     setDay(new Date().getDay());
-  }, []);
+  }, [sorteosLOT]);
 
   const onSubmit3 = (e) => {
     setTip_sorteo(2);
@@ -61,14 +76,16 @@ const CrearSorteos = ({ route }) => {
 
   const closeModal = useCallback(() => {
     setShowModal1(false);
-    ConsultaCrearSort().then((res) => {
+    //Consulta sorteos de Lotería de Bogotá
+    ConsultaCrearSort(sorteosLOT).then((res) => {
       setResp_con(res);
     });
   });
 
   const closeModal2 = useCallback(() => {
     setShowModal2(false);
-    ConsultaCrearSort().then((res) => {
+    //Consulta sorteos de Lotería de Bogotá
+    ConsultaCrearSort(sorteosLOT).then((res) => {
       setResp_con(res);
     });
   });

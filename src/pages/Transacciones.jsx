@@ -249,6 +249,7 @@ const Transacciones = () => {
                 transacciones(
                   page - 1,
                   idComercio,
+                  usuario,
                   tipoOp,
                   fechaInicial,
                   fechaFinal
@@ -265,6 +266,7 @@ const Transacciones = () => {
                 transacciones(
                   page + 1,
                   idComercio,
+                  usuario,
                   tipoOp,
                   fechaInicial,
                   fechaFinal
