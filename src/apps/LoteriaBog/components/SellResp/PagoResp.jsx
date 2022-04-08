@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Tickets from "../../../../components/Base/Tickets";
 import { notifyError } from "../../../../utils/notify";
+import { useLoteria } from "../../utils/LoteriaHooks";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -41,6 +42,12 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
     content: () => printDiv.current,
     pageStyle: pageStyle,
   });
+
+  const { tiposOperaciones } = useLoteria();
+
+  const operacion = useMemo(() => {
+    return tiposOperaciones;
+  }, [tiposOperaciones]);
 
   //const voucherPagoInfo = {};
 
