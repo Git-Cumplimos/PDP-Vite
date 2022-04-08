@@ -5,6 +5,7 @@ import { allUrlsPrivateApps } from "../utils/appsRoutes";
 
 import { rutasGestion } from "../pages/Gestion/routes";
 import { rutasReportes } from "../pages/Reportes/routes";
+import { rutasInformacionGeneral } from "../pages/InformacionGeneral/routes";
 import { loginUrls } from "../pages/Login/routes";
 import { publicUrls } from "../pages/PublicHome/routes";
 import { privateUrls } from "../pages/routes";
@@ -120,6 +121,7 @@ export const UrlsContext = createContext({
   allRoutes: [],
   urlsGestion: [],
   urlsReportes: [],
+  urlsInformacionGeneral: [],
 });
 
 export const useUrls = () => {
@@ -153,24 +155,33 @@ export const useProvideUrls = () => {
     }
   }, [userPermissions]);
 
+  const urlsInformacionGeneral = useMemo(() => {
+    if (Array.isArray(userPermissions) && userPermissions.length > 0) {
+      return [...filterPermissions(rutasInformacionGeneral, userPermissions)];
+    } else {
+      return [];
+    }
+  }, [userPermissions]);
+
   const allRoutes = useMemo(() => {
     return (
       <Routes>
-        <Route path="/" element={<AdminLayout />}>
+        <Route path='/' element={<AdminLayout />}>
           {toRoute(privateUrls)}
           {toRoute(urlsPrivateApps, true, SubPage)}
           {toRoute(urlsGestion, true, SubPage)}
           {toRoute(urlsReportes, true, SubPage)}
+          {toRoute(urlsInformacionGeneral, true, SubPage)}
         </Route>
-        <Route path="/login" element={<LoginLayout />}>
+        <Route path='/login' element={<LoginLayout />}>
           {toRoute(loginUrls, false)}
         </Route>
-        <Route path="/public" element={<PublicLayout />}>
+        <Route path='/public' element={<PublicLayout />}>
           {toRoute(publicUrls, false)}
         </Route>
       </Routes>
     );
-  }, [urlsPrivateApps, urlsGestion, urlsReportes]);
+  }, [urlsPrivateApps, urlsGestion, urlsReportes, urlsInformacionGeneral]);
 
   return {
     urlsPrivate: privateUrls,
@@ -179,5 +190,6 @@ export const useProvideUrls = () => {
     allRoutes,
     urlsGestion,
     urlsReportes,
+    urlsInformacionGeneral,
   };
 };
