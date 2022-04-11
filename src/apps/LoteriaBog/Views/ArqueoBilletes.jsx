@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import { useLoteria } from "../utils/LoteriaHooks";
@@ -12,6 +12,7 @@ import ReportVentasForm from "../components/ReportVentasForm/ReportVentasForm";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../../src/utils/fetchData";
+import Select from "../../../components/Base/Select";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -21,6 +22,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 
 const url_reportVentas = `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`;
 const url_Arqueobilletes = `${process.env.REACT_APP_URL_LOTERIAS}/arqueobilletes`;
+const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
 const ArqueoBilletes = ({ route }) => {
   /*__________ Fechas para consulta de transacciones del día________________ */
@@ -50,6 +52,123 @@ const ArqueoBilletes = ({ route }) => {
   console.log(roleInfo);
   const { con_SortVentas_S3 } = useLoteria();
   const [showModal2, setShowModal2] = useState(false);
+
+  const [sorteoOrdi, setSorteoOrdi] = useState(null);
+  const [sorteoExtra, setSorteoExtra] = useState(null);
+
+  const [sorteoOrdifisico, setSorteofisico] = useState(null);
+  const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
+
+  const { codigos_lot, setCodigos_lot, codigosOficina, setCodigosOficina } =
+    useLoteria();
+
+  const sorteosLOT = useMemo(() => {
+    var cod = "";
+    console.log(codigos_lot?.length);
+    if (codigos_lot?.length === 2) {
+      cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
+    } else {
+      cod = `${codigos_lot?.[0]?.cod_loteria}`;
+    }
+    console.log(cod);
+    return cod;
+  }, [codigos_lot]);
+
+  useEffect(() => {
+    const query = {
+      num_loteria: sorteosLOT,
+    };
+    fetchData(urlLoto, "GET", query, {})
+      .then((res) => {
+        ////sorteo virtual
+        setSorteoOrdi(null);
+        setSorteoExtra(null);
+        setSorteofisico(null);
+        setSorteofisicoextraordinario(null);
+        console.log(res);
+        // const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
+        //   return tip_sorteo === 1 && !fisico;
+        // });
+        // const sortExt = res.filter(({ tip_sorteo, fisico }) => {
+        //   return tip_sorteo === 2 && !fisico;
+        // });
+        // if (sortOrd.length > 0) {
+        //   setSorteoOrdi(sortOrd[0]);
+        // } else {
+        //   /*  notifyError("No se encontraron sorteos ordinarios"); */
+        // }
+        // if (sortExt.length > 0) {
+        //   setSorteoExtra(sortExt[0]);
+        // } else {
+        //   /* notifyError("No se encontraron sorteos extraordinarios"); */
+        // }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ///sorteo fisico
+        const sortOrdfisico = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 1 && fisico;
+        });
+        const sortExtfisico = res.filter(({ tip_sorteo, fisico }) => {
+          return tip_sorteo === 2 && fisico;
+        });
+
+        if (sortOrdfisico.length > 0) {
+          setSorteofisico(sortOrdfisico[0]);
+        } else {
+          /*    notifyError("No se encontraron extraordinarios fisicos"); */
+        }
+
+        if (sortExtfisico.length > 0) {
+          setSorteofisicoextraordinario(sortExtfisico[0]);
+        } else {
+          /*   notifyError("No se encontraron extraordinarios fisicos"); */
+        }
+      })
+      .catch((err) => console.error(err));
+  }, [codigos_lot, sorteosLOT]);
+
+  const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
+    { value: "", label: "" },
+  ]);
+
+  useEffect(() => {
+    console.log(sorteoOrdi);
+    const copy = [{ value: "", label: "" }];
+    if (sorteoOrdi !== null) {
+      copy.push({
+        value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
+        label: `Sorteo ordinario - ${sorteoOrdi.num_sorteo}`,
+      });
+    }
+    if (sorteoExtra !== null) {
+      copy.push({
+        value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}-${sorteoExtra.num_loteria}`,
+        label: `Sorteo extraordinario - ${sorteoExtra.num_sorteo}`,
+      });
+    }
+    if (sorteoOrdifisico !== null) {
+      copy.push({
+        value: `${sorteoOrdifisico.num_sorteo}-${sorteoOrdifisico.fisico}-${sorteoOrdifisico.num_loteria}`,
+        label: `Sorteo ordinario  fisico- ${sorteoOrdifisico.num_sorteo}`,
+      });
+    }
+
+    if (sorteoExtrafisico !== null) {
+      copy.push({
+        value: `${sorteoExtrafisico.num_sorteo}-${sorteoExtrafisico.fisico}-${sorteoExtrafisico.num_loteria}`,
+        label: `Sorteo extraordinario fisico - ${sorteoExtrafisico.num_sorteo}`,
+      });
+    }
+    SetOpcionesDisponibles([...copy]);
+  }, [
+    sorteoExtra,
+    sorteoExtrafisico,
+    sorteoOrdi,
+    sorteoOrdifisico,
+    sorteosLOT,
+    codigos_lot,
+  ]);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -89,32 +208,39 @@ const ArqueoBilletes = ({ route }) => {
     });
   };
 
-  const reportVentas = useCallback(async (fecha_ini, fecha_fin) => {
-    try {
-      const query = {
-        fecha_ini: fecha_ini.substr(0, 10),
-        fecha_fin: fecha_fin.substr(0, 10),
-      };
-      if ("cod_oficina_lot" in roleInfo) {
-        query.cod_distribuidor = roleInfo?.cod_oficina_lot;
-        query.cod_sucursal = roleInfo?.cod_sucursal_lot;
+  const reportVentas = useCallback(
+    async (fecha_ini, fecha_fin, sorteo) => {
+      try {
+        const query = {
+          fecha_ini: fecha_ini.substr(0, 10),
+          fecha_fin: fecha_fin.substr(0, 10),
+          num_loteria: sorteosLOT,
+        };
+        if ("cod_oficina_lot" in roleInfo) {
+          query.cod_distribuidor = codigosOficina?.cod_oficina_lot;
+          query.cod_sucursal = codigosOficina?.cod_sucursal_lot;
+        }
+        if (sorteo !== null) {
+          query.sorteo = sorteo;
+        }
+
+        // query.arqueo = "Si";
+        const res = await fetchData(url_reportVentas, "GET", query);
+
+        return res;
+      } catch (err) {
+        console.error(err);
       }
-
-      query.arqueo = "Si";
-      const res = await fetchData(url_reportVentas, "GET", query);
-
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+    },
+    [sorteosLOT, codigosOficina]
+  );
 
   const crearArqueoBilletes = useCallback(
     async (fecha_ini, fracDisp, total, id_arqueo) => {
       try {
         const body = {
-          cod_distribuidor: roleInfo?.cod_oficina_lot,
-          cod_sucursal: roleInfo?.cod_sucursal_lot,
+          cod_distribuidor: codigosOficina?.cod_oficina_lot,
+          cod_sucursal: codigosOficina?.cod_sucursal_lot,
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
@@ -137,7 +263,7 @@ const ArqueoBilletes = ({ route }) => {
         console.error(err);
       }
     },
-    []
+    [codigosOficina, roleInfo]
   );
 
   const consultaArqueoBilletes = useCallback(async (fecha_ini, fecha_fin) => {
@@ -157,19 +283,19 @@ const ArqueoBilletes = ({ route }) => {
     }
   }, []);
 
-  useEffect(() => {
-    reportVentas(fecha_ini, fecha_fin).then((res) => {
-      if ("msg" in res) {
-        notifyError(res.msg);
-        // setDisabledBtns(true);
-      } else {
-        console.log(res);
-        // setResp_report(res.data);
-        setTotal(res.total);
-        // setDisabledBtns(false);
-      }
-    });
-  }, []);
+  // useEffect(() => {
+  //   reportVentas(fecha_ini, fecha_fin).then((res) => {
+  //     if ("msg" in res) {
+  //       notifyError(res.msg);
+  //       // setDisabledBtns(true);
+  //     } else {
+  //       console.log(res);
+  //       // setResp_report(res.data);
+  //       setTotal(res.total);
+  //       // setDisabledBtns(false);
+  //     }
+  //   });
+  // }, []);
 
   useEffect(() => {
     consultaArqueoBilletes(fecha_ini, fecha_fin).then((res) => {
@@ -216,7 +342,6 @@ const ArqueoBilletes = ({ route }) => {
         ) : (
           ""
         )}
-
         <Input
           id="frac_disponibles"
           label="Fracciones disponibles"
@@ -228,6 +353,29 @@ const ArqueoBilletes = ({ route }) => {
               const num = e.target.value;
               setFracDisp(num);
             }
+          }}
+        />
+        <Select
+          // disabled={serie !== "" || numero !== ""}
+          id="selectSorteo"
+          label="Tipo de sorteo"
+          options={opcionesdisponibles}
+          value={sorteo}
+          onChange={(e) => {
+            setSorteo(e.target.value);
+            setShowArqueo(false);
+            setFracDisp(null);
+            reportVentas(fecha_ini, fecha_fin, e.target.value).then((res) => {
+              if ("msg" in res) {
+                notifyError(res.msg);
+                // setDisabledBtns(true);
+              } else {
+                console.log(res);
+                // setResp_report(res.data);
+                setTotal(res.total);
+                // setDisabledBtns(false);
+              }
+            });
           }}
         />
 
