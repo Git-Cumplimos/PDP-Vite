@@ -606,7 +606,7 @@ const allUrlsPrivateApps = [
         link: "/Solicitud-enrolamiento/ReporteComercios",
         label: <AppIcons Logo={"PAGO"} name={"Reporte De Comercios"} />,
         component: ReporteComercios,
-        permission: [38],
+        permission: [39],
         subRoutes: [],
       },
       {

@@ -18,7 +18,7 @@ const ReporteComercios = () => {
   useEffect(() => {
     if (tipoBusqueda && estadoProceso) {
       fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=${estadoProceso}`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?validation_state=${estadoProceso}`,
         "GET"
       )
         .then((result) => setDatosEstadoProceso(result?.obj?.results))
@@ -31,7 +31,7 @@ const ReporteComercios = () => {
   useEffect(() => {
     if (tipoBusqueda && tipoZona) {
       fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?tipozona=${tipoZona}`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?tipozona=${tipoZona}`,
         "GET"
       )
         .then((result) => setDatosTipoZona(result?.obj?.results))
@@ -45,7 +45,7 @@ const ReporteComercios = () => {
   useEffect(() => {
     if (tipoBusqueda && fechaInicial && fechaFinal) {
       fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}`,
         "GET"
       )
         .then((result) => setDatosFecha(result?.obj?.results))
@@ -116,7 +116,7 @@ const ReporteComercios = () => {
         options={{
           "": "",
           "Estado Proceso": "validation_state",
-          "Tipo Zona": "tipozona",
+          /* "Tipo Zona": "tipozona", */
           "Fecha Inscripcion": "fecha_inicio",
         }}
       ></Select>

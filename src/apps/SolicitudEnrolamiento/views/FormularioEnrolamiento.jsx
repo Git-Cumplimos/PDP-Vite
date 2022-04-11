@@ -103,39 +103,41 @@ const FormularioEnrolamiento = () => {
   useEffect(() => {
     fetchData(
       `${
-        process.env.REACT_APP_URL_SERVICE_COMMERCE_SS
+        process.env.REACT_APP_URL_SERVICE_PUBLIC_SS
       }/localidades?cod_dane=${codDaneMunicipioComercio}&limit=${0}`,
       "GET",
       {},
       {},
       {},
       false
-    ).then((respuesta) => setLocalidadUbComercio(respuesta.obj.results));
+    ).then((respuesta) => setLocalidadUbComercio(respuesta?.obj?.results));
   }, [codDaneMunicipioComercio]);
 
   //------------------Traer localidades Con codigo dane de la ubicacion Correspondencia---------------------//
   useEffect(() => {
     fetchData(
       `${
-        process.env.REACT_APP_URL_SERVICE_COMMERCE_SS
+        process.env.REACT_APP_URL_SERVICE_PUBLIC_SS
       }/localidades?cod_dane=${codDaneMunicipioCorrespondencia}&limit=${0}`,
       "GET",
       {},
       {},
       {},
       false
-    ).then((respuesta) => setLocalidadUbCorrespondencia(respuesta.obj.results));
+    ).then((respuesta) =>
+      setLocalidadUbCorrespondencia(respuesta?.obj?.results)
+    );
   }, [codDaneMunicipioCorrespondencia]);
   //------------------Traer Asesores---------------------//
   useEffect(() => {
     fetchData(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/asesores?limit=${14}`,
+      `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/asesores?limit=${14}`,
       "GET",
       {},
       {},
       {},
       false
-    ).then((respuesta) => setAsesores(respuesta.obj.results));
+    ).then((respuesta) => setAsesores(respuesta?.obj?.results));
   }, []);
   //------------------Guardar Archivos PDF---------------------//
   const onFileChange = useCallback((files) => {
@@ -416,13 +418,18 @@ const FormularioEnrolamiento = () => {
   useEffect(() => {
     if (desencriptarIdAsesor) {
       fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/asesores?id_asesor=${desencriptarIdAsesor}`,
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/asesores?id_asesor=${desencriptarIdAsesor}`,
         "GET",
         {},
         {},
         {},
         false
-      ).then((res) => setNombreAsesor(res.obj.results));
+      )
+        .then((res) => setNombreAsesor(res?.obj?.results))
+        .catch((err) => {
+          console.log(err);
+          /* notifyError("Error al cargar Datos localidad ubicacion del comercio"); */
+        });
     }
   }, [desencriptarIdAsesor]);
 
