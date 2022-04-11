@@ -99,6 +99,8 @@ export const LoteriaContext = createContext({
   codigos_lot: null,
   tiposOperaciones: null,
   setTiposOperaciones: null,
+  codigosOficina: null,
+  setCodigosOficina: null,
 });
 
 export const useLoteria = () => {
@@ -304,7 +306,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [roleInfo]
+    [roleInfo, codigosOficina]
   );
 
   const sellLoteria = useCallback(
@@ -380,7 +382,7 @@ export const useProvideLoteria = () => {
         ),
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: roleInfo.tipo_comercio,
-        tipoPago: tipoPago, /// Venta lotería de Bogotá - Intercambio/Fisica
+        tipoPago: tipoPago !== null ? tipoPago : tiposOperaciones?.Venta_Fisica, /// Venta lotería de Bogotá - Intercambio/Fisica
       };
 
       try {
@@ -805,5 +807,7 @@ export const useProvideLoteria = () => {
     setCodigos_lot,
     tiposOperaciones,
     setTiposOperaciones,
+    codigosOficina,
+    setCodigosOficina,
   };
 };

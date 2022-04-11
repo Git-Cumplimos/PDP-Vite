@@ -117,7 +117,7 @@ const Loteria = ({ route }) => {
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
   const [selecFrac, setSelecFrac] = useState([]);
-  const [tipoPago, setTipoPago] = useState("12");
+  const [tipoPago, setTipoPago] = useState(null);
 
   const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
     { value: "", label: "" },
@@ -180,7 +180,7 @@ const Loteria = ({ route }) => {
     setCustomer({ fracciones: "", phone: "", doc_id: "" });
     setSelected(null);
     setSelecFrac([]);
-    setTipoPago("12");
+    setTipoPago(null);
     sorteo.split("-")[1] === "true"
       ? searchLoteriafisica(sorteo, numero, serie, page)
       : searchLoteria(sorteo, numero, serie, page);

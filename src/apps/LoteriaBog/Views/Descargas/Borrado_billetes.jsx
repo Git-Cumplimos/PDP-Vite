@@ -111,7 +111,7 @@ const Borrado_billetes = ({ route }) => {
         <Form formDir="col" onSubmit={onSubmit} grid>
           <Select
             id="searchBySorteo"
-            label="Tipo de comercio"
+            label="Sorteo"
             options={
               Object.fromEntries([
                 ["", ""],

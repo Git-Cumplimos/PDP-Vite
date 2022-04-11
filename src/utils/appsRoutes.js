@@ -212,8 +212,8 @@ const allUrlsPrivateApps = [
     provider: ProvideLoteria,
     permission: [3, 4, 5, 6],
     subRoutes: [
-      { link: "loteria-de-bogota", label: "Loteria de bogota" },
-      { link: "loteria-del-tolima", label: "Loteria del tolima" },
+      { link: "loteria-de-bogota", label: "Lotería de Bogotá" },
+      { link: "loteria-del-tolima", label: "Lotería del Tolima" },
     ].map(({ link: name, label }) => ({
       link: `/loteria/${name}`,
       label: <AppIcons Logo={"LOTERIA"} name={label} />,
@@ -265,6 +265,13 @@ const allUrlsPrivateApps = [
           extern: false,
           permission: [3], ///////////////////////////////////////////////////////////////////
         },
+        // {
+        //   link: `/loteria/${name}/arqueo`,
+        //   label: <AppIcons Logo={"PAGO"} name="Arqueo Billetes" />,
+        //   component: ArqueoBilletes,
+        //   extern: false,
+        //   permission: [3, 6], ///////////////////////////////////////////////////////////////////
+        // },
       ],
     })),
   },
