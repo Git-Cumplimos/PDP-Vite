@@ -102,7 +102,7 @@ const FormularioAutoEnrolamiento = () => {
   useEffect(() => {
     fetchData(
       `${
-        process.env.REACT_APP_URL_SERVICE_COMMERCE
+        process.env.REACT_APP_URL_SERVICE_COMMERCE_SS
       }/localidades?cod_dane=${codDaneMunicipioComercio}&limit=${0}`,
       "GET",
       {},
@@ -123,7 +123,7 @@ const FormularioAutoEnrolamiento = () => {
   useEffect(() => {
     fetchData(
       `${
-        process.env.REACT_APP_URL_SERVICE_COMMERCE
+        process.env.REACT_APP_URL_SERVICE_COMMERCE_SS
       }/localidades?cod_dane=${codDaneMunicipioCorrespondencia}&limit=${0}`,
       "GET",
       {},
@@ -143,7 +143,7 @@ const FormularioAutoEnrolamiento = () => {
   //------------------Traer Asesores---------------------//
   useEffect(() => {
     fetchData(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?limit=${14}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/asesores?limit=${14}`,
       "GET",
       {},
       {},

@@ -13,6 +13,7 @@ const ValidacionApertura = () => {
   const [datosEnrolamientos, setDatosEnrolamientos] = useState([]);
   const [datosOrdenados, setOrdenados] = useState(0);
   const [datosFiltradosFecha, setDatosFiltradosFecha] = useState([]);
+  const [datosFiltradosEstado, setDatosFiltradosEstado] = useState([]);
   const [cantidadPaginas, setCantidadPaginas] = useState(0);
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
@@ -39,11 +40,11 @@ const ValidacionApertura = () => {
       });
   }, []);
   useEffect(() => {
-    if (fechaInicial && fechaFinal && estadoProceso) {
+    if (fechaInicial && fechaFinal /* && estadoProceso */) {
       fetchData(
         /*  `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}` */
         /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`, */
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}`,
         "GET",
         {},
         {},
@@ -51,10 +52,27 @@ const ValidacionApertura = () => {
       )
         /* .then((response) => response.json()) */
         .then((respuesta) => {
-          setDatosFiltradosFecha(respuesta.obj.results);
+          setDatosFiltradosFecha(respuesta?.obj?.results);
         });
     }
-  }, [fechaInicial, fechaFinal, estadoProceso]);
+  }, [fechaInicial, fechaFinal /* , estadoProceso */]);
+  useEffect(() => {
+    if (estadoProceso) {
+      fetchData(
+        /*  `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}` */
+        /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`, */
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?validation_state=${estadoProceso}`,
+        "GET",
+        {},
+        {},
+        false
+      )
+        /* .then((response) => response.json()) */
+        .then((respuesta) => {
+          setDatosFiltradosEstado(respuesta?.obj?.results);
+        });
+    }
+  }, [estadoProceso]);
   console.log(datosOrdenados);
   datosEnrolamientos.map((e) => delete e.task_token);
   datosEnrolamientos.map((e) => delete e.id_reconocer);

@@ -587,7 +587,7 @@ const allUrlsPrivateApps = [
           <AppIcons Logo={"PAGO"} name={"Validar Formulario Inscripción"} />
         ),
         component: ValidacionAsesorComercial,
-        permission: [38],
+        permission: [39],
         subRoutes: [
           {
             link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
@@ -598,7 +598,7 @@ const allUrlsPrivateApps = [
               />
             ),
             component: VerificacionFormulario,
-            permission: [38],
+            permission: [39],
           },
         ],
       },
