@@ -407,9 +407,14 @@ const VerificacionFormulario = () => {
   //----------------Obtener Localidades Con El Codigo Dane Del Responsable---------------------//
   useEffect(() => {
     if (datosAsesor) {
-      gedCodsDaneResponsable().then((value) =>
-        setCodigoDane(value?.map((datosCodLoc) => datosCodLoc))
-      );
+      gedCodsDaneResponsable()
+        .then((value) =>
+          setCodigoDane(value?.map((datosCodLoc) => datosCodLoc))
+        )
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos Codigo Dane del responsable");
+        });
     }
   }, [datosAsesor]);
   //----------------Traer Codigos Dane Del Responsable---------------------//
@@ -419,7 +424,7 @@ const VerificacionFormulario = () => {
         `${url}/responsables?nombre=${datosAsesor[0]?.responsable["nombre"]}`
       );
       const codsDaneResponsable = [
-        ...consultaResponsable?.obj?.results[0]["zona"]["municipios"].map(
+        ...consultaResponsable?.obj?.results[0]["zona"]["municipios"]?.map(
           (codigos) => parseInt(codigos)
         ),
       ];
@@ -428,7 +433,7 @@ const VerificacionFormulario = () => {
         const respuestaLocalidad = await fetchData(
           `${url}/localidades?cod_dane=${codigoIterado}&limit=${0}`
         );
-        guardarFetch.push(...respuestaLocalidad?.obj?.results);
+        guardarFetch?.push(...respuestaLocalidad?.obj?.results);
       }
 
       return guardarFetch;
@@ -442,9 +447,15 @@ const VerificacionFormulario = () => {
   useEffect(() => {
     console.log(nombreAsesor);
     if (nombreAsesor) {
-      gedCodsDaneResponsableAutoEnr().then((value) =>
-        setCodigoDane(value?.map((datosCodLoc) => datosCodLoc))
-      );
+      console.log(gedCodsDaneResponsableAutoEnr());
+      gedCodsDaneResponsableAutoEnr()
+        .then((value) =>
+          setCodigoDane(value?.map((datosCodLoc) => datosCodLoc))
+        )
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos Codigo Dane del Responsable");
+        });
     }
   }, [datosNombreAsesor]);
   //----------------Traer Codigos Dane Del Responsable---------------------//
@@ -463,7 +474,7 @@ const VerificacionFormulario = () => {
         const respuestaLocalidadAutoEn = await fetchData(
           `${url}/localidades?cod_dane=${codigoIterado}&limit=${0}`
         );
-        guardarFetchAutoEn.push(...respuestaLocalidadAutoEn?.obj?.results);
+        guardarFetchAutoEn?.push(...respuestaLocalidadAutoEn?.obj?.results);
       }
 
       return guardarFetchAutoEn;
@@ -537,7 +548,7 @@ const VerificacionFormulario = () => {
                   options={
                     Object.fromEntries([
                       ["N/A", "N/A"],
-                      ...codigoDane.map(({ id_localidad, nom_localidad }) => {
+                      ...codigoDane?.map(({ id_localidad, nom_localidad }) => {
                         return [`${id_localidad}${" "}${nom_localidad}`];
                       }),
                     ]) || { "": "" }
