@@ -265,13 +265,13 @@ const allUrlsPrivateApps = [
           extern: false,
           permission: [3], ///////////////////////////////////////////////////////////////////
         },
-        // {
-        //   link: `/loteria/${name}/arqueo`,
-        //   label: <AppIcons Logo={"PAGO"} name="Arqueo Billetes" />,
-        //   component: ArqueoBilletes,
-        //   extern: false,
-        //   permission: [3, 6], ///////////////////////////////////////////////////////////////////
-        // },
+        {
+          link: `/loteria/${name}/arqueo`,
+          label: <AppIcons Logo={"PAGO"} name="Arqueo Billetes" />,
+          component: ArqueoBilletes,
+          extern: false,
+          permission: [3, 6], ///////////////////////////////////////////////////////////////////
+        },
       ],
     })),
   },
