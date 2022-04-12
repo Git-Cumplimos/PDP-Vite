@@ -13,10 +13,13 @@ function ValidacionAsesorComercial() {
   const navigate = useNavigate();
   const [datosEnrolamientos, setDatosEnrolamientos] = useState([]);
   const [datosFiltradosFecha, setDatosFiltradosFecha] = useState([]);
+  const [datosFiltradosEstado, setDatosFiltradosEstado] = useState([]);
+  const [datosFiltradosNumero, setDatosFiltradosNumero] = useState([]);
   const [cantidadPaginas, setCantidadPaginas] = useState(0);
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
   const [estadoProceso, setEstadoProceso] = useState("");
+  const [numeroProceso, setNumeroProceso] = useState("");
   const [datosOrdenados, setOrdenados] = useState(0);
   const [keys, setKey] = useState(0);
   /* const [datosFiltrados, setDatosFiltrados] = useState(["perro"]);  */
@@ -38,11 +41,11 @@ function ValidacionAsesorComercial() {
       });
   }, []);
   useEffect(() => {
-    if (fechaInicial && fechaFinal && estadoProceso) {
+    if (fechaInicial && fechaFinal) {
       fetchData(
         /* `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`, */
         /*         `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`,
-         */ `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`,
+         */ `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}`,
         "GET"
       )
         /* .then((response) => response.json()) */
@@ -54,7 +57,42 @@ function ValidacionAsesorComercial() {
           notifyError("Error al cargar Datos Por Fecha y Estado");
         });
     }
-  }, [fechaInicial, fechaFinal, estadoProceso]);
+  }, [fechaInicial, fechaFinal /* , estadoProceso */]);
+
+  useEffect(() => {
+    if (estadoProceso) {
+      fetchData(
+        /*  `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}` */
+        /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`, */
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?validation_state=${estadoProceso}`,
+        "GET",
+        {},
+        {},
+        false
+      )
+        /* .then((response) => response.json()) */
+        .then((respuesta) => {
+          setDatosFiltradosEstado(respuesta?.obj?.results);
+        });
+    }
+  }, [estadoProceso]);
+  useEffect(() => {
+    if (numeroProceso) {
+      fetchData(
+        /*  `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}` */
+        /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`, */
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?numDoc=${numeroProceso}`,
+        "GET",
+        {},
+        {},
+        false
+      )
+        /* .then((response) => response.json()) */
+        .then((respuesta) => {
+          setDatosFiltradosNumero(respuesta?.obj?.results);
+        });
+    }
+  }, [numeroProceso]);
   /*   console.log(datosOrdenados); */
   datosEnrolamientos?.map((e) => delete e.task_token);
   datosEnrolamientos?.map((e) => delete e.id_reconocer);
@@ -66,14 +104,43 @@ function ValidacionAsesorComercial() {
       e.validation_state = "Validado Para reconoserID";
     } else if (e.validation_state === "102") {
       e.validation_state = "Rechazado Para reconoserID";
+    } else if (e.validation_state === "201") {
+      e.validation_state = "Aprobado Para Crear Comercio";
+    } else if (e.validation_state === "202") {
+      e.validation_state = "Rechazado Para Crear Comercio";
     }
   });
-
+  datosFiltradosEstado?.filter((e) => {
+    if (e.validation_state === "101") {
+      e.validation_state = "Validado Para reconoserID";
+    } else if (e.validation_state === "102") {
+      e.validation_state = "Rechazado Para reconoserID";
+    } else if (e.validation_state === "201") {
+      e.validation_state = "Aprobado Para Crear Comercio";
+    } else if (e.validation_state === "202") {
+      e.validation_state = "Rechazado Para Crear Comercio";
+    }
+  });
   datosFiltradosFecha?.filter((e) => {
     if (e.validation_state === "101") {
       e.validation_state = "Validado Para ReconoserID";
     } else if (e.validation_state === "102") {
       e.validation_state = "Rechazado Para reconoserID";
+    } else if (e.validation_state === "201") {
+      e.validation_state = "Aprobado Para Crear Comercio";
+    } else if (e.validation_state === "202") {
+      e.validation_state = "Rechazado Para Crear Comercio";
+    }
+  });
+  datosFiltradosNumero?.filter((e) => {
+    if (e.validation_state === "101") {
+      e.validation_state = "Validado Para ReconoserID";
+    } else if (e.validation_state === "102") {
+      e.validation_state = "Rechazado Para reconoserID";
+    } else if (e.validation_state === "201") {
+      e.validation_state = "Aprobado Para Crear Comercio";
+    } else if (e.validation_state === "202") {
+      e.validation_state = "Rechazado Para Crear Comercio";
     }
   });
   /*   console.log(datosEnrolamientos);
@@ -132,6 +199,7 @@ function ValidacionAsesorComercial() {
               setFechaFinal(e.target.value);
             }}
           />
+
           <Select
             label="Estado Del Comercio"
             options={{
@@ -146,8 +214,15 @@ function ValidacionAsesorComercial() {
               setEstadoProceso(e.target.value);
             }}
           />
+          <Input
+            label={"Numero Documento"}
+            placeholder="Ej:10306520..."
+            value={numeroProceso}
+            onChange={(e) => setNumeroProceso(e.target.value)}
+            type="number"
+          ></Input>
         </TableEnterprise>
-      ) : (
+      ) : datosFiltradosEstado?.length > 0 ? (
         <TableEnterprise
           maxPage={cantidadPaginas}
           title="Enrolamiento de Comercios"
@@ -158,7 +233,7 @@ function ValidacionAsesorComercial() {
             "Departamento",
             "Fecha Inicio",
           ]}
-          data={datosEnrolamientos?.map(
+          data={datosFiltradosEstado?.map(
             ({
               id_proceso,
               nombre,
@@ -212,6 +287,160 @@ function ValidacionAsesorComercial() {
               setEstadoProceso(e.target.value);
             }}
           />
+          <Input
+            label={"Numero Documento"}
+            placeholder="Ej:10306520..."
+            value={numeroProceso}
+            onChange={(e) => setNumeroProceso(e.target.value)}
+            type="number"
+          ></Input>
+        </TableEnterprise>
+      ) : datosFiltradosNumero?.length > 0 ? (
+        <TableEnterprise
+          maxPage={cantidadPaginas}
+          title="Enrolamiento de Comercios"
+          headers={[
+            "Id_proceso",
+            "Nombre",
+            "Estado",
+            "Departamento",
+            "Fecha Inicio",
+          ]}
+          data={datosFiltradosNumero?.map(
+            ({
+              id_proceso,
+              nombre,
+              apellido,
+              validation_state,
+              departamento,
+              fecha_inicio,
+            }) => ({
+              id_proceso,
+              nombre: `${nombre} ${apellido}`,
+
+              validation_state,
+              departamento,
+              fecha_inicio,
+            })
+          )}
+          onSelectRow={(e, i) =>
+            navigate(
+              `/Solicitud-enrolamiento/validarformulario/verificaciondatos/${datosEnrolamientos[i]["id_proceso"]}`
+            )
+          }
+        >
+          <Input
+            id="dateInit"
+            label="Fecha inicial"
+            type="date"
+            onInput={(e) => {
+              setFechaInicial(e.target.value);
+            }}
+          />
+          <Input
+            id="dateEnd"
+            label="Fecha final"
+            type="date"
+            value={fechaFinal}
+            onInput={(e) => {
+              setFechaFinal(e.target.value);
+            }}
+          />
+          <Select
+            label="Estado Del Comercio"
+            options={{
+              "": "",
+              "En Proceso de Validacion": "En Proceso de Validación",
+              "Aprobado Para ReconoserID": "101",
+              "Rechazado Para ReconoserID": "102",
+            }}
+            value={estadoProceso}
+            /* required={true} */
+            onChange={(e) => {
+              setEstadoProceso(e.target.value);
+            }}
+          />
+          <Input
+            label={"Numero Documento"}
+            placeholder="Ej:10306520..."
+            value={numeroProceso}
+            onChange={(e) => setNumeroProceso(e.target.value)}
+            type="number"
+          ></Input>
+        </TableEnterprise>
+      ) : (
+        <TableEnterprise
+          maxPage={cantidadPaginas}
+          title="Enrolamiento de Comercios"
+          headers={[
+            "Id_proceso",
+            "Nombre",
+            "Estado",
+            "Departamento",
+            "Fecha Inicio",
+          ]}
+          data={datosEnrolamientos?.map(
+            ({
+              id_proceso,
+              nombre,
+              apellido,
+              validation_state,
+              departamento,
+              fecha_inicio,
+            }) => ({
+              id_proceso,
+              nombre: `${nombre} ${apellido}`,
+
+              validation_state,
+              departamento,
+              fecha_inicio,
+            })
+          )}
+          onSelectRow={(e, i) =>
+            navigate(
+              `/Solicitud-enrolamiento/validarformulario/verificaciondatos/${datosEnrolamientos[i]["id_proceso"]}`
+            )
+          }
+        >
+          <Input
+            id="dateInit"
+            label="Fecha inicial"
+            type="date"
+            onInput={(e) => {
+              setFechaInicial(e.target.value);
+            }}
+          />
+          <Input
+            id="dateEnd"
+            label="Fecha final"
+            type="date"
+            value={fechaFinal}
+            onInput={(e) => {
+              setFechaFinal(e.target.value);
+            }}
+          />
+
+          <Select
+            label="Estado Del Comercio"
+            options={{
+              "": "",
+              "En Proceso de Validacion": "En Proceso de Validación",
+              "Aprobado Para ReconoserID": "101",
+              "Rechazado Para ReconoserID": "102",
+            }}
+            value={estadoProceso}
+            /* required={true} */
+            onChange={(e) => {
+              setEstadoProceso(e.target.value);
+            }}
+          />
+          <Input
+            label={"Numero Documento"}
+            placeholder="Ej:10306520..."
+            value={numeroProceso}
+            onChange={(e) => setNumeroProceso(e.target.value)}
+            type="number"
+          ></Input>
         </TableEnterprise>
       )}
     </div>

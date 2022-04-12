@@ -13,6 +13,6 @@ export const rutasInformacionGeneral = [
       />
     ),
     component: CodigoBarrasComercio,
-    permission: [42],
+    permission: [43],
   },
 ];
