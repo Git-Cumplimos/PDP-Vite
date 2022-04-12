@@ -10,10 +10,12 @@ const CodigoBarrasComercio = () => {
   const [isUploading, setIsUploading] = useState(false);
   const { roleInfo } = useAuth();
   const [userData, setUserData] = useState({
-    id_comercio: roleInfo.id_comercio ? roleInfo.id_comercio : "11",
+    id_comercio: roleInfo?.id_comercio?.toString()
+      ? roleInfo?.id_comercio?.toString()
+      : "",
     nombre_comercio: roleInfo["nombre comercio"]
       ? roleInfo["nombre comercio"]
-      : "asdas",
+      : "",
   });
   //   useEffect(() => {
   //     console.log(roleInfo);
