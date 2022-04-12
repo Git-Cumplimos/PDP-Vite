@@ -392,7 +392,7 @@ const ArqueoBilletes = ({ route }) => {
                       console.log(res?.obj?.maxpage);
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
-                      setMaxPages(res?.obj?.maxpage);
+                      setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
                       // setDisabledBtns(false);
                     }
                   });
@@ -424,7 +424,7 @@ const ArqueoBilletes = ({ route }) => {
                       console.log(res?.obj?.maxpage);
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
-                      setMaxPages(res?.obj?.maxpage);
+                      setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
                       // setDisabledBtns(false);
                     }
                   });
@@ -458,7 +458,7 @@ const ArqueoBilletes = ({ route }) => {
                       console.log(res?.obj?.maxpage);
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
-                      setMaxPages(res?.obj?.maxpage);
+                      setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
                       // setDisabledBtns(false);
                     }
                   });
@@ -488,7 +488,7 @@ const ArqueoBilletes = ({ route }) => {
                             console.log(res?.obj?.maxpage);
                             // setResp_report(res.data);
                             setDatosArqueo(res?.obj?.data);
-                            setMaxPages(res?.obj?.maxpage);
+                            setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
                             // setDisabledBtns(false);
                           }
                         });
@@ -517,7 +517,7 @@ const ArqueoBilletes = ({ route }) => {
                             console.log(res?.obj?.maxpage);
                             // setResp_report(res.data);
                             setDatosArqueo(res?.obj?.data);
-                            setMaxPages(res?.obj?.maxpage);
+                            setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
                             // setDisabledBtns(false);
                           }
                         });
