@@ -212,8 +212,8 @@ const allUrlsPrivateApps = [
     provider: ProvideLoteria,
     permission: [3, 4, 5, 6],
     subRoutes: [
-      { link: "loteria-de-bogota", label: "Loteria de bogota" },
-      { link: "loteria-del-tolima", label: "Loteria del tolima" },
+      { link: "loteria-de-bogota", label: "Lotería de Bogotá" },
+      { link: "loteria-del-tolima", label: "Lotería del Tolima" },
     ].map(({ link: name, label }) => ({
       link: `/loteria/${name}`,
       label: <AppIcons Logo={"LOTERIA"} name={label} />,
@@ -265,6 +265,13 @@ const allUrlsPrivateApps = [
           extern: false,
           permission: [3], ///////////////////////////////////////////////////////////////////
         },
+        // {
+        //   link: `/loteria/${name}/arqueo`,
+        //   label: <AppIcons Logo={"PAGO"} name="Arqueo Billetes" />,
+        //   component: ArqueoBilletes,
+        //   extern: false,
+        //   permission: [3, 6], ///////////////////////////////////////////////////////////////////
+        // },
       ],
     })),
   },
@@ -587,7 +594,7 @@ const allUrlsPrivateApps = [
           <AppIcons Logo={"PAGO"} name={"Validar Formulario Inscripción"} />
         ),
         component: ValidacionAsesorComercial,
-        permission: [38],
+        permission: [39],
         subRoutes: [
           {
             link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
@@ -598,7 +605,7 @@ const allUrlsPrivateApps = [
               />
             ),
             component: VerificacionFormulario,
-            permission: [38],
+            permission: [39],
           },
         ],
       },
@@ -606,7 +613,7 @@ const allUrlsPrivateApps = [
         link: "/Solicitud-enrolamiento/ReporteComercios",
         label: <AppIcons Logo={"PAGO"} name={"Reporte De Comercios"} />,
         component: ReporteComercios,
-        permission: [38],
+        permission: [39],
         subRoutes: [],
       },
       {

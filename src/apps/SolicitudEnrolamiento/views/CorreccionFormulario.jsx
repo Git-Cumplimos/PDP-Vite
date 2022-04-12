@@ -467,6 +467,8 @@ const CorreccionFormulario = () => {
             <Input
               label={"Responsable del iva"}
               placeholder={datosParams[0]["responsableiva"]}
+              value={responsableIva}
+              onChange={(e) => setResponsableIva(capitalize(e.target.value))}
             ></Input>
             <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
               <InputSuggestions

@@ -99,6 +99,8 @@ export const LoteriaContext = createContext({
   codigos_lot: null,
   tiposOperaciones: null,
   setTiposOperaciones: null,
+  codigosOficina: null,
+  setCodigosOficina: null,
 });
 
 export const useLoteria = () => {
@@ -209,20 +211,22 @@ export const useProvideLoteria = () => {
       });
 
       //Consulta codigos de oficina y sucursal por lotería
-      consulta_codigos_oficina(nit).then((res) => {
-        if ("msg" in res) {
-          console.log(res.msg);
-          setCodigosOficina({
-            cod_oficina_lot: "PPVIR",
-            cod_sucursal_lot: "00",
-          });
-        } else {
-          setCodigosOficina(res);
-          console.log(res);
-        }
-      });
+      if (roleInfo?.id_comercio !== undefined) {
+        consulta_codigos_oficina(nit).then((res) => {
+          if ("msg" in res) {
+            console.log(res.msg);
+            setCodigosOficina({
+              cod_oficina_lot: "PPVIR",
+              cod_sucursal_lot: "00",
+            });
+          } else {
+            setCodigosOficina(res);
+            console.log(res);
+          }
+        });
+      }
     }
-  }, [pathname]);
+  }, [pathname, roleInfo]);
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -302,7 +306,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [roleInfo]
+    [roleInfo, codigosOficina]
   );
 
   const sellLoteria = useCallback(
@@ -345,7 +349,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [selected, customer, roleInfo]
+    [selected, customer, roleInfo, tiposOperaciones]
   );
 
   const sellLoteriafisica = useCallback(
@@ -378,7 +382,7 @@ export const useProvideLoteria = () => {
         ),
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: roleInfo.tipo_comercio,
-        tipoPago: tipoPago, /// Venta lotería de Bogotá - Intercambio/Fisica
+        tipoPago: tipoPago !== null ? tipoPago : tiposOperaciones?.Venta_Fisica, /// Venta lotería de Bogotá - Intercambio/Fisica
       };
 
       try {
@@ -583,6 +587,7 @@ export const useProvideLoteria = () => {
         id_terminal: roleInfo.id_dispositivo,
         tipo_comercio: roleInfo.tipo_comercio,
         cod_distribuidor: codigosOficina?.cod_oficina_lot,
+        tipo_Operacion: tiposOperaciones?.Pago, /// Pago premios
       };
       try {
         const res = await fetchData(urls.pagopremio, "POST", {}, req);
@@ -593,7 +598,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [roleInfo]
+    [roleInfo, tiposOperaciones]
   );
 
   const pagopremiofisico = useCallback(
@@ -625,6 +630,7 @@ export const useProvideLoteria = () => {
         id_terminal: roleInfo.id_dispositivo,
         tipo_comercio: roleInfo.tipo_comercio,
         cod_distribuidor: codigosOficina?.cod_oficina_lot,
+        tipo_Operacion: tiposOperaciones?.Pago, /// Pago premios
       };
 
       try {
@@ -635,7 +641,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [roleInfo]
+    [roleInfo, tiposOperaciones]
   );
 
   const ConsultaCrearSort = useCallback(async (cod_loteria) => {
@@ -801,5 +807,7 @@ export const useProvideLoteria = () => {
     setCodigos_lot,
     tiposOperaciones,
     setTiposOperaciones,
+    codigosOficina,
+    setCodigosOficina,
   };
 };

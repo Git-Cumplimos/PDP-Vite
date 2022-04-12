@@ -39,7 +39,7 @@ const ReconoserID = () => {
       };
       console.log(datos);
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/solicitud-validacion-reconoserid`,
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/solicitud-validacion-reconoserid`,
         /* `http://127.0.0.1:5000/solicitudvalidacion` */
         {
           method: "POST",

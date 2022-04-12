@@ -102,7 +102,7 @@ const FormularioAutoEnrolamiento = () => {
   useEffect(() => {
     fetchData(
       `${
-        process.env.REACT_APP_URL_SERVICE_COMMERCE
+        process.env.REACT_APP_URL_SERVICE_PUBLIC_SS /* _SS */
       }/localidades?cod_dane=${codDaneMunicipioComercio}&limit=${0}`,
       "GET",
       {},
@@ -123,7 +123,7 @@ const FormularioAutoEnrolamiento = () => {
   useEffect(() => {
     fetchData(
       `${
-        process.env.REACT_APP_URL_SERVICE_COMMERCE
+        process.env.REACT_APP_URL_SERVICE_PUBLIC_SS
       }/localidades?cod_dane=${codDaneMunicipioCorrespondencia}&limit=${0}`,
       "GET",
       {},
@@ -136,14 +136,14 @@ const FormularioAutoEnrolamiento = () => {
       )
       .catch((err) => {
         console.log(err);
-        notifyError("Error al cargar Datos ubicacion Correspondencia");
+        notifyError("Error al cargar Datos ubicacion Correspondencia ");
       });
   }, [codDaneMunicipioCorrespondencia]);
 
   //------------------Traer Asesores---------------------//
   useEffect(() => {
     fetchData(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/asesores?limit=${14}`,
+      `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/asesores?limit=${14}`,
       "GET",
       {},
       {},
@@ -153,7 +153,7 @@ const FormularioAutoEnrolamiento = () => {
       .then((respuesta) => setAsesores(respuesta?.obj?.results))
       .catch((err) => {
         console.log(err);
-        notifyError("Error al cargar Datos Traer Asesores");
+        notifyError("Error al cargar Datos Traer Asesores 1");
       });
   }, []);
 
