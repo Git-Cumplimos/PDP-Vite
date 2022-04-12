@@ -114,6 +114,39 @@ const ValidacionApertura = () => {
       e.validation_state = "Pendiente De Aprobación";
     }
   });
+  datosFiltradosEstado?.filter((e) => {
+    if (e.validation_state === "101") {
+      e.validation_state = "Validado Para reconoserID";
+    } else if (e.validation_state === "102") {
+      e.validation_state = "Rechazado Para reconoserID";
+    } else if (e.validation_state === "201") {
+      e.validation_state = "Aprobado Para Crear Comercio";
+    } else if (e.validation_state === "202") {
+      e.validation_state = "Rechazado Para Crear Comercio";
+    }
+  });
+  datosFiltradosFecha?.filter((e) => {
+    if (e.validation_state === "101") {
+      e.validation_state = "Validado Para ReconoserID";
+    } else if (e.validation_state === "102") {
+      e.validation_state = "Rechazado Para reconoserID";
+    } else if (e.validation_state === "201") {
+      e.validation_state = "Aprobado Para Crear Comercio";
+    } else if (e.validation_state === "202") {
+      e.validation_state = "Rechazado Para Crear Comercio";
+    }
+  });
+  datosFiltradosNumero?.filter((e) => {
+    if (e.validation_state === "101") {
+      e.validation_state = "Validado Para ReconoserID";
+    } else if (e.validation_state === "102") {
+      e.validation_state = "Rechazado Para reconoserID";
+    } else if (e.validation_state === "201") {
+      e.validation_state = "Aprobado Para Crear Comercio";
+    } else if (e.validation_state === "202") {
+      e.validation_state = "Rechazado Para Crear Comercio";
+    }
+  });
 
   return (
     <div>
@@ -169,13 +202,13 @@ const ValidacionApertura = () => {
             }}
           />
           <Select
-            label="Estado Del Comercio"
+            label="Estado Comercio"
             options={{
               "": "",
               "En Proceso de Validacion": "En Proceso de Validación",
               "Aprobado Para ReconoserID": "101",
               "Rechazado Para ReconoserID": "102",
-              "Pendiente de Validación de Identidad ": "200",
+              "Pendiente Validación Identidad": "200",
               "Enrolamiento Exitoso": "201",
               "Enrolamiento Rechazado": "202",
             }}
@@ -185,6 +218,165 @@ const ValidacionApertura = () => {
               setEstadoProceso(e.target.value);
             }}
           />
+          <Input
+            label={"Numero Documento"}
+            placeholder="Ej:10306520..."
+            value={numeroProceso}
+            onChange={(e) => setNumeroProceso(e.target.value)}
+            type="number"
+          ></Input>
+        </TableEnterprise>
+      ) : datosFiltradosEstado?.length > 0 ? (
+        <TableEnterprise
+          maxPage={cantidadPaginas}
+          title="Enrolamiento de Comercios"
+          headers={[
+            "Id_proceso",
+            "Nombre",
+            "Estado",
+            "Departamento",
+            "Fecha Inicio",
+          ]}
+          data={datosFiltradosEstado?.map(
+            ({
+              id_proceso,
+              nombre,
+              apellido,
+              validation_state,
+              departamento,
+              fecha_inicio,
+            }) => ({
+              id_proceso,
+              nombre: `${nombre} ${apellido}`,
+
+              validation_state,
+              departamento,
+              fecha_inicio,
+            })
+          )}
+          onSelectRow={(e, i) =>
+            navigate(
+              `/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/${datosEnrolamientos[i]["id_proceso"]}`
+            )
+          }
+        >
+          <Input
+            id="dateInit"
+            label="Fecha inicial"
+            type="date"
+            onInput={(e) => {
+              setFechaInicial(e.target.value);
+            }}
+          />
+          <Input
+            id="dateEnd"
+            label="Fecha final"
+            type="date"
+            value={fechaFinal}
+            onInput={(e) => {
+              setFechaFinal(e.target.value);
+            }}
+          />
+          <Select
+            label="Estado Del Comercio"
+            options={{
+              "": "",
+              "En Proceso de Validacion": "En Proceso de Validación",
+              "Aprobado Para ReconoserID": "101",
+              "Rechazado Para ReconoserID": "102",
+              "Pendiente Validación Identidad": "200",
+              "Enrolamiento Exitoso": "201",
+              "Enrolamiento Rechazado": "202",
+            }}
+            value={estadoProceso}
+            /* required={true} */
+            onChange={(e) => {
+              setEstadoProceso(e.target.value);
+            }}
+          />
+          <Input
+            label={"Numero Documento"}
+            placeholder="Ej:10306520..."
+            value={numeroProceso}
+            onChange={(e) => setNumeroProceso(e.target.value)}
+            type="number"
+          ></Input>
+        </TableEnterprise>
+      ) : datosFiltradosNumero?.length > 0 ? (
+        <TableEnterprise
+          maxPage={cantidadPaginas}
+          title="Enrolamiento de Comercios"
+          headers={[
+            "Id_proceso",
+            "Nombre",
+            "Estado",
+            "Departamento",
+            "Fecha Inicio",
+          ]}
+          data={datosFiltradosNumero?.map(
+            ({
+              id_proceso,
+              nombre,
+              apellido,
+              validation_state,
+              departamento,
+              fecha_inicio,
+            }) => ({
+              id_proceso,
+              nombre: `${nombre} ${apellido}`,
+
+              validation_state,
+              departamento,
+              fecha_inicio,
+            })
+          )}
+          onSelectRow={(e, i) =>
+            navigate(
+              `/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/${datosEnrolamientos[i]["id_proceso"]}`
+            )
+          }
+        >
+          <Input
+            id="dateInit"
+            label="Fecha inicial"
+            type="date"
+            onInput={(e) => {
+              setFechaInicial(e.target.value);
+            }}
+          />
+          <Input
+            id="dateEnd"
+            label="Fecha final"
+            type="date"
+            value={fechaFinal}
+            onInput={(e) => {
+              setFechaFinal(e.target.value);
+            }}
+          />
+          <Select
+            label="Estado Del Comercio"
+            options={{
+              "": "",
+              "En Proceso de Validacion": "En Proceso de Validación",
+              "Aprobado Para ReconoserID": "101",
+              "Rechazado Para ReconoserID": "102",
+              "Pendiente Validación Identidad": "200",
+              "Enrolamiento Exitoso": "201",
+              "Enrolamiento Rechazado": "202",
+            }}
+            value={estadoProceso}
+            /* required={true} */
+            onChange={(e) => {
+              setEstadoProceso(e.target.value);
+            }}
+          />
+          <Input
+            label={"Numero Documento"}
+            placeholder="Ej:10306520..."
+            value={numeroProceso}
+            onChange={(e) => setNumeroProceso(e.target.value)}
+            type="number"
+          ></Input>
         </TableEnterprise>
       ) : (
         <TableEnterprise
@@ -241,13 +433,13 @@ const ValidacionApertura = () => {
             }}
           />
           <Select
-            label="Estado Del Comercio"
+            label="Estado Comercio"
             options={{
               "": "",
               "En Proceso de Validacion": "En Proceso de Validación",
               "Aprobado Para ReconoserID": "101",
               "Rechazado Para ReconoserID": "102",
-              "Pendiente de Validación de Identidad ": "200",
+              "Pendiente Validación Identidad": "200",
               "Enrolamiento Exitoso": "201",
               "Enrolamiento Rechazado": "202",
             }}
@@ -257,6 +449,13 @@ const ValidacionApertura = () => {
               setEstadoProceso(e.target.value);
             }}
           />
+          <Input
+            label={"Numero Documento"}
+            placeholder="Ej:10306520..."
+            value={numeroProceso}
+            onChange={(e) => setNumeroProceso(e.target.value)}
+            type="number"
+          ></Input>
         </TableEnterprise>
       )}
     </div>
