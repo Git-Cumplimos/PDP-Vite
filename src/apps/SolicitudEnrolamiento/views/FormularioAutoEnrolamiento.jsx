@@ -182,221 +182,227 @@ const FormularioAutoEnrolamiento = () => {
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
+      if (
+        (archivos1[0] && archivos2[0]) ||
+        (archivos1[0] && archivos2[0] && archivos3[0])
+      ) {
+        fetchData(
+          `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/iniciar-proceso-enrolamiento`,
+          "POST",
+          {},
+          {
+            asesor: "" /* asignarAsesores.toString() */,
+            nombre: `${nombre}`,
+            apellido: `${apellido}`,
+            nombre_comercio: nombreComercio,
+            numnit: numNit,
+            numcamycom: numCamaraComercio,
+            numrut: numRut,
+            autosms: autorizacion,
+            tipozona: "",
+            unidad_negocio: "Telemarketing",
+            responsableiva: responsableIva,
+            cod_localidad: "",
+            asesor_comercial_localidad: "",
+            actividad_economica: commerceType.toString(),
+            tipo_establecimiento: tipoComercio,
+            sede: "Bogotá",
+            direccion_comercio: `${commerceLocation.direccion[0]}`,
+            departamento: `${commerceLocation.departamento[0]}`,
+            municipio: `${commerceLocation.municipio[0]}`,
+            localidad_bogota: `${commerceLocation.localidad[0]}`,
+            barrio: `${commerceLocation.barrio[0]}`,
+            direccion_correspondencia: `${homeLocation.direccion[0]}`,
+            departamento_correspondencia: `${homeLocation.departamento[0]}`,
+            municipio_correspondencia: `${homeLocation.municipio[0]}`,
+            localidad_correspondencia: `${homeLocation.localidad[0]}`,
+            barrio_correspondencia: `${homeLocation.barrio[0]}`,
+            tipoDoc: tipoIdentificacion,
+            numDoc: numconsultaProceso,
+            email: correos[0],
+            celular: telefonos[0],
+            task_token: "token",
+            validation_state: "En Proceso de Validación",
+            id_name: "id_proceso",
+            responsable: "",
+          },
 
-      fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/iniciar-proceso-enrolamiento`,
-        "POST",
-        {},
-        {
-          asesor: "" /* asignarAsesores.toString() */,
-          nombre: `${nombre}`,
-          apellido: `${apellido}`,
-          nombre_comercio: nombreComercio,
-          numnit: numNit,
-          numcamycom: numCamaraComercio,
-          numrut: numRut,
-          autosms: autorizacion,
-          tipozona: "",
-          unidad_negocio: "Telemarketing",
-          responsableiva: responsableIva,
-          cod_localidad: "",
-          asesor_comercial_localidad: "",
-          actividad_economica: commerceType.toString(),
-          tipo_establecimiento: tipoComercio,
-          sede: "Bogotá",
-          direccion_comercio: `${commerceLocation.direccion[0]}`,
-          departamento: `${commerceLocation.departamento[0]}`,
-          municipio: `${commerceLocation.municipio[0]}`,
-          localidad_bogota: `${commerceLocation.localidad[0]}`,
-          barrio: `${commerceLocation.barrio[0]}`,
-          direccion_correspondencia: `${homeLocation.direccion[0]}`,
-          departamento_correspondencia: `${homeLocation.departamento[0]}`,
-          municipio_correspondencia: `${homeLocation.municipio[0]}`,
-          localidad_correspondencia: `${homeLocation.localidad[0]}`,
-          barrio_correspondencia: `${homeLocation.barrio[0]}`,
-          tipoDoc: tipoIdentificacion,
-          numDoc: numDocumento,
-          email: correos[0],
-          celular: telefonos[0],
-          task_token: "token",
-          validation_state: "En Proceso de Validación",
-          id_name: "id_proceso",
-          responsable: "",
-        },
+          {},
+          false
+        )
+          .then((respuesta) => {
+            console.log(respuesta);
+            console.log(respuesta.body.id_proceso);
+            const formData = new FormData();
 
-        {},
-        false
-      )
-        .then((respuesta) => {
-          console.log(respuesta);
-          console.log(respuesta.body.id_proceso);
-          const formData = new FormData();
+            formData.set("id_proceso", respuesta.body.id_proceso);
 
-          formData.set("id_proceso", respuesta.body.id_proceso);
+            notify("Se ha comenzado la carga");
+            /* console.log(Object.fromEntries(formData.entries())); */
+            fetch(
+              /* `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`, */
+              `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/uploadfile2?id_proceso=${respuesta.body.id_proceso}`,
+              /*  "POST",
+              {},
+              { formData },
+              {},
+              false */
 
-          notify("Se ha comenzado la carga");
-          /* console.log(Object.fromEntries(formData.entries())); */
-          fetch(
-            /* `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`, */
-            `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/uploadfile2?id_proceso=${respuesta.body.id_proceso}`,
-            /*  "POST",
-            {},
-            { formData },
-            {},
-            false */
+              {
+                method: "GET",
 
-            {
-              method: "GET",
-
-              /* body: formData, */
-            }
-          )
-            .then((res) => res.json())
-            .then((respuesta) => {
-              console.log(respuesta);
-              if (!respuesta?.status) {
-                console.log(respuesta);
-                notifyError(respuesta?.msg);
-              } else {
-                /*  console.log(respuesta?.obj); */
-                notify("Se han subido los archivos");
-                /*  console.log(respuesta?.obj[0]?.fields?.["x-amz-algorithm"]); */
-                const formData2 = new FormData();
-                const formData3 = new FormData();
-                const formData4 = new FormData();
-                /*   for (const datosS3 of respuesta?.obj) {
-                  console.log(datosS3.fields);
-                  for (const property in datosS3.fields) {
-                    console.log(`${property}: ${datosS3.fields[property]}`);
-                    formData2.set(`${property}`, `${datosS3.fields[property]}`);
-                  }
-                }
-                for (const datosS3 of respuesta?.obj) {
-                  console.log(datosS3.fields);
-                  for (const property in datosS3.fields) {
-                    console.log(`${property}: ${datosS3.fields[property]}`);
-                    formData3.set(`${property}`, `${datosS3.fields[property]}`);
-                  }
-                }
-                for (const datosS3 of respuesta?.obj) {
-                  console.log(datosS3.fields);
-                  for (const property in datosS3.fields) {
-                    console.log(`${property}: ${datosS3.fields[property]}`);
-                    formData4.set(`${property}`, `${datosS3.fields[property]}`);
-                  }
-                } */
-
-                if (archivos1 && archivos2 && !archivos3) {
-                  formData2.set("file", archivos1[0]);
-                  fetch(`${respuesta?.obj[0]?.url}`, {
-                    method: "POST",
-
-                    body: formData2,
-                  })
-                    .then((res) => res?.status)
-                    .catch((err) => {
-                      console.log(err);
-                    });
-
-                  //------fetch cc----//
-
-                  formData3.set("file", archivos2[0]);
-                  fetch(`${respuesta?.obj[1]?.url}`, {
-                    method: "POST",
-                    body: formData3,
-                  })
-                    .then((res) => res?.status)
-                    .catch((err) => {
-                      console.log(err);
-                    });
-                } else if (archivos1 && archivos2 && archivos3) {
-                  console.log("3 archivos");
-
-                  var cont_rut = 0;
-                  for (const datosS3 of respuesta?.obj) {
-                    if (cont_rut == 0) {
-                      for (const property in datosS3.fields) {
-                        console.log(datosS3.fields[property]);
-                        formData2.set(
-                          `${property}`,
-                          `${datosS3.fields[property]}`
-                        );
-                      }
-                    }
-                    cont_rut += 1;
-                  }
-                  formData2.set("file", archivos1[0]);
-                  fetch(`${respuesta?.obj[0]?.url}`, {
-                    method: "POST",
-                    body: formData2,
-                  })
-                    .then((res) => res?.status)
-                    .catch((err) => {
-                      console.log(err);
-                    });
-
-                  //------fetch cc----//
-                  var cont_Cc = 0;
-                  for (const datosS3 of respuesta?.obj) {
-                    if (cont_Cc == 1) {
-                      for (const property in datosS3.fields) {
-                        console.log(datosS3.fields[property]);
-                        formData3.set(
-                          `${property}`,
-                          `${datosS3.fields[property]}`
-                        );
-                      }
-                    }
-                    cont_Cc += 1;
-                  }
-                  formData3.set("file", archivos2[0]);
-
-                  fetch(`${respuesta?.obj[1]?.url}`, {
-                    method: "POST",
-                    body: formData3,
-                  })
-                    .then((res) => res?.status)
-                    .catch((err) => {
-                      console.log(err);
-                    });
-
-                  //------fetch Camara y Comercio----//
-                  var cont_cam = 0;
-                  for (const datosS3 of respuesta?.obj) {
-                    if (cont_cam == 2) {
-                      for (const property in datosS3.fields) {
-                        console.log(datosS3.fields[property]);
-                        formData4.set(
-                          `${property}`,
-                          `${datosS3.fields[property]}`
-                        );
-                      }
-                    }
-                    cont_cam += 1;
-                  }
-                  formData4.set("file", archivos3[0]);
-                  fetch(`${respuesta?.obj[2]?.url}`, {
-                    method: "POST",
-                    body: formData4,
-                  })
-                    .then((res) => res?.status)
-                    .catch((err) => {
-                      console.log(err);
-                    });
-                }
-                setEstadoForm(true);
-                navigate("/public/solicitud-enrolamiento/consultar");
+                /* body: formData, */
               }
-            })
-            .catch((err) => {
-              console.log(err);
-              notifyError("Error al cargar Datos");
-            }); /* notify("Se ha comenzado la carga"); */
-        })
-        .catch((err) => {
-          console.log(err);
-          notifyError("Error al cargar Datos");
-        }); /*  notify("Se ha comenzado la carga"); */
+            )
+              .then((res) => res.json())
+              .then((respuesta) => {
+                console.log(respuesta);
+                if (!respuesta?.status) {
+                  console.log(respuesta);
+                  notifyError(respuesta?.msg);
+                } else {
+                  /*  console.log(respuesta?.obj); */
+                  notify("Se han subido los archivos");
+                  /*  console.log(respuesta?.obj[0]?.fields?.["x-amz-algorithm"]); */
+                  const formData2 = new FormData();
+                  const formData3 = new FormData();
+                  const formData4 = new FormData();
+                  /*   for (const datosS3 of respuesta?.obj) {
+                    console.log(datosS3.fields);
+                    for (const property in datosS3.fields) {
+                      console.log(`${property}: ${datosS3.fields[property]}`);
+                      formData2.set(`${property}`, `${datosS3.fields[property]}`);
+                    }
+                  }
+                  for (const datosS3 of respuesta?.obj) {
+                    console.log(datosS3.fields);
+                    for (const property in datosS3.fields) {
+                      console.log(`${property}: ${datosS3.fields[property]}`);
+                      formData3.set(`${property}`, `${datosS3.fields[property]}`);
+                    }
+                  }
+                  for (const datosS3 of respuesta?.obj) {
+                    console.log(datosS3.fields);
+                    for (const property in datosS3.fields) {
+                      console.log(`${property}: ${datosS3.fields[property]}`);
+                      formData4.set(`${property}`, `${datosS3.fields[property]}`);
+                    }
+                  } */
+
+                  if (archivos1 && archivos2 && !archivos3) {
+                    formData2.set("file", archivos1[0]);
+                    fetch(`${respuesta?.obj[0]?.url}`, {
+                      method: "POST",
+
+                      body: formData2,
+                    })
+                      .then((res) => res?.status)
+                      .catch((err) => {
+                        console.log(err);
+                      });
+
+                    //------fetch cc----//
+
+                    formData3.set("file", archivos2[0]);
+                    fetch(`${respuesta?.obj[1]?.url}`, {
+                      method: "POST",
+                      body: formData3,
+                    })
+                      .then((res) => res?.status)
+                      .catch((err) => {
+                        console.log(err);
+                      });
+                  } else if (archivos1 && archivos2 && archivos3) {
+                    console.log("3 archivos");
+
+                    var cont_rut = 0;
+                    for (const datosS3 of respuesta?.obj) {
+                      if (cont_rut == 0) {
+                        for (const property in datosS3.fields) {
+                          console.log(datosS3.fields[property]);
+                          formData2.set(
+                            `${property}`,
+                            `${datosS3.fields[property]}`
+                          );
+                        }
+                      }
+                      cont_rut += 1;
+                    }
+                    formData2.set("file", archivos1[0]);
+                    fetch(`${respuesta?.obj[0]?.url}`, {
+                      method: "POST",
+                      body: formData2,
+                    })
+                      .then((res) => res?.status)
+                      .catch((err) => {
+                        console.log(err);
+                      });
+
+                    //------fetch cc----//
+                    var cont_Cc = 0;
+                    for (const datosS3 of respuesta?.obj) {
+                      if (cont_Cc == 1) {
+                        for (const property in datosS3.fields) {
+                          console.log(datosS3.fields[property]);
+                          formData3.set(
+                            `${property}`,
+                            `${datosS3.fields[property]}`
+                          );
+                        }
+                      }
+                      cont_Cc += 1;
+                    }
+                    formData3.set("file", archivos2[0]);
+
+                    fetch(`${respuesta?.obj[1]?.url}`, {
+                      method: "POST",
+                      body: formData3,
+                    })
+                      .then((res) => res?.status)
+                      .catch((err) => {
+                        console.log(err);
+                      });
+
+                    //------fetch Camara y Comercio----//
+                    var cont_cam = 0;
+                    for (const datosS3 of respuesta?.obj) {
+                      if (cont_cam == 2) {
+                        for (const property in datosS3.fields) {
+                          console.log(datosS3.fields[property]);
+                          formData4.set(
+                            `${property}`,
+                            `${datosS3.fields[property]}`
+                          );
+                        }
+                      }
+                      cont_cam += 1;
+                    }
+                    formData4.set("file", archivos3[0]);
+                    fetch(`${respuesta?.obj[2]?.url}`, {
+                      method: "POST",
+                      body: formData4,
+                    })
+                      .then((res) => res?.status)
+                      .catch((err) => {
+                        console.log(err);
+                      });
+                  }
+                  setEstadoForm(true);
+                  navigate("/public/solicitud-enrolamiento/consultar");
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+                notifyError("Error al cargar Datos");
+              }); /* notify("Se ha comenzado la carga"); */
+          })
+          .catch((err) => {
+            console.log(err);
+            notifyError("Error al cargar Datos");
+          }); /*  notify("Se ha comenzado la carga"); */
+      } else {
+        notifyError("Adjunte los Documentos");
+      }
     },
     [archivos1, archivos2, archivos3]
   );
@@ -526,9 +532,11 @@ const FormularioAutoEnrolamiento = () => {
                     ></Input>
                     <Input
                       label={"N° Documento"}
-                      placeholder="Ingrese su Numero Documento"
+                      placeholder={"Ingrese su Numero Documento"}
+                      value={numconsultaProceso}
                       onChange={(e) => setNumDocumento(e.target.value)}
                       type={"number"}
+                      disable
                     ></Input>
                     <Select
                       onChange={(event) =>
@@ -755,6 +763,7 @@ const FormularioAutoEnrolamiento = () => {
                     onGetFile={onFileChange}
                     accept=".pdf"
                     allowDrop={false}
+                    /* required */
                   />
                   <FileInput
                     className="lg:col-span-2"
@@ -762,6 +771,7 @@ const FormularioAutoEnrolamiento = () => {
                     onGetFile={onFileChange2}
                     accept=".pdf"
                     allowDrop={false}
+                    /* required */
                   />
                   <FileInput
                     className="lg:col-span-2"

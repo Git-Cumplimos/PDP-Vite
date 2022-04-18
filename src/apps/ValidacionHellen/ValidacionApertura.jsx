@@ -278,7 +278,7 @@ const ValidacionApertura = () => {
             }}
           />
           <Select
-            label="Estado Del Comercio"
+            label="Estado Comercio"
             options={{
               "": "",
               "En Proceso de Validacion": "En Proceso de Validación",
@@ -354,7 +354,7 @@ const ValidacionApertura = () => {
             }}
           />
           <Select
-            label="Estado Del Comercio"
+            label="Estado Comercio"
             options={{
               "": "",
               "En Proceso de Validacion": "En Proceso de Validación",
