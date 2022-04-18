@@ -17,7 +17,7 @@ import { button } from "aws-amplify";
 import React, { useRef } from "react";
 import classes from "../Views/AsesoresComerciales.module.css";
 
-const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+const url = process.env.REACT_APP_URL_SERVICE_COMMERCE_SS;
 
 const AsesoresComerciales = () => {
   const { contenedorPrincipal, contendorBoton } = classes;
@@ -47,7 +47,10 @@ const AsesoresComerciales = () => {
         setAsesoresComerciales(res?.obj?.results);
         setCantidadPaginas(res?.obj?.maxPages);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al cargar Datos Asesores");
+      });
   }, [page]);
 
   const onCrearAsesor = useCallback(
@@ -130,11 +133,19 @@ const AsesoresComerciales = () => {
     );
   }, []);
   const GenerarLinkAsesor = () => {
-    const link = `http://localhost:3000/public/solicitud-enrolamiento/formulario/${window.btoa(
+    const link = `${
+      process.env.REACT_APP_URL_SERVICE_PUBLIC_ASESORES_FRONT
+    }public/solicitud-enrolamiento/formulario/${window.btoa(
       selected.id_asesor
     )}`;
     setLinkAsesor(link);
   };
+  /*   const GenerarLinkAsesor = () => {
+    const link = `http://localhost:3000/public/solicitud-enrolamiento/formulario/${window.btoa(
+      selected.id_asesor
+    )}`;
+    setLinkAsesor(link);
+  }; */
 
   let inputRef = HTMLInputElement | null;
   const copyLink = () => {

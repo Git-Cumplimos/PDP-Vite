@@ -21,7 +21,8 @@ const Transacciones = () => {
 
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
-  const [idComercio, setIdComercio] = useState(2);
+  const [idComercio, setIdComercio] = useState(-1);
+  const [usuario, setUsuario] = useState(-1);
   const [tipoOp, setTipoOp] = useState("");
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
@@ -33,19 +34,37 @@ const Transacciones = () => {
   });
 
   const transacciones = useCallback(
-    (page, Comercio, Tipo_operacion, date_ini, date_end) => {
+    (page, Comercio, usuario, Tipo_operacion, date_ini, date_end) => {
       const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
       const queries = {};
       if (!(Comercio === -1 || Comercio === "")) {
-        queries.Comercio = Comercio;
+        queries.id_comercio = parseInt(Comercio);
+      }
+      if (!(usuario === -1 || usuario === "")) {
+        queries.id_usuario = parseInt(usuario);
       }
       if (Tipo_operacion) {
-        queries.Tipo_operacion = Tipo_operacion;
+        queries.id_tipo_transaccion = Tipo_operacion;
       }
       if (page) {
         queries.page = page;
       }
       if (date_ini && date_end) {
+        const fecha_ini = new Date(date_ini);
+        fecha_ini.setHours(fecha_ini.getHours() + 5);
+        date_ini = Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(fecha_ini);
+
+        const fecha_fin = new Date(date_end);
+        fecha_fin.setHours(fecha_fin.getHours() + 5);
+        date_end = Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(fecha_fin);
         queries.date_ini = date_ini;
         queries.date_end = date_end;
       }
@@ -87,7 +106,8 @@ const Transacciones = () => {
     setTiposOp([...allTypes]);
 
     setIdComercio(roleInfo?.id_comercio || -1);
-  }, [userPermissions, roleInfo?.id_comercio]);
+    setUsuario(roleInfo?.id_usuario || -1);
+  }, [userPermissions, roleInfo]);
 
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
@@ -103,7 +123,14 @@ const Transacciones = () => {
             setMaxPages(1);
             setFechaInicial(e.target.value);
             if (fechaFinal !== "" && tipoOp !== "") {
-              transacciones(1, idComercio, tipoOp, e.target.value, fechaFinal);
+              transacciones(
+                1,
+                idComercio,
+                usuario,
+                tipoOp,
+                e.target.value,
+                fechaFinal
+              );
             }
           }}
         />
@@ -119,6 +146,7 @@ const Transacciones = () => {
               transacciones(
                 1,
                 idComercio,
+                usuario,
                 tipoOp,
                 fechaInicial,
                 e.target.value
@@ -145,6 +173,7 @@ const Transacciones = () => {
             transacciones(
               1,
               idComercio,
+              usuario,
               parseInt(e.target.value) ?? 0,
               fechaInicial,
               fechaFinal
@@ -153,31 +182,59 @@ const Transacciones = () => {
         />
         {userPermissions
           .map(({ id_permission }) => id_permission)
-          .includes(3) ? (
-          <Input
-            id="id_comercio"
-            label="Id comercio"
-            type="numeric"
-            value={idComercio}
-            onChange={(e) => {
-              setIdComercio(e.target.value);
-            }}
-            onLazyInput={{
-              callback: (e) => {
-                setPage(1);
-                if (tipoOp !== "") {
-                  transacciones(
-                    1,
-                    e.target.value,
-                    tipoOp,
-                    fechaInicial,
-                    fechaFinal
-                  );
-                }
-              },
-              timeOut: 500,
-            }}
-          />
+          .includes(5) ? (
+          <>
+            <Input
+              id="id_comercio"
+              label="Id comercio"
+              type="numeric"
+              value={idComercio}
+              onChange={(e) => {
+                setIdComercio(e.target.value);
+              }}
+              onLazyInput={{
+                callback: (e) => {
+                  setPage(1);
+                  if (tipoOp !== "") {
+                    transacciones(
+                      1,
+                      e.target.value,
+                      usuario,
+                      tipoOp,
+                      fechaInicial,
+                      fechaFinal
+                    );
+                  }
+                },
+                timeOut: 500,
+              }}
+            />
+            <Input
+              id="id_usuario"
+              label="Id usuario"
+              type="numeric"
+              value={usuario}
+              onChange={(e) => {
+                setUsuario(e.target.value);
+              }}
+              onLazyInput={{
+                callback: (e) => {
+                  setPage(1);
+                  if (tipoOp !== "") {
+                    transacciones(
+                      1,
+                      idComercio,
+                      e.target.value,
+                      tipoOp,
+                      fechaInicial,
+                      fechaFinal
+                    );
+                  }
+                },
+                timeOut: 500,
+              }}
+            />
+          </>
         ) : (
           ""
         )}
@@ -192,6 +249,7 @@ const Transacciones = () => {
                 transacciones(
                   page - 1,
                   idComercio,
+                  usuario,
                   tipoOp,
                   fechaInicial,
                   fechaFinal
@@ -208,6 +266,7 @@ const Transacciones = () => {
                 transacciones(
                   page + 1,
                   idComercio,
+                  usuario,
                   tipoOp,
                   fechaInicial,
                   fechaFinal
@@ -229,23 +288,25 @@ const Transacciones = () => {
           </div>
           <Table
             headers={["Fecha", "Operación", "Monto"]}
-            data={trxs.map(({ Created_at, Tipo_operacion, Monto }) => {
-              const tempDate = new Date(Created_at);
-              tempDate.setHours(tempDate.getHours() + 5);
-              Created_at = Intl.DateTimeFormat("es-CO", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-              }).format(tempDate);
-              const money = formatMoney.format(Monto);
-              return {
-                Created_at,
-                Tipo_operacion,
-                money,
-              };
-            })}
+            data={trxs.map(
+              ({ created, "Tipo transaccion": Tipo_operacion, monto }) => {
+                const tempDate = new Date(created);
+                tempDate.setHours(tempDate.getHours() + 5);
+                created = Intl.DateTimeFormat("es-CO", {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                }).format(tempDate);
+                const money = formatMoney.format(monto);
+                return {
+                  created,
+                  Tipo_operacion,
+                  money,
+                };
+              }
+            )}
             onSelectRow={(_e, index) => {
               setSelected(trxs[index]);
               setShowModal(true);
@@ -257,12 +318,12 @@ const Transacciones = () => {
       )}
 
       <Modal show={showModal} handleClose={closeModal}>
-        {selected?.Ticket ? (
+        {selected?.ticket ? (
           <div className="flex flex-col justify-center items-center">
             <Tickets
               refPrint={printDiv}
               type="Reimpresión"
-              ticket={selected?.Ticket}
+              ticket={selected?.ticket}
             />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Select from "../../../../components/Base/Select";
@@ -7,6 +7,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import { notify, notifyError } from "../../../../utils/notify";
+import { useLoteria } from "../../utils/LoteriaHooks";
 
 const url_BorrarBilletes = `${process.env.REACT_APP_URL_LOTERIAS}/eliminar_asignacion`;
 const url_sorteos = `${process.env.REACT_APP_URL_LOTERIAS}/num_sorteo`;
@@ -17,6 +18,18 @@ const Borrado_billetes = ({ route }) => {
   const [showModal, setShowModal] = useState(false);
   const [optionsDisponibles, setOptionsDisponibles] = useState([]);
   const [num_sorteo, setNum_sorteo] = useState("");
+  const { codigos_lot, setCodigos_lot } = useLoteria();
+
+  const sorteosLOT = useMemo(() => {
+    var cod = "";
+    console.log(codigos_lot?.length);
+    if (codigos_lot?.length === 2) {
+      cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
+    } else {
+      cod = `${codigos_lot?.[0]?.cod_loteria}`;
+    }
+    return cod;
+  }, [codigos_lot]);
 
   /*Borrar Billetes*/
   const borrar_billetes = useCallback(
@@ -41,9 +54,11 @@ const Borrado_billetes = ({ route }) => {
   );
 
   /*Codigo de sorteos activos*/
-  const sorteos = useCallback(async () => {
+  const sorteos = useCallback(async (sorteosLOT) => {
     try {
-      const res = await fetchData(url_sorteos, "GET");
+      const res = await fetchData(url_sorteos, "GET", {
+        codigos_loteria: sorteosLOT,
+      });
       console.log(res);
       return res;
     } catch (err) {
@@ -82,13 +97,13 @@ const Borrado_billetes = ({ route }) => {
   };
 
   useEffect(() => {
-    sorteos().then((res) => {
+    sorteos(sorteosLOT).then((res) => {
       if (res.status === false) {
       } else {
         setOptionsDisponibles(res.num_sorteos);
       }
     });
-  }, []);
+  }, [sorteosLOT]);
 
   return (
     <>
@@ -96,7 +111,7 @@ const Borrado_billetes = ({ route }) => {
         <Form formDir="col" onSubmit={onSubmit} grid>
           <Select
             id="searchBySorteo"
-            label="Tipo de comercio"
+            label="Sorteo"
             options={
               Object.fromEntries([
                 ["", ""],

@@ -89,13 +89,13 @@ const SMSForm = ({
               setSMS(e.target.value);
             }}
           />
-          <Input
+          {/* <Input
             id="tipComercio"
             label="Tipo de comercio"
             type="text"
             autoComplete="off"
             value={tipComercio}
-          />
+          /> */}
           {/* <Input
             id="Nivel"
             label="Nivel"

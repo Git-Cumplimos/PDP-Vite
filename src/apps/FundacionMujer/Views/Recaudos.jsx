@@ -201,7 +201,7 @@ const Recaudo = () => {
           setStop(false);
         } else {
           console.log(res);
-          notifyError(res?.obj?.Mensaje);
+          notifyError(res?.msg);
           setStop(false);
         }
       })

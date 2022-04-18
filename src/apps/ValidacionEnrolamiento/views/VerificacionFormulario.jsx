@@ -12,7 +12,7 @@ import Input from "../../../components/Base/Input";
 /* import ToggleInput from "../../../components/Base/ToggleInput"; */
 import Fieldset from "../../../components/Base/Fieldset";
 import Select from "../../../components/Base/Select";
-import { notify } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 
 const VerificacionFormulario = () => {
@@ -43,6 +43,9 @@ const VerificacionFormulario = () => {
   const [asesores, SetAsesores] = useState(0);
   const [nombreAsesor, SetNombreAsesor] = useState("");
   const [datosNombreAsesor, SetDatosNombreAsesor] = useState("");
+  const [datosResponsableTelemarketing, SetDatosResponsableTelemarketing] =
+    useState("");
+  const [datosAsesorTelemarketing, SetDatosAsesorTelemarketing] = useState("");
 
   const [nombreLocalidadCorrespondencia, SetNombreLocalidadCorrespondencia] =
     useState("");
@@ -53,28 +56,40 @@ const VerificacionFormulario = () => {
   const params = useParams();
 
   const [zonas, setZonas] = useState([]);
-  const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+  /* const url = process.env.REACT_APP_URL_SERVICE_COMMERCE; */
+  const url = process.env.REACT_APP_URL_SERVICE_COMMERCE_SS;
+  /*  const url2 = process.env.REACT_APP_URL_SERVICE_PUBLIC_SS; */
 
   //----------------Traer Datos Usuario Con los Parametros---------------------//
   useEffect(() => {
-    fetchData(`${url}/actualizacionestado?id_proceso=${params.id}`, "GET").then(
-      (respuesta) => {
-        setDatosParams(respuesta.obj.results);
-      }
-    );
+    fetchData(`${url}/actualizacionestado?id_proceso=${params.id}`, "GET")
+      .then((respuesta) => {
+        setDatosParams(respuesta?.obj?.results);
+      })
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al cargar Datos Por Parametro");
+      });
   }, []);
 
   //----------------Traer Url Para Traer los PDF ---------------------//
   useEffect(() => {
     if (datosParams?.length > 0) {
       const datos = {
-        id_proceso: datosParams[0]["id_proceso"].toString(),
+        id_proceso: datosParams[0]["id_proceso"]?.toString(),
       };
-      fetchData(`${url}/urlfile?id_proceso=${datos["id_proceso"]}`, "GET").then(
-        (respuesta) => {
-          setUrlPdfs(respuesta.obj);
-        }
-      );
+      fetchData(
+        `${url}/urlfile?id_proceso=${datosParams[0]["id_proceso"]?.toString()}`,
+        "GET"
+      )
+        .then((respuesta) => {
+          console.log(respuesta?.obj);
+          setUrlPdfs(respuesta?.obj);
+        })
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar PDF");
+        });
     }
   }, [datosParams]);
 
@@ -91,19 +106,42 @@ const VerificacionFormulario = () => {
       tipozona: tipoZonaLink.toString(),
       causal_rechazo: mensajeCausal,
     };
-    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
-      method: "PUT",
+    fetchData(
+      `${url}/actualizacionestado?id_proceso=${params.id}`,
+      /* {method: "PUT",
       headers: {
         "Content-type": "application/json",
       },
       body: JSON.stringify(datos),
-    })
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
+    } */
+      "PUT",
+      {},
+      {
+        task_token: datosParams[0]["task_token"],
+        validation_state: "101",
+        responsable: personaResponsable,
+        unidad_negocio: unidadNegocio,
+        asesor: datosAsesor[0]["nom_asesor"],
+        /* asesor_comercial_localidad: asesorComercialLocalidad, */
+        cod_localidad: codigoLocalidad,
+        tipozona: tipoZonaLink.toString(),
+        causal_rechazo: mensajeCausal,
+      },
+
+      {},
+      true
+    )
+      /* .then((res) => res.json()) */
+      .then((respuesta) => console.log(respuesta?.obj?.data))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al Aprobar Formulario");
+      });
     notify("El Usuario ha sido Aprobado para ReconoserID");
+
     setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformulario"),
-      2500
+      1000
     );
   };
 
@@ -120,20 +158,42 @@ const VerificacionFormulario = () => {
       tipozona: tipoZonaLink.toString(),
       causal_rechazo: mensajeCausal,
     };
-    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
+    fetchData(
+      `${url}/actualizacionestado?id_proceso=${params.id}` /* {
       method: "PUT",
       headers: {
         "Content-type": "application/json",
       },
-      body: JSON.stringify(datos),
-    })
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
+      body: JSON.stringify(datos), */,
+      "PUT",
+      {},
+      {
+        task_token: datosParams[0]["task_token"],
+        validation_state: "102",
+        responsable: personaResponsable,
+        unidad_negocio: unidadNegocio,
+        asesor_comercial_localidad: asesorComercialLocalidad,
+        cod_localidad: codigoLocalidad,
+        tipozona: tipoZonaLink.toString(),
+        causal_rechazo: mensajeCausal,
+      },
+
+      {},
+      true
+      /* } */
+    )
+      /* .then((res) => res.json()) */
+      .then((respuesta) => console.log(respuesta?.obj?.data))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al Rechazar Formulario");
+      });
     notify("El Usuario ha sido Rechazado para ReconoserID");
-    setTimeout(
+    navigate("/Solicitud-enrolamiento/validarformulario");
+    /* setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformulario"),
       2500
-    );
+    ); */
   };
 
   //----------------Funcion para Aprobar Formulario AutoEnrolamiento Asesor---------------------//
@@ -142,56 +202,102 @@ const VerificacionFormulario = () => {
     const datos = {
       task_token: datosParams[0]["task_token"],
       validation_state: "101",
-      responsable: personaResponsable,
-      unidad_negocio: unidadNegocio,
-      asesor: nombreAsesor,
+      responsable: datosResponsableTelemarketing[0]["nombre"],
+      unidad_negocio: datosParams[0]["unidad_negocio"],
+      asesor: datosAsesorTelemarketing,
       cod_localidad: codigoLocalidad,
-      tipozona: tipoZona.toString(),
+      tipozona: datosResponsableTelemarketing[0]?.zona["id_zona"].toString(),
       causal_rechazo: mensajeCausal,
     };
-    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
+    fetchData(
+      `${url}/actualizacionestado?id_proceso=${params.id}` /* {
       method: "PUT",
       headers: {
         "Content-type": "application/json",
       },
       body: JSON.stringify(datos),
-    })
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
+    } */,
+      "PUT",
+      {},
+      {
+        task_token: datosParams[0]["task_token"],
+        validation_state: "101",
+        responsable: datosResponsableTelemarketing[0]["nombre"],
+        unidad_negocio: datosParams[0]["unidad_negocio"],
+        asesor: datosAsesorTelemarketing,
+        cod_localidad: codigoLocalidad,
+        tipozona: datosResponsableTelemarketing[0]?.zona["id_zona"].toString(),
+        causal_rechazo: mensajeCausal,
+      },
+
+      {},
+      true
+    )
+      /* .then((res) => res.json()) */
+      .then((respuesta) => console.log(respuesta?.obj?.data))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al Aprobar Formulario");
+      });
     notify("El Usuario ha sido Aprobado para ReconoserID");
-    setTimeout(
+    navigate("/Solicitud-enrolamiento/validarformulario");
+    /*  setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformulario"),
       2500
-    );
+    ); */
   };
 
   //----------------Funcion para Rechazar Formulario AutoEnrolamiento---------------------//
   const rechazarFormularioAuto = (e) => {
     e.preventDefault();
-    const datos = {
+    /*     const datos = {
       task_token: datosParams[0]["task_token"],
       validation_state: "102",
-      responsable: personaResponsable,
-      unidad_negocio: unidadNegocio,
-      asesor: nombreAsesor,
+      responsable: datosResponsableTelemarketing[0]["nombre"],
+      unidad_negocio: datosParams[0]["unidad_negocio"],
+      asesor: datosAsesorTelemarketing,
       cod_localidad: codigoLocalidad,
-      tipozona: tipoZona.toString(),
+      tipozona: datosResponsableTelemarketing[0]?.zona["id_zona"].toString(),
       causal_rechazo: mensajeCausal,
-    };
-    fetch(`${url}/actualizacionestado?id_proceso=${params.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-type": "application/json",
+    }; */
+    console.log(datosParams[0]["task_token"]);
+    fetchData(
+      `${url}/actualizacionestado?id_proceso=${params.id}` /* ,
+      {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(datos),
+      } */,
+      "PUT",
+      {},
+      {
+        task_token: datosParams[0]["task_token"],
+        validation_state: "102",
+        responsable: datosResponsableTelemarketing[0]["nombre"],
+        unidad_negocio: datosParams[0]["unidad_negocio"],
+        asesor: datosAsesorTelemarketing,
+        cod_localidad: codigoLocalidad,
+        tipozona: datosResponsableTelemarketing[0]?.zona["id_zona"].toString(),
+        causal_rechazo: mensajeCausal,
       },
-      body: JSON.stringify(datos),
-    })
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
+
+      {},
+      true
+    )
+      /* .then((res) => res.json()) */
+      .then((respuesta) => console.log(respuesta?.obj, "res"))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al Rechazar Formulario");
+      });
     notify("El Usuario ha sido Rechazado para ReconoserID");
-    setTimeout(
+    navigate("/Solicitud-enrolamiento/validarformulario");
+    /*  setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformulario"),
       2500
-    );
+    ); */
   };
   //----------------Traer Datos Asesor Cuando los parametros vienen en URL---------------------//
   useEffect(() => {
@@ -200,43 +306,67 @@ const VerificacionFormulario = () => {
       const datos = {
         asesor: datosParams[0]["asesor"],
       };
-      fetchData(`${url}/asesores?nom_asesor=${datos["asesor"]}`, "GET").then(
-        (respuesta) => {
-          dato: SetDatosAsesor(respuesta.obj.results);
+      fetchData(`${url}/asesores?nom_asesor=${datos["asesor"]}`, "GET")
+        .then((respuesta) => {
+          dato: SetDatosAsesor(respuesta?.obj?.results);
           zon: setTipoZonaLink(
-            respuesta.obj.results[0]["responsable"]["zona_id_zona"]
+            respuesta?.obj?.results[0]["responsable"]["zona_id_zona"]
           );
-        }
-      );
+        })
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos Asesor Por URL");
+        });
     }
   }, [datosParams]);
 
   //----------------Traer Todos los Asesores para Seleccionar cuando hay un AutoEnrolamiento---------------------//
   useEffect(() => {
     if (datosParams?.length > 0) {
-      fetchData(`${url}/asesores`, "GET").then((respuesta) => {
-        SetAsesores(respuesta.obj.results);
-      });
+      fetchData(`${url}/asesores`, "GET")
+        .then((respuesta) => {
+          SetAsesores(respuesta?.obj?.results);
+        })
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Asesores");
+        });
     }
   }, [datosParams]);
 
   //----------------Traer Datos Asesor Seleccionado Cuando es por AutoEnrolamiento---------------------//
   useEffect(() => {
     if (nombreAsesor) {
-      fetchData(`${url}/asesores?nom_asesor=${nombreAsesor}`, "GET").then(
-        (respuesta) => {
-          data: SetDatosNombreAsesor(respuesta.obj.results);
+      fetchData(`${url}/asesores?nom_asesor=${nombreAsesor}`, "GET")
+        .then((respuesta) => {
+          data: SetDatosNombreAsesor(respuesta?.obj?.results);
           respon: setPersonaResponsable(
-            respuesta.obj.results[0]["responsable"]["nombre"]
+            respuesta?.obj?.results[0]["responsable"]["nombre"]
           );
           zona: setTipoZona(
-            respuesta.obj.results[0]["responsable"]["zona_id_zona"]
+            respuesta?.obj?.results[0]["responsable"]["zona_id_zona"]
           );
-        }
-      );
+        })
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos ubicacion Correspondencia");
+        });
     }
   }, [nombreAsesor]);
 
+  //----------------Traer Datos responsable  Cuando es por Telemarketing---------------------//
+  useEffect(() => {
+    if (datosParams) {
+      fetchData(`${url}/responsables?nombre=jhon`, "GET")
+        .then((respuesta) => {
+          SetDatosResponsableTelemarketing(respuesta?.obj?.results);
+        })
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos Responsables Telemarketing");
+        });
+    }
+  }, [datosParams]);
   //----------------Funcion Para Enviar Mensaje de Rechazo---------------------//
 
   const handleClose = useCallback(() => {
@@ -256,35 +386,45 @@ const VerificacionFormulario = () => {
   useEffect(() => {
     fetchData(`${url}/zonas`, "GET", {
       limit: 0,
-    }).then((respuesta) =>
-      setZonas(
-        Object.fromEntries([
-          ["", ""],
-          ...respuesta?.obj?.results?.map(({ zona, id_zona }) => [
-            zona,
-            id_zona,
-          ]),
-        ])
+    })
+      .then((respuesta) =>
+        setZonas(
+          Object.fromEntries([
+            ["", ""],
+            ...respuesta?.obj?.results?.map(({ zona, id_zona }) => [
+              zona,
+              id_zona,
+            ]),
+          ])
+        )
       )
-    );
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al cargar Zonas");
+      });
   }, []);
 
   //----------------Obtener Localidades Con El Codigo Dane Del Responsable---------------------//
   useEffect(() => {
     if (datosAsesor) {
-      gedCodsDaneResponsable().then((value) =>
-        setCodigoDane(value.map((datosCodLoc) => datosCodLoc))
-      );
+      gedCodsDaneResponsable()
+        .then((value) =>
+          setCodigoDane(value?.map((datosCodLoc) => datosCodLoc))
+        )
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos Codigo Dane del responsable");
+        });
     }
   }, [datosAsesor]);
   //----------------Traer Codigos Dane Del Responsable---------------------//
   const gedCodsDaneResponsable = async () => {
     try {
       const consultaResponsable = await fetchData(
-        `${url}/responsables?nombre=${datosAsesor[0].responsable["nombre"]}`
+        `${url}/responsables?nombre=${datosAsesor[0]?.responsable["nombre"]}`
       );
       const codsDaneResponsable = [
-        ...consultaResponsable.obj.results[0]["zona"]["municipios"].map(
+        ...consultaResponsable?.obj?.results[0]["zona"]["municipios"]?.map(
           (codigos) => parseInt(codigos)
         ),
       ];
@@ -293,7 +433,7 @@ const VerificacionFormulario = () => {
         const respuestaLocalidad = await fetchData(
           `${url}/localidades?cod_dane=${codigoIterado}&limit=${0}`
         );
-        guardarFetch.push(...respuestaLocalidad.obj.results);
+        guardarFetch?.push(...respuestaLocalidad?.obj?.results);
       }
 
       return guardarFetch;
@@ -307,19 +447,25 @@ const VerificacionFormulario = () => {
   useEffect(() => {
     console.log(nombreAsesor);
     if (nombreAsesor) {
-      gedCodsDaneResponsableAutoEnr().then((value) =>
-        setCodigoDane(value.map((datosCodLoc) => datosCodLoc))
-      );
+      console.log(gedCodsDaneResponsableAutoEnr());
+      gedCodsDaneResponsableAutoEnr()
+        .then((value) =>
+          setCodigoDane(value?.map((datosCodLoc) => datosCodLoc))
+        )
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos Codigo Dane del Responsable");
+        });
     }
   }, [datosNombreAsesor]);
   //----------------Traer Codigos Dane Del Responsable---------------------//
   const gedCodsDaneResponsableAutoEnr = async () => {
     try {
       const consultaResponsableAutoEn = await fetchData(
-        `${url}/responsables?nombre=${datosNombreAsesor[0].responsable["nombre"]}`
+        `${url}/responsables?nombre=${datosNombreAsesor[0]?.responsable["nombre"]}`
       );
       const codsDaneResponsableAutoEn = [
-        ...consultaResponsableAutoEn.obj.results[0]["zona"]["municipios"].map(
+        ...consultaResponsableAutoEn?.obj?.results[0]["zona"]["municipios"].map(
           (codigos) => parseInt(codigos)
         ),
       ];
@@ -328,7 +474,7 @@ const VerificacionFormulario = () => {
         const respuestaLocalidadAutoEn = await fetchData(
           `${url}/localidades?cod_dane=${codigoIterado}&limit=${0}`
         );
-        guardarFetchAutoEn.push(...respuestaLocalidadAutoEn.obj.results);
+        guardarFetchAutoEn?.push(...respuestaLocalidadAutoEn?.obj?.results);
       }
 
       return guardarFetchAutoEn;
@@ -343,9 +489,14 @@ const VerificacionFormulario = () => {
       fetchData(
         `${url}/localidades?id_localidad=${datosParams[0]["localidad_correspondencia"]}`,
         "GET"
-      ).then((respuesta) =>
-        SetNombreLocalidadCorrespondencia(respuesta.obj.results)
-      );
+      )
+        .then((respuesta) =>
+          SetNombreLocalidadCorrespondencia(respuesta?.obj?.results)
+        )
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos Localidad Correspondencia");
+        });
     }
   }, [datosParams]);
 
@@ -355,12 +506,20 @@ const VerificacionFormulario = () => {
       fetchData(
         `${url}/localidades?id_localidad=${datosParams[0]["localidad_bogota"]}`,
         "GET"
-      ).then((respuesta) => SetNombreLocalidadComercio(respuesta.obj.results));
+      )
+        .then((respuesta) =>
+          SetNombreLocalidadComercio(respuesta?.obj?.results)
+        )
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos Localidad Comercio");
+        });
     }
   }, [datosParams]);
   return (
     <div>
-      {datosParams != "" ? (
+      {datosParams /* != "" */ ? (
+        //--------------Enrolamiento Por Link---------------//
         datosParams[0]["asesor"] != "" ? (
           <Form>
             <Input
@@ -389,17 +548,17 @@ const VerificacionFormulario = () => {
                   options={
                     Object.fromEntries([
                       ["N/A", "N/A"],
-                      ...codigoDane.map(({ id_localidad, nom_localidad }) => {
+                      ...codigoDane?.map(({ id_localidad, nom_localidad }) => {
                         return [`${id_localidad}${" "}${nom_localidad}`];
                       }),
                     ]) || { "": "" }
                   }
                 ></Select>
               )}
-              {datosAsesor[0] && datosAsesor[0].responsable["nombre"] != "" ? (
+              {datosAsesor[0] && datosAsesor[0]?.responsable["nombre"] != "" ? (
                 <Input
                   label={"Responsable"}
-                  value={datosAsesor[0].responsable["nombre"]}
+                  value={datosAsesor[0]?.responsable["nombre"]}
                   disabled
                 ></Input>
               ) : (
@@ -417,7 +576,7 @@ const VerificacionFormulario = () => {
                   options={
                     Object.fromEntries([
                       ["", ""],
-                      ...datosAsesor[0].unidades_de_negocio.map(
+                      ...datosAsesor[0]?.unidades_de_negocio?.map(
                         ({ nom_unidad_neg }) => {
                           return [nom_unidad_neg];
                         }
@@ -543,7 +702,7 @@ const VerificacionFormulario = () => {
                 value={datosParams[0]["barrio"]}
                 disabled
               />
-              {datosParams[0]["localidad_bogota"].length > 0 &&
+              {datosParams[0]["localidad_bogota"]?.length > 0 &&
               nombreLocalidadComercio ? (
                 <Input
                   label={"Localidad"}
@@ -580,7 +739,7 @@ const VerificacionFormulario = () => {
                 value={datosParams[0]["barrio_correspondencia"]}
                 disabled
               />
-              {datosParams[0]["localidad_correspondencia"].length > 0 &&
+              {datosParams[0]["localidad_correspondencia"]?.length > 0 &&
               nombreLocalidadCorrespondencia ? (
                 <Input
                   label={"Localidad"}
@@ -603,7 +762,7 @@ const VerificacionFormulario = () => {
               >
                 {true ? (
                   <object
-                    // data={`data:application/pdf;base64,${archivo}`}
+                    // data={`data:application/pdf;base64,${urlPdfs["cc"]}`}
                     data={`${urlPdfs["cc"]}`}
                     type="application/pdf"
                     width="100%"
@@ -747,7 +906,10 @@ const VerificacionFormulario = () => {
               )}
             </div>
           </Form>
-        ) : asesores ? (
+        ) : //--------------AutoEnrolamiento---------------//
+        /* asesores && */
+        datosParams[0]["unidad_negocio"] != "" &&
+          datosResponsableTelemarketing ? (
           <Form>
             <Input
               label={"Nombre Comercio"}
@@ -756,82 +918,58 @@ const VerificacionFormulario = () => {
             ></Input>
             <Fieldset legend="Asesor" className="lg:col-span-3">
               <Select
-                onChange={(event) => SetNombreAsesor(event.target.value)}
+                onChange={(event) =>
+                  SetDatosAsesorTelemarketing(event.target.value)
+                }
                 id="comissionType"
                 name="comissionType"
-                value={nombreAsesor}
-                label={`Nombre Asesor`}
+                label={`Asesor Telemarketing`}
                 options={
                   Object.fromEntries([
-                    ["", ""],
-                    ...asesores.map(({ nom_asesor }) => {
-                      return [nom_asesor];
-                    }),
+                    ["N/A", "N/A"],
+                    ...datosResponsableTelemarketing[0]?.asesor?.map(
+                      ({ nom_asesor }) => {
+                        return [nom_asesor];
+                      }
+                    ),
                   ]) || { "": "" }
                 }
               ></Select>
-              {nombreAsesor && datosNombreAsesor ? (
+              {datosResponsableTelemarketing && datosAsesorTelemarketing ? (
                 <Fragment>
                   <Input
                     label={"Responsable"}
-                    value={datosNombreAsesor[0]["responsable"]["nombre"]}
+                    value={datosResponsableTelemarketing[0]["nombre"]}
                     disabled
                   ></Input>
                 </Fragment>
               ) : (
                 ""
               )}
-              {datosNombreAsesor ? (
-                <Select
-                  onChange={(event) => setUnidadNegocio(event.target.value)}
-                  id="comissionType"
-                  name="comissionType"
-                  value={unidadNegocio}
-                  label={`Unidad De Negocio`}
-                  options={
-                    Object.fromEntries([
-                      ["", ""],
-                      ...datosNombreAsesor[0].unidades_de_negocio.map(
-                        ({ nom_unidad_neg }) => {
-                          return [nom_unidad_neg];
-                        }
-                      ),
-                    ]) || { "": "" }
+
+              {datosAsesorTelemarketing ? (
+                <Input
+                  label={"Unidad de Negocio"}
+                  value={datosParams[0]["unidad_negocio"]}
+                  disabled
+                ></Input>
+              ) : (
+                ""
+              )}
+              {datosResponsableTelemarketing && datosAsesorTelemarketing ? (
+                <Input
+                  label={"Tipo Zona"}
+                  value={
+                    datosResponsableTelemarketing[0]?.zona["id_zona"] === 1
+                      ? "Centro"
+                      : datosResponsableTelemarketing[0]?.zona["id_zona"] === 2
+                      ? "Norte"
+                      : datosResponsableTelemarketing[0]?.zona["id_zona"] === 3
+                      ? "Occidente"
+                      : datosResponsableTelemarketing[0]?.zona["id_zona"]
                   }
-                ></Select>
-              ) : (
-                ""
-              )}
-              {datosNombreAsesor ? (
-                <Fragment>
-                  <Input
-                    label={"Tipo Zona"}
-                    value={
-                      datosNombreAsesor[0].responsable["zona_id_zona"] === 1
-                        ? "Centro"
-                        : datosNombreAsesor[0].responsable["zona_id_zona"] === 2
-                        ? "Norte"
-                        : datosNombreAsesor[0].responsable["zona_id_zona"] === 3
-                        ? "Occidente"
-                        : datosNombreAsesor[0].responsable["zona_id_zona"]
-                    }
-                    disabled
-                  ></Input>
-                  <Select
-                    onChange={(event) => setCodigoLocalidad(event.target.value)}
-                    id="comissionType"
-                    name="comissionType"
-                    label={`Cod Localidad`}
-                    options={
-                      Object.fromEntries([
-                        ["N/A", "N/A"],
-                        ...codigoDane.map(({ id_localidad, nom_localidad }) => {
-                          return [`${id_localidad}${" "}${nom_localidad}`];
-                        }),
-                      ]) || { "": "" }
-                    }
-                  ></Select>
-                </Fragment>
+                  disabled
+                ></Input>
               ) : (
                 ""
               )}
@@ -928,7 +1066,7 @@ const VerificacionFormulario = () => {
                 value={datosParams[0]["barrio"]}
                 disabled
               />
-              {datosParams[0]["localidad_bogota"].length > 0 &&
+              {datosParams[0]["localidad_bogota"]?.length > 0 &&
               nombreLocalidadComercio ? (
                 <Input
                   label={"Localidad"}
@@ -965,7 +1103,7 @@ const VerificacionFormulario = () => {
                 value={datosParams[0]["barrio_correspondencia"]}
                 disabled
               />
-              {datosParams[0]["localidad_correspondencia"].length > 0 &&
+              {datosParams[0]["localidad_correspondencia"]?.length > 0 &&
               nombreLocalidadCorrespondencia ? (
                 <Input
                   label={"Localidad"}

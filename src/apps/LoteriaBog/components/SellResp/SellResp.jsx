@@ -6,6 +6,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { useEffect } from "react";
 import Tickets from "../../../../components/Base/Tickets";
+import { useLoteria } from "../../utils/LoteriaHooks";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -35,6 +36,12 @@ const SellResp = ({
     }
   }
 `;
+  const { tiposOperaciones } = useLoteria();
+
+  const operacion = useMemo(() => {
+    return tiposOperaciones;
+  }, [tiposOperaciones]);
+
   const printDiv = useRef();
 
   const { getQuota } = useAuth();
@@ -111,7 +118,8 @@ const SellResp = ({
         "Valor pago": formatMoney.format(sellResponse?.valor_pago),
         "Tipo de Billete": sellResponse?.fisico === true ? "Fisico" : "Virtual",
         "Forma de pago":
-          sellResponse?.tipoPago === "12" || sellResponse?.fisico == false
+          parseInt(sellResponse?.tipoPago) ===
+            parseInt(operacion?.Venta_Fisica) || sellResponse?.fisico == false
             ? "Efectivo"
             : "Bono",
       }),

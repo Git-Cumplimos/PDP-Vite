@@ -1,16 +1,19 @@
 .formItem {
-  @apply flex flex-col md:flex-row justify-center items-center md:items-start;
+  /* @apply flex flex-col md:flex-row justify-center items-center md:items-start; */
   @apply relative text-center my-4 mx-auto md:mx-4 gap-4;
+
+  @apply grid justify-items-center items-center;
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-minmax-sm), 1fr));
 }
 
 .formItem > label {
   /* flex: 1 1 50%; */
-  @apply text-xl md:w-full min-w-max;
+  @apply text-xl;
 }
 
 .formItem > div > textarea {
   /* flex: 1 1 50%; */
-  @apply px-4 py-2 rounded-md bg-secondary-light text-black md:w-full min-w-full md:min-w-max;
+  @apply px-4 py-2 rounded-md bg-secondary-light text-black;
   @apply resize-y max-h-60;
 }
 

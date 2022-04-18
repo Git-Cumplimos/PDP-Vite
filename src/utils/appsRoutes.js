@@ -5,9 +5,6 @@ import { lazy } from "react";
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
-import CreateComisionCobrada from "../apps/TrxParams/Views/Comisiones/CreateComisionCobrada";
-import ConfiguracionComercios from "../apps/TrxParams/Views/ConfiguracionComercios";
-import Gestion from "../pages/Gestion";
 
 /**
  * * Logos
@@ -21,19 +18,16 @@ const AppIcons = lazy(() => import("../components/Base/AppIcons"));
 /**
  * Base
  */
-const PublicHome = lazy(() => import("../pages/PublicHome"));
-const Login = lazy(() => import("../pages/Login"));
-const Home = lazy(() => import("../pages/Home"));
 const Transacciones = lazy(() => import("../pages/Transacciones"));
-const AuthButton = lazy(() => import("../components/Compound/Signout"));
-const Error404 = lazy(() => import("../pages/Error404"));
-const Reportes = lazy(() => import("../pages/Reportes"));
 
 /**
  * Loteria
  */
+
 const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
-const Loteria = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
+
+/** Loteria Bogota */
+const venta = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
 const Descargas = lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
 const DescargarArchivosS3 = lazy(() =>
   import("../apps/LoteriaBog/Views/Descargas/DescargarArchivosS3")
@@ -47,6 +41,11 @@ const CrearSorteos = lazy(() =>
 const CargaArchivos = lazy(() =>
   import("../apps/LoteriaBog/Views/CargaArchivos")
 );
+const ArqueoBilletes = lazy(() =>
+  import("../apps/LoteriaBog/Views/ArqueoBilletes")
+);
+const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
+
 /**
  * ColCard
  */
@@ -54,7 +53,6 @@ const ColCard = lazy(() => import("../apps/ColCard/ColCard"));
 const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
-const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
 
 /**
  * Marketplace
@@ -92,7 +90,6 @@ const CommerceInfo = lazy(() => import("../apps/UpdateCommerce/CommerceInfo"));
 const TipoContratoComisiones = lazy(() =>
   import("../apps/TrxParams/Views/TipoContratoComisiones")
 );
-const TrxParams = lazy(() => import("../apps/TrxParams/TrxParams"));
 const Comisiones = lazy(() => import("../apps/TrxParams/Views/Comisiones"));
 const Com2Pay = lazy(() =>
   import("../apps/TrxParams/Views/Comisiones/Com2Pay")
@@ -108,30 +105,11 @@ const ConvAuto = lazy(() => import("../apps/TrxParams/Views/ConvAuto"));
 const Autorizadores = lazy(() =>
   import("../apps/TrxParams/Views/Autorizadores")
 );
-
-/**
- * Solicitud Enrolamiento : publico
- */
-const SolicitudEnrolamiento = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/SolicitudEnrolamiento")
+const CreateComisionCobrada = lazy(() =>
+  import("../apps/TrxParams/Views/Comisiones/CreateComisionCobrada")
 );
-const FormularioEnrolamiento = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/FormularioEnrolamiento")
-);
-const FormularioAutoEnrolamiento = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/FormularioAutoEnrolamiento")
-);
-const ConsultaEnrolamiento = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/ConsultaEnrolamiento")
-);
-const CorreccionFormulario = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/CorreccionFormulario")
-);
-const ReconoserID = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/ReconoserID")
-);
-const ContinuarReconoserID = lazy(() =>
-  import("../apps/SolicitudEnrolamiento/views/ContinuarReconoserID")
+const ConfiguracionComercios = lazy(() =>
+  import("../apps/TrxParams/Views/ConfiguracionComercios")
 );
 
 /**
@@ -151,6 +129,9 @@ const VerificacionApertura = lazy(() =>
 );
 const VerificacionNuevosComercios = lazy(() =>
   import("../apps/ValidacionEnrolamiento/VerificacionNuevosComercios")
+);
+const ReporteComercios = lazy(() =>
+  import("../apps/ValidacionEnrolamiento/views/ReporteComercios")
 );
 
 /**
@@ -211,67 +192,10 @@ const TypesTrxs = lazy(() =>
   import("../apps/ParamsOperations/Views/TypesTrxs")
 );
 
-const emptyComp = () => {
-  return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
-};
-
 const CARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_1-P9wrhr8RWkx5zt3f64Ogy-Yr5DoQ_5ww&usqp=CAU";
 const DESCARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU";
-
-const loginUrls = [{ link: "/login", label: "Login", component: Login }];
-
-const publicUrls = [
-  { link: "", label: "Inicio", component: PublicHome },
-  {
-    link: "/public/solicitud-enrolamiento",
-    label: <AppIcons Logo={"PAGO"} name={"Solicitud Enrolamiento"} />,
-    component: SolicitudEnrolamiento,
-    permission: [1],
-    subRoutes: [
-      {
-        link: "/public/solicitud-enrolamiento/formulario",
-        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
-        component: FormularioAutoEnrolamiento,
-      },
-
-      {
-        link: "/public/solicitud-enrolamiento/consultar",
-        label: (
-          <AppIcons Logo={"PAGO"} name={"Consultar Estado de Inscripción"} />
-        ),
-        component: ConsultaEnrolamiento,
-        subRoutes: [
-          {
-            link: "/public/solicitud-enrolamiento/reconoserid/:numCedula",
-            label: (
-              <AppIcons Logo={"PAGO"} name={"Iniciar Proceso ReconoserID"} />
-            ),
-            component: ReconoserID,
-          },
-          {
-            link: "/public/solicitud-enrolamiento/continuarreconoserid/:idreconoser",
-            label: (
-              <AppIcons Logo={"PAGO"} name={"Continuar Proceso ReconoserID"} />
-            ),
-            component: ContinuarReconoserID,
-          },
-          {
-            link: "/public/solicitud-enrolamiento/correccionformulario/:numCedula",
-            label: <AppIcons Logo={"PAGO"} name={"Corrección De Formulario"} />,
-            component: CorreccionFormulario,
-          },
-        ],
-      },
-      {
-        link: "/public/solicitud-enrolamiento/formulario/:idAsesor",
-        label: <AppIcons Logo={"PAGO"} name={"Formulario Inscripción"} />,
-        component: FormularioEnrolamiento,
-      },
-    ],
-  },
-];
 
 const allUrlsPrivateApps = [
   {
@@ -280,60 +204,78 @@ const allUrlsPrivateApps = [
     extern: true,
     permission: [1],
   },
+
   {
-    link: "/loteria-de-bogota",
-    label: <AppIcons Logo={"LOTERIA"} name="Loteria de bogota" />,
+    link: "/loteria",
+    label: <AppIcons Logo={"LOTERIA"} name="Loteria" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
     permission: [3, 4, 5, 6],
     subRoutes: [
-      {
-        link: "/loteria-de-bogota/ventas",
-        label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
-        component: Loteria,
-        permission: [3],
-      },
-      {
-        link: "/loteria-de-bogota/cargar",
-        label: <AppIcons Logo={CARGAR} name="Carga de archivos" />,
-        component: CargaArchivos,
-        permission: [4],
-      },
-      {
-        link: "/loteria-de-bogota/descargar",
-        label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
-        component: Descargas,
-        permission: [6],
-        subRoutes: [
-          {
-            link: "/loteria-de-bogota/descargar/descarga_reportes",
-            label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
-            component: DescargarArchivosS3,
-            permission: [6],
-          },
-          {
-            link: "/loteria-de-bogota/descargar/borrar_billetes",
-            label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
-            component: BorrarBilletes,
-            permission: [6],
-          },
-        ],
-      },
-      {
-        link: "/loteria-de-bogota/sorteos",
-        label: <AppIcons Logo={"REPORTE"} name="Sorteos" />,
-        component: CrearSorteos,
-        permission: [5],
-      },
-      {
-        link: "/loteria-de-bogota/premios",
-        label: <AppIcons Logo={"PAGO"} name="Premios" />,
-        component: Premios,
-        extern: false,
-        permission: [3], ///////////////////////////////////////////////////////////////////
-      },
-    ],
+      { link: "loteria-de-bogota", label: "Lotería de Bogotá" },
+      { link: "loteria-del-tolima", label: "Lotería del Tolima" },
+    ].map(({ link: name, label }) => ({
+      link: `/loteria/${name}`,
+      label: <AppIcons Logo={"LOTERIA"} name={label} />,
+      component: LoteriaBog,
+      permission: [3, 4, 5, 6],
+      subRoutes: [
+        {
+          link: `/loteria/${name}/ventas`,
+          label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
+          component: venta,
+          permission: [3],
+        },
+        {
+          link: `/loteria/${name}/cargar`,
+          label: <AppIcons Logo={CARGAR} name="Carga de archivos" />,
+          component: CargaArchivos,
+          permission: [4],
+        },
+        {
+          link: `/loteria/${name}/descargar`,
+          label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+          component: Descargas,
+          permission: [6],
+          subRoutes: [
+            {
+              link: `/loteria/${name}/descargar/descarga_reportes`,
+              label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+              component: DescargarArchivosS3,
+              permission: [6],
+            },
+            {
+              link: `/loteria/${name}/descargar/borrar_billetes`,
+              label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
+              component: BorrarBilletes,
+              permission: [6],
+            },
+          ],
+        },
+        {
+          link: `/loteria/${name}/sorteos`,
+          label: <AppIcons Logo={"REPORTE"} name="Sorteos" />,
+          component: CrearSorteos,
+          permission: [5],
+        },
+        {
+          link: `/loteria/${name}/premios`,
+          label: <AppIcons Logo={"PAGO"} name="Premios" />,
+          component: Premios,
+          extern: false,
+          permission: [3], ///////////////////////////////////////////////////////////////////
+        },
+        {
+          link: `/loteria/${name}/arqueo`,
+          label: <AppIcons Logo={"PAGO"} name="Arqueo Billetes" />,
+          component: ArqueoBilletes,
+          extern: false,
+          permission: [3, 6], ///////////////////////////////////////////////////////////////////
+        },
+      ],
+    })),
   },
+
   {
     link: "/transacciones",
     label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones" />,
@@ -644,7 +586,7 @@ const allUrlsPrivateApps = [
     link: "/verificacionnuevoscomercios",
     label: <AppIcons Logo={"PAGO"} name={"Verificación Enrolamientos"} />,
     component: VerificacionNuevosComercios,
-    permission: [1],
+    permission: [38, 39],
     subRoutes: [
       {
         link: "/Solicitud-enrolamiento/validarformulario",
@@ -652,7 +594,7 @@ const allUrlsPrivateApps = [
           <AppIcons Logo={"PAGO"} name={"Validar Formulario Inscripción"} />
         ),
         component: ValidacionAsesorComercial,
-        permission: [1],
+        permission: [39],
         subRoutes: [
           {
             link: "/Solicitud-enrolamiento/validarformulario/verificaciondatos/:id",
@@ -663,24 +605,32 @@ const allUrlsPrivateApps = [
               />
             ),
             component: VerificacionFormulario,
-            permission: [1],
+            permission: [39],
           },
         ],
       },
-
+      {
+        link: "/Solicitud-enrolamiento/ReporteComercios",
+        label: <AppIcons Logo={"PAGO"} name={"Reporte De Comercios"} />,
+        component: ReporteComercios,
+        permission: [39],
+        subRoutes: [],
+      },
       {
         link: "/Solicitud-enrolamiento/validarformularioreconoserid",
         label: (
           <AppIcons Logo={"PAGO"} name={"Validar Formulario ReconoserID"} />
         ),
         component: ValidacionApertura,
-        permission: [1],
-      },
-      {
-        link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
-        label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
-        component: VerificacionApertura,
-        permission: [1],
+        permission: [39],
+        subRoutes: [
+          {
+            link: "/Solicitud-enrolamiento/validarformularioreconoserid/verificacionapertura/:id",
+            label: <AppIcons Logo={"PAGO"} name={"Verificacion Apertura"} />,
+            component: VerificacionApertura,
+            permission: [39],
+          },
+        ],
       },
     ],
   },
@@ -730,6 +680,7 @@ const allUrlsPrivateApps = [
   },
 ];
 
+<<<<<<< HEAD
 const privateUrls = [
   { link: "*", exact: false, component: Error404 },
   { link: "/", label: "Inicio", component: Home },
@@ -742,3 +693,6 @@ const privateUrls = [
 ];
 
 export { allUrlsPrivateApps, privateUrls, publicUrls, loginUrls };
+=======
+export { allUrlsPrivateApps };
+>>>>>>> ac0e4af02d1e3407e60543e7eeab37793dc43120

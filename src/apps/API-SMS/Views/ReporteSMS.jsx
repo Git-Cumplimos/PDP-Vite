@@ -96,7 +96,7 @@ const ReporteSMS = () => {
   /*Buscar report*/
   const report = useCallback(async (tipoOp, page, fechaInicial, fechaFinal) => {
     console.log(tipoOp);
-    const query = { tipo_operacion: tipoOp };
+    const query = { id_tipo_transaccion: tipoOp };
     query.page = page;
     if (fechaInicial && fechaFinal) {
       query.fecha_ini = fechaInicial;

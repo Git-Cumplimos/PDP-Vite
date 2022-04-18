@@ -6,9 +6,10 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Select from "../../../components/Base/Select";
 import classes from "../../ValidacionHellen/views/VerificacionApertura.module.css";
-import { notify } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 import Modal from "../../../components/Base/Modal";
 import LogoPDP from "../../../components/Base/LogoPDP";
+import fetchData from "../../../utils/fetchData";
 
 const VerificacionApertura = () => {
   const navigate = useNavigate();
@@ -39,6 +40,25 @@ const VerificacionApertura = () => {
   const [confirmarRechazo, setConfirmarRechazo] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const params = useParams();
+
+  useEffect(() => {
+    /* const updateWidth = () => { */
+
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?id_proceso=${params?.id}`,
+      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */ "GET",
+      {},
+      {},
+      false
+    )
+      /* .then((response) => response.json()) */
+      .then((respuesta) => setDatosParams(respuesta?.obj?.results))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al cargar Datos ");
+      });
+  }, []);
+
   useEffect(() => {
     if (datosParams?.length > 0) {
       console.log(datosParams[0]["id_reconocer"]);
@@ -46,7 +66,8 @@ const VerificacionApertura = () => {
         procesoConvenioGuid: datosParams[0]["id_reconocer"],
       };
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/consulta-validacion-reconoserid`,
+        /* `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/consulta-validacion-reconoserid`, */
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/consultavalidacion`,
         {
           method: "POST",
           headers: {
@@ -54,32 +75,17 @@ const VerificacionApertura = () => {
           },
           body: JSON.stringify(datos),
         }
+        /* "POST",
+        {},
+        { procesoConvenioGuid: datosParams[0]["id_reconocer"] },
+        true */
       )
         .then((response) => response.json())
-        .then((respuesta) => setDatosReconoserID(respuesta.obj.data));
+        .then((respuesta) => setDatosReconoserID(respuesta?.obj?.data))
+        .catch(() => {});
     }
   }, [datosParams]);
   /* console.log(datosReconoserID); */
-
-  useEffect(() => {
-    /* const updateWidth = () => { */
-
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */
-    )
-      .then((response) => response.json())
-      .then((respuesta) => setDatosParams(respuesta.obj.results));
-    /*  }; */
-
-    // actualizaremos el width al montar el componente
-    /*   updateWidth(); */
-
-    // nos suscribimos al evento resize de window
-    /*   window.addEventListener("resize", updateWidth); */
-  }, []);
-
-  /*   console.log(datosParams); */
 
   useEffect(() => {
     if (datosParams?.length > 0) {
@@ -87,13 +93,21 @@ const VerificacionApertura = () => {
       const datos = {
         id_proceso: datosParams[0]["id_proceso"].toString(),
       };
-      fetch(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile?id_proceso=${datos["id_proceso"]}`
+      fetchData(
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/urlfile?id_proceso=${datos["id_proceso"]}`,
+        "GET",
+        {},
+        {},
+        false
       )
-        .then((res) => res.json())
+        /* .then((res) => res.json()) */
         .then((respuesta /* console.log(respuesta) */) =>
-          setUrlPdfs(respuesta.obj)
-        );
+          setUrlPdfs(respuesta?.obj)
+        )
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar PDF");
+        });
     }
   }, [datosParams]);
 
@@ -119,18 +133,25 @@ const VerificacionApertura = () => {
       task_token: datosParams[0]["task_token"],
       validation_state: "201",
     };
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?id_proceso=${params?.id}`,
+      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ /* {
         method: "PUT",
         headers: {
           "Content-type": "application/json",
         },
         body: JSON.stringify(datos),
-      }
+      } */ "PUT",
+      {},
+      { task_token: datosParams[0]["task_token"], validation_state: "201" },
+      false
     )
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
+      /* .then((res) => res.json()) */
+      .then((respuesta) => console.log(respuesta?.obj?.data))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al Actualizar Estado");
+      });
     notify("El Usuario ha sido Aprobado para ReconoserID");
     setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformularioreconoserid"),
@@ -144,18 +165,30 @@ const VerificacionApertura = () => {
       validation_state: "202",
       causal_rechazo: mensajeCausal,
     };
-    fetch(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
-      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ {
+    fetchData(
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?id_proceso=${params.id}`,
+      /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ /* {
         method: "PUT",
         headers: {
           "Content-type": "application/json",
         },
         body: JSON.stringify(datos),
-      }
+      } */
+      "PUT",
+      {},
+      {
+        task_token: datosParams[0]["task_token"],
+        validation_state: "202",
+        causal_rechazo: mensajeCausal,
+      },
+      false
     )
-      .then((res) => res.json())
-      .then((respuesta) => console.log(respuesta.obj.data));
+      /* .then((res) => res.json()) */
+      .then((respuesta) => console.log(respuesta?.obj?.data))
+      .catch((err) => {
+        console.log(err);
+        notifyError("Error al Actualizar Estado");
+      });
     notify("El Usuario ha sido Rechazado para ReconoserID");
     setTimeout(
       () => navigate("/Solicitud-enrolamiento/validarformularioreconoserid"),
@@ -361,7 +394,7 @@ const VerificacionApertura = () => {
               ></Select>
             )} */}
 
-            {datosParams[0]["cod_localidad"].length != "" ? (
+            {datosParams[0]["cod_localidad"]?.length != "" ? (
               <Input
                 label={"Cod Localidad"}
                 value={datosParams[0]["cod_localidad"]}
@@ -382,7 +415,7 @@ const VerificacionApertura = () => {
               ></Select>
             )}
 
-            {datosParams[0]["responsable"].length != "" ? (
+            {datosParams[0]["responsable"]?.length != "" ? (
               <Input
                 label={"Responsable"}
                 value={datosParams[0]["responsable"]}
@@ -403,7 +436,7 @@ const VerificacionApertura = () => {
               ""
             )}
 
-            {datosParams[0]["unidad_negocio"].length != "" ? (
+            {datosParams[0]["unidad_negocio"]?.length != "" ? (
               <Input
                 label={"Unidad De Negocio"}
                 value={datosParams[0]["unidad_negocio"]}

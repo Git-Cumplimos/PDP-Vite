@@ -18,7 +18,9 @@ import { useParams } from "react-router";
 
 const CorreccionFormulario = () => {
   const params = useParams();
+  const navigate = useNavigate();
   const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actividades-economicas`;
+  /* const url = `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/actividades-economicas`; */
   //Datos Comercio
   const [datosParams, setDatosParams] = useState(0);
   const [nombreComercio, setNombreComercio] = useState("");
@@ -64,53 +66,57 @@ const CorreccionFormulario = () => {
   // Traer Datos Del Comercio
   useEffect(() => {
     fetch(
-      `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/actualizacion-estado?numDoc=${params.numCedula}`
+      `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/actualizacionestado?numDoc=${params.numCedula}`
     )
       .then((res) => res.json())
       .then((respuesta) => {
-        dat: setDatosParams(respuesta?.obj.results);
+        dat: setDatosParams(respuesta?.obj?.results);
         nomComer: setNombreComercio(
-          respuesta?.obj.results[0]["nombre_comercio"]
+          respuesta?.obj?.results[0]["nombre_comercio"]
         );
-        nomAsesor: setAsignarAsesores(respuesta?.obj.results[0]["asesor"]);
-        nomRespo: setNombre(respuesta?.obj.results[0]["nombre"]);
-        apellidoRespo: setApellido(respuesta?.obj.results[0]["apellido"]);
-        numDoc: setNumDocumento(respuesta?.obj.results[0]["numdoc"]);
-        tipoDoc: setTipoIdentificacion(respuesta?.obj.results[0]["tipodoc"]);
-        numNit: setNumNit(respuesta?.obj.results[0]["numnit"]);
-        numCamara: setNumCamaraComerci(respuesta?.obj.results[0]["numcamycom"]);
-        numRut: setNumRut(respuesta?.obj.results[0]["numrut"]);
+        nomAsesor: setAsignarAsesores(respuesta?.obj?.results[0]["asesor"]);
+        nomRespo: setNombre(respuesta?.obj?.results[0]["nombre"]);
+        apellidoRespo: setApellido(respuesta?.obj?.results[0]["apellido"]);
+        numDoc: setNumDocumento(respuesta?.obj?.results[0]["numdoc"]);
+        tipoDoc: setTipoIdentificacion(respuesta?.obj?.results[0]["tipodoc"]);
+        numNit: setNumNit(respuesta?.obj?.results[0]["numnit"]);
+        numCamara: setNumCamaraComerci(
+          respuesta?.obj?.results[0]["numcamycom"]
+        );
+        numRut: setNumRut(respuesta?.obj?.results[0]["numrut"]);
         actividadEcono: setActividad(
-          respuesta?.obj.results[0]["actividad_economica"]
+          respuesta?.obj?.results[0]["actividad_economica"]
         );
-        telefono: setTelefonos(respuesta?.obj.results[0]["celular"]);
-        correo: setCorreos(respuesta?.obj.results[0]["email"]);
+        telefono: setTelefonos(respuesta?.obj?.results[0]["celular"]);
+        correo: setCorreos(respuesta?.obj?.results[0]["email"]);
         munCorr: setMunicipioCorr(
           respuesta?.obj.results[0]["municipio_correspondencia"]
         );
         depCorr: setDepartamentoCorr(
-          respuesta?.obj.results[0]["departamento_correspondencia"]
+          respuesta?.obj?.results[0]["departamento_correspondencia"]
         );
         barCorr: setBarrioCorr(
-          respuesta?.obj.results[0]["barrio_correspondencia"]
+          respuesta?.obj?.results[0]["barrio_correspondencia"]
         );
         localidadCorr: setLocalidadCorr(
-          respuesta?.obj.results[0]["localidad_correspondencia"]
+          respuesta?.obj?.results[0]["localidad_correspondencia"]
         );
         dirCorr: setDireccionCorr(
-          respuesta?.obj.results[0]["direccion_correspondencia"]
+          respuesta?.obj?.results[0]["direccion_correspondencia"]
         );
-        dirCom: setMunicipioCom(respuesta?.obj.results[0]["municipio"]);
-        depacom: setDepartamentoCom(respuesta?.obj.results[0]["departamento"]);
-        locacom: setLocalidadCom(respuesta?.obj.results[0]["localidad_bogota"]);
+        dirCom: setMunicipioCom(respuesta?.obj?.results[0]["municipio"]);
+        depacom: setDepartamentoCom(respuesta?.obj?.results[0]["departamento"]);
+        locacom: setLocalidadCom(
+          respuesta?.obj?.results[0]["localidad_bogota"]
+        );
         dircom: setDireccionCom(
-          respuesta?.obj.results[0]["direccion_comercio"]
+          respuesta?.obj?.results[0]["direccion_comercio"]
         );
-        barrcom: setBarrioCom(respuesta?.obj.results[0]["barrio"]);
+        barrcom: setBarrioCom(respuesta?.obj?.results[0]["barrio"]);
         respoIva: setResponsableIva(
-          respuesta?.obj.results[0]["responsableiva"]
+          respuesta?.obj?.results[0]["responsableiva"]
         );
-        autosms: setAutorizacion(respuesta?.obj.results[0]["autosms"]);
+        autosms: setAutorizacion(respuesta?.obj?.results[0]["autosms"]);
       });
   }, []);
   /* console.log(datosParams); */
@@ -144,12 +150,11 @@ const CorreccionFormulario = () => {
   const corregirEnviar = useCallback(
     (e) => {
       e.preventDefault();
-      fetchData(
-        /* `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/idreconocer?id_proceso=26`, */
-        `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`,
-        "PUT",
-        {},
-        {
+      if (
+        (archivos1[0] && archivos2[0]) ||
+        (archivos1[0] && archivos2[0] && archivos3[0])
+      ) {
+        const data = {
           asesor: asignarAsesores,
           nombre: `${nombre}`,
           apellido: `${apellido}`,
@@ -163,8 +168,8 @@ const CorreccionFormulario = () => {
           responsableiva: responsableIva,
           cod_localidad: "",
           asesor_comercial_localidad: "",
-          actividad_economica: commerceType.toString(),
-          tipo_establecimiento: "",
+          actividad_economica: actividad /* commerceType.toString() */,
+          tipo_establecimiento: actividad,
           sede: "Bogotá",
           direccion_comercio: direccionCom,
           departamento: departamentoCom,
@@ -178,55 +183,203 @@ const CorreccionFormulario = () => {
           barrio_correspondencia: barrioCorr,
           tipoDoc: tipoIdentificacion,
           numDoc: numDocumento,
-          email: correos[0],
-          celular: telefonos[0],
+          email: correos /* [0] */,
+          celular: telefonos /* [0] */,
           /* task_token: datosParams[0]["task_token"], */
           validation_state: "En Proceso de Validación",
           /* id_name: "id_proceso", */
           responsable: "",
-        },
+        };
+        console.log(data?.validation_state);
+        fetch(
+          /* `${process.env.REACT_APP_URL_SERVICE_PUBLIC}/idreconocer?id_proceso=26`, */
+          /*  `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/idreconocer?id_proceso=${datosParams[0]["id_proceso"]}`, */
+          `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/idreconocer?id_proceso=${datosParams[0]?.id_proceso}`,
+          {
+            method: "PUT",
+            body: JSON.stringify(data),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+          .then((respuesta) => {
+            const formData = new FormData();
 
-        {},
-        false
-      )
-        .then((respuesta) => {
-          const formData = new FormData();
+            formData.set("id_proceso", datosParams[0]["id_proceso"]);
 
-          formData.set("rut", archivos1[0]);
+            notify("Se ha comenzado la carga");
+            /* console.log(Object.fromEntries(formData.entries())); */
+            fetch(
+              /* `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`, */
+              `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/uploadfile2?id_proceso=${datosParams[0]["id_proceso"]}`,
+              /*  "POST",
+              {},
+              { formData },
+              {},
+              false */
 
-          formData.set("cc", archivos2[0]);
+              {
+                method: "GET",
 
-          formData.set("camaracomercio", archivos3[0]);
-
-          formData.set("numdoc", numDocumento);
-
-          formData.set("id_proceso", datosParams[0]["id_proceso"]);
-
-          notify("Se ha comenzado la carga");
-
-          console.log(Object.fromEntries(formData.entries()));
-          fetch(
-            `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`,
-
-            {
-              method: "POST",
-
-              body: formData,
-            }
-          )
-            .then((res) => res.json())
-            .then((respuesta) => {
-              if (!respuesta?.status) {
-                notifyError(respuesta?.msg);
-              } else {
-                console.log(respuesta?.obj);
-                notify("Se han subido los archivos");
-                /* setEstadoForm(true); */
+                /* body: formData, */
               }
-            })
-            .catch(() => {});
-        })
-        .catch(() => {});
+            )
+              .then((res) => res.json())
+              .then((respuesta) => {
+                console.log(respuesta);
+                if (!respuesta?.status) {
+                  console.log(respuesta);
+                  notifyError(respuesta?.msg);
+                } else {
+                  /*  console.log(respuesta?.obj); */
+                  notify("Se han subido los archivos");
+                  /*  console.log(respuesta?.obj[0]?.fields?.["x-amz-algorithm"]); */
+                  const formData2 = new FormData();
+                  const formData3 = new FormData();
+                  const formData4 = new FormData();
+
+                  if (archivos1 && archivos2 && !archivos3) {
+                    var cont_rut = 0;
+                    for (const datosS3 of respuesta?.obj) {
+                      if (cont_rut == 0) {
+                        for (const property in datosS3.fields) {
+                          /*  console.log(datosS3.fields[property]); */
+                          formData2.set(
+                            `${property}`,
+                            `${datosS3.fields[property]}`
+                          );
+                        }
+                      }
+                      cont_rut += 1;
+                    }
+                    formData2.set("file", archivos1[0]);
+                    fetch(`${respuesta?.obj[0]?.url}`, {
+                      method: "POST",
+
+                      body: formData2,
+                    })
+                      .then((res) => res?.status)
+                      .catch((err) => {
+                        {
+                        }
+                      });
+
+                    //------fetch cc----//
+                    var cont_Cc = 0;
+                    for (const datosS3 of respuesta?.obj) {
+                      if (cont_Cc == 1) {
+                        for (const property in datosS3.fields) {
+                          /* console.log(datosS3.fields[property]); */
+                          formData3.set(
+                            `${property}`,
+                            `${datosS3.fields[property]}`
+                          );
+                        }
+                      }
+                      cont_Cc += 1;
+                    }
+                    formData3.set("file", archivos2[0]);
+                    fetch(`${respuesta?.obj[1]?.url}`, {
+                      method: "POST",
+                      body: formData3,
+                    })
+                      .then((res) => res?.status)
+                      .catch((err) => {
+                        {
+                        }
+                      });
+                  } else if (archivos1 && archivos2 && archivos3) {
+                    var cont_rut = 0;
+                    for (const datosS3 of respuesta?.obj) {
+                      if (cont_rut == 0) {
+                        for (const property in datosS3.fields) {
+                          /* console.log(datosS3.fields[property]); */
+                          formData2.set(
+                            `${property}`,
+                            `${datosS3.fields[property]}`
+                          );
+                        }
+                      }
+                      cont_rut += 1;
+                    }
+                    formData2.set("file", archivos1[0]);
+                    fetch(`${respuesta?.obj[0]?.url}`, {
+                      method: "POST",
+                      body: formData2,
+                    })
+                      .then((res) => res?.status)
+                      .catch((err) => {
+                        {
+                        }
+                      });
+
+                    //------fetch cc----//
+                    var cont_Cc = 0;
+                    for (const datosS3 of respuesta?.obj) {
+                      if (cont_Cc == 1) {
+                        for (const property in datosS3.fields) {
+                          /*  console.log(datosS3.fields[property]); */
+                          formData3.set(
+                            `${property}`,
+                            `${datosS3.fields[property]}`
+                          );
+                        }
+                      }
+                      cont_Cc += 1;
+                    }
+                    formData3.set("file", archivos2[0]);
+
+                    fetch(`${respuesta?.obj[1]?.url}`, {
+                      method: "POST",
+                      body: formData3,
+                    })
+                      .then((res) => res?.status)
+                      .catch((err) => {
+                        {
+                        }
+                      });
+
+                    //------fetch Camara y Comercio----//
+                    var cont_cam = 0;
+                    for (const datosS3 of respuesta?.obj) {
+                      if (cont_cam == 2) {
+                        for (const property in datosS3.fields) {
+                          /* console.log(datosS3.fields[property]); */
+                          formData4.set(
+                            `${property}`,
+                            `${datosS3.fields[property]}`
+                          );
+                        }
+                      }
+                      cont_cam += 1;
+                    }
+                    formData4.set("file", archivos3[0]);
+                    fetch(`${respuesta?.obj[2]?.url}`, {
+                      method: "POST",
+                      body: formData4,
+                    })
+                      .then((res) => res?.status)
+                      .catch((err) => {
+                        {
+                        }
+                      });
+                  }
+                  /*     setEstadoForm(true); */
+                  navigate("/public/solicitud-enrolamiento/consultar");
+                }
+              })
+              .catch((err) => {
+                notifyError("Error al cargar Datos");
+              }); /* notify("Se ha comenzado la carga"); */
+          })
+          .catch((err) => {
+            console.log(err);
+            notifyError("Error al cargar Datos");
+          }); /*  notify("Se ha comenzado la carga"); */
+      } else {
+        notifyError("Adjunte los Documentos");
+      }
     },
     [archivos1, archivos2, archivos3]
   );
@@ -321,6 +474,8 @@ const CorreccionFormulario = () => {
             <Input
               label={"Responsable del iva"}
               placeholder={datosParams[0]["responsableiva"]}
+              value={responsableIva}
+              onChange={(e) => setResponsableIva(capitalize(e.target.value))}
             ></Input>
             <div className="flex flex-col justify-center items-center text-center my-4 mx-4 gap-4">
               <InputSuggestions
@@ -512,7 +667,7 @@ const CorreccionFormulario = () => {
               onChange={(e) => setBarrioCorr(capitalize(e.target.value))}
               type="text"
             />
-            {datosParams[0]["localidad_correspondencia"].length > 0 ? (
+            {datosParams[0]["localidad_correspondencia"]?.length > 0 ? (
               <Input
                 label={"Localidad"}
                 placeholder={datosParams[0]["localidad_correspondencia"]}
@@ -532,12 +687,14 @@ const CorreccionFormulario = () => {
             />
           </Fieldset>
           <FileInput
+            /* required */
             label={"Elige el archivo del Rut"}
             onGetFile={onFileChange}
             accept=".pdf"
             allowDrop={false}
           />
           <FileInput
+            /*  required */
             label={"Elige el archivo de la CC"}
             onGetFile={onFileChange2}
             accept=".pdf"
@@ -551,7 +708,7 @@ const CorreccionFormulario = () => {
           />
           <ButtonBar className={"lg:col-span-2"} type="">
             <Button
-              type="submit"
+              type=""
               onClick={(e) => {
                 corregirEnviar(e);
               }}

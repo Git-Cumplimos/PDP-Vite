@@ -290,6 +290,7 @@ const Reversos = () => {
   ]);
 
   const closeModal = useCallback(async (ticket) => {
+    setTicket(false);
     setShowModal(false);
     handleChange();
     console.log(ticket);
@@ -418,10 +419,10 @@ const Reversos = () => {
                   autoComplete="off"
                   maxLength={"15"}
                   value={value ?? ""}
-                  onInput={(e, valor) => {
-                    const num = valor || "";
-                    setValue(num);
-                  }}
+                  // onInput={(e, valor) => {
+                  //   const num = valor || "";
+                  //   setValue(num);
+                  // }}
                   required
                 ></MoneyInput>
                 <Input
@@ -461,8 +462,15 @@ const Reversos = () => {
             title="Recaudos"
             maxPage={maxPages}
             // onChange={onChangeRecaudos}
-            headers={["ID transacción", "Fecha", "Operación", "Monto"]}
-            data={trxs.map(({ id_trx, created, message_trx, monto }) => {
+            headers={[
+              "ID transacción",
+              "Fecha",
+              "Cedula",
+              "Credito",
+              "Referencia",
+              "Monto",
+            ]}
+            data={trxs.map(({ id_trx, created, res_obj, monto }) => {
               const tempDate = new Date(created);
               tempDate.setHours(tempDate.getHours() + 5);
               created = Intl.DateTimeFormat("es-CO", {
@@ -473,17 +481,22 @@ const Reversos = () => {
                 minute: "numeric",
               }).format(tempDate);
               monto = formatMoney.format(monto);
+              const referencia = res_obj?.Referencia;
+              const credito = res_obj?.info?.credito;
+              const cedula = res_obj?.info?.cedula;
               return {
                 id_trx,
                 created,
-                message_trx,
+                cedula,
+                credito,
+                referencia,
                 monto,
               };
             })}
             onSelectRow={(_e, index) => {
               setSelected(trxs[index]);
               setShowModal(true);
-              setValue(trxs[index]?.monto);
+              setValue(parseFloat(trxs[index]?.monto));
             }}
             onSetPageData={setPageDataRecaudos}
           ></TableEnterprise>

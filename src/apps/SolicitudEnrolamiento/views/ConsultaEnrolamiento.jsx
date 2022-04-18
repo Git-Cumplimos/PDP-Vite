@@ -3,24 +3,27 @@ import Input from "../../../components/Base/Input";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import { useCallback, useState } from "react";
-import Card from "../../../components/Base/Card";
 import Modal from "../../../components/Base/Modal";
 import LogoPDP from "../../../components/Base/LogoPDP/LogoPDP";
 import classes from "../../SolicitudEnrolamiento/views/ConsultaEnrolamiento.module.css";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import ProgressBar from "../../../components/Base/ProgressBar";
+import { notifyError } from "../../../utils/notify";
+
 const ConsultaEnrolamiento = () => {
+  //------------------Estados Consulta---------------------//
   const [numconsultaProceso, setNumConsultaProceso] = useState("");
   const [respuestaProceso, setRespuestaProceso] = useState("");
-  const [estado, setEstado] = useState(false);
-  const [cantNum, setCantNum] = useState("");
-  /* const [showModal, setShowModal] = useState(false); */
+  const [showModal, setShowModal] = useState(false);
+  const [cantNum, setCantNum] = useState(0);
 
   const navigate = useNavigate();
+
+  //------------------Constantes para Dar Estilos---------------------//
   const {
     principalConsulta,
     tituloConsultaInscripcion,
-    contenedorNumeroProceso,
     contenedorForm,
     contenedorBotones,
     estadoConsulta,
@@ -30,44 +33,60 @@ const ConsultaEnrolamiento = () => {
     contenedorValoresTitulos,
   } = classes;
 
+  //------------------Funcion Para Consultar Proceso---------------------//
   const funConsultaProceso = (e) => {
     e.preventDefault();
-    setEstado(true);
+    setShowModal(true);
     if (numconsultaProceso) {
       fetch(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${numconsultaProceso}`
+        /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${numconsultaProceso}` */
+        `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/actualizacionestado?numDoc=${numconsultaProceso}`,
         /*  `http://127.0.0.1:5000/actualizacionestado?numDoc=${numconsultaProceso}` */
+        {
+          method: "GET",
+
+          /* body: formData, */
+        }
       )
         .then((res) => res.json())
-        .then((respuesta) => setRespuestaProceso(respuesta.obj.results))
-        .catch(() => {});
+        .then((respuesta) => {
+          setRespuestaProceso(respuesta?.obj?.results);
+          /* console.log(respuesta); */
+        })
+        .catch((e) => {
+          /* console.log(e); */
+          notifyError("Error al cargar Datos Proceso");
+        });
     }
   };
-  console.log(respuestaProceso);
 
+  //------------------Funcion Para Dirigir a ReconoserID---------------------//
   const handleReconoser = async () => {
     navigate(
       `/public/solicitud-enrolamiento/reconoserid/${numconsultaProceso}`
     );
   };
+
+  //------------------Funcion Para Dirigir a Correcion Formulario---------------------//
   const handleCorregir = async () => {
     navigate(
       `/public/solicitud-enrolamiento/correccionformulario/${numconsultaProceso}`
     );
   };
-
+  //------------------Funcion Para Dirigir a Continuar Proceso ReconoserID---------------------//
   const handleContinuarReconoser = async () => {
     console.log(respuestaProceso[0].id_reconocer);
     navigate(
-      `/public/solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0].id_reconocer}`
+      `/public/solicitud-enrolamiento/continuarreconoserid/${respuestaProceso[0]?.id_reconocer}`
     );
   };
+
+  //------------------Funcion Para Modal---------------------//
   const handleClose = useCallback(() => {
-    setEstado(false);
-    setNumConsultaProceso("");
-    setRespuestaProceso("");
+    setShowModal(false);
   }, []);
 
+  //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
   useEffect(() => {
     cantidadNumero(numconsultaProceso);
   }, [numconsultaProceso]);
@@ -87,17 +106,21 @@ const ConsultaEnrolamiento = () => {
         Consultar Proceso de Inscripción
       </span>
 
-      <Form onSubmit={(e) => funConsultaProceso(e)}>
+      <Form /* onSubmit={(e) => funConsultaProceso(e)} */>
         <Input
           label={"Ingrese Numero Proceso:"}
           placeholder="Ej:1030652xxx"
           value={numconsultaProceso}
+          type="number"
           minlength="5"
           onChange={(e) => setNumConsultaProceso(e.target.value)}
         ></Input>
 
         <ButtonBar className={contenedorBotones} type="">
-          <Button type="submit" onClick={(e) => funConsultaProceso(e)}>
+          <Button
+            /* type="submit" */ type=""
+            onClick={(e) => funConsultaProceso(e)}
+          >
             Consultar Proceso
           </Button>
         </ButtonBar>
@@ -105,8 +128,8 @@ const ConsultaEnrolamiento = () => {
         {
           /* console.log(respuestaProceso.length) &&
         respuestaProceso.length <= 0 && */
-          estado && cantNum < 5 ? (
-            <Modal show={estado} handleClose={() => handleClose()}>
+          showModal && cantNum < 5 ? (
+            <Modal show={showModal} handleClose={handleClose}>
               <LogoPDP></LogoPDP>
 
               <h1>
@@ -115,12 +138,11 @@ const ConsultaEnrolamiento = () => {
                 inscripción.
               </h1>
             </Modal>
-          ) : cantNum >= 5 &&
-            respuestaProceso?.length > 0 &&
-            respuestaProceso.filter(
+          ) : cantNum >= 5 && respuestaProceso?.length > 0 /* &&
+            respuestaProceso?.filter(
               (element) => element["numdoc"] === numconsultaProceso
-            )[0]["numdoc"] === numconsultaProceso ? (
-            <Modal show={estado} handleClose={() => handleClose()}>
+            )[0]["numdoc"] === numconsultaProceso */ ? (
+            <Modal show={showModal} handleClose={handleClose}>
               <div className={contenedorForm}>
                 <LogoPDP></LogoPDP>
                 <div className={contenedorDatos}>
@@ -164,19 +186,19 @@ const ConsultaEnrolamiento = () => {
                   ""
                 )}
 
-                {(respuestaProceso[0].validation_state === "101" &&
-                  respuestaProceso[0].id_reconocer === "None") ||
-                (respuestaProceso[0].validation_state === "101" &&
-                  respuestaProceso[0].id_reconocer === "") ? (
+                {(respuestaProceso[0]?.validation_state === "101" &&
+                  respuestaProceso[0]?.id_reconocer === "None") ||
+                (respuestaProceso[0]?.validation_state === "101" &&
+                  respuestaProceso[0]?.id_reconocer === "") ? (
                   <ButtonBar className={"lg:col-span-2"} type="">
                     <Button type="submit" onClick={() => handleReconoser()}>
                       Comenzar ReconoserID
                     </Button>
                   </ButtonBar>
-                ) : (respuestaProceso[0].validation_state === "101" &&
-                    respuestaProceso[0].id_reconocer !== "None") ||
-                  (respuestaProceso[0].validation_state === "101" &&
-                    respuestaProceso[0].id_reconocer !== "") ? (
+                ) : (respuestaProceso[0]?.validation_state === "101" &&
+                    respuestaProceso[0]?.id_reconocer !== "None") ||
+                  (respuestaProceso[0]?.validation_state === "101" &&
+                    respuestaProceso[0]?.id_reconocer !== "") ? (
                   <ButtonBar type="">
                     <Button
                       className={contenedorBotones}
@@ -190,13 +212,27 @@ const ConsultaEnrolamiento = () => {
                   ""
                 )}
               </div>
+              {respuestaProceso[0]?.validation_state === "101" ? (
+                <ProgressBar value={25} self={false} max="100"></ProgressBar>
+              ) : respuestaProceso[0]?.validation_state === "200" ? (
+                <ProgressBar value={50} self={false} max="100"></ProgressBar>
+              ) : respuestaProceso[0]?.validation_state === "201" ? (
+                <ProgressBar value={100} self={false} max="100"></ProgressBar>
+              ) : respuestaProceso[0]?.validation_state === "102" ? (
+                <ProgressBar value={25} self={true} max="100"></ProgressBar>
+              ) : respuestaProceso[0]?.validation_state === "202" ? (
+                <ProgressBar value={100} self={true} max="100"></ProgressBar>
+              ) : (
+                <ProgressBar value={10} self={false} max="100"></ProgressBar>
+              )}
             </Modal>
           ) : /*  respuestaProceso && */
-          respuestaProceso.lenth > 1 &&
+          respuestaProceso?.lenth > 1 /* &&
             respuestaProceso.filter(
               (element) => element["numdoc"] === numconsultaProceso
-            )[0]["numdoc"] !== numconsultaProceso ? (
-            <Modal show={estado} handleClose={() => handleClose()}>
+            )[0]["numdoc"] !== numconsultaProceso */ ? (
+            /*  (
+            <Modal show={showModal} handleClose={handleClose}>
               <LogoPDP></LogoPDP>
               <h1>
                 El número ingresado no se encuentra en proceso de enrolamiento,
@@ -204,8 +240,9 @@ const ConsultaEnrolamiento = () => {
                 inscripción.
               </h1>
             </Modal>
+          ) */ ""
           ) : (
-            <Modal show={estado} handleClose={() => handleClose()}>
+            <Modal show={showModal} handleClose={handleClose}>
               <LogoPDP></LogoPDP>
               <h1>
                 El número ingresado no se encuentra en proceso de enrolamiento,
