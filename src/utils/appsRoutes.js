@@ -371,7 +371,7 @@ const allUrlsPrivateApps = [
     link: "/reporte_general",
     label: <AppIcons Logo={"MARKETPLACE"} name="Reporte Punto De Compra" />,
     component: ReporteGral,
-    permission: [8],
+    permission: [37],
   },
   {
     link: "/funmujer",
@@ -734,7 +734,7 @@ const privateUrls = [
   { link: "*", exact: false, component: Error404 },
   { link: "/", label: "Inicio", component: Home },
   { link: "/info", label: "Informacion general", component: emptyComp },
-  { link: "/gestion", label: "Gestión", component: emptyComp },
+  { link: "/gestion", label: "Gestión", component: Gestion },
   { link: "/reportes", label: "Reportes", component: Reportes },
   { link: "/seguridad", label: "Seguridad", component: emptyComp },
   { link: "/solicitudes", label: "Tus solicitudes", component: emptyComp },
