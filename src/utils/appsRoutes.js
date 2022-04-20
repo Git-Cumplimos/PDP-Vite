@@ -680,19 +680,4 @@ const allUrlsPrivateApps = [
   },
 ];
 
-<<<<<<< HEAD
-const privateUrls = [
-  { link: "*", exact: false, component: Error404 },
-  { link: "/", label: "Inicio", component: Home },
-  { link: "/info", label: "Informacion general", component: emptyComp },
-  { link: "/gestion", label: "Gestión", component: Gestion },
-  { link: "/reportes", label: "Reportes", component: Reportes },
-  { link: "/seguridad", label: "Seguridad", component: emptyComp },
-  { link: "/solicitudes", label: "Tus solicitudes", component: emptyComp },
-  { label: <AuthButton /> },
-];
-
-export { allUrlsPrivateApps, privateUrls, publicUrls, loginUrls };
-=======
 export { allUrlsPrivateApps };
->>>>>>> ac0e4af02d1e3407e60543e7eeab37793dc43120
