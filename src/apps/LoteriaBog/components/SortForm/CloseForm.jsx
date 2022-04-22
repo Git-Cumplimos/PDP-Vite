@@ -12,6 +12,7 @@ const CloseForm = ({ closeModal, tip_sorteo }) => {
   const onSubmit = (e) => {
     e.preventDefault();
     cargueVentasExtra_S3(tip_sorteo).then((res) => {
+      console.log(res);
       if (res.estado === true) {
         notify(res.msg);
       } else {

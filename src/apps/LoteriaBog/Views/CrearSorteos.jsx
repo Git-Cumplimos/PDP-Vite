@@ -122,10 +122,11 @@ const CrearSorteos = ({ route }) => {
     setShowparams(false);
     setParams(null);
   });
+  console.log(resp_con);
   return (
     <>
       <div>
-        {resp_con?.extra?.Cerrar && day != 4 ? (
+        {resp_con?.extra?.Cerrar ? (
           <ButtonBar>
             <Button
               type="button"
