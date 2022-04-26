@@ -195,6 +195,11 @@ const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
 const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 
 /**
+ * Consorcio CIRCULEMOS
+ */
+const CirculemosComp = lazy(() => import("../apps/Circulemos/Circulemos"));
+
+/**
  * Editar parametros tipos de transacciones
  */
 const ParamsOperations = lazy(() =>
@@ -216,7 +221,6 @@ const allUrlsPrivateApps = [
     extern: true,
     permission: [1],
   },
-
   {
     link: "/loteria",
     label: <AppIcons Logo={"LOTERIA"} name='Loteria' />,
@@ -277,13 +281,13 @@ const allUrlsPrivateApps = [
           extern: false,
           permission: [3], ///////////////////////////////////////////////////////////////////
         },
-        // {
-        //   link: `/loteria/${name}/arqueo`,
-        //   label: <AppIcons Logo={"PAGO"} name="Arqueo Billetes" />,
-        //   component: ArqueoBilletes,
-        //   extern: false,
-        //   permission: [3, 6], ///////////////////////////////////////////////////////////////////
-        // },
+        {
+          link: `/loteria/${name}/arqueo`,
+          label: <AppIcons Logo={"PAGO"} name="Arqueo Billetes" />,
+          component: ArqueoBilletes,
+          extern: false,
+          permission: [3, 6], ///////////////////////////////////////////////////////////////////
+        },
       ],
     })),
   },
@@ -325,7 +329,7 @@ const allUrlsPrivateApps = [
     link: "/reporte_general",
     label: <AppIcons Logo={"MARKETPLACE"} name='Reporte Punto De Compra' />,
     component: ReporteGral,
-    permission: [8],
+    permission: [37],
   },
   {
     link: "/funmujer",
@@ -717,6 +721,12 @@ const allUrlsPrivateApps = [
         permission: [36],
       },
     ],
+  },
+  {
+    link: "/circulemos",
+    label: <AppIcons Logo={"RECAUDO"} name="Consorcio Circulemos" />,
+    component: CirculemosComp,
+    permission: [1],
   },
 ];
 

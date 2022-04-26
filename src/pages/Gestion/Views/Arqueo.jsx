@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import useFormNumbers from "../../../hooks/useFormNumbers";
 import Fieldset from "../../../components/Base/Fieldset";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Button from "../../../components/Base/Button";
+import fetchData from "../../../utils/fetchData";
 
-const Arqueo = () => {
+const Arqueo = ({ caja }) => {
   const [total, setTotal] = useState("");
   const [denominaciones, handleChange] = useFormNumbers({
     cienmil: "",
@@ -39,8 +42,34 @@ const Arqueo = () => {
         50 * denominaciones?.cincuenta
     );
 
-    console.log(total);
+    console.log(total, caja?.obj?.results?.[0]?.actual_caja);
   }, [denominaciones]);
+
+  const urls = {
+    consultaCaja: `${process.env.REACT_APP_URL_CAJA}cash`,
+  };
+
+  const registerCash = useCallback(async () => {
+    try {
+      const res = await fetchData(
+        urls.consultaCaja,
+        "GET",
+        {
+          id_usuario: 206,
+          id_comercio: 8,
+          id_terminal: 121,
+        },
+        {},
+        {},
+        false
+      );
+      console.log(res);
+      return res;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  });
 
   return (
     <Form>
@@ -135,8 +164,28 @@ const Arqueo = () => {
           info={formatMoney.format(denominaciones?.cincuenta * 50)}
         ></Input>
       </Fieldset>
-      <h1>Total arqueo: {formatMoney.format(total)}</h1>
-      <Fieldset legend={"Saldos"}></Fieldset>
+
+      <Fieldset legend={"Saldos"}>
+        <h1>
+          Saldo en caja:
+          {formatMoney.format(caja?.obj?.results?.[0]?.actual_caja)}
+        </h1>
+        <h1>
+          Movimientos del día:
+          {formatMoney.format(caja?.obj?.results?.[0]?.actual_caja)}
+        </h1>
+        <h1>
+          Total arqueo:
+          {formatMoney.format(total)}
+        </h1>
+        <h1>
+          Sobrantes y faltantes:
+          {formatMoney.format(caja?.obj?.results[0]?.actual_caja - total)}
+        </h1>
+        <ButtonBar>
+          <Button type="button">Cerrar caja</Button>
+        </ButtonBar>
+      </Fieldset>
     </Form>
   );
 };
