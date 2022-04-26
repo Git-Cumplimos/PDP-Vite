@@ -104,7 +104,8 @@ const CargaArchivos = ({ route }) => {
         }, 3000);
       })
       .send((err) => {
-        if (err) notifyError("Error en la conexión a la base de datos", err);
+        if (err)
+          notifyError("Error con servicio de almacenamiento en la nube", err);
         console.log(err);
       });
   };
