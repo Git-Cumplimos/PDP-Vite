@@ -76,7 +76,6 @@ const CargaArchivos = ({ route }) => {
     setDisabledBtns(true);
     const f = new Date();
     const params = {
-      ACL: "public-read",
       Body: file,
       Bucket: S3_BUCKET,
       Key: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
