@@ -249,7 +249,7 @@ const TypesTrxs = () => {
         </Button>
       </ButtonBar>
       <TableEnterprise
-        title='Convenios'
+        title='Tipos de transacciones'
         maxPage={maxPages}
         onChange={onChange}
         headers={["Id", "Tipo de transaccion", "Autorizador"]}
