@@ -1,5 +1,5 @@
 form.Grid {
-  @apply grid gap-4 xl:w-full my-4;
+  @apply grid gap-6 xl:w-full my-4;
 
   grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
 }
