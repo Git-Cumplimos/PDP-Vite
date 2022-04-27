@@ -283,7 +283,7 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/arqueo`,
-          label: <AppIcons Logo={"PAGO"} name="Arqueo Billetes" />,
+          label: <AppIcons Logo={"PAGO"} name='Arqueo Billetes' />,
           component: ArqueoBilletes,
           extern: false,
           permission: [3, 6], ///////////////////////////////////////////////////////////////////
@@ -472,13 +472,13 @@ const allUrlsPrivateApps = [
     link: "/recargas-Colcard",
     label: <AppIcons Logo={"LOTERIA"} name='Recargas ColCard' />,
     component: ColCard,
-    permission: [46],
+    permission: [50],
     subRoutes: [
       {
         link: "/recargas-Colcard/recargar-tarjeta",
         label: <AppIcons Logo={"SORTEOS"} name='Recargar tarjeta' />,
         component: RecargarColCard,
-        permission: [46],
+        permission: [50],
       },
       // {
       //   link: "/recargas-Colcard/consultar-tarjeta",
@@ -492,19 +492,19 @@ const allUrlsPrivateApps = [
     link: "/movii-pdp",
     label: <AppIcons Logo={"LOTERIA"} name='MOVII PDP' />,
     component: MoviiPDP,
-    permission: [44],
+    permission: [48],
     subRoutes: [
       {
         link: "/movii-pdp/cash-out",
         label: <AppIcons Logo={"SORTEOS"} name='Cash out' />,
         component: MoviiPDPCashOut,
-        permission: [45],
+        permission: [49],
       },
       {
         link: "/movii-pdp/cash-out-reversos",
         label: <AppIcons Logo={"SORTEOS"} name='Reversos cash out' />,
         component: MoviiPDPReverseCashOut,
-        permission: [48],
+        permission: [52],
       },
     ],
   },
@@ -520,7 +520,7 @@ const allUrlsPrivateApps = [
           <AppIcons Logo={"RECAUDO"} name={"Parametros por autorizador"} />
         ),
         component: ParametrosAutorizadores,
-        permission: [47],
+        permission: [51],
       },
       {
         link: "/params-operations/types-trxs",
@@ -724,7 +724,7 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/circulemos",
-    label: <AppIcons Logo={"RECAUDO"} name="Consorcio Circulemos" />,
+    label: <AppIcons Logo={"RECAUDO"} name='Consorcio Circulemos' />,
     component: CirculemosComp,
     permission: [1],
   },
