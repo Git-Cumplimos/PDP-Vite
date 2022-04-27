@@ -10,6 +10,9 @@ const PaymentSummary = ({
       <h1 className="text-xl font-semibold">{subtitle}</h1>
       <ul className="grid grid-flow-row auto-rows-fr gap-2 place-items-stretch">
         {Object.entries(summaryTrx ?? {}).map(([key, val]) => {
+          if (Array.isArray(val) || typeof val === "object") {
+            val = JSON.stringify(val);
+          }
           return (
             <li key={key}>
               <h1 className="grid grid-flow-col auto-cols-fr gap-6 place-items-center">
