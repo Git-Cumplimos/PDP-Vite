@@ -158,6 +158,16 @@ const ZonasComerciales = lazy(() =>
 const LocalidadesComerciales = lazy(() =>
   import("../apps/AdministradorGestionComercial/Views/LocalidadesComerciales")
 );
+/**
+ * Domiciliacion PPS
+ */
+const Domiciliacion = lazy(() => import("../apps/Domiciliacion/Domiciliacion"));
+const PpsVoluntario = lazy(() =>
+  import("../apps/Domiciliacion/Views/PpsDomiciliacion")
+);
+const ModificarPps = lazy(() =>
+  import("../apps/Domiciliacion/Views/ModificarPps")
+);
 
 /**
  * Recaudo
@@ -675,6 +685,26 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"RECAUDO"} name={"Administrar Localidades"} />,
         component: LocalidadesComerciales,
         permission: [36],
+      },
+    ],
+  },
+  {
+    link: "/domiciliacion",
+    label: <AppIcons Logo={"RECAUDO"} name={"Domiciliacion"} />,
+    component: Domiciliacion,
+    permission: [32, 33, 34, 35, 36],
+    subRoutes: [
+      {
+        link: "/domiciliacion/formulario",
+        label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliacion"} />,
+        component: PpsVoluntario,
+        permission: [34],
+      },
+      {
+        link: "/domiciliacion/modificar",
+        label: <AppIcons Logo={"ACTUALIZACION"} name={"Modificar"} />,
+        component: ModificarPps,
+        permission: [33],
       },
     ],
   },
