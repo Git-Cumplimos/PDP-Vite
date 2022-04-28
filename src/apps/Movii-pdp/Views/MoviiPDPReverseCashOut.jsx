@@ -86,6 +86,7 @@ const MoviiPDPReverseCashout = () => {
           nombre_comercio,
           subscriber_num,
           transaction_date,
+          transaction_id,
         }) => {
           return {
             id_trx,
@@ -108,6 +109,7 @@ const MoviiPDPReverseCashout = () => {
             id_terminal,
             nombre_comercio,
             issuer_id_dane,
+            transaction_id,
           };
         }
       ),
@@ -242,6 +244,7 @@ const MoviiPDPReverseCashout = () => {
           "Id terminal",
           "Nombre comercio",
           "Id dane",
+          "Id transaccion Movii",
         ]}
         data={tableReversosCashOut}
         onSelectRow={onSelectReversosCashOut}
