@@ -76,7 +76,6 @@ const CargaArchivos = ({ route }) => {
     setDisabledBtns(true);
     const f = new Date();
     const params = {
-      ACL: "public-read",
       Body: file,
       Bucket: S3_BUCKET,
       Key: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
@@ -105,7 +104,8 @@ const CargaArchivos = ({ route }) => {
         }, 3000);
       })
       .send((err) => {
-        if (err) notifyError("Error en la conexión a la base de datos", err);
+        if (err)
+          notifyError("Error con servicio de almacenamiento en la nube", err);
         console.log(err);
       });
   };

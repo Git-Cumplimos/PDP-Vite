@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import MicroTable from "../../../components/Base/MicroTable";
 import Arqueo from "./Arqueo";
 import Modal from "../../../components/Base/Modal";
 import Button from "../../../components/Base/Button";
+import { useGestion } from "../utils/GestionHooks";
+import fetchData from "../../../utils/fetchData";
 const trxs = [
   {
     id: "1",
@@ -19,6 +21,7 @@ const trxs = [
     total_consignado: 8000000,
   },
 ];
+
 const headers = [
   "Id",
   "Autorizador",
@@ -28,7 +31,45 @@ const headers = [
   "Saldo pendiente",
   "Saldo por consignar",
 ];
+
+const urls = {
+  consultaCaja: `${process.env.REACT_APP_URL_CAJA}cash`,
+};
+
 const Panel = () => {
+  const [total, setTotal] = useState("");
+  const searchCash = useCallback(async () => {
+    try {
+      const res = await fetchData(
+        urls.consultaCaja,
+        "GET",
+        {
+          id_usuario: 206,
+          id_comercio: 8,
+          id_terminal: 121,
+        },
+        {},
+        {},
+        false
+      );
+      console.log(res);
+      return res;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  });
+
+  useEffect(() => {
+    searchCash()
+      .then((res) => {
+        setTotal(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   const [estado, setEstado] = useState(false);
   const formatMoney = new Intl.NumberFormat("es-CO", {
     style: "currency",
@@ -58,7 +99,6 @@ const Panel = () => {
             const s_consignar = formatMoney.format(
               total_recaudo - total_consignado
             );
-            console.log(id);
             return {
               id,
               autorizador,
@@ -71,9 +111,9 @@ const Panel = () => {
           }
         )}
       ></MicroTable>
-      <Button onClick={() => setEstado(true)}></Button>
+      <Button onClick={() => setEstado(true)}>Cerrar caja</Button>
       <Modal show={estado} handleClose={closeModalFunction}>
-        <Arqueo />
+        <Arqueo caja={total} />
       </Modal>
     </>
   );

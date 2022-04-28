@@ -33,11 +33,17 @@ const Retiro = () => {
     min: 5000,
   });
 
+  const [revalTrxParams, setRevalTrxParams] = useState({
+    idcliente: 0,
+    idpersona: 0,
+    NoidentificacionCajero: "",
+  });
+
   const printDiv = useRef();
 
   useEffect(() => {
-    if (Object.keys(roleInfo).length === 0) {
-      navigate(-1);
+    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
+      navigate("/");
     } else {
       let hasKeys = true;
       const keys = [
@@ -58,7 +64,7 @@ const Retiro = () => {
         notifyError(
           "El usuario no cuenta con datos de comercio, no se permite la transaccion"
         );
-        navigate(-1);
+        navigate("/");
       }
     }
   }, [roleInfo, navigate]);
@@ -141,10 +147,10 @@ const Retiro = () => {
       id_usuario: roleInfo?.id_usuario,
       id_terminal: roleInfo?.id_dispositivo,
       oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
-      idcliente: 5,
-      ipcliente: "172.17.0.4",
-      idpersona: 240,
-      NoidentificacionCajero: "1022424095",
+      // idcliente: 5,
+      // idpersona: 240,
+      // NoidentificacionCajero: "52389030",
+      ...revalTrxParams,
       NoIdentificacionUsuario: userDoc,
       NumCelular: phone,
       Valor: valor,
@@ -176,8 +182,8 @@ const Retiro = () => {
           commerceInfo: [
             ["Id Comercio", roleInfo?.id_comercio],
             ["No. terminal", roleInfo?.id_dispositivo],
-            ["Municipio", roleInfo?.ciudad || "Bogota"],
-            ["Dirección", roleInfo?.direccion || "Calle 11 # 11 - 2"],
+            ["Municipio", roleInfo?.ciudad],
+            ["Dirección", roleInfo?.direccion],
             ["Id Trx", trx_id],
             ["Id Transacción", res?.obj?.IdTransaccion],
           ],
@@ -203,7 +209,16 @@ const Retiro = () => {
         console.error(err);
         notifyError("Error en la transaccion");
       });
-  }, [userDoc, otp, phone, valor, fetchCashOut, roleInfo, infoTicket]);
+  }, [
+    userDoc,
+    otp,
+    phone,
+    valor,
+    fetchCashOut,
+    roleInfo,
+    infoTicket,
+    revalTrxParams,
+  ]);
 
   useEffect(() => {
     fetchTypes(
@@ -220,6 +235,12 @@ const Retiro = () => {
         setLimitesMontos({
           max: parseFloat(_parametros?.monto_maximo),
           min: parseFloat(_parametros?.monto_minimo),
+        });
+
+        setRevalTrxParams({
+          idcliente: parseFloat(_parametros?.idcliente) ?? 0,
+          idpersona: parseFloat(_parametros?.idpersona) ?? 0,
+          NoidentificacionCajero: _parametros?.NoidentificacionCajero ?? "",
         });
       })
       .catch((err) => {
