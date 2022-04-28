@@ -1,15 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Button from "../components/Base/Button";
 import ButtonBar from "../components/Base/ButtonBar";
-import Form from "../components/Base/Form";
 import Modal from "../components/Base/Modal";
 import Select from "../components/Base/Select";
-import Table from "../components/Base/Table";
 import Input from "../components/Base/Input";
 import fetchData from "../utils/fetchData";
 import { useAuth } from "../hooks/AuthHooks";
 import Tickets from "../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
+import TableEnterprise from "../components/Base/TableEnterprise";
+import PaymentSummary from "../components/Compound/PaymentSummary";
+
+const dateFormatter = Intl.DateTimeFormat("es-CO", {
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "numeric",
+});
 
 const Transacciones = () => {
   const { roleInfo, userPermissions } = useAuth();
@@ -18,8 +26,10 @@ const Transacciones = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [summaryTrx, setSummaryTrx] = useState(null);
 
-  const [page, setPage] = useState(1);
+  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+
   const [maxPages, setMaxPages] = useState(1);
   const [idComercio, setIdComercio] = useState(-1);
   const [usuario, setUsuario] = useState(-1);
@@ -33,59 +43,51 @@ const Transacciones = () => {
     maximumFractionDigits: 0,
   });
 
-  const transacciones = useCallback(
-    (page, Comercio, usuario, Tipo_operacion, date_ini, date_end) => {
-      const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
-      const queries = {};
-      if (!(Comercio === -1 || Comercio === "")) {
-        queries.id_comercio = parseInt(Comercio);
-      }
-      if (!(usuario === -1 || usuario === "")) {
-        queries.id_usuario = parseInt(usuario);
-      }
-      if (Tipo_operacion) {
-        queries.id_tipo_transaccion = Tipo_operacion;
-      }
-      if (page) {
-        queries.page = page;
-      }
-      if (date_ini && date_end) {
-        const fecha_ini = new Date(date_ini);
-        fecha_ini.setHours(fecha_ini.getHours() + 5);
-        date_ini = Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }).format(fecha_ini);
+  const transacciones = useCallback(() => {
+    const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
+    const queries = { ...pageData };
+    if (!(idComercio === -1 || idComercio === "")) {
+      queries.id_comercio = parseInt(idComercio);
+    }
+    if (!(usuario === -1 || usuario === "")) {
+      queries.id_usuario = parseInt(usuario);
+    }
+    if (tipoOp) {
+      queries.id_tipo_transaccion = tipoOp;
+    }
+    if (fechaInicial && fechaFinal) {
+      const fecha_ini = new Date(fechaInicial);
+      fecha_ini.setHours(fecha_ini.getHours() + 5);
+      queries.date_ini = Intl.DateTimeFormat("es-CO", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      }).format(fecha_ini);
 
-        const fecha_fin = new Date(date_end);
-        fecha_fin.setHours(fecha_fin.getHours() + 5);
-        date_end = Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }).format(fecha_fin);
-        queries.date_ini = date_ini;
-        queries.date_end = date_end;
-      }
-      console.log(queries);
-      fetchData(url, "GET", queries)
-        .then((res) => {
-          console.log(res);
-          if (res?.status) {
-            setMaxPages(res?.obj?.maxpages);
-            setTrxs(res?.obj?.trxs);
-          } else {
-            throw new Error(res?.msg);
-          }
-        })
-        .catch(() => {});
-    },
-    []
-  );
+      const fecha_fin = new Date(fechaFinal);
+      fecha_fin.setHours(fecha_fin.getHours() + 5);
+      queries.fechaFinal = Intl.DateTimeFormat("es-CO", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      }).format(fecha_fin);
+    }
+    fetchData(url, "GET", queries)
+      .then((res) => {
+        if (res?.status) {
+          setMaxPages(res?.obj?.maxpages);
+          setTrxs(res?.obj?.trxs);
+        } else {
+          throw new Error(res?.msg);
+        }
+      })
+      .catch(() => {});
+  }, [pageData, idComercio, fechaFinal, fechaInicial, tipoOp, usuario]);
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
+    setSelected(null);
+    setSummaryTrx(null);
   }, []);
 
   const printDiv = useRef();
@@ -109,50 +111,74 @@ const Transacciones = () => {
     setUsuario(roleInfo?.id_usuario || -1);
   }, [userPermissions, roleInfo]);
 
+  useEffect(() => {
+    transacciones();
+  }, [transacciones]);
+
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Transacciones</h1>
-      <Form onSubmit={(e) => e.preventDefault()} grid>
+      <TableEnterprise
+        title="Transacciones"
+        headers={[
+          "Id transaccion",
+          "Operación",
+          "Monto",
+          "Fecha",
+          "Estado de la trasaccion",
+        ]}
+        data={trxs.map(
+          ({
+            id_trx,
+            "Tipo transaccion": Tipo_operacion,
+            monto,
+            created,
+            status_trx,
+          }) => {
+            const tempDate = new Date(created);
+            tempDate.setHours(tempDate.getHours() + 5);
+            created = dateFormatter.format(tempDate);
+            const money = formatMoney.format(monto);
+            return {
+              id_trx,
+              Tipo_operacion,
+              money,
+              created,
+              status_trx: status_trx
+                ? "Trasaccion aprobada"
+                : "Trasaccion rechazada",
+            };
+          }
+        )}
+        maxPage={maxPages}
+        onSelectRow={(_e, index) => {
+          setSelected(trxs[index]);
+          setSummaryTrx({
+            "Tipo transaccion": trxs[index]?.["Tipo transaccion"],
+            Fecha: dateFormatter.format(new Date(trxs[index]?.created)),
+            "Mensaje de respuesta trx": trxs[index]?.message_trx,
+            Monto: formatMoney.format(trxs[index]?.monto),
+            "Estado de la trasaccion": trxs[index]?.status_trx
+              ? "Trasaccion aprobada"
+              : "Trasaccion rechazada",
+          });
+          setShowModal(true);
+        }}
+        onSetPageData={setPageData}
+      >
         <Input
           id="dateInit"
           label="Fecha inicial"
           type="date"
           value={fechaInicial}
-          onInput={(e) => {
-            setPage(1);
-            setMaxPages(1);
-            setFechaInicial(e.target.value);
-            if (fechaFinal !== "" && tipoOp !== "") {
-              transacciones(
-                1,
-                idComercio,
-                usuario,
-                tipoOp,
-                e.target.value,
-                fechaFinal
-              );
-            }
-          }}
+          onInput={(e) => setFechaInicial(e.target.value)}
         />
         <Input
           id="dateEnd"
           label="Fecha final"
           type="date"
           value={fechaFinal}
-          onInput={(e) => {
-            setPage(1);
-            setFechaFinal(e.target.value);
-            if (fechaInicial !== "" && tipoOp !== "") {
-              transacciones(
-                1,
-                idComercio,
-                usuario,
-                tipoOp,
-                fechaInicial,
-                e.target.value
-              );
-            }
-          }}
+          onInput={(e) => setFechaFinal(e.target.value)}
         />
         <Select
           id="searchBySorteo"
@@ -167,18 +193,7 @@ const Transacciones = () => {
           }
           value={tipoOp}
           required={true}
-          onChange={(e) => {
-            setPage(1);
-            setTipoOp(parseInt(e.target.value) ?? "");
-            transacciones(
-              1,
-              idComercio,
-              usuario,
-              parseInt(e.target.value) ?? 0,
-              fechaInicial,
-              fechaFinal
-            );
-          }}
+          onChange={(e) => setTipoOp(parseInt(e.target.value) ?? "")}
         />
         {userPermissions
           .map(({ id_permission }) => id_permission)
@@ -193,19 +208,7 @@ const Transacciones = () => {
                 setIdComercio(e.target.value);
               }}
               onLazyInput={{
-                callback: (e) => {
-                  setPage(1);
-                  if (tipoOp !== "") {
-                    transacciones(
-                      1,
-                      e.target.value,
-                      usuario,
-                      tipoOp,
-                      fechaInicial,
-                      fechaFinal
-                    );
-                  }
-                },
+                callback: (e) => {},
                 timeOut: 500,
               }}
             />
@@ -218,19 +221,7 @@ const Transacciones = () => {
                 setUsuario(e.target.value);
               }}
               onLazyInput={{
-                callback: (e) => {
-                  setPage(1);
-                  if (tipoOp !== "") {
-                    transacciones(
-                      1,
-                      idComercio,
-                      e.target.value,
-                      tipoOp,
-                      fechaInicial,
-                      fechaFinal
-                    );
-                  }
-                },
+                callback: (e) => {},
                 timeOut: 500,
               }}
             />
@@ -238,85 +229,7 @@ const Transacciones = () => {
         ) : (
           ""
         )}
-
-        {maxPages > 1 ? (
-          <ButtonBar className="col-span-1 md:col-span-2">
-            <Button
-              type="button"
-              disabled={page < 2}
-              onClick={() => {
-                setPage(page - 1);
-                transacciones(
-                  page - 1,
-                  idComercio,
-                  usuario,
-                  tipoOp,
-                  fechaInicial,
-                  fechaFinal
-                );
-              }}
-            >
-              Anterior
-            </Button>
-            <Button
-              type="button"
-              disabled={page >= maxPages}
-              onClick={() => {
-                setPage(page + 1);
-                transacciones(
-                  page + 1,
-                  idComercio,
-                  usuario,
-                  tipoOp,
-                  fechaInicial,
-                  fechaFinal
-                );
-              }}
-            >
-              Siguiente
-            </Button>
-          </ButtonBar>
-        ) : (
-          ""
-        )}
-      </Form>
-      {Array.isArray(trxs) && trxs.length > 0 ? (
-        <>
-          <div className="flex flex-row justify-evenly w-full my-4">
-            <h1>Pagina: {page}</h1>
-            <h1>Ultima pagina: {maxPages}</h1>
-          </div>
-          <Table
-            headers={["Fecha", "Operación", "Monto"]}
-            data={trxs.map(
-              ({ created, "Tipo transaccion": Tipo_operacion, monto }) => {
-                const tempDate = new Date(created);
-                tempDate.setHours(tempDate.getHours() + 5);
-                created = Intl.DateTimeFormat("es-CO", {
-                  year: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                }).format(tempDate);
-                const money = formatMoney.format(monto);
-                return {
-                  created,
-                  Tipo_operacion,
-                  money,
-                };
-              }
-            )}
-            onSelectRow={(_e, index) => {
-              setSelected(trxs[index]);
-              setShowModal(true);
-            }}
-          />
-        </>
-      ) : (
-        ""
-      )}
-
+      </TableEnterprise>
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket ? (
           <div className="flex flex-col justify-center items-center">
@@ -327,21 +240,23 @@ const Transacciones = () => {
             />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button
-                onClick={() => {
-                  closeModal();
-                  setSelected(null);
-                }}
-              >
-                Cerrar
-              </Button>
+              <Button onClick={() => closeModal()}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
           <div className="flex flex-col justify-center items-center mx-auto container">
-            <h1 className="text-3xl mt-6 text-aling">
-              No hay ticket registrado
-            </h1>
+            <PaymentSummary
+              title="Resumen transaccion"
+              subtitle=""
+              summaryTrx={summaryTrx}
+            >
+              <h1 className="text-3xl mt-6 text-aling">
+                No hay ticket registrado
+              </h1>
+              <ButtonBar>
+                <Button onClick={() => closeModal()}>Cerrar</Button>
+              </ButtonBar>
+            </PaymentSummary>
           </div>
         )}
       </Modal>

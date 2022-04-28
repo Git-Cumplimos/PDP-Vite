@@ -17,43 +17,10 @@ import {
   postConfiguracionComercios,
   putConfiguracionComercios,
 } from "../utils/fetchConfiguracionComercios";
-import {
-  fetchAutorizadores,
-  postAutorizadores,
-  putAutorizadores,
-} from "../utils/fetchRevalAutorizadores";
+
 import { fetchTiposContratosComisiones } from "../utils/fetchTiposContratosComisiones";
 
-const calcularDigitoVerificacion = (myNit) => {
-  let vpri, z;
-
-  // Se limpia el Nit
-  // Espacios - comas - puntos - guiones
-  myNit = myNit.replace(/(\s)|(,)|(\.)|(-)/g, "");
-
-  // Se valida el nit
-  if (isNaN(myNit)) {
-    notifyError("El nit '" + myNit + "' no es válido(a).");
-    return "";
-  }
-
-  // Procedimiento
-  vpri = [2, 3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
-  z = myNit.length;
-
-  let x = 0;
-  let y = 0;
-  for (let i = 0; i < z; i++) {
-    y = myNit.substr(i, 1);
-    x += y * vpri[z - i];
-  }
-  y = x % 11;
-
-  return y > 1 ? 11 - y : y;
-};
-
 const ConfiguracionComercios = () => {
-  const navigate = useNavigate();
   const [{ searchAuto = "", openTipoContrato = false }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
