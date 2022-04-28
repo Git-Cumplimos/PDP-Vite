@@ -46,6 +46,7 @@ const MoviiPDPReverseCashout = () => {
       id_trx: "",
       transaction_date: "",
       message_reverse: "",
+      oficina_propia: "",
     });
     fecthReversosCashOutFunc();
   }, []);
@@ -61,6 +62,7 @@ const MoviiPDPReverseCashout = () => {
     id_trx: "",
     transaction_date: "",
     message_reverse: "",
+    oficina_propia: "",
   });
   const [reversosCashOut, setReversosCashOut] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
@@ -87,6 +89,7 @@ const MoviiPDPReverseCashout = () => {
           subscriber_num,
           transaction_date,
           transaction_id,
+          oficina_propia,
         }) => {
           return {
             id_trx,
@@ -110,6 +113,7 @@ const MoviiPDPReverseCashout = () => {
             nombre_comercio,
             issuer_id_dane,
             transaction_id,
+            oficina_propia: oficina_propia ? "Oficina propia" : "Comercio",
           };
         }
       ),
@@ -207,6 +211,8 @@ const MoviiPDPReverseCashout = () => {
         cashOutId: selectedRever.cashOutId,
         id_trx: parseInt(selectedRever.id_trx),
         message_reverse: selectedRever.message_reverse,
+        oficina_propia:
+          selectedRever.oficina_propia === "Oficina propia" ? true : false,
       })
         .then((res) => {
           if (res?.status) {
@@ -245,6 +251,7 @@ const MoviiPDPReverseCashout = () => {
           "Nombre comercio",
           "Id dane",
           "Id transaccion Movii",
+          "Tipo de comercio",
         ]}
         data={tableReversosCashOut}
         onSelectRow={onSelectReversosCashOut}
