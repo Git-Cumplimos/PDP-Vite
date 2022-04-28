@@ -12,6 +12,11 @@ const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 const PermissionForm = ({ onCloseModal }) => {
   const makeForm = useMemo(() => {
     return {
+      "Id del permiso": {
+        type: "number",
+        required: false,
+        info: "Campo opcional",
+      },
       "Nombre del permiso": {},
     };
   }, []);
@@ -21,14 +26,15 @@ const PermissionForm = ({ onCloseModal }) => {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    fetchData(
-      `${url_iam}/permissions`,
-      "POST",
-      {},
-      {
-        name_permission: formData.get("Nombre del permiso"),
-      }
-    )
+    const body = { name_permission: formData.get("Nombre del permiso") };
+
+    const settedId = parseInt(formData.get("Id del permiso")) ?? 0;
+
+    if (settedId) {
+      body.id_permission = settedId;
+    }
+
+    fetchData(`${url_iam}/permissions`, "POST", {}, body)
       .then((res) => {
         if (res?.status) {
           notify(res?.msg);
@@ -51,16 +57,13 @@ const PermissionForm = ({ onCloseModal }) => {
       <Form onSubmit={onSubmit} grid>
         {Object.entries(makeForm).map(([key, val]) => {
           if (!Object.keys(val).includes("options")) {
-            const { required, type } = val;
+            const { required, type, ...rest } = val;
             return (
               <Input
                 key={`${key}_new`}
                 id={`${key}_new`}
-                name={key}
-                label={key}
-                type={type || "text"}
-                autoComplete="off"
                 required={required ?? true}
+                {...rest}
               />
             );
           } else {

@@ -9,8 +9,8 @@ const DaviplataTrx = ({ subRoutes }) => {
   const { roleInfo } = useAuth();
 
   useEffect(() => {
-    if (Object.keys(roleInfo).length === 0) {
-      navigate(-1);
+    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
+      navigate("/");
     } else {
       let hasKeys = true;
       const keys = [
@@ -31,7 +31,7 @@ const DaviplataTrx = ({ subRoutes }) => {
         notifyError(
           "El usuario no cuenta con datos de comercio, no se permite la transaccion"
         );
-        navigate(-1);
+        navigate("/");
       }
     }
   }, [roleInfo, navigate]);
