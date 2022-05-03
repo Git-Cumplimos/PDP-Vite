@@ -7,6 +7,8 @@ import fetchData from "../../../../utils/fetchData";
 import Pagination from "../../../../components/Compound/Pagination";
 import useQuery from "../../../../hooks/useQuery";
 import { notify, notifyError } from "../../../../utils/notify";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -82,6 +84,10 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
   const [typesByPermissions, setTypesByPermissions] = useState({});
   const [typesDB, setTypesDB] = useState({});
 
+  const [name_permission, setName_permission] = useState(
+    selected?.["Nombre del permiso"]
+  );
+
   useEffect(() => {
     searchTypesByPermission(selected?.edit?.id_permission).then((res) => {
       setTypesByPermissions(res);
@@ -107,6 +113,25 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
 
       let edited = 0;
       let allToEdit = 0;
+
+      if (name_permission !== selected?.["Nombre del permiso"]) {
+        const resp = await fetchData(
+          `${url_iam}/permissions`,
+          "PUT",
+          {
+            id_permission: selected?.edit?.id_permission,
+          },
+          {
+            name_permission,
+          }
+        );
+        if (resp?.status) {
+          notify("Nombre de permiso actualizado satisfactoriamente");
+        } else {
+          notifyError(resp?.msg);
+          return;
+        }
+      }
 
       for (const [key, value] of relations) {
         try {
@@ -176,7 +201,8 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
       }
 
       if (allToEdit === 0) {
-        notifyError("No hay tipos seleccionados para editar en el permiso");
+        notifyError("No se seleccionaron tipos para editar en el permiso");
+        onCloseModal?.();
       } else {
         notify(
           `Se han editado ${edited} de ${allToEdit} tipos de operacion a editar en el permiso`
@@ -184,7 +210,7 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
         onCloseModal?.();
       }
     },
-    [onCloseModal, selected?.edit?.id_permission, typesByPermissions]
+    [onCloseModal, selected, typesByPermissions, name_permission]
   );
 
   return (
@@ -193,7 +219,7 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
         Editar transacciones visibles para el permiso
       </h1>
       {Object.entries(selected).map(([key, val]) => {
-        return key !== "edit" ? (
+        return key !== "edit" && key !== "Nombre del permiso" ? (
           <div
             className="flex flex-row justify-between text-lg font-medium w-3/4"
             key={key}
@@ -205,6 +231,13 @@ const EditPermissionForm = ({ selected, onCloseModal }) => {
           ""
         );
       })}
+      <Form grid>
+        <Input
+          label={"Nombre del permiso"}
+          value={name_permission}
+          onChange={(ev) => setName_permission(ev.target.value)}
+        />
+      </Form>
       <Pagination maxPage={typesDB?.maxPages} lgButtons={false} grid>
         {Array.isArray(Object.keys(typesByPermissions)) &&
         Object.keys(typesByPermissions).length > 0 ? (

@@ -53,7 +53,16 @@ const ColCard = lazy(() => import("../apps/ColCard/ColCard"));
 const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
-
+/**
+ * Movii
+ */
+const MoviiPDP = lazy(() => import("../apps/Movii-pdp/MoviiPDP"));
+const MoviiPDPCashOut = lazy(() =>
+  import("../apps/Movii-pdp/Views/MoviiPDPCashOut")
+);
+const MoviiPDPReverseCashOut = lazy(() =>
+  import("../apps/Movii-pdp/Views/MoviiPDPReverseCashOut")
+);
 /**
  * Marketplace
  */
@@ -87,6 +96,9 @@ const CommerceInfo = lazy(() => import("../apps/UpdateCommerce/CommerceInfo"));
 /**
  * Trx params
  */
+const ParametrosAutorizadores = lazy(() =>
+  import("../apps/TrxParams/Views/ParametrosAutorizadores")
+);
 const TipoContratoComisiones = lazy(() =>
   import("../apps/TrxParams/Views/TipoContratoComisiones")
 );
@@ -158,6 +170,16 @@ const ZonasComerciales = lazy(() =>
 const LocalidadesComerciales = lazy(() =>
   import("../apps/AdministradorGestionComercial/Views/LocalidadesComerciales")
 );
+/**
+ * Domiciliacion PPS
+ */
+const Domiciliacion = lazy(() => import("../apps/Domiciliacion/Domiciliacion"));
+const PpsVoluntario = lazy(() =>
+  import("../apps/Domiciliacion/Views/PpsDomiciliacion")
+);
+const ModificarPps = lazy(() =>
+  import("../apps/Domiciliacion/Views/ModificarPps")
+);
 
 /**
  * Recaudo
@@ -183,6 +205,11 @@ const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
 const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 
 /**
+ * Consorcio CIRCULEMOS
+ */
+const CirculemosComp = lazy(() => import("../apps/Circulemos/Circulemos"));
+
+/**
  * Editar parametros tipos de transacciones
  */
 const ParamsOperations = lazy(() =>
@@ -204,7 +231,6 @@ const allUrlsPrivateApps = [
     extern: true,
     permission: [1],
   },
-
   {
     link: "/loteria",
     label: <AppIcons Logo={"LOTERIA"} name="Loteria" />,
@@ -321,7 +347,7 @@ const allUrlsPrivateApps = [
     link: "/reporte_general",
     label: <AppIcons Logo={"MARKETPLACE"} name="Reporte Punto De Compra" />,
     component: ReporteGral,
-    permission: [8],
+    permission: [37],
   },
   {
     link: "/funmujer",
@@ -464,13 +490,13 @@ const allUrlsPrivateApps = [
     link: "/recargas-Colcard",
     label: <AppIcons Logo={"LOTERIA"} name="Recargas ColCard" />,
     component: ColCard,
-    permission: [3],
+    permission: [50],
     subRoutes: [
       {
         link: "/recargas-Colcard/recargar-tarjeta",
         label: <AppIcons Logo={"SORTEOS"} name="Recargar tarjeta" />,
         component: RecargarColCard,
-        permission: [3],
+        permission: [50],
       },
       // {
       //   link: "/recargas-Colcard/consultar-tarjeta",
@@ -481,11 +507,39 @@ const allUrlsPrivateApps = [
     ],
   },
   {
+    link: "/movii-pdp",
+    label: <AppIcons Logo={"LOTERIA"} name="MOVII PDP" />,
+    component: MoviiPDP,
+    permission: [48],
+    subRoutes: [
+      {
+        link: "/movii-pdp/cash-out",
+        label: <AppIcons Logo={"SORTEOS"} name="Cash out" />,
+        component: MoviiPDPCashOut,
+        permission: [49],
+      },
+      {
+        link: "/movii-pdp/cash-out-reversos",
+        label: <AppIcons Logo={"SORTEOS"} name="Reversos cash out" />,
+        component: MoviiPDPReverseCashOut,
+        permission: [52],
+      },
+    ],
+  },
+  {
     link: "/params-operations",
     label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />,
     component: ParamsOperations,
     permission: [18, 19, 20, 21, 31],
     subRoutes: [
+      {
+        link: "/params-operations/parametros-autorizadores",
+        label: (
+          <AppIcons Logo={"RECAUDO"} name={"Parametros por autorizador"} />
+        ),
+        component: ParametrosAutorizadores,
+        permission: [51],
+      },
       {
         link: "/params-operations/types-trxs",
         label: <AppIcons Logo={"RECAUDO"} name={"Tipos de transacciones"} />,
@@ -685,6 +739,32 @@ const allUrlsPrivateApps = [
         permission: [36],
       },
     ],
+  },
+  {
+    link: "/domiciliacion",
+    label: <AppIcons Logo={"RECAUDO"} name={"Domiciliacion"} />,
+    component: Domiciliacion,
+    permission: [32, 33, 34, 35, 36],
+    subRoutes: [
+      {
+        link: "/domiciliacion/formulario",
+        label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliacion"} />,
+        component: PpsVoluntario,
+        permission: [34],
+      },
+      {
+        link: "/domiciliacion/modificar",
+        label: <AppIcons Logo={"ACTUALIZACION"} name={"Modificar"} />,
+        component: ModificarPps,
+        permission: [33],
+      },
+    ],
+  },
+  {
+    link: "/circulemos",
+    label: <AppIcons Logo={"RECAUDO"} name="Consorcio Circulemos" />,
+    component: CirculemosComp,
+    permission: [1],
   },
 ];
 
