@@ -210,15 +210,23 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={"LOTERIA"} name="Loteria" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
-    permission: [3, 4, 5, 6],
+    permission: [3, 4, 5, 6, 44, 45, 46, 47],
     subRoutes: [
-      { link: "loteria-de-bogota", label: "Lotería de Bogotá" },
-      { link: "loteria-del-tolima", label: "Lotería del Tolima" },
-    ].map(({ link: name, label }) => ({
+      {
+        link: "loteria-de-bogota",
+        label: "Lotería de Bogotá",
+        permission: [3, 4, 5, 6],
+      },
+      {
+        link: "loteria-del-tolima",
+        label: "Lotería del Tolima",
+        permission: [44, 45, 46, 47],
+      },
+    ].map(({ link: name, label, permission }) => ({
       link: `/loteria/${name}`,
       label: <AppIcons Logo={"LOTERIA"} name={label} />,
       component: LoteriaBog,
-      permission: [3, 4, 5, 6],
+      permission: permission,
       subRoutes: [
         {
           link: `/loteria/${name}/ventas`,
