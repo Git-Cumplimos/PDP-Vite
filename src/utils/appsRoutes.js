@@ -174,8 +174,8 @@ const LocalidadesComerciales = lazy(() =>
  * Domiciliacion PPS
  */
 const Domiciliacion = lazy(() => import("../apps/Domiciliacion/Domiciliacion"));
-const PpsVoluntario = lazy(() =>
-  import("../apps/Domiciliacion/Views/PpsDomiciliacion")
+const comprobarEmail = lazy(() =>
+  import("../apps/Domiciliacion/Views/BuscarComercioEmail")
 );
 const ModificarPps = lazy(() =>
   import("../apps/Domiciliacion/Views/ModificarPps")
@@ -748,8 +748,14 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/domiciliacion/formulario",
-        label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliacion"} />,
-        component: PpsVoluntario,
+        label: (
+          <AppIcons
+            Logo={"IMPUESTO"}
+            name={"Formulario Domiciliacion"}
+            /*  val={false} */
+          />
+        ),
+        component: comprobarEmail,
         permission: [34],
       },
       {
@@ -759,12 +765,6 @@ const allUrlsPrivateApps = [
         permission: [33],
       },
     ],
-  },
-  {
-    link: "/circulemos",
-    label: <AppIcons Logo={"RECAUDO"} name="Consorcio Circulemos" />,
-    component: CirculemosComp,
-    permission: [1],
   },
 ];
 

@@ -8,7 +8,7 @@ import Input from "../../../components/Base/Input";
 import Select from "../../../components/Base/Select";
 import FileInput from "../../../components/Base/FileInput";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-const PpsObligatorio = () => {
+const PpsObligatorio = ({ datosConsulta }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [numDocumento, setNumDocumento] = useState("");
   const [idComercio, setIdComercio] = useState("");
@@ -17,7 +17,7 @@ const PpsObligatorio = () => {
   const [valorAportar, setValorAportar] = useState("");
   const [showModal, setShowModal] = useState(true);
   const [archivos1, setArchivos1] = useState([]);
-
+  console.log(datosConsulta);
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, []);
