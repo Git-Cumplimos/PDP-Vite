@@ -66,7 +66,7 @@ const Transacciones = () => {
 
       const fecha_fin = new Date(fechaFinal);
       fecha_fin.setHours(fecha_fin.getHours() + 5);
-      queries.fechaFinal = Intl.DateTimeFormat("es-CO", {
+      queries.date_end = Intl.DateTimeFormat("es-CO", {
         year: "numeric",
         month: "numeric",
         day: "numeric",

@@ -62,6 +62,7 @@ const PermissionForm = ({ onCloseModal }) => {
               <Input
                 key={`${key}_new`}
                 id={`${key}_new`}
+                label={key}
                 required={required ?? true}
                 {...rest}
               />
