@@ -28,7 +28,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
     setShowModal(false);
   }, []);
 
-  const url = "http://127.0.0.1:7000";
+  const url = process.env.REACT_APP_URL_TRXS_TRX;
   //------------------Funcion Para Subir El Formulario---------------------//
   const enviar = (e) => {
     e.preventDefault();
@@ -37,7 +37,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
       "POST",
       {},
       {
-        tipo_id: "cc",
+        tipo_id: tipoIdentificacion,
         identificacion: numDocumento,
         financial_institution_code: "96",
         canal_code: "20",
@@ -101,8 +101,8 @@ const PpsVoluntario = ({ datosConsulta }) => {
               label="Tipo de Identificación"
               options={{
                 "": "",
-                "C.C Cedula de Ciudadania": "cc",
-                "C.E Cedula de Extranjeria": "ce",
+                "C.C Cedula de Ciudadania": "1",
+                "C.E Cedula de Extranjeria": "2",
               }}
             ></Select>
             <Input

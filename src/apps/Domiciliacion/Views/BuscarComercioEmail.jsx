@@ -16,7 +16,7 @@ const BuscarComercioEmail = () => {
   const [showModal, setShowModal] = useState(true);
   const [continuarDomiciliacion, setContinuarDomiciliacion] = useState(false);
   const [emailVerificado, setEmailVerificado] = useState(true);
-  const url = "http://127.0.0.1:7000";
+  const url = `${process.env.REACT_APP_URL_TRXS_TRX}`;
 
   //------------------Constantes para Dar Estilos---------------------//
   const {
@@ -30,40 +30,47 @@ const BuscarComercioEmail = () => {
 
   const BuscarComercio = (e) => {
     e.preventDefault();
-    fetchData(
-      `${url}/consultaemail`,
-      "POST",
-      {},
-      {
-        email_user: emailComercio,
-      },
-      {},
-      {}
-    )
-      .then((respuesta) => {
-        console.log(respuesta);
-        setDatosConsulta(respuesta?.obj?.data_user);
-        setEstadoConsulta(true);
-        if (
-          respuesta?.obj?.Message ==
-          "El usuario no existe o se encuentra en estado INACTIVO. Por favor validar e intentar nuevamente !"
-        ) {
-          notifyError("El usuario no existe o se encuentra en estado INACTIVO");
-        } else {
-          if (respuesta?.obj?.Message == "Validacion de datos exitosa.") {
-            notify("Consulta Exitosa");
-            setEstadoConsulta(true);
-            setShowModal(true);
+    if (emailComercio != "") {
+      fetchData(
+        `${url}/consultaemail`,
+        "GET",
+        { correo: emailComercio },
+        {},
+        {},
+        {}
+      )
+        .then((respuesta) => {
+          console.log(respuesta);
+          setDatosConsulta(respuesta?.obj);
+          setEstadoConsulta(true);
+          if (
+            respuesta?.obj?.msg ==
+            "Fallo peticion de datos para correo suser: El usuario no existe o se encuentra en estado INACTIVO. Por favor validar e intentar nuevamente !"
+          ) {
+            notifyError(
+              "El usuario no existe o se encuentra en estado INACTIVO"
+            );
+          } else {
+            if (
+              respuesta?.msg == "La consulta a Suser del Email a sido exitosa"
+            ) {
+              notify("Consulta Exitosa");
+              setEstadoConsulta(true);
+              setShowModal(true);
+            }
           }
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        notifyError("Error al Consultar Email");
-      });
+        })
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al Consultar Email");
+        });
+    } else {
+      notifyError("Ingrese un Correo para la Consulta");
+    }
   };
   const ContinuarDomiciliacion = (e) => {
     e.preventDefault();
+    console.log("entre continuar");
     setShowModal(false);
     setContinuarDomiciliacion(true);
   };
@@ -89,7 +96,7 @@ const BuscarComercioEmail = () => {
                 <div className={contenedorValoresTitulos}>
                   <h2
                     className={tituloDatos}
-                  >{`${datosConsulta["nombre_comercio"]}`}</h2>
+                  >{`${datosConsulta["nombre comercio"]}`}</h2>
                   <h2
                     className={tituloDatos}
                   >{`${datosConsulta["tipo_comercio"]}`}</h2>
@@ -129,6 +136,7 @@ const BuscarComercioEmail = () => {
             value={emailComercio}
             onChange={(e) => setEmailComercio(e.target.value)}
             type={"email"}
+            required
           ></Input>
           <ButtonBar className={"lg:col-span-2"} type="">
             {

@@ -180,6 +180,9 @@ const comprobarEmail = lazy(() =>
 const ModificarPps = lazy(() =>
   import("../apps/Domiciliacion/Views/ModificarPps")
 );
+const BuscarCedulaPpsADemanda = lazy(() =>
+  import("../apps/Domiciliacion/Views/BuscarCedulaPpsADemanda")
+);
 
 /**
  * Recaudo
@@ -748,13 +751,7 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/domiciliacion/formulario",
-        label: (
-          <AppIcons
-            Logo={"IMPUESTO"}
-            name={"Formulario Domiciliacion"}
-            /*  val={false} */
-          />
-        ),
+        label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliacion"} />,
         component: comprobarEmail,
         permission: [34],
       },
@@ -762,6 +759,12 @@ const allUrlsPrivateApps = [
         link: "/domiciliacion/modificar",
         label: <AppIcons Logo={"ACTUALIZACION"} name={"Modificar"} />,
         component: ModificarPps,
+        permission: [33],
+      },
+      {
+        link: "/domiciliacion/ppspordemanda",
+        label: <AppIcons Logo={"ACTUALIZACION"} name={"Pps A Demanda"} />,
+        component: BuscarCedulaPpsADemanda,
         permission: [33],
       },
     ],

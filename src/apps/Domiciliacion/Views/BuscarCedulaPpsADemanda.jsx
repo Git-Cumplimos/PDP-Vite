@@ -9,7 +9,7 @@ const BuscarCedulaPpsADemanda = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
   const [buscarCedula, setBuscarCedula] = useState("");
   const url = `${process.env.REACT_APP_URL_TRXS_TRX}`;
-  const BuscarComercio = (e) => {
+  /* const BuscarComercio = (e) => {
     e.preventDefault();
     if (emailComercio != "") {
       fetchData(
@@ -48,7 +48,7 @@ const BuscarCedulaPpsADemanda = () => {
     } else {
       notifyError("Ingrese un Correo para la Consulta");
     }
-  };
+  }; */
   return (
     <div>
       {datosConsulta === "" ? (
