@@ -1,30 +1,66 @@
-import React, { Fragment, useCallback, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Input from "../../../components/Base/Input";
+import fetchData from "../../../utils/fetchData";
+import classes from "./BuscarCedulaPpsDemanda.module.css";
 import { notify, notifyError } from "../../../utils/notify";
 import TipoPpsADemanda from "./TipoPpsADemanda";
+import Modal from "../../../components/Base/Modal";
+import LogoPDP from "../../../components/Base/LogoPDP";
 
 const BuscarCedulaPpsADemanda = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
   const [buscarCedula, setBuscarCedula] = useState("");
+  const [cantNum, setCantNum] = useState(0);
+  const [showModal, setShowModal] = useState(true);
+  const [estado, setEstado] = useState(false);
   const url = `${process.env.REACT_APP_URL_TRXS_TRX}`;
-  /* const BuscarComercio = (e) => {
+
+  //------------------Constantes para Dar Estilos---------------------//
+  const {
+    contenedorForm,
+    contenedorDatos,
+    contenedorTitulos,
+    tituloDatos,
+    contenedorValoresTitulos,
+    contendorBoton,
+  } = classes;
+
+  //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
+  useEffect(() => {
+    cantidadNumero(buscarCedula);
+  }, [buscarCedula]);
+  function cantidadNumero(numero) {
+    let contador = 1;
+    while (numero >= 1) {
+      contador += 1;
+      numero = numero / 10;
+    }
+    setCantNum(contador);
+    console.log(cantNum);
+  }
+
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+    setDatosConsulta("");
+  }, []);
+  const BuscarCedula = (e) => {
     e.preventDefault();
-    if (emailComercio != "") {
+    if (cantNum >= 6) {
       fetchData(
-        `${url}/consultaemail`,
+        `${url}/domicilio`,
         "GET",
-        { correo: emailComercio },
+        { identificacion: buscarCedula },
         {},
         {},
         {}
       )
         .then((respuesta) => {
-          console.log(respuesta);
-          setDatosConsulta(respuesta?.obj);
-          setEstadoConsulta(true);
-          if (
+          setDatosConsulta(respuesta?.obj?.results);
+          setEstado(true);
+          /*        setEstadoConsulta(true); */
+          /* if (
             respuesta?.obj?.msg ==
             "Fallo peticion de datos para correo suser: El usuario no existe o se encuentra en estado INACTIVO. Por favor validar e intentar nuevamente !"
           ) {
@@ -39,42 +75,77 @@ const BuscarCedulaPpsADemanda = () => {
               setEstadoConsulta(true);
               setShowModal(true);
             }
-          }
+          } */
         })
         .catch((err) => {
           console.log(err);
-          notifyError("Error al Consultar Email");
+          notifyError("Error al Consultar Cedula");
         });
     } else {
-      notifyError("Ingrese un Correo para la Consulta");
+      notifyError("Ingrese un Numero Valido para la Consulta");
     }
-  }; */
+  };
   return (
     <div>
-      {datosConsulta === "" ? (
-        <Fragment>
-          <Input
-            label={"Numero Cédula"}
-            placeholder={"Ingrese Numero de Cédula"}
-            value={buscarCedula}
-            onChange={(e) => setBuscarCedula(e.target.value)}
-            type={"number"}
-            required
-          ></Input>
-          <ButtonBar className={"lg:col-span-2"} type="">
-            {
-              <Button type="submit" /* onClick={(e) => BuscarComercio(e)} */>
-                Buscar Cliente
-              </Button>
-              /*  ) : null */
-            }
-          </ButtonBar>
-        </Fragment>
-      ) : datosConsulta != "" ? (
+      {datosConsulta?.length == 0 && estado ? (
         <TipoPpsADemanda></TipoPpsADemanda>
+      ) : datosConsulta?.length > 0 ? (
+        <Modal show={showModal} handleClose={handleClose}>
+          <LogoPDP small></LogoPDP>
+          <div class={contenedorForm}>
+            <div class={contenedorDatos}>
+              <div class={contenedorTitulos}>
+                <h2 className={tituloDatos}>{`Tipo Pps: `}</h2>
+                <h2 className={tituloDatos}>{`Id Comercio: `}</h2>
+                <h2 className={tituloDatos}>{`Id Dispositivo: `}</h2>
+                <h2 className={tituloDatos}>{`Id Usuario: `}</h2>
+                <h2 className={tituloDatos}>{`Celular: `}</h2>
+                <h2 className={tituloDatos}>{`Estado: `}</h2>
+              </div>
+              <div className={contenedorValoresTitulos}>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["tipo_pps"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["id_comercio"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{` ${datosConsulta[0]["id_dispositivo"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["id_usuario"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["celular"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["estado"]}`}</h2>
+              </div>
+            </div>
+          </div>
+        </Modal>
       ) : (
         ""
       )}
+      <Fragment>
+        <Input
+          label={"Numero Cédula"}
+          placeholder={"Ingrese Numero de Cédula"}
+          value={buscarCedula}
+          onChange={(e) => setBuscarCedula(e.target.value)}
+          type={"number"}
+          required
+        ></Input>
+        <ButtonBar className={"lg:col-span-2"} type="">
+          {
+            <Button type="submit" onClick={(e) => BuscarCedula(e)}>
+              Buscar Cliente
+            </Button>
+            /*  ) : null */
+          }
+        </ButtonBar>
+      </Fragment>
     </div>
   );
 };
