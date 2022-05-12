@@ -3,19 +3,18 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
-  mostrarcreditos: `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`,
-  ingresoreverso: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresoreversorecibo`,
-  ingresorecibo: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`,
-  valorcuota: `${process.env.REACT_APP_URL_FDLMWSDL}/valorcuota`,
+  mostrarcreditos: `${process.env.REACT_APP_URL_pinesVusWSDL}/mostrarcreditos`,
+  ingresoreverso: `${process.env.REACT_APP_URL_pinesVusWSDL}/ingresoreversorecibo`,
+  ingresorecibo: `${process.env.REACT_APP_URL_pinesVusWSDL}/ingresorecibo`,
+  valorcuota: `${process.env.REACT_APP_URL_pinesVusWSDL}/valorcuota`,
   ///____
-  consultarPines: `${process.env.REACT_APP_URL_FDLMWSDL}/consultarPines`,
-  desembolsospin: `${process.env.REACT_APP_URL_FDLMWSDL}/confirmarDesembolso`,
-  cancelarDesembolso: `${process.env.REACT_APP_URL_FDLMWSDL}/cancelarDesembolso`,
+  PinVus: `${process.env.REACT_APP_URL_PinesVus}/pines`,
+  cancelarDesembolso: `${process.env.REACT_APP_URL_pinesVusWSDL}/cancelarDesembolso`,
 
   //_____
 };
 
-export const FDLMContext = createContext({
+export const pinesVusContext = createContext({
   infoLoto: {},
   searchLoteria: () => {},
   sellLoteria: () => {},
@@ -32,16 +31,16 @@ export const FDLMContext = createContext({
   ingresoreversorecibo: () => {},
   ingresorecibo: () => {},
   valorcuota: () => {},
-  consultarPines: () => {},
-  desembolsospin: () => {},
+  crearPinVus: () => {},
+  consultaPinesVus: () => {},
   cancelarDesembolso: () => {},
 });
 
-export const useMujer = () => {
-  return useContext(FDLMContext);
+export const usePinesVus = () => {
+  return useContext(pinesVusContext);
 };
 
-export const useProvideFDLM = () => {
+export const useProvidePinesVus = () => {
   // Datos consulta y compra
   const { roleInfo } = useAuth();
   const [RespuestaPagoRecaudo, setRespuestaPagoRecaudo] = useState(null);
@@ -137,17 +136,19 @@ export const useProvideFDLM = () => {
     }
   }, []);
 
-  const consultarPines = useCallback(async (documento, pin, user) => {
+  const crearPinVus = useCallback(async (documento, num_tramite, user) => {
     const body = {
+      tipo_pin: 1, //Por ahora es quemado, mas adelante sera una consulta
+      num_tramite: String(num_tramite),
+      doc_cliente: String(documento),
       Usuario: user?.Usuario,
       Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,
-      nroPIN: String(pin),
-      documento: String(documento),
+      Tipo: user?.Tipo,
     };
     console.log(body);
     try {
-      const res = await fetchData(urls.consultarPines, "POST", {}, body);
+      const res = await fetchData(urls.PinVus, "POST", {}, body);
       return res;
     } catch (err) {
       throw err;
@@ -171,25 +172,11 @@ export const useProvideFDLM = () => {
     }
   }, []);
 
-  const desembolsospin = useCallback(async (info, user) => {
-    console.log(info);
-    const body = {
-      Tipo: user?.Tipo,
-      Usuario: user?.Usuario,
-      Dispositivo: user?.Dispositivo,
-      Comercio: user?.Comercio,
-      Depto: parseInt(user?.Depto),
-      Municipio: parseInt(user?.Municipio),
-      nombre_comercio: user?.nombre_comercio,
-      NombresCliente: info?.NombresCliente,
-      Solicitud: info?.Solicitud,
-      nroPIN: info?.CodigoPIN,
-      documento: info?.Cedula,
-      valorDesembolso: info?.ValorDesembolso,
-    };
-    console.log(body);
+  const consultaPinesVus = useCallback(async (paramConsulta, pageData) => {
+    const query = { ...pageData };
+    query.doc_cliente = paramConsulta;
     try {
-      const res = await fetchData(urls.desembolsospin, "POST", {}, body);
+      const res = await fetchData(urls.PinVus, "GET", query);
       return res;
     } catch (err) {
       throw err;
@@ -217,8 +204,8 @@ export const useProvideFDLM = () => {
     ingresoreversorecibo,
     ingresorecibo,
     valorcuota,
-    consultarPines,
-    desembolsospin,
+    crearPinVus,
+    consultaPinesVus,
     cancelarDesembolso,
   };
 };

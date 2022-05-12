@@ -4,6 +4,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { useState, useEffect, useMemo } from "react";
 import { useLoteria } from "../../utils/LoteriaHooks";
+import { notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -71,8 +72,12 @@ const SendForm = ({
 
   const onSubmit = (e) => {
     e.preventDefault();
-    setDisabledBtns(true);
-    handleSubmit();
+    if (selecFrac.length == 0) {
+      notifyError("Seleccione la(s) fraccion(es) a vender");
+    } else {
+      setDisabledBtns(true);
+      handleSubmit();
+    }
   };
 
   // constructor(props) {

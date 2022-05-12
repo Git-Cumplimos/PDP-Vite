@@ -5,6 +5,7 @@ import { lazy } from "react";
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
+import ProvidepinesVus from "../apps/PinesVus/components/ProvidepinesVus";
 
 /**
  * * Logos
@@ -76,6 +77,16 @@ const FunMujer = lazy(() => import("../apps/FundacionMujer/FunMujer"));
 const recMujer = lazy(() => import("../apps/FundacionMujer/Views/Recaudos"));
 const revMujer = lazy(() => import("../apps/FundacionMujer/Views/Reversos"));
 const reportFDLM = lazy(() => import("../apps/FundacionMujer/Views/Reporte"));
+const DesembolsoFDLM = lazy(() =>
+  import("../apps/FundacionMujer/Views/Desembolsos")
+);
+
+/**
+ * Pines Vus
+ */
+const PinesVus = lazy(() => import("../apps/PinesVus/PinesVus"));
+const CrearPines = lazy(() => import("../apps/PinesVus/Views/CrearPin"));
+const TramitarPines = lazy(() => import("../apps/PinesVus/Views/TramitePines"));
 
 /**
  * IAM
@@ -363,6 +374,12 @@ const allUrlsPrivateApps = [
         permission: [17],
       },
       {
+        link: "/funmujer/desembolso",
+        label: <AppIcons Logo={"RECAUDO"} name={"Desembolso"} />,
+        component: DesembolsoFDLM,
+        permission: [28, 17],
+      },
+      {
         link: "/funmujer/reversorecaudo",
         label: <AppIcons Logo={"RECAUDO"} name={"Reverso Manual"} />,
         component: revMujer,
@@ -376,6 +393,29 @@ const allUrlsPrivateApps = [
       },
     ],
   },
+
+  {
+    link: "/PinesVus",
+    label: <AppIcons Logo={"RECAUDO"} name="Pines" />,
+    component: PinesVus,
+    permission: [17, 27, 28],
+    provider: ProvidepinesVus,
+    subRoutes: [
+      {
+        link: "/PinesVus/Crear",
+        label: <AppIcons Logo={"RECAUDO"} name={"Crear Pin"} />,
+        component: CrearPines,
+        permission: [17],
+      },
+      {
+        link: "/PinesVus/Tramitar",
+        label: <AppIcons Logo={"RECAUDO"} name={"Tramitar Pines"} />,
+        component: TramitarPines,
+        permission: [17],
+      },
+    ],
+  },
+
   {
     link: "/iam",
     label: <AppIcons Logo={"MARKETPLACE"} name="IAM" />,

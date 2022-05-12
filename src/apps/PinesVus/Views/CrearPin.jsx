@@ -7,24 +7,24 @@ import Modal from "../../../components/Base/Modal";
 
 import Sellfundamujer from "../components/sellFundamujer/SellFundamujer";
 import SearchForm from "../components/SearchForm/SearchForm";
-import { useMujer } from "../utils/mujerHooks";
+import { usePinesVus } from "../utils/pinesVusHooks";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { normalize } from "path";
 import { notifyError } from "../../../utils/notify";
 
-const Desembolsos = () => {
+const CrearPin = () => {
   const {
     infoLoto: { respuestamujer, setRespuestamujer },
-    consultarPines,
+    crearPinVus,
     cancelarpin,
-    desembolsospin,
+    CrearPinpin,
     cancelarDesembolso,
-  } = useMujer();
+  } = usePinesVus();
 
   const { roleInfo } = useAuth();
   const [documento, setDocumento] = useState("");
-  const [pin, setPin] = useState("");
+  const [num_tramite, setNum_tramite] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(true);
   const [disabledBtns, setDisabledBtns] = useState(false);
@@ -69,8 +69,9 @@ const Desembolsos = () => {
     setDisabledBtns(true);
 
     /// consultar pin
-    consultarPines(documento, pin, user)
+    crearPinVus(documento, num_tramite, user)
       .then((res) => {
+        console.log(res);
         setDisabledBtns(false);
         if (res?.status === false) {
           notifyError(res?.msg);
@@ -113,7 +114,7 @@ const Desembolsos = () => {
         .catch(() => setDisabledBtns(false));
     }
     setSelected(true);
-  }, [cancelarpin, desembolsospin, selected]);
+  }, [cancelarpin, CrearPinpin, selected]);
 
   const Desembolsitos = () => {
     setSelected(false);
@@ -121,25 +122,22 @@ const Desembolsos = () => {
 
   return (
     <>
-      <Modal
-        show={showModalAdvertencia}
-        handleClose={() => closeModalAdvertencia()}
-      >
-        <div className="flex flex-col justify-center items-center">
-          <h1 className="xl:text-center font-semibold">
-            Recuerde verificar si tiene el dinero suficiente en caja para
-            realizar la transacción !!!
-          </h1>
-          <Button
-            onClick={() => {
-              closeModalAdvertencia();
-            }}
-          >
-            Cerrar
-          </Button>
-        </div>
-      </Modal>
+      <h1 className="text-3xl">Datos creación de Pin</h1>
       <Form onSubmit={onSubmit} grid>
+        <Input
+          id="numTramite"
+          label="No. Tramite"
+          type="text"
+          required
+          // minLength="5"
+          // maxLength="12"
+          autoComplete="off"
+          value={num_tramite}
+          onInput={(e) => {
+            const num = parseInt(e.target.value) || "";
+            setNum_tramite(num);
+          }}
+        />
         <Input
           id="numDocumento"
           label="Documento"
@@ -154,23 +152,9 @@ const Desembolsos = () => {
             setDocumento(num);
           }}
         />
-        <Input
-          id="numpin"
-          label="Numero de pin"
-          type="text"
-          required
-          minLength="4"
-          maxLength="4"
-          autoComplete="off"
-          value={pin}
-          onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setPin(num);
-          }}
-        />
         <ButtonBar className="col-auto md:col-span-2">
           <Button type="submit" disabled={disabledBtns}>
-            Consultar pin
+            Crear pin
           </Button>
         </ButtonBar>
       </Form>
@@ -183,7 +167,7 @@ const Desembolsos = () => {
             handleSubmit={(event) => {
               event.preventDefault();
               setDisabledBtns(true);
-              desembolsospin(respuestamujer?.obj, user)
+              CrearPinpin(respuestamujer?.obj, user)
                 .then((res) => {
                   setDisabledBtns(false);
                   if (res?.status === false) {
@@ -214,4 +198,4 @@ const Desembolsos = () => {
     </>
   );
 };
-export default Desembolsos;
+export default CrearPin;
