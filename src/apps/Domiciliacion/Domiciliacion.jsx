@@ -1,12 +1,8 @@
 import React from "react";
 import Form from "../../components/Base/Form";
 import HNavbar from "../../components/Base/HNavbar";
-import { useAuth } from "../../hooks/AuthHooks";
 
 const Domiciliacion = ({ subRoutes }) => {
-  const { quotaInfo, roleInfo } = useAuth();
-  console.log(quotaInfo);
-  console.log(roleInfo);
   return (
     <div className="flex flex-row justify-center">
       <Form>

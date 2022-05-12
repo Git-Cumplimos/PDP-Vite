@@ -25,6 +25,8 @@ const BuscarCedulaPpsADemanda = () => {
     tituloDatos,
     contenedorValoresTitulos,
     contendorBoton,
+    tituloNotificacion,
+    contenedorImagen,
   } = classes;
 
   //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
@@ -43,9 +45,11 @@ const BuscarCedulaPpsADemanda = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setDatosConsulta("");
+    setDatosConsulta(0);
+    setBuscarCedula("");
   }, []);
   const BuscarCedula = (e) => {
+    setShowModal(true);
     e.preventDefault();
     if (cantNum >= 6) {
       fetchData(
@@ -57,9 +61,9 @@ const BuscarCedulaPpsADemanda = () => {
         {}
       )
         .then((respuesta) => {
+          console.log(respuesta?.obj?.results);
           setDatosConsulta(respuesta?.obj?.results);
           setEstado(true);
-          /*        setEstadoConsulta(true); */
           /* if (
             respuesta?.obj?.msg ==
             "Fallo peticion de datos para correo suser: El usuario no existe o se encuentra en estado INACTIVO. Por favor validar e intentar nuevamente !"
@@ -87,18 +91,17 @@ const BuscarCedulaPpsADemanda = () => {
   };
   return (
     <div>
-      {datosConsulta?.length == 0 && estado ? (
-        <TipoPpsADemanda></TipoPpsADemanda>
+      {(datosConsulta?.length === 0) & estado ? (
+        <TipoPpsADemanda numCed={buscarCedula}></TipoPpsADemanda>
       ) : datosConsulta?.length > 0 ? (
         <Modal show={showModal} handleClose={handleClose}>
-          <LogoPDP small></LogoPDP>
-          <div class={contenedorForm}>
-            <div class={contenedorDatos}>
-              <div class={contenedorTitulos}>
+          <div className={contenedorImagen}>
+            <LogoPDP small></LogoPDP>
+          </div>
+          <div className={contenedorForm}>
+            <div className={contenedorDatos}>
+              <div className={contenedorTitulos}>
                 <h2 className={tituloDatos}>{`Tipo Pps: `}</h2>
-                <h2 className={tituloDatos}>{`Id Comercio: `}</h2>
-                <h2 className={tituloDatos}>{`Id Dispositivo: `}</h2>
-                <h2 className={tituloDatos}>{`Id Usuario: `}</h2>
                 <h2 className={tituloDatos}>{`Celular: `}</h2>
                 <h2 className={tituloDatos}>{`Estado: `}</h2>
               </div>
@@ -108,44 +111,53 @@ const BuscarCedulaPpsADemanda = () => {
                 >{`${datosConsulta[0]["tipo_pps"]}`}</h2>
                 <h2
                   className={tituloDatos}
-                >{`${datosConsulta[0]["id_comercio"]}`}</h2>
-                <h2
-                  className={tituloDatos}
-                >{` ${datosConsulta[0]["id_dispositivo"]}`}</h2>
-                <h2
-                  className={tituloDatos}
-                >{`${datosConsulta[0]["id_usuario"]}`}</h2>
-                <h2
-                  className={tituloDatos}
                 >{`${datosConsulta[0]["celular"]}`}</h2>
                 <h2
                   className={tituloDatos}
                 >{`${datosConsulta[0]["estado"]}`}</h2>
               </div>
+              <div className={contenedorTitulos}>
+                <h2 className={tituloDatos}>{`Id Usuario: `}</h2>
+                <h2 className={tituloDatos}>{`Id Comercio: `}</h2>
+                <h2 className={tituloDatos}>{`Id Dispositivo: `}</h2>
+              </div>
+              <div className={contenedorTitulos}>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["id_usuario"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["id_comercio"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{` ${datosConsulta[0]["id_dispositivo"]}`}</h2>
+              </div>
             </div>
+            <span className={tituloNotificacion}>
+              No se Puede Realizar El Aporte, El Número de Cédula se Encuentra
+              Domiciliado.
+            </span>
           </div>
         </Modal>
       ) : (
-        ""
+        <Fragment>
+          <Input
+            label={"Numero Cédula"}
+            placeholder={"Ingrese Numero de Cédula"}
+            value={buscarCedula}
+            onChange={(e) => setBuscarCedula(e.target.value)}
+            type={"number"}
+            required
+          ></Input>
+          <ButtonBar className={"lg:col-span-2"} type="">
+            {
+              <Button type="submit" onClick={(e) => BuscarCedula(e)}>
+                Buscar Cliente
+              </Button>
+            }
+          </ButtonBar>
+        </Fragment>
       )}
-      <Fragment>
-        <Input
-          label={"Numero Cédula"}
-          placeholder={"Ingrese Numero de Cédula"}
-          value={buscarCedula}
-          onChange={(e) => setBuscarCedula(e.target.value)}
-          type={"number"}
-          required
-        ></Input>
-        <ButtonBar className={"lg:col-span-2"} type="">
-          {
-            <Button type="submit" onClick={(e) => BuscarCedula(e)}>
-              Buscar Cliente
-            </Button>
-            /*  ) : null */
-          }
-        </ButtonBar>
-      </Fragment>
     </div>
   );
 };
