@@ -45,7 +45,7 @@ const VerificacionApertura = () => {
     /* const updateWidth = () => { */
 
     fetchData(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?id_proceso=${params?.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params?.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}`  */ "GET",
       {},
       {},
@@ -94,7 +94,7 @@ const VerificacionApertura = () => {
         id_proceso: datosParams[0]["id_proceso"].toString(),
       };
       fetchData(
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/urlfile?id_proceso=${datos["id_proceso"]}`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/urlfile?id_proceso=${datos["id_proceso"]}`,
         "GET",
         {},
         {},
@@ -134,7 +134,7 @@ const VerificacionApertura = () => {
       validation_state: "201",
     };
     fetchData(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?id_proceso=${params?.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params?.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ /* {
         method: "PUT",
         headers: {
@@ -166,7 +166,7 @@ const VerificacionApertura = () => {
       causal_rechazo: mensajeCausal,
     };
     fetchData(
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?id_proceso=${params.id}`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ /* {
         method: "PUT",
         headers: {

@@ -17,7 +17,7 @@ import { button } from "aws-amplify";
 import React, { useRef } from "react";
 import classes from "../Views/AsesoresComerciales.module.css";
 
-const url = process.env.REACT_APP_URL_SERVICE_COMMERCE_SS;
+const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 const AsesoresComerciales = () => {
   const { contenedorPrincipal, contendorBoton } = classes;

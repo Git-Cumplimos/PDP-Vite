@@ -25,7 +25,7 @@ const ValidacionApertura = () => {
   useEffect(() => {
     fetchData(
       /*  `http://127.0.0.1:5000/actualizacionestado` */
-      `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?id_reconocer=-`,
+      `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_reconocer=-`,
       "GET",
       {},
       {},
@@ -46,7 +46,7 @@ const ValidacionApertura = () => {
       fetchData(
         /* `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`, */
         /*         `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}`,
-         */ `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}`,
+         */ `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}`,
         "GET"
       )
         /* .then((response) => response.json()) */
@@ -65,7 +65,7 @@ const ValidacionApertura = () => {
       fetchData(
         /*  `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}` */
         /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`, */
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?validation_state=${estadoProceso}`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=${estadoProceso}`,
         "GET",
         {},
         {},
@@ -82,7 +82,7 @@ const ValidacionApertura = () => {
       fetchData(
         /*  `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}` */
         /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`, */
-        `${process.env.REACT_APP_URL_SERVICE_COMMERCE_SS}/actualizacionestado?numDoc=${numeroProceso}`,
+        `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?numDoc=${numeroProceso}`,
         "GET",
         {},
         {},

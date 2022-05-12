@@ -153,9 +153,7 @@ const MoviiPDPCashOut = () => {
       subscriberNum: datosTrans.numeroTelefono,
       otp: datosTrans.otp,
       oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
-          ? roleInfo?.tipo_comercio
-          : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
     })
       .then((res) => {
         if (res?.status) {
