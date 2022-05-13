@@ -15,13 +15,13 @@ import Tickets from "../components/Voucher/Tickets";
 import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
+import UsarPinForm from "../components/UsarPinForm/UsarPinForm";
+import CancelPin from "../components/CancelPinForm/CancelPinForm";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
   month: "numeric",
   day: "numeric",
-  hour: "numeric",
-  minute: "numeric",
 });
 
 const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
@@ -54,13 +54,14 @@ const TramitePines = () => {
   const [ticket, setTicket] = useState(false);
   const [selected, setSelected] = useState(true);
   const [showModal, setShowModal] = useState("");
+  const [modalUsar, setModalUsar] = useState("");
+  const [modalCancel, setModalCancel] = useState("");
   const [response, setResponse] = useState("");
   const { roleInfo } = useAuth();
-  const [permiteCambio, setPermiteCambio] = useState("");
-  const [paraMax, setParaMax] = useState(null);
-  const [paraMin, setParaMin] = useState(null);
   const [maxPages, setMaxPages] = useState(1);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [valor, setValor] = useState("");
+  const [id_trx, setId_trx] = useState("");
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -140,28 +141,6 @@ const TramitePines = () => {
 
   const { infoTicket } = useAuth();
 
-  const params = useCallback(async () => {
-    const queries = { tipo_op: 5 };
-    console.log(queries);
-    try {
-      const res = await fetchData(url_params, "GET", queries);
-      if ("Parametros" in res?.obj?.[0]) {
-        setParaMax(res?.obj?.[0].Parametros.monto_maximo);
-        setParaMin(res?.obj?.[0].Parametros.monto_minimo);
-      } else {
-        setParaMax(10000000);
-        setParaMin(0);
-      }
-
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-  useEffect(() => {
-    params();
-  }, [info]);
-
   useEffect(() => {
     infoTicket(response?.id_trx, 5, tickets);
   }, [infoTicket, response]);
@@ -181,6 +160,8 @@ const TramitePines = () => {
     setInfo("");
     setTicket(false);
     setReferencia("");
+    setModalUsar(false);
+    setModalCancel(false);
   }, []);
 
   const bankCollection = (e) => {
@@ -251,100 +232,85 @@ const TramitePines = () => {
                 Id: row?.id_pin,
                 Cedula: row?.doc_cliente,
                 Estado: row?.name_estado_pin,
+                "Codigo Estado": row?.estado_pin,
                 Vencimiento: dateFormatter.format(fecha_vencimiento),
                 Valor: formatMoney.format(row?.valor),
               };
             })
           );
           setMaxPages(res?.obj?.maxPages);
+          setValor(res?.obj?.results?.[0]?.valor);
+          setId_trx(res?.obj?.results?.[0]?.id_trx?.creacion);
         }
       })
       .catch((err) => console.log("error", err));
   };
 
-  const onChangeTable = (e) => {
-    e.preventDefault();
-    setInfo("");
-    consultaPinesVus(parametroBusqueda, pageData)
-      .then((res) => {
-        console.log(res);
-        setInfo(res);
-        if (res?.status == false) {
-          notifyError(res?.msg);
-        } else {
-          setTable(
-            res?.obj?.results?.map((row) => {
-              console.log(row);
-              const fecha_vencimiento = new Date(row?.fecha_vencimiento);
-              fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
-              setFormatMon(row?.ValorPagar);
-              return {
-                Id: row?.id_pin,
-                Cedula: row?.doc_cliente,
-                Estado: row?.name_estado_pin,
-                Vencimiento: dateFormatter.format(fecha_vencimiento),
-                Valor: formatMoney.format(row?.valor),
-              };
-            })
-          );
-          setMaxPages(res?.obj?.maxPages);
-        }
-      })
-      .catch((err) => console.log("error", err));
+  useEffect(() => {
+    if (info !== "") {
+      consultaPinesVus(parametroBusqueda, pageData)
+        .then((res) => {
+          console.log(res);
+          setInfo(res);
+          setDisabledBtn(false);
+          if (res?.status == false) {
+            notifyError(res?.msg);
+          } else {
+            setTable(
+              res?.obj?.results?.map((row) => {
+                console.log(row);
+                const fecha_vencimiento = new Date(row?.fecha_vencimiento);
+                fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
+                setFormatMon(row?.ValorPagar);
+                return {
+                  Id: row?.id_pin,
+                  Cedula: row?.doc_cliente,
+                  Estado: row?.name_estado_pin,
+                  "Codigo Estado": row?.estado_pin,
+                  Vencimiento: dateFormatter.format(fecha_vencimiento),
+                  Valor: formatMoney.format(row?.valor),
+                };
+              })
+            );
+            setMaxPages(res?.obj?.maxPages);
+          }
+        })
+        .catch((err) => console.log("error", err));
+    }
+  }, [pageData]);
+
+  const onSubmitUsar = (e) => {
+    setModalUsar(true);
   };
 
-  console.log(maxPages);
   return (
     <>
       {"id_comercio" in roleInfo ? (
-        <>
-          <h1 className="text-3xl mt-6">Tramitar Pines Vus</h1>
-          <Form onSubmit={onSubmit} grid>
-            {/* <Select
-              id="searchBySorteo"
-              label="Tipo de busqueda"
-              options={[
-                { value: "", label: "" },
-                {
-                  value: 1,
-                  label: `Documento`,
-                },
-                {
-                  value: 2,
-                  label: `Nº credito`,
-                },
-              ]}
-              value={tipobusqueda}
-              onChange={(e) => {
-                setTiposBusqueda(e.target.value);
-                if (e.target.value == 1) {
-                  setLabel("Documento");
-                }
-                if (e.target.value == 2) {
-                  setLabel("Número crédito");
-                }
-              }}
-            /> */}
-            <Input
-              id="paramBusqueda"
-              label="Documento"
-              type="text"
-              minLength="7"
-              maxLength="12"
-              autoComplete="off"
-              value={parametroBusqueda}
-              onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setParametroBusqueda(num);
-              }}
-            />
-            <ButtonBar className="col-auto md:col-span-2">
-              <Button type="submit" disabled={disabledBtn}>
-                Consultar Pin
-              </Button>
-            </ButtonBar>
-          </Form>
-        </>
+        <div className="flex flex-col w-1/2 mx-auto">
+          <>
+            <h1 className="text-3xl mt-6 mx-auto">Tramitar Pines Vus</h1>
+            <br></br>
+            <Form onSubmit={onSubmit} grid>
+              <Input
+                id="paramBusqueda"
+                label="Codigo"
+                type="text"
+                minLength="10"
+                maxLength="10"
+                autoComplete="off"
+                value={parametroBusqueda}
+                onInput={(e) => {
+                  setParametroBusqueda(e.target.value);
+                }}
+              />
+              <ButtonBar className="col-auto md:col-span-2">
+                <Button type="submit" disabled={disabledBtn}>
+                  Consultar Pin
+                </Button>
+              </ButtonBar>
+            </Form>
+          </>
+        </div>
       ) : (
         <h1 className="text-3xl mt-6">El usuario no tiene comercio asociado</h1>
       )}
@@ -354,12 +320,20 @@ const TramitePines = () => {
           <TableEnterprise
             title="Información de credito"
             maxPage={maxPages}
-            onChange={onChangeTable}
-            headers={["Id", "Cedula", "Estado", "Vencimiento", "Valor"]}
+            headers={[
+              "Id",
+              "Cedula",
+              "Estado",
+              "Codigo Estado",
+              "Vencimiento",
+              "Valor",
+            ]}
             data={table || []}
             onSelectRow={(e, index) => {
-              setSelected(table[index]);
-              if (info?.obj?.NroMensaje === 1) {
+              if (table[index]["Codigo Estado"] !== 1) {
+                notifyError(table[index].Estado);
+              } else {
+                setSelected(table[index]);
                 setShowModal(true);
               }
             }}
@@ -367,9 +341,62 @@ const TramitePines = () => {
           ></TableEnterprise>
         </>
       )}
-      {info?.obj?.NroMensaje === 1 && (
-        <Modal show={showModal} handleClose={() => closeModal()}></Modal>
-      )}
+      <Modal show={showModal} handleClose={() => closeModal()}>
+        {(modalUsar !== true) & (modalCancel !== true) ? (
+          <>
+            <div className="flex flex-col w-1/2 mx-auto">
+              <h1 className="text-3xl mt-3 mx-auto">Datos del Pin</h1>
+              <br></br>
+              {Object.entries(selected).map(([key, val]) => {
+                return (
+                  <>
+                    <div
+                      className="flex flex-row justify-between text-lg font-medium"
+                      key={key}
+                    >
+                      <h1>{key}</h1>
+                      <h1>{val}</h1>
+                    </div>
+                  </>
+                );
+              })}
+            </div>
+            <Form onSubmit={onSubmitUsar}>
+              <ButtonBar>
+                <Button type="submit">Usar pin</Button>
+                <Button
+                  onClick={() => {
+                    setModalCancel(true);
+                  }}
+                >
+                  Cancelar pin
+                </Button>
+              </ButtonBar>
+            </Form>
+          </>
+        ) : (
+          ""
+        )}
+        {modalUsar === true ? (
+          <UsarPinForm
+            respPin={selected}
+            valor={valor}
+            closeModal={closeModal}
+          ></UsarPinForm>
+        ) : (
+          ""
+        )}
+        {modalCancel === true ? (
+          <CancelPin
+            respPin={selected}
+            valor={valor}
+            trx={id_trx}
+            closeModal={closeModal}
+          ></CancelPin>
+        ) : (
+          ""
+        )}
+      </Modal>
     </>
   );
 };

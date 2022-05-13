@@ -30,6 +30,7 @@ const CrearPin = () => {
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [showModalAdvertencia, setShowModalAdvertencia] = useState(false);
   const [respPago, setRespPago] = useState("");
+  const [respPin, setRespPin] = useState("");
 
   useEffect(() => {
     setShowModalAdvertencia(true);
@@ -67,8 +68,7 @@ const CrearPin = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
-
-    /// consultar pin
+    setShowModal(true);
     crearPinVus(documento, num_tramite, user)
       .then((res) => {
         console.log(res);
@@ -76,17 +76,10 @@ const CrearPin = () => {
         if (res?.status === false) {
           notifyError(res?.msg);
         } else {
-          if (res?.obj?.CodRespuesta !== 0) {
-            notifyError(res?.obj?.Mensaje);
-          } else {
-            console.log(res);
-            setRespuestamujer(res);
-            setShowModal(true);
-            setDisabledBtns(false);
-            notifyError(
-              "Recuerde verificar si tiene el dinero suficiente en caja para continuar el desembolso"
-            );
-          }
+          console.log(res);
+          setRespPin(res?.obj);
+          setShowModal(true);
+          setDisabledBtns(false);
         }
       })
       .catch(() => setDisabledBtns(false));
