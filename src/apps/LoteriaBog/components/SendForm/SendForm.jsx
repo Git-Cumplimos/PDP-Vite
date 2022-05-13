@@ -72,7 +72,7 @@ const SendForm = ({
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (selecFrac.length == 0) {
+    if ((selecFrac.length == 0) & (fracciones == 0)) {
       notifyError("Seleccione la(s) fraccion(es) a vender");
     } else {
       setDisabledBtns(true);
