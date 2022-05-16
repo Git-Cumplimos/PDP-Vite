@@ -13,7 +13,7 @@ import Select from "../../../components/Base/Select";
 import useQuery from "../../../hooks/useQuery";
 import ToggleInput from "../../../components/Base/ToggleInput";
 
-const url = process.env.REACT_APP_URL_SERVICE_COMMERCE_SS;
+const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 const ResponsablesComerciales = () => {
   const [{ page = 1 }] = useQuery();

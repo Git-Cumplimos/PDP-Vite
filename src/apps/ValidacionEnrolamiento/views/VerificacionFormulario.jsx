@@ -57,7 +57,7 @@ const VerificacionFormulario = () => {
 
   const [zonas, setZonas] = useState([]);
   /* const url = process.env.REACT_APP_URL_SERVICE_COMMERCE; */
-  const url = process.env.REACT_APP_URL_SERVICE_COMMERCE_SS;
+  const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
   /*  const url2 = process.env.REACT_APP_URL_SERVICE_PUBLIC_SS; */
 
   //----------------Traer Datos Usuario Con los Parametros---------------------//

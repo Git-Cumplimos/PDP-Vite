@@ -106,6 +106,7 @@ const Transacciones = () => {
       types_trx.forEach((val) => allTypes.push(val))
     );
     setTiposOp([...allTypes]);
+    console.log(tempArr);
 
     setIdComercio(roleInfo?.id_comercio || -1);
     setUsuario(roleInfo?.id_usuario || -1);

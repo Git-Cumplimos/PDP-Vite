@@ -37,7 +37,7 @@ const ReconoserID = () => {
         email: datosUsuario[0]["email"],
         celular: datosUsuario[0]["celular"],
       };
-      console.log(datos);
+      console.log("datos:", datos);
       fetch(
         `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/solicitud-validacion-reconoserid`,
         /* `http://127.0.0.1:5000/solicitudvalidacion` */
@@ -50,16 +50,17 @@ const ReconoserID = () => {
         }
       )
         .then((res) => res.json())
-        .then((respuesta) =>
-          setProcesoConvenioGuid(respuesta.obj.data.procesoConvenioGuid)
-        )
+        .then((respuesta) => {
+          console.log("ww", respuesta);
+          setProcesoConvenioGuid(respuesta?.obj?.data?.procesoConvenioGuid);
+        })
         .catch((err) => console.log(err));
     }
   }, [datosUsuario]);
 
   useEffect(() => {
     if (datosUsuario?.length > 0) {
-      console.log(procesoConvenioGuid);
+      console.log("ProcesoConv:", procesoConvenioGuid);
       const datos = {
         id_reconocer: procesoConvenioGuid,
       };
