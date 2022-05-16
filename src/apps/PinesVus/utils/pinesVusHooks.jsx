@@ -5,23 +5,13 @@ import fetchData from "../../../utils/fetchData";
 const urls = {
   cancelPinVus: `${process.env.REACT_APP_URL_PinesVus}/cancelarPines`,
   PinVus: `${process.env.REACT_APP_URL_PinesVus}/pines`,
+  cons_estado_tipoPin: `${process.env.REACT_APP_URL_PinesVus}/TipoEstadoPin`,
 };
 
 export const pinesVusContext = createContext({
-  infoLoto: {},
-  searchLoteria: () => {},
-  sellLoteria: () => {},
-  reportes: {
-    moda: null,
-    sorteo: null,
-    setSorteo: null,
-    fechaInicial: null,
-    setFechaInicial: null,
-    fechaFinal: null,
-    setFechaFinal: null,
-  },
   cancelPinVus: () => {},
   usarPinVus: () => {},
+  con_estado_tipoPin: () => {},
 });
 
 export const usePinesVus = () => {
@@ -31,19 +21,6 @@ export const usePinesVus = () => {
 export const useProvidePinesVus = () => {
   // Datos consulta y compra
   const { roleInfo } = useAuth();
-  const [RespuestaPagoRecaudo, setRespuestaPagoRecaudo] = useState(null);
-  const [respuestamujer, setRespuestamujer] = useState();
-  const [arreglo, setArreglo] = useState(null);
-  const [
-    respuestatipooperaciontransaccion,
-    setrespuestatipooperaciontransaccion,
-  ] = useState(null);
-
-  const [respuestaconsultarecaudo, setRespuestaconsultarecaudo] = useState();
-  const [
-    respuestaconsultarecaudocreditos,
-    setRespuestaconsultarecaudocreditos,
-  ] = useState();
 
   const cancelPinVus = useCallback(async (info, valor, motivo, trx, user) => {
     const body = {
@@ -86,13 +63,14 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const usarPinVus = useCallback(async (info, valor, user) => {
+  const usarPinVus = useCallback(async (info, valor, trx, user) => {
     const body = {
       Usuario: user?.id_usuario,
       Dispositivo: user?.id_dispositivo,
       Comercio: user?.id_comercio,
       Tipo: user?.tipo_comercio,
       valor: parseFloat(valor),
+      id_trx: trx,
     };
     const query = {
       id_pin: info?.Id,
@@ -105,11 +83,33 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const consultaPinesVus = useCallback(async (paramConsulta, pageData) => {
-    const query = { ...pageData };
-    query.cod_hash_pin = paramConsulta;
+  const consultaPinesVus = useCallback(
+    async (cod_hash_pin, fecha_ini, fecha_fin, estadoPin, pageData) => {
+      const query = { ...pageData };
+      if (cod_hash_pin !== "") {
+        query.cod_hash_pin = cod_hash_pin;
+      }
+      if (fecha_ini !== "") {
+        query.fecha_ini = fecha_ini;
+        query.fecha_fin = fecha_fin;
+      }
+      if (estadoPin !== "") {
+        query.estado_pin = estadoPin;
+      }
+      try {
+        const res = await fetchData(urls.PinVus, "GET", query);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
+
+  const con_estado_tipoPin = useCallback(async (table) => {
+    const query = { table: table };
     try {
-      const res = await fetchData(urls.PinVus, "GET", query);
+      const res = await fetchData(urls.cons_estado_tipoPin, "GET", query);
       return res;
     } catch (err) {
       throw err;
@@ -117,24 +117,10 @@ export const useProvidePinesVus = () => {
   }, []);
 
   return {
-    infoLoto: {
-      respuestamujer,
-      setRespuestamujer,
-      arreglo,
-      setArreglo,
-      RespuestaPagoRecaudo,
-      setRespuestaPagoRecaudo,
-      respuestatipooperaciontransaccion,
-      setrespuestatipooperaciontransaccion,
-      respuestaconsultarecaudo,
-      setRespuestaconsultarecaudo,
-      respuestaconsultarecaudocreditos,
-      setRespuestaconsultarecaudocreditos,
-    },
-    reportes: {},
     cancelPinVus,
     crearPinVus,
     consultaPinesVus,
     usarPinVus,
+    con_estado_tipoPin,
   };
 };

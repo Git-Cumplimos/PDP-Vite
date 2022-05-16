@@ -165,9 +165,11 @@ const SendForm = ({
             value={phone}
             required={true}
             onInput={(e) => {
-              const cus = { fracciones, phone, doc_id };
-              cus.phone = e.target.value;
-              setCustomer({ ...cus });
+              if (!isNaN(e.target.value)) {
+                const cus = { fracciones, phone, doc_id };
+                cus.phone = e.target.value;
+                setCustomer({ ...cus });
+              }
             }}
           />
           <Input
@@ -177,9 +179,11 @@ const SendForm = ({
             value={doc_id}
             required={true}
             onInput={(e) => {
-              const cus = { fracciones, phone, doc_id };
-              cus.doc_id = e.target.value;
-              setCustomer({ ...cus });
+              if (!isNaN(e.target.value)) {
+                const cus = { fracciones, phone, doc_id };
+                cus.doc_id = e.target.value;
+                setCustomer({ ...cus });
+              }
             }}
           />
           <ButtonBar>

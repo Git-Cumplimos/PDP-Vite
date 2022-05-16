@@ -87,6 +87,7 @@ const DesembolsoFDLM = lazy(() =>
 const PinesVus = lazy(() => import("../apps/PinesVus/PinesVus"));
 const CrearPines = lazy(() => import("../apps/PinesVus/Views/CrearPin"));
 const TramitarPines = lazy(() => import("../apps/PinesVus/Views/TramitePines"));
+const ReportePines = lazy(() => import("../apps/PinesVus/Views/ReportePines"));
 
 /**
  * IAM
@@ -414,6 +415,12 @@ const allUrlsPrivateApps = [
         link: "/PinesVus/Tramitar",
         label: <AppIcons Logo={"RECAUDO"} name={"Tramitar Pines"} />,
         component: TramitarPines,
+        permission: [17],
+      },
+      {
+        link: "/PinesVus/Reporte",
+        label: <AppIcons Logo={"RECAUDO"} name={"Reporte Pines"} />,
+        component: ReportePines,
         permission: [17],
       },
     ],

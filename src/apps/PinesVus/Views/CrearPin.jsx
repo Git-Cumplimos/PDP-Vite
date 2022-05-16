@@ -1,10 +1,9 @@
-import { useCallback, useState, useMemo, useEffect } from "react";
+import { useCallback, useState, useMemo, useEffect, useRef } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
-
 import Sellfundamujer from "../components/sellFundamujer/SellFundamujer";
 import SearchForm from "../components/SearchForm/SearchForm";
 import { usePinesVus } from "../utils/pinesVusHooks";
@@ -12,15 +11,24 @@ import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { normalize } from "path";
 import { notifyError } from "../../../utils/notify";
+import Tickets from "../components/Voucher/Tickets";
+import { useReactToPrint } from "react-to-print";
+
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
 
 const CrearPin = () => {
-  const {
-    infoLoto: { respuestamujer, setRespuestamujer },
-    crearPinVus,
-    cancelarpin,
-    CrearPinpin,
-    cancelarDesembolso,
-  } = usePinesVus();
+  const printDiv = useRef();
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+    // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
+  });
+
+  const { crearPinVus } = usePinesVus();
+  const { infoTicket } = useAuth();
 
   const { roleInfo } = useAuth();
   const [documento, setDocumento] = useState("");
@@ -64,11 +72,9 @@ const CrearPin = () => {
     };
   }, [roleInfo]);
 
-  //const submit
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
-    setShowModal(true);
     crearPinVus(documento, num_tramite, user)
       .then((res) => {
         console.log(res);
@@ -76,10 +82,10 @@ const CrearPin = () => {
         if (res?.status === false) {
           notifyError(res?.msg);
         } else {
-          console.log(res);
           setRespPin(res?.obj);
           setShowModal(true);
           setDisabledBtns(false);
+          setShowModal(true);
         }
       })
       .catch(() => setDisabledBtns(false));
@@ -89,29 +95,53 @@ const CrearPin = () => {
     setShowModal(false);
     setDisabledBtns(false);
     console.log(selected);
-    if (selected === true) {
-      ///cancelar un pin
-      cancelarDesembolso(respuestamujer?.obj, user)
-        .then((res) => {
-          setDisabledBtns(false);
-          if (res?.status === false) {
-            notifyError(res?.msg);
-          } else {
-            if (res?.obj?.CodRespuesta !== 0) {
-              notifyError(res?.obj?.Mensaje);
-            } else {
-              console.log(res);
-            }
-          }
-        })
-        .catch(() => setDisabledBtns(false));
-    }
-    setSelected(true);
-  }, [cancelarpin, CrearPinpin, selected]);
+    setDocumento("");
+    setNum_tramite("");
+    setRespPin("");
+  }, [selected]);
 
-  const Desembolsitos = () => {
-    setSelected(false);
-  };
+  const tickets = useMemo(() => {
+    return {
+      title: "Recibo de pago(Creacion Pin)",
+      timeInfo: {
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: false,
+        }).format(new Date()),
+      },
+      commerceInfo: Object.entries({
+        "Id Comercio": roleInfo?.id_comercio,
+        "No. terminal": roleInfo?.id_dispositivo,
+        Municipio: roleInfo?.ciudad,
+        Dirección: roleInfo?.direccion,
+        "Id Trx": respPin?.transacciones_id_trx?.creacion,
+        // "Id Confirmación": "0000",
+      }),
+      commerceName: "Pin para generación de Licencia",
+      trxInfo: [
+        ["Codigo", respPin?.cod_hash_pin],
+        ["VALOR", formatMoney.format(respPin?.valor)],
+        ["Vence", respPin?.fecha_vencimiento],
+      ],
+      disclamer:
+        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    };
+  }, [roleInfo, respPin]);
+
+  useEffect(() => {
+    infoTicket(
+      respPin?.transacciones_id_trx?.creacion,
+      respPin?.tipo_trx,
+      tickets
+    );
+  }, [infoTicket, respPin, tickets]);
 
   return (
     <>
@@ -153,40 +183,25 @@ const CrearPin = () => {
       </Form>
 
       <Modal show={showModal} handleClose={() => closeModal()}>
-        {selected ? (
-          <SearchForm
-            selected={respuestamujer}
-            closeModal={closeModal}
-            handleSubmit={(event) => {
-              event.preventDefault();
-              setDisabledBtns(true);
-              CrearPinpin(respuestamujer?.obj, user)
-                .then((res) => {
-                  setDisabledBtns(false);
-                  if (res?.status === false) {
-                    notifyError(res?.msg);
-                  } else {
-                    if (res?.obj?.CodRespuesta !== 0) {
-                      notifyError(res?.obj?.Mensaje);
-                    } else {
-                      console.log(res);
-                      setRespPago(res);
-                      // setShowModal(true);
-                      Desembolsitos();
-                    }
-                  }
-                })
-                .catch(() => setDisabledBtns(false));
-            }}
-            disabledBtns={disabledBtns}
-          />
-        ) : (
-          <Sellfundamujer
-            respPago={respPago?.obj}
-            setRespPago={setRespPago}
-            closeModal={closeModal}
-          />
-        )}
+        <div className="flex flex-col justify-center items-center">
+          <Tickets refPrint={printDiv} ticket={tickets} />
+          <ButtonBar>
+            <Button
+              onClick={() => {
+                handlePrint();
+              }}
+            >
+              Imprimir
+            </Button>
+            <Button
+              onClick={() => {
+                closeModal();
+              }}
+            >
+              Cerrar
+            </Button>
+          </ButtonBar>
+        </div>
       </Modal>
     </>
   );

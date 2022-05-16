@@ -27,12 +27,7 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
 const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 
 const TramitePines = () => {
-  const {
-    infoLoto: {},
-    consultaPinesVus,
-    ingresorecibo,
-    valorcuota,
-  } = usePinesVus();
+  const { consultaPinesVus } = usePinesVus();
 
   const formatMoney = new Intl.NumberFormat("es-CO", {
     style: "currency",
@@ -162,6 +157,7 @@ const TramitePines = () => {
     setReferencia("");
     setModalUsar(false);
     setModalCancel(false);
+    setParametroBusqueda("");
   }, []);
 
   const bankCollection = (e) => {
@@ -183,22 +179,6 @@ const TramitePines = () => {
       nombre_comercio: roleInfo?.["nombre comercio"],
     };
     console.log(body);
-    ingresorecibo(body)
-      .then((res) => {
-        if (res?.status == true) {
-          console.log(res);
-          setResponse(res?.obj);
-          setTicket(true);
-          setStop(false);
-        } else {
-          console.log(res);
-          notifyError(res?.msg);
-          setStop(false);
-        }
-      })
-      .catch((err) => {
-        notifyError("Se ha presentado un error, intente mas tarde", err);
-      });
   };
 
   //////////////////////
@@ -214,7 +194,7 @@ const TramitePines = () => {
     //   Depto: roleInfo?.codigo_dane?.slice(0, 2),
     //   Municipio: roleInfo?.codigo_dane?.slice(2),
     // };
-    consultaPinesVus(parametroBusqueda, pageData)
+    consultaPinesVus(parametroBusqueda, "", "", "", pageData)
       .then((res) => {
         console.log(res);
         setInfo(res);
@@ -246,38 +226,38 @@ const TramitePines = () => {
       .catch((err) => console.log("error", err));
   };
 
-  useEffect(() => {
-    if (info !== "") {
-      consultaPinesVus(parametroBusqueda, pageData)
-        .then((res) => {
-          console.log(res);
-          setInfo(res);
-          setDisabledBtn(false);
-          if (res?.status == false) {
-            notifyError(res?.msg);
-          } else {
-            setTable(
-              res?.obj?.results?.map((row) => {
-                console.log(row);
-                const fecha_vencimiento = new Date(row?.fecha_vencimiento);
-                fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
-                setFormatMon(row?.ValorPagar);
-                return {
-                  Id: row?.id_pin,
-                  Cedula: row?.doc_cliente,
-                  Estado: row?.name_estado_pin,
-                  "Codigo Estado": row?.estado_pin,
-                  Vencimiento: dateFormatter.format(fecha_vencimiento),
-                  Valor: formatMoney.format(row?.valor),
-                };
-              })
-            );
-            setMaxPages(res?.obj?.maxPages);
-          }
-        })
-        .catch((err) => console.log("error", err));
-    }
-  }, [pageData]);
+  // useEffect(() => {
+  //   if (info !== "") {
+  //     consultaPinesVus(parametroBusqueda, pageData)
+  //       .then((res) => {
+  //         console.log(res);
+  //         setInfo(res);
+  //         setDisabledBtn(false);
+  //         if (res?.status == false) {
+  //           notifyError(res?.msg);
+  //         } else {
+  //           setTable(
+  //             res?.obj?.results?.map((row) => {
+  //               console.log(row);
+  //               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
+  //               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
+  //               setFormatMon(row?.ValorPagar);
+  //               return {
+  //                 Id: row?.id_pin,
+  //                 Cedula: row?.doc_cliente,
+  //                 Estado: row?.name_estado_pin,
+  //                 "Codigo Estado": row?.estado_pin,
+  //                 Vencimiento: dateFormatter.format(fecha_vencimiento),
+  //                 Valor: formatMoney.format(row?.valor),
+  //               };
+  //             })
+  //           );
+  //           setMaxPages(res?.obj?.maxPages);
+  //         }
+  //       })
+  //       .catch((err) => console.log("error", err));
+  //   }
+  // }, [pageData]);
 
   const onSubmitUsar = (e) => {
     setModalUsar(true);
@@ -344,7 +324,7 @@ const TramitePines = () => {
       <Modal show={showModal} handleClose={() => closeModal()}>
         {(modalUsar !== true) & (modalCancel !== true) ? (
           <>
-            <div className="flex flex-col w-1/2 mx-auto">
+            <div className="flex flex-col w-1/2 mx-auto ">
               <h1 className="text-3xl mt-3 mx-auto">Datos del Pin</h1>
               <br></br>
               {Object.entries(selected).map(([key, val]) => {
@@ -361,18 +341,20 @@ const TramitePines = () => {
                 );
               })}
             </div>
-            <Form onSubmit={onSubmitUsar}>
-              <ButtonBar>
-                <Button type="submit">Usar pin</Button>
-                <Button
-                  onClick={() => {
-                    setModalCancel(true);
-                  }}
-                >
-                  Cancelar pin
-                </Button>
-              </ButtonBar>
-            </Form>
+            <div className="flex flex-col justify-center items-center mx-auto container">
+              <Form onSubmit={onSubmitUsar}>
+                <ButtonBar>
+                  <Button type="submit">Usar pin</Button>
+                  <Button
+                    onClick={() => {
+                      setModalCancel(true);
+                    }}
+                  >
+                    Cancelar pin
+                  </Button>
+                </ButtonBar>
+              </Form>
+            </div>
           </>
         ) : (
           ""
@@ -381,6 +363,7 @@ const TramitePines = () => {
           <UsarPinForm
             respPin={selected}
             valor={valor}
+            trx={id_trx}
             closeModal={closeModal}
           ></UsarPinForm>
         ) : (
