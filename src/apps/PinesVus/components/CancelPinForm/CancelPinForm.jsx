@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState, useEffect } from "react";
 import Button from "../../../../components/Base/Button";
-import Tickets from "../Voucher/Tickets";
+import Tickets from "../../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useAuth, infoTicket } from "../../../../hooks/AuthHooks";
@@ -15,17 +15,39 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const CancelPin = ({ respPin, valor, trx, closeModal }) => {
+const CancelPin = ({ respPin, valor, trx, tipoPin, closeModal }) => {
+  const { cancelPinVus, con_estado_tipoPin } = usePinesVus();
+
   const printDiv = useRef();
 
   const { getQuota, roleInfo, infoTicket } = useAuth();
+
+  const [optionsTipoPines, setOptionsTipoPines] = useState([]);
+
+  useEffect(() => {
+    con_estado_tipoPin("tipo_pines_vus")
+      .then((res) => {
+        console.log(res);
+
+        if (res?.status === false) {
+          notifyError(res?.msg);
+        } else {
+          setOptionsTipoPines(res?.obj?.results);
+        }
+      })
+      .catch((err) => console.log("error", err));
+  }, []);
+
+  const textTipoPin = useMemo(() => {
+    const resp = optionsTipoPines?.filter((id) => id.id === tipoPin);
+    return resp[0]?.descripcion.toUpperCase();
+  }, [optionsTipoPines, tipoPin]);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const { cancelPinVus } = usePinesVus();
   const [disabledBtn, setDisabledBtn] = useState(false);
   const [motivo, setMotivo] = useState("");
   const [respPinCancel, setRespPinCancel] = useState("");
@@ -46,7 +68,7 @@ const CancelPin = ({ respPin, valor, trx, closeModal }) => {
           hour12: false,
         }).format(new Date()),
       },
-      commerceName: "Pin para generación de Licencia \n\r",
+      commerceName: textTipoPin,
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,

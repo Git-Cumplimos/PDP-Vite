@@ -1,30 +1,18 @@
-import { useCallback, useState, useRef, useMemo, useEffect } from "react";
-import Button from "../../../components/Base/Button";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Form from "../../../components/Base/Form";
+import { useState, useRef, useMemo, useEffect } from "react";
 import Input from "../../../components/Base/Input";
-import Modal from "../../../components/Base/Modal";
 import Select from "../../../components/Base/Select";
-import Table from "../../../components/Base/Table";
-import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
 import { usePinesVus } from "../utils/pinesVusHooks";
 import { toast } from "react-toastify";
 import { useReactToPrint } from "react-to-print";
 import { notifyError } from "../../../utils/notify";
-import Tickets from "../components/Voucher/Tickets";
-import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
-import fetchData from "../../../utils/fetchData";
+import { useAuth } from "../../../hooks/AuthHooks";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
-import UsarPinForm from "../components/UsarPinForm/UsarPinForm";
-import CancelPin from "../components/CancelPinForm/CancelPinForm";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
   month: "numeric",
   day: "numeric",
 });
-
-const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 
 const ReportePines = () => {
   const { consultaPinesVus, con_estado_tipoPin } = usePinesVus();
@@ -35,15 +23,9 @@ const ReportePines = () => {
     maximumFractionDigits: 0,
   });
 
-  const [parametroBusqueda, setParametroBusqueda] = useState("");
-  const [disabledBtn, setDisabledBtn] = useState(false);
-  const [info, setInfo] = useState("");
   const [table, setTable] = useState("");
   const [formatMon, setFormatMon] = useState("");
-  const [referencia, setReferencia] = useState("");
-  const [ticket, setTicket] = useState(false);
   const [selected, setSelected] = useState(true);
-  const [response, setResponse] = useState("");
   const { roleInfo } = useAuth();
   const [maxPages, setMaxPages] = useState(1);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
@@ -53,18 +35,6 @@ const ReportePines = () => {
   const [estadoPin, setEstadoPin] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
   const [tipoPin, setTipoPin] = useState("");
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
 
   const pageStyle = `
   @page {
@@ -84,65 +54,6 @@ const ReportePines = () => {
   }
 `;
 
-  const tickets = useMemo(() => {
-    return {
-      title: "Recibo de pago(ReportePines)",
-      timeInfo: {
-        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }).format(new Date()),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        }).format(new Date()),
-      },
-      commerceInfo: Object.entries({
-        "Id Comercio": roleInfo?.id_comercio,
-        "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
-        "Id Trx": response.id_trx,
-        "Id Confirmación": response.Confirmacion,
-      }),
-      commerceName: "FUNDACIÓN DE LA MUJER",
-      trxInfo: [
-        ["CRÉDITO", selected?.Credito],
-        ["VALOR", formatMoney.format(formatMon)],
-        ["Cliente", selected?.Cliente],
-        ["", ""],
-        ["Cédula", selected?.Cedula],
-        ["", ""],
-      ],
-      disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-    };
-  }, [
-    roleInfo?.ciudad,
-    roleInfo?.direccion,
-    roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
-    response,
-    formatMon,
-    table,
-  ]);
-
-  const { infoTicket } = useAuth();
-
-  useEffect(() => {
-    infoTicket(response?.id_trx, 5, tickets);
-  }, [infoTicket, response]);
-
-  const printDiv = useRef();
-
-  const handlePrint = useReactToPrint({
-    content: () => printDiv.current,
-    pageStyle: pageStyle,
-  });
-
   useEffect(() => {
     if (
       (fechaInicial !== "") & (fechaFinal !== "") ||
@@ -160,8 +71,6 @@ const ReportePines = () => {
       )
         .then((res) => {
           setTable("");
-          setInfo(res);
-          setDisabledBtn(false);
           if (res?.status == false) {
             notifyError(res?.msg);
           } else {
@@ -277,39 +186,6 @@ const ReportePines = () => {
             required={true}
             onChange={(e) => setEstadoPin(parseInt(e.target.value) ?? "")}
           />
-          {/* {userPermissions
-            .map(({ id_permission }) => id_permission)
-            .includes(5) ? (
-            <>
-              <Input
-                id="id_comercio"
-                label="Id comercio"
-                type="numeric"
-                value={idComercio}
-                onChange={(e) => {
-                  setIdComercio(e.target.value);
-                }}
-                onLazyInput={{
-                  callback: (e) => {},
-                  timeOut: 500,
-                }}
-              />
-              <Input
-                id="id_usuario"
-                label="Id usuario"
-                type="numeric"
-                value={usuario}
-                onChange={(e) => {
-                  setUsuario(e.target.value);
-                }}
-                onLazyInput={{
-                  callback: (e) => {},
-                  timeOut: 500,
-                }}
-              />
-            </>
-          ) : (
-          "" )} */}
         </TableEnterprise>
       </>
     </>

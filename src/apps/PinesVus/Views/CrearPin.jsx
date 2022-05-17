@@ -8,7 +8,7 @@ import { usePinesVus } from "../utils/pinesVusHooks";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notifyError } from "../../../utils/notify";
-import Tickets from "../components/Voucher/Tickets";
+import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import Select from "../../../components/Base/Select";
 
@@ -32,7 +32,6 @@ const CrearPin = () => {
   const [documento, setDocumento] = useState("");
   const [num_tramite, setNum_tramite] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [selected, setSelected] = useState(true);
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [respPin, setRespPin] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
@@ -91,12 +90,11 @@ const CrearPin = () => {
   const closeModal = useCallback(async () => {
     setShowModal(false);
     setDisabledBtns(false);
-    console.log(selected);
     setDocumento("");
     setNum_tramite("");
     setRespPin("");
     setTipoPin("");
-  }, [selected]);
+  }, []);
 
   const tickets = useMemo(() => {
     return {
@@ -120,7 +118,6 @@ const CrearPin = () => {
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
         "Id Trx": respPin?.transacciones_id_trx?.creacion,
-        // "Id Confirmación": "0000",
       }),
       commerceName: textTipoPin,
       trxInfo: [

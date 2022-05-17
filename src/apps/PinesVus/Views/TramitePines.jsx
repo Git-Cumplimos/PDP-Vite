@@ -4,16 +4,12 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
-import Select from "../../../components/Base/Select";
-import Table from "../../../components/Base/Table";
-import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
+
 import { usePinesVus } from "../utils/pinesVusHooks";
 import { toast } from "react-toastify";
 import { useReactToPrint } from "react-to-print";
 import { notifyError } from "../../../utils/notify";
-import Tickets from "../components/Voucher/Tickets";
-import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
-import fetchData from "../../../utils/fetchData";
+import { useAuth } from "../../../hooks/AuthHooks";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import UsarPinForm from "../components/UsarPinForm/UsarPinForm";
 import CancelPin from "../components/CancelPinForm/CancelPinForm";
@@ -23,8 +19,6 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
   month: "numeric",
   day: "numeric",
 });
-
-const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 
 const TramitePines = () => {
   const { consultaPinesVus } = usePinesVus();
@@ -36,27 +30,20 @@ const TramitePines = () => {
   });
 
   const [parametroBusqueda, setParametroBusqueda] = useState("");
-  const [tipobusqueda, setTiposBusqueda] = useState("");
   const [disabledBtn, setDisabledBtn] = useState(false);
-  const [stop, setStop] = useState("");
-  const [number, setNumber] = useState("");
   const [info, setInfo] = useState("");
   const [table, setTable] = useState("");
-  const [cuota, setCuota] = useState("");
-  const [creditStatus, setCreditStatus] = useState(false);
   const [formatMon, setFormatMon] = useState("");
-  const [referencia, setReferencia] = useState("");
-  const [ticket, setTicket] = useState(false);
   const [selected, setSelected] = useState(true);
   const [showModal, setShowModal] = useState("");
   const [modalUsar, setModalUsar] = useState("");
   const [modalCancel, setModalCancel] = useState("");
-  const [response, setResponse] = useState("");
   const { roleInfo } = useAuth();
   const [maxPages, setMaxPages] = useState(1);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [valor, setValor] = useState("");
   const [id_trx, setId_trx] = useState("");
+  const [tipoPin, setTipoPin] = useState("");
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -88,98 +75,15 @@ const TramitePines = () => {
   }
 `;
 
-  const tickets = useMemo(() => {
-    return {
-      title: "Recibo de pago(TramitePines)",
-      timeInfo: {
-        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }).format(new Date()),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        }).format(new Date()),
-      },
-      commerceInfo: Object.entries({
-        "Id Comercio": roleInfo?.id_comercio,
-        "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
-        "Id Trx": response.id_trx,
-        "Id Confirmación": response.Confirmacion,
-      }),
-      commerceName: "FUNDACIÓN DE LA MUJER",
-      trxInfo: [
-        ["CRÉDITO", selected?.Credito],
-        ["VALOR", formatMoney.format(formatMon)],
-        ["Cliente", selected?.Cliente],
-        ["", ""],
-        ["Cédula", selected?.Cedula],
-        ["", ""],
-      ],
-      disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-    };
-  }, [
-    roleInfo?.ciudad,
-    roleInfo?.direccion,
-    roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
-    response,
-    formatMon,
-    table,
-  ]);
-
-  const { infoTicket } = useAuth();
-
-  useEffect(() => {
-    infoTicket(response?.id_trx, 5, tickets);
-  }, [infoTicket, response]);
-
-  const printDiv = useRef();
-
-  const handlePrint = useReactToPrint({
-    content: () => printDiv.current,
-    pageStyle: pageStyle,
-  });
-
   const closeModal = useCallback(async () => {
     setShowModal(false);
     setDisabledBtn(false);
     setFormatMon("");
-    setCreditStatus(false);
     setInfo("");
-    setTicket(false);
-    setReferencia("");
     setModalUsar(false);
     setModalCancel(false);
     setParametroBusqueda("");
   }, []);
-
-  const bankCollection = (e) => {
-    e.preventDefault();
-    setStop(true);
-
-    const body = {
-      Tipo: roleInfo?.tipo_comercio,
-      Usuario: roleInfo?.id_usuario,
-      Dispositivo: roleInfo?.id_dispositivo,
-      Comercio: roleInfo?.id_comercio,
-      Credito: selected?.Credito,
-      Depto: roleInfo?.codigo_dane.slice(0, 2),
-      Municipio: roleInfo?.codigo_dane.slice(2),
-      Valor: parseFloat(formatMon),
-      referenciaPago: referencia,
-      cliente: selected?.Cliente,
-      cedula: selected?.Cedula,
-      nombre_comercio: roleInfo?.["nombre comercio"],
-    };
-    console.log(body);
-  };
 
   //////////////////////
   const onSubmit = (e) => {
@@ -221,6 +125,7 @@ const TramitePines = () => {
           setMaxPages(res?.obj?.maxPages);
           setValor(res?.obj?.results?.[0]?.valor);
           setId_trx(res?.obj?.results?.[0]?.id_trx?.creacion);
+          setTipoPin(res?.obj?.results?.[0]?.tipo_pin);
         }
       })
       .catch((err) => console.log("error", err));
@@ -364,6 +269,7 @@ const TramitePines = () => {
             respPin={selected}
             valor={valor}
             trx={id_trx}
+            tipoPin={tipoPin}
             closeModal={closeModal}
           ></UsarPinForm>
         ) : (
@@ -374,6 +280,7 @@ const TramitePines = () => {
             respPin={selected}
             valor={valor}
             trx={id_trx}
+            tipoPin={tipoPin}
             closeModal={closeModal}
           ></CancelPin>
         ) : (
