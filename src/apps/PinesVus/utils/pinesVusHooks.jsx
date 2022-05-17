@@ -55,7 +55,6 @@ export const useProvidePinesVus = () => {
         Comercio: user?.Comercio,
         Tipo: user?.Tipo,
       };
-      console.log(body);
       try {
         const res = await fetchData(urls.PinVus, "POST", {}, body);
         return res;

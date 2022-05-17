@@ -14,19 +14,24 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const UsarPinForm = ({ respPin, closeModal, trx, valor, tipoPin }) => {
+const UsarPinForm = ({
+  respPin,
+  closeModal,
+  trx,
+  valor,
+  tipoPin,
+  setActivarNavigate,
+}) => {
   const printDiv = useRef();
 
   const { usarPinVus, con_estado_tipoPin } = usePinesVus();
-  const { getQuota, roleInfo, infoTicket } = useAuth();
+  const { roleInfo, infoTicket } = useAuth();
   const [respPinUso, setRespPinUso] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
 
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
       .then((res) => {
-        console.log(res);
-
         if (res?.status === false) {
           notifyError(res?.msg);
         } else {
@@ -97,6 +102,7 @@ const UsarPinForm = ({ respPin, closeModal, trx, valor, tipoPin }) => {
           notifyError(res?.msg);
         } else {
           notify(res?.msg);
+          setActivarNavigate(true);
           setRespPinUso(res?.obj);
         }
       })

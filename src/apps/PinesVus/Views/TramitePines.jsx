@@ -4,15 +4,14 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
-
 import { usePinesVus } from "../utils/pinesVusHooks";
 import { toast } from "react-toastify";
-import { useReactToPrint } from "react-to-print";
 import { notifyError } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import UsarPinForm from "../components/UsarPinForm/UsarPinForm";
 import CancelPin from "../components/CancelPinForm/CancelPinForm";
+import { useNavigate } from "react-router-dom";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -21,6 +20,7 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
 });
 
 const TramitePines = () => {
+  const navigate = useNavigate();
   const { consultaPinesVus } = usePinesVus();
 
   const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -44,6 +44,7 @@ const TramitePines = () => {
   const [valor, setValor] = useState("");
   const [id_trx, setId_trx] = useState("");
   const [tipoPin, setTipoPin] = useState("");
+  const [activarNavigate, setActivarNavigate] = useState(true);
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -83,13 +84,16 @@ const TramitePines = () => {
     setModalUsar(false);
     setModalCancel(false);
     setParametroBusqueda("");
+    if (activarNavigate) {
+      navigate(-1);
+    }
   }, []);
 
   //////////////////////
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    // setCreditStatus(false);
+    setActivarNavigate(false);
     setInfo("");
     // const user = {
     //   Usuario: roleInfo?.id_usuario,
@@ -100,7 +104,6 @@ const TramitePines = () => {
     // };
     consultaPinesVus(parametroBusqueda, "", "", "", pageData)
       .then((res) => {
-        console.log(res);
         setInfo(res);
         setDisabledBtn(false);
         if (res?.status == false) {
@@ -108,7 +111,6 @@ const TramitePines = () => {
         } else {
           setTable(
             res?.obj?.results?.map((row) => {
-              console.log(row);
               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
               setFormatMon(row?.ValorPagar);
@@ -167,7 +169,6 @@ const TramitePines = () => {
   const onSubmitUsar = (e) => {
     setModalUsar(true);
   };
-
   return (
     <>
       {"id_comercio" in roleInfo ? (
@@ -270,6 +271,7 @@ const TramitePines = () => {
             valor={valor}
             trx={id_trx}
             tipoPin={tipoPin}
+            setActivarNavigate={setActivarNavigate}
             closeModal={closeModal}
           ></UsarPinForm>
         ) : (
@@ -281,6 +283,7 @@ const TramitePines = () => {
             valor={valor}
             trx={id_trx}
             tipoPin={tipoPin}
+            setActivarNavigate={setActivarNavigate}
             closeModal={closeModal}
           ></CancelPin>
         ) : (

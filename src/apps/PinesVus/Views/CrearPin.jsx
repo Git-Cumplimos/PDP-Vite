@@ -11,6 +11,7 @@ import { notifyError } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import Select from "../../../components/Base/Select";
+import { useNavigate } from "react-router-dom";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -19,6 +20,8 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 });
 
 const CrearPin = () => {
+  const navigate = useNavigate();
+
   const printDiv = useRef();
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -40,7 +43,6 @@ const CrearPin = () => {
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
       .then((res) => {
-        console.log(res);
         setDisabledBtns(false);
         if (res?.status === false) {
           notifyError(res?.msg);
@@ -73,7 +75,6 @@ const CrearPin = () => {
     setDisabledBtns(true);
     crearPinVus(documento, num_tramite, tipoPin, user)
       .then((res) => {
-        console.log(res);
         setDisabledBtns(false);
         if (res?.status === false) {
           notifyError(res?.msg);
@@ -94,6 +95,7 @@ const CrearPin = () => {
     setNum_tramite("");
     setRespPin("");
     setTipoPin("");
+    navigate(-1);
   }, []);
 
   const tickets = useMemo(() => {

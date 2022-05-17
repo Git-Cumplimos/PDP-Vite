@@ -3,7 +3,7 @@ import Button from "../../../../components/Base/Button";
 import Tickets from "../../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-import { useAuth, infoTicket } from "../../../../hooks/AuthHooks";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import Form from "../../../../components/Base/Form";
 import { notify, notifyError } from "../../../../utils/notify";
 import { usePinesVus } from "../../utils/pinesVusHooks";
@@ -15,12 +15,19 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const CancelPin = ({ respPin, valor, trx, tipoPin, closeModal }) => {
+const CancelPin = ({
+  respPin,
+  valor,
+  trx,
+  tipoPin,
+  closeModal,
+  setActivarNavigate,
+}) => {
   const { cancelPinVus, con_estado_tipoPin } = usePinesVus();
 
   const printDiv = useRef();
 
-  const { getQuota, roleInfo, infoTicket } = useAuth();
+  const { roleInfo, infoTicket } = useAuth();
 
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
 
@@ -98,6 +105,7 @@ const CancelPin = ({ respPin, valor, trx, tipoPin, closeModal }) => {
         if (res?.status == false) {
           notifyError(res?.msg);
         } else {
+          setActivarNavigate(true);
           setRespPinCancel(res?.obj);
           notify(res?.msg);
         }
