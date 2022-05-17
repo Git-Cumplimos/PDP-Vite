@@ -77,29 +77,31 @@ const AdminLayout = () => {
   }, [backIcon2, clientWidth]);
 
   useEffect(() => {
+    console.log(roleInfo);
     if (roleInfo !== undefined) {
       const query = {
         id_usuario: roleInfo?.id_usuario,
         id_comercio: roleInfo?.id_comercio,
         id_terminal: roleInfo?.id_dispositivo,
       };
-
-      if (location.pathname === "/") {
-        console.log("location");
-        searchCierre(query)
-          .then((res) => {
-            console.log(typeof res?.obj);
-            if (res?.status) {
-              if (res?.obj !== 3 && res?.obj !== 2) {
-                setInfoCaja(true);
-                setCajaState(res?.obj);
-              } else {
+      if (roleInfo?.tipo_comercio !== "OFICINAS PROPIAS") {
+        if (location.pathname === "/") {
+          console.log("location");
+          searchCierre(query)
+            .then((res) => {
+              console.log(typeof res?.obj);
+              if (res?.status) {
+                if (res?.obj !== 3 && res?.obj !== 2) {
+                  setInfoCaja(true);
+                  setCajaState(res?.obj);
+                } else {
+                }
               }
-            }
-          })
-          .catch((err) => {
-            throw err;
-          });
+            })
+            .catch((err) => {
+              throw err;
+            });
+        }
       }
     }
   }, [roleInfo, location]);
