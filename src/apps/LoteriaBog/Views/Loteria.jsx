@@ -216,7 +216,6 @@ const Loteria = ({ route }) => {
           value={numero}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              console.log("aver");
               const num = e.target.value;
               setNumero(num);
             }
