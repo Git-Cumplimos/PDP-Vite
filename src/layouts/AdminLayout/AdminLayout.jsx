@@ -77,14 +77,16 @@ const AdminLayout = () => {
   }, [backIcon2, clientWidth]);
 
   useEffect(() => {
-    console.log(roleInfo);
-    if (roleInfo !== undefined) {
-      const query = {
-        id_usuario: roleInfo?.id_usuario,
-        id_comercio: roleInfo?.id_comercio,
-        id_terminal: roleInfo?.id_dispositivo,
-      };
-      if (roleInfo?.tipo_comercio !== "OFICINAS PROPIAS") {
+    console.log(roleInfo?.tipo_comercio === "OFICINAS PROPIAS");
+
+    if (roleInfo?.tipo_comercio === "OFICINAS PROPIAS") {
+      if (roleInfo !== undefined) {
+        const query = {
+          id_usuario: roleInfo?.id_usuario,
+          id_comercio: roleInfo?.id_comercio,
+          id_terminal: roleInfo?.id_dispositivo,
+        };
+
         if (location.pathname === "/") {
           console.log("location");
           searchCierre(query)
