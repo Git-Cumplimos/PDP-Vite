@@ -4,15 +4,13 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
-import Sellfundamujer from "../components/sellFundamujer/SellFundamujer";
-import SearchForm from "../components/SearchForm/SearchForm";
 import { usePinesVus } from "../utils/pinesVusHooks";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/AuthHooks";
-import { normalize } from "path";
 import { notifyError } from "../../../utils/notify";
 import Tickets from "../components/Voucher/Tickets";
 import { useReactToPrint } from "react-to-print";
+import Select from "../../../components/Base/Select";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -27,7 +25,7 @@ const CrearPin = () => {
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const { crearPinVus } = usePinesVus();
+  const { crearPinVus, con_estado_tipoPin } = usePinesVus();
   const { infoTicket } = useAuth();
 
   const { roleInfo } = useAuth();
@@ -36,29 +34,28 @@ const CrearPin = () => {
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(true);
   const [disabledBtns, setDisabledBtns] = useState(false);
-  const [showModalAdvertencia, setShowModalAdvertencia] = useState(false);
-  const [respPago, setRespPago] = useState("");
   const [respPin, setRespPin] = useState("");
+  const [optionsTipoPines, setOptionsTipoPines] = useState([]);
+  const [tipoPin, setTipoPin] = useState("");
 
   useEffect(() => {
-    setShowModalAdvertencia(true);
+    con_estado_tipoPin("tipo_pines_vus")
+      .then((res) => {
+        console.log(res);
+        setDisabledBtns(false);
+        if (res?.status === false) {
+          notifyError(res?.msg);
+        } else {
+          setOptionsTipoPines(res?.obj?.results);
+        }
+      })
+      .catch(() => setDisabledBtns(false));
   }, []);
 
-  const closeModalAdvertencia = (e) => {
-    setShowModalAdvertencia(false);
-  };
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const textTipoPin = useMemo(() => {
+    const resp = optionsTipoPines?.filter((id) => id.id === tipoPin);
+    return resp[0]?.descripcion.toUpperCase();
+  }, [optionsTipoPines, tipoPin]);
 
   const user = useMemo(() => {
     return {
@@ -75,7 +72,7 @@ const CrearPin = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
-    crearPinVus(documento, num_tramite, user)
+    crearPinVus(documento, num_tramite, tipoPin, user)
       .then((res) => {
         console.log(res);
         setDisabledBtns(false);
@@ -98,6 +95,7 @@ const CrearPin = () => {
     setDocumento("");
     setNum_tramite("");
     setRespPin("");
+    setTipoPin("");
   }, [selected]);
 
   const tickets = useMemo(() => {
@@ -124,7 +122,7 @@ const CrearPin = () => {
         "Id Trx": respPin?.transacciones_id_trx?.creacion,
         // "Id Confirmación": "0000",
       }),
-      commerceName: "Pin para generación de Licencia",
+      commerceName: textTipoPin,
       trxInfo: [
         ["Codigo", respPin?.cod_hash_pin],
         ["VALOR", formatMoney.format(respPin?.valor)],
@@ -133,7 +131,7 @@ const CrearPin = () => {
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [roleInfo, respPin]);
+  }, [roleInfo, respPin, textTipoPin]);
 
   useEffect(() => {
     infoTicket(
@@ -173,6 +171,23 @@ const CrearPin = () => {
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
             setDocumento(num);
+          }}
+        />
+        <Select
+          id="tipoPin"
+          label="Tipo Pin"
+          options={
+            Object.fromEntries([
+              ["", ""],
+              ...optionsTipoPines?.map(({ descripcion, id }) => {
+                return [descripcion, id];
+              }),
+            ]) || { "": "" }
+          }
+          value={tipoPin}
+          required={true}
+          onChange={(e) => {
+            setTipoPin(parseInt(e.target.value) ?? "");
           }}
         />
         <ButtonBar className="col-auto md:col-span-2">

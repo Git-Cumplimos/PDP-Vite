@@ -28,11 +28,11 @@ const CancelPin = ({ respPin, valor, trx, closeModal }) => {
   const { cancelPinVus } = usePinesVus();
   const [disabledBtn, setDisabledBtn] = useState(false);
   const [motivo, setMotivo] = useState("");
-  const [respPinCancel, setrespPinCancel] = useState("");
+  const [respPinCancel, setRespPinCancel] = useState("");
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago(Uso Pin)",
+      title: "Recibo de pago(Cancelación pin)",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -46,27 +46,24 @@ const CancelPin = ({ respPin, valor, trx, closeModal }) => {
           hour12: false,
         }).format(new Date()),
       },
+      commerceName: "Pin para generación de Licencia \n\r",
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
-        "Id Trx": respPinCancel?.transacciones_id_trx?.uso,
+        "Id Trx": respPinCancel?.id_trx,
         // "Id Confirmación": "0000",
       }),
       // commerceName: "Pin para generación de Licencia",
-      trxInfo: [["VALOR", formatMoney.format(0)]],
+      trxInfo: [["VALOR", formatMoney.format(valor)]],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [respPinCancel, roleInfo]);
+  }, [respPinCancel, roleInfo, valor]);
 
   useEffect(() => {
-    infoTicket(
-      respPinCancel?.transacciones_id_trx?.uso,
-      respPinCancel?.tipo_trx,
-      tickets
-    );
+    infoTicket(respPinCancel?.id_trx, respPinCancel?.tipo_trx, tickets);
   }, [infoTicket, respPinCancel, tickets]);
 
   const onSubmitCancel = (e) => {
@@ -79,7 +76,7 @@ const CancelPin = ({ respPin, valor, trx, closeModal }) => {
         if (res?.status == false) {
           notifyError(res?.msg);
         } else {
-          setrespPinCancel(res?.obj);
+          setRespPinCancel(res?.obj);
           notify(res?.msg);
         }
       })

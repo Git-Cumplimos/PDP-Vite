@@ -44,24 +44,27 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const crearPinVus = useCallback(async (documento, num_tramite, user) => {
-    const body = {
-      tipo_pin: 1, //Por ahora es quemado, mas adelante sera una consulta
-      num_tramite: String(num_tramite),
-      doc_cliente: String(documento),
-      Usuario: user?.Usuario,
-      Dispositivo: user?.Dispositivo,
-      Comercio: user?.Comercio,
-      Tipo: user?.Tipo,
-    };
-    console.log(body);
-    try {
-      const res = await fetchData(urls.PinVus, "POST", {}, body);
-      return res;
-    } catch (err) {
-      throw err;
-    }
-  }, []);
+  const crearPinVus = useCallback(
+    async (documento, num_tramite, tipoPin, user) => {
+      const body = {
+        tipo_pin: tipoPin,
+        num_tramite: String(num_tramite),
+        doc_cliente: String(documento),
+        Usuario: user?.Usuario,
+        Dispositivo: user?.Dispositivo,
+        Comercio: user?.Comercio,
+        Tipo: user?.Tipo,
+      };
+      console.log(body);
+      try {
+        const res = await fetchData(urls.PinVus, "POST", {}, body);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
 
   const usarPinVus = useCallback(async (info, valor, trx, user) => {
     const body = {
@@ -84,7 +87,14 @@ export const useProvidePinesVus = () => {
   }, []);
 
   const consultaPinesVus = useCallback(
-    async (cod_hash_pin, fecha_ini, fecha_fin, estadoPin, pageData) => {
+    async (
+      cod_hash_pin,
+      fecha_ini,
+      fecha_fin,
+      estadoPin,
+      tipoPin,
+      pageData
+    ) => {
       const query = { ...pageData };
       if (cod_hash_pin !== "") {
         query.cod_hash_pin = cod_hash_pin;
@@ -93,8 +103,11 @@ export const useProvidePinesVus = () => {
         query.fecha_ini = fecha_ini;
         query.fecha_fin = fecha_fin;
       }
-      if (estadoPin !== "") {
+      if ((estadoPin !== "") & !isNaN(estadoPin)) {
         query.estado_pin = estadoPin;
+      }
+      if ((tipoPin !== "") & !isNaN(tipoPin)) {
+        query.tipo_pin = tipoPin;
       }
       try {
         const res = await fetchData(urls.PinVus, "GET", query);

@@ -43,6 +43,7 @@ const UsarPinForm = ({ respPin, closeModal, trx, valor }) => {
           hour12: false,
         }).format(new Date()),
       },
+      commerceName: "Pin para generación de Licencia \n\r",
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
