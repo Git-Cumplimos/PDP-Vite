@@ -54,7 +54,7 @@ const UsarPinForm = ({
   const [disabledBtn, setDisabledBtn] = useState(false);
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago(Uso Pin)",
+      title: "Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -75,10 +75,11 @@ const UsarPinForm = ({
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
         "Id Trx": respPinUso?.transacciones_id_trx?.uso,
-        // "Id Confirmación": "0000",
       }),
-      // commerceName: "Pin para generación de Licencia",
-      trxInfo: [["VALOR", formatMoney.format(0)]],
+      trxInfo: [
+        ["Proceso", "Uso de Pin"],
+        ["VALOR", formatMoney.format(0)],
+      ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
@@ -97,6 +98,7 @@ const UsarPinForm = ({
     setDisabledBtn(true);
     usarPinVus(respPin, valor, trx, roleInfo)
       .then((res) => {
+        setActivarNavigate(false);
         setDisabledBtn(false);
         if (res?.status == false) {
           notifyError(res?.msg);

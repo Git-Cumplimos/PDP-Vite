@@ -100,7 +100,7 @@ const CrearPin = () => {
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago(Creacion Pin)",
+      title: "Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -123,8 +123,9 @@ const CrearPin = () => {
       }),
       commerceName: textTipoPin,
       trxInfo: [
+        ["Proceso", "Creación de Pin"],
         ["Codigo", respPin?.cod_hash_pin],
-        ["VALOR", formatMoney.format(respPin?.valor)],
+        ["Valor", formatMoney.format(respPin?.valor)],
         ["Vence", respPin?.fecha_vencimiento],
       ],
       disclamer:

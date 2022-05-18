@@ -12,8 +12,9 @@ export const pinesVusContext = createContext({
   cancelPinVus: () => {},
   usarPinVus: () => {},
   con_estado_tipoPin: () => {},
+  activarNavigate: null,
+  setActivarNavigate: null,
 });
-
 export const usePinesVus = () => {
   return useContext(pinesVusContext);
 };
@@ -21,6 +22,7 @@ export const usePinesVus = () => {
 export const useProvidePinesVus = () => {
   // Datos consulta y compra
   const { roleInfo } = useAuth();
+  const [activarNavigate, setActivarNavigate] = useState(true);
 
   const cancelPinVus = useCallback(async (info, valor, motivo, trx, user) => {
     const body = {
@@ -134,5 +136,7 @@ export const useProvidePinesVus = () => {
     consultaPinesVus,
     usarPinVus,
     con_estado_tipoPin,
+    activarNavigate,
+    setActivarNavigate,
   };
 };
