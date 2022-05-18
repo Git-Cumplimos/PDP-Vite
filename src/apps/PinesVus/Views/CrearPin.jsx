@@ -148,15 +148,17 @@ const CrearPin = () => {
         <Input
           id="numTramite"
           label="No. Tramite"
-          type="text"
+          type="search"
           required
-          // minLength="5"
-          // maxLength="12"
+          minLength="3"
+          maxLength="10"
           autoComplete="off"
           value={num_tramite}
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setNum_tramite(num);
+            if (!isNaN(e.target.value)) {
+              const num = e.target.value;
+              setNum_tramite(num);
+            }
           }}
         />
         <Input
