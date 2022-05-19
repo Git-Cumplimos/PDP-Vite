@@ -15,7 +15,8 @@ function ValidacionAsesorComercial() {
   const [datosFiltradosFecha, setDatosFiltradosFecha] = useState([]);
   const [datosFiltradosEstado, setDatosFiltradosEstado] = useState([]);
   const [datosFiltradosNumero, setDatosFiltradosNumero] = useState([]);
-  const [cantidadPaginas, setCantidadPaginas] = useState(0);
+  const [cantidadPaginas, setCantidadPaginas] = useState(1);
+  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
   const [estadoProceso, setEstadoProceso] = useState("");
@@ -23,23 +24,34 @@ function ValidacionAsesorComercial() {
   const [datosOrdenados, setOrdenados] = useState(0);
   const [keys, setKey] = useState(0);
   /* const [datosFiltrados, setDatosFiltrados] = useState(["perro"]);  */
-  useEffect(() => {
-    fetchData(
-      /*  `http://127.0.0.1:5000/actualizacionestado` */
-      /*       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`,
-       */ `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`,
-      "GET"
-    )
-      /* .then((response) => response.json()) */
-      .then((respuesta) => {
-        setDatosEnrolamientos(respuesta?.obj?.results);
-        setCantidadPaginas(respuesta?.obj?.maxPages);
-      })
-      .catch((err) => {
-        console.log(err);
-        notifyError("Error al cargar Datos ");
-      });
-  }, []);
+  useEffect(
+    () => {
+      /*   const queries = { ...pageData }; */
+      fetchData(
+        /*  `http://127.0.0.1:5000/actualizacionestado` */
+        /*       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`,
+         */ `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`,
+        "GET" /* ,
+      { queries },
+      {},
+      {},
+      {} */
+      )
+        /* .then((response) => response.json()) */
+        .then((respuesta) => {
+          // console.log(respuesta);
+          setDatosEnrolamientos(respuesta?.obj?.results);
+          setCantidadPaginas(respuesta?.obj?.maxPages);
+        })
+        .catch((err) => {
+          console.log(err);
+          notifyError("Error al cargar Datos ");
+        });
+    },
+    [
+      /* pageData */
+    ]
+  );
   useEffect(() => {
     if (fechaInicial && fechaFinal) {
       fetchData(
@@ -151,6 +163,7 @@ function ValidacionAsesorComercial() {
       {datosFiltradosFecha?.length > 0 ? (
         <TableEnterprise
           maxPage={cantidadPaginas}
+          onSetPageData={setPageData}
           title="Enrolamiento de Comercios"
           headers={[
             "Id_proceso",
