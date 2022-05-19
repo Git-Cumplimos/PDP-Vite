@@ -7,6 +7,12 @@ const urls = {
   ingresoreverso: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresoreversorecibo`,
   ingresorecibo: `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`,
   valorcuota: `${process.env.REACT_APP_URL_FDLMWSDL}/valorcuota`,
+  ///____
+  consultarPines: `${process.env.REACT_APP_URL_FDLMWSDL}/consultarPines`,
+  desembolsospin: `${process.env.REACT_APP_URL_FDLMWSDL}/confirmarDesembolso`,
+  cancelarDesembolso: `${process.env.REACT_APP_URL_FDLMWSDL}/cancelarDesembolso`,
+
+  //_____
 };
 
 export const FDLMContext = createContext({
@@ -26,6 +32,9 @@ export const FDLMContext = createContext({
   ingresoreversorecibo: () => {},
   ingresorecibo: () => {},
   valorcuota: () => {},
+  consultarPines: () => {},
+  desembolsospin: () => {},
+  cancelarDesembolso: () => {},
 });
 
 export const useMujer = () => {
@@ -127,6 +136,66 @@ export const useProvideFDLM = () => {
       throw err;
     }
   }, []);
+
+  const consultarPines = useCallback(async (documento, pin, user) => {
+    const body = {
+      Usuario: user?.Usuario,
+      Dispositivo: user?.Dispositivo,
+      Comercio: user?.Comercio,
+      nroPIN: String(pin),
+      documento: String(documento),
+    };
+    console.log(body);
+    try {
+      const res = await fetchData(urls.consultarPines, "POST", {}, body);
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  }, []);
+
+  const cancelarDesembolso = useCallback(async (info, user) => {
+    const body = {
+      Usuario: user?.Usuario,
+      Dispositivo: user?.Dispositivo,
+      Comercio: user?.Comercio,
+      nroPIN: info?.CodigoPIN,
+      documento: info?.Cedula,
+    };
+    console.log(body);
+    try {
+      const res = await fetchData(urls.cancelarDesembolso, "POST", {}, body);
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  }, []);
+
+  const desembolsospin = useCallback(async (info, user) => {
+    console.log(info);
+    const body = {
+      Tipo: user?.Tipo,
+      Usuario: user?.Usuario,
+      Dispositivo: user?.Dispositivo,
+      Comercio: user?.Comercio,
+      Depto: parseInt(user?.Depto),
+      Municipio: parseInt(user?.Municipio),
+      nombre_comercio: user?.nombre_comercio,
+      NombresCliente: info?.NombresCliente,
+      Solicitud: info?.Solicitud,
+      nroPIN: info?.CodigoPIN,
+      documento: info?.Cedula,
+      valorDesembolso: info?.ValorDesembolso,
+    };
+    console.log(body);
+    try {
+      const res = await fetchData(urls.desembolsospin, "POST", {}, body);
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  }, []);
+
   console.log(roleInfo);
   return {
     infoLoto: {
@@ -148,5 +217,8 @@ export const useProvideFDLM = () => {
     ingresoreversorecibo,
     ingresorecibo,
     valorcuota,
+    consultarPines,
+    desembolsospin,
+    cancelarDesembolso,
   };
 };

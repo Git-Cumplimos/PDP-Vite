@@ -84,7 +84,8 @@ const MoviiPDPCashOut = () => {
       ? roleInfo?.["nombre comercio"]
       : "prod",
     trxInfo: [],
-    disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+    disclamer:
+      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
   });
 
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
