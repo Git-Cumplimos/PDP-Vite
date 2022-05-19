@@ -33,7 +33,6 @@ const CrearPin = () => {
 
   const { roleInfo } = useAuth();
   const [documento, setDocumento] = useState("");
-  const [num_tramite, setNum_tramite] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [respPin, setRespPin] = useState("");
@@ -73,7 +72,7 @@ const CrearPin = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
-    crearPinVus(documento, num_tramite, tipoPin, user)
+    crearPinVus(documento, tipoPin, user)
       .then((res) => {
         setDisabledBtns(false);
         if (res?.status === false) {
@@ -92,7 +91,6 @@ const CrearPin = () => {
     setShowModal(false);
     setDisabledBtns(false);
     setDocumento("");
-    setNum_tramite("");
     setRespPin("");
     setTipoPin("");
     navigate(-1);
@@ -100,7 +98,7 @@ const CrearPin = () => {
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago(Creacion Pin)",
+      title: "Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -123,8 +121,9 @@ const CrearPin = () => {
       }),
       commerceName: textTipoPin,
       trxInfo: [
+        ["Proceso", "Creación de Pin"],
         ["Codigo", respPin?.cod_hash_pin],
-        ["VALOR", formatMoney.format(respPin?.valor)],
+        ["Valor", formatMoney.format(respPin?.valor)],
         ["Vence", respPin?.fecha_vencimiento],
       ],
       disclamer:
@@ -144,20 +143,6 @@ const CrearPin = () => {
     <>
       <h1 className="text-3xl">Datos creación de Pin</h1>
       <Form onSubmit={onSubmit} grid>
-        <Input
-          id="numTramite"
-          label="No. Tramite"
-          type="text"
-          required
-          // minLength="5"
-          // maxLength="12"
-          autoComplete="off"
-          value={num_tramite}
-          onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setNum_tramite(num);
-          }}
-        />
         <Input
           id="numDocumento"
           label="Documento"

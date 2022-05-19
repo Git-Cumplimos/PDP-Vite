@@ -21,7 +21,8 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
 
 const TramitePines = () => {
   const navigate = useNavigate();
-  const { consultaPinesVus } = usePinesVus();
+  const { consultaPinesVus, activarNavigate, setActivarNavigate } =
+    usePinesVus();
 
   const formatMoney = new Intl.NumberFormat("es-CO", {
     style: "currency",
@@ -44,7 +45,6 @@ const TramitePines = () => {
   const [valor, setValor] = useState("");
   const [id_trx, setId_trx] = useState("");
   const [tipoPin, setTipoPin] = useState("");
-  const [activarNavigate, setActivarNavigate] = useState(true);
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -84,16 +84,16 @@ const TramitePines = () => {
     setModalUsar(false);
     setModalCancel(false);
     setParametroBusqueda("");
+    console.log(activarNavigate);
     if (activarNavigate) {
-      navigate(-1);
+      navigate("/PinesVus");
     }
-  }, []);
+  }, [activarNavigate]);
 
   //////////////////////
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    setActivarNavigate(false);
     setInfo("");
     // const user = {
     //   Usuario: roleInfo?.id_usuario,
@@ -169,6 +169,8 @@ const TramitePines = () => {
   const onSubmitUsar = (e) => {
     setModalUsar(true);
   };
+
+  console.log(activarNavigate);
   return (
     <>
       {"id_comercio" in roleInfo ? (
@@ -221,6 +223,7 @@ const TramitePines = () => {
               } else {
                 setSelected(table[index]);
                 setShowModal(true);
+                setActivarNavigate(false);
               }
             }}
             onSetPageData={setPageData}
