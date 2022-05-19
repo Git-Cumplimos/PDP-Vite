@@ -7,6 +7,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import Form from "../../../../components/Base/Form";
 import { notify, notifyError } from "../../../../utils/notify";
 import { usePinesVus } from "../../utils/pinesVusHooks";
+import Input from "../../../../components/Base/Input";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -28,6 +29,7 @@ const UsarPinForm = ({
   const { roleInfo, infoTicket } = useAuth();
   const [respPinUso, setRespPinUso] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
+  const [num_tramite, setNum_tramite] = useState("");
 
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
@@ -96,8 +98,9 @@ const UsarPinForm = ({
   const onSubmitUsar = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    usarPinVus(respPin, valor, trx, roleInfo)
+    usarPinVus(respPin, valor, trx, num_tramite, roleInfo)
       .then((res) => {
+        setNum_tramite("");
         setActivarNavigate(false);
         setDisabledBtn(false);
         if (res?.status == false) {
@@ -132,21 +135,39 @@ const UsarPinForm = ({
               );
             })}
           </div>
+
           <Form onSubmit={onSubmitUsar}>
-            <ButtonBar>
-              <Button type="submit" disabled={disabledBtn}>
-                Usar Pin
-              </Button>
-              <Button
-                onClick={() => {
-                  closeModal();
-                  // setrespPago();
-                  // getQuota();
+            <div className="flex flex-col justify-center items-center mx-auto container">
+              <Input
+                id="numTramite"
+                label="No. Tramite"
+                type="search"
+                minLength="3"
+                maxLength="10"
+                autoComplete="off"
+                value={num_tramite}
+                onInput={(e) => {
+                  if (!isNaN(e.target.value)) {
+                    const num = e.target.value;
+                    setNum_tramite(num);
+                  }
                 }}
-              >
-                Cancelar
-              </Button>
-            </ButtonBar>
+              />
+              <ButtonBar>
+                <Button type="submit" disabled={disabledBtn}>
+                  Usar Pin
+                </Button>
+                <Button
+                  onClick={() => {
+                    closeModal();
+                    // setrespPago();
+                    // getQuota();
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </ButtonBar>
+            </div>
           </Form>
         </div>
       ) : (

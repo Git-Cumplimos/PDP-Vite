@@ -33,7 +33,6 @@ const CrearPin = () => {
 
   const { roleInfo } = useAuth();
   const [documento, setDocumento] = useState("");
-  const [num_tramite, setNum_tramite] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [respPin, setRespPin] = useState("");
@@ -73,7 +72,7 @@ const CrearPin = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
-    crearPinVus(documento, num_tramite, tipoPin, user)
+    crearPinVus(documento, tipoPin, user)
       .then((res) => {
         setDisabledBtns(false);
         if (res?.status === false) {
@@ -92,7 +91,6 @@ const CrearPin = () => {
     setShowModal(false);
     setDisabledBtns(false);
     setDocumento("");
-    setNum_tramite("");
     setRespPin("");
     setTipoPin("");
     navigate(-1);
@@ -145,22 +143,6 @@ const CrearPin = () => {
     <>
       <h1 className="text-3xl">Datos creación de Pin</h1>
       <Form onSubmit={onSubmit} grid>
-        <Input
-          id="numTramite"
-          label="No. Tramite"
-          type="search"
-          required
-          minLength="3"
-          maxLength="10"
-          autoComplete="off"
-          value={num_tramite}
-          onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
-              setNum_tramite(num);
-            }
-          }}
-        />
         <Input
           id="numDocumento"
           label="Documento"
