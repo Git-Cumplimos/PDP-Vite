@@ -9,12 +9,14 @@ import { confirmaArqueo } from "../utils/fetchCaja";
 
 const Arqueo = ({
   caja,
+  respuestaComprobante,
   setCierre,
   setResArqueo,
   setSobrante,
   setFaltante,
 }) => {
   const [total, setTotal] = useState("");
+  const [trans, setTrans] = useState("");
   const [confirmarArqueo, setConfirmarArqueo] = useState(false);
   const [denominaciones, handleChange] = useFormNumbers({
     cienmil: "",
@@ -29,6 +31,22 @@ const Arqueo = ({
     cien: "",
     cincuenta: "",
   });
+
+  const sumatoria = () => {
+    let arr = respuestaComprobante.map((row) => row.valor);
+    console.log(arr);
+    function add(accumulator, a) {
+      return accumulator + a;
+    }
+    const sum = arr.reduce(add, 0);
+    setTrans(sum);
+  };
+
+  useEffect(() => {
+    sumatoria();
+  });
+
+  console.log(trans);
   const formatMoney = new Intl.NumberFormat("es-CO", {
     style: "currency",
     currency: "COP",
@@ -189,8 +207,12 @@ const Arqueo = ({
               <h1>
                 Faltantes:
                 {caja?.obj?.actual_caja - total > 0
-                  ? formatMoney.format(total - caja?.obj?.actual_caja)
+                  ? formatMoney.format(total - caja?.obj?.actual_caja + trans)
                   : formatMoney.format(0)}
+              </h1>
+              <h1>
+                Dinero transportadora:
+                {trans}
               </h1>
               <ButtonBar>
                 <Button type="button" onClick={() => setConfirmarArqueo(true)}>

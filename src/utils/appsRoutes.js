@@ -816,6 +816,12 @@ const allUrlsPrivateApps = [
       },
     ],
   },
+  {
+    link: "/circulemos",
+    label: <AppIcons Logo={"RECAUDO"} name={"Consorcio circulemos"} />,
+    component: CirculemosComp,
+    permission: [1],
+  },
 ];
 
 export { allUrlsPrivateApps };

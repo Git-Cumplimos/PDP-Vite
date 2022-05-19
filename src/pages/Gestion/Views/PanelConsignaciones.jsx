@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import Form from "../../../components/Base/Form";
 import Select from "../../../components/Base/Select";
-import MicroTable from "../../../components/Base/MicroTable";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import ValidarComprobante from "./ValidarComprobante";

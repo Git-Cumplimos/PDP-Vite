@@ -1,12 +1,12 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Fieldset from "../../../components/Base/Fieldset";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
-import fetchData from "../../../utils/fetchData";
 import { notify } from "../../../utils/notify";
 import { confirmaCierre } from "../utils/fetchCaja";
 
 const Cierre = ({
+  respuestaComprobante,
   arqueo,
   caja,
   roleInfo,
@@ -20,7 +20,7 @@ const Cierre = ({
     currency: "COP",
     maximumFractionDigits: 0,
   });
-
+  const [trans, setTrans] = useState("");
   const urls = {
     cierreCaja: `${process.env.REACT_APP_URL_CAJA}cash`,
   };
@@ -33,7 +33,8 @@ const Cierre = ({
       id_terminal: String(roleInfo?.id_dispositivo),
       total_caja: caja?.obj?.actual_caja,
       sobrante: sobra,
-      faltante: falta,
+      faltante: falta + trans,
+      transportadora: trans,
     };
     confirmaCierre(body)
       .then((res) => {
@@ -46,6 +47,20 @@ const Cierre = ({
       .catch((err) => {
         throw err;
       });
+  });
+
+  const sumatoria = () => {
+    let arr = respuestaComprobante.map((row) => row.valor);
+    console.log(arr);
+    function add(accumulator, a) {
+      return accumulator + a;
+    }
+    const sum = arr.reduce(add, 0);
+    setTrans(sum);
+  };
+
+  useEffect(() => {
+    sumatoria();
   });
 
   return (
@@ -64,7 +79,12 @@ const Cierre = ({
           <span className="text-right">{formatMoney.format(sobra)}</span>
           <br />
           <span>Faltante: </span>
-          <span className="text-right">{formatMoney.format(falta)}</span>
+          <span className="text-right">
+            {formatMoney.format(falta + trans)}
+          </span>
+          <br />
+          <span>Dinero reportado a transportadora: </span>
+          <span className="text-right">{formatMoney.format(trans)}</span>
         </div>
         <ButtonBar>
           <Button type="button" onClick={() => confirmCierre()}>

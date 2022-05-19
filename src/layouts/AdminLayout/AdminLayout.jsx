@@ -77,8 +77,6 @@ const AdminLayout = () => {
   }, [backIcon2, clientWidth]);
 
   useEffect(() => {
-    console.log(roleInfo?.tipo_comercio === "OFICINAS PROPIAS");
-
     if (roleInfo?.tipo_comercio === "OFICINAS PROPIAS") {
       if (roleInfo !== undefined) {
         const query = {
@@ -88,10 +86,8 @@ const AdminLayout = () => {
         };
 
         if (location.pathname === "/") {
-          console.log("location");
           searchCierre(query)
             .then((res) => {
-              console.log(typeof res?.obj);
               if (res?.status) {
                 if (res?.obj !== 3 && res?.obj !== 2) {
                   setInfoCaja(true);

@@ -1,22 +1,17 @@
 import { useState, useEffect } from "react";
-import MicroTable from "../../../components/Base/MicroTable";
 import Arqueo from "./Arqueo";
 import Cierre from "./Cierre";
 import Modal from "../../../components/Base/Modal";
 import Button from "../../../components/Base/Button";
 import { useAuth } from "../../../hooks/AuthHooks";
-import { searchCash, searchCierre } from "../utils/fetchCaja";
-
-const urls = {
-  consultaCaja: `${process.env.REACT_APP_URL_CAJA}cash`,
-  cierresCaja: `${process.env.REACT_APP_URL_CAJA}consultacierre`,
-};
+import { searchCash, searchCierre, searchReceipt } from "../utils/fetchCaja";
 
 const Panel = () => {
   const [total, setTotal] = useState("");
   const [totalCierres, setTotalCierres] = useState(false);
   const [cierre, setCierre] = useState(false);
   const [resArqueo, setResArqueo] = useState("");
+  const [respuestaComprobante, setRespuestaComprobante] = useState("");
   const [sobrante, setSobrante] = useState("");
   const [faltante, setFaltante] = useState("");
   const { roleInfo } = useAuth();
@@ -45,6 +40,15 @@ const Panel = () => {
       })
       .catch((err) => {
         throw err;
+      });
+    query.status = "APROBADO";
+    searchReceipt(query)
+      .then((res) => {
+        console.log(res);
+        setRespuestaComprobante(res?.obj?.results);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }, []);
 
@@ -78,6 +82,7 @@ const Panel = () => {
         {!cierre && (
           <Arqueo
             caja={total}
+            respuestaComprobante={respuestaComprobante}
             setCierre={setCierre}
             setResArqueo={setResArqueo}
             setSobrante={setSobrante}
@@ -87,6 +92,7 @@ const Panel = () => {
         {cierre && (
           <Cierre
             arqueo={resArqueo}
+            respuestaComprobante={respuestaComprobante}
             caja={total}
             roleInfo={roleInfo}
             setEstado={setEstado}
