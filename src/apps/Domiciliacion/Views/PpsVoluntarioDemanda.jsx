@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Fieldset from "../../../components/Base/Fieldset";
@@ -9,6 +9,10 @@ import Select from "../../../components/Base/Select";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
+import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
+import Voucher from "../../LoteriaBog/components/Voucher/Voucher";
+import { useReactToPrint } from "react-to-print";
 
 const PpsVoluntarioDemanda = ({ ced }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
@@ -16,9 +20,9 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const [numCelular, setNumCelular] = useState("");
   const [valorAportar, setValorAportar] = useState();
   const [showModal, setShowModal] = useState(true);
+  const [showModalVoucher, setShowModalVoucher] = useState(false);
   const { quotaInfo, roleInfo } = useAuth();
 
-  console.log(roleInfo);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo["quota"]);
   const [idComercio, setIdComercio] = useState(roleInfo["id_comercio"]);
   const [idusuario, setIdUsuario] = useState(roleInfo["id_usuario"]);
@@ -27,78 +31,174 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   );
   const [tipoComercio, setTipoComercio] = useState(roleInfo["tipo_comercio"]);
   const [esPropio, setEsPropio] = useState(false);
-  const [tieneCupo, setTieneCupo] = useState(false);
+  const [voucher, setVoucher] = useState(false);
 
-  const url = process.env.REACT_APP_URL_TRXS_TRX;
+  const navigate = useNavigate();
+
+  const [cantNum, setCantNum] = useState(0);
+
+  const url = process.env.REACT_APP_URL_COLPENSIONES;
+  const url2 = "http://127.0.0.1:7000";
+
+  const printDiv = useRef();
+  const voucherInfo = {};
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+    // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
+  });
+  voucherInfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).format(new Date());
+  voucherInfo["Hora"] = Intl.DateTimeFormat("es-CO", {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: false,
+  }).format(new Date());
 
   const handleClose = useCallback(() => {
     setShowModal(false);
+    navigate(`/domiciliacion`);
   }, []);
+  const handleClose2 = useCallback(() => {
+    setShowModal(false);
+  }, []);
+
+  //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
+  useEffect(() => {
+    cantidadNumero(numCelular);
+  }, [numCelular]);
+
+  function cantidadNumero(numero) {
+    let contador = 0;
+    while (numero >= 1) {
+      contador += 1;
+      numero = numero / 10;
+    }
+    setCantNum(contador);
+    console.log(cantNum);
+  }
 
   const enviar = (e) => {
     e.preventDefault();
+    /*  setShowModal(false); */
     if (cupoLogin >= valorAportar) {
       if (tipoComercio === "OFICINAS PROPIAS") {
+        console.log("entre");
         setEsPropio(true);
         fetchData(
-          `${url}/ModificarCupoCrearPlanillaDemanda`,
-          /* `http://127.0.0.1:7000/ModificarCupoCrearPlanillaDemanda`, */
+          `${url}/crearplanillademandaofpropias`,
           "POST",
           {},
           {
-            tipo_id: tipoIdentificacion,
-            identificacion: numDocumento,
-            financial_institution_code: "96",
-            canal_code: "20",
-            operador_code: "84",
-            trazability_financial_institution_code: "1",
-            value_amount: valorAportar,
-            celular: numCelular,
+            TipoId: tipoIdentificacion,
+            Identificacion: numDocumento,
+            financialInstitutionCode: "96",
+            CanalCode: "20",
+            OperadorCode: "84",
+            trazabilityFinancialInstitutionCode: "1",
+            ValueAmount: parseInt(valorAportar),
+            Celular: numCelular,
             id_comercio: idComercio,
             id_dispositivo: iddispositivo,
             id_usuario: idusuario,
-            estado_pago: "",
-            es_Propio: esPropio,
+            /* es_Propio: esPropio, */
           },
-          {},
-          {}
+          {
+            /* "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+            "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS */
+          },
+          true
         )
           .then((respuesta) => {
-            console.log(respuesta);
-            if (
-              respuesta?.msg ==
-              "Exception: No fue posible hacer una conexion a la base de datos"
+            console.log(respuesta /* ?.msg?.["respuesta_colpensiones"] */);
+            /*  if (
+              respuesta?.msg?.["respuesta_colpensiones"] ===
+              "El aportante no existe."
             ) {
-              notifyError(
-                "No fue posible hacer una conexion a la base de datos"
-              );
-            }
-            if (
-              respuesta?.msg ==
-              "SchemaError: Key 'num_pago_pdp' error:\nint('') raised ValueError(\"invalid literal for int() with base 10: ''\")"
-            ) {
-              notifyError("Selecciones un Numero de Pagos");
-            } else {
-              if (
-                respuesta?.msg ==
-                "Se ha creado el comercio domiciliado voluntario exitosamente"
-              ) {
-                notify(
-                  "Se ha creado el comercio domiciliado voluntario exitosamente"
-                );
-              }
-            }
+              console.log("hola mundo");
+            } */
           })
           .catch((err) => {
             console.log(err);
-            notifyError("Error al subir Formulario");
+            notifyError("Error al Pagar Planilla Voluntaria a Demanda");
           });
+      } else {
+        if (cantNum == 10) {
+          console.log("Comercio");
+          setEsPropio(true);
+          fetchData(
+            `${url}/crearplanillademandacomercios`,
+            "POST",
+            {},
+            {
+              TipoId: tipoIdentificacion,
+              Identificacion: numDocumento,
+              financialInstitutionCode: "96",
+              CanalCode: "20",
+              OperadorCode: "84",
+              trazabilityFinancialInstitutionCode: "1",
+              ValueAmount: parseInt(valorAportar),
+              Celular: numCelular,
+              id_comercio: idComercio,
+              id_dispositivo: iddispositivo,
+              id_usuario: idusuario,
+              /* es_Propio: esPropio, */
+            },
+            {},
+            true
+          )
+            .then((respuesta) => {
+              console.log(respuesta);
+              if (
+                respuesta?.msg?.["respuesta_colpensiones"] ===
+                "El aportante no existe."
+              ) {
+                notifyError("El aportante no existe.");
+                navigate(`/domiciliacion`);
+              }
+
+              if (
+                respuesta?.msg ===
+                "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
+              ) {
+                notifyError(
+                  "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000."
+                );
+                navigate(`/domiciliacion`);
+              }
+              if (
+                (respuesta?.msg ===
+                  "La transaccion ha sido creada exitosamente") &
+                (respuesta?.obj.length > 1)
+              ) {
+                voucherInfo["Id Trx"] = 3333;
+                voucherInfo["Estado"] = "Activo";
+                voucherInfo["Nombre"] = "respuestamujer?.obj[]";
+                voucherInfo["Documento"] = "respuestamujer?.obj.Documento";
+                voucherInfo["pin"] = "respuestamujer?.obj.Pin";
+                voucherInfo["Valordesembolso"] = "respuestamujer?.ob";
+                voucherInfo["idtrx"] = "respuestamujer?.obj";
+                setShowModalVoucher(true);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              notifyError("Error al Pagar Planilla Voluntaria a Demanda");
+            });
+        } else {
+          notifyError("Ingrese un numero de Celular Valido");
+          setNumCelular("");
+        }
       }
     } else {
       notifyError("No Tiene el Cupo Suficiente Para el Aporte a Colpensiones.");
     }
   };
-
+  console.log(voucherInfo);
   return (
     <div>
       <Modal show={showModal} handleClose={handleClose}>
@@ -150,6 +250,16 @@ const PpsVoluntarioDemanda = ({ ced }) => {
           }
         </ButtonBar>
       </Modal>
+      {showModalVoucher === true ? (
+        <Modal show={showModal} handleClose={handleClose}>
+          <div className="flex flex-col justify-center items-center">
+            <Voucher {...voucherInfo} refPrint={printDiv} />
+            <Button onClick={handlePrint}>Imprimir</Button>
+          </div>
+        </Modal>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

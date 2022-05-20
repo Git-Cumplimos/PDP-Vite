@@ -78,12 +78,15 @@ const ReportePines = () => {
               res?.obj?.results?.map((row) => {
                 const fecha_vencimiento = new Date(row?.fecha_vencimiento);
                 fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
+                const fecha_creacion = new Date(row?.fecha_creacion);
+                fecha_creacion.setHours(fecha_creacion.getHours() + 5);
                 setFormatMon(row?.ValorPagar);
                 return {
                   Id: row?.id_pin,
                   Cedula: row?.doc_cliente,
                   Estado: row?.name_estado_pin,
                   "Codigo Estado": row?.estado_pin,
+                  Creacion: dateFormatter.format(fecha_creacion),
                   Vencimiento: dateFormatter.format(fecha_vencimiento),
                   Valor: formatMoney.format(row?.valor),
                 };
@@ -129,6 +132,7 @@ const ReportePines = () => {
             "Cedula",
             "Estado",
             "Codigo Estado",
+            "Creación",
             "Vencimiento",
             "Valor",
           ]}
