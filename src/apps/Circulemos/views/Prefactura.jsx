@@ -4,8 +4,10 @@ import Input from "../../../components/Base/Input";
 import Button from "../../../components/Base/Button";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { pagarPrefactura } from "../utils/fetchCirculemos";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 const Prefactura = ({ prefacturaInfo, numero }) => {
+  const { roleInfo } = useAuth();
   const [payment, setPayment] = useState("");
   const [type, setType] = useState("");
 
@@ -41,6 +43,9 @@ const Prefactura = ({ prefacturaInfo, numero }) => {
       password: "ithfnc45",
       codigoOrganismo: "13001000",
       origen: "c1",
+      id_usuario: roleInfo.id_usuario,
+      id_terminal: roleInfo.id_dispositivo,
+      id_comercio: roleInfo.id_comercio,
     };
     pagarPrefactura(body)
       .then((res) => {

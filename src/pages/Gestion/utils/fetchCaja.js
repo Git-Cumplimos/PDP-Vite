@@ -22,7 +22,7 @@ export const searchCash = async (queryParam) => {
       queryParam,
       {},
       {},
-      false
+      true
     );
     return res;
   } catch (err) {
@@ -43,7 +43,7 @@ export const searchCierre = async (queryParam) => {
       queryParam,
       {},
       {},
-      false
+      true
     );
     return res;
   } catch (err) {
@@ -64,7 +64,7 @@ export const confirmaCierre = async (bodyObj) => {
       {},
       bodyObj,
       {},
-      false
+      true
     );
     return res;
   } catch (err) {
@@ -85,7 +85,7 @@ export const confirmaArqueo = async (bodyObj) => {
       {},
       bodyObj,
       {},
-      false
+      true
     );
     return res;
   } catch (err) {
@@ -100,7 +100,7 @@ export const createUrlFile = async (queryParam) => {
     });
   }
   try {
-    const res = await fetchData(urls?.cargas, "GET", queryParam, {}, {}, false);
+    const res = await fetchData(urls?.cargas, "GET", queryParam, {}, {}, true);
     return res;
   } catch (err) {
     throw err;
@@ -114,7 +114,7 @@ export const registerReceipt = async (bodyObj) => {
     });
   }
   try {
-    const res = await fetchData(urls?.cargas, "POST", {}, bodyObj, {}, false);
+    const res = await fetchData(urls?.cargas, "POST", {}, bodyObj, {}, true);
     return res;
   } catch (err) {
     throw err;
@@ -128,7 +128,7 @@ export const crearCompañia = async (bodyObj) => {
     });
   }
   try {
-    const res = await fetchData(urls?.cuentas, "POST", {}, bodyObj, {}, false);
+    const res = await fetchData(urls?.cuentas, "POST", {}, bodyObj, {}, true);
     return res;
   } catch (err) {
     throw err;
@@ -142,7 +142,7 @@ export const buscarCompañias = async (queryParam) => {
     });
   }
   try {
-    const res = await fetchData(urls.cuentas, "GET", queryParam, {}, {}, false);
+    const res = await fetchData(urls.cuentas, "GET", queryParam, {}, {}, true);
     return res;
   } catch (err) {
     throw err;
@@ -157,7 +157,7 @@ export const searchReceipt = async (queryParam) => {
       queryParam,
       {},
       {},
-      false
+      true
     );
     return res;
   } catch (err) {
@@ -173,7 +173,7 @@ export const updateReceipts = async (queryParam, bodyObj) => {
       queryParam,
       bodyObj,
       {},
-      false
+      true
     );
     return res;
   } catch (err) {
