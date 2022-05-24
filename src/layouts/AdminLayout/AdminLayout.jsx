@@ -1,4 +1,5 @@
 import { useUrls } from "../../hooks/UrlsHooks";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import classes from "./AdminLayout.module.css";
 import LogoPDP from "../../components/Base/LogoPDP";
@@ -9,10 +10,12 @@ import { useAuth } from "../../hooks/AuthHooks";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import HNavbar from "../../components/Base/HNavbar";
 import Modal from "../../components/Base/Modal";
+import Button from "../../components/Base/Button";
 import { useImgs } from "../../hooks/ImgsHooks";
 import { useWindowSize } from "../../hooks/WindowSizeHooks";
 import { Outlet } from "react-router-dom";
 import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
+import { searchCierre } from "../../pages/Gestion/utils/fetchCaja";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -32,11 +35,15 @@ const AdminLayout = () => {
     cargar,
   } = classes;
 
-  const { quotaInfo } = useAuth();
+  const { quotaInfo, roleInfo, signOut } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const { urlsPrivate: urls } = useUrls();
 
   const [showModal, setShowModal] = useState(false);
+  const [infoCaja, setInfoCaja] = useState(false);
+  const [cajaState, setCajaState] = useState("");
 
   const saldoDisponible = useMemo(() => {
     return formatMoney.format(quotaInfo?.quota ?? 0);
@@ -47,6 +54,11 @@ const AdminLayout = () => {
   }, [quotaInfo?.comision]);
 
   const [clientWidth] = useWindowSize();
+
+  const closeCash = async () => {
+    navigate(`/gestion/panel_transacciones`);
+    setInfoCaja(false);
+  };
 
   const {
     svgs: { backIcon2 },
@@ -63,6 +75,34 @@ const AdminLayout = () => {
       document.body.style.backgroundImage = "none";
     }
   }, [backIcon2, clientWidth]);
+
+  useEffect(() => {
+    if (roleInfo?.tipo_comercio === "OFICINAS PROPIAS") {
+      if (roleInfo !== undefined) {
+        const query = {
+          id_usuario: roleInfo?.id_usuario,
+          id_comercio: roleInfo?.id_comercio,
+          id_terminal: roleInfo?.id_dispositivo,
+        };
+
+        if (location.pathname === "/") {
+          searchCierre(query)
+            .then((res) => {
+              if (res?.status) {
+                if (res?.obj !== 3 && res?.obj !== 2) {
+                  setInfoCaja(true);
+                  setCajaState(res?.obj);
+                } else {
+                }
+              }
+            })
+            .catch((err) => {
+              throw err;
+            });
+        }
+      }
+    }
+  }, [roleInfo, location]);
 
   return (
     <div className={adminLayout}>
@@ -92,9 +132,42 @@ const AdminLayout = () => {
         </Modal>
       </header>
       <main className="container">
-        <Suspense fallback={<ContentBox />}>
-          <Outlet />
-        </Suspense>
+        <Suspense fallback={<ContentBox />}>{!infoCaja && <Outlet />}</Suspense>
+        <Modal show={infoCaja}>
+          {cajaState === 1 ? (
+            <div className="items-center">
+              <h1>
+                Señor usuario, la caja presenta cierre tardio, no se pueden
+                realizar transacciones hasta que la cierre
+                <Button
+                  className="items-center"
+                  type="button"
+                  onClick={() => closeCash()}
+                >
+                  Cerrar caja
+                </Button>
+              </h1>
+            </div>
+          ) : cajaState === 4 ? (
+            <h1 className="text-center">
+              Señor usuario, la caja ha sido cerrada, no se pueden realizar mas
+              transacciones
+              <div className="ml-32">
+                <Button
+                  type="submit"
+                  onClick={() => {
+                    signOut();
+                    navigate("/login", { replace: true });
+                  }}
+                >
+                  Cerrar sesión
+                </Button>
+              </div>
+            </h1>
+          ) : (
+            <></>
+          )}
+        </Modal>
       </main>
     </div>
   );

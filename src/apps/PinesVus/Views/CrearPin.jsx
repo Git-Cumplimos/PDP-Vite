@@ -4,15 +4,14 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
-import Sellfundamujer from "../components/sellFundamujer/SellFundamujer";
-import SearchForm from "../components/SearchForm/SearchForm";
 import { usePinesVus } from "../utils/pinesVusHooks";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/AuthHooks";
-import { normalize } from "path";
 import { notifyError } from "../../../utils/notify";
-import Tickets from "../components/Voucher/Tickets";
+import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
+import Select from "../../../components/Base/Select";
+import { useNavigate } from "react-router-dom";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -21,44 +20,42 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 });
 
 const CrearPin = () => {
+  const navigate = useNavigate();
+
   const printDiv = useRef();
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const { crearPinVus } = usePinesVus();
+  const { crearPinVus, con_estado_tipoPin } = usePinesVus();
   const { infoTicket } = useAuth();
 
   const { roleInfo } = useAuth();
   const [documento, setDocumento] = useState("");
-  const [num_tramite, setNum_tramite] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [selected, setSelected] = useState(true);
   const [disabledBtns, setDisabledBtns] = useState(false);
-  const [showModalAdvertencia, setShowModalAdvertencia] = useState(false);
-  const [respPago, setRespPago] = useState("");
   const [respPin, setRespPin] = useState("");
+  const [optionsTipoPines, setOptionsTipoPines] = useState([]);
+  const [tipoPin, setTipoPin] = useState("");
 
   useEffect(() => {
-    setShowModalAdvertencia(true);
+    con_estado_tipoPin("tipo_pines_vus")
+      .then((res) => {
+        setDisabledBtns(false);
+        if (res?.status === false) {
+          notifyError(res?.msg);
+        } else {
+          setOptionsTipoPines(res?.obj?.results);
+        }
+      })
+      .catch(() => setDisabledBtns(false));
   }, []);
 
-  const closeModalAdvertencia = (e) => {
-    setShowModalAdvertencia(false);
-  };
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const textTipoPin = useMemo(() => {
+    const resp = optionsTipoPines?.filter((id) => id.id === tipoPin);
+    return resp[0]?.descripcion.toUpperCase();
+  }, [optionsTipoPines, tipoPin]);
 
   const user = useMemo(() => {
     return {
@@ -75,9 +72,8 @@ const CrearPin = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
-    crearPinVus(documento, num_tramite, user)
+    crearPinVus(documento, tipoPin, user)
       .then((res) => {
-        console.log(res);
         setDisabledBtns(false);
         if (res?.status === false) {
           notifyError(res?.msg);
@@ -94,15 +90,15 @@ const CrearPin = () => {
   const closeModal = useCallback(async () => {
     setShowModal(false);
     setDisabledBtns(false);
-    console.log(selected);
     setDocumento("");
-    setNum_tramite("");
     setRespPin("");
-  }, [selected]);
+    setTipoPin("");
+    navigate(-1);
+  }, []);
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago(Creacion Pin)",
+      title: "Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -122,18 +118,18 @@ const CrearPin = () => {
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
         "Id Trx": respPin?.transacciones_id_trx?.creacion,
-        // "Id Confirmación": "0000",
       }),
-      commerceName: "Pin para generación de Licencia",
+      commerceName: textTipoPin,
       trxInfo: [
+        ["Proceso", "Creación de Pin"],
         ["Codigo", respPin?.cod_hash_pin],
-        ["VALOR", formatMoney.format(respPin?.valor)],
+        ["Valor", formatMoney.format(respPin?.valor)],
         ["Vence", respPin?.fecha_vencimiento],
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [roleInfo, respPin]);
+  }, [roleInfo, respPin, textTipoPin]);
 
   useEffect(() => {
     infoTicket(
@@ -148,20 +144,6 @@ const CrearPin = () => {
       <h1 className="text-3xl">Datos creación de Pin</h1>
       <Form onSubmit={onSubmit} grid>
         <Input
-          id="numTramite"
-          label="No. Tramite"
-          type="text"
-          required
-          // minLength="5"
-          // maxLength="12"
-          autoComplete="off"
-          value={num_tramite}
-          onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setNum_tramite(num);
-          }}
-        />
-        <Input
           id="numDocumento"
           label="Documento"
           type="text"
@@ -173,6 +155,23 @@ const CrearPin = () => {
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
             setDocumento(num);
+          }}
+        />
+        <Select
+          id="tipoPin"
+          label="Tipo Pin"
+          options={
+            Object.fromEntries([
+              ["", ""],
+              ...optionsTipoPines?.map(({ descripcion, id }) => {
+                return [descripcion, id];
+              }),
+            ]) || { "": "" }
+          }
+          value={tipoPin}
+          required={true}
+          onChange={(e) => {
+            setTipoPin(parseInt(e.target.value) ?? "");
           }}
         />
         <ButtonBar className="col-auto md:col-span-2">

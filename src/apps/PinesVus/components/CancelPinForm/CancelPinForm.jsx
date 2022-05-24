@@ -1,9 +1,9 @@
 import { useRef, useMemo, useState, useEffect } from "react";
 import Button from "../../../../components/Base/Button";
-import Tickets from "../Voucher/Tickets";
+import Tickets from "../../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-import { useAuth, infoTicket } from "../../../../hooks/AuthHooks";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import Form from "../../../../components/Base/Form";
 import { notify, notifyError } from "../../../../utils/notify";
 import { usePinesVus } from "../../utils/pinesVusHooks";
@@ -15,24 +15,53 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const CancelPin = ({ respPin, valor, trx, closeModal }) => {
+const CancelPin = ({
+  respPin,
+  valor,
+  trx,
+  tipoPin,
+  closeModal,
+  setActivarNavigate,
+}) => {
+  const { cancelPinVus, con_estado_tipoPin } = usePinesVus();
+
   const printDiv = useRef();
 
-  const { getQuota, roleInfo, infoTicket } = useAuth();
+  const { roleInfo, infoTicket } = useAuth();
+
+  const [optionsTipoPines, setOptionsTipoPines] = useState([]);
+
+  useEffect(() => {
+    con_estado_tipoPin("tipo_pines_vus")
+      .then((res) => {
+        console.log(res);
+
+        if (res?.status === false) {
+          notifyError(res?.msg);
+        } else {
+          setOptionsTipoPines(res?.obj?.results);
+        }
+      })
+      .catch((err) => console.log("error", err));
+  }, []);
+
+  const textTipoPin = useMemo(() => {
+    const resp = optionsTipoPines?.filter((id) => id.id === tipoPin);
+    return resp[0]?.descripcion.toUpperCase();
+  }, [optionsTipoPines, tipoPin]);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const { cancelPinVus } = usePinesVus();
   const [disabledBtn, setDisabledBtn] = useState(false);
   const [motivo, setMotivo] = useState("");
-  const [respPinCancel, setrespPinCancel] = useState("");
+  const [respPinCancel, setRespPinCancel] = useState("");
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago(Uso Pin)",
+      title: "Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -46,27 +75,25 @@ const CancelPin = ({ respPin, valor, trx, closeModal }) => {
           hour12: false,
         }).format(new Date()),
       },
+      commerceName: textTipoPin,
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
-        "Id Trx": respPinCancel?.transacciones_id_trx?.uso,
-        // "Id Confirmación": "0000",
+        "Id Trx": respPinCancel?.id_trx,
       }),
-      // commerceName: "Pin para generación de Licencia",
-      trxInfo: [["VALOR", formatMoney.format(0)]],
+      trxInfo: [
+        ["Proceso", "Cancelación de Pin"],
+        ["VALOR", formatMoney.format(valor)],
+      ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [respPinCancel, roleInfo]);
+  }, [respPinCancel, roleInfo, valor]);
 
   useEffect(() => {
-    infoTicket(
-      respPinCancel?.transacciones_id_trx?.uso,
-      respPinCancel?.tipo_trx,
-      tickets
-    );
+    infoTicket(respPinCancel?.id_trx, respPinCancel?.tipo_trx, tickets);
   }, [infoTicket, respPinCancel, tickets]);
 
   const onSubmitCancel = (e) => {
@@ -74,12 +101,13 @@ const CancelPin = ({ respPin, valor, trx, closeModal }) => {
     setDisabledBtn(true);
     cancelPinVus(respPin, valor, motivo, trx, roleInfo)
       .then((res) => {
-        console.log(res);
+        setActivarNavigate(false);
         setDisabledBtn(false);
         if (res?.status == false) {
           notifyError(res?.msg);
         } else {
-          setrespPinCancel(res?.obj);
+          setActivarNavigate(true);
+          setRespPinCancel(res?.obj);
           notify(res?.msg);
         }
       })

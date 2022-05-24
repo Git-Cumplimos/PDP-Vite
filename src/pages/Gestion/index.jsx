@@ -1,6 +1,5 @@
-import HNavbar from "../components/Base/HNavbar";
-import { useUrls } from "../hooks/UrlsHooks";
-import ProvideGestion from "../menu/gestion/provider/ProvideGestion";
+import HNavbar from "../../components/Base/HNavbar";
+import { useUrls } from "../../hooks/UrlsHooks";
 
 const Gestion = () => {
   const { urlsGestion } = useUrls();

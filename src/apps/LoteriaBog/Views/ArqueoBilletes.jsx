@@ -280,7 +280,6 @@ const ArqueoBilletes = ({ route }) => {
         } else {
           body.id_arqueo = "";
         }
-
         const res = await fetchData(url_Arqueobilletes, "POST", {}, body);
 
         return res;

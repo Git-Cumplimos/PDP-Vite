@@ -153,9 +153,11 @@ const Transacciones = () => {
         maxPage={maxPages}
         onSelectRow={(_e, index) => {
           setSelected(trxs[index]);
+          const fecha = new Date(trxs[index]?.created);
+          fecha.setHours(fecha.getHours() + 5);
           setSummaryTrx({
             "Tipo transaccion": trxs[index]?.["Tipo transaccion"],
-            Fecha: dateFormatter.format(new Date(trxs[index]?.created)),
+            Fecha: dateFormatter.format(fecha),
             "Mensaje de respuesta trx": trxs[index]?.message_trx,
             Monto: formatMoney.format(trxs[index]?.monto),
             "Estado de la trasaccion": trxs[index]?.status_trx

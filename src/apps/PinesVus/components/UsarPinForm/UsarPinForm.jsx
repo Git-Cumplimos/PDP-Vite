@@ -1,12 +1,13 @@
 import { useRef, useMemo, useState, useEffect } from "react";
 import Button from "../../../../components/Base/Button";
-import Tickets from "../Voucher/Tickets";
+import Tickets from "../../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-import { useAuth, infoTicket } from "../../../../hooks/AuthHooks";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import Form from "../../../../components/Base/Form";
 import { notify, notifyError } from "../../../../utils/notify";
 import { usePinesVus } from "../../utils/pinesVusHooks";
+import Input from "../../../../components/Base/Input";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -14,22 +15,48 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const UsarPinForm = ({ respPin, closeModal, trx, valor }) => {
+const UsarPinForm = ({
+  respPin,
+  closeModal,
+  trx,
+  valor,
+  tipoPin,
+  setActivarNavigate,
+}) => {
   const printDiv = useRef();
 
-  const { getQuota, roleInfo, infoTicket } = useAuth();
+  const { usarPinVus, con_estado_tipoPin } = usePinesVus();
+  const { roleInfo, infoTicket } = useAuth();
   const [respPinUso, setRespPinUso] = useState("");
+  const [optionsTipoPines, setOptionsTipoPines] = useState([]);
+  const [num_tramite, setNum_tramite] = useState("");
+
+  useEffect(() => {
+    con_estado_tipoPin("tipo_pines_vus")
+      .then((res) => {
+        if (res?.status === false) {
+          notifyError(res?.msg);
+        } else {
+          setOptionsTipoPines(res?.obj?.results);
+        }
+      })
+      .catch((err) => console.log("error", err));
+  }, []);
+
+  const textTipoPin = useMemo(() => {
+    const resp = optionsTipoPines?.filter((id) => id.id === tipoPin);
+    return resp[0]?.descripcion.toUpperCase();
+  }, [optionsTipoPines, tipoPin]);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const { usarPinVus } = usePinesVus();
   const [disabledBtn, setDisabledBtn] = useState(false);
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago(Uso Pin)",
+      title: "Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -43,16 +70,18 @@ const UsarPinForm = ({ respPin, closeModal, trx, valor }) => {
           hour12: false,
         }).format(new Date()),
       },
+      commerceName: textTipoPin,
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
         "Id Trx": respPinUso?.transacciones_id_trx?.uso,
-        // "Id Confirmación": "0000",
       }),
-      // commerceName: "Pin para generación de Licencia",
-      trxInfo: [["VALOR", formatMoney.format(0)]],
+      trxInfo: [
+        ["Proceso", "Uso de Pin"],
+        ["VALOR", formatMoney.format(0)],
+      ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
@@ -69,13 +98,16 @@ const UsarPinForm = ({ respPin, closeModal, trx, valor }) => {
   const onSubmitUsar = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    usarPinVus(respPin, valor, trx, roleInfo)
+    usarPinVus(respPin, valor, trx, num_tramite, roleInfo)
       .then((res) => {
+        setNum_tramite("");
+        setActivarNavigate(false);
         setDisabledBtn(false);
         if (res?.status == false) {
           notifyError(res?.msg);
         } else {
           notify(res?.msg);
+          setActivarNavigate(true);
           setRespPinUso(res?.obj);
         }
       })
@@ -103,21 +135,39 @@ const UsarPinForm = ({ respPin, closeModal, trx, valor }) => {
               );
             })}
           </div>
+
           <Form onSubmit={onSubmitUsar}>
-            <ButtonBar>
-              <Button type="submit" disabled={disabledBtn}>
-                Usar Pin
-              </Button>
-              <Button
-                onClick={() => {
-                  closeModal();
-                  // setrespPago();
-                  // getQuota();
+            <div className="flex flex-col justify-center items-center mx-auto container">
+              <Input
+                id="numTramite"
+                label="No. Tramite"
+                type="search"
+                minLength="3"
+                maxLength="10"
+                autoComplete="off"
+                value={num_tramite}
+                onInput={(e) => {
+                  if (!isNaN(e.target.value)) {
+                    const num = e.target.value;
+                    setNum_tramite(num);
+                  }
                 }}
-              >
-                Cancelar
-              </Button>
-            </ButtonBar>
+              />
+              <ButtonBar>
+                <Button type="submit" disabled={disabledBtn}>
+                  Usar Pin
+                </Button>
+                <Button
+                  onClick={() => {
+                    closeModal();
+                    // setrespPago();
+                    // getQuota();
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </ButtonBar>
+            </div>
           </Form>
         </div>
       ) : (

@@ -402,26 +402,26 @@ const allUrlsPrivateApps = [
     link: "/PinesVus",
     label: <AppIcons Logo={"RECAUDO"} name="Pines" />,
     component: PinesVus,
-    permission: [17, 27, 28],
+    permission: [53],
     provider: ProvidepinesVus,
     subRoutes: [
       {
         link: "/PinesVus/Crear",
         label: <AppIcons Logo={"RECAUDO"} name={"Crear Pin"} />,
         component: CrearPines,
-        permission: [17],
+        permission: [53],
       },
       {
         link: "/PinesVus/Tramitar",
         label: <AppIcons Logo={"RECAUDO"} name={"Tramitar Pines"} />,
         component: TramitarPines,
-        permission: [17],
+        permission: [53],
       },
       {
         link: "/PinesVus/Reporte",
         label: <AppIcons Logo={"RECAUDO"} name={"Reporte Pines"} />,
         component: ReportePines,
-        permission: [17],
+        permission: [53],
       },
     ],
   },
@@ -815,6 +815,12 @@ const allUrlsPrivateApps = [
         permission: [33],
       },
     ],
+  },
+  {
+    link: "/circulemos",
+    label: <AppIcons Logo={"RECAUDO"} name={"Consorcio circulemos"} />,
+    component: CirculemosComp,
+    permission: [1],
   },
 ];
 

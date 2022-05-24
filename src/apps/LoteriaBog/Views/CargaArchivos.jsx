@@ -12,6 +12,8 @@ import CargarForm from "../components/CargarForm/CargarForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 
+const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/cargueS3`;
+
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_accessKeyId,
   secretAccessKey: process.env.REACT_APP_secretAccessKey,
@@ -109,6 +111,195 @@ const CargaArchivos = ({ route }) => {
         console.log(err);
       });
   };
+  //------------------Funcion Para Subir El Formulario---------------------//
+  // const handleSubmit = useCallback(
+  //   (e) => {
+  //     e.preventDefault();
+  //     if (
+  //       (archivos1[0] && archivos2[0]) ||
+  //       (archivos1[0] && archivos2[0] && archivos3[0])
+  //     ) {
+  //       fetchData(
+  //         url_cargueS3,
+  //         {},
+  //         {},
+
+  //         {},
+  //         false
+  //       )
+  //         .then((respuesta) => {
+  //           console.log(respuesta);
+  //           const formData = new FormData();
+
+  //           formData.set(fileName, file);
+
+  //           notify("Se ha comenzado la carga");
+
+  //           fetch(
+  //             /*  `http://servicios-comercios-pdp-dev.us-east-2.elasticbeanstalk.com/uploadfile`, */
+  //             `${process.env.REACT_APP_URL_SERVICE_PUBLIC_SS}/uploadfile2?id_proceso=${respuesta.body.id_proceso}`,
+  //             {
+  //               method: "GET",
+
+  //               /* body: formData, */
+  //             }
+  //           )
+  //             .then((res) => res.json())
+  //             .then((respuesta) => {
+  //               if (!respuesta?.status) {
+  //                 notifyError(respuesta?.msg);
+  //               } else {
+  //                 console.log(respuesta?.obj);
+  //                 notify("Se han subido los archivos");
+  //                 setEstadoForm(true);
+  //                 const formData2 = new FormData();
+  //                 const formData3 = new FormData();
+  //                 const formData4 = new FormData();
+
+  //                 if (archivos1 && archivos2 && !archivos3) {
+  //                   var cont_rut = 0;
+  //                   for (const datosS3 of respuesta?.obj) {
+  //                     if (cont_rut == 0) {
+  //                       for (const property in datosS3.fields) {
+  //                         /*  console.log(datosS3.fields[property]); */
+  //                         formData2.set(
+  //                           `${property}`,
+  //                           `${datosS3.fields[property]}`
+  //                         );
+  //                       }
+  //                     }
+  //                     cont_rut += 1;
+  //                   }
+  //                   formData2.set("file", archivos1[0]);
+  //                   fetch(`${respuesta?.obj[0]?.url}`, {
+  //                     method: "POST",
+
+  //                     body: formData2,
+  //                   })
+  //                     .then((res) => res?.status)
+  //                     .catch((err) => {
+  //                       {
+  //                       }
+  //                     });
+
+  //                   //------fetch cc----//
+  //                   var cont_Cc = 0;
+  //                   for (const datosS3 of respuesta?.obj) {
+  //                     if (cont_Cc == 1) {
+  //                       for (const property in datosS3.fields) {
+  //                         /* console.log(datosS3.fields[property]); */
+  //                         formData3.set(
+  //                           `${property}`,
+  //                           `${datosS3.fields[property]}`
+  //                         );
+  //                       }
+  //                     }
+  //                     cont_Cc += 1;
+  //                   }
+  //                   formData3.set("file", archivos2[0]);
+  //                   fetch(`${respuesta?.obj[1]?.url}`, {
+  //                     method: "POST",
+  //                     body: formData3,
+  //                   })
+  //                     .then((res) => res?.status)
+  //                     .catch((err) => {
+  //                       {
+  //                       }
+  //                     });
+  //                 } else if (archivos1 && archivos2 && archivos3) {
+  //                   var cont_rut = 0;
+  //                   for (const datosS3 of respuesta?.obj) {
+  //                     if (cont_rut == 0) {
+  //                       for (const property in datosS3.fields) {
+  //                         /* console.log(datosS3.fields[property]); */
+  //                         formData2.set(
+  //                           `${property}`,
+  //                           `${datosS3.fields[property]}`
+  //                         );
+  //                       }
+  //                     }
+  //                     cont_rut += 1;
+  //                   }
+  //                   formData2.set("file", archivos1[0]);
+  //                   fetch(`${respuesta?.obj[0]?.url}`, {
+  //                     method: "POST",
+  //                     body: formData2,
+  //                   })
+  //                     .then((res) => res?.status)
+  //                     .catch((err) => {
+  //                       {
+  //                       }
+  //                     });
+
+  //                   //------fetch cc----//
+  //                   var cont_Cc = 0;
+  //                   for (const datosS3 of respuesta?.obj) {
+  //                     if (cont_Cc == 1) {
+  //                       for (const property in datosS3.fields) {
+  //                         /*  console.log(datosS3.fields[property]); */
+  //                         formData3.set(
+  //                           `${property}`,
+  //                           `${datosS3.fields[property]}`
+  //                         );
+  //                       }
+  //                     }
+  //                     cont_Cc += 1;
+  //                   }
+  //                   formData3.set("file", archivos2[0]);
+
+  //                   fetch(`${respuesta?.obj[1]?.url}`, {
+  //                     method: "POST",
+  //                     body: formData3,
+  //                   })
+  //                     .then((res) => res?.status)
+  //                     .catch((err) => {
+  //                       {
+  //                       }
+  //                     });
+
+  //                   //------fetch Camara y Comercio----//
+  //                   var cont_cam = 0;
+  //                   for (const datosS3 of respuesta?.obj) {
+  //                     if (cont_cam == 2) {
+  //                       for (const property in datosS3.fields) {
+  //                         /* console.log(datosS3.fields[property]); */
+  //                         formData4.set(
+  //                           `${property}`,
+  //                           `${datosS3.fields[property]}`
+  //                         );
+  //                       }
+  //                     }
+  //                     cont_cam += 1;
+  //                   }
+  //                   formData4.set("file", archivos3[0]);
+  //                   fetch(`${respuesta?.obj[2]?.url}`, {
+  //                     method: "POST",
+  //                     body: formData4,
+  //                   })
+  //                     .then((res) => res?.status)
+  //                     .catch((err) => {
+  //                       {
+  //                       }
+  //                     });
+  //                 }
+  //                 /*     setEstadoForm(true); */
+  //                 navigate("/public/solicitud-enrolamiento/consultar");
+  //               }
+  //             })
+  //             .catch((err) => {
+  //               notifyError("Error al cargar Datos");
+  //             }); /* notify("Se ha comenzado la carga"); */
+  //         })
+  //         .catch((err) => {
+  //           console.log(err);
+  //           notifyError("Error al cargar Datos");
+  //         }); /*  notify("Se ha comenzado la carga"); */
+  //     } else {
+  //       notifyError("Adjunte los Documentos");
+  //     }
+  //   },
+  //   [file, fileName]
+  // );
 
   const { EstadoArchivos } = useLoteria();
 
