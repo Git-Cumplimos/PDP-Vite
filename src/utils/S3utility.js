@@ -1,10 +1,5 @@
 import AWS from "aws-sdk";
 
-AWS.config.update({
-  accessKeyId: process.env.REACT_APP_accessKeyId,
-  secretAccessKey: process.env.REACT_APP_secretAccessKey,
-});
-
 const REGION = process.env.REACT_APP_REGION;
 
 const getFromBucket = async (bucket, file) => {

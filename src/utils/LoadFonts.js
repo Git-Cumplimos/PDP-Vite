@@ -1,11 +1,6 @@
 import AWS from "aws-sdk";
 import { fonts } from "./AssetsObjects";
 
-AWS.config.update({
-  accessKeyId: process.env.REACT_APP_accessKeyId,
-  secretAccessKey: process.env.REACT_APP_secretAccessKey,
-});
-
 const S3_BUCKET = process.env.REACT_APP_BUCKET_CMS;
 const REGION = process.env.REACT_APP_REGION;
 
