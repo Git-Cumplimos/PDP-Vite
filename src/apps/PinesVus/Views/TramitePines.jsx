@@ -187,6 +187,7 @@ const TramitePines = () => {
                 maxLength="10"
                 autoComplete="off"
                 value={parametroBusqueda}
+                required
                 onInput={(e) => {
                   setParametroBusqueda(e.target.value);
                 }}

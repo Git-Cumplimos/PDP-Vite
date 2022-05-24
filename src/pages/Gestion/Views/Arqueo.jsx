@@ -194,26 +194,37 @@ const Arqueo = ({
             </Fieldset>
 
             <Fieldset legend={"Saldos"}>
-              <h1>
-                Total arqueo:
-                {formatMoney.format(total)}
-              </h1>
-              <h1>
-                Sobrantes:
-                {caja?.obj?.actual_caja - total < 0
-                  ? formatMoney.format(total - caja?.obj?.actual_caja)
-                  : formatMoney.format(0)}
-              </h1>
-              <h1>
-                Faltantes:
-                {caja?.obj?.actual_caja - total > 0
-                  ? formatMoney.format(total - caja?.obj?.actual_caja + trans)
-                  : formatMoney.format(0)}
-              </h1>
-              <h1>
-                Dinero transportadora:
-                {trans}
-              </h1>
+              <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+                <h1 className="text-2xl font-semibold">
+                  Total arqueo:
+                  {formatMoney.format(total)}
+                </h1>
+                <h1>
+                  Sobrantes:
+                  {caja?.obj?.actual_caja - total < 0
+                    ? formatMoney.format(total - caja?.obj?.actual_caja)
+                    : formatMoney.format(0)}
+                </h1>
+                <h1>
+                  {caja?.obj?.estimacion_f < 0
+                    ? `Estimación sobrante:${formatMoney.format(
+                        caja?.obj?.estimacion_f
+                      )}`
+                    : `Estimación faltante:${formatMoney.format(
+                        caja?.obj?.estimacion_f
+                      )}`}
+                </h1>
+                <h1>
+                  Faltantes:
+                  {caja?.obj?.actual_caja - total > 0
+                    ? formatMoney.format(total - caja?.obj?.actual_caja + trans)
+                    : formatMoney.format(0)}
+                </h1>
+                <h1>
+                  Dinero transportadora:
+                  {trans}
+                </h1>
+              </div>
               <ButtonBar>
                 <Button type="button" onClick={() => setConfirmarArqueo(true)}>
                   Confirmar arqueo
