@@ -1,0 +1,8 @@
+.contenedorLogo {
+  display: flex;
+  justify-content: center;
+}
+.contenedorSubtitle {
+  display: flex;
+  justify-content: center;
+}
