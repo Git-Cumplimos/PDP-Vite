@@ -2,6 +2,7 @@ import Input from "../../../components/Base/Input";
 import React, { Fragment, useCallback, useState } from "react";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
+import Form from "../../../components/Base/Form";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import LogoPDP from "../../../components/Base/LogoPDP";
@@ -129,7 +130,7 @@ const BuscarComercioEmail = () => {
       ) : continuarDomiciliacion ? (
         <PpsDomiciliacion datosDomiciliacion={datosConsulta}></PpsDomiciliacion>
       ) : (
-        <Fragment>
+        <Form grid onSubmit={(e) => BuscarComercio(e)}>
           <Input
             label={"Email Comercio"}
             placeholder={"Ingrese El Correo Del Comercio"}
@@ -140,13 +141,13 @@ const BuscarComercioEmail = () => {
           ></Input>
           <ButtonBar className={"lg:col-span-2"} type="">
             {
-              <Button type="submit" onClick={(e) => BuscarComercio(e)}>
+              <Button type="submit" /* onClick={(e) => BuscarComercio(e)} */>
                 Buscar Comercio
               </Button>
               /*  ) : null */
             }
           </ButtonBar>
-        </Fragment>
+        </Form>
       )}
     </div>
   );

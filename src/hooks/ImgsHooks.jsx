@@ -1,18 +1,6 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 
 import { images, svgs } from "../utils/AssetsObjects";
-import { getFromBucket } from "../utils/S3utility";
-
-// Funciones
-const S3_BUCKET = process.env.REACT_APP_BUCKET_CMS;
-
-const loadResource = async (url) => {
-  try {
-    return await getFromBucket(S3_BUCKET, url);
-  } catch (err) {
-    console.error(err);
-  }
-};
 
 const initialImgs = {
   imgs: images,
@@ -35,27 +23,19 @@ const reducerImgs = (state, action) => {
 
     case FETCH_IMGS:
       for (const [key, val] of Object.entries(images)) {
-        loadResource(val)
-          .then((url) =>
-            payload.dispatch({
-              type: SET_IMGS,
-              payload: { name: key, img: url },
-            })
-          )
-          .catch(() => {});
+        payload.dispatch({
+          type: SET_IMGS,
+          payload: { name: key, img: val },
+        });
       }
       return state;
 
     case FETCH_SVGS:
       for (const [key, val] of Object.entries(svgs)) {
-        loadResource(val)
-          .then((url) =>
-            payload.dispatch({
-              type: SET_SVGS,
-              payload: { name: key, svg: url },
-            })
-          )
-          .catch(() => {});
+        payload.dispatch({
+          type: SET_SVGS,
+          payload: { name: key, svg: val },
+        });
       }
       return state;
 

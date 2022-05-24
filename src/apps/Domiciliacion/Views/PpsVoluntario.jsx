@@ -10,6 +10,7 @@ import Select from "../../../components/Base/Select";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
+import { useNavigate } from "react-router-dom";
 
 const PpsVoluntario = ({ datosConsulta }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
@@ -24,6 +25,8 @@ const PpsVoluntario = ({ datosConsulta }) => {
   const [valorAportar, setValorAportar] = useState();
   const [numPagosPdp, setNumPagosPdp] = useState(0);
   const [showModal, setShowModal] = useState(true);
+  const navigate = useNavigate();
+
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, []);
@@ -85,82 +88,121 @@ const PpsVoluntario = ({ datosConsulta }) => {
         notifyError("Error al subir Formulario");
       });
     setShowModal(false);
+    navigate(`/domiciliacion`);
   };
   return (
     <div>
       {showModal && datosConsulta ? (
         <Modal show={showModal} handleClose={handleClose}>
           <LogoPDP small></LogoPDP>
-          <Fieldset
-            legend="Formulario Aporte Voluntario"
-            /* className="lg:col-span-3" */
-          >
-            <Select
-              onChange={(event) => setTipoIdentificacion(event?.target?.value)}
-              id="comissionType"
-              label="Tipo de Identificación"
-              options={{
-                "": "",
-                "C.C Cedula de Ciudadania": "1",
-                "C.E Cedula de Extranjeria": "2",
-              }}
-            ></Select>
-            <Input
-              label={"N° Documento"}
-              placeholder={"Ingrese su Numero Documento"}
-              value={numDocumento}
-              onChange={(e) => setNumDocumento(e.target.value)}
-              type={"number"}
-            ></Input>
-            <Input
-              label={"Id Comercio"}
-              placeholder="Ingrese Id Comercio"
-              value={idComercio}
-              onChange={(e) => setIdComercio(e.target.value)}
-              type={"number"}
-            ></Input>
-            <Input
-              label={"Id Dispositivo"}
-              placeholder="Ingrese Id Dispositivo"
-              value={iddispositivo}
-              onChange={(e) => setIddispositivo(e.target.value)}
-              type={"number"}
-            ></Input>
-            <Input
-              label={"N° Celular"}
-              placeholder={"Ingrese su Numero Celular"}
-              value={numCelular}
-              onChange={(e) => setNumCelular(e.target.value)}
-              type={"number"}
-            ></Input>
-            <Input
-              label={"Valor Aportar"}
-              placeholder={"Ingrese Valor Aportar"}
-              value={valorAportar}
-              onChange={(e) => setValorAportar(e.target.value)}
-              type={"number"}
-            ></Input>
-            <Select
-              onChange={(event) => setNumPagosPdp(event?.target?.value)}
-              id="comissionType"
-              label="N° Pagos Punto Pago"
-              value={numPagosPdp}
-              options={{
-                0: 0,
-                1: 1,
-                2: 2,
-                3: 3,
-              }}
-            ></Select>
-          </Fieldset>
-          <ButtonBar className={"lg:col-span-2"} type="">
-            {
-              <Button type="submit" onClick={(e) => enviar(e)}>
-                Enviar Formulario
-              </Button>
-              /*  ) : null */
-            }
-          </ButtonBar>
+          <Form onSubmit={(e) => enviar(e)}>
+            <Fieldset
+              legend="Formulario Aporte Voluntario"
+              /* className="lg:col-span-3" */
+            >
+              <Select
+                onChange={(event) =>
+                  setTipoIdentificacion(event?.target?.value)
+                }
+                id="comissionType"
+                label="Tipo de Identificación"
+                options={{
+                  "": "",
+                  "C.C Cedula de Ciudadania": "1",
+                  "C.E Cedula de Extranjeria": "2",
+                }}
+                required
+              ></Select>
+              <Input
+                label={"N° Documento"}
+                placeholder={"Ingrese su Numero Documento"}
+                value={numDocumento}
+                minLength="6"
+                maxLength="11"
+                onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+                  setNumDocumento(num.toString());
+                }}
+                type={"text"}
+                required
+              ></Input>
+              <Input
+                label={"Id Comercio"}
+                placeholder="Ingrese Id Comercio"
+                value={idComercio}
+                onChange={(e) => setIdComercio(e.target.value)}
+                type={"number"}
+                disabled
+              ></Input>
+              <Input
+                label={"Id Dispositivo"}
+                placeholder="Ingrese Id Dispositivo"
+                value={iddispositivo}
+                onChange={(e) => setIddispositivo(e.target.value)}
+                type={"number"}
+                disabled
+              ></Input>
+              <Input
+                label={"N° Celular"}
+                placeholder={"Ingrese su Numero Celular"}
+                value={numCelular}
+                /* onChange={(e) => setNumCelular(e.target.value)} */
+                /* onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+                  setNumCelular(num);
+                }} */
+                onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+
+                  if (parseInt(String(num)[0]) == 3) {
+                    const num = parseInt(e.target.value) || "";
+                    setNumCelular(num);
+                  } else {
+                    if (parseInt(String(num)[0]) != 3) {
+                      notifyError("El Primer Digito debe ser 3");
+                    }
+                  }
+                }}
+                minLength="10"
+                maxLength="10"
+                type={"text"}
+                required
+              ></Input>
+              <Input
+                label={"Valor Aportar"}
+                placeholder={"Ingrese Valor Aportar"}
+                value={valorAportar}
+                minLength="4"
+                maxLength="6"
+                onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+                  setValorAportar(num);
+                }}
+                type={"text"}
+                required
+              ></Input>
+              <Select
+                onChange={(event) => setNumPagosPdp(event?.target?.value)}
+                id="comissionType"
+                label="N° Pagos Punto Pago"
+                value={numPagosPdp}
+                options={{
+                  0: 0,
+                  1: 1,
+                  2: 2,
+                  3: 3,
+                }}
+              ></Select>
+            </Fieldset>
+            <ButtonBar className={"lg:col-span-2"} type="">
+              {
+                <Button type="submit" /* onClick={(e) => enviar(e)} */>
+                  Enviar Formulario
+                </Button>
+                /*  ) : null */
+              }
+            </ButtonBar>
+          </Form>
         </Modal>
       ) : (
         ""
