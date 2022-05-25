@@ -190,7 +190,7 @@ const comprobarEmail = lazy(() =>
   import("../apps/Domiciliacion/Views/BuscarComercioEmail")
 );
 const ModificarPps = lazy(() =>
-  import("../apps/Domiciliacion/Views/ModificarPps")
+  import("../apps/Domiciliacion/Views/ModificarPpsVoluntario")
 );
 const BuscarCedulaPpsADemanda = lazy(() =>
   import("../apps/Domiciliacion/Views/BuscarCedulaPpsADemanda")
