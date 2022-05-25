@@ -31,9 +31,10 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const [showModalVoucher, setShowModalVoucher] = useState(false);
   const { quotaInfo, roleInfo } = useAuth();
 
-  const [cupoLogin, setCupoLogin] = useState(quotaInfo["quota"]);
-  const [idComercio, setIdComercio] = useState(roleInfo["id_comercio"]);
-  const [idusuario, setIdUsuario] = useState(roleInfo["id_usuario"]);
+  console.log(quotaInfo);
+  const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
+  const [idComercio, setIdComercio] = useState(roleInfo?.["id_comercio"]);
+  const [idusuario, setIdUsuario] = useState(roleInfo?.["id_usuario"]);
   const [iddispositivo, setIddispositivo] = useState(
     roleInfo["id_dispositivo"]
   );
@@ -48,7 +49,6 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const [cantNum, setCantNum] = useState(0);
 
   const url = process.env.REACT_APP_URL_COLPENSIONES;
-  const url2 = "http://127.0.0.1:7000";
 
   const printDiv = useRef();
 
@@ -77,7 +77,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       numero = numero / 10;
     }
     setCantNum(contador);
-    console.log(cantNum);
+    /*    console.log(cantNum); */
   }
 
   const tickets = useMemo(() => {
@@ -145,13 +145,11 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             id_usuario: idusuario,
             /* es_Propio: esPropio, */
           },
-          {
-            /* "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-            "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS */
-          },
+          {},
           true
         )
           .then((respuesta) => {
+<<<<<<< HEAD
             /* console.log(respuesta);
 
           })
@@ -161,6 +159,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             setDisabledBtn(true);
           }); */
 
+=======
+>>>>>>> 1863b679bea1da82428da4eab66c0824a90e4f4a
             console.log(respuesta);
             if (
               respuesta?.msg?.["respuesta_colpensiones"] ===
@@ -193,6 +193,16 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               navigate(`/domiciliacion`);
             }
             if (
+<<<<<<< HEAD
+=======
+              respuesta?.msg?.["RESPUESTA COLPENSIONES"] ===
+              "Lo Sentimos, Falló el Servicio De Colpensiones"
+            ) {
+              notifyError("Lo Sentimos, Falló el Servicio De Colpensiones");
+              navigate(`/domiciliacion`);
+            }
+            if (
+>>>>>>> 1863b679bea1da82428da4eab66c0824a90e4f4a
               (respuesta?.msg ===
                 "La transaccion ha sido creada exitosamente") &
               (respuesta?.obj.length > 1)

@@ -792,13 +792,13 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/domiciliacion",
-    label: <AppIcons Logo={"RECAUDO"} name={"Domiciliacion"} />,
+    label: <AppIcons Logo={"RECAUDO"} name={"Domiciliación"} />,
     component: Domiciliacion,
     permission: [32, 33, 34, 35, 36],
     subRoutes: [
       {
         link: "/domiciliacion/formulario",
-        label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliacion"} />,
+        label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />,
         component: comprobarEmail,
         permission: [34],
       },
