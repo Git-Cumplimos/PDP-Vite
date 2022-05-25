@@ -163,6 +163,10 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
               navigate(`/domiciliacion`);
             }
+            if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
+              notifyError("Lo Sentimos, Falló el Registro Del Cupo");
+              navigate(`/domiciliacion`);
+            }
             if (
               respuesta?.msg?.["respuesta_colpensiones"] ===
               "Cotizante no existe."

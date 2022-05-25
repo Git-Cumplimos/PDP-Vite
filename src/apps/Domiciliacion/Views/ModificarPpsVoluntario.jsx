@@ -12,6 +12,7 @@ import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import fetchData from "../../../utils/fetchData";
 import { notifyError } from "../../../utils/notify";
 import classes from "./ModificarPpsVoluntario.module.css";
+
 const ModificarPps = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
   const [buscarCedula, setBuscarCedula] = useState("");
@@ -19,6 +20,10 @@ const ModificarPps = () => {
   const [cantNumCel, setCantNumCel] = useState(0);
   const [cantNumVal, setCantNumVal] = useState(0);
   const [showModal, setShowModal] = useState(true);
+  const [showModalUsuarioNoEncontrado, setShowModalUsuarioNoEncontrado] =
+    useState(true);
+  const [estadoUsuarioNoEncontrado, setEstadoUsuarioNoEncontrado] =
+    useState(false);
   const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
   const [estado, setEstado] = useState(false);
   const [valueAmount, setValueAmount] = useState("");
@@ -27,7 +32,7 @@ const ModificarPps = () => {
   const [numPagosPdp, setNumPagosPdp] = useState("");
   const [estadoComercio, setEstadoComercio] = useState("");
   const [estadoComercioString, setEstadoComercioString] = useState("");
-  const { contenedorLogo, contenedorSubtitle } = classes;
+  const { contenedorLogo, contenedorSubtitle, tituloNotificacion } = classes;
   //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
   useEffect(() => {
     cantidadNumero(buscarCedula);
@@ -68,13 +73,21 @@ const ModificarPps = () => {
     setCantNumVal(contadorVal);
     console.log(cantNumVal);
   }
+
   const handleClose = useCallback(() => {
     setShowModal(false);
     setDatosConsulta(0);
     setBuscarCedula("");
   }, []);
+  const handleCloseUsuarioNoEncontrado = useCallback(() => {
+    setShowModalUsuarioNoEncontrado(false);
+    setDatosConsulta(0);
+    setBuscarCedula("");
+  }, []);
+
   const BuscarCedula = (e) => {
     setShowModal(true);
+    setShowModalUsuarioNoEncontrado(true);
     e.preventDefault();
     if (cantNum >= 7) {
       fetchData(
@@ -86,22 +99,26 @@ const ModificarPps = () => {
         {}
       )
         .then((respuesta) => {
-          console.log(respuesta?.obj?.results[0]);
-          setDatosConsulta(respuesta?.obj?.results);
-          setEstado(true);
-          valorAportar: setValueAmount(
-            respuesta?.obj?.results[0]?.value_amount
-          );
-          celular: setCelular(respuesta?.obj?.results[0]?.celular);
-          identificacion: setIdentificacion(
-            respuesta?.obj?.results[0]?.identificacion
-          );
-          num_pagos: setNumPagosPdp(respuesta?.obj?.results[0]?.num_pago_pdp);
-          console.log(respuesta?.obj?.results[0]?.estado);
-          if (respuesta?.obj?.results[0]?.estado === "activo") {
-            setEstadoComercio(true);
+          console.log(respuesta?.obj?.results.length);
+          if (respuesta?.obj?.results.length > 0) {
+            setDatosConsulta(respuesta?.obj?.results);
+            setEstado(true);
+            valorAportar: setValueAmount(
+              respuesta?.obj?.results[0]?.value_amount
+            );
+            celular: setCelular(respuesta?.obj?.results[0]?.celular);
+            identificacion: setIdentificacion(
+              respuesta?.obj?.results[0]?.identificacion
+            );
+            num_pagos: setNumPagosPdp(respuesta?.obj?.results[0]?.num_pago_pdp);
+            console.log(respuesta?.obj?.results[0]?.estado);
+            if (respuesta?.obj?.results[0]?.estado === "activo") {
+              setEstadoComercio(true);
+            } else {
+              setEstadoComercio(false);
+            }
           } else {
-            setEstadoComercio(false);
+            setEstadoUsuarioNoEncontrado(true);
           }
         })
         .catch((err) => {
@@ -163,7 +180,22 @@ const ModificarPps = () => {
           </Button>
         }
       </ButtonBar>
-
+      {estadoUsuarioNoEncontrado ? (
+        <Modal
+          show={showModalUsuarioNoEncontrado}
+          handleClose={handleCloseUsuarioNoEncontrado}
+        >
+          <div className={contenedorLogo}>
+            <LogoPDP small></LogoPDP>
+          </div>
+          <span className={tituloNotificacion}>
+            No se Puede Realizar La Modificacíon, El Número de Cédula No se
+            Encuentra Domiciliado.
+          </span>
+        </Modal>
+      ) : (
+        ""
+      )}
       {Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
         <Modal show={showModal} handleClose={handleClose}>
           <div className={contenedorLogo}>
