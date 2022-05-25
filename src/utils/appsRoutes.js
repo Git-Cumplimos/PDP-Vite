@@ -190,7 +190,7 @@ const comprobarEmail = lazy(() =>
   import("../apps/Domiciliacion/Views/BuscarComercioEmail")
 );
 const ModificarPps = lazy(() =>
-  import("../apps/Domiciliacion/Views/ModificarPps")
+  import("../apps/Domiciliacion/Views/ModificarPpsVoluntario")
 );
 const BuscarCedulaPpsADemanda = lazy(() =>
   import("../apps/Domiciliacion/Views/BuscarCedulaPpsADemanda")
@@ -792,13 +792,13 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/domiciliacion",
-    label: <AppIcons Logo={"RECAUDO"} name={"Domiciliacion"} />,
+    label: <AppIcons Logo={"RECAUDO"} name={"Domiciliación"} />,
     component: Domiciliacion,
     permission: [32, 33, 34, 35, 36],
     subRoutes: [
       {
         link: "/domiciliacion/formulario",
-        label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliacion"} />,
+        label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />,
         component: comprobarEmail,
         permission: [34],
       },

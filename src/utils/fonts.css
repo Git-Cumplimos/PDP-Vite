@@ -1,0 +1,134 @@
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-Thin.gz");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-ThinItalic.gz");
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-ExtraLight.gz");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-ExtraLightItalic.gz");
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-Light.gz");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-LightItalic.gz");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-Regular.gz");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-Italic.gz");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-Medium.gz");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-MediumItalic.gz");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-SemiBold.gz");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-SemiBoldItalic.gz");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-Bold.gz");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-BoldItalic.gz");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-ExtraBold.gz");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-ExtraBoldItalic.gz");
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-Black.gz");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Montserrat;
+  src: url("https://cms-pdp.s3.us-east-2.amazonaws.com/assets/font/Montserrat-BlackItalic.gz");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
