@@ -149,18 +149,6 @@ const PpsVoluntarioDemanda = ({ ced }) => {
           true
         )
           .then((respuesta) => {
-<<<<<<< HEAD
-            /* console.log(respuesta);
-
-          })
-          .catch((err) => {
-            console.log(err);
-            notifyError("Error al Pagar Planilla Voluntaria a Demanda");
-            setDisabledBtn(true);
-          }); */
-
-=======
->>>>>>> 1863b679bea1da82428da4eab66c0824a90e4f4a
             console.log(respuesta);
             if (
               respuesta?.msg?.["respuesta_colpensiones"] ===
@@ -193,8 +181,6 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               navigate(`/domiciliacion`);
             }
             if (
-<<<<<<< HEAD
-=======
               respuesta?.msg?.["RESPUESTA COLPENSIONES"] ===
               "Lo Sentimos, Falló el Servicio De Colpensiones"
             ) {
@@ -202,7 +188,6 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               navigate(`/domiciliacion`);
             }
             if (
->>>>>>> 1863b679bea1da82428da4eab66c0824a90e4f4a
               (respuesta?.msg ===
                 "La transaccion ha sido creada exitosamente") &
               (respuesta?.obj.length > 1)
