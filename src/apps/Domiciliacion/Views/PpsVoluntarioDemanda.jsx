@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useMemo } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Fieldset from "../../../components/Base/Fieldset";
@@ -13,19 +13,28 @@ import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import Voucher from "../../LoteriaBog/components/Voucher/Voucher";
 import { useReactToPrint } from "react-to-print";
+import Form from "../../../components/Base/Form";
+import Tickets from "../../../components/Base/Tickets";
 
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
 const PpsVoluntarioDemanda = ({ ced }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [numDocumento, setNumDocumento] = useState(ced);
   const [numCelular, setNumCelular] = useState("");
+  const [datosRespuesta, setDatosRespuesta] = useState("");
   const [valorAportar, setValorAportar] = useState();
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
   const { quotaInfo, roleInfo } = useAuth();
 
-  const [cupoLogin, setCupoLogin] = useState(quotaInfo["quota"]);
-  const [idComercio, setIdComercio] = useState(roleInfo["id_comercio"]);
-  const [idusuario, setIdUsuario] = useState(roleInfo["id_usuario"]);
+  console.log(quotaInfo);
+  const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
+  const [idComercio, setIdComercio] = useState(roleInfo?.["id_comercio"]);
+  const [idusuario, setIdUsuario] = useState(roleInfo?.["id_usuario"]);
   const [iddispositivo, setIddispositivo] = useState(
     roleInfo["id_dispositivo"]
   );
@@ -33,31 +42,20 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const [esPropio, setEsPropio] = useState(false);
   const [voucher, setVoucher] = useState(false);
 
+  const [disabledBtn, setDisabledBtn] = useState(false);
+
   const navigate = useNavigate();
 
   const [cantNum, setCantNum] = useState(0);
 
   const url = process.env.REACT_APP_URL_COLPENSIONES;
-  const url2 = "http://127.0.0.1:7000";
 
   const printDiv = useRef();
-  const voucherInfo = {};
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
-  voucherInfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  }).format(new Date());
-  voucherInfo["Hora"] = Intl.DateTimeFormat("es-CO", {
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-    hour12: false,
-  }).format(new Date());
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -79,11 +77,51 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       numero = numero / 10;
     }
     setCantNum(contador);
-    console.log(cantNum);
+    /*    console.log(cantNum); */
   }
+
+  const tickets = useMemo(() => {
+    return {
+      title: "Recibo de pago",
+      timeInfo: {
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: false,
+        }).format(new Date()),
+      },
+      commerceName: tipoComercio,
+      commerceInfo: Object.entries({
+        "Id Comercio": roleInfo?.id_comercio,
+        "No. terminal": roleInfo?.id_dispositivo,
+        Municipio: roleInfo?.ciudad,
+        Dirección: roleInfo?.direccion,
+        "Id Trx": datosRespuesta?.[0]?.["inserted_id"] /* "22" */,
+      }),
+      trxInfo: [
+        ["Proceso", "Aporte Voluntario A Demanda"],
+        ["VALOR", formatMoney.format(valorAportar)],
+        ["N° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
+      ],
+      disclamer:
+        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    };
+  }, [
+    roleInfo,
+    valorAportar,
+    datosRespuesta,
+    tipoComercio /* respPinCancel, roleInfo, valor */,
+  ]);
 
   const enviar = (e) => {
     e.preventDefault();
+    setDisabledBtn(true);
     /*  setShowModal(false); */
     if (cupoLogin >= valorAportar) {
       if (tipoComercio === "OFICINAS PROPIAS") {
@@ -107,20 +145,56 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             id_usuario: idusuario,
             /* es_Propio: esPropio, */
           },
-          {
-            /* "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-            "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS */
-          },
+          {},
           true
         )
           .then((respuesta) => {
-            console.log(respuesta /* ?.msg?.["respuesta_colpensiones"] */);
-            /*  if (
+            console.log(respuesta);
+            if (
               respuesta?.msg?.["respuesta_colpensiones"] ===
               "El aportante no existe."
             ) {
-              console.log("hola mundo");
-            } */
+              notifyError("El aportante no existe.");
+              navigate(`/domiciliacion`);
+            }
+            if (
+              respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
+            ) {
+              notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
+              navigate(`/domiciliacion`);
+            }
+            if (
+              respuesta?.msg?.["respuesta_colpensiones"] ===
+              "Cotizante no existe."
+            ) {
+              notifyError("Cotizante no existe.");
+              navigate(`/domiciliacion`);
+            }
+
+            if (
+              respuesta?.msg ===
+              "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
+            ) {
+              notifyError(
+                "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000."
+              );
+              navigate(`/domiciliacion`);
+            }
+            if (
+              respuesta?.msg?.["RESPUESTA COLPENSIONES"] ===
+              "Lo Sentimos, Falló el Servicio De Colpensiones"
+            ) {
+              notifyError("Lo Sentimos, Falló el Servicio De Colpensiones");
+              navigate(`/domiciliacion`);
+            }
+            if (
+              (respuesta?.msg ===
+                "La transaccion ha sido creada exitosamente") &
+              (respuesta?.obj.length > 1)
+            ) {
+              setShowModalVoucher(true);
+              setDatosRespuesta(respuesta?.obj);
+            }
           })
           .catch((err) => {
             console.log(err);
@@ -160,6 +234,19 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 notifyError("El aportante no existe.");
                 navigate(`/domiciliacion`);
               }
+              if (
+                respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
+              ) {
+                notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
+                navigate(`/domiciliacion`);
+              }
+              if (
+                respuesta?.msg?.["respuesta_colpensiones"] ===
+                "Cotizante no existe."
+              ) {
+                notifyError("Cotizante no existe.");
+                navigate(`/domiciliacion`);
+              }
 
               if (
                 respuesta?.msg ===
@@ -175,14 +262,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   "La transaccion ha sido creada exitosamente") &
                 (respuesta?.obj.length > 1)
               ) {
-                voucherInfo["Id Trx"] = 3333;
-                voucherInfo["Estado"] = "Activo";
-                voucherInfo["Nombre"] = "respuestamujer?.obj[]";
-                voucherInfo["Documento"] = "respuestamujer?.obj.Documento";
-                voucherInfo["pin"] = "respuestamujer?.obj.Pin";
-                voucherInfo["Valordesembolso"] = "respuestamujer?.ob";
-                voucherInfo["idtrx"] = "respuestamujer?.obj";
                 setShowModalVoucher(true);
+                setDatosRespuesta(respuesta?.obj);
               }
             })
             .catch((err) => {
@@ -198,62 +279,87 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       notifyError("No Tiene el Cupo Suficiente Para el Aporte a Colpensiones.");
     }
   };
-  console.log(voucherInfo);
+
   return (
     <div>
       <Modal show={showModal} handleClose={handleClose}>
         <LogoPDP small></LogoPDP>
-        <Fieldset
-          legend="Formulario Aporte Voluntario"
-          /* className="lg:col-span-3" */
-        >
-          <Select
-            onChange={(event) => setTipoIdentificacion(event?.target?.value)}
-            id="comissionType"
-            label="Tipo de Identificación"
-            options={{
-              "": "",
-              "C.C Cedula de Ciudadania": "1",
-              "C.E Cedula de Extranjeria": "2",
-            }}
-          ></Select>
-          <Input
-            label={"N° Documento"}
-            placeholder={"Ingrese su Numero Documento"}
-            value={numDocumento}
-            onChange={(e) => setNumDocumento(e.target.value)}
-            type={"number"}
-            disabled
-          ></Input>
+        <Form onSubmit={(e) => enviar(e)}>
+          <Fieldset
+            legend="Formulario Aporte Voluntario"
+            /* className="lg:col-span-3" */
+          >
+            <Select
+              onChange={(event) => setTipoIdentificacion(event?.target?.value)}
+              id="comissionType"
+              label="Tipo de Identificación"
+              options={{
+                "": "",
+                "C.C Cedula de Ciudadania": "1",
+                "C.E Cedula de Extranjeria": "2",
+              }}
+            ></Select>
+            <Input
+              label={"N° Documento"}
+              placeholder={"Ingrese su Numero Documento"}
+              value={numDocumento}
+              onChange={(e) => setNumDocumento(e.target.value)}
+              type={"number"}
+              disabled
+            ></Input>
 
-          <Input
-            label={"N° Celular"}
-            placeholder={"Ingrese su Numero Celular"}
-            value={numCelular}
-            onChange={(e) => setNumCelular(e.target.value)}
-            type={"number"}
-          ></Input>
-          <Input
-            label={"Valor Aportar"}
-            placeholder={"Ingrese Valor Aportar"}
-            value={valorAportar}
-            onChange={(e) => setValorAportar(e.target.value)}
-            type={"number"}
-          ></Input>
-        </Fieldset>
-        <ButtonBar className={"lg:col-span-2"} type="">
-          {
-            <Button type="submit" onClick={(e) => enviar(e)}>
-              Guardar Datos
-            </Button>
-            /*  ) : null */
-          }
-        </ButtonBar>
+            <Input
+              label={"N° Celular"}
+              placeholder={"Ingrese su Numero Celular"}
+              value={numCelular}
+              onInput={(e) => {
+                const num = parseInt(e.target.value) || "";
+
+                if (parseInt(String(num)[0]) == 3) {
+                  const num = parseInt(e.target.value) || "";
+                  setNumCelular(num);
+                } else {
+                  if (parseInt(String(num)[0]) != 3) {
+                    notifyError("El Primer Digito debe ser 3");
+                  }
+                }
+              }}
+              minLength="10"
+              maxLength="10"
+              type={"text"}
+              required
+            ></Input>
+            <Input
+              label={"Valor Aportar"}
+              placeholder={"Ingrese Valor Aportar"}
+              value={valorAportar}
+              minLength="4"
+              maxLength="6"
+              onInput={(e) => {
+                const num = parseInt(e.target.value) || "";
+                setValorAportar(num);
+              }}
+              type={"text"}
+              required
+            ></Input>
+          </Fieldset>
+          <ButtonBar className={"lg:col-span-2"} type="">
+            {
+              <Button
+                type="submit"
+                disabled={disabledBtn} /* onClick={(e) => enviar(e)} */
+              >
+                Realizar Aporte
+              </Button>
+              /*  ) : null */
+            }
+          </ButtonBar>
+        </Form>
       </Modal>
       {showModalVoucher === true ? (
         <Modal show={showModal} handleClose={handleClose}>
           <div className="flex flex-col justify-center items-center">
-            <Voucher {...voucherInfo} refPrint={printDiv} />
+            <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
             <Button onClick={handlePrint}>Imprimir</Button>
           </div>
         </Modal>

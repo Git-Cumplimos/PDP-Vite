@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Form from "../../../components/Base/Form";
-import AWS from "aws-sdk";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import Modal from "../../../components/Base/Modal";
@@ -12,11 +11,6 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import ParamsForm from "../components/ParamsFomr/ParamsForm";
-
-AWS.config.update({
-  accessKeyId: process.env.REACT_APP_accessKeyId,
-  secretAccessKey: process.env.REACT_APP_secretAccessKey,
-});
 
 const url_consultaParams = `${process.env.REACT_APP_URL_LOTERIAS}/con_params`;
 

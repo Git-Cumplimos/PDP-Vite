@@ -2,6 +2,7 @@ import React, { Fragment, useCallback, useEffect, useState } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Input from "../../../components/Base/Input";
+import Form from "../../../components/Base/Form";
 import fetchData from "../../../utils/fetchData";
 import classes from "./BuscarCedulaPpsDemanda.module.css";
 import { notify, notifyError } from "../../../utils/notify";
@@ -51,7 +52,7 @@ const BuscarCedulaPpsADemanda = () => {
   const BuscarCedula = (e) => {
     setShowModal(true);
     e.preventDefault();
-    if (cantNum >= 6) {
+    if (cantNum >= 6 && cantNum <= 13) {
       fetchData(
         `${url}/domicilio`,
         "GET",
@@ -86,14 +87,18 @@ const BuscarCedulaPpsADemanda = () => {
           notifyError("Error al Consultar Cedula");
         });
     } else {
-      notifyError("Ingrese un Numero Valido para la Consulta");
+      if (cantNum < 6 || cantNum > 13) {
+        notifyError(
+          "El Numero de Consulta Debe Ser Mayor a 6  y Menor a 13 Digitos"
+        );
+      }
     }
   };
   return (
     <div>
       {(datosConsulta?.length === 0) & estado ? (
         <TipoPpsADemanda numCed={buscarCedula}></TipoPpsADemanda>
-      ) : datosConsulta?.length > 0 ? (
+      ) : Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
         <Modal show={showModal} handleClose={handleClose}>
           <div className={contenedorImagen}>
             <LogoPDP small></LogoPDP>
@@ -140,23 +145,30 @@ const BuscarCedulaPpsADemanda = () => {
           </div>
         </Modal>
       ) : (
-        <Fragment>
-          <Input
-            label={"Numero Cédula"}
-            placeholder={"Ingrese Numero de Cédula"}
-            value={buscarCedula}
-            onChange={(e) => setBuscarCedula(e.target.value)}
-            type={"number"}
-            required
-          ></Input>
-          <ButtonBar className={"lg:col-span-2"} type="">
-            {
-              <Button type="submit" onClick={(e) => BuscarCedula(e)}>
-                Buscar Cliente
-              </Button>
-            }
-          </ButtonBar>
-        </Fragment>
+        <div>
+          <Form grid onSubmit={(e) => BuscarCedula(e)}>
+            <Input
+              label={"Número Cédula"}
+              placeholder={"Ingrese Número de Cédula"}
+              value={buscarCedula}
+              onInput={(e) => {
+                const num = parseInt(e.target.value) || "";
+                setBuscarCedula(num);
+              }}
+              minLength="6"
+              maxLength="10"
+              type={"text"}
+              required
+            />
+            <ButtonBar className={"lg:col-span-2"} type="">
+              {
+                <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>
+                  Buscar Cliente
+                </Button>
+              }
+            </ButtonBar>
+          </Form>
+        </div>
       )}
     </div>
   );
