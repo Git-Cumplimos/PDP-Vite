@@ -110,9 +110,10 @@ const CargaArchivos = ({ route }) => {
   //------------------Funcion Para Subir El Formulario---------------------//
   const saveFile = useCallback(
     (e) => {
+      setDisabledBtns(true);
       const f = new Date();
       const query = {
-        contentType: ".txt",
+        contentType: "application/text",
         filename: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
           f.getMonth() + 1
         }${f.getFullYear()}${fileName}`,
@@ -122,12 +123,10 @@ const CargaArchivos = ({ route }) => {
           if (!respuesta?.status) {
             notifyError(respuesta?.msg);
           } else {
-            console.log(respuesta?.obj);
             // setEstadoForm(true);
             const formData2 = new FormData();
             if (file) {
               for (const property in respuesta?.obj?.fields) {
-                console.log(respuesta?.obj?.fields[property]);
                 formData2.set(
                   `${property}`,
                   `${respuesta?.obj?.fields[property]}`
@@ -139,12 +138,28 @@ const CargaArchivos = ({ route }) => {
               fetch(`${respuesta?.obj?.url}`, {
                 method: "POST",
                 body: formData2,
-              })
-                .then((res) => res?.status)
-                .catch((err) => {
-                  {
-                  }
-                });
+              }).then((res) => {
+                if (res?.ok) {
+                  setTimeout(() => {
+                    EstadoArchivos().then((res) => {
+                      if (typeof res != Object) {
+                        if ("Motivo" in res?.[0]) {
+                          closeModal();
+                          if (res[0]["Estado"] === 1) {
+                            notify(res[0]["Motivo"]);
+                          } else {
+                            notifyError(res[0]["Motivo"]);
+                          }
+                        } else {
+                          notifyError("Consulte con soporte");
+                        }
+                      }
+                    });
+                  }, 3000);
+                } else {
+                  notifyError("No fue posible conectar con el Bucket");
+                }
+              });
             }
           }
         })

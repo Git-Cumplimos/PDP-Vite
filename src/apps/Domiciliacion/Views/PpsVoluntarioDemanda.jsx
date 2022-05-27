@@ -163,6 +163,10 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
               navigate(`/domiciliacion`);
             }
+            if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
+              notifyError("Lo Sentimos, Falló el Registro Del Cupo");
+              navigate(`/domiciliacion`);
+            }
             if (
               respuesta?.msg?.["respuesta_colpensiones"] ===
               "Cotizante no existe."
@@ -237,7 +241,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               if (
                 respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
               ) {
-                notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
+                notifyError("El valor aportado debe ser exacto ej: 5000");
                 navigate(`/domiciliacion`);
               }
               if (
@@ -253,7 +257,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
               ) {
                 notifyError(
-                  "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000."
+                  "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
                 );
                 navigate(`/domiciliacion`);
               }
@@ -268,15 +272,18 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             })
             .catch((err) => {
               console.log(err);
-              notifyError("Error al Pagar Planilla Voluntaria a Demanda");
+              notifyError("Error al pagar planilla voluntaria a demanda");
+              navigate(`/domiciliacion`);
             });
         } else {
-          notifyError("Ingrese un numero de Celular Valido");
+          notifyError("Ingrese un número de célular valido");
+
           setNumCelular("");
         }
       }
     } else {
-      notifyError("No Tiene el Cupo Suficiente Para el Aporte a Colpensiones.");
+      notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
+      navigate(`/domiciliacion`);
     }
   };
 
@@ -292,11 +299,17 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             <Select
               onChange={(event) => setTipoIdentificacion(event?.target?.value)}
               id="comissionType"
-              label="Tipo de Identificación"
+              label="Tipo Identificación"
               options={{
                 "": "",
-                "C.C Cedula de Ciudadania": "1",
-                "C.E Cedula de Extranjeria": "2",
+                "Cédula de Ciudadania": "1",
+                "Cédula de Extranjeria": "2",
+                "Tarjeta de Identidad": "4",
+                "Registro Civil": "5",
+                "Pasaporte ": "6",
+                "Carnét Diplomático": "7",
+                "Salvo conducto permanencia": "8",
+                "Permiso especial permanencia": "9",
               }}
             ></Select>
             <Input
