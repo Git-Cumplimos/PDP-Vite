@@ -58,7 +58,7 @@ export const useProvideMarketPlace = () => {
       throw err;
     }
   });
-
+  console.log(urls?.consultaOrden);
   return {
     payOrder,
     searchsOrder,

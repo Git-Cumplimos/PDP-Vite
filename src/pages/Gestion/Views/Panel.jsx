@@ -11,7 +11,7 @@ const Panel = () => {
   const [totalCierres, setTotalCierres] = useState(false);
   const [cierre, setCierre] = useState(false);
   const [resArqueo, setResArqueo] = useState("");
-  const [respuestaComprobante, setRespuestaComprobante] = useState("");
+  const [respuestaComprobante, setRespuestaComprobante] = useState([]);
   const [sobrante, setSobrante] = useState("");
   const [faltante, setFaltante] = useState("");
   const { roleInfo } = useAuth();
@@ -36,19 +36,19 @@ const Panel = () => {
       .then((res) => {
         if (res?.status) {
           setTotalCierres(res?.obj);
+          query.status = "APROBADO";
+          searchReceipt(query)
+            .then((res) => {
+              console.log(res);
+              setRespuestaComprobante(res?.obj?.results);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         }
       })
       .catch((err) => {
         throw err;
-      });
-    query.status = "APROBADO";
-    searchReceipt(query)
-      .then((res) => {
-        console.log(res);
-        setRespuestaComprobante(res?.obj?.results);
-      })
-      .catch((err) => {
-        console.log(err);
       });
   }, []);
 

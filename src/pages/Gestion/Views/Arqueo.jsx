@@ -33,8 +33,7 @@ const Arqueo = ({
   });
 
   const sumatoria = () => {
-    let arr = respuestaComprobante.map((row) => row.valor);
-    console.log(arr);
+    let arr = respuestaComprobante?.map((row) => row.valor);
     function add(accumulator, a) {
       return accumulator + a;
     }

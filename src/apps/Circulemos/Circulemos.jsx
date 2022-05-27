@@ -5,10 +5,19 @@ import Button from "../../components/Base/Button";
 import ButtonBar from "../../components/Base/ButtonBar";
 import { consultarPrefactura } from "./utils/fetchCirculemos";
 import Prefactura from "./views/Prefactura";
+import Select from "../../components/Base/Select";
+import { notifyError } from "../../utils/notify";
 
 const Circulemos = () => {
   const [prefactura, setPrefactura] = useState("");
   const [consulta, setConsulta] = useState("");
+  const [total, setTotal] = useState("");
+
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 2,
+  });
 
   const HandleClick = (e) => {
     e.preventDefault();
@@ -29,17 +38,26 @@ const Circulemos = () => {
     consultarPrefactura(query)
       .then((res) => {
         console.log(res);
+        if (res?.status == false) {
+          notifyError(
+            "Error de conexión, intente de nuevo o consulte con soporte"
+          );
+        }
+        if (res?.obj?.codigo == "002") {
+          notifyError(res?.obj?.descripcion);
+        }
         setConsulta(res);
+        setTotal(res?.obj?.prefacturas?.[0]?.valorTotal);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-
+  console.log(formatMoney.format(150560.44));
   return (
-    <>
+    <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl mt-6">Consulta radicado</h1>
-      <Form>
+      <Form grid>
         <>
           <Input
             id="codigoTipoIdentificacion"
@@ -58,6 +76,15 @@ const Circulemos = () => {
             maxLength="12"
             autoComplete="off"
             value="Valor quemado"
+          />
+          <Select
+            id="codigoOrganismo"
+            name="codigo"
+            label="Código organismo"
+            options={[
+              { value: 0, label: "" },
+              { value: 1, label: "13001000" },
+            ]}
           />
           <Input
             id="numeroPrefactura"
@@ -79,8 +106,13 @@ const Circulemos = () => {
           </ButtonBar>
         </>
       </Form>
-      <Prefactura prefacturaInfo={consulta?.obj} numero={prefactura} />
-    </>
+      <Prefactura
+        prefacturaInfo={consulta?.obj}
+        numero={prefactura}
+        totalPrefactura={total}
+        setPrefactura={setPrefactura}
+      />
+    </div>
   );
 };
 
