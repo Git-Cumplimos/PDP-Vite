@@ -233,6 +233,16 @@ const Deposito = () => {
             ["Celular", phone],
             ["C.C.", userDoc],
             ["Valor de deposito", formatMoney.format(valor)],
+            ["", ""],
+            [
+              "Valor comision",
+              formatMoney.format(dataConsulta?.ValorComision ?? 0.0),
+            ],
+            ["", ""],
+            [
+              "Valor total",
+              formatMoney.format(valor + (dataConsulta?.ValorComision ?? 0.0)),
+            ],
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
