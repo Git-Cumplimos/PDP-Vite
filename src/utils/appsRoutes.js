@@ -238,7 +238,7 @@ const TypesTrxs = lazy(() =>
  * iFood Aportes Sociales
  */
 
-const iFoodAportes = lazy(() => import("../apps/iFood/IFood"));
+const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
 
 const CARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_1-P9wrhr8RWkx5zt3f64Ogy-Yr5DoQ_5ww&usqp=CAU";
