@@ -61,16 +61,6 @@ const Circulemos = () => {
         <>
           <Input
             id="codigoTipoIdentificacion"
-            label="Valor"
-            type="text"
-            minLength="7"
-            maxLength="12"
-            autoComplete="off"
-            value={formatMoney.format(150560.44)}
-            disabled={true}
-          />
-          <Input
-            id="codigoTipoIdentificacion"
             label="Tipo Identificación"
             type="text"
             minLength="7"

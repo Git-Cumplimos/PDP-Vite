@@ -234,6 +234,12 @@ const TypesTrxs = lazy(() =>
   import("../apps/ParamsOperations/Views/TypesTrxs")
 );
 
+/**
+ * iFood Aportes Sociales
+ */
+
+const iFoodAportes = lazy(() => import("../apps/iFood/IFood"));
+
 const CARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_1-P9wrhr8RWkx5zt3f64Ogy-Yr5DoQ_5ww&usqp=CAU";
 const DESCARGAR =
@@ -820,6 +826,12 @@ const allUrlsPrivateApps = [
     link: "/circulemos",
     label: <AppIcons Logo={"RECAUDO"} name={"Consorcio circulemos"} />,
     component: CirculemosComp,
+    permission: [1],
+  },
+  {
+    link: "/pagos-ifood",
+    label: <AppIcons Logo={"RECAUDO"} name={"Aportes en Linea iFood"} />,
+    component: iFoodAportes,
     permission: [1],
   },
 ];
