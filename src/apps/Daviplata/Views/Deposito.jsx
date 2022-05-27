@@ -243,6 +243,7 @@ const Deposito = () => {
               "Valor total",
               formatMoney.format(valor + (dataConsulta?.ValorComision ?? 0.0)),
             ],
+            ["", ""],
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
