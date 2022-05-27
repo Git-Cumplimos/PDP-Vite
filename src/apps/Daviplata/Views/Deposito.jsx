@@ -9,7 +9,7 @@ import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
-import { postCashIn } from "../utils/fetchRevalDaviplata";
+import { postCashIn, postConsultaCashIn } from "../utils/fetchRevalDaviplata";
 import { notify, notifyError } from "../../../utils/notify";
 import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import { useFetch } from "../../../hooks/useFetch";
@@ -17,10 +17,13 @@ import { useAuth } from "../../../hooks/AuthHooks";
 
 const Deposito = () => {
   const navigate = useNavigate();
-  const [{ phone, userDoc, valor, summary }, setQuery] = useQuery();
+  const [{ phone, userDoc, valor, summary, dataConsulta }, setQuery] =
+    useQuery();
 
   const { roleInfo, infoTicket } = useAuth();
 
+  const [loadingConsultaCashIn, fetchConsultaCashIn] =
+    useFetch(postConsultaCashIn);
   const [loadingCashIn, fetchCashIn] = useFetch(postCashIn);
   const [, fetchTypes] = useFetch();
 
@@ -82,18 +85,55 @@ const Deposito = () => {
 
       const { min, max } = limitesMontos;
 
+      const formData = new FormData(e.target);
+      const phone = formData.get("numCliente");
+      const userDoc = formData.get("docCliente");
+      const valorFormat = formData.get("valor");
+
+      const body = {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+        // idcliente: 5,
+        // idpersona: 240,
+        // NoidentificacionCajero: "52389030",
+        ...revalTrxParams,
+        NoIdentificacionUsuario: userDoc,
+        NumCelular: phone,
+        Valor: valor,
+      };
+
       if (valor >= min && valor < max) {
-        const formData = new FormData(e.target);
-        const phone = formData.get("numCliente");
-        const userDoc = formData.get("docCliente");
-        const valorFormat = formData.get("valor");
-        const summary = {
-          "Numero celular": phone,
-          "C.C. del depositante": userDoc,
-          "Valor de deposito": valorFormat,
-        };
-        setQuery({ phone, valor, summary }, { replace: true });
-        setShowModal(true);
+        fetchConsultaCashIn(body)
+          .then((res) => {
+            if (!res?.status) {
+              notifyError(res?.msg);
+              return;
+            }
+            notify("Consulta cash in satisfactoria");
+            const valorComision = parseFloat(res?.obj?.comision) ?? 0.0;
+            const summary = {
+              "Numero celular": phone,
+              "C.C. del depositante": userDoc,
+              "Valor de deposito": valorFormat,
+              "Valor de la comision": formatMoney.format(valorComision),
+              "Valor total": formatMoney.format(valor + valorComision),
+            };
+            const dataConsulta = {
+              ValorComision: valorComision,
+              Convenio: res?.obj?.Convenio ?? "",
+              IdTransaccion: res?.obj?.IdTransaccion ?? 0,
+            };
+            setQuery(
+              { phone, valor, summary, dataConsulta },
+              { replace: true }
+            );
+            setShowModal(true);
+          })
+          .catch((err) => {
+            console.error(err);
+            notifyError("Error interno en la transaccion");
+          });
       } else {
         notifyError(
           `El valor del deposito debe estar entre ${formatMoney.format(
@@ -102,7 +142,14 @@ const Deposito = () => {
         );
       }
     },
-    [setQuery, valor, limitesMontos]
+    [
+      setQuery,
+      valor,
+      limitesMontos,
+      fetchConsultaCashIn,
+      roleInfo,
+      revalTrxParams,
+    ]
   );
 
   const onChange = useCallback(
@@ -148,6 +195,7 @@ const Deposito = () => {
       NoIdentificacionUsuario: userDoc,
       NumCelular: phone,
       Valor: valor,
+      ...dataConsulta,
     };
 
     fetchCashIn(body)
@@ -206,6 +254,7 @@ const Deposito = () => {
     phone,
     valor,
     userDoc,
+    dataConsulta,
     fetchCashIn,
     roleInfo,
     infoTicket,
@@ -280,7 +329,9 @@ const Deposito = () => {
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar deposito</Button>
+          <Button type={"submit"} disabled={loadingConsultaCashIn}>
+            Realizar deposito
+          </Button>
         </ButtonBar>
       </Form>
       <Modal
