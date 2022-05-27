@@ -41,7 +41,7 @@ const BuscarComercioEmail = () => {
         {}
       )
         .then((respuesta) => {
-          console.log(respuesta);
+          /*   console.log(respuesta); */
           setDatosConsulta(respuesta?.obj);
           setEstadoConsulta(true);
           if (
@@ -53,7 +53,7 @@ const BuscarComercioEmail = () => {
             );
           } else {
             if (
-              respuesta?.msg == "La consulta a Suser del Email a sido exitosa"
+              respuesta?.msg == "La consulta a Suser del email a sido exitosa"
             ) {
               notify("Consulta Exitosa");
               setEstadoConsulta(true);
@@ -63,15 +63,15 @@ const BuscarComercioEmail = () => {
         })
         .catch((err) => {
           console.log(err);
-          notifyError("Error al Consultar Email");
+          notifyError("Error al consultar email");
         });
     } else {
-      notifyError("Ingrese un Correo para la Consulta");
+      notifyError("Ingrese un correo para la consulta");
     }
   };
   const ContinuarDomiciliacion = (e) => {
     e.preventDefault();
-    console.log("entre continuar");
+    /*   console.log("entre continuar"); */
     setShowModal(false);
     setContinuarDomiciliacion(true);
   };

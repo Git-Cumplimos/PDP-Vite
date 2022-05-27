@@ -84,12 +84,12 @@ const BuscarCedulaPpsADemanda = () => {
         })
         .catch((err) => {
           console.log(err);
-          notifyError("Error al Consultar Cedula");
+          notifyError("Error al consultar identificación");
         });
     } else {
       if (cantNum < 6 || cantNum > 13) {
         notifyError(
-          "El Numero de Consulta Debe Ser Mayor a 6  y Menor a 13 Digitos"
+          "El número de consulta debe ser mayor a 6  y menor a 13 digitos"
         );
       }
     }
@@ -107,7 +107,7 @@ const BuscarCedulaPpsADemanda = () => {
             <div className={contenedorDatos}>
               <div className={contenedorTitulos}>
                 <h2 className={tituloDatos}>{`Tipo Pps: `}</h2>
-                <h2 className={tituloDatos}>{`Celular: `}</h2>
+                <h2 className={tituloDatos}>{`Célular: `}</h2>
                 <h2 className={tituloDatos}>{`Estado: `}</h2>
               </div>
               <div className={contenedorValoresTitulos}>
@@ -139,8 +139,8 @@ const BuscarCedulaPpsADemanda = () => {
               </div>
             </div>
             <span className={tituloNotificacion}>
-              No se Puede Realizar El Aporte, El Número de Cédula se Encuentra
-              Domiciliado.
+              No se puede realizar el aporte, el número de cédula se encuentra
+              domiciliado.
             </span>
           </div>
         </Modal>
@@ -148,8 +148,8 @@ const BuscarCedulaPpsADemanda = () => {
         <div>
           <Form grid onSubmit={(e) => BuscarCedula(e)}>
             <Input
-              label={"Número Cédula"}
-              placeholder={"Ingrese Número de Cédula"}
+              label={"N° Identificación"}
+              placeholder={"Ingrese N° Identificación"}
               value={buscarCedula}
               onInput={(e) => {
                 const num = parseInt(e.target.value) || "";
