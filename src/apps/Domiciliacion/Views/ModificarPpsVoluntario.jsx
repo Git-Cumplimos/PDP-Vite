@@ -10,8 +10,10 @@ import Select from "../../../components/Base/Select";
 import ToggleInput from "../../../components/Base/ToggleInput";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import fetchData from "../../../utils/fetchData";
-import { notifyError } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 import classes from "./ModificarPpsVoluntario.module.css";
+import { useNavigate } from "react-router-dom";
+
 const ModificarPps = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
   const [buscarCedula, setBuscarCedula] = useState("");
@@ -19,6 +21,10 @@ const ModificarPps = () => {
   const [cantNumCel, setCantNumCel] = useState(0);
   const [cantNumVal, setCantNumVal] = useState(0);
   const [showModal, setShowModal] = useState(true);
+  const [showModalUsuarioNoEncontrado, setShowModalUsuarioNoEncontrado] =
+    useState(true);
+  const [estadoUsuarioNoEncontrado, setEstadoUsuarioNoEncontrado] =
+    useState(false);
   const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
   const [estado, setEstado] = useState(false);
   const [valueAmount, setValueAmount] = useState("");
@@ -27,7 +33,8 @@ const ModificarPps = () => {
   const [numPagosPdp, setNumPagosPdp] = useState("");
   const [estadoComercio, setEstadoComercio] = useState("");
   const [estadoComercioString, setEstadoComercioString] = useState("");
-  const { contenedorLogo, contenedorSubtitle } = classes;
+  const { contenedorLogo, contenedorSubtitle, tituloNotificacion } = classes;
+  const navigate = useNavigate();
   //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
   useEffect(() => {
     cantidadNumero(buscarCedula);
@@ -68,13 +75,21 @@ const ModificarPps = () => {
     setCantNumVal(contadorVal);
     console.log(cantNumVal);
   }
+
   const handleClose = useCallback(() => {
     setShowModal(false);
     setDatosConsulta(0);
     setBuscarCedula("");
   }, []);
+  const handleCloseUsuarioNoEncontrado = useCallback(() => {
+    setShowModalUsuarioNoEncontrado(false);
+    setDatosConsulta(0);
+    setBuscarCedula("");
+  }, []);
+
   const BuscarCedula = (e) => {
     setShowModal(true);
+    setShowModalUsuarioNoEncontrado(true);
     e.preventDefault();
     if (cantNum >= 7) {
       fetchData(
@@ -86,30 +101,34 @@ const ModificarPps = () => {
         {}
       )
         .then((respuesta) => {
-          console.log(respuesta?.obj?.results[0]);
-          setDatosConsulta(respuesta?.obj?.results);
-          setEstado(true);
-          valorAportar: setValueAmount(
-            respuesta?.obj?.results[0]?.value_amount
-          );
-          celular: setCelular(respuesta?.obj?.results[0]?.celular);
-          identificacion: setIdentificacion(
-            respuesta?.obj?.results[0]?.identificacion
-          );
-          num_pagos: setNumPagosPdp(respuesta?.obj?.results[0]?.num_pago_pdp);
-          console.log(respuesta?.obj?.results[0]?.estado);
-          if (respuesta?.obj?.results[0]?.estado === "activo") {
-            setEstadoComercio(true);
+          console.log(respuesta?.obj?.results.length);
+          if (respuesta?.obj?.results.length > 0) {
+            setDatosConsulta(respuesta?.obj?.results);
+            setEstado(true);
+            valorAportar: setValueAmount(
+              respuesta?.obj?.results[0]?.value_amount
+            );
+            celular: setCelular(respuesta?.obj?.results[0]?.celular);
+            identificacion: setIdentificacion(
+              respuesta?.obj?.results[0]?.identificacion
+            );
+            num_pagos: setNumPagosPdp(respuesta?.obj?.results[0]?.num_pago_pdp);
+            console.log(respuesta?.obj?.results[0]?.estado);
+            if (respuesta?.obj?.results[0]?.estado === "activo") {
+              setEstadoComercio(true);
+            } else {
+              setEstadoComercio(false);
+            }
           } else {
-            setEstadoComercio(false);
+            setEstadoUsuarioNoEncontrado(true);
           }
         })
         .catch((err) => {
           console.log(err);
-          notifyError("Error al Consultar Cedula");
+          notifyError("Error al consultar cédula");
         });
     } else {
-      notifyError("Ingrese un Numero Valido para la Consulta");
+      notifyError("Ingrese un número valido para la consulta");
     }
   };
   useEffect(() => {
@@ -138,38 +157,68 @@ const ModificarPps = () => {
           {}
         ).then((respuesta) => {
           console.log(respuesta);
+          if (respuesta?.msg === "El usuario ha sido modificado exitosamente") {
+            notify("El usuario ha sido modificado exitosamente");
+            navigate(`/domiciliacion`);
+          } else {
+            notifyError("El usuario no ha sido modificado exitosamente");
+            navigate(`/domiciliacion`);
+          }
         });
       } else {
         notifyError(
-          "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000."
+          "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
         );
+        navigate(`/domiciliacion`);
       }
     }
   };
   return (
     <div>
-      <Input
-        label={"Numero Cédula"}
-        placeholder={"Ingrese Numero de Cédula"}
-        value={buscarCedula}
-        onChange={(e) => setBuscarCedula(e.target.value)}
-        type={"number"}
-        required
-      ></Input>
-      <ButtonBar className={"lg:col-span-2"} type="">
-        {
-          <Button type="submit" onClick={(e) => BuscarCedula(e)}>
-            Buscar Cliente
-          </Button>
-        }
-      </ButtonBar>
-
+      <Form grid onSubmit={(e) => BuscarCedula(e)}>
+        <Input
+          label={"N° Identificación"}
+          placeholder={"Ingrese N° Identificación"}
+          value={buscarCedula}
+          minLength="5"
+          maxLength="10"
+          onInput={(e) => {
+            const num = parseInt(e.target.value) || "";
+            setBuscarCedula(num);
+          }}
+          type={"text"}
+          required
+        ></Input>
+        <ButtonBar className={"lg:col-span-2"} type="">
+          {
+            <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>
+              Buscar Cliente
+            </Button>
+          }
+        </ButtonBar>
+      </Form>
+      {estadoUsuarioNoEncontrado ? (
+        <Modal
+          show={showModalUsuarioNoEncontrado}
+          handleClose={handleCloseUsuarioNoEncontrado}
+        >
+          <div className={contenedorLogo}>
+            <LogoPDP small></LogoPDP>
+          </div>
+          <span className={tituloNotificacion}>
+            No se puede realizar la modificacíon, el número de cédula no se
+            encuentra domiciliado.
+          </span>
+        </Modal>
+      ) : (
+        ""
+      )}
       {Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
         <Modal show={showModal} handleClose={handleClose}>
           <div className={contenedorLogo}>
             <LogoPDP small></LogoPDP>
           </div>
-          <Form>
+          <Form onSubmit={(e) => ModificarGuardar(e)}>
             <PaymentSummary
               title="Editar Comercio Domiciliado"
               subtitle={`Tipo De Domiciliación: ${datosConsulta[0]?.tipo_pps}`}
@@ -195,13 +244,25 @@ const ModificarPps = () => {
                 required
               ></Input>
               <Input
-                label={"Numero Celular"}
-                /* placeholder={datosParams[0]["nombre_comercio"]} */
-                value={celular /* ?? datosParams[0]["nombre_comercio"] */}
-                onChange={(e) => setCelular(e.target.value)}
-                minLength="1"
+                label={"N° Célular"}
+                placeholder={"Ingrese su número célular"}
+                value={celular}
+                onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+
+                  if (parseInt(String(num)[0]) == 3) {
+                    const num = parseInt(e.target.value) || "";
+                    setCelular(num);
+                  } else {
+                    if (parseInt(String(num)[0]) != 3) {
+                      notifyError("El primer digito debe ser 3");
+                    }
+                  }
+                }}
+                minLength="10"
                 maxLength="10"
-                type="number"
+                type={"text"}
+                required
               ></Input>
               <div className={contenedorLogo}>
                 <Select
@@ -226,11 +287,7 @@ const ModificarPps = () => {
               </div>
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"} type="">
-              {
-                <Button type="submit" onClick={(e) => ModificarGuardar(e)}>
-                  Modificar y Guardar
-                </Button>
-              }
+              {<Button type="submit">Modificar y Guardar</Button>}
             </ButtonBar>
           </Form>
         </Modal>
