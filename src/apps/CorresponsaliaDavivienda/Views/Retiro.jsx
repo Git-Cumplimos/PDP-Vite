@@ -7,334 +7,309 @@ import Modal from "../../../components/Base/Modal";
 import useQuery from "../../../hooks/useQuery";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import { postCashOut } from "../utils/fetchCorresponsaliaDavivienda";
+import {
+  postCashOut,
+  postRealizarCashoutDavivienda,
+} from "../utils/fetchCorresponsaliaDavivienda";
 import { notify, notifyError } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import { useFetch } from "../../../hooks/useFetch";
 import { useAuth } from "../../../hooks/AuthHooks";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
+import { enumParametrosAutorizador } from "../utils/enumParametrosAutorizador";
+import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
 
 const Retiro = () => {
-  const navigate = useNavigate();
-
-  const [{ phone, userDoc, valor, otp, summary }, setQuery] = useQuery();
-
-  const { roleInfo, infoTicket } = useAuth();
-
-  const [loadingCashOut, fetchCashOut] = useFetch(postCashOut);
-  const [, fetchTypes] = useFetch();
-
+  const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState(null);
-
-  const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
+  const [limiteRecarga, setLimiteRecarga] = useState({
+    superior: 100000,
+    inferior: 100,
+  });
+  const [peticion, setPeticion] = useState(false);
+  const [botonAceptar, setBotonAceptar] = useState(false);
+  const [datosTrans, setDatosTrans] = useState({
+    otp: "",
+    numeroTelefono: "",
+    valorCashOut: "",
+  });
+  const [isUploading, setIsUploading] = useState(false);
+  useEffect(() => {
+    fetchParametrosAutorizadoresFunc();
+  }, []);
+  const fetchParametrosAutorizadoresFunc = useCallback(() => {
+    fetchParametrosAutorizadores({})
+      .then((autoArr) => {
+        setLimiteRecarga({
+          superior: parseInt(
+            autoArr?.results?.filter(
+              (i) =>
+                i.id_tabla_general_parametros_autorizadores ===
+                enumParametrosAutorizador.limite_superior_cash_out_davivienda_cb
+            )[0]?.valor_parametro
+          ),
+          inferior: parseInt(
+            autoArr?.results?.filter(
+              (i) =>
+                i.id_tabla_general_parametros_autorizadores ===
+                enumParametrosAutorizador.limite_inferior_cash_out_davivienda_cb
+            )[0]?.valor_parametro
+          ),
+        });
+      })
+      .catch((err) => console.error(err));
+  }, []);
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "Recibo de cash-out Davivienda CB",
+    timeInfo: {
+      "Fecha de venta": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      /*id transaccion recarga*/
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+      /*id_dispositivo*/
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      /*ciudad*/
+      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
+      /*direccion*/
+      [
+        "Dirección",
+        roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
+      ],
+    ],
+    commerceName: roleInfo?.["nombre comercio"]
+      ? roleInfo?.["nombre comercio"]
+      : "prod",
+    trxInfo: [],
+    disclamer:
+      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
   });
 
-  const [revalTrxParams, setRevalTrxParams] = useState({
-    idcliente: 0,
-    idpersona: 0,
-    NoidentificacionCajero: "",
-  });
+  // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
+  const onSubmit = (e) => {
+    e.preventDefault();
+    habilitarModal();
+  };
+
+  /*Funcion para habilitar el modal*/
+  const habilitarModal = () => {
+    setShowModal(!showModal);
+  };
+
+  const hideModal = () => {
+    setShowModal(false);
+    setDatosTrans({
+      otp: "",
+      numeroTelefono: "",
+      valorCashOut: "",
+    });
+    setObjTicketActual((old) => {
+      return { ...old, trxInfo: [] };
+    });
+    setPeticion(false);
+  };
 
   const printDiv = useRef();
-
-  useEffect(() => {
-    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
-      navigate("/");
-    } else {
-      let hasKeys = true;
-      const keys = [
-        "id_comercio",
-        "id_usuario",
-        "tipo_comercio",
-        "id_dispositivo",
-        "ciudad",
-        "direccion",
-      ];
-      for (const key of keys) {
-        if (!(key in roleInfo)) {
-          hasKeys = false;
-          break;
-        }
-      }
-      if (!hasKeys) {
-        notifyError(
-          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
-        );
-        navigate("/");
-      }
-    }
-  }, [roleInfo, navigate]);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
 
-  const handleClose = useCallback(() => {
-    setShowModal(false);
-  }, []);
-
-  const onSubmitDeposit = useCallback(
-    (e) => {
-      e.preventDefault();
-
-      const { min, max } = limitesMontos;
-
-      if (valor >= min && valor < max) {
-        const formData = new FormData(e.target);
-        const phone = formData.get("numCliente");
-        const valorFormat = formData.get("valor");
-        const otp = formData.get("OTP");
-        const summary = {
-          "Numero celular": phone,
-          "C.C. de quien retira": userDoc,
-          "Valor de retiro": valorFormat,
-          "Token de seguridad": otp,
-        };
-        setQuery({ phone, valor, otp, summary }, { replace: true });
-        setShowModal(true);
-      } else {
-        notifyError(
-          `El valor del deposito debe estar entre ${formatMoney.format(
-            min
-          )} y ${formatMoney.format(max)}`
-        );
-      }
-    },
-    [setQuery, valor, userDoc, limitesMontos]
-  );
-
-  const onChange = useCallback(
-    (ev) => {
-      if (ev.target.name !== "valor") {
-        const formData = new FormData(ev.target.form);
-        const phone = (
-          (formData.get("numCliente") ?? "").match(/\d/g) ?? []
-        ).join("");
-        const otp = ((formData.get("OTP") ?? "").match(/\d/g) ?? []).join("");
-        const userDoc = (
-          (formData.get("docCliente") ?? "").match(/\d/g) ?? []
-        ).join("");
-        setQuery(
-          { phone, userDoc, valor: valor ?? "", otp },
-          { replace: true }
-        );
-      }
-    },
-    [setQuery, valor]
-  );
-
-  const onMoneyChange = useCallback(
-    (e, valor) => {
-      setQuery(
-        { phone: phone ?? "", userDoc: userDoc ?? "", otp: otp ?? "", valor },
-        { replace: true }
-      );
-    },
-    [setQuery, phone, otp, userDoc]
-  );
-
-  const goToRecaudo = useCallback(() => {
-    navigate(-1);
-  }, [navigate]);
-
-  const onMakePayment = useCallback(() => {
-    const body = {
-      id_comercio: roleInfo?.id_comercio,
-      id_usuario: roleInfo?.id_usuario,
-      id_terminal: roleInfo?.id_dispositivo,
-      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
-      // idcliente: 5,
-      // idpersona: 240,
-      // NoidentificacionCajero: "52389030",
-      ...revalTrxParams,
-      NoIdentificacionUsuario: userDoc,
-      NumCelular: phone,
-      Valor: valor,
-      OTP: otp,
-    };
-
-    fetchCashOut(body)
+  const peticionCashOut = () => {
+    const hoy = new Date();
+    const fecha =
+      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+    /*hora actual */
+    const hora =
+      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+    const objTicket = { ...objTicketActual };
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"].push([
+      "Numero de telefono",
+      datosTrans.numeroTelefono,
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push(["Numero OTP", datosTrans.otp]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Valor transacción",
+      formatMoney.format(datosTrans.valorCashOut),
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    setIsUploading(true);
+    postRealizarCashoutDavivienda({
+      idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
+      idUsuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 1,
+      idTerminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 801,
+      valor: datosTrans?.valorCashOut,
+      issuerIdDane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 1121,
+      nombreComercio: roleInfo?.["nombre comercio"]
+        ? roleInfo?.["nombre comercio"]
+        : "prod",
+      ticket: objTicket,
+      numCelular: datosTrans.numeroTelefono,
+      municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "Bogota",
+      otp: datosTrans.otp,
+      oficinaPropia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+    })
       .then((res) => {
-        if (!res?.status) {
+        if (res?.status) {
+          setIsUploading(false);
+          console.log(roleInfo);
+          notify(res?.msg);
+          // hideModal();
+          objTicket["trxInfo"].push([
+            "Número autorización",
+            res?.obj?.respuesta_davivienda?.numeroAutorizacion,
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+
+          setObjTicketActual(objTicket);
+          setPeticion(true);
+        } else {
+          setIsUploading(false);
           notifyError(res?.msg);
-          return;
+          hideModal();
         }
-        notify("Transaccion satisfactoria");
-        const trx_id = res?.obj?.trxId ?? 0;
-        const tempTicket = {
-          title: "Recibo de retiro",
-          timeInfo: {
-            "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-            }).format(new Date()),
-            Hora: Intl.DateTimeFormat("es-CO", {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            }).format(new Date()),
-          },
-          commerceInfo: [
-            ["Id Comercio", roleInfo?.id_comercio],
-            ["No. terminal", roleInfo?.id_dispositivo],
-            ["Municipio", roleInfo?.ciudad],
-            ["Dirección", roleInfo?.direccion],
-            ["Id Trx", trx_id],
-            ["Id Transacción", res?.obj?.IdTransaccion],
-          ],
-          commerceName: "Daviplata",
-          trxInfo: [
-            ["Celular", phone],
-            ["C.C.", userDoc],
-            ["Valor retiro", formatMoney.format(valor)],
-          ],
-          disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
-        };
-        setPaymentStatus(tempTicket);
-        infoTicket(trx_id, 21, tempTicket)
-          .then((resTicket) => {
-            console.log(resTicket);
-          })
-          .catch((err) => {
-            console.error(err);
-            notifyError("Error guardando el ticket");
-          });
       })
       .catch((err) => {
+        setIsUploading(false);
+        notifyError("No se ha podido conectar al servidor");
         console.error(err);
-        notifyError("Error en la transaccion");
       });
-  }, [
-    userDoc,
-    otp,
-    phone,
-    valor,
-    fetchCashOut,
-    roleInfo,
-    infoTicket,
-    revalTrxParams,
-  ]);
-
-  useEffect(() => {
-    fetchTypes(
-      `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`,
-      "GET",
-      { tipo_op: 21 }
-    )
-      .then((res) => {
-        if (!res?.status) {
-          notifyError(res?.msg);
-          return;
-        }
-        const _parametros = res?.obj?.[0]?.Parametros;
-        setLimitesMontos({
-          max: parseFloat(_parametros?.monto_maximo),
-          min: parseFloat(_parametros?.monto_minimo),
-        });
-
-        setRevalTrxParams({
-          idcliente: parseFloat(_parametros?.idcliente) ?? 0,
-          idpersona: parseFloat(_parametros?.idpersona) ?? 0,
-          NoidentificacionCajero: _parametros?.NoidentificacionCajero ?? "",
-        });
-      })
-      .catch((err) => {
-        console.error(err);
-        notifyError("Error consultando parametros de la transaccion");
-      });
-  }, [fetchTypes]);
-
+  };
   return (
-    <Fragment>
-      <h1 className="text-3xl mt-6">Retiros Daviplata</h1>
-      <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
+    <>
+      <SimpleLoading show={isUploading} />
+      <h1 className='text-3xl'>Cash Out Davivienda CB</h1>
+      <Form grid onSubmit={onSubmit}>
         <Input
-          id="numCliente"
-          name="numCliente"
-          label="Número telefónico de cliente"
-          type="text"
-          autoComplete="off"
-          minLength={"10"}
-          maxLength={"10"}
-          value={phone ?? ""}
-          onChange={() => {}}
+          id='numeroTelefono'
+          label='Número de telefono'
+          type='text'
+          name='numeroTelefono'
+          minLength='10'
+          maxLength='10'
           required
-        />
+          value={datosTrans.numeroTelefono}
+          onInput={(e) => {
+            if (!isNaN(e.target.value)) {
+              const num = e.target.value;
+              setDatosTrans((old) => {
+                return { ...old, numeroTelefono: num };
+              });
+            }
+          }}></Input>
         <Input
-          id="docCliente"
-          name="docCliente"
-          label="CC de quien retira"
-          type="text"
-          autoComplete="off"
-          minLength={"7"}
-          maxLength={"13"}
-          value={userDoc ?? ""}
-          onInput={() => {}}
+          id='otp'
+          label='Número OTP'
+          type='text'
+          name='otp'
+          minLength='2'
+          maxLength='6'
           required
-        />
-        <Input
-          id="OTP"
-          name="OTP"
-          label="Token de retiro"
-          type="text"
-          minLength="6"
-          maxLength="6"
-          autoComplete="off"
-          value={otp ?? ""}
-          onChange={() => {}}
-          required
-        />
+          value={datosTrans.otp}
+          onInput={(e) => {
+            if (!isNaN(e.target.value)) {
+              const num = e.target.value;
+              setDatosTrans((old) => {
+                return { ...old, otp: num };
+              });
+            }
+          }}></Input>
         <MoneyInput
-          id="valor"
-          name="valor"
-          label="Valor a retirar"
-          autoComplete="off"
-          min={limitesMontos?.min}
-          max={limitesMontos?.max}
-          onInput={onMoneyChange}
-          required
-        />
-        <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar retiro</Button>
+          id='valCashOut'
+          name='valCashOut'
+          label='Valor'
+          type='text'
+          autoComplete='off'
+          maxLength={"15"}
+          value={datosTrans.valorCashOut ?? ""}
+          onInput={(e, valor) => {
+            if (!isNaN(valor)) {
+              const num = valor;
+              setDatosTrans((old) => {
+                return { ...old, valorCashOut: num };
+              });
+            }
+          }}
+          required></MoneyInput>
+        <ButtonBar className='lg:col-span-2'>
+          <Button type='submit'>Aceptar</Button>
         </ButtonBar>
       </Form>
-      <Modal
-        show={showModal}
-        handleClose={
-          paymentStatus ? () => {} : loadingCashOut ? () => {} : handleClose
-        }
-      >
-        {paymentStatus ? (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={paymentStatus} />
-            <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={goToRecaudo}>Cerrar</Button>
-            </ButtonBar>
-          </div>
-        ) : (
-          <PaymentSummary summaryTrx={summary}>
-            <ButtonBar>
-              <Button
-                type="submit"
-                onClick={onMakePayment}
-                disabled={loadingCashOut}
-              >
-                Aceptar
-              </Button>
-              <Button onClick={handleClose} disabled={loadingCashOut}>
-                Cancelar
-              </Button>
-            </ButtonBar>
-          </PaymentSummary>
-        )}
+      <Modal show={showModal} handleClose={hideModal}>
+        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+          {!peticion ? (
+            datosTrans.valorCashOut < limiteRecarga.superior &&
+            datosTrans.valorCashOut > limiteRecarga.inferior ? (
+              <>
+                <h1 className='text-2xl font-semibold'>
+                  ¿Esta seguro de realizar el cash out?
+                </h1>
+                <h2 className='text-base'>
+                  {`Valor de transacción: ${formatMoney.format(
+                    datosTrans.valorCashOut
+                  )} COP`}
+                </h2>
+                <h2>{`Número de telefono: ${datosTrans.numeroTelefono}`}</h2>
+                <h2>{`Número de otp: ${datosTrans.otp}`}</h2>
+                <ButtonBar>
+                  <Button
+                    disabled={botonAceptar}
+                    type='submit'
+                    onClick={peticionCashOut}>
+                    Aceptar
+                  </Button>
+                  <Button onClick={hideModal}>Cancelar</Button>
+                </ButtonBar>
+              </>
+            ) : (
+              <>
+                <h2 className='text-2xl font-semibold'>
+                  {datosTrans.valorCashOut <= limiteRecarga.inferior
+                    ? `ERROR el valor de cash out debe ser mayor a ${formatMoney.format(
+                        limiteRecarga.inferior
+                      )}`
+                    : "ERROR El valor de cash out debe ser menor a " +
+                      formatMoney.format(limiteRecarga.superior) +
+                      " COP"}
+                </h2>
+
+                <ButtonBar>
+                  <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+                </ButtonBar>
+              </>
+            )
+          ) : (
+            ""
+          )}
+          {peticion && (
+            <>
+              <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
+              <h2>
+                <ButtonBar>
+                  <Button
+                    type='submit'
+                    onClick={() => {
+                      hideModal();
+                    }}>
+                    Aceptar
+                  </Button>
+                  <Button onClick={handlePrint}>Imprimir</Button>
+                </ButtonBar>
+              </h2>
+            </>
+          )}
+        </div>
       </Modal>
-    </Fragment>
+    </>
   );
 };
 
