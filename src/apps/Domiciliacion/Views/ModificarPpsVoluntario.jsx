@@ -169,7 +169,6 @@ const ModificarPps = () => {
         notifyError(
           "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
         );
-        navigate(`/domiciliacion`);
       }
     }
   };

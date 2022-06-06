@@ -16,7 +16,7 @@ const BuscarCedulaPpsADemanda = () => {
   const [cantNum, setCantNum] = useState(0);
   const [showModal, setShowModal] = useState(true);
   const [estado, setEstado] = useState(false);
-  const url = `${process.env.REACT_APP_URL_TRXS_TRX}`;
+  const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
 
   //------------------Constantes para Dar Estilos---------------------//
   const {

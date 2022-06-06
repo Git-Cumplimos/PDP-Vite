@@ -17,7 +17,7 @@ const BuscarComercioEmail = () => {
   const [showModal, setShowModal] = useState(true);
   const [continuarDomiciliacion, setContinuarDomiciliacion] = useState(false);
   const [emailVerificado, setEmailVerificado] = useState(true);
-  const url = `${process.env.REACT_APP_URL_TRXS_TRX}`;
+  const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
 
   //------------------Constantes para Dar Estilos---------------------//
   const {
@@ -31,6 +31,7 @@ const BuscarComercioEmail = () => {
 
   const BuscarComercio = (e) => {
     e.preventDefault();
+    setShowModal(true);
     if (emailComercio != "") {
       fetchData(
         `${url}/consultaemail`,
@@ -51,6 +52,7 @@ const BuscarComercioEmail = () => {
             notifyError(
               "El usuario no existe o se encuentra en estado INACTIVO"
             );
+            setEstadoConsulta(false);
           } else {
             if (
               respuesta?.msg == "La consulta a Suser del email a sido exitosa"
