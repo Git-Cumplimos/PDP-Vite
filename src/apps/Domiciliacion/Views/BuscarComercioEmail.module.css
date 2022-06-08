@@ -47,7 +47,7 @@
   margin-left: 2vw;
 }
 .tituloDatos {
-  font-size: 22px;
+  font-size: 15px;
   display: flex;
   justify-content: center;
   margin-bottom: 0.4vw;
@@ -59,4 +59,8 @@
   height: 3vw;
   color: aliceblue;
   font-size: small;
+}
+.contenedorImagen {
+  display: flex;
+  justify-content: center;
 }

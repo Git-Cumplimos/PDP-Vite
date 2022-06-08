@@ -121,7 +121,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   ]);
 
   useEffect(() => {
-    infoTicket(datosRespuesta?.[0]?.["inserted_id"], 41, tickets)
+    infoTicket(datosRespuesta?.[0]?.["inserted_id"], 57, tickets)
       .then((resTicket) => {
         console.log(resTicket);
       })

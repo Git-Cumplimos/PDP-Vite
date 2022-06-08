@@ -27,6 +27,7 @@ const BuscarComercioEmail = () => {
     tituloDatos,
     contenedorValoresTitulos,
     contendorBoton,
+    contenedorImagen,
   } = classes;
 
   const BuscarComercio = (e) => {
@@ -86,7 +87,9 @@ const BuscarComercioEmail = () => {
       {estadoConsulta && showModal && datosConsulta ? (
         <Fragment>
           <Modal show={showModal} handleClose={handleClose}>
-            <LogoPDP small></LogoPDP>
+            <div className={contenedorImagen}>
+              <LogoPDP small></LogoPDP>
+            </div>
             <div class={contenedorForm}>
               <div class={contenedorDatos}>
                 <div class={contenedorTitulos}>
