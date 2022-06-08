@@ -67,3 +67,70 @@ export const postCashOut = async (bodyObj) => {
     throw err;
   }
 }
+
+
+export const consultaCostoCB = async (bodyObj) => {
+  if (!bodyObj) {
+    return new Promise((resolve, reject) => {
+      resolve("Sin datos body");
+    });
+  }
+  try {
+    const res = await fetchData(
+      `${urlDaviplata}/davivienda_cb_deposito_retiro/consultaCostoCB`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export const depositoCorresponsal = async (bodyObj) => {
+  if (!bodyObj) {
+    return new Promise((resolve, reject) => {
+      resolve("Sin datos body");
+    });
+  }
+  try {
+    const res = await fetchData(
+      `${urlDaviplata}/davivienda_cb_deposito_retiro/depositoCorresponsal`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export const retiroCorresponsal = async (bodyObj) => {
+  if (!bodyObj) {
+    return new Promise((resolve, reject) => {
+      resolve("Sin datos body");
+    });
+  }
+  try {
+    const res = await fetchData(
+      `${urlDaviplata}/davivienda_cb_deposito_retiro/retiroCorresponsal`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+}

@@ -265,7 +265,7 @@ const Loteria = ({ route }) => {
                       setMaxPages(Math.ceil(max / 10));
                     }
                   })
-                : searchLoteria(sorteo, num, serie, 1).then((max) => {
+                : searchLoteria(sorteo, numero, num, 1).then((max) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
