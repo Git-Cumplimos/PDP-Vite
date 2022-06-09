@@ -12,7 +12,6 @@ import {
   postRealizarCashoutDavivienda,
 } from "../utils/fetchCorresponsaliaDavivienda";
 import { notify, notifyError } from "../../../utils/notify";
-import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import { useFetch } from "../../../hooks/useFetch";
@@ -20,6 +19,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { enumParametrosAutorizador } from "../utils/enumParametrosAutorizador";
 import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
+import TicketsDavivienda from "../components/TicketsDavivienda";
 
 const Retiro = () => {
   const { roleInfo } = useAuth();
@@ -92,6 +92,8 @@ const Retiro = () => {
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
   const onSubmit = (e) => {
     e.preventDefault();
+    if (datosTrans?.valorCashOut % 1000 !== 0)
+      return notifyError("El valor debe ser multiplos de 1000");
     habilitarModal();
   };
 
@@ -129,18 +131,14 @@ const Retiro = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push([
-      "Numero de telefono",
-      datosTrans.numeroTelefono,
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Numero OTP", datosTrans.otp]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor transacción",
-      formatMoney.format(datosTrans.valorCashOut),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
+    // objTicket["trxInfo"].push([
+    //   "Numero de telefono",
+    //   datosTrans.numeroTelefono,
+    // ]);
+    // objTicket["trxInfo"].push(["", ""]);
+    // objTicket["trxInfo"].push(["Numero OTP", datosTrans.otp]);
+    // objTicket["trxInfo"].push(["", ""]);
+
     setIsUploading(true);
     postRealizarCashoutDavivienda({
       idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
@@ -161,15 +159,21 @@ const Retiro = () => {
       .then((res) => {
         if (res?.status) {
           setIsUploading(false);
-          console.log(roleInfo);
           notify(res?.msg);
           // hideModal();
+
           objTicket["trxInfo"].push([
             "Número autorización",
             res?.obj?.respuesta_davivienda?.numeroAutorizacion,
           ]);
           objTicket["trxInfo"].push(["", ""]);
-
+          objTicket["trxInfo"].push(["Número de telefono", res?.obj?.numero]);
+          objTicket["trxInfo"].push(["", ""]);
+          objTicket["trxInfo"].push([
+            "Valor transacción",
+            formatMoney.format(datosTrans.valorCashOut),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
           setObjTicketActual(objTicket);
           setPeticion(true);
         } else {
@@ -211,7 +215,7 @@ const Retiro = () => {
           label='Número OTP'
           type='text'
           name='otp'
-          minLength='2'
+          minLength='6'
           maxLength='6'
           required
           value={datosTrans.otp}
@@ -247,8 +251,8 @@ const Retiro = () => {
       <Modal show={showModal} handleClose={hideModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
           {!peticion ? (
-            datosTrans.valorCashOut < limiteRecarga.superior &&
-            datosTrans.valorCashOut > limiteRecarga.inferior ? (
+            datosTrans.valorCashOut <= limiteRecarga.superior &&
+            datosTrans.valorCashOut >= limiteRecarga.inferior ? (
               <>
                 <h1 className='text-2xl font-semibold'>
                   ¿Esta seguro de realizar el cash out?
@@ -292,7 +296,9 @@ const Retiro = () => {
           )}
           {peticion && (
             <>
-              <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
+              <TicketsDavivienda
+                ticket={objTicketActual}
+                refPrint={printDiv}></TicketsDavivienda>
               <h2>
                 <ButtonBar>
                   <Button
