@@ -18,7 +18,7 @@ import Select from "../../../../components/Base/Select";
 
 const Retiro = () => {
   const navigate = useNavigate();
-  const [{ userDoc, valor, summary }, setQuery] = useQuery();
+  const [{ userDoc, valor, otp,summary }, setQuery] = useQuery();
 
   const { roleInfo, infoTicket } = useAuth();
 
@@ -84,6 +84,7 @@ const Retiro = () => {
         const formData = new FormData(e.target);
         const userDoc = formData.get("docCliente");
         const valorFormat = formData.get("valor");
+        const otp = formData.get("OTP");
         
         const body = {
           idComercio: roleInfo?.id_comercio,
@@ -111,6 +112,7 @@ const Retiro = () => {
               // "Numero celular": numCuenta,
               "C.C. del depositante": userDoc,
               "Valor de retiro": valorFormat,
+              "Codigo OTP": otp,
             };
             setQuery({ valor, summary }, { replace: true });
             setShowModal(true);
@@ -138,14 +140,14 @@ const Retiro = () => {
     (ev) => {
       if (ev.target.name !== "valor") {
         const formData = new FormData(ev.target.form);
-        const numCuenta = (
-          (formData.get("numCuenta") ?? "").match(/\d/g) ?? []
+        const otp = (
+          (formData.get("OTP") ?? "").match(/\d/g) ?? []
         ).join("");
         const userDoc = (
           (formData.get("docCliente") ?? "").match(/\d/g) ?? []
         ).join("");
         const nomDepositante = (formData.get("nomDepositante") ?? "")
-        setQuery({ numCuenta, userDoc, valor: valor ?? "" , nomDepositante}, { replace: true });
+        setQuery({ otp, userDoc, valor: valor ?? "" , nomDepositante}, { replace: true });
       }
     },
     [setQuery, valor]
@@ -174,8 +176,7 @@ const Retiro = () => {
       numTipoDocumento: '01',
       numNumeroDocumento: userDoc,
       numValorRetiro: valor,
-      numOtp: 1234,
-      //numIdDepositante: IdDepositante,
+      numOtp: otp,
       valToken: "valToken",
       numTalonRetiro: 1111,    
     };
@@ -220,7 +221,7 @@ const Retiro = () => {
             ["",""],
             ["Cobro transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
             ["",""],
-            ["Código de autorización", "????"],
+            ["Código de autorización", trx_id],
             ["",""],
             ["Usuario de venta", "Nombre propietario del punto"],
             ["",""],
@@ -267,10 +268,22 @@ const Retiro = () => {
           onInput={() => {}}
           required
         />
+        <Input
+          id="OTP"
+          name="OTP"
+          label="Codigo OTP"
+          type="text"
+          autoComplete="off"
+          minLength={"6"}
+          maxLength={"6"}
+          value={otp ?? ""}
+          onInput={() => {}}
+          required
+        />
         <MoneyInput
           id="valor"
           name="valor"
-          label="Valor a retirarr"
+          label="Valor a retirar"
           autoComplete="off"
           min={limitesMontos?.min}
           max={limitesMontos?.max}

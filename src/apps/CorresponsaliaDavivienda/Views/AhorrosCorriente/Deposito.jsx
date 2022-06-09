@@ -119,7 +119,7 @@ const Deposito = () => {
               "Apellito titular": res?.obj?.Data?.apellidoTitular,
               "Numero cuenta": numCuenta,
               "Valor de deposito": valorFormat,
-              "Valor cobro": res?.obj?.Data?.valCobro,
+              "Valor cobro": formatMoney.format(res?.obj?.Data?.valCobro),
             };
             setQuery({ numCuenta, valor, summary }, { replace: true });
             setShowModal(true);
@@ -227,6 +227,8 @@ const Deposito = () => {
             ["Valor consignado", formatMoney.format(valor)],
             ["",""],
             ["Cobro transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
+            ["",""],
+            ["Código de autorización", trx_id],
             ["",""],
             ["Identificación depositante", userDoc],
             ["",""],
