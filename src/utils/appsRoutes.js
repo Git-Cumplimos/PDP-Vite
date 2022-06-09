@@ -218,6 +218,12 @@ const Deposito = lazy(() => import("../apps/Daviplata/Views/Deposito"));
  const CashIn = lazy(() => import("../apps/CorresponsaliaDavivienda/Views/Deposito"));
  const CashOut = lazy(() => import("../apps/CorresponsaliaDavivienda/Views/Retiro"));
 
+ const AhorrosCorrienteCB = lazy(() => import("../apps/CorresponsaliaDavivienda/Views/AhorrosCorriente"));
+ const DepositoCB = lazy(() => import("../apps/CorresponsaliaDavivienda/Views/AhorrosCorriente/Deposito"));
+ const RetiroCB = lazy(() => import("../apps/CorresponsaliaDavivienda/Views/AhorrosCorriente/Retiro"));
+
+
+
 
 /**
  * API-SMS
@@ -536,6 +542,26 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"MARKETPLACE"} name="Retiros Daviplata" />,
         component: CashOut,
         permission: [30],
+      },
+      {
+        link: "/ahorrosCorriente",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Deposito y Retiro" />,
+        component: AhorrosCorrienteCB,
+        permission: [29, 30],
+        subRoutes: [
+          {
+            link: "/ahorrosCorriente/deposito",
+            label: <AppIcons Logo={"MARKETPLACE"} name="Depositos" />,
+            component: DepositoCB,
+            permission: [29],
+          },
+          {
+            link: "/ahorrosCorriente/retiro",
+            label: <AppIcons Logo={"MARKETPLACE"} name="Retiros" />,
+            component: RetiroCB,
+            permission: [30],
+          },
+        ],
       },
     ],
   },

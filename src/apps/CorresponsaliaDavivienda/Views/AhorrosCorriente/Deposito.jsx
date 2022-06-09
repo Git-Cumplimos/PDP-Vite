@@ -1,34 +1,41 @@
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Button from "../../../components/Base/Button";
-import Modal from "../../../components/Base/Modal";
-import useQuery from "../../../hooks/useQuery";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import Modal from "../../../../components/Base/Modal";
+import useQuery from "../../../../hooks/useQuery";
 import { Fragment, useState, useCallback, useRef, useEffect } from "react";
-import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import Tickets from "../../../components/Base/Tickets";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import Tickets from "../../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
-import { pagoGiroDaviplata, consultaGiroDaviplata } from "../utils/fetchCorresponsaliaDavivienda";
-import { notify, notifyError } from "../../../utils/notify";
-import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
-import { useFetch } from "../../../hooks/useFetch";
-import { useAuth } from "../../../hooks/AuthHooks";
+import { depositoCorresponsal, consultaCostoCB } from "../../utils/fetchCorresponsaliaDavivienda";
+import { notify, notifyError } from "../../../../utils/notify";
+import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput";
+import { useFetch } from "../../../../hooks/useFetch";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import Select from "../../../../components/Base/Select";
 
 const Deposito = () => {
   const navigate = useNavigate();
-  const [{ phone, userDoc, valor, summary }, setQuery] = useQuery();
-  const [verificacionTel, setVerificacionTel] = useState("")
+  const [{ numCuenta, userDoc, valor, nomDepositante, summary }, setQuery] = useQuery();
 
   const { roleInfo, infoTicket } = useAuth();
 
-  const [loadingCashIn, fetchCashIn] = useFetch(pagoGiroDaviplata);
-  const [loadingConsultaCashIn, fetchConsultaCashIn] = useFetch(consultaGiroDaviplata);
+  const [loadingDepositoCorresponsal, fetchDepositoCorresponsal] = useFetch(depositoCorresponsal);
+  const [loadingConsultaCostoCB, fetchConsultaCostoCB] = useFetch(consultaCostoCB);
   const [, fetchTypes] = useFetch();
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
-  const [datosConsulta, setDatosConsulta] = useState("")
+  const [datosConsulta, setDatosConsulta] = useState("");
+  const [tipoCuenta, setTipoCuenta] = useState("");
+
+  const options = [
+    { value: "", label: "" },
+    { value: "02", label: "Corriente" },
+    { value: "01", label: "Ahorros" },
+  ];
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
@@ -81,40 +88,40 @@ const Deposito = () => {
 
       if (valor >= min && valor < max) {
         const formData = new FormData(e.target);
-        const phone = formData.get("numCliente");
+        const numCuenta = formData.get("numCuenta");
         const userDoc = formData.get("docCliente");
         const valorFormat = formData.get("valor");
-
-        if ((verificacionTel) === (phone)){
+        const nomDepositante = formData.get("nomDepositante");
         
         const body = {
           idComercio: roleInfo?.id_comercio,
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
           Tipo: roleInfo?.tipo_comercio,
-          numIdentificacionDepositante: userDoc,
-          numDaviplata: phone,
-          valGiro: valor,
-          valTipoIdentificacionDepositante: 1, /// Tipo de documento
-    
+          tipoTransaccion: 5706, /// Deposito
+          tipoDocumento: "01", /// Cedula
+          numDocumento: userDoc,
+          valTransaccion: valor,
+          tipoCuenta: tipoCuenta,
+          //nomDepositante: nomDepositante,
+          valToken: "valToken", /// De donde viene
+          numCuenta: numCuenta,       
         };
-        fetchConsultaCashIn(body)
+        fetchConsultaCostoCB(body)
         .then((res) => {
           if (!res?.status) {
             notifyError(res?.msg);
             return;
           }else{
-            setDatosConsulta(res?.obj)
-            const total = parseInt(res?.obj?.Data?.valComisionGiroDaviplata) + valor;
+            setDatosConsulta(res?.obj?.Data)
             const summary = {
-              "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
-              "Numero celular": phone,
-              "C.C. del depositante": userDoc,
+              "Nombre titular": res?.obj?.Data?.nombreTitular,
+              "Apellito titular": res?.obj?.Data?.apellidoTitular,
+              "Numero cuenta": numCuenta,
               "Valor de deposito": valorFormat,
-              "Valor de comisión": formatMoney.format(res?.obj?.Data?.valComisionGiroDaviplata),
-              "Valor total": formatMoney.format(total), 
+              "Valor cobro": res?.obj?.Data?.valCobro,
             };
-            setQuery({ phone, valor, summary }, { replace: true });
+            setQuery({ numCuenta, valor, summary }, { replace: true });
             setShowModal(true);
           }          
           
@@ -124,10 +131,7 @@ const Deposito = () => {
           console.error(err);
           notifyError("Error interno en la transaccion");
         });
-      }
-      else{
-        notifyError("Verifique que el celular del cliente es correcto")
-      }
+        
       } else {
         notifyError(
           `El valor del deposito debe estar entre ${formatMoney.format(
@@ -136,20 +140,21 @@ const Deposito = () => {
         );
       }
     },
-    [setQuery, valor, limitesMontos, verificacionTel]
+    [setQuery, valor, limitesMontos, tipoCuenta]
   );
 
   const onChange = useCallback(
     (ev) => {
       if (ev.target.name !== "valor") {
         const formData = new FormData(ev.target.form);
-        const phone = (
-          (formData.get("numCliente") ?? "").match(/\d/g) ?? []
+        const numCuenta = (
+          (formData.get("numCuenta") ?? "").match(/\d/g) ?? []
         ).join("");
         const userDoc = (
           (formData.get("docCliente") ?? "").match(/\d/g) ?? []
         ).join("");
-        setQuery({ phone, userDoc, valor: valor ?? "" }, { replace: true });
+        const nomDepositante = (formData.get("nomDepositante") ?? "")
+        setQuery({ numCuenta, userDoc, valor: valor ?? "" , nomDepositante}, { replace: true });
       }
     },
     [setQuery, valor]
@@ -158,11 +163,11 @@ const Deposito = () => {
   const onMoneyChange = useCallback(
     (e, valor) => {
       setQuery(
-        { phone: phone ?? "", userDoc: userDoc ?? "", valor },
+        { numCuenta: numCuenta ?? "", userDoc: userDoc ?? "", nomDepositante: nomDepositante ?? "", valor},
         { replace: true }
       );
     },
-    [setQuery, phone, userDoc]
+    [setQuery, numCuenta, userDoc, nomDepositante]
   );
 
   const goToRecaudo = useCallback(() => {
@@ -175,25 +180,21 @@ const Deposito = () => {
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       Tipo: roleInfo?.tipo_comercio,
-      numIdentificacionDepositante: userDoc,
-      numDaviplata: phone,
-      valGiro: valor,
-      valCodigoConvenioDaviplata: datosConsulta?.Data?.valCodigoConvenioDaviplata,
-      valTipoIdentificacionDepositante: 1, /// Tipo de documento
-      valComisionGiroDaviplata: datosConsulta?.Data?.valComisionGiroDaviplata,
-      id_transaccion: datosConsulta?.DataHeader?.idTransaccion
+      numTipoCuenta: tipoCuenta,
+      numNumeroCuenta: numCuenta,
+      numIdDepositante: 123,
+      valToken: "valToken",
+      numValorConsignacion: valor,    
     };
 
-    fetchCashIn(body)
+    fetchDepositoCorresponsal(body)
       .then((res) => {
         if (!res?.status) {
           notifyError(res?.msg);
           return;
         }
         notify("Transaccion satisfactoria");
-        const trx_id = res?.obj?.Data?.valTalon ?? 0;
-        const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
-        const total = parseInt(comision) + valor;
+        const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
 
         const tempTicket = {
           title: "Recibo de deposito",
@@ -217,19 +218,21 @@ const Deposito = () => {
             ["Id Trx", trx_id],
             //["Id Transacción", res?.obj?.IdTransaccion],
           ],
-          commerceName: "Daviplata",
+          commerceName: "Consignación en Corresponsal Davivienda",
           trxInfo: [
-            ["Celular", phone],
-            [],
-            ["C.C.", userDoc],
-            [],
-            ["Valor de deposito", formatMoney.format(valor)],
-            [],
-            ["Valor comisón", formatMoney.format(comision)],
-            [],
-            ["Total", formatMoney.format(total)],
-            []
-
+            ["Tipo de cuenta", res?.obj?.Data?.numTipoCuenta==="01" ? "Ahorros" : "Corriente"],
+            ["",""],
+            ["Numero de cuenta", '*****'+res?.obj?.Data?.numNumeroCuenta?.slice(-4)],
+            ["",""],
+            ["Valor consignado", formatMoney.format(valor)],
+            ["",""],
+            ["Cobro transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
+            ["",""],
+            ["Identificación depositante", userDoc],
+            ["",""],
+            ["Nombre depositante", nomDepositante],
+            ["",""],
+            
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
@@ -248,48 +251,42 @@ const Deposito = () => {
         notifyError("Error interno en la transaccion");
       });
   }, [
-    phone,
+    numCuenta,
     valor,
+    tipoCuenta,
     userDoc,
-    fetchCashIn,
+    fetchDepositoCorresponsal,
     roleInfo,
     infoTicket,
     ,
     datosConsulta
   ]);
+  console.log(tipoCuenta)
 
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Depositos Daviplata</h1>
       <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
         <Input
-          id="numCliente"
-          name="numCliente"
-          label="Celular"
+          id="numCuenta"
+          name="numCuenta"
+          label="Número de cuenta"
           type="text"
           autoComplete="off"
           minLength={"10"}
           maxLength={"10"}
-          value={phone ?? ""}
+          value={numCuenta ?? ""}
           onInput={() => {}}
           required
         />
-        <Input
-          id="numCliente"
-          name="numCliente"
-          label="Verificación Celular"
-          type="text"
-          autoComplete="off"
-          minLength={"10"}
-          maxLength={"10"}
-          value={verificacionTel}
-          onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
-              setVerificacionTel(num);
-            }
+        <Select
+          id="tipoCuenta"
+          label="Tipo Cuenta"
+          options={options}
+          value={tipoCuenta}
+          onChange={(e) => {
+            setTipoCuenta(e.target.value);
           }}
-          required
         />
         <Input
           id="docCliente"
@@ -300,6 +297,16 @@ const Deposito = () => {
           minLength={"7"}
           maxLength={"13"}
           value={userDoc ?? ""}
+          onInput={() => {}}
+          required
+        />
+        <Input
+          id="nomDepositante"
+          name="nomDepositante"
+          label="Nombre Depositante"
+          type="text"
+          autoComplete="off"
+          value={nomDepositante ?? ""}
           onInput={() => {}}
           required
         />
@@ -314,13 +321,13 @@ const Deposito = () => {
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"} disabled={loadingConsultaCashIn}>Realizar deposito</Button>
+          <Button type={"submit"} disabled={loadingConsultaCostoCB}>Realizar deposito</Button>
         </ButtonBar>
       </Form>
       <Modal
         show={showModal}
         handleClose={
-          paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
+          paymentStatus ? () => {} : loadingDepositoCorresponsal ? () => {} : handleClose
         }
       >
         {paymentStatus ? (
@@ -337,11 +344,11 @@ const Deposito = () => {
               <Button
                 type="submit"
                 onClick={onMakePayment}
-                disabled={loadingCashIn}
+                disabled={loadingDepositoCorresponsal}
               >
                 Aceptar
               </Button>
-              <Button onClick={handleClose} disabled={loadingCashIn}>
+              <Button onClick={handleClose} disabled={loadingDepositoCorresponsal}>
                 Cancelar
               </Button>
             </ButtonBar>
