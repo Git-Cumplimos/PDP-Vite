@@ -34,7 +34,7 @@ const UsarPinForm = ({
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
       .then((res) => {
-        if (res?.status === false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setOptionsTipoPines(res?.obj?.results);

@@ -72,7 +72,7 @@ const Desembolsos = () => {
     consultarPines(documento, pin, user)
       .then((res) => {
         setDisabledBtns(false);
-        if (res?.status === false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           if (res?.obj?.CodRespuesta !== 0) {
@@ -100,7 +100,7 @@ const Desembolsos = () => {
       cancelarDesembolso(respuestamujer?.obj, user)
         .then((res) => {
           setDisabledBtns(false);
-          if (res?.status === false) {
+          if (!res?.status) {
             notifyError(res?.msg);
           } else {
             if (res?.obj?.CodRespuesta !== 0) {
@@ -186,7 +186,7 @@ const Desembolsos = () => {
               desembolsospin(respuestamujer?.obj, user)
                 .then((res) => {
                   setDisabledBtns(false);
-                  if (res?.status === false) {
+                  if (!res?.status) {
                     notifyError(res?.msg);
                   } else {
                     if (res?.obj?.CodRespuesta !== 0) {

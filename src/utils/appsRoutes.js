@@ -545,7 +545,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/ahorrosCorriente",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Deposito y Retiro" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones cuentas Davivienda" />,
         component: AhorrosCorrienteCB,
         permission: [29, 30],
         subRoutes: [

@@ -184,7 +184,7 @@ const ArqueoBilletes = ({ route }) => {
     e.preventDefault();
     crearArqueoBilletes(fecha_ini, fracDisp, total, id_arqueo, sorteo).then(
       (res) => {
-        if (res?.status === false) {
+        if (!res?.status) {
           notifyError(res?.msg);
           setShowArqueo(false);
           consultaArqueoBilletes(
@@ -194,7 +194,7 @@ const ArqueoBilletes = ({ route }) => {
             sorteo,
             idComercio
           ).then((res) => {
-            if (res?.status === false) {
+            if (!res?.status) {
               notifyError(res.msg);
               // setDisabledBtns(true);
             } else {
@@ -216,7 +216,7 @@ const ArqueoBilletes = ({ route }) => {
             sorteo,
             idComercio
           ).then((res) => {
-            if (res?.status === false) {
+            if (!res?.status) {
               notifyError(res.msg);
               // setDisabledBtns(true);
             } else {

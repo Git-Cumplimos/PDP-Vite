@@ -30,11 +30,20 @@ const Deposito = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("");
 
   const options = [
     { value: "", label: "" },
     { value: "02", label: "Corriente" },
     { value: "01", label: "Ahorros" },
+  ];
+
+  const optionsDocumento = [
+    { value: "", label: "" },
+    { value: "01", label: "Cedula Ciudadanía" },
+    { value: "02", label: "Cedula Extrangeria" },
+    { value: "04", label: "Tarjeta Identidad" },
+    { value: "13", label: "Regitro Civil" },
   ];
 
   const [limitesMontos, setLimitesMontos] = useState({
@@ -99,12 +108,12 @@ const Deposito = () => {
           idDispositivo: roleInfo?.id_dispositivo,
           Tipo: roleInfo?.tipo_comercio,
           tipoTransaccion: 5706, /// Deposito
-          tipoDocumento: "01", /// Cedula
+          tipoDocumento: tipoDocumento, /// Cedula
           numDocumento: userDoc,
           valTransaccion: valor,
           tipoCuenta: tipoCuenta,
           //nomDepositante: nomDepositante,
-          valToken: "valToken", /// De donde viene
+          //valToken: "valToken", /// De donde viene
           numCuenta: numCuenta,       
         };
         fetchConsultaCostoCB(body)
@@ -183,7 +192,7 @@ const Deposito = () => {
       numTipoCuenta: tipoCuenta,
       numNumeroCuenta: numCuenta,
       numIdDepositante: 123,
-      valToken: "valToken",
+      //valToken: "valToken",
       numValorConsignacion: valor,    
     };
 
@@ -258,6 +267,15 @@ const Deposito = () => {
     <Fragment>
       <h1 className="text-3xl mt-6">Depositos</h1>
       <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
+        <Select
+          id="tipoCuenta"
+          label="Tipo de Cuenta"
+          options={options}
+          value={tipoCuenta}
+          onChange={(e) => {
+            setTipoCuenta(e.target.value);
+          }}
+        />
         <Input
           id="numCuenta"
           name="numCuenta"
@@ -271,12 +289,12 @@ const Deposito = () => {
           required
         />
         <Select
-          id="tipoCuenta"
-          label="Tipo Cuenta"
-          options={options}
-          value={tipoCuenta}
+          id="tipoDocumento"
+          label="Tipo de documento"
+          options={optionsDocumento}
+          value={tipoDocumento}
           onChange={(e) => {
-            setTipoCuenta(e.target.value);
+            setTipoDocumento(e.target.value);
           }}
         />
         <Input

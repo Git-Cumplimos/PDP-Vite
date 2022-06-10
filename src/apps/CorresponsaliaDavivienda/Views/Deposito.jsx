@@ -14,6 +14,7 @@ import { notify, notifyError } from "../../../utils/notify";
 import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import { useFetch } from "../../../hooks/useFetch";
 import { useAuth } from "../../../hooks/AuthHooks";
+import Select from "../../../components/Base/Select";
 
 const Deposito = () => {
   const navigate = useNavigate();
@@ -28,13 +29,22 @@ const Deposito = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
-  const [datosConsulta, setDatosConsulta] = useState("")
+  const [datosConsulta, setDatosConsulta] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("");
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
     min: 5000,
   });
   
+  const options = [
+    { value: "", label: "" },
+    { value: "01", label: "Cedula Ciudadanía" },
+    { value: "02", label: "Cedula Extrangeria" },
+    { value: "04", label: "Tarjeta Identidad" },
+    { value: "13", label: "Regitro Civil" },
+  ];
+
   const printDiv = useRef();
 
   useEffect(() => {
@@ -95,7 +105,7 @@ const Deposito = () => {
           numIdentificacionDepositante: userDoc,
           numDaviplata: phone,
           valGiro: valor,
-          valTipoIdentificacionDepositante: 1, /// Tipo de documento
+          valTipoIdentificacionDepositante: tipoDocumento, /// Tipo de documento
     
         };
         fetchConsultaCashIn(body)
@@ -179,7 +189,7 @@ const Deposito = () => {
       numDaviplata: phone,
       valGiro: valor,
       valCodigoConvenioDaviplata: datosConsulta?.Data?.valCodigoConvenioDaviplata,
-      valTipoIdentificacionDepositante: 1, /// Tipo de documento
+      valTipoIdentificacionDepositante: tipoDocumento, /// Tipo de documento
       valComisionGiroDaviplata: datosConsulta?.Data?.valComisionGiroDaviplata,
       id_transaccion: datosConsulta?.DataHeader?.idTransaccion
     };
@@ -283,6 +293,15 @@ const Deposito = () => {
             }
           }}
           required
+        />
+        <Select
+          id="tipoCuenta"
+          label="Tipo de documento"
+          options={options}
+          value={tipoDocumento}
+          onChange={(e) => {
+            setTipoDocumento(e.target.value);
+          }}
         />
         <Input
           id="docCliente"
