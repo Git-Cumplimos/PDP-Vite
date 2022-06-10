@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { retiroCorresponsal, consultaCostoCB } from "../../utils/fetchCorresponsaliaDavivienda";
 import { notify, notifyError } from "../../../../utils/notify";
-import Tickets from "../../../../components/Base/Tickets";
+import Tickets from "../../components/TicketsDavivienda";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useFetch } from "../../../../hooks/useFetch";
@@ -213,18 +213,12 @@ const Retiro = () => {
           ],
           commerceName: "Retiro en Corresponsal Davivienda",
           trxInfo: [
-            ["Tipo de cuenta", res?.obj?.Data?.numTipoCuenta==="01" ? "Ahorros" : "Corriente"],
-            ["",""],
-            ["Numero de cuenta", '*****'+res?.obj?.Data?.numNumeroDeCuenta?.slice(-4)],
-            ["",""],
-            ["Valor del retiro", formatMoney.format(valor)],
-            ["",""],
-            ["Cobro transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
-            ["",""],
-            ["Código de autorización", trx_id],
-            ["",""],
-            ["Usuario de venta", "Nombre propietario del punto"],
-            ["",""],
+            ["Numero de cuenta", '****'+res?.obj?.Data?.numNumeroDeCuenta?.slice(-4)],
+            ["Tipo", res?.obj?.Data?.numTipoCuenta==="01" ? "Ahorros" : "Corriente"],
+            ["Valor", formatMoney.format(valor)],
+            ["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
+            ["Cod. autorización", trx_id],
+            //["Usuario de venta", "Nombre propietario del punto"],
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
@@ -254,7 +248,7 @@ const Retiro = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">retiros Daviplata</h1>
+      <h1 className="text-3xl mt-6">Retiros</h1>
       <Form onSubmit={onSubmitRetiro} onChange={onChange} grid>
         <Input
           id="docCliente"

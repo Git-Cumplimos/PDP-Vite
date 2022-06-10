@@ -191,8 +191,8 @@ export const useProvideLoteria = () => {
       //Consulta codigos de lotería que tiene cada lotería
       setNit_loteria(nit);
       codigos_loteria(nit).then((res) => {
-        if (res.status === false) {
-          console.log(res.msg);
+        if (!res?.status) {
+          console.log(res?.msg);
           // setDisabledBtns(true);
         } else {
           setCodigos_lot(res?.obj);
@@ -201,8 +201,8 @@ export const useProvideLoteria = () => {
       });
       //Consulta id de las operaciones por lotería
       consulta_operaciones(nit).then((res) => {
-        if (res.status === false) {
-          console.log(res.msg);
+        if (!res?.status) {
+          console.log(res?.msg);
           // setDisabledBtns(true);
         } else {
           setTiposOperaciones(res?.obj);
@@ -214,7 +214,7 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         consulta_codigos_oficina(nit).then((res) => {
           if ("msg" in res) {
-            console.log(res.msg);
+            console.log(res?.msg);
             setCodigosOficina({
               cod_oficina_lot: "PPVIR",
               cod_sucursal_lot: "00",

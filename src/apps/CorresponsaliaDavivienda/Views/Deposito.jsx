@@ -6,7 +6,7 @@ import Modal from "../../../components/Base/Modal";
 import useQuery from "../../../hooks/useQuery";
 import { Fragment, useState, useCallback, useRef, useEffect } from "react";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import Tickets from "../../../components/Base/Tickets";
+import Tickets from "../components/TicketsDavivienda";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import { pagoGiroDaviplata, consultaGiroDaviplata } from "../utils/fetchCorresponsaliaDavivienda";
@@ -215,21 +215,14 @@ const Deposito = () => {
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
             ["Id Trx", trx_id],
-            //["Id Transacción", res?.obj?.IdTransaccion],
           ],
           commerceName: "Daviplata",
           trxInfo: [
-            ["Celular", phone],
-            [],
-            ["C.C.", userDoc],
-            [],
-            ["Valor de deposito", formatMoney.format(valor)],
-            [],
-            ["Valor comisón", formatMoney.format(comision)],
-            [],
+            ["Celular", "****" + phone.slice(-4)],
+            ["Valor", formatMoney.format(valor)],
+            ["Costo", formatMoney.format(comision)],
             ["Total", formatMoney.format(total)],
-            []
-
+            ["Nro. Autorización", trx_id]
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };

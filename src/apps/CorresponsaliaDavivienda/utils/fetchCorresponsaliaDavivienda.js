@@ -13,7 +13,7 @@ export const consultaGiroDaviplata = async (bodyObj) => {
       `${urlDaviplata}davivienda_cb_cashIn/consultaGiroDaviplata`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -35,7 +35,11 @@ export const pagoGiroDaviplata = async (bodyObj) => {
       `${urlDaviplata}/davivienda_cb_cashIn/pagoGiroDaviplata`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      {},
+      70000
+
     );
     if (!res?.status) {
       console.error(res?.msg);

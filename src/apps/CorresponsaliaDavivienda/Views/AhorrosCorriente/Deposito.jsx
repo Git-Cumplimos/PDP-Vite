@@ -6,7 +6,7 @@ import Modal from "../../../../components/Base/Modal";
 import useQuery from "../../../../hooks/useQuery";
 import { Fragment, useState, useCallback, useRef, useEffect } from "react";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
-import Tickets from "../../../../components/Base/Tickets";
+import Tickets from "../../components/TicketsDavivienda";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import { depositoCorresponsal, consultaCostoCB } from "../../utils/fetchCorresponsaliaDavivienda";
@@ -216,25 +216,14 @@ const Deposito = () => {
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
             ["Id Trx", trx_id],
-            //["Id Transacción", res?.obj?.IdTransaccion],
           ],
           commerceName: "Consignación en Corresponsal Davivienda",
           trxInfo: [
-            ["Tipo de cuenta", res?.obj?.Data?.numTipoCuenta==="01" ? "Ahorros" : "Corriente"],
-            ["",""],
-            ["Numero de cuenta", '*****'+res?.obj?.Data?.numNumeroCuenta?.slice(-4)],
-            ["",""],
-            ["Valor consignado", formatMoney.format(valor)],
-            ["",""],
-            ["Cobro transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
-            ["",""],
-            ["Código de autorización", trx_id],
-            ["",""],
-            ["Identificación depositante", userDoc],
-            ["",""],
-            ["Nombre depositante", nomDepositante],
-            ["",""],
-            
+            ["Nro. Cuenta", '****'+res?.obj?.Data?.numNumeroCuenta?.slice(-4)],
+            ["Tipo", res?.obj?.Data?.numTipoCuenta==="01" ? "Ahorros" : "Corriente"],
+            ["Valor", formatMoney.format(valor)],
+            ["Costo Transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
+            ["Cod. autorización", trx_id],            
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
@@ -267,7 +256,7 @@ const Deposito = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Depositos Daviplata</h1>
+      <h1 className="text-3xl mt-6">Depositos</h1>
       <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
         <Input
           id="numCuenta"
