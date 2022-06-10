@@ -1,25 +1,25 @@
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Button from "../../../components/Base/Button";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import Modal from "../../../components/Base/Modal";
-import useQuery from "../../../hooks/useQuery";
+import Modal from "../../../../components/Base/Modal";
+import useQuery from "../../../../hooks/useQuery";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import {
   postCashOut,
   postRealizarCashoutDavivienda,
-} from "../utils/fetchCorresponsaliaDavivienda";
-import { notify, notifyError } from "../../../utils/notify";
-import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
-import { useFetch } from "../../../hooks/useFetch";
-import { useAuth } from "../../../hooks/AuthHooks";
-import SimpleLoading from "../../../components/Base/SimpleLoading";
-import { enumParametrosAutorizador } from "../utils/enumParametrosAutorizador";
-import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
-import TicketsDavivienda from "../components/TicketsDavivienda";
+} from "../../utils/fetchCorresponsaliaDavivienda";
+import { notify, notifyError } from "../../../../utils/notify";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput";
+import { useFetch } from "../../../../hooks/useFetch";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
+import { enumParametrosAutorizador } from "../../utils/enumParametrosAutorizador";
+import { fetchParametrosAutorizadores } from "../../../TrxParams/utils/fetchParametrosAutorizadores";
+import TicketsDavivienda from "../../components/TicketsDavivienda";
 
 const Retiro = () => {
   const { roleInfo } = useAuth();

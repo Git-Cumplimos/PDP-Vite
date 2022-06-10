@@ -216,14 +216,17 @@ const Deposito = lazy(() => import("../apps/Daviplata/Views/Deposito"));
 const CorresponsaliaDavivienda = lazy(() =>
   import("../apps/CorresponsaliaDavivienda/CorresponsaliaDavivienda")
 );
+const DaviplataCB = lazy(() =>
+import("../apps/CorresponsaliaDavivienda/Views/Daviplata")
+);
 const CashIn = lazy(() =>
-  import("../apps/CorresponsaliaDavivienda/Views/Deposito")
+  import("../apps/CorresponsaliaDavivienda/Views/Daviplata/Deposito")
 );
 const CashOut = lazy(() =>
-  import("../apps/CorresponsaliaDavivienda/Views/Retiro")
+  import("../apps/CorresponsaliaDavivienda/Views/Daviplata/Retiro")
 );
 const PagoGiro = lazy(() =>
-  import("../apps/CorresponsaliaDavivienda/Views/PagoGiro")
+  import("../apps/CorresponsaliaDavivienda/Views/Daviplata/PagoGiro")
 );
 
 const AhorrosCorrienteCB = lazy(() =>
@@ -536,6 +539,7 @@ const allUrlsPrivateApps = [
       },
     ],
   },
+
   {
     link: "/corresponsaliaDavivienda",
     label: <AppIcons Logo={"MARKETPLACE"} name='Corresponsalia' />,
@@ -543,37 +547,46 @@ const allUrlsPrivateApps = [
     permission: [29, 30],
     subRoutes: [
       {
-        link: "/corresponsaliaDavivienda/cashIn",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />,
-        component: CashIn,
-        permission: [29],
+        link: "/corresponsaliaDavivienda/Daviplata",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
+        component: DaviplataCB,
+        permission: [29, 30],
+        subRoutes: [
+          {
+            link: "/corresponsaliaDavivienda/DaviplatacashIn",
+            label: <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />,
+            component: CashIn,
+            permission: [29],
+          },
+          {
+            link: "/corresponsaliaDavivienda/DaviplatacashOut",
+            label: <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />,
+            component: CashOut,
+            permission: [30],
+          },
+          {
+            link: "/corresponsaliaDavivienda/Daviplatapagos_giros",
+            label: <AppIcons Logo={"MARKETPLACE"} name='Pagos por giro' />,
+            component: PagoGiro,
+            permission: [30],
+          },
+        ],
       },
+      
       {
-        link: "/corresponsaliaDavivienda/cashOut",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />,
-        component: CashOut,
-        permission: [30],
-      },
-      {
-        link: "/corresponsaliaDavivienda/pagos_giros",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Pagos por giro' />,
-        component: PagoGiro,
-        permission: [30],
-      },
-      {
-        link: "/ahorrosCorriente",
+        link: "/corresponsaliaDavivienda/ahorrosCorriente",
         label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones cuentas Davivienda" />,
         component: AhorrosCorrienteCB,
         permission: [29, 30],
         subRoutes: [
           {
-            link: "/ahorrosCorriente/deposito",
+            link: "/corresponsaliaDavivienda/ahorrosCorriente/deposito",
             label: <AppIcons Logo={"MARKETPLACE"} name='Depositos' />,
             component: DepositoCB,
             permission: [29],
           },
           {
-            link: "/ahorrosCorriente/retiro",
+            link: "/corresponsaliaDavivienda/ahorrosCorriente/retiro",
             label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
             component: RetiroCB,
             permission: [30],
