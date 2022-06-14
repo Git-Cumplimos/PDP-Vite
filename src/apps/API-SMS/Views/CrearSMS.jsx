@@ -51,10 +51,10 @@ const CrearSMS = () => {
 
   const onSumit = useCallback(() => {
     crearSMS(SMS).then((res) => {
-      if (res.status === false) {
-        notifyError(res.msg);
+      if (!res.status) {
+        notifyError(res?.msg);
       } else {
-        notify(res.msg);
+        notify(res?.msg);
       }
     });
   });
@@ -79,8 +79,8 @@ const CrearSMS = () => {
         onLazyInput={{
           callback: (e) => {
             buscarSMS(SMS, 1).then((res) => {
-              if (res.status === false) {
-                notifyError(res.msg);
+              if (!res.status) {
+                notifyError(res?.msg);
               } else {
                 console.log(res.obj);
                 setResSMS(res.obj.results);
@@ -111,8 +111,8 @@ const CrearSMS = () => {
                 if (page > 1) {
                   setPage(page - 1);
                   buscarSMS(SMS, page - 1).then((res) => {
-                    if (res.status === false) {
-                      notifyError(res.msg);
+                    if (!res.status) {
+                      notifyError(res?.msg);
                     } else {
                       console.log(res.obj);
                       setResSMS(res.obj.results);
@@ -131,8 +131,8 @@ const CrearSMS = () => {
                 if (page < maxPages) {
                   setPage(page + 1);
                   buscarSMS(SMS, page + 1).then((res) => {
-                    if (res.status === false) {
-                      notifyError(res.msg);
+                    if (!res.status) {
+                      notifyError(res?.msg);
                     } else {
                       console.log(res.obj);
                       setResSMS(res.obj.results);

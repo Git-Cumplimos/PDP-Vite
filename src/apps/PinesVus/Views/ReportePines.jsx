@@ -71,7 +71,7 @@ const ReportePines = () => {
       )
         .then((res) => {
           setTable("");
-          if (res?.status == false) {
+          if (!res?.status) {
             notifyError(res?.msg);
           } else {
             setTable(
@@ -102,7 +102,7 @@ const ReportePines = () => {
   useEffect(() => {
     con_estado_tipoPin("estado_pines_vus")
       .then((res) => {
-        if (res?.status == false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setOptionsEstadoPin(res?.obj?.results);
@@ -113,7 +113,7 @@ const ReportePines = () => {
     con_estado_tipoPin("tipo_pines_vus")
       .then((res) => {
         console.log(res);
-        if (res?.status === false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setOptionsTipoPines(res?.obj?.results);

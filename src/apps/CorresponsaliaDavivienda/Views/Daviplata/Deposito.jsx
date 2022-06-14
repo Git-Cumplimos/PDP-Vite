@@ -1,23 +1,25 @@
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Button from "../../../components/Base/Button";
-import Modal from "../../../components/Base/Modal";
-import useQuery from "../../../hooks/useQuery";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import Modal from "../../../../components/Base/Modal";
+import useQuery from "../../../../hooks/useQuery";
 import { Fragment, useState, useCallback, useRef, useEffect } from "react";
-import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import Tickets from "../../../components/Base/Tickets";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import Tickets from "../../components/TicketsDavivienda";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
-import { pagoGiroDaviplata, consultaGiroDaviplata } from "../utils/fetchCorresponsaliaDavivienda";
-import { notify, notifyError } from "../../../utils/notify";
-import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
-import { useFetch } from "../../../hooks/useFetch";
-import { useAuth } from "../../../hooks/AuthHooks";
+import { pagoGiroDaviplata, consultaGiroDaviplata } from "../../utils/fetchCorresponsaliaDavivienda";
+import { notify, notifyError } from "../../../../utils/notify";
+import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput";
+import { useFetch } from "../../../../hooks/useFetch";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import Select from "../../../../components/Base/Select";
 
 const Deposito = () => {
   const navigate = useNavigate();
   const [{ phone, userDoc, valor, summary }, setQuery] = useQuery();
+  const [verificacionTel, setVerificacionTel] = useState("")
 
   const { roleInfo, infoTicket } = useAuth();
 
@@ -27,13 +29,22 @@ const Deposito = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
-  const [datosConsulta, setDatosConsulta] = useState("")
+  const [datosConsulta, setDatosConsulta] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("");
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
     min: 5000,
   });
   
+  const options = [
+    { value: "", label: "" },
+    { value: "01", label: "Cedula Ciudadanía" },
+    { value: "02", label: "Cedula Extrangeria" },
+    { value: "04", label: "Tarjeta Identidad" },
+    { value: "13", label: "Regitro Civil" },
+  ];
+
   const printDiv = useRef();
 
   useEffect(() => {
@@ -83,6 +94,8 @@ const Deposito = () => {
         const phone = formData.get("numCliente");
         const userDoc = formData.get("docCliente");
         const valorFormat = formData.get("valor");
+
+        if ((verificacionTel) === (phone)){
         
         const body = {
           idComercio: roleInfo?.id_comercio,
@@ -92,7 +105,7 @@ const Deposito = () => {
           numIdentificacionDepositante: userDoc,
           numDaviplata: phone,
           valGiro: valor,
-          valTipoIdentificacionDepositante: 1, /// Tipo de documento
+          valTipoIdentificacionDepositante: tipoDocumento, /// Tipo de documento
     
         };
         fetchConsultaCashIn(body)
@@ -101,12 +114,15 @@ const Deposito = () => {
             notifyError(res?.msg);
             return;
           }else{
-            setDatosConsulta(res?.obj?.Data)
+            setDatosConsulta(res?.obj)
+            const total = parseInt(res?.obj?.Data?.valComisionGiroDaviplata) + valor;
             const summary = {
               "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
               "Numero celular": phone,
               "C.C. del depositante": userDoc,
               "Valor de deposito": valorFormat,
+              "Valor de comisión": formatMoney.format(res?.obj?.Data?.valComisionGiroDaviplata),
+              "Valor total": formatMoney.format(total), 
             };
             setQuery({ phone, valor, summary }, { replace: true });
             setShowModal(true);
@@ -118,7 +134,10 @@ const Deposito = () => {
           console.error(err);
           notifyError("Error interno en la transaccion");
         });
-        
+      }
+      else{
+        notifyError("Verifique que el celular del cliente es correcto")
+      }
       } else {
         notifyError(
           `El valor del deposito debe estar entre ${formatMoney.format(
@@ -127,7 +146,7 @@ const Deposito = () => {
         );
       }
     },
-    [setQuery, valor, limitesMontos]
+    [setQuery, valor, limitesMontos, verificacionTel]
   );
 
   const onChange = useCallback(
@@ -169,9 +188,10 @@ const Deposito = () => {
       numIdentificacionDepositante: userDoc,
       numDaviplata: phone,
       valGiro: valor,
-      valCodigoConvenioDaviplata: datosConsulta?.valCodigoConvenioDaviplata,
-      valTipoIdentificacionDepositante: 1, /// Tipo de documento
-
+      valCodigoConvenioDaviplata: datosConsulta?.Data?.valCodigoConvenioDaviplata,
+      valTipoIdentificacionDepositante: tipoDocumento, /// Tipo de documento
+      valComisionGiroDaviplata: datosConsulta?.Data?.valComisionGiroDaviplata,
+      id_transaccion: datosConsulta?.DataHeader?.idTransaccion
     };
 
     fetchCashIn(body)
@@ -181,7 +201,10 @@ const Deposito = () => {
           return;
         }
         notify("Transaccion satisfactoria");
-        const trx_id = res?.obj?.trxId ?? 0;
+        const trx_id = res?.obj?.Data?.valTalon ?? 0;
+        const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
+        const total = parseInt(comision) + valor;
+
         const tempTicket = {
           title: "Recibo de deposito",
           timeInfo: {
@@ -202,18 +225,19 @@ const Deposito = () => {
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
             ["Id Trx", trx_id],
-            ["Id Transacción", res?.obj?.IdTransaccion],
           ],
           commerceName: "Daviplata",
           trxInfo: [
-            ["Celular", phone],
-            ["C.C.", userDoc],
-            ["Valor de deposito", formatMoney.format(valor)],
+            ["Celular", "****" + phone.slice(-4)],
+            ["Valor", formatMoney.format(valor)],
+            ["Costo", formatMoney.format(comision)],
+            ["Total", formatMoney.format(total)],
+            ["Nro. Autorización", trx_id]
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
         setPaymentStatus(tempTicket);
-        infoTicket(trx_id, 20, tempTicket)
+        infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket)////////////////////////////////////
           .then((resTicket) => {
             console.log(resTicket);
           })
@@ -244,7 +268,7 @@ const Deposito = () => {
         <Input
           id="numCliente"
           name="numCliente"
-          label="Número telefónico de cliente"
+          label="Celular"
           type="text"
           autoComplete="off"
           minLength={"10"}
@@ -252,6 +276,32 @@ const Deposito = () => {
           value={phone ?? ""}
           onInput={() => {}}
           required
+        />
+        <Input
+          id="numCliente"
+          name="numCliente"
+          label="Verificación Celular"
+          type="text"
+          autoComplete="off"
+          minLength={"10"}
+          maxLength={"10"}
+          value={verificacionTel}
+          onInput={(e) => {
+            if (!isNaN(e.target.value)) {
+              const num = e.target.value;
+              setVerificacionTel(num);
+            }
+          }}
+          required
+        />
+        <Select
+          id="tipoCuenta"
+          label="Tipo de documento"
+          options={options}
+          value={tipoDocumento}
+          onChange={(e) => {
+            setTipoDocumento(e.target.value);
+          }}
         />
         <Input
           id="docCliente"

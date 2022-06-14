@@ -36,7 +36,7 @@ const CancelPin = ({
       .then((res) => {
         console.log(res);
 
-        if (res?.status === false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setOptionsTipoPines(res?.obj?.results);

@@ -88,20 +88,20 @@ const EnviarSMS = () => {
 
   useEffect(() => {
     credito().then((res) => {
-      if (res.status === false) {
-        notifyError(res.msg);
+      if (!res?.status) {
+        notifyError(res?.msg);
       } else {
-        console.log(res.obj.balance);
-        setCreditos(res.obj.balance);
+        console.log(res?.obj?.balance);
+        setCreditos(res?.obj?.balance);
       }
     });
 
     tip_comercios().then((res) => {
-      if (res.status === false) {
-        notifyError(res.msg);
+      if (!res?.status) {
+        notifyError(res?.msg);
       } else {
-        setOptionsDisponibles(res.obj.results);
-        console.log(res.obj.results);
+        setOptionsDisponibles(res?.obj?.results);
+        console.log(res?.obj?.results);
       }
     });
   }, []);
@@ -115,10 +115,10 @@ const EnviarSMS = () => {
     setPage(1);
     setMaxPages(1);
     credito().then((res) => {
-      if (res.status === false) {
-        notifyError(res.msg);
+      if (!res?.status) {
+        notifyError(res?.msg);
       } else {
-        setCreditos(res.obj.balance);
+        setCreditos(res?.obj?.balance);
       }
     });
   });
@@ -191,11 +191,11 @@ const EnviarSMS = () => {
                 setTipComercio(e.target.value);
                 if (e.target.value !== null) {
                   buscarNum(e.target.value).then((res) => {
-                    if (res.status === false) {
-                      notifyError(res.msg);
+                    if (!res?.status) {
+                      notifyError(res?.msg);
                     } else {
-                      setPhones(res.obj.results);
-                      console.log(res.obj.results);
+                      setPhones(res?.obj?.results);
+                      console.log(res?.obj?.results);
                     }
                   });
                 }
@@ -229,11 +229,11 @@ const EnviarSMS = () => {
           onLazyInput={{
             callback: (e) => {
               buscarSMS(SMS, 1).then((res) => {
-                if (res.status === false) {
-                  notifyError(res.msg);
+                if (!res?.status) {
+                  notifyError(res?.msg);
                 } else {
                   console.log(res.obj);
-                  setResSMS(res.obj.results);
+                  setResSMS(res?.obj?.results);
                   setMaxPages(res.obj.maxPages);
                 }
               });
@@ -260,11 +260,11 @@ const EnviarSMS = () => {
                 if (page > 1) {
                   setPage(page - 1);
                   buscarSMS(SMS, page - 1).then((res) => {
-                    if (res.status === false) {
-                      notifyError(res.msg);
+                    if (!res?.status) {
+                      notifyError(res?.msg);
                     } else {
                       console.log(res.obj);
-                      setResSMS(res.obj.results);
+                      setResSMS(res?.obj?.results);
                       setMaxPages(res.obj.maxPages);
                     }
                   });
@@ -280,11 +280,11 @@ const EnviarSMS = () => {
                 if (page < maxPages) {
                   setPage(page + 1);
                   buscarSMS(SMS, page + 1).then((res) => {
-                    if (res.status === false) {
-                      notifyError(res.msg);
+                    if (!res?.status) {
+                      notifyError(res?.msg);
                     } else {
                       console.log(res.obj);
-                      setResSMS(res.obj.results);
+                      setResSMS(res?.obj?.results);
                       setMaxPages(res.obj.maxPages);
                     }
                   });
