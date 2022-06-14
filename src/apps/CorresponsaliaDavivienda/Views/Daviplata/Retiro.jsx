@@ -59,7 +59,9 @@ const Retiro = () => {
           ),
         });
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setIsUploading(false)
+        console.error(err)});
   }, []);
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de cash-out Davivienda CB",

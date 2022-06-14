@@ -94,9 +94,6 @@ const TicketsDavivienda = ({
         <h1 className='uppercase text-center px-8 my-2 text-sm font-semibold'>
           {commerceName ?? ""}
         </h1>
-        <h1 className='uppercase text-center px-8 my-1 text-sm font-semibold'>
-          Transacción exitosa
-        </h1>
         <div className='flex flex-col gap-2 px-2 text-xs'>
           {trxInfo
             .map((e, i, arr) => {

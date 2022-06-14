@@ -15,6 +15,7 @@ import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput"
 import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
 const Deposito = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const Deposito = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
   const [tipoDocumento, setTipoDocumento] = useState("");
+  const [isUploading, setIsUploading] = useState(false)
 
   const options = [
     { value: "", label: "" },
@@ -92,6 +94,7 @@ const Deposito = () => {
   const onSubmitDeposit = useCallback(
     (e) => {
       e.preventDefault();
+      setIsUploading(true)
 
       const { min, max } = limitesMontos;
 
@@ -118,6 +121,7 @@ const Deposito = () => {
         };
         fetchConsultaCostoCB(body)
         .then((res) => {
+          setIsUploading(false)
           if (!res?.status) {
             notifyError(res?.msg);
             return;
@@ -137,11 +141,13 @@ const Deposito = () => {
           //notify("Transaccion satisfactoria");          
         })
         .catch((err) => {
+          setIsUploading(false)
           console.error(err);
           notifyError("Error interno en la transaccion");
         });
         
       } else {
+        setIsUploading(false)
         notifyError(
           `El valor del deposito debe estar entre ${formatMoney.format(
             min
@@ -184,6 +190,7 @@ const Deposito = () => {
   }, [navigate]);
 
   const onMakePayment = useCallback(() => {
+    setIsUploading(true)
     const body = {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
@@ -198,15 +205,17 @@ const Deposito = () => {
 
     fetchDepositoCorresponsal(body)
       .then((res) => {
+        setIsUploading(false)
         if (!res?.status) {
           notifyError(res?.msg);
           return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Recibo de deposito",
+          title: "Deposito A Cuentas Davivienda",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -226,13 +235,16 @@ const Deposito = () => {
             ["Dirección", roleInfo?.direccion],
             ["Id Trx", trx_id],
           ],
-          commerceName: "Consignación en Corresponsal Davivienda",
           trxInfo: [
             ["Nro. Cuenta", '****'+res?.obj?.Data?.numNumeroCuenta?.slice(-4)],
             ["Tipo", res?.obj?.Data?.numTipoCuenta==="01" ? "Ahorros" : "Corriente"],
             ["Valor", formatMoney.format(valor)],
             ["Costo Transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
-            ["Cod. autorización", trx_id],            
+            ["Total", formatMoney.format(valor)],
+            ["Cod. autorización", trx_id],
+            ["Ter", ter],            
+            ["Id. Despositante", userDoc],
+            ["Depositante", nomDepositante]            
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
@@ -247,6 +259,7 @@ const Deposito = () => {
           });
       })
       .catch((err) => {
+        setIsUploading(false)
         console.error(err);
         notifyError("Error interno en la transaccion");
       });
@@ -264,6 +277,8 @@ const Deposito = () => {
   console.log(tipoCuenta)
 
   return (
+    <>
+    <SimpleLoading show={isUploading}/>
     <Fragment>
       <h1 className="text-3xl mt-6">Depositos</h1>
       <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
@@ -365,6 +380,7 @@ const Deposito = () => {
         )}
       </Modal>
     </Fragment>
+    </>
   );
 };
 

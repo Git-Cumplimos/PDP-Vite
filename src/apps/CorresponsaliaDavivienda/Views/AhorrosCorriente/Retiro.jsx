@@ -15,6 +15,7 @@ import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput"
 import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
 const Retiro = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const Retiro = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
+  const [isUploading, setIsUploading] = useState(false)
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
@@ -77,6 +79,7 @@ const Retiro = () => {
   const onSubmitRetiro = useCallback(
     (e) => {
       e.preventDefault();
+      setIsUploading(true)
 
       const { min, max } = limitesMontos;
 
@@ -102,6 +105,7 @@ const Retiro = () => {
         };
         fetchConsultaCostoCB(body)
         .then((res) => {
+          setIsUploading(false)
           if (!res?.status) {
             notifyError(res?.msg);
             return;
@@ -121,11 +125,13 @@ const Retiro = () => {
           //notify("Transaccion satisfactoria");          
         })
         .catch((err) => {
+          setIsUploading(false)
           console.error(err);
           notifyError("Error interno en la transaccion");
         });
         
       } else {
+        setIsUploading(false)
         notifyError(
           `El valor del retiro debe estar entre ${formatMoney.format(
             min
@@ -168,6 +174,7 @@ const Retiro = () => {
   }, [navigate]);
 
   const onMakePayment = useCallback(() => {
+    setIsUploading(true)
     const body = {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
@@ -183,12 +190,15 @@ const Retiro = () => {
 
     fetchRetiroCorresponsal(body)
       .then((res) => {
+        setIsUploading(false)
         if (!res?.status) {
           notifyError(res?.msg);
           return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+
         const tempTicket = {
           title: "Recibo de retiro",
           timeInfo: {
@@ -209,14 +219,15 @@ const Retiro = () => {
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
             ["Id Trx", trx_id],
-            //["Id Transacción", res?.obj?.IdTransaccion],
           ],
-          commerceName: "Retiro en Corresponsal Davivienda",
+          commerceName: "Retiro De Cuentas",
           trxInfo: [
             ["Numero de cuenta", '****'+res?.obj?.Data?.numNumeroDeCuenta?.slice(-4)],
             ["Tipo", res?.obj?.Data?.numTipoCuenta==="01" ? "Ahorros" : "Corriente"],
             ["Valor", formatMoney.format(valor)],
             ["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
+            ["Total", formatMoney.format(valor)],
+            ["Ter", ter],
             ["Cod. autorización", trx_id],
             //["Usuario de venta", "Nombre propietario del punto"],
           ],
@@ -233,6 +244,7 @@ const Retiro = () => {
           });
       })
       .catch((err) => {
+        setIsUploading(false)
         console.error(err);
         notifyError("Error interno en la transaccion");
       });
@@ -247,6 +259,8 @@ const Retiro = () => {
   ]);
 
   return (
+    <>
+    <SimpleLoading show={isUploading}/>
     <Fragment>
       <h1 className="text-3xl mt-6">Retiros</h1>
       <Form onSubmit={onSubmitRetiro} onChange={onChange} grid>
@@ -320,6 +334,7 @@ const Retiro = () => {
         )}
       </Modal>
     </Fragment>
+    </>
   );
 };
 
