@@ -208,7 +208,7 @@ const ModificarPps = () => {
             <LogoPDP small></LogoPDP>
           </div>
           <span className={tituloNotificacion}>
-            No se puede realizar la modificacíon, el número de documento no se
+            No se puede realizar la modificación, el número de documento no se
             encuentra domiciliado.
           </span>
         </Modal>
