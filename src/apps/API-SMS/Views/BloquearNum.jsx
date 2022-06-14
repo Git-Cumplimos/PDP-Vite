@@ -44,10 +44,10 @@ const BloquearNum = () => {
     e.preventDefault();
     closeModal();
     BloquearNum(phone, name).then((res) => {
-      if (res.status === false) {
-        notifyError(res.msg);
+      if (!res?.status) {
+        notifyError(res?.msg);
       } else {
-        notify(res.msg);
+        notify(res?.msg);
         console.log(res);
       }
     });

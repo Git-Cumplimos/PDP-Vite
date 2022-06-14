@@ -29,7 +29,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const [valorAportar, setValorAportar] = useState();
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
-  const { quotaInfo, roleInfo } = useAuth();
+  const { quotaInfo, roleInfo, infoTicket } = useAuth();
 
   console.log(quotaInfo);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
@@ -109,6 +109,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
         ["VALOR", formatMoney.format(valorAportar)],
         ["N° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
       ],
+
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
@@ -118,6 +119,17 @@ const PpsVoluntarioDemanda = ({ ced }) => {
     datosRespuesta,
     tipoComercio /* respPinCancel, roleInfo, valor */,
   ]);
+
+  useEffect(() => {
+    infoTicket(datosRespuesta?.[0]?.["inserted_id"], 57, tickets)
+      .then((resTicket) => {
+        console.log(resTicket);
+      })
+      .catch((err) => {
+        console.error(err);
+        notifyError("Error guardando el ticket");
+      });
+  }, [infoTicket, tickets]);
 
   const enviar = (e) => {
     e.preventDefault();
@@ -161,7 +173,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
             ) {
               notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
-              navigate(`/domiciliacion`);
+              /* navigate(`/domiciliacion`); */
+              setDisabledBtn(false);
             }
             if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
               notifyError("Lo Sentimos, Falló el Registro Del Cupo");
@@ -182,7 +195,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               notifyError(
                 "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000."
               );
-              navigate(`/domiciliacion`);
+              /* navigate(`/domiciliacion`); */
+              setDisabledBtn(false);
             }
             if (
               respuesta?.msg?.["RESPUESTA COLPENSIONES"] ===
@@ -191,6 +205,10 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               notifyError("Lo Sentimos, Falló el Servicio De Colpensiones");
               navigate(`/domiciliacion`);
             }
+            /* if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
+              notifyError("Lo Sentimos, Falló el Registro Del Cupo");
+              navigate(`/domiciliacion`);
+            } */
             if (
               (respuesta?.msg ===
                 "La transaccion ha sido creada exitosamente") &
@@ -203,6 +221,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
           .catch((err) => {
             console.log(err);
             notifyError("Error al Pagar Planilla Voluntaria a Demanda");
+            navigate(`/domiciliacion`);
           });
       } else {
         if (cantNum == 10) {
@@ -242,7 +261,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
               ) {
                 notifyError("El valor aportado debe ser exacto ej: 5000");
-                navigate(`/domiciliacion`);
+                /* navigate(`/domiciliacion`); */
+                setDisabledBtn(false);
               }
               if (
                 respuesta?.msg?.["respuesta_colpensiones"] ===
@@ -259,7 +279,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 notifyError(
                   "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
                 );
-                navigate(`/domiciliacion`);
+                /* navigate(`/domiciliacion`); */
+                setDisabledBtn(false);
               }
               if (
                 (respuesta?.msg ===

@@ -43,7 +43,7 @@ const CrearPin = () => {
     con_estado_tipoPin("tipo_pines_vus")
       .then((res) => {
         setDisabledBtns(false);
-        if (res?.status === false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setOptionsTipoPines(res?.obj?.results);
@@ -75,7 +75,7 @@ const CrearPin = () => {
     crearPinVus(documento, tipoPin, user)
       .then((res) => {
         setDisabledBtns(false);
-        if (res?.status === false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setRespPin(res?.obj);

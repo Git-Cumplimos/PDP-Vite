@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 
 const ModificarPps = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
+  const [sinDatosConsulta, setSinDatosConsulta] = useState(false);
   const [buscarCedula, setBuscarCedula] = useState("");
   const [cantNum, setCantNum] = useState(0);
   const [cantNumCel, setCantNumCel] = useState(0);
@@ -83,14 +84,13 @@ const ModificarPps = () => {
   }, []);
   const handleCloseUsuarioNoEncontrado = useCallback(() => {
     setShowModalUsuarioNoEncontrado(false);
-    setDatosConsulta(0);
+    /*  setDatosConsulta(""); */
     setBuscarCedula("");
   }, []);
 
   const BuscarCedula = (e) => {
     setShowModal(true);
-    setShowModalUsuarioNoEncontrado(true);
-    e.preventDefault();
+    /*    setShowModalUsuarioNoEncontrado(true) */ e.preventDefault();
     if (cantNum >= 7) {
       fetchData(
         `${url}/domicilio`,
@@ -121,6 +121,9 @@ const ModificarPps = () => {
             }
           } else {
             setEstadoUsuarioNoEncontrado(true);
+            console.log("entre");
+            setSinDatosConsulta(true);
+            setShowModalUsuarioNoEncontrado(true);
           }
         })
         .catch((err) => {
@@ -169,7 +172,6 @@ const ModificarPps = () => {
         notifyError(
           "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
         );
-        navigate(`/domiciliacion`);
       }
     }
   };
@@ -197,7 +199,7 @@ const ModificarPps = () => {
           }
         </ButtonBar>
       </Form>
-      {estadoUsuarioNoEncontrado ? (
+      {estadoUsuarioNoEncontrado && sinDatosConsulta ? (
         <Modal
           show={showModalUsuarioNoEncontrado}
           handleClose={handleCloseUsuarioNoEncontrado}
@@ -206,7 +208,7 @@ const ModificarPps = () => {
             <LogoPDP small></LogoPDP>
           </div>
           <span className={tituloNotificacion}>
-            No se puede realizar la modificacíon, el número de cédula no se
+            No se puede realizar la modificacíon, el número de documento no se
             encuentra domiciliado.
           </span>
         </Modal>
@@ -235,14 +237,18 @@ const ModificarPps = () => {
             <Fieldset legend="Modificar Domiciliación">
               <Input
                 label={"Valor Aportar"}
-                /* placeholder={datosParams[0]["nombre_comercio"]} */
-                value={valueAmount /* ?? datosParams[0]["nombre_comercio"] */}
-                onChange={(e) => setValueAmount(e.target.value)}
-                minLength="1"
+                placeholder={"Ingrese Valor Aportar"}
+                value={valueAmount}
+                minLength="4"
                 maxLength="6"
-                type="number"
+                onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+                  setValueAmount(num);
+                }}
+                type={"text"}
                 required
               ></Input>
+
               <Input
                 label={"N° Célular"}
                 placeholder={"Ingrese su número célular"}

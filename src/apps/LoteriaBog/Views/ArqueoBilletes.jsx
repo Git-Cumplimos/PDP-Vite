@@ -184,7 +184,7 @@ const ArqueoBilletes = ({ route }) => {
     e.preventDefault();
     crearArqueoBilletes(fecha_ini, fracDisp, total, id_arqueo, sorteo).then(
       (res) => {
-        if (res?.status === false) {
+        if (!res?.status) {
           notifyError(res?.msg);
           setShowArqueo(false);
           consultaArqueoBilletes(
@@ -194,7 +194,7 @@ const ArqueoBilletes = ({ route }) => {
             sorteo,
             idComercio
           ).then((res) => {
-            if (res?.status === false) {
+            if (!res?.status) {
               notifyError(res.msg);
               // setDisabledBtns(true);
             } else {
@@ -216,7 +216,7 @@ const ArqueoBilletes = ({ route }) => {
             sorteo,
             idComercio
           ).then((res) => {
-            if (res?.status === false) {
+            if (!res?.status) {
               notifyError(res.msg);
               // setDisabledBtns(true);
             } else {
@@ -337,7 +337,7 @@ const ArqueoBilletes = ({ route }) => {
   // useEffect(() => {
   //   if (userPermissions.map(({ id_permission }) => id_permission).includes(3)) {
   //     consultaArqueoBilletes(1, fecha_ini, fecha_fin).then((res) => {
-  //       if (res.status === false) {
+  //       if (!res.status) {
   //         notifyError(res.msg);
   //         // setDisabledBtns(true);
   //       } else {
@@ -384,10 +384,15 @@ const ArqueoBilletes = ({ route }) => {
                     sorteo,
                     idComercio
                   ).then((res) => {
-                    if (res.status === false) {
+                    console.log(res?.obj?.data)
+                    if (!res.status) {
                       notifyError(res.msg);
                       // setDisabledBtns(true);
-                    } else {
+                    }
+                    else if (!res?.obj?.data){
+                      notifyError("No hay arqueos registrados")
+                    }                    
+                    else {
                       console.log(res?.obj?.maxpage);
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
@@ -416,10 +421,14 @@ const ArqueoBilletes = ({ route }) => {
                     sorteo,
                     idComercio
                   ).then((res) => {
-                    if (res.status === false) {
+                    if (!res.status) {
                       notifyError(res.msg);
                       // setDisabledBtns(true);
-                    } else {
+                    }
+                    else if (!res?.obj?.length){
+                      notifyError("No hay arqueos registrados")
+                    } 
+                    else {
                       console.log(res?.obj?.maxpage);
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
@@ -450,11 +459,15 @@ const ArqueoBilletes = ({ route }) => {
                     e.target.value,
                     idComercio
                   ).then((res) => {
-                    if (res.status === false) {
+                    if (!res.status) {
                       notifyError(res.msg);
                       // setDisabledBtns(true);
-                    } else {
-                      console.log(res?.obj?.maxpage);
+                    } 
+                    else if (!res?.obj?.length){
+                      notifyError("No hay arqueos registrados")
+                    }
+                    else {
+                      console.log(res?.obj?.length);
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
                       setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
@@ -480,7 +493,7 @@ const ArqueoBilletes = ({ route }) => {
                           sorteo,
                           idComercio
                         ).then((res) => {
-                          if (res.status === false) {
+                          if (!res.status) {
                             notifyError(res.msg);
                             // setDisabledBtns(true);
                           } else {
@@ -509,7 +522,7 @@ const ArqueoBilletes = ({ route }) => {
                           sorteo,
                           idComercio
                         ).then((res) => {
-                          if (res.status === false) {
+                          if (!res.status) {
                             notifyError(res.msg);
                             // setDisabledBtns(true);
                           } else {
@@ -535,8 +548,8 @@ const ArqueoBilletes = ({ route }) => {
                     "Sorteo",
                     "Comercio",
                     "Fecha arqueo",
-                    "Fracciones contadas",
                     "Fracciones Base de datos",
+                    "Fracciones contadas",
                   ]}
                   data={datosArqueo.map(
                     ({
@@ -606,7 +619,7 @@ const ArqueoBilletes = ({ route }) => {
                   e.target.value,
                   idComercio
                 ).then((res) => {
-                  if (res.status === false) {
+                  if (!res.status) {
                     notifyError(res.msg);
                     // setDisabledBtns(true);
                   } else {

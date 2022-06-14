@@ -106,7 +106,7 @@ const TramitePines = () => {
       .then((res) => {
         setInfo(res);
         setDisabledBtn(false);
-        if (res?.status == false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setTable(
@@ -132,39 +132,6 @@ const TramitePines = () => {
       })
       .catch((err) => console.log("error", err));
   };
-
-  // useEffect(() => {
-  //   if (info !== "") {
-  //     consultaPinesVus(parametroBusqueda, pageData)
-  //       .then((res) => {
-  //         console.log(res);
-  //         setInfo(res);
-  //         setDisabledBtn(false);
-  //         if (res?.status == false) {
-  //           notifyError(res?.msg);
-  //         } else {
-  //           setTable(
-  //             res?.obj?.results?.map((row) => {
-  //               console.log(row);
-  //               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
-  //               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
-  //               setFormatMon(row?.ValorPagar);
-  //               return {
-  //                 Id: row?.id_pin,
-  //                 Cedula: row?.doc_cliente,
-  //                 Estado: row?.name_estado_pin,
-  //                 "Codigo Estado": row?.estado_pin,
-  //                 Vencimiento: dateFormatter.format(fecha_vencimiento),
-  //                 Valor: formatMoney.format(row?.valor),
-  //               };
-  //             })
-  //           );
-  //           setMaxPages(res?.obj?.maxPages);
-  //         }
-  //       })
-  //       .catch((err) => console.log("error", err));
-  //   }
-  // }, [pageData]);
 
   const onSubmitUsar = (e) => {
     setModalUsar(true);

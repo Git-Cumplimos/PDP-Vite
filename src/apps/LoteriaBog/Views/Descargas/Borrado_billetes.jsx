@@ -82,8 +82,8 @@ const Borrado_billetes = ({ route }) => {
   const borrar = (e) => {
     e.preventDefault();
     borrar_billetes(cod_distribuidor, cod_sucursal, num_sorteo).then((res) => {
-      if (res.status === false) {
-        notifyError(res.msg);
+      if (!res?.status) {
+        notifyError(res?.msg);
         setCod_distribuidor("");
         setCod_sucursal("");
         setNum_sorteo("");
@@ -98,9 +98,9 @@ const Borrado_billetes = ({ route }) => {
 
   useEffect(() => {
     sorteos(sorteosLOT).then((res) => {
-      if (res.status === false) {
+      if (!res?.status) {
       } else {
-        setOptionsDisponibles(res.num_sorteos);
+        setOptionsDisponibles(res?.num_sorteos);
       }
     });
   }, [sorteosLOT]);
