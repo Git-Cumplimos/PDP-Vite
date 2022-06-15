@@ -1,72 +1,54 @@
-import React, { useState, useEffect, useCallback } from "react";
-import MicroTable from "../../../components/Base/MicroTable";
+import { useState, useEffect } from "react";
 import Arqueo from "./Arqueo";
+import Cierre from "./Cierre";
 import Modal from "../../../components/Base/Modal";
 import Button from "../../../components/Base/Button";
-import { useGestion } from "../utils/GestionHooks";
-import fetchData from "../../../utils/fetchData";
-const trxs = [
-  {
-    id: "1",
-    autorizador: "Soluciones en Red",
-    cant_recaudo: 80,
-    total_recaudo: 8000000,
-    total_consignado: 8000000,
-  },
-  {
-    id: "2",
-    autorizador: "Colpatria",
-    cant_recaudo: 100,
-    total_recaudo: 10000000,
-    total_consignado: 8000000,
-  },
-];
-
-const headers = [
-  "Id",
-  "Autorizador",
-  "Cant Recaudo",
-  "Total recaudo",
-  "Total consignado",
-  "Saldo pendiente",
-  "Saldo por consignar",
-];
-
-const urls = {
-  consultaCaja: `${process.env.REACT_APP_URL_CAJA}cash`,
-};
+import { useAuth } from "../../../hooks/AuthHooks";
+import { searchCash, searchCierre, searchReceipt } from "../utils/fetchCaja";
 
 const Panel = () => {
   const [total, setTotal] = useState("");
-  const searchCash = useCallback(async () => {
-    try {
-      const res = await fetchData(
-        urls.consultaCaja,
-        "GET",
-        {
-          id_usuario: 206,
-          id_comercio: 8,
-          id_terminal: 121,
-        },
-        {},
-        {},
-        false
-      );
-      console.log(res);
-      return res;
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  });
+  const [totalCierres, setTotalCierres] = useState(false);
+  const [cierre, setCierre] = useState(false);
+  const [resArqueo, setResArqueo] = useState("");
+  const [respuestaComprobante, setRespuestaComprobante] = useState([]);
+  const [sobrante, setSobrante] = useState("");
+  const [faltante, setFaltante] = useState("");
+  const { roleInfo } = useAuth();
+
+  const date = new Date();
+  console.log(typeof date.toLocaleDateString());
 
   useEffect(() => {
-    searchCash()
+    const query = {
+      id_usuario: roleInfo?.id_usuario,
+      id_comercio: roleInfo?.id_comercio,
+      id_terminal: roleInfo?.id_dispositivo,
+    };
+    searchCash(query)
       .then((res) => {
         setTotal(res);
       })
       .catch((err) => {
-        console.log(err);
+        throw err;
+      });
+    searchCierre(query)
+      .then((res) => {
+        if (res?.status) {
+          setTotalCierres(res?.obj);
+          query.status = "APROBADO";
+          searchReceipt(query)
+            .then((res) => {
+              console.log(res);
+              setRespuestaComprobante(res?.obj?.results);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      })
+      .catch((err) => {
+        throw err;
       });
   }, []);
 
@@ -78,42 +60,47 @@ const Panel = () => {
   });
   const closeModalFunction = () => {
     setEstado(false);
+    setCierre(false);
   };
+
   return (
     <>
-      <MicroTable
-        headers={headers}
-        data={trxs?.map(
-          ({
-            id,
-            autorizador,
-            cant_recaudo,
-            total_recaudo,
-            total_consignado,
-          }) => {
-            const t_recaudo = formatMoney.format(total_recaudo);
-            const t_consignado = formatMoney.format(total_consignado);
-            const s_pendiente = formatMoney.format(
-              total_recaudo - total_consignado
-            );
-            const s_consignar = formatMoney.format(
-              total_recaudo - total_consignado
-            );
-            return {
-              id,
-              autorizador,
-              cant_recaudo,
-              t_recaudo,
-              t_consignado,
-              s_pendiente,
-              s_consignar,
-            };
-          }
-        )}
-      ></MicroTable>
-      <Button onClick={() => setEstado(true)}>Cerrar caja</Button>
+      {totalCierres === 2 ? (
+        <>
+          <h1>Señor usuario la caja ya fue cerrada el día de hoy</h1>
+        </>
+      ) : totalCierres === 3 || totalCierres === 1 ? (
+        <>
+          <Button onClick={() => setEstado(true)}>
+            Arqueo y cierre de caja
+          </Button>
+        </>
+      ) : (
+        <h1>Cargando...</h1>
+      )}
       <Modal show={estado} handleClose={closeModalFunction}>
-        <Arqueo caja={total} />
+        {!cierre && (
+          <Arqueo
+            caja={total}
+            respuestaComprobante={respuestaComprobante}
+            setCierre={setCierre}
+            setResArqueo={setResArqueo}
+            setSobrante={setSobrante}
+            setFaltante={setFaltante}
+          />
+        )}
+        {cierre && (
+          <Cierre
+            arqueo={resArqueo}
+            respuestaComprobante={respuestaComprobante}
+            caja={total}
+            roleInfo={roleInfo}
+            setEstado={setEstado}
+            setCierre={setCierre}
+            sobra={sobrante}
+            falta={faltante}
+          />
+        )}
       </Modal>
     </>
   );

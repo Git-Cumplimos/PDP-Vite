@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 
 import Magnifier from "react-magnifier";
 import Form from "../../../components/Base/Form";
@@ -10,21 +10,29 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import { saveAs } from "file-saver";
 import PanelConsignaciones from "./PanelConsignaciones";
-
-const mock = {
-  Banco: "Davivienda",
-  Cuenta: "123456789012345",
-  No_Consignacion: "1",
-  Valor: "1000000",
-  Fecha: "04/03/2022",
-  Estado: "Pendiente",
-};
+import { updateReceipts } from "../utils/fetchCaja";
+import { notify, notifyError } from "../../../utils/notify";
 
 const ValidarComprobante = ({ data, setShowModal }) => {
-  console.log(data.url);
-  const saveFile = () => {
-    saveAs(data.url);
+  const [status, setStatus] = useState("");
+  const [observation, setObservation] = useState("");
+  const updateReceipt = () => {
+    const query = { id_comprobante: data?.id_comprobante };
+    const body = { obs_analista: observation, status: status };
+    updateReceipts(query, body)
+      .then((res) => {
+        notify(res?.msg);
+        setShowModal(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
+
+  const saveFile = () => {
+    saveAs(data?.archivo);
+  };
+  console.log(data);
   return (
     <>
       <div className="w-full flex flex-col justify-center items-center my-8">
@@ -34,15 +42,19 @@ const ValidarComprobante = ({ data, setShowModal }) => {
         {[data].map((row) => {
           return (
             <>
-              <Input label="Banco" value={row.autorizador} disabled></Input>
-              <Input label="Cuenta" value={row.no_cuenta} disabled></Input>
+              <Input label="Banco" value={row?.compañia} disabled></Input>
+              <Input label="Cuenta" value={row?.cuenta} disabled></Input>
               <Input
                 label="# Consignación"
-                value={row.no_consignacion}
+                value={row.nro_comprobante}
                 disabled
               ></Input>
-              <MoneyInput label="Valor" value={row.valor} disabled></MoneyInput>
-              <Input label="Fecha" value={row.fecha_ingreso} disabled></Input>
+              <MoneyInput
+                label="Valor"
+                value={row?.valor}
+                disabled
+              ></MoneyInput>
+              <Input label="Fecha" value={row?.created} disabled></Input>
               <Select
                 id="searchByAgreement"
                 label="Estado"
@@ -53,9 +65,14 @@ const ValidarComprobante = ({ data, setShowModal }) => {
                 ]}
                 onChange={(e) => {
                   console.log(e.target.value);
+                  if (e.target.value === "1") {
+                    setStatus("RECHAZADO");
+                  } else if (e.target.value === "2") {
+                    setStatus("APROBADO");
+                  }
                 }}
               />
-              <Magnifier src={row.url} zoomFactor={2} />
+              <Magnifier src={row?.archivo} zoomFactor={2} />
             </>
           );
         })}
@@ -70,9 +87,14 @@ const ValidarComprobante = ({ data, setShowModal }) => {
           minLength="1"
           maxLength="160"
           autoComplete="off"
+          onChange={(e) => {
+            setObservation(e.target.value);
+          }}
         ></TextArea>
         <ButtonBar>
-          <Button type="submit">Guardar</Button>
+          <Button type="button" onClick={() => updateReceipt()}>
+            Guardar
+          </Button>
           <Button type="button" onClick={() => setShowModal(false)}>
             Salir
           </Button>

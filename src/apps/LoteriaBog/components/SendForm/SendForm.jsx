@@ -4,6 +4,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { useState, useEffect, useMemo } from "react";
 import { useLoteria } from "../../utils/LoteriaHooks";
+import { notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -71,8 +72,12 @@ const SendForm = ({
 
   const onSubmit = (e) => {
     e.preventDefault();
-    setDisabledBtns(true);
-    handleSubmit();
+    if ((selecFrac.length == 0) & (fracciones == 0)) {
+      notifyError("Seleccione la(s) fraccion(es) a vender");
+    } else {
+      setDisabledBtns(true);
+      handleSubmit();
+    }
   };
 
   // constructor(props) {
@@ -160,9 +165,11 @@ const SendForm = ({
             value={phone}
             required={true}
             onInput={(e) => {
-              const cus = { fracciones, phone, doc_id };
-              cus.phone = e.target.value;
-              setCustomer({ ...cus });
+              if (!isNaN(e.target.value)) {
+                const cus = { fracciones, phone, doc_id };
+                cus.phone = e.target.value;
+                setCustomer({ ...cus });
+              }
             }}
           />
           <Input
@@ -172,9 +179,11 @@ const SendForm = ({
             value={doc_id}
             required={true}
             onInput={(e) => {
-              const cus = { fracciones, phone, doc_id };
-              cus.doc_id = e.target.value;
-              setCustomer({ ...cus });
+              if (!isNaN(e.target.value)) {
+                const cus = { fracciones, phone, doc_id };
+                cus.doc_id = e.target.value;
+                setCustomer({ ...cus });
+              }
             }}
           />
           <ButtonBar>

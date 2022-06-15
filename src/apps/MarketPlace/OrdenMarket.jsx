@@ -25,7 +25,7 @@ const OrdenMarket = () => {
   const formatMoney = new Intl.NumberFormat("es-CO", {
     style: "currency",
     currency: "COP",
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   });
 
   useEffect(() => {
@@ -85,11 +85,11 @@ const OrdenMarket = () => {
                     value={row.EstadoTrx}
                     disabled={true}
                   />
-                  <MoneyInput
+                  <Input
                     id="mensaje"
                     label="Valor de la transacción:"
                     type="text"
-                    value={row?.obj?.valor}
+                    value={formatMoney.format(row?.obj?.valor)}
                     disabled={true}
                   />
                 </>

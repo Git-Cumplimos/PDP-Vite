@@ -24,7 +24,6 @@ const Home = () => {
       { name: "Punto de pago", url: BANNER2 },
     ];
   }, [imgs]);
-
   return (
     <>
       <Carousel

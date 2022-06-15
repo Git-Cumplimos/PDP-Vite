@@ -12,7 +12,7 @@ import Input from "../../../components/Base/Input";
 import useQuery from "../../../hooks/useQuery";
 import InputSuggestions from "../../../components/Base/InputSuggestions";
 
-const url = process.env.REACT_APP_URL_SERVICE_COMMERCE_SS;
+const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 const capitalize = (word) => {
   return word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);

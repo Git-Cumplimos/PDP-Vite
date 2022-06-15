@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo, useEffect } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -7,22 +7,37 @@ import Modal from "../../../components/Base/Modal";
 
 import Sellfundamujer from "../components/sellFundamujer/SellFundamujer";
 import SearchForm from "../components/SearchForm/SearchForm";
-import { Usemujer } from "../utils/mujerHooks";
+import { useMujer } from "../utils/mujerHooks";
 import { toast } from "react-toastify";
+import { useAuth } from "../../../hooks/AuthHooks";
+import { normalize } from "path";
+import { notifyError } from "../../../utils/notify";
 
 const Desembolsos = () => {
   const {
     infoLoto: { respuestamujer, setRespuestamujer },
-    consultapin,
+    consultarPines,
     cancelarpin,
     desembolsospin,
-  } = Usemujer();
+    cancelarDesembolso,
+  } = useMujer();
 
+  const { roleInfo } = useAuth();
   const [documento, setDocumento] = useState("");
   const [pin, setPin] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(true);
   const [disabledBtns, setDisabledBtns] = useState(false);
+  const [showModalAdvertencia, setShowModalAdvertencia] = useState(false);
+  const [respPago, setRespPago] = useState("");
+
+  useEffect(() => {
+    setShowModalAdvertencia(true);
+  }, []);
+
+  const closeModalAdvertencia = (e) => {
+    setShowModalAdvertencia(false);
+  };
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -35,48 +50,70 @@ const Desembolsos = () => {
       progress: undefined,
     });
   };
+
+  const user = useMemo(() => {
+    return {
+      Tipo: roleInfo?.tipo_comercio,
+      Usuario: roleInfo?.id_usuario,
+      Dispositivo: roleInfo?.id_dispositivo,
+      Comercio: roleInfo?.id_comercio,
+      Depto: roleInfo?.codigo_dane?.slice(0, 2),
+      Municipio: roleInfo?.codigo_dane?.slice(2),
+      nombre_comercio: roleInfo?.["nombre comercio"],
+    };
+  }, [roleInfo]);
+
   //const submit
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
+
     /// consultar pin
-    consultapin(documento, pin)
+    consultarPines(documento, pin, user)
       .then((res) => {
         setDisabledBtns(false);
-        if ("msg" in res) {
-          notify("datos confirmados");
+        if (!res?.status) {
+          notifyError(res?.msg);
+        } else {
+          if (res?.obj?.CodRespuesta !== 0) {
+            notifyError(res?.obj?.Mensaje);
+          } else {
+            console.log(res);
+            setRespuestamujer(res);
+            setShowModal(true);
+            setDisabledBtns(false);
+            notifyError(
+              "Recuerde verificar si tiene el dinero suficiente en caja para continuar el desembolso"
+            );
+          }
         }
-        setRespuestamujer(res);
-        setShowModal(true);
       })
       .catch(() => setDisabledBtns(false));
-    //desembolso pin
-    /*  desembolsospin()
-     en((res) => {
-        setDisabledBtns(false);
-        console.log(res); .th
-      })
-      .catch(() => setDisabledBtns(false)); */
   };
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
-    ///cancelar un pin
-    console.log("servicio cancelado");
-    await cancelarpin("TFM102")
-      .then((res) => {
-        setDisabledBtns(false);
-        if ("msg" in res) {
-          notify("  servicio cancelado");
-        }
-        console.log(res);
-      })
-      .catch(() => setDisabledBtns(false));
-    setDocumento("");
-    setPin("");
-    consultapin("");
-    desembolsospin("");
-  }, [cancelarpin, consultapin, desembolsospin]);
+    setDisabledBtns(false);
+    console.log(selected);
+    if (selected === true) {
+      ///cancelar un pin
+      cancelarDesembolso(respuestamujer?.obj, user)
+        .then((res) => {
+          setDisabledBtns(false);
+          if (!res?.status) {
+            notifyError(res?.msg);
+          } else {
+            if (res?.obj?.CodRespuesta !== 0) {
+              notifyError(res?.obj?.Mensaje);
+            } else {
+              console.log(res);
+            }
+          }
+        })
+        .catch(() => setDisabledBtns(false));
+    }
+    setSelected(true);
+  }, [cancelarpin, desembolsospin, selected]);
 
   const Desembolsitos = () => {
     setSelected(false);
@@ -84,14 +121,32 @@ const Desembolsos = () => {
 
   return (
     <>
+      <Modal
+        show={showModalAdvertencia}
+        handleClose={() => closeModalAdvertencia()}
+      >
+        <div className="flex flex-col justify-center items-center">
+          <h1 className="xl:text-center font-semibold">
+            Recuerde verificar si tiene el dinero suficiente en caja para
+            realizar la transacción !!!
+          </h1>
+          <Button
+            onClick={() => {
+              closeModalAdvertencia();
+            }}
+          >
+            Cerrar
+          </Button>
+        </div>
+      </Modal>
       <Form onSubmit={onSubmit} grid>
         <Input
           id="numDocumento"
           label="Documento"
           type="text"
           required
-          minLength="10"
-          maxLength="16"
+          minLength="5"
+          maxLength="12"
           autoComplete="off"
           value={documento}
           onInput={(e) => {
@@ -127,14 +182,31 @@ const Desembolsos = () => {
             closeModal={closeModal}
             handleSubmit={(event) => {
               event.preventDefault();
-              desembolsospin();
-              Desembolsitos();
+              setDisabledBtns(true);
+              desembolsospin(respuestamujer?.obj, user)
+                .then((res) => {
+                  setDisabledBtns(false);
+                  if (!res?.status) {
+                    notifyError(res?.msg);
+                  } else {
+                    if (res?.obj?.CodRespuesta !== 0) {
+                      notifyError(res?.obj?.Mensaje);
+                    } else {
+                      console.log(res);
+                      setRespPago(res);
+                      // setShowModal(true);
+                      Desembolsitos();
+                    }
+                  }
+                })
+                .catch(() => setDisabledBtns(false));
             }}
+            disabledBtns={disabledBtns}
           />
         ) : (
           <Sellfundamujer
-            respuestamujer={respuestamujer}
-            setRespuestamujer={setRespuestamujer}
+            respPago={respPago?.obj}
+            setRespPago={setRespPago}
             closeModal={closeModal}
           />
         )}

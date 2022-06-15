@@ -5,7 +5,7 @@ import App from "./App";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
 import "./index.css";
-import "./utils/LoadFonts";
+import "./utils/fonts.css";
 
 ReactDOM.render(
   <React.StrictMode>

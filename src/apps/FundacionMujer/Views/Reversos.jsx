@@ -321,7 +321,7 @@ const Reversos = () => {
       .then((res) => {
         console.log(res);
         setTicket(true);
-        if (res?.status === false) {
+        if (!res?.status) {
           setTicket(false);
           console.log(res);
           notifyError(res?.obj?.Mensaje);

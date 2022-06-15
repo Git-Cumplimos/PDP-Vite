@@ -1,51 +1,22 @@
-import React, { useState } from "react";
-import Form from "../../../components/Base/Form";
+import { useState, useEffect } from "react";
 import Select from "../../../components/Base/Select";
-import MicroTable from "../../../components/Base/MicroTable";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import ValidarComprobante from "./ValidarComprobante";
+import { searchReceipt } from "../utils/fetchCaja";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const headers = [
   "Id",
   "Id comercio",
-  "Nombre comercio",
-  "Autorizador",
+  "Número comprobante",
+  "Observación cajero",
+  "Observación analista",
   "Cuenta",
-  "Id consignación",
-  "Valor consignado",
-  "Fecha consignación",
-  "Estado",
+  "Compañia",
+  "Valor registrado",
   "Fecha registro",
-];
-
-const trxs = [
-  {
-    id: "1",
-    id_comercio: 2,
-    nombre_comercio: "Comercio de pruebas",
-    autorizador: "COLPATRIA",
-    no_cuenta: 12345678901234,
-    no_consignacion: 12345,
-    valor: 3500000,
-    fecha_ingreso: "04/03/2022",
-    estado: "PENDIENTE",
-    fecha_registro: "",
-    url: "http://designblog.uniandes.edu.co/blogs/dise2619/files/2013/09/Daniela-Polo-.jpg",
-  },
-  {
-    id: "2",
-    id_comercio: 2,
-    nombre_comercio: "Comercio de pruebas",
-    autorizador: "BANCOLOMBIA",
-    no_cuenta: 12345678901234,
-    no_consignacion: 12345,
-    valor: 3500000,
-    fecha_ingreso: "04/03/2022",
-    estado: "APROBADA",
-    fecha_registro: "04/03/2022",
-    url: "https://www.pedidos.co/formatofiduejemplo1.gif",
-  },
+  "Estado",
 ];
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -57,16 +28,64 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 const PanelConsignaciones = () => {
   const [showModal, setShowModal] = useState(false);
   const [data, setData] = useState({});
+  const [receipt, setReceipt] = useState([]);
   const CloseModal = () => {
     setShowModal(false);
   };
+
+  useEffect(() => {
+    searchReceipt()
+      .then((res) => {
+        setReceipt(res?.obj?.results);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+  console.log(receipt, typeof receipt);
   return (
     <>
       <div className="w-full flex flex-col justify-center items-center my-8">
         <h1 className="text-xl">Validación de comprobante</h1>
       </div>
-      <Form>
-        <Input id="dateInit" label="Fecha de consignación" type="date" />
+      <TableEnterprise
+        title="Comprobantes relacionados"
+        headers={headers}
+        data={receipt?.map(
+          ({
+            id_comprobante,
+            id_comercio,
+            nro_comprobante,
+            obs_cajero,
+            obs_analista,
+            cuenta,
+            compañia,
+            valor,
+            created,
+            status,
+          }) => {
+            const t_consignado = formatMoney.format(valor);
+            console.log(id_comprobante);
+            return {
+              id_comprobante,
+              id_comercio,
+              nro_comprobante,
+              obs_cajero,
+              obs_analista,
+              cuenta,
+              compañia,
+              t_consignado,
+              created,
+              status,
+            };
+          }
+        )}
+        onSelectRow={(_e, index) => {
+          setData(receipt[index]);
+          setShowModal(true);
+        }}
+      >
+        <Input id="dateInit" label="Fecha" type="date" />
         <Select
           id="searchByStatus"
           label="Estado"
@@ -81,43 +100,7 @@ const PanelConsignaciones = () => {
             setShowModal(true);
           }}
         />
-      </Form>
-      <MicroTable
-        headers={headers}
-        data={trxs?.map(
-          ({
-            id,
-            id_comercio,
-            nombre_comercio,
-            autorizador,
-            no_cuenta,
-            no_consignacion,
-            valor,
-            fecha_ingreso,
-            estado,
-            fecha_registro,
-          }) => {
-            const t_consignado = formatMoney.format(valor);
-            console.log(id);
-            return {
-              id,
-              id_comercio,
-              nombre_comercio,
-              autorizador,
-              no_cuenta,
-              no_consignacion,
-              t_consignado,
-              fecha_ingreso,
-              estado,
-              fecha_registro,
-            };
-          }
-        )}
-        onSelectRow={(_e, index) => {
-          setData(trxs[index]);
-          setShowModal(true);
-        }}
-      ></MicroTable>
+      </TableEnterprise>
       <Modal show={showModal} handleClose={CloseModal}>
         <ValidarComprobante data={data} setShowModal={setShowModal} />
       </Modal>

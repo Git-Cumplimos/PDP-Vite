@@ -11,11 +11,9 @@ import Modal from "../../../components/Base/Modal";
 import CargarForm from "../components/CargarForm/CargarForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 import SubPage from "../../../components/Base/SubPage/SubPage";
+import fetchData from "../../../utils/fetchData";
 
-AWS.config.update({
-  accessKeyId: process.env.REACT_APP_accessKeyId,
-  secretAccessKey: process.env.REACT_APP_secretAccessKey,
-});
+const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/cargueS3`;
 
 const CargaArchivos = ({ route }) => {
   const { codigos_lot, setCodigos_lot } = useLoteria();
@@ -72,43 +70,105 @@ const CargaArchivos = ({ route }) => {
     region: REGION,
   });
   console.log(`${tipoSorteo}${archivo}/${fisiVirtual}`);
-  const saveFile = () => {
-    setDisabledBtns(true);
-    const f = new Date();
-    const params = {
-      Body: file,
-      Bucket: S3_BUCKET,
-      Key: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
-        f.getMonth() + 1
-      }${f.getFullYear()}${fileName}`,
-    };
-    bucket
-      .putObject(params)
-      .on("httpUploadProgress", (evt) => {
-        setProgress(Math.round((evt.loaded / evt.total) * 100));
-        setTimeout(() => {
-          closeModal();
-          EstadoArchivos().then((res) => {
-            if (typeof res != Object) {
-              if ("Motivo" in res?.[0]) {
-                if (res[0]["Estado"] === 1) {
-                  notify(res[0]["Motivo"]);
-                } else {
-                  notifyError(res[0]["Motivo"]);
-                }
-              } else {
-                notifyError("Consulte con soporte");
+  // const saveFile = () => {
+  //   setDisabledBtns(true);
+  //   const f = new Date();
+  //   const params = {
+  //     Body: file,
+  //     Bucket: S3_BUCKET,
+  //     Key: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
+  //       f.getMonth() + 1
+  //     }${f.getFullYear()}${fileName}`,
+  //   };
+  //   bucket
+  //     .putObject(params)
+  //     .on("httpUploadProgress", (evt) => {
+  //       setProgress(Math.round((evt.loaded / evt.total) * 100));
+  //       setTimeout(() => {
+  //         closeModal();
+  //         EstadoArchivos().then((res) => {
+  //           if (typeof res != Object) {
+  //             if ("Motivo" in res?.[0]) {
+  //               if (res[0]["Estado"] === 1) {
+  //                 notify(res[0]["Motivo"]);
+  //               } else {
+  //                 notifyError(res[0]["Motivo"]);
+  //               }
+  //             } else {
+  //               notifyError("Consulte con soporte");
+  //             }
+  //           }
+  //         });
+  //       }, 3000);
+  //     })
+  //     .send((err) => {
+  //       if (err)
+  //         notifyError("Error con servicio de almacenamiento en la nube", err);
+  //       console.log(err);
+  //     });
+  // };
+  //------------------Funcion Para Subir El Formulario---------------------//
+  const saveFile = useCallback(
+    (e) => {
+      setDisabledBtns(true);
+      const f = new Date();
+      const query = {
+        contentType: "application/text",
+        filename: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
+          f.getMonth() + 1
+        }${f.getFullYear()}${fileName}`,
+      };
+      fetchData(url_cargueS3, "GET", query)
+        .then((respuesta) => {
+          if (!respuesta?.status) {
+            notifyError(respuesta?.msg);
+          } else {
+            // setEstadoForm(true);
+            const formData2 = new FormData();
+            if (file) {
+              for (const property in respuesta?.obj?.fields) {
+                formData2.set(
+                  `${property}`,
+                  `${respuesta?.obj?.fields[property]}`
+                );
               }
+
+              formData2.set("file", file);
+              console.log(formData2, `${respuesta?.obj?.url}`);
+              fetch(`${respuesta?.obj?.url}`, {
+                method: "POST",
+                body: formData2,
+              }).then((res) => {
+                if (res?.ok) {
+                  setTimeout(() => {
+                    EstadoArchivos().then((res) => {
+                      if (typeof res != Object) {
+                        if ("Motivo" in res?.[0]) {
+                          closeModal();
+                          if (res[0]["Estado"] === 1) {
+                            notify(res[0]["Motivo"]);
+                          } else {
+                            notifyError(res[0]["Motivo"]);
+                          }
+                        } else {
+                          notifyError("Consulte con soporte");
+                        }
+                      }
+                    });
+                  }, 3000);
+                } else {
+                  notifyError("No fue posible conectar con el Bucket");
+                }
+              });
             }
-          });
-        }, 3000);
-      })
-      .send((err) => {
-        if (err)
-          notifyError("Error con servicio de almacenamiento en la nube", err);
-        console.log(err);
-      });
-  };
+          }
+        })
+        .catch((err) => {
+          notifyError("Error al cargar Datos");
+        }); /* notify("Se ha comenzado la carga"); */
+    },
+    [file, fileName, archivo, tipoSorteo, fisiVirtual]
+  );
 
   const { EstadoArchivos } = useLoteria();
 

@@ -71,9 +71,7 @@ const Input = ({
           ) : inputRef.current?.validity?.valid ? (
             ""
           ) : (
-            <p className={`${invalidCls}`}>
-              {inputRef.current?.validationMessage}
-            </p>
+            ""
           )
         ) : (
           ""

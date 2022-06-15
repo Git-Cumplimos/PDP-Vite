@@ -84,7 +84,8 @@ const MoviiPDPCashOut = () => {
       ? roleInfo?.["nombre comercio"]
       : "prod",
     trxInfo: [],
-    disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+    disclamer:
+      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
   });
 
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
@@ -153,9 +154,7 @@ const MoviiPDPCashOut = () => {
       subscriberNum: datosTrans.numeroTelefono,
       otp: datosTrans.otp,
       oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
-          ? roleInfo?.tipo_comercio
-          : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
     })
       .then((res) => {
         if (res?.status) {

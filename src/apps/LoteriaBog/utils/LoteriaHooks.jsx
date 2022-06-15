@@ -191,8 +191,8 @@ export const useProvideLoteria = () => {
       //Consulta codigos de lotería que tiene cada lotería
       setNit_loteria(nit);
       codigos_loteria(nit).then((res) => {
-        if (res.status === false) {
-          console.log(res.msg);
+        if (!res?.status) {
+          console.log(res?.msg);
           // setDisabledBtns(true);
         } else {
           setCodigos_lot(res?.obj);
@@ -201,8 +201,8 @@ export const useProvideLoteria = () => {
       });
       //Consulta id de las operaciones por lotería
       consulta_operaciones(nit).then((res) => {
-        if (res.status === false) {
-          console.log(res.msg);
+        if (!res?.status) {
+          console.log(res?.msg);
           // setDisabledBtns(true);
         } else {
           setTiposOperaciones(res?.obj);
@@ -214,7 +214,7 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         consulta_codigos_oficina(nit).then((res) => {
           if ("msg" in res) {
-            console.log(res.msg);
+            console.log(res?.msg);
             setCodigosOficina({
               cod_oficina_lot: "PPVIR",
               cod_sucursal_lot: "00",
@@ -438,71 +438,6 @@ export const useProvideLoteria = () => {
       console.error(err);
     }
   }, []);
-
-  // const getReportesVentas = useCallback(async (sorteo,cod_distribuidor) => {
-
-  //   let fisico=false
-  //   let distribuidor=roleInfo.cod_oficina_lot
-  //     const sort = sorteo.split('-')
-  //     if(sort[1]==='true'){
-  //       fisico=true
-  //       distribuidor=cod_distribuidor
-  //     }
-
-  //   try {
-  //     const info = await fetchData(urls.ventasReportes, "GET", {
-  //       num_loteria:sort[2],
-  //       sorteo:sort[0],
-  //       fisico:fisico,
-  //       cod_distribuidor:distribuidor,
-  //       cod_sucursal:roleInfo.cod_sucursal_lot, /////////////////////////////////////////////////
-  //       cod_dane:roleInfo.codigo_dane
-  //     });
-
-  //     console.log(info)
-  //     if('msg' in info){
-  //       return info;
-  //     }
-  //     else{
-  //       const res = info[0];
-  //       var str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`
-  //       for (const venta of res.Campo5) {
-  //           const line = venta.split("-").join("").concat("\n");
-  //           str = str.concat(line);
-  //       }
-
-  //       const data = new Blob([str], { type: "text/plain;charset=utf-8" });
-  //       const csv = window.URL.createObjectURL(data);
-  //       return {'archivo':csv};
-  //     }
-
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }, [roleInfo?.cod_oficina_lot, roleInfo?.cod_sucursal_lot, roleInfo?.codigo_dane]);
-
-  // const getReportesPagos = useCallback(async () => {
-
-  //   try {
-  //     const info = await fetchData(urls.pagosReportes, "GET", {
-  //       sorteo_semana:'sorteo_semana',/////////////////////////////////////////////
-  //       cod_distribuidor:'PPAGO', /////////////////////////////////////////////////
-  //     });
-
-  //     const res = info[0];
-
-  //     let str = `${res.Campo1}\n${res.Campo2}\n${res.Campo3}\n${res.Campo4}\n`;
-  //     for (const venta of res.Campo5) {
-  //       const line = venta.split("-").join("").concat("\n");
-  //       str = str.concat(line);
-  //     }
-  //     const data = new Blob([str], { type: "text/plain;charset=utf-8" });
-  //     const csv = window.URL.createObjectURL(data);
-  //     return csv;
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }, []);
 
   const isWinner = useCallback(
     async (sorteo, billete, serie) => {
