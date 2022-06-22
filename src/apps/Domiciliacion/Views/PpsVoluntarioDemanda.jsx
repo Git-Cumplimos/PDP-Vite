@@ -321,6 +321,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               onChange={(event) => setTipoIdentificacion(event?.target?.value)}
               id="comissionType"
               label="Tipo Identificación"
+              required
               options={{
                 "": "",
                 "Cédula de Ciudadania": "1",
@@ -337,9 +338,14 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               label={"N° Documento"}
               placeholder={"Ingrese su Numero Documento"}
               value={numDocumento}
-              onChange={(e) => setNumDocumento(e.target.value)}
-              type={"number"}
-              disabled
+              minLength="6"
+              maxLength="11"
+              onInput={(e) => {
+                const num = e.target.value || "";
+                setNumDocumento(num.toString());
+              }}
+              type={"text"}
+              required
             ></Input>
 
             <Input
