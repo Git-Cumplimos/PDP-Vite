@@ -260,7 +260,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               if (
                 respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
               ) {
-                notifyError("El valor aportado debe ser exacto ej: 5000");
+                notifyError("El valor a aportar debe ser múltiplo de 100");
                 /* navigate(`/domiciliacion`); */
                 setDisabledBtn(false);
               }
