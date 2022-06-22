@@ -139,8 +139,8 @@ const BuscarCedulaPpsADemanda = () => {
               </div>
             </div>
             <span className={tituloNotificacion}>
-              No se puede realizar el aporte, el número de cédula se encuentra
-              domiciliado.
+              No se puede realizar el aporte, el número de documento se
+              encuentra domiciliado.
             </span>
           </div>
         </Modal>
@@ -152,7 +152,7 @@ const BuscarCedulaPpsADemanda = () => {
               placeholder={"Ingrese N° Identificación"}
               value={buscarCedula}
               onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
+                const num = e.target.value || "";
                 setBuscarCedula(num);
               }}
               minLength="6"

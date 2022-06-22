@@ -6,9 +6,7 @@ const Domiciliacion = ({ subRoutes }) => {
   return (
     <div className="flex flex-row justify-center">
       <Form>
-        <HNavbar links={[subRoutes[0]]} isIcon />
-        <HNavbar links={[subRoutes[1]]} isIcon />
-        <HNavbar links={[subRoutes[2]]} isIcon />
+        <HNavbar links={subRoutes} isIcon />
       </Form>
     </div>
   );
