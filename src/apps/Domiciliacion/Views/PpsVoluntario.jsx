@@ -98,6 +98,11 @@ const PpsVoluntario = ({ datosConsulta }) => {
               );
             }
             if (
+              respuesta?.msg == "El Valor Aportado Debe ser Exacto ej: 5000"
+            ) {
+              notifyError("El valor a aportar debe ser múltiplo de 100");
+            }
+            if (
               respuesta?.msg ==
               "SchemaError: Key 'num_pago_pdp' error:\nint('') raised ValueError(\"invalid literal for int() with base 10: ''\")"
             ) {
@@ -110,6 +115,8 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 notify(
                   "Se ha creado el comercio domiciliado voluntario exitosamente"
                 );
+                setShowModal(false);
+                navigate(`/domiciliacion`);
               }
             }
           })
@@ -117,8 +124,8 @@ const PpsVoluntario = ({ datosConsulta }) => {
             console.log(err);
             notifyError("Error al subir Formulario");
           });
-        setShowModal(false);
-        navigate(`/domiciliacion`);
+        // setShowModal(false);
+        // navigate(`/domiciliacion`);
       } else {
         notifyError("Número de cédula ya domiciliado.");
       }
