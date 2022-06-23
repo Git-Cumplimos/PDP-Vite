@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from "react";
+import React, { Fragment, useCallback, useState, useRef } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -6,59 +6,66 @@ import Input from "../../../components/Base/Input";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { PeticionRecarga, RealizarPeticionPro } from "../utils/fetchMovistar";
-// import Modal from "../../../components/Base/Modal";
-// import PaymentSummary from "../../../components/Compound/PaymentSummary";
-// import Tickets from "../../../components/Base/Tickets";
-// import { useFetch } from "../../../hooks/useFetch";
-// import fetchData from "../../../utils/fetchData";
+import Modal from "../../../components/Base/Modal";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
+import Tickets from "../../../components/Base/Tickets";
+import { useFetch } from "../../../hooks/useFetch";
+import fetchData from "../../../utils/fetchData";
+import { useNavigate } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
+
 
 const URL = "http://127.0.0.1:5000/recargasMovistar/prepago";
 
 const RecargasMovistar = () => {
+  const navigate = useNavigate();
   const [inputCelular, setInputCelular] = useState(null);
   const [inputValor, setInputValor] = useState(null);
-  // const [showModal, setShowModal] = useState(false);
-  // const [paymentStatus, setPaymentStatus] = useState(false);
- 
-  // const postCashIn = async (bodyObj) => {
-  //   if (!bodyObj) {
-  //     return new Promise((resolve, reject) => {
-  //       resolve("Sin datos body");
-  //     });
-  //   }
-  //   try {
-  //     const res = await fetchData(
-  //       `${URL}`,
-  //       "POST",
-  //       {},
-  //       bodyObj
-  //     );
-  //     if (!res?.status) {
-  //       console.error(res?.msg);
-  //     }
-  //     return res;
-  //   } catch (err) {
-  //     throw err;
-  //   }
-  // }
-  // const [loadingCashIn, fetchCashIn] = useFetch(postCashIn);
+  const [resPeticion, setResPeticion] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(false);
 
-  
 
-  // const handleClose = useCallback(() => {
-  //   setShowModal(false);
-  // }, []);
+  const printDiv = useRef();
+
+  const postCashIn = async (bodyObj) => {
+    if (!bodyObj) {
+      return new Promise((resolve, reject) => {
+        resolve("Sin datos body");
+      });
+    }
+    try {
+      const res = await fetchData(`${URL}`, "POST", {}, bodyObj);
+      if (!res?.status) {
+        console.error(res?.msg);
+      }
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  };
+  const [loadingCashIn, fetchCashIn] = useFetch(postCashIn);
+
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+  }, []);
   const { roleInfo } = useAuth();
-  const l = "";
+
+  const goToRecaudo = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
+
   const onChange = useCallback((e) => {
     if (e.target.name == "celular") {
-      setInputCelular(e.target.value);
-    }
-    if (e.target.name == "valor") {
-      let p = e.target.value.replaceAll(".", "");
-      p = parseInt(p.slice(2));
-
-      setInputValor(p);
+      const formData = new FormData(e.target.form);
+      const phone = ((formData.get("celular") ?? "").match(/\d/g) ?? []).join(
+        ""
+      );
+      setInputCelular(phone);
     }
   });
 
@@ -67,26 +74,43 @@ const RecargasMovistar = () => {
     const data = {
       celular: inputCelular,
       valor: inputValor,
-      codigo_comercio: "0679977",
-      identificador_region: "CIUDADELA",
+      codigo_comercio: roleInfo.id_comercio,
+      identificador_region: roleInfo.direccion,
     };
-    console.log(data);
-    PeticionRecarga(URL, data).then((return_) => {});
+
+    PeticionRecarga(URL, data).then((result) => {
+      //   setResPeticion(result.obj[0].codigo_error);
+      console.log(result.obj);
+      setPaymentStatus(true)
+      //   if(result.obj[0].codigo_error == ""){
+
+      //   }
+    });
   });
 
-  const onMoneyChange = useCallback(() => {});
+  const onMoneyChange = useCallback((e, valor) => {
+    setInputValor(valor);
+  });
+
+  const onShowModal = (e) => {
+    e.preventDefault()
+    setShowModal(true)
+  }
+
+
   const limitesMontos = 10;
   return (
     <Fragment>
-      <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
+      <Form onSubmit={onShowModal} onChange={onChange} grid>
         <Input
           id="celular"
           name="celular"
-          label="celular: "
-          type="number"
+          label="Celular: "
+          type="tel"
           autoComplete="off"
           minLength={"10"}
           maxLength={"10"}
+          value={inputCelular ?? ""}
           onInput={() => {}}
           required
         />
@@ -96,17 +120,16 @@ const RecargasMovistar = () => {
           name="valor"
           label="Valor de la recarga"
           autoComplete="off"
-          min={"1"}
-          max={"10"}
+          min={"1000"}
+          max={"9999999999"}
           onInput={onMoneyChange}
           required
         />
-
-        <Button type={"submit"} className={"lg:col-span-2"}>
-          Realizar deposito
-        </Button>
+        <ButtonBar className={"lg:col-span-2"}>
+          <Button type={"submit"}>Realizar deposito</Button>
+        </ButtonBar>
       </Form>
-      {/* <Modal
+      <Modal  
         show={showModal}
         handleClose={
           paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
@@ -114,20 +137,16 @@ const RecargasMovistar = () => {
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets />
+            <Tickets refPrint={printDiv}/>
             <ButtonBar>
-              <Button >Imprimir</Button>
-              <Button >Cerrar</Button>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button onClick={goToRecaudo}>Cerrar</Button>
             </ButtonBar>
           </div>
-        ):
-         (
-          <PaymentSummary >
+        ) : (
+          <PaymentSummary>
             <ButtonBar>
-              <Button
-                type="submit"
-                disabled={loadingCashIn}
-              >
+              <Button type="button" disabled={loadingCashIn} onClick={onSubmitDeposit}>
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingCashIn}>
@@ -135,9 +154,8 @@ const RecargasMovistar = () => {
               </Button>
             </ButtonBar>
           </PaymentSummary>
-        )
-        }
-      </Modal> */}
+        )}
+      </Modal>
     </Fragment>
   );
 };

@@ -162,6 +162,7 @@ const Deposito = () => {
         const userDoc = (
           (formData.get("docCliente") ?? "").match(/\d/g) ?? []
         ).join("");
+
         setQuery({ phone, userDoc, valor: valor ?? "" }, { replace: true });
       }
     },
