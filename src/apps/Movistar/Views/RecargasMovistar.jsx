@@ -6,6 +6,11 @@ import Input from "../../../components/Base/Input";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { PeticionRecarga, RealizarPeticionPro } from "../utils/fetchMovistar";
+import Modal from "../../../components/Base/Modal";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
+import Tickets from "../../../components/Base/Tickets";
+import { useFetch } from "../../../hooks/useFetch";
+import fetchData from "../../../utils/fetchData";
 
 const URL = "http://127.0.0.1:5000/recargasMovistar/prepago";
 
@@ -13,6 +18,30 @@ const RecargasMovistar = () => {
   const [inputCelular, setInputCelular] = useState(null);
   const [inputValor, setInputValor] = useState(null);
   const [resPeticion, setResPeticion] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(false);
+
+  const postCashIn = async (bodyObj) => {
+    if (!bodyObj) {
+      return new Promise((resolve, reject) => {
+        resolve("Sin datos body");
+      });
+    }
+    try {
+      const res = await fetchData(`${URL}`, "POST", {}, bodyObj);
+      if (!res?.status) {
+        console.error(res?.msg);
+      }
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  };
+  const [loadingCashIn, fetchCashIn] = useFetch(postCashIn);
+
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+  }, []);
   const { roleInfo } = useAuth();
 
   const onChange = useCallback((e) => {
@@ -77,6 +106,33 @@ const RecargasMovistar = () => {
           <Button type={"submit"}>Realizar deposito</Button>
         </ButtonBar>
       </Form>
+      <Modal
+        show={showModal}
+        handleClose={
+          paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
+        }
+      >
+        {paymentStatus ? (
+          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+            <Tickets />
+            <ButtonBar>
+              <Button>Imprimir</Button>
+              <Button>Cerrar</Button>
+            </ButtonBar>
+          </div>
+        ) : (
+          <PaymentSummary>
+            <ButtonBar>
+              <Button type="submit" disabled={loadingCashIn}>
+                Aceptar
+              </Button>
+              <Button onClick={handleClose} disabled={loadingCashIn}>
+                Cancelar
+              </Button>
+            </ButtonBar>
+          </PaymentSummary>
+        )}
+      </Modal>
     </Fragment>
   );
 };
