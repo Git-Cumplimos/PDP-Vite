@@ -94,9 +94,9 @@ const TicketsDavivienda = ({
         <h1 className='uppercase text-center px-8 my-2 text-sm font-semibold'>
           {commerceName ?? ""}
         </h1>
-        <h1 className='uppercase text-center px-8 my-1 text-sm font-semibold'>
+        {/* <h1 className='uppercase text-center px-8 my-1 text-sm font-semibold'>
           Transacción exitosa
-        </h1>
+        </h1> */}
         <div className='flex flex-col gap-2 px-2 text-xs'>
           {trxInfo
             .map((e, i, arr) => {
@@ -142,7 +142,7 @@ const TicketsDavivienda = ({
             <h1
               className='text-center my-1  font-normal'
               style={{
-                "writing-mode": "vertical-lr",
+                writingMode: "vertical-lr",
                 transform: "rotate(-180deg)",
                 padding: "0 1px",
                 fontSize: "5px",
@@ -152,7 +152,7 @@ const TicketsDavivienda = ({
             <h1
               className='text-center my-1  font-normal'
               style={{
-                "writing-mode": "vertical-lr",
+                writingMode: "vertical-lr",
                 transform: "rotate(-180deg)",
                 padding: "0 1px",
                 fontSize: "6px",
@@ -165,7 +165,11 @@ const TicketsDavivienda = ({
               {disclamer}
             </h1>
             <h1 className='text-center my-1 text-xs font-normal'>
-              Espacio para mensajes publicitarios y/o campañas
+              {"En este Punto DaviPlata Corresponsal"}
+              <br />
+              {"Bancario Davivienda usted podrá meter"}
+              <br />
+              {"y sacar plata de su DaviPlata"}
             </h1>
           </div>
         </div>
@@ -174,11 +178,11 @@ const TicketsDavivienda = ({
             <h1
               className='text-center my-1 text-xs font-normal'
               style={{
-                "writing-mode": "vertical-lr",
+                writingMode: "vertical-lr",
                 transform: "rotate(-180deg)",
                 padding: "0 1px",
-                "border-left": " 1px solid black",
-                "border-right": "1px solid black",
+                borderLeft: " 1px solid black",
+                borderRight: "1px solid black",
                 // borderWidth: "5px 0",
               }}>
               VIGILADO

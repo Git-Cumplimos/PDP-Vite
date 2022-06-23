@@ -62,7 +62,7 @@ const Retiro = () => {
       .catch((err) => console.error(err));
   }, []);
   const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de cash-out Davivienda CB",
+    title: "Recibo de retiro DaviPlata",
     timeInfo: {
       "Fecha de venta": "",
       Hora: "",
@@ -80,6 +80,8 @@ const Retiro = () => {
         "Dirección",
         roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
       ],
+      ["Tipo de operación", "Retiro DaviPlata"],
+      ["", ""],
     ],
     commerceName: roleInfo?.["nombre comercio"]
       ? roleInfo?.["nombre comercio"]
@@ -110,7 +112,29 @@ const Retiro = () => {
       valorCashOut: "",
     });
     setObjTicketActual((old) => {
-      return { ...old, trxInfo: [] };
+      return {
+        ...old,
+        commerceInfo: [
+          /*id transaccion recarga*/
+          /*id_comercio*/
+          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+          /*id_dispositivo*/
+          [
+            "No. terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1,
+          ],
+          /*ciudad*/
+          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
+          /*direccion*/
+          [
+            "Dirección",
+            roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
+          ],
+          ["Tipo de operación", "Retiro DaviPlata"],
+          ["", ""],
+        ],
+        trxInfo: [],
+      };
     });
     setPeticion(false);
   };
@@ -131,14 +155,6 @@ const Retiro = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    // objTicket["trxInfo"].push([
-    //   "Numero de telefono",
-    //   datosTrans.numeroTelefono,
-    // ]);
-    // objTicket["trxInfo"].push(["", ""]);
-    // objTicket["trxInfo"].push(["Numero OTP", datosTrans.otp]);
-    // objTicket["trxInfo"].push(["", ""]);
-
     setIsUploading(true);
     postRealizarCashoutDavivienda({
       idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
@@ -155,22 +171,36 @@ const Retiro = () => {
       otp: datosTrans.otp,
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      direccion: roleInfo?.direccion ? roleInfo?.direccion : "",
     })
       .then((res) => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
           // hideModal();
-
-          objTicket["trxInfo"].push([
-            "Número autorización",
+          objTicket["commerceInfo"][1] = [
+            "No. terminal",
+            res?.obj?.codigoTotal,
+          ];
+          objTicket["commerceInfo"].push([
+            "No. de aprobación",
             res?.obj?.respuesta_davivienda?.numeroAutorizacion,
           ]);
-          objTicket["trxInfo"].push(["", ""]);
+          objTicket["commerceInfo"].push(["", ""]);
           objTicket["trxInfo"].push(["Número de telefono", res?.obj?.numero]);
           objTicket["trxInfo"].push(["", ""]);
           objTicket["trxInfo"].push([
-            "Valor transacción",
+            "Valor",
+            formatMoney.format(datosTrans.valorCashOut),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          objTicket["trxInfo"].push([
+            "Costo transacción",
+            formatMoney.format(0),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          objTicket["trxInfo"].push([
+            "Total",
             formatMoney.format(datosTrans.valorCashOut),
           ]);
           objTicket["trxInfo"].push(["", ""]);
@@ -191,7 +221,7 @@ const Retiro = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl'>Cash Out Davivienda CB</h1>
+      <h1 className='text-3xl'>Retiro Daviplata</h1>
       <Form grid onSubmit={onSubmit}>
         <Input
           id='numeroTelefono'
@@ -296,9 +326,6 @@ const Retiro = () => {
           )}
           {peticion && (
             <>
-              <TicketsDavivienda
-                ticket={objTicketActual}
-                refPrint={printDiv}></TicketsDavivienda>
               <h2>
                 <ButtonBar>
                   <Button
@@ -311,6 +338,9 @@ const Retiro = () => {
                   <Button onClick={handlePrint}>Imprimir</Button>
                 </ButtonBar>
               </h2>
+              <TicketsDavivienda
+                ticket={objTicketActual}
+                refPrint={printDiv}></TicketsDavivienda>
             </>
           )}
         </div>

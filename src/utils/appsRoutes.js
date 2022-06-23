@@ -235,6 +235,9 @@ const DepositoCB = lazy(() =>
 const RetiroCB = lazy(() =>
   import("../apps/CorresponsaliaDavivienda/Views/AhorrosCorriente/Retiro")
 );
+const PagoDeProductosPropios = lazy(() =>
+  import("../apps/CorresponsaliaDavivienda/Views/PagoDeProductosPropios")
+);
 
 /**
  * API-SMS
@@ -552,6 +555,14 @@ const allUrlsPrivateApps = [
         link: "/corresponsaliaDavivienda/cashOut",
         label: <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />,
         component: CashOut,
+        permission: [30],
+      },
+      {
+        link: "/corresponsaliaDavivienda/pagoDeProductosPropios",
+        label: (
+          <AppIcons Logo={"MARKETPLACE"} name='Pago de productos de crédito' />
+        ),
+        component: PagoDeProductosPropios,
         permission: [30],
       },
       {

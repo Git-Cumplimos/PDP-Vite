@@ -4,23 +4,17 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Modal from "../../../components/Base/Modal";
-import useQuery from "../../../hooks/useQuery";
-import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import {
-  postCashOut,
-  postRealizarCashoutDavivienda,
-} from "../utils/fetchCorresponsaliaDavivienda";
 import { notify, notifyError } from "../../../utils/notify";
-import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
-import { useFetch } from "../../../hooks/useFetch";
+import { formatMoney } from "../../../components/Base/MoneyInput";
 import { useAuth } from "../../../hooks/AuthHooks";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
-import { enumParametrosAutorizador } from "../utils/enumParametrosAutorizador";
-import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
 import TicketsDavivienda from "../components/TicketsDavivienda";
 import Select from "../../../components/Base/Select";
+import {
+  postConsultaPagoPorGiroDavivienda,
+  postPagoPorGiroDavivienda,
+} from "../utils/fetchPagoPorGiro";
 
 const PagoGiro = () => {
   const { roleInfo } = useAuth();
@@ -29,8 +23,7 @@ const PagoGiro = () => {
   //   superior: 100000,
   //   inferior: 100,
   // });
-  const [peticion, setPeticion] = useState(false);
-  const [botonAceptar, setBotonAceptar] = useState(false);
+  const [peticion, setPeticion] = useState(0);
   const [datosTrans, setDatosTrans] = useState({
     tipoIdentificacion: "",
     numeroIdentificacion: "",
@@ -38,31 +31,7 @@ const PagoGiro = () => {
     nombreTipoIdentificacion: "",
   });
   const [isUploading, setIsUploading] = useState(false);
-  // useEffect(() => {
-  //   fetchParametrosAutorizadoresFunc();
-  // }, []);
-  // const fetchParametrosAutorizadoresFunc = useCallback(() => {
-  //   fetchParametrosAutorizadores({})
-  //     .then((autoArr) => {
-  //       setLimiteRecarga({
-  //         superior: parseInt(
-  //           autoArr?.results?.filter(
-  //             (i) =>
-  //               i.id_tabla_general_parametros_autorizadores ===
-  //               enumParametrosAutorizador.limite_superior_cash_out_davivienda_cb
-  //           )[0]?.valor_parametro
-  //         ),
-  //         inferior: parseInt(
-  //           autoArr?.results?.filter(
-  //             (i) =>
-  //               i.id_tabla_general_parametros_autorizadores ===
-  //               enumParametrosAutorizador.limite_inferior_cash_out_davivienda_cb
-  //           )[0]?.valor_parametro
-  //         ),
-  //       });
-  //     })
-  //     .catch((err) => console.error(err));
-  // }, []);
+  const [datosConsulta, setDatosConsulta] = useState({});
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de pago por giro Davivienda CB",
     timeInfo: {
@@ -73,6 +42,7 @@ const PagoGiro = () => {
       /*id transaccion recarga*/
       /*id_comercio*/
       ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
       /*ciudad*/
@@ -82,18 +52,21 @@ const PagoGiro = () => {
         "Dirección",
         roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
       ],
+      ["Tipo de operación", "Pago por giro"],
+      ["", ""],
     ],
     commerceName: roleInfo?.["nombre comercio"]
       ? roleInfo?.["nombre comercio"]
       : "prod",
     trxInfo: [],
     disclamer:
-      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+      "Línea de atención personalizada: #688 Mensaje de texto: 85888 Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
   });
 
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
   const onSubmit = (e) => {
     e.preventDefault();
+    setPeticion(1);
     habilitarModal();
   };
 
@@ -103,16 +76,40 @@ const PagoGiro = () => {
   };
 
   const hideModal = () => {
+    if (peticion === 3 || peticion === 2) return setPeticion(4);
     setShowModal(false);
     setDatosTrans({
-      otp: "",
-      numeroTelefono: "",
-      valorCashOut: "",
+      tipoIdentificacion: "",
+      numeroIdentificacion: "",
+      codigoFamilia: "",
+      nombreTipoIdentificacion: "",
     });
     setObjTicketActual((old) => {
-      return { ...old, trxInfo: [] };
+      return {
+        ...old,
+        commerceInfo: [
+          /*id transaccion recarga*/
+          /*id_comercio*/
+          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+          /*id_dispositivo*/
+          [
+            "No. terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1,
+          ],
+          /*ciudad*/
+          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
+          /*direccion*/
+          [
+            "Dirección",
+            roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
+          ],
+          ["Tipo de operación", "Pago por giro"],
+          ["", ""],
+        ],
+        trxInfo: [],
+      };
     });
-    setPeticion(false);
+    setPeticion(0);
   };
 
   const printDiv = useRef();
@@ -120,8 +117,7 @@ const PagoGiro = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-
-  const peticionCashOut = () => {
+  const peticionConsulta = () => {
     const hoy = new Date();
     const fecha =
       hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
@@ -131,28 +127,19 @@ const PagoGiro = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    // objTicket["trxInfo"].push([
-    //   "Numero de telefono",
-    //   datosTrans.numeroTelefono,
-    // ]);
-    // objTicket["trxInfo"].push(["", ""]);
-    // objTicket["trxInfo"].push(["Numero OTP", datosTrans.otp]);
-    // objTicket["trxInfo"].push(["", ""]);
-
     setIsUploading(true);
-    postRealizarCashoutDavivienda({
+    postConsultaPagoPorGiroDavivienda({
+      tipoIdentificacion: datosTrans.tipoIdentificacion,
+      numeroIdentificacion: datosTrans.numeroIdentificacion,
+      codigoFamilia: datosTrans.codigoFamilia,
       idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
       idUsuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 1,
       idTerminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 801,
-      valor: datosTrans?.valorCashOut,
       issuerIdDane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 1121,
       nombreComercio: roleInfo?.["nombre comercio"]
         ? roleInfo?.["nombre comercio"]
         : "prod",
-      ticket: objTicket,
-      numCelular: datosTrans.numeroTelefono,
       municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "Bogota",
-      otp: datosTrans.otp,
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
     })
@@ -161,21 +148,89 @@ const PagoGiro = () => {
           setIsUploading(false);
           notify(res?.msg);
           // hideModal();
+          objTicket["commerceInfo"][1] = [
+            "No. terminal",
+            res?.obj?.codigoTotal,
+          ];
+          objTicket["commerceInfo"].push([
+            "No. de aprobación",
+            "Transacción Declinada",
+          ]);
+          objTicket["commerceInfo"].push(["", ""]);
+          objTicket["trxInfo"].push(["Valor", formatMoney.format(0)]);
+          objTicket["trxInfo"].push(["", ""]);
+          objTicket["trxInfo"].push([
+            "Costo transacción",
+            formatMoney.format(0),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          objTicket["trxInfo"].push([
+            "Total",
+            formatMoney.format(res?.obj?.respuesta_davivienda[0].valorPago),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
+          setPeticion(2);
+        } else {
+          setIsUploading(false);
+          notifyError(res?.msg);
+          hideModal();
+        }
+      })
+      .catch((err) => {
+        setIsUploading(false);
+        notifyError("No se ha podido conectar al servidor");
+        console.error(err);
+      });
+  };
+  const peticionPagoPorGiro = () => {
+    const hoy = new Date();
+    const fecha =
+      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+    /*hora actual */
+    const hora =
+      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+    const objTicket = { ...objTicketActual };
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
 
-          objTicket["trxInfo"].push([
-            "Número autorización",
-            res?.obj?.respuesta_davivienda?.numeroAutorizacion,
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push(["Número de telefono", res?.obj?.numero]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Valor transacción",
-            formatMoney.format(datosTrans.valorCashOut),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
+    setIsUploading(true);
+    postPagoPorGiroDavivienda({
+      tipoIdentificacion: datosTrans.tipoIdentificacion,
+      numeroIdentificacion: datosTrans.numeroIdentificacion,
+      codigoFamilia: datosTrans.codigoFamilia,
+      idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
+      idUsuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 1,
+      idTerminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 801,
+      issuerIdDane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 1121,
+      nombreComercio: roleInfo?.["nombre comercio"]
+        ? roleInfo?.["nombre comercio"]
+        : "prod",
+      municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "Bogota",
+      oficinaPropia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      ticket: objTicket,
+      direccion: roleInfo?.direccion ? roleInfo?.direccion : "",
+    })
+      .then((res) => {
+        if (res?.status) {
+          setIsUploading(false);
+          notify(res?.msg);
+          // hideModal();
+          objTicket["commerceInfo"][6] = [
+            "No. de aprobación",
+            res?.obj?.referencia,
+          ];
+          objTicket["trxInfo"][0] = [
+            "Valor",
+            formatMoney.format(res?.obj?.valor),
+          ];
+          objTicket["trxInfo"][4] = [
+            "Total",
+            formatMoney.format(res?.obj?.valor),
+          ];
           setObjTicketActual(objTicket);
-          setPeticion(true);
+          setPeticion(4);
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
@@ -215,8 +270,8 @@ const PagoGiro = () => {
           label='Código de familia'
           type='text'
           name='codigoFamilia'
-          minLength='6'
-          maxLength='6'
+          minLength='1'
+          maxLength='8'
           required
           value={datosTrans.codigoFamilia}
           onInput={(e) => {
@@ -240,15 +295,14 @@ const PagoGiro = () => {
           value={datosTrans?.tipoIdentificacion}
           onChange={(e) =>
             setDatosTrans((old) => {
-              console.log(e);
               return {
                 ...old,
                 tipoIdentificacion: e.target.value,
-                nombreTipoIdentificacion: e.target.name,
+                nombreTipoIdentificacion:
+                  e.target.options[e.target.selectedIndex].text,
               };
             })
           }
-          // defaultValue={comissionData?.type}
           required
         />
         <ButtonBar className='lg:col-span-2'>
@@ -257,47 +311,73 @@ const PagoGiro = () => {
       </Form>
       <Modal show={showModal} handleClose={hideModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-          {!peticion && (
+          {peticion === 1 && (
             <>
               <h1 className='text-2xl font-semibold'>
                 ¿Esta seguro de realizar la consulta del giro?
               </h1>
-              {/* <h2 className='text-base'>
-                {`Valor de transacción: ${formatMoney.format(
-                  datosTrans.valorCashOut
-                )} COP`}
-              </h2> */}
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
               <h2>{`Código de familia: ${datosTrans.codigoFamilia}`}</h2>
               <ButtonBar>
-                <Button
-                  disabled={botonAceptar}
-                  type='submit'
-                  onClick={peticionCashOut}>
+                <Button type='submit' onClick={peticionConsulta}>
                   Aceptar
                 </Button>
                 <Button onClick={hideModal}>Cancelar</Button>
               </ButtonBar>
             </>
           )}
-          {peticion && (
+          {peticion === 2 && (
             <>
-              <TicketsDavivienda
-                ticket={objTicketActual}
-                refPrint={printDiv}></TicketsDavivienda>
+              <h1 className='text-2xl font-semibold'>
+                Consulta de pago por giro
+              </h1>
+              <h2>{`Nombre de convenio: ${datosConsulta.nombreConvenio}`}</h2>
+              <h2>{`Código de convenio: ${datosConsulta.codigoConvenio}`}</h2>
+              <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
+              <h2>{`Número de identificacion: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
+              <h2>{`Valor transacción: ${formatMoney.format(
+                datosConsulta.valorPago
+              )}`}</h2>
+              <ButtonBar>
+                <Button type='submit' onClick={() => setPeticion(3)}>
+                  Aceptar
+                </Button>
+                <Button onClick={hideModal}>Cancelar</Button>
+              </ButtonBar>
+            </>
+          )}
+          {peticion === 3 && (
+            <>
+              <h1 className='text-2xl font-semibold'>
+                ¿Esta seguro de realizar la transacción del giro?
+              </h1>
+              <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
+              <h2>{`Número de identificacion: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
+              <h2>{`Valor transacción: ${formatMoney.format(
+                datosConsulta.valorPago
+              )}`}</h2>
+              <ButtonBar>
+                <Button type='submit' onClick={peticionPagoPorGiro}>
+                  Aceptar
+                </Button>
+                <Button onClick={hideModal}>Cancelar</Button>
+              </ButtonBar>
+            </>
+          )}
+          {peticion === 4 && (
+            <>
               <h2>
                 <ButtonBar>
-                  <Button
-                    type='submit'
-                    onClick={() => {
-                      hideModal();
-                    }}>
+                  <Button type='submit' onClick={hideModal}>
                     Aceptar
                   </Button>
                   <Button onClick={handlePrint}>Imprimir</Button>
                 </ButtonBar>
               </h2>
+              <TicketsDavivienda
+                ticket={objTicketActual}
+                refPrint={printDiv}></TicketsDavivienda>
             </>
           )}
         </div>
