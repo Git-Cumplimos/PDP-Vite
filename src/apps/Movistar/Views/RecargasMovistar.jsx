@@ -12,17 +12,16 @@ const URL = "http://127.0.0.1:5000/recargasMovistar/prepago";
 const RecargasMovistar = () => {
   const [inputCelular, setInputCelular] = useState(null);
   const [inputValor, setInputValor] = useState(null);
+  const [resPeticion, setResPeticion] = useState(null);
   const { roleInfo } = useAuth();
-  const l = "";
+
   const onChange = useCallback((e) => {
     if (e.target.name == "celular") {
-      setInputCelular(e.target.value);
-    }
-    if (e.target.name == "valor") {
-      let p = e.target.value.replaceAll(".", "");
-      p = parseInt(p.slice(2));
-
-      setInputValor(p);
+      const formData = new FormData(e.target.form);
+      const phone = ((formData.get("celular") ?? "").match(/\d/g) ?? []).join(
+        ""
+      );
+      setInputCelular(phone);
     }
   });
 
@@ -31,14 +30,22 @@ const RecargasMovistar = () => {
     const data = {
       celular: inputCelular,
       valor: inputValor,
-      codigo_comercio: "0679977",
-      identificador_region: "CIUDADELA",
+      codigo_comercio: roleInfo.id_comercio,
+      identificador_region: roleInfo.direccion,
     };
-    console.log(data);
-    PeticionRecarga(URL, data).then((return_) => {});
+
+    PeticionRecarga(URL, data).then((result) => {
+      //   setResPeticion(result.obj[0].codigo_error);
+      console.log(result.obj);
+      //   if(result.obj[0].codigo_error == ""){
+
+      //   }
+    });
   });
 
-  const onMoneyChange = useCallback(() => {});
+  const onMoneyChange = useCallback((e, valor) => {
+    setInputValor(valor);
+  });
   const limitesMontos = 10;
   return (
     <Fragment>
@@ -47,10 +54,11 @@ const RecargasMovistar = () => {
           id="celular"
           name="celular"
           label="celular: "
-          type="number"
+          type="tel"
           autoComplete="off"
           minLength={"10"}
           maxLength={"10"}
+          value={inputCelular ?? ""}
           onInput={() => {}}
           required
         />
@@ -60,15 +68,14 @@ const RecargasMovistar = () => {
           name="valor"
           label="Valor de la recarga"
           autoComplete="off"
-          min={"1"}
-          max={"10"}
+          min={"1000"}
+          max={"9999999999"}
           onInput={onMoneyChange}
           required
         />
-
-        <Button type={"submit"} className={"lg:col-span-2"}>
-          Realizar deposito
-        </Button>
+        <ButtonBar className={"lg:col-span-2"}>
+          <Button type={"submit"}>Realizar deposito</Button>
+        </ButtonBar>
       </Form>
     </Fragment>
   );
