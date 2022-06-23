@@ -393,7 +393,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [selected, customer, roleInfo]
+    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica]
   );
 
   const searchModa = useCallback(

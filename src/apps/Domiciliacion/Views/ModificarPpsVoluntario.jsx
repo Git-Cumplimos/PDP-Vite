@@ -185,7 +185,7 @@ const ModificarPps = () => {
           minLength="5"
           maxLength="10"
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
+            const num = e.target.value || "";
             setBuscarCedula(num);
           }}
           type={"text"}
