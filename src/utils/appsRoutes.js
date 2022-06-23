@@ -544,31 +544,31 @@ const allUrlsPrivateApps = [
     link: "/corresponsaliaDavivienda",
     label: <AppIcons Logo={"MARKETPLACE"} name="Corresponsalia" />,
     component: CorresponsaliaDavivienda,
-    permission: [53],
+    permission: [54],
     subRoutes: [
       {
         link: "/corresponsaliaDavivienda/Daviplata",
         label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
         component: DaviplataCB,
-        permission: [53],
+        permission: [54],
         subRoutes: [
           {
             link: "/corresponsaliaDavivienda/DaviplatacashIn",
             label: <AppIcons Logo={"MARKETPLACE"} name="Depositos Daviplata" />,
             component: CashIn,
-            permission: [53],
+            permission: [54],
           },
           {
             link: "/corresponsaliaDavivienda/DaviplatacashOut",
             label: <AppIcons Logo={"MARKETPLACE"} name="Retiros Daviplata" />,
             component: CashOut,
-            permission: [53],
+            permission: [54],
           },
           {
             link: "/corresponsaliaDavivienda/Daviplatapagos_giros",
             label: <AppIcons Logo={"MARKETPLACE"} name="Pagos por giro" />,
             component: PagoGiro,
-            permission: [53],
+            permission: [54],
           },
         ],
       },

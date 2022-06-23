@@ -65,9 +65,15 @@ const CrearPin = () => {
       .catch(() => setDisabledBtns(false));
   }, []);
 
-  const textTipoPin = useMemo(() => {
+  const pinData = useMemo(() => {
     const resp = optionsTipoPines?.filter((id) => id.id === tipoPin);
-    return resp[0]?.descripcion.toUpperCase();
+    const pinData = {
+      descripcion : resp[0]?.descripcion.toUpperCase(),
+      valor : resp[0]?.valor,
+      iva : resp[0]?.iva,
+      total : resp[0]?.valor + resp[0]?.iva
+    }
+    return pinData;
   }, [optionsTipoPines, tipoPin]);
 
   const tramiteData = useMemo(() => {
@@ -93,6 +99,11 @@ const CrearPin = () => {
       nombre_comercio: roleInfo?.["nombre comercio"],
     };
   }, [roleInfo]);
+
+  const onSubmitModal = (e) => {
+    e.preventDefault();
+    setShowModal(true)
+  };
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -145,7 +156,7 @@ const CrearPin = () => {
         Dirección: roleInfo?.direccion,
         "Id Trx": respPin?.transacciones_id_trx?.creacion,
       }),
-      commerceName: textTipoPin,
+      commerceName: pinData.descripcion,
       trxInfo: [
         ["Proceso", "Creación de Pin"],
         ["Codigo", respPin?.cod_hash_pin],
@@ -159,7 +170,7 @@ const CrearPin = () => {
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [roleInfo, respPin, textTipoPin, tramiteData]);
+  }, [roleInfo, respPin, pinData, tramiteData]);
 
   useEffect(() => {
     infoTicket(
@@ -171,7 +182,7 @@ const CrearPin = () => {
   return (
     <>
       <h1 className="text-3xl">Datos creación de Pin</h1>
-      <Form onSubmit={onSubmit} grid>
+      <Form onSubmit={onSubmitModal} grid>
         <Input
           id="numDocumento"
           label="Documento"
@@ -204,6 +215,7 @@ const CrearPin = () => {
           }}
         />
         <Select
+          className="place-self-stretch"
           id="tramite"
           label="Tramite"
           options={
@@ -228,6 +240,7 @@ const CrearPin = () => {
       </Form>
 
       <Modal show={showModal} handleClose={() => closeModal()}>
+        {respPin !== ""? 
         <div className="flex flex-col justify-center items-center">
           <Tickets refPrint={printDiv} ticket={tickets} />
           <ButtonBar>
@@ -247,6 +260,82 @@ const CrearPin = () => {
             </Button>
           </ButtonBar>
         </div>
+        :
+        <div className="flex flex-col justify-center items-center">
+          <div className="flex flex-col w-1/2 mx-auto">
+            <h1 className="text-3xl mt-3 mx-auto">Crear Pin</h1>
+            <br></br>
+            <h1 className="flex flex-row justify-center text-lg font-medium">{tramiteData.descripcion}</h1>
+            <br></br>
+            <>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Tramite</h1>
+                <h1>{formatMoney.format(tramiteData.valor)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>IVa Tramite</h1>
+                <h1>{formatMoney.format(tramiteData.iva)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Pin</h1>
+                <h1>{formatMoney.format(pinData.valor)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>IVa Pin</h1>
+                <h1>{formatMoney.format(pinData.iva)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Total</h1>
+                <h1>{formatMoney.format(pinData.total + tramiteData.total)}</h1>
+              </div>
+            </>
+            {/* {Object.entries(tramiteData).map(([key, val]) => {
+              return (
+                <>
+                  <div
+                    className="flex flex-row justify-between text-lg font-medium"
+                    key={key}
+                  >
+                    <h1>{key}</h1>
+                    <h1>{val}</h1>
+                  </div>
+                </>
+              );
+            })} */}
+            <div className="flex flex-col justify-center items-center mx-auto container">
+              <Form onSubmit={onSubmit}>
+                <ButtonBar>
+                  <Button type="submit">
+                    Crear Pin
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      closeModal();
+                      // setrespPago();
+                      // getQuota();
+                    }}
+                  >
+                    Cerrar
+                  </Button>
+                </ButtonBar>
+              </Form>
+            </div>
+          </div>
+        </div>
+        
+        
+        }
+        
       </Modal>
     </>
   );
