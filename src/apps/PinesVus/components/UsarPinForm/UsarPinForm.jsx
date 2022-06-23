@@ -19,7 +19,9 @@ const UsarPinForm = ({
   respPin,
   closeModal,
   trx,
+  name_tramite,
   valor,
+  id_pin,
   tipoPin,
   setActivarNavigate,
 }) => {
@@ -56,7 +58,7 @@ const UsarPinForm = ({
   const [disabledBtn, setDisabledBtn] = useState(false);
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: "Recibo de pago: " + name_tramite,
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -98,7 +100,7 @@ const UsarPinForm = ({
   const onSubmitUsar = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    usarPinVus(respPin, valor, trx, num_tramite, roleInfo)
+    usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin) // Pin + IVA
       .then((res) => {
         setNum_tramite("");
         setActivarNavigate(false);

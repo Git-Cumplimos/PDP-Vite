@@ -82,13 +82,14 @@ const ReportePines = () => {
                 fecha_creacion.setHours(fecha_creacion.getHours() + 5);
                 setFormatMon(row?.ValorPagar);
                 return {
-                  Id: row?.id_pin,
+                  // Id: row?.id_pin,
                   Cedula: row?.doc_cliente,
                   Estado: row?.name_estado_pin,
-                  "Codigo Estado": row?.estado_pin,
+                  // "Codigo Estado": row?.estado_pin,
                   Creacion: dateFormatter.format(fecha_creacion),
                   Vencimiento: dateFormatter.format(fecha_vencimiento),
-                  Valor: formatMoney.format(row?.valor),
+                  Tramite: row?.name_tramite === "" ? "" : row?.name_tramite,
+                  Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite*1.19), // Valor + IVA
                 };
               })
             );
@@ -128,12 +129,11 @@ const ReportePines = () => {
           title="Información de credito"
           maxPage={maxPages}
           headers={[
-            "Id",
             "Cedula",
             "Estado",
-            "Codigo Estado",
             "Creación",
             "Vencimiento",
+            "Tramite",
             "Valor",
           ]}
           data={table || []}

@@ -110,14 +110,14 @@ const Deposito = () => {
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
           Tipo: roleInfo?.tipo_comercio,
-          tipoTransaccion: 5706, /// Deposito
-          tipoDocumento: tipoDocumento, /// Cedula
-          numDocumento: userDoc,
-          valTransaccion: valor,
-          tipoCuenta: tipoCuenta,
+          numTipoTransaccion: 5706, /// Deposito
+          numTipoDocumento: tipoDocumento, /// Cedula
+          numNumeroDocumento: userDoc,
+          numValorTransaccion: valor,
+          numTipoCuenta: tipoCuenta,
           //nomDepositante: nomDepositante,
           //valToken: "valToken", /// De donde viene
-          numCuenta: numCuenta,       
+          numNumeroDeCuenta: numCuenta,       
         };
         fetchConsultaCostoCB(body)
         .then((res) => {
@@ -128,11 +128,11 @@ const Deposito = () => {
           }else{
             setDatosConsulta(res?.obj?.Data)
             const summary = {
-              "Nombre titular": res?.obj?.Data?.nombreTitular,
-              "Apellito titular": res?.obj?.Data?.apellidoTitular,
+              "Nombre titular": res?.obj?.Data?.valNombreTitular,
+              "Apellito titular": res?.obj?.Data?.valApellidoTitular,
               "Numero cuenta": numCuenta,
               "Valor de deposito": valorFormat,
-              "Valor cobro": formatMoney.format(res?.obj?.Data?.valCobro),
+              "Valor cobro": formatMoney.format(res?.obj?.Data?.numValorCobro),
             };
             setQuery({ numCuenta, valor, summary }, { replace: true });
             setShowModal(true);
@@ -198,9 +198,13 @@ const Deposito = () => {
       Tipo: roleInfo?.tipo_comercio,
       numTipoCuenta: tipoCuenta,
       numNumeroCuenta: numCuenta,
-      numIdDepositante: 123,
+      numIdDepositante: userDoc,
       //valToken: "valToken",
-      numValorConsignacion: valor,    
+      numValorConsignacion: valor,
+      direccion: roleInfo?.direccion,
+      cod_dane: roleInfo?.codigo_dane,
+      nomdepositante: nomDepositante,
+      tip_id_depositante: tipoDocumento    
     };
 
     fetchDepositoCorresponsal(body)
@@ -319,7 +323,7 @@ const Deposito = () => {
           type="text"
           autoComplete="off"
           minLength={"7"}
-          maxLength={"13"}
+          maxLength={"10"}
           value={userDoc ?? ""}
           onInput={() => {}}
           required
