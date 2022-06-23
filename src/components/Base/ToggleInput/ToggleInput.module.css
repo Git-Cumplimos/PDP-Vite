@@ -1,0 +1,51 @@
+.formItem {
+  /* @apply flex flex-col md:flex-row justify-center items-center text-center my-4 mx-4 gap-4; */
+  @apply relative text-center my-4 mx-auto md:mx-4 gap-4;
+
+  @apply grid place-items-center place-content-end;
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-minmax-sm), 1fr));
+}
+
+.formItem > label:not(.toggle) {
+  @apply text-xl;
+}
+
+/* The toggle - the box around the slider */
+.toggle {
+  @apply relative inline-block w-16 h-9;
+}
+
+/* Hide default HTML checkbox */ 
+.toggle > input {
+  @apply opacity-0 w-0 h-0;
+}
+
+/* The slider */
+.slider {
+  @apply absolute inset-0 bg-gray-400 transition-all duration-300 cursor-pointer;
+}
+
+.slider::before {
+  @apply absolute h-7 w-7 right-1 bottom-1 bg-white transition-all duration-100;
+  content: "";
+}
+
+.toggle > input:checked + .slider {
+  @apply bg-primary;
+  /* background-color: #2196F3; */
+}
+
+.toggle > input:checked + .slider::before {
+  @apply transform -translate-x-7;
+}
+
+/* Rounded sliders */
+.slider.round {
+  @apply rounded-3xl;
+  /* border-radius: 34px; */
+}
+
+.slider.round::before {
+  @apply rounded-full;
+  /* border-radius: 50%; */
+}

@@ -1,0 +1,16 @@
+.formItem {
+  /* @apply flex flex-col md:flex-row justify-center items-center;
+  @apply text-center my-4 mx-auto md:mx-4 gap-4; */
+  @apply relative text-center my-4 mx-auto md:mx-4 gap-4;
+
+  @apply grid place-items-center place-content-end;
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-minmax-sm), 1fr));
+}
+
+.formItem > label {
+  @apply text-xl;
+}
+
+.formItem > select {
+  @apply px-4 py-2 rounded-md bg-secondary-light text-black;
+}

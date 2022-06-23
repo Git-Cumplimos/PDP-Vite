@@ -1,0 +1,64 @@
+.formItem {
+  /* @apply flex flex-col md:flex-row justify-center items-center; */
+  @apply relative text-center mx-auto md:mx-4 gap-4;
+
+  @apply grid place-items-center place-content-end;
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-minmax-sm), 1fr));
+}
+
+.formItem > label {
+  /* flex: 1 1 50%; */
+  @apply text-xl;
+}
+
+.formItem > div > input {
+  /* flex: 1 1 50%; */
+  @apply px-4 py-2 rounded-md bg-secondary-light text-black;
+}
+
+.formItem > div > input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.formItem > div > input[type="checkbox"] {
+  min-width: 100px;
+}
+
+.formItem > div > input:disabled {
+  @apply bg-gray-100;
+}
+
+.formItem > div > input[list]::-webkit-calendar-picker-indicator {
+  width: 0;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+}
+
+.formItem > div > input::-webkit-outer-spin-button,
+.formItem > div > input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.formItem > div > input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  content: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-lg' viewBox='0 0 16 16'><path d='M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z'/></svg>");
+  cursor: pointer;
+}
+
+.formItem > div {
+  @apply relative;
+}
+
+/* .formItem > div > input:invalid:not([value=""]) {
+  @apply border-2 border-red-600;
+} */
+
+.formItem > div > input + p {
+  @apply text-xs absolute text-left;
+}
+
+.formItem > div > input + p.invalid {
+  @apply text-red-600;
+}

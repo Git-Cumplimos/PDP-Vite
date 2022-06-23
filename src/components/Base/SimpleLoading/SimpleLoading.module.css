@@ -1,0 +1,10 @@
+/* The Modal (background) */
+.modal {
+  @apply fixed inset-0 w-full h-full bg-gray-200 bg-opacity-80 z-50;
+  @apply overflow-auto;
+}
+
+/* Modal Content/Box */
+.modalContent {
+  @apply flex bg-transparent mx-auto my-60 w-max justify-center align-middle;
+}
