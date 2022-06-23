@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -18,6 +18,7 @@ const RecargasMovistar = () => {
   const [inputCelular, setInputCelular] = useState(null);
   const [inputValor, setInputValor] = useState(null);
   const [resPeticion, setResPeticion] = useState(null);
+  const [resDataPeticion, setDataResPeticion] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(false);
 
@@ -40,6 +41,7 @@ const RecargasMovistar = () => {
   const [loadingCashIn, fetchCashIn] = useFetch(postCashIn);
 
   const handleClose = useCallback(() => {
+    setResPeticion(0);
     setShowModal(false);
   }, []);
   const { roleInfo } = useAuth();
@@ -64,13 +66,22 @@ const RecargasMovistar = () => {
     };
 
     PeticionRecarga(URL, data).then((result) => {
-      //   setResPeticion(result.obj[0].codigo_error);
-      console.log(result.obj);
-      //   if(result.obj[0].codigo_error == ""){
+      setDataResPeticion(result);
 
-      //   }
+      if (result.obj?.[0].codigo_error == "00") {
+        setResPeticion(1);
+        setShowModal(true);
+      } else {
+        console.log("jj");
+        setResPeticion(0);
+        setShowModal(true);
+      }
     });
   });
+
+  useEffect(() => {
+    console.log(resPeticion);
+  }, [resPeticion]);
 
   const onMoneyChange = useCallback((e, valor) => {
     setInputValor(valor);
@@ -112,7 +123,12 @@ const RecargasMovistar = () => {
           paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
         }
       >
-        {paymentStatus ? (
+        <div>
+          {resPeticion == 1
+            ? "Recarga exitosa"
+            : "Recarga no exitosa  - error recarga: datos no correctos "}
+        </div>
+        {/* {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <Tickets />
             <ButtonBar>
@@ -131,7 +147,7 @@ const RecargasMovistar = () => {
               </Button>
             </ButtonBar>
           </PaymentSummary>
-        )}
+        )} */}
       </Modal>
     </Fragment>
   );
