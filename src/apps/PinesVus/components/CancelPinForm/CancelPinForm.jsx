@@ -18,6 +18,9 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 const CancelPin = ({
   respPin,
   valor,
+  valor_tramite,
+  name_tramite,
+  id_pin,
   trx,
   tipoPin,
   closeModal,
@@ -36,7 +39,7 @@ const CancelPin = ({
       .then((res) => {
         console.log(res);
 
-        if (res?.status === false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setOptionsTipoPines(res?.obj?.results);
@@ -61,7 +64,7 @@ const CancelPin = ({
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: "Recibo de pago: " + name_tramite,
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -85,7 +88,11 @@ const CancelPin = ({
       }),
       trxInfo: [
         ["Proceso", "Cancelación de Pin"],
-        ["VALOR", formatMoney.format(valor)],
+        ["Valor Tramite", formatMoney.format(valor_tramite)],
+        ["Iva Tramite",formatMoney.format(valor_tramite*0.19)],
+        ["Valor Pin", formatMoney.format(valor)],
+        ["Iva Pin", formatMoney.format(valor*0.19)],
+        ["Total", formatMoney.format(valor*1.19 + valor_tramite*1.19)], // Valor + IVA
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -99,7 +106,7 @@ const CancelPin = ({
   const onSubmitCancel = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    cancelPinVus(respPin, valor, motivo, trx, roleInfo)
+    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin) //// Valor = valor + IVA
       .then((res) => {
         setActivarNavigate(false);
         setDisabledBtn(false);

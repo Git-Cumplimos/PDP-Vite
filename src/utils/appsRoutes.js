@@ -216,14 +216,17 @@ const Deposito = lazy(() => import("../apps/Daviplata/Views/Deposito"));
 const CorresponsaliaDavivienda = lazy(() =>
   import("../apps/CorresponsaliaDavivienda/CorresponsaliaDavivienda")
 );
+const DaviplataCB = lazy(() =>
+  import("../apps/CorresponsaliaDavivienda/Views/Daviplata")
+);
 const CashIn = lazy(() =>
-  import("../apps/CorresponsaliaDavivienda/Views/Deposito")
+  import("../apps/CorresponsaliaDavivienda/Views/Daviplata/Deposito")
 );
 const CashOut = lazy(() =>
-  import("../apps/CorresponsaliaDavivienda/Views/Retiro")
+  import("../apps/CorresponsaliaDavivienda/Views/Daviplata/Retiro")
 );
 const PagoGiro = lazy(() =>
-  import("../apps/CorresponsaliaDavivienda/Views/PagoGiro")
+  import("../apps/CorresponsaliaDavivienda/Views/Daviplata/PagoGiro")
 );
 
 const AhorrosCorrienteCB = lazy(() =>
@@ -523,73 +526,80 @@ const allUrlsPrivateApps = [
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name='Daviplata' />,
     component: Daviplata,
-    permission: [29, 30],
+    permission: [53],
     subRoutes: [
       {
         link: "/daviplata/depositos",
         label: <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />,
         component: Deposito,
-        permission: [29],
+        permission: [53],
       },
       {
         link: "/daviplata/retiros",
         label: <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />,
         component: Retiro,
-        permission: [30],
+        permission: [53],
       },
     ],
   },
+
   {
     link: "/corresponsaliaDavivienda",
     label: <AppIcons Logo={"MARKETPLACE"} name='Corresponsalia' />,
     component: CorresponsaliaDavivienda,
-    permission: [29, 30],
+    permission: [54],
     subRoutes: [
       {
-        link: "/corresponsaliaDavivienda/cashIn",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />,
-        component: CashIn,
-        permission: [29],
-      },
-      {
-        link: "/corresponsaliaDavivienda/cashOut",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />,
-        component: CashOut,
-        permission: [30],
-      },
-      {
-        link: "/corresponsaliaDavivienda/pagoDeProductosPropios",
-        label: (
-          <AppIcons Logo={"MARKETPLACE"} name='Pago de productos de crédito' />
-        ),
-        component: PagoDeProductosPropios,
-        permission: [30],
-      },
-      {
-        link: "/corresponsaliaDavivienda/pagos_giros",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Pagos por giro' />,
-        component: PagoGiro,
-        permission: [30],
-      },
-      {
-        link: "/ahorrosCorriente",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Deposito y Retiro' />,
-        component: AhorrosCorrienteCB,
-        permission: [29, 30],
+        link: "/corresponsaliaDavivienda/Daviplata",
+        label: <AppIcons Logo={"MARKETPLACE"} name='Daviplata' />,
+        component: DaviplataCB,
+        permission: [54],
         subRoutes: [
           {
-            link: "/ahorrosCorriente/deposito",
-            label: <AppIcons Logo={"MARKETPLACE"} name='Depositos' />,
-            component: DepositoCB,
-            permission: [29],
+            link: "/corresponsaliaDavivienda/DaviplatacashIn",
+            label: <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />,
+            component: CashIn,
+            permission: [54],
           },
           {
-            link: "/ahorrosCorriente/retiro",
-            label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
-            component: RetiroCB,
-            permission: [30],
+            link: "/corresponsaliaDavivienda/DaviplatacashOut",
+            label: <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />,
+            component: CashOut,
+            permission: [54],
           },
         ],
+      },
+
+      {
+        link: "/corresponsaliaDavivienda/ahorrosCorriente",
+        label: (
+          <AppIcons
+            Logo={"MARKETPLACE"}
+            name='Transacciones cuentas Davivienda'
+          />
+        ),
+        component: AhorrosCorrienteCB,
+        permission: [54],
+        subRoutes: [
+          {
+            link: "/corresponsaliaDavivienda/ahorrosCorriente/deposito",
+            label: <AppIcons Logo={"MARKETPLACE"} name='Depositos' />,
+            component: DepositoCB,
+            permission: [54],
+          },
+          {
+            link: "/corresponsaliaDavivienda/ahorrosCorriente/retiro",
+            label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
+            component: RetiroCB,
+            permission: [54],
+          },
+        ],
+      },
+      {
+        link: "/corresponsaliaDavivienda/Daviplatapagos_giros",
+        label: <AppIcons Logo={"MARKETPLACE"} name='Pagos por giro' />,
+        component: PagoGiro,
+        permission: [54],
       },
     ],
   },
@@ -883,25 +893,25 @@ const allUrlsPrivateApps = [
     link: "/domiciliacion",
     label: <AppIcons Logo={"RECAUDO"} name={"Domiciliación"} />,
     component: Domiciliacion,
-    permission: [32, 33, 34, 35, 36],
+    permission: [55, 56, 57],
     subRoutes: [
       {
         link: "/domiciliacion/formulario",
         label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />,
         component: comprobarEmail,
-        permission: [34],
+        permission: [55],
       },
       {
         link: "/domiciliacion/modificar",
         label: <AppIcons Logo={"ACTUALIZACION"} name={"Modificar"} />,
         component: ModificarPps,
-        permission: [33],
+        permission: [56],
       },
       {
         link: "/domiciliacion/ppspordemanda",
         label: <AppIcons Logo={"ACTUALIZACION"} name={"Pps A Demanda"} />,
         component: BuscarCedulaPpsADemanda,
-        permission: [33],
+        permission: [57],
       },
     ],
   },
@@ -909,7 +919,7 @@ const allUrlsPrivateApps = [
     link: "/circulemos",
     label: <AppIcons Logo={"RECAUDO"} name={"Consorcio circulemos"} />,
     component: CirculemosComp,
-    permission: [1],
+    permission: [],
   },
   {
     link: "/pagos-ifood",

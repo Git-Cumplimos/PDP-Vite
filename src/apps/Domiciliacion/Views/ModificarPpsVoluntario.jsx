@@ -185,7 +185,7 @@ const ModificarPps = () => {
           minLength="5"
           maxLength="10"
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
+            const num = e.target.value || "";
             setBuscarCedula(num);
           }}
           type={"text"}
@@ -208,7 +208,7 @@ const ModificarPps = () => {
             <LogoPDP small></LogoPDP>
           </div>
           <span className={tituloNotificacion}>
-            No se puede realizar la modificacíon, el número de documento no se
+            No se puede realizar la modificación, el número de documento no se
             encuentra domiciliado.
           </span>
         </Modal>

@@ -1,23 +1,25 @@
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Button from "../../../components/Base/Button";
-import Modal from "../../../components/Base/Modal";
-import useQuery from "../../../hooks/useQuery";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import Modal from "../../../../components/Base/Modal";
+import useQuery from "../../../../hooks/useQuery";
 import { Fragment, useState, useCallback, useRef, useEffect } from "react";
-import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import Tickets from "../components/TicketsDavivienda";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import Tickets from "../../components/TicketsDavivienda";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
-import { pagoGiroDaviplata, consultaGiroDaviplata } from "../utils/fetchCorresponsaliaDavivienda";
-import { notify, notifyError } from "../../../utils/notify";
-import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
-import { useFetch } from "../../../hooks/useFetch";
-import { useAuth } from "../../../hooks/AuthHooks";
+import { pagoGiroDaviplata, consultaGiroDaviplata } from "../../utils/fetchCorresponsaliaDavivienda";
+import { notify, notifyError } from "../../../../utils/notify";
+import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput";
+import { useFetch } from "../../../../hooks/useFetch";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import Select from "../../../../components/Base/Select";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
 const Deposito = () => {
   const navigate = useNavigate();
-  const [{ phone, userDoc, valor, summary }, setQuery] = useQuery();
+  const [{ phone, userDoc, valor, nomDepositante,summary }, setQuery] = useQuery();
   const [verificacionTel, setVerificacionTel] = useState("")
 
   const { roleInfo, infoTicket } = useAuth();
@@ -28,13 +30,22 @@ const Deposito = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
-  const [datosConsulta, setDatosConsulta] = useState("")
+  const [datosConsulta, setDatosConsulta] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [isUploading, setIsUploading] = useState(false)
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
     min: 5000,
   });
   
+  const options = [
+    { value: "", label: "" },
+    { value: "01", label: "Cedula Ciudadanía" },
+    { value: "02", label: "Cedula Extrangeria" },
+    { value: "04", label: "Tarjeta Identidad" },
+  ];
+
   const printDiv = useRef();
 
   useEffect(() => {
@@ -76,13 +87,14 @@ const Deposito = () => {
   const onSubmitDeposit = useCallback(
     (e) => {
       e.preventDefault();
-
+      setIsUploading(true)
       const { min, max } = limitesMontos;
 
       if (valor >= min && valor < max) {
         const formData = new FormData(e.target);
         const phone = formData.get("numCliente");
         const userDoc = formData.get("docCliente");
+        const nomDepositante = formData.get("nomDepositante");
         const valorFormat = formData.get("valor");
 
         if ((verificacionTel) === (phone)){
@@ -95,11 +107,12 @@ const Deposito = () => {
           numIdentificacionDepositante: userDoc,
           numDaviplata: phone,
           valGiro: valor,
-          valTipoIdentificacionDepositante: 1, /// Tipo de documento
+          valTipoIdentificacionDepositante: tipoDocumento, /// Tipo de documento
     
         };
         fetchConsultaCashIn(body)
         .then((res) => {
+          setIsUploading(false)
           if (!res?.status) {
             notifyError(res?.msg);
             return;
@@ -110,6 +123,7 @@ const Deposito = () => {
               "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
               "Numero celular": phone,
               "C.C. del depositante": userDoc,
+              "Nombre del depositante": nomDepositante, 
               "Valor de deposito": valorFormat,
               "Valor de comisión": formatMoney.format(res?.obj?.Data?.valComisionGiroDaviplata),
               "Valor total": formatMoney.format(total), 
@@ -126,9 +140,11 @@ const Deposito = () => {
         });
       }
       else{
+        setIsUploading(false)
         notifyError("Verifique que el celular del cliente es correcto")
       }
       } else {
+        setIsUploading(false)
         notifyError(
           `El valor del deposito debe estar entre ${formatMoney.format(
             min
@@ -150,6 +166,8 @@ const Deposito = () => {
           (formData.get("docCliente") ?? "").match(/\d/g) ?? []
         ).join("");
         setQuery({ phone, userDoc, valor: valor ?? "" }, { replace: true });
+        const nomDepositante = (formData.get("nomDepositante") ?? "")
+        setQuery({ phone, userDoc, valor: valor ?? "" , nomDepositante}, { replace: true });
       }
     },
     [setQuery, valor]
@@ -158,11 +176,11 @@ const Deposito = () => {
   const onMoneyChange = useCallback(
     (e, valor) => {
       setQuery(
-        { phone: phone ?? "", userDoc: userDoc ?? "", valor },
+        { phone: phone ?? "", userDoc: userDoc ?? "", nomDepositante: nomDepositante ?? "",valor },
         { replace: true }
       );
     },
-    [setQuery, phone, userDoc]
+    [setQuery, phone, userDoc, nomDepositante]
   );
 
   const goToRecaudo = useCallback(() => {
@@ -170,22 +188,27 @@ const Deposito = () => {
   }, [navigate]);
 
   const onMakePayment = useCallback(() => {
+    setIsUploading(true)
     const body = {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       Tipo: roleInfo?.tipo_comercio,
       numIdentificacionDepositante: userDoc,
+      nomDepositante: nomDepositante,
       numDaviplata: phone,
       valGiro: valor,
       valCodigoConvenioDaviplata: datosConsulta?.Data?.valCodigoConvenioDaviplata,
-      valTipoIdentificacionDepositante: 1, /// Tipo de documento
+      valTipoIdentificacionDepositante: tipoDocumento, /// Tipo de documento
       valComisionGiroDaviplata: datosConsulta?.Data?.valComisionGiroDaviplata,
-      id_transaccion: datosConsulta?.DataHeader?.idTransaccion
+      id_transaccion: datosConsulta?.DataHeader?.idTransaccion,
+      direccion: roleInfo?.direccion,
+      cod_dane: roleInfo?.codigo_dane
     };
 
     fetchCashIn(body)
       .then((res) => {
+        setIsUploading(false)
         if (!res?.status) {
           notifyError(res?.msg);
           return;
@@ -194,7 +217,8 @@ const Deposito = () => {
         const trx_id = res?.obj?.Data?.valTalon ?? 0;
         const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
         const total = parseInt(comision) + valor;
-
+        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+    
         const tempTicket = {
           title: "Recibo de deposito",
           timeInfo: {
@@ -218,11 +242,12 @@ const Deposito = () => {
           ],
           commerceName: "Daviplata",
           trxInfo: [
-            ["Celular", "****" + phone.slice(-4)],
+            ["Num Daviplata", "****" + phone.slice(-4)],
             ["Valor", formatMoney.format(valor)],
             ["Costo", formatMoney.format(comision)],
             ["Total", formatMoney.format(total)],
-            ["Nro. Autorización", trx_id]
+            ["Ter", ter],
+            ["No. de aprobación", trx_id]
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
@@ -252,13 +277,15 @@ const Deposito = () => {
   ]);
 
   return (
+    <>
+    <SimpleLoading show={isUploading} />
     <Fragment>
       <h1 className="text-3xl mt-6">Depositos Daviplata</h1>
       <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
         <Input
           id="numCliente"
           name="numCliente"
-          label="Celular"
+          label="Numero Daviplata"
           type="text"
           autoComplete="off"
           minLength={"10"}
@@ -270,7 +297,7 @@ const Deposito = () => {
         <Input
           id="numCliente"
           name="numCliente"
-          label="Verificación Celular"
+          label="Verificación"
           type="text"
           autoComplete="off"
           minLength={"10"}
@@ -284,6 +311,15 @@ const Deposito = () => {
           }}
           required
         />
+        <Select
+          id="tipoCuenta"
+          label="Tipo de documento"
+          options={options}
+          value={tipoDocumento}
+          onChange={(e) => {
+            setTipoDocumento(e.target.value);
+          }}
+        />
         <Input
           id="docCliente"
           name="docCliente"
@@ -291,8 +327,18 @@ const Deposito = () => {
           type="text"
           autoComplete="off"
           minLength={"7"}
-          maxLength={"13"}
+          maxLength={"10"}
           value={userDoc ?? ""}
+          onInput={() => {}}
+          required
+        />
+        <Input
+          id="nomDepositante"
+          name="nomDepositante"
+          label="Nombre Depositante"
+          type="text"
+          autoComplete="off"
+          value={nomDepositante ?? ""}
           onInput={() => {}}
           required
         />
@@ -342,6 +388,7 @@ const Deposito = () => {
         )}
       </Modal>
     </Fragment>
+    </>
   );
 };
 

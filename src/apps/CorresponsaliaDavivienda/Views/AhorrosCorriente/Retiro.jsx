@@ -15,6 +15,7 @@ import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput"
 import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
 const Retiro = () => {
   const navigate = useNavigate();
@@ -30,11 +31,21 @@ const Retiro = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [isUploading, setIsUploading] = useState(false)
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
     min: 5000,
   });
+
+  const optionsDocumento = [
+    { value: "", label: "" },
+    { value: "01", label: "Cedula Ciudadanía" },
+    { value: "02", label: "Cedula Extrangeria" },
+    { value: "04", label: "Tarjeta Identidad" },
+    { value: "13", label: "Regitro Civil" },
+  ];
   
   const printDiv = useRef();
 
@@ -77,6 +88,7 @@ const Retiro = () => {
   const onSubmitRetiro = useCallback(
     (e) => {
       e.preventDefault();
+      setIsUploading(true)
 
       const { min, max } = limitesMontos;
 
@@ -91,17 +103,16 @@ const Retiro = () => {
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
           Tipo: roleInfo?.tipo_comercio,
-          tipoTransaccion: 2130, /// retiro
-          tipoDocumento: "01", /// Cedula
-          numDocumento: userDoc,
-          valTransaccion: valor,
-          tipoCuenta: tipoCuenta,
+          numTipoTransaccion: 2130, /// retiro
+          numTipoDocumento: tipoDocumento, /// Cedula
+          numNumeroDocumento: userDoc,
+          numValorTransaccion: valor,
           //nomDepositante: nomDepositante,
-          valToken: "valToken", /// De donde viene
-          numCuenta: 123,       
+          // valToken: "valToken", /// De donde viene       
         };
         fetchConsultaCostoCB(body)
         .then((res) => {
+          setIsUploading(false)
           if (!res?.status) {
             notifyError(res?.msg);
             return;
@@ -111,8 +122,9 @@ const Retiro = () => {
               "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
               // "Numero celular": numCuenta,
               "C.C. del depositante": userDoc,
-              "Valor de retiro": valorFormat,
               "Codigo OTP": otp,
+              "Valor de retiro": valorFormat,              
+              "Valor cobro": formatMoney.format(res?.obj?.Data?.numValorCobro),
             };
             setQuery({ valor, summary }, { replace: true });
             setShowModal(true);
@@ -121,11 +133,13 @@ const Retiro = () => {
           //notify("Transaccion satisfactoria");          
         })
         .catch((err) => {
+          setIsUploading(false)
           console.error(err);
           notifyError("Error interno en la transaccion");
         });
         
       } else {
+        setIsUploading(false)
         notifyError(
           `El valor del retiro debe estar entre ${formatMoney.format(
             min
@@ -150,7 +164,7 @@ const Retiro = () => {
         setQuery({ otp, userDoc, valor: valor ?? "" , nomDepositante}, { replace: true });
       }
     },
-    [setQuery, valor]
+    [setQuery, valor, tipoDocumento]
   );
 
   const onMoneyChange = useCallback(
@@ -168,27 +182,32 @@ const Retiro = () => {
   }, [navigate]);
 
   const onMakePayment = useCallback(() => {
+    setIsUploading(true)
     const body = {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       Tipo: roleInfo?.tipo_comercio,
-      numTipoDocumento: '01',
+      numTipoDocumento: tipoDocumento,
       numNumeroDocumento: userDoc,
       numValorRetiro: valor,
       numOtp: otp,
       valToken: "valToken",
-      numTalonRetiro: 1111,    
+      direccion: roleInfo?.direccion,
+      cod_dane: roleInfo?.codigo_dane,    
     };
 
     fetchRetiroCorresponsal(body)
       .then((res) => {
+        setIsUploading(false)
         if (!res?.status) {
           notifyError(res?.msg);
           return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+
         const tempTicket = {
           title: "Recibo de retiro",
           timeInfo: {
@@ -209,14 +228,15 @@ const Retiro = () => {
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
             ["Id Trx", trx_id],
-            //["Id Transacción", res?.obj?.IdTransaccion],
           ],
-          commerceName: "Retiro en Corresponsal Davivienda",
+          commerceName: "Retiro De Cuentas",
           trxInfo: [
             ["Numero de cuenta", '****'+res?.obj?.Data?.numNumeroDeCuenta?.slice(-4)],
             ["Tipo", res?.obj?.Data?.numTipoCuenta==="01" ? "Ahorros" : "Corriente"],
             ["Valor", formatMoney.format(valor)],
             ["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
+            ["Total", formatMoney.format(valor)],
+            ["Ter", ter],
             ["Cod. autorización", trx_id],
             //["Usuario de venta", "Nombre propietario del punto"],
           ],
@@ -233,6 +253,7 @@ const Retiro = () => {
           });
       })
       .catch((err) => {
+        setIsUploading(false)
         console.error(err);
         notifyError("Error interno en la transaccion");
       });
@@ -243,13 +264,25 @@ const Retiro = () => {
     roleInfo,
     infoTicket,
     ,
-    datosConsulta
+    datosConsulta,
+    tipoDocumento
   ]);
 
   return (
+    <>
+    <SimpleLoading show={isUploading}/>
     <Fragment>
       <h1 className="text-3xl mt-6">Retiros</h1>
       <Form onSubmit={onSubmitRetiro} onChange={onChange} grid>
+        <Select
+          id="tipoDocumento"
+          label="Tipo de documento"
+          options={optionsDocumento}
+          value={tipoDocumento}
+          onChange={(e) => {
+            setTipoDocumento(e.target.value);
+          }}
+        />
         <Input
           id="docCliente"
           name="docCliente"
@@ -257,7 +290,7 @@ const Retiro = () => {
           type="text"
           autoComplete="off"
           minLength={"7"}
-          maxLength={"13"}
+          maxLength={"10"}
           value={userDoc ?? ""}
           onInput={() => {}}
           required
@@ -320,6 +353,7 @@ const Retiro = () => {
         )}
       </Modal>
     </Fragment>
+    </>
   );
 };
 

@@ -15,6 +15,7 @@ import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput"
 import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
 const Deposito = () => {
   const navigate = useNavigate();
@@ -30,11 +31,21 @@ const Deposito = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [isUploading, setIsUploading] = useState(false)
 
   const options = [
     { value: "", label: "" },
     { value: "02", label: "Corriente" },
     { value: "01", label: "Ahorros" },
+  ];
+
+  const optionsDocumento = [
+    { value: "", label: "" },
+    { value: "01", label: "Cedula Ciudadanía" },
+    { value: "02", label: "Cedula Extrangeria" },
+    { value: "04", label: "Tarjeta Identidad" },
+    { value: "13", label: "Regitro Civil" },
   ];
 
   const [limitesMontos, setLimitesMontos] = useState({
@@ -83,6 +94,7 @@ const Deposito = () => {
   const onSubmitDeposit = useCallback(
     (e) => {
       e.preventDefault();
+      setIsUploading(true)
 
       const { min, max } = limitesMontos;
 
@@ -98,28 +110,29 @@ const Deposito = () => {
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
           Tipo: roleInfo?.tipo_comercio,
-          tipoTransaccion: 5706, /// Deposito
-          tipoDocumento: "01", /// Cedula
-          numDocumento: userDoc,
-          valTransaccion: valor,
-          tipoCuenta: tipoCuenta,
+          numTipoTransaccion: 5706, /// Deposito
+          numTipoDocumento: tipoDocumento, /// Cedula
+          numNumeroDocumento: userDoc,
+          numValorTransaccion: valor,
+          numTipoCuenta: tipoCuenta,
           //nomDepositante: nomDepositante,
-          valToken: "valToken", /// De donde viene
-          numCuenta: numCuenta,       
+          //valToken: "valToken", /// De donde viene
+          numNumeroDeCuenta: numCuenta,       
         };
         fetchConsultaCostoCB(body)
         .then((res) => {
+          setIsUploading(false)
           if (!res?.status) {
             notifyError(res?.msg);
             return;
           }else{
             setDatosConsulta(res?.obj?.Data)
             const summary = {
-              "Nombre titular": res?.obj?.Data?.nombreTitular,
-              "Apellito titular": res?.obj?.Data?.apellidoTitular,
+              "Nombre titular": res?.obj?.Data?.valNombreTitular,
+              "Apellito titular": res?.obj?.Data?.valApellidoTitular,
               "Numero cuenta": numCuenta,
               "Valor de deposito": valorFormat,
-              "Valor cobro": formatMoney.format(res?.obj?.Data?.valCobro),
+              "Valor cobro": formatMoney.format(res?.obj?.Data?.numValorCobro),
             };
             setQuery({ numCuenta, valor, summary }, { replace: true });
             setShowModal(true);
@@ -128,11 +141,13 @@ const Deposito = () => {
           //notify("Transaccion satisfactoria");          
         })
         .catch((err) => {
+          setIsUploading(false)
           console.error(err);
           notifyError("Error interno en la transaccion");
         });
         
       } else {
+        setIsUploading(false)
         notifyError(
           `El valor del deposito debe estar entre ${formatMoney.format(
             min
@@ -175,6 +190,7 @@ const Deposito = () => {
   }, [navigate]);
 
   const onMakePayment = useCallback(() => {
+    setIsUploading(true)
     const body = {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
@@ -182,22 +198,28 @@ const Deposito = () => {
       Tipo: roleInfo?.tipo_comercio,
       numTipoCuenta: tipoCuenta,
       numNumeroCuenta: numCuenta,
-      numIdDepositante: 123,
-      valToken: "valToken",
-      numValorConsignacion: valor,    
+      numIdDepositante: userDoc,
+      //valToken: "valToken",
+      numValorConsignacion: valor,
+      direccion: roleInfo?.direccion,
+      cod_dane: roleInfo?.codigo_dane,
+      nomdepositante: nomDepositante,
+      tip_id_depositante: tipoDocumento    
     };
 
     fetchDepositoCorresponsal(body)
       .then((res) => {
+        setIsUploading(false)
         if (!res?.status) {
           notifyError(res?.msg);
           return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Recibo de deposito",
+          title: "Deposito A Cuentas Davivienda",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -217,13 +239,16 @@ const Deposito = () => {
             ["Dirección", roleInfo?.direccion],
             ["Id Trx", trx_id],
           ],
-          commerceName: "Consignación en Corresponsal Davivienda",
           trxInfo: [
             ["Nro. Cuenta", '****'+res?.obj?.Data?.numNumeroCuenta?.slice(-4)],
             ["Tipo", res?.obj?.Data?.numTipoCuenta==="01" ? "Ahorros" : "Corriente"],
             ["Valor", formatMoney.format(valor)],
             ["Costo Transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
-            ["Cod. autorización", trx_id],            
+            ["Total", formatMoney.format(valor)],
+            ["Cod. autorización", trx_id],
+            ["Ter", ter],            
+            ["Id. Despositante", userDoc],
+            ["Depositante", nomDepositante]            
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
@@ -238,6 +263,7 @@ const Deposito = () => {
           });
       })
       .catch((err) => {
+        setIsUploading(false)
         console.error(err);
         notifyError("Error interno en la transaccion");
       });
@@ -255,9 +281,20 @@ const Deposito = () => {
   console.log(tipoCuenta)
 
   return (
+    <>
+    <SimpleLoading show={isUploading}/>
     <Fragment>
       <h1 className="text-3xl mt-6">Depositos</h1>
       <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
+        <Select
+          id="tipoCuenta"
+          label="Tipo de Cuenta"
+          options={options}
+          value={tipoCuenta}
+          onChange={(e) => {
+            setTipoCuenta(e.target.value);
+          }}
+        />
         <Input
           id="numCuenta"
           name="numCuenta"
@@ -271,12 +308,12 @@ const Deposito = () => {
           required
         />
         <Select
-          id="tipoCuenta"
-          label="Tipo Cuenta"
-          options={options}
-          value={tipoCuenta}
+          id="tipoDocumento"
+          label="Tipo de documento"
+          options={optionsDocumento}
+          value={tipoDocumento}
           onChange={(e) => {
-            setTipoCuenta(e.target.value);
+            setTipoDocumento(e.target.value);
           }}
         />
         <Input
@@ -286,7 +323,7 @@ const Deposito = () => {
           type="text"
           autoComplete="off"
           minLength={"7"}
-          maxLength={"13"}
+          maxLength={"10"}
           value={userDoc ?? ""}
           onInput={() => {}}
           required
@@ -347,6 +384,7 @@ const Deposito = () => {
         )}
       </Modal>
     </Fragment>
+    </>
   );
 };
 
