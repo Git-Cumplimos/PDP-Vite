@@ -1,0 +1,3 @@
+.graphDiv {
+  @apply block lg:max-w-4xl container m-auto;
+}

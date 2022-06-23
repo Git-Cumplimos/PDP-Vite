@@ -1,0 +1,23 @@
+.progressBar {
+  @apply w-full h-6;
+}
+
+.progressBar[value]::-webkit-progress-bar {
+  @apply bg-gray-400 rounded-lg;
+}
+
+.progressBar[value]::-webkit-progress-value {
+  @apply bg-primary-light rounded-lg;
+}
+.colorProgress {
+  @apply w-full h-6;
+}
+/* .colorProgress > progressBar[type="end"] {
+  @apply bg-green-400 rounded-lg;
+} */
+.colorProgress[value]::-webkit-progress-bar {
+  @apply bg-gray-400 rounded-lg;
+}
+.colorProgress[value]::-webkit-progress-value {
+  @apply bg-red-500 rounded-lg;
+}

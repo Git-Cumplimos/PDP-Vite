@@ -1,0 +1,12 @@
+.userInfo {
+  @apply relative;
+}
+
+.userInfo > .name,
+.userInfo > .conv {
+  @apply text-xl capitalize;
+}
+
+.userInfo > .userid {
+  @apply uppercase text-2xl font-medium;
+}

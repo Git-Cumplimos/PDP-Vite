@@ -1,0 +1,66 @@
+.contenedorPrincipal {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+.contenedorSecundario {
+  width: auto;
+  height: auto;
+}
+.contenedorTercero {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: auto;
+}
+.contenedorImagenPDP {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 50%;
+  height: 7vw;
+}
+.tituloPrincipal {
+  display: flex;
+  justify-content: center;
+  font-size: x-large;
+  margin-bottom: 6vw;
+  font-weight: bold;
+}
+.titulosSecundarios {
+  margin-bottom: 1.5vw;
+  margin-left: 2vw;
+  font-size: large;
+}
+
+.valores {
+  margin-bottom: 1.5vw;
+  margin-left: 3vw;
+  font-size: large;
+}
+.contenedorPrincipalBotones {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.contenedorBotones {
+  display: flex;
+  justify-content: center;
+}
+.contenedorCausalRechazo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.textTarea {
+  display: flex;
+  justify-content: center;
+  width: 80%;
+  @apply grid gap-4 mx-auto xl:w-full border border-solid border-gray-500 p-3;
+}
+.autorizacionMensajes {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
