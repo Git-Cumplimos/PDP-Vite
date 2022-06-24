@@ -90,7 +90,7 @@ const RecargasMovistar = () => {
 
     PeticionRecarga(URL, data).then((res) => {
       const trx_id = res?.obj[0]?.pk_trx ?? 0;
-      const code_response = 11
+      const code_response = res?.obj[0]?.codigo_error ?? 0;
       if (code_response === "00") {
         notify("Transaccion satisfactoria");
       }
