@@ -13,9 +13,17 @@ import { useFetch } from "../../../hooks/useFetch";
 import fetchData from "../../../utils/fetchData";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
+import useQuery from "../../../hooks/useQuery";
+import { notify, notifyError } from "../../../utils/notify";
+
 
 
 const URL = "http://127.0.0.1:5000/recargasMovistar/prepago";
+const messageError = [
+  { code: "10", message: "Sistema de Recarga no disponible" },
+  { code: "11", message: "Fecha de captura inválida" },
+  { code: "12", message: "Tipo de mensaje inválido" },
+];
 
 const RecargasMovistar = () => {
   const navigate = useNavigate();
@@ -25,7 +33,8 @@ const RecargasMovistar = () => {
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(false);
 
-
+  const [summary, setSummary] = useState({});
+ 
   const printDiv = useRef();
 
   const postCashIn = async (bodyObj) => {
@@ -69,6 +78,7 @@ const RecargasMovistar = () => {
     }
   });
 
+
   const onSubmitDeposit = useCallback((e) => {
     e.preventDefault();
     const data = {
@@ -78,10 +88,47 @@ const RecargasMovistar = () => {
       identificador_region: roleInfo.direccion,
     };
 
-    PeticionRecarga(URL, data).then((result) => {
-      //   setResPeticion(result.obj[0].codigo_error);
-      console.log(result.obj);
-      setPaymentStatus(true)
+    PeticionRecarga(URL, data).then((res) => {
+      const trx_id = res?.obj[0]?.pk_trx ?? 0;
+      const code_response = 11
+      if (code_response === "00") {
+        notify("Transaccion satisfactoria");
+      }
+      const tempTicket = {
+        title: "Recibo de recarga",
+        code_response,
+        timeInfo: {
+          "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+            year: "2-digit",
+            month: "2-digit",
+            day: "2-digit",
+          }).format(new Date()),
+          Hora: Intl.DateTimeFormat("es-CO", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          }).format(new Date()),
+        },
+        commerceInfo: [
+          ["Id Comercio", roleInfo?.id_comercio],
+          ["No. terminal", roleInfo?.id_dispositivo],
+          ["Municipio", roleInfo?.ciudad],
+          ["Dirección", roleInfo?.direccion],
+          ["Id Trx", trx_id],
+          ["Id Transacción", res?.obj[0]?.IdTransaccion ?? 0],
+        ],
+        commerceName: "Recarga Movistar",
+        trxInfo: [
+          ["Celular", res?.obj[0]?.celular],
+          ["", ""],
+          ["Valor de recarga", "$ " + new Intl.NumberFormat('es-ES', { maximumSignificantDigits: 3}).format(res?.obj[0]?.valor ?? 0) ],
+          ["", ""]
+        ],
+        disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+      };
+      setPaymentStatus(tempTicket);
+      //   setResPeticion(result.obj[0][0].codigo_error);
+      setShowModal(true)
       //   if(result.obj[0].codigo_error == ""){
 
       //   }
@@ -94,15 +141,37 @@ const RecargasMovistar = () => {
 
   const onShowModal = (e) => {
     e.preventDefault()
-    setShowModal(true)
+    const validation= validatePhoneCompleted()
+    if(validation){
+      setSummary({
+        "Celular": inputCelular,
+        "Valor": "$ " + new Intl.NumberFormat('es-ES', { maximumSignificantDigits: 3}).format(inputValor)
+      });
+      setShowModal(true)
+    }
   }
 
+  function validatePhone(e){
+    if(e.target.value.length===1){
+      if(e.target.value!=3){
+        notifyError("Numero invalido")
+      }
+    }
+  }
+  function validatePhoneCompleted(){
+    const regex= /^[3]{1}[0-9]{9}$/
+    if (!regex.test(inputCelular)){
+      notifyError("Numero invalido")
+      return false
+    }
+      return true
+  }
 
-  const limitesMontos = 10;
   return (
     <Fragment>
       <Form onSubmit={onShowModal} onChange={onChange} grid>
         <Input
+          onChange={validatePhone}
           id="celular"
           name="celular"
           label="Celular: "
@@ -114,14 +183,15 @@ const RecargasMovistar = () => {
           onInput={() => {}}
           required
         />
-
         <MoneyInput
           id="valor"
           name="valor"
           label="Valor de la recarga"
           autoComplete="off"
           min={"1000"}
-          max={"9999999999"}
+          max={"1000000000"}
+          minLength={"4"}
+          maxLength={"14"}
           onInput={onMoneyChange}
           required
         />
@@ -132,19 +202,22 @@ const RecargasMovistar = () => {
       <Modal  
         show={showModal}
         handleClose={
-          paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
+          paymentStatus ? handleClose : loadingCashIn ? () => {} : handleClose
         }
       >
-        {paymentStatus ? (
+        {paymentStatus ? paymentStatus.code_response === "00" ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv}/>
+            <Tickets refPrint={printDiv} ticket={paymentStatus}/>
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={goToRecaudo}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
-          <PaymentSummary>
+
+          <div>Error: {messageError.find(item => item.code === paymentStatus.code_response)?.message ?? "Error desconocido"}</div>
+        ) : (
+          <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button type="button" disabled={loadingCashIn} onClick={onSubmitDeposit}>
                 Aceptar
