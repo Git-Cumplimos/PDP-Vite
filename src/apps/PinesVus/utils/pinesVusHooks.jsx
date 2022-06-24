@@ -26,8 +26,9 @@ export const useProvidePinesVus = () => {
   const { roleInfo } = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
 
-  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin) => {
+  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite) => {
     const body = {
+      valor_tramite : valor_tramite,
       Usuario: user?.id_usuario,
       Dispositivo: user?.id_dispositivo,
       Comercio: user?.id_comercio,
@@ -48,9 +49,11 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite,user) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite) => {
+    console.log(infoTramite)
     const body = {
       tipo_tramite: tramite,
+      infoTramite: infoTramite,
       tipo_pin: tipoPin,
       doc_cliente: String(documento),
       Usuario: user?.Usuario,
