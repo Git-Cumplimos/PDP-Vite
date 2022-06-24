@@ -677,7 +677,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/movistar/concilacion",
-        label: <AppIcons Logo={"SORTEOS"} name="Concilacion" />,
+        label: <AppIcons Logo={"SORTEOS"} name="Conciliación" />,
         component: ConcilacionMovistar,
         permission: [1],
       },

@@ -2,7 +2,7 @@ import React from 'react'
 
 const ConcilacionMovistar = () => {
   return (
-    <div>ConcilacionMovistar</div>
+    <div>ConciliacionMovistar</div>
   )
 }
 
