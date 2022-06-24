@@ -1,4 +1,10 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -11,16 +17,21 @@ import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import Tickets from "../../../components/Base/Tickets";
 import { useFetch } from "../../../hooks/useFetch";
 import fetchData from "../../../utils/fetchData";
+import { useNavigate } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
 
 const URL = "http://127.0.0.1:5000/recargasMovistar/prepago";
 
 const RecargasMovistar = () => {
+  const navigate = useNavigate();
   const [inputCelular, setInputCelular] = useState(null);
   const [inputValor, setInputValor] = useState(null);
   const [resPeticion, setResPeticion] = useState(null);
   const [resDataPeticion, setDataResPeticion] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(false);
+
+  const printDiv = useRef();
 
   const postCashIn = async (bodyObj) => {
     if (!bodyObj) {
@@ -46,6 +57,14 @@ const RecargasMovistar = () => {
   }, []);
   const { roleInfo } = useAuth();
 
+  const goToRecaudo = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
+
   const onChange = useCallback((e) => {
     if (e.target.name == "celular") {
       const formData = new FormData(e.target.form);
@@ -67,14 +86,18 @@ const RecargasMovistar = () => {
 
     PeticionRecarga(URL, data).then((result) => {
       setDataResPeticion(result);
+      //   setResPeticion(result.obj[0].codigo_error);
+      //   if(result.obj[0].codigo_error == ""){
 
       if (result.obj?.[0].codigo_error == "00") {
         setResPeticion(1);
         setShowModal(true);
+        setPaymentStatus(true);
       } else {
         console.log("jj");
         setResPeticion(0);
         setShowModal(true);
+        setPaymentStatus(false);
       }
     });
   });
@@ -86,14 +109,20 @@ const RecargasMovistar = () => {
   const onMoneyChange = useCallback((e, valor) => {
     setInputValor(valor);
   });
+
+  const onShowModal = (e) => {
+    e.preventDefault();
+    setShowModal(true);
+  };
+
   const limitesMontos = 10;
   return (
     <Fragment>
-      <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
+      <Form onSubmit={onShowModal} onChange={onChange} grid>
         <Input
           id="celular"
           name="celular"
-          label="celular: "
+          label="Celular: "
           type="tel"
           autoComplete="off"
           minLength={"10"}
@@ -123,23 +152,22 @@ const RecargasMovistar = () => {
           paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
         }
       >
-        <div>
-          {resPeticion == 1
-            ? "Recarga exitosa"
-            : "Recarga no exitosa  - error recarga: datos no correctos "}
-        </div>
-        {/* {paymentStatus ? (
+        {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets />
+            <Tickets refPrint={printDiv} />
             <ButtonBar>
-              <Button>Imprimir</Button>
-              <Button>Cerrar</Button>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button onClick={goToRecaudo}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
           <PaymentSummary>
             <ButtonBar>
-              <Button type="submit" disabled={loadingCashIn}>
+              <Button
+                type="button"
+                disabled={loadingCashIn}
+                onClick={onSubmitDeposit}
+              >
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingCashIn}>
@@ -147,7 +175,7 @@ const RecargasMovistar = () => {
               </Button>
             </ButtonBar>
           </PaymentSummary>
-        )} */}
+        )}
       </Modal>
     </Fragment>
   );
