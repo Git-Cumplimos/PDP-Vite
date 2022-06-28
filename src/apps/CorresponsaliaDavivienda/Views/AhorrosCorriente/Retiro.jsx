@@ -31,12 +31,21 @@ const Retiro = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("");
   const [isUploading, setIsUploading] = useState(false)
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
     min: 5000,
   });
+
+  const optionsDocumento = [
+    { value: "", label: "" },
+    { value: "01", label: "Cedula Ciudadanía" },
+    { value: "02", label: "Cedula Extrangeria" },
+    { value: "04", label: "Tarjeta Identidad" },
+    { value: "13", label: "Regitro Civil" },
+  ];
   
   const printDiv = useRef();
 
@@ -94,14 +103,12 @@ const Retiro = () => {
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
           Tipo: roleInfo?.tipo_comercio,
-          tipoTransaccion: 2130, /// retiro
-          tipoDocumento: "01", /// Cedula
-          numDocumento: userDoc,
-          valTransaccion: valor,
-          tipoCuenta: tipoCuenta,
+          numTipoTransaccion: 2130, /// retiro
+          numTipoDocumento: tipoDocumento, /// Cedula
+          numNumeroDocumento: userDoc,
+          numValorTransaccion: valor,
           //nomDepositante: nomDepositante,
-          valToken: "valToken", /// De donde viene
-          numCuenta: 123,       
+          // valToken: "valToken", /// De donde viene       
         };
         fetchConsultaCostoCB(body)
         .then((res) => {
@@ -115,8 +122,9 @@ const Retiro = () => {
               "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
               // "Numero celular": numCuenta,
               "C.C. del depositante": userDoc,
-              "Valor de retiro": valorFormat,
               "Codigo OTP": otp,
+              "Valor de retiro": valorFormat,              
+              "Valor cobro": formatMoney.format(res?.obj?.Data?.numValorCobro),
             };
             setQuery({ valor, summary }, { replace: true });
             setShowModal(true);
@@ -156,7 +164,7 @@ const Retiro = () => {
         setQuery({ otp, userDoc, valor: valor ?? "" , nomDepositante}, { replace: true });
       }
     },
-    [setQuery, valor]
+    [setQuery, valor, tipoDocumento]
   );
 
   const onMoneyChange = useCallback(
@@ -180,12 +188,13 @@ const Retiro = () => {
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       Tipo: roleInfo?.tipo_comercio,
-      numTipoDocumento: '01',
+      numTipoDocumento: tipoDocumento,
       numNumeroDocumento: userDoc,
       numValorRetiro: valor,
       numOtp: otp,
       valToken: "valToken",
-      numTalonRetiro: 1111,    
+      direccion: roleInfo?.direccion,
+      cod_dane: roleInfo?.codigo_dane,    
     };
 
     fetchRetiroCorresponsal(body)
@@ -255,7 +264,8 @@ const Retiro = () => {
     roleInfo,
     infoTicket,
     ,
-    datosConsulta
+    datosConsulta,
+    tipoDocumento
   ]);
 
   return (
@@ -264,6 +274,15 @@ const Retiro = () => {
     <Fragment>
       <h1 className="text-3xl mt-6">Retiros</h1>
       <Form onSubmit={onSubmitRetiro} onChange={onChange} grid>
+        <Select
+          id="tipoDocumento"
+          label="Tipo de documento"
+          options={optionsDocumento}
+          value={tipoDocumento}
+          onChange={(e) => {
+            setTipoDocumento(e.target.value);
+          }}
+        />
         <Input
           id="docCliente"
           name="docCliente"
@@ -271,7 +290,7 @@ const Retiro = () => {
           type="text"
           autoComplete="off"
           minLength={"7"}
-          maxLength={"13"}
+          maxLength={"10"}
           value={userDoc ?? ""}
           onInput={() => {}}
           required

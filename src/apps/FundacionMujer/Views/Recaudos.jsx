@@ -421,7 +421,7 @@ const Recaudo = () => {
                     setFormatMon(num);
                   }}
                 />
-                <Input
+                {/* <Input
                   id="refPago"
                   label="Referencia pago"
                   type="text"
@@ -432,7 +432,7 @@ const Recaudo = () => {
                     const ref = String(e.target.value) || "";
                     setReferencia(ref);
                   }}
-                />
+                /> */}
                 <ButtonBar>
                   <Button type="submit" disabled={stop}>
                     Realizar pago

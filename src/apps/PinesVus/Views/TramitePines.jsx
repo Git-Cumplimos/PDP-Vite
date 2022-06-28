@@ -45,6 +45,9 @@ const TramitePines = () => {
   const [valor, setValor] = useState("");
   const [id_trx, setId_trx] = useState("");
   const [tipoPin, setTipoPin] = useState("");
+  const [valor_tramite, setValor_tramite] = useState("");
+  const [name_tramite, setName_tramite] = useState("");
+  const [id_pin, setId_pin] = useState("")
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -115,12 +118,13 @@ const TramitePines = () => {
               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
               setFormatMon(row?.ValorPagar);
               return {
-                Id: row?.id_pin,
+                // Id: row?.id_pin,
                 Cedula: row?.doc_cliente,
                 Estado: row?.name_estado_pin,
-                "Codigo Estado": row?.estado_pin,
+                // "Codigo Estado": row?.estado_pin,
                 Vencimiento: dateFormatter.format(fecha_vencimiento),
-                Valor: formatMoney.format(row?.valor),
+                Tramite: row?.name_tramite,
+                Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite*1.19), // Valor + IVA
               };
             })
           );
@@ -128,6 +132,9 @@ const TramitePines = () => {
           setValor(res?.obj?.results?.[0]?.valor);
           setId_trx(res?.obj?.results?.[0]?.id_trx?.creacion);
           setTipoPin(res?.obj?.results?.[0]?.tipo_pin);
+          setValor_tramite(res?.obj?.results?.[0]?.valor_tramite);
+          setName_tramite(res?.obj?.results?.[0]?.name_tramite);
+          setId_pin(res?.obj?.results?.[0]?.id_pin)
         }
       })
       .catch((err) => console.log("error", err));
@@ -177,16 +184,15 @@ const TramitePines = () => {
             title="Información de credito"
             maxPage={maxPages}
             headers={[
-              "Id",
               "Cedula",
               "Estado",
-              "Codigo Estado",
               "Vencimiento",
+              "Tramite",
               "Valor",
             ]}
             data={table || []}
             onSelectRow={(e, index) => {
-              if (table[index]["Codigo Estado"] !== 1) {
+              if (table[index]["Estado"] !== "Pin creado") {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
@@ -204,7 +210,41 @@ const TramitePines = () => {
             <div className="flex flex-col w-1/2 mx-auto ">
               <h1 className="text-3xl mt-3 mx-auto">Datos del Pin</h1>
               <br></br>
-              {Object.entries(selected).map(([key, val]) => {
+            <h1 className="flex flex-row justify-center text-lg font-medium">{name_tramite}</h1>
+            <br></br>
+            <>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Tramite</h1>
+                <h1>{formatMoney.format(valor_tramite)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>IVa Tramite</h1>
+                <h1>{formatMoney.format(valor_tramite*0.19)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Pin</h1>
+                <h1>{formatMoney.format(valor)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>IVa Pin</h1>
+                <h1>{formatMoney.format(valor*0.19)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Total</h1>
+                <h1>{formatMoney.format(valor*1.19 + valor_tramite*1.19)}</h1>
+              </div>
+            </>
+              {/* {Object.entries(selected).map(([key, val]) => {
                 return (
                   <>
                     <div
@@ -216,7 +256,7 @@ const TramitePines = () => {
                     </div>
                   </>
                 );
-              })}
+              })} */}
             </div>
             <div className="flex flex-col justify-center items-center mx-auto container">
               <Form onSubmit={onSubmitUsar}>
@@ -240,6 +280,9 @@ const TramitePines = () => {
           <UsarPinForm
             respPin={selected}
             valor={valor}
+            valor_tramite={valor_tramite}
+            name_tramite = {name_tramite}
+            id_pin = {id_pin}
             trx={id_trx}
             tipoPin={tipoPin}
             setActivarNavigate={setActivarNavigate}
@@ -252,6 +295,9 @@ const TramitePines = () => {
           <CancelPin
             respPin={selected}
             valor={valor}
+            valor_tramite={valor_tramite}
+            name_tramite = {name_tramite}
+            id_pin = {id_pin}
             trx={id_trx}
             tipoPin={tipoPin}
             setActivarNavigate={setActivarNavigate}

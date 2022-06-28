@@ -58,6 +58,7 @@ const Reversos = () => {
   const [usuariosDB, setUsuariosDB] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState("");
   const [municipio, setMunicipio] = useState("");
+  const [stop, setStop] = useState("");
 
   const [{ page: pageUSER, limit: limitUSER }, setPageData] = useState({
     page: 1,
@@ -202,6 +203,7 @@ const Reversos = () => {
 
   const reversosFDLM = useCallback(
     (page, Comercio, Tipo_operacion, date_ini, date_end, state, limit) => {
+      setStop(true);
       const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
       const queries = {};
       if (!(Comercio?.id_comercio === -1 || Comercio?.id_comercio === "")) {
@@ -228,6 +230,7 @@ const Reversos = () => {
         .then((res) => {
           console.log(res);
           if (res?.status) {
+            setStop(false);
             if (res?.obj?.trxs.length < 1) {
               notifyError(
                 "No se encontraron transacciones en el rango de fechas"
@@ -236,6 +239,7 @@ const Reversos = () => {
             setMaxPages(res?.obj?.maxpages);
             setTrxs(res?.obj?.trxs);
           } else {
+            setStop(false);
             throw new Error(res?.msg);
           }
         })
@@ -446,7 +450,9 @@ const Reversos = () => {
                   }}
                 />
                 <ButtonBar>
-                  <Button type="submit">Aceptar</Button>
+                  <Button type="submit" disabled={stop}>
+                    Aceptar
+                  </Button>
                 </ButtonBar>
               </Form>
             </>
