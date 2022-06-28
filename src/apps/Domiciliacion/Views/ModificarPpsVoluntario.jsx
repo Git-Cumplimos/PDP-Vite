@@ -163,6 +163,10 @@ const ModificarPps = () => {
           if (respuesta?.msg === "El usuario ha sido modificado exitosamente") {
             notify("El usuario ha sido modificado exitosamente");
             navigate(`/domiciliacion`);
+          }
+          if (respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000") {
+            notifyError("El valor a aportar debe ser múltiplo de 100");
+            /* navigate(`/domiciliacion`); */
           } else {
             notifyError("El usuario no ha sido modificado exitosamente");
             navigate(`/domiciliacion`);

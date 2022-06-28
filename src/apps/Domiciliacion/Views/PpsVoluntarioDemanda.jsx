@@ -298,8 +298,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             });
         } else {
           notifyError("Ingrese un número de célular valido");
-
           setNumCelular("");
+          setDisabledBtn(false);
         }
       }
     } else {
