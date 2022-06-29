@@ -13,6 +13,7 @@ import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import classes from "./ModificarPpsVoluntario.module.css";
 import { useNavigate } from "react-router-dom";
+import MoneyInput from "../../../components/Base/MoneyInput";
 
 const ModificarPps = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
@@ -163,8 +164,9 @@ const ModificarPps = () => {
           if (respuesta?.msg === "El usuario ha sido modificado exitosamente") {
             notify("El usuario ha sido modificado exitosamente");
             navigate(`/domiciliacion`);
-          }
-          if (respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000") {
+          } else if (
+            respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
+          ) {
             notifyError("El valor a aportar debe ser múltiplo de 100");
             /* navigate(`/domiciliacion`); */
           } else {
@@ -239,7 +241,7 @@ const ModificarPps = () => {
               Numero De Identificación: {datosConsulta[0]?.identificacion ?? ""}
             </ul>
             <Fieldset legend="Modificar Domiciliación">
-              <Input
+              {/*  <Input
                 label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}
                 value={valueAmount}
@@ -251,7 +253,21 @@ const ModificarPps = () => {
                 }}
                 type={"text"}
                 required
-              ></Input>
+              ></Input> */}
+
+              <MoneyInput
+                label={"Valor Aportar"}
+                placeholder={"Ingrese Valor Aportar"}
+                value={valueAmount}
+                minLength="6"
+                maxLength="9"
+                onInput={(e) => {
+                  const num = e.target.value.replace(".", "") || "";
+                  setValueAmount(num.replace("$", ""));
+                }}
+                type={"text"}
+                required
+              ></MoneyInput>
 
               <Input
                 label={"N° Célular"}

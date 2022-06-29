@@ -15,6 +15,7 @@ import Voucher from "../../LoteriaBog/components/Voucher/Voucher";
 import { useReactToPrint } from "react-to-print";
 import Form from "../../../components/Base/Form";
 import Tickets from "../../../components/Base/Tickets";
+import MoneyInput from "../../../components/Base/MoneyInput";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -369,19 +370,27 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               type={"text"}
               required
             ></Input>
-            <Input
+            <MoneyInput
               label={"Valor Aportar"}
               placeholder={"Ingrese Valor Aportar"}
               value={valorAportar}
-              minLength="4"
-              maxLength="6"
+              minLength="6"
+              maxLength="9"
               onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setValorAportar(num);
+                const num = e.target.value.replace(".", "") || "";
+                setValorAportar(num.replace("$", ""));
               }}
+              /*    onInput={(e, valor) =>
+                setValorAportar((old) => {
+                  return {
+                    ...old,
+                    valorAportar: valor,
+                  };
+                })
+              } */
               type={"text"}
               required
-            ></Input>
+            ></MoneyInput>
           </Fieldset>
           <ButtonBar className={"lg:col-span-2"} type="">
             {
