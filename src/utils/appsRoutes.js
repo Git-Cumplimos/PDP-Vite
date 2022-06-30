@@ -241,7 +241,16 @@ const RetiroCB = lazy(() =>
 const PagoDeProductosPropios = lazy(() =>
   import("../apps/CorresponsaliaDavivienda/Views/PagoDeProductosPropios")
 );
-
+const SeleccionServicioPagar = lazy(() =>
+  import(
+    "../apps/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/SeleccionServicioPagar"
+  )
+);
+const RecaudoServiciosPublicosPrivados = lazy(() =>
+  import(
+    "../apps/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivados"
+  )
+);
 /**
  * API-SMS
  */
@@ -569,7 +578,7 @@ const allUrlsPrivateApps = [
           },
           {
             link: "/corresponsaliaDavivienda/Daviplatapagos_giros",
-            label: <AppIcons Logo={"MARKETPLACE"} name="Pagos por giro" />,
+            label: <AppIcons Logo={"MARKETPLACE"} name='Pagos por giro' />,
             component: PagoGiro,
             permission: [54],
           },
@@ -606,6 +615,37 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"MARKETPLACE"} name='Pagos por giro' />,
         component: PagoGiro,
         permission: [54],
+      },
+      {
+        link: "/corresponsaliaDavivienda/pagoDeProductosPropios",
+        label: (
+          <AppIcons Logo={"MARKETPLACE"} name='Pago de productos de crédito' />
+        ),
+        component: PagoDeProductosPropios,
+        permission: [54],
+      },
+      {
+        link: "/corresponsaliaDavivienda/seleccionServicioPublicoPrivado",
+        label: (
+          <AppIcons
+            Logo={"MARKETPLACE"}
+            name='Recaudo servicios publicos y privados'
+          />
+        ),
+        component: SeleccionServicioPagar,
+        permission: [54],
+      },
+      {
+        link: "/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados",
+        label: (
+          <AppIcons
+            Logo={"MARKETPLACE"}
+            name='Recaudo servicios publicos y privados'
+          />
+        ),
+        component: RecaudoServiciosPublicosPrivados,
+        permission: [54],
+        show: false,
       },
     ],
   },

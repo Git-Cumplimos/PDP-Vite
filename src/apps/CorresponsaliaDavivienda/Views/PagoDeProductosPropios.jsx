@@ -224,18 +224,20 @@ const PagoDeProductosPropios = () => {
       return notifyError("Ingrese el valor del abono");
     if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
       return notifyError("El valor del abono debe ser menor al valor total");
-    if (tipoAbono.valorAbono > limiteRecarga.superior)
+    if (tipoAbono.valorAbono > limiteRecarga.superior) {
       return notifyError(
         `El valor del abono debe ser menor a ${formatMoney(
           limiteRecarga.superior
         )}`
       );
-    if (tipoAbono.valorAbono < limiteRecarga.inferior)
-      return notifyError(
-        `El valor del abono debe ser mayor a ${formatMoney(
-          limiteRecarga.superior
-        )}`
-      );
+    }
+    // if (tipoAbono.valorAbono < limiteRecarga.inferior) {
+    //   return notifyError(
+    //     `El valor del abono debe ser mayor a ${formatMoney(
+    //       limiteRecarga.inferior
+    //     )}`
+    //   );
+    // }
     setPeticion(3);
   };
   const peticionPagoPropios = () => {
@@ -485,6 +487,9 @@ const PagoDeProductosPropios = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de consulta Davivienda
               </h1>
+              <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
+              <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
+              <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
               <h2>{`Valor de pago minimo: ${formatMoney.format(
                 datosConsulta.valPagoMinimo
               )}`}</h2>
@@ -499,7 +504,7 @@ const PagoDeProductosPropios = () => {
                   "": "",
                   "Valor mínimo": "0001",
                   "Valor total": "0002",
-                  ...(datosConsulta.valIndAbonoExtraordinario === "N" && {
+                  ...(datosConsulta.valIndAbonoExtraordinario === "S" && {
                     "Disminución de cuota": "0003",
                     "Adelanto de cuota": "0004",
                     "Abono a capital": "0005",
