@@ -87,7 +87,6 @@ const CrearPin = () => {
     return tramiteData;
   }, [optionsTramites, tramite]);
 
-  console.log(tramiteData)
   const user = useMemo(() => {
     return {
       Tipo: roleInfo?.tipo_comercio,
@@ -108,7 +107,7 @@ const CrearPin = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
-    crearPinVus(documento, tipoPin, tramite,user)
+    crearPinVus(documento, tipoPin, tramite,user, tramiteData)
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -315,7 +314,7 @@ const CrearPin = () => {
             <div className="flex flex-col justify-center items-center mx-auto container">
               <Form onSubmit={onSubmit}>
                 <ButtonBar>
-                  <Button type="submit">
+                  <Button type="submit" disabled={disabledBtns}>
                     Crear Pin
                   </Button>
                   <Button
