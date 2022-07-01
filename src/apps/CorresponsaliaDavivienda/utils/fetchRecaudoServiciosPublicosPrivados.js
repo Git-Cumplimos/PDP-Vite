@@ -35,7 +35,7 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
     if (!res?.status) {
       console.error(res?.msg);
     }
-    return res;
+    return res?.obj;
   } catch (err) {
     throw err;
   }
