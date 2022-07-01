@@ -14,7 +14,12 @@ const capitalize = (word) => {
 
 const url = process.env.REACT_APP_URL_DANE_MUNICIPIOS;
 
-const LocationForm = ({ place = "", location, LocalidadComponent = null }) => {
+const LocationForm = ({
+  place = "",
+  location,
+  LocalidadComponent = null,
+  addressInput = true,
+}) => {
   const {
     municipio: munState,
     departamento: depState,
@@ -91,11 +96,25 @@ const LocationForm = ({ place = "", location, LocalidadComponent = null }) => {
       ) : (
         ""
       )}
-      <AddressInput
-        label="Direccion de comercio"
-        place={place}
-        getAddress={addrState[1]}
-      />
+      {addressInput === "input" ? (
+        <Input
+          id={`dir_${place}`}
+          label={`Direccion de ${place}`}
+          type="text"
+          autoComplete="off"
+          value={addrState[0]}
+          onInput={(e) => addrState[1](e.target.value)}
+          required
+        />
+      ) : addressInput ? (
+        <AddressInput
+          label={`Direccion de ${place}`}
+          place={place}
+          getAddress={addrState[1]}
+        />
+      ) : (
+        ""
+      )}
       <Modal
         show={showModal}
         handleClose={() => setShowModal(false)}
