@@ -251,6 +251,17 @@ const RecaudoServiciosPublicosPrivados = lazy(() =>
     "../apps/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivados"
   )
 );
+const RecaudoServiciosPublicosPrivadosMenu = lazy(() =>
+  import(
+    "../apps/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivadosMenu"
+  )
+);
+
+const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = lazy(() =>
+  import(
+    "../apps/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosLecturaCodigoBarras"
+  )
+);
 /**
  * API-SMS
  */
@@ -616,23 +627,13 @@ const allUrlsPrivateApps = [
         component: PagoGiro,
         permission: [54],
       },
+
       {
         link: "/corresponsaliaDavivienda/pagoDeProductosPropios",
         label: (
           <AppIcons Logo={"MARKETPLACE"} name='Pago de productos de crédito' />
         ),
         component: PagoDeProductosPropios,
-        permission: [54],
-      },
-      {
-        link: "/corresponsaliaDavivienda/seleccionServicioPublicoPrivado",
-        label: (
-          <AppIcons
-            Logo={"MARKETPLACE"}
-            name='Recaudo servicios publicos y privados'
-          />
-        ),
-        component: SeleccionServicioPagar,
         permission: [54],
       },
       {
@@ -643,9 +644,38 @@ const allUrlsPrivateApps = [
             name='Recaudo servicios publicos y privados'
           />
         ),
-        component: RecaudoServiciosPublicosPrivados,
+        component: RecaudoServiciosPublicosPrivadosMenu,
         permission: [54],
-        show: false,
+        subRoutes: [
+          {
+            link: "/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccion",
+            label: (
+              <AppIcons Logo={"MARKETPLACE"} name='Selección del covenio' />
+            ),
+            component: SeleccionServicioPagar,
+            permission: [54],
+          },
+          {
+            link: "/corresponsaliaDavivienda/ahorrosCorriente/automatico",
+            label: (
+              <AppIcons
+                Logo={"MARKETPLACE"}
+                name='Ingreso por código de barras'
+              />
+            ),
+            component: RecaudoServiciosPublicosPrivadosLecturaCodigoBarras,
+            permission: [54],
+          },
+          {
+            link: "/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
+            label: (
+              <AppIcons Logo={"MARKETPLACE"} name='Selección del covenio' />
+            ),
+            component: RecaudoServiciosPublicosPrivados,
+            permission: [54],
+            show: false,
+          },
+        ],
       },
     ],
   },

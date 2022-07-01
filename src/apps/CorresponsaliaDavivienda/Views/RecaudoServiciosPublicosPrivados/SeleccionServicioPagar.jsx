@@ -2,7 +2,6 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Input from "../../../../components/Base/Input";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import useQuery from "../../../../hooks/useQuery";
 import { notify, notifyError } from "../../../../utils/notify";
 import { postConsultaTablaConveniosPaginado } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
@@ -20,7 +19,6 @@ const SeleccionServicioPagar = () => {
     idIAC: "",
   });
   const [convenios, setConvenios] = useState([]);
-  const [selectedAuto, setSelectedAuto] = useState(null);
   const [maxPages, setMaxPages] = useState(0);
 
   const tableConvenios = useMemo(() => {
@@ -30,12 +28,12 @@ const SeleccionServicioPagar = () => {
           pk_tbl_transaccional_convenios_davivienda_cb,
           nom_convenio_cnb,
           cod_convenio_cnb,
-          cod_iac_cnb
+          cod_iac_cnb,
         }) => {
           return {
             "Id convenio": cod_convenio_cnb,
             Convenio: nom_convenio_cnb,
-            "Id IAC": cod_iac_cnb
+            "Id IAC": cod_iac_cnb,
           };
         }
       ),
@@ -44,16 +42,18 @@ const SeleccionServicioPagar = () => {
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      navigate("../corresponsaliaDavivienda/recaudoServiciosPublicosPrivados", {
-        state: {
-          id: convenios[i]["pk_tbl_transaccional_convenios_davivienda_cb"],
-        },
-      });
+      navigate(
+        "../corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
+        {
+          state: {
+            id: convenios[i]["pk_tbl_transaccional_convenios_davivienda_cb"],
+          },
+        }
+      );
       console.log(convenios[i]["pk_tbl_transaccional_convenios_davivienda_cb"]);
     },
     [tableConvenios, navigate]
   );
-
 
   useEffect(() => {
     fecthTablaConveniosPaginadoFunc();
@@ -69,21 +69,24 @@ const SeleccionServicioPagar = () => {
     })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
-        setConvenios(autoArr?.results);
+        setConvenios(autoArr?.results ?? []);
       })
       .catch((err) => console.error(err));
   };
   return (
     <>
+      <h1 className='text-3xl text-center'>
+        Recaudo servicios publicos y privados
+      </h1>
       <TableEnterprise
         title='Tabla convenios Davivienda corresponsal bancario'
         maxPage={maxPages}
-        headers={["Id", "Convenio","Id IAC"]}
+        headers={["Id", "Convenio", "Id IAC"]}
         data={tableConvenios}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
         // onChange={onChange}
-        >
+      >
         <Input
           id='searchConvenio'
           name='searchConvenio'
@@ -91,9 +94,9 @@ const SeleccionServicioPagar = () => {
           type='text'
           autoComplete='off'
           onInput={(e) => {
-              setDatosTrans((old) => {
-                return { ...old, convenio: e.target.value };
-              });
+            setDatosTrans((old) => {
+              return { ...old, convenio: e.target.value };
+            });
           }}
         />
         <Input
@@ -113,7 +116,7 @@ const SeleccionServicioPagar = () => {
               });
             }
           }}></Input>
-          <Input
+        <Input
           id='idIAC'
           label='Id IAC'
           type='text'

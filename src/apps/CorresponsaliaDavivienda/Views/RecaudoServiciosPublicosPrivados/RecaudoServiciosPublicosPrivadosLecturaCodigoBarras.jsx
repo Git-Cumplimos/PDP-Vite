@@ -20,36 +20,30 @@ import useQuery from "../../../../hooks/useQuery";
 import { notify, notifyError } from "../../../../utils/notify";
 import { postConsultaTablaConveniosEspecifico } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
-const RecaudoServiciosPublicosPrivados = () => {
-  const { state } = useLocation();
+const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   const [showModal, setShowModal] = useState(false);
   const [datosTrans, setDatosTrans] = useState({
-    ref1: "",
-    ref2: "",
+    codBarras: "",
   });
-  const [isUploading, setIsUploading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const [convenio, setConvenio] = useState([]);
 
-  useEffect(() => {
-    fecthTablaConveniosEspecificoFunc();
-  }, [state?.id]);
+  // useEffect(() => {
+  //   fecthTablaConveniosEspecificoFunc();
+  // }, [state?.id]);
 
-  const fecthTablaConveniosEspecificoFunc = () => {
-    postConsultaTablaConveniosEspecifico({
-      pk_tbl_transaccional_convenios_davivienda_cb: state?.id,
-    })
-      .then((autoArr) => {
-        console.log(autoArr?.results[0]);
-        setConvenio(autoArr?.results[0]);
-        setIsUploading(false);
-      })
-      .catch((err) => console.error(err));
-  };
-  const printDiv = useRef();
+  // const fecthTablaConveniosEspecificoFunc = () => {
+  //   postConsultaTablaConveniosEspecifico({
+  //     pk_tbl_transaccional_convenios_davivienda_cb: state?.id,
+  //   })
+  //     .then((autoArr) => {
+  //       console.log(autoArr?.results[0])
+  //       setConvenio(autoArr?.results[0]);
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
+  // const printDiv = useRef();
 
-  const handlePrint = useReactToPrint({
-    content: () => printDiv.current,
-  });
   const onSubmit = () => {};
   return (
     <>
@@ -57,70 +51,25 @@ const RecaudoServiciosPublicosPrivados = () => {
       <h1 className='text-3xl text-center'>
         Recaudo servicios publicos y privados
       </h1>
-      <h1 className='text-3xl text-center'>{`Convenio: ${convenio?.nom_convenio_cnb}`}</h1>
+      <h1 className='text-3xl text-center'>Ingrese el código de barras</h1>
 
       <Form grid onSubmit={onSubmit}>
-        {convenio?.ctrol_ref1_cnb === "1" && (
-          <>
-            <Input
-              id='ref1'
-              label={convenio?.nom_ref1_cnb}
-              type='text'
-              name='ref1'
-              minLength='32'
-              maxLength='32'
-              required
-              value={datosTrans.ref1}
-              onInput={(e) => {
-                setDatosTrans((old) => {
-                  return { ...old, ref1: e.target.value };
-                });
-              }}></Input>
-          </>
-        )}
-        {convenio?.ctrol_ref2_cnb === "1" && (
-          <Input
-            id='ref2'
-            label={convenio?.nom_ref2_cnb}
-            type='text'
-            name='ref2'
-            minLength='32'
-            maxLength='32'
-            required
-            value={datosTrans.ref2}
-            onInput={(e) => {
-              setDatosTrans((old) => {
-                return { ...old, ref2: e.target.value };
-              });
-            }}></Input>
-        )}
-        {(convenio?.num_ind_consulta_cnb === "0" ||
-          convenio?.num_ind_consulta_cnb === "3") && (
-          <MoneyInput
-            id='valCashOut'
-            name='valCashOut'
-            label='Valor'
-            type='text'
-            autoComplete='off'
-            maxLength={"15"}
-            value={datosTrans.valorCashOut ?? ""}
-            onInput={(e, valor) => {
-              if (!isNaN(valor)) {
-                const num = valor;
-                setDatosTrans((old) => {
-                  return { ...old, valorCashOut: num };
-                });
-              }
-            }}
-            required></MoneyInput>
-        )}
+        <Input
+          id='codBarras'
+          label='Código de barras'
+          type='text'
+          name='codBarras'
+          minLength='32'
+          maxLength='32'
+          required
+          value={datosTrans.ref1}
+          onInput={(e) => {
+            setDatosTrans((old) => {
+              return { ...old, ref1: e.target.value };
+            });
+          }}></Input>
         <ButtonBar className='lg:col-span-2'>
-          <Button type='submit'>
-            {convenio?.num_ind_consulta_cnb === "0" ||
-            convenio?.num_ind_consulta_cnb === "3"
-              ? "Realizar pago"
-              : "Realizar consulta"}
-          </Button>
+          <Button type='submit'>Realizar consulta</Button>
         </ButtonBar>
       </Form>
       {/* <Modal show={showModal} handleClose={hideModal}>
@@ -194,4 +143,4 @@ const RecaudoServiciosPublicosPrivados = () => {
   );
 };
 
-export default RecaudoServiciosPublicosPrivados;
+export default RecaudoServiciosPublicosPrivadosLecturaCodigoBarras;
