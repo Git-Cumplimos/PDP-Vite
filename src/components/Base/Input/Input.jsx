@@ -49,7 +49,8 @@ const Input = ({
   return self ? (
     <>
       {label && label !== "" && (
-        <label htmlFor={_id} className={`${"text-right"}`}>
+        <label htmlFor={_id}>
+          {/* className={`${"text-right"}`}> */}
           {label}
         </label>
       )}
@@ -58,7 +59,8 @@ const Input = ({
   ) : (
     <div className={`${formItem}`}>
       {label && label !== "" && (
-        <label htmlFor={_id} className={`${"text-right"}`}>
+        <label htmlFor={_id}>
+          {/* className={`${"text-right"}`}> */}
           {label}
         </label>
       )}

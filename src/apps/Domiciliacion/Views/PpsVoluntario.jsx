@@ -11,6 +11,7 @@ import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import { useNavigate } from "react-router-dom";
+import MoneyInput from "../../../components/Base/MoneyInput";
 
 const PpsVoluntario = ({ datosConsulta }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
@@ -220,7 +221,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 type={"text"}
                 required
               ></Input>
-              <Input
+              {/*               <Input
                 label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}
                 value={valorAportar}
@@ -232,7 +233,28 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 }}
                 type={"text"}
                 required
-              ></Input>
+              ></Input> */}
+              <MoneyInput
+                label={"Valor Aportar"}
+                placeholder={"Ingrese Valor Aportar"}
+                value={valorAportar}
+                minLength="6"
+                maxLength="9"
+                onInput={(e) => {
+                  const num = e.target.value.replace(".", "") || "";
+                  setValorAportar(num.replace("$", ""));
+                }}
+                /*    onInput={(e, valor) =>
+                setValorAportar((old) => {
+                  return {
+                    ...old,
+                    valorAportar: valor,
+                  };
+                })
+              } */
+                type={"text"}
+                required
+              ></MoneyInput>
               <Select
                 onChange={(event) => setNumPagosPdp(event?.target?.value)}
                 id="comissionType"
