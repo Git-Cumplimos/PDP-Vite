@@ -308,7 +308,7 @@ const Recaudo = () => {
                 id="numpin"
                 label={label}
                 type="text"
-                minLength="7"
+                minLength="5"
                 maxLength="12"
                 autoComplete="off"
                 value={number}

@@ -137,7 +137,7 @@ const UsarPinForm = ({
                 className="flex flex-row justify-between text-lg font-medium"
               >
                 <h1>IVa Tramite</h1>
-                <h1>{formatMoney.format(valor_tramite*0.19)}</h1>
+                <h1>{formatMoney.format(0)}</h1>
               </div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
@@ -155,7 +155,7 @@ const UsarPinForm = ({
                 className="flex flex-row justify-between text-lg font-medium"
               >
                 <h1>Total</h1>
-                <h1>{formatMoney.format(valor*1.19 + valor_tramite*1.19)}</h1>
+                <h1>{formatMoney.format(valor*1.19 + valor_tramite)}</h1>
               </div>
             </>
             {/* {Object.entries(respPin).map(([key, val]) => {
