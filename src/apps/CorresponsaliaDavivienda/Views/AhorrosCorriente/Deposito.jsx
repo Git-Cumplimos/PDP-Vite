@@ -237,18 +237,24 @@ const Deposito = () => {
             ["No. terminal", roleInfo?.id_dispositivo],
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
-            ["Id Trx", trx_id],
+            ["",""],
+            ["",""],
           ],
           trxInfo: [
+            ["Cod. autorización", trx_id],
+            ["Ter", ter],  
             ["Nro. Cuenta", '****'+res?.obj?.Data?.numNumeroCuenta?.slice(-4)],
             ["Tipo", res?.obj?.Data?.numTipoCuenta==="01" ? "Ahorros" : "Corriente"],
-            ["Valor", formatMoney.format(valor)],
-            ["Costo Transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
-            ["Total", formatMoney.format(valor)],
-            ["Cod. autorización", trx_id],
-            ["Ter", ter],            
-            ["Id. Despositante", userDoc],
-            ["Depositante", nomDepositante]            
+            ["Valor", ""],
+            ["",formatMoney.format(valor)],
+            ["Costo Transacción", ""],
+            ["",formatMoney.format(res?.obj?.Data?.numValorCobro)],
+            ["Total", ""],
+            ["",formatMoney.format(valor)],          
+            ["Id. Despositante", ""],
+            ["",userDoc],
+            ["Depositante", ""],
+            ["",nomDepositante],            
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
@@ -322,7 +328,7 @@ const Deposito = () => {
           label="CC de quien deposita"
           type="text"
           autoComplete="off"
-          minLength={"7"}
+          minLength={"5"}
           maxLength={"10"}
           value={userDoc ?? ""}
           onInput={() => {}}

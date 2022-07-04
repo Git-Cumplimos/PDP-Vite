@@ -89,7 +89,7 @@ const ReportePines = () => {
                   Creacion: dateFormatter.format(fecha_creacion),
                   Vencimiento: dateFormatter.format(fecha_vencimiento),
                   Tramite: row?.name_tramite === "" ? "" : row?.name_tramite,
-                  Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite*1.19), // Valor + IVA
+                  Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite), // Valor + (IVA solo PIN)
                 };
               })
             );

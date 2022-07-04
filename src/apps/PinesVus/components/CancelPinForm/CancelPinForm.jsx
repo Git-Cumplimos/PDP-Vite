@@ -89,10 +89,10 @@ const CancelPin = ({
       trxInfo: [
         ["Proceso", "Cancelación de Pin"],
         ["Valor Tramite", formatMoney.format(valor_tramite)],
-        ["Iva Tramite",formatMoney.format(valor_tramite*0.19)],
+        ["Iva Tramite",formatMoney.format(0)],
         ["Valor Pin", formatMoney.format(valor)],
         ["Iva Pin", formatMoney.format(valor*0.19)],
-        ["Total", formatMoney.format(valor*1.19 + valor_tramite*1.19)], // Valor + IVA
+        ["Total", formatMoney.format(valor*1.19 + valor_tramite)], // Valor + IVA
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -106,7 +106,7 @@ const CancelPin = ({
   const onSubmitCancel = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite*1.19) //// Valor = valor + IVA
+    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite) //// Valor = valor + IVA
       .then((res) => {
         setActivarNavigate(false);
         setDisabledBtn(false);
@@ -140,8 +140,8 @@ const CancelPin = ({
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>IVa Tramite</h1>
-                <h1>{formatMoney.format(valor_tramite*0.19)}</h1>
+                <h1>Iva Tramite</h1>
+                <h1>{formatMoney.format(0)}</h1>
               </div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
@@ -152,14 +152,14 @@ const CancelPin = ({
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>IVa Pin</h1>
+                <h1>Iva Pin</h1>
                 <h1>{formatMoney.format(valor*0.19)}</h1>
               </div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
                 <h1>Total</h1>
-                <h1>{formatMoney.format(valor*1.19 + valor_tramite*1.19)}</h1>
+                <h1>{formatMoney.format(valor*1.19 + valor_tramite)}</h1>
               </div>
             </>
             {/* {Object.entries(respPin).map(([key, val]) => {

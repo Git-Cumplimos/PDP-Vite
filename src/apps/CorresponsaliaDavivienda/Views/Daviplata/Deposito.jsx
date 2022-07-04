@@ -238,16 +238,15 @@ const Deposito = () => {
             ["No. terminal", roleInfo?.id_dispositivo],
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
-            ["Id Trx", trx_id],
           ],
           commerceName: "Daviplata",
           trxInfo: [
+            ["Ter", ter],
+            ["No. de aprobación", trx_id],
             ["Num Daviplata", "****" + phone.slice(-4)],
             ["Valor", formatMoney.format(valor)],
             ["Costo", formatMoney.format(comision)],
             ["Total", formatMoney.format(total)],
-            ["Ter", ter],
-            ["No. de aprobación", trx_id]
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
