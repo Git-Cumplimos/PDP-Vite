@@ -212,7 +212,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                     setNumCelular(num);
                   } else {
                     if (parseInt(String(num)[0]) != 3) {
-                      notifyError("El Primer Digito debe ser 3");
+                      notifyError("El primer dígito debe ser 3");
                     }
                   }
                 }}
