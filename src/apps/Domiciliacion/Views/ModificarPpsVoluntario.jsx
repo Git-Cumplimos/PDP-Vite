@@ -270,8 +270,8 @@ const ModificarPps = () => {
               ></MoneyInput>
 
               <Input
-                label={"N° Célular"}
-                placeholder={"Ingrese su número célular"}
+                label={"N° Celular"}
+                placeholder={"Ingrese su número celular"}
                 value={celular}
                 onInput={(e) => {
                   const num = parseInt(e.target.value) || "";
