@@ -34,7 +34,9 @@ const PpsVoluntario = ({ datosConsulta }) => {
   }, []);
 
   const url = process.env.REACT_APP_URL_COLPENSIONES;
+  /*   const url = "http://127.0.0.1:7000"; */
 
+  useEffect(() => {}, [numCelular]);
   useEffect(() => {
     buscarNumCedula(numDocumento);
   }, [numDocumento]);
@@ -64,6 +66,9 @@ const PpsVoluntario = ({ datosConsulta }) => {
     if (valorAportar >= 5000 && valorAportar <= 149000) {
       console.log("r2", datosBusqueda?.length);
       if (datosBusqueda?.length <= 0) {
+        if (numCelular.length < 6) {
+          console.log("soy mayo");
+        }
         fetchData(
           `${url}/domicilio`,
           "POST",
@@ -102,6 +107,11 @@ const PpsVoluntario = ({ datosConsulta }) => {
               respuesta?.msg == "El Valor Aportado Debe ser Exacto ej: 5000"
             ) {
               notifyError("El valor a aportar debe ser múltiplo de 100");
+            }
+            if (
+              respuesta?.msg?.respuesta_colpensiones == "Estructura inválida."
+            ) {
+              notifyError("Estructura inválida.");
             }
             if (
               respuesta?.msg ==
@@ -200,11 +210,11 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 placeholder={"Ingrese su Numero Celular"}
                 value={numCelular}
                 /* onChange={(e) => setNumCelular(e.target.value)} */
-                /* onInput={(e) => {
+                onInput={(e) => {
                   const num = parseInt(e.target.value) || "";
                   setNumCelular(num);
-                }} */
-                onInput={(e) => {
+                }}
+                /*                onInput={(e) => {
                   const num = parseInt(e.target.value) || "";
 
                   if (parseInt(String(num)[0]) == 3) {
@@ -215,7 +225,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                       notifyError("El primer dígito debe ser 3");
                     }
                   }
-                }}
+                }} */
                 minLength="10"
                 maxLength="10"
                 type={"text"}
