@@ -51,7 +51,7 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia) => {
     console.log(infoTramite)
     const body = {
       tipo_tramite: tramite,
@@ -63,6 +63,7 @@ export const useProvidePinesVus = () => {
       Comercio: user?.Comercio,
       Tipo: user?.Tipo,
       infoCliente: infoCliente,
+      olimpia: olimpia,
     };
     try {
       const res = await fetchData(urls.PinVus, "POST", {}, body);
@@ -151,8 +152,9 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const consultaClientes = useCallback(async (cedula) => {
+  const consultaClientes = useCallback(async (cedula, olimpia) => {
     const query = { pk_documento_cliente: cedula};
+    query.olimpia = olimpia
     try {
       const res = await fetchData(urls.consultaClientes, "GET", query);
       return res;
