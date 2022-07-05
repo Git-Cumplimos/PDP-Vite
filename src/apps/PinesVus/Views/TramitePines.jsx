@@ -124,7 +124,7 @@ const TramitePines = () => {
                 // "Codigo Estado": row?.estado_pin,
                 Vencimiento: dateFormatter.format(fecha_vencimiento),
                 Tramite: row?.name_tramite,
-                Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite*1.19), // Valor + IVA
+                Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite), // Solo pin tiene iva
               };
             })
           );
@@ -222,8 +222,8 @@ const TramitePines = () => {
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>IVa Tramite</h1>
-                <h1>{formatMoney.format(valor_tramite*0.19)}</h1>
+                <h1>Iva Tramite</h1>
+                <h1>{formatMoney.format(0)}</h1>
               </div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
@@ -234,14 +234,14 @@ const TramitePines = () => {
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>IVa Pin</h1>
+                <h1>Iva Pin</h1>
                 <h1>{formatMoney.format(valor*0.19)}</h1>
               </div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
                 <h1>Total</h1>
-                <h1>{formatMoney.format(valor*1.19 + valor_tramite*1.19)}</h1>
+                <h1>{formatMoney.format(valor*1.19 + valor_tramite)}</h1>
               </div>
             </>
               {/* {Object.entries(selected).map(([key, val]) => {

@@ -7,6 +7,7 @@ const urls = {
   PinVus: `${process.env.REACT_APP_URL_PinesVus}/pines`,
   cons_estado_tipoPin: `${process.env.REACT_APP_URL_PinesVus}/TipoEstadoPin`,
   consultaTramites: `${process.env.REACT_APP_URL_PinesVus}/consultaTramites`,
+  consultaClientes: `${process.env.REACT_APP_URL_PinesVus}/consultaClientes`,
 };
 
 export const pinesVusContext = createContext({
@@ -14,6 +15,7 @@ export const pinesVusContext = createContext({
   usarPinVus: () => {},
   con_estado_tipoPin: () => {},
   consultaTramite: () => {},
+  consultaClientes: () => {},
   activarNavigate: null,
   setActivarNavigate: null,
 });
@@ -49,7 +51,7 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente) => {
     console.log(infoTramite)
     const body = {
       tipo_tramite: tramite,
@@ -60,6 +62,7 @@ export const useProvidePinesVus = () => {
       Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,
       Tipo: user?.Tipo,
+      infoCliente: infoCliente,
     };
     try {
       const res = await fetchData(urls.PinVus, "POST", {}, body);
@@ -148,6 +151,16 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
+  const consultaClientes = useCallback(async (cedula) => {
+    const query = { pk_documento_cliente: cedula};
+    try {
+      const res = await fetchData(urls.consultaClientes, "GET", query);
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  }, []);
+
   return {
     cancelPinVus,
     crearPinVus,
@@ -155,6 +168,7 @@ export const useProvidePinesVus = () => {
     usarPinVus,
     con_estado_tipoPin,
     consultaTramite,
+    consultaClientes,
     activarNavigate,
     setActivarNavigate,
   };
