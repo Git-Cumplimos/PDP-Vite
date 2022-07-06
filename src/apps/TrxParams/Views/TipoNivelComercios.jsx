@@ -8,7 +8,11 @@ import Select from "../../../components/Base/Select/Select";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import useQuery from "../../../hooks/useQuery";
 import { notify, notifyError } from "../../../utils/notify";
-import { postConsultaTipoNivelComercio } from "../utils/fetchComercios";
+import {
+  postConsultaTipoNivelComercio,
+  postCrearTipoNivelComercio,
+  putModificarTipoNivelComercio,
+} from "../utils/fetchComercios";
 import {
   fetchParametrosAutorizadores,
   postParametrosAutorizadores,
@@ -24,26 +28,26 @@ const TipoNivelComercio = () => {
   });
   const [tipoNivelComercio, setTipoNivelComercio] = useState([]);
   const [selectedTipoNivelComercio, setSelectedTipoNivelComercio] = useState({
-    pkTipoNivel: null,
+    pkTipoNivel: "",
     descripcion: "",
   });
   const [datosBusqueda, setDatosBusqueda] = useState({
-    pkTipoNivel: null,
+    pkTipoNivel: "",
     descripcion: "",
   });
   const [maxPages, setMaxPages] = useState(0);
   const handleClose = useCallback(() => {
     setShowModal(false);
-    selectedTipoNivelComercio({
-      pkTipoNivel: null,
+    setSelectedTipoNivelComercio({
+      pkTipoNivel: "",
       descripcion: "",
     });
     fetchTipoNivelComerciosFunc();
   }, []);
   const handleShowModal = useCallback(() => {
     setShowModal(true);
-    selectedTipoNivelComercio({
-      pkTipoNivel: null,
+    setSelectedTipoNivelComercio({
+      pkTipoNivel: "",
       descripcion: "",
     });
   }, []);
@@ -85,55 +89,44 @@ const TipoNivelComercio = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-      // if (selectedParam?.nombre_autorizador === "") {
-      //   notifyError("Se debe agregar el autorizador");
-      //   return;
-      // }
-      // if (selectedParam?.nombre_parametro === "") {
-      //   notifyError("Se debe agregar el nombre del parametro");
-      //   return;
-      // }
-      // if (selectedParam?.valor_parametro === "") {
-      //   notifyError("Se debe agregar el valor del parametro");
-      //   return;
-      // }
-      // if (selectedParam?.id_param !== "") {
-      //   putParametrosAutorizadores(
-      //     {
-      //       id_tabla_general_parametros_autorizadores: selectedParam?.id_param,
-      //     },
-      //     {
-      //       nombre_parametro: selectedParam?.nombre_parametro,
-      //       valor_parametro: selectedParam?.valor_parametro,
-      //     }
-      //   )
-      //     .then((res) => {
-      //       if (res?.status) {
-      //         notify(res?.msg);
-      //         handleClose();
-      //       } else {
-      //         notifyError(res?.msg);
-      //       }
-      //     })
-      //     .catch((err) => console.error(err));
-      // } else {
-      //   postParametrosAutorizadores({
-      //     id_autorizador: selectedParam?.id_autorizador,
-      //     nombre_parametro: selectedParam?.nombre_parametro,
-      //     valor_parametro: selectedParam?.valor_parametro,
-      //   })
-      //     .then((res) => {
-      //       if (res?.status) {
-      //         notify(res?.msg);
-      //         handleClose();
-      //       } else {
-      //         notifyError(res?.msg);
-      //       }
-      //     })
-      //     .catch((err) => console.error(err));
-      // }
+
+      if (selectedTipoNivelComercio?.descripcion === "") {
+        notifyError("Se debe escribir la descripción");
+        return;
+      }
+      if (selectedTipoNivelComercio?.pkTipoNivel !== "") {
+        putModificarTipoNivelComercio(
+          selectedTipoNivelComercio?.pkTipoNivel,
+
+          {
+            descripcion: selectedTipoNivelComercio?.descripcion,
+          }
+        )
+          .then((res) => {
+            if (res?.status) {
+              notify(res?.msg);
+              handleClose();
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => console.error(err));
+      } else {
+        postCrearTipoNivelComercio({
+          descripcion: selectedTipoNivelComercio?.descripcion,
+        })
+          .then((res) => {
+            if (res?.status) {
+              notify(res?.msg);
+              handleClose();
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => console.error(err));
+      }
     },
-    [handleClose]
+    [handleClose, selectedTipoNivelComercio]
   );
 
   useEffect(() => {
@@ -163,7 +156,7 @@ const TipoNivelComercio = () => {
       <TableEnterprise
         title='Tipo nivel comercios'
         maxPage={maxPages}
-        headers={["Id", "descripcion"]}
+        headers={["Id", "Descripción"]}
         data={tableTipoNivelComercio}
         onSelectRow={onSelectTipoNivelComercios}
         onSetPageData={setPageData}
@@ -211,88 +204,37 @@ const TipoNivelComercio = () => {
       ) : (
         ""
       )} */}
-      {/*
+
       <Modal show={showModal} handleClose={handleClose}>
-        <Form onSubmit={onSubmit} onChange={onChangeFormat} grid>
+        <Form onSubmit={onSubmit} grid>
           <Input
-            id='Nombre parametro'
-            name='nombre_parametro'
-            label={"Nombre parametro"}
+            id='descripcion'
+            name='descripcion'
+            label='Descripción'
             type='text'
             autoComplete='off'
-            value={selectedParam.nombre_parametro}
-            onChange={() => {}}
+            value={selectedTipoNivelComercio.descripcion}
+            onInput={(e) =>
+              setSelectedTipoNivelComercio((old) => {
+                return { ...old, descripcion: e.target.value };
+              })
+            }
             // defaultValue={selectedAuto?.["Id comercio"] ?? ""}
             // disabled={selectedAuto?.["Id configuracion"]}
             required
           />
-          <Input
-            id='Valor parametro'
-            name='valor_parametro'
-            label={"Valor parametro"}
-            type='text'
-            autoComplete='off'
-            value={selectedParam.valor_parametro}
-            onChange={() => {}}
-            // defaultValue={selectedAuto?.["Id comercio"] ?? ""}
-            // disabled={selectedAuto?.["Id configuracion"]}
-            required
-          />
-          {selectedParam?.nombre_autorizador && (
-            <Input
-              id='Nombre autorizador'
-              name='Nombre autorizador'
-              label={"Nombre autorizador"}
-              type='text'
-              autoComplete='off'
-              value={selectedParam?.nombre_autorizador}
-              onChange={() => {}}
-              // defaultValue={selectedAuto?.["Contrato"]}
-              disabled
-            />
-          )}
-          {!selectedParam?.id_param ? (
-            <ButtonBar>
-              <Button type='button' onClick={handleClose}>
-                Cancelar
-              </Button>
-              <Button
-                type='button'
-                onClick={() => {
-                  setShowModal2(true);
-                  setQuery({ ["openAutorizador"]: true }, { replace: true });
-                }}>
-                {selectedParam?.nombre_autorizador
-                  ? "Editar autorizador"
-                  : "Agregar autorizador"}
-              </Button>
-              <Button type='submit'>Crear parametro</Button>
-            </ButtonBar>
-          ) : (
-            <Fragment>
-              <ButtonBar>
-              </ButtonBar>
-              <ButtonBar>
-                <Button type='button' onClick={handleClose}>
-                  Cancelar
-                </Button>
-                <Button
-                  type='button'
-                  onClick={() => {
-                    setShowModal2(true);
-                    setQuery({ ["openAutorizador"]: true }, { replace: true });
-                  }}>
-                  {selectedParam?.nombre_autorizador
-                    ? "Editar autorizador"
-                    : "Agregar autorizador"}
-                </Button>
-                <Button type='submit'>Editar parametro</Button>
-              </ButtonBar>
-            </Fragment>
-          )}
+          <ButtonBar>
+            <Button type='button' onClick={handleClose}>
+              Cancelar
+            </Button>
+            <Button type='submit'>
+              {selectedTipoNivelComercio?.pkTipoNivel !== ""
+                ? "Actualizar tipo nivel comercio"
+                : "Crear tipo nivel comercio"}
+            </Button>
+          </ButtonBar>
         </Form>
-        </Modal>
-                  */}
+      </Modal>
     </Fragment>
   );
 };
