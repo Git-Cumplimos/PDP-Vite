@@ -6,11 +6,13 @@ const useFormNumbers = (initialValues) => {
   return [
     values,
     (e) => {
-      if (!isNaN(e?.target?.value)) {
-        setValues({
-          ...values,
-          [e?.target?.name]: e?.target?.value,
-        });
+      if (e.target.value <= 9999) {
+        if (!isNaN(e?.target?.value)) {
+          setValues({
+            ...values,
+            [e?.target?.name]: e?.target?.value,
+          });
+        }
       }
     },
   ];

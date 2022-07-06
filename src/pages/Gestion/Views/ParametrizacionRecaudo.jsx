@@ -111,7 +111,7 @@ const ParametrizacionRecaudo = () => {
               setType(e.target.value);
             }}
           />
-          {type === "1" ? (
+          {type === "2" ? (
             <Fieldset legend={"Registrar transportadora"}>
               <Input
                 label={"Nombre transportadora"}
@@ -121,18 +121,18 @@ const ParametrizacionRecaudo = () => {
                 required
               ></Input>
             </Fieldset>
-          ) : type === "2" ? (
+          ) : type === "1" ? (
             <h1>Sin acceso</h1>
           ) : (
             <></>
           )}
-          {type === "1" && (
+          {type === "2" && (
             <>
               <ButtonBar>
                 <Button type="button" onClick={closeModal}>
                   Cancelar
                 </Button>
-                {type === "2" && (
+                {type === "1" && (
                   <Button type="button" onClick={closeModal}>
                     Agregar cuenta
                   </Button>
