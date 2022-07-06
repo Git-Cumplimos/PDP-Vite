@@ -17,7 +17,7 @@ const BuscarComercioEmail = () => {
   const [showModal, setShowModal] = useState(true);
   const [continuarDomiciliacion, setContinuarDomiciliacion] = useState(false);
   const [emailVerificado, setEmailVerificado] = useState(true);
-  const url = `${process.env.REACT_APP_URL_TRXS_TRX}`;
+  const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
 
   //------------------Constantes para Dar Estilos---------------------//
   const {
@@ -27,10 +27,12 @@ const BuscarComercioEmail = () => {
     tituloDatos,
     contenedorValoresTitulos,
     contendorBoton,
+    contenedorImagen,
   } = classes;
 
   const BuscarComercio = (e) => {
     e.preventDefault();
+    setShowModal(true);
     if (emailComercio != "") {
       fetchData(
         `${url}/consultaemail`,
@@ -41,7 +43,7 @@ const BuscarComercioEmail = () => {
         {}
       )
         .then((respuesta) => {
-          console.log(respuesta);
+          /*   console.log(respuesta); */
           setDatosConsulta(respuesta?.obj);
           setEstadoConsulta(true);
           if (
@@ -51,9 +53,10 @@ const BuscarComercioEmail = () => {
             notifyError(
               "El usuario no existe o se encuentra en estado INACTIVO"
             );
+            setEstadoConsulta(false);
           } else {
             if (
-              respuesta?.msg == "La consulta a Suser del Email a sido exitosa"
+              respuesta?.msg == "La consulta a Suser del email a sido exitosa"
             ) {
               notify("Consulta Exitosa");
               setEstadoConsulta(true);
@@ -63,15 +66,15 @@ const BuscarComercioEmail = () => {
         })
         .catch((err) => {
           console.log(err);
-          notifyError("Error al Consultar Email");
+          notifyError("Error al consultar email");
         });
     } else {
-      notifyError("Ingrese un Correo para la Consulta");
+      notifyError("Ingrese un correo para la consulta");
     }
   };
   const ContinuarDomiciliacion = (e) => {
     e.preventDefault();
-    console.log("entre continuar");
+    /*   console.log("entre continuar"); */
     setShowModal(false);
     setContinuarDomiciliacion(true);
   };
@@ -84,7 +87,9 @@ const BuscarComercioEmail = () => {
       {estadoConsulta && showModal && datosConsulta ? (
         <Fragment>
           <Modal show={showModal} handleClose={handleClose}>
-            <LogoPDP small></LogoPDP>
+            <div className={contenedorImagen}>
+              <LogoPDP small></LogoPDP>
+            </div>
             <div class={contenedorForm}>
               <div class={contenedorDatos}>
                 <div class={contenedorTitulos}>

@@ -1,7 +1,7 @@
 .divPrint {
   size: 80mm 160mm;
   width: 80mm;
-  max-height: 160mm;
+  /* max-height: 160mm; */
   /* height: 160mm; */
   /* background-color: red; */
   margin: 0;

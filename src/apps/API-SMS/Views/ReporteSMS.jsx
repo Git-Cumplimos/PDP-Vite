@@ -156,8 +156,8 @@ const ReporteSMS = () => {
       setShowModal(false);
 
       report(tipoOp, page, fechaInicial, fechaFinal).then((res) => {
-        if (res.status === false) {
-          notifyError(res.msg);
+        if (!res.status) {
+          notifyError(res?.msg);
         } else {
           setMaxPages(res?.obj?.maxPages);
           setTrxs(res?.obj?.results);
@@ -189,8 +189,8 @@ const ReporteSMS = () => {
             if (fechaFinal !== "") {
               if (tipoOp !== "") {
                 report(tipoOp, 1, e.target.value, fechaFinal).then((res) => {
-                  if (res.status === false) {
-                    notifyError(res.msg);
+                  if (!res.status) {
+                    notifyError(res?.msg);
                   } else {
                     setMaxPages(res?.obj?.maxPages);
                     setTrxs(res?.obj?.results);
@@ -212,8 +212,8 @@ const ReporteSMS = () => {
             if (fechaInicial !== "") {
               if (tipoOp !== "") {
                 report(tipoOp, 1, fechaInicial, e.target.value).then((res) => {
-                  if (res.status === false) {
-                    notifyError(res.msg);
+                  if (!res.status) {
+                    notifyError(res?.msg);
                   } else {
                     setMaxPages(res?.obj?.maxPages);
                     setTrxs(res?.obj?.results);
@@ -235,8 +235,8 @@ const ReporteSMS = () => {
             if (!(e.target.value === null || e.target.value === "")) {
               report(e.target.value, 1, fechaInicial, fechaFinal).then(
                 (res) => {
-                  if (res.status === false) {
-                    notifyError(res.msg);
+                  if (!res.status) {
+                    notifyError(res?.msg);
                   } else {
                     setMaxPages(res?.obj?.maxPages);
                     setTrxs(res?.obj?.results);
@@ -255,8 +255,8 @@ const ReporteSMS = () => {
             onClick={() => {
               setPage(page - 1);
               report(tipoOp, page - 1, fechaInicial, fechaFinal).then((res) => {
-                if (res.status === false) {
-                  notifyError(res.msg);
+                if (!res.status) {
+                  notifyError(res?.msg);
                 } else {
                   setTrxs(res?.obj?.results);
                   console.log(res?.obj?.results);
@@ -272,8 +272,8 @@ const ReporteSMS = () => {
             onClick={() => {
               setPage(page + 1);
               report(tipoOp, page + 1, fechaInicial, fechaFinal).then((res) => {
-                if (res.status === false) {
-                  notifyError(res.msg);
+                if (!res.status) {
+                  notifyError(res?.msg);
                 } else {
                   setTrxs(res?.obj?.results);
                   console.log(res?.obj?.results);
@@ -351,7 +351,7 @@ const ReporteSMS = () => {
               onClick={() => {
                 closeModal(tipoOp, page, fechaInicial, fechaFinal);
                 actualizar(selected.id_trx).then((res) => {
-                  if (res.status === false) {
+                  if (!res.status) {
                     notifyError(res?.obj?.msg);
                   } else {
                     notify(res?.obj?.msg);
@@ -384,9 +384,9 @@ const ReporteSMS = () => {
                 setFechaInicialDownload(e.target.value);
                 if (fechaFinalDownload !== "") {
                   download(e.target.value, fechaFinalDownload).then((res) => {
-                    if (res.status === false) {
+                    if (!res.status) {
                       setDownload(null);
-                      notifyError(res.msg);
+                      notifyError(res?.msg);
                     } else {
                       console.log(res?.obj?.results);
                       setDisabledBtn(false);
@@ -406,9 +406,9 @@ const ReporteSMS = () => {
                 setFechaFinalDownload(e.target.value);
                 if (fechaInicialDownload !== "") {
                   download(fechaInicialDownload, e.target.value).then((res) => {
-                    if (res.status === false) {
+                    if (!res.status) {
                       setDownload(null);
-                      notifyError(res.msg);
+                      notifyError(res?.msg);
                     } else {
                       setDownload(res?.obj?.results);
                       setDisabledBtn(false);

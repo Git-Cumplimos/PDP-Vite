@@ -6,12 +6,16 @@ const urls = {
   cancelPinVus: `${process.env.REACT_APP_URL_PinesVus}/cancelarPines`,
   PinVus: `${process.env.REACT_APP_URL_PinesVus}/pines`,
   cons_estado_tipoPin: `${process.env.REACT_APP_URL_PinesVus}/TipoEstadoPin`,
+  consultaTramites: `${process.env.REACT_APP_URL_PinesVus}/consultaTramites`,
+  consultaClientes: `${process.env.REACT_APP_URL_PinesVus}/consultaClientes`,
 };
 
 export const pinesVusContext = createContext({
   cancelPinVus: () => {},
   usarPinVus: () => {},
   con_estado_tipoPin: () => {},
+  consultaTramite: () => {},
+  consultaClientes: () => {},
   activarNavigate: null,
   setActivarNavigate: null,
 });
@@ -24,8 +28,9 @@ export const useProvidePinesVus = () => {
   const { roleInfo } = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
 
-  const cancelPinVus = useCallback(async (info, valor, motivo, trx, user) => {
+  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite) => {
     const body = {
+      valor_tramite : valor_tramite,
       Usuario: user?.id_usuario,
       Dispositivo: user?.id_dispositivo,
       Comercio: user?.id_comercio,
@@ -36,7 +41,7 @@ export const useProvidePinesVus = () => {
     };
     console.log(body);
     const query = {
-      id_pin: info?.Id,
+      id_pin: id_pin,
     };
     try {
       const res = await fetchData(urls.cancelPinVus, "PUT", query, body);
@@ -46,14 +51,19 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const crearPinVus = useCallback(async (documento, tipoPin, user) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia) => {
+    console.log(infoTramite)
     const body = {
+      tipo_tramite: tramite,
+      infoTramite: infoTramite,
       tipo_pin: tipoPin,
       doc_cliente: String(documento),
       Usuario: user?.Usuario,
       Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,
       Tipo: user?.Tipo,
+      infoCliente: infoCliente,
+      olimpia: olimpia,
     };
     try {
       const res = await fetchData(urls.PinVus, "POST", {}, body);
@@ -64,7 +74,7 @@ export const useProvidePinesVus = () => {
   }, []);
 
   const usarPinVus = useCallback(
-    async (info, valor, trx, num_tramite, user) => {
+    async (valor, trx, num_tramite, user, id_pin) => {
       const body = {
         Usuario: user?.id_usuario,
         Dispositivo: user?.id_dispositivo,
@@ -78,7 +88,7 @@ export const useProvidePinesVus = () => {
       }
 
       const query = {
-        id_pin: info?.Id,
+        id_pin: id_pin,
       };
       try {
         const res = await fetchData(urls.PinVus, "PUT", query, body);
@@ -133,12 +143,34 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
+  const consultaTramite = useCallback(async () => {
+    try {
+      const res = await fetchData(urls.consultaTramites, "GET", {});
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  }, []);
+
+  const consultaClientes = useCallback(async (cedula, olimpia) => {
+    const query = { pk_documento_cliente: cedula};
+    query.olimpia = olimpia
+    try {
+      const res = await fetchData(urls.consultaClientes, "GET", query);
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  }, []);
+
   return {
     cancelPinVus,
     crearPinVus,
     consultaPinesVus,
     usarPinVus,
     con_estado_tipoPin,
+    consultaTramite,
+    consultaClientes,
     activarNavigate,
     setActivarNavigate,
   };

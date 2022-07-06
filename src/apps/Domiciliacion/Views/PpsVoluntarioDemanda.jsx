@@ -15,6 +15,7 @@ import Voucher from "../../LoteriaBog/components/Voucher/Voucher";
 import { useReactToPrint } from "react-to-print";
 import Form from "../../../components/Base/Form";
 import Tickets from "../../../components/Base/Tickets";
+import MoneyInput from "../../../components/Base/MoneyInput";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -29,7 +30,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const [valorAportar, setValorAportar] = useState();
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
-  const { quotaInfo, roleInfo } = useAuth();
+  const { quotaInfo, roleInfo, infoTicket } = useAuth();
 
   console.log(quotaInfo);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
@@ -109,6 +110,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
         ["VALOR", formatMoney.format(valorAportar)],
         ["N° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
       ],
+
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
@@ -118,6 +120,17 @@ const PpsVoluntarioDemanda = ({ ced }) => {
     datosRespuesta,
     tipoComercio /* respPinCancel, roleInfo, valor */,
   ]);
+
+  useEffect(() => {
+    infoTicket(datosRespuesta?.[0]?.["inserted_id"], 57, tickets)
+      .then((resTicket) => {
+        console.log(resTicket);
+      })
+      .catch((err) => {
+        console.error(err);
+        notifyError("Error guardando el ticket");
+      });
+  }, [infoTicket, tickets]);
 
   const enviar = (e) => {
     e.preventDefault();
@@ -161,6 +174,11 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
             ) {
               notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
+              /* navigate(`/domiciliacion`); */
+              setDisabledBtn(false);
+            }
+            if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
+              notifyError("Lo Sentimos, Falló el Registro Del Cupo");
               navigate(`/domiciliacion`);
             }
             if (
@@ -178,7 +196,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               notifyError(
                 "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000."
               );
-              navigate(`/domiciliacion`);
+              /* navigate(`/domiciliacion`); */
+              setDisabledBtn(false);
             }
             if (
               respuesta?.msg?.["RESPUESTA COLPENSIONES"] ===
@@ -187,6 +206,10 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               notifyError("Lo Sentimos, Falló el Servicio De Colpensiones");
               navigate(`/domiciliacion`);
             }
+            /* if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
+              notifyError("Lo Sentimos, Falló el Registro Del Cupo");
+              navigate(`/domiciliacion`);
+            } */
             if (
               (respuesta?.msg ===
                 "La transaccion ha sido creada exitosamente") &
@@ -199,6 +222,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
           .catch((err) => {
             console.log(err);
             notifyError("Error al Pagar Planilla Voluntaria a Demanda");
+            navigate(`/domiciliacion`);
           });
       } else {
         if (cantNum == 10) {
@@ -237,8 +261,9 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               if (
                 respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
               ) {
-                notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
-                navigate(`/domiciliacion`);
+                notifyError("El valor a aportar debe ser múltiplo de 100");
+                /* navigate(`/domiciliacion`); */
+                setDisabledBtn(false);
               }
               if (
                 respuesta?.msg?.["respuesta_colpensiones"] ===
@@ -253,9 +278,10 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
               ) {
                 notifyError(
-                  "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000."
+                  "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
                 );
-                navigate(`/domiciliacion`);
+                /* navigate(`/domiciliacion`); */
+                setDisabledBtn(false);
               }
               if (
                 (respuesta?.msg ===
@@ -268,15 +294,18 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             })
             .catch((err) => {
               console.log(err);
-              notifyError("Error al Pagar Planilla Voluntaria a Demanda");
+              notifyError("Error al pagar planilla voluntaria a demanda");
+              navigate(`/domiciliacion`);
             });
         } else {
-          notifyError("Ingrese un numero de Celular Valido");
+          notifyError("Ingrese un número de célular valido");
           setNumCelular("");
+          setDisabledBtn(false);
         }
       }
     } else {
-      notifyError("No Tiene el Cupo Suficiente Para el Aporte a Colpensiones.");
+      notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
+      navigate(`/domiciliacion`);
     }
   };
 
@@ -292,20 +321,32 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             <Select
               onChange={(event) => setTipoIdentificacion(event?.target?.value)}
               id="comissionType"
-              label="Tipo de Identificación"
+              label="Tipo Identificación"
+              required
               options={{
                 "": "",
-                "C.C Cedula de Ciudadania": "1",
-                "C.E Cedula de Extranjeria": "2",
+                "Cédula de Ciudadania": "1",
+                "Cédula de Extranjeria": "2",
+                "Tarjeta de Identidad": "4",
+                "Registro Civil": "5",
+                "Pasaporte ": "6",
+                "Carnét Diplomático": "7",
+                "Salvo conducto permanencia": "8",
+                "Permiso especial permanencia": "9",
               }}
             ></Select>
             <Input
               label={"N° Documento"}
               placeholder={"Ingrese su Numero Documento"}
               value={numDocumento}
-              onChange={(e) => setNumDocumento(e.target.value)}
-              type={"number"}
-              disabled
+              minLength="6"
+              maxLength="11"
+              onInput={(e) => {
+                const num = e.target.value || "";
+                setNumDocumento(num.toString());
+              }}
+              type={"text"}
+              required
             ></Input>
 
             <Input
@@ -329,19 +370,27 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               type={"text"}
               required
             ></Input>
-            <Input
+            <MoneyInput
               label={"Valor Aportar"}
               placeholder={"Ingrese Valor Aportar"}
               value={valorAportar}
-              minLength="4"
-              maxLength="6"
+              minLength="6"
+              maxLength="9"
               onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setValorAportar(num);
+                const num = e.target.value.replace(".", "") || "";
+                setValorAportar(num.replace("$", ""));
               }}
+              /*    onInput={(e, valor) =>
+                setValorAportar((old) => {
+                  return {
+                    ...old,
+                    valorAportar: valor,
+                  };
+                })
+              } */
               type={"text"}
               required
-            ></Input>
+            ></MoneyInput>
           </Fieldset>
           <ButtonBar className={"lg:col-span-2"} type="">
             {

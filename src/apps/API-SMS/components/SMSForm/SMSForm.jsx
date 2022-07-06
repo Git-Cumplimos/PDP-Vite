@@ -44,8 +44,8 @@ const SMSForm = ({
   const onSubmit = (e) => {
     e.preventDefault();
     enviarSMS(SMS, phones).then((res) => {
-      if (res.status === false) {
-        notifyError(res.msg);
+      if (!res.status) {
+        notifyError(res?.msg);
       } else {
         console.log(res);
         notify(res?.obj?.msg);

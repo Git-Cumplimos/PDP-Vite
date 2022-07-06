@@ -71,7 +71,7 @@ const ReportePines = () => {
       )
         .then((res) => {
           setTable("");
-          if (res?.status == false) {
+          if (!res?.status) {
             notifyError(res?.msg);
           } else {
             setTable(
@@ -82,13 +82,14 @@ const ReportePines = () => {
                 fecha_creacion.setHours(fecha_creacion.getHours() + 5);
                 setFormatMon(row?.ValorPagar);
                 return {
-                  Id: row?.id_pin,
+                  // Id: row?.id_pin,
                   Cedula: row?.doc_cliente,
                   Estado: row?.name_estado_pin,
-                  "Codigo Estado": row?.estado_pin,
+                  // "Codigo Estado": row?.estado_pin,
                   Creacion: dateFormatter.format(fecha_creacion),
                   Vencimiento: dateFormatter.format(fecha_vencimiento),
-                  Valor: formatMoney.format(row?.valor),
+                  Tramite: row?.name_tramite === "" ? "" : row?.name_tramite,
+                  Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite), // Valor + (IVA solo PIN)
                 };
               })
             );
@@ -102,7 +103,7 @@ const ReportePines = () => {
   useEffect(() => {
     con_estado_tipoPin("estado_pines_vus")
       .then((res) => {
-        if (res?.status == false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setOptionsEstadoPin(res?.obj?.results);
@@ -113,7 +114,7 @@ const ReportePines = () => {
     con_estado_tipoPin("tipo_pines_vus")
       .then((res) => {
         console.log(res);
-        if (res?.status === false) {
+        if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setOptionsTipoPines(res?.obj?.results);
@@ -128,12 +129,11 @@ const ReportePines = () => {
           title="Información de credito"
           maxPage={maxPages}
           headers={[
-            "Id",
             "Cedula",
             "Estado",
-            "Codigo Estado",
             "Creación",
             "Vencimiento",
+            "Tramite",
             "Valor",
           ]}
           data={table || []}

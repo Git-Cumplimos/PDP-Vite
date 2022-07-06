@@ -6,7 +6,8 @@ const fetchData = async (
   queries = {},
   data = {},
   headers = {},
-  authenticate = true
+  authenticate = true,
+  timeout = 60000
 ) => {
   if (!["GET", "POST", "PUT", "DELETE"].includes(method)) {
     throw new Error("Method not suported");
@@ -56,7 +57,20 @@ const fetchData = async (
     }
   }
 
-  const response = await fetch(url, fetchOptions);
+  async function fetchWithTimeout(resource, options, timeout) {
+  
+    
+    const abortController = new AbortController();
+    const id = setTimeout(() => abortController.abort(), timeout);
+    const response = await fetch(resource, {
+      ...options,
+      signal: abortController.signal  
+    });
+    clearTimeout(id);
+    return response;
+  }
+
+  const response = await fetchWithTimeout(url, fetchOptions, timeout);
   const contentType = response.headers.get("content-type");
 
   if (contentType && contentType.includes("application/json")) {

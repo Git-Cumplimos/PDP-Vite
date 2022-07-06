@@ -183,6 +183,7 @@ const Transacciones = () => {
           onInput={(e) => setFechaFinal(e.target.value)}
         />
         <Select
+          className = 'place-self-stretch'
           id="searchBySorteo"
           label="Tipo de busqueda"
           options={

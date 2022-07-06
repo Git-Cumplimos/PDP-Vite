@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import Button from "../../../components/Base/Button";
 
 import Fieldset from "../../../components/Base/Fieldset";
@@ -11,6 +11,7 @@ import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import { useNavigate } from "react-router-dom";
+import MoneyInput from "../../../components/Base/MoneyInput";
 
 const PpsVoluntario = ({ datosConsulta }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
@@ -21,6 +22,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
     datosConsulta?.id_dispositivo
   );
   const [numCelular, setNumCelular] = useState("");
+  const [datosBusqueda, setDatosBusqueda] = useState("");
   const [estado, setEstado] = useState(true);
   const [valorAportar, setValorAportar] = useState();
   const [numPagosPdp, setNumPagosPdp] = useState(0);
@@ -31,64 +33,119 @@ const PpsVoluntario = ({ datosConsulta }) => {
     setShowModal(false);
   }, []);
 
-  const url = process.env.REACT_APP_URL_TRXS_TRX;
-  //------------------Funcion Para Subir El Formulario---------------------//
-  const enviar = (e) => {
-    e.preventDefault();
+  const url = process.env.REACT_APP_URL_COLPENSIONES;
+  /*   const url = "http://127.0.0.1:7000"; */
+
+  useEffect(() => {}, [numCelular]);
+  useEffect(() => {
+    buscarNumCedula(numDocumento);
+  }, [numDocumento]);
+
+  function buscarNumCedula(numero) {
     fetchData(
       `${url}/domicilio`,
-      "POST",
+      "GET",
+      { identificacion: numDocumento },
       {},
-      {
-        tipo_id: tipoIdentificacion,
-        identificacion: numDocumento,
-        financial_institution_code: "96",
-        canal_code: "20",
-        operador_code: "84",
-        trazability_financial_institution_code: "1",
-        value_amount: valorAportar,
-        celular: numCelular,
-        id_comercio: idComercio,
-        id_dispositivo: iddispositivo,
-        id_usuario: idusuario,
-        estado: "activo",
-        estado_pago: "",
-        tipo_pps: "voluntario",
-        num_pago_pdp: numPagosPdp,
-      },
       {},
       {}
     )
       .then((respuesta) => {
-        console.log(respuesta);
-        if (
-          respuesta?.msg ==
-          "Exception: No fue posible hacer una conexion a la base de datos"
-        ) {
-          notifyError("No fue posible hacer una conexion a la base de datos");
-        }
-        if (
-          respuesta?.msg ==
-          "SchemaError: Key 'num_pago_pdp' error:\nint('') raised ValueError(\"invalid literal for int() with base 10: ''\")"
-        ) {
-          notifyError("Selecciones un Numero de Pagos");
-        } else {
-          if (
-            respuesta?.msg ==
-            "Se ha creado el comercio domiciliado voluntario exitosamente"
-          ) {
-            notify(
-              "Se ha creado el comercio domiciliado voluntario exitosamente"
-            );
-          }
-        }
+        console.log("r1", respuesta?.obj?.results.length);
+        setDatosBusqueda(respuesta?.obj?.results);
       })
       .catch((err) => {
         console.log(err);
-        notifyError("Error al subir Formulario");
+        notifyError("Error al consultar identificación");
       });
-    setShowModal(false);
-    navigate(`/domiciliacion`);
+  }
+
+  //------------------Funcion Para Subir El Formulario---------------------//
+  const enviar = (e) => {
+    e.preventDefault();
+    if (valorAportar >= 5000 && valorAportar <= 149000) {
+      console.log("r2", datosBusqueda?.length);
+      if (datosBusqueda?.length <= 0) {
+        if (numCelular.length < 6) {
+          console.log("soy mayo");
+        }
+        fetchData(
+          `${url}/domicilio`,
+          "POST",
+          {},
+          {
+            tipo_id: tipoIdentificacion,
+            identificacion: numDocumento,
+            financial_institution_code: "96",
+            canal_code: "20",
+            operador_code: "84",
+            trazability_financial_institution_code: "1",
+            value_amount: valorAportar,
+            celular: numCelular,
+            id_comercio: idComercio,
+            id_dispositivo: iddispositivo,
+            id_usuario: idusuario,
+            estado: "activo",
+            estado_pago: "",
+            tipo_pps: "voluntario",
+            num_pago_pdp: numPagosPdp,
+          },
+          {},
+          {}
+        )
+          .then((respuesta) => {
+            console.log("r3", respuesta);
+            if (
+              respuesta?.msg ==
+              "Exception: No fue posible hacer una conexion a la base de datos"
+            ) {
+              notifyError(
+                "No fue posible hacer una conexion a la base de datos"
+              );
+            }
+            if (
+              respuesta?.msg == "El Valor Aportado Debe ser Exacto ej: 5000"
+            ) {
+              notifyError("El valor a aportar debe ser múltiplo de 100");
+            }
+            if (
+              respuesta?.msg?.respuesta_colpensiones == "Estructura inválida."
+            ) {
+              notifyError("Estructura inválida.");
+            }
+            if (
+              respuesta?.msg ==
+              "SchemaError: Key 'num_pago_pdp' error:\nint('') raised ValueError(\"invalid literal for int() with base 10: ''\")"
+            ) {
+              notifyError("Seleccione un número de pagos");
+            } else {
+              if (
+                respuesta?.msg ==
+                "Se ha creado el comercio domiciliado voluntario exitosamente"
+              ) {
+                notify(
+                  "Se ha creado el comercio domiciliado voluntario exitosamente"
+                );
+                setShowModal(false);
+                navigate(`/domiciliacion`);
+              }
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            notifyError("Error al subir Formulario");
+          });
+        // setShowModal(false);
+        // navigate(`/domiciliacion`);
+      } else {
+        notifyError("Número de cédula ya domiciliado.");
+      }
+      /*   notify("Valor Correcto"); */
+    } else {
+      notifyError(
+        "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+      );
+    }
   };
   return (
     <div>
@@ -108,8 +165,14 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 label="Tipo de Identificación"
                 options={{
                   "": "",
-                  "C.C Cedula de Ciudadania": "1",
-                  "C.E Cedula de Extranjeria": "2",
+                  "Cédula de Ciudadania": "1",
+                  "Cédula de Extranjeria": "2",
+                  "Tarjeta de Identidad": "4",
+                  "Registro Civil": "5",
+                  "Pasaporte ": "6",
+                  "Carnét Diplomático": "7",
+                  "Salvo conducto permanencia": "8",
+                  "Permiso especial permanencia": "9",
                 }}
                 required
               ></Select>
@@ -120,7 +183,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 minLength="6"
                 maxLength="11"
                 onInput={(e) => {
-                  const num = parseInt(e.target.value) || "";
+                  const num = e.target.value || "";
                   setNumDocumento(num.toString());
                 }}
                 type={"text"}
@@ -147,11 +210,11 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 placeholder={"Ingrese su Numero Celular"}
                 value={numCelular}
                 /* onChange={(e) => setNumCelular(e.target.value)} */
-                /* onInput={(e) => {
+                onInput={(e) => {
                   const num = parseInt(e.target.value) || "";
                   setNumCelular(num);
-                }} */
-                onInput={(e) => {
+                }}
+                /*                onInput={(e) => {
                   const num = parseInt(e.target.value) || "";
 
                   if (parseInt(String(num)[0]) == 3) {
@@ -159,16 +222,16 @@ const PpsVoluntario = ({ datosConsulta }) => {
                     setNumCelular(num);
                   } else {
                     if (parseInt(String(num)[0]) != 3) {
-                      notifyError("El Primer Digito debe ser 3");
+                      notifyError("El primer dígito debe ser 3");
                     }
                   }
-                }}
+                }} */
                 minLength="10"
                 maxLength="10"
                 type={"text"}
                 required
               ></Input>
-              <Input
+              {/*               <Input
                 label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}
                 value={valorAportar}
@@ -180,7 +243,28 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 }}
                 type={"text"}
                 required
-              ></Input>
+              ></Input> */}
+              <MoneyInput
+                label={"Valor Aportar"}
+                placeholder={"Ingrese Valor Aportar"}
+                value={valorAportar}
+                minLength="6"
+                maxLength="9"
+                onInput={(e) => {
+                  const num = e.target.value.replace(".", "") || "";
+                  setValorAportar(num.replace("$", ""));
+                }}
+                /*    onInput={(e, valor) =>
+                setValorAportar((old) => {
+                  return {
+                    ...old,
+                    valorAportar: valor,
+                  };
+                })
+              } */
+                type={"text"}
+                required
+              ></MoneyInput>
               <Select
                 onChange={(event) => setNumPagosPdp(event?.target?.value)}
                 id="comissionType"
