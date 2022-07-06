@@ -355,6 +355,10 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               value={numCelular}
               onInput={(e) => {
                 const num = parseInt(e.target.value) || "";
+                setNumCelular(num);
+              }}
+              /*               onInput={(e) => {
+                const num = parseInt(e.target.value) || "";
 
                 if (parseInt(String(num)[0]) == 3) {
                   const num = parseInt(e.target.value) || "";
@@ -364,7 +368,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                     notifyError("El Primer Digito debe ser 3");
                   }
                 }
-              }}
+              }} */
               minLength="10"
               maxLength="10"
               type={"text"}

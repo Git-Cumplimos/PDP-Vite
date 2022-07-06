@@ -275,6 +275,10 @@ const ModificarPps = () => {
                 value={celular}
                 onInput={(e) => {
                   const num = parseInt(e.target.value) || "";
+                  setCelular(num);
+                }}
+                /*                 onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
 
                   if (parseInt(String(num)[0]) == 3) {
                     const num = parseInt(e.target.value) || "";
@@ -284,7 +288,7 @@ const ModificarPps = () => {
                       notifyError("El primer digito debe ser 3");
                     }
                   }
-                }}
+                }} */
                 minLength="10"
                 maxLength="10"
                 type={"text"}
