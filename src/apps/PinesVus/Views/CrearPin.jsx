@@ -58,6 +58,8 @@ const CrearPin = () => {
   const [eps, setEps] = useState("")
   const [arl, setArl] = useState("")
 
+  const [olimpia, setOlimpia] = useState(false)
+
   const homeLocation = {
     municipio: useState(""),
     departamento: useState(""),
@@ -301,7 +303,7 @@ const CrearPin = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
-    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente)
+    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia)
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -399,6 +401,19 @@ const CrearPin = () => {
         onInput={(e) => {
           const num = parseInt(e.target.value) || "";
           setDocumento(num);
+        }}
+      />
+      <Select
+        id="olimpia"
+        label="Ya inicio el proceso en Olimpia?"
+        options={[
+          { value: "", label: "" },
+          { value: true, label: "Si" },
+          { value: false, label: "No" },
+        ]}
+        value={olimpia}
+        onChange={(e) => {
+          setOlimpia(e.target.value);
         }}
       />
       <ButtonBar className="lg:col-span-2">
@@ -550,7 +565,7 @@ const CrearPin = () => {
             setArl(e.target.value);
           }}
         />
-        <LocationForm place="Residencia" location={homeLocation} />
+        <LocationForm place="Residencia" location={homeLocation} addressInput="input"/>
       </Fieldset>
       <Fieldset legend="Datos Vehículo" className="lg:col-span-2">
         <Select

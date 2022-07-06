@@ -135,6 +135,15 @@ const CreateComisionCobrada = lazy(() =>
 const ConfiguracionComercios = lazy(() =>
   import("../apps/TrxParams/Views/ConfiguracionComercios")
 );
+const CrearComercios = lazy(() =>
+  import("../apps/TrxParams/Views/Comercios/CrearComercios")
+);
+const ListarComercios = lazy(() =>
+  import("../apps/TrxParams/Views/Comercios/ListarComercios")
+);
+const TipoNivelComercio = lazy(() =>
+  import("../apps/TrxParams/Views/TipoNivelComercios")
+);
 
 /**
  * Solicitud Enrolamiento : privado
@@ -866,6 +875,25 @@ const allUrlsPrivateApps = [
             permission: [20],
           },
         ],
+      },
+      {
+        link: "/params-operations/tipo-nivel-comercios",
+        label: <AppIcons Logo={"RECAUDO"} name={"Tipo nivel comercios"} />,
+        component: TipoNivelComercio,
+        permission: [51],
+      },
+      {
+        link: "/params-operations/comercios",
+        label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
+        component: ListarComercios,
+        permission: [31],
+      },
+      {
+        link: "/params-operations/comercios/crear",
+        label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
+        component: CrearComercios,
+        permission: [31],
+        show: false,
       },
     ],
   },

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Select from "../../../components/Base/Select";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
@@ -25,24 +25,54 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
+const dateFormatter = Intl.DateTimeFormat("es-CO", {
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "numeric",
+});
+
 const PanelConsignaciones = () => {
   const [showModal, setShowModal] = useState(false);
-  const [data, setData] = useState({});
+  const [dataRes, setDataRes] = useState({});
   const [receipt, setReceipt] = useState([]);
+  const [consultaEstado, setConsultaEstado] = useState("");
+  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [fecha, setFecha] = useState("");
+  const [maxPages, setMaxPages] = useState(1);
   const CloseModal = () => {
     setShowModal(false);
   };
 
-  useEffect(() => {
-    searchReceipt()
+  const buscarConsignaciones = useCallback(() => {
+    const queries = { ...pageData };
+    if (consultaEstado !== 0 || consultaEstado !== "") {
+      queries.status = consultaEstado;
+    }
+    if (fecha) {
+      const fecha_ini = new Date(fecha);
+      fecha_ini.setHours(fecha_ini.getHours() + 5);
+      queries.created = Intl.DateTimeFormat("es-CO", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      }).format(fecha_ini);
+    }
+    searchReceipt(queries)
       .then((res) => {
         setReceipt(res?.obj?.results);
+        setMaxPages(res?.obj?.maxPages);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
-  console.log(receipt, typeof receipt);
+  }, [consultaEstado, fecha]);
+
+  useEffect(() => {
+    buscarConsignaciones();
+  }, [buscarConsignaciones]);
+
   return (
     <>
       <div className="w-full flex flex-col justify-center items-center my-8">
@@ -51,6 +81,7 @@ const PanelConsignaciones = () => {
       <TableEnterprise
         title="Comprobantes relacionados"
         headers={headers}
+        maxPage={maxPages}
         data={receipt?.map(
           ({
             id_comprobante,
@@ -65,7 +96,9 @@ const PanelConsignaciones = () => {
             status,
           }) => {
             const t_consignado = formatMoney.format(valor);
-            console.log(id_comprobante);
+            const tempDate = new Date(created);
+            tempDate.setHours(tempDate.getHours() + 5);
+            const fechaHora = dateFormatter.format(tempDate);
             return {
               id_comprobante,
               id_comercio,
@@ -75,34 +108,40 @@ const PanelConsignaciones = () => {
               cuenta,
               compañia,
               t_consignado,
-              created,
+              fechaHora,
               status,
             };
           }
         )}
         onSelectRow={(_e, index) => {
-          setData(receipt[index]);
+          setDataRes(receipt[index]);
           setShowModal(true);
         }}
+        onSetPageData={setPageData}
       >
-        <Input id="dateInit" label="Fecha" type="date" />
+        <Input
+          id="dateInit"
+          label="Fecha"
+          type="date"
+          onInput={(e) => setFecha(e.target.value)}
+        />
         <Select
           id="searchByStatus"
           label="Estado"
           options={[
             { value: 0, label: "" },
-            { value: 1, label: "PENDIENTE" },
-            { value: 1, label: "RECHAZADO" },
-            { value: 2, label: "APROBADO" },
+            { value: "PENDIENTE", label: "PENDIENTE" },
+            { value: "RECHAZADO", label: "RECHAZADO" },
+            { value: "APROBADO", label: "APROBADO" },
           ]}
           onChange={(e) => {
             console.log(e.target.value);
-            setShowModal(true);
+            setConsultaEstado(e.target.value);
           }}
         />
       </TableEnterprise>
       <Modal show={showModal} handleClose={CloseModal}>
-        <ValidarComprobante data={data} setShowModal={setShowModal} />
+        <ValidarComprobante data={dataRes} setShowModal={setShowModal} />
       </Modal>
     </>
   );

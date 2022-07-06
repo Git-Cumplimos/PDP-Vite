@@ -4,7 +4,6 @@ import Form from "../../../components/Base/Form";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import Select from "../../../components/Base/Select";
 import FileInput from "../../../components/Base/FileInput";
-import Input from "../../../components/Base/Input";
 import TextArea from "../../../components/Base/TextArea";
 import Button from "../../../components/Base/Button";
 import { notify, notifyError } from "../../../utils/notify";
@@ -20,7 +19,6 @@ const CargaComprobante = () => {
   const [label, setLabel] = useState(" ");
   const [tipoCons, setTipoCons] = useState("");
   const [attributes, setAttributes] = useState(false);
-
   const [transportadora, setTransportadora] = useState([]);
   const [file, setFile] = useState([]);
   const [data, handleChange] = useForm({
@@ -56,76 +54,80 @@ const CargaComprobante = () => {
 
   const onSubmit = useCallback(async (e) => {
     e.preventDefault();
-    setAttributes(false);
+
     const formData = new FormData();
     if (file?.length > 0) {
-      const query = {
-        filename: file?.[0]?.name,
-        contentType: file?.[0]?.type,
-        location: tipoCons,
-      };
-      createUrlFile(query)
-        .then((res) => {
-          console.log(res);
-          for (const key in res?.obj?.fields) {
-            formData.set(`${key}`, `${res?.obj?.fields[key]}`);
-          }
-          formData.set("file", file[0]);
-          fetch(`${res?.obj?.url}`, { method: "POST", body: formData })
-            .then((res) => {})
-            .catch((err) => {
-              setFile([]);
-            });
-          const regex = /(\d+)/g;
-          const comma = /(\,+)/g;
-          if (tipoCons > 1) {
-            let body = {
-              id_comercio: roleInfo?.id_comercio,
-              id_usuario: roleInfo?.id_usuario,
-              id_terminal: roleInfo?.id_dispositivo,
-              valor: parseInt(
-                String(data?.valor?.match(regex))?.replace(comma, "")
-              ),
-              archivo: formData.get("key"),
-              obs_cajero: data?.obs,
-              compañia: data?.transport,
-              status: "PENDIENTE",
-            };
-            registerReceipt(body)
-              .then((res) => {
-                navigate("/gestion/");
-              })
+      if (data?.valor?.length > 2) {
+        const query = {
+          filename: file?.[0]?.name,
+          contentType: file?.[0]?.type,
+          location: tipoCons,
+        };
+        createUrlFile(query)
+          .then((res) => {
+            console.log(res);
+            for (const key in res?.obj?.fields) {
+              formData.set(`${key}`, `${res?.obj?.fields[key]}`);
+            }
+            formData.set("file", file[0]);
+            fetch(`${res?.obj?.url}`, { method: "POST", body: formData })
+              .then((res) => {})
               .catch((err) => {
-                console.log(err);
+                setFile([]);
+                setAttributes(false);
               });
-          } else {
-            let body = {
-              id_comercio: roleInfo?.id_comercio,
-              id_usuario: roleInfo?.id_usuario,
-              id_terminal: roleInfo?.id_dispositivo,
-              valor: parseInt(
-                String(data?.valor?.match(regex))?.replace(comma, "")
-              ),
-              archivo: file?.[0]?.name,
-              obs_cajero: data?.obs,
-              compañia: data?.transport,
-              cuenta: data?.account,
-              nro_comprobante: "",
-            };
-            console.log(body, roleInfo);
-            registerReceipt(body)
-              .then((res) => {
-                console.log(res);
-                navigate("/gestion/");
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-          }
-        })
-        .catch((err) => {
-          throw err;
-        });
+            const regex = /(\d+)/g;
+            const comma = /(\,+)/g;
+            if (tipoCons > 1) {
+              let body = {
+                id_comercio: roleInfo?.id_comercio,
+                id_usuario: roleInfo?.id_usuario,
+                id_terminal: roleInfo?.id_dispositivo,
+                valor: parseInt(
+                  String(data?.valor?.match(regex))?.replace(comma, "")
+                ),
+                archivo: formData.get("key"),
+                obs_cajero: data?.obs,
+                compañia: data?.transport,
+                status: "PENDIENTE",
+              };
+              registerReceipt(body)
+                .then((res) => {
+                  console.log(res);
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            } else {
+              let body = {
+                id_comercio: roleInfo?.id_comercio,
+                id_usuario: roleInfo?.id_usuario,
+                id_terminal: roleInfo?.id_dispositivo,
+                valor: parseInt(
+                  String(data?.valor?.match(regex))?.replace(comma, "")
+                ),
+                archivo: file?.[0]?.name,
+                obs_cajero: data?.obs,
+                compañia: data?.transport,
+                cuenta: data?.account,
+                nro_comprobante: "",
+              };
+              console.log(body, roleInfo);
+              registerReceipt(body)
+                .then((res) => {
+                  console.log(res);
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
+          })
+          .catch((err) => {
+            throw err;
+          });
+      } else {
+        notify("Reporte un valor para poder continuar");
+      }
     } else {
       notifyError("Por favor adjunte un archivo");
     }
@@ -171,18 +173,19 @@ const CargaComprobante = () => {
                 label="Transportadora"
                 options={[
                   { value: "", label: "" },
-                  ...transportadora?.map(({ nombre_compañia }) => {
-                    console.log(nombre_compañia);
+                  ...(transportadora?.map(({ nombre_compañia }) => {
+                    const name = nombre_compañia ? nombre_compañia : "";
                     return {
-                      value: `${nombre_compañia}`,
-                      label: `${nombre_compañia}`,
+                      value: `${name}`,
+                      label: `${name}`,
                     };
-                  }),
+                  }) ?? []),
                 ]}
                 onChange={(e) => {
                   handleChange(e);
                   console.log(e.target.value);
                 }}
+                required
               />
             ) : (
               tipoCons === "1" && <></>
@@ -194,6 +197,7 @@ const CargaComprobante = () => {
                   name="valor"
                   onChange={handleChange}
                   label={label}
+                  required
                 ></MoneyInput>
                 <TextArea
                   id="obsCashier"
@@ -206,16 +210,20 @@ const CargaComprobante = () => {
                   onInput={handleChange}
                 ></TextArea>
                 <FileInput
-                  label={"Elegir archivo"}
+                  label={"Elegir archivo plataforma"}
                   onGetFile={onFileChange}
                   name="file"
                   accept=".png,.jpg,.jpeg"
                   allowDrop={true}
                 />
                 {file.length > 0 && (
-                  <h6 className="text-center">Nombre: {file?.[0]?.name}</h6>
+                  <>
+                    <h6 className="text-center">Nombre: {file?.[0]?.name}</h6>
+                    <Button type="submit" className="text-center">
+                      Subir archivo para revisión
+                    </Button>
+                  </>
                 )}
-                <Button type="submit">Subir archivos</Button>
               </>
             ) : (
               <h1 className="text-center">Sin acceso</h1>

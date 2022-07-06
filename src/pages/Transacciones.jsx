@@ -145,8 +145,8 @@ const Transacciones = () => {
               money,
               created,
               status_trx: status_trx
-                ? "Trasaccion aprobada"
-                : "Trasaccion rechazada",
+                ? "Transaccion aprobada"
+                : "Transaccion rechazada",
             };
           }
         )}
@@ -161,8 +161,8 @@ const Transacciones = () => {
             "Mensaje de respuesta trx": trxs[index]?.message_trx,
             Monto: formatMoney.format(trxs[index]?.monto),
             "Estado de la trasaccion": trxs[index]?.status_trx
-              ? "Trasaccion aprobada"
-              : "Trasaccion rechazada",
+              ? "Transaccion aprobada"
+              : "Transaccion rechazada",
           });
           setShowModal(true);
         }}
