@@ -160,23 +160,28 @@ const ModificarPps = () => {
             },
             {},
             {}
-          ).then((respuesta) => {
-            console.log(respuesta);
-            if (
-              respuesta?.msg === "El usuario ha sido modificado exitosamente"
-            ) {
-              notify("El usuario ha sido modificado exitosamente");
-              navigate(`/domiciliacion`);
-            } else if (
-              respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
-            ) {
-              notifyError("El valor a aportar debe ser múltiplo de 100");
-              /* navigate(`/domiciliacion`); */
-            } else {
-              notifyError("El usuario no ha sido modificado exitosamente");
-              navigate(`/domiciliacion`);
-            }
-          });
+          )
+            .then((respuesta) => {
+              console.log(respuesta);
+              if (
+                respuesta?.msg === "El usuario ha sido modificado exitosamente"
+              ) {
+                notify("El usuario ha sido modificado exitosamente");
+                navigate(`/domiciliacion`);
+              } else if (
+                respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
+              ) {
+                notifyError("El valor a aportar debe ser múltiplo de 100");
+                /* navigate(`/domiciliacion`); */
+              } else {
+                notifyError("El usuario no ha sido modificado exitosamente");
+                navigate(`/domiciliacion`);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              notifyError("Error al modificar");
+            });
         } else {
           console.log("no es 3");
           notifyError(
