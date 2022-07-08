@@ -50,7 +50,6 @@ const SeleccionServicioPagar = () => {
           },
         }
       );
-      console.log(convenios[i]["pk_tbl_transaccional_convenios_davivienda_cb"]);
     },
     [tableConvenios, navigate]
   );

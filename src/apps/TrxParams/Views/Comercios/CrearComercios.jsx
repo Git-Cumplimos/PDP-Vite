@@ -1,364 +1,785 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
+import Fieldset from "../../../../components/Base/Fieldset";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
+import MoneyInput from "../../../../components/Base/MoneyInput";
+import Select from "../../../../components/Base/Select";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import useQuery from "../../../../hooks/useQuery";
+import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
+import {
+  postConsultaComercio,
+  postConsultaTipoNivelComercio,
+  postCrearComercio,
+  putModificarComercio,
+} from "../../utils/fetchComercios";
 import {
   fetchParametrosAutorizadores,
   postParametrosAutorizadores,
   putParametrosAutorizadores,
 } from "../../utils/fetchParametrosAutorizadores";
-import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
+const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+const vectorCodigosInstitucionales = [
+  ...process.env.REACT_APP_CODIGOS_INSTITUCIONALES_COMERCIOS.split("/").map(
+    (e, i) => {
+      return {
+        value: e,
+        label: e,
+      };
+    }
+  ),
+];
 
 const CrearComercios = () => {
-  const [{ searchAuto = "", openAutorizador = false }, setQuery] = useQuery();
+  const navigate = useNavigate();
+  const { state } = useLocation();
 
-  const [showModal, setShowModal] = useState(false);
-  const handleClose = useCallback(() => {
-    setShowModal(false);
-    setSelectedParam({
-      id_param: "",
-      nombre_parametro: "",
-      valor_parametro: "",
-      id_autorizador: "",
-      nombre_autorizador: "",
-    });
-    fetchParametrosAutorizadoresFunc();
-  }, []);
-  const handleShowModal = useCallback(() => {
-    setShowModal(true);
-    setSelectedParam({
-      id_param: "",
-      nombre_parametro: "",
-      valor_parametro: "",
-      id_autorizador: "",
-      nombre_autorizador: "",
-    });
-  }, []);
-  const [showModal2, setShowModal2] = useState(false);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
   });
-  const handleClose2 = useCallback(() => {
-    setShowModal2(false);
-    setQuery({ ["openAutorizador"]: false }, { replace: true });
-  }, []);
-
-  const [parametrosAutorizadores, setParametrosAutorizadores] = useState([]);
-  const [selectedParam, setSelectedParam] = useState({
-    id_param: "",
-    nombre_parametro: "",
-    valor_parametro: "",
-    id_autorizador: "",
-    nombre_autorizador: "",
+  const [
+    { searchComercio, searchPkComercio, openComercios },
+    setComerciosConsulta,
+  ] = useState({
+    searchComercio: "",
+    searchPkComercio: "",
+    openComercios: false,
   });
+  const [isUploading, setIsUploading] = useState(false);
+  const [comercios, setComercios] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
-  const [data, setdata] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCodigo, setSelectedCodigo] = useState({
+    selectedCod: "",
+    codigosInst: [],
+  });
+  const [tipoNivelComercio, setTipoNivelComercio] = useState([]);
 
-  const tableParametrosAutorizadores = useMemo(() => {
+  const [docTypes, setDocTypes] = useState({ "": "" });
+  const [comercio, setComercio] = useState({
+    apellido_contacto1_comercio: "",
+    apellido_contacto2_comercio: "",
+    codigos_institucionales: {},
+    comercio_padre: "",
+    credito_comercio: "",
+    dane_ciudad: "",
+    dane_dpto: "",
+    dane_pais: "",
+    descripcion_tipo_nivel: "",
+    direccion_comercio: "",
+    email_comercio: "",
+    fecha_actualizacion: "",
+    fecha_registro: "",
+    fk_comercio_padre: "",
+    fk_tipo_identificacion: "",
+    fk_tipo_nivel: "",
+    latitud_comercio: "",
+    longitud_comercio: "",
+    nombre_comercio: "",
+    nombre_contacto1_comercio: "",
+    nombre_contacto2_comercio: "",
+    numero_identificacion: "",
+    obtener_mejor_tarifa: "",
+    pk_comercio: "",
+    razon_social_comercio: "",
+    tel_contacto1_comercio: "",
+    tel_contacto2_comercio: "",
+    telefono_fijo_comercio: "",
+  });
+  const tableComercios = useMemo(() => {
     return [
-      ...parametrosAutorizadores.map(
+      ...comercios.map(
         ({
-          id_tabla_general_parametros_autorizadores,
-          id_autorizador,
-          nombre_parametro,
-          valor_parametro,
-          nombre_autorizador,
+          comercio_padre,
+          nombre_comercio,
+          numero_identificacion,
+          pk_comercio,
         }) => {
           return {
-            "Id parametro": id_tabla_general_parametros_autorizadores,
-            "Nombre parametro": nombre_parametro,
-            "Valor parametro": valor_parametro,
-            "Nombre autorizador": nombre_autorizador,
+            Id: pk_comercio,
+            Comercio: nombre_comercio,
+            Documento: numero_identificacion,
+            "Comercio padre": comercio_padre ?? "Vacio",
           };
         }
       ),
     ];
-  }, [parametrosAutorizadores]);
-
-  const onSelectParametrosAutorizadores = useCallback(
+  }, [comercios]);
+  const onChange = useCallback((ev) => {
+    const formData = new FormData(ev.target.form);
+    const comercio = formData.get("searchComercio");
+    const pkComercio = formData.get("searchPkComercio");
+    setComerciosConsulta((old) => ({
+      ...old,
+      searchPkComercio: pkComercio,
+      searchComercio: comercio,
+    }));
+  }, []);
+  useEffect(() => {
+    if (openComercios) {
+      fetchComerciosFuncPage();
+    }
+  }, [page, limit, searchComercio, searchPkComercio, openComercios]);
+  const fetchComerciosFuncPage = useCallback(() => {
+    let obj = {};
+    if (parseInt(searchPkComercio))
+      obj["co1.pk_comercio"] = parseInt(searchPkComercio);
+    if (searchComercio) obj["co1.nombre_comercio"] = searchComercio;
+    postConsultaComercio({ ...obj, page, limit })
+      .then((autoArr) => {
+        setMaxPages(autoArr?.maxPages);
+        setComercios(autoArr?.results ?? []);
+      })
+      .catch((err) => console.error(err));
+  }, [page, limit, searchComercio, searchPkComercio]);
+  const onSelectComercios = useCallback(
     (e, i) => {
-      setShowModal(true);
-      setSelectedParam({
-        id_param: tableParametrosAutorizadores[i]?.["Id parametro"],
-        nombre_parametro: tableParametrosAutorizadores[i]?.["Nombre parametro"],
-        valor_parametro: tableParametrosAutorizadores[i]?.["Valor parametro"],
-        id_autorizador: "",
-        nombre_autorizador:
-          tableParametrosAutorizadores[i]?.["Nombre autorizador"],
+      setComercio((old) => {
+        return {
+          ...old,
+          fk_comercio_padre: tableComercios[i]["Id"],
+          comercio_padre: tableComercios[i]["Comercio"],
+        };
       });
+      handleClose();
+      // id?tableComercios[i]["Id"]
     },
-    [tableParametrosAutorizadores]
+    [tableComercios, comercio]
   );
-
-  const onChange = useCallback(
-    (ev) => {
-      const formData = new FormData(ev.target.form);
-      const nameAuto = formData.get("searchAuto");
-      setQuery({ searchAuto: nameAuto }, { replace: true });
-    },
-    [setQuery]
-  );
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+  }, []);
+  const handleShowModal = useCallback(() => {
+    setShowModal(true);
+    setComerciosConsulta((old) => ({ ...old, openComercios: true }));
+  }, []);
+  useEffect(() => {
+    if (state?.id) {
+      fetchComerciosFunc();
+    }
+    fetchTipoNivelComerciosFunc();
+    fetchData(`${url_types}/type-doc`, "GET", {}, {})
+      .then((res) => {
+        const temp = { "": "" };
+        if (res?.status) {
+          for (const { id_doc, Nombre, nombre_corto } of res?.obj) {
+            temp[`${Nombre} (${nombre_corto})`] = id_doc;
+          }
+          setDocTypes(temp);
+        } else {
+          notifyError(res?.msg);
+        }
+      })
+      .catch(() => {});
+  }, [state?.id]);
+  const fetchTipoNivelComerciosFunc = useCallback(() => {
+    let obj = {};
+    postConsultaTipoNivelComercio({ ...obj })
+      .then((autoArr) => {
+        const temp = { "": "" };
+        for (const { pk_tipo_nivel, descripcion } of autoArr?.results ?? []) {
+          temp[`${descripcion}`] = pk_tipo_nivel;
+        }
+        setTipoNivelComercio(temp);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+  const fetchComerciosFunc = useCallback(() => {
+    let obj = { "co1.pk_comercio": state?.id };
+    postConsultaComercio({ ...obj })
+      .then((autoArr) => {
+        console.log(autoArr?.results[0]);
+        setComercio(
+          { ...autoArr?.results[0] } ?? {
+            apellido_contacto1_comercio: "",
+            apellido_contacto2_comercio: "",
+            codigos_institucionales: "",
+            comercio_padre: "",
+            credito_comercio: "",
+            dane_ciudad: "",
+            dane_dpto: "",
+            dane_pais: "",
+            descripcion_tipo_nivel: "",
+            direccion_comercio: "",
+            email_comercio: "",
+            fecha_actualizacion: "",
+            fecha_registro: "",
+            fk_comercio_padre: "",
+            fk_tipo_identificacion: "",
+            fk_tipo_nivel: "",
+            latitud_comercio: "",
+            longitud_comercio: "",
+            nombre_comercio: "",
+            nombre_contacto1_comercio: "",
+            nombre_contacto2_comercio: "",
+            numero_identificacion: "",
+            obtener_mejor_tarifa: "",
+            pk_comercio: "",
+            razon_social_comercio: "",
+            tel_contacto1_comercio: "",
+            tel_contacto2_comercio: "",
+            telefono_fijo_comercio: "",
+          }
+        );
+      })
+      .catch((err) => console.error(err));
+  }, [state]);
   const onChangeFormat = useCallback((ev) => {
-    setSelectedParam((old) => {
+    setComercio((old) => {
       return { ...old, [ev.target.name]: ev.target.value };
     });
   }, []);
+  const seleccionarCodigoIns = useCallback(() => {
+    if (selectedCodigo.selectedCod === "") {
+      return notifyError("Seleccione el código institucional a agregar");
+    }
+    if (selectedCodigo.selectedCod in comercio?.codigos_institucionales) {
+      return notifyError("El código ya existe en el comercio");
+    }
+    setComercio((old) => {
+      return {
+        ...old,
+        codigos_institucionales: {
+          ...old.codigos_institucionales,
+          [selectedCodigo.selectedCod]: "",
+        },
+      };
+    });
+  }, [comercio.codigos_institucionales, selectedCodigo]);
+
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-      if (selectedParam?.nombre_autorizador === "") {
-        notifyError("Se debe agregar el autorizador");
-        return;
-      }
-      if (selectedParam?.nombre_parametro === "") {
-        notifyError("Se debe agregar el nombre del parametro");
-        return;
-      }
-      if (selectedParam?.valor_parametro === "") {
-        notifyError("Se debe agregar el valor del parametro");
-        return;
-      }
-      if (selectedParam?.id_param !== "") {
-        putParametrosAutorizadores(
-          {
-            id_tabla_general_parametros_autorizadores: selectedParam?.id_param,
-          },
-          {
-            nombre_parametro: selectedParam?.nombre_parametro,
-            valor_parametro: selectedParam?.valor_parametro,
-          }
-        )
-          .then((res) => {
-            if (res?.status) {
-              notify(res?.msg);
-              handleClose();
-            } else {
-              notifyError(res?.msg);
-            }
-          })
-          .catch((err) => console.error(err));
-      } else {
-        postParametrosAutorizadores({
-          id_autorizador: selectedParam?.id_autorizador,
-          nombre_parametro: selectedParam?.nombre_parametro,
-          valor_parametro: selectedParam?.valor_parametro,
+      setIsUploading(true);
+      // if (selectedParam?.nombre_autorizador === "") {
+      //   notifyError("Se debe agregar el autorizador");
+      //   return;
+      // }
+      // if (selectedParam?.nombre_parametro === "") {
+      //   notifyError("Se debe agregar el nombre del parametro");
+      //   return;
+      // }
+      // if (selectedParam?.valor_parametro === "") {
+      //   notifyError("Se debe agregar el valor del parametro");
+      //   return;
+      // }
+      const dataOrg = { ...comercio };
+      delete dataOrg["comercio_padre"];
+      delete dataOrg["descripcion_tipo_nivel"];
+      delete dataOrg["fecha_actualizacion"];
+      delete dataOrg["fecha_registro"];
+      if (!dataOrg.fk_comercio_padre) delete dataOrg["fk_comercio_padre"];
+      if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
+      if (!dataOrg.credito_comercio) delete dataOrg["credito_comercio"];
+      if (state?.id) {
+        // const dataOrg = Object.keys(comercio).map((obj, i) => {
+        //   if (obj !== "" || obj) {
+        //     return { [obj]: comercio[obj] };
+        //   }
+        // });
+        delete dataOrg["pk_comercio"];
+        putModificarComercio(state?.id, {
+          ...dataOrg,
         })
           .then((res) => {
+            setIsUploading(false);
             if (res?.status) {
               notify(res?.msg);
-              handleClose();
+              navigate(-1);
             } else {
               notifyError(res?.msg);
             }
           })
-          .catch((err) => console.error(err));
+          .catch((err) => {
+            setIsUploading(false);
+            notifyError("No se ha podido conectar al servidor");
+            console.error(err);
+          });
+      } else {
+        postCrearComercio({
+          ...dataOrg,
+        })
+          .then((res) => {
+            setIsUploading(false);
+            if (res?.status) {
+              notify(res?.msg);
+              navigate(-1);
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => {
+            setIsUploading(false);
+            notifyError("No se ha podido conectar al servidor");
+            console.error(err);
+          });
       }
     },
-    [selectedParam, handleClose]
-  );
-
-  useEffect(() => {
-    if (openAutorizador) {
-      fetchAutorizadoresFunc();
-    } else {
-      fetchParametrosAutorizadoresFunc();
-    }
-  }, [searchAuto, page, limit, openAutorizador]);
-  const fetchParametrosAutorizadoresFunc = useCallback(() => {
-    let obj = {};
-    if (parseInt(searchAuto))
-      obj["id_tabla_general_parametros_autorizadores"] = parseInt(searchAuto);
-    fetchParametrosAutorizadores({ ...obj, page, limit })
-      .then((autoArr) => {
-        setMaxPages(autoArr?.maxPages);
-        setParametrosAutorizadores(autoArr?.results);
-      })
-      .catch((err) => console.error(err));
-  }, [page, limit, searchAuto]);
-  const fetchAutorizadoresFunc = useCallback(() => {
-    fetchAutorizadores({ page, limit })
-      .then((res) => {
-        setdata(
-          [...res?.results].map(({ id_autorizador, nombre_autorizador }) => {
-            return {
-              "Id autorizador": id_autorizador,
-              "Nombre autorizador": nombre_autorizador,
-            };
-          })
-        );
-        setMaxPages(res?.maxPages);
-      })
-      .catch((err) => console.error(err));
-  }, [page, limit]);
-  const onSelectAutorizador = useCallback(
-    (e, i) => {
-      setSelectedParam((old) => ({
-        ...old,
-        id_autorizador: data[i]?.["Id autorizador"],
-        nombre_autorizador: data[i]?.["Nombre autorizador"],
-      }));
-      handleClose2();
-    },
-    [data, handleClose2]
+    [comercio, handleClose, state, navigate]
   );
 
   return (
-    <Fragment>
-      <ButtonBar>
-        <Button type='submit' onClick={handleShowModal}>
-          Crear parametro de autorizador
-        </Button>
-      </ButtonBar>
-      <TableEnterprise
-        title='Prametros de autorizadores'
-        maxPage={maxPages}
-        headers={[
-          "Id parametro",
-          "Nombre parametro",
-          "Valor parametro",
-          "Nombre autorizador",
-        ]}
-        data={tableParametrosAutorizadores}
-        onSelectRow={onSelectParametrosAutorizadores}
-        onSetPageData={setPageData}
-        onChange={onChange}>
-        <Input
-          id='searchAuto'
-          name='searchAuto'
-          label={"Id parametro"}
-          type='number'
-          autoComplete='off'
-          defaultValue={searchAuto}
-        />
-      </TableEnterprise>
-      {/* {Array.isArray(tableConfiguracionComercios) &&
-      tableConfiguracionComercios.length > 0 ? (
-        <Table
-          headers={Object.keys(tableConfiguracionComercios[0])}
-          data={tableConfiguracionComercios}
-          onSelectRow={onSelectConfiguracionComercios}
-        />
-      ) : (
-        ""
-      )} */}
-      <Modal show={showModal} handleClose={handleClose}>
-        <Form onSubmit={onSubmit} onChange={onChangeFormat} grid>
-          <Input
-            id='Nombre parametro'
-            name='nombre_parametro'
-            label={"Nombre parametro"}
-            type='text'
-            autoComplete='off'
-            value={selectedParam.nombre_parametro}
-            onChange={() => {}}
-            // defaultValue={selectedAuto?.["Id comercio"] ?? ""}
-            // disabled={selectedAuto?.["Id configuracion"]}
-            required
-          />
-          <Input
-            id='Valor parametro'
-            name='valor_parametro'
-            label={"Valor parametro"}
-            type='text'
-            autoComplete='off'
-            value={selectedParam.valor_parametro}
-            onChange={() => {}}
-            // defaultValue={selectedAuto?.["Id comercio"] ?? ""}
-            // disabled={selectedAuto?.["Id configuracion"]}
-            required
-          />
-          {selectedParam?.nombre_autorizador && (
+    <>
+      <SimpleLoading show={isUploading} />
+      <h1 className='text-3xl text-center'>
+        {state?.id ? "Actualizar comercio" : "Crear comercio"}
+      </h1>
+      <Form grid onSubmit={onSubmit}>
+        <Fieldset
+          legend='Información general comercio'
+          className='lg:col-span-2'>
+          {!state?.id && (
             <Input
-              id='Nombre autorizador'
-              name='Nombre autorizador'
-              label={"Nombre autorizador"}
+              id='pk_comercio'
+              label='Id comercio(Opcional)'
               type='text'
-              autoComplete='off'
-              value={selectedParam?.nombre_autorizador}
-              onChange={() => {}}
-              // defaultValue={selectedAuto?.["Contrato"]}
-              disabled
-            />
+              name='pk_comercio'
+              minLength='1'
+              maxLength='32'
+              value={comercio?.pk_comercio}
+              onInput={onChangeFormat}></Input>
           )}
-          {!selectedParam?.id_param ? (
-            <ButtonBar>
-              <Button type='button' onClick={handleClose}>
-                Cancelar
-              </Button>
-              <Button
+          <Input
+            id='nombre_comercio'
+            label='Nombre comercio'
+            type='text'
+            name='nombre_comercio'
+            minLength='1'
+            maxLength='32'
+            required
+            value={comercio?.nombre_comercio}
+            onInput={onChangeFormat}></Input>
+          <Input
+            id='email_comercio'
+            label='Email comercio'
+            type='text'
+            name='email_comercio'
+            minLength='1'
+            maxLength='32'
+            required
+            value={comercio?.email_comercio}
+            onInput={onChangeFormat}></Input>
+          <Select
+            className='place-self-stretch'
+            id='fk_tipo_identificacion'
+            name='fk_tipo_identificacion'
+            label='Tipo de documento'
+            required={true}
+            options={docTypes ?? []}
+            onChange={onChangeFormat}
+            value={comercio?.fk_tipo_identificacion}
+          />
+          <Input
+            id='numero_identificacion'
+            label='Número de identificación'
+            type='text'
+            name='numero_identificacion'
+            minLength='1'
+            maxLength='12'
+            required
+            value={comercio?.numero_identificacion}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, numero_identificacion: num };
+                });
+              }
+            }}></Input>
+          <Select
+            className='place-self-stretch'
+            id='fk_tipo_nivel'
+            name='fk_tipo_nivel'
+            label='Tipo nivel'
+            required={true}
+            options={tipoNivelComercio ?? []}
+            onChange={onChangeFormat}
+            value={comercio?.fk_tipo_nivel}
+          />
+          <Input
+            id='telefono_fijo_comercio'
+            label='Telefono fijo'
+            type='text'
+            name='telefono_fijo_comercio'
+            minLength='1'
+            maxLength='12'
+            required
+            value={comercio?.telefono_fijo_comercio}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, telefono_fijo_comercio: num };
+                });
+              }
+            }}></Input>
+          <Input
+            id='razon_social_comercio'
+            label='Razón social'
+            type='text'
+            name='razon_social_comercio'
+            minLength='1'
+            maxLength='100'
+            required
+            value={comercio?.razon_social_comercio}
+            onInput={onChangeFormat}></Input>
+          <Input
+            key='comercio_padre'
+            id='comercio_padre'
+            label='Comercio padre'
+            type='text'
+            name='comercio_padre'
+            minLength='1'
+            maxLength='20'
+            value={
+              comercio?.comercio_padre ? comercio?.comercio_padre : "Vacio"
+            }
+            info={
+              <button
                 type='button'
-                onClick={() => {
-                  setShowModal2(true);
-                  setQuery({ ["openAutorizador"]: true }, { replace: true });
+                style={{
+                  position: "absolute",
+                  top: "-33px",
+                  right: "-235px",
+                  fontSize: "15px",
+                  padding: "5px",
+                  backgroundColor: "#e26c22",
+                  color: "white",
+                  borderRadius: "5px",
+                }}
+                onClick={(e) => {
+                  if (comercio?.comercio_padre) {
+                    setComercio((old) => ({
+                      ...old,
+                      fk_comercio_padre: null,
+                      comercio_padre: "",
+                    }));
+                  } else {
+                    handleShowModal();
+                  }
                 }}>
-                {selectedParam?.nombre_autorizador
-                  ? "Editar autorizador"
-                  : "Agregar autorizador"}
-              </Button>
-              <Button type='submit'>Crear parametro</Button>
-            </ButtonBar>
-          ) : (
-            <Fragment>
-              <ButtonBar>
-                {/* <Button
-                  type='button'
-                  onClick={() => {
-                    const urlParams = new URLSearchParams();
-                    urlParams.append(
-                      "autorizador_id_autorizador",
-                      selectedAuto?.["Id autorizador"]
-                    );
-                    urlParams.append(
-                      "nombre_autorizador",
-                      JSON.stringify(selectedAuto?.["Nombre de autorizador"])
-                    );
-                    navigate(
-                      `/trx-params/comisiones/cobradas?${urlParams.toString()}`
-                    );
-                  }}>
-                  Editar comisiones a cobrar
-                </Button> */}
-              </ButtonBar>
-              <ButtonBar>
-                <Button type='button' onClick={handleClose}>
-                  Cancelar
-                </Button>
-                <Button
-                  type='button'
-                  onClick={() => {
-                    setShowModal2(true);
-                    setQuery({ ["openAutorizador"]: true }, { replace: true });
-                  }}>
-                  {selectedParam?.nombre_autorizador
-                    ? "Editar autorizador"
-                    : "Agregar autorizador"}
-                </Button>
-                <Button type='submit'>Editar parametro</Button>
-              </ButtonBar>
-            </Fragment>
-          )}
-        </Form>
-        <Modal
-          show={showModal2}
-          handleClose={handleClose2}
-          className='flex align-middle'>
-          <TableEnterprise
-            title='Autorizadores'
-            maxPage={maxPages}
-            headers={["Id autorizador", "Autorizador"]}
-            data={data}
-            onSelectRow={onSelectAutorizador}
-            onSetPageData={setPageData}
-            onChange={onChange}></TableEnterprise>
-        </Modal>
+                {comercio?.comercio_padre ? "Eliminar" : "Agregar comercio"}
+              </button>
+            }
+            disabled></Input>
+        </Fieldset>
+
+        <Fieldset legend='Ubicación comercio' className='lg:col-span-2'>
+          <Input
+            id='direccion_comercio'
+            label='Dirección comercio'
+            type='text'
+            name='direccion_comercio'
+            minLength='1'
+            maxLength='100'
+            required
+            value={comercio?.direccion_comercio}
+            onInput={onChangeFormat}></Input>
+          <Input
+            id='latitud_comercio'
+            label='Latitud comercio'
+            type='text'
+            name='latitud_comercio'
+            minLength='1'
+            maxLength='12'
+            required
+            value={comercio?.latitud_comercio}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, latitud_comercio: num };
+                });
+              }
+            }}></Input>
+          <Input
+            id='longitud_comercio'
+            label='Longitud comercio'
+            type='text'
+            name='longitud_comercio'
+            minLength='1'
+            maxLength='12'
+            required
+            value={comercio?.longitud_comercio}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, longitud_comercio: num };
+                });
+              }
+            }}></Input>
+        </Fieldset>
+        <Fieldset legend='Códigos Dane' className='lg:col-span-2'>
+          <Input
+            id='dane_ciudad'
+            label='Número Dane ciudad'
+            type='text'
+            name='dane_ciudad'
+            minLength='1'
+            maxLength='5'
+            required
+            value={comercio?.dane_ciudad}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, dane_ciudad: num };
+                });
+              }
+            }}></Input>
+          <Input
+            id='dane_dpto'
+            label='Número Dane departamento'
+            type='text'
+            name='dane_dpto'
+            minLength='1'
+            maxLength='5'
+            required
+            value={comercio?.dane_dpto}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, dane_dpto: num };
+                });
+              }
+            }}></Input>
+          <Input
+            id='dane_pais'
+            label='Número Dane pais'
+            type='text'
+            name='dane_pais'
+            minLength='1'
+            maxLength='5'
+            required
+            value={comercio?.dane_pais}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, dane_pais: num };
+                });
+              }
+            }}></Input>
+        </Fieldset>
+
+        <MoneyInput
+          id='credito_comercio'
+          name='credito_comercio'
+          label='Credito comercio'
+          type='text'
+          autoComplete='off'
+          maxLength={"15"}
+          value={comercio.credito_comercio ?? ""}
+          onInput={(e, valor) => {
+            if (!isNaN(valor)) {
+              const num = valor;
+              setComercio((old) => {
+                return { ...old, credito_comercio: num };
+              });
+            }
+          }}
+          required></MoneyInput>
+
+        <Fieldset legend='Contacto 1' className='lg:col-span-2'>
+          <Input
+            id='nombre_contacto1_comercio'
+            label='Nombre contacto 1'
+            type='text'
+            name='nombre_contacto1_comercio'
+            minLength='1'
+            maxLength='100'
+            required
+            value={comercio?.nombre_contacto1_comercio}
+            onInput={onChangeFormat}></Input>
+          <Input
+            id='apellido_contacto1_comercio'
+            label='Apellido contacto 1'
+            type='text'
+            name='apellido_contacto1_comercio'
+            minLength='1'
+            maxLength='100'
+            required
+            value={comercio?.apellido_contacto1_comercio}
+            onInput={onChangeFormat}></Input>
+          <Input
+            id='tel_contacto1_comercio'
+            label='Telefono contacto 1'
+            type='text'
+            name='tel_contacto1_comercio'
+            minLength='1'
+            maxLength='12'
+            required
+            value={comercio?.tel_contacto1_comercio}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, tel_contacto1_comercio: num };
+                });
+              }
+            }}></Input>
+        </Fieldset>
+        <Fieldset legend='Contacto 2' className='lg:col-span-2'>
+          <Input
+            id='nombre_contacto2_comercio'
+            label='Nombre contacto 2'
+            type='text'
+            name='nombre_contacto2_comercio'
+            minLength='1'
+            maxLength='100'
+            value={comercio?.nombre_contacto2_comercio}
+            onInput={onChangeFormat}></Input>
+          <Input
+            id='apellido_contacto2_comercio'
+            label='Apellido contacto 2'
+            type='text'
+            name='apellido_contacto2_comercio'
+            minLength='1'
+            maxLength='100'
+            value={comercio?.apellido_contacto2_comercio}
+            onInput={onChangeFormat}></Input>
+          <Input
+            id='tel_contacto2_comercio'
+            label='Telefono contacto 2'
+            type='text'
+            name='tel_contacto2_comercio'
+            minLength='1'
+            maxLength='12'
+            value={comercio?.tel_contacto2_comercio}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, tel_contacto2_comercio: num };
+                });
+              }
+            }}></Input>
+        </Fieldset>
+        <Fieldset legend='Códigos institucionales' className='lg:col-span-2'>
+          <Select
+            className='place-self-stretch'
+            id='selected_codigo'
+            name='selected_codigo'
+            label='Código institucional'
+            options={vectorCodigosInstitucionales ?? []}
+            onChange={(e) => {
+              setSelectedCodigo((old) => ({
+                ...old,
+                selectedCod: e.target.value,
+              }));
+            }}
+            value={selectedCodigo.selectedCod}
+          />
+          <Button type='button' onClick={seleccionarCodigoIns}>
+            Agregar código institucional
+          </Button>
+          <Fieldset
+            legend='Códigos institucionales existentes'
+            className='lg:col-span-2'>
+            {Object.keys(comercio?.codigos_institucionales)?.length > 0 ? (
+              Object.keys(comercio?.codigos_institucionales).map(
+                (key, index) => {
+                  return (
+                    <Input
+                      key={index}
+                      id={`${key}_${index}`}
+                      label={`${key}`}
+                      type='text'
+                      name={`${key}_${index}`}
+                      minLength='1'
+                      maxLength='20'
+                      required
+                      value={comercio?.codigos_institucionales[key]}
+                      info={
+                        <button
+                          type='button'
+                          style={{
+                            position: "absolute",
+                            top: "-33px",
+                            right: "-235px",
+                            fontSize: "15px",
+                            padding: "5px",
+                            backgroundColor: "#e26c22",
+                            color: "white",
+                            borderRadius: "5px",
+                          }}
+                          onClick={() => {
+                            const rest = {
+                              ...comercio?.codigos_institucionales,
+                            };
+                            delete rest[key];
+                            setComercio((old) => {
+                              return {
+                                ...old,
+                                codigos_institucionales: rest,
+                              };
+                            });
+                          }}>
+                          Eliminar
+                        </button>
+                      }
+                      onInput={(e) => {
+                        setComercio((old) => {
+                          return {
+                            ...old,
+                            codigos_institucionales: {
+                              ...old.codigos_institucionales,
+                              [key]: e.target.value,
+                            },
+                          };
+                        });
+                      }}></Input>
+                  );
+                }
+              )
+            ) : (
+              <h1>No hay códigos institucionales asociados al comercio</h1>
+            )}
+          </Fieldset>
+        </Fieldset>
+        <ButtonBar className='lg:col-span-2'>
+          <Button type='submit'>
+            {state?.id ? "Actualizar comercio" : "Crear comercio"}
+          </Button>
+        </ButtonBar>
+      </Form>
+      <Modal show={showModal} handleClose={handleClose}>
+        <TableEnterprise
+          title='Comercios'
+          maxPage={maxPages}
+          headers={["Id", "Comercio", "Documento", "Comercio padre"]}
+          data={tableComercios}
+          onSelectRow={onSelectComercios}
+          onSetPageData={setPageData}
+          onChange={onChange}>
+          <Input
+            id='searchPkComercio'
+            name='searchPkComercio'
+            label={"Id comercio"}
+            type='number'
+            autoComplete='off'
+            defaultValue={searchPkComercio}
+          />
+          <Input
+            id='searchComercio'
+            name='searchComercio'
+            label={"Nombre comercio"}
+            type='text'
+            autoComplete='off'
+            defaultValue={searchComercio}
+          />
+        </TableEnterprise>
       </Modal>
-    </Fragment>
+    </>
   );
 };
 
