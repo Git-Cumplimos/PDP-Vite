@@ -9,6 +9,7 @@ import { useAuth } from "../hooks/AuthHooks";
 import Tickets from "../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import TableEnterprise from "../components/Base/TableEnterprise";
+import { formatMoney } from "../components/Base/MoneyInput";
 import PaymentSummary from "../components/Compound/PaymentSummary";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
@@ -23,6 +24,7 @@ const Transacciones = () => {
   const { roleInfo, userPermissions } = useAuth();
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
+  const [montoAcumulado, setMontoAcumulado] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -37,14 +39,9 @@ const Transacciones = () => {
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
 
-  const formatMoney = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  });
-
   const transacciones = useCallback(() => {
     const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
+    const urlAcumulado = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-acumulado`;
     const queries = { ...pageData };
     if (!(idComercio === -1 || idComercio === "")) {
       queries.id_comercio = parseInt(idComercio);
@@ -77,6 +74,19 @@ const Transacciones = () => {
         if (res?.status) {
           setMaxPages(res?.obj?.maxpages);
           setTrxs(res?.obj?.trxs);
+        } else {
+          throw new Error(res?.msg);
+        }
+      })
+      .catch(() => {});
+
+    const acumQueries = { ...queries };
+    delete acumQueries.limit;
+    delete acumQueries.page;
+    fetchData(urlAcumulado, "GET", acumQueries)
+      .then((res) => {
+        if (res?.status) {
+          setMontoAcumulado(res?.obj);
         } else {
           throw new Error(res?.msg);
         }
@@ -183,7 +193,7 @@ const Transacciones = () => {
           onInput={(e) => setFechaFinal(e.target.value)}
         />
         <Select
-          className = 'place-self-stretch'
+          className="place-self-stretch"
           id="searchBySorteo"
           label="Tipo de busqueda"
           options={
@@ -197,6 +207,12 @@ const Transacciones = () => {
           value={tipoOp}
           required={true}
           onChange={(e) => setTipoOp(parseInt(e.target.value) ?? "")}
+        />
+        <Input
+          label="Monto acumulado"
+          type="tel"
+          value={formatMoney.format(montoAcumulado)}
+          readOnly
         />
         {userPermissions
           .map(({ id_permission }) => id_permission)
