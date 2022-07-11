@@ -1,4 +1,10 @@
-import React, { Fragment, useCallback, useState, useRef } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -32,8 +38,12 @@ const RecargasMovistar = () => {
   const [paymentStatus, setPaymentStatus] = useState(false);
 
   const [summary, setSummary] = useState({});
-
+  const { roleInfo } = useAuth();
   const printDiv = useRef();
+
+  useEffect(() => {
+    console.log(roleInfo);
+  }, []);
 
   const postCashIn = async (bodyObj) => {
     if (!bodyObj) {
@@ -56,7 +66,6 @@ const RecargasMovistar = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, []);
-  const { roleInfo } = useAuth();
 
   const goToRecaudo = useCallback(() => {
     navigate(-1);
@@ -76,6 +85,20 @@ const RecargasMovistar = () => {
     }
   });
 
+  // const prueba = () => {
+  //   // e.preventDefault();
+  //   const data = {
+  //     celular: inputCelular,
+  //     valor: inputValor,
+  //     codigo_comercio: roleInfo.id_comercio,
+  //     identificador_region: roleInfo.direccion,
+  //     tipo_comercio: roleInfo.tipo_comercio,
+  //     id_dispositivo: roleInfo.id_dispositivo,
+  //     id_usuario: roleInfo.id_usuario,
+  //   };
+  //   console.log("hola");
+  //   // PeticionRecarga(URL, data).then((res) => {});
+  // };
   const onSubmitDeposit = useCallback((e) => {
     e.preventDefault();
     const data = {

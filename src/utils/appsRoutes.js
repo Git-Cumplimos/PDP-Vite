@@ -273,6 +273,9 @@ const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
  * RecargasMovistar
  */
 const Movistar = lazy(() => import("../apps/Movistar/Movistar"));
+const RecargasMovistarFull = lazy(() =>
+  import("../apps/Movistar/Views/RecargasMovistarFull.jsx")
+);
 const RecargasMovistar = lazy(() =>
   import("../apps/Movistar/Views/RecargasMovistar")
 );
@@ -673,6 +676,12 @@ const allUrlsPrivateApps = [
         link: "/movistar/recargas-movistar",
         label: <AppIcons Logo={"SORTEOS"} name="Recargas Movistar" />,
         component: RecargasMovistar,
+        permission: [1],
+      },
+      {
+        link: "/movistar/recargas-movistar-full",
+        label: <AppIcons Logo={"SORTEOS"} name="Recargas Movistar full" />,
+        component: RecargasMovistarFull,
         permission: [1],
       },
       {
