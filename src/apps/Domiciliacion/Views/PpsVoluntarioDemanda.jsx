@@ -343,7 +343,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   return (
     <div>
       <Modal show={showModal} handleClose={handleClose}>
-        <LogoPDP small></LogoPDP>
+        <LogoPDP xsmall></LogoPDP>
         <Form onSubmit={(e) => enviar(e)}>
           <Fieldset
             legend="Formulario Aporte Voluntario"

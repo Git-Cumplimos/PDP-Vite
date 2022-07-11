@@ -101,7 +101,7 @@ const BuscarCedulaPpsADemanda = () => {
       ) : Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
         <Modal show={showModal} handleClose={handleClose}>
           <div className={contenedorImagen}>
-            <LogoPDP small></LogoPDP>
+            <LogoPDP></LogoPDP>
           </div>
           <div className={contenedorForm}>
             <div className={contenedorDatos}>

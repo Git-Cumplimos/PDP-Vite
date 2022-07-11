@@ -226,7 +226,7 @@ const ModificarPps = () => {
           handleClose={handleCloseUsuarioNoEncontrado}
         >
           <div className={contenedorLogo}>
-            <LogoPDP small></LogoPDP>
+            <LogoPDP xsmall></LogoPDP>
           </div>
           <span className={tituloNotificacion}>
             No se puede realizar la modificación, el número de documento no se
@@ -239,7 +239,7 @@ const ModificarPps = () => {
       {Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
         <Modal show={showModal} handleClose={handleClose}>
           <div className={contenedorLogo}>
-            <LogoPDP small></LogoPDP>
+            <LogoPDP xsmall></LogoPDP>
           </div>
           <Form onSubmit={(e) => ModificarGuardar(e)}>
             <PaymentSummary

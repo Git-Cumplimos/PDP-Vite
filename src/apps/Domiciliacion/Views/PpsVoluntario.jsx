@@ -157,7 +157,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
     <div>
       {showModal && datosConsulta ? (
         <Modal show={showModal} handleClose={handleClose}>
-          <LogoPDP small></LogoPDP>
+          <LogoPDP xsmall></LogoPDP>
           <Form onSubmit={(e) => enviar(e)}>
             <Fieldset
               legend="Formulario Aporte Voluntario"
