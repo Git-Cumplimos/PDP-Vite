@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Button from "../components/Base/Button";
 import ButtonBar from "../components/Base/ButtonBar";
 import Modal from "../components/Base/Modal";
@@ -24,7 +24,7 @@ const Transacciones = () => {
   const { roleInfo, userPermissions } = useAuth();
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
-  const [montoAcumulado, setMontoAcumulado] = useState([]);
+  // const [montoAcumulado, setMontoAcumulado] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -35,13 +35,14 @@ const Transacciones = () => {
   const [maxPages, setMaxPages] = useState(1);
   const [idComercio, setIdComercio] = useState(-1);
   const [usuario, setUsuario] = useState(-1);
+  // const [tipoComercio, setTipoComercio] = useState(null);
   const [tipoOp, setTipoOp] = useState("");
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
 
   const transacciones = useCallback(() => {
     const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
-    const urlAcumulado = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-acumulado`;
+    // const urlAcumulado = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-acumulado`;
     const queries = { ...pageData };
     if (!(idComercio === -1 || idComercio === "")) {
       queries.id_comercio = parseInt(idComercio);
@@ -80,19 +81,29 @@ const Transacciones = () => {
       })
       .catch(() => {});
 
-    const acumQueries = { ...queries };
-    delete acumQueries.limit;
-    delete acumQueries.page;
-    fetchData(urlAcumulado, "GET", acumQueries)
-      .then((res) => {
-        if (res?.status) {
-          setMontoAcumulado(res?.obj);
-        } else {
-          throw new Error(res?.msg);
-        }
-      })
-      .catch(() => {});
-  }, [pageData, idComercio, fechaFinal, fechaInicial, tipoOp, usuario]);
+    // if (tipoComercio !== null) {
+    //   const acumQueries = { ...queries, oficina_propia: tipoComercio };
+    //   delete acumQueries.limit;
+    //   delete acumQueries.page;
+    //   fetchData(urlAcumulado, "GET", acumQueries)
+    //     .then((res) => {
+    //       if (res?.status) {
+    //         setMontoAcumulado(res?.obj);
+    //       } else {
+    //         throw new Error(res?.msg);
+    //       }
+    //     })
+    //     .catch(() => {});
+    // }
+  }, [
+    pageData,
+    idComercio,
+    fechaFinal,
+    fechaInicial,
+    tipoOp,
+    usuario,
+    // tipoComercio,
+  ]);
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
@@ -119,6 +130,11 @@ const Transacciones = () => {
 
     setIdComercio(roleInfo?.id_comercio || -1);
     setUsuario(roleInfo?.id_usuario || -1);
+    // setTipoComercio(
+    //   "tipo_comercio" in roleInfo
+    //     ? roleInfo.tipo_comercio === "OFICINAS PROPIAS"
+    //     : null
+    // );
   }, [userPermissions, roleInfo]);
 
   useEffect(() => {
@@ -208,12 +224,19 @@ const Transacciones = () => {
           required={true}
           onChange={(e) => setTipoOp(parseInt(e.target.value) ?? "")}
         />
-        <Input
-          label="Monto acumulado"
-          type="tel"
-          value={formatMoney.format(montoAcumulado)}
-          readOnly
-        />
+        {/* {userPermissions
+          .map(({ id_permission }) => id_permission)
+          .includes(58) &&
+          tipoComercio !== null && (
+            <Fragment>
+              <Input
+                label="Monto acumulado"
+                type="tel"
+                value={formatMoney.format(montoAcumulado ?? 0)}
+                readOnly
+              />
+            </Fragment>
+          )} */}
         {userPermissions
           .map(({ id_permission }) => id_permission)
           .includes(5) ? (
