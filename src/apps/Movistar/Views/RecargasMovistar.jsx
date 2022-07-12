@@ -38,6 +38,8 @@ const RecargasMovistar = () => {
     setInputValor(valor);
   });
 
+  
+
   const onCelChange = (e) => {
     const formData = new FormData(e.target.form);
     const phone = ((formData.get("celular") ?? "").match(/\d/g) ?? []).join("");
@@ -89,16 +91,16 @@ const RecargasMovistar = () => {
         ticketRecarga(result);
       } else {
         setShowModal(false);
-
+        
         if (response_obj?.identificador == "02") {
-          notifyError("no hay cupo");
+          notifyError("No hay cupo");
         }
         const controlErrores = ["00", "01", "03", "04", "05", "10"];
         if (controlErrores?.indexOf(response_obj?.identificador) > -1) {
-          notifyError("sistema caido");
+          notifyError("Sistema caido");
         }
         if (response_obj?.identificador == "11") {
-          notifyError("recarga rechazada");
+          notifyError("Recarga rechazada");
         }
       }
 
@@ -138,6 +140,7 @@ const RecargasMovistar = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
+  const [loadingCashIn, fetchCashIn] = useFetch();
 
   // useEffect(() => {
   //   console.log(roleInfo);
@@ -177,7 +180,9 @@ const RecargasMovistar = () => {
 
       <Modal
         show={showModal}
-        handleClose={paymentStatus ? handleClose : () => {}}
+        handleClose={
+          paymentStatus ? handleClose : loadingCashIn ? () => {} : handleClose
+        }
       >
         {!flagRecarga ? (
           <PaymentSummary summaryTrx={summary}>
@@ -201,7 +206,7 @@ const RecargasMovistar = () => {
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Link to="/movistar">
-                  <Button>cerrar</Button>
+                  <Button>Cerrar</Button>
                 </Link>
               </ButtonBar>
             </div>
