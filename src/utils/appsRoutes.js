@@ -1,6 +1,12 @@
 import { lazy } from "react";
 
 /**
+ * Rutas
+ */
+import rutasColpatria from "../apps/Colpatria/routes";
+
+
+/**
  * * Providers
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
@@ -1031,6 +1037,7 @@ const allUrlsPrivateApps = [
     component: iFoodAportes,
     permission: [1],
   },
+  rutasColpatria,
 ];
 
 export { allUrlsPrivateApps };
