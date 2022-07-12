@@ -7,6 +7,7 @@ import Input from "../../../../components/Base/Input";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import Select from "../../../../components/Base/Select";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import { useFetch } from "../../../../hooks/useFetch";
 import { notifyError } from "../../../../utils/notify";
 import {
   getConsultaDtlMovCupo,
@@ -19,6 +20,7 @@ const DtlMovComercio = () => {
   const [limit, setLimit] = useState(10);
   const [fechaini, setFechaini] = useState();
   const [fechaEnd, setFechaEnd] = useState();
+  const [loadData, crearData] = useFetch(PeticionDescargarPdf);
   const [tipoAfectacion, setTipoAfectacion] = useState(null);
   const [tipoTransaccion, setTipoTransaccion] = useState(null);
   let { id_comercio } = useParams();
@@ -60,7 +62,7 @@ const DtlMovComercio = () => {
       e.preventDefault();
       if (id_comercio != "") {
         if (fechaEnd !== null || fechaini !== null) {
-          PeticionDescargarPdf(
+          crearData(
             id_comercio,
             fechaEnd,
             fechaini,
@@ -172,7 +174,11 @@ const DtlMovComercio = () => {
           </Form>
         </TableEnterprise>
         <ButtonBar>
-          <Button type={"submit"} onClick={onSubmitDownload}>
+          <Button
+            type={"submit"}
+            disabled={loadData}
+            onClick={onSubmitDownload}
+          >
             Descargar reporte
           </Button>
         </ButtonBar>
