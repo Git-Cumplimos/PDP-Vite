@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Button from "../components/Base/Button";
 import ButtonBar from "../components/Base/ButtonBar";
 import Modal from "../components/Base/Modal";
@@ -9,6 +9,7 @@ import { useAuth } from "../hooks/AuthHooks";
 import Tickets from "../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import TableEnterprise from "../components/Base/TableEnterprise";
+import { formatMoney } from "../components/Base/MoneyInput";
 import PaymentSummary from "../components/Compound/PaymentSummary";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
@@ -23,6 +24,7 @@ const Transacciones = () => {
   const { roleInfo, userPermissions } = useAuth();
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
+  // const [montoAcumulado, setMontoAcumulado] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -33,18 +35,14 @@ const Transacciones = () => {
   const [maxPages, setMaxPages] = useState(1);
   const [idComercio, setIdComercio] = useState(-1);
   const [usuario, setUsuario] = useState(-1);
+  // const [tipoComercio, setTipoComercio] = useState(null);
   const [tipoOp, setTipoOp] = useState("");
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
 
-  const formatMoney = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  });
-
   const transacciones = useCallback(() => {
     const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
+    // const urlAcumulado = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-acumulado`;
     const queries = { ...pageData };
     if (!(idComercio === -1 || idComercio === "")) {
       queries.id_comercio = parseInt(idComercio);
@@ -82,7 +80,30 @@ const Transacciones = () => {
         }
       })
       .catch(() => {});
-  }, [pageData, idComercio, fechaFinal, fechaInicial, tipoOp, usuario]);
+
+    // if (tipoComercio !== null) {
+    //   const acumQueries = { ...queries, oficina_propia: tipoComercio };
+    //   delete acumQueries.limit;
+    //   delete acumQueries.page;
+    //   fetchData(urlAcumulado, "GET", acumQueries)
+    //     .then((res) => {
+    //       if (res?.status) {
+    //         setMontoAcumulado(res?.obj);
+    //       } else {
+    //         throw new Error(res?.msg);
+    //       }
+    //     })
+    //     .catch(() => {});
+    // }
+  }, [
+    pageData,
+    idComercio,
+    fechaFinal,
+    fechaInicial,
+    tipoOp,
+    usuario,
+    // tipoComercio,
+  ]);
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
@@ -109,6 +130,11 @@ const Transacciones = () => {
 
     setIdComercio(roleInfo?.id_comercio || -1);
     setUsuario(roleInfo?.id_usuario || -1);
+    // setTipoComercio(
+    //   "tipo_comercio" in roleInfo
+    //     ? roleInfo.tipo_comercio === "OFICINAS PROPIAS"
+    //     : null
+    // );
   }, [userPermissions, roleInfo]);
 
   useEffect(() => {
@@ -145,8 +171,8 @@ const Transacciones = () => {
               money,
               created,
               status_trx: status_trx
-                ? "Trasaccion aprobada"
-                : "Trasaccion rechazada",
+                ? "Transaccion aprobada"
+                : "Transaccion rechazada",
             };
           }
         )}
@@ -161,8 +187,8 @@ const Transacciones = () => {
             "Mensaje de respuesta trx": trxs[index]?.message_trx,
             Monto: formatMoney.format(trxs[index]?.monto),
             "Estado de la trasaccion": trxs[index]?.status_trx
-              ? "Trasaccion aprobada"
-              : "Trasaccion rechazada",
+              ? "Transaccion aprobada"
+              : "Transaccion rechazada",
           });
           setShowModal(true);
         }}
@@ -183,7 +209,7 @@ const Transacciones = () => {
           onInput={(e) => setFechaFinal(e.target.value)}
         />
         <Select
-          className = 'place-self-stretch'
+          className="place-self-stretch"
           id="searchBySorteo"
           label="Tipo de busqueda"
           options={
@@ -198,6 +224,19 @@ const Transacciones = () => {
           required={true}
           onChange={(e) => setTipoOp(parseInt(e.target.value) ?? "")}
         />
+        {/* {userPermissions
+          .map(({ id_permission }) => id_permission)
+          .includes(58) &&
+          tipoComercio !== null && (
+            <Fragment>
+              <Input
+                label="Monto acumulado"
+                type="tel"
+                value={formatMoney.format(montoAcumulado ?? 0)}
+                readOnly
+              />
+            </Fragment>
+          )} */}
         {userPermissions
           .map(({ id_permission }) => id_permission)
           .includes(5) ? (

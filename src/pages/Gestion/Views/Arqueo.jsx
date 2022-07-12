@@ -108,6 +108,8 @@ const Arqueo = ({
                 onChange={handleChange}
                 type="text"
                 info={formatMoney.format(denominaciones?.cienmil * 100000)}
+                max="9999"
+                min="0"
               ></Input>
               <Input
                 name="cincuentamil"

@@ -51,7 +51,7 @@ export const putModificarTipoNivelComercio = async (pkTipoNivel, bodyObj) => {
   try {
     const res = await fetchData(
       `${urlComercios}/tipo_nivel/modificar?pk_tipo_nivel=${pkTipoNivel}`,
-      "POST",
+      "PUT",
       {},
       bodyObj,
       {},
@@ -114,7 +114,7 @@ export const putModificarComercio = async (pkComercio, bodyObj) => {
   try {
     const res = await fetchData(
       `${urlComercios}/comercios/modificar?pk_comercio=${pkComercio}`,
-      "POST",
+      "PUT",
       {},
       bodyObj,
       {},

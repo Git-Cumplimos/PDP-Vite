@@ -53,11 +53,6 @@ const Panel = () => {
   }, []);
 
   const [estado, setEstado] = useState(false);
-  const formatMoney = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  });
   const closeModalFunction = () => {
     setEstado(false);
     setCierre(false);
@@ -69,7 +64,7 @@ const Panel = () => {
         <>
           <h1>Señor usuario la caja ya fue cerrada el día de hoy</h1>
         </>
-      ) : totalCierres === 3 || totalCierres === 1 ? (
+      ) : totalCierres === 3 || totalCierres === 1 || true ? (
         <>
           <Button onClick={() => setEstado(true)}>
             Arqueo y cierre de caja
