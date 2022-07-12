@@ -85,20 +85,13 @@ const ConcilacionMovistar = () => {
         <TableEnterprise
           title="Conciliación Movistar"
           maxPage={maxPages}
-          headers={[
-            "Fecha",
-            "PuntoDePago",
-            "Movistar",
-            "Diferencias",
-            "Descargar ",
-          ]}
+          headers={["Fecha", "PuntoDePago", "Movistar", "Diferencias"]}
           data={
             data?.map((inf) => ({
               Fecha: inf.fechabusqueda,
               ArchivoPuntoDePago: inf.ptopago.status,
               ArchivoMovistar: inf.movistar.status,
               Diferencias: inf.diferencias.status,
-              Descargar: "",
             })) ?? []
           }
           onSelectRow={(e, i) => {
