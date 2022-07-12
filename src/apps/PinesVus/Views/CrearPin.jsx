@@ -14,6 +14,7 @@ import Select from "../../../components/Base/Select";
 import { useNavigate } from "react-router-dom";
 import Fieldset from "../../../components/Base/Fieldset";
 import LocationForm from "../../../components/Compound/LocationForm";
+import { enumParametrosPines } from "../utils/enumParametrosPines";
 
 const dateFormatter = Intl.DateTimeFormat("az", {
   year: "numeric",
@@ -58,7 +59,7 @@ const CrearPin = () => {
   const [eps, setEps] = useState("")
   const [arl, setArl] = useState("")
 
-  const [olimpia, setOlimpia] = useState(false)
+  const [olimpia, setOlimpia] = useState("")
 
   const homeLocation = {
     municipio: useState(""),
@@ -242,7 +243,7 @@ const CrearPin = () => {
 
   const onSubmitCliente = (e) => {
     e.preventDefault();
-    consultaClientes(documento).then((resp) => {
+    consultaClientes(documento,olimpia).then((resp) => {
       if (resp?.obj?.results?.length > 0) {
         const fecha_nacimiento = new Date(resp?.obj?.results?.[0]?.fecha_nacimiento);
         fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
@@ -373,8 +374,35 @@ const CrearPin = () => {
       tickets
     );
   }, [infoTicket, respPin, tickets]);
+  
+  const hora = useMemo(() => {    
+    return Intl.DateTimeFormat("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).format(new Date())
+  }, [venderVehiculo,tipoPin]);
 
-  console.log(homeLocation)
+  useEffect(() => {
+    const horaCierre = enumParametrosPines.horaCierre.split(":")
+    const horaActual = hora.split(":")
+    const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
+    const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
+    console.log(deltaHora, deltaMinutos)
+    if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
+      notifyError("Modulo cerrado a partir de las " + enumParametrosPines.horaCierre)
+      navigate("/PinesVus");
+    }
+    else if ((deltaHora ===1 & deltaMinutos<-50)){
+      notifyError("El modulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
+    }
+    else if ((deltaHora ===0 & deltaMinutos<10)){
+      notifyError("El modulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
+    }
+
+  }, [venderVehiculo,tipoPin])
+
+  console.log(olimpia)
   return (
     <>
       <h1 className="text-3xl">Datos creación de Pin</h1>
@@ -406,6 +434,7 @@ const CrearPin = () => {
       <Select
         id="olimpia"
         label="Ya inicio el proceso en Olimpia?"
+        required
         options={[
           { value: "", label: "" },
           { value: true, label: "Si" },
@@ -443,42 +472,6 @@ const CrearPin = () => {
           maxLength="12"
           autoComplete="off"
           value={documento}
-          // onInput={(e) => {
-          //   const num = parseInt(e.target.value) || "";
-          //   setDocumento(num);
-          // }}
-          // onLazyInput={{
-          //   callback: (e) => {
-          //    consultaClientes(e.target.value).then((resp) => {
-          //           if (resp?.obj?.results?.length > 0) {
-          //             setNombre(resp?.obj?.results?.[0]?.nombre)
-          //             setApellidos(resp?.obj?.results?.[0]?.apellidos)
-          //             setFechaNacimiento(resp?.obj?.results?.[0]?.fecha_nacimiento)
-          //             setGenero(resp?.obj?.results?.[0]?.genero)
-          //             setCelular(resp?.obj?.results?.[0]?.celular)
-          //             setEmail(resp?.obj?.results?.[0]?.email)
-          //             setEps(resp?.obj?.results?.[0]?.eps)
-          //             setArl(resp?.obj?.results?.[0]?.arl)
-          //             setTiene_vehiculo(resp?.obj?.results?.[0]?.info_vehiculo?.vehiculo)
-          //             setModelo(resp?.obj?.results?.[0]?.info_vehiculo?.modelo)
-          //             setVenderVehiculo(resp?.obj?.results?.[0]?.info_vehiculo?.esta_vendiendo)
-          //             setCreditoVehiculo(resp?.obj?.results?.[0]?.info_vehiculo?.sigue_pagando_vehiculo)
-          //             setBanco(resp?.obj?.results?.[0]?.info_vehiculo?.banco)
-          //             setComprarVehiculo(resp?.obj?.results?.[0]?.interes_compra_vehiculo !== "" ? true : false)
-          //             setVehiculoCompra(resp?.obj?.results?.[0]?.interes_compra_vehiculo)
-          //             if (resp?.obj?.results?.[0]?.home_location !== null){ 
-          //             homeLocation?.municipio?.[1](resp?.obj?.results?.[0]?.home_location?.municipio?.[0])
-          //             homeLocation?.departamento?.[1](resp?.obj?.results?.[0]?.home_location?.departamento?.[0])
-          //             homeLocation?.direccion?.[1](resp?.obj?.results?.[0]?.home_location?.direccion?.[0])
-          //             homeLocation?.barrio?.[1](resp?.obj?.results?.[0]?.home_location?.barrio?.[0])
-          //             homeLocation?.localidad?.[1](resp?.obj?.results?.[0]?.home_location?.localidad?.[0])
-          //             homeLocation?.foundMunicipios?.[1](resp?.obj?.results?.[0]?.home_location?.foundMunicipios?.[0])
-          //             }
-          //           }
-          //         });
-          //   },
-          //   timeOut: 500,
-          // }}
         />
         <Input
           id="nombre"

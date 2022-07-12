@@ -88,6 +88,12 @@ const PinesVus = lazy(() => import("../apps/PinesVus/PinesVus"));
 const CrearPines = lazy(() => import("../apps/PinesVus/Views/CrearPin"));
 const TramitarPines = lazy(() => import("../apps/PinesVus/Views/TramitePines"));
 const ReportePines = lazy(() => import("../apps/PinesVus/Views/ReportePines"));
+const ReportePinesVer = lazy(() => import("../apps/PinesVus/Views/Reportes/ReportePines"));
+const ReportePinesDescargar = lazy(() => import("../apps/PinesVus/Views/Reportes/DescargarReportePines"));
+const PagoParticipantes = lazy(() => import("../apps/PinesVus/Views/PagoParticipantes"));
+const ParticipacionPines = lazy(() => import("../apps/PinesVus/Views/PagoParticipantes/Participacion"));
+const VerParticipacionPines = lazy(() => import("../apps/PinesVus/Views/PagoParticipantes/VerParticipacion"));
+const EspejoQX = lazy(() => import("../apps/PinesVus/Views/EspejoQX"));
 
 /**
  * IAM
@@ -485,9 +491,49 @@ const allUrlsPrivateApps = [
         permission: [53],
       },
       {
-        link: "/PinesVus/Reporte",
-        label: <AppIcons Logo={"RECAUDO"} name={"Reporte Pines"} />,
+        link: "/PinesVus/Participacion",
+        label: <AppIcons Logo={"RECAUDO"} name={"Participacion Pines"} />,
+        component: PagoParticipantes,
+        permission: [53],
+        subRoutes: [
+        {
+          link: "/PinesVus/Participacion/PagoParticipacion",
+          label: <AppIcons Logo={"RECAUDO"} name={"Pago participacion"} />,
+          component: ParticipacionPines,
+          permission: [53],
+        },
+        {
+          link: "/PinesVus/Participacion/VerPagoParticipacion",
+          label: <AppIcons Logo={"RECAUDO"} name={"Ver pago participacion"} />,
+          component: VerParticipacionPines,
+          permission: [53],
+        },
+        ]
+      },
+      {
+        link: "/PinesVus/Reportes",
+        label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
         component: ReportePines,
+        permission: [53],
+        subRoutes: [
+          {
+          link: "/PinesVus/Reporte/VerReportes",
+          label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
+          component: ReportePinesVer,
+          permission: [53],
+          },
+          {
+            link: "/PinesVus/Reporte/DescargarReportes",
+            label: <AppIcons Logo={"RECAUDO"} name={"Descargar Reportes Pines"} />,
+            component: ReportePinesDescargar,
+            permission: [53],
+          }          
+        ]
+      },
+      {
+        link: "/PinesVus/EspejoQX",
+        label: <AppIcons Logo={"RECAUDO"} name={"Espejo Cupo QX"} />,
+        component: EspejoQX,
         permission: [53],
       },
     ],
