@@ -123,7 +123,11 @@ const CrearCupo = () => {
           show={showModal}
           handleClose={paymentStatus ? handleClose : () => {}}
         >
-          <PaymentSummary summaryTrx={summary}>
+          <PaymentSummary
+            title="¿Esta seguro de crear el comercio?"
+            subtitle="Resumen del comercio"
+            summaryTrx={summary}
+          >
             <ButtonBar>
               <Link to="/cupo">
                 <Button type="button" onClick={crearComercio}>
