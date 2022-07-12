@@ -1,7 +1,7 @@
 import HNavbar from "../../../components/Base/HNavbar";
 
-const ReportePines = ({ subRoutes }) => {
+const PagoParticipantes = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default ReportePines;
+export default PagoParticipantes;

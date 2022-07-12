@@ -12,6 +12,7 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 import UsarPinForm from "../components/UsarPinForm/UsarPinForm";
 import CancelPin from "../components/CancelPinForm/CancelPinForm";
 import { useNavigate } from "react-router-dom";
+import { enumParametrosPines } from "../utils/enumParametrosPines";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -144,7 +145,32 @@ const TramitePines = () => {
     setModalUsar(true);
   };
 
-  console.log(activarNavigate);
+  const hora = useMemo(() => {    
+    return Intl.DateTimeFormat("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).format(new Date())
+  }, [parametroBusqueda, table]);
+
+  useEffect(() => {
+    const horaCierre = enumParametrosPines.horaCierre.split(":")
+    const horaActual = hora.split(":")
+    const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
+    const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
+    console.log(deltaHora, deltaMinutos)
+    if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
+      notifyError("Modulo cerrado a partir de las " + enumParametrosPines.horaCierre)
+      navigate("/PinesVus");
+    }
+    else if ((deltaHora ===1 & deltaMinutos<-50)){
+      notifyError("El modulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
+    }
+    else if ((deltaHora ===0 & deltaMinutos<10)){
+      notifyError("El modulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
+    }
+
+  }, [hora,parametroBusqueda, table])
   return (
     <>
       {"id_comercio" in roleInfo ? (
@@ -192,7 +218,7 @@ const TramitePines = () => {
             ]}
             data={table || []}
             onSelectRow={(e, index) => {
-              if (table[index]["Estado"] !== "Pin creado") {
+              if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Pin creado-No cancelable")) {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
@@ -244,31 +270,22 @@ const TramitePines = () => {
                 <h1>{formatMoney.format(valor*1.19 + valor_tramite)}</h1>
               </div>
             </>
-              {/* {Object.entries(selected).map(([key, val]) => {
-                return (
-                  <>
-                    <div
-                      className="flex flex-row justify-between text-lg font-medium"
-                      key={key}
-                    >
-                      <h1>{key}</h1>
-                      <h1>{val}</h1>
-                    </div>
-                  </>
-                );
-              })} */}
             </div>
             <div className="flex flex-col justify-center items-center mx-auto container">
               <Form onSubmit={onSubmitUsar}>
                 <ButtonBar>
                   <Button type="submit">Usar pin</Button>
+                  {selected.Estado==="Pin creado" ? 
                   <Button
-                    onClick={() => {
-                      setModalCancel(true);
-                    }}
-                  >
-                    Cancelar pin
-                  </Button>
+                  onClick={() => {
+                    setModalCancel(true);
+                  }}
+                >
+                  Cancelar pin
+                </Button>
+                :
+                ""}
+                  
                 </ButtonBar>
               </Form>
             </div>
