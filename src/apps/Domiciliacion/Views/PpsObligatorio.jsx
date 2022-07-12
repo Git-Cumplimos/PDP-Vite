@@ -40,7 +40,7 @@ const PpsObligatorio = ({ datosConsulta }) => {
       {" "}
       {showModal ? (
         <Modal show={showModal} handleClose={handleClose}>
-          <LogoPDP small></LogoPDP>
+          <LogoPDP xsmall></LogoPDP>
           <Fieldset
             legend="Formulario Aporte Obligatorio"
             /* className="lg:col-span-3" */
