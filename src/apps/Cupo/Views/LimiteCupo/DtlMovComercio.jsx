@@ -1,11 +1,17 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
+import { formatMoney } from "../../../../components/Base/MoneyInput";
 import Select from "../../../../components/Base/Select";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { notifyError } from "../../../../utils/notify";
-import { getConsultaDtlMovCupo } from "../../utils/fetchCupo";
+import {
+  getConsultaDtlMovCupo,
+  PeticionDescargarPdf,
+} from "../../utils/fetchCupo";
 
 const DtlMovComercio = () => {
   const [dtlCupo, setDtlCupo] = useState(null);
@@ -42,7 +48,6 @@ const DtlMovComercio = () => {
     tipoAfectacion,
     tipoTransaccion,
   ]);
-
   const onChange = useCallback((ev) => {
     if (ev.target.name === "fecha_inico") {
       setFechaini(ev.target.value);
@@ -50,52 +55,38 @@ const DtlMovComercio = () => {
       setFechaEnd(ev.target.value);
     }
   }, []);
-  const onSubmitDeposit = useCallback((e) => {
-    e.preventDefault();
-  }, []);
+  const onSubmitDownload = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (id_comercio != "") {
+        if (fechaEnd !== null || fechaini !== null) {
+          PeticionDescargarPdf(
+            id_comercio,
+            fechaEnd,
+            fechaini,
+            tipoTransaccion,
+            tipoAfectacion
+          );
+        }
+      }
+    },
+    [id_comercio, fechaEnd, fechaini, tipoTransaccion, tipoAfectacion]
+  );
   return (
     <div>
       <Fragment>
         <h1 className="text-3xl mt-6">Detalle movimineto cupo comercio</h1>
-        {/* <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
-          <Input
-            id="fecha_inico"
-            name="fecha_inico"
-            label="Fecha inico"
-            type="date"
-            autoComplete="off"
-            // minLength={"10"}
-            // maxLength={"10"}
-            // value={""}
-            onInput={() => {}}
-            required
-          />
-          <Input
-            id="fecha_final"
-            name="fecha_final"
-            label="Fecha _final"
-            type="date"
-            autoComplete="off"
-            // minLength={"10"}
-            // maxLength={"10"}
-            // value={""}
-            onInput={() => {}}
-            required
-          />
-        </Form> */}
-
         <TableEnterprise
           title="Detalle movimientos cupo Comercios"
           headers={[
-            "id detalle_mov",
-            "Id comercio",
+            "id detalle movimiento",
             "Tipo de movimiento",
             "Tipo de afectacion",
             "Valor afectación",
             "Fecha afectación",
             "Hora afectación",
-            "Cupo antes de afectación",
-            "Cupo despues de afectación",
+            "Deuda actual",
+            "Cupo canje",
             "usuario",
             "Id transaccion",
           ]}
@@ -103,54 +94,44 @@ const DtlMovComercio = () => {
             dtlCupo?.results.map(
               ({
                 pk_id_dtl_mov,
-                fk_id_comercio,
                 tipo_movimiento,
                 nombre,
                 valor_afectacion,
                 fecha_afectacion,
                 hora_afectacion,
-                cupo_antes_afectacion,
-                cupo_dsp_afectacion,
+                deuda_dsp_afectacion,
+                cupo_canje_dsp_afectacion,
                 usuario,
                 fk_id_trx,
               }) => ({
                 pk_id_dtl_mov,
-                fk_id_comercio,
                 tipo_movimiento,
                 nombre,
-                valor_afectacion,
+                valor_afectacion: formatMoney.format(valor_afectacion),
                 fecha_afectacion,
                 hora_afectacion,
-                cupo_antes_afectacion,
-                cupo_dsp_afectacion,
+                deuda_dsp_afectacion: formatMoney.format(deuda_dsp_afectacion),
+                cupo_canje_dsp_afectacion: formatMoney.format(
+                  cupo_canje_dsp_afectacion
+                ),
                 usuario,
                 fk_id_trx,
               })
             ) ?? []
           }
-          // onSelectRow={(e, i) => {
-          //     navegateValid(
-          //       `/cupo/cupo-comercio/detalles-cupo/${cupoComer?.results[i].pk_id_comercio}`
-          //     );
-          //     console.log(e, cupoComer?.results[i]);
-          //   }}
           onSetPageData={(pagedata) => {
             setPage(pagedata.page);
             setLimit(pagedata.limit);
           }}
           maxPage={dtlCupo?.maxPages}
         >
-          <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
+          <Form onChange={onChange} grid>
             <Input
               id="fecha_inico"
               name="fecha_inico"
               label="Fecha inico"
               type="datetime-local"
               autoComplete="off"
-              // minLength={"10"}
-              // maxLength={"10"}
-              // value={""}
-              // onInput={() => {}}
               required
             />
             <Input
@@ -159,18 +140,14 @@ const DtlMovComercio = () => {
               label="Fecha final"
               type="datetime-local"
               autoComplete="off"
-              // minLength={"10"}
-              // maxLength={"10"}
-              // value={""}
-              // onInput={() => {}}
               required
             />
             <Select
               label="Tipo de afectación"
               options={{
                 "": null,
-                "Cash-In": true,
-                "Cash-Out": false,
+                "Cash-In": false,
+                "Cash-Out": true,
               }}
               value={tipoAfectacion}
               /* required={true} */
@@ -194,6 +171,11 @@ const DtlMovComercio = () => {
             />
           </Form>
         </TableEnterprise>
+        <ButtonBar>
+          <Button type={"submit"} onClick={onSubmitDownload}>
+            Descargar reporte
+          </Button>
+        </ButtonBar>
       </Fragment>
     </div>
   );

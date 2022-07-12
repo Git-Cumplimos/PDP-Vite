@@ -59,11 +59,12 @@ const RecargarColCard = lazy(() =>
  */
 const cupo = lazy(() => import("../apps/Cupo/Cupo"));
 const DtlMovCupo = lazy(() =>
-  import("../apps/Cupo/Views/cupoCanje/DtlMovComercio")
+  import("../apps/Cupo/Views/LimiteCupo/DtlMovComercio")
 );
 const cupoComercio = lazy(() => import("../apps/Cupo/Views/CupoComer"));
 const CrearCupo = lazy(() => import("../apps/Cupo/Views/CrearCupo"));
 const ModifiCupo = lazy(() => import("../apps/Cupo/Views/ModifiLimiteCanje"));
+const AjusteCupo = lazy(() => import("../apps/Cupo/Views/AjusteCupoComer"));
 /**
  * Movii
  */
@@ -559,8 +560,14 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/cupo/modificar-cupo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Asignacion limite cupo y cupo en canje"} />,
+        label: <AppIcons Logo={"RECAUDO"} name={"Asignacion limite de cupo"} />,
         component: ModifiCupo,
+        permission: [1],
+      },
+      {
+        link: "/cupo/ajuste-deuda-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Ajuste deuda cupo"} />,
+        component: AjusteCupo,
         permission: [1],
       },
     ],

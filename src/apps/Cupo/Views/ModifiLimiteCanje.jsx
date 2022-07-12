@@ -1,18 +1,53 @@
-import React, { Fragment, useCallback, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
-import MoneyInput from "../../../components/Base/MoneyInput";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import Select from "../../../components/Base/Select";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
+import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
-import { postDtlCambioLimiteCanje } from "../utils/fetchCupo";
+import {
+  getConsultaAsignacionCupoLimite,
+  getConsultaCupoComercio,
+  postDtlCambioLimiteCanje,
+} from "../utils/fetchCupo";
 
 const ModifiLimiteCanje = () => {
   const [cambioCupo, setCambioCupo] = useState(1);
+  const [cupoComer, setCupoComer] = useState(null);
   const [valor, setValor] = useState(null);
   const [idComercio, setIdComercio] = useState(null);
-  const [usuario, setUsuario] = useState("juan");
+  const [asigLimite, setAsigLimite] = useState(null);
+  const [limiteCupo, setLimiteCupo] = useState(null);
+  const [usuario, setUsuario] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1);
+  const { roleInfo } = useAuth();
+
+  useEffect(() => {
+    getConsultaCupoComercio(idComercio)
+      .then((objUdusrio) => {
+        setCupoComer(objUdusrio);
+      })
+      .catch((reason) => {
+        notifyError("Error al cargar Datos ");
+      });
+    tablalimitecupo(idComercio, page, limit);
+  }, [idComercio, page, limit]);
+
+  const tablalimitecupo = (idComercio, page, limit) => {
+    getConsultaAsignacionCupoLimite(idComercio, page, limit)
+      .then((objUdusrio) => {
+        setAsigLimite(objUdusrio);
+      })
+      .catch((reason) => {
+        console.log(reason.message);
+        notifyError("Error al cargar Datos ");
+      });
+  };
+
   const onChange = useCallback((ev) => {
     // if (ev.target.name === "valor") {
     //   setValor(ev.target.value);
@@ -21,78 +56,125 @@ const ModifiLimiteCanje = () => {
       setIdComercio(ev.target.value);
     }
   }, []);
+
   const onSubmitDeposit = useCallback(
     (e) => {
       e.preventDefault();
-
       const body = {
-        valor: valor,
-        id_comercio: idComercio,
-        usuario: usuario,
-        id_tipo_cupo_modificado: cambioCupo,
+        fk_id_comercio: idComercio,
+        valor_afectacion: valor,
+        usuario: roleInfo.id_usuario,
       };
       postDtlCambioLimiteCanje(body)
         .then((res) => {
           if (!res?.status) {
-            notifyError("Balance cupo es menor al nuevo limite de cupo");
+            notifyError("Error al asignar limite de cupo");
             return;
           }
           notify("Modificacion exitosa");
+          tablalimitecupo(idComercio, page, limit);
         })
         .catch((r) => {
           console.error(r.message);
           notifyError("Error al modificar cupo");
         });
-      console.log(body);
     },
-    [cambioCupo, valor, idComercio]
+    [idComercio, valor]
   );
   const onMoneyChange = useCallback((e, valor) => {
-    setValor("-" + valor);
+    setValor(valor);
   }, []);
   return (
-    <div>
-      <Fragment>
-        <h1 className="text-3xl mt-6">Modificar cupo Comercios</h1>
-        <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
-          <Input
-            id="Id comercio"
-            name="Id comercio"
-            label="Id comercio"
-            type="number"
-            autoComplete="off"
-            // minLength={"10"}
-            // maxLength={"10"}
-            // value={""}
-            onInput={() => {}}
-            required
-          />
-          <MoneyInput
-            id="valor"
-            name="valor"
-            label="Valor a cambiar"
-            autoComplete="off"
-            onInput={onMoneyChange}
-            required
-          />
-          <Select
-            label="Cupo a modificar"
-            options={{
-              "Limite de cupo": 1,
-              "Cupo en canje": 2,
+    <Fragment>
+      <h1 className="text-3xl mt-6">Asignación límite cupo</h1>
+      <Form onChange={onChange} grid>
+        <Input
+          id="Id comercio"
+          name="Id comercio"
+          label="Id comercio"
+          type="number"
+          autoComplete="off"
+          // minLength={"10"}
+          // maxLength={"10"}
+          // value={""}
+          onInput={() => {}}
+          required
+        />
+        <ButtonBar></ButtonBar>
+      </Form>
+      {cupoComer?.results.length === 1 ? (
+        <Fragment>
+          <Form onSubmit={onSubmitDeposit} grid>
+            <MoneyInput
+              id="cupo_limite"
+              name="cupo_limite"
+              label="Limite de cupo"
+              autoComplete="off"
+              defaultValue={parseInt(cupoComer?.results[0].limite_cupo)}
+              onInput={onMoneyChange}
+              required
+            />
+            <MoneyInput
+              id="deuda"
+              name="deuda"
+              label="Deuda del comercio"
+              autoComplete="off"
+              value={parseInt(cupoComer?.results[0].deuda)}
+              required
+            />
+            <MoneyInput
+              id="cupo_en_canje"
+              name="cupo_en_canje"
+              label="Cupo en canje"
+              autoComplete="off"
+              value={parseInt(cupoComer?.results[0].cupo_en_canje)}
+              required
+            />
+            <ButtonBar className={"lg:col-span-2"}>
+              <Button type={"submit"}>Asignar límite cupo</Button>
+            </ButtonBar>
+          </Form>
+          <TableEnterprise
+            title="Cupo Comercios"
+            headers={[
+              "Id comercio",
+              "Valor Afectacion",
+              "Fecha afectacion",
+              "Limite de Cupo",
+              "Usuario",
+            ]}
+            data={
+              asigLimite?.results.map(
+                ({
+                  fk_id_comercio,
+                  valor_afectacion,
+                  fecha,
+                  limite_cupo_dsp_afectacion,
+                  usuario,
+                }) => ({
+                  fk_id_comercio,
+                  valor_afectacion: formatMoney.format(valor_afectacion),
+                  fecha,
+                  limite_cupo_dsp_afectacion: formatMoney.format(
+                    limite_cupo_dsp_afectacion
+                  ),
+                  usuario,
+                })
+              ) ?? []
+            }
+            onSelectRow={(e, i) => {}}
+            onSetPageData={(pagedata) => {
+              setPage(pagedata.page);
+              setLimit(pagedata.limit);
             }}
-            value={cambioCupo}
-            /* required={true} */
-            onChange={(e) => {
-              setCambioCupo(e.target.value);
-            }}
-          />
-          <ButtonBar className={"lg:col-span-2"}>
-            <Button type={"submit"}>Realizar cambio cupo</Button>
-          </ButtonBar>
-        </Form>
-      </Fragment>
-    </div>
+            maxPage={asigLimite?.maxPages}
+          ></TableEnterprise>
+        </Fragment>
+      ) : (
+        <h1 className="text-3xl mt-6">Ingrese un Id de comercio existente</h1>
+        // notifyError("Id de comercio no existe")
+      )}
+    </Fragment>
   );
 };
 
