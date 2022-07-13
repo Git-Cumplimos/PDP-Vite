@@ -1,8 +1,9 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlCupo = `http://127.0.0.1:5000/servicio-cupo`;
+const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}`;
 
 export const getConsultaCupoComercio = async (pk_id_comercio, page, limit) => {
+  console.log(urlCupo);
   const busqueda = {};
   if (pk_id_comercio) {
     busqueda.pk_id_comercio = pk_id_comercio;
@@ -179,7 +180,7 @@ export const PeticionDescargar = async (parametro) => {
       .get("Content-Disposition")
       .slice(22, -1);
     if (
-      contentType ==
+      contentType ===
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ) {
       const byts = await response.blob();
@@ -193,7 +194,7 @@ export const PeticionDescargar = async (parametro) => {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-    } else if (contentType == "application/json") {
+    } else if (contentType === "application/json") {
       const json = await response.json();
       if (!json?.status) {
         console.error(json?.msg);
@@ -229,7 +230,7 @@ export const PeticionDescargarPdf = async (
     const nombreDocumento = response.headers
       .get("Content-Disposition")
       .slice(22, -1);
-    if (contentType == "application/pdf") {
+    if (contentType === "application/pdf") {
       const byts = await response.blob();
       const downloadUrl = URL.createObjectURL(byts);
       const a = document.createElement("a");
@@ -238,7 +239,7 @@ export const PeticionDescargarPdf = async (
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-    } else if (contentType == "application/json") {
+    } else if (contentType === "application/json") {
       const json = await response.json();
       if (!json?.status) {
         console.error(json?.msg);

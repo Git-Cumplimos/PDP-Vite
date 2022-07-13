@@ -534,13 +534,13 @@ const allUrlsPrivateApps = [
     link: "/cupo",
     label: <AppIcons Logo={"RECAUDO"} name={"Detalles Cupo"} />,
     component: cupo,
-    permission: [1],
+    permission: [59, 60, 61, 62],
     subRoutes: [
       {
         link: "/cupo/cupo-comercio",
         label: <AppIcons Logo={"RECAUDO"} name={"Cupo comercios"} />,
         component: cupoComercio,
-        permission: [1],
+        permission: [62],
         subRoutes: [
           {
             link: "/cupo/cupo-comercio/detalles-cupo/:id_comercio",
@@ -548,7 +548,7 @@ const allUrlsPrivateApps = [
               <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />
             ),
             component: DtlMovCupo,
-            permission: [1],
+            permission: [62],
           },
         ],
       },
@@ -556,19 +556,19 @@ const allUrlsPrivateApps = [
         link: "/cupo/crear-cupo",
         label: <AppIcons Logo={"RECAUDO"} name={"Crear cupo"} />,
         component: CrearCupo,
-        permission: [1],
+        permission: [61],
       },
       {
         link: "/cupo/modificar-cupo",
         label: <AppIcons Logo={"RECAUDO"} name={"Asignacion limite de cupo"} />,
         component: ModifiCupo,
-        permission: [1],
+        permission: [60],
       },
       {
         link: "/cupo/ajuste-deuda-cupo",
         label: <AppIcons Logo={"RECAUDO"} name={"Ajuste deuda cupo"} />,
         component: AjusteCupo,
-        permission: [1],
+        permission: [59],
       },
     ],
   },

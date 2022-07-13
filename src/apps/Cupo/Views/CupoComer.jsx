@@ -64,7 +64,6 @@ const CupoComer = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Consulta cupo comercio</h1>
-      <ButtonBar></ButtonBar>
 
       {roleInfo?.id_comercio ? (
         ""
@@ -82,38 +81,35 @@ const CupoComer = () => {
             onInput={() => {}}
             required
           />
+          <ButtonBar></ButtonBar>
         </Form>
       )}
+
+      <TableEnterprise
+        title="Cupo Comercios"
+        headers={["Id comercio", "Cupo Limite", "Deuda Cupo", "Cupo en Canje"]}
+        data={
+          cupoComer?.results.map(
+            ({ pk_id_comercio, limite_cupo, deuda, cupo_en_canje }) => ({
+              pk_id_comercio,
+              limite_cupo: formatMoney.format(limite_cupo),
+              deuda: formatMoney.format(deuda),
+              cupo_en_canje: formatMoney.format(cupo_en_canje),
+            })
+          ) ?? []
+        }
+        onSelectRow={(e, i) => {
+          navegateValid(
+            `/cupo/cupo-comercio/detalles-cupo/${cupoComer?.results[i].pk_id_comercio}`
+          );
+        }}
+        onSetPageData={(pagedata) => {
+          setPage(pagedata.page);
+          setLimit(pagedata.limit);
+        }}
+        maxPage={cupoComer?.maxPages}
+      ></TableEnterprise>
       <Form>
-        <TableEnterprise
-          title="Cupo Comercios"
-          headers={[
-            "Id comercio",
-            "Cupo Limite",
-            "Deuda Cupo",
-            "Cupo en Canje",
-          ]}
-          data={
-            cupoComer?.results.map(
-              ({ pk_id_comercio, limite_cupo, deuda, cupo_en_canje }) => ({
-                pk_id_comercio,
-                limite_cupo: formatMoney.format(limite_cupo),
-                deuda: formatMoney.format(deuda),
-                cupo_en_canje: formatMoney.format(cupo_en_canje),
-              })
-            ) ?? []
-          }
-          onSelectRow={(e, i) => {
-            navegateValid(
-              `/cupo/cupo-comercio/detalles-cupo/${cupoComer?.results[i].pk_id_comercio}`
-            );
-          }}
-          onSetPageData={(pagedata) => {
-            setPage(pagedata.page);
-            setLimit(pagedata.limit);
-          }}
-          maxPage={cupoComer?.maxPages}
-        ></TableEnterprise>
         <ButtonBar className={"lg col-span-2"}>
           <Button
             type={"submit"}
