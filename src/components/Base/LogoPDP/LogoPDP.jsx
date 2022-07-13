@@ -14,7 +14,7 @@ const LogoPDP = memo(({ large = false, small = false, xsmall = false }) => {
         xsmall ? xsImg : ""
       } ${!large && !small && !xsmall ? small : ""}`}
     >
-      <div className="aspect-w-13 aspect-h-7">
+      <div className="aspect-w-16 aspect-h-9">
         <img src={LogoPng} alt="Logo punto de pago" />
       </div>
     </div>

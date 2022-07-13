@@ -4,7 +4,6 @@ const images = {
   BANNER2: `${urlAssets}/assets/img/BANNER2.jpg`,
   COLPENSIONES: `${urlAssets}/assets/img/COLPENSIONES.jpg`,
   pdpHorizontal: `${urlAssets}/assets/img/LogofinalPDP.svg`,
-  pdpVertical: `${urlAssets}/assets/img/LogofinalPDP.svg`,
   Loteria_de_Bogota: `${urlAssets}/assets/img/Loteria_de_Bogota.png`,
   personas: `${urlAssets}/assets/img/personas.png`,
 };
