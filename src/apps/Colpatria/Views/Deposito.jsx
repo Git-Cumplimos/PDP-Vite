@@ -14,7 +14,6 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
-// import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import Select from "../../../components/Base/Select";
 import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
@@ -23,23 +22,13 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import useMoney from "../../../hooks/useMoney";
 import { makeDeposit } from "../utils/fetchFunctions";
 
-import { notifyError } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 import {
   makeMoneyFormatter,
   onChangeAccountNumber,
   onChangeNumber,
   toAccountNumber,
 } from "../../../utils/functions";
-
-const keys = [
-  "id_comercio",
-  "id_usuario",
-  "tipo_comercio",
-  "id_dispositivo",
-  "ciudad",
-  "direccion",
-  "codigo_dane",
-];
 
 const accountTypes = {
   10: "Cuenta ahorros",
@@ -52,10 +41,12 @@ const formatMoney = makeMoneyFormatter(2);
 const Deposito = () => {
   const navigate = useNavigate();
 
-  const { roleInfo } = useAuth();
+  const { roleInfo, infoTicket } = useAuth();
 
   const [userDocument, setUserDocument] = useState("");
-  const [userAddress, setUserAddress] = useState(roleInfo?.direccion ?? "");
+  const [userAddress /* , setUserAddress */] = useState(
+    roleInfo?.direccion ?? ""
+  );
   const [accountNumber, setAccountNumber] = useState("");
   const [accountType, setAccountType] = useState("");
   const [valDeposito, setValDeposito] = useState(0);
@@ -115,21 +106,70 @@ const Deposito = () => {
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
-            city: roleInfo?.ciudad,
+            city: roleInfo?.ciudad.substring(0, 8),
             state: roleInfo?.codigo_dane.substring(0, 2),
           },
           valor: valDeposito,
         },
       };
       sendDeposit(data)
-        .then((res) => {})
+        .then((res) => {
+          notify("Transaccion satisfactoria");
+          const trx_id = res?.obj?.id_trx ?? 0;
+          const id_type_trx = res?.obj?.id_type_trx ?? 0;
+          const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
+          const tempTicket = {
+            title: "Recibo de deposito",
+            timeInfo: {
+              "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+                year: "2-digit",
+                month: "2-digit",
+                day: "2-digit",
+              }).format(new Date()),
+              Hora: Intl.DateTimeFormat("es-CO", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              }).format(new Date()),
+            },
+            commerceInfo: [
+              ["Id Comercio", roleInfo?.id_comercio],
+              ["No. terminal", roleInfo?.id_dispositivo],
+              ["Municipio", roleInfo?.ciudad],
+              ["Dirección", roleInfo?.direccion],
+              ["Id Trx", trx_id],
+              ["codigo autorizacion", codigo_autorizacion],
+              // ["Id Transacción", res?.obj?.IdTransaccion],
+            ],
+            commerceName: "Colpatria",
+            trxInfo: [
+              ["Tipo de cuenta", accountTypes?.[accountType] ?? "No type"],
+              ["", ""],
+              ["Numero de cuenta", toAccountNumber(accountNumber)],
+              ["", ""],
+              ["C.C. del depositante", userDocument],
+              ["", ""],
+              ["Valor de deposito", formatMoney.format(valDeposito)],
+              ["", ""],
+            ],
+            disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+          };
+          setPaymentStatus(tempTicket);
+          infoTicket(trx_id, id_type_trx, tempTicket)
+            .then((resTicket) => {
+              console.log(resTicket);
+            })
+            .catch((err) => {
+              console.error(err);
+              notifyError("Error guardando el ticket");
+            });
+        })
         .catch((err) => {
-          console.log(Object.getOwnPropertyNames(err));
-          console.error(err.message);
           if (err?.cause === "custom") {
             notifyError(err?.message);
             return;
           }
+          console.error(err?.message);
         });
     },
     [
@@ -140,6 +180,7 @@ const Deposito = () => {
       userAddress,
       valDeposito,
       roleInfo,
+      infoTicket,
     ]
   );
 
@@ -175,21 +216,29 @@ const Deposito = () => {
   /**
    * Check if has commerce data
    */
-  if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
-    return <Navigate to={"/"} replace />;
-  }
 
-  let hasKeys = true;
-  for (const key of keys) {
-    if (!(key in roleInfo)) {
-      hasKeys = false;
-      break;
+  const hasData = useMemo(() => {
+    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
+      return false;
     }
-  }
-  if (!hasKeys) {
-    notifyError(
-      "El usuario no cuenta con datos de comercio, no se permite la transaccion"
-    );
+    const keys = [
+      "id_comercio",
+      "id_usuario",
+      "tipo_comercio",
+      "id_dispositivo",
+      "ciudad",
+      "direccion",
+      "codigo_dane",
+    ];
+    for (const key of keys) {
+      if (!(key in roleInfo)) {
+        return false;
+      }
+    }
+    return true;
+  }, [roleInfo]);
+
+  if (!hasData) {
     return <Navigate to={"/"} replace />;
   }
 
@@ -257,14 +306,14 @@ const Deposito = () => {
       </Form>
       <Modal
         show={showModal}
-        handleClose={paymentStatus ? () => {} : false ? () => {} : handleClose}
+        handleClose={paymentStatus ? () => {} : handleClose}
       >
-        {false ? (
+        {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <Tickets refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/")}>Cerrar</Button>
+              <Button onClick={() => navigate("/colpatria")}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
