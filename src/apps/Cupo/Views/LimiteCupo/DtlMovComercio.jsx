@@ -91,6 +91,7 @@ const DtlMovComercio = () => {
             "Cupo canje",
             "usuario",
             "Id transaccion",
+            "Descripcion afectacion",
           ]}
           data={
             dtlCupo?.results.map(
@@ -105,6 +106,7 @@ const DtlMovComercio = () => {
                 cupo_canje_dsp_afectacion,
                 usuario,
                 fk_id_trx,
+                motivo_afectacion,
               }) => ({
                 pk_id_dtl_mov,
                 tipo_movimiento,
@@ -118,6 +120,7 @@ const DtlMovComercio = () => {
                 ),
                 usuario,
                 fk_id_trx,
+                motivo_afectacion,
               })
             ) ?? []
           }
