@@ -61,6 +61,17 @@ const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
 /**
+ * Cupo
+ */
+const cupo = lazy(() => import("../apps/Cupo/Cupo"));
+const DtlMovCupo = lazy(() =>
+  import("../apps/Cupo/Views/LimiteCupo/DtlMovComercio")
+);
+const cupoComercio = lazy(() => import("../apps/Cupo/Views/CupoComer"));
+const CrearCupo = lazy(() => import("../apps/Cupo/Views/CrearCupo"));
+const ModifiCupo = lazy(() => import("../apps/Cupo/Views/ModifiLimiteCanje"));
+const AjusteCupo = lazy(() => import("../apps/Cupo/Views/AjusteCupoComer"));
+/**
  * Movii
  */
 const MoviiPDP = lazy(() => import("../apps/Movii-pdp/MoviiPDP"));
@@ -312,6 +323,17 @@ const TypesTrxs = lazy(() =>
  */
 
 const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
+
+/**
+ * RecargasMovistar
+ */
+const Movistar = lazy(() => import("../apps/Movistar/Movistar"));
+const RecargasMovistar = lazy(() =>
+  import("../apps/Movistar/Views/RecargasMovistar.jsx")
+);
+const ConcilacionMovistar = lazy(() =>
+  import("../apps/Movistar/Views/ConcilacionMovistar")
+);
 
 const CARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_1-P9wrhr8RWkx5zt3f64Ogy-Yr5DoQ_5ww&usqp=CAU";
@@ -604,6 +626,48 @@ const allUrlsPrivateApps = [
     ],
   },
   {
+    link: "/cupo",
+    label: <AppIcons Logo={"RECAUDO"} name={"Detalles Cupo"} />,
+    component: cupo,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/cupo/cupo-comercio",
+        label: <AppIcons Logo={"RECAUDO"} name={"Cupo comercios"} />,
+        component: cupoComercio,
+        permission: [1],
+        subRoutes: [
+          {
+            link: "/cupo/cupo-comercio/detalles-cupo/:id_comercio",
+            label: (
+              <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />
+            ),
+            component: DtlMovCupo,
+            permission: [1],
+          },
+        ],
+      },
+      {
+        link: "/cupo/crear-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Crear cupo"} />,
+        component: CrearCupo,
+        permission: [1],
+      },
+      {
+        link: "/cupo/modificar-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Asignacion limite de cupo"} />,
+        component: ModifiCupo,
+        permission: [1],
+      },
+      {
+        link: "/cupo/ajuste-deuda-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Ajuste deuda cupo"} />,
+        component: AjusteCupo,
+        permission: [1],
+      },
+    ],
+  },
+  {
     link: "/daviplata",
     label: <AppIcons Logo={"MARKETPLACE"} name='Daviplata' />,
     component: Daviplata,
@@ -793,8 +857,28 @@ const allUrlsPrivateApps = [
     ],
   },
   {
+    link: "/movistar",
+    label: <AppIcons Logo={"LOTERIA"} name="Movistar" />,
+    component: Movistar,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/movistar/recargas-movistar-full",
+        label: <AppIcons Logo={"SORTEOS"} name="Recargas Movistar " />,
+        component: RecargasMovistar,
+        permission: [1],
+      },
+      {
+        link: "/movistar/concilacion",
+        label: <AppIcons Logo={"SORTEOS"} name="Conciliación" />,
+        component: ConcilacionMovistar,
+        permission: [1],
+      },
+    ],
+  },
+  {
     link: "/movii-pdp",
-    label: <AppIcons Logo={"LOTERIA"} name='MOVII PDP' />,
+    label: <AppIcons Logo={"LOTERIA"} name="MOVII PDP" />,
     component: MoviiPDP,
     permission: [48],
     subRoutes: [
