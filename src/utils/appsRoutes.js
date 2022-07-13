@@ -313,6 +313,17 @@ const TypesTrxs = lazy(() =>
 
 const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
 
+/**
+ * RecargasMovistar
+ */
+const Movistar = lazy(() => import("../apps/Movistar/Movistar"));
+const RecargasMovistar = lazy(() =>
+  import("../apps/Movistar/Views/RecargasMovistar.jsx")
+);
+const ConcilacionMovistar = lazy(() =>
+  import("../apps/Movistar/Views/ConcilacionMovistar")
+);
+
 const CARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_1-P9wrhr8RWkx5zt3f64Ogy-Yr5DoQ_5ww&usqp=CAU";
 const DESCARGAR =
@@ -793,8 +804,28 @@ const allUrlsPrivateApps = [
     ],
   },
   {
+    link: "/movistar",
+    label: <AppIcons Logo={"LOTERIA"} name="Movistar" />,
+    component: Movistar,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/movistar/recargas-movistar-full",
+        label: <AppIcons Logo={"SORTEOS"} name="Recargas Movistar " />,
+        component: RecargasMovistar,
+        permission: [1],
+      },
+      {
+        link: "/movistar/concilacion",
+        label: <AppIcons Logo={"SORTEOS"} name="Conciliación" />,
+        component: ConcilacionMovistar,
+        permission: [1],
+      },
+    ],
+  },
+  {
     link: "/movii-pdp",
-    label: <AppIcons Logo={"LOTERIA"} name='MOVII PDP' />,
+    label: <AppIcons Logo={"LOTERIA"} name="MOVII PDP" />,
     component: MoviiPDP,
     permission: [48],
     subRoutes: [
