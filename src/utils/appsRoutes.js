@@ -61,6 +61,17 @@ const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
 /**
+ * Cupo
+ */
+const cupo = lazy(() => import("../apps/Cupo/Cupo"));
+const DtlMovCupo = lazy(() =>
+  import("../apps/Cupo/Views/LimiteCupo/DtlMovComercio")
+);
+const cupoComercio = lazy(() => import("../apps/Cupo/Views/CupoComer"));
+const CrearCupo = lazy(() => import("../apps/Cupo/Views/CrearCupo"));
+const ModifiCupo = lazy(() => import("../apps/Cupo/Views/ModifiLimiteCanje"));
+const AjusteCupo = lazy(() => import("../apps/Cupo/Views/AjusteCupoComer"));
+/**
  * Movii
  */
 const MoviiPDP = lazy(() => import("../apps/Movii-pdp/MoviiPDP"));
@@ -611,6 +622,48 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"RECAUDO"} name={"Recaudo codigo de barras"} />,
         component: RecaudoCodigo,
         permission: [23],
+      },
+    ],
+  },
+  {
+    link: "/cupo",
+    label: <AppIcons Logo={"RECAUDO"} name={"Detalles Cupo"} />,
+    component: cupo,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/cupo/cupo-comercio",
+        label: <AppIcons Logo={"RECAUDO"} name={"Cupo comercios"} />,
+        component: cupoComercio,
+        permission: [1],
+        subRoutes: [
+          {
+            link: "/cupo/cupo-comercio/detalles-cupo/:id_comercio",
+            label: (
+              <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />
+            ),
+            component: DtlMovCupo,
+            permission: [1],
+          },
+        ],
+      },
+      {
+        link: "/cupo/crear-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Crear cupo"} />,
+        component: CrearCupo,
+        permission: [1],
+      },
+      {
+        link: "/cupo/modificar-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Asignacion limite de cupo"} />,
+        component: ModifiCupo,
+        permission: [1],
+      },
+      {
+        link: "/cupo/ajuste-deuda-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Ajuste deuda cupo"} />,
+        component: AjusteCupo,
+        permission: [1],
       },
     ],
   },
