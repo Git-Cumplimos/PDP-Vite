@@ -152,7 +152,7 @@ const BuscarCedulaPpsADemanda = () => {
               placeholder={"Ingrese N° Identificación"}
               value={buscarCedula}
               onInput={(e) => {
-                const num = e.target.value || "";
+                const num = parseInt(e.target.value) || "";
                 setBuscarCedula(num);
               }}
               minLength="6"
