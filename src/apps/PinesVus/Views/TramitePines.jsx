@@ -12,6 +12,7 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 import UsarPinForm from "../components/UsarPinForm/UsarPinForm";
 import CancelPin from "../components/CancelPinForm/CancelPinForm";
 import { useNavigate } from "react-router-dom";
+import { enumParametrosPines } from "../utils/enumParametrosPines";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -45,6 +46,9 @@ const TramitePines = () => {
   const [valor, setValor] = useState("");
   const [id_trx, setId_trx] = useState("");
   const [tipoPin, setTipoPin] = useState("");
+  const [valor_tramite, setValor_tramite] = useState("");
+  const [name_tramite, setName_tramite] = useState("");
+  const [id_pin, setId_pin] = useState("")
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -115,12 +119,13 @@ const TramitePines = () => {
               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
               setFormatMon(row?.ValorPagar);
               return {
-                Id: row?.id_pin,
+                // Id: row?.id_pin,
                 Cedula: row?.doc_cliente,
                 Estado: row?.name_estado_pin,
-                "Codigo Estado": row?.estado_pin,
+                // "Codigo Estado": row?.estado_pin,
                 Vencimiento: dateFormatter.format(fecha_vencimiento),
-                Valor: formatMoney.format(row?.valor),
+                Tramite: row?.name_tramite,
+                Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite), // Solo pin tiene iva
               };
             })
           );
@@ -128,6 +133,9 @@ const TramitePines = () => {
           setValor(res?.obj?.results?.[0]?.valor);
           setId_trx(res?.obj?.results?.[0]?.id_trx?.creacion);
           setTipoPin(res?.obj?.results?.[0]?.tipo_pin);
+          setValor_tramite(res?.obj?.results?.[0]?.valor_tramite);
+          setName_tramite(res?.obj?.results?.[0]?.name_tramite);
+          setId_pin(res?.obj?.results?.[0]?.id_pin)
         }
       })
       .catch((err) => console.log("error", err));
@@ -137,7 +145,32 @@ const TramitePines = () => {
     setModalUsar(true);
   };
 
-  console.log(activarNavigate);
+  const hora = useMemo(() => {    
+    return Intl.DateTimeFormat("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).format(new Date())
+  }, [parametroBusqueda, table]);
+
+  useEffect(() => {
+    const horaCierre = enumParametrosPines.horaCierre.split(":")
+    const horaActual = hora.split(":")
+    const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
+    const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
+    console.log(deltaHora, deltaMinutos)
+    if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
+      notifyError("Modulo cerrado a partir de las " + enumParametrosPines.horaCierre)
+      navigate("/PinesVus");
+    }
+    else if ((deltaHora ===1 & deltaMinutos<-50)){
+      notifyError("El modulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
+    }
+    else if ((deltaHora ===0 & deltaMinutos<10)){
+      notifyError("El modulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
+    }
+
+  }, [hora,parametroBusqueda, table])
   return (
     <>
       {"id_comercio" in roleInfo ? (
@@ -177,16 +210,15 @@ const TramitePines = () => {
             title="Información de credito"
             maxPage={maxPages}
             headers={[
-              "Id",
               "Cedula",
               "Estado",
-              "Codigo Estado",
               "Vencimiento",
+              "Tramite",
               "Valor",
             ]}
             data={table || []}
             onSelectRow={(e, index) => {
-              if (table[index]["Codigo Estado"] !== 1) {
+              if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Pin creado-No cancelable")) {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
@@ -204,31 +236,56 @@ const TramitePines = () => {
             <div className="flex flex-col w-1/2 mx-auto ">
               <h1 className="text-3xl mt-3 mx-auto">Datos del Pin</h1>
               <br></br>
-              {Object.entries(selected).map(([key, val]) => {
-                return (
-                  <>
-                    <div
-                      className="flex flex-row justify-between text-lg font-medium"
-                      key={key}
-                    >
-                      <h1>{key}</h1>
-                      <h1>{val}</h1>
-                    </div>
-                  </>
-                );
-              })}
+            <h1 className="flex flex-row justify-center text-lg font-medium">{name_tramite}</h1>
+            <br></br>
+            <>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Tramite</h1>
+                <h1>{formatMoney.format(valor_tramite)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Iva Tramite</h1>
+                <h1>{formatMoney.format(0)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Pin</h1>
+                <h1>{formatMoney.format(valor)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Iva Pin</h1>
+                <h1>{formatMoney.format(valor*0.19)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Total</h1>
+                <h1>{formatMoney.format(valor*1.19 + valor_tramite)}</h1>
+              </div>
+            </>
             </div>
             <div className="flex flex-col justify-center items-center mx-auto container">
               <Form onSubmit={onSubmitUsar}>
                 <ButtonBar>
                   <Button type="submit">Usar pin</Button>
+                  {selected.Estado==="Pin creado" ? 
                   <Button
-                    onClick={() => {
-                      setModalCancel(true);
-                    }}
-                  >
-                    Cancelar pin
-                  </Button>
+                  onClick={() => {
+                    setModalCancel(true);
+                  }}
+                >
+                  Cancelar pin
+                </Button>
+                :
+                ""}
+                  
                 </ButtonBar>
               </Form>
             </div>
@@ -240,6 +297,9 @@ const TramitePines = () => {
           <UsarPinForm
             respPin={selected}
             valor={valor}
+            valor_tramite={valor_tramite}
+            name_tramite = {name_tramite}
+            id_pin = {id_pin}
             trx={id_trx}
             tipoPin={tipoPin}
             setActivarNavigate={setActivarNavigate}
@@ -252,6 +312,9 @@ const TramitePines = () => {
           <CancelPin
             respPin={selected}
             valor={valor}
+            valor_tramite={valor_tramite}
+            name_tramite = {name_tramite}
+            id_pin = {id_pin}
             trx={id_trx}
             tipoPin={tipoPin}
             setActivarNavigate={setActivarNavigate}

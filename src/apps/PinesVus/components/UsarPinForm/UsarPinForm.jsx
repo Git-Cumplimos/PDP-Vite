@@ -19,7 +19,10 @@ const UsarPinForm = ({
   respPin,
   closeModal,
   trx,
+  valor_tramite,
+  name_tramite,
   valor,
+  id_pin,
   tipoPin,
   setActivarNavigate,
 }) => {
@@ -56,7 +59,7 @@ const UsarPinForm = ({
   const [disabledBtn, setDisabledBtn] = useState(false);
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: "Recibo de pago: " + name_tramite,
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -98,7 +101,7 @@ const UsarPinForm = ({
   const onSubmitUsar = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    usarPinVus(respPin, valor, trx, num_tramite, roleInfo)
+    usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin) // Pin + IVA
       .then((res) => {
         setNum_tramite("");
         setActivarNavigate(false);
@@ -121,7 +124,41 @@ const UsarPinForm = ({
           <div className="flex flex-col w-1/2 mx-auto">
             <h1 className="text-3xl mt-3 mx-auto">Usar Pin</h1>
             <br></br>
-            {Object.entries(respPin).map(([key, val]) => {
+            <h1 className="flex flex-row justify-center text-lg font-medium">{name_tramite}</h1>
+            <br></br>
+            <>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Tramite</h1>
+                <h1>{formatMoney.format(valor_tramite)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>IVa Tramite</h1>
+                <h1>{formatMoney.format(0)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Pin</h1>
+                <h1>{formatMoney.format(valor)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>IVa Pin</h1>
+                <h1>{formatMoney.format(valor*0.19)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Total</h1>
+                <h1>{formatMoney.format(valor*1.19 + valor_tramite)}</h1>
+              </div>
+            </>
+            {/* {Object.entries(respPin).map(([key, val]) => {
               return (
                 <>
                   <div
@@ -133,7 +170,7 @@ const UsarPinForm = ({
                   </div>
                 </>
               );
-            })}
+            })} */}
           </div>
 
           <Form onSubmit={onSubmitUsar}>

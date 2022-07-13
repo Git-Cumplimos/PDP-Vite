@@ -13,6 +13,7 @@ import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 import classes from "./ModificarPpsVoluntario.module.css";
 import { useNavigate } from "react-router-dom";
+import MoneyInput from "../../../components/Base/MoneyInput";
 
 const ModificarPps = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
@@ -146,28 +147,48 @@ const ModificarPps = () => {
     e.preventDefault();
     if (cantNumCel == 10 /* */) {
       if (valueAmount >= 5000 && valueAmount <= 149000) {
-        fetchData(
-          `${url}/domicilio`,
-          "PUT",
-          { identificacion: buscarCedula },
-          {
-            value_amount: valueAmount,
-            celular: celular.toString(),
-            num_pago_pdp: numPagosPdp,
-            estado: estadoComercioString,
-          },
-          {},
-          {}
-        ).then((respuesta) => {
-          console.log(respuesta);
-          if (respuesta?.msg === "El usuario ha sido modificado exitosamente") {
-            notify("El usuario ha sido modificado exitosamente");
-            navigate(`/domiciliacion`);
-          } else {
-            notifyError("El usuario no ha sido modificado exitosamente");
-            navigate(`/domiciliacion`);
-          }
-        });
+        if (String(celular).charAt(0) === "3") {
+          fetchData(
+            `${url}/domicilio`,
+            "PUT",
+            { identificacion: buscarCedula },
+            {
+              value_amount: valueAmount,
+              celular: celular.toString(),
+              num_pago_pdp: numPagosPdp,
+              estado: estadoComercioString,
+            },
+            {},
+            {}
+          )
+            .then((respuesta) => {
+              console.log(respuesta);
+              if (
+                respuesta?.msg === "El usuario ha sido modificado exitosamente"
+              ) {
+                notify("El usuario ha sido modificado exitosamente");
+                navigate(`/domiciliacion`);
+              } else if (
+                respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
+              ) {
+                notifyError("El valor a aportar debe ser múltiplo de 100");
+                /* navigate(`/domiciliacion`); */
+              } else {
+                notifyError("El usuario no ha sido modificado exitosamente");
+                navigate(`/domiciliacion`);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              notifyError("Error al modificar");
+            });
+        } else {
+          console.log("no es 3");
+          notifyError(
+            "Numero invalido, el N° de celular debe comenzar con el número 3."
+          );
+          /* setDisabledBtn(false); */
+        }
       } else {
         notifyError(
           "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
@@ -185,7 +206,7 @@ const ModificarPps = () => {
           minLength="5"
           maxLength="10"
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
+            const num = e.target.value || "";
             setBuscarCedula(num);
           }}
           type={"text"}
@@ -205,10 +226,10 @@ const ModificarPps = () => {
           handleClose={handleCloseUsuarioNoEncontrado}
         >
           <div className={contenedorLogo}>
-            <LogoPDP small></LogoPDP>
+            <LogoPDP xsmall></LogoPDP>
           </div>
           <span className={tituloNotificacion}>
-            No se puede realizar la modificacíon, el número de documento no se
+            No se puede realizar la modificación, el número de documento no se
             encuentra domiciliado.
           </span>
         </Modal>
@@ -218,7 +239,7 @@ const ModificarPps = () => {
       {Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
         <Modal show={showModal} handleClose={handleClose}>
           <div className={contenedorLogo}>
-            <LogoPDP small></LogoPDP>
+            <LogoPDP xsmall></LogoPDP>
           </div>
           <Form onSubmit={(e) => ModificarGuardar(e)}>
             <PaymentSummary
@@ -235,7 +256,7 @@ const ModificarPps = () => {
               Numero De Identificación: {datosConsulta[0]?.identificacion ?? ""}
             </ul>
             <Fieldset legend="Modificar Domiciliación">
-              <Input
+              {/*  <Input
                 label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}
                 value={valueAmount}
@@ -247,29 +268,43 @@ const ModificarPps = () => {
                 }}
                 type={"text"}
                 required
-              ></Input>
-
-              <Input
-                label={"N° Célular"}
-                placeholder={"Ingrese su número célular"}
-                value={celular}
+              ></Input> */}
+              <MoneyInput
+                label={"Valor Aportar"}
+                placeholder={"Ingrese Valor Aportar"}
+                value={valueAmount}
+                minLength="6"
+                maxLength="9"
                 onInput={(e) => {
-                  const num = parseInt(e.target.value) || "";
-
-                  if (parseInt(String(num)[0]) == 3) {
-                    const num = parseInt(e.target.value) || "";
-                    setCelular(num);
-                  } else {
-                    if (parseInt(String(num)[0]) != 3) {
-                      notifyError("El primer digito debe ser 3");
-                    }
-                  }
+                  const num = e.target.value.replace(".", "") || "";
+                  setValueAmount(num.replace("$", ""));
                 }}
-                minLength="10"
-                maxLength="10"
                 type={"text"}
                 required
-              ></Input>
+              ></MoneyInput>
+              <Input
+                id="celular"
+                name="celular"
+                label="Celular: "
+                type="tel"
+                autoComplete="off"
+                minLength="10"
+                maxLength="10"
+                value={celular ?? ""}
+                onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+                  if (e.target.value.length === 1) {
+                    if (e.target.value != 3) {
+                      notifyError(
+                        "Número inválido, el N° de celular debe comenzar con el número 3."
+                      );
+                    }
+                  }
+                  setCelular(num);
+                }}
+                required
+              />
+
               <div className={contenedorLogo}>
                 <Select
                   onChange={(event) => setNumPagosPdp(event?.target?.value)}

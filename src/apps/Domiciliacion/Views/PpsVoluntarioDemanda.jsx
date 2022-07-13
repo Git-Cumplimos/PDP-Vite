@@ -15,6 +15,8 @@ import Voucher from "../../LoteriaBog/components/Voucher/Voucher";
 import { useReactToPrint } from "react-to-print";
 import Form from "../../../components/Base/Form";
 import Tickets from "../../../components/Base/Tickets";
+import MoneyInput from "../../../components/Base/MoneyInput";
+import useQuery from "../../../hooks/useQuery";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -26,11 +28,13 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const [numDocumento, setNumDocumento] = useState(ced);
   const [numCelular, setNumCelular] = useState("");
   const [datosRespuesta, setDatosRespuesta] = useState("");
-  const [valorAportar, setValorAportar] = useState();
+  const [valorAportar, setValorAportar] = useState(0);
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
   const { quotaInfo, roleInfo, infoTicket } = useAuth();
 
+  const [{ numCuenta, userDoc, valor, nomDepositante, summary }, setQuery] =
+    useQuery();
   console.log(quotaInfo);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
   const [idComercio, setIdComercio] = useState(roleInfo?.["id_comercio"]);
@@ -139,167 +143,195 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       if (tipoComercio === "OFICINAS PROPIAS") {
         console.log("entre");
         setEsPropio(true);
-        fetchData(
-          `${url}/crearplanillademandaofpropias`,
-          "POST",
-          {},
-          {
-            TipoId: tipoIdentificacion,
-            Identificacion: numDocumento,
-            financialInstitutionCode: "96",
-            CanalCode: "20",
-            OperadorCode: "84",
-            trazabilityFinancialInstitutionCode: "1",
-            ValueAmount: parseInt(valorAportar),
-            Celular: numCelular,
-            id_comercio: idComercio,
-            id_dispositivo: iddispositivo,
-            id_usuario: idusuario,
-            /* es_Propio: esPropio, */
-          },
-          {},
-          true
-        )
-          .then((respuesta) => {
-            console.log(respuesta);
-            if (
-              respuesta?.msg?.["respuesta_colpensiones"] ===
-              "El aportante no existe."
-            ) {
-              notifyError("El aportante no existe.");
-              navigate(`/domiciliacion`);
-            }
-            if (
-              respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
-            ) {
-              notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
-              /* navigate(`/domiciliacion`); */
-              setDisabledBtn(false);
-            }
-            if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
-              notifyError("Lo Sentimos, Falló el Registro Del Cupo");
-              navigate(`/domiciliacion`);
-            }
-            if (
-              respuesta?.msg?.["respuesta_colpensiones"] ===
-              "Cotizante no existe."
-            ) {
-              notifyError("Cotizante no existe.");
-              navigate(`/domiciliacion`);
-            }
 
-            if (
-              respuesta?.msg ===
-              "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
-            ) {
-              notifyError(
-                "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000."
-              );
-              /* navigate(`/domiciliacion`); */
-              setDisabledBtn(false);
-            }
-            if (
-              respuesta?.msg?.["RESPUESTA COLPENSIONES"] ===
-              "Lo Sentimos, Falló el Servicio De Colpensiones"
-            ) {
-              notifyError("Lo Sentimos, Falló el Servicio De Colpensiones");
-              navigate(`/domiciliacion`);
-            }
-            /* if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
-              notifyError("Lo Sentimos, Falló el Registro Del Cupo");
-              navigate(`/domiciliacion`);
-            } */
-            if (
-              (respuesta?.msg ===
-                "La transaccion ha sido creada exitosamente") &
-              (respuesta?.obj.length > 1)
-            ) {
-              setShowModalVoucher(true);
-              setDatosRespuesta(respuesta?.obj);
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            notifyError("Error al Pagar Planilla Voluntaria a Demanda");
-            navigate(`/domiciliacion`);
-          });
+        if (String(numCelular).charAt(0) === "3") {
+          console.log("es 3");
+
+          if (valorAportar >= 5000 && valorAportar <= 149000) {
+            fetchData(
+              `${url}/crearplanillademandaofpropias`,
+              "POST",
+              {},
+              {
+                TipoId: tipoIdentificacion,
+                Identificacion: numDocumento,
+                financialInstitutionCode: "96",
+                CanalCode: "20",
+                OperadorCode: "84",
+                trazabilityFinancialInstitutionCode: "1",
+                ValueAmount: parseInt(valorAportar),
+                Celular: numCelular,
+                id_comercio: idComercio,
+                id_dispositivo: iddispositivo,
+                id_usuario: idusuario,
+                /* es_Propio: esPropio, */
+              },
+              {},
+              true
+            )
+              .then((respuesta) => {
+                console.log(respuesta);
+                if (
+                  respuesta?.msg?.["respuesta_colpensiones"] ===
+                  "El aportante no existe."
+                ) {
+                  notifyError("El aportante no existe.");
+                  navigate(`/domiciliacion`);
+                }
+                if (
+                  respuesta?.msg ===
+                  "El Valor Aportado Debe ser Exacto ej: 5000"
+                ) {
+                  notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
+                  /* navigate(`/domiciliacion`); */
+                  setDisabledBtn(false);
+                }
+                if (
+                  respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo"
+                ) {
+                  notifyError("Lo Sentimos, Falló el Registro Del Cupo");
+                  navigate(`/domiciliacion`);
+                }
+                if (
+                  respuesta?.msg?.["respuesta_colpensiones"] ===
+                  "Cotizante no existe."
+                ) {
+                  notifyError("Cotizante no existe.");
+                  navigate(`/domiciliacion`);
+                }
+
+                if (
+                  respuesta?.msg ===
+                  "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
+                ) {
+                  notifyError(
+                    "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000."
+                  );
+                  /* navigate(`/domiciliacion`); */
+                  setDisabledBtn(false);
+                }
+                if (
+                  respuesta?.msg?.["RESPUESTA COLPENSIONES"] ===
+                  "Lo Sentimos, Falló el Servicio De Colpensiones"
+                ) {
+                  notifyError("Lo Sentimos, Falló el Servicio De Colpensiones");
+                  navigate(`/domiciliacion`);
+                }
+                /* if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
+                  notifyError("Lo Sentimos, Falló el Registro Del Cupo");
+                  navigate(`/domiciliacion`);
+                } */
+                if (
+                  (respuesta?.msg ===
+                    "La transaccion ha sido creada exitosamente") &
+                  (respuesta?.obj.length > 1)
+                ) {
+                  setShowModalVoucher(true);
+                  setDatosRespuesta(respuesta?.obj);
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+                notifyError("Error al Pagar Planilla Voluntaria a Demanda");
+                navigate(`/domiciliacion`);
+              });
+          } else {
+            notifyError("Completa el valor aportar.");
+            setDisabledBtn(false);
+          }
+        } else {
+          console.log("no es 3");
+          notifyError(
+            "Numero invalido, el N° de celular debe comenzar con el número 3."
+          );
+          setDisabledBtn(false);
+        }
       } else {
         if (cantNum == 10) {
           console.log("Comercio");
           setEsPropio(true);
-          fetchData(
-            `${url}/crearplanillademandacomercios`,
-            "POST",
-            {},
-            {
-              TipoId: tipoIdentificacion,
-              Identificacion: numDocumento,
-              financialInstitutionCode: "96",
-              CanalCode: "20",
-              OperadorCode: "84",
-              trazabilityFinancialInstitutionCode: "1",
-              ValueAmount: parseInt(valorAportar),
-              Celular: numCelular,
-              id_comercio: idComercio,
-              id_dispositivo: iddispositivo,
-              id_usuario: idusuario,
-              /* es_Propio: esPropio, */
-            },
-            {},
-            true
-          )
-            .then((respuesta) => {
-              console.log(respuesta);
-              if (
-                respuesta?.msg?.["respuesta_colpensiones"] ===
-                "El aportante no existe."
-              ) {
-                notifyError("El aportante no existe.");
-                navigate(`/domiciliacion`);
-              }
-              if (
-                respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
-              ) {
-                notifyError("El valor aportado debe ser exacto ej: 5000");
-                /* navigate(`/domiciliacion`); */
-                setDisabledBtn(false);
-              }
-              if (
-                respuesta?.msg?.["respuesta_colpensiones"] ===
-                "Cotizante no existe."
-              ) {
-                notifyError("Cotizante no existe.");
-                navigate(`/domiciliacion`);
-              }
+          if (String(numCelular).charAt(0) === "3") {
+            fetchData(
+              `${url}/crearplanillademandacomercios`,
+              "POST",
+              {},
+              {
+                TipoId: tipoIdentificacion,
+                Identificacion: numDocumento,
+                financialInstitutionCode: "96",
+                CanalCode: "20",
+                OperadorCode: "84",
+                trazabilityFinancialInstitutionCode: "1",
+                ValueAmount: parseInt(valorAportar),
+                Celular: numCelular,
+                id_comercio: idComercio,
+                id_dispositivo: iddispositivo,
+                id_usuario: idusuario,
+                /* es_Propio: esPropio, */
+              },
+              {},
+              true
+            )
+              .then((respuesta) => {
+                console.log(respuesta);
+                if (
+                  respuesta?.msg?.["respuesta_colpensiones"] ===
+                  "El aportante no existe."
+                ) {
+                  notifyError("El aportante no existe.");
+                  navigate(`/domiciliacion`);
+                }
+                if (
+                  respuesta?.msg ===
+                  "El Valor Aportado Debe ser Exacto ej: 5000"
+                ) {
+                  notifyError("El valor a aportar debe ser múltiplo de 100");
+                  /* navigate(`/domiciliacion`); */
+                  setDisabledBtn(false);
+                }
+                if (
+                  respuesta?.msg?.["respuesta_colpensiones"] ===
+                  "Cotizante no existe."
+                ) {
+                  notifyError("Cotizante no existe.");
+                  navigate(`/domiciliacion`);
+                }
 
-              if (
-                respuesta?.msg ===
-                "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
-              ) {
-                notifyError(
-                  "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
-                );
-                /* navigate(`/domiciliacion`); */
-                setDisabledBtn(false);
-              }
-              if (
-                (respuesta?.msg ===
-                  "La transaccion ha sido creada exitosamente") &
-                (respuesta?.obj.length > 1)
-              ) {
-                setShowModalVoucher(true);
-                setDatosRespuesta(respuesta?.obj);
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-              notifyError("Error al pagar planilla voluntaria a demanda");
-              navigate(`/domiciliacion`);
-            });
+                if (
+                  respuesta?.msg ===
+                  "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
+                ) {
+                  notifyError(
+                    "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                  );
+                  /* navigate(`/domiciliacion`); */
+                  setDisabledBtn(false);
+                }
+                if (
+                  (respuesta?.msg ===
+                    "La transaccion ha sido creada exitosamente") &
+                  (respuesta?.obj.length > 1)
+                ) {
+                  setShowModalVoucher(true);
+                  setDatosRespuesta(respuesta?.obj);
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+                notifyError("Error al pagar planilla voluntaria a demanda");
+                navigate(`/domiciliacion`);
+              });
+          } else {
+            console.log("no es 3");
+            notifyError(
+              "Numero invalido, el N° de celular debe comenzar con el número 3."
+            );
+            setDisabledBtn(false);
+          }
         } else {
           notifyError("Ingrese un número de célular valido");
-
           setNumCelular("");
+          setDisabledBtn(false);
         }
       }
     } else {
@@ -307,11 +339,19 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       navigate(`/domiciliacion`);
     }
   };
-
+  function validatePhone(e) {
+    if (e.target.value.length === 1) {
+      if (e.target.value != 3) {
+        notifyError("Numero invalido");
+      } else {
+        setNumCelular(e.target.value);
+      }
+    }
+  }
   return (
     <div>
       <Modal show={showModal} handleClose={handleClose}>
-        <LogoPDP small></LogoPDP>
+        <LogoPDP xsmall></LogoPDP>
         <Form onSubmit={(e) => enviar(e)}>
           <Fieldset
             legend="Formulario Aporte Voluntario"
@@ -321,6 +361,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               onChange={(event) => setTipoIdentificacion(event?.target?.value)}
               id="comissionType"
               label="Tipo Identificación"
+              required
               options={{
                 "": "",
                 "Cédula de Ciudadania": "1",
@@ -337,16 +378,65 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               label={"N° Documento"}
               placeholder={"Ingrese su Numero Documento"}
               value={numDocumento}
-              onChange={(e) => setNumDocumento(e.target.value)}
-              type={"number"}
-              disabled
+              minLength="6"
+              maxLength="11"
+              onInput={(e) => {
+                const num = e.target.value || "";
+                setNumDocumento(num.toString());
+              }}
+              type={"text"}
+              required
             ></Input>
-
             <Input
+              id="celular"
+              name="celular"
+              label="Celular: "
+              type="tel"
+              autoComplete="off"
+              minLength="10"
+              maxLength="10"
+              value={numCelular ?? ""}
+              onInput={(e) => {
+                const num = parseInt(e.target.value) || "";
+                if (e.target.value.length === 1) {
+                  if (e.target.value != 3) {
+                    notifyError(
+                      "Número inválido, el N° de celular debe comenzar con el número 3."
+                    );
+                  }
+                }
+                setNumCelular(num);
+              }}
+              required
+            />
+            {/*      <Input
               label={"N° Celular"}
               placeholder={"Ingrese su Numero Celular"}
-              value={numCelular}
+              value={numCelular ?? ""}
               onInput={(e) => {
+                if (e.target.value.length === 1) {
+                  if (e.target.value != 3) {
+                    notifyError("Numero invalido");
+                  }
+                }
+
+                const num = parseInt(e.target.value) || "";
+                setNumCelular(num); 
+              }}
+              minLength="10"
+              maxLength="10"
+              type={"text"}
+              required
+            /> */}
+            {/*             <Input
+              label={"N° Celular"}
+              placeholder={"Ingrese su Numero Celular"}
+              value={numCelular ?? ""}
+              onInput={(e) => {
+                const num = parseInt(e.target.value) || "";
+                setNumCelular(num);
+              }}
+                          onInput={(e) => {
                 const num = parseInt(e.target.value) || "";
 
                 if (parseInt(String(num)[0]) == 3) {
@@ -357,25 +447,25 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                     notifyError("El Primer Digito debe ser 3");
                   }
                 }
-              }}
+              }} 
               minLength="10"
               maxLength="10"
               type={"text"}
               required
-            ></Input>
-            <Input
+            ></Input> */}
+            <MoneyInput
               label={"Valor Aportar"}
               placeholder={"Ingrese Valor Aportar"}
               value={valorAportar}
-              minLength="4"
-              maxLength="6"
+              minLength="6"
+              maxLength="9"
               onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setValorAportar(num);
+                const num = e.target.value.replace(".", "") || "";
+                setValorAportar(num.replace("$", ""));
               }}
               type={"text"}
               required
-            ></Input>
+            ></MoneyInput>
           </Fieldset>
           <ButtonBar className={"lg:col-span-2"} type="">
             {

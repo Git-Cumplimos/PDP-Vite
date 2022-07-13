@@ -18,6 +18,9 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 const CancelPin = ({
   respPin,
   valor,
+  valor_tramite,
+  name_tramite,
+  id_pin,
   trx,
   tipoPin,
   closeModal,
@@ -61,7 +64,7 @@ const CancelPin = ({
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: "Recibo de pago: " + name_tramite,
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -85,7 +88,11 @@ const CancelPin = ({
       }),
       trxInfo: [
         ["Proceso", "Cancelación de Pin"],
-        ["VALOR", formatMoney.format(valor)],
+        ["Valor Tramite", formatMoney.format(valor_tramite)],
+        ["Iva Tramite",formatMoney.format(0)],
+        ["Valor Pin", formatMoney.format(valor)],
+        ["Iva Pin", formatMoney.format(valor*0.19)],
+        ["Total", formatMoney.format(valor*1.19 + valor_tramite)], // Valor + IVA
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -99,7 +106,7 @@ const CancelPin = ({
   const onSubmitCancel = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    cancelPinVus(respPin, valor, motivo, trx, roleInfo)
+    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite) //// Valor = valor + IVA
       .then((res) => {
         setActivarNavigate(false);
         setDisabledBtn(false);
@@ -121,7 +128,41 @@ const CancelPin = ({
           <div className="flex flex-col w-1/2 mx-auto">
             <h1 className="text-3xl mt-3 mx-auto">Cancelar Pin</h1>
             <br></br>
-            {Object.entries(respPin).map(([key, val]) => {
+            <h1 className="flex flex-row justify-center text-lg font-medium">{name_tramite}</h1>
+            <br></br>
+            <>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Tramite</h1>
+                <h1>{formatMoney.format(valor_tramite)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Iva Tramite</h1>
+                <h1>{formatMoney.format(0)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Pin</h1>
+                <h1>{formatMoney.format(valor)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Iva Pin</h1>
+                <h1>{formatMoney.format(valor*0.19)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Total</h1>
+                <h1>{formatMoney.format(valor*1.19 + valor_tramite)}</h1>
+              </div>
+            </>
+            {/* {Object.entries(respPin).map(([key, val]) => {
               return (
                 <>
                   <div
@@ -133,7 +174,7 @@ const CancelPin = ({
                   </div>
                 </>
               );
-            })}
+            })} */}
             <div className="flex flex-col justify-center items-center mx-auto container">
               <Form onSubmit={onSubmitCancel}>
                 <TextArea

@@ -59,7 +59,7 @@ const MoneyInput = ({ ...input }) => {
     <Input
       {...input}
       value={newValue}
-      type={"text"}
+      type={"tel"}
       onInput={(e) => {
         let caret_pos = e.target.selectionStart;
         const len = e.target.value.length;
@@ -84,7 +84,7 @@ const MoneyInput = ({ ...input }) => {
   ) : (
     <Input
       {...input}
-      type={"text"}
+      type={"tel"}
       onInput={(e) => {
         let caret_pos = e.target.selectionStart;
         const len = e.target.value.length;

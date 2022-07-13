@@ -68,9 +68,7 @@ const TableEnterprise = ({
             const temp1 = dir ? a[ind][1] : b[ind][1];
             const temp2 = dir ? b[ind][1] : a[ind][1];
             sortRet.push(
-              temp1 instanceof Number
-                ? temp1 - temp2
-                : temp1.localeCompare(temp2)
+              !isNaN(temp1) ? temp1 - temp2 : temp1.localeCompare(temp2)
             );
           }
         }
@@ -111,8 +109,8 @@ const TableEnterprise = ({
   return (
     <div className={`${wrapper}`}>
       <div className={`grid grid-cols-12 rounded-t-md ${staticBar}`}>
-        <div className="col-start-2 col-span-3 text-left text-2xl">{title}</div>
-        <div className="col-span-6"></div>
+        <div className='col-start-2 col-span-3 text-left text-2xl'>{title}</div>
+        <div className='col-span-6'></div>
         <div className={`${tooling}`}>
           {children ? (
             <span
@@ -128,13 +126,11 @@ const TableEnterprise = ({
               setShowHidden(
                 (old) => tableOpts.filter(({ hide }) => hide).length > 0 && !old
               )
-            }
-          >
+            }>
             <div
               className={`absolute z-20 top-full right-0 bg-secondary-dark rounded-md text-white w-max ${
                 showHidden ? "block" : "hidden"
-              }`}
-            >
+              }`}>
               {tableOpts.map(({ hide }, idx) => (
                 <div
                   key={idx}
@@ -158,8 +154,7 @@ const TableEnterprise = ({
                       };
                       return [...copy];
                     })
-                  }
-                >
+                  }>
                   {headers?.[idx]}
                 </div>
               ))}
@@ -172,15 +167,14 @@ const TableEnterprise = ({
           <Form
             onLazyChange={{ callback: onChange, timeOut: 300 }}
             onSubmit={onSubmit}
-            grid
-          >
+            grid>
             {children}
           </Form>
         </div>
       ) : (
         ""
       )}
-      <div className="overflow-x-auto">
+      <div className='overflow-x-auto'>
         <table className={`${tableEnterprise}`}>
           <thead>
             <tr>
@@ -203,13 +197,11 @@ const TableEnterprise = ({
                         });
                         return [...copy];
                       })
-                    }
-                  >
-                    <div className="flex flex-row justify-center">
-                      <div className="py-2 px-3 w-max">{name}</div>
+                    }>
+                    <div className='flex flex-row justify-center'>
+                      <div className='py-2 px-3 w-max'>{name}</div>
                       <span
-                        className={`bi bi-sliders ${iconBtn} ${slidersBtn}`}
-                      >
+                        className={`bi bi-sliders ${iconBtn} ${slidersBtn}`}>
                         <div className={`${menuOthers}`}>
                           <div
                             onClick={(e) => {
@@ -225,9 +217,8 @@ const TableEnterprise = ({
                                 });
                                 return [...copy];
                               });
-                            }}
-                          >
-                            <span className="bi bi-sort-down" />
+                            }}>
+                            <span className='bi bi-sort-down' />
                           </div>
                           <div
                             onClick={(e) => {
@@ -240,9 +231,8 @@ const TableEnterprise = ({
                                 };
                                 return [...copy];
                               });
-                            }}
-                          >
-                            <span className="bi bi-eye-slash-fill" />
+                            }}>
+                            <span className='bi bi-eye-slash-fill' />
                           </div>
                         </div>
                       </span>
@@ -272,8 +262,7 @@ const TableEnterprise = ({
               sortedData.map((obj, index) => (
                 <tr
                   key={index}
-                  onClick={onSelectRow ? (e) => onSelectRow(e, index) : null}
-                >
+                  onClick={onSelectRow ? (e) => onSelectRow(e, index) : null}>
                   {obj.map(([key, value], idx) => {
                     return (
                       <td
@@ -282,8 +271,7 @@ const TableEnterprise = ({
                           tableOpts?.[idx]?.hide ? "hidden" : "table-cell"
                         } ${
                           onSelectRow ? "cursor-pointer" : "cursor-auto"
-                        } whitespace-pre z-0`}
-                      >
+                        } whitespace-pre z-0`}>
                         {value}
                       </td>
                     );
@@ -295,10 +283,9 @@ const TableEnterprise = ({
         </table>
       </div>
       <div
-        className={`flex flex-row justify-between gap-2 rounded-b-md ${staticBar}`}
-      >
+        className={`flex flex-row justify-between gap-2 rounded-b-md ${staticBar}`}>
         <select
-          name="limits"
+          name='limits'
           className={`${limitsBtn} appearance-none`}
           value={limit}
           onChange={(e) =>
@@ -306,19 +293,18 @@ const TableEnterprise = ({
               page,
               limit: Number(e.target.value),
             }))
-          }
-        >
+          }>
           {[5, 10, 20, 50].map((val, idx) => (
             <option value={val} key={idx}>
               {val} items por pagina
             </option>
           ))}
         </select>
-        <div className="flex flex-row gap-6 items-center">
+        <div className='flex flex-row gap-6 items-center'>
           <h1>
             {page} de {maxPage}
           </h1>
-          <div className="flex flex-row gap-2 items-center">
+          <div className='flex flex-row gap-2 items-center'>
             <span
               className={`bi bi-chevron-left ${iconBtn}`}
               onClick={useCallback(() => {

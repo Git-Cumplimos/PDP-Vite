@@ -308,7 +308,7 @@ const Recaudo = () => {
                 id="numpin"
                 label={label}
                 type="text"
-                minLength="7"
+                minLength="5"
                 maxLength="12"
                 autoComplete="off"
                 value={number}
@@ -421,7 +421,7 @@ const Recaudo = () => {
                     setFormatMon(num);
                   }}
                 />
-                <Input
+                {/* <Input
                   id="refPago"
                   label="Referencia pago"
                   type="text"
@@ -432,7 +432,7 @@ const Recaudo = () => {
                     const ref = String(e.target.value) || "";
                     setReferencia(ref);
                   }}
-                />
+                /> */}
                 <ButtonBar>
                   <Button type="submit" disabled={stop}>
                     Realizar pago
