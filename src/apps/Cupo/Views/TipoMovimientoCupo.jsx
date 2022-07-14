@@ -1,5 +1,4 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -109,11 +108,12 @@ const TipoMovimientoCupo = () => {
   );
   return (
     <Fragment>
+      <h1 className="text-3xl mt-6">Tipos de movimientos</h1>
       <Form onSubmit={onSubmitCrearMovimiento} onChange={onChange} grid>
         <Input
           id="Crear tipo de movimiento cupo"
           name="Crear tipo de movimiento cupo"
-          label="Crear tipo de movimiento cupo"
+          label="Crear tipo de movimiento"
           type="text"
           autoComplete="off"
           onInput={() => {}}
@@ -124,8 +124,8 @@ const TipoMovimientoCupo = () => {
         </ButtonBar>
       </Form>
       <TableEnterprise
-        title="Tipo movimiento cupo"
-        headers={["pk_id_tipo_movimiento", "nombre"]}
+        title="Tipo movimiento"
+        headers={["Id movimiento", "Tipo de movimiento"]}
         data={
           dataTipoMovimientoCupo?.results.map(
             ({ pk_id_tipo_movimiento, nombre }) => ({
@@ -154,7 +154,7 @@ const TipoMovimientoCupo = () => {
           <Input
             id="Tipo de movimiento cupo"
             name="Tipo de moviento cupo"
-            label="Tipo de moviento cupo"
+            label="Tipo de moviento "
             type="text"
             autoComplete="off"
             onInput={() => {}}
