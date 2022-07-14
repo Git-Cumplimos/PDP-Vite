@@ -125,7 +125,7 @@ const TipoMovimientoCupo = () => {
       </Form>
       <TableEnterprise
         title="Tipo movimiento"
-        headers={["Id movimiento", "Tipo de movimiento"]}
+        headers={["Id del movimiento", "Tipo de movimiento"]}
         data={
           dataTipoMovimientoCupo?.results.map(
             ({ pk_id_tipo_movimiento, nombre }) => ({
