@@ -38,7 +38,6 @@ export const useProvidePinesVus = () => {
   // Datos consulta y compra
   const { roleInfo } = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
-
   const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite) => {
     const body = {
       valor_tramite : valor_tramite,
@@ -133,6 +132,9 @@ export const useProvidePinesVus = () => {
       }
       if ((tipoPin !== "") & !isNaN(tipoPin)) {
         query.tipo_pin = tipoPin;
+      }
+      if ( roleInfo?.id_comercio !== undefined) {
+        query.id_comercio = roleInfo?.id_comercio;
       }
       try {
         const res = await fetchData(urls.PinVus, "GET", query);
