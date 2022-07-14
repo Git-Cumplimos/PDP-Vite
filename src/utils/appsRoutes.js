@@ -670,7 +670,7 @@ const allUrlsPrivateApps = [
     permission: [1],
     subRoutes: [
       {
-        link: "/movistar/recargas-movistar-full",
+        link: "/movistar/recargas-movistar",
         label: <AppIcons Logo={"SORTEOS"} name="Recargas Movistar " />,
         component: RecargasMovistar,
         permission: [1],
