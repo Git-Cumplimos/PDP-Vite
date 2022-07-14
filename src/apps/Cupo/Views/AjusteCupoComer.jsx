@@ -1,10 +1,8 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Fieldset from "../../../components/Base/Fieldset";
 import Form from "../../../components/Base/Form";
-import HNavbar from "../../../components/Base/HNavbar";
 import Input from "../../../components/Base/Input";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import TextArea from "../../../components/Base/TextArea";
@@ -18,16 +16,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
   const [valor, setValor] = useState(null);
   const [razonAjuste, setRazonAjuste] = useState(null);
   const { roleInfo } = useAuth();
-  const navegateValid = useNavigate();
-  const args = { pk_id_comercio: idComercio };
-  const body = {
-    valor_afectacion: valor,
-    fk_id_comercio: idComercio,
-    usuario: roleInfo.id_usuario,
-    fk_tipo_de_movimiento: 2,
-    ajustes_deuda: true,
-    motivo_afectacion: razonAjuste,
-  };
+
   useEffect(() => {
     consultaCupoComercios(idComercio);
   }, [idComercio]);
@@ -40,111 +29,17 @@ const AjusteCupoComer = ({ subRoutes }) => {
         notifyError("Error al cargar Datos ");
       });
   };
-  const onChange = useCallback(
-    (ev) => {
-      if (ev.target.name === "Id comercio") {
-        setIdComercio(ev.target.value);
-      }
-      if (ev.target.name === "razon_ajuste") {
-        setRazonAjuste(ev.target.value);
-      }
-    },
-    [idComercio, valor, razonAjuste]
-  );
-  const onSubmitDebito = useCallback(
-    (e) => {
-      e.preventDefault();
-      const args = { pk_id_comercio: idComercio };
-
-      const body = {
-        valor_afectacion: valor,
-        fk_id_comercio: idComercio,
-        usuario: roleInfo.id_usuario,
-        fk_tipo_de_movimiento: 2,
-        ajustes_deuda: true,
-        motivo_afectacion: razonAjuste,
-      };
-
-      putAjusteCupo(args, body)
-        .then((res) => {
-          consultaCupoComercios(idComercio);
-          if (res?.status) {
-            notify(res?.msg);
-            // navigate(-1, { replace: true });
-          } else {
-            notifyError(res?.msg);
-          }
-        })
-        .catch((err) => console.error(err));
-
-      // navegateValid(`/cupo/cupo-comercio/ajuste-debito-deuda/${idComercio}`);
-    },
-    [idComercio, valor, razonAjuste]
-  );
-  const onSubmitCredito = useCallback(
-    (e) => {
-      e.preventDefault();
-      const args = { pk_id_comercio: idComercio };
-      const afectacion = "-" + valor;
-      const body = {
-        valor_afectacion: afectacion,
-        fk_id_comercio: idComercio,
-        usuario: roleInfo.id_usuario,
-        fk_tipo_de_movimiento: 2,
-        // ajustes_deuda: true,
-        motivo_afectacion: razonAjuste,
-      };
-
-      putAjusteCupo(args, body)
-        .then((res) => {
-          consultaCupoComercios(idComercio);
-          if (res?.status) {
-            notify(res?.msg);
-            // navigate(-1, { replace: true });
-          } else {
-            notifyError(res?.msg);
-          }
-        })
-        .catch((err) => console.error(err));
-      // navegateValid(`/cupo/cupo-comercio/ajuste-credito-deuda/${idComercio}`);
-    },
-    [idComercio, valor, razonAjuste]
-  );
-  const onSubmitContingencia = useCallback(
-    (e) => {
-      e.preventDefault();
-      const args = { pk_id_comercio: idComercio };
-      const afectacion = "-" + valor;
-      const body = {
-        valor_afectacion: afectacion,
-        fk_id_comercio: idComercio,
-        usuario: roleInfo.id_usuario,
-        fk_tipo_de_movimiento: 2,
-        ajustes_deuda: true,
-        motivo_afectacion: razonAjuste,
-      };
-
-      putAjusteCupo(args, body)
-        .then((res) => {
-          consultaCupoComercios(idComercio);
-          if (res?.status) {
-            notify(res?.msg);
-            // navigate(-1, { replace: true });
-          } else {
-            notifyError(res?.msg);
-          }
-        })
-        .catch((err) => console.error(err));
-      // `/cupo/cupo-comercio/ajuste-credito-contigencia/${idComercio}`
-    },
-    [idComercio, valor, razonAjuste]
-  );
-  const onMoneyChange = useCallback(
-    (e, monto) => {
-      setValor(monto);
-    },
-    [idComercio, valor, razonAjuste]
-  );
+  const onChange = useCallback((ev) => {
+    if (ev.target.name === "Id comercio") {
+      setIdComercio(ev.target.value);
+    }
+    if (ev.target.name === "razon_ajuste") {
+      setRazonAjuste(ev.target.value);
+    }
+  }, []);
+  const onMoneyChange = useCallback((e, monto) => {
+    setValor(monto);
+  }, []);
   const onSubmitAjuste = useCallback(
     (e) => {
       e.preventDefault();
@@ -222,7 +117,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
           .catch((err) => console.error(err));
       }
     },
-    [idComercio, valor, razonAjuste]
+    [idComercio, valor, razonAjuste, roleInfo.id_usuario]
   );
   return (
     <Fragment>

@@ -60,7 +60,7 @@ const DtlMovComercio = () => {
   const onSubmitDownload = useCallback(
     (e) => {
       e.preventDefault();
-      if (id_comercio != "") {
+      if (id_comercio !== "") {
         if (fechaEnd !== null || fechaini !== null) {
           crearData(
             id_comercio,
@@ -72,7 +72,14 @@ const DtlMovComercio = () => {
         }
       }
     },
-    [id_comercio, fechaEnd, fechaini, tipoTransaccion, tipoAfectacion]
+    [
+      id_comercio,
+      fechaEnd,
+      fechaini,
+      tipoTransaccion,
+      tipoAfectacion,
+      crearData,
+    ]
   );
   return (
     <Fragment>

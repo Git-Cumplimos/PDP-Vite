@@ -249,3 +249,59 @@ export const PeticionDescargarPdf = async (
     console.log("Error con fetch - no conecta al servicio");
   }
 };
+
+export const getTipoMovimientosCupo = async (
+  pk_id_tipo_movimiento,
+  page,
+  limit,
+  nombre
+) => {
+  console.log(urlCupo);
+  const busqueda = {};
+  if (pk_id_tipo_movimiento) {
+    busqueda.pk_id_tipo_movimiento = pk_id_tipo_movimiento;
+  }
+  if (page) {
+    busqueda.page = page;
+  }
+  if (limit) {
+    busqueda.limit = limit;
+  }
+  if (nombre) {
+    busqueda.nombre = nombre;
+  }
+  try {
+    const res = await fetchData(
+      `${urlCupo}/movimientos`,
+      "GET",
+      busqueda,
+      {},
+      false
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const postTipoMovimientosCupo = async (bodyObj) => {
+  if (!bodyObj) {
+    return new Promise((resolve, reject) => {
+      resolve("Sin datos body");
+    });
+  }
+  try {
+    const res = await fetchData(`${urlCupo}/movimientos`, "POST", {}, bodyObj);
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
