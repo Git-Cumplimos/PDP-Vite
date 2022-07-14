@@ -189,7 +189,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 minLength="6"
                 maxLength="11"
                 onInput={(e) => {
-                  const num = e.target.value || "";
+                  const num = parseInt(e.target.value) || "";
                   setNumDocumento(num.toString());
                 }}
                 type={"text"}
