@@ -66,75 +66,81 @@ const PpsVoluntario = ({ datosConsulta }) => {
     if (valorAportar >= 5000 && valorAportar <= 149000) {
       console.log("r2", datosBusqueda?.length);
       if (datosBusqueda?.length <= 0) {
-        if (numCelular.length < 6) {
-          console.log("soy mayo");
-        }
-        fetchData(
-          `${url}/domicilio`,
-          "POST",
-          {},
-          {
-            tipo_id: tipoIdentificacion,
-            identificacion: numDocumento,
-            financial_institution_code: "96",
-            canal_code: "20",
-            operador_code: "84",
-            trazability_financial_institution_code: "1",
-            value_amount: valorAportar,
-            celular: numCelular,
-            id_comercio: idComercio,
-            id_dispositivo: iddispositivo,
-            id_usuario: idusuario,
-            estado: "activo",
-            estado_pago: "",
-            tipo_pps: "voluntario",
-            num_pago_pdp: numPagosPdp,
-          },
-          {},
-          {}
-        )
-          .then((respuesta) => {
-            console.log("r3", respuesta);
-            if (
-              respuesta?.msg ==
-              "Exception: No fue posible hacer una conexion a la base de datos"
-            ) {
-              notifyError(
-                "No fue posible hacer una conexion a la base de datos"
-              );
-            }
-            if (
-              respuesta?.msg == "El Valor Aportado Debe ser Exacto ej: 5000"
-            ) {
-              notifyError("El valor a aportar debe ser múltiplo de 100");
-            }
-            if (
-              respuesta?.msg?.respuesta_colpensiones == "Estructura inválida."
-            ) {
-              notifyError("Estructura inválida.");
-            }
-            if (
-              respuesta?.msg ==
-              "SchemaError: Key 'num_pago_pdp' error:\nint('') raised ValueError(\"invalid literal for int() with base 10: ''\")"
-            ) {
-              notifyError("Seleccione un número de pagos");
-            } else {
+        if (String(numCelular).charAt(0) === "3") {
+          fetchData(
+            `${url}/domicilio`,
+            "POST",
+            {},
+            {
+              tipo_id: tipoIdentificacion,
+              identificacion: numDocumento,
+              financial_institution_code: "96",
+              canal_code: "20",
+              operador_code: "84",
+              trazability_financial_institution_code: "1",
+              value_amount: valorAportar,
+              celular: numCelular,
+              id_comercio: idComercio,
+              id_dispositivo: iddispositivo,
+              id_usuario: idusuario,
+              estado: "activo",
+              estado_pago: "",
+              tipo_pps: "voluntario",
+              num_pago_pdp: numPagosPdp,
+            },
+            {},
+            {}
+          )
+            .then((respuesta) => {
+              console.log("r3", respuesta);
               if (
                 respuesta?.msg ==
-                "Se ha creado el comercio domiciliado voluntario exitosamente"
+                "Exception: No fue posible hacer una conexion a la base de datos"
               ) {
-                notify(
-                  "Se ha creado el comercio domiciliado voluntario exitosamente"
+                notifyError(
+                  "No fue posible hacer una conexion a la base de datos"
                 );
-                setShowModal(false);
-                navigate(`/domiciliacion`);
               }
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            notifyError("Error al subir Formulario");
-          });
+              if (
+                respuesta?.msg == "El Valor Aportado Debe ser Exacto ej: 5000"
+              ) {
+                notifyError("El valor a aportar debe ser múltiplo de 100");
+              }
+              if (
+                respuesta?.msg?.respuesta_colpensiones == "Estructura inválida."
+              ) {
+                notifyError("Estructura inválida.");
+              }
+              if (
+                respuesta?.msg ==
+                "SchemaError: Key 'num_pago_pdp' error:\nint('') raised ValueError(\"invalid literal for int() with base 10: ''\")"
+              ) {
+                notifyError("Seleccione un número de pagos");
+              } else {
+                if (
+                  respuesta?.msg ==
+                  "Se ha creado el comercio domiciliado voluntario exitosamente"
+                ) {
+                  notify(
+                    "Se ha creado el comercio domiciliado voluntario exitosamente"
+                  );
+                  setShowModal(false);
+                  navigate(`/domiciliacion`);
+                }
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              notifyError("Error al subir Formulario");
+            });
+        } else {
+          console.log("no es 3");
+          notifyError(
+            "Numero invalido, el N° de celular debe comenzar con el número 3."
+          );
+          /* setDisabledBtn(false); */
+        }
+
         // setShowModal(false);
         // navigate(`/domiciliacion`);
       } else {
@@ -151,7 +157,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
     <div>
       {showModal && datosConsulta ? (
         <Modal show={showModal} handleClose={handleClose}>
-          <LogoPDP small></LogoPDP>
+          <LogoPDP xsmall></LogoPDP>
           <Form onSubmit={(e) => enviar(e)}>
             <Fieldset
               legend="Formulario Aporte Voluntario"
@@ -183,7 +189,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 minLength="6"
                 maxLength="11"
                 onInput={(e) => {
-                  const num = e.target.value || "";
+                  const num = parseInt(e.target.value) || "";
                   setNumDocumento(num.toString());
                 }}
                 type={"text"}
@@ -206,44 +212,27 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 disabled
               ></Input>
               <Input
-                label={"N° Celular"}
-                placeholder={"Ingrese su Numero Celular"}
-                value={numCelular}
-                /* onChange={(e) => setNumCelular(e.target.value)} */
-                onInput={(e) => {
-                  const num = parseInt(e.target.value) || "";
-                  setNumCelular(num);
-                }}
-                /*                onInput={(e) => {
-                  const num = parseInt(e.target.value) || "";
-
-                  if (parseInt(String(num)[0]) == 3) {
-                    const num = parseInt(e.target.value) || "";
-                    setNumCelular(num);
-                  } else {
-                    if (parseInt(String(num)[0]) != 3) {
-                      notifyError("El primer dígito debe ser 3");
-                    }
-                  }
-                }} */
+                id="celular"
+                name="celular"
+                label="Celular: "
+                type="tel"
+                autoComplete="off"
                 minLength="10"
                 maxLength="10"
-                type={"text"}
-                required
-              ></Input>
-              {/*               <Input
-                label={"Valor Aportar"}
-                placeholder={"Ingrese Valor Aportar"}
-                value={valorAportar}
-                minLength="4"
-                maxLength="6"
+                value={numCelular ?? ""}
                 onInput={(e) => {
                   const num = parseInt(e.target.value) || "";
-                  setValorAportar(num);
+                  if (e.target.value.length === 1) {
+                    if (e.target.value != 3) {
+                      notifyError(
+                        "Número inválido, el N° de celular debe comenzar con el número 3."
+                      );
+                    }
+                  }
+                  setNumCelular(num);
                 }}
-                type={"text"}
                 required
-              ></Input> */}
+              />
               <MoneyInput
                 label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}

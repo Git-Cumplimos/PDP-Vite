@@ -1,6 +1,12 @@
 import { lazy } from "react";
 
 /**
+ * Rutas
+ */
+import rutasColpatria from "../apps/Colpatria/routes";
+
+
+/**
  * * Providers
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
@@ -55,6 +61,17 @@ const RecargarColCard = lazy(() =>
   import("../apps/ColCard/Views/RecargarColCard")
 );
 /**
+ * Cupo
+ */
+const cupo = lazy(() => import("../apps/Cupo/Cupo"));
+const DtlMovCupo = lazy(() =>
+  import("../apps/Cupo/Views/LimiteCupo/DtlMovComercio")
+);
+const cupoComercio = lazy(() => import("../apps/Cupo/Views/CupoComer"));
+const CrearCupo = lazy(() => import("../apps/Cupo/Views/CrearCupo"));
+const ModifiCupo = lazy(() => import("../apps/Cupo/Views/ModifiLimiteCanje"));
+const AjusteCupo = lazy(() => import("../apps/Cupo/Views/AjusteCupoComer"));
+/**
  * Movii
  */
 const MoviiPDP = lazy(() => import("../apps/Movii-pdp/MoviiPDP"));
@@ -88,6 +105,12 @@ const PinesVus = lazy(() => import("../apps/PinesVus/PinesVus"));
 const CrearPines = lazy(() => import("../apps/PinesVus/Views/CrearPin"));
 const TramitarPines = lazy(() => import("../apps/PinesVus/Views/TramitePines"));
 const ReportePines = lazy(() => import("../apps/PinesVus/Views/ReportePines"));
+const ReportePinesVer = lazy(() => import("../apps/PinesVus/Views/Reportes/ReportePines"));
+const ReportePinesDescargar = lazy(() => import("../apps/PinesVus/Views/Reportes/DescargarReportePines"));
+const PagoParticipantes = lazy(() => import("../apps/PinesVus/Views/PagoParticipantes"));
+const ParticipacionPines = lazy(() => import("../apps/PinesVus/Views/PagoParticipantes/Participacion"));
+const VerParticipacionPines = lazy(() => import("../apps/PinesVus/Views/PagoParticipantes/VerParticipacion"));
+const EspejoQX = lazy(() => import("../apps/PinesVus/Views/EspejoQX"));
 
 /**
  * IAM
@@ -301,6 +324,17 @@ const TypesTrxs = lazy(() =>
 
 const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
 
+/**
+ * RecargasMovistar
+ */
+const Movistar = lazy(() => import("../apps/Movistar/Movistar"));
+const RecargasMovistar = lazy(() =>
+  import("../apps/Movistar/Views/RecargasMovistar.jsx")
+);
+const ConcilacionMovistar = lazy(() =>
+  import("../apps/Movistar/Views/ConcilacionMovistar")
+);
+
 const CARGAR =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_1-P9wrhr8RWkx5zt3f64Ogy-Yr5DoQ_5ww&usqp=CAU";
 const DESCARGAR =
@@ -485,9 +519,49 @@ const allUrlsPrivateApps = [
         permission: [53],
       },
       {
-        link: "/PinesVus/Reporte",
-        label: <AppIcons Logo={"RECAUDO"} name={"Reporte Pines"} />,
+        link: "/PinesVus/Participacion",
+        label: <AppIcons Logo={"RECAUDO"} name={"Participacion Pines"} />,
+        component: PagoParticipantes,
+        permission: [53],
+        subRoutes: [
+        {
+          link: "/PinesVus/Participacion/PagoParticipacion",
+          label: <AppIcons Logo={"RECAUDO"} name={"Pago participacion"} />,
+          component: ParticipacionPines,
+          permission: [53],
+        },
+        {
+          link: "/PinesVus/Participacion/VerPagoParticipacion",
+          label: <AppIcons Logo={"RECAUDO"} name={"Ver pago participacion"} />,
+          component: VerParticipacionPines,
+          permission: [53],
+        },
+        ]
+      },
+      {
+        link: "/PinesVus/Reportes",
+        label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
         component: ReportePines,
+        permission: [53],
+        subRoutes: [
+          {
+          link: "/PinesVus/Reporte/VerReportes",
+          label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
+          component: ReportePinesVer,
+          permission: [53],
+          },
+          {
+            link: "/PinesVus/Reporte/DescargarReportes",
+            label: <AppIcons Logo={"RECAUDO"} name={"Descargar Reportes Pines"} />,
+            component: ReportePinesDescargar,
+            permission: [53],
+          }          
+        ]
+      },
+      {
+        link: "/PinesVus/EspejoQX",
+        label: <AppIcons Logo={"RECAUDO"} name={"Espejo Cupo QX"} />,
+        component: EspejoQX,
         permission: [53],
       },
     ],
@@ -548,6 +622,48 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"RECAUDO"} name={"Recaudo codigo de barras"} />,
         component: RecaudoCodigo,
         permission: [23],
+      },
+    ],
+  },
+  {
+    link: "/cupo",
+    label: <AppIcons Logo={"RECAUDO"} name={"Detalles Cupo"} />,
+    component: cupo,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/cupo/cupo-comercio",
+        label: <AppIcons Logo={"RECAUDO"} name={"Cupo comercios"} />,
+        component: cupoComercio,
+        permission: [1],
+        subRoutes: [
+          {
+            link: "/cupo/cupo-comercio/detalles-cupo/:id_comercio",
+            label: (
+              <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />
+            ),
+            component: DtlMovCupo,
+            permission: [1],
+          },
+        ],
+      },
+      {
+        link: "/cupo/crear-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Crear cupo"} />,
+        component: CrearCupo,
+        permission: [1],
+      },
+      {
+        link: "/cupo/modificar-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Asignacion limite de cupo"} />,
+        component: ModifiCupo,
+        permission: [1],
+      },
+      {
+        link: "/cupo/ajuste-deuda-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Ajuste deuda cupo"} />,
+        component: AjusteCupo,
+        permission: [1],
       },
     ],
   },
@@ -741,8 +857,28 @@ const allUrlsPrivateApps = [
     ],
   },
   {
+    link: "/movistar",
+    label: <AppIcons Logo={"LOTERIA"} name="Movistar" />,
+    component: Movistar,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/movistar/recargas-movistar-full",
+        label: <AppIcons Logo={"SORTEOS"} name="Recargas Movistar " />,
+        component: RecargasMovistar,
+        permission: [1],
+      },
+      {
+        link: "/movistar/concilacion",
+        label: <AppIcons Logo={"SORTEOS"} name="Conciliación" />,
+        component: ConcilacionMovistar,
+        permission: [1],
+      },
+    ],
+  },
+  {
     link: "/movii-pdp",
-    label: <AppIcons Logo={"LOTERIA"} name='MOVII PDP' />,
+    label: <AppIcons Logo={"LOTERIA"} name="MOVII PDP" />,
     component: MoviiPDP,
     permission: [48],
     subRoutes: [
@@ -1031,6 +1167,7 @@ const allUrlsPrivateApps = [
     component: iFoodAportes,
     permission: [1],
   },
+  rutasColpatria,
 ];
 
 export { allUrlsPrivateApps };
