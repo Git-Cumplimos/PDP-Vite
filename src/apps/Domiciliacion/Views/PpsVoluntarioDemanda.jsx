@@ -17,12 +17,13 @@ import Form from "../../../components/Base/Form";
 import Tickets from "../../../components/Base/Tickets";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import useQuery from "../../../hooks/useQuery";
-
+import classes from "./PpsVoluntarioDemanda.module.css";
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
   maximumFractionDigits: 0,
 });
+const { contenedorImagen } = classes;
 const PpsVoluntarioDemanda = ({ ced }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [numDocumento, setNumDocumento] = useState(ced);
@@ -356,7 +357,9 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   return (
     <div>
       <Modal show={showModal} handleClose={handleClose}>
-        <LogoPDP xsmall></LogoPDP>
+        <div className={contenedorImagen}>
+          <LogoPDP xsmall></LogoPDP>
+        </div>
         <Form onSubmit={(e) => enviar(e)}>
           <Fieldset
             legend="Formulario Aporte Voluntario"
@@ -392,7 +395,6 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               type={"text"}
               required
               disabled
-
             ></Input>
             <Input
               id="celular"

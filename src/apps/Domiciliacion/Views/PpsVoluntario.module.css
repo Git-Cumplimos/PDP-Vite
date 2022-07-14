@@ -1,0 +1,5 @@
+.contenedorImagen {
+  display: flex;
+  justify-content: left;
+  margin-bottom: 3rem;
+}
