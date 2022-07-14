@@ -1,0 +1,11 @@
+{
+  "auth": {
+    "puntodepago3f461e9d": {
+      "service": "Cognito",
+      "serviceType": "imported",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
+}

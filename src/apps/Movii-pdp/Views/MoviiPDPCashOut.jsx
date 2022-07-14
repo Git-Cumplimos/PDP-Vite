@@ -7,7 +7,6 @@ import Input from "../../../components/Base/Input";
 import Form from "../../../components/Base/Form";
 import { notify, notifyError } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets";
-import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { postRealizarCashout } from "../utils/fetchMoviiRed";
 import MoneyInput from "../../../components/Base/MoneyInput";

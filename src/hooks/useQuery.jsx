@@ -20,7 +20,7 @@ const useQuery = () => {
     },
     [searchParams, setSearchParams]
   );
-    console.log(value);
+
   return [value, setValue];
 };
 

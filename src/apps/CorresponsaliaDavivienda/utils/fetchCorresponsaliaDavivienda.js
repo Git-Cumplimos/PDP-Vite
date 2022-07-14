@@ -14,6 +14,9 @@ export const consultaGiroDaviplata = async (bodyObj) => {
       "POST",
       {},
       bodyObj,
+      {},
+      {},
+      40000
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -38,7 +41,7 @@ export const pagoGiroDaviplata = async (bodyObj) => {
       bodyObj,
       {},
       {},
-      70000
+      80000
 
     );
     if (!res?.status) {
@@ -71,6 +74,7 @@ export const postCashOut = async (bodyObj) => {
     throw err;
   }
 };
+
 export const postRealizarCashoutDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
@@ -103,7 +107,10 @@ export const consultaCostoCB = async (bodyObj) => {
       `${urlDaviplata}/davivienda_cb_deposito_retiro/consultaCostoCB`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      {},
+      40000
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -125,7 +132,10 @@ export const depositoCorresponsal = async (bodyObj) => {
       `${urlDaviplata}/davivienda_cb_deposito_retiro/depositoCorresponsal`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      {},
+      40000
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -147,7 +157,10 @@ export const retiroCorresponsal = async (bodyObj) => {
       `${urlDaviplata}/davivienda_cb_deposito_retiro/retiroCorresponsal`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      {},
+      40000
     );
     if (!res?.status) {
       console.error(res?.msg);

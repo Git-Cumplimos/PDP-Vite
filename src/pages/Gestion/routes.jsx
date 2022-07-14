@@ -30,7 +30,7 @@ export const rutasGestion = [
   },
   {
     link: "/gestion/validar_comprobante",
-    label: <AppIcons Logo={"RECAUDO"} name="Validar comprobantes" />,
+    label: <AppIcons Logo={"RECAUDO"} name="Análisis de comprobante" />,
     component: PanelConsignaciones,
     permission: [3],
   },

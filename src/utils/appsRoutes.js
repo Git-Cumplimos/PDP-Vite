@@ -1,6 +1,12 @@
 import { lazy } from "react";
 
 /**
+ * Rutas
+ */
+import rutasColpatria from "../apps/Colpatria/routes";
+
+
+/**
  * * Providers
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
@@ -88,6 +94,12 @@ const PinesVus = lazy(() => import("../apps/PinesVus/PinesVus"));
 const CrearPines = lazy(() => import("../apps/PinesVus/Views/CrearPin"));
 const TramitarPines = lazy(() => import("../apps/PinesVus/Views/TramitePines"));
 const ReportePines = lazy(() => import("../apps/PinesVus/Views/ReportePines"));
+const ReportePinesVer = lazy(() => import("../apps/PinesVus/Views/Reportes/ReportePines"));
+const ReportePinesDescargar = lazy(() => import("../apps/PinesVus/Views/Reportes/DescargarReportePines"));
+const PagoParticipantes = lazy(() => import("../apps/PinesVus/Views/PagoParticipantes"));
+const ParticipacionPines = lazy(() => import("../apps/PinesVus/Views/PagoParticipantes/Participacion"));
+const VerParticipacionPines = lazy(() => import("../apps/PinesVus/Views/PagoParticipantes/VerParticipacion"));
+const EspejoQX = lazy(() => import("../apps/PinesVus/Views/EspejoQX"));
 
 /**
  * IAM
@@ -134,6 +146,15 @@ const CreateComisionCobrada = lazy(() =>
 );
 const ConfiguracionComercios = lazy(() =>
   import("../apps/TrxParams/Views/ConfiguracionComercios")
+);
+const CrearComercios = lazy(() =>
+  import("../apps/TrxParams/Views/Comercios/CrearComercios")
+);
+const ListarComercios = lazy(() =>
+  import("../apps/TrxParams/Views/Comercios/ListarComercios")
+);
+const TipoNivelComercio = lazy(() =>
+  import("../apps/TrxParams/Views/TipoNivelComercios")
 );
 
 /**
@@ -238,7 +259,30 @@ const DepositoCB = lazy(() =>
 const RetiroCB = lazy(() =>
   import("../apps/CorresponsaliaDavivienda/Views/AhorrosCorriente/Retiro")
 );
+const PagoDeProductosPropios = lazy(() =>
+  import("../apps/CorresponsaliaDavivienda/Views/PagoDeProductosPropios")
+);
+const SeleccionServicioPagar = lazy(() =>
+  import(
+    "../apps/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/SeleccionServicioPagar"
+  )
+);
+const RecaudoServiciosPublicosPrivados = lazy(() =>
+  import(
+    "../apps/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivados"
+  )
+);
+const RecaudoServiciosPublicosPrivadosMenu = lazy(() =>
+  import(
+    "../apps/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivadosMenu"
+  )
+);
 
+const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = lazy(() =>
+  import(
+    "../apps/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosLecturaCodigoBarras"
+  )
+);
 /**
  * API-SMS
  */
@@ -288,13 +332,13 @@ const DESCARGAR =
 const allUrlsPrivateApps = [
   {
     link: "https://portal.solucionesenred.co/",
-    label: <AppIcons Logo={"SUSER"} name="SUSER" />,
+    label: <AppIcons Logo={"SUSER"} name='SUSER' />,
     extern: true,
     permission: [1],
   },
   {
     link: "/loteria",
-    label: <AppIcons Logo={"LOTERIA"} name="Loteria" />,
+    label: <AppIcons Logo={"LOTERIA"} name='Loteria' />,
     component: LoteriaBog,
     provider: ProvideLoteria,
     permission: [3, 4, 5, 6, 44, 45, 46, 47],
@@ -317,31 +361,31 @@ const allUrlsPrivateApps = [
       subRoutes: [
         {
           link: `/loteria/${name}/ventas`,
-          label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
+          label: <AppIcons Logo={"SORTEOS"} name='Ventas' />,
           component: venta,
           permission: [3],
         },
         {
           link: `/loteria/${name}/cargar`,
-          label: <AppIcons Logo={CARGAR} name="Carga de archivos" />,
+          label: <AppIcons Logo={CARGAR} name='Carga de archivos' />,
           component: CargaArchivos,
           permission: [4],
         },
         {
           link: `/loteria/${name}/descargar`,
-          label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+          label: <AppIcons Logo={DESCARGAR} name='Descarga de archivos' />,
           component: Descargas,
           permission: [6],
           subRoutes: [
             {
               link: `/loteria/${name}/descargar/descarga_reportes`,
-              label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+              label: <AppIcons Logo={DESCARGAR} name='Descarga de archivos' />,
               component: DescargarArchivosS3,
               permission: [6],
             },
             {
               link: `/loteria/${name}/descargar/borrar_billetes`,
-              label: <AppIcons Logo={"REPORTE"} name="Eliminar Billeteria" />,
+              label: <AppIcons Logo={"REPORTE"} name='Eliminar Billeteria' />,
               component: BorrarBilletes,
               permission: [6],
             },
@@ -349,20 +393,20 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/sorteos`,
-          label: <AppIcons Logo={"REPORTE"} name="Sorteos" />,
+          label: <AppIcons Logo={"REPORTE"} name='Sorteos' />,
           component: CrearSorteos,
           permission: [5],
         },
         {
           link: `/loteria/${name}/premios`,
-          label: <AppIcons Logo={"PAGO"} name="Premios" />,
+          label: <AppIcons Logo={"PAGO"} name='Premios' />,
           component: Premios,
           extern: false,
           permission: [3], ///////////////////////////////////////////////////////////////////
         },
         {
           link: `/loteria/${name}/arqueo`,
-          label: <AppIcons Logo={"PAGO"} name="Arqueo Billetes" />,
+          label: <AppIcons Logo={"PAGO"} name='Arqueo Billetes' />,
           component: ArqueoBilletes,
           extern: false,
           permission: [3, 6], ///////////////////////////////////////////////////////////////////
@@ -373,27 +417,27 @@ const allUrlsPrivateApps = [
 
   {
     link: "/transacciones",
-    label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name='Transacciones' />,
     component: Transacciones,
     permission: [8],
   },
   {
     link: "/update-commerce",
-    label: <AppIcons Logo={"ACTUALIZACION"} name="Actualizacion de datos" />,
+    label: <AppIcons Logo={"ACTUALIZACION"} name='Actualizacion de datos' />,
     component: FormCommerce,
     permission: [7],
   },
   {
     link: "/review-commerce-forms",
     label: (
-      <AppIcons Logo={"ACTUALIZACION"} name="Revisar actualizacion de datos" />
+      <AppIcons Logo={"ACTUALIZACION"} name='Revisar actualizacion de datos' />
     ),
     component: CommerceInfo,
     permission: [9],
   },
   {
     link: "https://www.puntodecompra.com.co/",
-    label: <AppIcons Logo={"MARKETPLACE"} name="Marketplace" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name='Marketplace' />,
     component: MarketPlace,
     extern: true,
     permission: [10],
@@ -406,13 +450,13 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/reporte_general",
-    label: <AppIcons Logo={"MARKETPLACE"} name="Reporte Punto De Compra" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name='Reporte Punto De Compra' />,
     component: ReporteGral,
     permission: [37],
   },
   {
     link: "/funmujer",
-    label: <AppIcons Logo={"RECAUDO"} name="Fundación de la mujer" />,
+    label: <AppIcons Logo={"RECAUDO"} name='Fundación de la mujer' />,
     component: FunMujer,
     permission: [17, 27, 28],
     provider: ProvideFundamujer,
@@ -446,7 +490,7 @@ const allUrlsPrivateApps = [
 
   {
     link: "/PinesVus",
-    label: <AppIcons Logo={"RECAUDO"} name="Pines" />,
+    label: <AppIcons Logo={"RECAUDO"} name='Pines' />,
     component: PinesVus,
     permission: [53],
     provider: ProvidepinesVus,
@@ -464,9 +508,49 @@ const allUrlsPrivateApps = [
         permission: [53],
       },
       {
-        link: "/PinesVus/Reporte",
-        label: <AppIcons Logo={"RECAUDO"} name={"Reporte Pines"} />,
+        link: "/PinesVus/Participacion",
+        label: <AppIcons Logo={"RECAUDO"} name={"Participacion Pines"} />,
+        component: PagoParticipantes,
+        permission: [53],
+        subRoutes: [
+        {
+          link: "/PinesVus/Participacion/PagoParticipacion",
+          label: <AppIcons Logo={"RECAUDO"} name={"Pago participacion"} />,
+          component: ParticipacionPines,
+          permission: [53],
+        },
+        {
+          link: "/PinesVus/Participacion/VerPagoParticipacion",
+          label: <AppIcons Logo={"RECAUDO"} name={"Ver pago participacion"} />,
+          component: VerParticipacionPines,
+          permission: [53],
+        },
+        ]
+      },
+      {
+        link: "/PinesVus/Reportes",
+        label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
         component: ReportePines,
+        permission: [53],
+        subRoutes: [
+          {
+          link: "/PinesVus/Reporte/VerReportes",
+          label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
+          component: ReportePinesVer,
+          permission: [53],
+          },
+          {
+            link: "/PinesVus/Reporte/DescargarReportes",
+            label: <AppIcons Logo={"RECAUDO"} name={"Descargar Reportes Pines"} />,
+            component: ReportePinesDescargar,
+            permission: [53],
+          }          
+        ]
+      },
+      {
+        link: "/PinesVus/EspejoQX",
+        label: <AppIcons Logo={"RECAUDO"} name={"Espejo Cupo QX"} />,
+        component: EspejoQX,
         permission: [53],
       },
     ],
@@ -474,37 +558,37 @@ const allUrlsPrivateApps = [
 
   {
     link: "/iam",
-    label: <AppIcons Logo={"MARKETPLACE"} name="IAM" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name='IAM' />,
     component: IAMIndex,
     permission: [12, 13, 14, 15, 16],
     subRoutes: [
       {
         link: "/iam/users",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Usuarios" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Usuarios' />,
         component: IAMUsers,
         permission: [13],
       },
       {
         link: "/iam/groups",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Grupos" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Grupos' />,
         component: IAMGroups,
         permission: [12],
       },
       {
         link: "/iam/policies",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Politicas" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Politicas' />,
         component: IAMPolicies,
         permission: [16],
       },
       {
         link: "/iam/roles",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Roles" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Roles' />,
         component: IAMRoles,
         permission: [14],
       },
       {
         link: "/iam/permissions",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Permisos" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Permisos' />,
         component: IAMPermissions,
         permission: [15],
       },
@@ -532,54 +616,54 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/daviplata",
-    label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name='Daviplata' />,
     component: Daviplata,
-    permission: [29, 30],
+    permission: [53],
     subRoutes: [
       {
         link: "/daviplata/depositos",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Depositos Daviplata" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />,
         component: Deposito,
-        permission: [29],
+        permission: [53],
       },
       {
         link: "/daviplata/retiros",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Retiros Daviplata" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />,
         component: Retiro,
-        permission: [30],
+        permission: [53],
       },
     ],
   },
 
   {
     link: "/corresponsaliaDavivienda",
-    label: <AppIcons Logo={"MARKETPLACE"} name="Corresponsalia" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name='Corresponsalia' />,
     component: CorresponsaliaDavivienda,
-    permission: [29, 30],
+    permission: [54],
     subRoutes: [
       {
         link: "/corresponsaliaDavivienda/Daviplata",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Daviplata' />,
         component: DaviplataCB,
-        permission: [29, 30],
+        permission: [54],
         subRoutes: [
           {
             link: "/corresponsaliaDavivienda/DaviplatacashIn",
-            label: <AppIcons Logo={"MARKETPLACE"} name="Depositos Daviplata" />,
+            label: <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />,
             component: CashIn,
-            permission: [29],
+            permission: [54],
           },
           {
             link: "/corresponsaliaDavivienda/DaviplatacashOut",
-            label: <AppIcons Logo={"MARKETPLACE"} name="Retiros Daviplata" />,
+            label: <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />,
             component: CashOut,
-            permission: [30],
+            permission: [54],
           },
           {
             link: "/corresponsaliaDavivienda/Daviplatapagos_giros",
-            label: <AppIcons Logo={"MARKETPLACE"} name="Pagos por giro" />,
+            label: <AppIcons Logo={"MARKETPLACE"} name='Pagos por giro' />,
             component: PagoGiro,
-            permission: [30],
+            permission: [54],
           },
         ],
       },
@@ -589,23 +673,79 @@ const allUrlsPrivateApps = [
         label: (
           <AppIcons
             Logo={"MARKETPLACE"}
-            name="Transacciones cuentas Davivienda"
+            name='Transacciones cuentas Davivienda'
           />
         ),
         component: AhorrosCorrienteCB,
-        permission: [29, 30],
+        permission: [54],
         subRoutes: [
           {
             link: "/corresponsaliaDavivienda/ahorrosCorriente/deposito",
-            label: <AppIcons Logo={"MARKETPLACE"} name="Depositos" />,
+            label: <AppIcons Logo={"MARKETPLACE"} name='Depositos' />,
             component: DepositoCB,
-            permission: [29],
+            permission: [54],
           },
           {
             link: "/corresponsaliaDavivienda/ahorrosCorriente/retiro",
-            label: <AppIcons Logo={"MARKETPLACE"} name="Retiros" />,
+            label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
             component: RetiroCB,
-            permission: [30],
+            permission: [54],
+          },
+        ],
+      },
+      {
+        link: "/corresponsaliaDavivienda/Daviplatapagos_giros",
+        label: <AppIcons Logo={"MARKETPLACE"} name='Pagos por giro' />,
+        component: PagoGiro,
+        permission: [54],
+      },
+
+      {
+        link: "/corresponsaliaDavivienda/pagoDeProductosPropios",
+        label: (
+          <AppIcons Logo={"MARKETPLACE"} name='Pago de productos de crédito' />
+        ),
+        component: PagoDeProductosPropios,
+        permission: [54],
+      },
+      {
+        link: "/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados",
+        label: (
+          <AppIcons
+            Logo={"MARKETPLACE"}
+            name='Recaudo servicios publicos y privados'
+          />
+        ),
+        component: RecaudoServiciosPublicosPrivadosMenu,
+        permission: [54],
+        subRoutes: [
+          {
+            link: "/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccion",
+            label: (
+              <AppIcons Logo={"MARKETPLACE"} name='Selección del covenio' />
+            ),
+            component: SeleccionServicioPagar,
+            permission: [54],
+          },
+          {
+            link: "/corresponsaliaDavivienda/ahorrosCorriente/automatico",
+            label: (
+              <AppIcons
+                Logo={"MARKETPLACE"}
+                name='Ingreso por código de barras'
+              />
+            ),
+            component: RecaudoServiciosPublicosPrivadosLecturaCodigoBarras,
+            permission: [54],
+          },
+          {
+            link: "/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
+            label: (
+              <AppIcons Logo={"MARKETPLACE"} name='Selección del covenio' />
+            ),
+            component: RecaudoServiciosPublicosPrivados,
+            permission: [54],
+            show: false,
           },
         ],
       },
@@ -613,31 +753,31 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/API_SMS",
-    label: <AppIcons Logo={"MARKETPLACE"} name="SMS" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name='SMS' />,
     component: API_SMS,
     permission: [25],
     subRoutes: [
       {
         link: "/API_SMS/EnviarSMS",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Enviar SMS" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Enviar SMS' />,
         component: EnviarSMS,
         permission: [25],
       },
       {
         link: "/API_SMS/crearSMS",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Crear SMS" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Crear SMS' />,
         component: CrearSMS,
         permission: [26],
       },
       {
         link: "/API_SMS/reporteSMS",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Reporte" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Reporte' />,
         component: reporteSMS,
         permission: [26],
       },
       {
         link: "/API_SMS/BloquearNum",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Bloqueo de números" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Bloqueo de números' />,
         component: BloquearNum,
         permission: [26],
       },
@@ -645,13 +785,13 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/recargas-Colcard",
-    label: <AppIcons Logo={"LOTERIA"} name="Recargas ColCard" />,
+    label: <AppIcons Logo={"LOTERIA"} name='Recargas ColCard' />,
     component: ColCard,
     permission: [50],
     subRoutes: [
       {
         link: "/recargas-Colcard/recargar-tarjeta",
-        label: <AppIcons Logo={"SORTEOS"} name="Recargar tarjeta" />,
+        label: <AppIcons Logo={"SORTEOS"} name='Recargar tarjeta' />,
         component: RecargarColCard,
         permission: [50],
       },
@@ -691,13 +831,13 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/movii-pdp/cash-out",
-        label: <AppIcons Logo={"SORTEOS"} name="Cash out" />,
+        label: <AppIcons Logo={"SORTEOS"} name='Cash out' />,
         component: MoviiPDPCashOut,
         permission: [49],
       },
       {
         link: "/movii-pdp/cash-out-reversos",
-        label: <AppIcons Logo={"SORTEOS"} name="Reversos cash out" />,
+        label: <AppIcons Logo={"SORTEOS"} name='Reversos cash out' />,
         component: MoviiPDPReverseCashOut,
         permission: [52],
       },
@@ -819,6 +959,25 @@ const allUrlsPrivateApps = [
           },
         ],
       },
+      {
+        link: "/params-operations/tipo-nivel-comercios",
+        label: <AppIcons Logo={"RECAUDO"} name={"Tipo nivel comercios"} />,
+        component: TipoNivelComercio,
+        permission: [51],
+      },
+      {
+        link: "/params-operations/comercios",
+        label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
+        component: ListarComercios,
+        permission: [31],
+      },
+      {
+        link: "/params-operations/comercios/crear",
+        label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
+        component: CrearComercios,
+        permission: [31],
+        show: false,
+      },
     ],
   },
   {
@@ -921,25 +1080,25 @@ const allUrlsPrivateApps = [
     link: "/domiciliacion",
     label: <AppIcons Logo={"RECAUDO"} name={"Domiciliación"} />,
     component: Domiciliacion,
-    permission: [32, 33, 34, 35, 36],
+    permission: [55, 56, 57],
     subRoutes: [
       {
         link: "/domiciliacion/formulario",
         label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />,
         component: comprobarEmail,
-        permission: [34],
+        permission: [55],
       },
       {
         link: "/domiciliacion/modificar",
         label: <AppIcons Logo={"ACTUALIZACION"} name={"Modificar"} />,
         component: ModificarPps,
-        permission: [33],
+        permission: [56],
       },
       {
         link: "/domiciliacion/ppspordemanda",
         label: <AppIcons Logo={"ACTUALIZACION"} name={"Pps A Demanda"} />,
         component: BuscarCedulaPpsADemanda,
-        permission: [33],
+        permission: [57],
       },
     ],
   },
@@ -947,7 +1106,7 @@ const allUrlsPrivateApps = [
     link: "/circulemos",
     label: <AppIcons Logo={"RECAUDO"} name={"Consorcio circulemos"} />,
     component: CirculemosComp,
-    permission: [1],
+    permission: [],
   },
   {
     link: "/pagos-ifood",
@@ -955,6 +1114,7 @@ const allUrlsPrivateApps = [
     component: iFoodAportes,
     permission: [1],
   },
+  rutasColpatria,
 ];
 
 export { allUrlsPrivateApps };

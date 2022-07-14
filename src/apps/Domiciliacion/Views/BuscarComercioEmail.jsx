@@ -88,7 +88,7 @@ const BuscarComercioEmail = () => {
         <Fragment>
           <Modal show={showModal} handleClose={handleClose}>
             <div className={contenedorImagen}>
-              <LogoPDP small></LogoPDP>
+              <LogoPDP xsmall></LogoPDP>
             </div>
             <div class={contenedorForm}>
               <div class={contenedorDatos}>

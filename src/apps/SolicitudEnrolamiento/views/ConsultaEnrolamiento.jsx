@@ -130,8 +130,8 @@ const ConsultaEnrolamiento = () => {
         respuestaProceso.length <= 0 && */
           showModal && cantNum < 5 ? (
             <Modal show={showModal} handleClose={handleClose}>
-              <LogoPDP></LogoPDP>
-
+              <LogoPDP xsmall></LogoPDP>
+              <br></br>
               <h1>
                 El número ingresado no se encuentra en proceso de enrolamiento,
                 por favor revise si esta bien escrito o realice el proceso de
@@ -144,7 +144,7 @@ const ConsultaEnrolamiento = () => {
             )[0]["numdoc"] === numconsultaProceso */ ? (
             <Modal show={showModal} handleClose={handleClose}>
               <div className={contenedorForm}>
-                <LogoPDP></LogoPDP>
+                <LogoPDP xsmall></LogoPDP>
                 <div className={contenedorDatos}>
                   <div className={contenedorTitulos}>
                     <h2 className={tituloDatos}>{`Nombre: `}</h2>

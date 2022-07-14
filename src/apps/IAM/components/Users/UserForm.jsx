@@ -111,6 +111,7 @@ const UserForm = ({ onCloseModal }) => {
             const { required, options } = val;
             return (
               <Select
+                className = 'place-self-stretch'
                 key={`${key}_new`}
                 id={`${key}_new`}
                 name={key}

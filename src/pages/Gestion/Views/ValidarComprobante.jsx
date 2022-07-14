@@ -9,9 +9,16 @@ import Select from "../../../components/Base/Select";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import { saveAs } from "file-saver";
-import PanelConsignaciones from "./PanelConsignaciones";
 import { updateReceipts } from "../utils/fetchCaja";
-import { notify, notifyError } from "../../../utils/notify";
+import { notify } from "../../../utils/notify";
+
+const dateFormatter = Intl.DateTimeFormat("es-CO", {
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "numeric",
+});
 
 const ValidarComprobante = ({ data, setShowModal }) => {
   const [status, setStatus] = useState("");
@@ -32,6 +39,7 @@ const ValidarComprobante = ({ data, setShowModal }) => {
   const saveFile = () => {
     saveAs(data?.archivo);
   };
+
   console.log(data);
   return (
     <>
@@ -40,9 +48,12 @@ const ValidarComprobante = ({ data, setShowModal }) => {
       </div>
       <Form Grid>
         {[data].map((row) => {
+          const tempDate = new Date(row?.created);
+          tempDate.setHours(tempDate.getHours() + 5);
+          const fechaHora = dateFormatter.format(tempDate);
           return (
             <>
-              <Input label="Banco" value={row?.compañia} disabled></Input>
+              <Input label="Empresa" value={row?.compañia} disabled></Input>
               <Input label="Cuenta" value={row?.cuenta} disabled></Input>
               <Input
                 label="# Consignación"
@@ -54,24 +65,28 @@ const ValidarComprobante = ({ data, setShowModal }) => {
                 value={row?.valor}
                 disabled
               ></MoneyInput>
-              <Input label="Fecha" value={row?.created} disabled></Input>
-              <Select
-                id="searchByAgreement"
-                label="Estado"
-                options={[
-                  { value: 0, label: "" },
-                  { value: 1, label: "RECHAZADO" },
-                  { value: 2, label: "APROBADO" },
-                ]}
-                onChange={(e) => {
-                  console.log(e.target.value);
-                  if (e.target.value === "1") {
-                    setStatus("RECHAZADO");
-                  } else if (e.target.value === "2") {
-                    setStatus("APROBADO");
-                  }
-                }}
-              />
+              <Input label="Fecha" value={fechaHora} disabled></Input>
+              {data?.status === "PENDIENTE" ? (
+                <Select
+                  id="searchByAgreement"
+                  label="Estado"
+                  options={[
+                    { value: 0, label: "" },
+                    { value: 1, label: "RECHAZADO" },
+                    { value: 2, label: "APROBADO" },
+                  ]}
+                  onChange={(e) => {
+                    console.log(e.target.value);
+                    if (e.target.value === "1") {
+                      setStatus("RECHAZADO");
+                    } else if (e.target.value === "2") {
+                      setStatus("APROBADO");
+                    }
+                  }}
+                />
+              ) : (
+                ""
+              )}
               <Magnifier src={row?.archivo} zoomFactor={2} />
             </>
           );
@@ -80,21 +95,29 @@ const ValidarComprobante = ({ data, setShowModal }) => {
         <Button type="button" onClick={saveFile}>
           Descargar imagen
         </Button>
-        <TextArea
-          id="obs"
-          label="Observación"
-          type="input"
-          minLength="1"
-          maxLength="160"
-          autoComplete="off"
-          onChange={(e) => {
-            setObservation(e.target.value);
-          }}
-        ></TextArea>
+        {data?.status === "PENDIENTE" ? (
+          <TextArea
+            id="obs"
+            label="Observación"
+            type="input"
+            minLength="1"
+            maxLength="160"
+            autoComplete="off"
+            onChange={(e) => {
+              setObservation(e.target.value);
+            }}
+          ></TextArea>
+        ) : (
+          ""
+        )}
         <ButtonBar>
-          <Button type="button" onClick={() => updateReceipt()}>
-            Guardar
-          </Button>
+          {data?.status === "PENDIENTE" ? (
+            <Button type="button" onClick={() => updateReceipt()}>
+              Guardar
+            </Button>
+          ) : (
+            ""
+          )}
           <Button type="button" onClick={() => setShowModal(false)}>
             Salir
           </Button>
