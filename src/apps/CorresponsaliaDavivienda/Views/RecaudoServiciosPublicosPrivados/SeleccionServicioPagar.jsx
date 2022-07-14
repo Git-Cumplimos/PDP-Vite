@@ -51,7 +51,7 @@ const SeleccionServicioPagar = () => {
         }
       );
     },
-    [tableConvenios, navigate]
+    [navigate, convenios]
   );
 
   useEffect(() => {

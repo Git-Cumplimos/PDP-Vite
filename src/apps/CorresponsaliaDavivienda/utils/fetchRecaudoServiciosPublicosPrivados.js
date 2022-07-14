@@ -40,3 +40,22 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
     throw err;
   }
 };
+export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/codigo_barras`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};

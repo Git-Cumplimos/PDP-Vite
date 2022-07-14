@@ -26,6 +26,7 @@ const RecaudoServiciosPublicosPrivados = () => {
   const [datosTrans, setDatosTrans] = useState({
     ref1: "",
     ref2: "",
+    valor: "",
   });
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
@@ -39,7 +40,6 @@ const RecaudoServiciosPublicosPrivados = () => {
       pk_tbl_transaccional_convenios_davivienda_cb: state?.id,
     })
       .then((autoArr) => {
-        console.log(autoArr?.results[0]);
         setConvenio(autoArr?.results[0]);
         setIsUploading(false);
       })
@@ -50,16 +50,28 @@ const RecaudoServiciosPublicosPrivados = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-  const onSubmit = () => {};
+  const onSubmitPago = (e) => {
+    e.preventDefault();
+    if (
+      convenio?.num_ind_consulta_cnb === "0" ||
+      convenio?.num_ind_consulta_cnb === "3"
+    ) {
+      console.log("realizar pago");
+    } else {
+      console.log("realizar consulta");
+    }
+  };
   return (
     <>
       <SimpleLoading show={isUploading} />
       <h1 className='text-3xl text-center'>
         Recaudo servicios publicos y privados
       </h1>
-      <h1 className='text-3xl text-center'>{`Convenio: ${convenio?.nom_convenio_cnb}`}</h1>
+      <h1 className='text-3xl text-center'>{`Convenio: ${
+        convenio?.nom_convenio_cnb ?? ""
+      }`}</h1>
 
-      <Form grid onSubmit={onSubmit}>
+      <Form grid onSubmit={onSubmitPago}>
         {convenio?.ctrol_ref1_cnb === "1" && (
           <>
             <Input
@@ -103,12 +115,12 @@ const RecaudoServiciosPublicosPrivados = () => {
             type='text'
             autoComplete='off'
             maxLength={"15"}
-            value={datosTrans.valorCashOut ?? ""}
+            value={datosTrans.valor ?? ""}
             onInput={(e, valor) => {
               if (!isNaN(valor)) {
                 const num = valor;
                 setDatosTrans((old) => {
-                  return { ...old, valorCashOut: num };
+                  return { ...old, valor: num };
                 });
               }
             }}
@@ -123,73 +135,6 @@ const RecaudoServiciosPublicosPrivados = () => {
           </Button>
         </ButtonBar>
       </Form>
-      {/* <Modal show={showModal} handleClose={hideModal}>
-        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-          {!peticion ? (
-            datosTrans.valorCashOut <= limiteRecarga.superior &&
-            datosTrans.valorCashOut >= limiteRecarga.inferior ? (
-              <>
-                <h1 className='text-2xl font-semibold'>
-                  ¿Esta seguro de realizar el cash out?
-                </h1>
-                <h2 className='text-base'>
-                  {`Valor de transacción: ${formatMoney.format(
-                    datosTrans.valorCashOut
-                  )} COP`}
-                </h2>
-                <h2>{`Número de telefono: ${datosTrans.numeroTelefono}`}</h2>
-                <h2>{`Número de otp: ${datosTrans.otp}`}</h2>
-                <ButtonBar>
-                  <Button
-                    disabled={botonAceptar}
-                    type='submit'
-                    onClick={peticionCashOut}>
-                    Aceptar
-                  </Button>
-                  <Button onClick={hideModal}>Cancelar</Button>
-                </ButtonBar>
-              </>
-            ) : (
-              <>
-                <h2 className='text-2xl font-semibold'>
-                  {datosTrans.valorCashOut <= limiteRecarga.inferior
-                    ? `ERROR el valor de cash out debe ser mayor a ${formatMoney.format(
-                        limiteRecarga.inferior
-                      )}`
-                    : "ERROR El valor de cash out debe ser menor a " +
-                      formatMoney.format(limiteRecarga.superior) +
-                      " COP"}
-                </h2>
-
-                <ButtonBar>
-                  <Button onClick={() => setShowModal(false)}>Cancelar</Button>
-                </ButtonBar>
-              </>
-            )
-          ) : (
-            ""
-          )} */}
-      {/* {peticion && (
-            <>
-              <h2>
-                <ButtonBar>
-                  <Button
-                    type='submit'
-                    onClick={() => {
-                      hideModal();
-                    }}>
-                    Aceptar
-                  </Button>
-                  <Button onClick={handlePrint}>Imprimir</Button>
-                </ButtonBar>
-              </h2>
-              <TicketsDavivienda
-                ticket={objTicketActual}
-                refPrint={printDiv}></TicketsDavivienda>
-            </>
-          )} */}
-      {/* </div>
-      </Modal> */}
     </>
   );
 };
