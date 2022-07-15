@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import HNavbar from "../../../components/Base/HNavbar";
-import { useAuth } from "../../../hooks/AuthHooks";
-import { notifyError } from "../../../utils/notify";
+import HNavbar from "../../../../components/Base/HNavbar";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import { notifyError } from "../../../../utils/notify";
 
 const Daviplata = ({ subRoutes }) => {
   const navigate = useNavigate();

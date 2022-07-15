@@ -1,4 +1,4 @@
-import fetchData from "../../../utils/fetchData";
+import fetchData from "../../../../utils/fetchData";
 
 const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
 

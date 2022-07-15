@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import HNavbar from "../../../components/Base/HNavbar";
-import { useAuth } from "../../../hooks/AuthHooks";
-import { notifyError } from "../../../utils/notify";
+import HNavbar from "../../../../components/Base/HNavbar";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import { notifyError } from "../../../../utils/notify";
 
-const CorresponsaliaDavivienda = ({ subRoutes }) => {
+const RecaudoServiciosPublicosPrivadosMenu = ({ subRoutes }) => {
   const navigate = useNavigate();
   const { roleInfo } = useAuth();
 
@@ -39,4 +39,4 @@ const CorresponsaliaDavivienda = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default CorresponsaliaDavivienda;
+export default RecaudoServiciosPublicosPrivadosMenu;

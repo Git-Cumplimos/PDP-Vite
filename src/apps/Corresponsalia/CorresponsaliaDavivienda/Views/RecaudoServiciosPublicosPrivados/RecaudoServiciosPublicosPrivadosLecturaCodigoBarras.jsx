@@ -8,17 +8,17 @@ import {
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import Button from "../../../../components/Base/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import Form from "../../../../components/Base/Form";
-import Input from "../../../../components/Base/Input";
-import Modal from "../../../../components/Base/Modal";
-import MoneyInput from "../../../../components/Base/MoneyInput";
-import MoneyInputDec from "../../../../components/Base/MoneyInputDec";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import useQuery from "../../../../hooks/useQuery";
-import { notify, notifyError } from "../../../../utils/notify";
+import Button from "../../../../../components/Base/Button";
+import ButtonBar from "../../../../../components/Base/ButtonBar";
+import Form from "../../../../../components/Base/Form";
+import Input from "../../../../../components/Base/Input";
+import Modal from "../../../../../components/Base/Modal";
+import MoneyInput from "../../../../../components/Base/MoneyInput";
+import MoneyInputDec from "../../../../../components/Base/MoneyInputDec";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import TableEnterprise from "../../../../../components/Base/TableEnterprise";
+import useQuery from "../../../../../hooks/useQuery";
+import { notify, notifyError } from "../../../../../utils/notify";
 import {
   postConsultaCodigoBarrasConveniosEspecifico,
   postConsultaTablaConveniosEspecifico,

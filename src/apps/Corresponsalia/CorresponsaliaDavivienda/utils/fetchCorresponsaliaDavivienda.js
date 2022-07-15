@@ -1,4 +1,4 @@
-import fetchData from "../../../utils/fetchData";
+import fetchData from "../../../../utils/fetchData";
 
 const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
 console.log(urlDaviplata);
@@ -42,7 +42,6 @@ export const pagoGiroDaviplata = async (bodyObj) => {
       {},
       {},
       80000
-
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -93,8 +92,7 @@ export const postRealizarCashoutDavivienda = async (bodyObj) => {
   } catch (err) {
     throw err;
   }
-}
-
+};
 
 export const consultaCostoCB = async (bodyObj) => {
   if (!bodyObj) {
@@ -119,7 +117,7 @@ export const consultaCostoCB = async (bodyObj) => {
   } catch (err) {
     throw err;
   }
-}
+};
 
 export const depositoCorresponsal = async (bodyObj) => {
   if (!bodyObj) {
@@ -144,7 +142,7 @@ export const depositoCorresponsal = async (bodyObj) => {
   } catch (err) {
     throw err;
   }
-}
+};
 
 export const retiroCorresponsal = async (bodyObj) => {
   if (!bodyObj) {
@@ -169,4 +167,4 @@ export const retiroCorresponsal = async (bodyObj) => {
   } catch (err) {
     throw err;
   }
-}
+};

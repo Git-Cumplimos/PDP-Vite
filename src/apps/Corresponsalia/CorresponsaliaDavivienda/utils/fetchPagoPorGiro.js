@@ -1,14 +1,14 @@
-import fetchData from "../../../utils/fetchData";
+import fetchData from "../../../../utils/fetchData";
 
 const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
 
-export const postConsultaProductosPropiosDavivienda = async (bodyObj) => {
+export const postConsultaPagoPorGiroDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_productos_propios/consulta`,
+      `${urlDaviplata}davivienda_pago_por_giro/consulta`,
       "POST",
       {},
       bodyObj
@@ -21,13 +21,13 @@ export const postConsultaProductosPropiosDavivienda = async (bodyObj) => {
     throw err;
   }
 };
-export const postPagoProductosPropiosDavivienda = async (bodyObj) => {
+export const postPagoPorGiroDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_productos_propios/pago_productos_propios`,
+      `${urlDaviplata}davivienda_pago_por_giro/pago_giro`,
       "POST",
       {},
       bodyObj
