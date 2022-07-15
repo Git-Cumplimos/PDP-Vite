@@ -534,7 +534,7 @@ const allUrlsPrivateApps = [
     link: "/PinesVus",
     label: <AppIcons Logo={"RECAUDO"} name='Pines' />,
     component: PinesVus,
-    permission: [53],
+    permission: [53, 63],
     provider: ProvidepinesVus,
     subRoutes: [
       {
@@ -549,39 +549,37 @@ const allUrlsPrivateApps = [
         component: TramitarPines,
         permission: [53],
       },
-      {
-        link: "/PinesVus/Participacion",
-        label: <AppIcons Logo={"RECAUDO"} name={"Participacion Pines"} />,
-        component: PagoParticipantes,
-        permission: [53],
-        subRoutes: [
-          {
-            link: "/PinesVus/Participacion/PagoParticipacion",
-            label: <AppIcons Logo={"RECAUDO"} name={"Pago participacion"} />,
-            component: ParticipacionPines,
-            permission: [53],
-          },
-          {
-            link: "/PinesVus/Participacion/VerPagoParticipacion",
-            label: (
-              <AppIcons Logo={"RECAUDO"} name={"Ver pago participacion"} />
-            ),
-            component: VerParticipacionPines,
-            permission: [53],
-          },
-        ],
-      },
+      // {
+      //   link: "/PinesVus/Participacion",
+      //   label: <AppIcons Logo={"RECAUDO"} name={"Participacion Pines"} />,
+      //   component: PagoParticipantes,
+      //   permission: [53],
+      //   subRoutes: [
+      //   {
+      //     link: "/PinesVus/Participacion/PagoParticipacion",
+      //     label: <AppIcons Logo={"RECAUDO"} name={"Pago participacion"} />,
+      //     component: ParticipacionPines,
+      //     permission: [53],
+      //   },
+      //   {
+      //     link: "/PinesVus/Participacion/VerPagoParticipacion",
+      //     label: <AppIcons Logo={"RECAUDO"} name={"Ver pago participacion"} />,
+      //     component: VerParticipacionPines,
+      //     permission: [53],
+      //   },
+      //   ]
+      // },
       {
         link: "/PinesVus/Reportes",
         label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
         component: ReportePines,
-        permission: [53],
+        permission: [53, 63],
         subRoutes: [
           {
             link: "/PinesVus/Reporte/VerReportes",
             label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
             component: ReportePinesVer,
-            permission: [53],
+            permission: [53, 63],
           },
           {
             link: "/PinesVus/Reporte/DescargarReportes",
@@ -589,7 +587,7 @@ const allUrlsPrivateApps = [
               <AppIcons Logo={"RECAUDO"} name={"Descargar Reportes Pines"} />
             ),
             component: ReportePinesDescargar,
-            permission: [53],
+            permission: [63],
           },
         ],
       },
@@ -597,7 +595,7 @@ const allUrlsPrivateApps = [
         link: "/PinesVus/EspejoQX",
         label: <AppIcons Logo={"RECAUDO"} name={"Espejo Cupo QX"} />,
         component: EspejoQX,
-        permission: [53],
+        permission: [63],
       },
     ],
   },

@@ -88,29 +88,25 @@ const EspejoQX = () => {
   
   return (
     <>
-      {"id_comercio" in roleInfo ? (
-        <><h1 className="text-3xl mt-6 mx-auto">Espejo Cupo QX</h1>
-        <br></br>
-        <div
-          className="max-width: 8.75rem;
-        @apply rounded-full px-6 bg-primary text-white mx-2 text-center;"
-        >
-          Cupo: {formatMoney.format(cupoQXconsulta || "NaN")}
-        </div>
-        <Form></Form>
-        <ButtonBar>
-              <Button 
-              type="submit"
-              onClick={() => {
-                setShowModal(true)
-              }}
-              >Modificar</Button>     
-          </ButtonBar>
-        </>
-
-      ) : (
-        <h1 className="text-3xl mt-6">El usuario no tiene comercio asociado</h1>
-      )}
+      
+      <><h1 className="text-3xl mt-6 mx-auto">Espejo Cupo QX</h1>
+      <br></br>
+      <div
+        className="max-width: 8.75rem;
+      @apply rounded-full px-6 bg-primary text-white mx-2 text-center;"
+      >
+        Cupo: {formatMoney.format(cupoQXconsulta || "NaN")}
+      </div>
+      <Form></Form>
+      <ButtonBar>
+            <Button 
+            type="submit"
+            onClick={() => {
+              setShowModal(true)
+            }}
+            >Modificar</Button>     
+        </ButtonBar>
+      </>
       <Modal show={showModal} handleClose={() => closeModal()}>
       <>
         <div className="flex flex-col w-1/2 mx-auto ">
