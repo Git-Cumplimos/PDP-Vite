@@ -43,7 +43,6 @@ const AjusteCupoComer = ({ subRoutes }) => {
   const onSubmitAjuste = useCallback(
     (e) => {
       e.preventDefault();
-      console.log(e.nativeEvent.submitter.name);
       if (e.nativeEvent.submitter.name === "debito") {
         const args = { pk_id_comercio: idComercio };
 

@@ -3,7 +3,6 @@ import fetchData from "../../../utils/fetchData";
 const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}`;
 
 export const getConsultaCupoComercio = async (pk_id_comercio, page, limit) => {
-  console.log(urlCupo);
   const busqueda = {};
   if (pk_id_comercio) {
     busqueda.pk_id_comercio = pk_id_comercio;
@@ -162,7 +161,6 @@ export const putAjusteCupo = async (argsObj, bodyObj) => {
       argsObj,
       bodyObj
     );
-    console.log(res?.obj);
     if (!res?.status) {
       console.error(res?.msg);
     }
@@ -229,7 +227,8 @@ export const PeticionDescargarPdf = async (
     const contentType = response.headers.get("content-type");
     const nombreDocumento = response.headers
       .get("Content-Disposition")
-      .slice(22, -1);
+      .slice(21);
+
     if (contentType === "application/pdf") {
       const byts = await response.blob();
       const downloadUrl = URL.createObjectURL(byts);
@@ -256,7 +255,6 @@ export const getTipoMovimientosCupo = async (
   limit,
   nombre
 ) => {
-  console.log(urlCupo);
   const busqueda = {};
   if (pk_id_tipo_movimiento) {
     busqueda.pk_id_tipo_movimiento = pk_id_tipo_movimiento;
