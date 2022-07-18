@@ -20,7 +20,7 @@ import { useFetch } from "../../../hooks/useFetch";
 import { notify, notifyError } from "../../../utils/notify";
 import { PeticionRecarga } from "../utils/fetchMovistar";
 
-const URL = "http://127.0.0.1:5000/recargasmovistar/prepago";
+const URL = `${process.env.REACT_APP_URL_MOVISTAR}/recargasmovistar/prepago`;
 
 const RecargasMovistar = () => {
   //Variables
@@ -80,6 +80,7 @@ const RecargasMovistar = () => {
       tipo_comercio: roleInfo.tipo_comercio,
       id_dispositivo: roleInfo.id_dispositivo,
       id_usuario: roleInfo.id_usuario,
+      codigo_dane:roleInfo.codigo_dane
     };
 
     fetchRecarga(URL, data).then((response) => {

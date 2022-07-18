@@ -10,8 +10,8 @@ import {
   PeticionDescargar,
 } from "../utils/fetchMovistar";
 
-const URL = "http://127.0.0.1:5000/movistar/conciliacion/buscar";
-const URLDescarga = "http://127.0.0.1:5000/movistar/conciliacion/descargar";
+const URL = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/buscar`;
+const URLDescarga = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/descargar`;
 
 const ConcilacionMovistar = () => {
   const [paramts, setParamts] = useState({
@@ -97,7 +97,7 @@ const ConcilacionMovistar = () => {
           onSelectRow={(e, i) => {
             // console.log(e, data?.[i]);
             PeticionDescargar(
-              "http://127.0.0.1:5000/movistar/conciliacion/descargar?fechabusqueda=" +
+              URLDescarga+"?fechabusqueda=" +
                 data?.[i].fechabusqueda
             );
           }}
