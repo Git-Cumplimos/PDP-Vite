@@ -82,7 +82,7 @@ const CupoComer = () => {
 
       <TableEnterprise
         title="Cupo Comercios"
-        headers={["Id comercio", "Cupo Limite", "Deuda Cupo", "Cupo en Canje"]}
+        headers={["Id comercio", "Cupo Límite", "Deuda Cupo", "Cupo en Canje"]}
         data={
           cupoComer?.results.map(
             ({ pk_id_comercio, limite_cupo, deuda, cupo_en_canje }) => ({

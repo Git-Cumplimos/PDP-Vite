@@ -64,7 +64,7 @@ const ModifiLimiteCanje = () => {
       postDtlCambioLimiteCanje(body)
         .then((res) => {
           if (!res?.status) {
-            notifyError("Error al asignar limite de cupo");
+            notifyError("Error al asignar límite de cupo");
             return;
           }
           notify("Modificacion exitosa");
@@ -104,7 +104,7 @@ const ModifiLimiteCanje = () => {
             <MoneyInput
               id="cupo_limite"
               name="cupo_limite"
-              label="Limite de cupo"
+              label="Límite de cupo"
               autoComplete="off"
               defaultValue={parseInt(cupoComer?.results[0].limite_cupo)}
               onInput={onMoneyChange}
@@ -136,7 +136,7 @@ const ModifiLimiteCanje = () => {
               "Id comercio",
               "Valor Afectacion",
               "Fecha afectacion",
-              "Limite de Cupo",
+              "Límite de Cupo",
               "Usuario",
             ]}
             data={
