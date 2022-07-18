@@ -16,6 +16,7 @@ const BuscarCedulaPpsADemanda = () => {
   const [cantNum, setCantNum] = useState(0);
   const [showModal, setShowModal] = useState(true);
   const [estado, setEstado] = useState(false);
+  const [message, setMessage] = useState("3");
   const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
 
   //------------------Constantes para Dar Estilos---------------------//
@@ -88,9 +89,7 @@ const BuscarCedulaPpsADemanda = () => {
         });
     } else {
       if (cantNum < 6 || cantNum > 13) {
-        notifyError(
-          "El número de consulta debe ser mayor a 6  y menor a 13 digitos"
-        );
+        notifyError("Ingrese un número valido para la consulta.");
       }
     }
   };
@@ -147,7 +146,21 @@ const BuscarCedulaPpsADemanda = () => {
       ) : (
         <div>
           <Form grid onSubmit={(e) => BuscarCedula(e)}>
-            <Input
+            {/*  <Input
+              value={buscarCedula}
+              minLength="6"
+              maxLength="10"
+              type="tel"
+              onInput={(event) => {
+                if (!/[0-9]/.test(event.key)) {
+                  event.preventDefault();
+                  console.log("error");
+                }
+                setBuscarCedula(event.target.value);
+              }}
+              required
+            /> */}
+            {/*             <Input
               label={"N° Identificación"}
               placeholder={"Ingrese N° Identificación"}
               value={buscarCedula}
@@ -159,7 +172,21 @@ const BuscarCedulaPpsADemanda = () => {
               maxLength="10"
               type={"text"}
               required
-            />
+            /> */}
+
+            <Input
+              label={"N° Identificación"}
+              placeholder={"Ingrese N° Identificación"}
+              value={buscarCedula}
+              minLength="6"
+              maxLength="10"
+              onInput={(e) => {
+                const num = e.target.value || "";
+                setBuscarCedula(num);
+              }}
+              type={"text"}
+              required
+            ></Input>
             <ButtonBar className={"lg:col-span-2"} type="">
               {
                 <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>

@@ -1,5 +1,5 @@
 import classes from "./TicketsDavivienda.module.css";
-import LogoPDP from "../../../../components/Base/LogoPDP/LogoPDP";
+import LogoPDP from "../../../../../components/Base/LogoPDP/LogoPDP";
 // import LogoPDP from "../../../LogoPDP/LogoPDP";
 
 const TicketsDavivienda = ({

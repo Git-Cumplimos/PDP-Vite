@@ -141,14 +141,12 @@ const MoviiPDPCashOut = () => {
     objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
     postRealizarCashout({
-      id_comercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
-      id_usuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 1,
-      id_terminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 801,
+      id_comercio: roleInfo?.id_comercio,
+      id_usuario: roleInfo?.id_usuario,
+      id_terminal: roleInfo?.id_dispositivo,
       amount: datosTrans?.valorCashOut,
-      issuer_id_dane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 1121,
-      nombre_comercio: roleInfo?.["nombre comercio"]
-        ? roleInfo?.["nombre comercio"]
-        : "prod",
+      issuer_id_dane: roleInfo?.codigo_dane,
+      nombre_comercio: roleInfo?.["nombre comercio"],
       Ticket: objTicket,
       subscriberNum: datosTrans.numeroTelefono,
       otp: datosTrans.otp,

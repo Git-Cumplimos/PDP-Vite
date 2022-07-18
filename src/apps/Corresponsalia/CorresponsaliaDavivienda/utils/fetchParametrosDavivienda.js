@@ -1,4 +1,4 @@
-import fetchData from "../../../utils/fetchData";
+import fetchData from "../../../../utils/fetchData";
 
 const urlComercios = `${process.env.REACT_APP_URL_COLPENSIONES}`;
 

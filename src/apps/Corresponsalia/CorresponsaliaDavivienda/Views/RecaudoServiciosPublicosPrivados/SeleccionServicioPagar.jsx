@@ -1,8 +1,8 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Input from "../../../../components/Base/Input";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import { notify, notifyError } from "../../../../utils/notify";
+import Input from "../../../../../components/Base/Input";
+import TableEnterprise from "../../../../../components/Base/TableEnterprise";
+import { notify, notifyError } from "../../../../../utils/notify";
 import { postConsultaTablaConveniosPaginado } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const SeleccionServicioPagar = () => {
@@ -43,16 +43,15 @@ const SeleccionServicioPagar = () => {
   const onSelectAutorizador = useCallback(
     (e, i) => {
       navigate(
-        "../corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
+        "../corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
         {
           state: {
             id: convenios[i]["pk_tbl_transaccional_convenios_davivienda_cb"],
           },
         }
       );
-      console.log(convenios[i]["pk_tbl_transaccional_convenios_davivienda_cb"]);
     },
-    [tableConvenios, navigate]
+    [navigate, convenios]
   );
 
   useEffect(() => {

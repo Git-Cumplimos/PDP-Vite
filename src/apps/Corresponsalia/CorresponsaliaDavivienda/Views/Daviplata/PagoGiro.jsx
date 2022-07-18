@@ -1,16 +1,16 @@
-import Form from "../../../../components/Base/Form";
-import Input from "../../../../components/Base/Input";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import Button from "../../../../components/Base/Button";
+import Form from "../../../../../components/Base/Form";
+import Input from "../../../../../components/Base/Input";
+import ButtonBar from "../../../../../components/Base/ButtonBar";
+import Button from "../../../../../components/Base/Button";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import Modal from "../../../../components/Base/Modal";
+import Modal from "../../../../../components/Base/Modal";
 import { useReactToPrint } from "react-to-print";
-import { notify, notifyError } from "../../../../utils/notify";
-import { formatMoney } from "../../../../components/Base/MoneyInput";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
+import { notify, notifyError } from "../../../../../utils/notify";
+import { formatMoney } from "../../../../../components/Base/MoneyInput";
+import { useAuth } from "../../../../../hooks/AuthHooks";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
-import Select from "../../../../components/Base/Select";
+import Select from "../../../../../components/Base/Select";
 import {
   postConsultaPagoPorGiroDavivienda,
   postPagoPorGiroDavivienda,

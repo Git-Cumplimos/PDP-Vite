@@ -1,14 +1,14 @@
-import fetchData from "../../../utils/fetchData";
+import fetchData from "../../../../utils/fetchData";
 
 const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
 
-export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
+export const postConsultaPagoPorGiroDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/consulta_tabla_convenios_paginado`,
+      `${urlDaviplata}davivienda_pago_por_giro/consulta`,
       "POST",
       {},
       bodyObj
@@ -16,18 +16,18 @@ export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
     if (!res?.status) {
       console.error(res?.msg);
     }
-    return res?.obj;
+    return res;
   } catch (err) {
     throw err;
   }
 };
-export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
+export const postPagoPorGiroDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/consulta_tabla_convenios_especifico`,
+      `${urlDaviplata}davivienda_pago_por_giro/pago_giro`,
       "POST",
       {},
       bodyObj
@@ -35,7 +35,7 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
     if (!res?.status) {
       console.error(res?.msg);
     }
-    return res?.obj;
+    return res;
   } catch (err) {
     throw err;
   }

@@ -405,6 +405,8 @@ const CrearPin = () => {
   console.log(olimpia)
   return (
     <>
+    {"id_comercio" in roleInfo ? (
+    <>
       <h1 className="text-3xl">Datos creación de Pin</h1>
       <Form onSubmit={onSubmitCliente} grid>
       <Select
@@ -797,6 +799,9 @@ const CrearPin = () => {
         }
         
       </Modal>
+    </>) : (
+      <h1 className="text-3xl mt-6">El usuario no tiene comercio asociado</h1>
+    )}
     </>
   );
 };
