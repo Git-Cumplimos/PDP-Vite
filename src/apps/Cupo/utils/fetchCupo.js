@@ -3,7 +3,6 @@ import fetchData from "../../../utils/fetchData";
 const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}`;
 
 export const getConsultaCupoComercio = async (pk_id_comercio, page, limit) => {
-  console.log(urlCupo);
   const busqueda = {};
   if (pk_id_comercio) {
     busqueda.pk_id_comercio = pk_id_comercio;
@@ -162,7 +161,6 @@ export const putAjusteCupo = async (argsObj, bodyObj) => {
       argsObj,
       bodyObj
     );
-    console.log(res?.obj);
     if (!res?.status) {
       console.error(res?.msg);
     }
@@ -229,7 +227,8 @@ export const PeticionDescargarPdf = async (
     const contentType = response.headers.get("content-type");
     const nombreDocumento = response.headers
       .get("Content-Disposition")
-      .slice(22, -1);
+      .slice(21);
+
     if (contentType === "application/pdf") {
       const byts = await response.blob();
       const downloadUrl = URL.createObjectURL(byts);
@@ -247,5 +246,60 @@ export const PeticionDescargarPdf = async (
     }
   } catch (error) {
     console.log("Error con fetch - no conecta al servicio");
+  }
+};
+
+export const getTipoMovimientosCupo = async (
+  pk_id_tipo_movimiento,
+  page,
+  limit,
+  nombre
+) => {
+  const busqueda = {};
+  if (pk_id_tipo_movimiento) {
+    busqueda.pk_id_tipo_movimiento = pk_id_tipo_movimiento;
+  }
+  if (page) {
+    busqueda.page = page;
+  }
+  if (limit) {
+    busqueda.limit = limit;
+  }
+  if (nombre) {
+    busqueda.nombre = nombre;
+  }
+  try {
+    const res = await fetchData(
+      `${urlCupo}/movimientos`,
+      "GET",
+      busqueda,
+      {},
+      false
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const postTipoMovimientosCupo = async (bodyObj) => {
+  if (!bodyObj) {
+    return new Promise((resolve, reject) => {
+      resolve("Sin datos body");
+    });
+  }
+  try {
+    const res = await fetchData(`${urlCupo}/movimientos`, "POST", {}, bodyObj);
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
   }
 };

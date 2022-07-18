@@ -4,7 +4,6 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
-import Select from "../../../components/Base/Select";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
@@ -15,13 +14,10 @@ import {
 } from "../utils/fetchCupo";
 
 const ModifiLimiteCanje = () => {
-  const [cambioCupo, setCambioCupo] = useState(1);
   const [cupoComer, setCupoComer] = useState(null);
   const [valor, setValor] = useState(null);
   const [idComercio, setIdComercio] = useState(null);
   const [asigLimite, setAsigLimite] = useState(null);
-  const [limiteCupo, setLimiteCupo] = useState(null);
-  const [usuario, setUsuario] = useState(0);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const { roleInfo } = useAuth();
@@ -79,7 +75,7 @@ const ModifiLimiteCanje = () => {
           notifyError("Error al modificar cupo");
         });
     },
-    [idComercio, valor]
+    [idComercio, valor, limit, roleInfo.id_usuario, page]
   );
   const onMoneyChange = useCallback((e, valor) => {
     setValor(valor);

@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -11,7 +11,6 @@ import { useFetch } from "../../../hooks/useFetch";
 import { notifyError } from "../../../utils/notify";
 import { getConsultaCupoComercio, PeticionDescargar } from "../utils/fetchCupo";
 const CupoComer = () => {
-  const [dtlCupo, setDtlCupo] = useState(null);
   const [cupoComer, setCupoComer] = useState(null);
   const [loadDocument, crearData] = useFetch(PeticionDescargar);
   const [idComercio, setIdComercio] = useState("");
@@ -22,7 +21,7 @@ const CupoComer = () => {
 
   useEffect(() => {
     setIdComercio(roleInfo?.id_comercio);
-  }, []);
+  }, [roleInfo?.id_comercio]);
 
   useEffect(() => {
     getConsultaCupoComercio(idComercio, page, limit)
@@ -35,20 +34,16 @@ const CupoComer = () => {
       });
   }, [idComercio, page, limit]);
 
-  const onChange = useCallback(
-    (ev) => {
-      if (ev.target.name === "idCliente") {
-        setIdComercio(ev.target.value);
-      }
-    },
-    [idComercio]
-  );
+  const onChange = useCallback((ev) => {
+    if (ev.target.name === "idCliente") {
+      setIdComercio(ev.target.value);
+    }
+  }, []);
   const onSubmitDownload = useCallback(
     (e) => {
       e.preventDefault();
       if (cupoComer?.results.length > 0) {
-        console.log(idComercio);
-        if (idComercio == "") {
+        if (idComercio === "") {
           notifyError("No se puede descargar reporte falta ID comercio");
         } else {
           // PeticionDescargar("");
@@ -58,7 +53,7 @@ const CupoComer = () => {
         notifyError("Id de comercio no existe");
       }
     },
-    [idComercio, cupoComer]
+    [idComercio, cupoComer, crearData]
   );
 
   return (
