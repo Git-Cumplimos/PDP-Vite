@@ -80,7 +80,6 @@ const RecargasMovistar = () => {
       tipo_comercio: roleInfo.tipo_comercio,
       id_dispositivo: roleInfo.id_dispositivo,
       id_usuario: roleInfo.id_usuario,
-      codigo_dane:roleInfo.codigo_dane
     };
 
     fetchRecarga(URL, data).then((response) => {
