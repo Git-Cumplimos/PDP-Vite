@@ -807,19 +807,19 @@ const allUrlsPrivateApps = [
     link: "/movistar",
     label: <AppIcons Logo={"LOTERIA"} name="Movistar" />,
     component: Movistar,
-    permission: [1],
+    permission: [65,66],
     subRoutes: [
       {
         link: "/movistar/recargas-movistar-full",
         label: <AppIcons Logo={"SORTEOS"} name="Recargas Movistar " />,
         component: RecargasMovistar,
-        permission: [1],
+        permission: [65],
       },
       {
         link: "/movistar/concilacion",
         label: <AppIcons Logo={"SORTEOS"} name="Conciliación" />,
         component: ConcilacionMovistar,
-        permission: [1],
+        permission: [66],
       },
     ],
   },
