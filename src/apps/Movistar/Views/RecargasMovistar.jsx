@@ -20,7 +20,7 @@ import { useFetch } from "../../../hooks/useFetch";
 import { notify, notifyError } from "../../../utils/notify";
 import { PeticionRecarga } from "../utils/fetchMovistar";
 
-const URL = "http://127.0.0.1:5000/recargasmovistar/prepago";
+const URL = `${process.env.REACT_APP_URL_MOVISTAR}/recargasmovistar/prepago`;
 
 const RecargasMovistar = () => {
   //Variables
