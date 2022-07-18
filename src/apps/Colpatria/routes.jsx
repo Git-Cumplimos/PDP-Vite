@@ -10,28 +10,28 @@ const AdminColpatria = lazy(() => import("./Views/Admin"));
 const ListaErrores = lazy(() => import("./Views/Admin/ListaErrores"));
 
 const rutasColpatria = {
-  link: "/colpatria",
+  link: "/corresponsalia/colpatria",
   label: <AppIcons Logo={"RECAUDO"} name={"Colpatria"} />,
   component: colpatriaTrx,
-  permission: [1],
+  permission: [67, 68],
   subRoutes: [
     {
-      link: "/colpatria/deposito",
+      link: "/corresponsalia/colpatria/deposito",
       label: <AppIcons Logo={"RECAUDO"} name={"Deposito"} />,
       component: Deposito,
-      permission: [1],
+      permission: [67],
     },
     {
-      link: "/colpatria/gestion",
+      link: "/corresponsalia/colpatria/gestion",
       label: <AppIcons Logo={"RECAUDO"} name={"Gestion"} />,
       component: AdminColpatria,
-      permission: [1],
+      permission: [68],
       subRoutes: [
         {
-          link: "/colpatria/gestion/lista-errores",
+          link: "/corresponsalia/colpatria/gestion/lista-errores",
           label: <AppIcons Logo={"RECAUDO"} name={"Lista de errores"} />,
           component: ListaErrores,
-          permission: [1],
+          permission: [68],
         },
       ]
     },
