@@ -103,7 +103,7 @@ const ModifiLimiteCanje = () => {
   );
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Asignación límite cupo</h1>
+      <h1 className="text-3xl mt-6">Modificación límite de cupo</h1>
       <Form onChange={onChange} onSubmit={onSubmitComercio} grid>
         <Input
           id="Id comercio"
