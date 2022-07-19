@@ -123,6 +123,7 @@ const VerParticipacionPines = lazy(() =>
   import("../apps/PinesVus/Views/PagoParticipantes/VerParticipacion")
 );
 const EspejoQX = lazy(() => import("../apps/PinesVus/Views/EspejoQX"));
+const QX = lazy(() => import("../apps/PinesVus/Views/QX"));
 
 /**
  * IAM
@@ -552,26 +553,26 @@ const allUrlsPrivateApps = [
         component: TramitarPines,
         permission: [53],
       },
-      // {
-      //   link: "/PinesVus/Participacion",
-      //   label: <AppIcons Logo={"RECAUDO"} name={"Participacion Pines"} />,
-      //   component: PagoParticipantes,
-      //   permission: [53],
-      //   subRoutes: [
-      //   {
-      //     link: "/PinesVus/Participacion/PagoParticipacion",
-      //     label: <AppIcons Logo={"RECAUDO"} name={"Pago participacion"} />,
-      //     component: ParticipacionPines,
-      //     permission: [53],
-      //   },
-      //   {
-      //     link: "/PinesVus/Participacion/VerPagoParticipacion",
-      //     label: <AppIcons Logo={"RECAUDO"} name={"Ver pago participacion"} />,
-      //     component: VerParticipacionPines,
-      //     permission: [53],
-      //   },
-      //   ]
-      // },
+      {
+        link: "/PinesVus/Participacion",
+        label: <AppIcons Logo={"RECAUDO"} name={"Participacion Pines"} />,
+        component: PagoParticipantes,
+        permission: [53],
+        subRoutes: [
+        {
+          link: "/PinesVus/Participacion/PagoParticipacion",
+          label: <AppIcons Logo={"RECAUDO"} name={"Pago participacion"} />,
+          component: ParticipacionPines,
+          permission: [53],
+        },
+        {
+          link: "/PinesVus/Participacion/VerPagoParticipacion",
+          label: <AppIcons Logo={"RECAUDO"} name={"Ver pago participacion"} />,
+          component: VerParticipacionPines,
+          permission: [53],
+        },
+        ]
+      },
       {
         link: "/PinesVus/Reportes",
         label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
@@ -594,11 +595,17 @@ const allUrlsPrivateApps = [
           },
         ],
       },
+      // {
+      //   link: "/PinesVus/EspejoQX",
+      //   label: <AppIcons Logo={"RECAUDO"} name={"Espejo Cupo QX"} />,
+      //   component: EspejoQX,
+      //   permission: [63],
+      // },
       {
-        link: "/PinesVus/EspejoQX",
-        label: <AppIcons Logo={"RECAUDO"} name={"Espejo Cupo QX"} />,
-        component: EspejoQX,
-        permission: [63],
+        link: "/PinesVus/QX",
+        label: <AppIcons Logo={"RECAUDO"} name={"QX"} />,
+        component: QX,
+        permission: [63, 53],
       },
     ],
   },
