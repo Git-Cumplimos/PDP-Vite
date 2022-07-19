@@ -70,9 +70,6 @@ const CupoComer = () => {
             label="Id cliente"
             type="number"
             autoComplete="off"
-            minLength={"10"}
-            maxLength={"10"}
-            // value={}
             onInput={() => {}}
             required
           />
