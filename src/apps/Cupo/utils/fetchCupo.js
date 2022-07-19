@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}`;
+const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}/servicio-cupo`;
 
 export const getConsultaCupoComercio = async (pk_id_comercio, page, limit) => {
   const busqueda = {};
