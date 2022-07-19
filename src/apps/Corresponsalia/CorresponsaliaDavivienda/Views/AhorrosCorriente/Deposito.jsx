@@ -331,7 +331,7 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"10"}
-            maxLength={"10"}
+            maxLength={"16"}
             value={numCuenta ?? ""}
             onInput={() => {}}
             required

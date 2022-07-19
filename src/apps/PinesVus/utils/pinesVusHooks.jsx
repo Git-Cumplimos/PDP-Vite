@@ -13,6 +13,7 @@ const urls = {
   consultaPagoParticipacion: `${process.env.REACT_APP_URL_PinesVus}/consultaPagoParticipacion`,
   descargaArchivosS3: `${process.env.REACT_APP_URL_PinesVus}/descargaArchivosS3`,
   cupoQX: `${process.env.REACT_APP_URL_PinesVus}/cupoQX`,
+  ingresarIdQX: `${process.env.REACT_APP_URL_PinesVus}/ingresarIdQX`,
 };
 
 export const pinesVusContext = createContext({
@@ -27,6 +28,7 @@ export const pinesVusContext = createContext({
   descargaArchivosS3: () => {},
   consultaCupoQX: () => {},
   modificarCupoQX: () => {},
+  ingresarIdQX: () => {},
   activarNavigate: null,
   setActivarNavigate: null,
 });
@@ -38,6 +40,7 @@ export const useProvidePinesVus = () => {
   // Datos consulta y compra
   const { roleInfo } = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
+
   const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite) => {
     const body = {
       valor_tramite : valor_tramite,
@@ -45,6 +48,7 @@ export const useProvidePinesVus = () => {
       Dispositivo: user?.id_dispositivo,
       Comercio: user?.id_comercio,
       Tipo: user?.tipo_comercio,
+      NombreComercio: roleInfo?.["nombre comercio"],
       valor: parseFloat(valor),
       motivo: motivo,
       id_trx: trx,
@@ -60,7 +64,8 @@ export const useProvidePinesVus = () => {
       throw err;
     }
   }, []);
-
+  console.log(roleInfo)
+  
   const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia) => {
     console.log(infoTramite)
     const body = {
@@ -72,6 +77,7 @@ export const useProvidePinesVus = () => {
       Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,
       Tipo: user?.Tipo,
+      NombreComercio: roleInfo?.["nombre comercio"],
       infoCliente: infoCliente,
       olimpia: olimpia,
     };
@@ -90,6 +96,7 @@ export const useProvidePinesVus = () => {
         Dispositivo: user?.id_dispositivo,
         Comercio: user?.id_comercio,
         Tipo: user?.tipo_comercio,
+        NombreComercio: roleInfo?.["nombre comercio"],
         valor: parseFloat(valor),
         id_trx: trx,
       };
@@ -117,6 +124,7 @@ export const useProvidePinesVus = () => {
       fecha_fin,
       estadoPin,
       tipoPin,
+      doc_cliente,
       pageData
     ) => {
       const query = { ...pageData };
@@ -136,6 +144,10 @@ export const useProvidePinesVus = () => {
       if ( roleInfo?.id_comercio !== undefined) {
         query.id_comercio = roleInfo?.id_comercio;
       }
+      if (doc_cliente !== "") {
+        query.doc_cliente = doc_cliente;
+      }
+
       try {
         const res = await fetchData(urls.PinVus, "GET", query);
         return res;
@@ -188,21 +200,21 @@ export const useProvidePinesVus = () => {
 
   const registroPagoParticipacion = useCallback(async (
     participante, 
-    banco, 
-    num_cuenta, 
-    num_aprobacion,
-    num_transaccion, 
+    // banco, 
+    // num_cuenta, 
+    // num_aprobacion,
+    // num_transaccion, 
     valor,
-    voucher
+    // voucher
     ) => {
     const body = {
       participante: participante, 
-      banco: banco, 
-      num_cuenta: num_cuenta, 
-      num_aprobacion: num_aprobacion,
-      num_transaccion: num_transaccion, 
+      // banco: banco, 
+      // num_cuenta: num_cuenta, 
+      // num_aprobacion: num_aprobacion,
+      // num_transaccion: num_transaccion, 
       valor: valor,
-      voucher: voucher,
+      // voucher: voucher,
       Usuario: roleInfo?.id_usuario,
       Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
@@ -279,6 +291,25 @@ export const useProvidePinesVus = () => {
     []
   );
 
+  const ingresarIdQX = useCallback(
+    async (id_pin,id_qx) => {
+      const body = {
+        id_qx: id_qx,
+      };
+
+      const query = {
+        id_pin: id_pin,
+      };
+      try {
+        const res = await fetchData(urls.ingresarIdQX, "PUT", query, body);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
+
   return {
     cancelPinVus,
     crearPinVus,
@@ -293,6 +324,7 @@ export const useProvidePinesVus = () => {
     descargaArchivosS3,
     consultaCupoQX,
     modificarCupoQX,
+    ingresarIdQX,
     activarNavigate,
     setActivarNavigate,
   };

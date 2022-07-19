@@ -63,14 +63,14 @@ const Participacion = () => {
               setFormatMon(row?.ValorPagar);
               return {
                 Participante: row?.participante,
-                Banco: row?.banco,
-                "No cuenta": row?.num_cuenta,
-                "No transaccion": row?.num_transaccion,
-                "No aprobacion": row?.num_aprobacion,
+                // Banco: row?.banco,
+                // "No cuenta": row?.num_cuenta,
+                // "No transaccion": row?.num_transaccion,
+                // "No aprobacion": row?.num_aprobacion,
                 "Fecha pago": dateFormatter.format(fecha_registro),
                 "Comercio": row?.id_comercio,
                 Valor: formatMoney.format(row?.valor),
-                "voucher": row?.voucher
+                // "voucher": row?.voucher
               };
             }));            
             setMaxPages(res?.obj?.maxPages);
@@ -108,20 +108,15 @@ const Participacion = () => {
           maxPage={maxPages}
           headers={[
             "Participante",
-            "Banco",
-            "No cuenta",
-            "No transaccion",
-            "No aprobacion",
             "Fecha pago",
             "Comercio",
             "Valor",
-            "Carpeta voucher"
           ]}
           data={table || []}
           onSelectRow={(e, index) => {
               setSelected(table[index]);
-              descargarVoucher(table[index]);
-              setShowModal(true)
+              // descargarVoucher(table[index]);
+              // setShowModal(true)
           }}
           onSetPageData={setPageData}
         >

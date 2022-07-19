@@ -106,7 +106,7 @@ const TramitePines = () => {
     //   Depto: roleInfo?.codigo_dane?.slice(0, 2),
     //   Municipio: roleInfo?.codigo_dane?.slice(2),
     // };
-    consultaPinesVus(parametroBusqueda, "", "", "", pageData)
+    consultaPinesVus(parametroBusqueda, "", "", "", "",pageData)
       .then((res) => {
         setInfo(res);
         setDisabledBtn(false);

@@ -54,78 +54,78 @@ const Participacion = () => {
   const [numAprobacion, setNumAprobacion] = useState("")
   const [disabledBtns, setDisabledBtns] = useState(false)
   const [respPago, setRespPago] = useState("")
-  const [nombreArchivo, setNombreArchivo] = useState("")
+  // const [nombreArchivo, setNombreArchivo] = useState("")
 
-  const [archivo, setArchivo] = useState("");
+  // const [archivo, setArchivo] = useState("");
   const [progress, setProgress] = useState(0);
   const [file, setFile] = useState("");
   const [fileName, setFileName] = useState("");
 
-  const onChange = (files) => {
-    console.log(file);
-    if (Array.isArray(Array.from(files))) {
-      files = Array.from(files);
-      if (files.length === 1) {
-        const m_file = files[0];
-        console.log(m_file);
-        setFile(m_file);
-        setFileName(m_file.name);
-      } else {
-        if (files.length > 1) {
-          notifyError("Se debe ingresar un solo archivo para subir");
-        }
-      }
-    }
-  };
+  // const onChange = (files) => {
+  //   console.log(file);
+  //   if (Array.isArray(Array.from(files))) {
+  //     files = Array.from(files);
+  //     if (files.length === 1) {
+  //       const m_file = files[0];
+  //       console.log(m_file);
+  //       setFile(m_file);
+  //       setFileName(m_file.name);
+  //     } else {
+  //       if (files.length > 1) {
+  //         notifyError("Se debe ingresar un solo archivo para subir");
+  //       }
+  //     }
+  //   }
+  // };
 
-  const onSubmitArchivo = useCallback(
-    (e) => {
-      console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-      const f = new Date();
-      const query = {
-        contentType: "application/text",
-        filename: `vouchersPagoParticipacion/voucherPago_${selected.aliado}_${f.getDate()}${
-          f.getMonth() + 1
-        }${f.getFullYear()}/${fileName}`,
-      };
-      console.log(query.filename)
-      fetchData(url_cargueS3, "GET", query)
-        .then((respuesta) => {
-          if (!respuesta?.status) {
-            notifyError(respuesta?.msg);
-          } else {
-            // setEstadoForm(true);
-            const formData2 = new FormData();
-            if (file) {
-              for (const property in respuesta?.obj?.fields) {
-                formData2.set(
-                  `${property}`,
-                  `${respuesta?.obj?.fields[property]}`
-                );
-              }
-              formData2.set("file", file);
-              console.log(formData2, `${respuesta?.obj?.url}`);
-              fetch(`${respuesta?.obj?.url}`, {
-                method: "POST",
-                body: formData2,
-              }).then((res) => {
-                if (res?.ok) {
-                  notify("El voucher fue cargado")
-                } else {
-                  notifyError("No fue posible conectar con el Bucket");
-                }
-              }).catch((err) => {
-                console.log(err, "ERROR ********")
-              });
-            }
-          }
-        })
-        .catch((err) => {
-          notifyError("Error al cargar Datos");
-        }); /* notify("Se ha comenzado la carga"); */
-    },
-    [file, fileName, archivo]
-  );
+  // const onSubmitArchivo = useCallback(
+  //   (e) => {
+  //     console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+  //     const f = new Date();
+  //     const query = {
+  //       contentType: "application/text",
+  //       filename: `vouchersPagoParticipacion/voucherPago_${selected.aliado}_${f.getDate()}${
+  //         f.getMonth() + 1
+  //       }${f.getFullYear()}/${fileName}`,
+  //     };
+  //     console.log(query.filename)
+  //     fetchData(url_cargueS3, "GET", query)
+  //       .then((respuesta) => {
+  //         if (!respuesta?.status) {
+  //           notifyError(respuesta?.msg);
+  //         } else {
+  //           // setEstadoForm(true);
+  //           const formData2 = new FormData();
+  //           if (file) {
+  //             for (const property in respuesta?.obj?.fields) {
+  //               formData2.set(
+  //                 `${property}`,
+  //                 `${respuesta?.obj?.fields[property]}`
+  //               );
+  //             }
+  //             formData2.set("file", file);
+  //             console.log(formData2, `${respuesta?.obj?.url}`);
+  //             fetch(`${respuesta?.obj?.url}`, {
+  //               method: "POST",
+  //               body: formData2,
+  //             }).then((res) => {
+  //               if (res?.ok) {
+  //                 notify("El voucher fue cargado")
+  //               } else {
+  //                 notifyError("No fue posible conectar con el Bucket");
+  //               }
+  //             }).catch((err) => {
+  //               console.log(err, "ERROR ********")
+  //             });
+  //           }
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         notifyError("Error al cargar Datos");
+  //       }); /* notify("Se ha comenzado la carga"); */
+  //   },
+  //   [file, fileName, archivo]
+  // );
 
 
   useEffect(() => {
@@ -155,6 +155,32 @@ const Participacion = () => {
     setFileName("")
   }, []);
 
+  // const onSubmit = (e) => { 
+  //   e.preventDefault();
+  //   setDisabledBtns(true)
+  //   console.log(selected)
+  //   const f = new Date()
+  //   registroPagoParticipacion(
+  //     selected.aliado, 
+  //     banco, 
+  //     numCuenta, 
+  //     numAprobacion, 
+  //     numTransaccion,
+  //     selected.valor,
+  //     `vouchersPagoParticipacion/voucherPago_${selected.aliado}_${f.getDate()}${
+  //       f.getMonth() + 1
+  //     }${f.getFullYear()}/`,
+  //   ).then((res) => {
+  //       console.log(res)
+  //       setDisabledBtns(false)
+  //       if (!res?.status) {
+  //         notifyError(res?.msg);
+  //       } else {
+  //         setRespPago(res?.obj)
+  //       }
+  //   }).catch(() => setDisabledBtns(false));    
+  // }
+
   const onSubmit = (e) => { 
     e.preventDefault();
     setDisabledBtns(true)
@@ -162,14 +188,15 @@ const Participacion = () => {
     const f = new Date()
     registroPagoParticipacion(
       selected.aliado, 
-      banco, 
-      numCuenta, 
-      numAprobacion, 
-      numTransaccion,
+      //banco, 
+      //numCuenta, 
+      //numAprobacion, 
+      //numTransaccion,
       selected.valor,
-      `vouchersPagoParticipacion/voucherPago_${selected.aliado}_${f.getDate()}${
-        f.getMonth() + 1
-      }${f.getFullYear()}/`,
+      // `vouchersPagoParticipacion/voucherPago_${selected.aliado}_${f.getDate()}${
+      //   f.getMonth() + 1
+      // }${f.getFullYear()}/`,
+
     ).then((res) => {
         console.log(res)
         setDisabledBtns(false)
@@ -180,6 +207,7 @@ const Participacion = () => {
         }
     }).catch(() => setDisabledBtns(false));    
   }
+
   const tickets = useMemo(() => {
     return {
       title: "Recibo de pago participante pines vus",
@@ -206,6 +234,9 @@ const Participacion = () => {
       commerceName: "Pago a " + respPago?.participante,
       trxInfo: [
         ["Valor Tramite", formatMoney.format(respPago?.valor)],
+        ["",""],
+        ["Recibido", "______________________"],
+        ["",""]
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -293,7 +324,7 @@ const Participacion = () => {
         :
       <>
             <div className="flex flex-col w-1/2 mx-auto ">
-              <h1 className="text-3xl mt-3 mx-auto">{selected.aliado}</h1>
+              <h1 className="text-3xl mt-3 mx-auto">Pago {selected.aliado}</h1>
               <br></br>
             </div>
             <div className="flex flex-col justify-center items-center mx-auto container">
@@ -306,7 +337,7 @@ const Participacion = () => {
                 value={formatMoney.format(selected.valor)}
                 required
                 />
-                <Input
+                {/* <Input
                 id="banco"
                 label="Banco consignacion"
                 type="text"
@@ -381,7 +412,7 @@ const Participacion = () => {
                   </ButtonBar>
                 ) : (
                   ""
-                )}
+                )} */}
                 
                 <ButtonBar>
                   <Button type="submit" disabled={disabledBtns}>Registrar</Button>
