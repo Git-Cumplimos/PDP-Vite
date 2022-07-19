@@ -51,7 +51,10 @@ const RecargasMovistar = () => {
       if (e.target.value[0] == 3) {
         setInvalidCelular("");
       } else {
-        setInvalidCelular("numero invalido");
+        setInvalidCelular("Número invalido");
+        notifyError(
+          "Número inválido, el No. de celular debe comenzar con el número 3"
+        );
       }
     }
   };
@@ -70,13 +73,13 @@ const RecargasMovistar = () => {
     if (inputCelular[0] == 3) {
       realizarRecarga++;
     } else {
-      notifyError("numero invalido");
+      notifyError("Número invalido");
     }
 
     if (inputValor >= minValor && inputValor <= maxValor) {
       realizarRecarga++;
     } else {
-      notifyError("valor invalido");
+      notifyError("Valor invalido");
     }
 
     //Realizar recarga
@@ -118,7 +121,7 @@ const RecargasMovistar = () => {
           }
           const controlErrores = ["00", "01", "03", "04", "05", "10"];
           if (controlErrores?.indexOf(response_obj?.identificador) > -1) {
-            notifyError("Sistema caido");
+            notifyError("Falla en el sistema");
           }
           if (response_obj?.identificador == "11") {
             notifyError("Recarga rechazada");
@@ -127,7 +130,7 @@ const RecargasMovistar = () => {
       })
       .catch((e) => {
         setShowModal(false);
-        notifyError("Sistema caido");
+        notifyError("Falla en el sistema");
       });
   };
 
@@ -167,6 +170,7 @@ const RecargasMovistar = () => {
 
   return (
     <Fragment>
+      <h1 className="text-3xl mt-6">Recargas Movistar</h1>
       <Form onSubmit={onSubmitCheck} grid>
         <Input
           name="celular"

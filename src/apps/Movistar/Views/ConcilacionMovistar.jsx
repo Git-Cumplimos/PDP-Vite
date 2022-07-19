@@ -56,7 +56,7 @@ const ConcilacionMovistar = () => {
         <TableEnterprise
           title="Conciliación Movistar"
           maxPage={maxPages}
-          headers={["Fecha", "PuntoDePago", "Movistar", "Diferencias"]}
+          headers={["Fecha", "Punto de pago", "Movistar", "Diferencias"]}
           data={
             data?.map((inf) => ({
               Fecha: inf.fechabusqueda,
@@ -88,7 +88,7 @@ const ConcilacionMovistar = () => {
           />
           <Select
             name="filtro"
-            label="Tipo de busqueda"
+            label="Tipo de búsqueda"
             options={{
               Todas: "",
               "Conciliaciones efectivas": "completo",
