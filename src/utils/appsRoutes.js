@@ -691,7 +691,9 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/cupo/modificar-cupo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Asignacion limite de cupo"} />,
+        label: (
+          <AppIcons Logo={"RECAUDO"} name={"Modificación límite de cupo"} />
+        ),
         component: ModifiCupo,
         permission: [60],
       },
