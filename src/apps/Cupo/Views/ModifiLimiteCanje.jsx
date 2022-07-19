@@ -20,18 +20,21 @@ const ModifiLimiteCanje = () => {
   const [asigLimite, setAsigLimite] = useState(null);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
+  const limitesMontos = {
+    max: 9999999999,
+    min: 0,
+  };
   const { roleInfo } = useAuth();
 
+  // useEffect(() => {
+  //   tablalimitecupo(idComercio, page, limit);
+  // }, [idComercio, page, limit, cupoComer]);
+
   useEffect(() => {
-    getConsultaCupoComercio(idComercio)
-      .then((objUdusrio) => {
-        setCupoComer(objUdusrio);
-      })
-      .catch((reason) => {
-        notifyError("Error al cargar Datos ");
-      });
-    tablalimitecupo(idComercio, page, limit);
-  }, [idComercio, page, limit]);
+    if (cupoComer?.results.length === 0) {
+      notifyError("ID de comercio incorrecto");
+    }
+  }, [cupoComer]);
 
   const tablalimitecupo = (idComercio, page, limit) => {
     getConsultaAsignacionCupoLimite(idComercio, page, limit)
@@ -56,47 +59,66 @@ const ModifiLimiteCanje = () => {
   const onSubmitDeposit = useCallback(
     (e) => {
       e.preventDefault();
-      const body = {
-        fk_id_comercio: idComercio,
-        valor_afectacion: valor,
-        usuario: roleInfo.id_usuario,
-      };
-      postDtlCambioLimiteCanje(body)
-        .then((res) => {
-          if (!res?.status) {
-            notifyError("Error al asignar limite de cupo");
-            return;
-          }
-          notify("Modificacion exitosa");
-          tablalimitecupo(idComercio, page, limit);
-        })
-        .catch((r) => {
-          console.error(r.message);
-          notifyError("Error al modificar cupo");
-        });
+      if (e.nativeEvent.submitter.name === "AsignarLimiteCupo") {
+        const body = {
+          fk_id_comercio: idComercio,
+          valor_afectacion: valor,
+          usuario: roleInfo.id_usuario,
+        };
+        postDtlCambioLimiteCanje(body)
+          .then((res) => {
+            if (!res?.status) {
+              notifyError("Error al asignar límite de cupo");
+              return;
+            }
+            notify("Modificacion exitosa");
+            tablalimitecupo(idComercio, page, limit);
+          })
+          .catch((r) => {
+            console.error(r.message);
+            notifyError("Error al modificar cupo");
+          });
+      }
     },
     [idComercio, valor, limit, roleInfo.id_usuario, page]
   );
   const onMoneyChange = useCallback((e, valor) => {
     setValor(valor);
   }, []);
+  const onSubmitComercio = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (e.nativeEvent.submitter.name === "buscarComercio") {
+        getConsultaCupoComercio(idComercio)
+          .then((objUdusrio) => {
+            setCupoComer(objUdusrio);
+            tablalimitecupo(idComercio, page, limit);
+          })
+          .catch((reason) => {
+            notifyError("Error al cargar Datos ");
+          });
+      }
+    },
+    [idComercio, cupoComer, page, limit]
+  );
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Asignación límite cupo</h1>
-      <Form onChange={onChange} grid>
+      <Form onChange={onChange} onSubmit={onSubmitComercio} grid>
         <Input
           id="Id comercio"
           name="Id comercio"
           label="Id comercio"
           type="number"
           autoComplete="off"
-          // minLength={"10"}
-          // maxLength={"10"}
-          // value={""}
           onInput={() => {}}
           required
         />
-        <ButtonBar></ButtonBar>
+        <ButtonBar>
+          <Button type={"submit"} name="buscarComercio">
+            Buscar comercio
+          </Button>
+        </ButtonBar>
       </Form>
       {cupoComer?.results.length === 1 ? (
         <Fragment>
@@ -104,8 +126,11 @@ const ModifiLimiteCanje = () => {
             <MoneyInput
               id="cupo_limite"
               name="cupo_limite"
-              label="Limite de cupo"
+              label="Límite de cupo"
               autoComplete="off"
+              maxLength={"14"}
+              min={limitesMontos?.min}
+              max={limitesMontos?.max}
               defaultValue={parseInt(cupoComer?.results[0].limite_cupo)}
               onInput={onMoneyChange}
               required
@@ -127,16 +152,18 @@ const ModifiLimiteCanje = () => {
               required
             />
             <ButtonBar className={"lg:col-span-2"}>
-              <Button type={"submit"}>Asignar límite cupo</Button>
+              <Button type={"submit"} name="AsignarLimiteCupo">
+                Asignar límite cupo
+              </Button>
             </ButtonBar>
           </Form>
           <TableEnterprise
             title="Cupo Comercios"
             headers={[
               "Id comercio",
-              "Valor Afectacion",
-              "Fecha afectacion",
-              "Limite de Cupo",
+              "Valor afectación",
+              "Fecha afectación",
+              "Límite de Cupo",
               "Usuario",
             ]}
             data={
@@ -167,8 +194,9 @@ const ModifiLimiteCanje = () => {
           ></TableEnterprise>
         </Fragment>
       ) : (
-        <h1 className="text-3xl mt-6">Ingrese un Id de comercio existente</h1>
+        // <h1 className="text-3xl mt-6">Ingrese un Id de comercio existente</h1>
         // notifyError("Id de comercio no existe")
+        ""
       )}
     </Fragment>
   );
