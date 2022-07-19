@@ -239,6 +239,9 @@ const Deposito = () => {
   }, [roleInfo]);
 
   if (!hasData) {
+    notifyError(
+      "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+    );
     return <Navigate to={"/"} replace />;
   }
 

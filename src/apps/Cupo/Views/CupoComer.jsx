@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -11,7 +11,6 @@ import { useFetch } from "../../../hooks/useFetch";
 import { notifyError } from "../../../utils/notify";
 import { getConsultaCupoComercio, PeticionDescargar } from "../utils/fetchCupo";
 const CupoComer = () => {
-  const [dtlCupo, setDtlCupo] = useState(null);
   const [cupoComer, setCupoComer] = useState(null);
   const [loadDocument, crearData] = useFetch(PeticionDescargar);
   const [idComercio, setIdComercio] = useState("");
@@ -22,7 +21,7 @@ const CupoComer = () => {
 
   useEffect(() => {
     setIdComercio(roleInfo?.id_comercio);
-  }, []);
+  }, [roleInfo?.id_comercio]);
 
   useEffect(() => {
     getConsultaCupoComercio(idComercio, page, limit)
@@ -35,20 +34,16 @@ const CupoComer = () => {
       });
   }, [idComercio, page, limit]);
 
-  const onChange = useCallback(
-    (ev) => {
-      if (ev.target.name === "idCliente") {
-        setIdComercio(ev.target.value);
-      }
-    },
-    [idComercio]
-  );
+  const onChange = useCallback((ev) => {
+    if (ev.target.name === "idCliente") {
+      setIdComercio(ev.target.value);
+    }
+  }, []);
   const onSubmitDownload = useCallback(
     (e) => {
       e.preventDefault();
       if (cupoComer?.results.length > 0) {
-        console.log(idComercio);
-        if (idComercio == "") {
+        if (idComercio === "") {
           notifyError("No se puede descargar reporte falta ID comercio");
         } else {
           // PeticionDescargar("");
@@ -58,13 +53,12 @@ const CupoComer = () => {
         notifyError("Id de comercio no existe");
       }
     },
-    [idComercio, cupoComer]
+    [idComercio, cupoComer, crearData]
   );
 
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Consulta cupo comercio</h1>
-      <ButtonBar></ButtonBar>
 
       {roleInfo?.id_comercio ? (
         ""
@@ -82,38 +76,35 @@ const CupoComer = () => {
             onInput={() => {}}
             required
           />
+          <ButtonBar></ButtonBar>
         </Form>
       )}
+
+      <TableEnterprise
+        title="Cupo Comercios"
+        headers={["Id comercio", "Cupo Limite", "Deuda Cupo", "Cupo en Canje"]}
+        data={
+          cupoComer?.results.map(
+            ({ pk_id_comercio, limite_cupo, deuda, cupo_en_canje }) => ({
+              pk_id_comercio,
+              limite_cupo: formatMoney.format(limite_cupo),
+              deuda: formatMoney.format(deuda),
+              cupo_en_canje: formatMoney.format(cupo_en_canje),
+            })
+          ) ?? []
+        }
+        onSelectRow={(e, i) => {
+          navegateValid(
+            `/cupo/cupo-comercio/detalles-cupo/${cupoComer?.results[i].pk_id_comercio}`
+          );
+        }}
+        onSetPageData={(pagedata) => {
+          setPage(pagedata.page);
+          setLimit(pagedata.limit);
+        }}
+        maxPage={cupoComer?.maxPages}
+      ></TableEnterprise>
       <Form>
-        <TableEnterprise
-          title="Cupo Comercios"
-          headers={[
-            "Id comercio",
-            "Cupo Limite",
-            "Deuda Cupo",
-            "Cupo en Canje",
-          ]}
-          data={
-            cupoComer?.results.map(
-              ({ pk_id_comercio, limite_cupo, deuda, cupo_en_canje }) => ({
-                pk_id_comercio,
-                limite_cupo: formatMoney.format(limite_cupo),
-                deuda: formatMoney.format(deuda),
-                cupo_en_canje: formatMoney.format(cupo_en_canje),
-              })
-            ) ?? []
-          }
-          onSelectRow={(e, i) => {
-            navegateValid(
-              `/cupo/cupo-comercio/detalles-cupo/${cupoComer?.results[i].pk_id_comercio}`
-            );
-          }}
-          onSetPageData={(pagedata) => {
-            setPage(pagedata.page);
-            setLimit(pagedata.limit);
-          }}
-          maxPage={cupoComer?.maxPages}
-        ></TableEnterprise>
         <ButtonBar className={"lg col-span-2"}>
           <Button
             type={"submit"}

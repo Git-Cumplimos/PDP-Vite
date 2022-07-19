@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlCupo = `http://127.0.0.1:5000/servicio-cupo`;
+const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}`;
 
 export const getConsultaCupoComercio = async (pk_id_comercio, page, limit) => {
   const busqueda = {};
@@ -161,7 +161,6 @@ export const putAjusteCupo = async (argsObj, bodyObj) => {
       argsObj,
       bodyObj
     );
-    console.log(res?.obj);
     if (!res?.status) {
       console.error(res?.msg);
     }
@@ -179,7 +178,7 @@ export const PeticionDescargar = async (parametro) => {
       .get("Content-Disposition")
       .slice(22, -1);
     if (
-      contentType ==
+      contentType ===
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ) {
       const byts = await response.blob();
@@ -193,7 +192,7 @@ export const PeticionDescargar = async (parametro) => {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-    } else if (contentType == "application/json") {
+    } else if (contentType === "application/json") {
       const json = await response.json();
       if (!json?.status) {
         console.error(json?.msg);
@@ -228,8 +227,9 @@ export const PeticionDescargarPdf = async (
     const contentType = response.headers.get("content-type");
     const nombreDocumento = response.headers
       .get("Content-Disposition")
-      .slice(22, -1);
-    if (contentType == "application/pdf") {
+      .slice(21);
+
+    if (contentType === "application/pdf") {
       const byts = await response.blob();
       const downloadUrl = URL.createObjectURL(byts);
       const a = document.createElement("a");
@@ -238,7 +238,7 @@ export const PeticionDescargarPdf = async (
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-    } else if (contentType == "application/json") {
+    } else if (contentType === "application/json") {
       const json = await response.json();
       if (!json?.status) {
         console.error(json?.msg);
@@ -246,5 +246,60 @@ export const PeticionDescargarPdf = async (
     }
   } catch (error) {
     console.log("Error con fetch - no conecta al servicio");
+  }
+};
+
+export const getTipoMovimientosCupo = async (
+  pk_id_tipo_movimiento,
+  page,
+  limit,
+  nombre
+) => {
+  const busqueda = {};
+  if (pk_id_tipo_movimiento) {
+    busqueda.pk_id_tipo_movimiento = pk_id_tipo_movimiento;
+  }
+  if (page) {
+    busqueda.page = page;
+  }
+  if (limit) {
+    busqueda.limit = limit;
+  }
+  if (nombre) {
+    busqueda.nombre = nombre;
+  }
+  try {
+    const res = await fetchData(
+      `${urlCupo}/movimientos`,
+      "GET",
+      busqueda,
+      {},
+      false
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const postTipoMovimientosCupo = async (bodyObj) => {
+  if (!bodyObj) {
+    return new Promise((resolve, reject) => {
+      resolve("Sin datos body");
+    });
+  }
+  try {
+    const res = await fetchData(`${urlCupo}/movimientos`, "POST", {}, bodyObj);
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
   }
 };

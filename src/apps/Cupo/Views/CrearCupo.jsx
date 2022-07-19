@@ -6,11 +6,10 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
-import Select from "../../../components/Base/Select";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
-import { postCupoComercio, postDtlCambioLimiteCanje } from "../utils/fetchCupo";
+import { postCupoComercio} from "../utils/fetchCupo";
 
 const CrearCupo = () => {
   const [idComercio, setIdComercio] = useState(null);
@@ -64,7 +63,7 @@ const CrearCupo = () => {
           notifyError("Error al crear cupo");
         });
     },
-    [idComercio, deuda, canje, limite]
+    [idComercio, deuda, canje, limite,roleInfo.id_usuario]
   );
   const onMoneyChangeDeuda = useCallback((e, valor) => {
     setDeuda(valor);

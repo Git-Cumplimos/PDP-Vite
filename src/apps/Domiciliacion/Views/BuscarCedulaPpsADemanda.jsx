@@ -95,7 +95,7 @@ const BuscarCedulaPpsADemanda = () => {
   };
   return (
     <div>
-      {(datosConsulta?.length === 0) & estado ? (
+      {(datosConsulta?.length >= 0) & estado ? (
         <TipoPpsADemanda numCed={buscarCedula}></TipoPpsADemanda>
       ) : Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
         <Modal show={showModal} handleClose={handleClose}>
@@ -146,34 +146,6 @@ const BuscarCedulaPpsADemanda = () => {
       ) : (
         <div>
           <Form grid onSubmit={(e) => BuscarCedula(e)}>
-            {/*  <Input
-              value={buscarCedula}
-              minLength="6"
-              maxLength="10"
-              type="tel"
-              onInput={(event) => {
-                if (!/[0-9]/.test(event.key)) {
-                  event.preventDefault();
-                  console.log("error");
-                }
-                setBuscarCedula(event.target.value);
-              }}
-              required
-            /> */}
-            {/*             <Input
-              label={"N° Identificación"}
-              placeholder={"Ingrese N° Identificación"}
-              value={buscarCedula}
-              onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setBuscarCedula(num);
-              }}
-              minLength="6"
-              maxLength="10"
-              type={"text"}
-              required
-            /> */}
-
             <Input
               label={"N° Identificación"}
               placeholder={"Ingrese N° Identificación"}
