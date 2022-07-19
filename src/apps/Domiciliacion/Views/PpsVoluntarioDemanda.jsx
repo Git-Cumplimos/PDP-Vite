@@ -237,7 +237,9 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 navigate(`/domiciliacion`);
               });
           } else {
-            notifyError("Completa el valor aportar.");
+            notifyError(
+              "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+            );
             setDisabledBtn(false);
           }
         } else {
@@ -324,7 +326,9 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   navigate(`/domiciliacion`);
                 });
             } else {
-              notifyError("Completa el valor aportar.");
+              notifyError(
+                "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+              );
               setDisabledBtn(false);
             }
           } else {
