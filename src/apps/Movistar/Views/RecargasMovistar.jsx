@@ -38,8 +38,6 @@ const RecargasMovistar = () => {
     setInputValor(valor);
   });
 
-  
-
   const onCelChange = (e) => {
     const formData = new FormData(e.target.form);
     const phone = ((formData.get("celular") ?? "").match(/\d/g) ?? []).join("");
@@ -91,7 +89,7 @@ const RecargasMovistar = () => {
         ticketRecarga(result);
       } else {
         setShowModal(false);
-        
+
         if (response_obj?.identificador == "02") {
           notifyError("No hay cupo");
         }
@@ -103,11 +101,6 @@ const RecargasMovistar = () => {
           notifyError("Recarga rechazada");
         }
       }
-
-      //   if (response.status == false && response.error == false) {
-      //     setShowModal(false);
-      //     notifyError("no hay cupo");
-      //   }
     });
   };
 
@@ -142,9 +135,9 @@ const RecargasMovistar = () => {
   });
   const [loadingCashIn, fetchCashIn] = useFetch();
 
-  // useEffect(() => {
-  //   console.log(roleInfo);
-  // }, []);
+  useEffect(() => {
+    console.log(roleInfo);
+  }, []);
 
   return (
     <Fragment>
