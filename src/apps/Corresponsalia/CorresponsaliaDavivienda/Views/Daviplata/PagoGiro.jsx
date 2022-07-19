@@ -32,6 +32,10 @@ const PagoGiro = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
   const [datosConsulta, setDatosConsulta] = useState({});
+  const [datosConsultaIdTrx, setDatosConsultaIdTrx] = useState({
+    idTrx: "",
+    valor: "",
+  });
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de pago por giro Davivienda CB",
     timeInfo: {
@@ -84,6 +88,10 @@ const PagoGiro = () => {
       codigoFamilia: "",
       nombreTipoIdentificacion: "",
     });
+    setDatosConsultaIdTrx({
+      idTrx: "",
+      valor: "",
+    });
     setObjTicketActual((old) => {
       return {
         ...old,
@@ -132,14 +140,12 @@ const PagoGiro = () => {
       tipoIdentificacion: datosTrans.tipoIdentificacion,
       numeroIdentificacion: datosTrans.numeroIdentificacion,
       codigoFamilia: datosTrans.codigoFamilia,
-      idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
-      idUsuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 1,
-      idTerminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 801,
-      issuerIdDane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 1121,
-      nombreComercio: roleInfo?.["nombre comercio"]
-        ? roleInfo?.["nombre comercio"]
-        : "prod",
-      municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "Bogota",
+      idComercio: roleInfo?.id_comercio,
+      idUsuario: roleInfo?.id_usuario,
+      idTerminal: roleInfo?.id_dispositivo,
+      issuerIdDane: roleInfo?.codigo_dane,
+      nombreComercio: roleInfo?.["nombre comercio"],
+      municipio: roleInfo?.["ciudad"],
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
     })
@@ -148,6 +154,7 @@ const PagoGiro = () => {
           setIsUploading(false);
           notify(res?.msg);
           // hideModal();
+          console.log(res);
           objTicket["commerceInfo"][1] = [
             "No. terminal",
             res?.obj?.codigoTotal,
@@ -169,6 +176,7 @@ const PagoGiro = () => {
             formatMoney.format(res?.obj?.respuesta_davivienda[0].valorPago),
           ]);
           objTicket["trxInfo"].push(["", ""]);
+          setDatosConsultaIdTrx((old) => ({ ...old, idTrx: res?.obj?.idTrx }));
           setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
           setPeticion(2);
         } else {
@@ -199,18 +207,23 @@ const PagoGiro = () => {
       tipoIdentificacion: datosTrans.tipoIdentificacion,
       numeroIdentificacion: datosTrans.numeroIdentificacion,
       codigoFamilia: datosTrans.codigoFamilia,
-      idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
-      idUsuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 1,
-      idTerminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 801,
-      issuerIdDane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 1121,
-      nombreComercio: roleInfo?.["nombre comercio"]
-        ? roleInfo?.["nombre comercio"]
-        : "prod",
-      municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "Bogota",
+      idComercio: roleInfo?.id_comercio,
+      idUsuario: roleInfo?.id_usuario,
+      idTerminal: roleInfo?.id_dispositivo,
+      issuerIdDane: roleInfo?.codigo_dane,
+      nombreComercio: roleInfo?.["nombre comercio"],
+      municipio: roleInfo?.["ciudad"],
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
       ticket: objTicket,
-      direccion: roleInfo?.direccion ? roleInfo?.direccion : "",
+      direccion: roleInfo?.direccion,
+      idTrx: datosConsultaIdTrx.idTrx,
+      valor: datosConsulta?.valorPago,
+      datosTrx: {
+        numeroCuenta: datosConsulta?.numeroCuenta,
+        origenCuenta: datosConsulta?.origenCuenta,
+        cicloDePago: datosConsulta?.cicloDePago,
+      },
     })
       .then((res) => {
         if (res?.status) {

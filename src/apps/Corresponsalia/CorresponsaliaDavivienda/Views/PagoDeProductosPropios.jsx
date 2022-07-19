@@ -199,7 +199,8 @@ const PagoDeProductosPropios = () => {
           setIsUploading(false);
           notify(res?.msg);
           // hideModal();
-          setDatosConsulta(res?.obj?.respuesta_davivienda);
+          console.log(res);
+          setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
           setPeticion(2);
         } else {
           setIsUploading(false);
@@ -477,10 +478,10 @@ const PagoDeProductosPropios = () => {
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
               <h2>{`Número producto: ${datosTrans.numeroProducto}`}</h2>
               <ButtonBar>
+                <Button onClick={hideModal}>Cancelar</Button>
                 <Button type='submit' onClick={peticionConsulta}>
                   Aceptar
                 </Button>
-                <Button onClick={hideModal}>Cancelar</Button>
               </ButtonBar>
             </>
           )}
@@ -498,35 +499,43 @@ const PagoDeProductosPropios = () => {
               <h2>{`Valor de pago total: ${formatMoney.format(
                 datosConsulta.valPagoTotal
               )}`}</h2>
-              <Select
-                id='tipoAbono'
-                name='tipoAbono'
-                label='Indique el tipo de abono'
-                options={{
-                  "": "",
-                  "Valor mínimo": "0001",
-                  "Valor total": "0002",
-                  ...(datosConsulta.valIndAbonoExtraordinario === "S" && {
-                    "Disminución de cuota": "0003",
-                    "Adelanto de cuota": "0004",
-                    "Abono a capital": "0005",
-                    "Indicador extraordinario": "0006",
-                    Otro: "0006",
-                  }),
-                }}
-                value={tipoAbono?.tipoAbonoId}
-                onChange={(e) =>
-                  setTipoAbono((old) => {
-                    return {
-                      ...old,
-                      tipoAbonoId: e.target.value,
-                      tipoAbonoNombre:
-                        e.target.options[e.target.selectedIndex].text,
-                    };
-                  })
-                }
-                required
-              />
+              {datosConsulta.valPagoTotal &&
+              parseInt(datosConsulta.valPagoTotal) !== 0 &&
+              datosConsulta.valPagoMinimo &&
+              parseInt(datosConsulta.valPagoMinimo) !== 0 ? (
+                <Select
+                  id='tipoAbono'
+                  name='tipoAbono'
+                  label='Indique el tipo de abono'
+                  options={{
+                    "": "",
+                    "Valor mínimo": "0001",
+                    "Valor total": "0002",
+                    ...(datosConsulta.valIndAbonoExtraordinario === "S" && {
+                      "Disminución de cuota": "0003",
+                      "Adelanto de cuota": "0004",
+                      "Abono a capital": "0005",
+                      "Indicador extraordinario": "0006",
+                      Otro: "0006",
+                    }),
+                  }}
+                  value={tipoAbono?.tipoAbonoId}
+                  onChange={(e) =>
+                    setTipoAbono((old) => {
+                      return {
+                        ...old,
+                        tipoAbonoId: e.target.value,
+                        tipoAbonoNombre:
+                          e.target.options[e.target.selectedIndex].text,
+                      };
+                    })
+                  }
+                  required
+                />
+              ) : (
+                <></>
+              )}
+
               {(tipoAbono.tipoAbonoId === "0003" ||
                 tipoAbono.tipoAbonoId === "0004" ||
                 tipoAbono.tipoAbonoId === "0005" ||
@@ -548,10 +557,17 @@ const PagoDeProductosPropios = () => {
                 />
               )}
               <ButtonBar>
-                <Button type='submit' onClick={peticionIntermedia}>
-                  Aceptar
-                </Button>
                 <Button onClick={hideModal}>Cancelar</Button>
+                {datosConsulta.valPagoTotal &&
+                parseInt(datosConsulta.valPagoTotal) !== 0 &&
+                datosConsulta.valPagoMinimo &&
+                parseInt(datosConsulta.valPagoMinimo) !== 0 ? (
+                  <Button type='submit' onClick={peticionIntermedia}>
+                    Aceptar
+                  </Button>
+                ) : (
+                  <></>
+                )}
               </ButtonBar>
             </>
           )}

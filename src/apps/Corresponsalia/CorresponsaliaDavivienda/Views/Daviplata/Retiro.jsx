@@ -236,12 +236,17 @@ const Retiro = () => {
           minLength='10'
           maxLength='10'
           required
+          autoComplete='off'
           value={datosTrans.numeroTelefono}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               const num = e.target.value;
               setDatosTrans((old) => {
-                return { ...old, numeroTelefono: num };
+                if (old.numeroTelefono.length === 0 && num !== "3") {
+                  return { ...old };
+                } else {
+                  return { ...old, numeroTelefono: num };
+                }
               });
             }
           }}></Input>
@@ -253,6 +258,7 @@ const Retiro = () => {
           minLength='6'
           maxLength='6'
           required
+          autoComplete='off'
           value={datosTrans.otp}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
