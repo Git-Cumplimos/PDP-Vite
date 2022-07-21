@@ -144,8 +144,8 @@ const RecargasMovistar = () => {
       commerceInfo: [
         ["Id Comercio", roleInfo.id_comercio],
         ["No. terminal", roleInfo.id_dispositivo],
-        ["Municipio", roleInfo.ciudad],
         ["Dirección", roleInfo.direccion],
+        ["Municipio", roleInfo.ciudad],
         ["Id Trx", result_.pk_trx],
         ["Id Transacción", result_.transaccion_ptopago],
       ],
@@ -157,10 +157,11 @@ const RecargasMovistar = () => {
         ${inputCelular.slice(6)}`,
         ],
         ["", ""],
-        ["Valor pago", formatMoney.format(inputValor)],
+        ["Valor  ", formatMoney.format(inputValor)],
         ["", ""],
       ],
-      disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+      disclamer:
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
     });
   };
 
@@ -204,7 +205,11 @@ const RecargasMovistar = () => {
 
       <Modal show={showModal} handleClose={handleClose}>
         {!flagRecarga ? (
-          <PaymentSummary summaryTrx={summary}>
+          <PaymentSummary
+            title="¿Está seguro de realizar la transacción?"
+            subtitle="Resumen de transacción"
+            summaryTrx={summary}
+          >
             <ButtonBar>
               <Button
                 type="button"

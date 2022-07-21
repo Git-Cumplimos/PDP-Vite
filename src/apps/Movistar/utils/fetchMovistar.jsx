@@ -7,6 +7,7 @@ export const PeticionRecarga = async (data_) => {
     const Peticion = await fetchData(URL_Recarga, "POST", {}, data_);
     return Peticion;
   } catch (error) {
+    console.log(error);
     console.log("Error con fetch - no conecta al servicio");
     throw "Error con fetch - no conecta al servicio";
   }
