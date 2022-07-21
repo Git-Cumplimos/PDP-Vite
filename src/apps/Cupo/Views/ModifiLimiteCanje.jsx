@@ -99,7 +99,7 @@ const ModifiLimiteCanje = () => {
           });
       }
     },
-    [idComercio, cupoComer, page, limit]
+    [idComercio, page, limit]
   );
   return (
     <Fragment>
