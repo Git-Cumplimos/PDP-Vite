@@ -156,9 +156,9 @@ const RecargasMovistar = () => {
           `${inputCelular.slice(0, 3)} ${inputCelular.slice(3, 6)} 
         ${inputCelular.slice(6)}`,
         ],
-        ["Valor pago", formatMoney.format(inputValor)],
+        ["Valor", formatMoney.format(inputValor)],
       ],
-      disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+      disclamer: "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
     });
   };
 
