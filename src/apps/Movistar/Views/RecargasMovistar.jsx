@@ -121,7 +121,7 @@ const RecargasMovistar = () => {
           }
           const controlErrores = ["00", "01", "03", "04", "05", "10"];
           if (controlErrores?.indexOf(response_obj?.identificador) > -1) {
-            notifyError("Falla en el sistema");
+            notifyError("Falla en el sistema- no conecta con el servidor");
           }
           if (response_obj?.identificador == "11") {
             notifyError("Recarga rechazada");
@@ -130,7 +130,7 @@ const RecargasMovistar = () => {
       })
       .catch((e) => {
         setShowModal(false);
-        notifyError("Falla en el sistema");
+        notifyError("Falla en el sistema " + e);
       });
   };
 
@@ -156,9 +156,7 @@ const RecargasMovistar = () => {
           `${inputCelular.slice(0, 3)} ${inputCelular.slice(3, 6)} 
         ${inputCelular.slice(6)}`,
         ],
-        ["", ""],
-        ["Valor  ", formatMoney.format(inputValor)],
-        ["", ""],
+        ["Valor", formatMoney.format(inputValor)],
       ],
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
