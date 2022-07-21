@@ -38,9 +38,6 @@ const AjusteCupoComer = ({ subRoutes }) => {
     if (ev.target.name === "Id comercio") {
       setIdComercio(ev.target.value);
     }
-    if (ev.target.name === "razon_ajuste") {
-      setRazonAjuste(ev.target.value);
-    }
   }, []);
   const onMoneyChange = useCallback((e, monto) => {
     setValor(monto);
@@ -107,7 +104,6 @@ const AjusteCupoComer = ({ subRoutes }) => {
           ajustes_deuda: true,
           motivo_afectacion: razonAjuste,
         };
-
         putAjusteCupo(args, body)
           .then((res) => {
             consultaCupoComercios(idComercio);
@@ -201,10 +197,9 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 name="razon_ajuste"
                 label="Razon de ajuste"
                 autoComplete="off"
-                // minLength={"10"}
-                // maxLength={"10"}
-                // value={""}
-                onInput={() => {}}
+                onInput={(e) => {
+                  setRazonAjuste(e.target.value);
+                }}
               />
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"}>
