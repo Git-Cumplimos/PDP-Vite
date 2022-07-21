@@ -162,6 +162,8 @@ const RecargasMovistar = () => {
     });
   };
 
+  
+  
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
