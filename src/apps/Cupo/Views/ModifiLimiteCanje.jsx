@@ -22,7 +22,7 @@ const ModifiLimiteCanje = () => {
   const [page, setPage] = useState(1);
   const limitesMontos = {
     max: 9999999999,
-    min: 0,
+    min: -9999999999,
   };
   const { roleInfo } = useAuth();
 
@@ -140,6 +140,8 @@ const ModifiLimiteCanje = () => {
               name="deuda"
               label="Deuda del comercio"
               autoComplete="off"
+              min={limitesMontos?.min}
+              max={limitesMontos?.max}
               value={parseInt(cupoComer?.results[0].deuda)}
               required
             />
@@ -148,6 +150,8 @@ const ModifiLimiteCanje = () => {
               name="cupo_en_canje"
               label="Cupo en canje"
               autoComplete="off"
+              min={limitesMontos?.min}
+              max={limitesMontos?.max}
               value={parseInt(cupoComer?.results[0].cupo_en_canje)}
               required
             />
