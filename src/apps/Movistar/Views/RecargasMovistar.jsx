@@ -156,9 +156,7 @@ const RecargasMovistar = () => {
           `${inputCelular.slice(0, 3)} ${inputCelular.slice(3, 6)} 
         ${inputCelular.slice(6)}`,
         ],
-        ["", ""],
         ["Valor pago", formatMoney.format(inputValor)],
-        ["", ""],
       ],
       disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
     });
