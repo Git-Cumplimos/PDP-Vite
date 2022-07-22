@@ -698,7 +698,9 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/cupo/modificar-cupo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Asignacion limite de cupo"} />,
+        label: (
+          <AppIcons Logo={"RECAUDO"} name={"Modificación límite de cupo"} />
+        ),
         component: ModifiCupo,
         permission: [60],
       },
@@ -919,7 +921,7 @@ const allUrlsPrivateApps = [
     link: "/movistar",
     label: <AppIcons Logo={"LOTERIA"} name='Movistar' />,
     component: Movistar,
-    permission: [65,66],
+    permission: [65, 66],
     subRoutes: [
       {
         link: "/movistar/recargas-movistar",

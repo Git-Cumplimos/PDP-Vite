@@ -15,11 +15,16 @@ const AjusteCupoComer = ({ subRoutes }) => {
   const [idComercio, setIdComercio] = useState(null);
   const [valor, setValor] = useState(null);
   const [razonAjuste, setRazonAjuste] = useState(null);
+  const limitesMontos = {
+    max: 9999999999,
+    min: -9999999999,
+  };
   const { roleInfo } = useAuth();
-
   useEffect(() => {
-    consultaCupoComercios(idComercio);
-  }, [idComercio]);
+    if (cupoComer?.results.length === 0) {
+      notifyError("ID de comercio incorrecto");
+    }
+  }, [cupoComer]);
   const consultaCupoComercios = (id_comercio) => {
     getConsultaCupoComercio(id_comercio)
       .then((objUdusrio) => {
@@ -32,9 +37,6 @@ const AjusteCupoComer = ({ subRoutes }) => {
   const onChange = useCallback((ev) => {
     if (ev.target.name === "Id comercio") {
       setIdComercio(ev.target.value);
-    }
-    if (ev.target.name === "razon_ajuste") {
-      setRazonAjuste(ev.target.value);
     }
   }, []);
   const onMoneyChange = useCallback((e, monto) => {
@@ -102,7 +104,6 @@ const AjusteCupoComer = ({ subRoutes }) => {
           ajustes_deuda: true,
           motivo_afectacion: razonAjuste,
         };
-
         putAjusteCupo(args, body)
           .then((res) => {
             consultaCupoComercios(idComercio);
@@ -118,10 +119,19 @@ const AjusteCupoComer = ({ subRoutes }) => {
     },
     [idComercio, valor, razonAjuste, roleInfo.id_usuario]
   );
+  const onSubmitBusqueda = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (e.nativeEvent.submitter.name === "buscarComercio") {
+        consultaCupoComercios(idComercio);
+      }
+    },
+    [idComercio]
+  );
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Ajuste deuda cupo</h1>
-      <Form onChange={onChange} grid>
+      <Form onChange={onChange} onSubmit={onSubmitBusqueda} grid>
         <Input
           id="Id comercio"
           name="Id comercio"
@@ -134,7 +144,11 @@ const AjusteCupoComer = ({ subRoutes }) => {
           onInput={() => {}}
           required
         />
-        <ButtonBar></ButtonBar>
+        <ButtonBar>
+          <Button type={"submit"} name="buscarComercio">
+            Buscar comercio
+          </Button>
+        </ButtonBar>
       </Form>
       {cupoComer?.results.length === 1 ? (
         <Fragment>
@@ -145,6 +159,8 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 name="cupo_limite"
                 label="Limite de cupo"
                 autoComplete="off"
+                min={limitesMontos?.min}
+                max={limitesMontos?.max}
                 value={parseInt(cupoComer?.results[0].limite_cupo)}
                 required
               />
@@ -153,6 +169,8 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 name="deuda"
                 label="Deuda del comercio"
                 autoComplete="off"
+                min={limitesMontos?.min}
+                max={limitesMontos?.max}
                 value={parseInt(cupoComer?.results[0].deuda)}
                 required
               />
@@ -161,6 +179,8 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 name="cupo_en_canje"
                 label="Cupo en canje"
                 autoComplete="off"
+                min={limitesMontos?.min}
+                max={limitesMontos?.max}
                 value={parseInt(cupoComer?.results[0].cupo_en_canje)}
                 required
               />
@@ -171,6 +191,9 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 name="monto"
                 label="Monto"
                 autoComplete="off"
+                maxLength={"14"}
+                min={limitesMontos?.min}
+                max={limitesMontos?.max}
                 onInput={onMoneyChange}
                 required
               />
@@ -180,42 +203,28 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 name="razon_ajuste"
                 label="Razon de ajuste"
                 autoComplete="off"
-                // minLength={"10"}
-                // maxLength={"10"}
-                // value={""}
-                onInput={() => {}}
+                onInput={(e) => {
+                  setRazonAjuste(e.target.value);
+                }}
               />
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"}>
-              <Button
-                type={"submit"}
-                name={"debito"}
-                // onClick={onSubmitDebito}
-              >
+              <Button type={"submit"} name={"debito"}>
                 Ajuste debito
               </Button>
 
-              <Button
-                type={"submit"}
-                name={"credito"}
-                // onClick={onSubmitCredito}
-              >
+              <Button type={"submit"} name={"credito"}>
                 Ajuste credito
               </Button>
 
-              <Button
-                type={"submit"}
-                name={"contigencia"}
-                //  onClick={onSubmitContingencia}
-              >
+              <Button type={"submit"} name={"contigencia"}>
                 Ajuste credito tipo contingencia
               </Button>
             </ButtonBar>
           </Form>
         </Fragment>
       ) : (
-        <h1 className="text-3xl mt-6">Ingrese un Id de comercio existente</h1>
-        // notifyError("Id de comercio no existe")
+        ""
       )}
     </Fragment>
   );

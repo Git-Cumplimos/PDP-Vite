@@ -9,7 +9,7 @@ import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
-import { postCupoComercio} from "../utils/fetchCupo";
+import { postCupoComercio } from "../utils/fetchCupo";
 
 const CrearCupo = () => {
   const [idComercio, setIdComercio] = useState(null);
@@ -19,6 +19,10 @@ const CrearCupo = () => {
   const [summary, setSummary] = useState({});
   const [limite, setLimite] = useState(null);
   const [canje, setCanje] = useState(null);
+  const limitesMontos = {
+    max: 9999999999,
+    min: 0,
+  };
   const { roleInfo } = useAuth();
   const onChange = useCallback((ev) => {
     if (ev.target.name === "Id comercio") {
@@ -31,13 +35,17 @@ const CrearCupo = () => {
   const onSubmitComercio = useCallback(
     (e) => {
       e.preventDefault();
-      setShowModal(true);
-      setSummary({
-        pk_id_comercio: idComercio,
-        limite_cupo: formatMoney.format(limite),
-        deuda: formatMoney.format(deuda),
-        cupo_en_canje: formatMoney.format(canje),
-      });
+      if (limite !== null && limite !== "") {
+        setShowModal(true);
+        setSummary({
+          "Id del comercio": idComercio,
+          "Límite del cupo": formatMoney.format(limite),
+          Dueda: formatMoney.format(deuda),
+          "Cupo en canje": formatMoney.format(canje),
+        });
+      } else {
+        notifyError("El límite del cupo no puede estar vacío");
+      }
     },
     [idComercio, deuda, canje, limite]
   );
@@ -63,7 +71,7 @@ const CrearCupo = () => {
           notifyError("Error al crear cupo");
         });
     },
-    [idComercio, deuda, canje, limite,roleInfo.id_usuario]
+    [idComercio, deuda, canje, limite, roleInfo.id_usuario]
   );
   const onMoneyChangeDeuda = useCallback((e, valor) => {
     setDeuda(valor);
@@ -86,15 +94,17 @@ const CrearCupo = () => {
           autoComplete="off"
           // minLength={"10"}
           // maxLength={"10"}
-          // value={""}
           onInput={() => {}}
           required
         />
         <MoneyInput
           id="cupo_limite"
           name="cupo_limite"
-          label="Limite de cupo"
+          label="Límite de cupo"
           autoComplete="off"
+          maxLength={"14"}
+          min={limitesMontos?.min}
+          max={limitesMontos?.max}
           onInput={onMoneyChangeLimite}
           required
         />
@@ -103,6 +113,9 @@ const CrearCupo = () => {
           name="deuda"
           label="Deuda"
           autoComplete="off"
+          maxLength={"14"}
+          min={limitesMontos?.min}
+          max={limitesMontos?.max}
           onInput={onMoneyChangeDeuda}
           required
         />
@@ -111,19 +124,22 @@ const CrearCupo = () => {
           name="cupo_canje"
           label="Cupo en canje"
           autoComplete="off"
+          maxLength={"14"}
+          min={limitesMontos?.min}
+          max={limitesMontos?.max}
           onInput={onMoneyChangeCanje}
           required
         />
 
         <ButtonBar className={"lg  col-span-2"}>
-          <Button type={"submit"}>Asignar límite cupo</Button>
+          <Button type={"submit"}>Asignar cupo al comercio</Button>
         </ButtonBar>
         <Modal
           show={showModal}
           handleClose={paymentStatus ? handleClose : () => {}}
         >
           <PaymentSummary
-            title="¿Esta seguro de crear el comercio?"
+            title="¿Esta seguro de asignar el cupo al comercio?"
             subtitle="Resumen del comercio"
             summaryTrx={summary}
           >
