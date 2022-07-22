@@ -38,6 +38,7 @@ const ServiceWorkerWrapper = () => {
         </div>
       </div>,
       {
+        toastId: "toast-id-service-worker-159",
         autoClose: false,
         closeOnClick: false,
       }
