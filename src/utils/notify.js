@@ -24,4 +24,26 @@ const notifyError = (msg = "Error") => {
   });
 };
 
-export { notify, notifyError };
+const notifyPending = (
+  promise,
+  onPending = { render: () => "Pending ..." },
+  onSuccess = { render: ({ data }) => `Success ${JSON.stringify(data)}` },
+  onError = { render: ({ data }) => `Error ${data.message}` }
+) => {
+  toast.promise(promise, {
+    pending: {
+      ...onPending,
+      type: "info",
+    },
+    error: {
+      ...onError,
+      type: "info",
+    },
+    success: {
+      ...onSuccess,
+      type: "warning",
+    },
+  });
+};
+
+export { notify, notifyError, notifyPending };
