@@ -306,13 +306,13 @@ const Retiro = () => {
                 <h2>{`Número de telefono: ${datosTrans.numeroTelefono}`}</h2>
                 <h2>{`Número de otp: ${datosTrans.otp}`}</h2>
                 <ButtonBar>
+                  <Button onClick={hideModal}>Cancelar</Button>
                   <Button
                     disabled={botonAceptar}
                     type='submit'
                     onClick={peticionCashOut}>
                     Aceptar
                   </Button>
-                  <Button onClick={hideModal}>Cancelar</Button>
                 </ButtonBar>
               </>
             ) : (

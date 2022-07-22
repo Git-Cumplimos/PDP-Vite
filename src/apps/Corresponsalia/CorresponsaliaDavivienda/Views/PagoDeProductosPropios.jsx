@@ -27,6 +27,7 @@ import {
 } from "../utils/fetchProductosPropios";
 import { fetchParametrosAutorizadores } from "../../../TrxParams/utils/fetchParametrosAutorizadores";
 import { enumParametrosAutorizador } from "../utils/enumParametrosAutorizador";
+import Fieldset from "../../../../components/Base/Fieldset";
 
 const PagoDeProductosPropios = () => {
   const { roleInfo } = useAuth();
@@ -47,6 +48,7 @@ const PagoDeProductosPropios = () => {
     nombreTipoIdentificacion: "",
     binTarjetaCredito: "",
     ultimosTarjetaCredito: "",
+    idTrx: "",
   });
   const [tipoAbono, setTipoAbono] = useState({
     tipoAbonoId: "",
@@ -65,22 +67,19 @@ const PagoDeProductosPropios = () => {
     commerceInfo: [
       /*id transaccion recarga*/
       /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
       /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
       /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
+      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
       /*direccion*/
-      [
-        "Dirección",
-        roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
-      ],
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
       ["Tipo de operación", "Pago de Productos de Crédito"],
       ["", ""],
     ],
     commerceName: roleInfo?.["nombre comercio"]
       ? roleInfo?.["nombre comercio"]
-      : "prod",
+      : "Sin datos",
     trxInfo: [],
     disclamer:
       "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot) Línea de atención Bogotá:338 38 38 Resto del país:01 8000 123 838",
@@ -141,6 +140,7 @@ const PagoDeProductosPropios = () => {
       nombreTipoIdentificacion: "",
       binTarjetaCredito: "",
       ultimosTarjetaCredito: "",
+      idTrx: "",
     });
     setTipoAbono({ tipoAbonoId: "", tipoAbonoNombre: "", valorAbono: "" });
     setObjTicketActual((old) => {
@@ -183,14 +183,12 @@ const PagoDeProductosPropios = () => {
       numeroIdentificacion: datosTrans.numeroIdentificacion,
       numProducto: datosTrans.numeroProducto,
       valConsulta: datosTrans.tipoProducto,
-      idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
-      idUsuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 1,
-      idTerminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 801,
-      issuerIdDane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 1121,
-      nombreComercio: roleInfo?.["nombre comercio"]
-        ? roleInfo?.["nombre comercio"]
-        : "prod",
-      municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "Bogota",
+      idComercio: roleInfo?.id_comercio,
+      idUsuario: roleInfo?.id_usuario,
+      idTerminal: roleInfo?.id_dispositivo,
+      issuerIdDane: roleInfo?.codigo_dane,
+      nombreComercio: roleInfo?.["nombre comercio"],
+      municipio: roleInfo?.["ciudad"],
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
     })
@@ -200,6 +198,10 @@ const PagoDeProductosPropios = () => {
           notify(res?.msg);
           // hideModal();
           console.log(res);
+          setDatosTrans((old) => ({
+            ...old,
+            idTrx: res?.obj?.idTrx,
+          }));
           setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
           setPeticion(2);
         } else {
@@ -264,6 +266,15 @@ const PagoDeProductosPropios = () => {
       `*******${numeroProducto}`,
     ]);
     objTicket["trxInfo"].push(["", ""]);
+    let valorPagar = 0;
+    if (tipoAbono.tipoAbonoId === "0001") {
+      valorPagar = datosConsulta?.valPagoMinimo;
+    } else if (tipoAbono.tipoAbonoId === "0002") {
+      valorPagar = datosConsulta?.valPagoTotal;
+    } else {
+      valorPagar = tipoAbono.valorAbono;
+    }
+    console.log(valorPagar);
     setIsUploading(true);
     postPagoProductosPropiosDavivienda({
       tipoIdentificacion: datosTrans.tipoIdentificacion,
@@ -271,20 +282,19 @@ const PagoDeProductosPropios = () => {
       numProducto: datosTrans.numeroProducto,
       valConsulta: datosTrans.tipoProducto,
       tipoAbono: tipoAbono.tipoAbonoId,
-      valAbono: tipoAbono.valorAbono,
+      valAbono: valorPagar,
 
-      idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
-      idUsuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 1,
-      idTerminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 801,
-      issuerIdDane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 1121,
-      nombreComercio: roleInfo?.["nombre comercio"]
-        ? roleInfo?.["nombre comercio"]
-        : "prod",
+      idComercio: roleInfo?.id_comercio,
+      idUsuario: roleInfo?.id_usuario,
+      idTerminal: roleInfo?.id_dispositivo,
+      issuerIdDane: roleInfo?.codigo_dane,
+      nombreComercio: roleInfo?.["nombre comercio"],
       ticket: objTicket,
-      municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "Bogota",
+      municipio: roleInfo?.["ciudad"],
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
-      direccion: roleInfo?.direccion ? roleInfo?.direccion : "",
+      direccion: roleInfo?.direccion,
+      idTrx: datosTrans?.idTrx,
     })
       .then((res) => {
         if (res?.status) {
@@ -368,7 +378,7 @@ const PagoDeProductosPropios = () => {
           label='Número de identificación'
           type='text'
           name='numeroIdentificacion'
-          minLength='10'
+          minLength='5'
           maxLength='10'
           required
           value={datosTrans.numeroIdentificacion}
@@ -406,26 +416,28 @@ const PagoDeProductosPropios = () => {
         />
 
         {datosTrans?.tipoProducto === "2" && (
-          <Input
-            id='numeroProducto'
-            label='Número de producto'
-            type='text'
-            name='numeroProducto'
-            minLength='16'
-            maxLength='16'
-            required
-            value={datosTrans.numeroProducto}
-            onInput={(e) => {
-              if (!isNaN(e.target.value)) {
-                const num = e.target.value;
-                setDatosTrans((old) => {
-                  return { ...old, numeroProducto: num };
-                });
-              }
-            }}></Input>
+          <Fieldset legend='Datos producto' className='lg:col-span-2'>
+            <Input
+              id='numeroProducto'
+              label='Número de producto'
+              type='text'
+              name='numeroProducto'
+              minLength='16'
+              maxLength='16'
+              required
+              value={datosTrans.numeroProducto}
+              onInput={(e) => {
+                if (!isNaN(e.target.value)) {
+                  const num = e.target.value;
+                  setDatosTrans((old) => {
+                    return { ...old, numeroProducto: num };
+                  });
+                }
+              }}></Input>
+          </Fieldset>
         )}
         {datosTrans?.tipoProducto === "1" && (
-          <>
+          <Fieldset legend='Datos producto' className='lg:col-span-2'>
             <Input
               id='binTarjetaCredito'
               label='Primeros seis dígitos tarjeta de crédito'
@@ -460,7 +472,7 @@ const PagoDeProductosPropios = () => {
                   });
                 }
               }}></Input>
-          </>
+          </Fieldset>
         )}
         <ButtonBar className='lg:col-span-2'>
           <Button type='submit'>Aceptar</Button>
@@ -490,6 +502,7 @@ const PagoDeProductosPropios = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de consulta Davivienda
               </h1>
+              {console.log(datosConsulta.valPagoMinimo)}
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
@@ -589,10 +602,10 @@ const PagoDeProductosPropios = () => {
               )}`}</h2>
 
               <ButtonBar>
+                <Button onClick={hideModal}>Cancelar</Button>
                 <Button type='submit' onClick={peticionPagoPropios}>
                   Aceptar
                 </Button>
-                <Button onClick={hideModal}>Cancelar</Button>
               </ButtonBar>
             </>
           )}
@@ -600,6 +613,7 @@ const PagoDeProductosPropios = () => {
             <>
               <h2>
                 <ButtonBar>
+                  <Button onClick={handlePrint}>Imprimir</Button>
                   <Button
                     type='submit'
                     onClick={() => {
@@ -607,7 +621,6 @@ const PagoDeProductosPropios = () => {
                     }}>
                     Aceptar
                   </Button>
-                  <Button onClick={handlePrint}>Imprimir</Button>
                 </ButtonBar>
               </h2>
               <TicketsDavivienda

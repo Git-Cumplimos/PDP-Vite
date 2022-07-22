@@ -13,6 +13,7 @@ import TicketsDavivienda from "../../components/TicketsDavivienda";
 import Select from "../../../../../components/Base/Select";
 import {
   postConsultaPagoPorGiroDavivienda,
+  postModificarTicketPagoPorGiroDavivienda,
   postPagoPorGiroDavivienda,
 } from "../../utils/fetchPagoPorGiro";
 
@@ -50,18 +51,15 @@ const PagoGiro = () => {
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
       /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
+      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
       /*direccion*/
-      [
-        "Dirección",
-        roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
-      ],
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
       ["Tipo de operación", "Pago por giro"],
       ["", ""],
     ],
     commerceName: roleInfo?.["nombre comercio"]
       ? roleInfo?.["nombre comercio"]
-      : "prod",
+      : "Sin datos",
     trxInfo: [],
     disclamer:
       "Línea de atención personalizada: #688 Mensaje de texto: 85888 Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -80,7 +78,31 @@ const PagoGiro = () => {
   };
 
   const hideModal = () => {
-    if (peticion === 3 || peticion === 2) return setPeticion(4);
+    if (peticion === 3 || peticion === 2) {
+      const objTicket = { ...objTicketActual };
+      setIsUploading(true);
+      postModificarTicketPagoPorGiroDavivienda({
+        ticket: objTicket,
+        idTrx: datosConsultaIdTrx.idTrx,
+      })
+        .then((res) => {
+          if (res?.status) {
+            setIsUploading(false);
+            notify(res?.msg);
+          } else {
+            setIsUploading(false);
+            notifyError(res?.msg);
+            hideModal();
+          }
+        })
+        .catch((err) => {
+          setIsUploading(false);
+          notifyError("No se ha podido conectar al servidor");
+          console.error(err);
+        });
+
+      return setPeticion(4);
+    }
     setShowModal(false);
     setDatosTrans({
       tipoIdentificacion: "",
@@ -98,18 +120,18 @@ const PagoGiro = () => {
         commerceInfo: [
           /*id transaccion recarga*/
           /*id_comercio*/
-          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
           /*id_dispositivo*/
           [
             "No. terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1,
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
           ],
           /*ciudad*/
-          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
+          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
           /*direccion*/
           [
             "Dirección",
-            roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
+            roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
           ],
           ["Tipo de operación", "Pago por giro"],
           ["", ""],
@@ -135,6 +157,11 @@ const PagoGiro = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["commerceInfo"].push([
+      "No. de aprobación",
+      "Consulta Transacción",
+    ]);
+    objTicket["commerceInfo"].push(["", ""]);
     setIsUploading(true);
     postConsultaPagoPorGiroDavivienda({
       tipoIdentificacion: datosTrans.tipoIdentificacion,
@@ -148,6 +175,7 @@ const PagoGiro = () => {
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      ticket: objTicket,
     })
       .then((res) => {
         if (res?.status) {
@@ -159,11 +187,10 @@ const PagoGiro = () => {
             "No. terminal",
             res?.obj?.codigoTotal,
           ];
-          objTicket["commerceInfo"].push([
+          objTicket["commerceInfo"][6] = [
             "No. de aprobación",
-            "Transacción Declinada",
-          ]);
-          objTicket["commerceInfo"].push(["", ""]);
+            "Transacción Cancelada por el usuario",
+          ];
           objTicket["trxInfo"].push(["Valor", formatMoney.format(0)]);
           objTicket["trxInfo"].push(["", ""]);
           objTicket["trxInfo"].push([
@@ -247,12 +274,24 @@ const PagoGiro = () => {
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
-          hideModal();
+          objTicket["commerceInfo"][6] = [
+            "No. de aprobación",
+            "Transacción Declinada",
+          ];
+          setObjTicketActual(objTicket);
+          setPeticion(4);
+          // hideModal();
         }
       })
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        objTicket["commerceInfo"][6] = [
+          "No. de aprobación",
+          "Transacción Declinada",
+        ];
+        setObjTicketActual(objTicket);
+        setPeticion(4);
         console.error(err);
       });
   };
@@ -269,6 +308,7 @@ const PagoGiro = () => {
           minLength='10'
           maxLength='10'
           required
+          autoComplete='off'
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -286,6 +326,7 @@ const PagoGiro = () => {
           minLength='1'
           maxLength='8'
           required
+          autoComplete='off'
           value={datosTrans.codigoFamilia}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -333,10 +374,10 @@ const PagoGiro = () => {
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
               <h2>{`Código de familia: ${datosTrans.codigoFamilia}`}</h2>
               <ButtonBar>
+                <Button onClick={hideModal}>Cancelar</Button>
                 <Button type='submit' onClick={peticionConsulta}>
                   Aceptar
                 </Button>
-                <Button onClick={hideModal}>Cancelar</Button>
               </ButtonBar>
             </>
           )}
@@ -353,10 +394,10 @@ const PagoGiro = () => {
                 datosConsulta.valorPago
               )}`}</h2>
               <ButtonBar>
+                <Button onClick={hideModal}>Cancelar</Button>
                 <Button type='submit' onClick={() => setPeticion(3)}>
                   Aceptar
                 </Button>
-                <Button onClick={hideModal}>Cancelar</Button>
               </ButtonBar>
             </>
           )}
@@ -371,10 +412,10 @@ const PagoGiro = () => {
                 datosConsulta.valorPago
               )}`}</h2>
               <ButtonBar>
+                <Button onClick={hideModal}>Cancelar</Button>
                 <Button type='submit' onClick={peticionPagoPorGiro}>
                   Aceptar
                 </Button>
-                <Button onClick={hideModal}>Cancelar</Button>
               </ButtonBar>
             </>
           )}
@@ -382,10 +423,10 @@ const PagoGiro = () => {
             <>
               <h2>
                 <ButtonBar>
+                  <Button onClick={handlePrint}>Imprimir</Button>
                   <Button type='submit' onClick={hideModal}>
                     Aceptar
                   </Button>
-                  <Button onClick={handlePrint}>Imprimir</Button>
                 </ButtonBar>
               </h2>
               <TicketsDavivienda
