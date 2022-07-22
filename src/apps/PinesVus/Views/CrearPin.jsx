@@ -58,6 +58,7 @@ const CrearPin = () => {
   const [email, setEmail] = useState("")
   const [eps, setEps] = useState("")
   const [arl, setArl] = useState("")
+  const [idPin, setIdPin] = useState("")
 
   const [olimpia, setOlimpia] = useState("")
 
@@ -219,7 +220,8 @@ const CrearPin = () => {
       descripcion : resp[0]?.descripcion.toUpperCase(),
       valor : resp[0]?.valor,
       iva : resp[0]?.iva,
-      total : resp[0]?.valor + resp[0]?.iva
+      total : resp[0]?.valor + resp[0]?.iva,
+      tipo : resp[0]?.tipoTramite
     }
     return tramiteData;
   }, [optionsTramites, tramite]);
@@ -243,7 +245,9 @@ const CrearPin = () => {
 
   const onSubmitCliente = (e) => {
     e.preventDefault();
-    consultaClientes(documento,olimpia).then((resp) => {
+    setDisabledBtns(true);
+    setShowFormulario(false)
+    consultaClientes(documento,olimpia,idPin).then((resp) => {
       if (resp?.obj?.results?.length > 0) {
         const fecha_nacimiento = new Date(resp?.obj?.results?.[0]?.fecha_nacimiento);
         fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
@@ -298,13 +302,14 @@ const CrearPin = () => {
       }
     }
     setShowFormulario(true)
+    setDisabledBtns(false);
     });
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
-    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia)
+    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin)
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -325,6 +330,7 @@ const CrearPin = () => {
     setDocumento("");
     setRespPin("");
     setTipoPin("");
+    setIdPin("");
     navigate(-1);
   }, []);
 
@@ -447,6 +453,24 @@ const CrearPin = () => {
           setOlimpia(e.target.value);
         }}
       />
+      {olimpia == "true" ? 
+      <>
+       <Input
+       id="idPin"
+       label="Id Pin"
+       type="text"
+       required
+       minLength="1"
+       maxLength="12"
+       autoComplete="off"
+       value={idPin}
+       onInput={(e) => {
+         const num = parseInt(e.target.value) || "";
+         setIdPin(num);
+       }}
+      />
+      </>
+      :"" }
       <ButtonBar className="lg:col-span-2">
       <Button type="submit" disabled={disabledBtns}>
         Continuar

@@ -97,7 +97,7 @@ const QX = () => {
           notifyError(res?.msg);
         } else {  
           notify(res?.msg)       
-          setShowModal(false);
+          closeModal();
           setDisabledBtns(false);         
         }
       })
@@ -270,7 +270,7 @@ const QX = () => {
                   }}}
                 />
                 <ButtonBar>
-                  <Button type="submit">Usar pin</Button>
+                  <Button type="submit">Cargar ID</Button>
                   <Button
                   onClick={() => {
                     closeModal()
