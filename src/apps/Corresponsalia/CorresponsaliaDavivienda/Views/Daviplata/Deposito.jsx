@@ -44,7 +44,7 @@ const Deposito = () => {
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
-    min: 5000,
+    min: 10000,
   });
 
   const options = [
