@@ -9,7 +9,7 @@ export const makeDeposit = async (bodyDep) => {
   }
 
   try {    
-    const res = await fetchData(`${urlColpatriaTrx}/cash-in/deposito`, "POST", {}, bodyDep);
+    const res = await fetchData(`${urlColpatriaTrx}/deposito`, "POST", {}, bodyDep);
     if (!res?.status) {
       if (res?.msg) {
         throw new Error(res?.msg, { cause: "custom" });
@@ -29,7 +29,7 @@ export const makeSellPin = async (bodyDep) => {
   }
 
   try {    
-    const res = await fetchData(`${urlColpatriaTrx}/cash-in/venta-pines`, "POST", {}, bodyDep);
+    const res = await fetchData(`${urlColpatriaTrx}/venta-pines`, "POST", {}, bodyDep);
     if (!res?.status) {
       if (res?.msg) {
         throw new Error(res?.msg, { cause: "custom" });
