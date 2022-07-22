@@ -9,7 +9,27 @@ export const makeDeposit = async (bodyDep) => {
   }
 
   try {    
-    const res = await fetchData(`${urlColpatriaTrx}/deposito`, "POST", {}, bodyDep);
+    const res = await fetchData(`${urlColpatriaTrx}/cash-in/deposito`, "POST", {}, bodyDep);
+    if (!res?.status) {
+      if (res?.msg) {
+        throw new Error(res?.msg, { cause: "custom" });
+      }
+
+      throw new Error(res, { cause: "custom" });
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const makeSellPin = async (bodyDep) => {
+  if (!bodyDep) {
+    throw new Error("sin datos de venta de pin", { cause: "custom" });
+  }
+
+  try {    
+    const res = await fetchData(`${urlColpatriaTrx}/cash-in/venta-pines`, "POST", {}, bodyDep);
     if (!res?.status) {
       if (res?.msg) {
         throw new Error(res?.msg, { cause: "custom" });
