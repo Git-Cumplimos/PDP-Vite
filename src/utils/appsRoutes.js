@@ -921,7 +921,7 @@ const allUrlsPrivateApps = [
     link: "/movistar",
     label: <AppIcons Logo={"LOTERIA"} name='Movistar' />,
     component: Movistar,
-    permission: [65,66],
+    permission: [65, 66],
     subRoutes: [
       {
         link: "/movistar/recargas-movistar",
