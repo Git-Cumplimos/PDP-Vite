@@ -3,6 +3,7 @@ import Input from "../../../components/Base/Input";
 import Select from "../../../components/Base/Select";
 import Form from "../../../components/Base/Form";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
+import { notifyError } from "../../../utils/notify";
 import {
   PeticionConciliacion,
   PeticionDescargar,
@@ -37,9 +38,11 @@ const ConcilacionMovistar = () => {
         ? (URLCompleta = URL + "?" + arrayParamts.join("&"))
         : URL;
 
-    PeticionConciliacion(URLCompleta).then((response) =>
-      setData(response.obj.results)
-    );
+    PeticionConciliacion(URLCompleta)
+      .then((response) => setData(response.obj.results))
+      .catch((e) => {
+        notifyError("Falla en el sistema >> " + e);
+      });
   }, [paramts]);
 
   function FunctionInput(e) {
@@ -56,7 +59,7 @@ const ConcilacionMovistar = () => {
         <TableEnterprise
           title="Conciliación Movistar"
           maxPage={maxPages}
-          headers={["Fecha", "PuntoDePago", "Movistar", "Diferencias"]}
+          headers={["Fecha", "Punto de pago", "Movistar", "Diferencias"]}
           data={
             data?.map((inf) => ({
               Fecha: inf.fechabusqueda,
@@ -68,7 +71,9 @@ const ConcilacionMovistar = () => {
           onSelectRow={(e, i) => {
             PeticionDescargar(
               URLDescarga + "?fechabusqueda=" + data?.[i].fechabusqueda
-            );
+            ).catch((e) => {
+              notifyError("Falla en el sistema >> " + e);
+            });
           }}
           onSetPageData={setPageData}
         >
@@ -88,7 +93,7 @@ const ConcilacionMovistar = () => {
           />
           <Select
             name="filtro"
-            label="Tipo de busqueda"
+            label="Tipo de búsqueda"
             options={{
               Todas: "",
               "Conciliaciones efectivas": "completo",
