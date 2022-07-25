@@ -20,15 +20,12 @@ const ModifiLimiteCanje = () => {
   const [asigLimite, setAsigLimite] = useState(null);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
+  const [inputId, setinputId] = useState(false);
   const limitesMontos = {
     max: 9999999999,
     min: -9999999999,
   };
   const { roleInfo } = useAuth();
-
-  // useEffect(() => {
-  //   tablalimitecupo(idComercio, page, limit);
-  // }, [idComercio, page, limit, cupoComer]);
 
   useEffect(() => {
     if (cupoComer?.results.length === 0) {
@@ -47,19 +44,22 @@ const ModifiLimiteCanje = () => {
       });
   };
 
-  const onChange = useCallback((ev) => {
-    // if (ev.target.name === "valor") {
-    //   setValor(ev.target.value);
-    // } else
-    if (ev.target.name === "Id comercio") {
-      setIdComercio(ev.target.value);
-    }
+  const onChangeId = useCallback((ev) => {
+    const formData = new FormData(ev.target.form);
+    const idComer = (
+      (formData.get("Id comercio") ?? "").match(/\d/g) ?? []
+    ).join("");
+    setIdComercio(idComer);
   }, []);
 
   const onSubmitDeposit = useCallback(
     (e) => {
       e.preventDefault();
-      if (e.nativeEvent.submitter.name === "AsignarLimiteCupo") {
+      if (
+        e.nativeEvent.submitter.name === "AsignarLimiteCupo" &&
+        valor !== null &&
+        valor !== ""
+      ) {
         const body = {
           fk_id_comercio: idComercio,
           valor_afectacion: valor,
@@ -78,6 +78,8 @@ const ModifiLimiteCanje = () => {
             console.error(r.message);
             notifyError("Error al modificar cupo");
           });
+      } else {
+        notifyError("El campo límite de cupo no puede estar vacío");
       }
     },
     [idComercio, valor, limit, roleInfo.id_usuario, page]
@@ -89,6 +91,7 @@ const ModifiLimiteCanje = () => {
     (e) => {
       e.preventDefault();
       if (e.nativeEvent.submitter.name === "buscarComercio") {
+        setinputId(true);
         getConsultaCupoComercio(idComercio)
           .then((objUdusrio) => {
             setCupoComer(objUdusrio);
@@ -104,21 +107,29 @@ const ModifiLimiteCanje = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Modificación límite de cupo</h1>
-      <Form onChange={onChange} onSubmit={onSubmitComercio} grid>
+      <Form onSubmit={onSubmitComercio} grid>
         <Input
           id="Id comercio"
           name="Id comercio"
           label="Id comercio"
-          type="number"
+          type="text"
+          minLength={"1"}
+          maxLength={"10"}
           autoComplete="off"
-          onInput={() => {}}
+          value={idComercio ?? ""}
+          onChange={onChangeId}
+          disabled={inputId}
           required
         />
-        <ButtonBar>
-          <Button type={"submit"} name="buscarComercio">
-            Buscar comercio
-          </Button>
-        </ButtonBar>
+        {cupoComer?.results.length !== 1 ? (
+          <ButtonBar>
+            <Button type={"submit"} name="buscarComercio">
+              Buscar comercio
+            </Button>
+          </ButtonBar>
+        ) : (
+          ""
+        )}
       </Form>
       {cupoComer?.results.length === 1 ? (
         <Fragment>
@@ -161,8 +172,8 @@ const ModifiLimiteCanje = () => {
               </Button>
             </ButtonBar>
           </Form>
-          <TableEnterprise
-            title="Cupo Comercios"
+          {/* <TableEnterprise
+            title="Historial cupo límite del comercio"
             headers={[
               "Id comercio",
               "Valor afectación",
@@ -195,11 +206,9 @@ const ModifiLimiteCanje = () => {
               setLimit(pagedata.limit);
             }}
             maxPage={asigLimite?.maxPages}
-          ></TableEnterprise>
+          ></TableEnterprise> */}
         </Fragment>
       ) : (
-        // <h1 className="text-3xl mt-6">Ingrese un Id de comercio existente</h1>
-        // notifyError("Id de comercio no existe")
         ""
       )}
     </Fragment>

@@ -641,16 +641,12 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"RECAUDO"} name={"Cupo comercios"} />,
         component: cupoComercio,
         permission: [62],
-        subRoutes: [
-          {
-            link: "/cupo/cupo-comercio/detalles-cupo/:id_comercio",
-            label: (
-              <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />
-            ),
-            component: DtlMovCupo,
-            permission: [62],
-          },
-        ],
+      },
+      {
+        link: "/cupo/cupo-comercio/detalles-cupo/:id_comercio",
+        label: <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />,
+        component: DtlMovCupo,
+        permission: [62],
       },
       {
         link: "/cupo/crear-cupo",

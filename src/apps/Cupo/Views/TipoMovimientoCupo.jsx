@@ -154,7 +154,7 @@ const TipoMovimientoCupo = () => {
           <Input
             id="Tipo de movimiento cupo"
             name="Tipo de moviento cupo"
-            label="Tipo de moviento "
+            label="Tipo de movimiento"
             type="text"
             autoComplete="off"
             onInput={() => {}}

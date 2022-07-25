@@ -7,6 +7,7 @@ import Input from "../../../../components/Base/Input";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import Select from "../../../../components/Base/Select";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import { useFetch } from "../../../../hooks/useFetch";
 import { notifyError } from "../../../../utils/notify";
 import {
@@ -23,10 +24,26 @@ const DtlMovComercio = () => {
   const [loadData, crearData] = useFetch(PeticionDescargarPdf);
   const [tipoAfectacion, setTipoAfectacion] = useState(null);
   const [tipoTransaccion, setTipoTransaccion] = useState(null);
+  const { roleInfo } = useAuth();
+  const [idComercio, setIdComercio] = useState(roleInfo?.id_comercio ?? null);
   let { id_comercio } = useParams();
+
+  const onChangeId = useCallback((ev) => {
+    const formData = new FormData(ev.target.form);
+    const idComer = (
+      (formData.get("Id comercio") ?? "").match(/\d/g) ?? []
+    ).join("");
+    setIdComercio(idComer);
+  }, []);
+
   useEffect(() => {
+    if (roleInfo?.id_comercio) {
+      setIdComercio(roleInfo?.id_comercio);
+    } else if (id_comercio > 0) {
+      setIdComercio(id_comercio);
+    }
     getConsultaDtlMovCupo(
-      id_comercio,
+      idComercio,
       page,
       limit,
       fechaEnd,
@@ -41,15 +58,7 @@ const DtlMovComercio = () => {
         console.log(reason.message);
         notifyError("Error al cargar Datos ");
       });
-  }, [
-    id_comercio,
-    page,
-    limit,
-    fechaEnd,
-    fechaini,
-    tipoAfectacion,
-    tipoTransaccion,
-  ]);
+  }, [roleInfo, id_comercio]);
   const onChange = useCallback((ev) => {
     if (ev.target.name === "fecha_inico") {
       setFechaini(ev.target.value);
@@ -63,7 +72,7 @@ const DtlMovComercio = () => {
       if (id_comercio !== "") {
         if (fechaEnd !== null || fechaini !== null) {
           crearData(
-            id_comercio,
+            idComercio,
             fechaEnd,
             fechaini,
             tipoTransaccion,
@@ -73,31 +82,87 @@ const DtlMovComercio = () => {
       }
     },
     [
-      id_comercio,
+      idComercio,
       fechaEnd,
       fechaini,
       tipoTransaccion,
       tipoAfectacion,
       crearData,
+      id_comercio,
+    ]
+  );
+  const onSubmitComercio = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (e.nativeEvent.submitter.name === "buscarComercio") {
+        getConsultaDtlMovCupo(
+          idComercio,
+          page,
+          limit,
+          fechaEnd,
+          fechaini,
+          tipoTransaccion,
+          tipoAfectacion
+        )
+          .then((objUdusrio) => {
+            setDtlCupo(objUdusrio);
+          })
+          .catch((reason) => {
+            console.log(reason.message);
+            notifyError("Error al cargar Datos ");
+          });
+      }
+    },
+    [
+      idComercio,
+      page,
+      limit,
+      fechaEnd,
+      fechaini,
+      tipoAfectacion,
+      tipoTransaccion,
     ]
   );
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Detalle movimineto cupo comercio</h1>
+      <h1 className="text-3xl mt-6">Detalle movimiento cupo comercio</h1>
+      {dtlCupo?.results.length > 0 && roleInfo?.id_comercio ? (
+        ""
+      ) : (
+        <Form grid onSubmit={onSubmitComercio}>
+          <Input
+            id="idCliente"
+            name="Id comercio"
+            label="Id comercio"
+            type="text"
+            autoComplete="off"
+            minLength={"0"}
+            maxLength={"10"}
+            value={idComercio ?? ""}
+            onChange={onChangeId}
+            required
+          />
+          <ButtonBar>
+            <Button type={"submit"} name="buscarComercio">
+              Buscar comercio
+            </Button>
+          </ButtonBar>
+        </Form>
+      )}
       <TableEnterprise
         title="Detalle movimientos cupo Comercios"
         headers={[
-          "id detalle movimiento",
+          "Id detalle movimiento",
           "Tipo de movimiento",
-          "Tipo de afectacion",
+          "Tipo de afectación",
           "Valor afectación",
           "Fecha afectación",
           "Hora afectación",
           "Deuda actual",
           "Cupo canje",
-          "usuario",
-          "Id transaccion",
-          "Descripcion afectacion",
+          "Usuario",
+          "Id transacción",
+          "Descripción afectación",
         ]}
         data={
           dtlCupo?.results.map(

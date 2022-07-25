@@ -21,7 +21,7 @@ const CupoComer = () => {
 
   useEffect(() => {
     setIdComercio(roleInfo?.id_comercio);
-  }, [roleInfo?.id_comercio]);
+  }, [roleInfo]);
 
   useEffect(() => {
     getConsultaCupoComercio(idComercio, page, limit)
@@ -34,10 +34,12 @@ const CupoComer = () => {
       });
   }, [idComercio, page, limit]);
 
-  const onChange = useCallback((ev) => {
-    if (ev.target.name === "idCliente") {
-      setIdComercio(ev.target.value);
-    }
+  const onChangeId = useCallback((ev) => {
+    const formData = new FormData(ev.target.form);
+    const idComer = (
+      (formData.get("Id comercio") ?? "").match(/\d/g) ?? []
+    ).join("");
+    setIdComercio(idComer);
   }, []);
   const onSubmitDownload = useCallback(
     (e) => {
@@ -63,14 +65,17 @@ const CupoComer = () => {
       {roleInfo?.id_comercio ? (
         ""
       ) : (
-        <Form onChange={onChange} grid>
+        <Form grid>
           <Input
             id="idCliente"
-            name="idCliente"
-            label="Id cliente"
-            type="number"
+            name="Id comercio"
+            label="Id comercio"
+            type="text"
             autoComplete="off"
-            onInput={() => {}}
+            minLength={"0"}
+            maxLength={"10"}
+            value={idComercio ?? ""}
+            onChange={onChangeId}
             required
           />
           <ButtonBar></ButtonBar>

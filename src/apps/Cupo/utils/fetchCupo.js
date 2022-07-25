@@ -1,4 +1,5 @@
 import fetchData from "../../../utils/fetchData";
+import { Auth } from "@aws-amplify/auth";
 
 const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}`;
 
@@ -177,8 +178,12 @@ export const putAjusteCupo = async (argsObj, bodyObj) => {
 
 export const PeticionDescargar = async (parametro) => {
   try {
+    const session = await Auth.currentSession();
     const response = await fetch(
-      `${urlCupo}/servicio-cupo/cupo/documento${parametro}`
+      `${urlCupo}/servicio-cupo/cupo/documento${parametro}`,
+      {
+        headers: { Authorization: `Bearer ${session?.idToken?.jwtToken}` },
+      }
     );
     const contentType = response.headers.get("content-type");
     const nombreDocumento = response.headers
@@ -189,9 +194,6 @@ export const PeticionDescargar = async (parametro) => {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ) {
       const byts = await response.blob();
-      // const blob = new Blob([byts], {
-      //   type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      // });
       const downloadUrl = URL.createObjectURL(byts);
       const a = document.createElement("a");
       a.href = downloadUrl;
@@ -228,8 +230,12 @@ export const PeticionDescargarPdf = async (
     busqueda += `&tipo_afectacion=${tipo_afectacion}`;
   }
   try {
+    const session = await Auth.currentSession();
     const response = await fetch(
-      `${urlCupo}/servicio-cupo/dtlcupo/fpdf?fk_id_comercio=${parametro}${busqueda}`
+      `${urlCupo}/servicio-cupo/dtlcupo/fpdf?fk_id_comercio=${parametro}${busqueda}`,
+      {
+        headers: { Authorization: `Bearer ${session?.idToken?.jwtToken}` },
+      }
     );
     const contentType = response.headers.get("content-type");
     const nombreDocumento = response.headers
