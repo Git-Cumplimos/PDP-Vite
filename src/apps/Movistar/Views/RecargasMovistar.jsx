@@ -24,11 +24,12 @@ import { PeticionRecarga } from "../utils/fetchMovistar";
 
 const minValor = 1000;
 const maxValor = 500000;
+const tipo_operacion = 77;
 
 const RecargasMovistar = () => {
   //Variables
   const printDiv = useRef();
-  const { roleInfo } = useAuth();
+  const { roleInfo, infoTicket } = useAuth();
   const validNavigate = useNavigate();
   const [inputCelular, setInputCelular] = useState("");
   const [inputValor, setInputValor] = useState("");
@@ -47,16 +48,18 @@ const RecargasMovistar = () => {
   const onCelChange = (e) => {
     const formData = new FormData(e.target.form);
     const phone = ((formData.get("celular") ?? "").match(/\d/g) ?? []).join("");
+    if(phone[0] != 3){
+    setInvalidCelular("Número inválido");
+    }else{
+    setInvalidCelular(" ");
 
+    }
     if (phone.length == 1 && inputCelular == "") {
-      if (phone[0] == 3) {
-        setInvalidCelular("");
-      } else {
-        setInvalidCelular("Número invalido");
+      if (phone[0] != 3) {
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
-      }
+      } 
     }
     setInputCelular(phone);
   };
@@ -72,22 +75,22 @@ const RecargasMovistar = () => {
         "Número inválido, el No. de celular debe comenzar con el número 3"
       );
     }
+    const minValorFormato= formatMoney.format(
+      minValor
+    ).replace(/\s+/g, '')
+    const maxValorFormato= formatMoney.format(
+      maxValor
+    ).replace(/\s+/g, '')
 
     if (inputValor >= minValor && inputValor <= maxValor) {
       realizarRecarga++;
-    } else if (inputValor == "") {
-      notifyError("Escribir el valor de la recarga");
     } else if (inputValor < minValor) {
       notifyError(
-        `Valor de la recarga invalido, debe ser mayor o igual a ${formatMoney.format(
-          minValor
-        )}`
+        `Valor de la recarga inválido, debe ser mayor o igual a ${minValorFormato}`
       );
     } else if (inputValor > maxValor) {
       notifyError(
-        `Valor de la recarga invalido, debe ser menor o igual a ${formatMoney.format(
-          maxValor
-        )}`
+        `Valor de la recarga inválido, debe ser menor o igual a ${maxValorFormato}`
       );
     }
 
@@ -127,12 +130,12 @@ const RecargasMovistar = () => {
           switch (response_obj?.identificador) {
             case "00":
               notifyError(
-                "Falla en el sistema ______________________ Datos de entrada al servicio erroneos [identificador=00]"
+                "Falla en el sistema >> Datos de entrada al servicio erróneos  [identificador=00]"
               );
               break;
             case "01":
               notifyError(
-                "Falla en el sistema ______________________ Servicio transaccional caido [identificador=01]"
+                "Falla en el sistema >> Servicio transaccional caído  [identificador=01]"
               );
               break;
             case "02":
@@ -140,26 +143,27 @@ const RecargasMovistar = () => {
               break;
             case "03":
               notifyError(
-                "Falla en el sistema ______________________ Error con la conexión inicial a la base de datos [identificador=03]"
+                "Falla en el sistema >> Error con la conexión inicial a la base de datos [identificador=03]"
               );
               break;
             case "04":
               notifyError(
-                "Falla en el sistema ______________________ Error con la trama de envio [identificador=04]"
+                "Falla en el sistema >> Error con la trama de envió  [identificador=04]"
               );
               break;
             case "05":
               notifyError(
-                "Falla en el sistema ______________________ Error con la conexión telnet [identificador=05]"
+                "Falla en el sistema >> Error con la conexión telnet [identificador=05]"
               );
+              break;
             case "10":
               notifyError(
-                "Falla en el sistema ______________________ Error con la trama recibida [identificador=10]"
+                "Falla en el sistema >> Error con la trama recibida [identificador=10]"
               );
               break;
             case "11":
               notifyError(
-                "recarga RECHAZADA por parte de movistar - verifique el número telefónico [identificador=11]"
+                "Recarga RECHAZADA por parte de movistar - Verifique el número telefónico [identificador=11]"
               );
               break;
             default:
@@ -170,7 +174,7 @@ const RecargasMovistar = () => {
       .catch((e) => {
         setFlagRecarga(false);
         setShowModal(false);
-        notifyError("Falla en el sistema : " + e);
+        notifyError("Falla en el sistema >> " + e);
       });
   };
 
@@ -187,11 +191,17 @@ const RecargasMovistar = () => {
   });
 
   const ticketRecarga = (result_) => {
-    setInfTicket({
+    const now = new Date();
+    const voucher = {
       title: "Recibo de recarga ",
       timeInfo: {
         "Fecha de venta": result_.fecha_final_ptopago,
-        Hora: result_.hora_final_ptopago,
+        // Hora: now.getHours() + ':' + now.getMinutes() + ':'+ now.getSeconds(),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }).format(new Date()),
       },
       commerceInfo: [
         ["Id Comercio", roleInfo.id_comercio],
@@ -212,7 +222,16 @@ const RecargasMovistar = () => {
       ],
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
-    });
+    };
+    setInfTicket(voucher);
+    infoTicket(result_.transaccion_ptopago, tipo_operacion, voucher)
+      .then((resTicket) => {
+        console.log(resTicket);
+      })
+      .catch((err) => {
+        console.error(err);
+        notifyError("Error guardando el ticket");
+      });
   };
 
   return (
