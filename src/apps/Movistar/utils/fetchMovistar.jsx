@@ -25,14 +25,14 @@ export const PeticionConciliacion = async (url_) => {
 };
 
 export const PeticionDescargar = async (url_) => {
-  const headers=session = await Auth.currentSession();
+  const session = await Auth.currentSession();
   try {
-    const response = await fetch(url_), 
+    const response = await fetch(url_, 
     {
       headers:{
-        Authorization = `Bearer ${session?.idToken?.jwtToken}`;
+        Authorization: `Bearer ${session?.idToken?.jwtToken}`
       }
-    };
+    })
     const contentType = response.headers.get("content-type")  ;
     const nombreDocumento = response.headers
       .get("Content-Disposition")

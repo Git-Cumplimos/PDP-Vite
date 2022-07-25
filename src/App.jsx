@@ -18,7 +18,15 @@ Amplify.configure(awsconfig);
 function App() {
   return (
     <Router>
-      <ToastContainer />
+      <ToastContainer
+        position={"top-center"}
+        autoClose={5000}
+        hideProgressBar={false}
+        closeOnClick={true}
+        pauseOnHover={true}
+        draggable={true}
+        progress={undefined}
+      />
       <ProvideAuth>
         <ProvideImgs>
           <ProvideUrls>

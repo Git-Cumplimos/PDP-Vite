@@ -279,6 +279,7 @@ const Transacciones = () => {
               refPrint={printDiv}
               type="Reimpresión"
               ticket={selected?.ticket}
+              stateTrx={selected?.status_trx}
             />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>

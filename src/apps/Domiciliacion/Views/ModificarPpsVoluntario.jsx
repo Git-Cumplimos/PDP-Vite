@@ -89,6 +89,14 @@ const ModificarPps = () => {
     setBuscarCedula("");
   }, []);
 
+  const UsuarioNoEncontradoNotify = useCallback(() => {
+    if (setShowModalUsuarioNoEncontrado) {
+      notifyError("Usuario No Encontrad");
+    }
+    /*  setDatosConsulta(""); */
+    setBuscarCedula("");
+  }, []);
+
   const BuscarCedula = (e) => {
     setShowModal(true);
     /*    setShowModalUsuarioNoEncontrado(true) */ e.preventDefault();
@@ -125,6 +133,9 @@ const ModificarPps = () => {
             console.log("entre");
             setSinDatosConsulta(true);
             setShowModalUsuarioNoEncontrado(true);
+            notifyError(
+              "No se puede realizar la modificación, el número de documento no se encuentra domiciliado"
+            );
           }
         })
         .catch((err) => {
@@ -220,7 +231,7 @@ const ModificarPps = () => {
           }
         </ButtonBar>
       </Form>
-      {estadoUsuarioNoEncontrado && sinDatosConsulta ? (
+      {/*       {estadoUsuarioNoEncontrado && sinDatosConsulta ? (
         <Modal
           show={showModalUsuarioNoEncontrado}
           handleClose={handleCloseUsuarioNoEncontrado}
@@ -235,7 +246,7 @@ const ModificarPps = () => {
         </Modal>
       ) : (
         ""
-      )}
+      )} */}
       {Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
         <Modal show={showModal} handleClose={handleClose}>
           <div className={contenedorLogo}>

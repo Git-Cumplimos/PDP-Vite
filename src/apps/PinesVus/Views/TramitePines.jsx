@@ -106,7 +106,7 @@ const TramitePines = () => {
     //   Depto: roleInfo?.codigo_dane?.slice(0, 2),
     //   Municipio: roleInfo?.codigo_dane?.slice(2),
     // };
-    consultaPinesVus(parametroBusqueda, "", "", "", pageData)
+    consultaPinesVus(parametroBusqueda, "", "", "", "",pageData)
       .then((res) => {
         setInfo(res);
         setDisabledBtn(false);
@@ -172,6 +172,8 @@ const TramitePines = () => {
 
   }, [hora,parametroBusqueda, table])
   return (
+    <>
+    {"id_comercio" in roleInfo ? (
     <>
       {"id_comercio" in roleInfo ? (
         <div className="flex flex-col w-1/2 mx-auto">
@@ -324,6 +326,10 @@ const TramitePines = () => {
           ""
         )}
       </Modal>
+    </>
+    ) : (
+      <h1 className="text-3xl mt-6">El usuario no tiene comercio asociado</h1>
+    )}
     </>
   );
 };
