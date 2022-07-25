@@ -559,19 +559,21 @@ const allUrlsPrivateApps = [
         component: PagoParticipantes,
         permission: [53],
         subRoutes: [
-        {
-          link: "/PinesVus/Participacion/PagoParticipacion",
-          label: <AppIcons Logo={"RECAUDO"} name={"Pago participacion"} />,
-          component: ParticipacionPines,
-          permission: [53],
-        },
-        {
-          link: "/PinesVus/Participacion/VerPagoParticipacion",
-          label: <AppIcons Logo={"RECAUDO"} name={"Ver pago participacion"} />,
-          component: VerParticipacionPines,
-          permission: [53],
-        },
-        ]
+          {
+            link: "/PinesVus/Participacion/PagoParticipacion",
+            label: <AppIcons Logo={"RECAUDO"} name={"Pago participacion"} />,
+            component: ParticipacionPines,
+            permission: [53],
+          },
+          {
+            link: "/PinesVus/Participacion/VerPagoParticipacion",
+            label: (
+              <AppIcons Logo={"RECAUDO"} name={"Ver pago participacion"} />
+            ),
+            component: VerParticipacionPines,
+            permission: [53],
+          },
+        ],
       },
       {
         link: "/PinesVus/Reportes",
@@ -679,16 +681,12 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"RECAUDO"} name={"Cupo comercios"} />,
         component: cupoComercio,
         permission: [62],
-        subRoutes: [
-          {
-            link: "/cupo/cupo-comercio/detalles-cupo/:id_comercio",
-            label: (
-              <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />
-            ),
-            component: DtlMovCupo,
-            permission: [62],
-          },
-        ],
+      },
+      {
+        link: "/cupo/cupo-comercio/detalles-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />,
+        component: DtlMovCupo,
+        permission: [62],
       },
       {
         link: "/cupo/crear-cupo",
@@ -740,28 +738,28 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/corresponsalia",
-    label: <AppIcons Logo={"MARKETPLACE"} name='Corresponsalia' />,
+    label: <AppIcons Logo={"MARKETPLACE"} name="Corresponsalia" />,
     component: Corresponsalia,
     permission: [54],
     subRoutes: [
       {
         link: "/corresponsalia/corresponsaliaDavivienda",
         label: (
-          <AppIcons Logo={"MARKETPLACE"} name='Corresponsalia Davivienda' />
+          <AppIcons Logo={"MARKETPLACE"} name="Corresponsalia Davivienda" />
         ),
         component: CorresponsaliaDavivienda,
         permission: [54],
         subRoutes: [
           {
             link: "/corresponsalia/corresponsaliaDavivienda/Daviplata",
-            label: <AppIcons Logo={"MARKETPLACE"} name='Daviplata' />,
+            label: <AppIcons Logo={"MARKETPLACE"} name="Daviplata" />,
             component: DaviplataCB,
             permission: [54],
             subRoutes: [
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashIn",
                 label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />
+                  <AppIcons Logo={"MARKETPLACE"} name="Depositos Daviplata" />
                 ),
                 component: CashIn,
                 permission: [54],
@@ -769,7 +767,7 @@ const allUrlsPrivateApps = [
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashOut",
                 label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Retiros Daviplata' />
+                  <AppIcons Logo={"MARKETPLACE"} name="Retiros Daviplata" />
                 ),
                 component: CashOut,
                 permission: [54],
@@ -782,7 +780,7 @@ const allUrlsPrivateApps = [
             label: (
               <AppIcons
                 Logo={"MARKETPLACE"}
-                name='Transacciones cuentas Davivienda'
+                name="Transacciones cuentas Davivienda"
               />
             ),
             component: AhorrosCorrienteCB,
@@ -790,13 +788,13 @@ const allUrlsPrivateApps = [
             subRoutes: [
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente/deposito",
-                label: <AppIcons Logo={"MARKETPLACE"} name='Depositos' />,
+                label: <AppIcons Logo={"MARKETPLACE"} name="Depositos" />,
                 component: DepositoCB,
                 permission: [54],
               },
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente/retiro",
-                label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
+                label: <AppIcons Logo={"MARKETPLACE"} name="Retiros" />,
                 component: RetiroCB,
                 permission: [54],
               },
@@ -804,7 +802,7 @@ const allUrlsPrivateApps = [
           },
           {
             link: "/corresponsalia/corresponsaliaDavivienda/Daviplatapagos_giros",
-            label: <AppIcons Logo={"MARKETPLACE"} name='Pagos por giro' />,
+            label: <AppIcons Logo={"MARKETPLACE"} name="Pagos por giro" />,
             component: PagoGiro,
             permission: [54],
           },
@@ -814,7 +812,7 @@ const allUrlsPrivateApps = [
             label: (
               <AppIcons
                 Logo={"MARKETPLACE"}
-                name='Pago de productos de crédito'
+                name="Pago de productos de crédito"
               />
             ),
             component: PagoDeProductosPropios,
@@ -825,7 +823,7 @@ const allUrlsPrivateApps = [
             label: (
               <AppIcons
                 Logo={"MARKETPLACE"}
-                name='Recaudo servicios publicos y privados'
+                name="Recaudo servicios publicos y privados"
               />
             ),
             component: RecaudoServiciosPublicosPrivadosMenu,
@@ -834,7 +832,7 @@ const allUrlsPrivateApps = [
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccion",
                 label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Selección del covenio' />
+                  <AppIcons Logo={"MARKETPLACE"} name="Selección del covenio" />
                 ),
                 component: SeleccionServicioPagar,
                 permission: [54],
@@ -844,7 +842,7 @@ const allUrlsPrivateApps = [
                 label: (
                   <AppIcons
                     Logo={"MARKETPLACE"}
-                    name='Ingreso por código de barras'
+                    name="Ingreso por código de barras"
                   />
                 ),
                 component: RecaudoServiciosPublicosPrivadosLecturaCodigoBarras,
@@ -853,7 +851,7 @@ const allUrlsPrivateApps = [
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
                 label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Selección del covenio' />
+                  <AppIcons Logo={"MARKETPLACE"} name="Selección del covenio" />
                 ),
                 component: RecaudoServiciosPublicosPrivados,
                 permission: [54],
@@ -919,7 +917,7 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/movistar",
-    label: <AppIcons Logo={"LOTERIA"} name='Movistar' />,
+    label: <AppIcons Logo={"LOTERIA"} name="Movistar" />,
     component: Movistar,
     permission: [65, 66],
     subRoutes: [
@@ -931,7 +929,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/movistar/concilacion",
-        label: <AppIcons Logo={"SORTEOS"} name='Conciliación' />,
+        label: <AppIcons Logo={"SORTEOS"} name="Conciliación" />,
         component: ConcilacionMovistar,
         permission: [66],
       },

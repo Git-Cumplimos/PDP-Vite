@@ -14,7 +14,7 @@ import { postCupoComercio } from "../utils/fetchCupo";
 const CrearCupo = () => {
   const [idComercio, setIdComercio] = useState(null);
   const [deuda, setDeuda] = useState(null);
-  const [paymentStatus, setPaymentStatus] = useState(false);
+  const [paymentStatus] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [summary, setSummary] = useState({});
   const [limite, setLimite] = useState(null);
@@ -24,18 +24,30 @@ const CrearCupo = () => {
     min: 0,
   };
   const { roleInfo } = useAuth();
-  const onChange = useCallback((ev) => {
-    if (ev.target.name === "Id comercio") {
-      setIdComercio(ev.target.value);
-    }
+
+  const onChangeId = useCallback((ev) => {
+    const formData = new FormData(ev.target.form);
+    const idComer = (
+      (formData.get("Id comercio") ?? "").match(/\d/g) ?? []
+    ).join("");
+    setIdComercio(idComer);
   }, []);
+
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, []);
+
   const onSubmitComercio = useCallback(
     (e) => {
       e.preventDefault();
-      if (limite !== null && limite !== "") {
+      if (
+        limite !== null &&
+        limite !== "" &&
+        deuda !== null &&
+        deuda !== "" &&
+        canje !== "" &&
+        canje !== ""
+      ) {
         setShowModal(true);
         setSummary({
           "Id del comercio": idComercio,
@@ -44,7 +56,9 @@ const CrearCupo = () => {
           "Cupo en canje": formatMoney.format(canje),
         });
       } else {
-        notifyError("El límite del cupo no puede estar vacío");
+        notifyError(
+          "Los campos límite, deuda o cupo en canje no pueden estar vacíos"
+        );
       }
     },
     [idComercio, deuda, canje, limite]
@@ -85,16 +99,17 @@ const CrearCupo = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Crear cupo Comercios</h1>
-      <Form onSubmit={onSubmitComercio} onChange={onChange} grid>
+      <Form onSubmit={onSubmitComercio} grid>
         <Input
           id="Id comercio"
           name="Id comercio"
           label="Id comercio"
-          type="number"
+          type="text"
           autoComplete="off"
-          // minLength={"10"}
-          // maxLength={"10"}
-          onInput={() => {}}
+          value={idComercio ?? ""}
+          // minLength={"1"}
+          maxLength={"10"}
+          onChange={onChangeId}
           required
         />
         <MoneyInput
@@ -136,10 +151,10 @@ const CrearCupo = () => {
         </ButtonBar>
         <Modal
           show={showModal}
-          handleClose={paymentStatus ? handleClose : () => {}}
+          handleClose={paymentStatus ? () => {} : handleClose}
         >
           <PaymentSummary
-            title="¿Esta seguro de asignar el cupo al comercio?"
+            title="¿Está seguro de asignar el cupo al comercio?"
             subtitle="Resumen del comercio"
             summaryTrx={summary}
           >
