@@ -73,22 +73,22 @@ const RecargasMovistar = () => {
         "Número inválido, el No. de celular debe comenzar con el número 3"
       );
     }
+    const minValorFormato= formatMoney.format(
+      minValor
+    ).replace(/\s+/g, '')
+    const maxValorFormato= formatMoney.format(
+      maxValor
+    ).replace(/\s+/g, '')
 
     if (inputValor >= minValor && inputValor <= maxValor) {
       realizarRecarga++;
-    } else if (inputValor == "") {
-      notifyError("Escribir el valor de la recarga");
     } else if (inputValor < minValor) {
       notifyError(
-        `Valor de la recarga invalido, debe ser mayor o igual a ${formatMoney.format(
-          minValor
-        )}`
+        `Valor de la recarga inválido, debe ser mayor o igual a ${minValorFormato}`
       );
     } else if (inputValor > maxValor) {
       notifyError(
-        `Valor de la recarga invalido, debe ser menor o igual a ${formatMoney.format(
-          maxValor
-        )}`
+        `Valor de la recarga inválido, debe ser menor o igual a ${maxValorFormato}`
       );
     }
 
@@ -128,12 +128,12 @@ const RecargasMovistar = () => {
           switch (response_obj?.identificador) {
             case "00":
               notifyError(
-                "Falla en el sistema ______________________ Datos de entrada al servicio erroneos [identificador=00]"
+                "Falla en el sistema >> Datos de entrada al servicio erróneos  [identificador=00]"
               );
               break;
             case "01":
               notifyError(
-                "Falla en el sistema ______________________ Servicio transaccional caido [identificador=01]"
+                "Falla en el sistema >> Servicio transaccional caído  [identificador=01]"
               );
               break;
             case "02":
@@ -141,21 +141,22 @@ const RecargasMovistar = () => {
               break;
             case "03":
               notifyError(
-                "Falla en el sistema ______________________ Error con la conexión inicial a la base de datos [identificador=03]"
+                "Falla en el sistema >> Error con la conexión inicial a la base de datos [identificador=03]"
               );
               break;
             case "04":
               notifyError(
-                "Falla en el sistema ______________________ Error con la trama de envio [identificador=04]"
+                "Falla en el sistema >> Error con la trama de envió  [identificador=04]"
               );
               break;
             case "05":
               notifyError(
-                "Falla en el sistema ______________________ Error con la conexión telnet [identificador=05]"
+                "Falla en el sistema >> Error con la conexión telnet [identificador=05]"
               );
+              break;
             case "10":
               notifyError(
-                "Falla en el sistema ______________________ Error con la trama recibida [identificador=10]"
+                "Falla en el sistema >> Error con la trama recibida [identificador=10]"
               );
               break;
             case "11":
@@ -171,7 +172,7 @@ const RecargasMovistar = () => {
       .catch((e) => {
         setFlagRecarga(false);
         setShowModal(false);
-        notifyError("Falla en el sistema : " + e);
+        notifyError("Falla en el sistema >> " + e);
       });
   };
 

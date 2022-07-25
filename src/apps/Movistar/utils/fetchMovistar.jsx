@@ -8,7 +8,7 @@ export const PeticionRecarga = async (data_) => {
     const Peticion = await fetchData(URL_Recarga, "POST", {}, data_);
     return Peticion;
   } catch (error) {
-    throw "Error con fetch - no conecta con el servicio del proveedor";
+    throw "Error con fetch - no conecta con el servicio del recargas";
   }
 };
 
@@ -20,7 +20,7 @@ export const PeticionConciliacion = async (url_) => {
     }
     return Peticion;
   } catch (error) {
-    console.log("Error con fetch - no conecta al servicio");
+    console.log("Error con fetch - no conecta al servicio de conciliación");
   }
 };
 
@@ -55,6 +55,6 @@ export const PeticionDescargar = async (url_) => {
       }
     }
   } catch (error) {
-    console.log("Error con fetch - no conecta al servicio");
+    console.log("Error con fetch - no conecta al servicio de descarga");
   }
 };
