@@ -33,6 +33,7 @@ const AdminLayout = () => {
     saldoCupo,
     comision,
     cargar,
+    itemButtonCentered
   } = classes;
 
   const { quotaInfo, roleInfo, signOut } = useAuth();
@@ -133,19 +134,21 @@ const AdminLayout = () => {
       </header>
       <main className="container">
         <Suspense fallback={<ContentBox />}>{!infoCaja && <Outlet />}</Suspense>
-        <Modal show={infoCaja}>
+        <Modal show={infoCaja }>
           {cajaState === 1 ? (
-            <div className="items-center">
+            <div className="items-center text-center">
               <h1>
-                Señor usuario, la caja presenta cierre tardio, no se pueden
-                realizar transacciones hasta que la cierre
-                <Button
-                  className="items-center"
-                  type="button"
-                  onClick={() => closeCash()}
-                >
-                  Cerrar caja
-                </Button>
+                Señor usuario, la caja presenta cierre tardío, no se pueden
+                realizar transacciones hasta que la cierre.
+                <div className={itemButtonCentered}>
+                  <Button
+                    className="btn mx-auto d-block"
+                    type="button"
+                    onClick={() => closeCash()}
+                  >
+                    Cerrar caja
+                  </Button>
+                </div>
               </h1>
             </div>
           ) : cajaState === 4 ? (

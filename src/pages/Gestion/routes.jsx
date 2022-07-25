@@ -1,5 +1,4 @@
 import { lazy } from "react";
-
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 
 /**
