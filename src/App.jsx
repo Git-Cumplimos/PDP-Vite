@@ -11,6 +11,7 @@ import ProvideImgs from "./components/Compound/ProvideImgs";
 import MessengerCustomerChat from "react-messenger-customer-chat";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ServiceWorkerWrapper from "./components/Compound/ServiceWorkerWrapper/ServiceWorkerWrapper";
 // import ContactMenu from "./components/Compound/ContactMenu";
 
 Amplify.configure(awsconfig);
@@ -48,6 +49,7 @@ function App() {
         tl="PDP_MultibancoBot"
         msg="Hola, requiero más información"
       /> */}
+      <ServiceWorkerWrapper />
     </Router>
   );
 }

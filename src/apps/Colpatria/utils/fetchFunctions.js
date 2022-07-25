@@ -23,6 +23,26 @@ export const makeDeposit = async (bodyDep) => {
   }
 };
 
+export const makeSellPin = async (bodyDep) => {
+  if (!bodyDep) {
+    throw new Error("sin datos de venta de pin", { cause: "custom" });
+  }
+
+  try {    
+    const res = await fetchData(`${urlColpatriaTrx}/venta-pines`, "POST", {}, bodyDep);
+    if (!res?.status) {
+      if (res?.msg) {
+        throw new Error(res?.msg, { cause: "custom" });
+      }
+
+      throw new Error(res, { cause: "custom" });
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
 
 export const getErrorList = async (args = {}) => {
   // if (!args) {

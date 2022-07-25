@@ -14,31 +14,19 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
-import Select from "../../../components/Base/Select";
 import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import useMoney from "../../../hooks/useMoney";
-import { makeDeposit } from "../utils/fetchFunctions";
+import { makeSellPin } from "../utils/fetchFunctions";
 
-import { notifyPending, notifyError } from "../../../utils/notify";
-import {
-  makeMoneyFormatter,
-  onChangeAccountNumber,
-  onChangeNumber,
-  toAccountNumber,
-} from "../../../utils/functions";
+import { notifyError, notifyPending } from "../../../utils/notify";
+import { makeMoneyFormatter, onChangeNumber } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
-
-const accountTypes = {
-  10: "Cuenta ahorros",
-  20: "Cuenta corriente",
-  30: "Cuenta de credito",
-};
 
 const formatMoney = makeMoneyFormatter(2);
 
-const Deposito = () => {
+const VentaPines = () => {
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
@@ -47,9 +35,7 @@ const Deposito = () => {
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
-  const [accountNumber, setAccountNumber] = useState("");
-  const [accountType, setAccountType] = useState("");
-  const [valDeposito, setValDeposito] = useState(0);
+  const [valVentaPines, setValVentaPines] = useState(0);
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
@@ -63,7 +49,7 @@ const Deposito = () => {
     limits: [limitesMontos.min, limitesMontos.max],
   });
 
-  const [loadingDeposit, setLoadingDeposit] = useState(false);
+  const [loadingSell, setLoadingSell] = useState(false);
 
   const printDiv = useRef();
 
@@ -73,14 +59,12 @@ const Deposito = () => {
 
   const summary = useMemo(
     () => ({
-      "Tipo de cuenta": accountTypes?.[accountType] ?? "No type",
-      "Numero de cuenta": toAccountNumber(accountNumber),
       "C.C. del depositante": userDocument,
-      "Valor de deposito": formatMoney.format(valDeposito),
+      "Valor de deposito": formatMoney.format(valVentaPines),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
-    [accountNumber, accountType, userDocument, valDeposito]
+    [userDocument, valVentaPines]
   );
 
   const handleClose = useCallback(() => {
@@ -96,13 +80,11 @@ const Deposito = () => {
           id_terminal: roleInfo?.id_dispositivo,
         },
         oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
-        valor_total_trx: valDeposito,
+        valor_total_trx: valVentaPines,
 
         // Datos trx colpatria
         colpatria: {
           user_document: userDocument,
-          account_number: accountNumber,
-          processing_code: accountType,
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -111,17 +93,20 @@ const Deposito = () => {
           },
         },
       };
+
       notifyPending(
-        makeDeposit(data),
+        makeSellPin(data),
         {
-          render() {
-            setLoadingDeposit(true);
+          render: () => {
+            setLoadingSell(true);
             return "Procesando transaccion";
           },
         },
         {
-          render({ data: res }) {
-            setLoadingDeposit(false);
+          render: (info) => {
+            console.log(info);
+            const { data: res } = info;
+            setLoadingSell(false);
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
@@ -150,13 +135,9 @@ const Deposito = () => {
               ],
               commerceName: "Colpatria",
               trxInfo: [
-                ["Tipo de cuenta", accountTypes?.[accountType] ?? "No type"],
-                ["", ""],
-                ["Numero de cuenta", toAccountNumber(accountNumber)],
-                ["", ""],
                 ["C.C. del depositante", userDocument],
                 ["", ""],
-                ["Valor de deposito", formatMoney.format(valDeposito)],
+                ["Valor de deposito", formatMoney.format(valVentaPines)],
                 ["", ""],
               ],
               disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
@@ -170,38 +151,29 @@ const Deposito = () => {
                 console.error(err);
                 notifyError("Error guardando el ticket");
               });
-
             return "Transaccion satisfactoria";
           },
         },
         {
-          render({data: err}) {
-            setLoadingDeposit(false);
-            if (err?.cause === "custom") {
-              return err?.message;
+          render: ({ data: error }) => {
+            setLoadingSell(false);
+            if (error?.cause === "custom") {
+              return error?.message;
             }
-            console.error(err?.message);
+            console.error(error?.message);
             return "Transaccion fallida";
-          }
+          },
         }
       );
     },
-    [
-      accountNumber,
-      accountType,
-      userDocument,
-      userAddress,
-      valDeposito,
-      roleInfo,
-      infoTicket,
-    ]
+    [userDocument, userAddress, valVentaPines, roleInfo, infoTicket]
   );
 
   useEffect(() => {
     fetchData(
       `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`,
       "GET",
-      { tipo_op: 70 }
+      { tipo_op: 73 }
     )
       .then((res) => {
         if (!res?.status) {
@@ -260,7 +232,7 @@ const Deposito = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Depositos Colpatria</h1>
+      <h1 className="text-3xl mt-6">Venta de Pines Colpatria</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
@@ -268,35 +240,10 @@ const Deposito = () => {
         }}
         grid
       >
-        <Select
-          id="accType"
-          name="accType"
-          label="Tipo de cuenta"
-          options={{
-            "": "",
-            ...Object.fromEntries(
-              Object.entries(accountTypes).map(([key, val]) => [val, key])
-            ),
-          }}
-          value={accountType}
-          onChange={(ev) => setAccountType(ev.target.value)}
-          required
-        />
-        <Input
-          id="numCuenta"
-          name="numCuenta"
-          label="Número de cuenta"
-          type="tel"
-          autoComplete="off"
-          minLength={"19"}
-          maxLength={"19"}
-          onInput={(ev) => setAccountNumber(onChangeAccountNumber(ev))}
-          required
-        />
         <Input
           id="docCliente"
           name="docCliente"
-          label="CC de quien deposita"
+          label="CC del comprador"
           type="text"
           autoComplete="off"
           minLength={"7"}
@@ -308,21 +255,21 @@ const Deposito = () => {
         <Input
           id="valor"
           name="valor"
-          label="Valor a depositar"
+          label="Valor del pin"
           autoComplete="off"
           type="tel"
           minLength={"5"}
           maxLength={"20"}
-          onInput={(ev) => setValDeposito(onChangeMoney(ev))}
+          onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar deposito</Button>
+          <Button type={"submit"}>Realizar venta de pin</Button>
         </ButtonBar>
       </Form>
       <Modal
         show={showModal}
-        handleClose={paymentStatus || loadingDeposit ? () => {} : handleClose}
+        handleClose={paymentStatus || loadingSell ? () => {} : handleClose}
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
@@ -338,11 +285,11 @@ const Deposito = () => {
               <Button
                 type="submit"
                 onClick={onMakePayment}
-                disabled={loadingDeposit}
+                disabled={loadingSell}
               >
                 Aceptar
               </Button>
-              <Button onClick={handleClose} disabled={loadingDeposit}>
+              <Button onClick={handleClose} disabled={loadingSell}>
                 Cancelar
               </Button>
             </ButtonBar>
@@ -353,4 +300,4 @@ const Deposito = () => {
   );
 };
 
-export default Deposito;
+export default VentaPines;
