@@ -18,7 +18,7 @@ const TipoMovimientoCupo = () => {
   const [page, setPage] = useState(null);
   const [summary, setSummary] = useState({});
   const [pk_id_tipo_movimiento, setPk_id_tipo_movimiento] = useState(null);
-  const [paymentStatus, setPaymentStatus] = useState(false);
+  const [paymentStatus, ] = useState(false);
   const [nombreTipoMovimiento, setNombreTipoMovimiento] = useState(null);
   const [dataTipoMovimientoCupo, setDataTipoMovimientoCupo] = useState(null);
   const [nuevoTipoDeMovimiento, setNuevoTipoDeMovimiento] = useState(null);

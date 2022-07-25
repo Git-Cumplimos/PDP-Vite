@@ -1,5 +1,4 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -16,7 +15,6 @@ const CupoComer = () => {
   const [idComercio, setIdComercio] = useState("");
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
-  const navegateValid = useNavigate();
   const { roleInfo } = useAuth();
 
   useEffect(() => {
@@ -95,11 +93,6 @@ const CupoComer = () => {
             })
           ) ?? []
         }
-        onSelectRow={(e, i) => {
-          navegateValid(
-            `/cupo/cupo-comercio/detalles-cupo/${cupoComer?.results[i].pk_id_comercio}`
-          );
-        }}
         onSetPageData={(pagedata) => {
           setPage(pagedata.page);
           setLimit(pagedata.limit);

@@ -1,5 +1,4 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
@@ -26,7 +25,6 @@ const DtlMovComercio = () => {
   const [tipoTransaccion, setTipoTransaccion] = useState(null);
   const { roleInfo } = useAuth();
   const [idComercio, setIdComercio] = useState(roleInfo?.id_comercio ?? null);
-  let { id_comercio } = useParams();
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -39,9 +37,7 @@ const DtlMovComercio = () => {
   useEffect(() => {
     if (roleInfo?.id_comercio) {
       setIdComercio(roleInfo?.id_comercio);
-    } else if (id_comercio > 0) {
-      setIdComercio(id_comercio);
-    }
+    } 
     getConsultaDtlMovCupo(
       idComercio,
       page,
@@ -58,7 +54,7 @@ const DtlMovComercio = () => {
         console.log(reason.message);
         notifyError("Error al cargar Datos ");
       });
-  }, [roleInfo, id_comercio]);
+  }, [roleInfo]);
   const onChange = useCallback((ev) => {
     if (ev.target.name === "fecha_inico") {
       setFechaini(ev.target.value);
@@ -69,7 +65,7 @@ const DtlMovComercio = () => {
   const onSubmitDownload = useCallback(
     (e) => {
       e.preventDefault();
-      if (id_comercio !== "") {
+      if (idComercio !== "") {
         if (fechaEnd !== null || fechaini !== null) {
           crearData(
             idComercio,
@@ -88,7 +84,6 @@ const DtlMovComercio = () => {
       tipoTransaccion,
       tipoAfectacion,
       crearData,
-      id_comercio,
     ]
   );
   const onSubmitComercio = useCallback(

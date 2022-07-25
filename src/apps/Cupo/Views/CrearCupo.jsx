@@ -14,7 +14,7 @@ import { postCupoComercio } from "../utils/fetchCupo";
 const CrearCupo = () => {
   const [idComercio, setIdComercio] = useState(null);
   const [deuda, setDeuda] = useState(null);
-  const [paymentStatus, setPaymentStatus] = useState(false);
+  const [paymentStatus] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [summary, setSummary] = useState({});
   const [limite, setLimite] = useState(null);
@@ -24,7 +24,6 @@ const CrearCupo = () => {
     min: 0,
   };
   const { roleInfo } = useAuth();
-
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -152,7 +151,7 @@ const CrearCupo = () => {
         </ButtonBar>
         <Modal
           show={showModal}
-          handleClose={paymentStatus ? handleClose : () => {}}
+          handleClose={paymentStatus ? () => {} : handleClose}
         >
           <PaymentSummary
             title="¿Está seguro de asignar el cupo al comercio?"

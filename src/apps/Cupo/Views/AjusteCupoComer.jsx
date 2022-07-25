@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Fieldset from "../../../components/Base/Fieldset";
@@ -132,7 +132,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
           navegateValid(`/cupo`);
         }
       } else {
-        notifyError("El campo monto de cupo no puede estar vacío");
+        notifyError("El campo monto no puede estar vacío");
       }
     },
     [idComercio, valor, razonAjuste, roleInfo.id_usuario, navegateValid]

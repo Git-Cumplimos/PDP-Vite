@@ -3,8 +3,8 @@ import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
-import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
+import MoneyInput from "../../../components/Base/MoneyInput";
+
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
 import {
@@ -17,9 +17,9 @@ const ModifiLimiteCanje = () => {
   const [cupoComer, setCupoComer] = useState(null);
   const [valor, setValor] = useState(null);
   const [idComercio, setIdComercio] = useState(null);
-  const [asigLimite, setAsigLimite] = useState(null);
-  const [limit, setLimit] = useState(10);
-  const [page, setPage] = useState(1);
+  const [ ,setAsigLimite] = useState(null);
+  const [limit] = useState(10);
+  const [page] = useState(1);
   const [inputId, setinputId] = useState(false);
   const limitesMontos = {
     max: 9999999999,
