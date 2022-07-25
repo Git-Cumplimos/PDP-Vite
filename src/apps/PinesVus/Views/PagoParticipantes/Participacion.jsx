@@ -1,10 +1,8 @@
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import Input from "../../../../components/Base/Input";
-import Select from "../../../../components/Base/Select";
 import { usePinesVus } from "../../utils/pinesVusHooks";
-import { toast } from "react-toastify";
 import { useReactToPrint } from "react-to-print";
-import { notify, notifyError } from "../../../../utils/notify";
+import { notifyError } from "../../../../utils/notify";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Modal from "../../../../components/Base/Modal";
@@ -14,16 +12,10 @@ import Button from "../../../../components/Base/Button";
 import { enumParametrosPines } from "../../utils/enumParametrosPines";
 import { useNavigate } from "react-router-dom";
 import Tickets from "../../../../components/Base/Tickets";
-import InputX from "../../../../components/Base/InputX/InputX";
-import fetchData from "../../../../utils/fetchData";
 
-const dateFormatter = Intl.DateTimeFormat("es-CO", {
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-});
 
-const url_cargueS3 = `${process.env.REACT_APP_URL_PinesVus}/CargueS3`;
+
+//const url_cargueS3 = `${process.env.REACT_APP_URL_PinesVus}/CargueS3`;
 
 const Participacion = () => {
   const navigate = useNavigate();
@@ -140,7 +132,7 @@ const Participacion = () => {
       })
       .catch((err) => console.log("error", err));
     
-  }, [showModal]);
+  }, [showModal, consultaParticipacion]);
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
@@ -184,8 +176,7 @@ const Participacion = () => {
   const onSubmit = (e) => { 
     e.preventDefault();
     setDisabledBtns(true)
-    console.log(selected)
-    const f = new Date()
+    // const f = new Date()
     registroPagoParticipacion(
       selected.aliado, 
       //banco, 
@@ -198,7 +189,6 @@ const Participacion = () => {
       // }${f.getFullYear()}/`,
 
     ).then((res) => {
-        console.log(res)
         setDisabledBtns(false)
         if (!res?.status) {
           notifyError(res?.msg);
@@ -233,7 +223,7 @@ const Participacion = () => {
       }),
       commerceName: "Pago a " + respPago?.participante,
       trxInfo: [
-        ["Valor Tramite", formatMoney.format(respPago?.valor)],
+        ["Valor Trámite", formatMoney.format(respPago?.valor)],
         ["",""],
         ["Recibido", "______________________"],
         ["",""]
@@ -241,7 +231,7 @@ const Participacion = () => {
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [roleInfo, respPago]);
+  }, [roleInfo, respPago, formatMoney]);
 
   useEffect(() => {
     infoTicket(
@@ -266,14 +256,14 @@ const Participacion = () => {
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
     if (!(deltaHora<0 || (deltaHora===0 & deltaMinutos<1)) ){
       notifyError("Modulo disponible a partir de las " + enumParametrosPines.horaCierre)
-      navigate("/PinesVus/Participacion");
+      navigate("/PinesVus/Participacion",{replace:true});
     }
-  }, [table])
+  }, [table, hora, navigate])
   return (
     <>
       <>
         <TableEnterprise
-          title="Participacion"
+          title="Participación"
           headers={[
             "Aliado",
             "Valor",
@@ -289,7 +279,6 @@ const Participacion = () => {
           }) || []}
           onSelectRow={(e, index) => {            
               setSelected(table[index]);
-              console.log(table[index])
               if (table[index].pagado === false){
                 setShowModal(true)
               }

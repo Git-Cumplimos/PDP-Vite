@@ -129,7 +129,7 @@ const PanelConsignaciones = () => {
           id="searchByStatus"
           label="Estado"
           options={[
-            { value: 0, label: "" },
+            { value: "", label: "" },
             { value: "PENDIENTE", label: "PENDIENTE" },
             { value: "RECHAZADO", label: "RECHAZADO" },
             { value: "APROBADO", label: "APROBADO" },

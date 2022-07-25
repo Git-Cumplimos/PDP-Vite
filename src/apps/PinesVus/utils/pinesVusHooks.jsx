@@ -53,7 +53,6 @@ export const useProvidePinesVus = () => {
       motivo: motivo,
       id_trx: trx,
     };
-    console.log(body);
     const query = {
       id_pin: id_pin,
     };
@@ -64,10 +63,8 @@ export const useProvidePinesVus = () => {
       throw err;
     }
   }, []);
-  console.log(roleInfo)
   
   const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin) => {
-    console.log(infoTramite)
     const body = {
       tipo_tramite: tramite,
       infoTramite: infoTramite,

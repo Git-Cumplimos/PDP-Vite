@@ -133,7 +133,9 @@ const CargaComprobante = () => {
     }
     handleChange();
   });
-
+  //ToDo: Options value:
+  //{ value: 2, label: "Entrega transportadora" },
+  //{ value: 3, label: "Recibido transportadora" },
   return (
     <div className="flex items-center mx-auto">
       <Form onSubmit={onSubmit} grid>
@@ -144,8 +146,8 @@ const CargaComprobante = () => {
           options={[
             { value: 0, label: "" },
             { value: 1, label: "Consignación bancaria" },
-            { value: 2, label: "Entrega transportadora" },
-            { value: 3, label: "Recibido transportadora" },
+            { value: 1, label: "Entrega transportadora" },
+            { value: 1, label: "Recibido transportadora" },
           ]}
           onChange={(e) => {
             handleChange(e);

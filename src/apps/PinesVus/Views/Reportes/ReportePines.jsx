@@ -1,9 +1,7 @@
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Input from "../../../../components/Base/Input";
 import Select from "../../../../components/Base/Select";
 import { usePinesVus } from "../../utils/pinesVusHooks";
-import { toast } from "react-toastify";
-import { useReactToPrint } from "react-to-print";
 import { notifyError } from "../../../../utils/notify";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
@@ -82,7 +80,7 @@ const ReportePines = () => {
         })
         .catch((err) => console.log("error", err));
     }
-  }, [pageData, fechaFinal, fechaInicial, estadoPin, tipoPin]);
+  }, [pageData, fechaFinal, fechaInicial, estadoPin, tipoPin, consultaPinesVus, formatMoney]);
 
   useEffect(() => {
     con_estado_tipoPin("estado_pines_vus")
@@ -105,7 +103,7 @@ const ReportePines = () => {
         }
       })
       .catch((err) => console.log("error", err));
-  }, []);
+  }, [con_estado_tipoPin]);
   return (
     <>
       <>
@@ -113,11 +111,11 @@ const ReportePines = () => {
           title="Reporte Pines"
           maxPage={maxPages}
           headers={[
-            "Cedula",
+            "Cédula",
             "Estado",
             "Creación",
             "Vencimiento",
-            "Tramite",
+            "Trámite",
             "Valor",
           ]}
           data={table || []}

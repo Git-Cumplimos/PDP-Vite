@@ -12,7 +12,8 @@ import LogoPDP from "../../../components/Base/LogoPDP";
 
 const BuscarCedulaPpsADemanda = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
-  const [buscarCedula, setBuscarCedula] = useState("");
+  const [buscarCedula, setBuscarCedula] = useState(null);
+  const [invalidCedula, setInvalidCedula] = useState("");
   const [cantNum, setCantNum] = useState(0);
   const [showModal, setShowModal] = useState(true);
   const [estado, setEstado] = useState(false);
@@ -93,6 +94,14 @@ const BuscarCedulaPpsADemanda = () => {
       }
     }
   };
+
+  const onCedChange = (e) => {
+    const formData = new FormData(e.target.form);
+    const cedula = (
+      (formData.get("N° Identificación") ?? "").match(/\d/g) ?? []
+    ).join("");
+    setBuscarCedula(cedula);
+  };
   return (
     <div>
       {(datosConsulta?.length >= 0) & estado ? (
@@ -146,7 +155,7 @@ const BuscarCedulaPpsADemanda = () => {
       ) : (
         <div>
           <Form grid onSubmit={(e) => BuscarCedula(e)}>
-            <Input
+            {/*             <Input
               label={"N° Identificación"}
               placeholder={"Ingrese N° Identificación"}
               value={buscarCedula}
@@ -158,7 +167,20 @@ const BuscarCedulaPpsADemanda = () => {
               }}
               type={"text"}
               required
-            ></Input>
+            ></Input> */}
+
+            <Input
+              name="N° Identificación"
+              label="N° Identificación"
+              type="tel"
+              autoComplete="off"
+              minLength={"5"}
+              maxLength={"10"}
+              invalid={invalidCedula}
+              value={buscarCedula ?? ""}
+              onChange={onCedChange}
+              required
+            />
             <ButtonBar className={"lg:col-span-2"} type="">
               {
                 <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>

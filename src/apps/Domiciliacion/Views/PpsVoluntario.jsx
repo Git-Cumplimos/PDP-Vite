@@ -15,13 +15,15 @@ import MoneyInput from "../../../components/Base/MoneyInput";
 
 const PpsVoluntario = ({ datosConsulta }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
-  const [numDocumento, setNumDocumento] = useState("");
+  const [numDocumento, setNumDocumento] = useState(null);
+
   const [idComercio, setIdComercio] = useState(datosConsulta?.id_comercio);
   const [idusuario, setIdUsuario] = useState(datosConsulta?.id_usuario);
   const [iddispositivo, setIddispositivo] = useState(
     datosConsulta?.id_dispositivo
   );
   const [numCelular, setNumCelular] = useState("");
+  const [invalidCelular, setInvalidCelular] = useState("");
   const [datosBusqueda, setDatosBusqueda] = useState("");
   const [estado, setEstado] = useState(true);
   const [valorAportar, setValorAportar] = useState();
@@ -154,6 +156,26 @@ const PpsVoluntario = ({ datosConsulta }) => {
       );
     }
   };
+  const onCedChange = (e) => {
+    const formData = new FormData(e.target.form);
+    const cedula = (
+      (formData.get("N° Identificación") ?? "").match(/\d/g) ?? []
+    ).join("");
+    setNumDocumento(cedula);
+  };
+  const onCelChange = (e) => {
+    const formData = new FormData(e.target.form);
+    const phone = ((formData.get("celular") ?? "").match(/\d/g) ?? []).join("");
+    setNumCelular(phone);
+
+    if (e.target.value.length == 1) {
+      if (e.target.value[0] == 3) {
+        setInvalidCelular("");
+      } else {
+        setInvalidCelular("numero invalido");
+      }
+    }
+  };
   return (
     <div>
       {showModal && datosConsulta ? (
@@ -185,7 +207,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 }}
                 required
               ></Select>
-              <Input
+              {/*               <Input
                 label={"N° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={numDocumento}
@@ -197,7 +219,20 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 }}
                 type={"text"}
                 required
-              ></Input>
+              ></Input> */}
+
+              <Input
+                name="N° Identificación"
+                label="N° Identificación"
+                type="tel"
+                autoComplete="off"
+                minLength={"5"}
+                maxLength={"10"}
+                /* invalid={invalidCedula} */
+                value={numDocumento ?? ""}
+                onChange={onCedChange}
+                required
+              />
               <Input
                 label={"Id Comercio"}
                 placeholder="Ingrese Id Comercio"
@@ -214,7 +249,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 type={"number"}
                 disabled
               ></Input>
-              <Input
+              {/* <Input
                 id="celular"
                 name="celular"
                 label="Celular: "
@@ -234,6 +269,19 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   }
                   setNumCelular(num);
                 }}
+                required
+              /> */}
+
+              <Input
+                name="celular"
+                label="Celular"
+                type="tel"
+                autoComplete="off"
+                minLength={"10"}
+                maxLength={"10"}
+                invalid={invalidCelular}
+                value={numCelular ?? ""}
+                onChange={onCelChange}
                 required
               />
               <MoneyInput

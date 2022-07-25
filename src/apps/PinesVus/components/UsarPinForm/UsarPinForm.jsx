@@ -130,13 +130,13 @@ const UsarPinForm = ({
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Valor Tramite</h1>
+                <h1>Valor Trámite</h1>
                 <h1>{formatMoney.format(valor_tramite)}</h1>
               </div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>IVa Tramite</h1>
+                <h1>IVA Trámite</h1>
                 <h1>{formatMoney.format(0)}</h1>
               </div>
               <div
@@ -148,7 +148,7 @@ const UsarPinForm = ({
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>IVa Pin</h1>
+                <h1>IVA Pin</h1>
                 <h1>{formatMoney.format(valor*0.19)}</h1>
               </div>
               <div
