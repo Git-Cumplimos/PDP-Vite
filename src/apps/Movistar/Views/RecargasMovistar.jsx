@@ -51,7 +51,7 @@ const RecargasMovistar = () => {
       if (e.target.value[0] == 3) {
         setInvalidCelular("");
       } else {
-        setInvalidCelular("Número invalido");
+        setInvalidCelular("Número inválido");
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
@@ -73,13 +73,13 @@ const RecargasMovistar = () => {
     if (inputCelular[0] == 3) {
       realizarRecarga++;
     } else {
-      notifyError("Número invalido");
+      notifyError("Número inválido");
     }
 
     if (inputValor >= minValor && inputValor <= maxValor) {
       realizarRecarga++;
     } else {
-      notifyError("Valor invalido");
+      notifyError("Valor inválido");
     }
 
     //Realizar recarga

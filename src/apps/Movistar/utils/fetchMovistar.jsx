@@ -1,4 +1,5 @@
 import fetchData from "../../../utils/fetchData";
+import { Auth } from "@aws-amplify/auth";
 
 const URL_Recarga = `${process.env.REACT_APP_URL_MOVISTAR}/recargasmovistar/prepago`;
 
@@ -24,9 +25,15 @@ export const PeticionConciliacion = async (url_) => {
 };
 
 export const PeticionDescargar = async (url_) => {
+  const headers=session = await Auth.currentSession();
   try {
-    const response = await fetch(url_);
-    const contentType = response.headers.get("content-type");
+    const response = await fetch(url_), 
+    {
+      headers:{
+        Authorization = `Bearer ${session?.idToken?.jwtToken}`;
+      }
+    };
+    const contentType = response.headers.get("content-type")  ;
     const nombreDocumento = response.headers
       .get("Content-Disposition")
       .slice(21);
