@@ -85,7 +85,7 @@ const ModifiLimiteCanje = () => {
         notifyError("El campo límite de cupo no puede estar vacío");
       }
     },
-    [idComercio, valor, limit, roleInfo.id_usuario, page]
+    [idComercio, valor, limit, roleInfo.id_usuario, page, navegateValid]
   );
   const onMoneyChange = useCallback((e, valor) => {
     setValor(valor);
