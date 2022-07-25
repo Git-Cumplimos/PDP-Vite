@@ -68,36 +68,13 @@ const RecargasMovistar = () => {
     if (inputCelular[0] == 3) {
       realizarRecarga++;
     } else {
-<<<<<<< HEAD
       notifyError("Número inválido");
-=======
-      notifyError(
-        "Número inválido, el No. de celular debe comenzar con el número 3"
-      );
->>>>>>> 5ea39ef30668684b0de1a48e774e59a1c104a0de
     }
 
     if (inputValor >= minValor && inputValor <= maxValor) {
       realizarRecarga++;
-<<<<<<< HEAD
     } else {
-      notifyError("Valor inválido");
-=======
-    } else if (inputValor == "") {
-      notifyError("Escribir el valor de la recarga");
-    } else if (inputValor < minValor) {
-      notifyError(
-        `Valor de la recarga invalido, debe ser mayor o igual a ${formatMoney.format(
-          minValor
-        )}`
-      );
-    } else if (inputValor > maxValor) {
-      notifyError(
-        `Valor de la recarga invalido, debe ser menor o igual a ${formatMoney.format(
-          maxValor
-        )}`
-      );
->>>>>>> 5ea39ef30668684b0de1a48e774e59a1c104a0de
+      notifyError("Valor de la recarga inválido, debe ser mayor o igual a $1.000");
     }
 
     //Realizar recarga
@@ -196,11 +173,12 @@ const RecargasMovistar = () => {
   });
 
   const ticketRecarga = (result_) => {
+    const now = new Date()
     setInfTicket({
       title: "Recibo de recarga ",
       timeInfo: {
         "Fecha de venta": result_.fecha_final_ptopago,
-        Hora: result_.hora_final_ptopago,
+        Hora: now.getHours() + ':' + now.getMinutes() + ':'+ now.getSeconds(),
       },
       commerceInfo: [
         ["Id Comercio", roleInfo.id_comercio],
