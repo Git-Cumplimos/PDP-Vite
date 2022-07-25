@@ -24,12 +24,12 @@ import { PeticionRecarga } from "../utils/fetchMovistar";
 
 const minValor = 1000;
 const maxValor = 500000;
-const tipo_operacion= 77;
+const tipo_operacion = 77;
 
 const RecargasMovistar = () => {
   //Variables
   const printDiv = useRef();
-  const { roleInfo, infoTicket} = useAuth();
+  const { roleInfo, infoTicket } = useAuth();
   const validNavigate = useNavigate();
   const [inputCelular, setInputCelular] = useState("");
   const [inputValor, setInputValor] = useState("");
@@ -38,7 +38,6 @@ const RecargasMovistar = () => {
   const [flagRecarga, setFlagRecarga] = useState(false);
   const [summary, setSummary] = useState({});
   const [infTicket, setInfTicket] = useState(null);
-
 
   const [loadingFetchRecarga, fetchRecarga] = useFetch(PeticionRecarga);
 
@@ -70,13 +69,27 @@ const RecargasMovistar = () => {
     if (inputCelular[0] == 3) {
       realizarRecarga++;
     } else {
-      notifyError("Número inválido");
+      notifyError(
+        "Número inválido, el No. de celular debe comenzar con el número 3"
+      );
     }
 
     if (inputValor >= minValor && inputValor <= maxValor) {
       realizarRecarga++;
-    } else {
-      notifyError("Valor de la recarga inválido, debe ser mayor o igual a $1.000");
+    } else if (inputValor == "") {
+      notifyError("Escribir el valor de la recarga");
+    } else if (inputValor < minValor) {
+      notifyError(
+        `Valor de la recarga invalido, debe ser mayor o igual a ${formatMoney.format(
+          minValor
+        )}`
+      );
+    } else if (inputValor > maxValor) {
+      notifyError(
+        `Valor de la recarga invalido, debe ser menor o igual a ${formatMoney.format(
+          maxValor
+        )}`
+      );
     }
 
     //Realizar recarga
@@ -175,12 +188,12 @@ const RecargasMovistar = () => {
   });
 
   const ticketRecarga = (result_) => {
-    const now = new Date()
-    const voucher={
+    const now = new Date();
+    const voucher = {
       title: "Recibo de recarga ",
       timeInfo: {
         "Fecha de venta": result_.fecha_final_ptopago,
-       // Hora: now.getHours() + ':' + now.getMinutes() + ':'+ now.getSeconds(),
+        // Hora: now.getHours() + ':' + now.getMinutes() + ':'+ now.getSeconds(),
         Hora: Intl.DateTimeFormat("es-CO", {
           hour: "2-digit",
           minute: "2-digit",
@@ -207,27 +220,16 @@ const RecargasMovistar = () => {
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
     };
-    setInfTicket(voucher)
-    infoTicket(result_.transaccion_ptopago,tipo_operacion , voucher)
-          .then((resTicket) => {
-            console.log(resTicket);
-          })
-          .catch((err) => {
-            console.error(err);
-            notifyError("Error guardando el ticket");
-          });
+    setInfTicket(voucher);
+    infoTicket(result_.transaccion_ptopago, tipo_operacion, voucher)
+      .then((resTicket) => {
+        console.log(resTicket);
+      })
+      .catch((err) => {
+        console.error(err);
+        notifyError("Error guardando el ticket");
+      });
   };
-  
-// useEffect(() => {
-//   infoTicket(19006,tipo_operacion , infTicket)
-//           .then((resTicket) => {
-//             console.log(resTicket);
-//           })
-//           .catch((err) => {
-//             console.error(err);
-//             notifyError("Error guardando el ticket");
-//           });
-// }, [infTicket])
 
   return (
     <Fragment>
