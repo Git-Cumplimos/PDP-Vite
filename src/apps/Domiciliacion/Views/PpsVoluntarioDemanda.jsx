@@ -27,12 +27,15 @@ const { contenedorImagen } = classes;
 const PpsVoluntarioDemanda = ({ ced }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [numDocumento, setNumDocumento] = useState(ced);
-  const [numCelular, setNumCelular] = useState("");
+  const [numCelular, setNumCelular] = useState(null);
   const [datosRespuesta, setDatosRespuesta] = useState("");
   const [valorAportar, setValorAportar] = useState(0);
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
   const { quotaInfo, roleInfo, infoTicket } = useAuth();
+
+  const [invalidCelular, setInvalidCelular] = useState("");
+  const [inputCelular, setInputCelular] = useState(null);
 
   const [{ numCuenta, userDoc, valor, nomDepositante, summary }, setQuery] =
     useQuery();
@@ -349,15 +352,19 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       navigate(`/domiciliacion`);
     }
   };
-  function validatePhone(e) {
-    if (e.target.value.length === 1) {
-      if (e.target.value != 3) {
-        notifyError("Numero invalido");
+  const onCelChange = (e) => {
+    const formData = new FormData(e.target.form);
+    const phone = ((formData.get("celular") ?? "").match(/\d/g) ?? []).join("");
+    setNumCelular(phone);
+
+    if (e.target.value.length == 1) {
+      if (e.target.value[0] == 3) {
+        setInvalidCelular("");
       } else {
-        setNumCelular(e.target.value);
+        setInvalidCelular("numero invalido");
       }
     }
-  }
+  };
   return (
     <div>
       <Modal show={showModal} handleClose={handleClose}>
@@ -386,6 +393,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 "Permiso especial permanencia": "9",
               }}
             ></Select>
+
             <Input
               label={"N° Documento"}
               placeholder={"Ingrese su Numero Documento"}
@@ -400,7 +408,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               required
               disabled
             ></Input>
-            <Input
+            {/*             <Input
               id="celular"
               name="celular"
               label="Celular: "
@@ -421,51 +429,19 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 setNumCelular(num);
               }}
               required
-            />
-            {/*      <Input
-              label={"N° Celular"}
-              placeholder={"Ingrese su Numero Celular"}
-              value={numCelular ?? ""}
-              onInput={(e) => {
-                if (e.target.value.length === 1) {
-                  if (e.target.value != 3) {
-                    notifyError("Numero invalido");
-                  }
-                }
-
-                const num = parseInt(e.target.value) || "";
-                setNumCelular(num); 
-              }}
-              minLength="10"
-              maxLength="10"
-              type={"text"}
-              required
             /> */}
-            {/*             <Input
-              label={"N° Celular"}
-              placeholder={"Ingrese su Numero Celular"}
+            <Input
+              name="celular"
+              label="Celular"
+              type="tel"
+              autoComplete="off"
+              minLength={"10"}
+              maxLength={"10"}
+              invalid={invalidCelular}
               value={numCelular ?? ""}
-              onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setNumCelular(num);
-              }}
-                          onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-
-                if (parseInt(String(num)[0]) == 3) {
-                  const num = parseInt(e.target.value) || "";
-                  setNumCelular(num);
-                } else {
-                  if (parseInt(String(num)[0]) != 3) {
-                    notifyError("El Primer Digito debe ser 3");
-                  }
-                }
-              }} 
-              minLength="10"
-              maxLength="10"
-              type={"text"}
+              onChange={onCelChange}
               required
-            ></Input> */}
+            />
             <MoneyInput
               label={"Valor Aportar"}
               placeholder={"Ingrese Valor Aportar"}

@@ -15,7 +15,8 @@ import MoneyInput from "../../../components/Base/MoneyInput";
 
 const PpsVoluntario = ({ datosConsulta }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
-  const [numDocumento, setNumDocumento] = useState("");
+  const [numDocumento, setNumDocumento] = useState(null);
+
   const [idComercio, setIdComercio] = useState(datosConsulta?.id_comercio);
   const [idusuario, setIdUsuario] = useState(datosConsulta?.id_usuario);
   const [iddispositivo, setIddispositivo] = useState(
@@ -154,6 +155,13 @@ const PpsVoluntario = ({ datosConsulta }) => {
       );
     }
   };
+  const onCedChange = (e) => {
+    const formData = new FormData(e.target.form);
+    const cedula = (
+      (formData.get("N° Identificación") ?? "").match(/\d/g) ?? []
+    ).join("");
+    setNumDocumento(cedula);
+  };
   return (
     <div>
       {showModal && datosConsulta ? (
@@ -185,7 +193,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 }}
                 required
               ></Select>
-              <Input
+              {/*               <Input
                 label={"N° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={numDocumento}
@@ -197,7 +205,20 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 }}
                 type={"text"}
                 required
-              ></Input>
+              ></Input> */}
+
+              <Input
+                name="N° Identificación"
+                label="N° Identificación"
+                type="tel"
+                autoComplete="off"
+                minLength={"5"}
+                maxLength={"10"}
+                /* invalid={invalidCedula} */
+                value={numDocumento ?? ""}
+                onChange={onCedChange}
+                required
+              />
               <Input
                 label={"Id Comercio"}
                 placeholder="Ingrese Id Comercio"
