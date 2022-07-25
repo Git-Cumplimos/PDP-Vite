@@ -24,11 +24,12 @@ import { PeticionRecarga } from "../utils/fetchMovistar";
 
 const minValor = 1000;
 const maxValor = 500000;
+const tipo_operacion= 77;
 
 const RecargasMovistar = () => {
   //Variables
   const printDiv = useRef();
-  const { roleInfo } = useAuth();
+  const { roleInfo, infoTicket} = useAuth();
   const validNavigate = useNavigate();
   const [inputCelular, setInputCelular] = useState("");
   const [inputValor, setInputValor] = useState("");
@@ -37,6 +38,7 @@ const RecargasMovistar = () => {
   const [flagRecarga, setFlagRecarga] = useState(false);
   const [summary, setSummary] = useState({});
   const [infTicket, setInfTicket] = useState(null);
+
 
   const [loadingFetchRecarga, fetchRecarga] = useFetch(PeticionRecarga);
 
@@ -145,7 +147,7 @@ const RecargasMovistar = () => {
               break;
             case "11":
               notifyError(
-                "recarga RECHAZADA por parte de movistar - verifique el número telefónico [identificador=11]"
+                "Recarga RECHAZADA por parte de movistar - Verifique el número telefónico [identificador=11]"
               );
               break;
             default:
@@ -174,11 +176,16 @@ const RecargasMovistar = () => {
 
   const ticketRecarga = (result_) => {
     const now = new Date()
-    setInfTicket({
+    const voucher={
       title: "Recibo de recarga ",
       timeInfo: {
         "Fecha de venta": result_.fecha_final_ptopago,
-        Hora: now.getHours() + ':' + now.getMinutes() + ':'+ now.getSeconds(),
+       // Hora: now.getHours() + ':' + now.getMinutes() + ':'+ now.getSeconds(),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }).format(new Date()),
       },
       commerceInfo: [
         ["Id Comercio", roleInfo.id_comercio],
@@ -199,8 +206,28 @@ const RecargasMovistar = () => {
       ],
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
-    });
+    };
+    setInfTicket(voucher)
+    infoTicket(result_.transaccion_ptopago,tipo_operacion , voucher)
+          .then((resTicket) => {
+            console.log(resTicket);
+          })
+          .catch((err) => {
+            console.error(err);
+            notifyError("Error guardando el ticket");
+          });
   };
+  
+// useEffect(() => {
+//   infoTicket(19006,tipo_operacion , infTicket)
+//           .then((resTicket) => {
+//             console.log(resTicket);
+//           })
+//           .catch((err) => {
+//             console.error(err);
+//             notifyError("Error guardando el ticket");
+//           });
+// }, [infTicket])
 
   return (
     <Fragment>
