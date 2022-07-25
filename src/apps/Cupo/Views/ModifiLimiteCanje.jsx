@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -17,7 +18,7 @@ const ModifiLimiteCanje = () => {
   const [cupoComer, setCupoComer] = useState(null);
   const [valor, setValor] = useState(null);
   const [idComercio, setIdComercio] = useState(null);
-  const [ ,setAsigLimite] = useState(null);
+  const [, setAsigLimite] = useState(null);
   const [limit] = useState(10);
   const [page] = useState(1);
   const [inputId, setinputId] = useState(false);
@@ -26,6 +27,7 @@ const ModifiLimiteCanje = () => {
     min: -9999999999,
   };
   const { roleInfo } = useAuth();
+  const navegateValid = useNavigate();
 
   useEffect(() => {
     if (cupoComer?.results.length === 0) {
@@ -73,6 +75,7 @@ const ModifiLimiteCanje = () => {
             }
             notify("Modificacion exitosa");
             tablalimitecupo(idComercio, page, limit);
+            navegateValid(`/cupo`);
           })
           .catch((r) => {
             console.error(r.message);
