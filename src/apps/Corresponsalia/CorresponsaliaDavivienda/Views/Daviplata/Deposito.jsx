@@ -229,7 +229,7 @@ const Deposito = () => {
         if (!res?.status) {
           notifyError(res?.msg);
           return;
-        }
+        }else{
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.Data?.valTalon ?? 0;
         const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
@@ -276,6 +276,7 @@ const Deposito = () => {
             console.error(err);
             notifyError("Error guardando el ticket");
           });
+        }
       })
       .catch((err) => {
         console.error(err);
@@ -342,8 +343,8 @@ const Deposito = () => {
             label='CC de quien deposita'
             type='text'
             autoComplete='off'
-            minLength={"7"}
-            maxLength={"10"}
+            minLength={"5"}
+            maxLength={"16"}
             value={userDoc ?? ""}
             onInput={() => {}}
             required

@@ -94,7 +94,7 @@ const DescargarReportePines = () => {
         title="Vista de reportes"
         maxPage={maxPages}
         // onChange={onChange}
-        headers={["Nombre", "Tipo", "Ultima modificacion"]}
+        headers={["Nombre", "Tipo", "Última modificación"]}
         data={fileList}
         onSelectRow={(_, i) => {
           if (!isLoading) {
@@ -151,7 +151,7 @@ const DescargarReportePines = () => {
               
             }
           >
-            Ir una carpeta atras
+            Ir una carpeta atrás
           </Button>
         </ButtonBar>
       </TableEnterprise>

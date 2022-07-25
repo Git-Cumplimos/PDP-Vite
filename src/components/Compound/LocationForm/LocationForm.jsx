@@ -40,7 +40,7 @@ const LocationForm = ({
 
   return (
     <Fieldset
-      legend={`Ubicacion${place !== "" ? ` ${place}` : ""}`}
+      legend={`Ubicación${place !== "" ? ` ${place}` : ""}`}
       className="lg:col-span-2"
     >
       <Input
@@ -99,7 +99,7 @@ const LocationForm = ({
       {addressInput === "input" ? (
         <Input
           id={`dir_${place}`}
-          label={`Direccion de ${place}`}
+          label={`Dirección de ${place}`}
           type="text"
           autoComplete="off"
           value={addrState[0]}
@@ -108,7 +108,7 @@ const LocationForm = ({
         />
       ) : addressInput ? (
         <AddressInput
-          label={`Direccion de ${place}`}
+          label={`Dirección de ${place}`}
           place={place}
           getAddress={addrState[1]}
         />
@@ -122,7 +122,7 @@ const LocationForm = ({
       >
         <Input
           id={`buscar_${place}`}
-          label="Busqueda por municipio"
+          label="Búsqueda por municipio"
           type="search"
           autoComplete="off"
           value={simpleSearch}
