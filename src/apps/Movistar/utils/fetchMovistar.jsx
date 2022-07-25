@@ -1,4 +1,5 @@
 import fetchData from "../../../utils/fetchData";
+import { Auth } from "@aws-amplify/auth";
 
 const URL_Recarga = `${process.env.REACT_APP_URL_MOVISTAR}/recargasmovistar/prepago`;
 
@@ -7,7 +8,7 @@ export const PeticionRecarga = async (data_) => {
     const Peticion = await fetchData(URL_Recarga, "POST", {}, data_);
     return Peticion;
   } catch (error) {
-    throw "Error con fetch - no conecta con el servicio de recargas";
+    throw "Error con fetch - no conecta con el servicio del recargas";
   }
 };
 
@@ -19,14 +20,20 @@ export const PeticionConciliacion = async (url_) => {
     }
     return Peticion;
   } catch (error) {
-    throw "Error con fetch - no conecta con el servicio de conciliación";
+    console.log("Error con fetch - no conecta al servicio de conciliación");
   }
 };
 
 export const PeticionDescargar = async (url_) => {
+  const session = await Auth.currentSession();
   try {
-    const response = await fetch(url_);
-    const contentType = response.headers.get("content-type");
+    const response = await fetch(url_, 
+    {
+      headers:{
+        Authorization: `Bearer ${session?.idToken?.jwtToken}`
+      }
+    })
+    const contentType = response.headers.get("content-type")  ;
     const nombreDocumento = response.headers
       .get("Content-Disposition")
       .slice(21);
@@ -48,6 +55,6 @@ export const PeticionDescargar = async (url_) => {
       }
     }
   } catch (error) {
-    throw "Error con fetch - no conecta con el servicio de descarga conciliación";
+    console.log("Error con fetch - no conecta al servicio de descarga");
   }
 };
