@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
 import Button from "../../../components/Base/Button";
-
+import classes from "./PpsVoluntario.module.css";
 import Fieldset from "../../../components/Base/Fieldset";
 import Input from "../../../components/Base/Input";
 import Form from "../../../components/Base/Form";
@@ -29,6 +29,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
   const [showModal, setShowModal] = useState(true);
   const navigate = useNavigate();
 
+  const { contenedorImagen } = classes;
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, []);
@@ -157,7 +158,9 @@ const PpsVoluntario = ({ datosConsulta }) => {
     <div>
       {showModal && datosConsulta ? (
         <Modal show={showModal} handleClose={handleClose}>
-          <LogoPDP xsmall></LogoPDP>
+          <div className={contenedorImagen}>
+            <LogoPDP xsmall></LogoPDP>
+          </div>
           <Form onSubmit={(e) => enviar(e)}>
             <Fieldset
               legend="Formulario Aporte Voluntario"
@@ -189,7 +192,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 minLength="6"
                 maxLength="11"
                 onInput={(e) => {
-                  const num = e.target.value || "";
+                  const num = parseInt(e.target.value) || "";
                   setNumDocumento(num.toString());
                 }}
                 type={"text"}
