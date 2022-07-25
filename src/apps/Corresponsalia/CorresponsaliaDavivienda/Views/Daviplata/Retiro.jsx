@@ -4,19 +4,12 @@ import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Button from "../../../../../components/Base/Button";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Modal from "../../../../../components/Base/Modal";
-import useQuery from "../../../../../hooks/useQuery";
-import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import {
-  postCashOut,
-  postRealizarCashoutDavivienda,
-} from "../../utils/fetchCorresponsaliaDavivienda";
+import { postRealizarCashoutDavivienda } from "../../utils/fetchCorresponsaliaDavivienda";
 import { notify, notifyError } from "../../../../../utils/notify";
-import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import MoneyInput, {
   formatMoney,
 } from "../../../../../components/Base/MoneyInput";
-import { useFetch } from "../../../../../hooks/useFetch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import { enumParametrosAutorizador } from "../../utils/enumParametrosAutorizador";
@@ -31,7 +24,6 @@ const Retiro = () => {
     inferior: 100,
   });
   const [peticion, setPeticion] = useState(false);
-  const [botonAceptar, setBotonAceptar] = useState(false);
   const [datosTrans, setDatosTrans] = useState({
     otp: "",
     numeroTelefono: "",
@@ -79,18 +71,15 @@ const Retiro = () => {
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
       /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
+      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
       /*direccion*/
-      [
-        "Dirección",
-        roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
-      ],
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
       ["Tipo de operación", "Retiro DaviPlata"],
       ["", ""],
     ],
     commerceName: roleInfo?.["nombre comercio"]
       ? roleInfo?.["nombre comercio"]
-      : "prod",
+      : "No hay datos",
     trxInfo: [],
     disclamer:
       "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -129,11 +118,11 @@ const Retiro = () => {
             roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1,
           ],
           /*ciudad*/
-          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
+          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
           /*direccion*/
           [
             "Dirección",
-            roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
+            roleInfo?.direccion ? roleInfo?.direccion : "No hay datos",
           ],
           ["Tipo de operación", "Retiro DaviPlata"],
           ["", ""],
@@ -162,17 +151,17 @@ const Retiro = () => {
     objTicket["timeInfo"]["Hora"] = hora;
     setIsUploading(true);
     postRealizarCashoutDavivienda({
-      idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 8,
-      idUsuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 1,
-      idTerminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 801,
+      idComercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 0,
+      idUsuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 0,
+      idTerminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
       valor: datosTrans?.valorCashOut,
-      issuerIdDane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 1121,
+      issuerIdDane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 0,
       nombreComercio: roleInfo?.["nombre comercio"]
         ? roleInfo?.["nombre comercio"]
-        : "prod",
+        : "No hay datos",
       ticket: objTicket,
       numCelular: datosTrans.numeroTelefono,
-      municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "Bogota",
+      municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "No hay datos",
       otp: datosTrans.otp,
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
@@ -307,10 +296,7 @@ const Retiro = () => {
                 <h2>{`Número de otp: ${datosTrans.otp}`}</h2>
                 <ButtonBar>
                   <Button onClick={hideModal}>Cancelar</Button>
-                  <Button
-                    disabled={botonAceptar}
-                    type='submit'
-                    onClick={peticionCashOut}>
+                  <Button type='submit' onClick={peticionCashOut}>
                     Aceptar
                   </Button>
                 </ButtonBar>
