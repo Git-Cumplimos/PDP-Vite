@@ -4,7 +4,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 // import Modal from "../../../../components/Base/Modal";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { onChangeNumber } from "../../../../utils/functions";
-import { notifyError } from "../../../../utils/notify";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 
 import { getErrorList, modErrorList } from "../../utils/fetchFunctions";
 
@@ -115,17 +115,26 @@ const ListaErrores = () => {
         <ButtonBar>
           <Button
             onClick={() => {
-              modErrorList({ pk_error_id: "" }, listaErrores)
-                .then((res) => {
-                  console.log(res);
-                })
-                .catch((err) => {
-                  if (err?.cause === "custom") {
-                    notifyError(err?.message);
-                    return;
-                  }
-                  console.error(err?.message);
-                });
+              notifyPending(
+                modErrorList({ pk_error_id: "" }, listaErrores),
+                {
+                  render: () => "Actulizando lista de errores",
+                },
+                {
+                  render: () => "Actualizacion exitosa",
+                },
+                {
+                  render({ data: err }) {
+                    if (err?.cause === "custom") {
+                      return err?.message;
+                    }
+                    console.error(err?.message);
+                    return "Actualizacion fallida";
+                  },
+                  autoClose: 5000,
+                  closeOnClick: true,
+                }
+              );
             }}
           >
             Actualizar datos

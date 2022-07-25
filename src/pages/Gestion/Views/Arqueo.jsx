@@ -18,18 +18,19 @@ const Arqueo = ({
   const [total, setTotal] = useState("");
   const [trans, setTrans] = useState("");
   const [confirmarArqueo, setConfirmarArqueo] = useState(false);
+  const [arqueoConfirmado, setArqueoConfirmado] = useState(false);
   const [denominaciones, handleChange] = useFormNumbers({
-    cienmil: "",
-    cincuentamil: "",
-    veintemil: "",
-    diezmil: "",
-    cincomil: "",
-    dosmil: "",
-    mil: "",
-    quinientos: "",
-    doscientos: "",
-    cien: "",
-    cincuenta: "",
+    cienmil: 0,
+    cincuentamil: 0,
+    veintemil: 0,
+    diezmil: 0,
+    cincomil: 0,
+    dosmil: 0,
+    mil: 0,
+    quinientos: 0,
+    doscientos: 0,
+    cien: 0,
+    cincuenta: 0,
   });
 
   const sumatoria = () => {
@@ -42,10 +43,9 @@ const Arqueo = ({
   };
 
   useEffect(() => {
-    sumatoria();
+    //sumatoria();
   });
 
-  console.log(trans);
   const formatMoney = new Intl.NumberFormat("es-CO", {
     style: "currency",
     currency: "COP",
@@ -82,6 +82,7 @@ const Arqueo = ({
       denominaciones: denominaciones,
       saldo_total: total,
     };
+    setArqueoConfirmado(true);
     confirmaArqueo(body)
       .then((res) => {
         console.log(res);
@@ -195,36 +196,14 @@ const Arqueo = ({
             </Fieldset>
 
             <Fieldset legend={"Saldos"}>
-              <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
-                <h1 className="text-2xl font-semibold">
-                  Total arqueo:
-                  {formatMoney.format(total)}
-                </h1>
-                <h1>
-                  Sobrantes:
-                  {caja?.obj?.actual_caja - total < 0
-                    ? formatMoney.format(total - caja?.obj?.actual_caja)
-                    : formatMoney.format(0)}
-                </h1>
-                <h1>
-                  {caja?.obj?.estimacion_f < 0
-                    ? `Estimación sobrante:${formatMoney.format(
-                        caja?.obj?.estimacion_f
-                      )}`
-                    : `Estimación faltante:${formatMoney.format(
-                        caja?.obj?.estimacion_f
-                      )}`}
-                </h1>
-                <h1>
-                  Faltantes:
-                  {caja?.obj?.actual_caja - total > 0
-                    ? formatMoney.format(total - caja?.obj?.actual_caja + trans)
-                    : formatMoney.format(0)}
-                </h1>
-                <h1>
-                  Dinero transportadora:
-                  {trans}
-                </h1>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center" >
+              {
+                !confirmarArqueo ? <div><h1 className="text-2xl font-semibold">
+                Total arqueo:&nbsp;
+                {formatMoney.format(total)}
+              </h1></div> : 
+              <></>
+              }
               </div>
               <ButtonBar>
                 <Button type="button" onClick={() => setConfirmarArqueo(true)}>
@@ -235,6 +214,37 @@ const Arqueo = ({
           </>
         ) : (
           <Fieldset legend={"Confirmación arqueo"}>
+            {arqueoConfirmado ? <div>
+                <h1 className="text-2xl font-semibold">
+                  Total arqueo:&nbsp;
+                  {formatMoney.format(total)}
+                </h1>
+                <h1>
+                  Sobrantes:&nbsp;
+                  {caja?.obj?.actual_caja - total < 0
+                    ? formatMoney.format(total - caja?.obj?.actual_caja)
+                    : formatMoney.format(0)}
+                </h1>
+                <h1>
+                  {caja?.obj?.estimacion_f < 0
+                    ? `Estimación sobrante: ${formatMoney.format(
+                        caja?.obj?.estimacion_f
+                      )}`
+                    : `Estimación faltante: ${formatMoney.format(
+                        caja?.obj?.estimacion_f
+                      )}`}
+                </h1>
+                <h1>
+                  Faltantes:&nbsp;
+                  {caja?.obj?.actual_caja - total > 0
+                    ? formatMoney.format(total - caja?.obj?.actual_caja + trans)
+                    : formatMoney.format(0)}
+                </h1>
+                <h1>
+                  Dinero transportadora:&nbsp;
+                  {formatMoney.format(trans)}
+                </h1>
+              </div> : <div>
             <h1 className="text-lg">
               ¿Esta seguro de los datos para el arqueo, no podra modificarlos?
             </h1>
@@ -246,6 +256,8 @@ const Arqueo = ({
                 Confirmar arqueo
               </Button>
             </ButtonBar>
+            </div>}
+            
           </Fieldset>
         )}
       </Form>

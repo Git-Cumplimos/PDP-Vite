@@ -97,6 +97,17 @@ const Deposito = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
+    setTipoCuenta("")
+    setTipoDocumento("")
+    setQuery(
+      {
+        numCuenta: "",
+        userDoc: "",
+        nomDepositante: "",
+        valor: "",
+      },
+      { replace: true }
+    );
   }, []);
 
   const onSubmitDeposit = useCallback(
@@ -331,7 +342,7 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"10"}
-            maxLength={"10"}
+            maxLength={"16"}
             value={numCuenta ?? ""}
             onInput={() => {}}
             required

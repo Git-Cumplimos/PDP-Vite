@@ -36,23 +36,6 @@ const ReportePines = () => {
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
   const [tipoPin, setTipoPin] = useState("");
 
-  const pageStyle = `
-  @page {
-    size: 80mm 50mm;
-  }
-
-  @media all {
-    .pagebreak {
-      display: none;
-    }
-  }
-
-  @media print {
-    .pagebreak {
-      page-break-before: always;
-    }
-  }
-`;
 
   useEffect(() => {
     if (
@@ -67,6 +50,7 @@ const ReportePines = () => {
         fechaFinal,
         estadoPin,
         tipoPin,
+        "",
         pageData
       )
         .then((res) => {

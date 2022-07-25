@@ -15,7 +15,7 @@ export const getConsultaCupoComercio = async (pk_id_comercio, page, limit) => {
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/cupo/sindocumento`,
+      `${urlCupo}/servicio-cupo/cupo/sindocumento`,
       "GET",
       busqueda,
       {},
@@ -40,7 +40,7 @@ export const postCupoComercio = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/cupo/sindocumento`,
+      `${urlCupo}/servicio-cupo/cupo/sindocumento`,
       "POST",
       {},
       bodyObj
@@ -83,7 +83,7 @@ export const getConsultaDtlMovCupo = async (
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/dtlcupo/sinpdf`,
+      `${urlCupo}/servicio-cupo/dtlcupo/sinpdf`,
       "GET",
       busqueda,
       {},
@@ -107,7 +107,12 @@ export const postDtlCambioLimiteCanje = async (bodyObj) => {
     });
   }
   try {
-    const res = await fetchData(`${urlCupo}/modcupo`, "POST", {}, bodyObj);
+    const res = await fetchData(
+      `${urlCupo}/servicio-cupo/modcupo`,
+      "POST",
+      {},
+      bodyObj
+    );
     if (!res?.status) {
       console.error(res?.msg);
     }
@@ -131,7 +136,7 @@ export const getConsultaAsignacionCupoLimite = async (
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/modcupo`,
+      `${urlCupo}/servicio-cupo/modcupo`,
       "GET",
       busqueda,
       {},
@@ -156,7 +161,7 @@ export const putAjusteCupo = async (argsObj, bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/cupo/sindocumento`,
+      `${urlCupo}/servicio-cupo/cupo/sindocumento`,
       "PUT",
       argsObj,
       bodyObj
@@ -172,7 +177,9 @@ export const putAjusteCupo = async (argsObj, bodyObj) => {
 
 export const PeticionDescargar = async (parametro) => {
   try {
-    const response = await fetch(`${urlCupo}/cupo/documento${parametro}`);
+    const response = await fetch(
+      `${urlCupo}/servicio-cupo/cupo/documento${parametro}`
+    );
     const contentType = response.headers.get("content-type");
     const nombreDocumento = response.headers
       .get("Content-Disposition")
@@ -222,7 +229,7 @@ export const PeticionDescargarPdf = async (
   }
   try {
     const response = await fetch(
-      `${urlCupo}/dtlcupo/fpdf?fk_id_comercio=${parametro}${busqueda}`
+      `${urlCupo}/servicio-cupo/dtlcupo/fpdf?fk_id_comercio=${parametro}${busqueda}`
     );
     const contentType = response.headers.get("content-type");
     const nombreDocumento = response.headers
@@ -270,7 +277,7 @@ export const getTipoMovimientosCupo = async (
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/movimientos`,
+      `${urlCupo}/servicio-cupo/movimientos`,
       "GET",
       busqueda,
       {},
@@ -294,7 +301,12 @@ export const postTipoMovimientosCupo = async (bodyObj) => {
     });
   }
   try {
-    const res = await fetchData(`${urlCupo}/movimientos`, "POST", {}, bodyObj);
+    const res = await fetchData(
+      `${urlCupo}/servicio-cupo/movimientos`,
+      "POST",
+      {},
+      bodyObj
+    );
     if (!res?.status) {
       console.error(res?.msg);
     }
