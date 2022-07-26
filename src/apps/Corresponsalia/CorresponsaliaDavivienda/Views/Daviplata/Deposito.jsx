@@ -24,12 +24,16 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 
 const Deposito = () => {
   const navigate = useNavigate();
-  const [{ phone, userDoc, valor, nomDepositante, summary }, setQuery] =
-    useQuery();
+  // const [{ phone, userDoc, valor, nomDepositante, summary }, setQuery] =
+  //   useQuery();
   const [verificacionTel, setVerificacionTel] = useState("");
 
+  const [phone, setPhone] = useState("")
+  const [userDoc, setUserDoc] = useState("")
+  const [valor, setValor] = useState("")
+  const [nomDepositante, setNomDepositante] = useState("")
+  const [summary, setSummary] = useState([])
   const { roleInfo, infoTicket } = useAuth();
-
   const [loadingCashIn, fetchCashIn] = useFetch(pagoGiroDaviplata);
   const [loadingConsultaCashIn, fetchConsultaCashIn] = useFetch(
     consultaGiroDaviplata
@@ -90,6 +94,13 @@ const Deposito = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
+    setPhone("")
+    setVerificacionTel("")
+    setNomDepositante("")
+    setSummary([])
+    setValor("")
+    setTipoDocumento("")
+    setUserDoc("")
   }, []);
 
   const onSubmitDeposit = useCallback(
@@ -137,7 +148,7 @@ const Deposito = () => {
                   ),
                   "Valor total": formatMoney.format(total),
                 };
-                setQuery({ phone, valor, summary }, { replace: true });
+                setSummary(summary);
                 setShowModal(true);
               }
 
@@ -160,43 +171,14 @@ const Deposito = () => {
         );
       }
     },
-    [setQuery, valor, limitesMontos, verificacionTel]
+    [valor, limitesMontos, verificacionTel]
   );
-
-  const onChange = useCallback(
-    (ev) => {
-      if (ev.target.name !== "valor") {
-        const formData = new FormData(ev.target.form);
-        const phone = (
-          (formData.get("numCliente") ?? "").match(/\d/g) ?? []
-        ).join("");
-        const userDoc = (
-          (formData.get("docCliente") ?? "").match(/\d/g) ?? []
-        ).join("");
-        setQuery({ phone, userDoc, valor: valor ?? "" }, { replace: true });
-        const nomDepositante = formData.get("nomDepositante") ?? "";
-        setQuery(
-          { phone, userDoc, valor: valor ?? "", nomDepositante },
-          { replace: true }
-        );
-      }
-    },
-    [setQuery, valor]
-  );
-
+ 
   const onMoneyChange = useCallback(
     (e, valor) => {
-      setQuery(
-        {
-          phone: phone ?? "",
-          userDoc: userDoc ?? "",
-          nomDepositante: nomDepositante ?? "",
-          valor,
-        },
-        { replace: true }
-      );
+      setValor(valor);
     },
-    [setQuery, phone, userDoc, nomDepositante]
+    [valor]
   );
 
   const goToRecaudo = useCallback(() => {
@@ -237,7 +219,7 @@ const Deposito = () => {
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Recibo de deposito",
+          title: "Recibo de deposito Daviplata",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -252,20 +234,28 @@ const Deposito = () => {
           },
           commerceInfo: [
             ["Id Comercio", roleInfo?.id_comercio],
-            ["No. terminal", roleInfo?.id_dispositivo],
+            ["No. terminal", ter],
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
-          ],
-          commerceName: "Daviplata",
-          trxInfo: [
-            ["Ter", ter],
+            ["Tipo de operación", "Deposito DaviPlata"],
+            ["", ""],
             ["No. de aprobación", trx_id],
-            ["Num Daviplata", "****" + phone.slice(-4)],
-            ["Valor", formatMoney.format(valor)],
-            ["Costo", formatMoney.format(comision)],
-            ["Total", formatMoney.format(total)],
+            ["", ""],
           ],
-          disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+          commerceName: roleInfo?.["nombre comercio"]
+          ? roleInfo?.["nombre comercio"]
+          : "No hay datos",
+          trxInfo: [          
+            ["Número de telefono", "****" + phone.slice(-4)],
+            ["",""],
+            ["Valor", formatMoney.format(valor)],
+            ["",""],
+            ["Costo transacción", formatMoney.format(comision)],
+            ["",""],
+            ["Total", formatMoney.format(total)],
+            ["",""],
+          ],
+          disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
         };
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
@@ -298,7 +288,7 @@ const Deposito = () => {
       <SimpleLoading show={isUploading} />
       <Fragment>
         <h1 className='text-3xl mt-6'>Depositos Daviplata</h1>
-        <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
+        <Form onSubmit={onSubmitDeposit} grid>
           <Input
             id='numCliente'
             name='numCliente'
@@ -307,8 +297,13 @@ const Deposito = () => {
             autoComplete='off'
             minLength={"10"}
             maxLength={"10"}
-            value={phone ?? ""}
-            onInput={() => {}}
+            value={phone}
+            onInput={(e) => {
+              if (!isNaN(e.target.value)) {
+                const num = e.target.value;
+                setPhone(num);
+              }
+            }}
             required
           />
           <Input
@@ -345,8 +340,10 @@ const Deposito = () => {
             autoComplete='off'
             minLength={"5"}
             maxLength={"16"}
-            value={userDoc ?? ""}
-            onInput={() => {}}
+            value={userDoc}
+            onInput={(e) => {
+              setUserDoc(e.target.value);
+            }}
             required
           />
           <Input
@@ -355,8 +352,10 @@ const Deposito = () => {
             label='Nombre Depositante'
             type='text'
             autoComplete='off'
-            value={nomDepositante ?? ""}
-            onInput={() => {}}
+            value={nomDepositante}
+            onInput={(e) => {
+              setNomDepositante(e.target.value);
+            }}
             required
           />
           <MoneyInput
