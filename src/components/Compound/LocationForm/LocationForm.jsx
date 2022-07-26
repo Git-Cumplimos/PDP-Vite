@@ -69,6 +69,8 @@ const LocationForm = ({
         label="Barrio"
         type="text"
         autoComplete="off"
+        minLength="1"
+        maxLength="30"
         value={barrio}
         onInput={(e) => setBarrio(capitalize(e.target.value))}
         required
@@ -102,6 +104,8 @@ const LocationForm = ({
           label={`Dirección de ${place}`}
           type="text"
           autoComplete="off"
+          minLength="1"
+          maxLength="60"
           value={addrState[0]}
           onInput={(e) => addrState[1](e.target.value)}
           required

@@ -165,7 +165,7 @@ const CrearPin = () => {
     { value: "A1", label: "A1-Motocicletas con cilindrada hasta 125" },
     { value: "A2", label: "A2-Motocicletas y mototriciclos con cilindrada mayor a 125" },
     { value: "B1", label: "B1-Automóviles, motocarros, cuatrimotos, camperos, camionetas y microbuses de servicio particular" },
-    { value: "C1", label: "C1-Autómoviles, camperos, camionetas y microbuses de servicio público" },
+    { value: "C1", label: "C1-Automóviles, camperos, camionetas y microbuses de servicio público" },
     { value: "B2", label: "B2-Camiones rígidos, busetas y buses de servicio particular" },
     { value: "C2", label: "C2-Camiones rígidos, busetas y buses de servicio público" },
     { value: "B3", label: "B3-Vehículos articulados servicio particular" },
@@ -240,7 +240,13 @@ const CrearPin = () => {
 
   const onSubmitModal = (e) => {
     e.preventDefault();
+    if(!isNaN(infoCliente?.municipio)){
+    e.preventDefault();
     setShowModal(true)
+    }
+    else{
+      notifyError("Agregue municipio y departamento de residencia")
+    }
   };
 
   const onSubmitCliente = (e) => {
@@ -324,14 +330,18 @@ const CrearPin = () => {
   };
 
   const closeModal = useCallback(async () => {
+    if(respPin !== ""){
+      navigate(-1);
+      setDocumento("");
+      setRespPin("");
+      setTipoPin("");
+      setIdPin("");
+    }
     setShowModal(false);
     setDisabledBtns(false);
-    setDocumento("");
-    setRespPin("");
-    setTipoPin("");
-    setIdPin("");
-    navigate(-1);
-  }, []);
+    
+    
+  }, [respPin]);
 
   const tickets = useMemo(() => {
     return {
@@ -450,7 +460,7 @@ const CrearPin = () => {
           setOlimpia(e.target.value);
         }}
       />
-      {olimpia == "true" ? 
+      {olimpia === "true" ? 
       <>
        <Input
        id="idPin"
@@ -550,14 +560,21 @@ const CrearPin = () => {
           autoComplete="off"
           value={celular}
           onInput={(e) => {
+            console.log(e.target.value?.length)
+            if (celular?.length === 0 & e.target.value!=="3"){
+              notifyError("El número de celular debe iniciar por 3")
+              setCelular("");
+            } 
+            else {
             const num = parseInt(e.target.value) || "";
             setCelular(num);
+          }
           }}
         />
         <Input
           id="email"
           label="Email"
-          type="text"
+          type="email"
           minLength="5"
           maxLength="100"
           required
