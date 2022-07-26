@@ -1,5 +1,4 @@
 export const enumParametrosPines = Object.freeze({
-    horaCierre: "23:30",
+    horaCierre: "17:30",
   });
 
-  
