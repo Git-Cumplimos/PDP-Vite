@@ -219,7 +219,7 @@ const Deposito = () => {
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Recibo de deposito Daviplata",
+          title: "Deposito a Daviplata",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -255,7 +255,7 @@ const Deposito = () => {
             ["Total", formatMoney.format(total)],
             ["",""],
           ],
-          disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
         };
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
