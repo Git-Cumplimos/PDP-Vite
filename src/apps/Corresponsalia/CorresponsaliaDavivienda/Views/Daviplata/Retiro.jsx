@@ -20,7 +20,7 @@ const Retiro = () => {
   const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: 100000,
+    superior: 2000000,
     inferior: 100,
   });
   const [peticion, setPeticion] = useState(false);
@@ -81,8 +81,7 @@ const Retiro = () => {
       ? roleInfo?.["nombre comercio"]
       : "No hay datos",
     trxInfo: [],
-    disclamer:
-      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
   });
 
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
@@ -242,7 +241,7 @@ const Retiro = () => {
         <Input
           id='otp'
           label='Número OTP'
-          type='text'
+          type='password'
           name='otp'
           minLength='6'
           maxLength='6'
@@ -293,7 +292,7 @@ const Retiro = () => {
                   )} COP`}
                 </h2>
                 <h2>{`Número de telefono: ${datosTrans.numeroTelefono}`}</h2>
-                <h2>{`Número de otp: ${datosTrans.otp}`}</h2>
+                {/* <h2>{`Número de otp: ${datosTrans.otp}`}</h2> */}
                 <ButtonBar>
                   <Button onClick={hideModal}>Cancelar</Button>
                   <Button type='submit' onClick={peticionCashOut}>
