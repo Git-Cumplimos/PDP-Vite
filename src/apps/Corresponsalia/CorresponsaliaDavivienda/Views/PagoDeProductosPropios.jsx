@@ -4,19 +4,11 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Button from "../../../../components/Base/Button";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Modal from "../../../../components/Base/Modal";
-import useQuery from "../../../../hooks/useQuery";
-import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import {
-  postCashOut,
-  postRealizarCashoutDavivienda,
-} from "../utils/fetchCorresponsaliaDavivienda";
 import { notify, notifyError } from "../../../../utils/notify";
-import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import MoneyInput, {
   formatMoney,
 } from "../../../../components/Base/MoneyInput";
-import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import TicketsDavivienda from "../components/TicketsDavivienda";
@@ -37,7 +29,6 @@ const PagoDeProductosPropios = () => {
     inferior: 1,
   });
   const [peticion, setPeticion] = useState(0);
-  const [botonAceptar, setBotonAceptar] = useState(false);
   const [datosTrans, setDatosTrans] = useState({
     tipoIdentificacion: "",
     numeroIdentificacion: "",
@@ -82,7 +73,7 @@ const PagoDeProductosPropios = () => {
       : "Sin datos",
     trxInfo: [],
     disclamer:
-      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot) Línea de atención Bogotá:338 38 38 Resto del país:01 8000 123 838",
+      "Línea de atención Bogotá:338 38 38\nResto del país:01 8000 123 838",
   });
 
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/

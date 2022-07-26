@@ -61,8 +61,7 @@ const PagoGiro = () => {
       ? roleInfo?.["nombre comercio"]
       : "Sin datos",
     trxInfo: [],
-    disclamer:
-      "Línea de atención personalizada: #688 Mensaje de texto: 85888 Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
   });
 
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
