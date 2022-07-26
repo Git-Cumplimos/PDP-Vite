@@ -18,7 +18,8 @@ import MoneyInput from "../../../components/Base/MoneyInput";
 const ModificarPps = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
   const [sinDatosConsulta, setSinDatosConsulta] = useState(false);
-  const [buscarCedula, setBuscarCedula] = useState("");
+  const [buscarCedula, setBuscarCedula] = useState(null);
+  const [invalidCedula, setInvalidCedula] = useState("");
   const [cantNum, setCantNum] = useState(0);
   const [cantNumCel, setCantNumCel] = useState(0);
   const [cantNumVal, setCantNumVal] = useState(0);
@@ -207,10 +208,18 @@ const ModificarPps = () => {
       }
     }
   };
+
+  const onCedChange = (e) => {
+    const formData = new FormData(e.target.form);
+    const cedula = (
+      (formData.get("N° Identificación") ?? "").match(/\d/g) ?? []
+    ).join("");
+    setBuscarCedula(cedula);
+  };
   return (
     <div>
       <Form grid onSubmit={(e) => BuscarCedula(e)}>
-        <Input
+        {/* <Input
           label={"N° Identificación"}
           placeholder={"Ingrese N° Identificación"}
           value={buscarCedula}
@@ -222,7 +231,19 @@ const ModificarPps = () => {
           }}
           type={"text"}
           required
-        ></Input>
+        ></Input> */}
+        <Input
+          name="N° Identificación"
+          label="N° Identificación"
+          type="tel"
+          autoComplete="off"
+          minLength={"5"}
+          maxLength={"10"}
+          invalid={invalidCedula}
+          value={buscarCedula ?? ""}
+          onChange={onCedChange}
+          required
+        />
         <ButtonBar className={"lg:col-span-2"} type="">
           {
             <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>

@@ -73,8 +73,8 @@ const CrearPin = () => {
 
   const optionsDocumento = [
     { value: "", label: "" },
-    { value: "1", label: "Cedula Ciudadanía" },
-    { value: "2", label: "Cedula Extrangeria" },
+    { value: "1", label: "Cédula Ciudadanía" },
+    { value: "2", label: "Cédula Extranjería" },
     { value: "3", label: "Tarjeta Identidad" },
     { value: "4", label: "NIT" },
     { value: "5", label: "Pasaporte" },
@@ -162,14 +162,14 @@ const CrearPin = () => {
 
   const optionsCategoria = [
     { value: "", label: "" },
-    { value: "A1", label: "Motocicletas con cilindrada hasta 125" },
-    { value: "A2", label: "Motocicletas y mototriciclos con cilindrada mayor a 125" },
-    { value: "B1", label: "Automóviles, motocarros, cuatrimotos, camperos, camionetas y microbuses de servicio particular" },
-    { value: "C1", label: "Autómoviles, camperos, camionetas y microbuses de servicio público" },
-    { value: "B2", label: "Camiones rígidos, busetas y buses de servicio particular" },
-    { value: "C2", label: "Camiones rígidos, busetas y buses de servicio público" },
-    { value: "B3", label: "Vehículos articulados servicio particular" },
-    { value: "C3", label: "Vehículos articulados servicio público" },
+    { value: "A1", label: "A1-Motocicletas con cilindrada hasta 125" },
+    { value: "A2", label: "A2-Motocicletas y mototriciclos con cilindrada mayor a 125" },
+    { value: "B1", label: "B1-Automóviles, motocarros, cuatrimotos, camperos, camionetas y microbuses de servicio particular" },
+    { value: "C1", label: "C1-Automóviles, camperos, camionetas y microbuses de servicio público" },
+    { value: "B2", label: "B2-Camiones rígidos, busetas y buses de servicio particular" },
+    { value: "C2", label: "C2-Camiones rígidos, busetas y buses de servicio público" },
+    { value: "B3", label: "B3-Vehículos articulados servicio particular" },
+    { value: "C3", label: "C3-Vehículos articulados servicio público" },
   ];
 
   const [categoria, setCategoria] = useState("")
@@ -240,7 +240,13 @@ const CrearPin = () => {
 
   const onSubmitModal = (e) => {
     e.preventDefault();
+    if(!isNaN(infoCliente?.municipio)){
+    e.preventDefault();
     setShowModal(true)
+    }
+    else{
+      notifyError("Agregue municipio y departamento de residencia")
+    }
   };
 
   const onSubmitCliente = (e) => {
@@ -267,7 +273,6 @@ const CrearPin = () => {
         setComprarVehiculo(resp?.obj?.results?.[0]?.interes_compra_vehiculo !== "" ? "true" : "false")
         setVehiculoCompra(resp?.obj?.results?.[0]?.interes_compra_vehiculo)
         if (resp?.obj?.results?.[0]?.home_location !== null){
-        console.log(resp?.obj?.results?.[0]?.home_location?.direccion?.[0]) 
         homeLocation?.municipio?.[1](resp?.obj?.results?.[0]?.home_location?.municipio?.[0])
         homeLocation?.departamento?.[1](resp?.obj?.results?.[0]?.home_location?.departamento?.[0])
         homeLocation?.direccion?.[1](resp?.obj?.results?.[0]?.home_location?.direccion?.[0])
@@ -325,14 +330,18 @@ const CrearPin = () => {
   };
 
   const closeModal = useCallback(async () => {
+    if(respPin !== ""){
+      navigate(-1);
+      setDocumento("");
+      setRespPin("");
+      setTipoPin("");
+      setIdPin("");
+    }
     setShowModal(false);
     setDisabledBtns(false);
-    setDocumento("");
-    setRespPin("");
-    setTipoPin("");
-    setIdPin("");
-    navigate(-1);
-  }, []);
+    
+    
+  }, [respPin]);
 
   const tickets = useMemo(() => {
     return {
@@ -360,12 +369,12 @@ const CrearPin = () => {
       commerceName: pinData.descripcion,
       trxInfo: [
         ["Proceso", "Creación de Pin"],
-        ["Codigo", respPin?.cod_hash_pin],
+        ["Código", respPin?.cod_hash_pin],
         ["Vence", respPin?.fecha_vencimiento],
-        ["Valor Tramite", formatMoney.format(tramiteData?.valor)],
-        ["Iva Tramite",formatMoney.format(tramiteData?.iva)],
+        ["Valor Trámite", formatMoney.format(tramiteData?.valor)],
+        ["IVA Trámite",formatMoney.format(tramiteData?.iva)],
         ["Valor Pin", formatMoney.format(respPin?.valor)],
-        ["Iva Pin",formatMoney.format(respPin?.valor_iva)],
+        ["IVA Pin",formatMoney.format(respPin?.valor_iva)],
         ["Total", formatMoney.format(respPin?.valor_total)],
       ],
       disclamer:
@@ -394,21 +403,19 @@ const CrearPin = () => {
     const horaActual = hora.split(":")
     const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
-    console.log(deltaHora, deltaMinutos)
     if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
-      notifyError("Modulo cerrado a partir de las " + enumParametrosPines.horaCierre)
-      navigate("/PinesVus");
+      notifyError("Módulo cerrado a partir de las " + enumParametrosPines.horaCierre)
+      navigate("/PinesVus",{replace:true});
     }
     else if ((deltaHora ===1 & deltaMinutos<-50)){
-      notifyError("El modulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
+      notifyError("El módulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
     }
     else if ((deltaHora ===0 & deltaMinutos<10)){
-      notifyError("El modulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
+      notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
     }
 
-  }, [venderVehiculo,tipoPin])
+  }, [venderVehiculo,tipoPin, hora, navigate])
 
-  console.log(olimpia)
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -441,7 +448,7 @@ const CrearPin = () => {
       />
       <Select
         id="olimpia"
-        label="Ya inicio el proceso en Olimpia?"
+        label="¿Ya inicio el proceso en Olimpia?"
         required
         options={[
           { value: "", label: "" },
@@ -453,7 +460,7 @@ const CrearPin = () => {
           setOlimpia(e.target.value);
         }}
       />
-      {olimpia == "true" ? 
+      {olimpia === "true" ? 
       <>
        <Input
        id="idPin"
@@ -503,6 +510,8 @@ const CrearPin = () => {
           id="nombre"
           label="Nombre"
           type="text"
+          minLength="1"
+          maxLength="30"
           required
           autoComplete="off"
           value={nombre}
@@ -514,6 +523,8 @@ const CrearPin = () => {
           id="apellidos"
           label="Apellidos"
           type="text"
+          minLength="1"
+          maxLength="30"
           required
           autoComplete="off"
           value={apellidos}
@@ -525,6 +536,7 @@ const CrearPin = () => {
           id="dateInit"
           label="Fecha Nacimiento"
           type="date"
+          required
           value={fechaNacimiento}
           onInput={(e) => setFechaNacimiento(e.target.value)}
         />
@@ -532,6 +544,7 @@ const CrearPin = () => {
           id="genero"
           label="Genero"
           options={optionsGenero}
+          requiered
           value={genero}
           onChange={(e) => {
             setGenero(e.target.value);
@@ -542,19 +555,28 @@ const CrearPin = () => {
           label="Celular"
           type="text"
           required
-          minLength="5"
-          maxLength="12"
+          minLength="10"
+          maxLength="10"
           autoComplete="off"
           value={celular}
           onInput={(e) => {
+            console.log(e.target.value?.length)
+            if (celular?.length === 0 & e.target.value!=="3"){
+              notifyError("El número de celular debe iniciar por 3")
+              setCelular("");
+            } 
+            else {
             const num = parseInt(e.target.value) || "";
             setCelular(num);
+          }
           }}
         />
         <Input
           id="email"
           label="Email"
-          type="text"
+          type="email"
+          minLength="5"
+          maxLength="100"
           required
           autoComplete="off"
           value={email}
@@ -566,6 +588,8 @@ const CrearPin = () => {
           id="eps"
           label="Eps"
           type="text"
+          minLength="1"
+          maxLength="30"
           required
           autoComplete="off"
           value={eps}
@@ -577,6 +601,8 @@ const CrearPin = () => {
           id="arl"
           label="Arl"
           type="text"
+          minLength="1"
+          maxLength="30"
           required
           autoComplete="off"
           value={arl}
@@ -589,7 +615,7 @@ const CrearPin = () => {
       <Fieldset legend="Datos Vehículo" className="lg:col-span-2">
         <Select
           id="tieneVehiculo"
-          label="Tiene Vehículo"
+          label="¿Tiene Vehículo?"
           options={optionsVehiculo}
           value={tiene_vehiculo}
           onChange={(e) => {
@@ -614,7 +640,7 @@ const CrearPin = () => {
           />
           <Select
           id="venderVehiculo"
-          label="Interes en vender"
+          label="¿Interés en vender?"
           options={optionsSiNo}
           value={venderVehiculo}
           onChange={(e) => {
@@ -623,7 +649,7 @@ const CrearPin = () => {
           />
           <Select
           id="venderVehiculo"
-          label="Sigue pagando credito"
+          label="¿Sigue pagando crédito?"
           options={optionsSiNo}
           value={creditoVehiculo}
           onChange={(e) => {
@@ -647,7 +673,7 @@ const CrearPin = () => {
         <Fieldset className="lg:col-span-2">
         <Select
           id="comprarVehiculo"
-          label="Interes en comprar"
+          label="¿Interés en comprar?"
           options={optionsSiNo}
           value={comprarVehiculo}
           onChange={(e) => {
@@ -657,7 +683,7 @@ const CrearPin = () => {
         {comprarVehiculo==="true"? 
             <Select
             id="vehiculoCompra"
-            label="Que desea comprar"
+            label="¿Qué desea comprar?"
             options={optionsVehiculo}
             value={vehiculoCompra}
             onChange={(e) => {
@@ -667,7 +693,7 @@ const CrearPin = () => {
             : "" }
         </Fieldset>
       </Fieldset>     
-      <Fieldset legend="Datos Tramite" className="lg:col-span-2">
+      <Fieldset legend="Datos Trámite" className="lg:col-span-2">
         <Select
           className="place-self-stretch"
           id="tipoPin"
@@ -689,7 +715,7 @@ const CrearPin = () => {
         <Select
           className="place-self-stretch"
           id="tramite"
-          label="Tramite"
+          label="Trámite"
           options={
             Object.fromEntries([
               ["", ""],
@@ -707,7 +733,7 @@ const CrearPin = () => {
         <Select
           className="place-self-stretch"
           id="categoria"
-          label="Categoria de Licencia"
+          label="Categoría de Licencia"
           options={optionsCategoria}
           value={categoria}
           onChange={(e) => {
@@ -757,13 +783,13 @@ const CrearPin = () => {
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Valor Tramite</h1>
+                <h1>Valor Trámite</h1>
                 <h1>{formatMoney.format(tramiteData.valor)}</h1>
               </div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Iva Tramite</h1>
+                <h1>IVA Trámite</h1>
                 <h1>{formatMoney.format(tramiteData.iva)}</h1>
               </div>
               <div
@@ -775,7 +801,7 @@ const CrearPin = () => {
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Iva Pin</h1>
+                <h1>IVA Pin</h1>
                 <h1>{formatMoney.format(pinData.iva)}</h1>
               </div>
               <div
