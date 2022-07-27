@@ -204,6 +204,7 @@ const PagoGiro = () => {
           objTicket["trxInfo"].push(["", ""]);
           setDatosConsultaIdTrx((old) => ({ ...old, idTrx: res?.obj?.idTrx }));
           setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
+          console.log("Recibe,", res?.prueba);
           setPeticion(2);
         } else {
           setIsUploading(false);
@@ -249,6 +250,7 @@ const PagoGiro = () => {
         numeroCuenta: datosConsulta?.numeroCuenta,
         origenCuenta: datosConsulta?.origenCuenta,
         cicloDePago: datosConsulta?.cicloDePago,
+        talon: datosConsulta?.talon,
       },
     })
       .then((res) => {
