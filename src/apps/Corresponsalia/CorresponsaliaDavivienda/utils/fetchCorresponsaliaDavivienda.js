@@ -1,7 +1,6 @@
 import fetchData from "../../../../utils/fetchData";
 
 const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
-console.log(urlDaviplata);
 export const consultaGiroDaviplata = async (bodyObj) => {
   if (!bodyObj) {
     return new Promise((resolve, reject) => {
@@ -63,7 +62,9 @@ export const postCashOut = async (bodyObj) => {
       `${urlDaviplata}/cash-out`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -83,7 +84,9 @@ export const postRealizarCashoutDavivienda = async (bodyObj) => {
       `${urlDaviplata}davivienda_cb_cashout/cashout`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);
