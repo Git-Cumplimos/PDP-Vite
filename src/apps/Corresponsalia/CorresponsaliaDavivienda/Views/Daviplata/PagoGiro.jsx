@@ -304,8 +304,8 @@ const PagoGiro = () => {
           label='Número de identificación'
           type='text'
           name='numeroIdentificacion'
-          minLength='10'
-          maxLength='10'
+          minLength='5'
+          maxLength='16'
           required
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
