@@ -202,9 +202,13 @@ const PagoGiro = () => {
             formatMoney.format(res?.obj?.respuesta_davivienda[0].valorPago),
           ]);
           objTicket["trxInfo"].push(["", ""]);
-          setDatosConsultaIdTrx((old) => ({ ...old, idTrx: res?.obj?.idTrx }));
+          setDatosConsultaIdTrx((old) => ({
+            ...old,
+            idTrx: res?.obj?.idTrx,
+            valor: res?.valorTransaccion,
+          }));
           setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
-          console.log("Recibe,", res?.prueba);
+          console.log("Recibe,", res?.valorTransaccion);
           setPeticion(2);
         } else {
           setIsUploading(false);
@@ -245,7 +249,7 @@ const PagoGiro = () => {
       ticket: objTicket,
       direccion: roleInfo?.direccion,
       idTrx: datosConsultaIdTrx.idTrx,
-      valor: datosConsulta?.valorPago,
+      valor: datosConsultaIdTrx.valor,
       datosTrx: {
         numeroCuenta: datosConsulta?.numeroCuenta,
         origenCuenta: datosConsulta?.origenCuenta,
@@ -392,7 +396,7 @@ const PagoGiro = () => {
               <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
               <h2>{`Número de identificacion: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
               <h2>{`Valor transacción: ${formatMoney.format(
-                datosConsulta.valorPago
+                datosConsultaIdTrx.valor
               )}`}</h2>
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>
@@ -410,7 +414,7 @@ const PagoGiro = () => {
               <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
               <h2>{`Número de identificacion: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
               <h2>{`Valor transacción: ${formatMoney.format(
-                datosConsulta.valorPago
+                datosConsultaIdTrx.valor
               )}`}</h2>
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>
