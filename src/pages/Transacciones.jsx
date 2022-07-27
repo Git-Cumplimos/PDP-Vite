@@ -277,7 +277,7 @@ const Transacciones = () => {
           <div className='flex flex-col justify-center items-center'>
             <TicketsDavivienda
               refPrint={printDiv}
-              type='Reimpresión Dav'
+              type='Reimpresión'
               ticket={selected?.ticket}
               stateTrx={selected?.status_trx}
             />
