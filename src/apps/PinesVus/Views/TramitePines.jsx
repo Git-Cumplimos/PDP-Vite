@@ -177,7 +177,7 @@ const TramitePines = () => {
       {info?.status && (
         <>
           <TableEnterprise
-            title="Información de crédito"
+            title="Información Pin"
             maxPage={maxPages}
             headers={[
               "Cédula",
