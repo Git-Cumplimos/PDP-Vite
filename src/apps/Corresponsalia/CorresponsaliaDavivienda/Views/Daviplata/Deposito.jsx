@@ -53,8 +53,8 @@ const Deposito = () => {
 
   const options = [
     { value: "", label: "" },
-    { value: "01", label: "Cedula Ciudadanía" },
-    { value: "02", label: "Cedula Extrangeria" },
+    { value: "01", label: "Cédula Ciudadanía" },
+    { value: "02", label: "Cédula Extranjeria" },
     { value: "04", label: "Tarjeta Identidad" },
   ];
 
@@ -219,7 +219,7 @@ const Deposito = () => {
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Deposito a Daviplata",
+          title: "Recibo de Depósito a Daviplata",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -237,7 +237,7 @@ const Deposito = () => {
             ["No. terminal", ter],
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
-            ["Tipo de operación", "Deposito DaviPlata"],
+            ["Tipo de operación", "Depósito a DaviPlata"],
             ["", ""],
             ["No. de aprobación", trx_id],
             ["", ""],
@@ -381,11 +381,11 @@ const Deposito = () => {
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <PaymentSummary summaryTrx={summary}>
