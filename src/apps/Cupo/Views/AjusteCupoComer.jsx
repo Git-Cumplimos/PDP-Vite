@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Fieldset from "../../../components/Base/Fieldset";
@@ -28,6 +28,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
   useEffect(() => {
     if (cupoComer?.results.length === 0) {
       notifyError("ID de comercio incorrecto");
+      setinputId(false);
     }
   }, [cupoComer]);
 
@@ -186,6 +187,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
                 value={parseInt(cupoComer?.results[0].limite_cupo)}
+                disabled={true}
                 required
               />
               <MoneyInput
@@ -196,6 +198,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
                 value={parseInt(cupoComer?.results[0].deuda)}
+                disabled={true}
                 required
               />
               <MoneyInput
@@ -206,6 +209,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
                 value={parseInt(cupoComer?.results[0].cupo_en_canje)}
+                disabled={true}
                 required
               />
             </Fieldset>
@@ -240,7 +244,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 Ajuste crédito
               </Button>
               <Button type={"submit"} name={"contigencia"}>
-                Ajuste credito tipo contingencia
+                Ajuste crédito tipo contingencia
               </Button>
             </ButtonBar>
           </Form>
