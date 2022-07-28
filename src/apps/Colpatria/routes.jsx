@@ -6,6 +6,7 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 /** Rutas */
 const colpatriaTrx = lazy(() => import("./ColpatriaTrx"));
 const Deposito = lazy(() => import("./Views/Deposito"));
+const VentaPines = lazy(() => import("./Views/VentaPines"));
 const AdminColpatria = lazy(() => import("./Views/Admin"));
 const ListaErrores = lazy(() => import("./Views/Admin/ListaErrores"));
 
@@ -19,6 +20,12 @@ const rutasColpatria = {
       link: "/corresponsalia/colpatria/deposito",
       label: <AppIcons Logo={"RECAUDO"} name={"Deposito"} />,
       component: Deposito,
+      permission: [67],
+    },
+    {
+      link: "/corresponsalia/colpatria/venta-pines",
+      label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines"} />,
+      component: VentaPines,
       permission: [67],
     },
     {

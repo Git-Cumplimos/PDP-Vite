@@ -17,8 +17,7 @@ const Panel = () => {
   const { roleInfo } = useAuth();
 
   const date = new Date();
-  console.log(typeof date.toLocaleDateString());
-
+  
   useEffect(() => {
     const query = {
       id_usuario: roleInfo?.id_usuario,
@@ -60,7 +59,8 @@ const Panel = () => {
 
   return (
     <>
-      {totalCierres === 2 ? (
+      {roleInfo.tipo_comercio === "OFICINAS PROPIAS" ? (<>
+        {totalCierres === 2 ? (
         <>
           <h1>Señor usuario la caja ya fue cerrada el día de hoy</h1>
         </>
@@ -97,6 +97,7 @@ const Panel = () => {
           />
         )}
       </Modal>
+      </>) : (<></>)}
     </>
   );
 };

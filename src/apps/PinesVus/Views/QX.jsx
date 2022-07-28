@@ -1,9 +1,7 @@
-import { useState, useRef, useMemo, useEffect, useCallback} from "react";
+import { useState, useEffect, useCallback} from "react";
 import Input from "../../../components/Base/Input";
 import Select from "../../../components/Base/Select";
 import { usePinesVus } from "../utils/pinesVusHooks";
-import { toast } from "react-toastify";
-import { useReactToPrint } from "react-to-print";
 import { notify, notifyError } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
@@ -30,7 +28,6 @@ const QX = () => {
 
   const [table, setTable] = useState([]);
   const [selected, setSelected] = useState(true);
-  const { roleInfo } = useAuth();
   const [maxPages, setMaxPages] = useState(1);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [fechaInicial, setFechaInicial] = useState("");
@@ -73,7 +70,6 @@ const QX = () => {
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
       .then((res) => {
-        console.log(res);
         if (!res?.status) {
           notifyError(res?.msg);
         } else {
@@ -97,7 +93,7 @@ const QX = () => {
           notifyError(res?.msg);
         } else {  
           notify(res?.msg)       
-          setShowModal(false);
+          closeModal();
           setDisabledBtns(false);         
         }
       })
@@ -118,11 +114,11 @@ const QX = () => {
           title="Reporte Pines"
           maxPage={maxPages}
           headers={[
-            "Cedula",
+            "Cédula",
             "Id QX",
             "Creación",
             "Vencimiento",
-            "Tramite",
+            "Trámite",
             "Valor",
           ]}
           data={table?.map((row) => {
@@ -177,10 +173,10 @@ const QX = () => {
             autoComplete="off"
             value={documentoCliente}
             required
-            onInput={(e) => {{
+            onInput={(e) => {
               setDocumentoCliente(e.target.value);
               consultaPines(fechaInicial,fechaFinal,tipoPin,e.target.value, pageData)
-            }}}
+            }}
           />
           <Select
             className="place-self-stretch"
@@ -225,13 +221,13 @@ const QX = () => {
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Valor Tramite</h1>
+                <h1>Valor Trámite</h1>
                 <h1>{formatMoney.format(selected?.valor_tramite)}</h1>
               </div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Iva Tramite</h1>
+                <h1>IVA Trámite</h1>
                 <h1>{formatMoney.format(0)}</h1>
               </div>
               <div
@@ -243,7 +239,7 @@ const QX = () => {
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Iva Pin</h1>
+                <h1>IVA Pin</h1>
                 <h1>{formatMoney.format(selected?.valor*0.19)}</h1>
               </div>
               <div
@@ -265,12 +261,12 @@ const QX = () => {
                   autoComplete="off"
                   value={idQX}
                   required
-                  onInput={(e) => {{
+                  onInput={(e) => {
                     setIdQX(e.target.value);
-                  }}}
+                  }}
                 />
                 <ButtonBar>
-                  <Button type="submit">Usar pin</Button>
+                  <Button type="submit">Cargar ID</Button>
                   <Button
                   onClick={() => {
                     closeModal()

@@ -15,6 +15,9 @@ import Tickets from "../components/Voucher/Tickets";
 import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
+import { enumParametrosFundacion } from "../utils/enumParametrosFundacion";
+import { useNavigate } from "react-router-dom";
+
 
 const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 
@@ -31,6 +34,7 @@ const Recaudo = () => {
     currency: "COP",
     maximumFractionDigits: 0,
   });
+  const navigate = useNavigate();
 
   const [label, setLabel] = useState("");
   const [tipobusqueda, setTiposBusqueda] = useState("");
@@ -271,6 +275,39 @@ const Recaudo = () => {
       })
       .catch((err) => console.log("error", err));
   };
+
+  const hora = useMemo(() => {    
+    return Intl.DateTimeFormat("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).format(new Date())
+  }, [tipobusqueda]);
+
+  const dia = useMemo(() => {    
+    return (new Date()).getDay()
+  }, [tipobusqueda]);
+
+  useEffect(() => {
+    console.log(dia)
+    if (dia === 1){
+    const horaCierre = enumParametrosFundacion.horaCierreSabado.split(":")
+    const horaActual = hora.split(":")
+    const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
+    const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
+    console.log(deltaHora, deltaMinutos)
+    if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
+      notifyError("Modulo cerrado a partir de las " + enumParametrosFundacion.horaCierre)
+      navigate("/PinesVus");
+    }
+    else if ((deltaHora ===1 & deltaMinutos<-50)){
+      notifyError("El modulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
+    }
+    else if ((deltaHora ===0 & deltaMinutos<10)){
+      notifyError("El modulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
+    }}
+
+  }, [hora,dia])
 
   return (
     <>

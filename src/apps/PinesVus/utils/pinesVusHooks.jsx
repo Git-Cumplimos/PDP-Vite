@@ -53,7 +53,6 @@ export const useProvidePinesVus = () => {
       motivo: motivo,
       id_trx: trx,
     };
-    console.log(body);
     const query = {
       id_pin: id_pin,
     };
@@ -64,10 +63,8 @@ export const useProvidePinesVus = () => {
       throw err;
     }
   }, []);
-  console.log(roleInfo)
   
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia) => {
-    console.log(infoTramite)
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin) => {
     const body = {
       tipo_tramite: tramite,
       infoTramite: infoTramite,
@@ -80,7 +77,11 @@ export const useProvidePinesVus = () => {
       NombreComercio: roleInfo?.["nombre comercio"],
       infoCliente: infoCliente,
       olimpia: olimpia,
+      categoria: categoria
     };
+    if (idPin != ""){
+      body.Pin = idPin
+    }
     try {
       const res = await fetchData(urls.PinVus, "POST", {}, body);
       return res;
@@ -177,9 +178,12 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const consultaClientes = useCallback(async (cedula, olimpia) => {
+  const consultaClientes = useCallback(async (cedula, olimpia, idPin) => {
     const query = { pk_documento_cliente: cedula};
     query.olimpia = olimpia
+    query.id_comercio = roleInfo?.id_comercio
+    if (idPin != ""){
+      query.Pin = idPin}
     try {
       const res = await fetchData(urls.consultaClientes, "GET", query);
       return res;

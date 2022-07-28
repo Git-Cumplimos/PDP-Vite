@@ -11,7 +11,7 @@ const moneyValidator = (value) => {
 export const formatMoney = Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
-  maximumFractionDigits: 0,
+  maximumFractionDigits: 2,
   minimumFractionDigits: 0,
 });
 

@@ -113,11 +113,11 @@ const ReportePines = () => {
           title="Reporte Pines"
           maxPage={maxPages}
           headers={[
-            "Cedula",
+            "Cédula",
             "Estado",
             "Creación",
             "Vencimiento",
-            "Tramite",
+            "Trámite",
             "Valor",
           ]}
           data={table || []}

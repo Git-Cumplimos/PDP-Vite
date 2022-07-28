@@ -32,16 +32,18 @@ const notifyPending = (
 ) => {
   toast.promise(promise, {
     pending: {
-      ...onPending,
       type: "info",
+      ...onPending,
     },
     error: {
+      type: "warning",
+      autoClose: false,
+      closeOnClick: false,
       ...onError,
-      type: "info",
     },
     success: {
+      type: "info",
       ...onSuccess,
-      type: "warning",
     },
   });
 };

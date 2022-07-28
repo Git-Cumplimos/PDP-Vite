@@ -97,6 +97,17 @@ const Deposito = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
+    setTipoCuenta("")
+    setTipoDocumento("")
+    setQuery(
+      {
+        numCuenta: "",
+        userDoc: "",
+        nomDepositante: "",
+        valor: "",
+      },
+      { replace: true }
+    );
   }, []);
 
   const onSubmitDeposit = useCallback(

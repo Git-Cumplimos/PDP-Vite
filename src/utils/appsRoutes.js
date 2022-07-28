@@ -123,7 +123,7 @@ const ParticipacionPines = lazy(() =>
 const VerParticipacionPines = lazy(() =>
   import("../apps/PinesVus/Views/PagoParticipantes/VerParticipacion")
 );
-const EspejoQX = lazy(() => import("../apps/PinesVus/Views/EspejoQX"));
+//const EspejoQX = lazy(() => import("../apps/PinesVus/Views/EspejoQX"));
 const QX = lazy(() => import("../apps/PinesVus/Views/QX"));
 
 /**
@@ -556,25 +556,23 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/PinesVus/Participacion",
-        label: <AppIcons Logo={"RECAUDO"} name={"Participacion Pines"} />,
+        label: <AppIcons Logo={"RECAUDO"} name={"Participación Pines"} />,
         component: PagoParticipantes,
         permission: [53],
         subRoutes: [
-          {
-            link: "/PinesVus/Participacion/PagoParticipacion",
-            label: <AppIcons Logo={"RECAUDO"} name={"Pago participacion"} />,
-            component: ParticipacionPines,
-            permission: [53],
-          },
-          {
-            link: "/PinesVus/Participacion/VerPagoParticipacion",
-            label: (
-              <AppIcons Logo={"RECAUDO"} name={"Ver pago participacion"} />
-            ),
-            component: VerParticipacionPines,
-            permission: [53],
-          },
-        ],
+        {
+          link: "/PinesVus/Participacion/PagoParticipacion",
+          label: <AppIcons Logo={"RECAUDO"} name={"Pago participación"} />,
+          component: ParticipacionPines,
+          permission: [53],
+        },
+        {
+          link: "/PinesVus/Participacion/VerPagoParticipacion",
+          label: <AppIcons Logo={"RECAUDO"} name={"Ver pago participación"} />,
+          component: VerParticipacionPines,
+          permission: [53],
+        },
+        ]
       },
       {
         link: "/PinesVus/Reportes",
@@ -926,7 +924,7 @@ const allUrlsPrivateApps = [
     link: "/movistar",
     label: <AppIcons Logo={"LOTERIA"} name="Movistar" />,
     component: Movistar,
-    permission: [65, 66],
+    permission: [65,66],
     subRoutes: [
       {
         link: "/movistar/recargas-movistar",
