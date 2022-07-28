@@ -249,7 +249,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 type={"number"}
                 disabled
               ></Input>
-              {/* <Input
+              <Input
                 id="celular"
                 name="celular"
                 label="Celular: "
@@ -263,16 +263,16 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   if (e.target.value.length === 1) {
                     if (e.target.value != 3) {
                       notifyError(
-                        "Número inválido, el N° de celular debe comenzar con el número 3."
+                        "Número inválido, el N° de celular debe comenzar con el número 3. "
                       );
                     }
                   }
                   setNumCelular(num);
                 }}
                 required
-              /> */}
+              />
 
-              <Input
+              {/*               <Input
                 name="celular"
                 label="Celular"
                 type="tel"
@@ -283,7 +283,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 value={numCelular ?? ""}
                 onChange={onCelChange}
                 required
-              />
+              /> */}
               <MoneyInput
                 label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}

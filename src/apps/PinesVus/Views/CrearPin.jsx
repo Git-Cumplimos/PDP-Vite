@@ -735,6 +735,7 @@ const CrearPin = () => {
           id="categoria"
           label="Categoría de Licencia"
           options={optionsCategoria}
+          required={true}
           value={categoria}
           onChange={(e) => {
             setCategoria(e.target.value);

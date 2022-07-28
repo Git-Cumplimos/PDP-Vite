@@ -9,6 +9,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetch } from "../../../hooks/useFetch";
 import { notifyError } from "../../../utils/notify";
 import { getConsultaCupoComercio, PeticionDescargar } from "../utils/fetchCupo";
+
 const CupoComer = () => {
   const [cupoComer, setCupoComer] = useState(null);
   const [loadDocument, crearData] = useFetch(PeticionDescargar);
@@ -18,11 +19,8 @@ const CupoComer = () => {
   const { roleInfo } = useAuth();
 
   useEffect(() => {
-    setIdComercio(roleInfo?.id_comercio);
-  }, [roleInfo]);
-
-  useEffect(() => {
-    getConsultaCupoComercio(idComercio, page, limit)
+    const comercioId = idComercio || roleInfo?.id_comercio;
+    getConsultaCupoComercio(comercioId, page, limit)
       .then((objUdusrio) => {
         setCupoComer(objUdusrio);
       })
@@ -30,7 +28,7 @@ const CupoComer = () => {
         console.log(reason.message);
         notifyError("Error al cargar Datos ");
       });
-  }, [idComercio, page, limit]);
+  }, [roleInfo?.id_comercio, idComercio, page, limit]);
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -39,6 +37,7 @@ const CupoComer = () => {
     ).join("");
     setIdComercio(idComer);
   }, []);
+
   const onSubmitDownload = useCallback(
     (e) => {
       e.preventDefault();
@@ -73,7 +72,8 @@ const CupoComer = () => {
             minLength={"0"}
             maxLength={"10"}
             value={idComercio ?? ""}
-            onChange={onChangeId}
+            // onChange={onChangeId}
+            onLazyInput={{ callback: onChangeId, timeOut: 500 }}
             required
           />
           <ButtonBar></ButtonBar>

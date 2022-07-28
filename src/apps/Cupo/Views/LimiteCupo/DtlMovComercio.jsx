@@ -37,7 +37,7 @@ const DtlMovComercio = () => {
   useEffect(() => {
     if (roleInfo?.id_comercio) {
       setIdComercio(roleInfo?.id_comercio);
-    } 
+    }
     getConsultaDtlMovCupo(
       idComercio,
       page,
@@ -54,7 +54,15 @@ const DtlMovComercio = () => {
         console.log(reason.message);
         notifyError("Error al cargar Datos ");
       });
-  }, [roleInfo]);
+  }, [
+    roleInfo,
+    tipoTransaccion,
+    tipoAfectacion,
+    page,
+    limit,
+    fechaini,
+    fechaEnd,
+  ]);
   const onChange = useCallback((ev) => {
     if (ev.target.name === "fecha_inico") {
       setFechaini(ev.target.value);
@@ -77,14 +85,7 @@ const DtlMovComercio = () => {
         }
       }
     },
-    [
-      idComercio,
-      fechaEnd,
-      fechaini,
-      tipoTransaccion,
-      tipoAfectacion,
-      crearData,
-    ]
+    [idComercio, fechaEnd, fechaini, tipoTransaccion, tipoAfectacion, crearData]
   );
   const onSubmitComercio = useCallback(
     (e) => {
@@ -121,9 +122,7 @@ const DtlMovComercio = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Detalle movimiento cupo comercio</h1>
-      {dtlCupo?.results.length > 0 && roleInfo?.id_comercio ? (
-        ""
-      ) : (
+      {!roleInfo?.id_comercio ? (
         <Form grid onSubmit={onSubmitComercio}>
           <Input
             id="idCliente"
@@ -143,6 +142,8 @@ const DtlMovComercio = () => {
             </Button>
           </ButtonBar>
         </Form>
+      ) : (
+        ""
       )}
       <TableEnterprise
         title="Detalle movimientos cupo Comercios"

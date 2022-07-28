@@ -177,7 +177,7 @@ const TramitePines = () => {
       {info?.status && (
         <>
           <TableEnterprise
-            title="Información de crédito"
+            title="Información Pin"
             maxPage={maxPages}
             headers={[
               "Cédula",
@@ -188,7 +188,7 @@ const TramitePines = () => {
             ]}
             data={table || []}
             onSelectRow={(e, index) => {
-              if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Pin creado-No cancelable")) {
+              if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Dispersado no usado")) {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
