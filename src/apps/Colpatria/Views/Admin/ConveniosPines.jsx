@@ -74,21 +74,30 @@ const ConveniosPines = () => {
     const formData = new FormData(ev.currentTarget);
     const body = Object.fromEntries(formData);
     console.log(body);
-    notifyPending(addConveniosPinesList(body), {
-      render() {
-        setLoading(true);
-        return "Enviando solicitud";
+    notifyPending(
+      addConveniosPinesList(body),
+      {
+        render() {
+          setLoading(true);
+          return "Enviando solicitud";
+        },
       },
-    }, {
-      render({ data:res }) {
-        console.log(res);
-        return "Convenio agregado exitosamente";
+      {
+        render({ data: res }) {
+          console.log(res);
+          return "Convenio agregado exitosamente";
+        },
+      },
+      {
+        render({ data: err }) {
+          if (err?.cause === "custom") {
+            return err?.message;
+          }
+          console.error(err?.message);
+          return "Creacion fallida";
+        },
       }
-    }, {
-      render({ data:err}) {
-        
-      }
-    });
+    );
   }, []);
 
   return (
