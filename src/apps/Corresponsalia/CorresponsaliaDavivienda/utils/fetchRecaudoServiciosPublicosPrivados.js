@@ -11,7 +11,9 @@ export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
       `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/consulta_tabla_convenios_paginado`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -30,7 +32,9 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
       `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/consulta_tabla_convenios_especifico`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -49,7 +53,9 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
       `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/codigo_barras`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);

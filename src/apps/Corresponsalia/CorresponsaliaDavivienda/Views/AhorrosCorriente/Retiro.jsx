@@ -48,8 +48,8 @@ const Retiro = () => {
 
   const optionsDocumento = [
     { value: "", label: "" },
-    { value: "01", label: "Cedula Ciudadanía" },
-    { value: "02", label: "Cedula Extrangeria" },
+    { value: "01", label: "Cédula Ciudadanía" },
+    { value: "02", label: "Cédula Extranjeria" },
     { value: "04", label: "Tarjeta Identidad" },
     { value: "13", label: "Regitro Civil" },
   ];
@@ -215,7 +215,7 @@ const Retiro = () => {
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Recibo de retiro",
+          title: "Retiro De Cuentas Davivienda",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -230,28 +230,37 @@ const Retiro = () => {
           },
           commerceInfo: [
             ["Id Comercio", roleInfo?.id_comercio],
-            ["No. terminal", roleInfo?.id_dispositivo],
+            ["No. terminal", ter],
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
+            ["Tipo de operación", "Retiro De Cuentas"],
+            ["", ""],
+            ["No. de aprobación", trx_id],
+            ["", ""],
           ],
-          // commerceName: "Retiros De Cuentas",
+          commerceName: roleInfo?.["nombre comercio"]
+          ? roleInfo?.["nombre comercio"]
+          : "No hay datos",
           trxInfo: [
-            ["Ter", ter],
-            ["Cod. autorización", trx_id],
-            [
-              "Numero de cuenta",
-              "****" + res?.obj?.Data?.numNumeroDeCuenta?.slice(-4),
-            ],
             [
               "Tipo",
               res?.obj?.Data?.numTipoCuenta === "01" ? "Ahorros" : "Corriente",
             ],
+            ["",""],
+            [
+              "Nro. Cuenta",
+              "****" + res?.obj?.Data?.numNumeroDeCuenta?.slice(-4),
+            ],
+            ["",""],
             ["Valor", formatMoney.format(valor)],
+            ["",""],
             [
               "Costo transacción",
               formatMoney.format(res?.obj?.Data?.numValorCobro),
             ],
+            ["",""],
             ["Total", formatMoney.format(valor)],
+            ["",""],
 
             //["Usuario de venta", "Nombre propietario del punto"],
           ],
@@ -349,11 +358,11 @@ const Retiro = () => {
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <PaymentSummary summaryTrx={summary}>

@@ -249,7 +249,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 type={"number"}
                 disabled
               ></Input>
-              {/* <Input
+              <Input
                 id="celular"
                 name="celular"
                 label="Celular: "
@@ -270,9 +270,9 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   setNumCelular(num);
                 }}
                 required
-              /> */}
+              />
 
-              <Input
+              {/*               <Input
                 name="celular"
                 label="Celular"
                 type="tel"
@@ -283,7 +283,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 value={numCelular ?? ""}
                 onChange={onCelChange}
                 required
-              />
+              /> */}
               <MoneyInput
                 label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}

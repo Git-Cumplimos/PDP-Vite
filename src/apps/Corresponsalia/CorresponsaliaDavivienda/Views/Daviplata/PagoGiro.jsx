@@ -61,8 +61,7 @@ const PagoGiro = () => {
       ? roleInfo?.["nombre comercio"]
       : "Sin datos",
     trxInfo: [],
-    disclamer:
-      "Línea de atención personalizada: #688 Mensaje de texto: 85888 Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
   });
 
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
@@ -203,8 +202,13 @@ const PagoGiro = () => {
             formatMoney.format(res?.obj?.respuesta_davivienda[0].valorPago),
           ]);
           objTicket["trxInfo"].push(["", ""]);
-          setDatosConsultaIdTrx((old) => ({ ...old, idTrx: res?.obj?.idTrx }));
+          setDatosConsultaIdTrx((old) => ({
+            ...old,
+            idTrx: res?.obj?.idTrx,
+            valor: res?.valorTransaccion,
+          }));
           setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
+          console.log("Recibe,", res?.valorTransaccion);
           setPeticion(2);
         } else {
           setIsUploading(false);
@@ -245,11 +249,12 @@ const PagoGiro = () => {
       ticket: objTicket,
       direccion: roleInfo?.direccion,
       idTrx: datosConsultaIdTrx.idTrx,
-      valor: datosConsulta?.valorPago,
+      valor: datosConsultaIdTrx.valor,
       datosTrx: {
         numeroCuenta: datosConsulta?.numeroCuenta,
         origenCuenta: datosConsulta?.origenCuenta,
         cicloDePago: datosConsulta?.cicloDePago,
+        talon: datosConsulta?.talon,
       },
     })
       .then((res) => {
@@ -305,8 +310,8 @@ const PagoGiro = () => {
           label='Número de identificación'
           type='text'
           name='numeroIdentificacion'
-          minLength='10'
-          maxLength='10'
+          minLength='5'
+          maxLength='16'
           required
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
@@ -391,7 +396,7 @@ const PagoGiro = () => {
               <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
               <h2>{`Número de identificacion: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
               <h2>{`Valor transacción: ${formatMoney.format(
-                datosConsulta.valorPago
+                datosConsultaIdTrx.valor
               )}`}</h2>
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>
@@ -409,7 +414,7 @@ const PagoGiro = () => {
               <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
               <h2>{`Número de identificacion: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
               <h2>{`Valor transacción: ${formatMoney.format(
-                datosConsulta.valorPago
+                datosConsultaIdTrx.valor
               )}`}</h2>
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>

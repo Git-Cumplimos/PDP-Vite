@@ -50,8 +50,8 @@ const Deposito = () => {
 
   const optionsDocumento = [
     { value: "", label: "" },
-    { value: "01", label: "Cedula Ciudadanía" },
-    { value: "02", label: "Cedula Extrangeria" },
+    { value: "01", label: "Cédula Ciudadanía" },
+    { value: "02", label: "Cédula Extranjeria" },
     { value: "04", label: "Tarjeta Identidad" },
     { value: "13", label: "Regitro Civil" },
   ];
@@ -247,7 +247,7 @@ const Deposito = () => {
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Deposito A Cuentas Davivienda",
+          title: "Depósito A Cuentas Davivienda",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -262,33 +262,38 @@ const Deposito = () => {
           },
           commerceInfo: [
             ["Id Comercio", roleInfo?.id_comercio],
-            ["No. terminal", roleInfo?.id_dispositivo],
+            ["No. terminal", ter],
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
+            ["Tipo de operación", "Depósito A Cuentas"],
             ["", ""],
+            ["No. de aprobación", trx_id],
             ["", ""],
           ],
+          commerceName: roleInfo?.["nombre comercio"]
+          ? roleInfo?.["nombre comercio"]
+          : "No hay datos",
           trxInfo: [
-            ["Cod. autorización", trx_id],
-            ["Ter", ter],
-            [
-              "Nro. Cuenta",
-              "****" + res?.obj?.Data?.numNumeroCuenta?.slice(-4),
-            ],
             [
               "Tipo",
               res?.obj?.Data?.numTipoCuenta === "01" ? "Ahorros" : "Corriente",
             ],
-            ["Valor", ""],
-            ["", formatMoney.format(valor)],
-            ["Costo Transacción", ""],
-            ["", formatMoney.format(res?.obj?.Data?.numValorCobro)],
-            ["Total", ""],
-            ["", formatMoney.format(valor)],
-            ["Id. Despositante", ""],
-            ["", userDoc],
-            ["Depositante", ""],
-            ["", nomDepositante],
+            ["",""],
+            [
+              "Nro. Cuenta",
+              "****" + res?.obj?.Data?.numNumeroDeCuenta?.slice(-4),
+            ],
+            ["",""],
+            ["Valor", formatMoney.format(valor)],
+            ["", ""],
+            ["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
+            ["", ""],
+            ["Total", formatMoney.format(valor)],
+            ["", ""],
+            ["Identificación depositante", userDoc],
+            ["", ""],
+            ["Nombre depositante", nomDepositante],
+            ["", ""],
           ],
           disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
         };
@@ -405,11 +410,11 @@ const Deposito = () => {
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <PaymentSummary summaryTrx={summary}>

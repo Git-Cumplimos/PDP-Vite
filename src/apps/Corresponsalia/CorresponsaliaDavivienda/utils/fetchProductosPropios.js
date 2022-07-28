@@ -11,7 +11,9 @@ export const postConsultaProductosPropiosDavivienda = async (bodyObj) => {
       `${urlDaviplata}davivienda_productos_propios/consulta`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -30,7 +32,9 @@ export const postPagoProductosPropiosDavivienda = async (bodyObj) => {
       `${urlDaviplata}davivienda_productos_propios/pago_productos_propios`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);

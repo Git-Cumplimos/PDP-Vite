@@ -11,7 +11,9 @@ export const postConsultaPagoPorGiroDavivienda = async (bodyObj) => {
       `${urlDaviplata}davivienda_pago_por_giro/consulta`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -30,7 +32,9 @@ export const postPagoPorGiroDavivienda = async (bodyObj) => {
       `${urlDaviplata}davivienda_pago_por_giro/pago_giro`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -49,7 +53,9 @@ export const postModificarTicketPagoPorGiroDavivienda = async (bodyObj) => {
       `${urlDaviplata}davivienda_pago_por_giro/modificar_ticket_consulta`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
+      {},
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);
