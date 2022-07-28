@@ -180,7 +180,11 @@ const ListarComercios = lazy(() =>
 const TipoNivelComercio = lazy(() =>
   import("../apps/TrxParams/Views/TipoNivelComercios")
 );
-
+const ListarMensajePublicitario = lazy(() =>
+  import(
+    "../apps/TrxParams/Views/MensajesPublicitarios/ListarMensajePublicitario"
+  )
+);
 /**
  * Solicitud Enrolamiento : privado
  */
@@ -1090,8 +1094,15 @@ const allUrlsPrivateApps = [
         permission: [21],
         show: false,
       },
+      {
+        link: "/params-operations/mensajes_publicitarios",
+        label: <AppIcons Logo={"RECAUDO"} name={"Mensajes publicitarios"} />,
+        component: ListarMensajePublicitario,
+        permission: [21],
+      },
     ],
   },
+
   {
     link: "/verificacionnuevoscomercios",
     label: <AppIcons Logo={"PAGO"} name={"Verificación Enrolamientos"} />,
