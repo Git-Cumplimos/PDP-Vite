@@ -73,6 +73,7 @@ const AjusteCupo = lazy(() => import("../apps/Cupo/Views/AjusteCupoComer"));
 const TipoMovimientoCupo = lazy(() =>
   import("../apps/Cupo/Views/TipoMovimientoCupo")
 );
+const DetalleLimite = lazy(() => import("../apps/Cupo/Views/DtlMovLimite"));
 /**
  * Movii
  */
@@ -717,6 +718,12 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"RECAUDO"} name={"Tipos de movimientos cupo"} />,
         component: TipoMovimientoCupo,
         permission: [64],
+      },
+      {
+        link: "/cupo/detalles-limite-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Detalles limite de cupo"} />,
+        component: DetalleLimite,
+        permission: [1],
       },
     ],
   },

@@ -18,19 +18,38 @@ const CupoComer = () => {
   const { roleInfo } = useAuth();
 
   useEffect(() => {
-    setIdComercio(roleInfo?.id_comercio);
-  }, [roleInfo]);
-
-  useEffect(() => {
-    getConsultaCupoComercio(idComercio, page, limit)
-      .then((objUdusrio) => {
-        setCupoComer(objUdusrio);
-      })
-      .catch((reason) => {
-        console.log(reason.message);
-        notifyError("Error al cargar Datos ");
-      });
+    const comercioId = roleInfo?.id_comercio;
+    if (roleInfo?.id_comercio) {
+      // setIdComercio(roleInfo?.id_comercio);
+      getConsultaCupoComercio(comercioId, page, limit)
+        .then((objUdusrio) => {
+          setCupoComer(objUdusrio);
+        })
+        .catch((reason) => {
+          console.log(reason.message);
+          notifyError("Error al cargar Datos ");
+        });
+    } else {
+      getConsultaCupoComercio(idComercio, page, limit)
+        .then((objUdusrio) => {
+          setCupoComer(objUdusrio);
+        })
+        .catch((reason) => {
+          console.log(reason.message);
+          notifyError("Error al cargar Datos ");
+        });
+    }
   }, [idComercio, page, limit]);
+  // useEffect(() => {
+  //   getConsultaCupoComercio(idComercio, page, limit)
+  //     .then((objUdusrio) => {
+  //       setCupoComer(objUdusrio);
+  //     })
+  //     .catch((reason) => {
+  //       console.log(reason.message);
+  //       notifyError("Error al cargar Datos ");
+  //     });
+  // }, [idComercio, page, limit]);
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -39,6 +58,7 @@ const CupoComer = () => {
     ).join("");
     setIdComercio(idComer);
   }, []);
+
   const onSubmitDownload = useCallback(
     (e) => {
       e.preventDefault();

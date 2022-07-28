@@ -18,7 +18,7 @@ const TipoMovimientoCupo = () => {
   const [page, setPage] = useState(null);
   const [summary, setSummary] = useState({});
   const [pk_id_tipo_movimiento, setPk_id_tipo_movimiento] = useState(null);
-  const [paymentStatus, ] = useState(false);
+  const [paymentStatus] = useState(false);
   const [nombreTipoMovimiento, setNombreTipoMovimiento] = useState(null);
   const [dataTipoMovimientoCupo, setDataTipoMovimientoCupo] = useState(null);
   const [nuevoTipoDeMovimiento, setNuevoTipoDeMovimiento] = useState(null);
@@ -101,7 +101,7 @@ const TipoMovimientoCupo = () => {
       e.preventDefault();
       setShowModal(true);
       setSummary({
-        TipoMovimientoCupo: nuevoTipoDeMovimiento,
+        "Tipo de movimiento cupo": nuevoTipoDeMovimiento,
       });
     },
     [nuevoTipoDeMovimiento]
@@ -164,11 +164,11 @@ const TipoMovimientoCupo = () => {
       </TableEnterprise>
       <Modal
         show={showModal}
-        handleClose={paymentStatus ? handleClose : () => {}}
+        handleClose={paymentStatus ? () => {} : handleClose}
       >
         <PaymentSummary
-          title="¿Esta seguro de crear este tipo de movimiento?"
-          subtitle="Tipo de movimiento"
+          title="¿Está seguro de crear este tipo de movimiento?"
+          subtitle=""
           summaryTrx={summary}
         >
           <ButtonBar>
