@@ -37,7 +37,6 @@ const CancelPin = ({
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
       .then((res) => {
-        console.log(res);
 
         if (!res?.status) {
           notifyError(res?.msg);
@@ -88,10 +87,10 @@ const CancelPin = ({
       }),
       trxInfo: [
         ["Proceso", "Cancelación de Pin"],
-        ["Valor Tramite", formatMoney.format(valor_tramite)],
-        ["Iva Tramite",formatMoney.format(0)],
+        ["Valor Trámite", formatMoney.format(valor_tramite)],
+        ["IVA Trámite",formatMoney.format(0)],
         ["Valor Pin", formatMoney.format(valor)],
-        ["Iva Pin", formatMoney.format(valor*0.19)],
+        ["IVA Pin", formatMoney.format(valor*0.19)],
         ["Total", formatMoney.format(valor*1.19 + valor_tramite)], // Valor + IVA
       ],
       disclamer:
@@ -134,13 +133,13 @@ const CancelPin = ({
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Valor Tramite</h1>
+                <h1>Valor Trámite</h1>
                 <h1>{formatMoney.format(valor_tramite)}</h1>
               </div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Iva Tramite</h1>
+                <h1>IVA Trámite</h1>
                 <h1>{formatMoney.format(0)}</h1>
               </div>
               <div
@@ -152,7 +151,7 @@ const CancelPin = ({
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Iva Pin</h1>
+                <h1>IVA Pin</h1>
                 <h1>{formatMoney.format(valor*0.19)}</h1>
               </div>
               <div

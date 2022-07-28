@@ -1,6 +1,6 @@
 import fetchData from "../../../../utils/fetchData";
 
-const urlComercios = `${process.env.REACT_APP_URL_COLPENSIONES}`;
+const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 
 export const postConsultaTotalDavivienda = async (bodyObj) => {
   if (!bodyObj) {

@@ -40,7 +40,7 @@ const LocationForm = ({
 
   return (
     <Fieldset
-      legend={`Ubicacion${place !== "" ? ` ${place}` : ""}`}
+      legend={`Ubicación${place !== "" ? ` ${place}` : ""}`}
       className="lg:col-span-2"
     >
       <Input
@@ -69,6 +69,8 @@ const LocationForm = ({
         label="Barrio"
         type="text"
         autoComplete="off"
+        minLength="1"
+        maxLength="30"
         value={barrio}
         onInput={(e) => setBarrio(capitalize(e.target.value))}
         required
@@ -99,16 +101,18 @@ const LocationForm = ({
       {addressInput === "input" ? (
         <Input
           id={`dir_${place}`}
-          label={`Direccion de ${place}`}
+          label={`Dirección de ${place}`}
           type="text"
           autoComplete="off"
+          minLength="1"
+          maxLength="60"
           value={addrState[0]}
           onInput={(e) => addrState[1](e.target.value)}
           required
         />
       ) : addressInput ? (
         <AddressInput
-          label={`Direccion de ${place}`}
+          label={`Dirección de ${place}`}
           place={place}
           getAddress={addrState[1]}
         />
@@ -122,7 +126,7 @@ const LocationForm = ({
       >
         <Input
           id={`buscar_${place}`}
-          label="Busqueda por municipio"
+          label="Búsqueda por municipio"
           type="search"
           autoComplete="off"
           value={simpleSearch}

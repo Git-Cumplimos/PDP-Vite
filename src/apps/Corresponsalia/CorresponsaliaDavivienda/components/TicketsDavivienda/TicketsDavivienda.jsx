@@ -161,7 +161,7 @@ const TicketsDavivienda = ({
             </h1>
           </div>
           <div className='block justify-center items-center'>
-            <h1 className='text-center my-1 text-xs font-normal'>
+            <h1 className='text-center my-1 text-xs font-normal whitespace-pre-wrap'>
               {disclamer}
             </h1>
             <h1 className='text-center my-1 text-xs font-normal'>

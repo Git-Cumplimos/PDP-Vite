@@ -1,11 +1,10 @@
-import { useCallback, useState, useRef, useMemo, useEffect } from "react";
+import { useCallback, useState, useMemo, useEffect } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import { usePinesVus } from "../utils/pinesVusHooks";
-import { toast } from "react-toastify";
 import { notifyError } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
@@ -50,35 +49,6 @@ const TramitePines = () => {
   const [name_tramite, setName_tramite] = useState("");
   const [id_pin, setId_pin] = useState("")
 
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const pageStyle = `
-  @page {
-    size: 80mm 50mm;
-  }
-
-  @media all {
-    .pagebreak {
-      display: none;
-    }
-  }
-
-  @media print {
-    .pagebreak {
-      page-break-before: always;
-    }
-  }
-`;
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
@@ -88,11 +58,10 @@ const TramitePines = () => {
     setModalUsar(false);
     setModalCancel(false);
     setParametroBusqueda("");
-    console.log(activarNavigate);
     if (activarNavigate) {
       navigate("/PinesVus");
     }
-  }, [activarNavigate]);
+  }, [activarNavigate, navigate]);
 
   //////////////////////
   const onSubmit = (e) => {
@@ -158,19 +127,18 @@ const TramitePines = () => {
     const horaActual = hora.split(":")
     const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
-    console.log(deltaHora, deltaMinutos)
     if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
-      notifyError("Modulo cerrado a partir de las " + enumParametrosPines.horaCierre)
-      navigate("/PinesVus");
+      notifyError("Módulo cerrado a partir de las " + enumParametrosPines.horaCierre)
+      navigate("/PinesVus",{replace:true});
     }
     else if ((deltaHora ===1 & deltaMinutos<-50)){
-      notifyError("El modulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
+      notifyError("El módulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
     }
     else if ((deltaHora ===0 & deltaMinutos<10)){
-      notifyError("El modulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
+      notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
     }
 
-  }, [hora,parametroBusqueda, table])
+  }, [hora,parametroBusqueda, table, navigate])
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -178,12 +146,12 @@ const TramitePines = () => {
       {"id_comercio" in roleInfo ? (
         <div className="flex flex-col w-1/2 mx-auto">
           <>
-            <h1 className="text-3xl mt-6 mx-auto">Tramitar Pines Vus</h1>
+            <h1 className="text-3xl mt-6 mx-auto">Tramitar Pines VUS</h1>
             <br></br>
             <Form onSubmit={onSubmit} grid>
               <Input
                 id="paramBusqueda"
-                label="Codigo"
+                label="Código"
                 type="text"
                 minLength="10"
                 maxLength="10"
@@ -209,18 +177,18 @@ const TramitePines = () => {
       {info?.status && (
         <>
           <TableEnterprise
-            title="Información de credito"
+            title="Información Pin"
             maxPage={maxPages}
             headers={[
-              "Cedula",
+              "Cédula",
               "Estado",
               "Vencimiento",
-              "Tramite",
+              "Trámite",
               "Valor",
             ]}
             data={table || []}
             onSelectRow={(e, index) => {
-              if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Pin creado-No cancelable")) {
+              if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Dispersado no usado")) {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
@@ -244,13 +212,13 @@ const TramitePines = () => {
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Valor Tramite</h1>
+                <h1>Valor Trámite</h1>
                 <h1>{formatMoney.format(valor_tramite)}</h1>
               </div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Iva Tramite</h1>
+                <h1>IVA Trámite</h1>
                 <h1>{formatMoney.format(0)}</h1>
               </div>
               <div
@@ -262,7 +230,7 @@ const TramitePines = () => {
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
-                <h1>Iva Pin</h1>
+                <h1>IVA Pin</h1>
                 <h1>{formatMoney.format(valor*0.19)}</h1>
               </div>
               <div
