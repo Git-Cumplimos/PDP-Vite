@@ -18,10 +18,10 @@ const CupoComer = () => {
   const { roleInfo } = useAuth();
 
   useEffect(() => {
-    const m = roleInfo?.id_comercio;
+    const comercioId = roleInfo?.id_comercio;
     if (roleInfo?.id_comercio) {
       // setIdComercio(roleInfo?.id_comercio);
-      getConsultaCupoComercio(m, page, limit)
+      getConsultaCupoComercio(comercioId, page, limit)
         .then((objUdusrio) => {
           setCupoComer(objUdusrio);
         })
