@@ -9,6 +9,7 @@ const Deposito = lazy(() => import("./Views/Deposito"));
 const VentaPines = lazy(() => import("./Views/VentaPines"));
 const AdminColpatria = lazy(() => import("./Views/Admin"));
 const ListaErrores = lazy(() => import("./Views/Admin/ListaErrores"));
+const ConveniosPines = lazy(() => import("./Views/Admin/ConveniosPines"));
 
 const rutasColpatria = {
   link: "/corresponsalia/colpatria",
@@ -38,6 +39,12 @@ const rutasColpatria = {
           link: "/corresponsalia/colpatria/gestion/lista-errores",
           label: <AppIcons Logo={"RECAUDO"} name={"Lista de errores"} />,
           component: ListaErrores,
+          permission: [68],
+        },
+        {
+          link: "/corresponsalia/colpatria/gestion/lista-convenios-pines",
+          label: <AppIcons Logo={"RECAUDO"} name={"Convenios de pines de recaudo"} />,
+          component: ConveniosPines,
           permission: [68],
         },
       ]

@@ -13,6 +13,9 @@
   --min-minmax-base: 300px;
   --min-minmax-lg: 420px;
   --min-minmax-xl: 480px;
+
+  --toastify-spinner-color: rgb(36, 36, 36);
+  --toastify-spinner-color-empty-area: #e0e0e0;
 }
 
 @tailwind base;
