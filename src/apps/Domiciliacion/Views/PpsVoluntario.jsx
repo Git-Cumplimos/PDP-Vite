@@ -263,7 +263,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   if (e.target.value.length === 1) {
                     if (e.target.value != 3) {
                       notifyError(
-                        "Número inválido, el N° de celular debe comenzar con el número 3."
+                        "Número inválido, el N° de celular debe comenzar con el número 3. "
                       );
                     }
                   }
