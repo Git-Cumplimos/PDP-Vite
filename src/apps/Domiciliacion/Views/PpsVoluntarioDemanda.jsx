@@ -408,7 +408,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               required
               disabled
             ></Input>
-            {/*             <Input
+            <Input
               id="celular"
               name="celular"
               label="Celular: "
@@ -429,8 +429,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 setNumCelular(num);
               }}
               required
-            /> */}
-            <Input
+            />
+            {/*             <Input
               name="celular"
               label="Celular"
               type="tel"
@@ -441,7 +441,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               value={numCelular ?? ""}
               onChange={onCelChange}
               required
-            />
+            /> */}
             <MoneyInput
               label={"Valor Aportar"}
               placeholder={"Ingrese Valor Aportar"}

@@ -69,6 +69,9 @@ export const getConsultaDtlMovCupo = async (
     page,
     limit,
   };
+  busqueda.sortBy = "pk_id_dtl_mov";
+  busqueda.sortDir = "DESC";
+  console.log(busqueda);
   if (date_end && date_ini) {
     if (date_end >= date_ini) {
       busqueda.date_end = date_end;
@@ -129,12 +132,15 @@ export const getConsultaAsignacionCupoLimite = async (
   limit
 ) => {
   const busqueda = { limit };
+  busqueda.sortBy = "fecha_afectacion";
+  busqueda.sortDir = "DESC";
   if (fk_id_comercio) {
     busqueda.fk_id_comercio = fk_id_comercio;
   }
   if (page) {
     busqueda.page = page;
   }
+  console.log(busqueda);
   try {
     const res = await fetchData(
       `${urlCupo}/servicio-cupo/modcupo`,

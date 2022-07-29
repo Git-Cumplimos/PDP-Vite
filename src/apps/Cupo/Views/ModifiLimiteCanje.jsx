@@ -32,6 +32,7 @@ const ModifiLimiteCanje = () => {
   useEffect(() => {
     if (cupoComer?.results.length === 0) {
       notifyError("ID de comercio incorrecto");
+      setinputId(false);
     }
   }, [cupoComer]);
 
@@ -157,6 +158,7 @@ const ModifiLimiteCanje = () => {
               min={limitesMontos?.min}
               max={limitesMontos?.max}
               value={parseInt(cupoComer?.results[0].deuda)}
+              disabled={true}
               required
             />
             <MoneyInput
@@ -167,6 +169,7 @@ const ModifiLimiteCanje = () => {
               min={limitesMontos?.min}
               max={limitesMontos?.max}
               value={parseInt(cupoComer?.results[0].cupo_en_canje)}
+              disabled={true}
               required
             />
             <ButtonBar className={"lg:col-span-2"}>
@@ -175,41 +178,6 @@ const ModifiLimiteCanje = () => {
               </Button>
             </ButtonBar>
           </Form>
-          {/* <TableEnterprise
-            title="Historial cupo límite del comercio"
-            headers={[
-              "Id comercio",
-              "Valor afectación",
-              "Fecha afectación",
-              "Límite de Cupo",
-              "Usuario",
-            ]}
-            data={
-              asigLimite?.results.map(
-                ({
-                  fk_id_comercio,
-                  valor_afectacion,
-                  fecha,
-                  limite_cupo_dsp_afectacion,
-                  usuario,
-                }) => ({
-                  fk_id_comercio,
-                  valor_afectacion: formatMoney.format(valor_afectacion),
-                  fecha,
-                  limite_cupo_dsp_afectacion: formatMoney.format(
-                    limite_cupo_dsp_afectacion
-                  ),
-                  usuario,
-                })
-              ) ?? []
-            }
-            onSelectRow={(e, i) => {}}
-            onSetPageData={(pagedata) => {
-              setPage(pagedata.page);
-              setLimit(pagedata.limit);
-            }}
-            maxPage={asigLimite?.maxPages}
-          ></TableEnterprise> */}
         </Fragment>
       ) : (
         ""
