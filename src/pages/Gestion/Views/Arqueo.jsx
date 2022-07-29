@@ -14,6 +14,7 @@ const Arqueo = ({
   setResArqueo,
   setSobrante,
   setFaltante,
+  setAllowClose
 }) => {
   const [total, setTotal] = useState("");
   const [trans, setTrans] = useState(0);
@@ -90,6 +91,7 @@ const Arqueo = ({
         if (res?.status) {
           setResArqueo(res);
           setCierre(true);
+          setAllowClose(false);
         }
       })
       .catch((err) => {

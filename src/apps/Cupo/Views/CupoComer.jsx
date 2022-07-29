@@ -9,6 +9,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetch } from "../../../hooks/useFetch";
 import { notifyError } from "../../../utils/notify";
 import { getConsultaCupoComercio, PeticionDescargar } from "../utils/fetchCupo";
+
 const CupoComer = () => {
   const [cupoComer, setCupoComer] = useState(null);
   const [loadDocument, crearData] = useFetch(PeticionDescargar);
@@ -18,38 +19,16 @@ const CupoComer = () => {
   const { roleInfo } = useAuth();
 
   useEffect(() => {
-    const comercioId = roleInfo?.id_comercio;
-    if (roleInfo?.id_comercio) {
-      // setIdComercio(roleInfo?.id_comercio);
-      getConsultaCupoComercio(comercioId, page, limit)
-        .then((objUdusrio) => {
-          setCupoComer(objUdusrio);
-        })
-        .catch((reason) => {
-          console.log(reason.message);
-          notifyError("Error al cargar Datos ");
-        });
-    } else {
-      getConsultaCupoComercio(idComercio, page, limit)
-        .then((objUdusrio) => {
-          setCupoComer(objUdusrio);
-        })
-        .catch((reason) => {
-          console.log(reason.message);
-          notifyError("Error al cargar Datos ");
-        });
-    }
-  }, [idComercio, page, limit]);
-  // useEffect(() => {
-  //   getConsultaCupoComercio(idComercio, page, limit)
-  //     .then((objUdusrio) => {
-  //       setCupoComer(objUdusrio);
-  //     })
-  //     .catch((reason) => {
-  //       console.log(reason.message);
-  //       notifyError("Error al cargar Datos ");
-  //     });
-  // }, [idComercio, page, limit]);
+    const comercioId = idComercio || roleInfo?.id_comercio;
+    getConsultaCupoComercio(comercioId, page, limit)
+      .then((objUdusrio) => {
+        setCupoComer(objUdusrio);
+      })
+      .catch((reason) => {
+        console.log(reason.message);
+        notifyError("Error al cargar Datos ");
+      });
+  }, [roleInfo?.id_comercio, idComercio, page, limit]);
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -93,7 +72,8 @@ const CupoComer = () => {
             minLength={"0"}
             maxLength={"10"}
             value={idComercio ?? ""}
-            onChange={onChangeId}
+            // onChange={onChangeId}
+            onLazyInput={{ callback: onChangeId, timeOut: 500 }}
             required
           />
           <ButtonBar></ButtonBar>
@@ -101,7 +81,7 @@ const CupoComer = () => {
       )}
 
       <TableEnterprise
-        title="Cupo Comercios"
+        title="Cupo comercios"
         headers={["Id comercio", "Cupo Límite", "Deuda Cupo", "Cupo en Canje"]}
         data={
           cupoComer?.results.map(

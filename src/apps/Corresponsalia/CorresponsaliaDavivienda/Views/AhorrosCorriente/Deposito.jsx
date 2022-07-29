@@ -302,7 +302,6 @@ const Deposito = () => {
     ,
     datosConsulta,
   ]);
-  console.log(tipoCuenta);
 
   return (
     <>
@@ -403,7 +402,7 @@ const Deposito = () => {
            />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"} disabled={loadingConsultaCostoCB}>
-              Realizar deposito
+              Realizar depósito
             </Button>
           </ButtonBar>
         </Form>
