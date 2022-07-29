@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Input from "../Input";
 
 const moneyValidator = (value) => {
-  const floatMoney = value.replace(/[($\s).,\s]+/g, "");
+  //const floatMoney = value.replace(/[($\s).,\s]+/g, "");
   // .replace(/,+/g, ".");
   let val = 0;
   if (value.includes(",") || value.includes(".")) {

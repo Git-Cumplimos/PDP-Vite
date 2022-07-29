@@ -45,7 +45,6 @@ const EnviarSMS = () => {
     const query = { sms: SMS, page: page, limit: 2 };
     try {
       const res = await fetchData(url_SMS, "GET", query);
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -56,7 +55,6 @@ const EnviarSMS = () => {
   const credito = useCallback(async () => {
     try {
       const res = await fetchData(url_consultaBalance, "GET");
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -67,7 +65,6 @@ const EnviarSMS = () => {
   const tip_comercios = useCallback(async () => {
     try {
       const res = await fetchData(url_tipComercios, "GET");
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -79,7 +76,6 @@ const EnviarSMS = () => {
     const query = { tipo_comercio: tipComercio };
     try {
       const res = await fetchData(url_buscarNum, "GET", query);
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -91,7 +87,6 @@ const EnviarSMS = () => {
       if (!res?.status) {
         notifyError(res?.msg);
       } else {
-        console.log(res?.obj?.balance);
         setCreditos(res?.obj?.balance);
       }
     });
@@ -101,7 +96,6 @@ const EnviarSMS = () => {
         notifyError(res?.msg);
       } else {
         setOptionsDisponibles(res?.obj?.results);
-        console.log(res?.obj?.results);
       }
     });
   }, []);
@@ -123,7 +117,6 @@ const EnviarSMS = () => {
     });
   });
 
-  console.log(phones?.length);
   return (
     <>
       <h1 className="text-3xl mb-6">Enviar SMS</h1>
@@ -154,17 +147,11 @@ const EnviarSMS = () => {
           value={phonesText}
           onInput={(e) => {
             const numeros = e.target.value.split(",");
-            console.log(e.target.value);
-            console.log(
-              e.target.value.length,
-              12 + (12 + 1) * (numeros.length - 1)
-            );
             setPhonesText(e.target.value);
             if (
               e.target.value.length ===
               12 + (12 + 1) * (numeros.length - 1)
             ) {
-              console.log();
               setPhones(numeros);
             } else {
               setPhones(null);
@@ -187,7 +174,6 @@ const EnviarSMS = () => {
               }
               value={tipComercio}
               onChange={(e) => {
-                console.log(e.target.value);
                 setTipComercio(e.target.value);
                 if (e.target.value !== null) {
                   buscarNum(e.target.value).then((res) => {
@@ -195,7 +181,6 @@ const EnviarSMS = () => {
                       notifyError(res?.msg);
                     } else {
                       setPhones(res?.obj?.results);
-                      console.log(res?.obj?.results);
                     }
                   });
                 }
@@ -232,7 +217,6 @@ const EnviarSMS = () => {
                 if (!res?.status) {
                   notifyError(res?.msg);
                 } else {
-                  console.log(res.obj);
                   setResSMS(res?.obj?.results);
                   setMaxPages(res.obj.maxPages);
                 }
@@ -263,7 +247,6 @@ const EnviarSMS = () => {
                     if (!res?.status) {
                       notifyError(res?.msg);
                     } else {
-                      console.log(res.obj);
                       setResSMS(res?.obj?.results);
                       setMaxPages(res.obj.maxPages);
                     }
@@ -283,7 +266,6 @@ const EnviarSMS = () => {
                     if (!res?.status) {
                       notifyError(res?.msg);
                     } else {
-                      console.log(res.obj);
                       setResSMS(res?.obj?.results);
                       setMaxPages(res.obj.maxPages);
                     }
@@ -309,7 +291,6 @@ const EnviarSMS = () => {
                   };
                 })}
                 onSelectRow={(e, index) => {
-                  console.log(resSMS[index]);
                   setSMS(resSMS[index].sms);
                 }}
               />

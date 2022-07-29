@@ -107,10 +107,9 @@ const IFood = () => {
               method: "POST",
             })
               .then((res) => {
-                console.log(res);
+                //ToDo: res
               })
               .catch((err) => {
-                console.log(err);
                 notify(
                   "Se ha subido el archivo y se estan procesando los pagos"
                 );
@@ -120,7 +119,6 @@ const IFood = () => {
           }
         })
         .catch((err) => {
-          console.log(err);
         });
     } catch (error) {
       setModal(false);

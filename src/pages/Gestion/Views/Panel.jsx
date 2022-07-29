@@ -16,7 +16,7 @@ const Panel = () => {
   const [faltante, setFaltante] = useState("");
   const { roleInfo } = useAuth();
 
-  const date = new Date();
+  // const date = new Date();
   
   useEffect(() => {
     const query = {

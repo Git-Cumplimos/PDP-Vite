@@ -37,7 +37,6 @@ const Circulemos = () => {
     };
     consultarPrefactura(query)
       .then((res) => {
-        console.log(res);
         if (res?.status == false) {
           notifyError(
             "Error de conexión, intente de nuevo o consulte con soporte"
@@ -50,10 +49,8 @@ const Circulemos = () => {
         setTotal(res?.obj?.prefacturas?.[0]?.valorTotal);
       })
       .catch((err) => {
-        console.log(err);
       });
   };
-  console.log(formatMoney.format(150560.44));
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl mt-6">Consulta radicado</h1>

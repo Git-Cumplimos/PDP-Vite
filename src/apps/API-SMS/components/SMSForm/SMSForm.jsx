@@ -32,7 +32,6 @@ const SMSForm = ({
     const body = { sms: SMS, phone: phones };
     try {
       const res = await fetchData(url_enviarSMS, "POST", {}, body);
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -47,7 +46,6 @@ const SMSForm = ({
       if (!res.status) {
         notifyError(res?.msg);
       } else {
-        console.log(res);
         notify(res?.obj?.msg);
         setResEnvioSMS(res);
       }
@@ -60,7 +58,6 @@ const SMSForm = ({
   //   setMax_pago(params?.max_pago)
   // }, [params])
 
-  console.log(phones, typeof phones);
   return (
     <>
       <div className="flex flex-col justify-center items-center mx-auto container">
