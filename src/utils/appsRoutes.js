@@ -728,7 +728,7 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/daviplata/depositos",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Depósitos Daviplata' />,
         component: Deposito,
         permission: [53],
       },
@@ -763,7 +763,7 @@ const allUrlsPrivateApps = [
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashIn",
                 label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Depositos Daviplata' />
+                  <AppIcons Logo={"MARKETPLACE"} name='Depósitos Daviplata' />
                 ),
                 component: CashIn,
                 permission: [54],

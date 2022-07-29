@@ -21,6 +21,8 @@ import { useFetch } from "../../../../../hooks/useFetch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import useMoney from "../../../../../hooks/useMoney";
+import { makeMoneyFormatter } from "../../../../../utils/functions";
 
 const Deposito = () => {
   const navigate = useNavigate();
@@ -51,10 +53,14 @@ const Deposito = () => {
     min: 10000,
   });
 
+  const onChangeMoney = useMoney({
+    limits: [limitesMontos.min, limitesMontos.max],
+  });
+
   const options = [
     { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
-    { value: "02", label: "Cédula Extranjeria" },
+    { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
   ];
 
@@ -110,11 +116,11 @@ const Deposito = () => {
       const { min, max } = limitesMontos;
 
       if (valor >= min && valor < max) {
-        const formData = new FormData(e.target);
-        const phone = formData.get("numCliente");
-        const userDoc = formData.get("docCliente");
-        const nomDepositante = formData.get("nomDepositante");
-        const valorFormat = formData.get("valor");
+        // const formData = new FormData(e.target);
+        // const phone = formData.get("numCliente");
+        // const userDoc = formData.get("docCliente");
+        // const nomDepositante = formData.get("nomDepositante");
+        // const valorFormat = formData.get("valor");
 
         if (verificacionTel === phone) {
           const body = {
@@ -139,11 +145,11 @@ const Deposito = () => {
                   parseInt(res?.obj?.Data?.valComisionGiroDaviplata) + valor;
                 const summary = {
                   "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
-                  "Numero celular": phone,
-                  "C.C. del depositante": userDoc,
-                  "Nombre del depositante": nomDepositante,
-                  "Valor de deposito": valorFormat,
-                  "Valor de comisión": formatMoney.format(
+                  "Número celular": phone,
+                  "Documento depositante": userDoc,
+                  "Nombre depositante": nomDepositante,
+                  "Valor depósito": formatMoney.format(valor),
+                  "Valor comisión": formatMoney.format(
                     res?.obj?.Data?.valComisionGiroDaviplata
                   ),
                   "Valor total": formatMoney.format(total),
@@ -171,7 +177,7 @@ const Deposito = () => {
         );
       }
     },
-    [valor, limitesMontos, verificacionTel]
+    [phone, verificacionTel, tipoDocumento, userDoc, nomDepositante, valor, limitesMontos]
   );
  
   const onMoneyChange = useCallback(
@@ -282,44 +288,53 @@ const Deposito = () => {
     ,
     datosConsulta,
   ]);
-
+  console.log(phone, verificacionTel, phone===verificacionTel)
   return (
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Depositos Daviplata</h1>
+        <h1 className='text-3xl mt-6'>Depósitos Daviplata</h1>
+        <br></br>
         <Form onSubmit={onSubmitDeposit} grid>
           <Input
             id='numCliente'
             name='numCliente'
-            label='Numero Daviplata'
+            label='Número Daviplata'
             type='text'
             autoComplete='off'
             minLength={"10"}
             maxLength={"10"}
             value={phone}
             onInput={(e) => {
-              if (!isNaN(e.target.value)) {
-                const num = e.target.value;
-                setPhone(num);
-              }
+              if (phone?.length === 0 & e.target.value!=="3"){
+                notifyError("El número de celular debe iniciar por 3")
+                setPhone("");
+              } 
+              else {
+              const num = parseInt(e.target.value) || "";
+              setPhone(num);
+            }
             }}
             required
           />
           <Input
             id='numCliente'
             name='numCliente'
-            label='Verificación'
+            label='Verificación Daviplata'
             type='text'
             autoComplete='off'
             minLength={"10"}
             maxLength={"10"}
             value={verificacionTel}
             onInput={(e) => {
-              if (!isNaN(e.target.value)) {
-                const num = e.target.value;
-                setVerificacionTel(num);
-              }
+              if (verificacionTel?.length === 0 & e.target.value!=="3"){
+                notifyError("El número de celular debe iniciar por 3")
+                setVerificacionTel("");
+              } 
+              else {
+              const num = parseInt(e.target.value) || "";
+              setVerificacionTel(num);
+            }
             }}
             required
           />
@@ -328,6 +343,7 @@ const Deposito = () => {
             label='Tipo de documento'
             options={options}
             value={tipoDocumento}
+            required
             onChange={(e) => {
               setTipoDocumento(e.target.value);
             }}
@@ -335,39 +351,59 @@ const Deposito = () => {
           <Input
             id='docCliente'
             name='docCliente'
-            label='CC de quien deposita'
+            label='Documento depositante'
             type='text'
             autoComplete='off'
             minLength={"5"}
             maxLength={"16"}
             value={userDoc}
             onInput={(e) => {
-              setUserDoc(e.target.value);
+              if (!isNaN(e.target.value)){
+              setUserDoc(e.target.value)
+            }
             }}
             required
           />
           <Input
             id='nomDepositante'
             name='nomDepositante'
-            label='Nombre Depositante'
+            label='Nombre depositante'
             type='text'
+            minLength={"1"}
+            maxLength={"50"}
             autoComplete='off'
             value={nomDepositante}
-            onInput={(e) => {
-              setNomDepositante(e.target.value);
+            onInput={(e) => {              
+              setNomDepositante(e.target.value)
             }}
             required
           />
-          <MoneyInput
+          {/* <MoneyInput
             id='valor'
             name='valor'
-            label='Valor a depositar'
+            label='Valor a depósitar'
             autoComplete='off'
             min={limitesMontos?.min}
             max={limitesMontos?.max}
+            minLength={"1"}
+            maxLength={"15"}
             onInput={onMoneyChange}
             required
-          />
+          /> */}
+          <Input
+          id="valor"
+          name="valor"
+          label="Valor a depositar"
+          autoComplete="off"
+          type="text"
+          minLength={"1"}
+          maxLength={"15"}
+          min={limitesMontos?.min}
+          max={limitesMontos?.max}
+          value={makeMoneyFormatter(0).format(valor)}
+          onInput={(ev) => setValor(onChangeMoney(ev))}
+          required
+           />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"} disabled={loadingConsultaCashIn}>
               Realizar deposito

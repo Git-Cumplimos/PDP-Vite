@@ -21,11 +21,20 @@ import { useFetch } from "../../../../../hooks/useFetch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import useMoney from "../../../../../hooks/useMoney";
+import { makeMoneyFormatter } from "../../../../../utils/functions";
 
 const Deposito = () => {
   const navigate = useNavigate();
-  const [{ numCuenta, userDoc, valor, nomDepositante, summary }, setQuery] =
-    useQuery();
+
+  const [limitesMontos, setLimitesMontos] = useState({
+    max: 9999999,
+    min: 5000,
+  });
+
+  const onChangeMoney = useMoney({
+    limits: [limitesMontos.min, limitesMontos.max],
+  });
 
   const { roleInfo, infoTicket } = useAuth();
 
@@ -41,6 +50,11 @@ const Deposito = () => {
   const [tipoCuenta, setTipoCuenta] = useState("");
   const [tipoDocumento, setTipoDocumento] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [numCuenta, setNumCuenta] = useState("")
+  const [userDoc, setUserDoc] = useState("")
+  const [valor, setValor] = useState("")
+  const [nomDepositante, setNomDepositante] = useState("")
+  const [summary, setSummary] = useState([])
 
   const options = [
     { value: "", label: "" },
@@ -51,15 +65,12 @@ const Deposito = () => {
   const optionsDocumento = [
     { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
-    { value: "02", label: "Cédula Extranjeria" },
+    { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
     { value: "13", label: "Regitro Civil" },
   ];
 
-  const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
-  });
+  
 
   const printDiv = useRef();
 
@@ -99,15 +110,11 @@ const Deposito = () => {
     setShowModal(false);
     setTipoCuenta("")
     setTipoDocumento("")
-    setQuery(
-      {
-        numCuenta: "",
-        userDoc: "",
-        nomDepositante: "",
-        valor: "",
-      },
-      { replace: true }
-    );
+    setNomDepositante("")
+    setNumCuenta("")
+    setValor("")
+    setUserDoc("")
+
   }, []);
 
   const onSubmitDeposit = useCallback(
@@ -148,14 +155,14 @@ const Deposito = () => {
               setDatosConsulta(res?.obj?.Data);
               const summary = {
                 "Nombre titular": res?.obj?.Data?.valNombreTitular,
-                "Apellito titular": res?.obj?.Data?.valApellidoTitular,
-                "Numero cuenta": numCuenta,
-                "Valor de deposito": valorFormat,
+                "Apellido titular": res?.obj?.Data?.valApellidoTitular,
+                "Número cuenta": numCuenta,
+                "Valor depósito": valorFormat,
                 "Valor cobro": formatMoney.format(
                   res?.obj?.Data?.numValorCobro
                 ),
               };
-              setQuery({ numCuenta, valor, summary }, { replace: true });
+              setSummary(summary)
               setShowModal(true);
             }
 
@@ -175,42 +182,14 @@ const Deposito = () => {
         );
       }
     },
-    [setQuery, valor, limitesMontos, tipoCuenta]
-  );
-
-  const onChange = useCallback(
-    (ev) => {
-      if (ev.target.name !== "valor") {
-        const formData = new FormData(ev.target.form);
-        const numCuenta = (
-          (formData.get("numCuenta") ?? "").match(/\d/g) ?? []
-        ).join("");
-        const userDoc = (
-          (formData.get("docCliente") ?? "").match(/\d/g) ?? []
-        ).join("");
-        const nomDepositante = formData.get("nomDepositante") ?? "";
-        setQuery(
-          { numCuenta, userDoc, valor: valor ?? "", nomDepositante },
-          { replace: true }
-        );
-      }
-    },
-    [setQuery, valor]
+    [valor, limitesMontos, tipoCuenta]
   );
 
   const onMoneyChange = useCallback(
     (e, valor) => {
-      setQuery(
-        {
-          numCuenta: numCuenta ?? "",
-          userDoc: userDoc ?? "",
-          nomDepositante: nomDepositante ?? "",
-          valor,
-        },
-        { replace: true }
-      );
+      setValor(valor)
     },
-    [setQuery, numCuenta, userDoc, nomDepositante]
+    [valor]
   );
 
   const goToRecaudo = useCallback(() => {
@@ -329,13 +308,15 @@ const Deposito = () => {
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Depositos</h1>
-        <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
+        <h1 className='text-3xl mt-6'>Depósitos</h1>
+        <br></br>
+        <Form onSubmit={onSubmitDeposit} grid>
           <Select
             id='tipoCuenta'
-            label='Tipo de Cuenta'
+            label='Tipo de cuenta'
             options={options}
             value={tipoCuenta}
+            required
             onChange={(e) => {
               setTipoCuenta(e.target.value);
             }}
@@ -348,8 +329,12 @@ const Deposito = () => {
             autoComplete='off'
             minLength={"10"}
             maxLength={"16"}
-            value={numCuenta ?? ""}
-            onInput={() => {}}
+            value={numCuenta}
+            onInput={(e) => {
+              if (!isNaN(e.target.value)){
+                setNumCuenta(e.target.value)
+              }
+            }}
             required
           />
           <Select
@@ -357,6 +342,7 @@ const Deposito = () => {
             label='Tipo de documento'
             options={optionsDocumento}
             value={tipoDocumento}
+            required
             onChange={(e) => {
               setTipoDocumento(e.target.value);
             }}
@@ -364,35 +350,57 @@ const Deposito = () => {
           <Input
             id='docCliente'
             name='docCliente'
-            label='CC de quien deposita'
+            label='Documento depositante'
             type='text'
             autoComplete='off'
             minLength={"5"}
-            maxLength={"10"}
-            value={userDoc ?? ""}
-            onInput={() => {}}
+            maxLength={"16"}
+            value={userDoc}
+            onInput={(e) => {
+              if (!isNaN(e.target.value)){
+                setUserDoc(e.target.value)
+              }
+            }}
             required
           />
           <Input
             id='nomDepositante'
             name='nomDepositante'
-            label='Nombre Depositante'
+            label='Nombre depositante'
             type='text'
+            minLength={"1"}
+            maxLength={"50"}
             autoComplete='off'
-            value={nomDepositante ?? ""}
-            onInput={() => {}}
+            value={nomDepositante}
+            onInput={(e) =>{setNomDepositante(e.target.value)}}
             required
           />
-          <MoneyInput
+          {/* <MoneyInput
             id='valor'
             name='valor'
             label='Valor a depositar'
             autoComplete='off'
             min={limitesMontos?.min}
             max={limitesMontos?.max}
+            minLength={"1"}
+            maxLength={"15"}
             onInput={onMoneyChange}
             required
-          />
+          /> */}
+          <Input
+          id="valor"
+          name="valor"
+          label="Valor a depositar"
+          autoComplete="off"
+          type="text"
+          minLength={"1"}
+          maxLength={"15"}
+          min={limitesMontos?.min}
+          max={limitesMontos?.max}
+          value={makeMoneyFormatter(0).format(valor)}
+          onInput={(ev) => setValor(onChangeMoney(ev))}
+          required
+           />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"} disabled={loadingConsultaCostoCB}>
               Realizar deposito
