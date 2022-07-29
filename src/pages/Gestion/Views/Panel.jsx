@@ -9,6 +9,7 @@ import { searchCash, searchCierre, searchReceipt } from "../utils/fetchCaja";
 const Panel = () => {
   const [total, setTotal] = useState("");
   const [totalCierres, setTotalCierres] = useState(false);
+  const [allowClose, setAllowClose] = useState(true);
   const [cierre, setCierre] = useState(false);
   const [resArqueo, setResArqueo] = useState("");
   const [respuestaComprobante, setRespuestaComprobante] = useState([]);
@@ -73,7 +74,7 @@ const Panel = () => {
       ) : (
         <h1>Cargando...</h1>
       )}
-      <Modal show={estado} handleClose={closeModalFunction}>
+      <Modal show={estado} handleClose={closeModalFunction} allowClose={allowClose}>
         {!cierre && (
           <Arqueo
             caja={total}
@@ -82,6 +83,7 @@ const Panel = () => {
             setResArqueo={setResArqueo}
             setSobrante={setSobrante}
             setFaltante={setFaltante}
+            setAllowClose={setAllowClose}
           />
         )}
         {cierre && (

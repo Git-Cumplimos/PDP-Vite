@@ -76,7 +76,7 @@ const Cierre = ({
             {formatMoney.format(caja?.obj?.actual_caja)}
           </span>
           <br />
-          <span>Reporte en el arqueo </span>
+          <div class="text-center mb-0 mt-5"><strong>Reporte en el arqueo</strong></div>
           <br />
           <span>Sobrante: </span>
           <span className="text-right">{formatMoney.format(sobra)}</span>
