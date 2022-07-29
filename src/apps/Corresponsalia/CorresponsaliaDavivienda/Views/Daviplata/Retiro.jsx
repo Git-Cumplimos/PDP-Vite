@@ -15,6 +15,7 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import { enumParametrosAutorizador } from "../../utils/enumParametrosAutorizador";
 import { fetchParametrosAutorizadores } from "../../../../TrxParams/utils/fetchParametrosAutorizadores";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
+import HideInput from "../../../../../components/Base/HideInput";
 
 const Retiro = () => {
   const { roleInfo } = useAuth();
@@ -28,6 +29,7 @@ const Retiro = () => {
     otp: "",
     numeroTelefono: "",
     valorCashOut: "",
+    otpEnco: "",
   });
   const [isUploading, setIsUploading] = useState(false);
   useEffect(() => {
@@ -91,13 +93,17 @@ const Retiro = () => {
       return notifyError("El valor debe ser multiplos de 10000");
     if (datosTrans?.numeroTelefono[0] !== "3")
       return notifyError("El número Daviplata debe comenzar por 3");
-    if(datosTrans.valorCashOut > limiteRecarga.superior)
-      return notifyError("ERROR El valor de cash out debe ser menor a " +
-      formatMoney.format(limiteRecarga.superior));
-    if(datosTrans.valorCashOut < limiteRecarga.inferior)
-      return notifyError(`ERROR el valor de cash out debe ser mayor a ${formatMoney.format(
-        limiteRecarga.inferior
-      )}`);
+    if (datosTrans.valorCashOut > limiteRecarga.superior)
+      return notifyError(
+        "ERROR El valor de cash out debe ser menor a " +
+          formatMoney.format(limiteRecarga.superior)
+      );
+    if (datosTrans.valorCashOut < limiteRecarga.inferior)
+      return notifyError(
+        `ERROR el valor de cash out debe ser mayor a ${formatMoney.format(
+          limiteRecarga.inferior
+        )}`
+      );
     habilitarModal();
   };
 
@@ -224,7 +230,7 @@ const Retiro = () => {
     <>
       <SimpleLoading show={isUploading} />
       <h1 className='text-3xl mb-10'>Retiro DaviPlata</h1>
-      <Form grid onSubmit={onSubmit} autoComplete="off">
+      <Form grid onSubmit={onSubmit} autoComplete='off'>
         <Input
           id='numeroTelefono'
           label='Número DaviPlata'
@@ -240,31 +246,50 @@ const Retiro = () => {
               const num = e.target.value;
               if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
                 return notifyError("El número DaviPlata debe comenzar por 3");
-              } 
+              }
               setDatosTrans((old) => {
-                  return { ...old, numeroTelefono: num };
-                }
-              );
+                return { ...old, numeroTelefono: num };
+              });
             }
           }}></Input>
-        <Input
+        {/* <Input
           id='otp'
           label='Número OTP'
-          type='password'
+          type='text'
           name='otp'
           minLength='6'
           maxLength='6'
-          autoComplete='new-password'
+          autoComplete='off'
           required
-          value={datosTrans.otp}
+          value={datosTrans.otpEnco}
           onInput={(e) => {
+            console.log(e.target.value[e.target.value.length - 1]);
             if (!isNaN(e.target.value)) {
               const num = e.target.value;
+
+              setDatosTrans((old) => {
+                return { ...old, otpEnco: num.replace(/\w/g, "*"), otp: num };
+              });
+            }
+          }}></Input> */}
+        <HideInput
+          id='otp'
+          label='Número OTP'
+          type='text'
+          name='otp'
+          minLength='6'
+          maxLength='6'
+          autoComplete='off'
+          required
+          value={datosTrans.otp ?? ""}
+          onInput={(e, valor) => {
+            if (!isNaN(valor)) {
+              const num = valor;
               setDatosTrans((old) => {
                 return { ...old, otp: num };
               });
             }
-          }}></Input>
+          }}></HideInput>
         <MoneyInput
           id='valCashOut'
           name='valCashOut'
@@ -288,25 +313,25 @@ const Retiro = () => {
       </Form>
       <Modal show={showModal} handleClose={hideModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-          {!peticion ?(
-              <>
-                <h1 className='text-2xl font-semibold'>
-                  ¿Está seguro de realizar el retiro DaviPlata?
-                </h1>
-                <h2 className='text-base'>
-                  {`Valor de transacción: ${formatMoney.format(
-                    datosTrans.valorCashOut
-                  )} COP`}
-                </h2>
-                <h2>{`Número Daviplata: ${datosTrans.numeroTelefono}`}</h2>
-                {/* <h2>{`Número de otp: ${datosTrans.otp}`}</h2> */}
-                <ButtonBar>
-                  <Button onClick={hideModal}>Cancelar</Button>
-                  <Button type='submit' onClick={peticionCashOut}>
-                    Aceptar
-                  </Button>
-                </ButtonBar>
-              </>
+          {!peticion ? (
+            <>
+              <h1 className='text-2xl font-semibold'>
+                ¿Está seguro de realizar el retiro DaviPlata?
+              </h1>
+              <h2 className='text-base'>
+                {`Valor de transacción: ${formatMoney.format(
+                  datosTrans.valorCashOut
+                )} COP`}
+              </h2>
+              <h2>{`Número Daviplata: ${datosTrans.numeroTelefono}`}</h2>
+              {/* <h2>{`Número de otp: ${datosTrans.otp}`}</h2> */}
+              <ButtonBar>
+                <Button onClick={hideModal}>Cancelar</Button>
+                <Button type='submit' onClick={peticionCashOut}>
+                  Aceptar
+                </Button>
+              </ButtonBar>
+            </>
           ) : (
             ""
           )}
