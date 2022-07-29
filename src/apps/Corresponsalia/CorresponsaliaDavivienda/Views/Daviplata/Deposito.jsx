@@ -288,7 +288,6 @@ const Deposito = () => {
     ,
     datosConsulta,
   ]);
-  console.log(phone, verificacionTel, phone===verificacionTel)
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -299,7 +298,7 @@ const Deposito = () => {
           <Input
             id='numCliente'
             name='numCliente'
-            label='Número Daviplata'
+            label='Número DaviPlata'
             type='text'
             autoComplete='off'
             minLength={"10"}
@@ -320,7 +319,7 @@ const Deposito = () => {
           <Input
             id='numCliente'
             name='numCliente'
-            label='Verificación Daviplata'
+            label='Verificación No. DaviPlata'
             type='text'
             autoComplete='off'
             minLength={"10"}
@@ -406,7 +405,7 @@ const Deposito = () => {
            />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"} disabled={loadingConsultaCashIn}>
-              Realizar deposito
+              Realizar depósito
             </Button>
           </ButtonBar>
         </Form>
