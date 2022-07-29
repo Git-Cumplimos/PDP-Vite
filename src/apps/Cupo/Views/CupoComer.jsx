@@ -81,7 +81,7 @@ const CupoComer = () => {
       )}
 
       <TableEnterprise
-        title="Cupo Comercios"
+        title="Cupo comercios"
         headers={["Id comercio", "Cupo Límite", "Deuda Cupo", "Cupo en Canje"]}
         data={
           cupoComer?.results.map(
