@@ -48,7 +48,6 @@ const AsesoresComerciales = () => {
         setCantidadPaginas(res?.obj?.maxPages);
       })
       .catch((err) => {
-        console.log(err);
         notifyError("Error al cargar Datos Asesores");
       });
   }, [page]);
@@ -153,8 +152,6 @@ const AsesoresComerciales = () => {
     notify("Copia Exitosa.");
     /*    console.log("INPUT VALUE: ", inputRef?.value); */
   };
-
-  console.log("Rendering");
   return (
     <Fragment>
       <ButtonBar>
