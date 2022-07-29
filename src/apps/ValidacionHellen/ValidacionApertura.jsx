@@ -1,10 +1,10 @@
-import React from "react";
+//import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Input from "../../components/Base/Input";
 import Select from "../../components/Base/Select";
-import Table from "../../components/Base/Table";
+//import Table from "../../components/Base/Table";
 import TableEnterprise from "../../components/Base/TableEnterprise";
 import fetchData from "../../utils/fetchData";
 import { notifyError } from "../../utils/notify";
@@ -20,7 +20,7 @@ const ValidacionApertura = () => {
   const [fechaFinal, setFechaFinal] = useState("");
   const [estadoProceso, setEstadoProceso] = useState("");
   const [numeroProceso, setNumeroProceso] = useState("");
-  const [keys, setKey] = useState(0);
+  //const [keys, setKey] = useState(0);
   /* const [datosFiltrados, setDatosFiltrados] = useState(["perro"]);  */
   useEffect(() => {
     fetchData(
@@ -97,8 +97,8 @@ const ValidacionApertura = () => {
   console.log(datosOrdenados);
   datosEnrolamientos.map((e) => delete e.task_token);
   datosEnrolamientos.map((e) => delete e.id_reconocer);
-  const datosFiltrados = datosEnrolamientos.map((e) => Object.values(e));
-  const key = datosEnrolamientos.map((e) => Object.keys(e));
+  //const datosFiltrados = datosEnrolamientos.map((e) => Object.values(e));
+  //const key = datosEnrolamientos.map((e) => Object.keys(e));
 
   console.log(datosEnrolamientos);
   datosEnrolamientos.filter((e) => {

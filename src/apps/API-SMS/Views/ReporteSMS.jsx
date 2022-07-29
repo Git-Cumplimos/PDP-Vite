@@ -95,7 +95,6 @@ const ReporteSMS = () => {
 
   /*Buscar report*/
   const report = useCallback(async (tipoOp, page, fechaInicial, fechaFinal) => {
-    console.log(tipoOp);
     const query = { id_tipo_transaccion: tipoOp };
     query.page = page;
     if (fechaInicial && fechaFinal) {
@@ -105,7 +104,6 @@ const ReporteSMS = () => {
 
     try {
       const res = await fetchData(url_Report, "GET", query);
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -117,7 +115,6 @@ const ReporteSMS = () => {
     const query = { id_trx: id_trx };
     try {
       const res = await fetchData(url_actualizar, "GET", query);
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -131,7 +128,6 @@ const ReporteSMS = () => {
     query.fecha_fin = fecha_fin;
     try {
       const res = await fetchData(url_Download, "GET", query);
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -161,7 +157,6 @@ const ReporteSMS = () => {
         } else {
           setMaxPages(res?.obj?.maxPages);
           setTrxs(res?.obj?.results);
-          console.log(res?.obj?.results);
         }
       });
     },
@@ -194,7 +189,6 @@ const ReporteSMS = () => {
                   } else {
                     setMaxPages(res?.obj?.maxPages);
                     setTrxs(res?.obj?.results);
-                    console.log(res?.obj?.results);
                   }
                 });
               }
@@ -217,7 +211,6 @@ const ReporteSMS = () => {
                   } else {
                     setMaxPages(res?.obj?.maxPages);
                     setTrxs(res?.obj?.results);
-                    console.log(res?.obj?.results);
                   }
                 });
               }
@@ -240,7 +233,6 @@ const ReporteSMS = () => {
                   } else {
                     setMaxPages(res?.obj?.maxPages);
                     setTrxs(res?.obj?.results);
-                    console.log(res?.obj?.results);
                   }
                 }
               );
@@ -259,7 +251,6 @@ const ReporteSMS = () => {
                   notifyError(res?.msg);
                 } else {
                   setTrxs(res?.obj?.results);
-                  console.log(res?.obj?.results);
                 }
               });
             }}
@@ -276,7 +267,6 @@ const ReporteSMS = () => {
                   notifyError(res?.msg);
                 } else {
                   setTrxs(res?.obj?.results);
-                  console.log(res?.obj?.results);
                 }
               });
             }}
@@ -355,7 +345,6 @@ const ReporteSMS = () => {
                     notifyError(res?.obj?.msg);
                   } else {
                     notify(res?.obj?.msg);
-                    console.log(res?.obj?.results);
                   }
                 });
               }}
@@ -388,7 +377,6 @@ const ReporteSMS = () => {
                       setDownload(null);
                       notifyError(res?.msg);
                     } else {
-                      console.log(res?.obj?.results);
                       setDisabledBtn(false);
                       setDownload(res?.obj);
                     }
@@ -412,7 +400,6 @@ const ReporteSMS = () => {
                     } else {
                       setDownload(res?.obj?.results);
                       setDisabledBtn(false);
-                      console.log(res?.obj?.results);
                     }
                   });
                 }

@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Fieldset from "../../../components/Base/Fieldset";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import { notify } from "../../../utils/notify";
 import { confirmaCierre } from "../utils/fetchCaja";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 const Cierre = ({
   respuestaComprobante,
@@ -15,15 +16,16 @@ const Cierre = ({
   sobra,
   falta,
 }) => {
+  const { signOut } = useAuth();
   const formatMoney = new Intl.NumberFormat("es-CO", {
     style: "currency",
     currency: "COP",
     maximumFractionDigits: 0,
   });
   const [trans, setTrans] = useState("");
-  const urls = {
+  /*const urls = {
     cierreCaja: `${process.env.REACT_APP_URL_CAJA}cash`,
-  };
+  };*/
 
   const confirmCierre = useCallback(async () => {
     const body = {
@@ -42,6 +44,7 @@ const Cierre = ({
           notify(res?.msg);
           setEstado(false);
           setCierre(false);
+          signOut();
         }
       })
       .catch((err) => {
@@ -49,9 +52,9 @@ const Cierre = ({
       });
   });
 
+  /*
   const sumatoria = () => {
     let arr = respuestaComprobante.map((row) => row.valor);
-    console.log(arr);
     function add(accumulator, a) {
       return accumulator + a;
     }
@@ -62,7 +65,7 @@ const Cierre = ({
   useEffect(() => {
     sumatoria();
   });
-
+  */
   return (
     <div>
       <Fieldset legend={"Registro cierre de caja"}>
@@ -73,7 +76,7 @@ const Cierre = ({
             {formatMoney.format(caja?.obj?.actual_caja)}
           </span>
           <br />
-          <span>Reporte en el arqueo </span>
+          <div class="text-center mb-0 mt-5"><strong>Reporte en el arqueo</strong></div>
           <br />
           <span>Sobrante: </span>
           <span className="text-right">{formatMoney.format(sobra)}</span>
@@ -88,7 +91,7 @@ const Cierre = ({
         </div>
         <ButtonBar>
           <Button type="button" onClick={() => confirmCierre()}>
-            Confirmar cierre
+            Cerrar Sesión
           </Button>
         </ButtonBar>
       </Fieldset>

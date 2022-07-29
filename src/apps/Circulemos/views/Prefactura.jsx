@@ -140,7 +140,6 @@ const Prefactura = ({
     };
     pagarPrefactura(body)
       .then((res) => {
-        console.log(res);
         if (res?.status) {
           setTicket(true);
           setSummary(res);
@@ -148,7 +147,6 @@ const Prefactura = ({
         }
       })
       .catch((err) => {
-        console.log(err);
       });
   };
   useEffect(() => {}, [totalPrefactura]);

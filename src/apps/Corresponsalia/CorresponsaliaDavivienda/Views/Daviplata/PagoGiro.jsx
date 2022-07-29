@@ -303,7 +303,7 @@ const PagoGiro = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl'>Pago por giro Davivienda CB</h1>
+      <h1 className='text-3xl mb-10'>Pago por giro Davivienda CB</h1>
       <Form grid onSubmit={onSubmit}>
         <Input
           id='numeroIdentificacion'
@@ -347,9 +347,9 @@ const PagoGiro = () => {
           label='Tipo de identificación'
           options={{
             "": "",
-            Cedula: "01",
+            "Cédula de ciudadanía": "01",
             "Tarjeta de identidad": "04",
-            "Cedula extranjeria": "02",
+            "Cédula extranjería": "02",
           }}
           value={datosTrans?.tipoIdentificacion}
           onChange={(e) =>
@@ -373,7 +373,7 @@ const PagoGiro = () => {
           {peticion === 1 && (
             <>
               <h1 className='text-2xl font-semibold'>
-                ¿Esta seguro de realizar la consulta del giro?
+                ¿Está seguro de realizar la consulta del giro?
               </h1>
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
@@ -409,10 +409,10 @@ const PagoGiro = () => {
           {peticion === 3 && (
             <>
               <h1 className='text-2xl font-semibold'>
-                ¿Esta seguro de realizar la transacción del giro?
+                ¿Está seguro de realizar la transacción del giro?
               </h1>
               <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
-              <h2>{`Número de identificacion: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
+              <h2>{`Número de identificación: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
               <h2>{`Valor transacción: ${formatMoney.format(
                 datosConsultaIdTrx.valor
               )}`}</h2>
