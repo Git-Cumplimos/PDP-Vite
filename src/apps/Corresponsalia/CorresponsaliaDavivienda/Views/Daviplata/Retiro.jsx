@@ -20,8 +20,8 @@ const Retiro = () => {
   const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: 2000000,
-    inferior: 100,
+    superior: 720000,
+    inferior: 10000,
   });
   const [peticion, setPeticion] = useState(false);
   const [datosTrans, setDatosTrans] = useState({
@@ -87,8 +87,17 @@ const Retiro = () => {
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
   const onSubmit = (e) => {
     e.preventDefault();
-    if (datosTrans?.valorCashOut % 1000 !== 0)
-      return notifyError("El valor debe ser multiplos de 1000");
+    if (datosTrans?.valorCashOut % 10000 !== 0)
+      return notifyError("El valor debe ser multiplos de 10000");
+    if (datosTrans?.numeroTelefono[0] !== "3")
+      return notifyError("El número Daviplata debe comenzar por 3");
+    if(datosTrans.valorCashOut > limiteRecarga.superior)
+      return notifyError("ERROR El valor de cash out debe ser menor a " +
+      formatMoney.format(limiteRecarga.superior));
+    if(datosTrans.valorCashOut < limiteRecarga.inferior)
+      return notifyError(`ERROR el valor de cash out debe ser mayor a ${formatMoney.format(
+        limiteRecarga.inferior
+      )}`);
     habilitarModal();
   };
 
@@ -180,7 +189,7 @@ const Retiro = () => {
             res?.obj?.respuesta_davivienda?.numeroAutorizacion,
           ]);
           objTicket["commerceInfo"].push(["", ""]);
-          objTicket["trxInfo"].push(["Número de telefono", res?.obj?.numero]);
+          objTicket["trxInfo"].push(["Número DaviPlata", res?.obj?.numero]);
           objTicket["trxInfo"].push(["", ""]);
           objTicket["trxInfo"].push([
             "Valor",
@@ -214,11 +223,11 @@ const Retiro = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl'>Retiro Daviplata</h1>
-      <Form grid onSubmit={onSubmit}>
+      <h1 className='text-3xl mb-10'>Retiro DaviPlata</h1>
+      <Form grid onSubmit={onSubmit} autoComplete="off">
         <Input
           id='numeroTelefono'
-          label='Número de telefono'
+          label='Número DaviPlata'
           type='text'
           name='numeroTelefono'
           minLength='10'
@@ -229,13 +238,13 @@ const Retiro = () => {
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               const num = e.target.value;
+              if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
+                return notifyError("El número DaviPlata debe comenzar por 3");
+              } 
               setDatosTrans((old) => {
-                if (old.numeroTelefono.length === 0 && num !== "3") {
-                  return { ...old };
-                } else {
                   return { ...old, numeroTelefono: num };
                 }
-              });
+              );
             }
           }}></Input>
         <Input
@@ -245,8 +254,8 @@ const Retiro = () => {
           name='otp'
           minLength='6'
           maxLength='6'
+          autoComplete='new-password'
           required
-          autoComplete='off'
           value={datosTrans.otp}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -279,19 +288,17 @@ const Retiro = () => {
       </Form>
       <Modal show={showModal} handleClose={hideModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-          {!peticion ? (
-            datosTrans.valorCashOut <= limiteRecarga.superior &&
-            datosTrans.valorCashOut >= limiteRecarga.inferior ? (
+          {!peticion ?(
               <>
                 <h1 className='text-2xl font-semibold'>
-                  ¿Esta seguro de realizar el cash out?
+                  ¿Está seguro de realizar el retiro DaviPlata?
                 </h1>
                 <h2 className='text-base'>
                   {`Valor de transacción: ${formatMoney.format(
                     datosTrans.valorCashOut
                   )} COP`}
                 </h2>
-                <h2>{`Número de telefono: ${datosTrans.numeroTelefono}`}</h2>
+                <h2>{`Número Daviplata: ${datosTrans.numeroTelefono}`}</h2>
                 {/* <h2>{`Número de otp: ${datosTrans.otp}`}</h2> */}
                 <ButtonBar>
                   <Button onClick={hideModal}>Cancelar</Button>
@@ -300,23 +307,6 @@ const Retiro = () => {
                   </Button>
                 </ButtonBar>
               </>
-            ) : (
-              <>
-                <h2 className='text-2xl font-semibold'>
-                  {datosTrans.valorCashOut <= limiteRecarga.inferior
-                    ? `ERROR el valor de cash out debe ser mayor a ${formatMoney.format(
-                        limiteRecarga.inferior
-                      )}`
-                    : "ERROR El valor de cash out debe ser menor a " +
-                      formatMoney.format(limiteRecarga.superior) +
-                      " COP"}
-                </h2>
-
-                <ButtonBar>
-                  <Button onClick={() => setShowModal(false)}>Cancelar</Button>
-                </ButtonBar>
-              </>
-            )
           ) : (
             ""
           )}
