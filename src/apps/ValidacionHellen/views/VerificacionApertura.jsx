@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import Fieldset from "../../../components/Base/Fieldset";
@@ -14,12 +14,12 @@ import fetchData from "../../../utils/fetchData";
 const VerificacionApertura = () => {
   const navigate = useNavigate();
   const {
-    contenedorPrincipal,
-    contenedorSecundario,
-    contenedorTercero,
-    tituloPrincipal,
+    //contenedorPrincipal,
+    //contenedorSecundario,
+    //contenedorTercero,
+    //tituloPrincipal,
     titulosSecundarios,
-    valores,
+    //valores,
     contenedorBotones,
     contenedorPrincipalBotones,
     contenedorCausalRechazo,
@@ -27,9 +27,9 @@ const VerificacionApertura = () => {
     textTarea,
   } = classes;
   const [datosParams, setDatosParams] = useState(0);
-  const [personaResponsable, setPersonaResponsable] = useState("");
+  //const [personaResponsable, setPersonaResponsable] = useState("");
   const [unidadNegocio, setUnidadNegocio] = useState("");
-  const [asesorComercialLocalidad, setAsesorComercialLocalidad] = useState("");
+  //const [asesorComercialLocalidad, setAsesorComercialLocalidad] = useState("");
   const [codigoLocalidad, setCodigoLocalidad] = useState("");
   const [tipoZona, setTipoZona] = useState("");
   const [datosReconoserID, setDatosReconoserID] = useState([]);
@@ -129,10 +129,10 @@ const VerificacionApertura = () => {
 
   const aprobacionFormulario = (e) => {
     e.preventDefault();
-    const datos = {
+    /* const datos = {
       task_token: datosParams[0]["task_token"],
       validation_state: "201",
-    };
+    }; */
     fetchData(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params?.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ /* {
@@ -160,11 +160,11 @@ const VerificacionApertura = () => {
   };
   const rechazarFormulario = (e) => {
     e.preventDefault();
-    const datos = {
+    /* const datos = {
       task_token: datosParams[0]["task_token"],
       validation_state: "202",
       causal_rechazo: mensajeCausal,
-    };
+    }; */
     fetchData(
       `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?id_proceso=${params.id}`,
       /* `http://127.0.0.1:5000/actualizacionestado?id_proceso=${params.id}` */ /* {
@@ -394,7 +394,7 @@ const VerificacionApertura = () => {
               ></Select>
             )} */}
 
-            {datosParams[0]["cod_localidad"]?.length != "" ? (
+            {datosParams[0]["cod_localidad"]?.length !== "" ? (
               <Input
                 label={"Cod Localidad"}
                 value={datosParams[0]["cod_localidad"]}
