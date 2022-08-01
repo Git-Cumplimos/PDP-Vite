@@ -95,12 +95,12 @@ const Retiro = () => {
       return notifyError("El número Daviplata debe comenzar por 3");
     if (datosTrans.valorCashOut > limiteRecarga.superior)
       return notifyError(
-        "ERROR El valor de cash out debe ser menor a " +
+        "El valor de cash out debe ser menor a " +
           formatMoney.format(limiteRecarga.superior)
       );
     if (datosTrans.valorCashOut < limiteRecarga.inferior)
       return notifyError(
-        `ERROR el valor de cash out debe ser mayor a ${formatMoney.format(
+        `El valor de cash out debe ser mayor a ${formatMoney.format(
           limiteRecarga.inferior
         )}`
       );
@@ -321,7 +321,7 @@ const Retiro = () => {
               <h2 className='text-base'>
                 {`Valor de transacción: ${formatMoney.format(
                   datosTrans.valorCashOut
-                )} COP`}
+                )} `}
               </h2>
               <h2>{`Número Daviplata: ${datosTrans.numeroTelefono}`}</h2>
               {/* <h2>{`Número de otp: ${datosTrans.otp}`}</h2> */}

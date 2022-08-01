@@ -51,18 +51,18 @@ export const fetchConveniosMany = async (obj) => {
   }
 };
 
-export const fetchConveniosUnique = async (id_convenio, ean13) => {
-  if (!id_convenio && !ean13) {
-    return { maxPages: 0, results: [] };
-  }
+export const fetchConveniosUnique = async (args) => {
+  // if (!id_convenio && !ean13) {
+  //   return { maxPages: 0, results: [] };
+  // }
   try {
-    let args = {};
-    if (id_convenio) {
-      args = { id_convenio };
-    }
-    if (ean13) {
-      args = { ean13 };
-    }
+    // let args = {};
+    // if (id_convenio) {
+    //   args = { id_convenio };
+    // }
+    // if (ean13) {
+    //   args = { ean13 };
+    // }
     const res = await fetchData(
       `${urlConvenios}/convenios-recaudo/convenio_unique`,
       "GET",
@@ -146,6 +146,30 @@ export const putConvenios = async (argsObj, bodyObj) => {
       console.error(res?.msg);
     }
     return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const fetchTiposConvenios = async (obj) => {
+  // if (!tags) {
+  //   return { maxPages: 0, results: [] };
+  // }
+  try {
+    const res = await fetchData(
+      `${urlConvenios}/convenios-recaudo/tipos-convenios`,
+      "GET",
+      obj,
+      {},
+      {},
+      true
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
   } catch (err) {
     throw err;
   }

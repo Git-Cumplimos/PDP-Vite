@@ -30,11 +30,11 @@ const Deposito = () => {
   //   useQuery();
   const [verificacionTel, setVerificacionTel] = useState("");
 
-  const [phone, setPhone] = useState("")
-  const [userDoc, setUserDoc] = useState("")
-  const [valor, setValor] = useState("")
-  const [nomDepositante, setNomDepositante] = useState("")
-  const [summary, setSummary] = useState([])
+  const [phone, setPhone] = useState("");
+  const [userDoc, setUserDoc] = useState("");
+  const [valor, setValor] = useState("");
+  const [nomDepositante, setNomDepositante] = useState("");
+  const [summary, setSummary] = useState([]);
   const { roleInfo, infoTicket } = useAuth();
   const [loadingCashIn, fetchCashIn] = useFetch(pagoGiroDaviplata);
   const [loadingConsultaCashIn, fetchConsultaCashIn] = useFetch(
@@ -100,13 +100,13 @@ const Deposito = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setPhone("")
-    setVerificacionTel("")
-    setNomDepositante("")
-    setSummary([])
-    setValor("")
-    setTipoDocumento("")
-    setUserDoc("")
+    setPhone("");
+    setVerificacionTel("");
+    setNomDepositante("");
+    setSummary([]);
+    setValor("");
+    setTipoDocumento("");
+    setUserDoc("");
   }, []);
 
   const onSubmitDeposit = useCallback(
@@ -177,9 +177,17 @@ const Deposito = () => {
         );
       }
     },
-    [phone, verificacionTel, tipoDocumento, userDoc, nomDepositante, valor, limitesMontos]
+    [
+      phone,
+      verificacionTel,
+      tipoDocumento,
+      userDoc,
+      nomDepositante,
+      valor,
+      limitesMontos,
+    ]
   );
- 
+
   const onMoneyChange = useCallback(
     (e, valor) => {
       setValor(valor);
@@ -217,61 +225,62 @@ const Deposito = () => {
         if (!res?.status) {
           notifyError(res?.msg);
           return;
-        }else{
-        notify("Transaccion satisfactoria");
-        const trx_id = res?.obj?.Data?.valTalon ?? 0;
-        const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
-        const total = parseInt(comision) + valor;
-        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+        } else {
+          notify("Transaccion satisfactoria");
+          const trx_id = res?.obj?.Data?.valTalon ?? 0;
+          const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
+          const total = parseInt(comision) + valor;
+          const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
-        const tempTicket = {
-          title: "Recibo de Depósito a Daviplata",
-          timeInfo: {
-            "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-            }).format(new Date()),
-            Hora: Intl.DateTimeFormat("es-CO", {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            }).format(new Date()),
-          },
-          commerceInfo: [
-            ["Id Comercio", roleInfo?.id_comercio],
-            ["No. terminal", ter],
-            ["Municipio", roleInfo?.ciudad],
-            ["Dirección", roleInfo?.direccion],
-            ["Tipo de operación", "Depósito a DaviPlata"],
-            ["", ""],
-            ["No. de aprobación", trx_id],
-            ["", ""],
-          ],
-          commerceName: roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "No hay datos",
-          trxInfo: [          
-            ["Número de telefono", "****" + phone.slice(-4)],
-            ["",""],
-            ["Valor", formatMoney.format(valor)],
-            ["",""],
-            ["Costo transacción", formatMoney.format(comision)],
-            ["",""],
-            ["Total", formatMoney.format(total)],
-            ["",""],
-          ],
-          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
-        };
-        setPaymentStatus(tempTicket);
-        infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
-          .then((resTicket) => {
-            console.log(resTicket);
-          })
-          .catch((err) => {
-            console.error(err);
-            notifyError("Error guardando el ticket");
-          });
+          const tempTicket = {
+            title: "Recibo de Depósito a Daviplata",
+            timeInfo: {
+              "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+                year: "2-digit",
+                month: "2-digit",
+                day: "2-digit",
+              }).format(new Date()),
+              Hora: Intl.DateTimeFormat("es-CO", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              }).format(new Date()),
+            },
+            commerceInfo: [
+              ["Id Comercio", roleInfo?.id_comercio],
+              ["No. terminal", ter],
+              ["Municipio", roleInfo?.ciudad],
+              ["Dirección", roleInfo?.direccion],
+              ["Tipo de operación", "Depósito a DaviPlata"],
+              ["", ""],
+              ["No. de aprobación", trx_id],
+              ["", ""],
+            ],
+            commerceName: roleInfo?.["nombre comercio"]
+              ? roleInfo?.["nombre comercio"]
+              : "No hay datos",
+            trxInfo: [
+              ["Número de telefono", "****" + phone.slice(-4)],
+              ["", ""],
+              ["Valor", formatMoney.format(valor)],
+              ["", ""],
+              ["Costo transacción", formatMoney.format(comision)],
+              ["", ""],
+              ["Total", formatMoney.format(total)],
+              ["", ""],
+            ],
+            disclamer:
+              "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+          };
+          setPaymentStatus(tempTicket);
+          infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
+            .then((resTicket) => {
+              console.log(resTicket);
+            })
+            .catch((err) => {
+              console.error(err);
+              notifyError("Error guardando el ticket");
+            });
         }
       })
       .catch((err) => {
@@ -292,7 +301,7 @@ const Deposito = () => {
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Depósitos Daviplata</h1>
+        <h1 className='text-3xl mt-6'>Depósito Daviplata</h1>
         <br></br>
         <Form onSubmit={onSubmitDeposit} grid>
           <Input
@@ -305,14 +314,13 @@ const Deposito = () => {
             maxLength={"10"}
             value={phone}
             onInput={(e) => {
-              if (phone?.length === 0 & e.target.value!=="3"){
-                notifyError("El número de celular debe iniciar por 3")
+              if ((phone?.length === 0) & (e.target.value !== "3")) {
+                notifyError("El número de celular debe iniciar por 3");
                 setPhone("");
-              } 
-              else {
-              const num = parseInt(e.target.value) || "";
-              setPhone(num);
-            }
+              } else {
+                const num = parseInt(e.target.value) || "";
+                setPhone(num);
+              }
             }}
             required
           />
@@ -326,14 +334,13 @@ const Deposito = () => {
             maxLength={"10"}
             value={verificacionTel}
             onInput={(e) => {
-              if (verificacionTel?.length === 0 & e.target.value!=="3"){
-                notifyError("El número de celular debe iniciar por 3")
+              if ((verificacionTel?.length === 0) & (e.target.value !== "3")) {
+                notifyError("El número de celular debe iniciar por 3");
                 setVerificacionTel("");
-              } 
-              else {
-              const num = parseInt(e.target.value) || "";
-              setVerificacionTel(num);
-            }
+              } else {
+                const num = parseInt(e.target.value) || "";
+                setVerificacionTel(num);
+              }
             }}
             required
           />
@@ -357,9 +364,9 @@ const Deposito = () => {
             maxLength={"16"}
             value={userDoc}
             onInput={(e) => {
-              if (!isNaN(e.target.value)){
-              setUserDoc(e.target.value)
-            }
+              if (!isNaN(e.target.value)) {
+                setUserDoc(e.target.value);
+              }
             }}
             required
           />
@@ -372,8 +379,8 @@ const Deposito = () => {
             maxLength={"50"}
             autoComplete='off'
             value={nomDepositante}
-            onInput={(e) => {              
-              setNomDepositante(e.target.value)
+            onInput={(e) => {
+              setNomDepositante(e.target.value);
             }}
             required
           />
@@ -390,19 +397,19 @@ const Deposito = () => {
             required
           /> */}
           <Input
-          id="valor"
-          name="valor"
-          label="Valor a depositar"
-          autoComplete="off"
-          type="text"
-          minLength={"1"}
-          maxLength={"15"}
-          min={limitesMontos?.min}
-          max={limitesMontos?.max}
-          value={makeMoneyFormatter(0).format(valor)}
-          onInput={(ev) => setValor(onChangeMoney(ev))}
-          required
-           />
+            id='valor'
+            name='valor'
+            label='Valor a depositar'
+            autoComplete='off'
+            type='text'
+            minLength={"1"}
+            maxLength={"15"}
+            min={limitesMontos?.min}
+            max={limitesMontos?.max}
+            value={makeMoneyFormatter(0).format(valor)}
+            onInput={(ev) => setValor(onChangeMoney(ev))}
+            required
+          />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"} disabled={loadingConsultaCashIn}>
               Realizar depósito

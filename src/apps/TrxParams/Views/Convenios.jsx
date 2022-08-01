@@ -1,10 +1,11 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Fieldset from "../../../components/Base/Fieldset";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
+import InputSuggestions from "../../../components/Base/InputSuggestions";
 import Modal from "../../../components/Base/Modal";
 import Table from "../../../components/Base/Table";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
@@ -14,6 +15,7 @@ import { notify, notifyError } from "../../../utils/notify";
 import {
   fetchConveniosMany,
   fetchConveniosUnique,
+  fetchTiposConvenios,
   postConvenios,
   putConvenios,
 } from "../utils/fetchRevalConvenios";
@@ -26,6 +28,11 @@ const Convenios = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelectedConvenio({
+      "Nombre de convenio": "",
+      Ean13: "",
+      tiposConvenios: "",
+      NewTipoConvenio: {},
+      pk_id_tipo_convenio: "",
       Tags: [""],
       Referencias: [
         {
@@ -42,7 +49,13 @@ const Convenios = () => {
     limit: 10,
   });
   const [convenios, setConvenios] = useState([]);
+  const [tiposConvenios, setTiposConvenios] = useState([]);
   const [selectedConvenio, setSelectedConvenio] = useState({
+    "Nombre de convenio": "",
+    Ean13: "",
+    tiposConvenios: "",
+    NewTipoConvenio: {},
+    pk_id_tipo_convenio: "",
     Tags: [""],
     Referencias: [
       {
@@ -53,33 +66,75 @@ const Convenios = () => {
     ],
   });
   const [maxPages, setMaxPages] = useState(0);
-
+  const mapSuggestionsTiposConvenios = useMemo(
+    () =>
+      tiposConvenios.map(({ nombre_tipo_convenio }) => (
+        <h1 className='py-2'>{nombre_tipo_convenio}</h1>
+      )),
+    [tiposConvenios]
+  );
+  const fecthTiposConveniosFunc = useCallback((e) => {
+    fetchTiposConvenios({
+      nombre_tipo_convenio: e.target.value ?? "",
+      limit: 5,
+    })
+      .then((autoArr) => {
+        // setMaxPages(autoArr?.maxPages);
+        setTiposConvenios(autoArr?.results);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+  const onSelectSuggestion = useCallback(
+    (i, el) => {
+      const copy = { ...selectedConvenio };
+      copy.NewTipoConvenio = tiposConvenios[i];
+      copy.tiposConvenios = tiposConvenios[i].nombre_tipo_convenio;
+      copy.pk_id_tipo_convenio = tiposConvenios[i].pk_id_tipo_convenio;
+      setSelectedConvenio({ ...copy });
+    },
+    [selectedConvenio, tiposConvenios]
+  );
   const onSelectConvenio = useCallback(
     (e, i) => {
       setShowModal(true);
-      fetchConveniosUnique(convenios[i]?.["Id convenio"])
+      fetchConveniosUnique({ id_convenio: convenios[i]?.["Id convenio"] })
         .then((res) => {
-          setSelectedConvenio(
-            [...res?.results].map(
-              ({ id_convenio, nombre_convenio, ean13, tags, referencias }) => {
-                return {
-                  "Id convenio": id_convenio,
-                  "Nombre de convenio": nombre_convenio,
-                  Ean13: ean13,
-                  Tags: tags.split(","),
-                  Referencias: [
-                    ...referencias.map(({ nombre_referencia, max, min }) => {
-                      return {
-                        "Nombre de Referencia": nombre_referencia,
-                        "Longitud minima": min,
-                        "Longitud maxima": max,
-                      };
-                    }),
-                  ],
-                };
-              }
-            )[0]
-          );
+          const dataTemp = [...res?.results];
+          const dataSelect = dataTemp.map(
+            ({
+              id_convenio,
+              fk_id_tipo_convenio,
+              nombre_convenio,
+              ean13,
+              tags,
+              referencias,
+            }) => {
+              return {
+                "Id convenio": id_convenio,
+                "Nombre de convenio": nombre_convenio,
+                fk_id_tipo_convenio: fk_id_tipo_convenio
+                  ? fk_id_tipo_convenio
+                  : "Ninguno",
+                Ean13: ean13,
+                pk_id_tipo_convenio: fk_id_tipo_convenio,
+                tiposConvenios: "",
+                NewTipoConvenio: {},
+                Tags: tags.split(","),
+                Referencias: [
+                  ...(referencias.length
+                    ? referencias.map(({ nombre_referencia, max, min }) => {
+                        return {
+                          "Nombre de Referencia": nombre_referencia,
+                          "Longitud minima": min,
+                          "Longitud maxima": max,
+                        };
+                      })
+                    : []),
+                ],
+              };
+            }
+          )[0];
+          setSelectedConvenio(dataSelect);
         })
         .catch((err) => console.error(err));
       // searchUniqueConvenios(convenios[i]["Id convenio"])
@@ -107,7 +162,13 @@ const Convenios = () => {
       "Longitud maxima",
     ];
     const newData = [];
-    ["Nombre de convenio", "Ean13", "Tags", "Referencias"].forEach((col) => {
+    [
+      "Nombre de convenio",
+      "Ean13",
+      "Tags",
+      "Referencias",
+      "tiposConvenios",
+    ].forEach((col) => {
       let data = null;
       if (col === "Referencias") {
         data = [];
@@ -148,6 +209,7 @@ const Convenios = () => {
         putConvenios(
           { id_convenio: selectedConvenio?.["Id convenio"] },
           {
+            id_convenio: selectedConvenio?.["Id convenio"],
             ean13: selectedConvenio?.Ean13,
             nombre_convenio: selectedConvenio?.["Nombre de convenio"],
             tags: selectedConvenio?.Tags.join(","),
@@ -183,7 +245,7 @@ const Convenios = () => {
           obj = { ...obj, ean13: selectedConvenio?.Ean13 };
         }
         postConvenios({
-          obj,
+          ...obj,
           nombre_convenio: selectedConvenio?.["Nombre de convenio"],
           tags: selectedConvenio?.Tags.join(","),
           referencias: [
@@ -217,7 +279,7 @@ const Convenios = () => {
   );
 
   useEffect(() => {
-    fetchConveniosMany({ tags: searchConvenio, page, limit })
+    fetchConveniosUnique({ tags: searchConvenio, page, limit })
       .then((res) => {
         setConvenios(
           [...res?.results].map(({ id_convenio, nombre_convenio }) => {
@@ -230,23 +292,23 @@ const Convenios = () => {
         setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
-  }, [searchConvenio, page]);
+  }, [searchConvenio, page, limit]);
 
-  useEffect(() => {
-    fetchConveniosUnique(null, ean13Convenio)
-      .then((res) => {
-        setConvenios(
-          [...res?.results].map(({ id_convenio, nombre_convenio }) => {
-            return {
-              "Id convenio": id_convenio,
-              "Nombre de convenio": nombre_convenio,
-            };
-          })
-        );
-        setMaxPages(res?.maxPages);
-      })
-      .catch((err) => console.error(err));
-  }, [ean13Convenio]);
+  // useEffect(() => {
+  //   fetchConveniosUnique(null, ean13Convenio)
+  //     .then((res) => {
+  //       setConvenios(
+  //         [...res?.results].map(({ id_convenio, nombre_convenio }) => {
+  //           return {
+  //             "Id convenio": id_convenio,
+  //             "Nombre de convenio": nombre_convenio,
+  //           };
+  //         })
+  //       );
+  //       setMaxPages(res?.maxPages);
+  //     })
+  //     .catch((err) => console.error(err));
+  // }, [ean13Convenio]);
   const fetchConveniosManyFunc = () => {
     fetchConveniosMany({ tags: searchConvenio, page, limit })
       .then((res) => {
@@ -309,6 +371,7 @@ const Convenios = () => {
             type='text'
             autoComplete='off'
             defaultValue={selectedConvenio?.["Nombre de convenio"]}
+            onChange={() => {}}
             required
           />
           <Input
@@ -323,11 +386,29 @@ const Convenios = () => {
             value={selectedConvenio?.Ean13}
             onChange={() => {}}
           />
+          <InputSuggestions
+            id='tiposConvenios'
+            name='tiposConvenios'
+            label={"Tipo convenio"}
+            type='search'
+            autoComplete='off'
+            suggestions={mapSuggestionsTiposConvenios || []}
+            onLazyInput={{
+              callback: fecthTiposConveniosFunc,
+              timeOut: 500,
+            }}
+            onSelectSuggestion={onSelectSuggestion}
+            value={selectedConvenio?.tiposConvenios || ""}
+            onChange={() => {}}
+            // disabled={selected?.id_tipo_operacion ? true : false}
+            // readOnly={selected?.id_tipo_operacion}
+          />
           <Fieldset legend={"Tags"}>
             {selectedConvenio?.Tags?.map((val, ind) => {
               return (
                 <div className='grid grid-cols-2' key={ind}>
                   <Input
+                    key={ind}
                     id={`tagsConvenio_${ind}`}
                     name='Tags'
                     type='text'
@@ -368,10 +449,13 @@ const Convenios = () => {
           <Fieldset legend={"Referencias"}>
             {selectedConvenio?.Referencias?.map((val, index) => {
               return (
-                <div className='grid grid-cols-auto-fit-md place-items-center place-content-end'>
+                <div
+                  key={index}
+                  className='grid grid-cols-auto-fit-md place-items-center place-content-end'>
                   {Object.entries(val).map(([key, valRef]) => {
                     return (
                       <Input
+                        key={key}
                         id={`${key}_${index}`}
                         name={key}
                         label={key}

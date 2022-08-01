@@ -735,13 +735,13 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/daviplata/depositos",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Depósitos DaviPlata' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Depósito DaviPlata' />,
         component: Deposito,
         permission: [53],
       },
       {
         link: "/daviplata/retiros",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Retiros DaviPlata' />,
+        label: <AppIcons Logo={"MARKETPLACE"} name='Retiro DaviPlata' />,
         component: Retiro,
         permission: [53],
       },
@@ -770,7 +770,7 @@ const allUrlsPrivateApps = [
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashIn",
                 label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Depósitos DaviPlata' />
+                  <AppIcons Logo={"MARKETPLACE"} name='Depósito DaviPlata' />
                 ),
                 component: CashIn,
                 permission: [54],
@@ -778,7 +778,7 @@ const allUrlsPrivateApps = [
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashOut",
                 label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Retiros DaviPlata' />
+                  <AppIcons Logo={"MARKETPLACE"} name='Retiro DaviPlata' />
                 ),
                 component: CashOut,
                 permission: [54],
@@ -813,7 +813,7 @@ const allUrlsPrivateApps = [
           },
           {
             link: "/corresponsalia/corresponsaliaDavivienda/Daviplatapagos_giros",
-            label: <AppIcons Logo={"MARKETPLACE"} name='Pagos por giro' />,
+            label: <AppIcons Logo={"MARKETPLACE"} name='Pago por giro' />,
             component: PagoGiro,
             permission: [54],
           },
