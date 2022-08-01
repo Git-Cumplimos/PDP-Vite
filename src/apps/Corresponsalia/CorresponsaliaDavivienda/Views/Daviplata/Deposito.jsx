@@ -137,9 +137,11 @@ const Deposito = () => {
             .then((res) => {
               setIsUploading(false);
               if (!res?.status) {
+                setIsUploading(false);
                 notifyError(res?.msg);
                 return;
               } else {
+                setIsUploading(false);
                 setDatosConsulta(res?.obj);
                 const total =
                   parseInt(res?.obj?.Data?.valComisionGiroDaviplata) + valor;
@@ -161,6 +163,7 @@ const Deposito = () => {
               //notify("Transaccion satisfactoria");
             })
             .catch((err) => {
+              setIsUploading(false);
               console.error(err);
               notifyError("Error interno en la transaccion");
             });
@@ -223,6 +226,7 @@ const Deposito = () => {
       .then((res) => {
         setIsUploading(false);
         if (!res?.status) {
+          setIsUploading(false);
           notifyError(res?.msg);
           return;
         } else {
@@ -231,7 +235,6 @@ const Deposito = () => {
           const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
           const total = parseInt(comision) + valor;
           const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
-
           const tempTicket = {
             title: "Recibo de Depósito a Daviplata",
             timeInfo: {
@@ -260,7 +263,7 @@ const Deposito = () => {
               ? roleInfo?.["nombre comercio"]
               : "No hay datos",
             trxInfo: [
-              ["Número de telefono", "****" + phone.slice(-4)],
+              ["Número de telefono", `****${String(phone)?.slice(-4)}`],
               ["", ""],
               ["Valor", formatMoney.format(valor)],
               ["", ""],
@@ -272,18 +275,21 @@ const Deposito = () => {
             disclamer:
               "Línea de atención personalizada: #688\nMensaje de texto: 85888",
           };
+
           setPaymentStatus(tempTicket);
           infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
             .then((resTicket) => {
               console.log(resTicket);
             })
             .catch((err) => {
+              setIsUploading(false);
               console.error(err);
               notifyError("Error guardando el ticket");
             });
         }
       })
       .catch((err) => {
+        setIsUploading(false);
         console.error(err);
         notifyError("Error interno en la transaccion");
       });
@@ -297,6 +303,7 @@ const Deposito = () => {
     ,
     datosConsulta,
   ]);
+
   return (
     <>
       <SimpleLoading show={isUploading} />

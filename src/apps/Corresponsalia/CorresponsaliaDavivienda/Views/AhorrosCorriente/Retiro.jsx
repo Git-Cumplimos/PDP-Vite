@@ -235,7 +235,7 @@ const Retiro = () => {
             ["",""],
             [
               "Nro. Cuenta",
-              "****" + res?.obj?.Data?.numNumeroDeCuenta?.slice(-4),
+              `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4)}`,
             ],
             ["",""],
             ["Valor", formatMoney.format(valor)],
