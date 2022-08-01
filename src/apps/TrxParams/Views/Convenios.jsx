@@ -42,7 +42,7 @@ const Convenios = () => {
         },
       ],
     });
-    fetchConveniosManyFunc();
+    fetchConveniosUnique();
   }, []);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
@@ -108,16 +108,16 @@ const Convenios = () => {
               ean13,
               tags,
               referencias,
+              nombre_tipo_convenio,
             }) => {
               return {
                 "Id convenio": id_convenio,
                 "Nombre de convenio": nombre_convenio,
-                fk_id_tipo_convenio: fk_id_tipo_convenio
-                  ? fk_id_tipo_convenio
-                  : "Ninguno",
                 Ean13: ean13,
                 pk_id_tipo_convenio: fk_id_tipo_convenio,
-                tiposConvenios: "",
+                tiposConvenios: nombre_tipo_convenio
+                  ? nombre_tipo_convenio
+                  : "",
                 NewTipoConvenio: {},
                 Tags: tags.split(","),
                 Referencias: [
