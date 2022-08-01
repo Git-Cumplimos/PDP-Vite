@@ -146,7 +146,7 @@ const DtlMovComercio = () => {
         ""
       )}
       <TableEnterprise
-        title="Detalle movimientos cupo Comercios"
+        title="Detalle movimientos cupo comercios"
         headers={[
           "Id detalle movimiento",
           "Tipo de movimiento",

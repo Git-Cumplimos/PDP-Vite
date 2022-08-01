@@ -231,6 +231,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 name="razon_ajuste"
                 label="Razón de ajuste"
                 autoComplete="off"
+                maxLength={"100"}
                 onInput={(e) => {
                   setRazonAjuste(e.target.value);
                 }}
