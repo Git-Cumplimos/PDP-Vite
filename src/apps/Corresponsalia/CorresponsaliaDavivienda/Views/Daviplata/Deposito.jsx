@@ -263,7 +263,7 @@ const Deposito = () => {
               ? roleInfo?.["nombre comercio"]
               : "No hay datos",
             trxInfo: [
-              ["Número de telefono", `****${String(phone)?.slice(-4)}`],
+              ["Número de telefono", `****${String(phone)?.slice(-4) ?? ""}`],
               ["", ""],
               ["Valor", formatMoney.format(valor)],
               ["", ""],
