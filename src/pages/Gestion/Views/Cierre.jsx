@@ -22,7 +22,7 @@ const Cierre = ({
     currency: "COP",
     maximumFractionDigits: 0,
   });
-  const [trans, setTrans] = useState("");
+  const [trans, setTrans] = useState(0);
   /*const urls = {
     cierreCaja: `${process.env.REACT_APP_URL_CAJA}cash`,
   };*/
