@@ -122,13 +122,23 @@ const TramitePines = () => {
     }).format(new Date())
   }, [parametroBusqueda, table]);
 
+  const horaCierre = useMemo(() => { 
+    const dia = (new Date()).getDay()  
+    if (dia === enumParametrosPines.diaFinSemana) {
+      return enumParametrosPines.horaCierreFinSemana.split(":") 
+    }
+    else{
+      return enumParametrosPines.horaCierre.split(":")
+    }
+     
+  }, []);
+
   useEffect(() => {
-    const horaCierre = enumParametrosPines.horaCierre.split(":")
     const horaActual = hora.split(":")
     const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
     if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
-      notifyError("Módulo cerrado a partir de las " + enumParametrosPines.horaCierre)
+      notifyError("Módulo cerrado a partir de las " + horaCierre)
       navigate("/PinesVus",{replace:true});
     }
     else if ((deltaHora ===1 & deltaMinutos<-50)){
@@ -138,7 +148,7 @@ const TramitePines = () => {
       notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
     }
 
-  }, [hora,parametroBusqueda, table, navigate])
+  }, [hora,parametroBusqueda, table, horaCierre,navigate])
   return (
     <>
     {"id_comercio" in roleInfo ? (

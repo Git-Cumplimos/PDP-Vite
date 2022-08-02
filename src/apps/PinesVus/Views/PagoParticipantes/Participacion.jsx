@@ -249,16 +249,26 @@ const Participacion = () => {
     }).format(new Date())
   }, [table]);
 
+  const horaCierre = useMemo(() => { 
+    const dia = (new Date()).getDay()  
+    if (dia === enumParametrosPines.diaFinSemana) {
+      return enumParametrosPines.horaCierreFinSemana.split(":") 
+    }
+    else{
+      return enumParametrosPines.horaCierre.split(":")
+    }
+     
+  }, []);
+
   useEffect(() => {
-    const horaCierre = enumParametrosPines.horaCierre.split(":")
     const horaActual = hora.split(":")
     const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
     if (!(deltaHora<0 || (deltaHora===0 & deltaMinutos<1)) ){
-      notifyError("Modulo disponible a partir de las " + enumParametrosPines.horaCierre)
+      notifyError("Modulo disponible a partir de las " + horaCierre)
       navigate("/PinesVus/Participacion",{replace:true});
     }
-  }, [table, hora, navigate])
+  }, [table, hora, horaCierre,navigate])
   return (
     <>
       <>
