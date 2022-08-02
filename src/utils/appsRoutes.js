@@ -843,7 +843,7 @@ const allUrlsPrivateApps = [
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccion",
                 label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Selección del covenio' />
+                  <AppIcons Logo={"MARKETPLACE"} name='Selección del convenio' />
                 ),
                 component: SeleccionServicioPagar,
                 permission: [54],
