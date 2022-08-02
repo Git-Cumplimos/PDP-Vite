@@ -16,6 +16,7 @@ import {
   postModificarTicketPagoPorGiroDavivienda,
   postPagoPorGiroDavivienda,
 } from "../../utils/fetchPagoPorGiro";
+import HideInput from "../../../../../components/Base/HideInput";
 
 const PagoGiro = () => {
   const { roleInfo } = useAuth();
@@ -323,7 +324,25 @@ const PagoGiro = () => {
               });
             }
           }}></Input>
-        <Input
+          <HideInput
+          id='codigoFamilia'
+          label='Código de familia'
+          type='text'
+          name='codigoFamilia'
+          minLength='1'
+          maxLength='8'
+          autoComplete='off'
+          required
+          value={datosTrans.codigoFamilia ?? ""}
+          onInput={(e, valor) => {
+            if (!isNaN(valor)) {
+              const num = valor;
+              setDatosTrans((old) => {
+                return { ...old, codigoFamilia: num };
+              });
+            }
+          }}></HideInput>
+        {/* <Input
           id='codigoFamilia'
           label='Código de familia'
           type='text'
@@ -340,7 +359,7 @@ const PagoGiro = () => {
                 return { ...old, codigoFamilia: num };
               });
             }
-          }}></Input>
+          }}></Input> */}
         <Select
           id='tipoIdentificacion'
           name='tipoIdentificacion'
@@ -377,7 +396,7 @@ const PagoGiro = () => {
               </h1>
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
-              <h2>{`Código de familia: ${datosTrans.codigoFamilia}`}</h2>
+              <h2>{`Código de familia: ${datosTrans.codigoFamilia.replace(/\w/g,"*")}`}</h2>
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>
                 <Button type='submit' onClick={peticionConsulta}>
