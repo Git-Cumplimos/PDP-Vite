@@ -78,8 +78,19 @@ const ConveniosPines = () => {
     (ev) => {
       ev.preventDefault();
       const formData = new FormData(ev.currentTarget);
-      const body = Object.fromEntries(formData);
-      console.log(body);
+      const body = Object.fromEntries(
+        Object.entries(Object.fromEntries(formData))
+          .map(([key, val]) => [
+            key,
+            key.includes("referencia_") && val === "" ? null : val,
+          ])
+          .filter(([key, val]) => {
+            if (!selected) {
+              return val;
+            }
+            return selected[key] !== val || key === "pk_codigo_convenio";
+          })
+      );
       notifyPending(
         selected
           ? modConveniosPinesList({ pk_codigo_convenio: "" }, body)
@@ -186,7 +197,7 @@ const ConveniosPines = () => {
                   ev.target.value = onChangeNumber(ev);
                 }}
                 defaultValue={selected?.pk_codigo_convenio ?? ""}
-                // disabled={selected ?? false}
+                readOnly={selected}
                 required
               />
               <Input
