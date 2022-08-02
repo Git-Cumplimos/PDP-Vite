@@ -308,7 +308,7 @@ const Deposito = () => {
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Depósito Daviplata</h1>
+        <h1 className='text-3xl mt-6'>Depósito DaviPlata</h1>
         <br></br>
         <Form onSubmit={onSubmitDeposit} grid>
           <Input
