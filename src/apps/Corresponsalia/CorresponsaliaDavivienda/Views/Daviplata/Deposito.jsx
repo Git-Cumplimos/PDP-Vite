@@ -263,7 +263,7 @@ const Deposito = () => {
               ? roleInfo?.["nombre comercio"]
               : "No hay datos",
             trxInfo: [
-              ["Número de telefono", `****${String(phone)?.slice(-4) ?? ""}`],
+              ["Número DaviPlata", `****${String(phone)?.slice(-4) ?? ""}`],
               ["", ""],
               ["Valor", formatMoney.format(valor)],
               ["", ""],
@@ -387,7 +387,9 @@ const Deposito = () => {
             autoComplete='off'
             value={nomDepositante}
             onInput={(e) => {
+              if (isNaN(e.target.value) || e.target.value ===""){
               setNomDepositante(e.target.value);
+              }
             }}
             required
           />

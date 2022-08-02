@@ -371,7 +371,11 @@ const Deposito = () => {
             maxLength={"50"}
             autoComplete='off'
             value={nomDepositante}
-            onInput={(e) =>{setNomDepositante(e.target.value)}}
+            onInput={(e) =>{
+              if (isNaN(e.target.value) || e.target.value ===""){
+              setNomDepositante(e.target.value)}
+            }
+            }
             required
           />
           {/* <MoneyInput
