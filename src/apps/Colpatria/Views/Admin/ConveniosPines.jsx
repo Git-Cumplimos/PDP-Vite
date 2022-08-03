@@ -16,6 +16,7 @@ import {
   modConveniosPinesList,
   getConveniosPinesTiposValores,
   getConveniosPinesListMassive,
+  addConveniosPinesListMassive,
 } from "../../utils/fetchFunctions";
 
 const ConveniosPines = () => {
@@ -31,6 +32,7 @@ const ConveniosPines = () => {
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
   const [uploadMasivo, setUploadMasivo] = useState(false);
+  const [massiveFile, setMassiveFile] = useState(null);
 
   const [tiposValores, setTiposValores] = useState([]);
 
@@ -145,7 +147,10 @@ const ConveniosPines = () => {
       {
         render({ data: response }) {
           setLoading(false);
-          const filename = response.headers.get("Content-Disposition").split("; ")?.[1].split("=")?.[1];
+          const filename = response.headers
+            .get("Content-Disposition")
+            .split("; ")?.[1]
+            .split("=")?.[1];
 
           response.blob().then((blob) => {
             if (window.navigator && window.navigator.msSaveOrOpenBlob) {
@@ -153,7 +158,7 @@ const ConveniosPines = () => {
             } else {
               // other browsers
               const exportUrl = URL.createObjectURL(blob);
-              const a = document.createElement('a');
+              const a = document.createElement("a");
               a.href = exportUrl;
               a.download = filename;
               document.body.appendChild(a);
@@ -161,7 +166,7 @@ const ConveniosPines = () => {
               URL.revokeObjectURL(exportUrl);
               document.body.removeChild(a);
             }
-          })
+          });
           return "Descarga de archivo de convenios exitosa";
         },
       },
@@ -177,6 +182,43 @@ const ConveniosPines = () => {
       }
     );
   }, [searchFilters]);
+
+  const handleUploadMasivo = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      const formData = new FormData();
+      formData.set("file", massiveFile);
+      notifyPending(
+        addConveniosPinesListMassive(formData),
+        {
+          render() {
+            setLoading(true);
+            return "Enviando solicitud";
+          },
+        },
+        {
+          render({ data: res }) {
+            setLoading(false);
+            console.log(res);
+            handleClose();
+            getConvPines();
+            return `Se han creado ${res?.obj?.stats_creados} y se han modificado ${res?.obj?.stats_modificados} convenios de pines de colpatria`;
+          },
+        },
+        {
+          render({ data: err }) {
+            setLoading(false);
+            if (err?.cause === "custom") {
+              return err?.message;
+            }
+            console.error(err?.message);
+            return "Subida de archivo fallida";
+          },
+        }
+      );
+    },
+    [handleClose, getConvPines, massiveFile]
+  );
 
   return (
     <Fragment>
@@ -268,11 +310,21 @@ const ConveniosPines = () => {
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         {uploadMasivo ? (
-          <Form grid>
+          <Form onSubmit={handleUploadMasivo} grid>
             <FileInput
-              label={"Archivo masivo"}
-              onGetFile={() => {}}
+              label={"Subir archivo masivo"}
+              onGetFile={(files) => {
+                if (Array.isArray(files)) {
+                  setMassiveFile(files[0]);
+                  return;
+                } else if (files instanceof FileList) {
+                  setMassiveFile(files.item(0));
+                  return;
+                }
+                setMassiveFile(files);
+              }}
               allowDrop={false}
+              required
             />
             <ButtonBar>
               <Button type={"submit"}>Realizar carge</Button>
