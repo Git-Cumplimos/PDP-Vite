@@ -219,7 +219,7 @@ const Arqueo = ({
           <Fieldset legend={"Confirmación arqueo"}>
             {!arqueoConfirmado ? <div>
             <h1 className="text-lg">
-              ¿Está seguro de los datos para el arqueo, no podrá modificarlos?
+              ¿Está seguro de los datos para el arqueo? Una vez confirmados no podrá modificarlos.
             </h1>
             <ButtonBar>
               <Button type="button" onClick={() => setConfirmarArqueo(false)}>
