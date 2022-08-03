@@ -254,6 +254,10 @@ const CrearPin = () => {
     setDisabledBtns(true);
     setShowFormulario(false)
     consultaClientes(documento,olimpia,idPin).then((resp) => {
+      if (!resp?.status){
+        notifyError(resp?.msg)
+      }else{
+      setShowFormulario(true)    
       if (resp?.obj?.results?.length > 0) {
         const fecha_nacimiento = new Date(resp?.obj?.results?.[0]?.fecha_nacimiento);
         fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
@@ -305,8 +309,7 @@ const CrearPin = () => {
         homeLocation?.localidad?.[1]("")
         homeLocation?.foundMunicipios?.[1]("")
       }
-    }
-    setShowFormulario(true)
+    }}
     setDisabledBtns(false);
     });
   };
@@ -398,13 +401,24 @@ const CrearPin = () => {
     }).format(new Date())
   }, [venderVehiculo,tipoPin]);
 
+  const horaCierre = useMemo(() => { 
+    const dia = (new Date()).getDay()  
+    if (dia === enumParametrosPines.diaFinSemana) {
+      return enumParametrosPines.horaCierreFinSemana.split(":")
+    }
+    else{
+      return enumParametrosPines.horaCierre.split(":")
+    }
+     
+  }, []);
+
   useEffect(() => {
-    const horaCierre = enumParametrosPines.horaCierre.split(":")
+    
     const horaActual = hora.split(":")
     const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
     if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
-      notifyError("Módulo cerrado a partir de las " + enumParametrosPines.horaCierre)
+      notifyError("Módulo cerrado a partir de las " + horaCierre)
       navigate("/PinesVus",{replace:true});
     }
     else if ((deltaHora ===1 & deltaMinutos<-50)){
@@ -414,7 +428,7 @@ const CrearPin = () => {
       notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
     }
 
-  }, [venderVehiculo,tipoPin, hora, navigate])
+  }, [venderVehiculo,tipoPin, hora, horaCierre, navigate])
 
   return (
     <>

@@ -7,6 +7,7 @@ const urls = {
   cargas: `${process.env.REACT_APP_URL_CAJA}generate`,
   buscar_comprobante: `${process.env.REACT_APP_URL_CAJA}searchreceipts`,
   cuentas: `${process.env.REACT_APP_URL_CAJA}cuentas`,
+  historicoscierre: `${process.env.REACT_APP_URL_CAJA}consultahistoricos`,
 };
 
 export const searchCash = async (queryParam) => {
@@ -153,6 +154,22 @@ export const searchReceipt = async (queryParam) => {
   try {
     const res = await fetchData(
       urls.buscar_comprobante,
+      "GET",
+      queryParam,
+      {},
+      {},
+      true
+    );
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const searchHistorico = async (queryParam) => {
+  try {
+    const res = await fetchData(
+      urls.historicoscierre,
       "GET",
       queryParam,
       {},

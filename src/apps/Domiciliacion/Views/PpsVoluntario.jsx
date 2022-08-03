@@ -28,6 +28,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
   const [estado, setEstado] = useState(true);
   const [valorAportar, setValorAportar] = useState();
   const [numPagosPdp, setNumPagosPdp] = useState(0);
+  const [tipoDomiciliacion, setTipoDomiciliacion] = useState(1);
   const [showModal, setShowModal] = useState(true);
   const navigate = useNavigate();
 
@@ -36,8 +37,8 @@ const PpsVoluntario = ({ datosConsulta }) => {
     setShowModal(false);
   }, []);
 
-  const url = process.env.REACT_APP_URL_COLPENSIONES;
-  /*   const url = "http://127.0.0.1:7000"; */
+  // const url = process.env.REACT_APP_URL_COLPENSIONES;
+  const url = "http://127.0.0.1:7000";
 
   useEffect(() => {}, [numCelular]);
   useEffect(() => {
@@ -54,7 +55,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
       {}
     )
       .then((respuesta) => {
-        console.log("r1", respuesta?.obj?.results.length);
+        console.log("r1", respuesta?.obj?.results?.length);
         setDatosBusqueda(respuesta?.obj?.results);
       })
       .catch((err) => {
@@ -87,9 +88,10 @@ const PpsVoluntario = ({ datosConsulta }) => {
               id_dispositivo: iddispositivo,
               id_usuario: idusuario,
               estado: "activo",
-              estado_pago: "",
+              // estado_pago: "",
               tipo_pps: "voluntario",
               num_pago_pdp: numPagosPdp,
+              tipo_domiciliacion: tipoDomiciliacion,
             },
             {},
             {}
@@ -306,6 +308,17 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 required
               ></MoneyInput>
               <Select
+                onChange={(event) => setTipoDomiciliacion(event?.target?.value)}
+                id="comissionType"
+                label="Tipo de Domiciliación"
+                value={tipoDomiciliacion}
+                options={{
+                  Mensual: 1,
+                  Quincenal: 2,
+                  Semanal: 3,
+                }}
+              ></Select>
+              {/*               <Select
                 onChange={(event) => setNumPagosPdp(event?.target?.value)}
                 id="comissionType"
                 label="N° Pagos Punto Pago"
@@ -316,7 +329,19 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   2: 2,
                   3: 3,
                 }}
-              ></Select>
+              ></Select> */}
+              <Input
+                name="N° Pagos Punto Pago"
+                label="N° Pagos Punto Pago"
+                type="tel"
+                autoComplete="off"
+                minLength={"1"}
+                maxLength={"2"}
+                /* invalid={invalidCedula} */
+                value={numPagosPdp}
+                onChange={(event) => setNumPagosPdp(event?.target?.value)}
+                required
+              />
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"} type="">
               {

@@ -255,12 +255,12 @@ const Deposito = () => {
           trxInfo: [
             [
               "Tipo",
-              res?.obj?.Data?.numTipoCuenta === "01" ? "Ahorros" : "Corriente",
+              res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
             ["",""],
             [
               "Nro. Cuenta",
-              "****" + res?.obj?.Data?.numNumeroDeCuenta?.slice(-4),
+              `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
             ],
             ["",""],
             ["Valor", formatMoney.format(valor)],
@@ -371,7 +371,11 @@ const Deposito = () => {
             maxLength={"50"}
             autoComplete='off'
             value={nomDepositante}
-            onInput={(e) =>{setNomDepositante(e.target.value)}}
+            onInput={(e) =>{
+              if (isNaN(e.target.value) || e.target.value ===""){
+              setNomDepositante(e.target.value)}
+            }
+            }
             required
           />
           {/* <MoneyInput

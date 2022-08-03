@@ -10,6 +10,9 @@ const Panel = lazy(() => import("./Views/Panel"));
  * COMPONENTES ROL ANALISTA
  */
 const PanelConsignaciones = lazy(() => import("./Views/PanelConsignaciones"));
+
+const PanelHistorico = lazy(() => import("./Views/PanelHistorico"));
+
 const ParametrizacionRecaudo = lazy(() =>
   import("./Views/ParametrizacionRecaudo")
 );
@@ -37,6 +40,12 @@ export const rutasGestion = [
     link: "/gestion/parametrizar_cuenta",
     label: <AppIcons Logo={"RECAUDO"} name="Parametrizar cuenta(s) recaudo" />,
     component: ParametrizacionRecaudo,
+    permission: [3],
+  },
+  {
+    link: "/gestion/historial_cierre",
+    label: <AppIcons Logo={"RECAUDO"} name="Históricos de cierre de caja" />,
+    component: PanelHistorico,
     permission: [3],
   },
 ];

@@ -217,39 +217,9 @@ const Arqueo = ({
           </>
         ) : (
           <Fieldset legend={"Confirmación arqueo"}>
-            {arqueoConfirmado ? <div>
-                <h1 className="text-2xl font-semibold">
-                  Total arqueo:&nbsp;
-                  {formatMoney.format(total)}
-                </h1>
-                <h1>
-                  Sobrantes:&nbsp;
-                  {caja?.obj?.actual_caja - total < 0
-                    ? formatMoney.format(total - caja?.obj?.actual_caja)
-                    : formatMoney.format(0)}
-                </h1>
-                <h1>
-                  {caja?.obj?.estimacion_f < 0
-                    ? `Estimación sobrante: ${formatMoney.format(
-                        caja?.obj?.estimacion_f
-                      )}`
-                    : `Estimación faltante: ${formatMoney.format(
-                        caja?.obj?.estimacion_f
-                      )}`}
-                </h1>
-                <h1>
-                  Faltantes:&nbsp;
-                  {caja?.obj?.actual_caja - total > 0
-                    ? formatMoney.format(total - caja?.obj?.actual_caja + trans)
-                    : formatMoney.format(0)}
-                </h1>
-                <h1>
-                  Dinero transportadora:&nbsp;
-                  {formatMoney.format(trans)}
-                </h1>
-              </div> : <div>
+            {!arqueoConfirmado ? <div>
             <h1 className="text-lg">
-              ¿Está seguro de los datos para el arqueo, no podrá modificarlos?
+              ¿Está seguro de los datos para el arqueo? Una vez confirmados no podrá modificarlos.
             </h1>
             <ButtonBar>
               <Button type="button" onClick={() => setConfirmarArqueo(false)}>
@@ -259,7 +229,7 @@ const Arqueo = ({
                 Confirmar arqueo
               </Button>
             </ButtonBar>
-            </div>}
+            </div> : <></>}
             
           </Fieldset>
         )}
