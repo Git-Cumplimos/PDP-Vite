@@ -1,55 +1,68 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../../hooks/AuthHooks";
+import { notifyError } from "../../../utils/notify";
 import Button from "../../Base/Button";
 import ButtonBar from "../../Base/ButtonBar";
 import Modal from "../../Base/Modal";
-// import {Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
+
+const timeIdleTimeOut = `${process.env.REACT_APP_TIEMPO_INACTIVIDAD_ADVERTENCIA}`;
+const timeLogOutTimeOut = `${process.env.REACT_APP_TIEMPO_INACTIVIDAD_LOGOUT}`;
 
 const IdleTimeOut = () => {
-  //Modal
   const [idleModal, setIdleModal] = useState(false);
   const { roleInfo, signOut } = useAuth();
+  const refModal = useRef(false);
 
-  let idleTimeout = 1000 * 5 * 1; //1 minute
-  let idleLogout = 1000 * 5 * 2; //2 Minutes
-  let idleEvent;
-  let idleLogoutEvent;
+  //   let idleTimeout = 1000 * parseInt(timeIdleTimeOut);
+  //   let idleLogout = 1000 * parseInt(timeLogOutTimeOut);
+  let idleTimeout = 1000 * 10;
+  let idleLogout = 1000 * 20;
+  let idleEvent = useRef();
+  let idleLogoutEvent = useRef();
 
   const events = ["click", "keypress"];
 
   const sessionTimeout = () => {
-    console.log("aaaa", idleEvent);
-    console.log("ddd", idleLogoutEvent);
-    if (!!idleEvent) clearTimeout(idleEvent);
-    if (!!idleLogoutEvent) clearTimeout(idleLogoutEvent);
-
-    idleEvent = setTimeout(() => {
-      console.log("tiemeee");
-      setIdleModal(true);
-    }, idleTimeout);
-    idleLogoutEvent = setTimeout(() => {
+    // console.log("aaaa", idleEvent.current);
+    // console.log("ddd", idleLogoutEvent.current);
+    // console.log("fff", idleModal);
+    // console.log("fff", refModal.current);
+    if (!!idleEvent.current) clearTimeout(idleEvent.current);
+    // if (!refModal.current) {
+    if (!!idleLogoutEvent.current) clearTimeout(idleLogoutEvent.current);
+    idleLogoutEvent.current = setTimeout(() => {
       logOut();
     }, idleLogout);
+    // }
+
+    // idleEvent.current = setTimeout(() => {
+    //   console.log("tiemeee");
+    //   setIdleModal(true);
+    //   refModal.current = true;
+    // }, idleTimeout);
   };
 
   const extendSession = () => {
-    console.log("user wants to stay logged in");
+    // console.log("user wants to stay logged in");
     setIdleModal(false);
+    refModal.current = false;
   };
 
   const logOut = () => {
     signOut();
-    setIdleModal(false);
-    console.log("logging out");
+    notifyError("La sesión se cerro por inactividad", false);
+    // setIdleModal(false);
+    // refModal.current = false;
+    // console.log("logging out");
   };
 
   useEffect(() => {
-    console.log(roleInfo);
     if (roleInfo) {
       for (let e in events) {
-        console.log("mounted", e);
+        // console.log("mounted", e);
         window.addEventListener(events[e], sessionTimeout);
       }
+      sessionTimeout();
 
       return () => {
         for (let e in events) {
@@ -58,9 +71,12 @@ const IdleTimeOut = () => {
       };
     }
   }, [roleInfo]);
-
+  const handleCloseModal = () => {
+    setIdleModal(false);
+  };
   return (
-    <Modal show={idleModal} handleClose={() => setIdleModal(false)}>
+    <>
+      {/* <Modal show={idleModal} handleClose={handleCloseModal}>
       <h1 className='text-3xl text-center mb-10'>
         La sesión se cerrará por inactividad
       </h1>
@@ -72,18 +88,8 @@ const IdleTimeOut = () => {
           Extender sesión
         </Button>
       </ButtonBar>
-      {/* <ModalHeader toggle={() => setIdleModal(false)}>
-            Session expire warning
-        </ModalHeader>
-        <ModalBody>
-            your session will expire in {idleLogout / 60 / 1000} minutes. Do you want to extend the session?
-        </ModalBody>
-        <ModalFooter>
-          <button className="btn btn-info"  onClick={()=> logOut()}>Logout</button>
-          <button className="btn btn-success" onClick={()=> extendSession()}>Extend session</button>
-        
-        </ModalFooter> */}
-    </Modal>
+    </Modal> */}
+    </>
   );
 };
 

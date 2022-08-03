@@ -12,10 +12,10 @@ const notify = (msg = "Info") => {
   });
 };
 
-const notifyError = (msg = "Error") => {
+const notifyError = (msg = "Error", autoClose = 5000) => {
   toast.warning(msg, {
     position: "top-center",
-    autoClose: 5000,
+    autoClose: autoClose,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,

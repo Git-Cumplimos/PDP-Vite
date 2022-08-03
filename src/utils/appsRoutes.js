@@ -906,26 +906,26 @@ const allUrlsPrivateApps = [
       },
     ],
   },
-  {
-    link: "/recargas-Colcard",
-    label: <AppIcons Logo={"LOTERIA"} name='Recargas ColCard' />,
-    component: ColCard,
-    permission: [50],
-    subRoutes: [
-      {
-        link: "/recargas-Colcard/recargar-tarjeta",
-        label: <AppIcons Logo={"SORTEOS"} name='Recargar tarjeta' />,
-        component: RecargarColCard,
-        permission: [50],
-      },
-      // {
-      //   link: "/recargas-Colcard/consultar-tarjeta",
-      //   label: <AppIcons Logo={CARGAR} name="Consultar tarjeta" />,
-      //   component: ConsultarColCard,
-      //   permission: [3],
-      // },
-    ],
-  },
+  // {
+  //   link: "/recargas-Colcard",
+  //   label: <AppIcons Logo={"LOTERIA"} name='Recargas ColCard' />,
+  //   component: ColCard,
+  //   permission: [50],
+  //   subRoutes: [
+  //     {
+  //       link: "/recargas-Colcard/recargar-tarjeta",
+  //       label: <AppIcons Logo={"SORTEOS"} name='Recargar tarjeta' />,
+  //       component: RecargarColCard,
+  //       permission: [50],
+  //     },
+  //     // {
+  //     //   link: "/recargas-Colcard/consultar-tarjeta",
+  //     //   label: <AppIcons Logo={CARGAR} name="Consultar tarjeta" />,
+  //     //   component: ConsultarColCard,
+  //     //   permission: [3],
+  //     // },
+  //   ],
+  // },
   {
     link: "/movistar",
     label: <AppIcons Logo={"LOTERIA"} name='Movistar' />,
