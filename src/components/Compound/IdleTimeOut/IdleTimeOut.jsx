@@ -61,6 +61,9 @@ const IdleTimeOut = () => {
 
   return (
     <Modal show={idleModal} handleClose={() => setIdleModal(false)}>
+      <h1 className='text-3xl text-center mb-10'>
+        La sesión se cerrará por inactividad
+      </h1>
       <ButtonBar>
         <Button type='button' onClick={logOut}>
           Cerrar sesión
