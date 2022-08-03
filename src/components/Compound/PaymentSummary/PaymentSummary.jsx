@@ -1,6 +1,6 @@
 const PaymentSummary = ({
-  title = "¿Esta seguro de realizar el transaccion?",
-  subtitle = "Resumen de transaccion",
+  title = "¿Está seguro de realizar la transacción?",
+  subtitle = "Resumen de transacción",
   summaryTrx = {},
   children,
 }) => {

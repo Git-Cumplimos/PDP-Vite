@@ -22,7 +22,6 @@ const CrearSMS = () => {
     const body = { sms: SMS };
     try {
       const res = await fetchData(url_SMS, "POST", {}, body);
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -34,7 +33,6 @@ const CrearSMS = () => {
     const query = { sms: SMS, limit: 2, page: page };
     try {
       const res = await fetchData(url_SMS, "GET", query);
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -59,7 +57,6 @@ const CrearSMS = () => {
     });
   });
 
-  console.log(typeof SMS);
   return (
     <>
       <h1 className="text-3xl">Crear mensaje predefinido</h1>
@@ -82,7 +79,6 @@ const CrearSMS = () => {
               if (!res.status) {
                 notifyError(res?.msg);
               } else {
-                console.log(res.obj);
                 setResSMS(res.obj.results);
                 setMaxPages(res.obj.maxPages);
               }
@@ -114,7 +110,6 @@ const CrearSMS = () => {
                     if (!res.status) {
                       notifyError(res?.msg);
                     } else {
-                      console.log(res.obj);
                       setResSMS(res.obj.results);
                       setMaxPages(res.obj.maxPages);
                     }
@@ -134,7 +129,6 @@ const CrearSMS = () => {
                     if (!res.status) {
                       notifyError(res?.msg);
                     } else {
-                      console.log(res.obj);
                       setResSMS(res.obj.results);
                       setMaxPages(res.obj.maxPages);
                     }
@@ -158,7 +152,6 @@ const CrearSMS = () => {
               };
             })}
             onSelectRow={(e, index) => {
-              console.log(resSMS[index]);
               setSMS(resSMS[index].sms);
             }}
           />

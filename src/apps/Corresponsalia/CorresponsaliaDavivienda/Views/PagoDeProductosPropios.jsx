@@ -50,7 +50,7 @@ const PagoDeProductosPropios = () => {
   const [datosConsulta, setDatosConsulta] = useState({});
 
   const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de retiro DaviPlata",
+    title: "Recibo de Pago de Productos de Crédito",
     timeInfo: {
       "Fecha de venta": "",
       Hora: "",
@@ -338,7 +338,7 @@ const PagoDeProductosPropios = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl'>Pago de productos de crédito</h1>
+      <h1 className='text-3xl mb-10'>Pago de productos de crédito</h1>
       <Form grid onSubmit={onSubmit}>
         <Select
           id='tipoIdentificacion'
@@ -346,7 +346,7 @@ const PagoDeProductosPropios = () => {
           label='Tipo de identificación'
           options={{
             "": "",
-            Cedula: "01",
+            "Cédula de ciudadanía": "01",
             "Cedula extranjeria": "02",
             NIT: "03",
             "NIT Persona natural": "04",

@@ -34,14 +34,10 @@ const ConsultarColCard = () => {
       }
     )
       .then((response) => {
-        console.log(response);
         setRespuesta(response);
         habilitarModal();
       })
       .catch((e) => {
-        console.log(
-          "hubo un problema con la peticion de la consulta al servidor " + e
-        );
         setRespuesta(e);
         setShowModal2(true);
       });
@@ -50,8 +46,6 @@ const ConsultarColCard = () => {
   const habilitarModal = () => {
     setShowModal(!showModal);
   };
-
-  console.log(respuesta);
 
   return (
     <>

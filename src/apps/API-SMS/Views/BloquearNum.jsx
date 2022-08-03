@@ -22,7 +22,6 @@ const BloquearNum = () => {
     body.phone = phone;
     try {
       const res = await fetchData(url_bloqueo, "POST", {}, body);
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -48,12 +47,10 @@ const BloquearNum = () => {
         notifyError(res?.msg);
       } else {
         notify(res?.msg);
-        console.log(res);
       }
     });
   };
 
-  console.log(typeof SMS);
   return (
     <>
       <h1 className="text-3xl">Bloquear Número</h1>
