@@ -12,6 +12,7 @@ import MessengerCustomerChat from "react-messenger-customer-chat";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ServiceWorkerWrapper from "./components/Compound/ServiceWorkerWrapper/ServiceWorkerWrapper";
+import IdleTimeOut from "./components/Compound/IdleTimeOut/IdleTimeOut";
 // import ContactMenu from "./components/Compound/ContactMenu";
 
 Amplify.configure(awsconfig);
@@ -38,11 +39,12 @@ function App() {
             </UrlsContext.Consumer>
           </ProvideUrls>
         </ProvideImgs>
+        <IdleTimeOut />
       </ProvideAuth>
       <MessengerCustomerChat
-        pageId="455201114671494"
-        appId="603779204002555"
-        language="es_LA"
+        pageId='455201114671494'
+        appId='603779204002555'
+        language='es_LA'
       />
       {/* <ContactMenu
         wa="573102976460"
