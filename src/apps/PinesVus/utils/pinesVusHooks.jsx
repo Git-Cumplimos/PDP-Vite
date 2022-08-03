@@ -192,8 +192,9 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const consultaParticipacion = useCallback(async () => {
+  const consultaParticipacion = useCallback(async (fecha_ini) => {
     const query = { id_comercio: roleInfo.id_comercio};
+    query.fecha_participacion = fecha_ini
     try {
       const res = await fetchData(urls.consultaParticipacion, "GET", query);
       return res;
@@ -209,6 +210,7 @@ export const useProvidePinesVus = () => {
     // num_aprobacion,
     // num_transaccion, 
     valor,
+    fecha_participacion
     // voucher
     ) => {
     const body = {
@@ -218,6 +220,7 @@ export const useProvidePinesVus = () => {
       // num_aprobacion: num_aprobacion,
       // num_transaccion: num_transaccion, 
       valor: valor,
+      fecha_participacion: fecha_participacion,
       // voucher: voucher,
       Usuario: roleInfo?.id_usuario,
       Dispositivo: roleInfo?.id_dispositivo,

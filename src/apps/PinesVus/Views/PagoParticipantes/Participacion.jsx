@@ -13,7 +13,11 @@ import { enumParametrosPines } from "../../utils/enumParametrosPines";
 import { useNavigate } from "react-router-dom";
 import Tickets from "../../../../components/Base/Tickets";
 
-
+const dateFormatter = Intl.DateTimeFormat("az", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 //const url_cargueS3 = `${process.env.REACT_APP_URL_PinesVus}/CargueS3`;
 
@@ -46,6 +50,8 @@ const Participacion = () => {
   const [numAprobacion, setNumAprobacion] = useState("")
   const [disabledBtns, setDisabledBtns] = useState(false)
   const [respPago, setRespPago] = useState("")
+  const [fecha_ini, setFecha_ini] = useState("")
+  const [pagoParticipacion, setPagoParticipacion] = useState(false)
   // const [nombreArchivo, setNombreArchivo] = useState("")
 
   // const [archivo, setArchivo] = useState("");
@@ -53,75 +59,12 @@ const Participacion = () => {
   const [file, setFile] = useState("");
   const [fileName, setFileName] = useState("");
 
-  // const onChange = (files) => {
-  //   console.log(file);
-  //   if (Array.isArray(Array.from(files))) {
-  //     files = Array.from(files);
-  //     if (files.length === 1) {
-  //       const m_file = files[0];
-  //       console.log(m_file);
-  //       setFile(m_file);
-  //       setFileName(m_file.name);
-  //     } else {
-  //       if (files.length > 1) {
-  //         notifyError("Se debe ingresar un solo archivo para subir");
-  //       }
-  //     }
-  //   }
-  // };
-
-  // const onSubmitArchivo = useCallback(
-  //   (e) => {
-  //     console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-  //     const f = new Date();
-  //     const query = {
-  //       contentType: "application/text",
-  //       filename: `vouchersPagoParticipacion/voucherPago_${selected.aliado}_${f.getDate()}${
-  //         f.getMonth() + 1
-  //       }${f.getFullYear()}/${fileName}`,
-  //     };
-  //     console.log(query.filename)
-  //     fetchData(url_cargueS3, "GET", query)
-  //       .then((respuesta) => {
-  //         if (!respuesta?.status) {
-  //           notifyError(respuesta?.msg);
-  //         } else {
-  //           // setEstadoForm(true);
-  //           const formData2 = new FormData();
-  //           if (file) {
-  //             for (const property in respuesta?.obj?.fields) {
-  //               formData2.set(
-  //                 `${property}`,
-  //                 `${respuesta?.obj?.fields[property]}`
-  //               );
-  //             }
-  //             formData2.set("file", file);
-  //             console.log(formData2, `${respuesta?.obj?.url}`);
-  //             fetch(`${respuesta?.obj?.url}`, {
-  //               method: "POST",
-  //               body: formData2,
-  //             }).then((res) => {
-  //               if (res?.ok) {
-  //                 notify("El voucher fue cargado")
-  //               } else {
-  //                 notifyError("No fue posible conectar con el Bucket");
-  //               }
-  //             }).catch((err) => {
-  //               console.log(err, "ERROR ********")
-  //             });
-  //           }
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         notifyError("Error al cargar Datos");
-  //       }); /* notify("Se ha comenzado la carga"); */
-  //   },
-  //   [file, fileName, archivo]
-  // );
 
 
   useEffect(() => {
-    consultaParticipacion()
+    if (
+      (fecha_ini !== "")){
+    consultaParticipacion(fecha_ini)
       .then((res) => {
         setTable([]);
         if (!res?.status) {
@@ -131,8 +74,8 @@ const Participacion = () => {
         }
       })
       .catch((err) => console.log("error", err));
-    
-  }, [showModal, consultaParticipacion]);
+    }    
+  }, [showModal, consultaParticipacion,fecha_ini]);
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
@@ -147,32 +90,6 @@ const Participacion = () => {
     setFileName("")
   }, []);
 
-  // const onSubmit = (e) => { 
-  //   e.preventDefault();
-  //   setDisabledBtns(true)
-  //   console.log(selected)
-  //   const f = new Date()
-  //   registroPagoParticipacion(
-  //     selected.aliado, 
-  //     banco, 
-  //     numCuenta, 
-  //     numAprobacion, 
-  //     numTransaccion,
-  //     selected.valor,
-  //     `vouchersPagoParticipacion/voucherPago_${selected.aliado}_${f.getDate()}${
-  //       f.getMonth() + 1
-  //     }${f.getFullYear()}/`,
-  //   ).then((res) => {
-  //       console.log(res)
-  //       setDisabledBtns(false)
-  //       if (!res?.status) {
-  //         notifyError(res?.msg);
-  //       } else {
-  //         setRespPago(res?.obj)
-  //       }
-  //   }).catch(() => setDisabledBtns(false));    
-  // }
-
   const onSubmit = (e) => { 
     e.preventDefault();
     setDisabledBtns(true)
@@ -184,6 +101,7 @@ const Participacion = () => {
       //numAprobacion, 
       //numTransaccion,
       selected.valor,
+      fecha_ini,
       // `vouchersPagoParticipacion/voucherPago_${selected.aliado}_${f.getDate()}${
       //   f.getMonth() + 1
       // }${f.getFullYear()}/`,
@@ -223,6 +141,8 @@ const Participacion = () => {
       }),
       commerceName: "Pago a " + respPago?.participante,
       trxInfo: [
+        ["Fecha participación", fecha_ini],
+        ["",""],
         ["Valor Trámite", formatMoney.format(respPago?.valor)],
         ["",""],
         ["Recibido", "______________________"],
@@ -231,7 +151,7 @@ const Participacion = () => {
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [roleInfo, respPago, formatMoney]);
+  }, [roleInfo, respPago, formatMoney, fecha_ini]);
 
   useEffect(() => {
     infoTicket(
@@ -264,11 +184,14 @@ const Participacion = () => {
     const horaActual = hora.split(":")
     const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
-    if (!(deltaHora<0 || (deltaHora===0 & deltaMinutos<1)) ){
-      notifyError("Modulo disponible a partir de las " + horaCierre)
-      navigate("/PinesVus/Participacion",{replace:true});
+    
+    if (!(deltaHora<0 || (deltaHora===0 & deltaMinutos<1)) & dateFormatter.format(new Date())===fecha_ini){
+      setPagoParticipacion(false)
     }
-  }, [table, hora, horaCierre,navigate])
+    else{
+      setPagoParticipacion(true)
+    }
+  }, [table, hora, horaCierre, fecha_ini,navigate])
   return (
     <>
       <>
@@ -289,14 +212,25 @@ const Participacion = () => {
           }) || []}
           onSelectRow={(e, index) => {            
               setSelected(table[index]);
+              if (!pagoParticipacion){
+                notifyError("Debe esperar la hora de cierre para hacer el pago de participación")
+              }else{
               if (table[index].pagado === false){
                 setShowModal(true)
               }
               else{
                 notifyError("El pago a " + table[index].aliado + " ya se realizo")
-              }            
+              }  
+            }          
           }}
         >
+          <Input
+            id="dateInit"
+            label="Fecha participación"
+            type="date"
+            value={fecha_ini}
+            onInput={(e) => setFecha_ini(e.target.value)}
+          />
         </TableEnterprise>
       </>
       <Modal show={showModal} handleClose={() => closeModal()}>
