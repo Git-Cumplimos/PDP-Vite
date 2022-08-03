@@ -1,3 +1,5 @@
+import { Auth } from "aws-amplify";
+
 export const makeMoneyFormatter = (fractionDigits) => {
   return Intl.NumberFormat("es-CO", {
     style: "currency",
@@ -70,4 +72,17 @@ export const onChangeAccountNumber = (ev) => {
   ev.target.setSelectionRange(caret_pos, caret_pos);
 
   return temp;
+};
+
+export const fetchSecure = async (input, init) => {
+  const _session = await Auth.currentSession();
+
+  const newinit = init ?? { headers: {} };
+
+  newinit.headers = {
+    ...newinit.headers,
+    Authorization: `Bearer ${_session?.getIdToken().getJwtToken()}`,
+  };
+
+  return await fetch(input, newinit);
 };

@@ -7,6 +7,7 @@ import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import Select from "../../../../components/Base/Select";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import ToggleInput from "../../../../components/Base/ToggleInput";
 import { onChangeNumber } from "../../../../utils/functions";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import {
@@ -14,12 +15,18 @@ import {
   addConveniosPinesList,
   modConveniosPinesList,
   getConveniosPinesTiposValores,
+  getConveniosPinesListMassive,
 } from "../../utils/fetchFunctions";
 
 const ConveniosPines = () => {
   const [listaConveniosPines, setListaConveniosPines] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [searchFilters, setSearchFilters] = useState({
+    pk_codigo_convenio: "",
+    codigo_pin: "",
+    nombre_convenio: "",
+  });
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -30,7 +37,7 @@ const ConveniosPines = () => {
   const [loading, setLoading] = useState(false);
 
   const getConvPines = useCallback(() => {
-    getConveniosPinesList({ ...pageData })
+    getConveniosPinesList({ ...pageData, ...searchFilters })
       .then((res) => {
         setListaConveniosPines(res?.obj?.results ?? []);
         setMaxPages(res?.obj?.maxPages ?? []);
@@ -42,7 +49,7 @@ const ConveniosPines = () => {
         }
         console.error(err?.message);
       });
-  }, [pageData]);
+  }, [pageData, searchFilters]);
 
   useEffect(() => {
     getConveniosPinesTiposValores()
@@ -84,12 +91,11 @@ const ConveniosPines = () => {
             key,
             key.includes("referencia_") && val === "" ? null : val,
           ])
-          .filter(([key, val]) => {
-            if (!selected) {
-              return val;
-            }
-            return selected[key] !== val || key === "pk_codigo_convenio";
-          })
+          .filter(([key, val]) =>
+            !selected
+              ? val
+              : selected[key] !== val || key === "pk_codigo_convenio"
+          )
       );
       notifyPending(
         selected
@@ -126,6 +132,51 @@ const ConveniosPines = () => {
     },
     [handleClose, getConvPines, selected]
   );
+
+  const downloadMasive = useCallback(() => {
+    notifyPending(
+      getConveniosPinesListMassive({ ...searchFilters }),
+      {
+        render() {
+          setLoading(true);
+          return "Enviando solicitud";
+        },
+      },
+      {
+        render({ data: response }) {
+          setLoading(false);
+          const filename = response.headers.get("Content-Disposition").split("; ")?.[1].split("=")?.[1];
+
+          response.blob().then((blob) => {
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+              window.navigator.msSaveOrOpenBlob(blob, filename);
+            } else {
+              // other browsers
+              const exportUrl = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = exportUrl;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              URL.revokeObjectURL(exportUrl);
+              document.body.removeChild(a);
+            }
+          })
+          return "Descarga de archivo de convenios exitosa";
+        },
+      },
+      {
+        render({ data: err }) {
+          setLoading(false);
+          if (err?.cause === "custom") {
+            return err?.message;
+          }
+          console.error(err?.message);
+          return "Descarga de archivo de convenios fallida";
+        },
+      }
+    );
+  }, [searchFilters]);
 
   return (
     <Fragment>
@@ -167,7 +218,54 @@ const ConveniosPines = () => {
           setShowModal(true);
           setSelected(listaConveniosPines[i]);
         }}
-      ></TableEnterprise>
+        onChange={(ev) =>
+          setSearchFilters((old) => ({
+            ...old,
+            [ev.target.name]: ev.target.value,
+          }))
+        }
+        actions={{
+          download: downloadMasive,
+        }}
+      >
+        <Input
+          id={"pk_codigo_convenio"}
+          label={"Codigo de convenio"}
+          name={"pk_codigo_convenio"}
+          type="tel"
+          autoComplete="off"
+          maxLength={"6"}
+          onChange={(ev) => {
+            ev.target.value = onChangeNumber(ev);
+          }}
+          defaultValue={selected?.pk_codigo_convenio ?? ""}
+          readOnly={selected}
+          required
+        />
+        <Input
+          id={"codigo_pin"}
+          label={"Codigo pin"}
+          name={"codigo_pin"}
+          type="tel"
+          autoComplete="off"
+          maxLength={"4"}
+          onChange={(ev) => {
+            ev.target.value = onChangeNumber(ev);
+          }}
+          defaultValue={selected?.codigo_pin ?? ""}
+          required
+        />
+        <Input
+          id={"nombre_convenio"}
+          label={"Nombre del Convenio"}
+          name={"nombre_convenio"}
+          type="text"
+          autoComplete="off"
+          maxLength={"255"}
+          defaultValue={selected?.nombre_convenio ?? ""}
+          required
+        />
+      </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         {uploadMasivo ? (
           <Form grid>
@@ -277,6 +375,12 @@ const ConveniosPines = () => {
                 autoComplete="off"
                 maxLength={"255"}
                 defaultValue={selected?.referencia_5 ?? ""}
+              />
+              <ToggleInput
+                id={"activo"}
+                label={"Se encuentra activo"}
+                name={"activo"}
+                defaultChecked={selected?.activo}
               />
               <ButtonBar>
                 <Button type={"submit"} disabled={loading}>
