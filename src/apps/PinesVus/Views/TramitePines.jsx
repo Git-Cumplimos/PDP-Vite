@@ -114,41 +114,41 @@ const TramitePines = () => {
     setModalUsar(true);
   };
 
-  const hora = useMemo(() => {    
-    return Intl.DateTimeFormat("es-CO", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: false,
-    }).format(new Date())
-  }, [parametroBusqueda, table]);
+  // const hora = useMemo(() => {    
+  //   return Intl.DateTimeFormat("es-CO", {
+  //     hour: "numeric",
+  //     minute: "numeric",
+  //     hour12: false,
+  //   }).format(new Date())
+  // }, [parametroBusqueda, table]);
 
-  const horaCierre = useMemo(() => { 
-    const dia = (new Date()).getDay()  
-    if (dia === enumParametrosPines.diaFinSemana) {
-      return enumParametrosPines.horaCierreFinSemana.split(":") 
-    }
-    else{
-      return enumParametrosPines.horaCierre.split(":")
-    }
+  // const horaCierre = useMemo(() => { 
+  //   const dia = (new Date()).getDay()  
+  //   if (dia === enumParametrosPines.diaFinSemana) {
+  //     return enumParametrosPines.horaCierreFinSemana.split(":") 
+  //   }
+  //   else{
+  //     return enumParametrosPines.horaCierre.split(":")
+  //   }
      
-  }, []);
+  // }, []);
 
-  useEffect(() => {
-    const horaActual = hora.split(":")
-    const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
-    const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
-    if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
-      notifyError("Módulo cerrado a partir de las " + horaCierre)
-      navigate("/PinesVus",{replace:true});
-    }
-    else if ((deltaHora ===1 & deltaMinutos<-50)){
-      notifyError("El módulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
-    }
-    else if ((deltaHora ===0 & deltaMinutos<10)){
-      notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
-    }
+  // useEffect(() => {
+  //   const horaActual = hora.split(":")
+  //   const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
+  //   const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
+  //   if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
+  //     notifyError("Módulo cerrado a partir de las " + horaCierre)
+  //     navigate("/PinesVus",{replace:true});
+  //   }
+  //   else if ((deltaHora ===1 & deltaMinutos<-50)){
+  //     notifyError("El módulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
+  //   }
+  //   else if ((deltaHora ===0 & deltaMinutos<10)){
+  //     notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
+  //   }
 
-  }, [hora,parametroBusqueda, table, horaCierre,navigate])
+  // }, [hora,parametroBusqueda, table, horaCierre,navigate])
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -163,8 +163,8 @@ const TramitePines = () => {
                 id="paramBusqueda"
                 label="Código"
                 type="text"
-                minLength="10"
-                maxLength="10"
+                minLength="4"
+                maxLength="4"
                 autoComplete="off"
                 value={parametroBusqueda}
                 required
