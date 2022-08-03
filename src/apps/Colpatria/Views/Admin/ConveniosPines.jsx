@@ -7,6 +7,7 @@ import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import Select from "../../../../components/Base/Select";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import TextArea from "../../../../components/Base/TextArea";
 import ToggleInput from "../../../../components/Base/ToggleInput";
 import { onChangeNumber } from "../../../../utils/functions";
 import { notifyError, notifyPending } from "../../../../utils/notify";
@@ -80,6 +81,7 @@ const ConveniosPines = () => {
       setShowModal(false);
       setSelected(null);
       setUploadMasivo(false);
+      setMassiveFile(null);
     }
   }, [loading]);
 
@@ -312,7 +314,7 @@ const ConveniosPines = () => {
         {uploadMasivo ? (
           <Form onSubmit={handleUploadMasivo} grid>
             <FileInput
-              label={"Subir archivo masivo"}
+              label={"Elegir archivo masivo"}
               onGetFile={(files) => {
                 if (Array.isArray(files)) {
                   setMassiveFile(files[0]);
@@ -326,6 +328,13 @@ const ConveniosPines = () => {
               allowDrop={false}
               required
             />
+            <TextArea
+                id={"filename"}
+                label={"Archivo selecionado"}
+                value={massiveFile?.name ?? ""}
+                disabled
+                readOnly
+              />
             <ButtonBar>
               <Button type={"submit"}>Realizar carge</Button>
             </ButtonBar>
