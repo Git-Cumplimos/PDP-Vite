@@ -372,7 +372,7 @@ const CrearPin = () => {
       commerceName: pinData.descripcion,
       trxInfo: [
         ["Proceso", "Creación de Pin"],
-        ["Código", respPin?.cod_hash_pin],
+        // ["Código", respPin?.cod_hash_pin],
         ["Vence", respPin?.fecha_vencimiento],
         ["Valor Trámite", formatMoney.format(tramiteData?.valor)],
         ["IVA Trámite",formatMoney.format(tramiteData?.iva)],
