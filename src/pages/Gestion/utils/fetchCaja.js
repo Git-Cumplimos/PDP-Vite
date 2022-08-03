@@ -7,7 +7,7 @@ const urls = {
   cargas: `${process.env.REACT_APP_URL_CAJA}generate`,
   buscar_comprobante: `${process.env.REACT_APP_URL_CAJA}searchreceipts`,
   cuentas: `${process.env.REACT_APP_URL_CAJA}cuentas`,
-  historicoscierre: `http://127.0.0.1:7000/consultahistoricos` //`${process.env.REACT_APP_URL_CAJA}consultahistoricos`,
+  historicoscierre: `${process.env.REACT_APP_URL_CAJA}consultahistoricos`,
 };
 
 export const searchCash = async (queryParam) => {
