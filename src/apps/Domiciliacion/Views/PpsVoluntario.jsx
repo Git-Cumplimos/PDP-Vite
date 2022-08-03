@@ -37,8 +37,8 @@ const PpsVoluntario = ({ datosConsulta }) => {
     setShowModal(false);
   }, []);
 
-  // const url = process.env.REACT_APP_URL_COLPENSIONES;
-  const url = "http://127.0.0.1:7000";
+  const url = process.env.REACT_APP_URL_COLPENSIONES;
+  // const url = "http://127.0.0.1:7000";
 
   useEffect(() => {}, [numCelular]);
   useEffect(() => {
