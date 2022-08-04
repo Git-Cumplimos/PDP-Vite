@@ -1,8 +1,9 @@
 import fetchData from "../../../utils/fetchData";
 import { fetchSecure } from "../../../utils/functions";
 
-const urlColpatriaTrx = `${process.env.REACT_APP_URL_COLPATRIA}/trx`;
+// const urlColpatriaTrx = `${process.env.REACT_APP_URL_COLPATRIA}/trx`;
 // const urlColpatriaParams = `${process.env.REACT_APP_URL_COLPATRIA}/params`;
+const urlColpatriaTrx = `http://localhost:5000/trx`;
 const urlColpatriaParams = `http://localhost:5000/params`;
 
 export const makeDeposit = async (bodyDep) => {
@@ -114,6 +115,10 @@ const buildPutFunction = (url) => {
     }
   };
 };
+
+export const searchConveniosPinesList = buildGetFunction(
+  `${urlColpatriaTrx}/consulta-pines`
+);
 
 export const getErrorList = buildGetFunction(
   `${urlColpatriaParams}/error-table`

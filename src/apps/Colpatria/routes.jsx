@@ -6,7 +6,13 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 /** Rutas */
 const colpatriaTrx = lazy(() => import("./ColpatriaTrx"));
 const Deposito = lazy(() => import("./Views/Deposito"));
-const VentaPines = lazy(() => import("./Views/VentaPines"));
+
+
+const Pines = lazy(() => import("./Views/Pines"));
+const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
+const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
+
+
 const AdminColpatria = lazy(() => import("./Views/Admin"));
 const ListaErrores = lazy(() => import("./Views/Admin/ListaErrores"));
 const ConveniosPines = lazy(() => import("./Views/Admin/ConveniosPines"));
@@ -24,10 +30,25 @@ const rutasColpatria = {
       permission: [67],
     },
     {
-      link: "/corresponsalia/colpatria/venta-pines",
-      label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines"} />,
-      component: VentaPines,
+      link: "/corresponsalia/colpatria/pines",
+      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo de Pines"} />,
+      component: Pines,
       permission: [67],
+      subRoutes: [
+        {
+          link: "/corresponsalia/colpatria/pines/consulta",
+          label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines"} />,
+          component: PinesConsulta,
+          permission: [67],
+        },
+        {
+          link: "/corresponsalia/colpatria/pines/venta/:id_convenio_pin",
+          label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines"} />,
+          component: PinesVenta,
+          permission: [67],
+          show: false,
+        },
+      ],
     },
     {
       link: "/corresponsalia/colpatria/gestion",
@@ -43,11 +64,13 @@ const rutasColpatria = {
         },
         {
           link: "/corresponsalia/colpatria/gestion/lista-convenios-pines",
-          label: <AppIcons Logo={"RECAUDO"} name={"Convenios de pines de recaudo"} />,
+          label: (
+            <AppIcons Logo={"RECAUDO"} name={"Convenios de pines de recaudo"} />
+          ),
           component: ConveniosPines,
           permission: [68],
         },
-      ]
+      ],
     },
   ],
 };

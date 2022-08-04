@@ -6,32 +6,43 @@ import {
   useRef,
   useState,
 } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 
-import Button from "../../../components/Base/Button";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import Modal from "../../../components/Base/Modal";
-import Tickets from "../../../components/Base/Tickets";
-import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import { useAuth } from "../../../hooks/AuthHooks";
-import useMoney from "../../../hooks/useMoney";
-import { makeSellPin } from "../utils/fetchFunctions";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import Modal from "../../../../components/Base/Modal";
+import Tickets from "../../../../components/Base/Tickets";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import useMoney from "../../../../hooks/useMoney";
+import {
+  makeSellPin,
+  searchConveniosPinesList,
+} from "../../utils/fetchFunctions";
 
-import { notifyError, notifyPending } from "../../../utils/notify";
-import { makeMoneyFormatter, onChangeNumber } from "../../../utils/functions";
-import fetchData from "../../../utils/fetchData";
+import { notifyError, notifyPending } from "../../../../utils/notify";
+import {
+  makeMoneyFormatter,
+  onChangeNumber,
+} from "../../../../utils/functions";
+import fetchData from "../../../../utils/fetchData";
 
 const formatMoney = makeMoneyFormatter(2);
 
 const VentaPines = () => {
   const navigate = useNavigate();
 
+  const { id_convenio_pin } = useParams();
+
   const { roleInfo, infoTicket } = useAuth();
 
+  const [searchingConvData, setSearchingConvData] = useState(false);
+  const [datosConvenio, setDatosConvenio] = useState(null);
   const [userDocument, setUserDocument] = useState("");
+  const [userReferences, setUserReferences] = useState(null);
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
@@ -198,6 +209,36 @@ const VentaPines = () => {
       });
   }, []);
 
+  useEffect(() => {
+    setSearchingConvData(true);
+    searchConveniosPinesList({
+      pk_codigo_convenio: id_convenio_pin,
+    })
+      .then((res) => {
+        setSearchingConvData(false);
+        const received = res?.obj?.[0] ?? null;
+        setDatosConvenio(received);
+        if (received) {
+          setUserReferences(
+            Object.fromEntries(
+              [1, 2, 3, 4, 5]
+                .filter((ref) => received[`referencia_${ref}`])
+                .map((ref) => [`referencia_${ref}`, ""])
+            )
+          );
+        }
+      })
+      .catch((error) => {
+        setSearchingConvData(false);
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+          return;
+        }
+        console.error(error?.message);
+        notifyError("Busqueda fallida");
+      });
+  }, [id_convenio_pin]);
+
   /**
    * Check if has commerce data
    */
@@ -230,6 +271,19 @@ const VentaPines = () => {
     return <Navigate to={"/"} replace />;
   }
 
+  if (searchingConvData || !(searchingConvData || datosConvenio)) {
+    return (
+      <Fragment>
+        <h1 className="text-3xl mt-6">Venta de Pines Colpatria</h1>
+        <h1 className="text-xl mt-6">
+          {searchingConvData
+            ? "Buscando infomacion de convenio ..."
+            : "No se ha encontrado informacion del convenio"}
+        </h1>
+      </Fragment>
+    );
+  }
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Venta de Pines Colpatria</h1>
@@ -240,6 +294,46 @@ const VentaPines = () => {
         }}
         grid
       >
+        <Input
+          label="Numero de convenio pin"
+          type="text"
+          autoComplete="off"
+          value={datosConvenio.pk_codigo_convenio}
+          disabled
+        />
+        <Input
+          label="Numero de pin"
+          type="text"
+          autoComplete="off"
+          value={datosConvenio.codigo_pin}
+          disabled
+        />
+        <Input
+          label="Nombre de convenio pin"
+          type="text"
+          autoComplete="off"
+          value={datosConvenio.nombre_convenio}
+          disabled
+        />
+        {[1, 2, 3, 4, 5]
+          .filter((ref) => datosConvenio[`referencia_${ref}`])
+          .map((ref) => (
+            <Input
+              id={`referencia_${ref}`}
+              label={datosConvenio[`referencia_${ref}`]}
+              name={`referencia_${ref}`}
+              type="text"
+              autoComplete="off"
+              value={userReferences?.[`referencia_${ref}`] ?? ""}
+              onInput={(ev) =>
+                setUserReferences((old) => ({
+                  ...old,
+                  [ev.target.name]: ev.target.value,
+                }))
+              }
+              required
+            />
+          ))}
         <Input
           id="docCliente"
           name="docCliente"
@@ -252,19 +346,23 @@ const VentaPines = () => {
           onInput={(ev) => setUserDocument(onChangeNumber(ev))}
           required
         />
-        <Input
-          id="valor"
-          name="valor"
-          label="Valor del pin"
-          autoComplete="off"
-          type="tel"
-          minLength={"5"}
-          maxLength={"20"}
-          onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
-          required
-        />
+        {datosConvenio.permite_modificar ? (
+          <Input
+            id="valor"
+            name="valor"
+            label="Valor a pagar"
+            autoComplete="off"
+            type="tel"
+            minLength={"5"}
+            maxLength={"10"}
+            onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
+            required
+          />
+        ) : (
+          ""
+        )}
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar venta de pin</Button>
+          <Button type={"submit"}>Realizar consulta</Button>
         </ButtonBar>
       </Form>
       <Modal
