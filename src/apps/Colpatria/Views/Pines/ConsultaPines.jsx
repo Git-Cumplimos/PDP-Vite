@@ -107,28 +107,6 @@ const ConsultaPines = () => {
             timeOut: 500,
           }}
         />
-        <InputSuggestions
-          id={"searchConv2"}
-          label={"Buscar convenio"}
-          type={"search"}
-          autoComplete="off"
-          suggestions={mapSuggestions || []}
-          onLazyInput={{
-            callback: searchConvenios,
-            timeOut: 500,
-          }}
-        />
-        <InputSuggestions
-          id={"searchConv3"}
-          label={"Buscar convenio"}
-          type={"search"}
-          autoComplete="off"
-          suggestions={mapSuggestions || []}
-          onLazyInput={{
-            callback: searchConvenios,
-            timeOut: 500,
-          }}
-        />
         <ButtonBar></ButtonBar>
       </Form>
     </Fragment>
