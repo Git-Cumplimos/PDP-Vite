@@ -49,7 +49,7 @@ const Deposito = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
+    max:1000000,
     min: 10000,
   });
 
@@ -387,7 +387,7 @@ const Deposito = () => {
             autoComplete='off'
             value={nomDepositante}
             onInput={(e) => {
-              if (isNaN(e.target.value) || e.target.value ===""){
+              if (isNaN(e.target.value.slice(-1)) || e.target.value.slice(-1) === "" || e.target.value.slice(-1) === " "){
               setNomDepositante(e.target.value);
               }
             }}
