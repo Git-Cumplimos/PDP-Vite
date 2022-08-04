@@ -17,6 +17,7 @@ import MoneyInput from "../../../components/Base/MoneyInput";
 
 const ModificarPps = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
+  const [tipoDomiciliacion, setTipoDomiciliacion] = useState(1);
   const [sinDatosConsulta, setSinDatosConsulta] = useState(false);
   const [buscarCedula, setBuscarCedula] = useState(null);
   const [invalidCedula, setInvalidCedula] = useState("");
@@ -338,18 +339,29 @@ const ModificarPps = () => {
               />
 
               <div className={contenedorLogo}>
-                <Select
-                  onChange={(event) => setNumPagosPdp(event?.target?.value)}
-                  id="comissionType"
-                  label="N° Pagos Incentivo"
-                  value={numPagosPdp}
-                  options={{
-                    0: 0,
-                    1: 1,
-                    2: 2,
-                    3: 3,
-                  }}
-                ></Select>
+              <Input
+                name="N° Pagos Punto Pago"
+                label="N° Pagos Punto Pago"
+                type="tel"
+                autoComplete="off"
+                minLength={"1"}
+                maxLength={"2"}
+                /* invalid={invalidCedula} */
+                value={numPagosPdp}
+                onChange={(event) => setNumPagosPdp(event?.target?.value)}
+                required
+              />
+                            <Select
+                onChange={(event) => setTipoDomiciliacion(event?.target?.value)}
+                id="comissionType"
+                label="Tipo de Domiciliación"
+                value={tipoDomiciliacion}
+                options={{
+                  Mensual: 1,
+                  Quincenal: 2,
+                  Semanal: 3,
+                }}
+              ></Select>
                 <ToggleInput
                   checked={estadoComercio}
                   onClick={() => setEstadoComercio((old) => !old)}
