@@ -319,6 +319,7 @@ const VentaPines = () => {
           .filter((ref) => datosConvenio[`referencia_${ref}`])
           .map((ref) => (
             <Input
+              key={ref}
               id={`referencia_${ref}`}
               label={datosConvenio[`referencia_${ref}`]}
               name={`referencia_${ref}`}
