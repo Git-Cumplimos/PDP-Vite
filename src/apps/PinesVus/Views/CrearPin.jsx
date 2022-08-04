@@ -317,6 +317,18 @@ const CrearPin = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
+    const hora_actual=Intl.DateTimeFormat("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).format(new Date())
+    const hora = hora_actual.split(":")
+    const deltaHora = parseInt(horaCierre[0])-parseInt(hora[0])
+    const deltaMinutos = parseInt(horaCierre[1])-parseInt(hora[1])
+    if (deltaHora<0 || (deltaHora===0 & deltaMinutos<5) ){
+      notifyError("Para evitar fallas no se permite realizar la transacción, hora cierre: " + horaCierre[0] + ":" + horaCierre[1])
+      navigate("/PinesVus",{replace:true});
+    }else{
     crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin)
       .then((res) => {
         setDisabledBtns(false);
@@ -330,6 +342,7 @@ const CrearPin = () => {
         }
       })
       .catch(() => setDisabledBtns(false));
+    }
   };
 
   const closeModal = useCallback(async () => {
@@ -399,7 +412,7 @@ const CrearPin = () => {
       minute: "numeric",
       hour12: false,
     }).format(new Date())
-  }, [venderVehiculo,tipoPin]);
+  }, [venderVehiculo, tipoPin, showModal]);
 
   const horaCierre = useMemo(() => { 
     const dia = (new Date()).getDay()  
@@ -410,7 +423,7 @@ const CrearPin = () => {
       return enumParametrosPines.horaCierre.split(":")
     }
      
-  }, []);
+  }, [hora]);
 
   useEffect(() => {
     
@@ -418,7 +431,7 @@ const CrearPin = () => {
     const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
     if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
-      notifyError("Módulo cerrado a partir de las " + horaCierre)
+      notifyError("Módulo cerrado a partir de las " + horaCierre[0] + ":" + horaCierre[1])
       navigate("/PinesVus",{replace:true});
     }
     else if ((deltaHora ===1 & deltaMinutos<-50)){
