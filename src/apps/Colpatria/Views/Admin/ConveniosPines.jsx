@@ -34,6 +34,7 @@ const ConveniosPines = () => {
   const [selected, setSelected] = useState(null);
   const [uploadMasivo, setUploadMasivo] = useState(false);
   const [massiveFile, setMassiveFile] = useState(null);
+  const [uploadingError, setUploadingError] = useState("");
 
   const [tiposValores, setTiposValores] = useState([]);
 
@@ -211,7 +212,9 @@ const ConveniosPines = () => {
           render({ data: err }) {
             setLoading(false);
             if (err?.cause === "custom") {
-              return err?.message;
+              setUploadingError(err?.message);
+              return "Subida de archivo fallida";
+              // return err?.message;
             }
             console.error(err?.message);
             return "Subida de archivo fallida";
@@ -329,12 +332,15 @@ const ConveniosPines = () => {
               required
             />
             <TextArea
-                id={"filename"}
-                label={"Archivo selecionado"}
-                value={massiveFile?.name ?? ""}
-                disabled
-                readOnly
-              />
+              id={"filename"}
+              label={"Archivo selecionado"}
+              value={massiveFile?.name ?? ""}
+              disabled
+              readOnly
+            />
+            <div className="p-4 rounded bg-yellow-300">
+              <p className="whitespace-pre-wrap">{uploadingError}</p>
+            </div>
             <ButtonBar>
               <Button type={"submit"}>Realizar carge</Button>
             </ButtonBar>
