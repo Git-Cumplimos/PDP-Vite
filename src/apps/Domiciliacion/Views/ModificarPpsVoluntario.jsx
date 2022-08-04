@@ -30,6 +30,7 @@ const ModificarPps = () => {
   const [estadoUsuarioNoEncontrado, setEstadoUsuarioNoEncontrado] =
     useState(false);
   const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
+  // const url =  "http://127.0.0.1:7000";
   const [estado, setEstado] = useState(false);
   const [valueAmount, setValueAmount] = useState("");
   const [celular, setCelular] = useState("");
@@ -170,6 +171,7 @@ const ModificarPps = () => {
               celular: celular.toString(),
               num_pago_pdp: numPagosPdp,
               estado: estadoComercioString,
+              tipo_domiciliacion:tipoDomiciliacion,
             },
             {},
             {}
@@ -351,7 +353,7 @@ const ModificarPps = () => {
                 onChange={(event) => setNumPagosPdp(event?.target?.value)}
                 required
               />
-                            <Select
+              <Select
                 onChange={(event) => setTipoDomiciliacion(event?.target?.value)}
                 id="comissionType"
                 label="Tipo de Domiciliación"
