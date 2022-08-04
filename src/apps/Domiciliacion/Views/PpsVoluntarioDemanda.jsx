@@ -114,7 +114,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       }),
       trxInfo: [
         ["Proceso", "Aporte Voluntario A Demanda"],
-        ["VALOR", formatMoney.format(valorAportar)],
+        ["Valor", formatMoney.format(valorAportar)],
         ["N° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
       ],
 
@@ -186,14 +186,14 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   respuesta?.msg ===
                   "El Valor Aportado Debe ser Exacto ej: 5000"
                 ) {
-                  notifyError("El Valor Aportado Debe ser Exacto ej: 5000");
+                  notifyError("El valor a aportar debe ser múltiplo de 100");
                   /* navigate(`/domiciliacion`); */
                   setDisabledBtn(false);
                 }
                 if (
                   respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo"
                 ) {
-                  notifyError("Lo Sentimos, Falló el Registro Del Cupo");
+                  notifyError("Lo sentimos, falló el registro del cupo");
                   navigate(`/domiciliacion`);
                 }
                 if (
@@ -209,7 +209,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
                 ) {
                   notifyError(
-                    "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000."
+                    "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
                   );
                   /* navigate(`/domiciliacion`); */
                   setDisabledBtn(false);
@@ -218,7 +218,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   respuesta?.msg?.["RESPUESTA COLPENSIONES"] ===
                   "Lo Sentimos, Falló el Servicio De Colpensiones"
                 ) {
-                  notifyError("Lo Sentimos, Falló el Servicio De Colpensiones");
+                  notifyError("Lo sentimos, falló el servicio de colpensiones");
                   navigate(`/domiciliacion`);
                 }
                 /* if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
@@ -236,7 +236,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               })
               .catch((err) => {
                 console.log(err);
-                notifyError("Error al Pagar Planilla Voluntaria a Demanda");
+                notifyError("Error al pagar planilla voluntaria a demanda");
                 navigate(`/domiciliacion`);
               });
           } else {
@@ -466,6 +466,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               </Button>
               /*  ) : null */
             }
+            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
           </ButtonBar>
         </Form>
       </Modal>
@@ -474,6 +475,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
             <Button onClick={handlePrint}>Imprimir</Button>
+            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
           </div>
         </Modal>
       ) : (

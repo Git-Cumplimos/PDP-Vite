@@ -128,6 +128,7 @@ const BuscarComercioEmail = () => {
                 </Button>
                 /*  ) : null */
               }
+              <Button onClick={() => setShowModal(false)}>Cancelar</Button>
             </ButtonBar>
           </Modal>
           {/* {continuarDomiciliacion ? <PpsDomiciliacion></PpsDomiciliacion> : ""} */}
