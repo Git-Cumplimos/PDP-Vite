@@ -252,7 +252,9 @@ const ModificarPps = () => {
             <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>
               Buscar Cliente
             </Button>
+            
           }
+     
         </ButtonBar>
       </Form>
       {/*       {estadoUsuarioNoEncontrado && sinDatosConsulta ? (
@@ -375,6 +377,7 @@ const ModificarPps = () => {
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"} type="">
               {<Button type="submit">Modificar y Guardar</Button>}
+              <Button onClick={() => setShowModal(false)}>Cancelar</Button>
             </ButtonBar>
           </Form>
         </Modal>

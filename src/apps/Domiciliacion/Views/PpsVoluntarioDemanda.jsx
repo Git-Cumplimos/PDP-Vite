@@ -466,6 +466,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               </Button>
               /*  ) : null */
             }
+            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
           </ButtonBar>
         </Form>
       </Modal>
@@ -474,6 +475,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
             <Button onClick={handlePrint}>Imprimir</Button>
+            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
           </div>
         </Modal>
       ) : (
