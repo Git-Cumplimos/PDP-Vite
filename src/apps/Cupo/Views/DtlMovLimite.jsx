@@ -23,8 +23,12 @@ const DtlMovLimite = () => {
     ).join("");
     setIdComercio(idComer);
   }, []);
+
   useEffect(() => {
     setIdComercio(roleInfo?.id_comercio);
+  }, [roleInfo?.id_comercio]);
+
+  useEffect(() => {
     getConsultaAsignacionCupoLimite(idComercio, page, limit)
       .then((objUdusrio) => {
         setAsigLimite(objUdusrio);
@@ -33,7 +37,7 @@ const DtlMovLimite = () => {
         console.log(reason.message);
         notifyError("Error al cargar Datos ");
       });
-  }, [roleInfo, limit, page]);
+  }, [idComercio, limit, page]);
 
   const onSubmitComercio = useCallback(
     (e) => {
