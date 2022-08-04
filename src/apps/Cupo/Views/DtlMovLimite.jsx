@@ -17,7 +17,8 @@ const DtlMovLimite = () => {
   const [asigLimite, setAsigLimite] = useState(null);
 
   const onChangeId = useCallback((ev) => {
-    const formData = new FormData(ev.target.form);
+    ev.preventDefault();
+    const formData = new FormData(ev.target);
     const idComer = (
       (formData.get("Id comercio") ?? "").match(/\d/g) ?? []
     ).join("");
@@ -39,26 +40,11 @@ const DtlMovLimite = () => {
       });
   }, [idComercio, limit, page]);
 
-  const onSubmitComercio = useCallback(
-    (e) => {
-      e.preventDefault();
-      getConsultaAsignacionCupoLimite(idComercio, page, limit)
-        .then((objUdusrio) => {
-          setAsigLimite(objUdusrio);
-        })
-        .catch((reason) => {
-          console.log(reason.message);
-          notifyError("Error al cargar Datos ");
-        });
-    },
-    [idComercio, limit, page]
-  );
-
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Detalle límite cupo comercio</h1>
       {!roleInfo?.id_comercio ? (
-        <Form grid onSubmit={onSubmitComercio}>
+        <Form grid onSubmit={onChangeId}>
           <Input
             id="idCliente"
             name="Id comercio"
@@ -67,9 +53,6 @@ const DtlMovLimite = () => {
             autoComplete="off"
             minLength={"0"}
             maxLength={"10"}
-            value={idComercio ?? ""}
-            onChange={onChangeId}
-            required
           />
           <ButtonBar>
             <Button type={"submit"} name="buscarComercio">
@@ -113,7 +96,7 @@ const DtlMovLimite = () => {
           setPage(pagedata.page);
           setLimit(pagedata.limit);
         }}
-        maxPage={asigLimite?.maxPages}
+        maxPage={asigLimite?.maxPages ?? 0}
       ></TableEnterprise>
     </Fragment>
   );
