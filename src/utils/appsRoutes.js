@@ -715,7 +715,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/cupo/detalles-limite-cupo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Detalles limite de cupo"} />,
+        label: <AppIcons Logo={"RECAUDO"} name={"Detalles límite de cupo"} />,
         component: DetalleLimite,
         permission: [1],
       },
