@@ -182,14 +182,13 @@ const PagoGiro = () => {
           setIsUploading(false);
           notify(res?.msg);
           // hideModal();
-          console.log(res);
           objTicket["commerceInfo"][1] = [
             "No. terminal",
             res?.obj?.codigoTotal,
           ];
           objTicket["commerceInfo"][6] = [
             "No. de aprobación",
-            "Transacción Cancelada por el usuario",
+            "<strong>Transacción Rechazada por el usuario",
           ];
           objTicket["trxInfo"].push(["Valor", formatMoney.format(0)]);
           objTicket["trxInfo"].push(["", ""]);
@@ -209,7 +208,6 @@ const PagoGiro = () => {
             valor: res?.valorTransaccion,
           }));
           setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
-          console.log("Recibe,", res?.valorTransaccion);
           setPeticion(2);
         } else {
           setIsUploading(false);
@@ -309,7 +307,7 @@ const PagoGiro = () => {
         <Input
           id='numeroIdentificacion'
           label='Número de identificación'
-          type='text'
+          type='number'
           name='numeroIdentificacion'
           minLength='5'
           maxLength='16'
@@ -324,10 +322,10 @@ const PagoGiro = () => {
               });
             }
           }}></Input>
-          <HideInput
+        <HideInput
           id='codigoFamilia'
           label='Código de familia'
-          type='text'
+          type='number'
           name='codigoFamilia'
           minLength='1'
           maxLength='8'
@@ -335,8 +333,8 @@ const PagoGiro = () => {
           required
           value={datosTrans.codigoFamilia ?? ""}
           onInput={(e, valor) => {
-            if (!isNaN(valor)) {
-              const num = valor;
+            let num = valor.replace(" ", "");
+            if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, codigoFamilia: num };
               });
@@ -396,7 +394,10 @@ const PagoGiro = () => {
               </h1>
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
-              <h2>{`Código de familia: ${datosTrans.codigoFamilia.replace(/\w/g,"*")}`}</h2>
+              <h2>{`Código de familia: ${datosTrans.codigoFamilia.replace(
+                /\w/g,
+                "*"
+              )}`}</h2>
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>
                 <Button type='submit' onClick={peticionConsulta}>

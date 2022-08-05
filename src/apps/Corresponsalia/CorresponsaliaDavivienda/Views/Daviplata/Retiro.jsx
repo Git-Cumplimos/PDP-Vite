@@ -283,8 +283,8 @@ const Retiro = () => {
           required
           value={datosTrans.otp ?? ""}
           onInput={(e, valor) => {
+            let num = valor.replace(" ", "");
             if (!isNaN(valor)) {
-              const num = valor;
               setDatosTrans((old) => {
                 return { ...old, otp: num };
               });

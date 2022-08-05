@@ -188,7 +188,6 @@ const PagoDeProductosPropios = () => {
           setIsUploading(false);
           notify(res?.msg);
           // hideModal();
-          console.log(res);
           setDatosTrans((old) => ({
             ...old,
             idTrx: res?.obj?.idTrx,
@@ -265,7 +264,6 @@ const PagoDeProductosPropios = () => {
     } else {
       valorPagar = tipoAbono.valorAbono;
     }
-    console.log(valorPagar);
     setIsUploading(true);
     postPagoProductosPropiosDavivienda({
       tipoIdentificacion: datosTrans.tipoIdentificacion,
@@ -493,7 +491,6 @@ const PagoDeProductosPropios = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de consulta Davivienda
               </h1>
-              {console.log(datosConsulta.valPagoMinimo)}
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>

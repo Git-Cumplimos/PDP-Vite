@@ -96,7 +96,14 @@ const TicketsDavivienda = ({
                         <h1 className='font-semibold'>
                           {key ? `${key}:` : ""}
                         </h1>
-                        <h1>{val}</h1>
+                        {typeof val === "string" &&
+                        val?.includes("<strong>") ? (
+                          <h1 className='font-bold'>
+                            {val?.replace("<strong>", "")}
+                          </h1>
+                        ) : (
+                          <h1>{val}</h1>
+                        )}
                       </div>
                     );
                   })}

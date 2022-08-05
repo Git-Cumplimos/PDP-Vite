@@ -1,22 +1,53 @@
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useCallback, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
+import Modal from "../../../../../components/Base/Modal";
 import MoneyInputDec, {
   formatMoney,
 } from "../../../../../components/Base/MoneyInputDec";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
+import TicketsDavivienda from "../../components/TicketsDavivienda";
 import { postConsultaCodigoBarrasConveniosEspecifico } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
+  const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
+  const [peticion, setPeticion] = useState(0);
   const formatMoney = makeMoneyFormatter(2);
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "Recibo de pago por giro Davivienda CB",
+    timeInfo: {
+      "Fecha de venta": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      /*id transaccion recarga*/
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+
+      /*id_dispositivo*/
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      /*ciudad*/
+      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
+      ["Tipo de operación", "Pago por giro"],
+      ["", ""],
+    ],
+    commerceName: roleInfo?.["nombre comercio"]
+      ? roleInfo?.["nombre comercio"]
+      : "Sin datos",
+    trxInfo: [],
+    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+  });
   const [datosTrans, setDatosTrans] = useState({
     codBarras: "",
   });
@@ -30,6 +61,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     ref1: "",
     ref2: "",
     valor: "",
+    showValor: "",
     valorSinModificar: "",
     data: "",
   });
@@ -45,7 +77,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       fecthTablaConveniosEspecificoFunc(valor);
     }
   }, []);
-
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
   const fecthTablaConveniosEspecificoFunc = useCallback((codigoBar) => {
     postConsultaCodigoBarrasConveniosEspecifico({
       codigoBarras: codigoBar,
@@ -82,7 +116,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               ...old,
               ref1: autoArr?.obj.datosCodigoBarras.codigosReferencia[0] ?? "",
               ref2: autoArr?.obj.datosCodigoBarras.codigosReferencia[1] ?? "",
-              valor: formatMoney.format(valorTrx) ?? "",
+              showValor: formatMoney.format(valorTrx) ?? "",
+              valor: valorTrx ?? "",
               valorSinModificar: valorTrx ?? "",
             };
           });
@@ -111,9 +146,15 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       notifyError("El codigo de barras no tiene el formato correcto");
     }
   };
-  const onSubmitPago = (e) => {
-    e.preventDefault();
+  const habilitarModal = () => {
+    setShowModal(true);
+  };
 
+  const hideModal = () => {
+    setShowModal(false);
+  };
+  const onSubmitConfirm = (e) => {
+    e.preventDefault();
     if (datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0") {
       if (
         datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb === "0" &&
@@ -123,13 +164,22 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       if (
         datosEnvio?.datosConvenio?.ind_menor_vlr_cnb === "0" &&
         datosTransaccion.valor < datosTransaccion.valorSinModificar
-      )
-        return notifyError("No esta permitido el pago menor al original");
+      ) {
+        if (
+          !(
+            datosEnvio?.datosConvenio?.ind_valor_ceros_cnb === "1" &&
+            datosTransaccion.valor === 0
+          )
+        ) {
+          return notifyError("No esta permitido el pago menor al original");
+        }
+      }
       if (
         datosEnvio?.datosConvenio?.ind_valor_ceros_cnb === "0" &&
         datosTransaccion.valor === 0
-      )
+      ) {
         return notifyError("No esta permitido el pago en ceros");
+      }
     }
     if (
       datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "0" ||
@@ -139,12 +189,28 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     } else {
       console.log("realizar consulta");
     }
+    setPeticion(1);
+    habilitarModal();
+  };
+  const onSubmitPago = (estado) => (e) => {
+    e.preventDefault();
+    console.log(estado);
+    if (
+      datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "0" ||
+      datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "3"
+    ) {
+      console.log("realizar pago");
+    } else {
+      console.log("realizar consulta");
+    }
+    setPeticion(2);
+    habilitarModal();
   };
   const onChangeMoney = useMoney({
     limits: [0, 20000000],
     decimalDigits: 2,
   });
-
+  const printDiv = useRef();
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -177,7 +243,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           <h1 className='text-3xl text-center  mb-10'>{`Convenio: ${
             datosEnvio?.datosConvenio?.nom_convenio_cnb ?? ""
           }`}</h1>
-          <Form grid onSubmit={onSubmitPago}>
+          <Form grid onSubmit={onSubmitConfirm}>
             {datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1" && (
               <>
                 <Input
@@ -254,24 +320,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             {(datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "0" ||
               datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "3") &&
             datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0" ? (
-              // <MoneyInputDec
-              //   id='valCashOut'
-              //   name='valCashOut'
-              //   label='Valor a pagar modificable'
-              //   type='text'
-              //   autoComplete='off'
-              //   maxLength={"15"}
-              //   value={datosTransaccion.valor ?? ""}
-              //   onInput={(e, valor) => {
-              //     if (!isNaN(valor)) {
-              //       const num = valor;
-              //       console.log(num);
-              //       setDatosTransaccion((old) => {
-              //         return { ...old, valor: num };
-              //       });
-              //     }
-              //   }}
-              //   required></MoneyInputDec>
               <Input
                 id='valor'
                 name='valor'
@@ -280,11 +328,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                 type='tel'
                 minLength={"5"}
                 maxLength={"20"}
-                defaultValue={datosTransaccion.valor ?? ""}
+                defaultValue={datosTransaccion.showValor ?? ""}
                 onInput={(ev) =>
                   setDatosTransaccion((old) => ({
                     ...old,
                     valor: onChangeMoney(ev),
+                    showValor: onChangeMoney(ev),
                   }))
                 }
                 required
@@ -315,6 +364,71 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               )}
             </ButtonBar>
           </Form>
+          <Modal show={showModal} handleClose={hideModal}>
+            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+              {peticion === 1 && (
+                <>
+                  <h1 className='text-2xl font-semibold'>
+                    {datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "0" ||
+                    datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "3"
+                      ? "¿Está seguro de realizar el pago?"
+                      : "¿Está seguro de realizar la consulta?"}
+                  </h1>
+                  <h2>{`Convenio: ${
+                    datosEnvio?.datosConvenio?.nom_convenio_cnb ?? ""
+                  }`}</h2>
+                  <h2>{`Valor transacción: ${formatMoney.format(
+                    datosTransaccion.valor
+                  )}`}</h2>
+                  {datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1" && (
+                    <h2>{`${datosEnvio?.datosConvenio?.nom_ref1_cnb}: ${
+                      datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                    }`}</h2>
+                  )}
+                  {datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1" && (
+                    <h2>{`${datosEnvio?.datosConvenio?.nom_ref2_cnb}: ${
+                      datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
+                    }`}</h2>
+                  )}
+                  <ButtonBar>
+                    <Button onClick={hideModal}>Cancelar</Button>
+                    <Button type='submit' onClick={onSubmitPago("pago")}>
+                      Aceptar
+                    </Button>
+                  </ButtonBar>
+                </>
+              )}
+              {peticion === 2 && (
+                <>
+                  <h1 className='text-2xl font-semibold'>
+                    Consulta de pago por giro
+                  </h1>
+                  <h2>{`Valor transacción: ${formatMoney.format()}`}</h2>
+                  <ButtonBar>
+                    <Button onClick={hideModal}>Cancelar</Button>
+                    <Button type='submit' onClick={() => setPeticion(3)}>
+                      Aceptar
+                    </Button>
+                  </ButtonBar>
+                </>
+              )}
+              {peticion === 4 && (
+                <>
+                  <h2>
+                    <ButtonBar>
+                      <Button onClick={handlePrint}>Imprimir</Button>
+                      <Button type='submit' onClick={hideModal}>
+                        Aceptar
+                      </Button>
+                    </ButtonBar>
+                  </h2>
+                  <TicketsDavivienda
+                    ticket={objTicketActual}
+                    refPrint={printDiv}></TicketsDavivienda>
+                </>
+              )}
+            </div>
+          </Modal>
         </>
       )}
     </>
