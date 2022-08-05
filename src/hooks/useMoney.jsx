@@ -27,7 +27,7 @@ const useMoney = ({
       const len = filterExtraDigit(ev.target.value, decimalDigits).length;
 
       const moneyValue =
-        Math.floor(
+        Math.round(
           moneyValidator(ev.target.value) * Math.pow(10, decimalDigits)
         ) / Math.pow(10, decimalDigits);
 

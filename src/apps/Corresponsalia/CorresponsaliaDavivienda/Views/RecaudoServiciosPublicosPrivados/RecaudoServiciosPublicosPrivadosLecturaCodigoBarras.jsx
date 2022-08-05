@@ -5,13 +5,18 @@ import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
-import MoneyInputDec from "../../../../../components/Base/MoneyInputDec";
+import MoneyInputDec, {
+  formatMoney,
+} from "../../../../../components/Base/MoneyInputDec";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import useMoney from "../../../../../hooks/useMoney";
+import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { postConsultaCodigoBarrasConveniosEspecifico } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   const [showModal, setShowModal] = useState(false);
+  const formatMoney = makeMoneyFormatter(2);
   const [datosTrans, setDatosTrans] = useState({
     codBarras: "",
   });
@@ -25,6 +30,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     ref1: "",
     ref2: "",
     valor: "",
+    valorSinModificar: "",
+    data: "",
   });
   const [isUploading, setIsUploading] = useState(false);
 
@@ -69,6 +76,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             estadoConsulta: true,
             estadoFecha: dateStatus,
           });
+          let valorTrx = autoArr?.obj.datosCodigoBarras.pago[0];
+          setDatosTransaccion((old) => {
+            return {
+              ...old,
+              ref1: autoArr?.obj.datosCodigoBarras.codigosReferencia[0] ?? "",
+              ref2: autoArr?.obj.datosCodigoBarras.codigosReferencia[1] ?? "",
+              valor: formatMoney.format(valorTrx) ?? "",
+              valorSinModificar: valorTrx ?? "",
+            };
+          });
         } else {
           notifyError(autoArr?.msg);
         }
@@ -96,6 +113,24 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   };
   const onSubmitPago = (e) => {
     e.preventDefault();
+
+    if (datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0") {
+      if (
+        datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb === "0" &&
+        datosTransaccion.valor > datosTransaccion.valorSinModificar
+      )
+        return notifyError("No esta permitido el pago mayor al original");
+      if (
+        datosEnvio?.datosConvenio?.ind_menor_vlr_cnb === "0" &&
+        datosTransaccion.valor < datosTransaccion.valorSinModificar
+      )
+        return notifyError("No esta permitido el pago menor al original");
+      if (
+        datosEnvio?.datosConvenio?.ind_valor_ceros_cnb === "0" &&
+        datosTransaccion.valor === 0
+      )
+        return notifyError("No esta permitido el pago en ceros");
+    }
     if (
       datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "0" ||
       datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "3"
@@ -105,10 +140,15 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       console.log("realizar consulta");
     }
   };
+  const onChangeMoney = useMoney({
+    limits: [0, 20000000],
+    decimalDigits: 2,
+  });
+
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center'>
+      <h1 className='text-3xl text-center mb-10'>
         Recaudo servicios publicos y privados
       </h1>
       {!datosEnvio.estadoConsulta ? (
@@ -134,7 +174,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         </>
       ) : (
         <>
-          <h1 className='text-3xl text-center'>{`Convenio: ${
+          <h1 className='text-3xl text-center  mb-10'>{`Convenio: ${
             datosEnvio?.datosConvenio?.nom_convenio_cnb ?? ""
           }`}</h1>
           <Form grid onSubmit={onSubmitPago}>
@@ -152,9 +192,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
                   }
                   onInput={(e) => {
-                    setDatosTransaccion((old) => {
-                      return { ...old, ref1: e.target.value };
-                    });
+                    // setDatosTransaccion((old) => {
+                    //   return { ...old, ref1: e.target.value };
+                    // });
                   }}></Input>
               </>
             )}
@@ -191,17 +231,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     // });
                   }}></Input>
               )}
-            {(datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "0" ||
-              datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "3") && (
+            {datosEnvio.datosCodigoBarras.pago[0] && (
               <MoneyInputDec
                 id='valCashOut'
                 name='valCashOut'
-                label='Valor a pagar en '
+                label='Valor a pagar original'
                 type='text'
                 autoComplete='off'
                 maxLength={"15"}
                 disabled={true}
-                value={datosEnvio.datosCodigoBarras.pago[0] ?? ""}
+                value={datosTransaccion.valorSinModificar ?? ""}
                 onInput={(e, valor) => {
                   if (!isNaN(valor)) {
                     const num = valor;
@@ -211,6 +250,47 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   }
                 }}
                 required></MoneyInputDec>
+            )}
+            {(datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "0" ||
+              datosEnvio?.datosConvenio?.num_ind_consulta_cnb === "3") &&
+            datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0" ? (
+              // <MoneyInputDec
+              //   id='valCashOut'
+              //   name='valCashOut'
+              //   label='Valor a pagar modificable'
+              //   type='text'
+              //   autoComplete='off'
+              //   maxLength={"15"}
+              //   value={datosTransaccion.valor ?? ""}
+              //   onInput={(e, valor) => {
+              //     if (!isNaN(valor)) {
+              //       const num = valor;
+              //       console.log(num);
+              //       setDatosTransaccion((old) => {
+              //         return { ...old, valor: num };
+              //       });
+              //     }
+              //   }}
+              //   required></MoneyInputDec>
+              <Input
+                id='valor'
+                name='valor'
+                label='Valor a depositar'
+                autoComplete='off'
+                type='tel'
+                minLength={"5"}
+                maxLength={"20"}
+                defaultValue={datosTransaccion.valor ?? ""}
+                onInput={(ev) =>
+                  setDatosTransaccion((old) => ({
+                    ...old,
+                    valor: onChangeMoney(ev),
+                  }))
+                }
+                required
+              />
+            ) : (
+              <></>
             )}
             <ButtonBar className='lg:col-span-2'>
               <Button
