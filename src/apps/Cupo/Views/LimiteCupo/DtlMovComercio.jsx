@@ -204,7 +204,7 @@ const DtlMovComercio = () => {
           <Input
             id="fecha_inico"
             name="fecha_inico"
-            label="Fecha inico"
+            label="Fecha inicio"
             type="datetime-local"
             autoComplete="off"
             required

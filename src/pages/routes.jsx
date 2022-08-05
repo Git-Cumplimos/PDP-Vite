@@ -16,7 +16,7 @@ export const privateUrls = [
   { link: "/", label: "Inicio", component: Home },
   {
     link: "/info",
-    label: "Informacion general",
+    label: "Información general",
     component: InformacionGeneral,
   },
   { link: "/gestion", label: "Gestión", component: Gestion },
