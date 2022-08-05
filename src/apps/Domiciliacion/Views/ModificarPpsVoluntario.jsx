@@ -94,7 +94,7 @@ const ModificarPps = () => {
 
   const UsuarioNoEncontradoNotify = useCallback(() => {
     if (setShowModalUsuarioNoEncontrado) {
-      notifyError("Usuario No Encontrad");
+      notifyError("Usuario no encontrado");
     }
     /*  setDatosConsulta(""); */
     setBuscarCedula("");

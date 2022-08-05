@@ -1,6 +1,7 @@
 import fetchData from "../../../../utils/fetchData";
 
 const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
+const urlParametrizacion = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}`;
 export const consultaGiroDaviplata = async (bodyObj) => {
   if (!bodyObj) {
     return new Promise((resolve, reject) => {
@@ -167,6 +168,28 @@ export const retiroCorresponsal = async (bodyObj) => {
       console.error(res?.msg);
     }
     return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const consultarMensajePublicitarioDavivienda = async () => {
+  try {
+    const res = await fetchData(
+      `${urlParametrizacion}//mensajes_publicitarios/consultar`,
+      "POST",
+      {},
+      {
+        nombreMensaje: "Mensaje Davivienda CB",
+        autorizador: "Davivienda CB",
+      },
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res.obj;
   } catch (err) {
     throw err;
   }
