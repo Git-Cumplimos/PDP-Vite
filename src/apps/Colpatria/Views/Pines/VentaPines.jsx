@@ -55,12 +55,14 @@ const VentaPines = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [inquiryStatus, setInquiryStatus] = useState(null);
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
   });
 
   const [loadingSell, setLoadingSell] = useState(false);
+  const [loadingInquiry, setLoadingInquiry] = useState(false);
 
   const printDiv = useRef();
 
@@ -82,6 +84,60 @@ const VentaPines = () => {
     setShowModal(false);
   }, []);
 
+  const onMakeInquiry = useCallback(
+    (ev) => {
+      ev.preventDefault();
+
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        valor_total_trx: valVentaPines,
+
+        // Datos trx colpatria
+        colpatria: {
+          user_document: userDocument,
+          location: {
+            address: userAddress,
+            dane_code: roleInfo?.codigo_dane,
+            city: roleInfo?.ciudad.substring(0, 8),
+          },
+        },
+      };
+
+      notifyPending(
+        makeSellPin(data),
+        {
+          render: () => {
+            setLoadingInquiry(true);
+            return "Procesando consulta";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            setLoadingInquiry(false);
+            setInquiryStatus(res);
+            return "Consulta satisfactoria";
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            setLoadingInquiry(false);
+            if (error?.cause === "custom") {
+              return error?.message;
+            }
+            console.error(error?.message);
+            return "Consulta fallida";
+          },
+        }
+      );
+    },
+    [userDocument, userAddress, valVentaPines, roleInfo]
+  );
+
   const onMakePayment = useCallback(
     (ev) => {
       const data = {
@@ -100,7 +156,6 @@ const VentaPines = () => {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
             city: roleInfo?.ciudad.substring(0, 8),
-            state: roleInfo?.codigo_dane.substring(0, 2),
           },
         },
       };
@@ -114,9 +169,7 @@ const VentaPines = () => {
           },
         },
         {
-          render: (info) => {
-            console.log(info);
-            const { data: res } = info;
+          render: ({ data: res }) => {
             setLoadingSell(false);
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
@@ -288,10 +341,14 @@ const VentaPines = () => {
     <Fragment>
       <h1 className="text-3xl mt-6">Venta de Pines Colpatria</h1>
       <Form
-        onSubmit={(ev) => {
-          ev.preventDefault();
-          setShowModal(true);
-        }}
+        onSubmit={
+          !inquiryStatus
+            ? (ev) => {
+                ev.preventDefault();
+                setShowModal(true);
+              }
+            : onMakeInquiry
+        }
         grid
       >
         <Input
@@ -347,7 +404,7 @@ const VentaPines = () => {
           onInput={(ev) => setUserDocument(onChangeNumber(ev))}
           required
         />
-        {datosConvenio.permite_modificar ? (
+        {datosConvenio.fk_tipo_valor === 1 || inquiryStatus  ? (
           <Input
             id="valor"
             name="valor"
@@ -357,13 +414,16 @@ const VentaPines = () => {
             minLength={"5"}
             maxLength={"10"}
             onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
+            readOnly={datosConvenio.fk_tipo_valor !== 3}
             required
           />
         ) : (
           ""
         )}
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar consulta</Button>
+          <Button type={"submit"} disabled={loadingInquiry}>
+            Realizar {!inquiryStatus ? "consulta" : "venta de pin"}
+          </Button>
         </ButtonBar>
       </Form>
       <Modal
