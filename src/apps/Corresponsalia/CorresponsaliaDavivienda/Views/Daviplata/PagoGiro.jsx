@@ -188,7 +188,7 @@ const PagoGiro = () => {
           ];
           objTicket["commerceInfo"][6] = [
             "No. de aprobación",
-            "<strong>Transacción Rechazada por el usuario",
+            "<strong>Transacción Rechazada por el cliente",
           ];
           objTicket["trxInfo"].push(["Valor", formatMoney.format(0)]);
           objTicket["trxInfo"].push(["", ""]);
@@ -307,7 +307,7 @@ const PagoGiro = () => {
         <Input
           id='numeroIdentificacion'
           label='Número de identificación'
-          type='number'
+          type='text'
           name='numeroIdentificacion'
           minLength='5'
           maxLength='16'
@@ -315,8 +315,9 @@ const PagoGiro = () => {
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+            let valor = e.target.value;
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, numeroIdentificacion: num };
               });
@@ -333,7 +334,7 @@ const PagoGiro = () => {
           required
           value={datosTrans.codigoFamilia ?? ""}
           onInput={(e, valor) => {
-            let num = valor.replace(" ", "");
+            let num = valor.replace(/[\s\.]/g, "");
             if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, codigoFamilia: num };

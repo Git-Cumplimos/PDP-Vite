@@ -372,8 +372,9 @@ const PagoDeProductosPropios = () => {
           required
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+            let valor = e.target.value;
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, numeroIdentificacion: num };
               });
@@ -416,8 +417,9 @@ const PagoDeProductosPropios = () => {
               required
               value={datosTrans.numeroProducto}
               onInput={(e) => {
-                if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
+                let valor = e.target.value;
+                let num = valor.replace(/[\s\.]/g, "");
+                if (!isNaN(num)) {
                   setDatosTrans((old) => {
                     return { ...old, numeroProducto: num };
                   });
@@ -437,8 +439,9 @@ const PagoDeProductosPropios = () => {
               required
               value={datosTrans.binTarjetaCredito}
               onInput={(e) => {
-                if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
+                let valor = e.target.value;
+                let num = valor.replace(/[\s\.]/g, "");
+                if (!isNaN(num)) {
                   setDatosTrans((old) => {
                     return { ...old, binTarjetaCredito: num };
                   });
@@ -454,8 +457,9 @@ const PagoDeProductosPropios = () => {
               required
               value={datosTrans.ultimosTarjetaCredito}
               onInput={(e) => {
+                let valor = e.target.value;
+                let num = valor.replace(/[\s\.]/g, "");
                 if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
                   setDatosTrans((old) => {
                     return { ...old, ultimosTarjetaCredito: num };
                   });
