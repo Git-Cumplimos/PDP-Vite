@@ -354,7 +354,6 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 </Button>
                 /*  ) : null */
               }
-                   <Button onClick={() => setShowModal(false)}>Cancelar</Button>
             </ButtonBar>
           </Form>
         </Modal>

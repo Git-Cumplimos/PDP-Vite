@@ -38,9 +38,6 @@ const DtlMovComercio = () => {
     if (roleInfo?.id_comercio) {
       setIdComercio(roleInfo?.id_comercio);
     }
-  }, [roleInfo?.id_comercio]);
-
-  useEffect(() => {
     getConsultaDtlMovCupo(
       idComercio,
       page,
@@ -58,7 +55,7 @@ const DtlMovComercio = () => {
         notifyError("Error al cargar Datos ");
       });
   }, [
-    idComercio,
+    roleInfo,
     tipoTransaccion,
     tipoAfectacion,
     page,
@@ -124,7 +121,7 @@ const DtlMovComercio = () => {
   );
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Detalle movimientos cupo comercios</h1>
+      <h1 className="text-3xl mt-6">Detalle movimiento cupo comercio</h1>
       {!roleInfo?.id_comercio ? (
         <Form grid onSubmit={onSubmitComercio}>
           <Input
@@ -204,7 +201,7 @@ const DtlMovComercio = () => {
           <Input
             id="fecha_inico"
             name="fecha_inico"
-            label="Fecha inico"
+            label="Fecha inicio"
             type="datetime-local"
             autoComplete="off"
             required

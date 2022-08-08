@@ -1,7 +1,6 @@
 .contenedorLogo {
   display: flex;
   justify-content: center;
-  flex-direction: column;
 }
 .contenedorSubtitle {
   display: flex;

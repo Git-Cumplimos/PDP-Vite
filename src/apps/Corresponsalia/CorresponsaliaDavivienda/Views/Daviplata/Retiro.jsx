@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
@@ -242,8 +243,9 @@ const Retiro = () => {
           autoComplete='off'
           value={datosTrans.numeroTelefono}
           onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+            let valor = e.target.value;
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(num)) {
               if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
                 return notifyError("El número DaviPlata debe comenzar por 3");
               }
@@ -283,8 +285,8 @@ const Retiro = () => {
           required
           value={datosTrans.otp ?? ""}
           onInput={(e, valor) => {
+            let num = valor.replace(/[\s\.]/g, "");
             if (!isNaN(valor)) {
-              const num = valor;
               setDatosTrans((old) => {
                 return { ...old, otp: num };
               });
