@@ -49,7 +49,7 @@ const Deposito = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max:1000000,
+    max:1000001,
     min: 10000,
   });
 
