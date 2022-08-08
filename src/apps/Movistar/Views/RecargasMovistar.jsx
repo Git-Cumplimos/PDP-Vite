@@ -1,11 +1,5 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { Fragment, useCallback, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
@@ -15,12 +9,14 @@ import Modal from "../../../components/Base/Modal";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { formatMoney } from "../../../components/Base/MoneyInput";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetch } from "../../../hooks/useFetch";
 import { notify, notifyError } from "../../../utils/notify";
-import { PeticionRecarga } from "../utils/fetchMovistar";
+import {
+  PeticionRecarga,
+  PeticionConciliacionCargar,
+} from "../utils/fetchMovistar";
 
 const minValor = 1000;
 const maxValor = 500000;
@@ -41,25 +37,24 @@ const RecargasMovistar = () => {
 
   const [loadingFetchRecarga, fetchRecarga] = useFetch(PeticionRecarga);
 
-  const onMoneyChange = useCallback((e, valor) => {
+  const onMoneyChange = (e, valor) => {
     setInputValor(valor);
-  });
+  };
 
   const onCelChange = (e) => {
-    const formData = new FormData(e.target.form);
-    const phone = ((formData.get("celular") ?? "").match(/\d/g) ?? []).join("");
-    if(phone[0] != 3){
-    setInvalidCelular("Número inválido");
-    }else{
-    setInvalidCelular(" ");
-
+    const cel = e.target.value;
+    const phone = ((cel ?? "").match(/\d/g) ?? []).join("");
+    if (phone[0] != 3) {
+      setInvalidCelular("Número inválido");
+    } else {
+      setInvalidCelular("");
     }
     if (phone.length == 1 && inputCelular == "") {
       if (phone[0] != 3) {
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
-      } 
+      }
     }
     setInputCelular(phone);
   };
@@ -75,12 +70,8 @@ const RecargasMovistar = () => {
         "Número inválido, el No. de celular debe comenzar con el número 3"
       );
     }
-    const minValorFormato= formatMoney.format(
-      minValor
-    ).replace(/\s+/g, '')
-    const maxValorFormato= formatMoney.format(
-      maxValor
-    ).replace(/\s+/g, '')
+    const minValorFormato = formatMoney.format(minValor).replace(/\s+/g, "");
+    const maxValorFormato = formatMoney.format(maxValor).replace(/\s+/g, "");
 
     if (inputValor >= minValor && inputValor <= maxValor) {
       realizarRecarga++;
@@ -105,7 +96,7 @@ const RecargasMovistar = () => {
     }
   };
 
-  const recargaMovistar = (e) => {
+  const recargaMovistar = () => {
     const data = {
       celular: inputCelular,
       valor: inputValor,
@@ -120,6 +111,7 @@ const RecargasMovistar = () => {
 
     fetchRecarga(data)
       .then((response) => {
+        console.log(response);
         const response_obj = response?.obj;
         const result = response_obj?.result;
         if (response?.status == true) {
@@ -191,12 +183,10 @@ const RecargasMovistar = () => {
   });
 
   const ticketRecarga = (result_) => {
-    const now = new Date();
     const voucher = {
       title: "Recibo de recarga ",
       timeInfo: {
         "Fecha de venta": result_.fecha_final_ptopago,
-        // Hora: now.getHours() + ':' + now.getMinutes() + ':'+ now.getSeconds(),
         Hora: Intl.DateTimeFormat("es-CO", {
           hour: "2-digit",
           minute: "2-digit",
@@ -240,7 +230,7 @@ const RecargasMovistar = () => {
       <Form onSubmit={onSubmitCheck} grid>
         <Input
           name="celular"
-          label="Celular"
+          label="Número de celular"
           type="tel"
           autoComplete="off"
           minLength={"10"}
