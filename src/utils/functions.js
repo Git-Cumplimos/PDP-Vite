@@ -43,7 +43,7 @@ export const onChangeNumber = (ev) => {
   let caret_pos = ev.target.selectionStart ?? 0;
   const len = ev.target.value.length;
 
-  ev.target.setAttribute("value", ((ev.target.value ?? "").match(/\d/g) ?? []).join(""));
+  ev.target.value = ((ev.target.value ?? "").match(/\d/g) ?? []).join("");
 
   ev.target.focus();
   caret_pos += ev.target.value.length - len;
@@ -65,7 +65,7 @@ export const onChangeAccountNumber = (ev) => {
   const len = ev.target.value.length;
 
   const temp = ((ev.target.value ?? "").match(/\d/g) ?? []).join("");
-  ev.target.setAttribute("value", toAccountNumber(temp));
+  ev.target.value = toAccountNumber(temp);
 
   ev.target.focus();
   caret_pos += ev.target.value.length - len;
