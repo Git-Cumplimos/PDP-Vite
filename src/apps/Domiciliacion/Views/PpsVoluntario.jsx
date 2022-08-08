@@ -32,7 +32,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
   const [showModal, setShowModal] = useState(true);
   const navigate = useNavigate();
 
-  const { contenedorImagen } = classes;
+  const { contenedorImagen,contenedorFormulario } = classes;
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, []);
@@ -190,6 +190,9 @@ const PpsVoluntario = ({ datosConsulta }) => {
               legend="Formulario Aporte Voluntario"
               /* className="lg:col-span-3" */
             >
+              <div className={contenedorFormulario}>
+
+
               <Select
                 onChange={(event) =>
                   setTipoIdentificacion(event?.target?.value)
@@ -342,6 +345,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 onChange={(event) => setNumPagosPdp(event?.target?.value)}
                 required
               />
+              </div>
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"} type="">
               {
