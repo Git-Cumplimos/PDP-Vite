@@ -13,10 +13,10 @@ const IdleTimeOut = () => {
   const { roleInfo, signOut } = useAuth();
   const refModal = useRef(false);
 
-  //   let idleTimeout = 1000 * parseInt(timeIdleTimeOut);
-  //   let idleLogout = 1000 * parseInt(timeLogOutTimeOut);
-  let idleTimeout = 1000 * timeIdleTimeOut;
-  let idleLogout = 1000 * timeLogOutTimeOut;
+  let idleTimeout = 1000 * parseInt(timeIdleTimeOut);
+  let idleLogout = 1000 * parseInt(timeLogOutTimeOut);
+  // let idleTimeout = 1000 * timeIdleTimeOut;
+  // let idleLogout = 1000 * timeLogOutTimeOut;
   let idleEvent = useRef();
   let idleLogoutEvent = useRef();
 
