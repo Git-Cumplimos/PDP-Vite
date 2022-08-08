@@ -21,6 +21,7 @@ import { useFetch } from "../../../../../hooks/useFetch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import HideInput from "../../../../../components/Base/HideInput";
 
 const Retiro = () => {
   const navigate = useNavigate();
@@ -129,7 +130,7 @@ const Retiro = () => {
             } else {
               setDatosConsulta(res?.obj?.Data);
               const summary = {
-                "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
+                "Nombre cliente": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
                 // "Numero celular": numCuenta,
                 "C.C. del depositante": userDoc,
                 "Codigo OTP": otp,
@@ -250,7 +251,7 @@ const Retiro = () => {
 
             //["Usuario de venta", "Nombre propietario del punto"],
           ],
-          disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
         };
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
@@ -297,35 +298,36 @@ const Retiro = () => {
           <Input
             id='docCliente'
             name='docCliente'
-            label='Documento Cliente'
+            label='Documento cliente'
             type='text'
             autoComplete='off'
             minLength={"7"}
             maxLength={"16"}
             value={userDoc}
             onInput={(e) => {
-              if (!isNaN(e.target.value)){
-                setUserDoc(e.target.value)
-              }
+              const num = e.target.value.replace(/[\s\.]/g, "");
+              if (! isNaN(num)){
+              setUserDoc(num)  
+              }            
             }}
             required
           />
-          <Input
-            id='OTP'
-            name='OTP'
-            label='Codigo OTP'
-            type='text'
-            autoComplete='off'
-            minLength={"6"}
-            maxLength={"6"}
-            value={otp}
-            onInput={(e) => {
-              if (!isNaN(e.target.value)){
-                setOtp(e.target.value)
-              }
-              }}
-            required
-          />
+          <HideInput
+          id='otp'
+          label='Número OTP'
+          type='text'
+          name='otp'
+          minLength='6'
+          maxLength='6'
+          autoComplete='off'
+          required
+          value={otp}
+          onInput={(e, valor) => {
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(valor)) {
+              setOtp(num);
+            }
+          }}></HideInput>
           <MoneyInput
             id='valor'
             name='valor'

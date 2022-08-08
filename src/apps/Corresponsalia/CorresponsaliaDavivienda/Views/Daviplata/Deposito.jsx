@@ -149,7 +149,7 @@ const Deposito = () => {
                   "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
                   "Número celular": phone,
                   "Documento depositante": userDoc,
-                  "Nombre depositante": nomDepositante,
+                  // "Nombre depositante": nomDepositante,
                   "Valor depósito": formatMoney.format(valor),
                   "Valor comisión": formatMoney.format(
                     res?.obj?.Data?.valComisionGiroDaviplata
@@ -371,13 +371,14 @@ const Deposito = () => {
             maxLength={"16"}
             value={userDoc}
             onInput={(e) => {
-              if (!isNaN(e.target.value)) {
-                setUserDoc(e.target.value);
-              }
+              const num = e.target.value.replace(/[\s\.]/g, "");
+              if (! isNaN(num)){
+              setUserDoc(num)  
+              }    
             }}
             required
           />
-          <Input
+          {/* <Input
             id='nomDepositante'
             name='nomDepositante'
             label='Nombre depositante'
@@ -392,7 +393,7 @@ const Deposito = () => {
               }
             }}
             required
-          />
+          /> */}
           {/* <MoneyInput
             id='valor'
             name='valor'
