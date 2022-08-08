@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useCallback } from "react";
 import { toast } from "react-toastify";
 
 import * as serviceWorkerRegistration from "../../../serviceWorkerRegistration";
@@ -7,20 +7,20 @@ const ServiceWorkerWrapper = () => {
   const [showReload, setShowReload] = useState(false);
   const [waitingWorker, setWaitingWorker] = useState(null);
 
-  const onSWUpdate = (registration) => {
+  const onSWUpdate = useCallback((registration) => {
     setShowReload(true);
     setWaitingWorker(registration.waiting);
-  };
+  }, []);
 
   useEffect(() => {
     serviceWorkerRegistration.register({ onUpdate: onSWUpdate });
-  }, []);
+  }, [onSWUpdate]);
 
-  const reloadPage = () => {
+  const reloadPage = useCallback(() => {
     waitingWorker?.postMessage({ type: "SKIP_WAITING" });
     setShowReload(false);
     window.location.reload(true);
-  };
+  }, [waitingWorker]);
 
   if (showReload) {
     toast.info(
@@ -29,8 +29,6 @@ const ServiceWorkerWrapper = () => {
         <div>
           <button
             className="px-2 py-1 bg-primary text-white rounded text-sm"
-            color="inherit"
-            size="small"
             onClick={reloadPage}
           >
             Recargar
