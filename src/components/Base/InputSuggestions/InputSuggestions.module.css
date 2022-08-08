@@ -12,11 +12,11 @@
 }
 
 .formItem > .suggestion {
-  @apply relative;
+  @apply relative place-self-stretch;
 }
 
 .formItem > .suggestion > ul {
-  @apply hidden absolute top-full right-0 bg-gray-300 rounded-md cursor-pointer w-full;
+  @apply hidden absolute top-full right-0 bg-gray-300 rounded-md cursor-pointer w-full z-20;
 }
 
 .formItem > .suggestion > input:focus + ul,
@@ -35,7 +35,7 @@
 
 .formItem > .suggestion > input {
   /* flex: 1 1 50%; */
-  @apply px-4 py-2 rounded-md bg-secondary-light text-black;
+  @apply px-4 py-2 rounded-md bg-secondary-light text-black w-full;
 }
 
 .formItem > .suggestion > input[type="number"] {
