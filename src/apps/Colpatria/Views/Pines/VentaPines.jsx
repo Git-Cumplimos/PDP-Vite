@@ -342,7 +342,7 @@ const VentaPines = () => {
       <h1 className="text-3xl mt-6">Venta de Pines Colpatria</h1>
       <Form
         onSubmit={
-          !inquiryStatus
+          inquiryStatus
             ? (ev) => {
                 ev.preventDefault();
                 setShowModal(true);
@@ -396,15 +396,15 @@ const VentaPines = () => {
           id="docCliente"
           name="docCliente"
           label="CC del comprador"
-          type="text"
+          type="tel"
           autoComplete="off"
           minLength={"7"}
           maxLength={"13"}
-          value={userDocument}
+          value={`${userDocument}`}
           onInput={(ev) => setUserDocument(onChangeNumber(ev))}
           required
         />
-        {datosConvenio.fk_tipo_valor === 1 || inquiryStatus  ? (
+        {datosConvenio.fk_tipo_valor === 1 || inquiryStatus ? (
           <Input
             id="valor"
             name="valor"
@@ -414,7 +414,7 @@ const VentaPines = () => {
             minLength={"5"}
             maxLength={"10"}
             onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
-            readOnly={datosConvenio.fk_tipo_valor !== 3}
+            readOnly={inquiryStatus && datosConvenio.fk_tipo_valor !== 3}
             required
           />
         ) : (
