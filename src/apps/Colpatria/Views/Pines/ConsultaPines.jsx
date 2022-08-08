@@ -14,15 +14,20 @@ const ConsultaPines = () => {
   const [foundConv, setFoundConv] = useState([]);
 
   const mapSuggestions = useMemo(() => {
-    return foundConv.map(({ pk_codigo_convenio, codigo_pin, nombre_convenio }) => {
-      return (
-        <Link to={`/corresponsalia/colpatria/pines/venta/${pk_codigo_convenio}`}>
-          <div className="grid grid-cols-1 place-items-center px-4 py-2">
-            <h1 className="text-lg">{pk_codigo_convenio} | {codigo_pin} | {nombre_convenio}</h1>
-          </div>
-        </Link>
-      );
-    });
+    return foundConv.map(
+      ({ pk_codigo_convenio, codigo_pin, nombre_convenio }) => {
+        return (
+          <Link to={`/corresponsalia/colpatria/pines/${pk_codigo_convenio}`}>
+            <div className="grid grid-cols-1 place-items-center px-4 py-2">
+              <h1 className="text-sm">
+                {pk_codigo_convenio} &nbsp;&nbsp;|&nbsp;&nbsp; {codigo_pin}
+              </h1>
+              <h1 className="text-base">{nombre_convenio}</h1>
+            </div>
+          </Link>
+        );
+      }
+    );
   }, [foundConv]);
 
   const searchConvenios = useCallback((e) => {
@@ -38,7 +43,7 @@ const ConsultaPines = () => {
             if (res?.obj.length === 0) {
               notifyError("No se encontradon datos de convenio");
             }
-            return
+            return;
           }
           throw new Error("Objeto recibido erroneo");
         })

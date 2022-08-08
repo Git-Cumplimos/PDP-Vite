@@ -8,7 +8,6 @@ const colpatriaTrx = lazy(() => import("./ColpatriaTrx"));
 const Deposito = lazy(() => import("./Views/Deposito"));
 
 
-const Pines = lazy(() => import("./Views/Pines"));
 const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
 const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
 
@@ -32,17 +31,11 @@ const rutasColpatria = {
     {
       link: "/corresponsalia/colpatria/pines",
       label: <AppIcons Logo={"RECAUDO"} name={"Recaudo de Pines"} />,
-      component: Pines,
+      component: PinesConsulta,
       permission: [67],
       subRoutes: [
         {
-          link: "/corresponsalia/colpatria/pines/consulta",
-          label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines"} />,
-          component: PinesConsulta,
-          permission: [67],
-        },
-        {
-          link: "/corresponsalia/colpatria/pines/venta/:id_convenio_pin",
+          link: "/corresponsalia/colpatria/pines/:id_convenio_pin",
           label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines"} />,
           component: PinesVenta,
           permission: [67],
