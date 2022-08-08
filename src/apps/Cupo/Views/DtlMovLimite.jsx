@@ -24,6 +24,7 @@ const DtlMovLimite = () => {
     ).join("");
     setIdComercio(idComer);
   }, []);
+
   useEffect(() => {
     getConsultaAsignacionCupoLimite(roleInfo?.id_comercio ?? idComercio, page, limit)
       .then((objUdusrio) => {

@@ -17,6 +17,7 @@ import MoneyInput from "../../../components/Base/MoneyInput";
 
 const ModificarPps = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
+  const [tipoDomiciliacion, setTipoDomiciliacion] = useState(1);
   const [sinDatosConsulta, setSinDatosConsulta] = useState(false);
   const [buscarCedula, setBuscarCedula] = useState(null);
   const [invalidCedula, setInvalidCedula] = useState("");
@@ -29,6 +30,7 @@ const ModificarPps = () => {
   const [estadoUsuarioNoEncontrado, setEstadoUsuarioNoEncontrado] =
     useState(false);
   const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
+  // const url =  "http://127.0.0.1:7000";
   const [estado, setEstado] = useState(false);
   const [valueAmount, setValueAmount] = useState("");
   const [celular, setCelular] = useState("");
@@ -92,7 +94,7 @@ const ModificarPps = () => {
 
   const UsuarioNoEncontradoNotify = useCallback(() => {
     if (setShowModalUsuarioNoEncontrado) {
-      notifyError("Usuario No Encontrad");
+      notifyError("Usuario no encontrado");
     }
     /*  setDatosConsulta(""); */
     setBuscarCedula("");
@@ -169,6 +171,7 @@ const ModificarPps = () => {
               celular: celular.toString(),
               num_pago_pdp: numPagosPdp,
               estado: estadoComercioString,
+              tipo_domiciliacion:tipoDomiciliacion,
             },
             {},
             {}
@@ -249,7 +252,9 @@ const ModificarPps = () => {
             <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>
               Buscar Cliente
             </Button>
+            
           }
+     
         </ButtonBar>
       </Form>
       {/*       {estadoUsuarioNoEncontrado && sinDatosConsulta ? (
@@ -338,18 +343,29 @@ const ModificarPps = () => {
               />
 
               <div className={contenedorLogo}>
-                <Select
-                  onChange={(event) => setNumPagosPdp(event?.target?.value)}
-                  id="comissionType"
-                  label="N° Pagos Incentivo"
-                  value={numPagosPdp}
-                  options={{
-                    0: 0,
-                    1: 1,
-                    2: 2,
-                    3: 3,
-                  }}
-                ></Select>
+              <Input
+                name="N° Pagos Punto Pago"
+                label="N° Pagos Punto Pago"
+                type="tel"
+                autoComplete="off"
+                minLength={"1"}
+                maxLength={"2"}
+                /* invalid={invalidCedula} */
+                value={numPagosPdp}
+                onChange={(event) => setNumPagosPdp(event?.target?.value)}
+                required
+              />
+              <Select
+                onChange={(event) => setTipoDomiciliacion(event?.target?.value)}
+                id="comissionType"
+                label="Tipo de Domiciliación"
+                value={tipoDomiciliacion}
+                options={{
+                  Mensual: 1,
+                  Quincenal: 2,
+                  Semanal: 3,
+                }}
+              ></Select>
                 <ToggleInput
                   checked={estadoComercio}
                   onClick={() => setEstadoComercio((old) => !old)}
@@ -361,6 +377,7 @@ const ModificarPps = () => {
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"} type="">
               {<Button type="submit">Modificar y Guardar</Button>}
+              <Button onClick={() => setShowModal(false)}>Cancelar</Button>
             </ButtonBar>
           </Form>
         </Modal>
