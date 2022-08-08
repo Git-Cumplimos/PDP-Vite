@@ -22,6 +22,7 @@ import { notify, notifyError } from "../../../../../utils/notify";
 import {
   postConsultaConveniosDavivienda,
   postConsultaTablaConveniosEspecifico,
+  postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const RecaudoServiciosPublicosPrivados = () => {
@@ -85,6 +86,44 @@ const RecaudoServiciosPublicosPrivados = () => {
       if (datosTrans.valor !== datosTransValidacion.valor) {
         return notifyError("El valor ingresado es diferente");
       }
+      setIsUploading(true);
+      postRecaudoConveniosDavivienda({
+        valTipoConsultaConvenio: "2",
+        numConvenio: convenio.cod_convenio_cnb,
+        numTipoProductoRecaudo: convenio.tipo_cta_recaudo_cnb,
+        numProductoRecaudo: convenio.nro_cta_recaudo_cnb,
+        valTipoProdDestinoRecaudoCent: convenio.tipo_cta_destino_cnb,
+        valProdDestinoRecaudoCent: convenio.nro_cta_destino_cnb,
+        valCodigoIAC: "0",
+        valor: datosTransValidacion?.valor ?? "0",
+        valReferencia1: datosTransValidacion?.ref1 ?? "",
+        valReferencia2: datosTransValidacion?.ref2 ?? "",
+
+        idComercio: roleInfo?.id_comercio,
+        idUsuario: roleInfo?.id_usuario,
+        idTerminal: roleInfo?.id_dispositivo,
+        issuerIdDane: roleInfo?.codigo_dane,
+        nombreComercio: roleInfo?.["nombre comercio"],
+        municipio: roleInfo?.["ciudad"],
+        oficinaPropia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      })
+        .then((res) => {
+          if (res?.status) {
+            setIsUploading(false);
+            notify(res?.msg);
+            console.log(res);
+          } else {
+            setIsUploading(false);
+            notifyError(res?.msg);
+            handleClose();
+          }
+        })
+        .catch((err) => {
+          setIsUploading(false);
+          notifyError("No se ha podido conectar al servidor");
+          console.error(err);
+        });
       console.log("realizar pago");
     } else {
       setIsUploading(true);
@@ -160,8 +199,10 @@ const RecaudoServiciosPublicosPrivados = () => {
               required
               value={datosTrans.ref1}
               onInput={(e) => {
+                let valor = e.target.value;
+                let num = valor.replace(/[\s\.]/g, "");
                 setDatosTrans((old) => {
-                  return { ...old, ref1: e.target.value };
+                  return { ...old, ref1: num };
                 });
               }}></Input>
           </>
@@ -177,23 +218,12 @@ const RecaudoServiciosPublicosPrivados = () => {
             required
             value={datosTrans.ref2}
             onInput={(e) => {
+              let valor = e.target.value;
+              let num = valor.replace(/[\s\.]/g, "");
               setDatosTrans((old) => {
-                return { ...old, ref2: e.target.value };
+                return { ...old, ref2: num };
               });
             }}></Input>
-        )}
-        {(convenio?.num_ind_consulta_cnb === "0" ||
-          convenio?.num_ind_consulta_cnb === "3") && (
-          <MoneyInput
-            id='valCashOut'
-            name='valCashOut'
-            label='Valor'
-            type='text'
-            autoComplete='off'
-            maxLength={"15"}
-            value={datosTrans.valor ?? ""}
-            onInput={onChangeMoney}
-            required></MoneyInput>
         )}
         {(convenio?.num_ind_consulta_cnb === "0" ||
           convenio?.num_ind_consulta_cnb === "3") && (
@@ -223,7 +253,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             <h1 className='text-2xl text-center mb-10'>
               Ingrese nuevamente los datos de la transacción
             </h1>
-            <Form grid onSubmit={onSubmitValidacion}>
+            <Form onSubmit={onSubmitValidacion}>
               {convenio?.ctrol_ref1_cnb === "1" && (
                 <>
                   <Input
@@ -236,8 +266,10 @@ const RecaudoServiciosPublicosPrivados = () => {
                     required
                     value={datosTransValidacion.ref1}
                     onInput={(e) => {
+                      let valor = e.target.value;
+                      let num = valor.replace(/[\s\.]/g, "");
                       setDatosTransValidacion((old) => {
-                        return { ...old, ref1: e.target.value };
+                        return { ...old, ref1: num };
                       });
                     }}></Input>
                 </>
@@ -253,8 +285,10 @@ const RecaudoServiciosPublicosPrivados = () => {
                   required
                   value={datosTransValidacion.ref2}
                   onInput={(e) => {
+                    let valor = e.target.value;
+                    let num = valor.replace(/[\s\.]/g, "");
                     setDatosTransValidacion((old) => {
-                      return { ...old, ref2: e.target.value };
+                      return { ...old, ref2: num };
                     });
                   }}></Input>
               )}

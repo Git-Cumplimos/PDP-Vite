@@ -86,3 +86,24 @@ export const postConsultaConveniosDavivienda = async (bodyObj) => {
     throw err;
   }
 };
+export const postRecaudoConveniosDavivienda = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/recaudo_servicios_publicos_privados`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};

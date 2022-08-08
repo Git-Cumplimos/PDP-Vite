@@ -307,7 +307,7 @@ const PagoGiro = () => {
         <Input
           id='numeroIdentificacion'
           label='Número de identificación'
-          type='text'
+          type='tel'
           name='numeroIdentificacion'
           minLength='5'
           maxLength='16'
