@@ -50,7 +50,7 @@ const PagoDeProductosPropios = () => {
   const [datosConsulta, setDatosConsulta] = useState({});
 
   const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de retiro DaviPlata",
+    title: "Recibo de Pago de Productos de Crédito",
     timeInfo: {
       "Fecha de venta": "",
       Hora: "",
@@ -188,7 +188,6 @@ const PagoDeProductosPropios = () => {
           setIsUploading(false);
           notify(res?.msg);
           // hideModal();
-          console.log(res);
           setDatosTrans((old) => ({
             ...old,
             idTrx: res?.obj?.idTrx,
@@ -265,7 +264,6 @@ const PagoDeProductosPropios = () => {
     } else {
       valorPagar = tipoAbono.valorAbono;
     }
-    console.log(valorPagar);
     setIsUploading(true);
     postPagoProductosPropiosDavivienda({
       tipoIdentificacion: datosTrans.tipoIdentificacion,
@@ -338,7 +336,7 @@ const PagoDeProductosPropios = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl'>Pago de productos de crédito</h1>
+      <h1 className='text-3xl mb-10'>Pago de productos de crédito</h1>
       <Form grid onSubmit={onSubmit}>
         <Select
           id='tipoIdentificacion'
@@ -346,7 +344,7 @@ const PagoDeProductosPropios = () => {
           label='Tipo de identificación'
           options={{
             "": "",
-            Cedula: "01",
+            "Cédula de ciudadanía": "01",
             "Cedula extranjeria": "02",
             NIT: "03",
             "NIT Persona natural": "04",
@@ -374,8 +372,9 @@ const PagoDeProductosPropios = () => {
           required
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+            let valor = e.target.value;
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, numeroIdentificacion: num };
               });
@@ -418,8 +417,9 @@ const PagoDeProductosPropios = () => {
               required
               value={datosTrans.numeroProducto}
               onInput={(e) => {
-                if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
+                let valor = e.target.value;
+                let num = valor.replace(/[\s\.]/g, "");
+                if (!isNaN(num)) {
                   setDatosTrans((old) => {
                     return { ...old, numeroProducto: num };
                   });
@@ -439,8 +439,9 @@ const PagoDeProductosPropios = () => {
               required
               value={datosTrans.binTarjetaCredito}
               onInput={(e) => {
-                if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
+                let valor = e.target.value;
+                let num = valor.replace(/[\s\.]/g, "");
+                if (!isNaN(num)) {
                   setDatosTrans((old) => {
                     return { ...old, binTarjetaCredito: num };
                   });
@@ -456,8 +457,9 @@ const PagoDeProductosPropios = () => {
               required
               value={datosTrans.ultimosTarjetaCredito}
               onInput={(e) => {
+                let valor = e.target.value;
+                let num = valor.replace(/[\s\.]/g, "");
                 if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
                   setDatosTrans((old) => {
                     return { ...old, ultimosTarjetaCredito: num };
                   });
@@ -493,7 +495,6 @@ const PagoDeProductosPropios = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de consulta Davivienda
               </h1>
-              {console.log(datosConsulta.valPagoMinimo)}
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>

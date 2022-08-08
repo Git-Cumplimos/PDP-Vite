@@ -13,7 +13,7 @@ const AuthButton = () => {
         navigate("/login", { replace: true });
       }}
     >
-      Cerrar sesion
+      Cerrar sesión
     </button>
   ) : (
     ""

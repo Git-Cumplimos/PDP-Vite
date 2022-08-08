@@ -21,6 +21,8 @@ import { useFetch } from "../../../../../hooks/useFetch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import useMoney from "../../../../../hooks/useMoney";
+import { makeMoneyFormatter } from "../../../../../utils/functions";
 
 const Deposito = () => {
   const navigate = useNavigate();
@@ -28,11 +30,11 @@ const Deposito = () => {
   //   useQuery();
   const [verificacionTel, setVerificacionTel] = useState("");
 
-  const [phone, setPhone] = useState("")
-  const [userDoc, setUserDoc] = useState("")
-  const [valor, setValor] = useState("")
-  const [nomDepositante, setNomDepositante] = useState("")
-  const [summary, setSummary] = useState([])
+  const [phone, setPhone] = useState("");
+  const [userDoc, setUserDoc] = useState("");
+  const [valor, setValor] = useState("");
+  const [nomDepositante, setNomDepositante] = useState("");
+  const [summary, setSummary] = useState([]);
   const { roleInfo, infoTicket } = useAuth();
   const [loadingCashIn, fetchCashIn] = useFetch(pagoGiroDaviplata);
   const [loadingConsultaCashIn, fetchConsultaCashIn] = useFetch(
@@ -47,14 +49,18 @@ const Deposito = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
+    max:1000001,
     min: 10000,
+  });
+
+  const onChangeMoney = useMoney({
+    limits: [limitesMontos.min, limitesMontos.max],
   });
 
   const options = [
     { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
-    { value: "02", label: "Cédula Extranjeria" },
+    { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
   ];
 
@@ -94,13 +100,13 @@ const Deposito = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setPhone("")
-    setVerificacionTel("")
-    setNomDepositante("")
-    setSummary([])
-    setValor("")
-    setTipoDocumento("")
-    setUserDoc("")
+    setPhone("");
+    setVerificacionTel("");
+    setNomDepositante("");
+    setSummary([]);
+    setValor("");
+    setTipoDocumento("");
+    setUserDoc("");
   }, []);
 
   const onSubmitDeposit = useCallback(
@@ -110,11 +116,11 @@ const Deposito = () => {
       const { min, max } = limitesMontos;
 
       if (valor >= min && valor < max) {
-        const formData = new FormData(e.target);
-        const phone = formData.get("numCliente");
-        const userDoc = formData.get("docCliente");
-        const nomDepositante = formData.get("nomDepositante");
-        const valorFormat = formData.get("valor");
+        // const formData = new FormData(e.target);
+        // const phone = formData.get("numCliente");
+        // const userDoc = formData.get("docCliente");
+        // const nomDepositante = formData.get("nomDepositante");
+        // const valorFormat = formData.get("valor");
 
         if (verificacionTel === phone) {
           const body = {
@@ -131,19 +137,21 @@ const Deposito = () => {
             .then((res) => {
               setIsUploading(false);
               if (!res?.status) {
+                setIsUploading(false);
                 notifyError(res?.msg);
                 return;
               } else {
+                setIsUploading(false);
                 setDatosConsulta(res?.obj);
                 const total =
                   parseInt(res?.obj?.Data?.valComisionGiroDaviplata) + valor;
                 const summary = {
                   "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
-                  "Numero celular": phone,
-                  "C.C. del depositante": userDoc,
-                  "Nombre del depositante": nomDepositante,
-                  "Valor de deposito": valorFormat,
-                  "Valor de comisión": formatMoney.format(
+                  "Número celular": phone,
+                  "Documento depositante": userDoc,
+                  "Nombre depositante": nomDepositante,
+                  "Valor depósito": formatMoney.format(valor),
+                  "Valor comisión": formatMoney.format(
                     res?.obj?.Data?.valComisionGiroDaviplata
                   ),
                   "Valor total": formatMoney.format(total),
@@ -155,6 +163,7 @@ const Deposito = () => {
               //notify("Transaccion satisfactoria");
             })
             .catch((err) => {
+              setIsUploading(false);
               console.error(err);
               notifyError("Error interno en la transaccion");
             });
@@ -171,9 +180,17 @@ const Deposito = () => {
         );
       }
     },
-    [valor, limitesMontos, verificacionTel]
+    [
+      phone,
+      verificacionTel,
+      tipoDocumento,
+      userDoc,
+      nomDepositante,
+      valor,
+      limitesMontos,
+    ]
   );
- 
+
   const onMoneyChange = useCallback(
     (e, valor) => {
       setValor(valor);
@@ -209,66 +226,70 @@ const Deposito = () => {
       .then((res) => {
         setIsUploading(false);
         if (!res?.status) {
+          setIsUploading(false);
           notifyError(res?.msg);
           return;
-        }else{
-        notify("Transaccion satisfactoria");
-        const trx_id = res?.obj?.Data?.valTalon ?? 0;
-        const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
-        const total = parseInt(comision) + valor;
-        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+        } else {
+          notify("Transaccion satisfactoria");
+          const trx_id = res?.obj?.Data?.valTalon ?? 0;
+          const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
+          const total = parseInt(comision) + valor;
+          const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+          const tempTicket = {
+            title: "Recibo de Depósito a Daviplata",
+            timeInfo: {
+              "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+                year: "2-digit",
+                month: "2-digit",
+                day: "2-digit",
+              }).format(new Date()),
+              Hora: Intl.DateTimeFormat("es-CO", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              }).format(new Date()),
+            },
+            commerceInfo: [
+              ["Id Comercio", roleInfo?.id_comercio],
+              ["No. terminal", ter],
+              ["Municipio", roleInfo?.ciudad],
+              ["Dirección", roleInfo?.direccion],
+              ["Tipo de operación", "Depósito a DaviPlata"],
+              ["", ""],
+              ["No. de aprobación", trx_id],
+              ["", ""],
+            ],
+            commerceName: roleInfo?.["nombre comercio"]
+              ? roleInfo?.["nombre comercio"]
+              : "No hay datos",
+            trxInfo: [
+              ["Número DaviPlata", `****${String(phone)?.slice(-4) ?? ""}`],
+              ["", ""],
+              ["Valor", formatMoney.format(valor)],
+              ["", ""],
+              ["Costo transacción", formatMoney.format(comision)],
+              ["", ""],
+              ["Total", formatMoney.format(total)],
+              ["", ""],
+            ],
+            disclamer:
+              "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+          };
 
-        const tempTicket = {
-          title: "Recibo de Depósito a Daviplata",
-          timeInfo: {
-            "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-            }).format(new Date()),
-            Hora: Intl.DateTimeFormat("es-CO", {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            }).format(new Date()),
-          },
-          commerceInfo: [
-            ["Id Comercio", roleInfo?.id_comercio],
-            ["No. terminal", ter],
-            ["Municipio", roleInfo?.ciudad],
-            ["Dirección", roleInfo?.direccion],
-            ["Tipo de operación", "Depósito a DaviPlata"],
-            ["", ""],
-            ["No. de aprobación", trx_id],
-            ["", ""],
-          ],
-          commerceName: roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "No hay datos",
-          trxInfo: [          
-            ["Número de telefono", "****" + phone.slice(-4)],
-            ["",""],
-            ["Valor", formatMoney.format(valor)],
-            ["",""],
-            ["Costo transacción", formatMoney.format(comision)],
-            ["",""],
-            ["Total", formatMoney.format(total)],
-            ["",""],
-          ],
-          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
-        };
-        setPaymentStatus(tempTicket);
-        infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
-          .then((resTicket) => {
-            console.log(resTicket);
-          })
-          .catch((err) => {
-            console.error(err);
-            notifyError("Error guardando el ticket");
-          });
+          setPaymentStatus(tempTicket);
+          infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
+            .then((resTicket) => {
+              console.log(resTicket);
+            })
+            .catch((err) => {
+              setIsUploading(false);
+              console.error(err);
+              notifyError("Error guardando el ticket");
+            });
         }
       })
       .catch((err) => {
+        setIsUploading(false);
         console.error(err);
         notifyError("Error interno en la transaccion");
       });
@@ -287,20 +308,24 @@ const Deposito = () => {
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Depositos Daviplata</h1>
+        <h1 className='text-3xl mt-6'>Depósito DaviPlata</h1>
+        <br></br>
         <Form onSubmit={onSubmitDeposit} grid>
           <Input
             id='numCliente'
             name='numCliente'
-            label='Numero Daviplata'
+            label='Número DaviPlata'
             type='text'
             autoComplete='off'
             minLength={"10"}
             maxLength={"10"}
             value={phone}
             onInput={(e) => {
-              if (!isNaN(e.target.value)) {
-                const num = e.target.value;
+              if ((phone?.length === 0) & (e.target.value !== "3")) {
+                notifyError("El número de celular debe iniciar por 3");
+                setPhone("");
+              } else {
+                const num = parseInt(e.target.value) || "";
                 setPhone(num);
               }
             }}
@@ -309,15 +334,18 @@ const Deposito = () => {
           <Input
             id='numCliente'
             name='numCliente'
-            label='Verificación'
+            label='Verificación No. DaviPlata'
             type='text'
             autoComplete='off'
             minLength={"10"}
             maxLength={"10"}
             value={verificacionTel}
             onInput={(e) => {
-              if (!isNaN(e.target.value)) {
-                const num = e.target.value;
+              if ((verificacionTel?.length === 0) & (e.target.value !== "3")) {
+                notifyError("El número de celular debe iniciar por 3");
+                setVerificacionTel("");
+              } else {
+                const num = parseInt(e.target.value) || "";
                 setVerificacionTel(num);
               }
             }}
@@ -328,6 +356,7 @@ const Deposito = () => {
             label='Tipo de documento'
             options={options}
             value={tipoDocumento}
+            required
             onChange={(e) => {
               setTipoDocumento(e.target.value);
             }}
@@ -335,42 +364,64 @@ const Deposito = () => {
           <Input
             id='docCliente'
             name='docCliente'
-            label='CC de quien deposita'
+            label='Documento depositante'
             type='text'
             autoComplete='off'
             minLength={"5"}
             maxLength={"16"}
             value={userDoc}
             onInput={(e) => {
-              setUserDoc(e.target.value);
+              if (!isNaN(e.target.value)) {
+                setUserDoc(e.target.value);
+              }
             }}
             required
           />
           <Input
             id='nomDepositante'
             name='nomDepositante'
-            label='Nombre Depositante'
+            label='Nombre depositante'
             type='text'
+            minLength={"1"}
+            maxLength={"50"}
             autoComplete='off'
             value={nomDepositante}
             onInput={(e) => {
+              if (isNaN(e.target.value.slice(-1)) || e.target.value.slice(-1) === "" || e.target.value.slice(-1) === " "){
               setNomDepositante(e.target.value);
+              }
             }}
             required
           />
-          <MoneyInput
+          {/* <MoneyInput
+            id='valor'
+            name='valor'
+            label='Valor a depósitar'
+            autoComplete='off'
+            min={limitesMontos?.min}
+            max={limitesMontos?.max}
+            minLength={"1"}
+            maxLength={"15"}
+            onInput={onMoneyChange}
+            required
+          /> */}
+          <Input
             id='valor'
             name='valor'
             label='Valor a depositar'
             autoComplete='off'
+            type='text'
+            minLength={"1"}
+            maxLength={"15"}
             min={limitesMontos?.min}
             max={limitesMontos?.max}
-            onInput={onMoneyChange}
+            value={makeMoneyFormatter(0).format(valor)}
+            onInput={(ev) => setValor(onChangeMoney(ev))}
             required
           />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"} disabled={loadingConsultaCashIn}>
-              Realizar deposito
+              Realizar depósito
             </Button>
           </ButtonBar>
         </Form>

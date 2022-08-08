@@ -24,7 +24,6 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 
 const Retiro = () => {
   const navigate = useNavigate();
-  const [{ userDoc, valor, otp, summary }, setQuery] = useQuery();
 
   const { roleInfo, infoTicket } = useAuth();
 
@@ -40,6 +39,10 @@ const Retiro = () => {
   const [tipoCuenta, setTipoCuenta] = useState("");
   const [tipoDocumento, setTipoDocumento] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [userDoc, setUserDoc] = useState("")
+  const [valor, setValor] = useState("")
+  const [otp, setOtp] = useState("")
+  const [summary, setSummary] = useState([])
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
@@ -49,7 +52,7 @@ const Retiro = () => {
   const optionsDocumento = [
     { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
-    { value: "02", label: "Cédula Extranjeria" },
+    { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
     { value: "13", label: "Regitro Civil" },
   ];
@@ -135,7 +138,7 @@ const Retiro = () => {
                   res?.obj?.Data?.numValorCobro
                 ),
               };
-              setQuery({ valor, summary }, { replace: true });
+              setSummary(summary)
               setShowModal(true);
             }
 
@@ -155,32 +158,15 @@ const Retiro = () => {
         );
       }
     },
-    [setQuery, valor, limitesMontos]
+    [valor, limitesMontos]
   );
 
-  const onChange = useCallback(
-    (ev) => {
-      if (ev.target.name !== "valor") {
-        const formData = new FormData(ev.target.form);
-        const otp = ((formData.get("OTP") ?? "").match(/\d/g) ?? []).join("");
-        const userDoc = (
-          (formData.get("docCliente") ?? "").match(/\d/g) ?? []
-        ).join("");
-        const nomDepositante = formData.get("nomDepositante") ?? "";
-        setQuery(
-          { otp, userDoc, valor: valor ?? "", nomDepositante },
-          { replace: true }
-        );
-      }
-    },
-    [setQuery, valor, tipoDocumento]
-  );
 
   const onMoneyChange = useCallback(
     (e, valor) => {
-      setQuery({ userDoc: userDoc ?? "", valor }, { replace: true });
+      setValor(valor)
     },
-    [setQuery, userDoc]
+    [valor]
   );
 
   const goToRecaudo = useCallback(() => {
@@ -249,7 +235,7 @@ const Retiro = () => {
             ["",""],
             [
               "Nro. Cuenta",
-              "****" + res?.obj?.Data?.numNumeroDeCuenta?.slice(-4),
+              `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
             ],
             ["",""],
             ["Valor", formatMoney.format(valor)],
@@ -297,7 +283,7 @@ const Retiro = () => {
       <SimpleLoading show={isUploading} />
       <Fragment>
         <h1 className='text-3xl mt-6'>Retiros</h1>
-        <Form onSubmit={onSubmitRetiro} onChange={onChange} grid>
+        <Form onSubmit={onSubmitRetiro} grid>
           <Select
             id='tipoDocumento'
             label='Tipo de documento'
@@ -306,6 +292,7 @@ const Retiro = () => {
             onChange={(e) => {
               setTipoDocumento(e.target.value);
             }}
+            required
           />
           <Input
             id='docCliente'
@@ -314,9 +301,13 @@ const Retiro = () => {
             type='text'
             autoComplete='off'
             minLength={"7"}
-            maxLength={"10"}
-            value={userDoc ?? ""}
-            onInput={() => {}}
+            maxLength={"16"}
+            value={userDoc}
+            onInput={(e) => {
+              if (!isNaN(e.target.value)){
+                setUserDoc(e.target.value)
+              }
+            }}
             required
           />
           <Input
@@ -327,8 +318,12 @@ const Retiro = () => {
             autoComplete='off'
             minLength={"6"}
             maxLength={"6"}
-            value={otp ?? ""}
-            onInput={() => {}}
+            value={otp}
+            onInput={(e) => {
+              if (!isNaN(e.target.value)){
+                setOtp(e.target.value)
+              }
+              }}
             required
           />
           <MoneyInput
@@ -338,6 +333,8 @@ const Retiro = () => {
             autoComplete='off'
             min={limitesMontos?.min}
             max={limitesMontos?.max}
+            minLength={"1"}
+            maxLength={"15"}
             onInput={onMoneyChange}
             required
           />

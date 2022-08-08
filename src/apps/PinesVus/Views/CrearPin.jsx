@@ -13,7 +13,7 @@ import { useReactToPrint } from "react-to-print";
 import Select from "../../../components/Base/Select";
 import { useNavigate } from "react-router-dom";
 import Fieldset from "../../../components/Base/Fieldset";
-import LocationForm from "../../../components/Compound/LocationForm";
+import LocationFormPinVus from "../components/LocationForm/LocationFormPinesVus"
 import { enumParametrosPines } from "../utils/enumParametrosPines";
 
 const dateFormatter = Intl.DateTimeFormat("az", {
@@ -85,6 +85,7 @@ const CrearPin = () => {
     { value: "", label: "" },
     { value: "F", label: "Femenino" },
     { value: "M", label: "Masculino" },
+    { Value: "O", label: "Otro"},
   ];
   const [genero, setGenero] = useState("")
 
@@ -254,15 +255,19 @@ const CrearPin = () => {
     setDisabledBtns(true);
     setShowFormulario(false)
     consultaClientes(documento,olimpia,idPin).then((resp) => {
+      if (!resp?.status){
+        notifyError(resp?.msg)
+      }else{
+      setShowFormulario(true)    
       if (resp?.obj?.results?.length > 0) {
         const fecha_nacimiento = new Date(resp?.obj?.results?.[0]?.fecha_nacimiento);
         fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
-        setNombre(resp?.obj?.results?.[0]?.nombre)
-        setApellidos(resp?.obj?.results?.[0]?.apellidos)
+        setNombre(resp?.obj?.results?.[0]?.nombre?.toUpperCase())
+        setApellidos(resp?.obj?.results?.[0]?.apellidos?.toUpperCase())
         setFechaNacimiento(dateFormatter.format(fecha_nacimiento))
         setGenero(resp?.obj?.results?.[0]?.genero)
         setCelular(resp?.obj?.results?.[0]?.celular)
-        setEmail(resp?.obj?.results?.[0]?.email)
+        setEmail(resp?.obj?.results?.[0]?.email?.toUpperCase())
         setEps(resp?.obj?.results?.[0]?.eps)
         setArl(resp?.obj?.results?.[0]?.arl)
         setTiene_vehiculo(resp?.obj?.results?.[0]?.info_vehiculo?.vehiculo)
@@ -275,8 +280,8 @@ const CrearPin = () => {
         if (resp?.obj?.results?.[0]?.home_location !== null){
         homeLocation?.municipio?.[1](resp?.obj?.results?.[0]?.home_location?.municipio?.[0])
         homeLocation?.departamento?.[1](resp?.obj?.results?.[0]?.home_location?.departamento?.[0])
-        homeLocation?.direccion?.[1](resp?.obj?.results?.[0]?.home_location?.direccion?.[0])
-        homeLocation?.barrio?.[1](resp?.obj?.results?.[0]?.home_location?.barrio?.[0])
+        homeLocation?.direccion?.[1](resp?.obj?.results?.[0]?.home_location?.direccion?.[0]?.toUpperCase())
+        homeLocation?.barrio?.[1](resp?.obj?.results?.[0]?.home_location?.barrio?.[0]?.toUpperCase())
         homeLocation?.localidad?.[1](resp?.obj?.results?.[0]?.home_location?.localidad?.[0])
         homeLocation?.foundMunicipios?.[1](resp?.obj?.results?.[0]?.home_location?.foundMunicipios?.[0])
         }
@@ -305,8 +310,7 @@ const CrearPin = () => {
         homeLocation?.localidad?.[1]("")
         homeLocation?.foundMunicipios?.[1]("")
       }
-    }
-    setShowFormulario(true)
+    }}
     setDisabledBtns(false);
     });
   };
@@ -314,6 +318,18 @@ const CrearPin = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);
+    const hora_actual=Intl.DateTimeFormat("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).format(new Date())
+    const hora = hora_actual.split(":")
+    const deltaHora = parseInt(horaCierre[0])-parseInt(hora[0])
+    const deltaMinutos = parseInt(horaCierre[1])-parseInt(hora[1])
+    if (deltaHora<0 || (deltaHora===0 & deltaMinutos<5) ){
+      notifyError("Para evitar fallas no se permite realizar la transacción, hora cierre: " + horaCierre[0] + ":" + horaCierre[1])
+      navigate("/PinesVus",{replace:true});
+    }else{
     crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin)
       .then((res) => {
         setDisabledBtns(false);
@@ -327,6 +343,7 @@ const CrearPin = () => {
         }
       })
       .catch(() => setDisabledBtns(false));
+    }
   };
 
   const closeModal = useCallback(async () => {
@@ -369,7 +386,7 @@ const CrearPin = () => {
       commerceName: pinData.descripcion,
       trxInfo: [
         ["Proceso", "Creación de Pin"],
-        ["Código", respPin?.cod_hash_pin],
+        // ["Código", respPin?.cod_hash_pin],
         ["Vence", respPin?.fecha_vencimiento],
         ["Valor Trámite", formatMoney.format(tramiteData?.valor)],
         ["IVA Trámite",formatMoney.format(tramiteData?.iva)],
@@ -396,15 +413,26 @@ const CrearPin = () => {
       minute: "numeric",
       hour12: false,
     }).format(new Date())
-  }, [venderVehiculo,tipoPin]);
+  }, [venderVehiculo, tipoPin, showModal]);
+
+  const horaCierre = useMemo(() => { 
+    const dia = (new Date()).getDay()  
+    if (dia === enumParametrosPines.diaFinSemana) {
+      return enumParametrosPines.horaCierreFinSemana.split(":")
+    }
+    else{
+      return enumParametrosPines.horaCierre.split(":")
+    }
+     
+  }, [hora]);
 
   useEffect(() => {
-    const horaCierre = enumParametrosPines.horaCierre.split(":")
+    
     const horaActual = hora.split(":")
     const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
     if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
-      notifyError("Módulo cerrado a partir de las " + enumParametrosPines.horaCierre)
+      notifyError("Módulo cerrado a partir de las " + horaCierre[0] + ":" + horaCierre[1])
       navigate("/PinesVus",{replace:true});
     }
     else if ((deltaHora ===1 & deltaMinutos<-50)){
@@ -414,8 +442,9 @@ const CrearPin = () => {
       notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
     }
 
-  }, [venderVehiculo,tipoPin, hora, navigate])
-
+  }, [venderVehiculo,tipoPin, hora, horaCierre, navigate])
+  console.log(pinData)
+  console.log(homeLocation)
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -487,25 +516,6 @@ const CrearPin = () => {
       {showFormulario? 
       <Form onSubmit={onSubmitModal} grid>
       <Fieldset legend="Datos cliente" className="lg:col-span-2">
-        <Select
-          id="tipoDocumento"
-          label="Tipo de documento"
-          options={optionsDocumento}
-          value={tipoDocumento}
-          onChange={(e) => {
-            setTipoDocumento(e.target.value);
-          }}
-        />
-        <Input
-          id="numDocumento"
-          label="Documento"
-          type="text"
-          required
-          minLength="5"
-          maxLength="12"
-          autoComplete="off"
-          value={documento}
-        />
         <Input
           id="nombre"
           label="Nombre"
@@ -516,7 +526,8 @@ const CrearPin = () => {
           autoComplete="off"
           value={nombre}
           onInput={(e) => {
-            setNombre(e.target.value);
+            const text = e.target.value.toUpperCase()
+            setNombre(text);
           }}
         />
         <Input
@@ -529,7 +540,8 @@ const CrearPin = () => {
           autoComplete="off"
           value={apellidos}
           onInput={(e) => {
-            setApellidos(e.target.value);
+            const text = e.target.value.toUpperCase()
+            setApellidos(text);
           }}
         />
         <Input
@@ -544,7 +556,6 @@ const CrearPin = () => {
           id="genero"
           label="Genero"
           options={optionsGenero}
-          requiered
           value={genero}
           onChange={(e) => {
             setGenero(e.target.value);
@@ -581,7 +592,8 @@ const CrearPin = () => {
           autoComplete="off"
           value={email}
           onInput={(e) => {
-            setEmail(e.target.value);
+            const text = e.target.value.toUpperCase()
+            setEmail(text);
           }}
         />
         <Input
@@ -610,7 +622,7 @@ const CrearPin = () => {
             setArl(e.target.value);
           }}
         />
-        <LocationForm place="Residencia" location={homeLocation} addressInput="input"/>
+        <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/>
       </Fieldset>
       <Fieldset legend="Datos Vehículo" className="lg:col-span-2">
         <Select
@@ -699,8 +711,8 @@ const CrearPin = () => {
           id="tipoPin"
           label="Tipo Pin"
           options={
-            Object.fromEntries([
-              ["", ""],
+            Object.fromEntries([    
+              ["",""],        
               ...optionsTipoPines?.map(({ descripcion, id }) => {
                 return [descripcion, id];
               }),

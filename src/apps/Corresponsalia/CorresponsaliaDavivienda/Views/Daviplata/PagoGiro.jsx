@@ -2,7 +2,7 @@ import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Button from "../../../../../components/Base/Button";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import Modal from "../../../../../components/Base/Modal";
 import { useReactToPrint } from "react-to-print";
 import { notify, notifyError } from "../../../../../utils/notify";
@@ -16,6 +16,7 @@ import {
   postModificarTicketPagoPorGiroDavivienda,
   postPagoPorGiroDavivienda,
 } from "../../utils/fetchPagoPorGiro";
+import HideInput from "../../../../../components/Base/HideInput";
 
 const PagoGiro = () => {
   const { roleInfo } = useAuth();
@@ -181,14 +182,13 @@ const PagoGiro = () => {
           setIsUploading(false);
           notify(res?.msg);
           // hideModal();
-          console.log(res);
           objTicket["commerceInfo"][1] = [
             "No. terminal",
             res?.obj?.codigoTotal,
           ];
           objTicket["commerceInfo"][6] = [
             "No. de aprobación",
-            "Transacción Cancelada por el usuario",
+            "<strong>Transacción Rechazada por el cliente",
           ];
           objTicket["trxInfo"].push(["Valor", formatMoney.format(0)]);
           objTicket["trxInfo"].push(["", ""]);
@@ -208,7 +208,6 @@ const PagoGiro = () => {
             valor: res?.valorTransaccion,
           }));
           setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
-          console.log("Recibe,", res?.valorTransaccion);
           setPeticion(2);
         } else {
           setIsUploading(false);
@@ -303,7 +302,7 @@ const PagoGiro = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl'>Pago por giro Davivienda CB</h1>
+      <h1 className='text-3xl mb-10'>Pago por giro Davivienda CB</h1>
       <Form grid onSubmit={onSubmit}>
         <Input
           id='numeroIdentificacion'
@@ -316,14 +315,33 @@ const PagoGiro = () => {
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+            let valor = e.target.value;
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, numeroIdentificacion: num };
               });
             }
           }}></Input>
-        <Input
+        <HideInput
+          id='codigoFamilia'
+          label='Código de familia'
+          type='number'
+          name='codigoFamilia'
+          minLength='1'
+          maxLength='8'
+          autoComplete='off'
+          required
+          value={datosTrans.codigoFamilia ?? ""}
+          onInput={(e, valor) => {
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(num)) {
+              setDatosTrans((old) => {
+                return { ...old, codigoFamilia: num };
+              });
+            }
+          }}></HideInput>
+        {/* <Input
           id='codigoFamilia'
           label='Código de familia'
           type='text'
@@ -340,16 +358,16 @@ const PagoGiro = () => {
                 return { ...old, codigoFamilia: num };
               });
             }
-          }}></Input>
+          }}></Input> */}
         <Select
           id='tipoIdentificacion'
           name='tipoIdentificacion'
           label='Tipo de identificación'
           options={{
             "": "",
-            Cedula: "01",
+            "Cédula de ciudadanía": "01",
             "Tarjeta de identidad": "04",
-            "Cedula extranjeria": "02",
+            "Cédula extranjería": "02",
           }}
           value={datosTrans?.tipoIdentificacion}
           onChange={(e) =>
@@ -373,11 +391,14 @@ const PagoGiro = () => {
           {peticion === 1 && (
             <>
               <h1 className='text-2xl font-semibold'>
-                ¿Esta seguro de realizar la consulta del giro?
+                ¿Está seguro de realizar la consulta del giro?
               </h1>
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
-              <h2>{`Código de familia: ${datosTrans.codigoFamilia}`}</h2>
+              <h2>{`Código de familia: ${datosTrans.codigoFamilia.replace(
+                /\w/g,
+                "*"
+              )}`}</h2>
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>
                 <Button type='submit' onClick={peticionConsulta}>
@@ -409,10 +430,10 @@ const PagoGiro = () => {
           {peticion === 3 && (
             <>
               <h1 className='text-2xl font-semibold'>
-                ¿Esta seguro de realizar la transacción del giro?
+                ¿Está seguro de realizar la transacción del giro?
               </h1>
               <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
-              <h2>{`Número de identificacion: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
+              <h2>{`Número de identificación: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
               <h2>{`Valor transacción: ${formatMoney.format(
                 datosConsultaIdTrx.valor
               )}`}</h2>

@@ -146,7 +146,7 @@ const DtlMovComercio = () => {
         ""
       )}
       <TableEnterprise
-        title="Detalle movimientos cupo Comercios"
+        title="Detalle movimientos cupo comercios"
         headers={[
           "Id detalle movimiento",
           "Tipo de movimiento",
@@ -201,7 +201,7 @@ const DtlMovComercio = () => {
           <Input
             id="fecha_inico"
             name="fecha_inico"
-            label="Fecha inico"
+            label="Fecha inicio"
             type="datetime-local"
             autoComplete="off"
             required

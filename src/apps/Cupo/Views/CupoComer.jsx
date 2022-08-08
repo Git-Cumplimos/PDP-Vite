@@ -18,17 +18,25 @@ const CupoComer = () => {
   const [page, setPage] = useState(1);
   const { roleInfo } = useAuth();
 
+  const searchCupoComercio = useCallback(
+    (comercioId) => {
+      // const comercioId = idComercio || roleInfo?.id_comercio;
+      getConsultaCupoComercio(comercioId, page, limit)
+        .then((objUdusrio) => {
+          setCupoComer(objUdusrio);
+        })
+        .catch((reason) => {
+          console.log(reason.message);
+          notifyError("Error al cargar Datos ");
+        });
+    },
+    [page, limit]
+  );
+
   useEffect(() => {
-    const comercioId = idComercio || roleInfo?.id_comercio;
-    getConsultaCupoComercio(comercioId, page, limit)
-      .then((objUdusrio) => {
-        setCupoComer(objUdusrio);
-      })
-      .catch((reason) => {
-        console.log(reason.message);
-        notifyError("Error al cargar Datos ");
-      });
-  }, [roleInfo?.id_comercio, idComercio, page, limit]);
+    setIdComercio(roleInfo?.id_comercio ?? "");
+    searchCupoComercio(roleInfo?.id_comercio ?? "");
+  }, [roleInfo?.id_comercio, searchCupoComercio]);
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -72,8 +80,11 @@ const CupoComer = () => {
             minLength={"0"}
             maxLength={"10"}
             value={idComercio ?? ""}
-            // onChange={onChangeId}
-            onLazyInput={{ callback: onChangeId, timeOut: 500 }}
+            onChange={onChangeId}
+            onLazyInput={{
+              callback: (ev) => searchCupoComercio(ev.target.value),
+              timeOut: 500,
+            }}
             required
           />
           <ButtonBar></ButtonBar>
@@ -81,7 +92,7 @@ const CupoComer = () => {
       )}
 
       <TableEnterprise
-        title="Cupo Comercios"
+        title="Cupo comercios"
         headers={["Id comercio", "Cupo Límite", "Deuda Cupo", "Cupo en Canje"]}
         data={
           cupoComer?.results.map(

@@ -60,6 +60,8 @@ const Participacion = () => {
             setTable(res?.obj?.results?.map((row) => {
               const fecha_registro = new Date(row?.fecha_registro);
               fecha_registro.setHours(fecha_registro.getHours() + 5);
+              const fecha_participacion = new Date(row?.fecha_participacion);
+              fecha_participacion.setHours(fecha_participacion.getHours() + 5);
               setFormatMon(row?.ValorPagar);
               return {
                 Participante: row?.participante,
@@ -67,6 +69,7 @@ const Participacion = () => {
                 // "No cuenta": row?.num_cuenta,
                 // "No transaccion": row?.num_transaccion,
                 // "No aprobacion": row?.num_aprobacion,
+                "Fecha participación": dateFormatter.format(fecha_participacion),
                 "Fecha pago": dateFormatter.format(fecha_registro),
                 "Comercio": row?.id_comercio,
                 Valor: formatMoney.format(row?.valor),
@@ -108,6 +111,7 @@ const Participacion = () => {
           maxPage={maxPages}
           headers={[
             "Participante",
+            "Fecha participación",
             "Fecha pago",
             "Comercio",
             "Valor",

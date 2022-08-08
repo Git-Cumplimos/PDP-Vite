@@ -14,8 +14,8 @@ import { getConsultaCupoComercio, putAjusteCupo } from "../utils/fetchCupo";
 const AjusteCupoComer = ({ subRoutes }) => {
   const [cupoComer, setCupoComer] = useState(null);
   const [idComercio, setIdComercio] = useState(null);
-  const [valor, setValor] = useState(null);
-  const [razonAjuste, setRazonAjuste] = useState(null);
+  const [valor, setValor] = useState("");
+  const [razonAjuste, setRazonAjuste] = useState("");
   const [inputId, setinputId] = useState(false);
   const navegateValid = useNavigate();
 
@@ -231,9 +231,10 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 name="razon_ajuste"
                 label="Razón de ajuste"
                 autoComplete="off"
-                onInput={(e) => {
-                  setRazonAjuste(e.target.value);
-                }}
+                maxLength={"100"}
+                value={razonAjuste}
+                onInput={(e) => setRazonAjuste(e.target.value.trimLeft())}
+                info={`Maximo 100 caracteres: (${razonAjuste.length}/100)`}
               />
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"}>
