@@ -26,11 +26,7 @@ const DtlMovLimite = () => {
   }, []);
 
   useEffect(() => {
-    setIdComercio(roleInfo?.id_comercio);
-  }, [roleInfo?.id_comercio]);
-
-  useEffect(() => {
-    getConsultaAsignacionCupoLimite(idComercio, page, limit)
+    getConsultaAsignacionCupoLimite(roleInfo?.id_comercio ?? idComercio, page, limit)
       .then((objUdusrio) => {
         setAsigLimite(objUdusrio);
       })
@@ -38,22 +34,7 @@ const DtlMovLimite = () => {
         console.log(reason.message);
         notifyError("Error al cargar Datos ");
       });
-  }, [idComercio, limit, page]);
-
-  const onSubmitComercio = useCallback(
-    (e) => {
-      e.preventDefault();
-      getConsultaAsignacionCupoLimite(idComercio, page, limit)
-        .then((objUdusrio) => {
-          setAsigLimite(objUdusrio);
-        })
-        .catch((reason) => {
-          console.log(reason.message);
-          notifyError("Error al cargar Datos ");
-        });
-    },
-    [idComercio, limit, page]
-  );
+  }, [roleInfo?.id_comercio, idComercio, limit, page]);
 
   return (
     <Fragment>
