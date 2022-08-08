@@ -6,7 +6,7 @@ const Modal = ({
   show,
   full = false,
   bigger = false,
-  allowClose = false,
+  allowClose = true,
   children,
 }) => {
   const { modal, modalContent, close } = classes;
@@ -30,9 +30,12 @@ const Modal = ({
   return show ? (
     <div ref={refModal} className={`${modal} flex`}>
       <section className={`container ${limit} ${modalContent} ${hasPadding}`}>
-        {allowClose?
-        <span className={`bi bi-x ${close}`} onClick={() => (allowClose)?handleClose?.():false} />
-        :<></>}
+        {allowClose && (
+          <span
+            className={`bi bi-x ${close}`}
+            onClick={() => handleClose?.()}
+          />
+        )}
         <br />
         {children}
       </section>
