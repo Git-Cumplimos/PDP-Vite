@@ -24,8 +24,13 @@ const DtlMovLimite = () => {
     ).join("");
     setIdComercio(idComer);
   }, []);
+
   useEffect(() => {
-    getConsultaAsignacionCupoLimite(roleInfo?.id_comercio ?? idComercio, page, limit)
+    setIdComercio(roleInfo?.id_comercio);
+  }, [roleInfo?.id_comercio]);
+
+  useEffect(() => {
+    getConsultaAsignacionCupoLimite(idComercio, page, limit)
       .then((objUdusrio) => {
         setAsigLimite(objUdusrio);
       })
@@ -33,7 +38,22 @@ const DtlMovLimite = () => {
         console.log(reason.message);
         notifyError("Error al cargar Datos ");
       });
-  }, [roleInfo?.id_comercio, idComercio, limit, page]);
+  }, [idComercio, limit, page]);
+
+  const onSubmitComercio = useCallback(
+    (e) => {
+      e.preventDefault();
+      getConsultaAsignacionCupoLimite(idComercio, page, limit)
+        .then((objUdusrio) => {
+          setAsigLimite(objUdusrio);
+        })
+        .catch((reason) => {
+          console.log(reason.message);
+          notifyError("Error al cargar Datos ");
+        });
+    },
+    [idComercio, limit, page]
+  );
 
   return (
     <Fragment>
