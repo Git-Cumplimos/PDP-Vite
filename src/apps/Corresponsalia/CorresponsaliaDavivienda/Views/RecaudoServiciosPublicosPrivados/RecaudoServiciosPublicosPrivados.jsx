@@ -28,6 +28,7 @@ import {
 const RecaudoServiciosPublicosPrivados = () => {
   const { state } = useLocation();
   const { roleInfo } = useAuth();
+  const navigate = useNavigate();
   const [{ showModal, estadoPeticion }, setShowModal] = useState({
     showModal: false,
     estadoPeticion: 0,
@@ -44,9 +45,13 @@ const RecaudoServiciosPublicosPrivados = () => {
   });
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
-
+  const [dataConveniosPagar, setDataConveniosPagar] = useState([3]);
   useEffect(() => {
-    fecthTablaConveniosEspecificoFunc();
+    if (state?.id) {
+      fecthTablaConveniosEspecificoFunc();
+    } else {
+      navigate("../");
+    }
   }, [state?.id]);
 
   const fecthTablaConveniosEspecificoFunc = () => {
@@ -79,10 +84,7 @@ const RecaudoServiciosPublicosPrivados = () => {
       if (datosTrans.ref2 !== datosTransValidacion.ref2)
         return notifyError("Los datos ingresados son diferentes");
     }
-    if (
-      convenio?.num_ind_consulta_cnb === "0" ||
-      convenio?.num_ind_consulta_cnb === "3"
-    ) {
+    if (dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)) {
       if (datosTrans.valor !== datosTransValidacion.valor) {
         return notifyError("El valor ingresado es diferente");
       }
@@ -225,8 +227,7 @@ const RecaudoServiciosPublicosPrivados = () => {
               });
             }}></Input>
         )}
-        {(convenio?.num_ind_consulta_cnb === "0" ||
-          convenio?.num_ind_consulta_cnb === "3") && (
+        {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb) && (
           <MoneyInput
             id='valCashOut'
             name='valCashOut'
@@ -240,8 +241,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         )}
         <ButtonBar className='lg:col-span-2'>
           <Button type='submit'>
-            {convenio?.num_ind_consulta_cnb === "0" ||
-            convenio?.num_ind_consulta_cnb === "3"
+            {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
               ? "Realizar pago"
               : "Realizar consulta"}
           </Button>
@@ -253,7 +253,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             <h1 className='text-2xl text-center mb-10'>
               Ingrese nuevamente los datos de la transacción
             </h1>
-            <Form onSubmit={onSubmitValidacion}>
+            <Form grid onSubmit={onSubmitValidacion}>
               {convenio?.ctrol_ref1_cnb === "1" && (
                 <>
                   <Input
@@ -292,8 +292,8 @@ const RecaudoServiciosPublicosPrivados = () => {
                     });
                   }}></Input>
               )}
-              {(convenio?.num_ind_consulta_cnb === "0" ||
-                convenio?.num_ind_consulta_cnb === "3") && (
+              {console.log(dataConveniosPagar)}
+              {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb) && (
                 <MoneyInput
                   id='valCashOut'
                   name='valCashOut'
@@ -317,8 +317,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                   cancelar
                 </Button>
                 <Button type='submit'>
-                  {convenio?.num_ind_consulta_cnb === "0" ||
-                  convenio?.num_ind_consulta_cnb === "3"
+                  {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
                     ? "Realizar pago"
                     : "Realizar consulta"}
                 </Button>
