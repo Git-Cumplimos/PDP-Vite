@@ -19,6 +19,7 @@ const TipoPpsADemanda = ({ numCed }) => {
           "Pps Voluntario": "Pps Voluntario A Demanda",
           "Pps Obligatorio": "Pps Obligatorio A Demanda",
         }}
+        required
       ></Select>
       {tipoPps === "Pps Voluntario A Demanda" ? (
         <PpsVoluntarioDemanda ced={numCed}></PpsVoluntarioDemanda>
