@@ -112,7 +112,7 @@ const DescargarReportePines = () => {
       >
         <Input
             id="dateInit"
-            label="Fecha participación"
+            label="Fecha de reportes"
             type="date"
             value={fecha_reporte}
             onInput={(e) => setFecha_reporte(e.target.value)}
