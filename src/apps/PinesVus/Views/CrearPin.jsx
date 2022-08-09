@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import Fieldset from "../../../components/Base/Fieldset";
 import LocationFormPinVus from "../components/LocationForm/LocationFormPinesVus"
 import { enumParametrosPines } from "../utils/enumParametrosPines";
+import InputSuggestions from "../../../components/Base/InputSuggestions";
 
 const dateFormatter = Intl.DateTimeFormat("az", {
   year: "numeric",
@@ -174,11 +175,41 @@ const CrearPin = () => {
   ];
 
   const [categoria, setCategoria] = useState("")
-  // const myDate = new Date();  
-  // const year = myDate.getFullYear();
-  // for(var i = 1900; i < year+1; i++){
-    
-  // }
+  const [foundEps, setFoundEps] = useState([])
+
+  const optionsEps = [
+    'SALUDMIA',
+    'SANITAS',
+    'CAPITAL SALUD',
+    'NUEVA EPS S.A',
+    'EPS Y MEDICINA PREPAGADA SURAMERICANA S.A',
+    'COMPENSAR',
+    'CAPRESOCA',
+    'SALUD COLMENA',
+    'SAlUD TOTAL'
+  ]
+
+  const searchEps = useCallback((e) => {
+    const query = (e.target.value);
+    if (query.length > 1) {
+    const resp = optionsEps.map(() => {
+      return ('Hola')
+    })  
+      
+    } else {
+      setFoundEps([]);
+    }
+  }, []);
+  const mapEps = useMemo(() => {
+    return foundEps.map(({Eps}) => {
+      return (
+        <div onClick={ (e) => {setEps(Eps)}}
+        >
+        <h1>{Eps}</h1>
+        </div>
+      );
+    });
+  }, []);
 
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
@@ -602,6 +633,20 @@ const CrearPin = () => {
             const text = e.target.value.toUpperCase()
             setEmail(text);
           }}
+        />
+        <InputSuggestions
+        id={"searchEps"}
+        label={"Eps"}
+        name={"nameEps"}
+        type={"search"}
+        value={eps}
+        autoComplete="off"
+        suggestions={mapEps || []}
+        onInput={(e) => setEps((e.target.value))}
+        onLazyInput={{
+          callback: searchEps,
+          timeOut: 500,
+        }}
         />
         <Input
           id="eps"

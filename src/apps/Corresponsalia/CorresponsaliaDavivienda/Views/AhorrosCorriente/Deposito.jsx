@@ -254,13 +254,13 @@ const Deposito = () => {
           : "No hay datos",
           trxInfo: [
             [
-              "Tipo",
-              res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
+            "Tipo",
+            res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
             ["",""],
             [
-              "Nro. Cuenta",
-              `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
+            "Nro. Cuenta",
+            `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
             ],
             ["",""],
             ["Valor", formatMoney.format(valor)],

@@ -56,6 +56,7 @@ const DescargarReportePines = () => {
           notifyError(res?.msg);
           return;
         }
+        console.log(res)
         const listOfFiles = (res?.obj?.results?.results || []).map(
           ({ name, type, date }) => ({
             name,
@@ -77,7 +78,7 @@ const DescargarReportePines = () => {
             route !== "" || (route === "" && mappedPermissions.includes(name))
         );
         setFileList(filteredFiles);
-        setMaxPages(res?.obj?.maxpages || 1);
+        setMaxPages(res?.obj?.results?.maxpages || 1);
       })
       .catch((err) => console.error(err));
   }, [route, fetchList, pageData, mappedPermissions]);
