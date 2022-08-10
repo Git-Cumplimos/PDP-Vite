@@ -21,15 +21,18 @@ const Select = ({ label, options, self = false, info = "", ...select }) => {
     ) : (
       <div className={formItem}>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
-        <select id={_id} {...select}>
-          {options.map(({ value, label }, idx) => {
-            return (
-              <option key={`${value}_${idx}`} value={value}>
-                {label}
-              </option>
-            );
-          })}
-        </select>
+        <div>
+          <select id={_id} {...select}>
+            {options.map(({ value, label }, idx) => {
+              return (
+                <option key={`${value}_${idx}`} value={value}>
+                  {label}
+                </option>
+              );
+            })}
+          </select>
+          {info ? <p>{info}</p> : ""}
+        </div>
       </div>
     );
   }
