@@ -12,21 +12,21 @@ import ToggleInput from "../../../../components/Base/ToggleInput";
 import { onChangeNumber } from "../../../../utils/functions";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import {
-  getConveniosPinesList,
-  addConveniosPinesList,
-  modConveniosPinesList,
+  getConveniosRecaudoList,
+  addConveniosRecaudoList,
+  modConveniosRecaudoList,
   getTiposValores,
-  getConveniosPinesListMassive,
-  addConveniosPinesListMassive,
+  getConveniosRecaudoListMassive,
+  addConveniosRecaudoListMassive,
 } from "../../utils/fetchFunctions";
 
-const ConveniosPines = () => {
-  const [listaConveniosPines, setListaConveniosPines] = useState([]);
+const ConveniosRecaudo = () => {
+  const [listaConveniosRecaudo, setListaConveniosRecaudo] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [searchFilters, setSearchFilters] = useState({
     pk_codigo_convenio: "",
-    codigo_pin: "",
+    codigo_ean_iac: "",
     nombre_convenio: "",
   });
 
@@ -40,10 +40,10 @@ const ConveniosPines = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const getConvPines = useCallback(() => {
-    getConveniosPinesList({ ...pageData, ...searchFilters })
+  const getConvRecaudo = useCallback(() => {
+    getConveniosRecaudoList({ ...pageData, ...searchFilters })
       .then((res) => {
-        setListaConveniosPines(res?.obj?.results ?? []);
+        setListaConveniosRecaudo(res?.obj?.results ?? []);
         setMaxPages(res?.obj?.maxPages ?? []);
       })
       .catch((err) => {
@@ -74,8 +74,8 @@ const ConveniosPines = () => {
       });
   }, []);
   useEffect(() => {
-    getConvPines();
-  }, [getConvPines]);
+    getConvRecaudo();
+  }, [getConvRecaudo]);
 
   const handleClose = useCallback(() => {
     if (!loading) {
@@ -108,8 +108,8 @@ const ConveniosPines = () => {
       );
       notifyPending(
         selected
-          ? modConveniosPinesList({ pk_codigo_convenio: "" }, body)
-          : addConveniosPinesList(body),
+          ? modConveniosRecaudoList({ pk_codigo_convenio: "" }, body)
+          : addConveniosRecaudoList(body),
         {
           render() {
             setLoading(true);
@@ -121,7 +121,7 @@ const ConveniosPines = () => {
             setLoading(false);
             console.log(res);
             handleClose();
-            getConvPines();
+            getConvRecaudo();
             return `Convenio ${
               selected ? "modificado" : "agregado"
             } exitosamente`;
@@ -139,12 +139,12 @@ const ConveniosPines = () => {
         }
       );
     },
-    [handleClose, getConvPines, selected]
+    [handleClose, getConvRecaudo, selected]
   );
 
   const downloadMasive = useCallback(() => {
     notifyPending(
-      getConveniosPinesListMassive({ ...searchFilters }),
+      getConveniosRecaudoListMassive({ ...searchFilters }),
       {
         render() {
           setLoading(true);
@@ -196,7 +196,7 @@ const ConveniosPines = () => {
       const formData = new FormData();
       formData.set("file", massiveFile);
       notifyPending(
-        addConveniosPinesListMassive(formData),
+        addConveniosRecaudoListMassive(formData),
         {
           render() {
             setLoading(true);
@@ -208,8 +208,8 @@ const ConveniosPines = () => {
             setLoading(false);
             console.log(res);
             handleClose();
-            getConvPines();
-            return `Se han creado ${res?.obj?.stats_creados} y se han modificado ${res?.obj?.stats_modificados} convenios de pines de colpatria`;
+            getConvRecaudo();
+            return `Se han creado ${res?.obj?.stats_creados} y se han modificado ${res?.obj?.stats_modificados} convenios de recaudo de colpatria`;
           },
         },
         {
@@ -226,12 +226,12 @@ const ConveniosPines = () => {
         }
       );
     },
-    [handleClose, getConvPines, massiveFile]
+    [handleClose, getConvRecaudo, massiveFile]
   );
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Convenio de pines de recaudo Colpatria</h1>
+      <h1 className="text-3xl mt-6">Convenios de recaudo Colpatria</h1>
       <ButtonBar>
         <Button type={"submit"} onClick={() => setShowModal(true)}>
           Crear nuevo convenio
@@ -247,18 +247,23 @@ const ConveniosPines = () => {
         </Button>
       </ButtonBar>
       <TableEnterprise
-        title="Convenios de pines"
-        headers={["Codigo convenio", "Codigo pin", "Nombre convenio", "Estado"]}
-        data={listaConveniosPines.map(
+        title="Convenios de recaudo"
+        headers={[
+          "Codigo convenio",
+          "Codigo ean o iac",
+          "Nombre convenio",
+          "Estado",
+        ]}
+        data={listaConveniosRecaudo.map(
           ({
             pk_codigo_convenio,
-            codigo_pin,
+            codigo_ean_iac,
             nombre_convenio,
             fk_tipo_valor,
             activo,
           }) => ({
             pk_codigo_convenio,
-            codigo_pin,
+            codigo_ean_iac,
             nombre_convenio,
             activo: activo ? "Activo" : "No activo",
           })
@@ -267,7 +272,7 @@ const ConveniosPines = () => {
         onSetPageData={setPageData}
         onSelectRow={(e, i) => {
           setShowModal(true);
-          setSelected(listaConveniosPines[i]);
+          setSelected(listaConveniosRecaudo[i]);
         }}
         onChange={(ev) =>
           setSearchFilters((old) => ({
@@ -294,16 +299,16 @@ const ConveniosPines = () => {
           required
         />
         <Input
-          id={"codigo_pin_search"}
-          label={"Codigo pin"}
-          name={"codigo_pin"}
+          id={"codigo_ean_iac_search"}
+          label={"Codigo ean o iac"}
+          name={"codigo_ean_iac"}
           type="tel"
           autoComplete="off"
           maxLength={"4"}
           onChange={(ev) => {
             ev.target.value = onChangeNumber(ev);
           }}
-          defaultValue={selected?.codigo_pin ?? ""}
+          defaultValue={selected?.codigo_ean_iac ?? ""}
           required
         />
         <Input
@@ -372,16 +377,17 @@ const ConveniosPines = () => {
                 required
               />
               <Input
-                id={"codigo_pin"}
-                label={"Codigo pin"}
-                name={"codigo_pin"}
+                id={"codigo_ean_iac"}
+                label={"Codigo ean o iac"}
+                name={"codigo_ean_iac"}
                 type="tel"
                 autoComplete="off"
-                maxLength={"4"}
+                minLength={"13"}
+                maxLength={"13"}
                 onChange={(ev) => {
                   ev.target.value = onChangeNumber(ev);
                 }}
-                defaultValue={selected?.codigo_pin ?? ""}
+                defaultValue={selected?.codigo_ean_iac ?? ""}
                 required
               />
               <Input
@@ -431,24 +437,6 @@ const ConveniosPines = () => {
                 maxLength={"255"}
                 defaultValue={selected?.referencia_3 ?? ""}
               />
-              <Input
-                id={"referencia_4"}
-                label={"Referencia 4"}
-                name={"referencia_4"}
-                type="text"
-                autoComplete="off"
-                maxLength={"255"}
-                defaultValue={selected?.referencia_4 ?? ""}
-              />
-              <Input
-                id={"referencia_5"}
-                label={"Referencia 5"}
-                name={"referencia_5"}
-                type="text"
-                autoComplete="off"
-                maxLength={"255"}
-                defaultValue={selected?.referencia_5 ?? ""}
-              />
               {selected && (
                 <ToggleInput
                   id={"activo"}
@@ -470,4 +458,4 @@ const ConveniosPines = () => {
   );
 };
 
-export default ConveniosPines;
+export default ConveniosRecaudo;

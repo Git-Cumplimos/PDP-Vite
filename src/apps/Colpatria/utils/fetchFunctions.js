@@ -166,13 +166,27 @@ export const addConveniosPinesListMassive = buildPostFunction(
   `${urlColpatriaParams}/convenios-masivo/pines`
 );
 
-export const getConveniosPinesTiposValores = buildGetFunction(
+export const getConveniosRecaudoList = buildGetFunction(
+  `${urlColpatriaParams}/convenios/recaudo`
+);
+export const addConveniosRecaudoList = buildPostFunction(
+  `${urlColpatriaParams}/convenios/recaudo`
+);
+export const modConveniosRecaudoList = buildPutFunction(
+  `${urlColpatriaParams}/convenios/recaudo`
+);
+
+export const addConveniosRecaudoListMassive = buildPostFunction(
+  `${urlColpatriaParams}/convenios-masivo/recaudo`
+);
+
+export const getTiposValores = buildGetFunction(
   `${urlColpatriaParams}/tipos-valores`
 );
-export const addConveniosPinesTiposValores = buildPostFunction(
+export const addTiposValores = buildPostFunction(
   `${urlColpatriaParams}/tipos-valores`
 );
-export const modConveniosPinesTiposValores = buildPutFunction(
+export const modTiposValores = buildPutFunction(
   `${urlColpatriaParams}/tipos-valores`
 );
 
@@ -183,6 +197,34 @@ export const getConveniosPinesListMassive = async (args = {}) => {
       .join("&");
     const response = await fetchSecure(
       `${urlColpatriaParams}/convenios-masivo/pines?${_args}`
+    );
+
+    if (response.ok) {
+      return response;
+    }
+
+    const res = await response.json();
+    if (!res?.status) {
+      if (res?.msg) {
+        throw new Error(res?.msg, { cause: "custom" });
+      }
+
+      throw new Error(res, { cause: "custom" });
+    }
+    throw new Error({ message: "Unhandled error" }, { cause: "custom" });
+    // return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const getConveniosRecaudoListMassive = async (args = {}) => {
+  try {
+    const _args = Object.entries(args)
+      .map(([key, val]) => `${key}=${val}`)
+      .join("&");
+    const response = await fetchSecure(
+      `${urlColpatriaParams}/convenios-masivo/recaudo?${_args}`
     );
 
     if (response.ok) {
