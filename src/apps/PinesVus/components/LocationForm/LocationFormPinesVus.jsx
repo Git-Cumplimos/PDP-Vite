@@ -199,7 +199,6 @@ const LocationFormPinesVus = ({
               return { departamento, municipio };
             })}
             onSelectRow={(e, i) => {
-              console.log(foundMuni[i])
               setDepartamento(foundMuni[i].departamento);
               setMunicipio(foundMuni[i].municipio);
               setFoundMuni([foundMuni[i]]);

@@ -179,8 +179,6 @@ const CrearPin = () => {
   const [optionsEps, setOptionsEps] = useState([])
   const [optionsArl, setOptionsArl] = useState([])
 
-  console.log(optionsArl,optionsEps)
-
   const searchEps = useCallback((e) => {
     const query = (e.target.value);
     if (query.length > 1) {
@@ -636,7 +634,6 @@ const CrearPin = () => {
           autoComplete="off"
           value={celular}
           onInput={(e) => {
-            console.log(e.target.value?.length)
             if (celular?.length === 0 & e.target.value!=="3"){
               notifyError("El número de celular debe iniciar por 3")
               setCelular("");
