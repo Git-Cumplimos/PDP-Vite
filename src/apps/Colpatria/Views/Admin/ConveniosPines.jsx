@@ -94,7 +94,11 @@ const ConveniosPines = () => {
         Object.entries(Object.fromEntries(formData))
           .map(([key, val]) => [
             key,
-            key.includes("referencia_") && val === "" ? null : val,
+            key.includes("referencia_") && val === ""
+              ? null
+              : key === "activo"
+              ? val === "on"
+              : val,
           ])
           .filter(([key, val]) =>
             !selected
@@ -443,12 +447,14 @@ const ConveniosPines = () => {
                 maxLength={"255"}
                 defaultValue={selected?.referencia_5 ?? ""}
               />
-              <ToggleInput
-                id={"activo"}
-                label={"Se encuentra activo"}
-                name={"activo"}
-                defaultChecked={selected?.activo}
-              />
+              {selected && (
+                <ToggleInput
+                  id={"activo"}
+                  label={"Se encuentra activo"}
+                  name={"activo"}
+                  defaultChecked={selected?.activo}
+                />
+              )}
               <ButtonBar>
                 <Button type={"submit"} disabled={loading}>
                   {selected ? "Realizar cambios" : "Crear convenio pin"}

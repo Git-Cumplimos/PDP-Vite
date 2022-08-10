@@ -21,6 +21,7 @@ import useMoney from "../../../../hooks/useMoney";
 import {
   makeSellPin,
   searchConveniosPinesList,
+  makeInquiryPin,
 } from "../../utils/fetchFunctions";
 
 import { notifyError, notifyPending } from "../../../../utils/notify";
@@ -109,7 +110,7 @@ const VentaPines = () => {
       };
 
       notifyPending(
-        makeSellPin(data),
+        makeInquiryPin(data),
         {
           render: () => {
             setLoadingInquiry(true);
