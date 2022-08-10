@@ -153,27 +153,27 @@ export const modErrorList = buildPutFunction(
 );
 
 export const getConveniosPinesList = buildGetFunction(
-  `${urlColpatriaParams}/convenios-pines`
+  `${urlColpatriaParams}/convenios/pines`
 );
 export const addConveniosPinesList = buildPostFunction(
-  `${urlColpatriaParams}/convenios-pines`
+  `${urlColpatriaParams}/convenios/pines`
 );
 export const modConveniosPinesList = buildPutFunction(
-  `${urlColpatriaParams}/convenios-pines`
+  `${urlColpatriaParams}/convenios/pines`
 );
 
 export const addConveniosPinesListMassive = buildPostFunction(
-  `${urlColpatriaParams}/convenios-pines-masivo`
+  `${urlColpatriaParams}/convenios-masivo/pines`
 );
 
 export const getConveniosPinesTiposValores = buildGetFunction(
-  `${urlColpatriaParams}/tipos-valores-pines`
+  `${urlColpatriaParams}/tipos-valores`
 );
 export const addConveniosPinesTiposValores = buildPostFunction(
-  `${urlColpatriaParams}/tipos-valores-pines`
+  `${urlColpatriaParams}/tipos-valores`
 );
 export const modConveniosPinesTiposValores = buildPutFunction(
-  `${urlColpatriaParams}/tipos-valores-pines`
+  `${urlColpatriaParams}/tipos-valores`
 );
 
 export const getConveniosPinesListMassive = async (args = {}) => {
@@ -182,7 +182,7 @@ export const getConveniosPinesListMassive = async (args = {}) => {
       .map(([key, val]) => `${key}=${val}`)
       .join("&");
     const response = await fetchSecure(
-      `${urlColpatriaParams}/convenios-pines-masivo?${_args}`
+      `${urlColpatriaParams}/convenios-masivo/pines?${_args}`
     );
 
     if (response.ok) {
