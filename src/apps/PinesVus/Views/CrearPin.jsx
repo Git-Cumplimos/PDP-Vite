@@ -38,7 +38,7 @@ const CrearPin = () => {
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const { crearPinVus, con_estado_tipoPin, consultaTramite, consultaClientes } = usePinesVus();
+  const { crearPinVus, con_estado_tipoPin, consultaTramite, consultaClientes, consultaEpsArl } = usePinesVus();
   const { infoTicket } = useAuth();
 
   const { roleInfo } = useAuth();
@@ -86,10 +86,9 @@ const CrearPin = () => {
     { value: "", label: "" },
     { value: "F", label: "Femenino" },
     { value: "M", label: "Masculino" },
-    { Value: "O", label: "Otro"},
+    { value: "O", label: "Otro" }, 
   ];
   const [genero, setGenero] = useState("")
-
 
 
   const optionsVehiculo = [
@@ -176,63 +175,92 @@ const CrearPin = () => {
 
   const [categoria, setCategoria] = useState("")
   const [foundEps, setFoundEps] = useState([])
+  const [foundArl, setFoundArl] = useState([])
+  const [optionsEps, setOptionsEps] = useState([])
+  const [optionsArl, setOptionsArl] = useState([])
 
-  const optionsEps = [
-    'SALUDMIA',
-    'SANITAS',
-    'CAPITAL SALUD',
-    'NUEVA EPS S.A',
-    'EPS Y MEDICINA PREPAGADA SURAMERICANA S.A',
-    'COMPENSAR',
-    'CAPRESOCA',
-    'SALUD COLMENA',
-    'SAlUD TOTAL'
-  ]
+  console.log(optionsArl,optionsEps)
 
   const searchEps = useCallback((e) => {
     const query = (e.target.value);
     if (query.length > 1) {
-    const resp = optionsEps.map(() => {
-      return ('Hola')
+    const datos = [];
+    const resp = optionsEps.map((eps) => {
+      if (eps.includes(query)){
+      datos.push(
+        <div onClick={ (e) => {
+          setEps(eps)
+        }}
+          >
+          <h1>{eps}</h1>
+          </div>
+        )
+      }
+      return datos
     })  
-      
+      setFoundEps(resp[0]) 
     } else {
       setFoundEps([]);
     }
-  }, []);
-  const mapEps = useMemo(() => {
-    return foundEps.map(({Eps}) => {
-      return (
-        <div onClick={ (e) => {setEps(Eps)}}
-        >
-        <h1>{Eps}</h1>
-        </div>
-      );
-    });
-  }, []);
+  }, [optionsEps]);
+
+  const searchArl = useCallback((e) => {
+    const query = (e.target.value);
+    if (query.length > 1) {
+    const datos = [];
+    const resp = optionsArl.map((arl) => {
+      if (arl.includes(query)){
+      datos.push(
+        <div onClick={ (e) => {
+          setArl(arl)
+        }}
+          >
+          <h1>{arl}</h1>
+          </div>
+        )
+      }
+      return datos
+    })  
+      setFoundArl(resp[0]) 
+    } else {
+      setFoundArl([]);
+    }
+  }, [optionsArl]);
 
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
-      .then((res) => {
-        setDisabledBtns(false);
-        if (!res?.status) {
-          notifyError(res?.msg);
-        } else {
-          setOptionsTipoPines(res?.obj?.results);
-        }
-      })
-      .catch(() => setDisabledBtns(false));
-    
-      consultaTramite()
-      .then((res) => {
-        setDisabledBtns(false);
-        if (!res?.status) {
-          notifyError(res?.msg);
-        } else {
-          setOptionsTramites(res?.obj?.results);
-        }
-      })
-      .catch(() => setDisabledBtns(false));
+    .then((res) => {
+      setDisabledBtns(false);
+      if (!res?.status) {
+        notifyError(res?.msg);
+      } else {
+        setOptionsTipoPines(res?.obj?.results);
+      }
+    })
+    .catch(() => setDisabledBtns(false));
+  
+    consultaTramite()
+    .then((res) => {
+      setDisabledBtns(false);
+      if (!res?.status) {
+        notifyError(res?.msg);
+      } else {
+        setOptionsTramites(res?.obj?.results);
+      }
+    })
+    .catch(() => setDisabledBtns(false));
+
+    consultaEpsArl()
+    .then((res) => {
+      setDisabledBtns(false);
+      if (!res?.status) {
+        notifyError(res?.msg);
+      } else {
+        setOptionsEps(res?.obj?.eps);
+        setOptionsArl(res?.obj?.arl);
+      }
+    })
+    .catch(() => setDisabledBtns(false));
   }, []);
 
   const pinData = useMemo(() => {
@@ -481,8 +509,7 @@ const CrearPin = () => {
     }
 
   }, [venderVehiculo,tipoPin, hora, horaCierre, navigate])
-  console.log(pinData)
-  console.log(homeLocation)
+  
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -641,38 +668,32 @@ const CrearPin = () => {
         type={"search"}
         value={eps}
         autoComplete="off"
-        suggestions={mapEps || []}
-        onInput={(e) => setEps((e.target.value))}
+        suggestions={foundEps || []}
+        onInput={(e) => {
+          const text = e.target.value.toUpperCase()
+          setEps(text);
+        }}
         onLazyInput={{
           callback: searchEps,
           timeOut: 500,
         }}
         />
-        <Input
-          id="eps"
-          label="Eps"
-          type="text"
-          minLength="1"
-          maxLength="30"
-          required
-          autoComplete="off"
-          value={eps}
-          onInput={(e) => {
-            setEps(e.target.value);
-          }}
-        />
-        <Input
-          id="arl"
-          label="Arl"
-          type="text"
-          minLength="1"
-          maxLength="30"
-          required
-          autoComplete="off"
-          value={arl}
-          onInput={(e) => {
-            setArl(e.target.value);
-          }}
+        <InputSuggestions
+        id={"searchArl"}
+        label={"Arl"}
+        name={"nameArl"}
+        type={"search"}
+        value={arl}
+        autoComplete="off"
+        suggestions={foundArl || []}
+        onInput={(e) => {
+          const text = e.target.value.toUpperCase()
+          setArl(text);
+        }}
+        onLazyInput={{
+          callback: searchArl,
+          timeOut: 500,
+        }}
         />
         <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/>
       </Fieldset>

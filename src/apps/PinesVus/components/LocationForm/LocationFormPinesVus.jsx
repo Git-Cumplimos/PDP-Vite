@@ -90,7 +90,6 @@ const LocationFormPinesVus = ({
       );
     });
   }, [foundMuni]);
-  console.log(foundMuni)
   return (
     <Fieldset
       legend={`Ubicación${place !== "" ? ` ${place}` : ""}`}
