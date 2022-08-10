@@ -1,6 +1,6 @@
 import classes from "./Select.module.css";
 
-const Select = ({ label, options, self = false, ...select }) => {
+const Select = ({ label, options, self = false, info = "", ...select }) => {
   const { formItem } = classes;
   const { id: _id } = select;
 
@@ -50,15 +50,18 @@ const Select = ({ label, options, self = false, ...select }) => {
   ) : (
     <div className={formItem}>
       {label && label !== "" && <label htmlFor={_id}>{label}</label>}
-      <select id={_id} {...select}>
-        {Object.entries(options).map(([ label, value ]) => {
-          return (
-            <option key={label} value={value}>
-              {label}
-            </option>
-          );
-        })}
-      </select>
+      <div>
+        <select id={_id} {...select}>
+          {Object.entries(options).map(([ label, value ]) => {
+            return (
+              <option key={label} value={value}>
+                {label}
+              </option>
+            );
+          })}
+        </select>
+        {info ? <p>{info}</p> : ""}
+      </div>
     </div>
   );
 };
