@@ -4,12 +4,13 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 // import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import TextArea from "../../../../components/Base/TextArea";
+
 import { useAuth } from "../../../../hooks/AuthHooks";
 
 import { useFetch } from "../../../../hooks/useFetch";
 
 import { notifyError } from "../../../../utils/notify";
+import Input from "../../../../components/Base/Input";
 
 const url = process.env.REACT_APP_URL_PinesVus;
 
@@ -40,6 +41,7 @@ const DescargarReportePines = () => {
 
   const [loadingList, fetchList] = useFetch();
   const [loadingFile, fetchFile] = useFetch();
+  const [fecha_reporte, setFecha_reporte] = useState("")
 
   const mappedPermissions = useMemo(
     () =>
@@ -50,12 +52,15 @@ const DescargarReportePines = () => {
   );
 
   useEffect(() => {
-    fetchList(`${url}/listarArchivosS3`, "GET", { path: route, ...pageData })
+    if (fecha_reporte !== ''){
+    const query = {fechaReportes : fecha_reporte}  
+    fetchList(`${url}/listarArchivosS3`, "GET", query)
       .then((res) => {
         if (!res?.status) {
           notifyError(res?.msg);
           return;
         }
+        console.log(res)
         const listOfFiles = (res?.obj?.results?.results || []).map(
           ({ name, type, date }) => ({
             name,
@@ -72,15 +77,12 @@ const DescargarReportePines = () => {
               : "",
           })
         );
-        const filteredFiles = listOfFiles.filter(
-          ({ name }) =>
-            route !== "" || (route === "" && mappedPermissions.includes(name))
-        );
-        setFileList(filteredFiles);
-        setMaxPages(res?.obj?.maxpages || 1);
+        setFileList(res?.obj);
+        setMaxPages(res?.obj?.results?.maxpages || 1);
       })
       .catch((err) => console.error(err));
-  }, [route, fetchList, pageData, mappedPermissions]);
+    }
+  }, [fecha_reporte, pageData]);
 
   const isLoading = useMemo(
     () => loadingList || loadingFile,
@@ -94,66 +96,27 @@ const DescargarReportePines = () => {
         title="Vista de reportes"
         maxPage={maxPages}
         // onChange={onChange}
-        headers={["Nombre", "Tipo", "Última modificación"]}
-        data={fileList}
-        onSelectRow={(_, i) => {
-          if (!isLoading) {
-            if (fileList[i]?.type === "Carpeta") {
-              setRoute((old) => {
-                return `${old}${fileList[i]?.name}`;
-              });
-            } else if (fileList[i]?.type === "Archivo") {
-              fetchFile(`${url}/descargaArchivosS3`, "GET", {
-                ruta: `${route}${fileList[i]?.name}`,
-              })
-                .then((res) => {
-                  if (!res?.status) {
-                    notifyError(res?.msg);
-                    return;
-                  }
-                  window.open(res?.obj?.[0]?.url, "_blank");
-                })
-                .catch((err) => console.error(err));
-            }
+        headers={["Archivos"]}
+        data={fileList.map(
+          ({ archivo }) => {
+            return {
+              archivo
+            };
           }
+        )}
+        onSelectRow={(_, i) => {
+          console.log(`${route}${fileList[i]?.archivo}`, fileList[i]?.url)
+          window.open(fileList[i]?.url, "_blank");
         }}
         onSetPageData={setPageData}
       >
-        {/* <Input
-          id={"date_report_koncilia_1"}
-          name={"date_ini"}
-          label={"Fecha inicial"}
-          type={"date"}
-        />
         <Input
-          id={"date_report_koncilia_2"}
-          name={"date_end"}
-          label={"Fecha Final"}
-          type={"date"}
-        /> */}
-        <TextArea
-          id={"date_report_koncilia_2"}
-          label={"Ruta"}
-          value={route}
-          readOnly
-          rows={3}
-        />
-        <ButtonBar>
-          <Button
-            disabled={!route}
-            onClick={() =>
-              { if(route !== "sftp_user/prueba_Pines/" ) 
-              setRoute((old) => {
-                const splited = old.split("/");
-                splited.splice(splited.length - 2, 1);
-                return `${splited.join("/")}`;
-              })}
-              
-            }
-          >
-            Ir una carpeta atrás
-          </Button>
-        </ButtonBar>
+            id="dateInit"
+            label="Fecha de reportes"
+            type="date"
+            value={fecha_reporte}
+            onInput={(e) => setFecha_reporte(e.target.value)}
+          />
       </TableEnterprise>
     </Fragment>
   );

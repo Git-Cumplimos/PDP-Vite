@@ -90,7 +90,6 @@ const LocationFormPinesVus = ({
       );
     });
   }, [foundMuni]);
-  console.log(foundMuni)
   return (
     <Fieldset
       legend={`Ubicación${place !== "" ? ` ${place}` : ""}`}
@@ -200,7 +199,6 @@ const LocationFormPinesVus = ({
               return { departamento, municipio };
             })}
             onSelectRow={(e, i) => {
-              console.log(foundMuni[i])
               setDepartamento(foundMuni[i].departamento);
               setMunicipio(foundMuni[i].municipio);
               setFoundMuni([foundMuni[i]]);
