@@ -142,7 +142,7 @@ const buildPutFunction = (url) => {
 };
 
 export const searchConveniosPinesList = buildGetFunction(
-  `${urlColpatriaTrx}/consulta-pines`
+  `${urlColpatriaTrx}/consulta/pines`
 );
 
 export const getErrorList = buildGetFunction(
