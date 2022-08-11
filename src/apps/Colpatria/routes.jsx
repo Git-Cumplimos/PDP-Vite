@@ -12,6 +12,10 @@ const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
 const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
 
 
+const ConsultaManual = lazy(() => import("./Views/Recaudo/ConsultaManual"));
+const TrxRecaudo = lazy(() => import("./Views/Recaudo/TrxRecaudo"));
+
+
 const AdminColpatria = lazy(() => import("./Views/Admin"));
 const ListaErrores = lazy(() => import("./Views/Admin/ListaErrores"));
 const ConveniosPines = lazy(() => import("./Views/Admin/ConveniosPines"));
@@ -31,14 +35,29 @@ const rutasColpatria = {
     },
     {
       link: "/corresponsalia/colpatria/pines",
-      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo de Pines"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines de Recaudo"} />,
       component: PinesConsulta,
       permission: [67],
       subRoutes: [
         {
           link: "/corresponsalia/colpatria/pines/:id_convenio_pin",
-          label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines"} />,
+          label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines de Recaudo"} />,
           component: PinesVenta,
+          permission: [67],
+          show: false,
+        },
+      ],
+    },
+    {
+      link: "/corresponsalia/colpatria/recaudo",
+      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Manual en Efectivo"} />,
+      component: ConsultaManual,
+      permission: [67],
+      subRoutes: [
+        {
+          link: "/corresponsalia/colpatria/recaudo/:id_convenio_pin",
+          label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Manual en Efectivo"} />,
+          component: TrxRecaudo,
           permission: [67],
           show: false,
         },

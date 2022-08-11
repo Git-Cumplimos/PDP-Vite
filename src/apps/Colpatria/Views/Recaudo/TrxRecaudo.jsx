@@ -19,9 +19,9 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import useMoney from "../../../../hooks/useMoney";
 import {
-  makeSellPin,
-  searchConveniosPinesList,
-  makeInquiryPin,
+  makeSellRecaudo,
+  searchConveniosRecaudoList,
+  makeInquiryRecaudo,
 } from "../../utils/fetchFunctions";
 
 import { notifyError, notifyPending } from "../../../../utils/notify";
@@ -33,7 +33,7 @@ import fetchData from "../../../../utils/fetchData";
 
 const formatMoney = makeMoneyFormatter(2);
 
-const VentaPines = () => {
+const TrxRecaudo = () => {
   const navigate = useNavigate();
 
   const { id_convenio_pin } = useParams();
@@ -47,7 +47,7 @@ const VentaPines = () => {
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
-  const [valVentaPines, setValVentaPines] = useState(0);
+  const [valTrxRecaudo, setValTrxRecaudo] = useState(0);
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
@@ -74,11 +74,11 @@ const VentaPines = () => {
   const summary = useMemo(
     () => ({
       "C.C. del depositante": userDocument,
-      "Valor de deposito": formatMoney.format(valVentaPines),
+      "Valor de deposito": formatMoney.format(valTrxRecaudo),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
-    [userDocument, valVentaPines]
+    [userDocument, valTrxRecaudo]
   );
 
   const handleClose = useCallback(() => {
@@ -96,7 +96,7 @@ const VentaPines = () => {
           id_terminal: roleInfo?.id_dispositivo,
         },
         oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
-        valor_total_trx: valVentaPines,
+        valor_total_trx: valTrxRecaudo,
 
         // Datos trx colpatria
         colpatria: {
@@ -110,7 +110,7 @@ const VentaPines = () => {
       };
 
       notifyPending(
-        makeInquiryPin(data),
+        makeInquiryRecaudo(data),
         {
           render: () => {
             setLoadingInquiry(true);
@@ -136,7 +136,7 @@ const VentaPines = () => {
         }
       );
     },
-    [userDocument, userAddress, valVentaPines, roleInfo]
+    [userDocument, userAddress, valTrxRecaudo, roleInfo]
   );
 
   const onMakePayment = useCallback(
@@ -148,7 +148,7 @@ const VentaPines = () => {
           id_terminal: roleInfo?.id_dispositivo,
         },
         oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
-        valor_total_trx: valVentaPines,
+        valor_total_trx: valTrxRecaudo,
 
         // Datos trx colpatria
         colpatria: {
@@ -162,7 +162,7 @@ const VentaPines = () => {
       };
 
       notifyPending(
-        makeSellPin(data),
+        makeSellRecaudo(data),
         {
           render: () => {
             setLoadingSell(true);
@@ -202,7 +202,7 @@ const VentaPines = () => {
               trxInfo: [
                 ["C.C. del depositante", userDocument],
                 ["", ""],
-                ["Valor de deposito", formatMoney.format(valVentaPines)],
+                ["Valor de deposito", formatMoney.format(valTrxRecaudo)],
                 ["", ""],
               ],
               disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
@@ -231,7 +231,7 @@ const VentaPines = () => {
         }
       );
     },
-    [userDocument, userAddress, valVentaPines, roleInfo, infoTicket]
+    [userDocument, userAddress, valTrxRecaudo, roleInfo, infoTicket]
   );
 
   useEffect(() => {
@@ -265,7 +265,7 @@ const VentaPines = () => {
 
   useEffect(() => {
     setSearchingConvData(true);
-    searchConveniosPinesList({
+    searchConveniosRecaudoList({
       pk_codigo_convenio: id_convenio_pin,
     })
       .then((res) => {
@@ -328,7 +328,7 @@ const VentaPines = () => {
   if (searchingConvData || !(searchingConvData || datosConvenio)) {
     return (
       <Fragment>
-        <h1 className="text-3xl mt-6">Venta de Pines de Recaudo</h1>
+        <h1 className="text-3xl mt-6">Recaudo PSP Manual en Efectivo</h1>
         <h1 className="text-xl mt-6">
           {searchingConvData
             ? "Buscando infomacion de convenio ..."
@@ -340,7 +340,7 @@ const VentaPines = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Venta de Pines de Recaudo</h1>
+      <h1 className="text-3xl mt-6">Recaudo PSP Manual en Efectivo</h1>
       <Form
         onSubmit={
           inquiryStatus
@@ -414,7 +414,7 @@ const VentaPines = () => {
             type="tel"
             minLength={"5"}
             maxLength={"10"}
-            onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
+            onInput={(ev) => setValTrxRecaudo(onChangeMoney(ev))}
             readOnly={inquiryStatus && datosConvenio.fk_tipo_valor !== 3}
             required
           />
@@ -460,4 +460,4 @@ const VentaPines = () => {
   );
 };
 
-export default VentaPines;
+export default TrxRecaudo;

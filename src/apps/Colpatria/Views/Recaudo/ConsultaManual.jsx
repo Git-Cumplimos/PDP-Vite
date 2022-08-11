@@ -6,21 +6,21 @@ import Form from "../../../../components/Base/Form";
 import InputSuggestions from "../../../../components/Base/InputSuggestions";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notifyError } from "../../../../utils/notify";
-import { searchConveniosPinesList } from "../../utils/fetchFunctions";
+import { searchConveniosRecaudoList } from "../../utils/fetchFunctions";
 
-const ConsultaPines = () => {
+const ConsultaManual = () => {
   const { roleInfo } = useAuth();
 
   const [foundConv, setFoundConv] = useState([]);
 
   const mapSuggestions = useMemo(() => {
     return foundConv.map(
-      ({ pk_codigo_convenio, codigo_pin, nombre_convenio }) => {
+      ({ pk_codigo_convenio, codigo_ean_iac, nombre_convenio }) => {
         return (
           <Link to={`/corresponsalia/colpatria/pines/${pk_codigo_convenio}`}>
             <div className="grid grid-cols-1 place-items-center px-4 py-2">
               <h1 className="text-sm">
-                {pk_codigo_convenio} &nbsp;&nbsp;|&nbsp;&nbsp; {codigo_pin}
+                {pk_codigo_convenio} &nbsp;&nbsp;|&nbsp;&nbsp; {codigo_ean_iac}
               </h1>
               <h1 className="text-base">{nombre_convenio}</h1>
             </div>
@@ -33,7 +33,7 @@ const ConsultaPines = () => {
   const searchConvenios = useCallback((e) => {
     const _consulta = e.target.value;
     if (_consulta.length > 1) {
-      searchConveniosPinesList({
+      searchConveniosRecaudoList({
         consulta: _consulta,
         limit: 5,
       })
@@ -94,7 +94,7 @@ const ConsultaPines = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Consulta de Pines de Recaudo</h1>
+      <h1 className="text-3xl mt-6">Consulta recaudo manual</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
@@ -118,4 +118,4 @@ const ConsultaPines = () => {
   );
 };
 
-export default ConsultaPines;
+export default ConsultaManual;
