@@ -27,7 +27,7 @@ import {
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import {
   makeMoneyFormatter,
-  onChangeNumber,
+  // onChangeNumber,
 } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
 
@@ -42,8 +42,7 @@ const TrxRecaudo = () => {
 
   const [searchingConvData, setSearchingConvData] = useState(false);
   const [datosConvenio, setDatosConvenio] = useState(null);
-  const [userDocument, setUserDocument] = useState("");
-  const [userReferences, setUserReferences] = useState(null);
+  const [userReferences, setUserReferences] = useState({});
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
@@ -73,12 +72,17 @@ const TrxRecaudo = () => {
 
   const summary = useMemo(
     () => ({
-      "C.C. del depositante": userDocument,
+      ...Object.fromEntries(
+        Object.entries(userReferences).map(([, val], index) => [
+          `Referencia ${index + 1}`,
+          val,
+        ])
+      ),
       "Valor de deposito": formatMoney.format(valTrxRecaudo),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
-    [userDocument, valTrxRecaudo]
+    [userReferences, valTrxRecaudo]
   );
 
   const handleClose = useCallback(() => {
@@ -100,7 +104,7 @@ const TrxRecaudo = () => {
 
         // Datos trx colpatria
         colpatria: {
-          user_document: userDocument,
+          ...userReferences,
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -136,7 +140,7 @@ const TrxRecaudo = () => {
         }
       );
     },
-    [userDocument, userAddress, valTrxRecaudo, roleInfo]
+    [userReferences, userAddress, valTrxRecaudo, roleInfo]
   );
 
   const onMakePayment = useCallback(
@@ -152,7 +156,6 @@ const TrxRecaudo = () => {
 
         // Datos trx colpatria
         colpatria: {
-          user_document: userDocument,
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -200,8 +203,6 @@ const TrxRecaudo = () => {
               ],
               commerceName: "Colpatria",
               trxInfo: [
-                ["C.C. del depositante", userDocument],
-                ["", ""],
                 ["Valor de deposito", formatMoney.format(valTrxRecaudo)],
                 ["", ""],
               ],
@@ -231,14 +232,14 @@ const TrxRecaudo = () => {
         }
       );
     },
-    [userDocument, userAddress, valTrxRecaudo, roleInfo, infoTicket]
+    [userAddress, valTrxRecaudo, roleInfo, infoTicket]
   );
 
   useEffect(() => {
     fetchData(
       `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`,
       "GET",
-      { tipo_op: 73 }
+      { tipo_op: 85 }
     )
       .then((res) => {
         if (!res?.status) {
@@ -353,21 +354,21 @@ const TrxRecaudo = () => {
         grid
       >
         <Input
-          label="Numero de convenio pin"
+          label="Numero de convenio"
           type="text"
           autoComplete="off"
           value={datosConvenio.pk_codigo_convenio}
           disabled
         />
         <Input
-          label="Numero de pin"
+          label="Codigo ean o iac"
           type="text"
           autoComplete="off"
-          value={datosConvenio.codigo_pin}
+          value={datosConvenio.codigo_ean_iac}
           disabled
         />
         <Input
-          label="Nombre de convenio pin"
+          label="Nombre de convenio"
           type="text"
           autoComplete="off"
           value={datosConvenio.nombre_convenio}
@@ -393,18 +394,6 @@ const TrxRecaudo = () => {
               required
             />
           ))}
-        <Input
-          id="docCliente"
-          name="docCliente"
-          label="CC del comprador"
-          type="tel"
-          autoComplete="off"
-          minLength={"7"}
-          maxLength={"13"}
-          value={`${userDocument}`}
-          onInput={(ev) => setUserDocument(onChangeNumber(ev))}
-          required
-        />
         {datosConvenio.fk_tipo_valor === 1 || inquiryStatus ? (
           <Input
             id="valor"

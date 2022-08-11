@@ -88,7 +88,7 @@ export const makeSellRecaudo = async (bodyDep) => {
 
   try {
     const res = await fetchData(
-      `${urlColpatriaTrx}/venta-pines`,
+      `${urlColpatriaTrx}/recaudo`,
       "POST",
       {},
       bodyDep
@@ -113,7 +113,7 @@ export const makeInquiryRecaudo = async (bodyDep) => {
 
   try {
     const res = await fetchData(
-      `${urlColpatriaTrx}/consulta-venta-pines`,
+      `${urlColpatriaTrx}/consulta-recaudo`,
       "POST",
       {},
       bodyDep

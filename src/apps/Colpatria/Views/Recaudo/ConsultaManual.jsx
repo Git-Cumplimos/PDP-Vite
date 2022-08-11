@@ -17,7 +17,7 @@ const ConsultaManual = () => {
     return foundConv.map(
       ({ pk_codigo_convenio, codigo_ean_iac, nombre_convenio }) => {
         return (
-          <Link to={`/corresponsalia/colpatria/pines/${pk_codigo_convenio}`}>
+          <Link to={`/corresponsalia/colpatria/recaudo/${pk_codigo_convenio}`}>
             <div className="grid grid-cols-1 place-items-center px-4 py-2">
               <h1 className="text-sm">
                 {pk_codigo_convenio} &nbsp;&nbsp;|&nbsp;&nbsp; {codigo_ean_iac}
