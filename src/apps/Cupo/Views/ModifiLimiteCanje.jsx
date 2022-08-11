@@ -63,6 +63,10 @@ const ModifiLimiteCanje = () => {
         valor !== null &&
         valor !== ""
       ) {
+        if (valor === cupoComer?.results[0].limite_cupo) {
+          notifyError("No se detectaron cambios");
+          return;
+        }
         const body = {
           fk_id_comercio: idComercio,
           valor_afectacion: valor,
@@ -86,7 +90,7 @@ const ModifiLimiteCanje = () => {
         notifyError("El campo límite de cupo no puede estar vacío");
       }
     },
-    [idComercio, valor, limit, roleInfo.id_usuario, page, navegateValid]
+    [idComercio, valor, limit, roleInfo.id_usuario, page, navegateValid, cupoComer]
   );
   const onMoneyChange = useCallback((e, valor) => {
     setValor(valor);
@@ -99,6 +103,7 @@ const ModifiLimiteCanje = () => {
         getConsultaCupoComercio(idComercio)
           .then((objUdusrio) => {
             setCupoComer(objUdusrio);
+            setValor(objUdusrio?.results[0].limite_cupo);
             tablalimitecupo(idComercio, page, limit);
           })
           .catch((reason) => {

@@ -52,7 +52,7 @@ const CrearCupo = () => {
         setSummary({
           "Id del comercio": idComercio,
           "Límite del cupo": formatMoney.format(limite),
-          Dueda: formatMoney.format(deuda),
+          Deuda: formatMoney.format(deuda),
           "Cupo en canje": formatMoney.format(canje),
         });
       } else {
@@ -75,7 +75,7 @@ const CrearCupo = () => {
       postCupoComercio(body)
         .then((res) => {
           if (!res?.status) {
-            notifyError("Error al crear cupo");
+            notifyError(res?.msg);
             return;
           }
           notify("Cupo creado exitosamente");
@@ -149,26 +149,26 @@ const CrearCupo = () => {
         <ButtonBar className={"lg  col-span-2"}>
           <Button type={"submit"}>Asignar cupo al comercio</Button>
         </ButtonBar>
-        <Modal
-          show={showModal}
-          handleClose={paymentStatus ? () => {} : handleClose}
-        >
-          <PaymentSummary
-            title="¿Está seguro de asignar el cupo al comercio?"
-            subtitle="Resumen del comercio"
-            summaryTrx={summary}
-          >
-            <ButtonBar>
-              <Link to="/cupo">
-                <Button type="button" onClick={crearComercio}>
-                  Aceptar
-                </Button>
-              </Link>
-              <Button onClick={handleClose}>Cancelar</Button>
-            </ButtonBar>
-          </PaymentSummary>
-        </Modal>
       </Form>
+      <Modal
+        show={showModal}
+        handleClose={paymentStatus ? () => {} : handleClose}
+      >
+        <PaymentSummary
+          title="¿Está seguro de asignar el cupo al comercio?"
+          subtitle="Resumen del comercio"
+          summaryTrx={summary}
+        >
+          <ButtonBar>
+            <Link to="/cupo">
+              <Button type="submit" onClick={crearComercio}>
+                Aceptar
+              </Button>
+            </Link>
+            <Button onClick={handleClose}>Cancelar</Button>
+          </ButtonBar>
+        </PaymentSummary>
+      </Modal>
     </Fragment>
   );
 };
