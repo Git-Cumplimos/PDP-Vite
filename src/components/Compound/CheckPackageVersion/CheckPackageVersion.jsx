@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import packageJson from "../../../../package.json";
 
-const urlprueba = `${process.env.REACT_APP_PRUEBA}`;
+// const urlprueba = `${process.env.REACT_APP_PRUEBA}`;
 
 const CheckPackageVersion = () => {
   //   const caching = () => {
