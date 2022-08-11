@@ -139,7 +139,7 @@ const LocationForm = ({
                   url,
                   "GET",
                   {
-                    $where: `municipio LIKE '%${query}%'`,
+                    $where: `(UPPER(municipio)) LIKE UPPER('%${query}%')`,
                     $limit: 5,
                   },
                   {},
