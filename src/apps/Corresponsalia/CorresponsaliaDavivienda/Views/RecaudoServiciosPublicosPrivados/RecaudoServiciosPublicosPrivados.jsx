@@ -18,6 +18,7 @@ import MoneyInput, {
 } from "../../../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import { useAuth } from "../../../../../hooks/AuthHooks";
+import useMoney from "../../../../../hooks/useMoney";
 import { notify, notifyError } from "../../../../../utils/notify";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
 import {
@@ -69,7 +70,10 @@ const RecaudoServiciosPublicosPrivados = () => {
     trxInfo: [],
     disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
   });
-  const [datosConsulta, setDatosConsulta] = useState({});
+  const [datosConsulta, setDatosConsulta] = useState({
+    idTrx: "",
+    consultaDavivienda: {},
+  });
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
   const dataConveniosPagar = ["3", "0"];
@@ -103,17 +107,59 @@ const RecaudoServiciosPublicosPrivados = () => {
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();
-    if (convenio?.ctrol_ref1_cnb === "1") {
-      if (datosTrans.ref1 !== datosTransValidacion.ref1)
-        return notifyError("Los datos ingresados son diferentes");
+    if (estadoPeticion !== 1) {
+      if (convenio?.ctrol_ref1_cnb === "1") {
+        if (datosTrans.ref1 !== datosTransValidacion.ref1)
+          return notifyError("Los datos ingresados son diferentes");
+      }
+      if (convenio?.ctrol_ref2_cnb === "1") {
+        if (datosTrans.ref2 !== datosTransValidacion.ref2)
+          return notifyError("Los datos ingresados son diferentes");
+      }
+      if (dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)) {
+        if (datosTrans.valor !== datosTransValidacion.valor) {
+          return notifyError("El valor ingresado es diferente");
+        }
+      }
     }
-    if (convenio?.ctrol_ref2_cnb === "1") {
-      if (datosTrans.ref2 !== datosTransValidacion.ref2)
-        return notifyError("Los datos ingresados son diferentes");
-    }
-    if (dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)) {
-      if (datosTrans.valor !== datosTransValidacion.valor) {
-        return notifyError("El valor ingresado es diferente");
+    if (
+      dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb) ||
+      estadoPeticion === 1
+    ) {
+      let valorTransaccion = 0;
+      if (estadoPeticion === 1) {
+        if (typeof datosTransValidacion?.valor == "string") {
+          valorTransaccion = datosTransValidacion?.valor.replace(/[$ .]/g, "");
+          valorTransaccion = parseInt(valorTransaccion);
+        } else {
+          valorTransaccion = datosTransValidacion?.valor;
+        }
+        if (convenio?.ind_valor_exacto_cnb === "0") {
+          if (
+            convenio?.ind_mayor_vlr_cnb === "0" &&
+            valorTransaccion >
+              datosConsulta.consultaDavivienda?.numValorTotalFactura
+          )
+            return notifyError("No esta permitido el pago mayor al consultado");
+          if (
+            convenio?.ind_menor_vlr_cnb === "0" &&
+            valorTransaccion <
+              datosConsulta.consultaDavivienda?.numValorTotalFactura
+          ) {
+            if (
+              !(convenio?.ind_valor_ceros_cnb === "1" && valorTransaccion === 0)
+            ) {
+              return notifyError(
+                "No esta permitido el pago menor al consultado"
+              );
+            }
+          }
+          if (convenio?.ind_valor_ceros_cnb === "0" && valorTransaccion === 0) {
+            return notifyError("No esta permitido el pago en ceros");
+          }
+        }
+      } else {
+        valorTransaccion = datosTransValidacion?.valor ?? "0";
       }
       const hoy = new Date();
       const fecha =
@@ -147,7 +193,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         valTipoProdDestinoRecaudoCent: convenio.tipo_cta_destino_cnb,
         valProdDestinoRecaudoCent: convenio.nro_cta_destino_cnb,
         valCodigoIAC: "0",
-        valor: datosTransValidacion?.valor ?? "0",
+        valor: valorTransaccion,
         valReferencia1: datosTransValidacion?.ref1 ?? "",
         valReferencia2: datosTransValidacion?.ref2 ?? "",
         nomConvenio: convenio.nom_convenio_cnb,
@@ -166,7 +212,7 @@ const RecaudoServiciosPublicosPrivados = () => {
           if (res?.status) {
             setIsUploading(false);
             notify(res?.msg);
-            console.log(res);
+            console.log("pago", res?.obj);
           } else {
             setIsUploading(false);
             notifyError(res?.msg);
@@ -200,7 +246,18 @@ const RecaudoServiciosPublicosPrivados = () => {
             setIsUploading(false);
             notify(res?.msg);
             console.log("SSSS", res?.obj);
-            setDatosConsulta(res?.obj);
+            setDatosConsulta((old) => ({
+              ...old,
+              idTrx: res?.obj?.idTrx,
+              consultaDavivienda: res?.obj?.respuesta_davivienda,
+            }));
+            setDatosTransValidacion((old) => ({
+              ...old,
+              valor:
+                formatMoney.format(
+                  res?.obj?.respuesta_davivienda?.numValorTotalFactura
+                ) ?? "",
+            }));
             setShowModal((old) => ({ ...old, estadoPeticion: 1 }));
           } else {
             setIsUploading(false);
@@ -216,6 +273,7 @@ const RecaudoServiciosPublicosPrivados = () => {
     }
   };
   const handleClose = useCallback(() => {
+    setShowModal((old) => ({ ShowModal: false, estadoPeticion: 0 }));
     setDatosTransValidacion((old) => ({
       ...old,
       ref1: "",
@@ -245,10 +303,8 @@ const RecaudoServiciosPublicosPrivados = () => {
       };
     });
     setDatosConsulta({});
-
-    setShowModal((old) => ({ ShowModal: false, estadoPeticion: 0 }));
   }, []);
-  const onChangeMoney = (ev, valor) => {
+  const onChangeMoneyLocal = (ev, valor) => {
     if (!isNaN(valor)) {
       const num = valor;
       setDatosTrans((old) => {
@@ -256,6 +312,10 @@ const RecaudoServiciosPublicosPrivados = () => {
       });
     }
   };
+  const onChangeMoney = useMoney({
+    limits: [0, 20000000],
+    decimalDigits: 2,
+  });
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -314,7 +374,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             autoComplete='off'
             maxLength={"15"}
             value={datosTrans.valor ?? ""}
-            onInput={onChangeMoney}
+            onInput={onChangeMoneyLocal}
             required></MoneyInput>
         )}
         <ButtonBar className='lg:col-span-2'>
@@ -326,6 +386,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={handleClose}>
+        {/* <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'> */}
         {estadoPeticion === 0 ? (
           <>
             <h1 className='text-2xl text-center mb-10 font-semibold'>
@@ -369,25 +430,44 @@ const RecaudoServiciosPublicosPrivados = () => {
                   }}></Input>
               )}
               {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb) && (
-                <MoneyInput
-                  id='valCashOut'
-                  name='valCashOut'
-                  label='Valor'
-                  type='text'
+                <Input
+                  id='valor'
+                  name='valor'
+                  label='Valor a depositar'
                   autoComplete='off'
-                  maxLength={"15"}
-                  value={datosTransValidacion.valor ?? ""}
-                  onInput={(e, valor) => {
-                    if (!isNaN(valor)) {
-                      const num = valor;
-                      setDatosTransValidacion((old) => {
-                        return { ...old, valor: num };
-                      });
-                    }
-                  }}
-                  required></MoneyInput>
+                  type='tel'
+                  minLength={"2"}
+                  maxLength={"20"}
+                  defaultValue={datosTransValidacion.valor ?? ""}
+                  onInput={(ev) =>
+                    setDatosTransValidacion((old) => ({
+                      ...old,
+                      valor: onChangeMoney(ev),
+                    }))
+                  }
+                  required
+                />
+                // <>
+                //   <MoneyInput
+                //     id='valCashOut'
+                //     name='valCashOut'
+                //     label='Valor'
+                //     type='text'
+                //     autoComplete='off'
+                //     maxLength={"15"}
+                //     value={datosTransValidacion.valor ?? ""}
+                //     onInput={(e, valor) => {
+                //       if (!isNaN(valor)) {
+                //         const num = valor;
+                //         setDatosTransValidacion((old) => {
+                //           return { ...old, valor: num };
+                //         });
+                //       }
+                //     }}
+                //     required></MoneyInput>
+                // </>
               )}
-              <ButtonBar className='lg:col-span-2'>
+              <ButtonBar>
                 <Button type='button' onClick={handleClose}>
                   cancelar
                 </Button>
@@ -401,22 +481,50 @@ const RecaudoServiciosPublicosPrivados = () => {
           </>
         ) : estadoPeticion === 1 ? (
           <>
-            <h1 className='text-2xl text-center mb-10 font-semibold'>
+            <h1 className='text-2xl text-center mb-5 font-semibold'>
               Resultado consulta
             </h1>
-            {/* <h2 className='text-base'>
-                {`Valor de transacción: ${formatMoney.format(
-                  // datosTrans.valorCashOut
-                )} `}
-              </h2> */}
-            {/* <h2>{`Número Daviplata: ${datosTrans.numeroTelefono}`}</h2> */}
-            {/* <h2>{`Número de otp: ${datosTrans.otp}`}</h2> */}
-            <ButtonBar>
-              <Button onClick={handleClose}>Cancelar</Button>
-              <Button type='submit' onClick={() => {}}>
-                Aceptar
-              </Button>
-            </ButtonBar>
+            <h2>{`Nombre convenio: ${datosConsulta.consultaDavivienda.valNombreConvenio}`}</h2>
+            <h2>{`Número convenio: ${datosConsulta.consultaDavivienda.numNumeroConvenio}`}</h2>
+            {convenio?.ctrol_ref1_cnb === "1" && (
+              <h2>{`${convenio?.nom_ref1_cnb}: ${datosTransValidacion.ref1}`}</h2>
+            )}
+            {convenio?.ctrol_ref2_cnb === "1" && (
+              <h2>{`${convenio?.nom_ref2_cnb}: ${datosTransValidacion.ref2}`}</h2>
+            )}
+            <h2 className='text-base'>
+              {`Valor consultado: ${formatMoney.format(
+                datosConsulta.consultaDavivienda.numValorTotalFactura
+              )} `}
+            </h2>
+            {convenio?.ind_valor_exacto_cnb === "0" &&
+              (convenio?.ind_valor_ceros_cnb !== "0" ||
+                convenio?.ind_menor_vlr_cnb !== "0" ||
+                convenio?.ind_mayor_vlr_cnb !== "0") && (
+                <Form grid onSubmit={onSubmitValidacion}>
+                  <Input
+                    id='valor'
+                    name='valor'
+                    label='Valor a depositar'
+                    autoComplete='off'
+                    type='tel'
+                    minLength={"2"}
+                    maxLength={"20"}
+                    defaultValue={datosTransValidacion.valor ?? ""}
+                    onInput={(ev) =>
+                      setDatosTransValidacion((old) => ({
+                        ...old,
+                        valor: onChangeMoney(ev),
+                      }))
+                    }
+                    required
+                  />
+                  <ButtonBar>
+                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button type='submit'>Aceptar</Button>
+                  </ButtonBar>
+                </Form>
+              )}
           </>
         ) : estadoPeticion === 2 ? (
           <>
@@ -458,6 +566,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         ) : (
           <></>
         )}
+        {/* </div> */}
       </Modal>
     </>
   );

@@ -72,10 +72,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     setDatosTrans((old) => {
       return { ...old, [ev.target.name]: valor };
     });
-    if (valor.slice(0, 4) === "C281") {
-      setIsUploading(true);
-      fecthTablaConveniosEspecificoFunc(valor);
-    }
   }, []);
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -139,7 +135,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   // };
   const onSubmit = (e) => {
     e.preventDefault();
-    if (datosTrans?.codBarras.slice(0, 4) === "C281") {
+    if (datosTrans?.codBarras.slice(0, 3) === "]C1") {
       setIsUploading(true);
       fecthTablaConveniosEspecificoFunc(datosTrans?.codBarras);
     } else {
@@ -211,6 +207,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     decimalDigits: 2,
   });
   const printDiv = useRef();
+  const isAlt = useRef("");
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -231,8 +228,24 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               autoFocus
               autoComplete='off'
               onInput={onChangeFormat}
-              // onKeyDown={handleKeyDown}
-            ></Input>
+              onKeyDown={(ev) => {
+                if (ev.altKey) {
+                  if (ev.keyCode !== 18) {
+                    isAlt.current += ev.key;
+                  }
+                }
+              }}
+              onKeyUp={(ev) => {
+                if (ev.altKey === false && isAlt.current !== "") {
+                  let value = String.fromCharCode(parseInt(isAlt.current));
+                  isAlt.current = "";
+                  if (value === "") {
+                    setDatosTrans((old) => {
+                      return { ...old, codBarras: old.codBarras + value };
+                    });
+                  }
+                }
+              }}></Input>
             <ButtonBar className='lg:col-span-2'>
               <Button type='submit'>Realizar consulta</Button>
             </ButtonBar>
