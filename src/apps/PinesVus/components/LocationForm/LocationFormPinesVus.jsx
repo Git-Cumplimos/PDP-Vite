@@ -42,12 +42,13 @@ const LocationFormPinesVus = ({
 
   const searchMunicipio = useCallback((e) => {
     const query = (e.target.value);
+    setDepartamento("")
     if (query.length > 1) {
       fetchData(
         url,
         "GET",
         {
-          $where: `municipio LIKE '%${query}%'`,
+          $where: `(UPPER(municipio)) LIKE UPPER('%${query}%')`,
           $limit: 5,
         },
         {},
