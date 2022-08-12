@@ -106,7 +106,7 @@ const Deposito = () => {
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
-            city: roleInfo?.ciudad.substring(0, 8),
+            city: roleInfo?.ciudad.substring(0, 7),
           },
         },
       };
