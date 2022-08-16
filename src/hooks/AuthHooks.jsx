@@ -17,6 +17,21 @@ const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteri
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_permissions = process.env.REACT_APP_URL_IAM_PDP;
+const url_user =
+  "https://7i347am3a5.execute-api.us-east-2.amazonaws.com/v1/cognitovalidator";
+
+const validateUser = async (email) => {
+  const get = {
+    email: email,
+  };
+
+  try {
+    const res = await fetchData(url_user, "GET", get, {}, {}, false);
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
 
 const infoTicket = async (id_trx, Tipo_operacion, ticket) => {
   const get = {
@@ -273,6 +288,8 @@ export const AuthContext = createContext({
   infoTicket,
   handleverifyTotpToken: () => {},
   handleChangePass: () => {},
+  forgotPassword: () => {},
+  forgotPasswordSubmit: () => {},
   parameters: null,
   qr: null,
   ...initialUser,
@@ -408,6 +425,26 @@ export const useProvideAuth = () => {
     [handleSetupTOTP, signOut]
   );
 
+  const forgotPassword = useCallback(async (email) => {
+    try {
+      const changePassword = await Auth.forgotPassword(email);
+      console.log(changePassword);
+    } catch (error) {}
+  });
+
+  const forgotPasswordSubmit = useCallback(async (email, code, confirmPass) => {
+    try {
+      const confirmChangePassword = await Auth.forgotPasswordSubmit(
+        email,
+        code,
+        confirmPass
+      );
+      console.log(confirmChangePassword);
+    } catch (error) {
+      throw error;
+    }
+  });
+
   const handlesetPreferredMFA = useCallback(
     async (totp) => {
       try {
@@ -539,10 +576,13 @@ export const useProvideAuth = () => {
     signIn,
     confirmSignIn,
     signOut,
+    forgotPassword,
+    forgotPasswordSubmit,
     qr,
     timer,
     parameters,
     infoTicket,
+    validateUser,
     ...userState,
   };
 };

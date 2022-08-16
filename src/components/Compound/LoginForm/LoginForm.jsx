@@ -19,6 +19,9 @@ const LoginForm = () => {
   const [confirmPass, setConfirmPass] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
+  const [forgotPass, setForgotPass] = useState(false);
+  const [forgotPassSubmit, setForgotPassSubmit] = useState(false);
+  const [code, setCode] = useState("");
 
   const auth = useAuth();
 
@@ -130,6 +133,60 @@ const LoginForm = () => {
             notifyError("Complete los campos");
           } else {
             notifyError("Por favor valide todos los campos");
+          }
+        });
+    } else {
+      notifyError("Las contraseñas no coinciden");
+    }
+  };
+  const handleForgotPassword = (event) => {
+    event.preventDefault();
+    auth
+      .validateUser(username)
+      .then((res) => {
+        if (res?.Status === true) {
+          setPassword("");
+          setForgotPass(false);
+          setForgotPassSubmit(true);
+          auth
+            .forgotPassword(username)
+            .then()
+            .catch(() => {});
+        } else {
+          notifyError("El usuario no existe");
+        }
+      })
+      .catch((err) => {});
+  };
+
+  const handleForgotPasswordSubmit = (event) => {
+    event.preventDefault();
+    if (newPass === confirmPass) {
+      auth
+        .forgotPasswordSubmit(username, code, confirmPass)
+        .then((res) => {
+          notify("Contraseña modificada correctamente");
+          setNewPass("");
+          setConfirmPass("");
+          setForgotPassSubmit(false);
+        })
+        .catch((err) => {
+          if (err.code === "CodeMismatchException") {
+            notifyError("El código proporcionado no es valido");
+          } else if (err.code === "InvalidPasswordException") {
+            notifyError(
+              <h6>
+                Politica de contraseñas:
+                <br />
+                1. Debe contener minimo 8 carácteres
+                <br />
+                2. Contiene al menos una cáracter especial
+                <br />
+                Contiene al menos una letra mayúscula
+                <br />
+                4. Contiene al menos una letra minúscula
+              </h6>
+            );
           }
         });
     } else {
@@ -374,6 +431,106 @@ const LoginForm = () => {
         </div>
       </div>
     </>
+  ) : forgotPassSubmit ? (
+    <>
+      <div className="container flex flex-row justify-center items-center">
+        <RightArrow xlarge />
+        <div className={card}>
+          <h1 className="uppercase text-2xl font-medium text-center">
+            Modificación de contraseña
+          </h1>
+          <hr />
+          <form onSubmit={handleForgotPasswordSubmit}>
+            <div className={field}>
+              <label htmlFor="names">Correo:</label>
+              <input
+                id="email"
+                type="email"
+                autoFocus
+                autoComplete="off"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                }}
+              />
+            </div>
+            <div className={field}>
+              <label htmlFor="names">Código:</label>
+              <input
+                id="email"
+                type="text"
+                autoFocus
+                maxLength="6"
+                autoComplete="off"
+                value={code}
+                onChange={(e) => {
+                  setCode(e.target.value);
+                }}
+              />
+            </div>
+            <div className={field}>
+              <label htmlFor="names">Contraseña:</label>
+              <input
+                id="newpass"
+                type="password"
+                autoFocus
+                autoComplete="off"
+                value={newPass}
+                onChange={(e) => {
+                  setNewPass(e.target.value);
+                }}
+              />
+            </div>
+            <div className={field}>
+              <label htmlFor="names">Confirmar contraseña:</label>
+              <input
+                id="confirmpass"
+                type="password"
+                autoFocus
+                autoComplete="off"
+                value={confirmPass}
+                onChange={(e) => {
+                  setConfirmPass(e.target.value);
+                }}
+              />
+            </div>
+            <div className={field}>
+              <button type="submit">Modificar contraseña</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
+  ) : forgotPass ? (
+    <>
+      <div className="container flex flex-row justify-center items-center">
+        <RightArrow xlarge />
+        <div className={card}>
+          <h1 className="uppercase text-2xl font-medium text-center">
+            ¿Olvido su contraseña?
+          </h1>
+          <hr />
+          <form onSubmit={handleForgotPassword}>
+            <div className={field}>
+              <label htmlFor="names">Correo:</label>
+              <input
+                id="email"
+                type="email"
+                autoFocus
+                autoComplete="off"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                }}
+              />
+            </div>
+            <div className={field}>
+              <button type="submit">Solicitar código</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
   ) : (
     <div className={contain}>
       <form onSubmit={handleCognito}>
@@ -402,6 +559,16 @@ const LoginForm = () => {
         </div>
         <div className={field}>
           <button type="submit">Ingresar</button>
+        </div>
+        <div className={field}>
+          <button
+            type="button"
+            onClick={() => {
+              setForgotPass(true);
+            }}
+          >
+            ¿Olvido contraseña?
+          </button>
         </div>
       </form>
     </div>

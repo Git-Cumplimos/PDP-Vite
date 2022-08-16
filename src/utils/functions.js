@@ -77,16 +77,7 @@ export const onChangeAccountNumber = (ev) => {
 export const onUpdateSW = (registration) => {
   console.log("Recargando la pagina para usar una nueva version");
   registration.waiting.postMessage({ type: "SKIP_WAITING" });
-  window.location.reload();
-  // toast.info(
-  //   <div className="grid grid-flow-row place-content-start">
-  //     <h1>Nueva version de la pagina disponible</h1>
-  //     <h1>Recargando la pagina</h1>
-  //   </div>,
-  //   {
-  //     toastId: "toast-id-service-worker-159",
-  //     autoClose: false,
-  //     closeOnClick: false,
-  //   }
-  // );
+  registration.update().then(() => {
+    window.location.reload();
+  });
 };
