@@ -10,7 +10,6 @@ import ProvideUrls from "./components/Compound/ProvideUrls";
 import ProvideImgs from "./components/Compound/ProvideImgs";
 import MessengerCustomerChat from "react-messenger-customer-chat";
 import IdleTimeOut from "./components/Compound/IdleTimeOut/IdleTimeOut";
-import CheckPackageVersion from "./components/Compound/CheckPackageVersion/CheckPackageVersion";
 // import ContactMenu from "./components/Compound/ContactMenu";
 
 Amplify.configure(awsconfig);
@@ -29,7 +28,6 @@ function App() {
           </ProvideUrls>
         </ProvideImgs>
         <IdleTimeOut />
-        <CheckPackageVersion />
       </ProvideAuth>
       <MessengerCustomerChat
         pageId='455201114671494'
