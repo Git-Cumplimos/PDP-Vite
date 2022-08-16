@@ -1,3 +1,5 @@
+// import { toast } from "react-toastify";
+
 export const makeMoneyFormatter = (fractionDigits) => {
   return Intl.NumberFormat("es-CO", {
     style: "currency",
@@ -70,4 +72,12 @@ export const onChangeAccountNumber = (ev) => {
   ev.target.setSelectionRange(caret_pos, caret_pos);
 
   return temp;
+};
+
+export const onUpdateSW = (registration) => {
+  console.log("Recargando la pagina para usar una nueva version");
+  registration.waiting.postMessage({ type: "SKIP_WAITING" });
+  registration.update().then(() => {
+    window.location.reload();
+  });
 };
