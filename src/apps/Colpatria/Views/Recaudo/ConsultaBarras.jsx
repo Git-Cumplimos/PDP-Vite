@@ -126,9 +126,6 @@ const ConsultaBarras = () => {
               if (value === "\u001d") {
                 ev.target.value += "\u001d"
               }
-              // if (value === "") {
-              //   ev.target.value += "\u001d"
-              // }
             }
           }}
           required
