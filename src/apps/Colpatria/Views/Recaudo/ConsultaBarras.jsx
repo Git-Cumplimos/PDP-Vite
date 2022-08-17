@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useMemo, useState, useRef } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
@@ -60,6 +60,7 @@ const ConsultaBarras = () => {
       }
     );
   }, [navigate]);
+  const isAlt = useRef("");
 
   /**
    * Check if has commerce data
@@ -101,7 +102,35 @@ const ConsultaBarras = () => {
           label={"Codigo de barras"}
           name="codigo_barras"
           // onLazyInput={{ callback: () => {}, timeOut: 500 }}
+          // onChange={(ev) => {
+          //   console.log(ev.target.value.at(-1));
+          //   console.log(ev.target.value.charAt(ev.target.value.length-1));
+          //   console.log(ev.target.value.charCodeAt(ev.target.value.length-1));
+          //   console.log(String.fromCharCode(ev.target.value.charCodeAt(ev.target.value.length-1)));
+          //   if (ev.target.value.at(-1) === "\u001d") {
+          //     ev.target.value += "\u001d"
+          //   }
+          // }}
           className={"place-self-stretch w-full"}
+          onKeyDown={(ev) => {
+            if (ev.altKey) {
+              if (ev.keyCode !== 18) {
+                isAlt.current += ev.key;
+              }
+            }
+          }}
+          onKeyUp={(ev) => {
+            if (ev.altKey === false && isAlt.current !== "") {
+              let value = String.fromCharCode(parseInt(isAlt.current));
+              isAlt.current = "";
+              if (value === "\u001d") {
+                ev.target.value += "\u001d"
+              }
+              // if (value === "") {
+              //   ev.target.value += "\u001d"
+              // }
+            }
+          }}
           required
         />
         <ButtonBar className="lg:col-span-2">
