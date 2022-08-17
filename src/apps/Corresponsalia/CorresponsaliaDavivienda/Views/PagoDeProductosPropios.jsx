@@ -226,13 +226,6 @@ const PagoDeProductosPropios = () => {
         )}`
       );
     }
-    // if (tipoAbono.valorAbono < limiteRecarga.inferior) {
-    //   return notifyError(
-    //     `El valor del abono debe ser mayor a ${formatMoney(
-    //       limiteRecarga.inferior
-    //     )}`
-    //   );
-    // }
     setPeticion(3);
   };
   const peticionPagoPropios = () => {
@@ -370,6 +363,7 @@ const PagoDeProductosPropios = () => {
           minLength='5'
           maxLength='10'
           required
+          autoComplete='off'
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
             let valor = e.target.value;
@@ -415,6 +409,7 @@ const PagoDeProductosPropios = () => {
               minLength='16'
               maxLength='16'
               required
+              autoComplete='off'
               value={datosTrans.numeroProducto}
               onInput={(e) => {
                 let valor = e.target.value;
@@ -437,6 +432,7 @@ const PagoDeProductosPropios = () => {
               minLength='6'
               maxLength='6'
               required
+              autoComplete='off'
               value={datosTrans.binTarjetaCredito}
               onInput={(e) => {
                 let valor = e.target.value;
@@ -455,6 +451,7 @@ const PagoDeProductosPropios = () => {
               minLength='4'
               maxLength='4'
               required
+              autoComplete='off'
               value={datosTrans.ultimosTarjetaCredito}
               onInput={(e) => {
                 let valor = e.target.value;
