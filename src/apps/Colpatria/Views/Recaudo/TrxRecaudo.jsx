@@ -49,6 +49,7 @@ const TrxRecaudo = () => {
   const [searchingConvData, setSearchingConvData] = useState(false);
   const [datosConvenio, setDatosConvenio] = useState(null);
   const [userReferences, setUserReferences] = useState({});
+  const [disableRefs, setDisableRefs] = useState([]);
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
@@ -314,13 +315,20 @@ const TrxRecaudo = () => {
     if ("refs" in urlData && datosConvenio) {
       setUserReferences(
         Object.fromEntries(
-          [1, 2, 3, 4, 5]
+          [1, 2, 3]
             .filter((ref) => datosConvenio[`referencia_${ref}`])
             .map((ref) => [
               `referencia_${ref}`,
               JSON.parse(urlData.refs)?.[`referencia_${ref}`] ?? "",
             ])
         )
+      );
+      setDisableRefs(
+        [1, 2, 3]
+          .filter((ref) => datosConvenio[`referencia_${ref}`])
+          .map((ref) =>
+            Boolean(JSON.parse(urlData.refs)?.[`referencia_${ref}`])
+          )
       );
     }
     if ("valor" in urlData) {
@@ -410,7 +418,7 @@ const TrxRecaudo = () => {
         />
         {[1, 2, 3]
           .filter((ref) => datosConvenio[`referencia_${ref}`])
-          .map((ref) => (
+          .map((ref, index) => (
             <Input
               key={ref}
               id={`referencia_${ref}`}
@@ -425,6 +433,7 @@ const TrxRecaudo = () => {
                   [ev.target.name]: ev.target.value,
                 }))
               }
+              readOnly={disableRefs?.[index]}
               required
             />
           ))}
