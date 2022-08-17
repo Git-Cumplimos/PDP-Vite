@@ -120,7 +120,7 @@ const VentaPines = () => {
         {
           render: ({ data: res }) => {
             setLoadingInquiry(false);
-            setInquiryStatus(res);
+            setInquiryStatus(res?.obj);
             return "Consulta satisfactoria";
           },
         },
@@ -150,6 +150,7 @@ const VentaPines = () => {
         oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
         valor_total_trx: valVentaPines,
 
+        id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
         colpatria: {
           user_document: userDocument,
@@ -231,7 +232,14 @@ const VentaPines = () => {
         }
       );
     },
-    [userDocument, userAddress, valVentaPines, roleInfo, infoTicket]
+    [
+      userDocument,
+      userAddress,
+      valVentaPines,
+      inquiryStatus,
+      roleInfo,
+      infoTicket,
+    ]
   );
 
   useEffect(() => {

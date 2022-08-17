@@ -6,7 +6,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { useNavigate, Navigate, useParams } from "react-router-dom";
+import {
+  useNavigate,
+  Navigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 
 import Button from "../../../../components/Base/Button";
@@ -35,6 +40,7 @@ const formatMoney = makeMoneyFormatter(2);
 
 const TrxRecaudo = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const { id_convenio_pin } = useParams();
 
@@ -124,7 +130,7 @@ const TrxRecaudo = () => {
         {
           render: ({ data: res }) => {
             setLoadingInquiry(false);
-            setInquiryStatus(res);
+            setInquiryStatus(res?.obj);
             return "Consulta satisfactoria";
           },
         },
@@ -154,8 +160,10 @@ const TrxRecaudo = () => {
         oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
         valor_total_trx: valTrxRecaudo,
 
+        id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
         colpatria: {
+          ...userReferences,
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -232,7 +240,14 @@ const TrxRecaudo = () => {
         }
       );
     },
-    [userAddress, valTrxRecaudo, roleInfo, infoTicket]
+    [
+      userReferences,
+      userAddress,
+      valTrxRecaudo,
+      inquiryStatus,
+      roleInfo,
+      infoTicket,
+    ]
   );
 
   useEffect(() => {
@@ -294,6 +309,25 @@ const TrxRecaudo = () => {
       });
   }, [id_convenio_pin]);
 
+  useEffect(() => {
+    const urlData = Object.fromEntries(searchParams);
+    if ("refs" in urlData && datosConvenio) {
+      setUserReferences(
+        Object.fromEntries(
+          [1, 2, 3, 4, 5]
+            .filter((ref) => datosConvenio[`referencia_${ref}`])
+            .map((ref) => [
+              `referencia_${ref}`,
+              JSON.parse(urlData.refs)?.[`referencia_${ref}`] ?? "",
+            ])
+        )
+      );
+    }
+    if ("valor" in urlData) {
+      setValTrxRecaudo(urlData.valor);
+    }
+  }, [searchParams, datosConvenio]);
+
   /**
    * Check if has commerce data
    */
@@ -341,7 +375,7 @@ const TrxRecaudo = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Recaudo PSP Manual en Efectivo</h1>
+      <h1 className="text-3xl mt-6">Recaudo PSP en Efectivo</h1>
       <Form
         onSubmit={
           inquiryStatus
@@ -374,7 +408,7 @@ const TrxRecaudo = () => {
           value={datosConvenio.nombre_convenio}
           disabled
         />
-        {[1, 2, 3, 4, 5]
+        {[1, 2, 3]
           .filter((ref) => datosConvenio[`referencia_${ref}`])
           .map((ref) => (
             <Input
@@ -394,7 +428,7 @@ const TrxRecaudo = () => {
               required
             />
           ))}
-        {datosConvenio.fk_tipo_valor === 1 || inquiryStatus ? (
+        {datosConvenio.fk_tipo_valor === 1 || inquiryStatus || valTrxRecaudo ? (
           <Input
             id="valor"
             name="valor"
@@ -403,8 +437,14 @@ const TrxRecaudo = () => {
             type="tel"
             minLength={"5"}
             maxLength={"10"}
+            value={valTrxRecaudo ? formatMoney.format(valTrxRecaudo) : ""}
             onInput={(ev) => setValTrxRecaudo(onChangeMoney(ev))}
-            readOnly={inquiryStatus && datosConvenio.fk_tipo_valor !== 3}
+            readOnly={
+              (!inquiryStatus &&
+                valTrxRecaudo &&
+                datosConvenio.fk_tipo_valor !== 1) ||
+              (inquiryStatus && datosConvenio.fk_tipo_valor !== 3)
+            }
             required
           />
         ) : (
@@ -412,7 +452,7 @@ const TrxRecaudo = () => {
         )}
         <ButtonBar className={"lg:col-span-2"}>
           <Button type={"submit"} disabled={loadingInquiry}>
-            Realizar {!inquiryStatus ? "consulta" : "venta de pin"}
+            Realizar {!inquiryStatus ? "consulta" : "recaudo"}
           </Button>
         </ButtonBar>
       </Form>

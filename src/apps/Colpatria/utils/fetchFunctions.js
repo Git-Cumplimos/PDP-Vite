@@ -198,6 +198,9 @@ export const searchConveniosPinesList = buildGetFunction(
 export const searchConveniosRecaudoList = buildGetFunction(
   `${urlColpatriaTrx}/consulta/recaudo`
 );
+export const searchConveniosRecaudoBarras = buildPostFunction(
+  `${urlColpatriaTrx}/consulta-barras`
+);
 
 export const getErrorList = buildGetFunction(
   `${urlColpatriaParams}/error-table`
