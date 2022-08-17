@@ -89,7 +89,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       .then((autoArr) => {
         if (autoArr?.status) {
           notify(autoArr?.msg);
-          console.log(autoArr);
           let dateStatus = false;
           if (
             datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
@@ -112,7 +111,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             estadoConsulta: true,
             estadoFecha: dateStatus,
           });
-          let valorTrx = autoArr?.obj.datosCodigoBarras.pago[0];
+          let valorTrx = autoArr?.obj.datosCodigoBarras.pago[0] ?? 0;
           setDatosTransaccion((old) => {
             return {
               ...old,
@@ -148,6 +147,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   };
 
   const hideModal = () => {
+    setPeticion(0);
     setShowModal(false);
   };
   const hideModalReset = () => {
@@ -167,40 +167,42 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       data: "",
     });
     setShowModal(false);
+    setPeticion(0);
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
-    if (datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0") {
-      if (
-        datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb === "0" &&
-        datosTransaccion.valor > datosTransaccion.valorSinModificar
-      )
-        return notifyError("No esta permitido el pago mayor al original");
-      if (
-        datosEnvio?.datosConvenio?.ind_menor_vlr_cnb === "0" &&
-        datosTransaccion.valor < datosTransaccion.valorSinModificar
-      ) {
-        if (
-          !(
-            datosEnvio?.datosConvenio?.ind_valor_ceros_cnb === "1" &&
-            datosTransaccion.valor === 0
-          )
-        ) {
-          return notifyError("No esta permitido el pago menor al original");
-        }
-      }
-      if (
-        datosEnvio?.datosConvenio?.ind_valor_ceros_cnb === "0" &&
-        datosTransaccion.valor === 0
-      ) {
-        return notifyError("No esta permitido el pago en ceros");
-      }
-    }
+
     if (
       dataConveniosPagar.includes(
         datosEnvio?.datosConvenio?.num_ind_consulta_cnb
       )
     ) {
+      if (datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0") {
+        if (
+          datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb === "0" &&
+          datosTransaccion.valor > datosTransaccion.valorSinModificar
+        )
+          return notifyError("No esta permitido el pago mayor al original");
+        if (
+          datosEnvio?.datosConvenio?.ind_menor_vlr_cnb === "0" &&
+          datosTransaccion.valor < datosTransaccion.valorSinModificar
+        ) {
+          if (
+            !(
+              datosEnvio?.datosConvenio?.ind_valor_ceros_cnb === "1" &&
+              datosTransaccion.valor === 0
+            )
+          ) {
+            return notifyError("No esta permitido el pago menor al original");
+          }
+        }
+        if (
+          datosEnvio?.datosConvenio?.ind_valor_ceros_cnb === "0" &&
+          datosTransaccion.valor === 0
+        ) {
+          return notifyError("No esta permitido el pago en ceros");
+        }
+      }
       setPeticion(1);
     } else {
       onSubmitPago(e);
@@ -250,9 +252,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             return notifyError("No esta permitido el pago en ceros");
           }
         }
-        valorTransaccion = datosTransaccion.valor;
+        valorTransaccion = datosTransaccion.valor ?? 0;
       } else {
-        valorTransaccion = datosTransaccion.valor ?? "0";
+        valorTransaccion = datosTransaccion.valor ?? 0;
       }
       const hoy = new Date();
       const fecha =
@@ -379,7 +381,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             notify(res?.msg);
             console.log("consulta", res);
             let valorTrxCons =
-              res?.obj?.respuesta_davivienda?.numValorTotalFactura;
+              res?.obj?.respuesta_davivienda?.numValorTotalFactura ?? 0;
             setDatosTransaccion((old) => {
               return {
                 ...old,
