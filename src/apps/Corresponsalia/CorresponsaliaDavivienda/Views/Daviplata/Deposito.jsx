@@ -322,7 +322,7 @@ const Deposito = () => {
             maxLength={"10"}
             value={phone}
             onInput={(e) => {
-              if ((String(phone).length > 0 & String(e.target.value).slice(0,1) !== "3")) {
+              if ((String(e.target.value).length > 0 & String(e.target.value).slice(0,1) !== "3")) {
                 notifyError("El número de celular debe iniciar por 3");
                 setPhone("");
               } else {
@@ -342,7 +342,7 @@ const Deposito = () => {
             maxLength={"10"}
             value={verificacionTel}
             onInput={(e) => {
-              if ((String(phone).length > 0 & String(e.target.value).slice(0,1) !== "3")) {
+              if ((String(e.target.value).length > 0 & String(e.target.value).slice(0,1) !== "3")) {
                 notifyError("El número de celular debe iniciar por 3");
                 setVerificacionTel("");
               } else {
