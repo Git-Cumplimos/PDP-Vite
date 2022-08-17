@@ -38,7 +38,9 @@ const useMoney = ({
         );
       } else if (moneyValue > max) {
         ev.target.setCustomValidity(
-          `El valor debe ser menor a ${moneyFormatter.format(max)}`
+          `El valor debe ser menor${
+            !equalError ? " o igual" : ""
+          } a ${moneyFormatter.format(max)}`
         );
       } else if (moneyValue === max && equalError) {
         ev.target.setCustomValidity(

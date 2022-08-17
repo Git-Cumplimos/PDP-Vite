@@ -14,6 +14,7 @@ const urls = {
   descargaArchivosS3: `${process.env.REACT_APP_URL_PinesVus}/descargaArchivosS3`,
   cupoQX: `${process.env.REACT_APP_URL_PinesVus}/cupoQX`,
   ingresarIdQX: `${process.env.REACT_APP_URL_PinesVus}/ingresarIdQX`,
+  consultaEpsArl: `${process.env.REACT_APP_URL_PinesVus}/consultaEpsArl`,
 };
 
 export const pinesVusContext = createContext({
@@ -29,6 +30,7 @@ export const pinesVusContext = createContext({
   consultaCupoQX: () => {},
   modificarCupoQX: () => {},
   ingresarIdQX: () => {},
+  consultaEpsArl: () => {},
   activarNavigate: null,
   setActivarNavigate: null,
 });
@@ -317,6 +319,18 @@ export const useProvidePinesVus = () => {
     []
   );
 
+  const consultaEpsArl = useCallback(
+    async () => {
+      try {
+        const res = await fetchData(urls.consultaEpsArl, "GET", {});
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
+
   return {
     cancelPinVus,
     crearPinVus,
@@ -334,5 +348,6 @@ export const useProvidePinesVus = () => {
     ingresarIdQX,
     activarNavigate,
     setActivarNavigate,
+    consultaEpsArl,
   };
 };

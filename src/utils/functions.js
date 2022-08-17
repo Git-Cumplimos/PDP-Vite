@@ -86,3 +86,12 @@ export const fetchSecure = async (input, init) => {
 
   return await fetch(input, newinit);
 };
+
+export const onUpdateSW = (registration) => {
+  console.log("Recargando la pagina para usar una nueva version");
+  registration.waiting.postMessage({ type: "SKIP_WAITING" });
+  registration.update().then(() => {
+    window.location.reload();
+  });
+
+};

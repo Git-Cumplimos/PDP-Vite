@@ -57,7 +57,7 @@ const TipoMovimientoCupo = () => {
     } else if (ev.target.name === "Tipo de moviento cupo") {
       setNombreTipoMovimiento(ev.target.value);
     } else if (ev.target.name === "Crear tipo de movimiento cupo") {
-      setNuevoTipoDeMovimiento(ev.target.value);
+      setNuevoTipoDeMovimiento(ev.target.value.trimLeft());
     }
   }, []);
   const handleClose = useCallback(() => {
@@ -71,7 +71,7 @@ const TipoMovimientoCupo = () => {
       postTipoMovimientosCupo(body)
         .then((res) => {
           if (!res?.status) {
-            notifyError("Error al crear tipo de movimiento");
+            notifyError(res?.msg);
             return;
           }
           consultaTipoMovimienots(
@@ -81,6 +81,7 @@ const TipoMovimientoCupo = () => {
             nombreTipoMovimiento
           );
           notify("Creacion de movimiento exitosa");
+          setNuevoTipoDeMovimiento("");
         })
         .catch((r) => {
           console.error(r.message);
@@ -116,7 +117,10 @@ const TipoMovimientoCupo = () => {
           label="Crear movimiento"
           type="text"
           autoComplete="off"
+          maxLength="30"
+          value={nuevoTipoDeMovimiento}
           onInput={() => {}}
+          info="Maximo 30 caracteres"
           required
         />
         <ButtonBar>

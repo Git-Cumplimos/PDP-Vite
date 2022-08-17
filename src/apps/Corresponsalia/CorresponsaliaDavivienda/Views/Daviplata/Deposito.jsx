@@ -49,12 +49,13 @@ const Deposito = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max:1000001,
+    max:1000000,
     min: 10000,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
 
   const options = [
@@ -115,7 +116,7 @@ const Deposito = () => {
       setIsUploading(true);
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
+      if (valor >= min && valor <= max) {
         // const formData = new FormData(e.target);
         // const phone = formData.get("numCliente");
         // const userDoc = formData.get("docCliente");

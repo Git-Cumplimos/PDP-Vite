@@ -21,6 +21,7 @@ const PpsDomiciliacion = ({ datosDomiciliacion }) => {
               "Pps Voluntario": "Pps Voluntario",
               "Pps Obligatorio": "Pps Obligatorio",
             }}
+            info={"Seleccione un elemento de la lista"}
           ></Select>
           {tipoPps === "Pps Voluntario" ? (
             <PpsVoluntario datosConsulta={datosDomiciliacion}></PpsVoluntario>
