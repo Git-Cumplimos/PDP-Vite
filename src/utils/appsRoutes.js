@@ -755,14 +755,14 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/corresponsalia",
-    label: <AppIcons Logo={"MARKETPLACE"} name='Corresponsalia' />,
+    label: <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía' />,
     component: Corresponsalia,
     permission: [54],
     subRoutes: [
       {
         link: "/corresponsalia/corresponsaliaDavivienda",
         label: (
-          <AppIcons Logo={"MARKETPLACE"} name='Corresponsalia Davivienda' />
+          <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Davivienda' />
         ),
         component: CorresponsaliaDavivienda,
         permission: [54],
