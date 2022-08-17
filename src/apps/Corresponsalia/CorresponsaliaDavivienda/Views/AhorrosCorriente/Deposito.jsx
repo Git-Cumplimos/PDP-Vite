@@ -114,6 +114,7 @@ const Deposito = () => {
     setNumCuenta("")
     setValor("")
     setUserDoc("")
+    setSummary([])
 
   }, []);
 
@@ -150,6 +151,12 @@ const Deposito = () => {
             setIsUploading(false);
             if (!res?.status) {
               notifyError(res?.msg);
+              setTipoCuenta("")
+              setTipoDocumento("")
+              setNomDepositante("")
+              setNumCuenta("")
+              setValor("")
+              setUserDoc("")
               return;
             } else {
               setDatosConsulta(res?.obj?.Data);

@@ -139,6 +139,13 @@ const Deposito = () => {
               setIsUploading(false);
               if (!res?.status) {
                 setIsUploading(false);
+                setPhone("");
+                setVerificacionTel("");
+                setNomDepositante("");
+                setSummary([]);
+                setValor("");
+                setTipoDocumento("");
+                setUserDoc("");
                 notifyError(res?.msg);
                 return;
               } else {
