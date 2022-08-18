@@ -66,7 +66,7 @@ export const useProvidePinesVus = () => {
     }
   }, []);
   
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma) => {
     const body = {
       tipo_tramite: tramite,
       infoTramite: infoTramite,
@@ -79,9 +79,10 @@ export const useProvidePinesVus = () => {
       NombreComercio: roleInfo?.["nombre comercio"],
       infoCliente: infoCliente,
       olimpia: olimpia,
-      categoria: categoria
+      categoria: categoria,
+      firma: firma,
     };
-    if (idPin != ""){
+    if (idPin !== ""){
       body.Pin = idPin
     }
     try {

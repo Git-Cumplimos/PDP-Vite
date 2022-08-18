@@ -22,11 +22,22 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import HideInput from "../../../../../components/Base/HideInput";
+import { makeMoneyFormatter } from "../../../../../utils/functions";
+import useMoney from "../../../../../hooks/useMoney";
 
 const Retiro = () => {
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
+
+  const [limitesMontos, setLimitesMontos] = useState({
+    max: 9999999,
+    min: 5000,
+  });
+
+  const onChangeMoney = useMoney({
+    limits: [limitesMontos.min, limitesMontos.max],
+  });
 
   const [loadingRetiroCorresponsal, fetchRetiroCorresponsal] =
     useFetch(retiroCorresponsal);
@@ -45,10 +56,7 @@ const Retiro = () => {
   const [otp, setOtp] = useState("")
   const [summary, setSummary] = useState([])
 
-  const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
-  });
+ 
 
   const optionsDocumento = [
     { value: "", label: "" },
@@ -94,6 +102,12 @@ const Retiro = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
+    setTipoCuenta("")
+    setTipoDocumento("")             
+    setValor("")
+    setUserDoc("")
+    setOtp("")
+    setSummary([])
   }, []);
 
   const onSubmitRetiro = useCallback(
@@ -126,6 +140,11 @@ const Retiro = () => {
             setIsUploading(false);
             if (!res?.status) {
               notifyError(res?.msg);
+              setTipoCuenta("")
+              setTipoDocumento("")             
+              setValor("")
+              setUserDoc("")
+              setOtp("")
               return;
             } else {
               setDatosConsulta(res?.obj?.Data);
@@ -328,18 +347,20 @@ const Retiro = () => {
               setOtp(num);
             }
           }}></HideInput>
-          <MoneyInput
-            id='valor'
-            name='valor'
-            label='Valor a retirar'
-            autoComplete='off'
-            min={limitesMontos?.min}
-            max={limitesMontos?.max}
-            minLength={"1"}
-            maxLength={"15"}
-            onInput={onMoneyChange}
-            required
-          />
+          <Input
+          id="valor"
+          name="valor"
+          label="Valor a depositar"
+          autoComplete="off"
+          type="text"
+          minLength={"1"}
+          maxLength={"15"}
+          min={limitesMontos?.min}
+          max={limitesMontos?.max}
+          value={makeMoneyFormatter(0).format(valor)}
+          onInput={(ev) => setValor(onChangeMoney(ev))}
+          required
+           />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"} disabled={loadingConsultaCostoCB}>
               Realizar retiro
