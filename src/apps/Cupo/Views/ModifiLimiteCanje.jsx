@@ -90,7 +90,15 @@ const ModifiLimiteCanje = () => {
         notifyError("El campo límite de cupo no puede estar vacío");
       }
     },
-    [idComercio, valor, limit, roleInfo.id_usuario, page, navegateValid, cupoComer]
+    [
+      idComercio,
+      valor,
+      limit,
+      roleInfo.id_usuario,
+      page,
+      navegateValid,
+      cupoComer,
+    ]
   );
   const onMoneyChange = useCallback((e, valor) => {
     setValor(valor);
@@ -102,6 +110,10 @@ const ModifiLimiteCanje = () => {
         setinputId(true);
         getConsultaCupoComercio(idComercio)
           .then((objUdusrio) => {
+            if (!objUdusrio?.maxElems) {
+              notifyError("No se encontraron comercios con ese id");
+              return;
+            }
             setCupoComer(objUdusrio);
             setValor(objUdusrio?.results[0].limite_cupo);
             tablalimitecupo(idComercio, page, limit);
@@ -151,7 +163,7 @@ const ModifiLimiteCanje = () => {
               maxLength={"14"}
               min={limitesMontos?.min}
               max={limitesMontos?.max}
-              defaultValue={parseInt(cupoComer?.results[0].limite_cupo)}
+              defaultValue={parseInt(cupoComer?.results?.[0]?.limite_cupo)}
               onInput={onMoneyChange}
               required
             />
