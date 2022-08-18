@@ -1,4 +1,4 @@
-// import { toast } from "react-toastify";
+import { Auth } from "aws-amplify";
 
 export const makeMoneyFormatter = (fractionDigits) => {
   return Intl.NumberFormat("es-CO", {
@@ -74,10 +74,24 @@ export const onChangeAccountNumber = (ev) => {
   return temp;
 };
 
+export const fetchSecure = async (input, init) => {
+  const _session = await Auth.currentSession();
+
+  const newinit = init ?? { headers: {} };
+
+  newinit.headers = {
+    ...newinit.headers,
+    Authorization: `Bearer ${_session?.getIdToken().getJwtToken()}`,
+  };
+
+  return await fetch(input, newinit);
+};
+
 export const onUpdateSW = (registration) => {
   console.log("Recargando la pagina para usar una nueva version");
   registration.waiting.postMessage({ type: "SKIP_WAITING" });
   registration.update().then(() => {
     window.location.reload();
   });
+
 };

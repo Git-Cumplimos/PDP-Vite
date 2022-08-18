@@ -6,9 +6,21 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 /** Rutas */
 const colpatriaTrx = lazy(() => import("./ColpatriaTrx"));
 const Deposito = lazy(() => import("./Views/Deposito"));
-const VentaPines = lazy(() => import("./Views/VentaPines"));
+
+
+const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
+const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
+
+
+const ConsultaManual = lazy(() => import("./Views/Recaudo/ConsultaManual"));
+const ConsultaBarras = lazy(() => import("./Views/Recaudo/ConsultaBarras"));
+const TrxRecaudo = lazy(() => import("./Views/Recaudo/TrxRecaudo"));
+
+
 const AdminColpatria = lazy(() => import("./Views/Admin"));
 const ListaErrores = lazy(() => import("./Views/Admin/ListaErrores"));
+const ConveniosPines = lazy(() => import("./Views/Admin/ConveniosPines"));
+const ConveniosRecaudo = lazy(() => import("./Views/Admin/ConveniosRecaudo"));
 
 const rutasColpatria = {
   link: "/corresponsalia/colpatria",
@@ -23,10 +35,38 @@ const rutasColpatria = {
       permission: [67],
     },
     {
-      link: "/corresponsalia/colpatria/venta-pines",
-      label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines"} />,
-      component: VentaPines,
+      link: "/corresponsalia/colpatria/pines",
+      label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines de Recaudo"} />,
+      component: PinesConsulta,
       permission: [67],
+      subRoutes: [
+        {
+          link: "/corresponsalia/colpatria/pines/:id_convenio_pin",
+          label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines de Recaudo"} />,
+          component: PinesVenta,
+          permission: [67],
+          show: false,
+        },
+      ],
+    },
+    {
+      link: "/corresponsalia/colpatria/recaudo-manual",
+      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Manual en Efectivo"} />,
+      component: ConsultaManual,
+      permission: [67],
+    },
+    {
+      link: "/corresponsalia/colpatria/recaudo-barras",
+      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Barras en Efectivo"} />,
+      component: ConsultaBarras,
+      permission: [67],
+    },
+    {
+      link: "/corresponsalia/colpatria/recaudo/:id_convenio_pin",
+      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP en Efectivo"} />,
+      component: TrxRecaudo,
+      permission: [67],
+      show: false,
     },
     {
       link: "/corresponsalia/colpatria/gestion",
@@ -40,7 +80,23 @@ const rutasColpatria = {
           component: ListaErrores,
           permission: [68],
         },
-      ]
+        {
+          link: "/corresponsalia/colpatria/gestion/lista-convenios-pines",
+          label: (
+            <AppIcons Logo={"RECAUDO"} name={"Convenios de pines de recaudo"} />
+          ),
+          component: ConveniosPines,
+          permission: [68],
+        },
+        {
+          link: "/corresponsalia/colpatria/gestion/lista-convenios-recaudo",
+          label: (
+            <AppIcons Logo={"RECAUDO"} name={"Convenios de recaudo"} />
+          ),
+          component: ConveniosRecaudo,
+          permission: [68],
+        },
+      ],
     },
   ],
 };

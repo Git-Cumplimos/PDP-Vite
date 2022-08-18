@@ -32,7 +32,7 @@ table.tableEnterprise tr:hover td {
 }
 
 .tooling {
-  @apply relative col-span-2 grid grid-flow-col auto-cols-auto gap-2 
+  @apply relative grid grid-flow-col auto-cols-auto gap-2 
           place-items-center;
 }
 
