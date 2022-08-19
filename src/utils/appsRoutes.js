@@ -840,7 +840,7 @@ const allUrlsPrivateApps = [
             label: (
               <AppIcons
                 Logo={"MARKETPLACE"}
-                name='Recaudo servicios publicos y privados'
+                name='Recaudo servicios públicos y privados'
               />
             ),
             component: RecaudoServiciosPublicosPrivadosMenu,
@@ -848,12 +848,7 @@ const allUrlsPrivateApps = [
             subRoutes: [
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccion",
-                label: (
-                  <AppIcons
-                    Logo={"MARKETPLACE"}
-                    name='Selección del convenio'
-                  />
-                ),
+                label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
                 component: SeleccionServicioPagar,
                 permission: [54],
               },
@@ -862,7 +857,7 @@ const allUrlsPrivateApps = [
                 label: (
                   <AppIcons
                     Logo={"MARKETPLACE"}
-                    name='Ingreso por código de barras'
+                    name='Recaudo código de barras'
                   />
                 ),
                 component: RecaudoServiciosPublicosPrivadosLecturaCodigoBarras,

@@ -329,7 +329,7 @@ const PagoDeProductosPropios = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl mb-10'>Pago de productos de crédito</h1>
+      <h1 className='text-3xl mb-10 mt-5'>Pago de productos de crédito</h1>
       <Form grid onSubmit={onSubmit}>
         <Select
           id='tipoIdentificacion'
@@ -338,7 +338,7 @@ const PagoDeProductosPropios = () => {
           options={{
             "": "",
             "Cédula de ciudadanía": "01",
-            "Cedula extranjeria": "02",
+            "Cédula extranjería": "02",
             NIT: "03",
             "NIT Persona natural": "04",
           }}
@@ -445,7 +445,7 @@ const PagoDeProductosPropios = () => {
               }}></Input>
             <Input
               id='ultimosTarjetaCredito'
-              label='Ultimos cuatro dígitos tarjeta de crédito'
+              label='Últimos cuatro dígitos tarjeta de crédito'
               type='text'
               name='ultimosTarjetaCredito'
               minLength='4'
