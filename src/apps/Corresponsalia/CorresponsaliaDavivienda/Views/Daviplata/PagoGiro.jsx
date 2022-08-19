@@ -414,6 +414,9 @@ const PagoGiro = () => {
               </h1>
               <h2>{`Nombre de convenio: ${datosConsulta.nombreConvenio}`}</h2>
               <h2>{`Código de convenio: ${datosConsulta.codigoConvenio}`}</h2>
+              <h2>{`Nombre beneficiario: ${
+                datosConsulta.nombreBeneficiario ?? ""
+              }`}</h2>
               <h2>{`Código de Familia: ${datosTrans.codigoFamilia.replace(
                 /\w/g,
                 "*"
