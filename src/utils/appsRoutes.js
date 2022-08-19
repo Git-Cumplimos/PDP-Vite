@@ -335,6 +335,29 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = lazy(() =>
   )
 );
 /**
+ * Corresponsalia Grupo Aval
+ */
+const CorresponsaliaGrupoAval = lazy(() =>
+ import(
+   "../apps/Corresponsalia/CorresponsaliaGrupoAval/CorresponsaliaGrupoAval"
+ )
+);
+// const AhorrosCorrienteGrupoAval = lazy(() =>
+//  import(
+//    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/AhorrosCorriente"
+//  )
+// );
+const DepositoGrupoAval = lazy(() =>
+ import(
+   "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Deposito"
+ )
+);
+const RetiroGrupoAval = lazy(() =>
+ import(
+   "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Retiro"
+ )
+);
+/**
  * API-SMS
  */
 const API_SMS = lazy(() => import("../apps/API-SMS/API_SMS"));
@@ -755,14 +778,14 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/corresponsalia",
-    label: <AppIcons Logo={"MARKETPLACE"} name='Corresponsalia' />,
+    label: <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía' />,
     component: Corresponsalia,
     permission: [54],
     subRoutes: [
       {
         link: "/corresponsalia/corresponsaliaDavivienda",
         label: (
-          <AppIcons Logo={"MARKETPLACE"} name='Corresponsalia Davivienda' />
+          <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Davivienda' />
         ),
         component: CorresponsaliaDavivienda,
         permission: [54],
@@ -797,7 +820,7 @@ const allUrlsPrivateApps = [
             label: (
               <AppIcons
                 Logo={"MARKETPLACE"}
-                name='Transacciones cuentas Davivienda'
+                name='Retiros y Depósitos Davivienda'
               />
             ),
             component: AhorrosCorrienteCB,
@@ -876,8 +899,44 @@ const allUrlsPrivateApps = [
           },
         ],
       },
+      // {
+      //   link: "/corresponsalia/CorresponsaliaGrupoAval",
+      //   label: (
+      //     <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Grupo Aval' />
+      //   ),
+      //   component: CorresponsaliaGrupoAval,
+      //   permission: [54],
+      //   subRoutes: [
+      //     {
+      //       link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente",
+      //       label: (
+      //         <AppIcons
+      //           Logo={"MARKETPLACE"}
+      //           name='Transacciones cuentas Grupo Aval'
+      //         />
+      //       ),
+      //       component: AhorrosCorrienteCB,
+      //       permission: [54],
+      //       subRoutes: [
+      //         {
+      //           link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/deposito",
+      //           label: <AppIcons Logo={"MARKETPLACE"} name='Depósitos' />,
+      //           component: DepositoCB,
+      //           permission: [54],
+      //         },
+      //         {
+      //           link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/retiro",
+      //           label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
+      //           component: RetiroCB,
+      //           permission: [54],
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
     ],
   },
+  
   {
     link: "/API_SMS",
     label: <AppIcons Logo={"MARKETPLACE"} name='SMS' />,

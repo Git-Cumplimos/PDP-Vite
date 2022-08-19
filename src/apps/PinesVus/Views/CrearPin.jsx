@@ -16,6 +16,7 @@ import Fieldset from "../../../components/Base/Fieldset";
 import LocationFormPinVus from "../components/LocationForm/LocationFormPinesVus"
 import { enumParametrosPines } from "../utils/enumParametrosPines";
 import InputSuggestions from "../../../components/Base/InputSuggestions";
+import FirmaTratamientoDatos from "../components/FirmaTratamientoDatos/FirmaTratamientoDatos";
 
 const dateFormatter = Intl.DateTimeFormat("az", {
   year: "numeric",
@@ -45,6 +46,7 @@ const CrearPin = () => {
   const [showFormulario, setShowFormulario] = useState(false)
   const [documento, setDocumento] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showModalFirma, setShowModalFirma] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [respPin, setRespPin] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
@@ -60,6 +62,7 @@ const CrearPin = () => {
   const [eps, setEps] = useState("")
   const [arl, setArl] = useState("")
   const [idPin, setIdPin] = useState("")
+  const [firma, setFirma] = useState("")
 
   const [olimpia, setOlimpia] = useState("")
 
@@ -298,12 +301,17 @@ const CrearPin = () => {
 
   const onSubmitModal = (e) => {
     e.preventDefault();
+    if (firma !== "") {
     if(!isNaN(infoCliente?.municipio)){
     e.preventDefault();
     setShowModal(true)
     }
     else{
       notifyError("Agregue municipio y departamento de residencia")
+    }
+    }
+    else{
+      notifyError("Es necesario que el cliente autorice el uso de datos personales a Punto de Pago")
     }
   };
 
@@ -394,7 +402,7 @@ const CrearPin = () => {
       notifyError("Para evitar fallas no se permite realizar la transacción, hora cierre: " + horaCierre[0] + ":" + horaCierre[1])
       navigate("/PinesVus",{replace:true});
     }else{
-    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin)
+    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin,firma)
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -420,9 +428,13 @@ const CrearPin = () => {
     }
     setShowModal(false);
     setDisabledBtns(false);
-    
+    setFirma("")
     
   }, [respPin]);
+
+  const closeModalFirma = useCallback(async () => {    
+    setShowModalFirma(false);      
+  }, []);
 
   const tickets = useMemo(() => {
     return {
@@ -828,6 +840,13 @@ const CrearPin = () => {
         <Button type="submit" disabled={disabledBtns}>
           Crear pin
         </Button>
+        <Button type="button"
+        onClick={() => {
+          setShowModalFirma(true)
+        }}
+        >
+          Firma
+        </Button>
       </ButtonBar>
       </Form>
       :
@@ -926,11 +945,16 @@ const CrearPin = () => {
               </Form>
             </div>
           </div>
-        </div>
-        
-        
-        }
-        
+        </div>     
+        }   
+      </Modal>
+      <Modal show={showModalFirma} handleClose={() => closeModalFirma()}>
+        <FirmaTratamientoDatos
+        closeModal={closeModalFirma}
+        setFirma = {setFirma}
+        firma = {firma}
+        >
+        </FirmaTratamientoDatos>
       </Modal>
     </>) : (
       <h1 className="text-3xl mt-6">El usuario no tiene comercio asociado</h1>
