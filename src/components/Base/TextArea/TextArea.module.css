@@ -41,7 +41,7 @@
 }
 
 .formItem > div {
-  @apply relative;
+  @apply relative place-self-stretch;
 }
 
 .formItem > div > textarea + p {

@@ -6,32 +6,44 @@ import {
   useRef,
   useState,
 } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 
-import Button from "../../../components/Base/Button";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import Modal from "../../../components/Base/Modal";
-import Tickets from "../../../components/Base/Tickets";
-import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import { useAuth } from "../../../hooks/AuthHooks";
-import useMoney from "../../../hooks/useMoney";
-import { makeSellPin } from "../utils/fetchFunctions";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import Modal from "../../../../components/Base/Modal";
+import Tickets from "../../../../components/Base/Tickets";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import useMoney from "../../../../hooks/useMoney";
+import {
+  makeSellPin,
+  searchConveniosPinesList,
+  makeInquiryPin,
+} from "../../utils/fetchFunctions";
 
-import { notifyError, notifyPending } from "../../../utils/notify";
-import { makeMoneyFormatter, onChangeNumber } from "../../../utils/functions";
-import fetchData from "../../../utils/fetchData";
+import { notifyError, notifyPending } from "../../../../utils/notify";
+import {
+  makeMoneyFormatter,
+  onChangeNumber,
+} from "../../../../utils/functions";
+import fetchData from "../../../../utils/fetchData";
 
 const formatMoney = makeMoneyFormatter(2);
 
 const VentaPines = () => {
   const navigate = useNavigate();
 
+  const { id_convenio_pin } = useParams();
+
   const { roleInfo, infoTicket } = useAuth();
 
+  const [searchingConvData, setSearchingConvData] = useState(false);
+  const [datosConvenio, setDatosConvenio] = useState(null);
   const [userDocument, setUserDocument] = useState("");
+  const [userReferences, setUserReferences] = useState(null);
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
@@ -44,12 +56,14 @@ const VentaPines = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [inquiryStatus, setInquiryStatus] = useState(null);
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
   });
 
   const [loadingSell, setLoadingSell] = useState(false);
+  const [loadingInquiry, setLoadingInquiry] = useState(false);
 
   const printDiv = useRef();
 
@@ -71,8 +85,10 @@ const VentaPines = () => {
     setShowModal(false);
   }, []);
 
-  const onMakePayment = useCallback(
+  const onMakeInquiry = useCallback(
     (ev) => {
+      ev.preventDefault();
+
       const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
@@ -88,8 +104,60 @@ const VentaPines = () => {
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
-            city: roleInfo?.ciudad.substring(0, 8),
-            state: roleInfo?.codigo_dane.substring(0, 2),
+            city: roleInfo?.ciudad.substring(0, 7),
+          },
+        },
+      };
+
+      notifyPending(
+        makeInquiryPin(data),
+        {
+          render: () => {
+            setLoadingInquiry(true);
+            return "Procesando consulta";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            setLoadingInquiry(false);
+            setInquiryStatus(res?.obj);
+            return "Consulta satisfactoria";
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            setLoadingInquiry(false);
+            if (error?.cause === "custom") {
+              return error?.message;
+            }
+            console.error(error?.message);
+            return "Consulta fallida";
+          },
+        }
+      );
+    },
+    [userDocument, userAddress, valVentaPines, roleInfo]
+  );
+
+  const onMakePayment = useCallback(
+    (ev) => {
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        valor_total_trx: valVentaPines,
+
+        id_trx: inquiryStatus?.id_trx,
+        // Datos trx colpatria
+        colpatria: {
+          user_document: userDocument,
+          location: {
+            address: userAddress,
+            dane_code: roleInfo?.codigo_dane,
+            city: roleInfo?.ciudad.substring(0, 7),
           },
         },
       };
@@ -103,9 +171,7 @@ const VentaPines = () => {
           },
         },
         {
-          render: (info) => {
-            console.log(info);
-            const { data: res } = info;
+          render: ({ data: res }) => {
             setLoadingSell(false);
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
@@ -166,7 +232,14 @@ const VentaPines = () => {
         }
       );
     },
-    [userDocument, userAddress, valVentaPines, roleInfo, infoTicket]
+    [
+      userDocument,
+      userAddress,
+      valVentaPines,
+      inquiryStatus,
+      roleInfo,
+      infoTicket,
+    ]
   );
 
   useEffect(() => {
@@ -197,6 +270,36 @@ const VentaPines = () => {
         notifyError("Error consultando parametros de la transaccion");
       });
   }, []);
+
+  useEffect(() => {
+    setSearchingConvData(true);
+    searchConveniosPinesList({
+      pk_codigo_convenio: id_convenio_pin,
+    })
+      .then((res) => {
+        setSearchingConvData(false);
+        const received = res?.obj?.[0] ?? null;
+        setDatosConvenio(received);
+        if (received) {
+          setUserReferences(
+            Object.fromEntries(
+              [1, 2, 3, 4, 5]
+                .filter((ref) => received[`referencia_${ref}`])
+                .map((ref) => [`referencia_${ref}`, ""])
+            )
+          );
+        }
+      })
+      .catch((error) => {
+        setSearchingConvData(false);
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+          return;
+        }
+        console.error(error?.message);
+        notifyError("Busqueda fallida");
+      });
+  }, [id_convenio_pin]);
 
   /**
    * Check if has commerce data
@@ -230,41 +333,106 @@ const VentaPines = () => {
     return <Navigate to={"/"} replace />;
   }
 
+  if (searchingConvData || !(searchingConvData || datosConvenio)) {
+    return (
+      <Fragment>
+        <h1 className="text-3xl mt-6">Venta de Pines de Recaudo</h1>
+        <h1 className="text-xl mt-6">
+          {searchingConvData
+            ? "Buscando infomacion de convenio ..."
+            : "No se ha encontrado informacion del convenio"}
+        </h1>
+      </Fragment>
+    );
+  }
+
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Venta de Pines Colpatria</h1>
+      <h1 className="text-3xl mt-6">Venta de Pines de Recaudo</h1>
       <Form
-        onSubmit={(ev) => {
-          ev.preventDefault();
-          setShowModal(true);
-        }}
+        onSubmit={
+          inquiryStatus
+            ? (ev) => {
+                ev.preventDefault();
+                setShowModal(true);
+              }
+            : onMakeInquiry
+        }
         grid
       >
+        <Input
+          label="Numero de convenio pin"
+          type="text"
+          autoComplete="off"
+          value={datosConvenio.pk_codigo_convenio}
+          disabled
+        />
+        <Input
+          label="Numero de pin"
+          type="text"
+          autoComplete="off"
+          value={datosConvenio.codigo_pin}
+          disabled
+        />
+        <Input
+          label="Nombre de convenio pin"
+          type="text"
+          autoComplete="off"
+          value={datosConvenio.nombre_convenio}
+          disabled
+        />
+        {[1, 2, 3, 4, 5]
+          .filter((ref) => datosConvenio[`referencia_${ref}`])
+          .map((ref) => (
+            <Input
+              key={ref}
+              id={`referencia_${ref}`}
+              label={datosConvenio[`referencia_${ref}`]}
+              name={`referencia_${ref}`}
+              type="text"
+              autoComplete="off"
+              value={userReferences?.[`referencia_${ref}`] ?? ""}
+              onInput={(ev) =>
+                setUserReferences((old) => ({
+                  ...old,
+                  [ev.target.name]: ev.target.value,
+                }))
+              }
+              required
+            />
+          ))}
         <Input
           id="docCliente"
           name="docCliente"
           label="CC del comprador"
-          type="text"
+          type="tel"
           autoComplete="off"
           minLength={"7"}
           maxLength={"13"}
-          value={userDocument}
+          value={`${userDocument}`}
           onInput={(ev) => setUserDocument(onChangeNumber(ev))}
           required
         />
-        <Input
-          id="valor"
-          name="valor"
-          label="Valor del pin"
-          autoComplete="off"
-          type="tel"
-          minLength={"5"}
-          maxLength={"20"}
-          onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
-          required
-        />
+        {datosConvenio.fk_tipo_valor === 1 || inquiryStatus ? (
+          <Input
+            id="valor"
+            name="valor"
+            label="Valor a pagar"
+            autoComplete="off"
+            type="tel"
+            minLength={"5"}
+            maxLength={"10"}
+            onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
+            readOnly={inquiryStatus && datosConvenio.fk_tipo_valor !== 3}
+            required
+          />
+        ) : (
+          ""
+        )}
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar venta de pin</Button>
+          <Button type={"submit"} disabled={loadingInquiry}>
+            Realizar {!inquiryStatus ? "consulta" : "venta de pin"}
+          </Button>
         </ButtonBar>
       </Form>
       <Modal
