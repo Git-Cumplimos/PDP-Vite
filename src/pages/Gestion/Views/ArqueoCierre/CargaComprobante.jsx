@@ -1,19 +1,20 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, Fragment } from "react";
 //import { useNavigate } from "react-router-dom";
-import Form from "../../../components/Base/Form";
-import MoneyInput from "../../../components/Base/MoneyInput";
-import Select from "../../../components/Base/Select";
-import FileInput from "../../../components/Base/FileInput";
-import TextArea from "../../../components/Base/TextArea";
-import Button from "../../../components/Base/Button";
-import { notify, notifyError } from "../../../utils/notify";
+import Form from "../../../../components/Base/Form";
+import MoneyInput from "../../../../components/Base/MoneyInput";
+import Select from "../../../../components/Base/Select";
+import FileInput from "../../../../components/Base/FileInput";
+import TextArea from "../../../../components/Base/TextArea";
+import Button from "../../../../components/Base/Button";
+import { notify, notifyError } from "../../../../utils/notify";
 import {
   createUrlFile,
   registerReceipt,
   buscarCompañias,
-} from "../utils/fetchCaja";
-import useForm from "../../../hooks/useForm";
-import { useAuth } from "../../../hooks/AuthHooks";
+} from "../../utils/fetchCaja";
+import useForm from "../../../../hooks/useForm";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import ButtonBar from "../../../../components/Base/ButtonBar";
 
 const CargaComprobante = () => {
   const [label, setLabel] = useState(" ");
@@ -37,7 +38,7 @@ const CargaComprobante = () => {
   const onFileChange = useCallback((files) => {
     files = Array.from(files);
     setFile(files);
-  });
+  }, []);
 
   useEffect(() => {
     const number = tipoCons === "2" || tipoCons === "3" ? 2 : 0;
@@ -52,92 +53,103 @@ const CargaComprobante = () => {
       });
   }, [tipoCons]);
 
-  const onSubmit = useCallback(async (e) => {
-    e.preventDefault();
+  const onSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-    const formData = new FormData();
-    if (file?.length > 0) {
-      if (data?.valor?.length > 2) {
-        const query = {
-          filename: file?.[0]?.name,
-          contentType: file?.[0]?.type,
-          location: tipoCons,
-        };
-        createUrlFile(query)
-          .then((res) => {
-            console.log(res);
-            for (const key in res?.obj?.fields) {
-              formData.set(`${key}`, `${res?.obj?.fields[key]}`);
-            }
-            formData.set("file", file[0]);
-            fetch(`${res?.obj?.url}`, { method: "POST", body: formData })
-              .then((res) => {})
-              .catch((err) => {
-                setFile([]);
-                setAttributes(false);
-              });
-            const regex = /(\d+)/g;
-            const comma = /(\,+)/g;
-            if (tipoCons > 1) {
-              let body = {
-                id_comercio: roleInfo?.id_comercio,
-                id_usuario: roleInfo?.id_usuario,
-                id_terminal: roleInfo?.id_dispositivo,
-                valor: parseInt(
-                  String(data?.valor?.match(regex))?.replace(comma, "")
-                ),
-                archivo: formData.get("key"),
-                obs_cajero: data?.obs,
-                compañia: data?.transport,
-                status: "PENDIENTE",
-              };
-              registerReceipt(body)
-                .then((res) => {
-                  console.log(res);
-                })
+      const formData = new FormData();
+      if (file?.length > 0) {
+        if (data?.valor?.length > 2) {
+          const query = {
+            filename: file?.[0]?.name,
+            contentType: file?.[0]?.type,
+            location: tipoCons,
+          };
+          createUrlFile(query)
+            .then((res) => {
+              console.log(res);
+              for (const key in res?.obj?.fields) {
+                formData.set(`${key}`, `${res?.obj?.fields[key]}`);
+              }
+              formData.set("file", file[0]);
+              fetch(`${res?.obj?.url}`, { method: "POST", body: formData })
+                .then((res) => {})
                 .catch((err) => {
-                  console.log(err);
+                  setFile([]);
+                  setAttributes(false);
                 });
-            } else {
-              let body = {
-                id_comercio: roleInfo?.id_comercio,
-                id_usuario: roleInfo?.id_usuario,
-                id_terminal: roleInfo?.id_dispositivo,
-                valor: parseInt(
-                  String(data?.valor?.match(regex))?.replace(comma, "")
-                ),
-                archivo: file?.[0]?.name,
-                obs_cajero: data?.obs,
-                compañia: data?.transport,
-                cuenta: data?.account,
-                nro_comprobante: "",
-              };
-              console.log(body, roleInfo);
-              registerReceipt(body)
-                .then((res) => {
-                  console.log(res);
-                })
-                .catch((err) => {
-                  console.log(err);
-                });
-            }
-          })
-          .catch((err) => {
-            throw err;
-          });
+              const regex = /(\d+)/g;
+              const comma = /(,+)/g;
+              if (tipoCons > 1) {
+                let body = {
+                  id_comercio: roleInfo?.id_comercio,
+                  id_usuario: roleInfo?.id_usuario,
+                  id_terminal: roleInfo?.id_dispositivo,
+                  valor: parseInt(
+                    String(data?.valor?.match(regex))?.replace(comma, "")
+                  ),
+                  archivo: formData.get("key"),
+                  obs_cajero: data?.obs,
+                  compañia: data?.transport,
+                  status: "PENDIENTE",
+                };
+                registerReceipt(body)
+                  .then((res) => {
+                    console.log(res);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              } else {
+                let body = {
+                  id_comercio: roleInfo?.id_comercio,
+                  id_usuario: roleInfo?.id_usuario,
+                  id_terminal: roleInfo?.id_dispositivo,
+                  valor: parseInt(
+                    String(data?.valor?.match(regex))?.replace(comma, "")
+                  ),
+                  archivo: file?.[0]?.name,
+                  obs_cajero: data?.obs,
+                  compañia: data?.transport,
+                  cuenta: data?.account,
+                  nro_comprobante: "",
+                };
+                console.log(body, roleInfo);
+                registerReceipt(body)
+                  .then((res) => {
+                    console.log(res);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              }
+            })
+            .catch((err) => {
+              throw err;
+            });
+        } else {
+          notify("Reporte un valor para poder continuar");
+        }
       } else {
-        notify("Reporte un valor para poder continuar");
+        notifyError("Por favor adjunte un archivo");
       }
-    } else {
-      notifyError("Por favor adjunte un archivo");
-    }
-    handleChange();
-  });
-  //ToDo: Options value:
-  //{ value: 2, label: "Entrega transportadora" },
-  //{ value: 3, label: "Recibido transportadora" },
+      handleChange();
+    },
+    [
+      data?.account,
+      data?.obs,
+      data?.transport,
+      data?.valor,
+      file,
+      handleChange,
+      roleInfo,
+      tipoCons,
+    ]
+  );
+
   return (
-    <div className="flex items-center mx-auto">
+    <Fragment>
+      <h1 className="text-3xl mt-6">Transportadora y Consignaciones</h1>
       <Form onSubmit={onSubmit} grid>
         <Select
           id="searchByType"
@@ -166,7 +178,7 @@ const CargaComprobante = () => {
             }
           }}
         />
-        {attributes && (
+        {attributes ? (
           <div>
             {tipoCons === "2" || tipoCons === "3" ? (
               <Select
@@ -193,7 +205,7 @@ const CargaComprobante = () => {
               tipoCons === "1" && <></>
             )}
             {tipoCons !== "1" ? (
-              <>
+              <Fragment>
                 <MoneyInput
                   id="valorCons"
                   name="valor"
@@ -226,14 +238,17 @@ const CargaComprobante = () => {
                     </Button>
                   </>
                 )}
-              </>
+              </Fragment>
             ) : (
               <h1 className="text-center">Sin acceso</h1>
             )}
           </div>
+        ) : (
+          <ButtonBar />
         )}
       </Form>
-    </div>
+    </Fragment>
+
   );
 };
 

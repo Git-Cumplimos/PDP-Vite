@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
-import Input from "../../../components/Base/Input";
-import Modal from "../../../components/Base/Modal";
+import { useState, useEffect, useCallback, Fragment } from "react";
+import Input from "../../../../components/Base/Input";
+import Modal from "../../../../components/Base/Modal";
 import ValidarComprobante from "./ValidarComprobante";
-import { searchHistorico } from "../utils/fetchCaja";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
+import { searchHistorico } from "../../utils/fetchCaja";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
 const headers = [
   "Id",
@@ -60,14 +60,14 @@ const PanelConsignaciones = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [fecha]);
+  }, [fecha, pageData]);
 
   useEffect(() => {
     buscarConsignaciones();
   }, [buscarConsignaciones]);
 
   return (
-    <>
+    <Fragment>
       <TableEnterprise
         title="Históricos - Cierre de Caja"
         headers={headers}
@@ -109,7 +109,7 @@ const PanelConsignaciones = () => {
           onInput={(e) => setFecha(e.target.value)}
         />
       </TableEnterprise>
-    </>
+    </Fragment>
   );
 };
 

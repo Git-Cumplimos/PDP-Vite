@@ -1,16 +1,16 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 import Magnifier from "react-magnifier";
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import MoneyInput from "../../../components/Base/MoneyInput";
-import TextArea from "../../../components/Base/TextArea";
-import Select from "../../../components/Base/Select";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Button from "../../../components/Base/Button";
-import { saveAs } from "file-saver";
-import { updateReceipts } from "../utils/fetchCaja";
-import { notify } from "../../../utils/notify";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import MoneyInput from "../../../../components/Base/MoneyInput";
+import TextArea from "../../../../components/Base/TextArea";
+import Select from "../../../../components/Base/Select";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
+// import { saveAs } from "file-saver";
+import { updateReceipts } from "../../utils/fetchCaja";
+import { notify } from "../../../../utils/notify";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -36,15 +36,12 @@ const ValidarComprobante = ({ data, setShowModal }) => {
       });
   };
 
-  const saveFile = () => {
-    saveAs(data?.archivo);
-  };
-
   console.log(data);
+
   return (
-    <>
+    <Fragment>
       <div className="w-full flex flex-col justify-center items-center my-8">
-        <h1 className="text-xl">Validación de comprobante</h1>
+        <h1 className="text-2xl font-semibold">Validación de comprobante</h1>
       </div>
       <Form Grid>
         {[data].map((row) => {
@@ -52,20 +49,16 @@ const ValidarComprobante = ({ data, setShowModal }) => {
           tempDate.setHours(tempDate.getHours() + 5);
           const fechaHora = dateFormatter.format(tempDate);
           return (
-            <>
-              <Input label="Empresa" value={row?.compañia} disabled></Input>
-              <Input label="Cuenta" value={row?.cuenta} disabled></Input>
+            <Fragment>
+              <Input label="Empresa" value={row?.compañia} disabled />
+              <Input label="Cuenta" value={row?.cuenta} disabled />
               <Input
                 label="# Consignación"
                 value={row.nro_comprobante}
                 disabled
-              ></Input>
-              <MoneyInput
-                label="Valor"
-                value={row?.valor}
-                disabled
-              ></MoneyInput>
-              <Input label="Fecha" value={fechaHora} disabled></Input>
+              />
+              <MoneyInput label="Valor" value={row?.valor} disabled />
+              <Input label="Fecha" value={fechaHora} disabled />
               {data?.status === "PENDIENTE" ? (
                 <Select
                   id="searchByAgreement"
@@ -87,14 +80,16 @@ const ValidarComprobante = ({ data, setShowModal }) => {
               ) : (
                 ""
               )}
-              <Magnifier src={row?.archivo} zoomFactor={2} />
-            </>
+              <div className="my-4 mx-auto md:mx-4 gap-4">
+                <Magnifier src={row?.archivo} zoomFactor={2} />
+              </div>
+            </Fragment>
           );
         })}
 
-        <Button type="button" onClick={saveFile}>
-          Descargar imagen
-        </Button>
+        <a href={data?.archivo} target="_blank" rel="noopener noreferrer">
+          <Button type="button">Descargar imagen</Button>
+        </a>
         {data?.status === "PENDIENTE" ? (
           <TextArea
             id="obs"
@@ -123,7 +118,7 @@ const ValidarComprobante = ({ data, setShowModal }) => {
           </Button>
         </ButtonBar>
       </Form>
-    </>
+    </Fragment>
   );
 };
 
