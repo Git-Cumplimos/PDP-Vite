@@ -4,14 +4,14 @@ import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Button from "../../../../../components/Base/Button";
 import Modal from "../../../../../components/Base/Modal";
 import useQuery from "../../../../../hooks/useQuery";
-import { Fragment, useState, useCallback, useRef, useEffect } from "react";
+import { Fragment, useState, useCallback, useRef, useEffect, useMemo } from "react";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import Tickets from "../../components/TicketsDavivienda";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import {
-  depositoCorresponsal,
-  consultaCostoCB,
+  depositoCorresponsalGrupoAval,
+  consultaCostoGrupoAval,
 } from "../../utils/fetchCorresponsaliaDavivienda";
 import { notify, notifyError } from "../../../../../utils/notify";
 import MoneyInput, {
@@ -38,10 +38,10 @@ const Deposito = () => {
 
   const { roleInfo, infoTicket } = useAuth();
 
-  const [loadingDepositoCorresponsal, fetchDepositoCorresponsal] =
-    useFetch(depositoCorresponsal);
-  const [loadingConsultaCostoCB, fetchConsultaCostoCB] =
-    useFetch(consultaCostoCB);
+  const [loadingDepositoCorresponsalGrupoAval, fetchDepositoCorresponsalGrupoAval] =
+    useFetch(depositoCorresponsalGrupoAval);
+  const [loadingConsultaCostoGrupoAval, fetchConsultaCostoGrupoAval] =
+    useFetch(consultaCostoGrupoAval);
   const [, fetchTypes] = useFetch();
 
   const [showModal, setShowModal] = useState(false);
@@ -55,6 +55,22 @@ const Deposito = () => {
   const [valor, setValor] = useState("")
   const [nomDepositante, setNomDepositante] = useState("")
   const [summary, setSummary] = useState([])
+  const [banco, setBanco] = useState("")
+  const [phone, setPhone] = useState("")
+
+  const optionsBanco = [
+    { value: "", label: "" },
+    { value: "01", label: "Banco AvVillas" },
+    { value: "02", label: "Banco Bogotá" },
+    { value: "04", label: "Banco Occidental" },
+    { value: "13", label: "Banco Popular" },
+  ];
+
+  const nomBanco = useMemo(() => {
+    const resp = optionsBanco?.filter((id) => id.value === banco);
+    const nomBanco = resp[0]?.label
+    return nomBanco;
+  }, [optionsBanco, banco]);
 
   const options = [
     { value: "", label: "" },
@@ -70,6 +86,17 @@ const Deposito = () => {
     { value: "13", label: "Regitro Civil" },
   ];
 
+  const onSubmitModal = useCallback((e) => {
+    e.preventDefault();
+    const summary = {
+      "Banco": nomBanco,
+      "Documento" : userDoc,
+      "Numero celular": phone,
+      "Valor cobro": formatMoney.format(valor),
+    };
+    setSummary(summary)
+    setShowModal(true)
+  }, [banco, userDoc, phone, valor, nomBanco]);
   
 
   const printDiv = useRef();
@@ -114,6 +141,8 @@ const Deposito = () => {
     setNumCuenta("")
     setValor("")
     setUserDoc("")
+    setPhone("")
+    setBanco("")
     setSummary([])
 
   }, []);
@@ -146,7 +175,7 @@ const Deposito = () => {
           //valToken: "valToken", /// De donde viene
           numNumeroDeCuenta: numCuenta,
         };
-        fetchConsultaCostoCB(body)
+        fetchConsultaCostoGrupoAval(body)
           .then((res) => {
             setIsUploading(false);
             if (!res?.status) {
@@ -221,7 +250,7 @@ const Deposito = () => {
       tip_id_depositante: tipoDocumento,
     };
 
-    fetchDepositoCorresponsal(body)
+    fetchDepositoCorresponsalGrupoAval(body)
       .then((res) => {
         setIsUploading(false);
         if (!res?.status) {
@@ -303,7 +332,7 @@ const Deposito = () => {
     valor,
     tipoCuenta,
     userDoc,
-    fetchDepositoCorresponsal,
+    fetchDepositoCorresponsalGrupoAval,
     roleInfo,
     infoTicket,
     ,
@@ -316,7 +345,17 @@ const Deposito = () => {
       <Fragment>
         <h1 className='text-3xl mt-6'>Depósitos</h1>
         <br></br>
-        <Form onSubmit={onSubmitDeposit} grid>
+        <Form onSubmit={onSubmitModal} grid>
+          <Select
+            id='banco'
+            label='Banco a Retirar'
+            options={optionsBanco}
+            value={banco}
+            onChange={(e) => {
+              setBanco(e.target.value);
+            }}
+            required
+          />
           <Select
             id='tipoCuenta'
             label='Tipo de cuenta'
@@ -334,7 +373,7 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"10"}
-            maxLength={"16"}
+            maxLength={"14"}
             value={numCuenta}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
@@ -344,7 +383,7 @@ const Deposito = () => {
             }}
             required
           />
-          <Select
+          {/* <Select
             id='tipoDocumento'
             label='Tipo de documento'
             options={optionsDocumento}
@@ -353,20 +392,40 @@ const Deposito = () => {
             onChange={(e) => {
               setTipoDocumento(e.target.value);
             }}
-          />
+          /> */}
           <Input
             id='docCliente'
             name='docCliente'
-            label='Documento depositante'
+            label='Documento cliente'
             type='text'
             autoComplete='off'
             minLength={"5"}
-            maxLength={"16"}
+            maxLength={"12"}
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
               if (! isNaN(num)){
               setUserDoc(num)  
+              }
+            }}
+            required
+          />
+          <Input
+            id='numCliente'
+            name='numCliente'
+            label='Número celular'
+            type='text'
+            autoComplete='off'
+            minLength={"10"}
+            maxLength={"10"}
+            value={phone}
+            onInput={(e) => {
+              if ((String(e.target.value).length > 0 & String(e.target.value).slice(0,1) !== "3")) {
+                notifyError("El número de celular debe iniciar por 3");
+                setPhone("");
+              } else {
+                const num = parseInt(e.target.value) || "";
+                setPhone(num);
               }
             }}
             required
@@ -414,8 +473,8 @@ const Deposito = () => {
           required
            />
           <ButtonBar className={"lg:col-span-2"}>
-            <Button type={"submit"} disabled={loadingConsultaCostoCB}>
-              Realizar depósito
+            <Button type={"submit"} disabled={loadingConsultaCostoGrupoAval}>
+              Continuar
             </Button>
           </ButtonBar>
         </Form>
@@ -424,7 +483,7 @@ const Deposito = () => {
           handleClose={
             paymentStatus
               ? () => {}
-              : loadingDepositoCorresponsal
+              : loadingDepositoCorresponsalGrupoAval
               ? () => {}
               : handleClose
           }>
@@ -442,12 +501,18 @@ const Deposito = () => {
                 <Button
                   type='submit'
                   onClick={onMakePayment}
-                  disabled={loadingDepositoCorresponsal}>
-                  Aceptar
+                  disabled={loadingDepositoCorresponsalGrupoAval}>
+                  Realizar deposito
+                </Button>
+                <Button
+                  type='submit'
+                  onClick={onMakePayment}
+                  disabled={loadingDepositoCorresponsalGrupoAval}>
+                  Consultar costo
                 </Button>
                 <Button
                   onClick={handleClose}
-                  disabled={loadingDepositoCorresponsal}>
+                  disabled={loadingDepositoCorresponsalGrupoAval}>
                   Cancelar
                 </Button>
               </ButtonBar>

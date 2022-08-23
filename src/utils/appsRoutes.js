@@ -904,41 +904,41 @@ const allUrlsPrivateApps = [
           },
         ],
       },
-      // {
-      //   link: "/corresponsalia/CorresponsaliaGrupoAval",
-      //   label: (
-      //     <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Grupo Aval' />
-      //   ),
-      //   component: CorresponsaliaGrupoAval,
-      //   permission: [54],
-      //   subRoutes: [
-      //     {
-      //       link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente",
-      //       label: (
-      //         <AppIcons
-      //           Logo={"MARKETPLACE"}
-      //           name='Transacciones cuentas Grupo Aval'
-      //         />
-      //       ),
-      //       component: AhorrosCorrienteCB,
-      //       permission: [54],
-      //       subRoutes: [
-      //         {
-      //           link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/deposito",
-      //           label: <AppIcons Logo={"MARKETPLACE"} name='Depósitos' />,
-      //           component: DepositoCB,
-      //           permission: [54],
-      //         },
-      //         {
-      //           link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/retiro",
-      //           label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
-      //           component: RetiroCB,
-      //           permission: [54],
-      //         },
-      //       ],
-      //     },
-      //   ],
-      // },
+      {
+        link: "/corresponsalia/CorresponsaliaGrupoAval",
+        label: (
+          <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Grupo Aval' />
+        ),
+        component: CorresponsaliaGrupoAval,
+        permission: [54],
+        subRoutes: [
+          {
+            link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente",
+            label: (
+              <AppIcons
+                Logo={"MARKETPLACE"}
+                name='Transacciones cuentas Grupo Aval'
+              />
+            ),
+            component: AhorrosCorrienteCB,
+            permission: [54],
+            subRoutes: [
+              {
+                link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/deposito",
+                label: <AppIcons Logo={"MARKETPLACE"} name='Depósitos' />,
+                component: DepositoGrupoAval,
+                permission: [54],
+              },
+              {
+                link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/retiro",
+                label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
+                component: RetiroGrupoAval,
+                permission: [54],
+              },
+            ],
+          },
+        ],
+      },
     ],
   },
   
