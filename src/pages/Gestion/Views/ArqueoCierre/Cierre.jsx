@@ -23,9 +23,6 @@ const Cierre = ({
     maximumFractionDigits: 0,
   });
   const [trans] = useState(0);
-  /*const urls = {
-    cierreCaja: `${process.env.REACT_APP_URL_CAJA}cash`,
-  };*/
 
   const confirmCierre = useCallback(async () => {
     const body = {
