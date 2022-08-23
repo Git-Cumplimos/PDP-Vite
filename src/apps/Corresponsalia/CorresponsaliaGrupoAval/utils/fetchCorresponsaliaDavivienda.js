@@ -98,7 +98,7 @@ export const postRealizarCashoutDavivienda = async (bodyObj) => {
   }
 };
 
-export const consultaCostoCB = async (bodyObj) => {
+export const consultaCostoGrupoAval = async (bodyObj) => {
   if (!bodyObj) {
     return new Promise((resolve, reject) => {
       resolve("Sin datos body");
@@ -123,7 +123,7 @@ export const consultaCostoCB = async (bodyObj) => {
   }
 };
 
-export const depositoCorresponsal = async (bodyObj) => {
+export const depositoCorresponsalGrupoAval = async (bodyObj) => {
   if (!bodyObj) {
     return new Promise((resolve, reject) => {
       resolve("Sin datos body");
@@ -148,7 +148,7 @@ export const depositoCorresponsal = async (bodyObj) => {
   }
 };
 
-export const retiroCorresponsal = async (bodyObj) => {
+export const retiroCorresponsalGrupoAval = async (bodyObj) => {
   if (!bodyObj) {
     return new Promise((resolve, reject) => {
       resolve("Sin datos body");

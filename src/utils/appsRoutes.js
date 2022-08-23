@@ -266,6 +266,26 @@ const Deposito = lazy(() => import("../apps/Daviplata/Views/Deposito"));
 const Corresponsalia = lazy(() =>
   import("../apps/Corresponsalia/Corresponsalia")
 );
+
+/**
+ * Corresponsalia Banco Agrario
+ */
+const CorresponsaliaBancoAgrario = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/CorresponsaliaBancoAgrario"
+  )
+);
+const RetiroBancoAgrario = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/Retiro/RetiroBancoAgrario"
+  )
+);
+const RetiroEfectivoBancoAgrario = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/Retiro/Views/RetiroEfectivo"
+  )
+);
+
 /**
  * Corresponsalia Davivienda
  */
@@ -338,9 +358,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = lazy(() =>
  * Corresponsalia Grupo Aval
  */
 const CorresponsaliaGrupoAval = lazy(() =>
- import(
-   "../apps/Corresponsalia/CorresponsaliaGrupoAval/CorresponsaliaGrupoAval"
- )
+  import(
+    "../apps/Corresponsalia/CorresponsaliaGrupoAval/CorresponsaliaGrupoAval"
+  )
 );
 // const AhorrosCorrienteGrupoAval = lazy(() =>
 //  import(
@@ -348,14 +368,14 @@ const CorresponsaliaGrupoAval = lazy(() =>
 //  )
 // );
 const DepositoGrupoAval = lazy(() =>
- import(
-   "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Deposito"
- )
+  import(
+    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Deposito"
+  )
 );
 const RetiroGrupoAval = lazy(() =>
- import(
-   "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Retiro"
- )
+  import(
+    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Retiro"
+  )
 );
 /**
  * API-SMS
@@ -783,6 +803,7 @@ const allUrlsPrivateApps = [
     permission: [54],
     subRoutes: [
       {
+        //corresponsaliaDavivienda
         link: "/corresponsalia/corresponsaliaDavivienda",
         label: (
           <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Davivienda' />
@@ -899,44 +920,72 @@ const allUrlsPrivateApps = [
           },
         ],
       },
-      // {
-      //   link: "/corresponsalia/CorresponsaliaGrupoAval",
-      //   label: (
-      //     <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Grupo Aval' />
-      //   ),
-      //   component: CorresponsaliaGrupoAval,
-      //   permission: [54],
-      //   subRoutes: [
-      //     {
-      //       link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente",
-      //       label: (
-      //         <AppIcons
-      //           Logo={"MARKETPLACE"}
-      //           name='Transacciones cuentas Grupo Aval'
-      //         />
-      //       ),
-      //       component: AhorrosCorrienteCB,
-      //       permission: [54],
-      //       subRoutes: [
-      //         {
-      //           link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/deposito",
-      //           label: <AppIcons Logo={"MARKETPLACE"} name='Depósitos' />,
-      //           component: DepositoCB,
-      //           permission: [54],
-      //         },
-      //         {
-      //           link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/retiro",
-      //           label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
-      //           component: RetiroCB,
-      //           permission: [54],
-      //         },
-      //       ],
-      //     },
-      //   ],
-      // },
+      {
+        link: "/corresponsalia/CorresponsaliaGrupoAval",
+        label: (
+          <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Grupo Aval' />
+        ),
+        component: CorresponsaliaGrupoAval,
+        permission: [54],
+        subRoutes: [
+          {
+            link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente",
+            label: (
+              <AppIcons
+                Logo={"MARKETPLACE"}
+                name='Transacciones cuentas Grupo Aval'
+              />
+            ),
+            component: AhorrosCorrienteCB,
+            permission: [54],
+            subRoutes: [
+              {
+                link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/deposito",
+                label: <AppIcons Logo={"MARKETPLACE"} name='Depósitos' />,
+                component: DepositoGrupoAval,
+                permission: [54],
+              },
+              {
+                link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/retiro",
+                label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
+                component: RetiroGrupoAval,
+                permission: [54],
+              },
+            ],
+          },
+        ],
+      },
+
+      //CorresponsaliaBancoAgrario
+      {
+        link: "/corresponsalia/corresponsalia-banco-agrario",
+        label: (
+          <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Banco Agrario' />
+        ),
+        component: CorresponsaliaBancoAgrario,
+        permission: [1],
+        subRoutes: [
+          {
+            link: "/corresponsalia/corresponsalia-banco-agrario/retiro",
+            label: <AppIcons Logo={"MARKETPLACE"} name='Retiro' />,
+            component: RetiroBancoAgrario,
+            permission: [1],
+            subRoutes: [
+              {
+                link: "/corresponsalia/corresponsalia-banco-agrario/retiro/retiro-efectivo",
+                label: (
+                  <AppIcons Logo={"MARKETPLACE"} name='Retiro en efectivo' />
+                ),
+                component: RetiroEfectivoBancoAgrario,
+                permission: [1],
+              },
+            ],
+          },
+        ],
+      },
     ],
   },
-  
+
   {
     link: "/API_SMS",
     label: <AppIcons Logo={"MARKETPLACE"} name='SMS' />,
