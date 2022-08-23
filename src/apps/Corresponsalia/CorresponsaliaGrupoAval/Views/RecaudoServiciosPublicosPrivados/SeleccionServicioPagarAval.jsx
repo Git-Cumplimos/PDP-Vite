@@ -5,7 +5,7 @@ import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { postConsultaTablaConveniosPaginado } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
-const SeleccionServicioPagar = () => {
+const SeleccionServicioPagarAval = () => {
   const navigate = useNavigate();
   // const [{ searchConvenio = "" }, setQuery] = useQuery();
 
@@ -137,4 +137,4 @@ const SeleccionServicioPagar = () => {
   );
 };
 
-export default SeleccionServicioPagar;
+export default SeleccionServicioPagarAval;

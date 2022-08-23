@@ -338,7 +338,7 @@ const PagoDeProductosPropios = () => {
           options={{
             "": "",
             "Cédula de ciudadanía": "01",
-            "Cédula extranjería": "02",
+            "Cédula de extranjería": "02",
             NIT: "03",
             "NIT Persona natural": "04",
           }}

@@ -27,7 +27,7 @@ import {
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
-const RecaudoServiciosPublicosPrivados = () => {
+const RecaudoServiciosPublicosPrivadosAval = () => {
   const { state } = useLocation();
   const { roleInfo } = useAuth();
   const navigate = useNavigate();
@@ -569,4 +569,4 @@ const RecaudoServiciosPublicosPrivados = () => {
   );
 };
 
-export default RecaudoServiciosPublicosPrivados;
+export default RecaudoServiciosPublicosPrivadosAval;

@@ -354,6 +354,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = lazy(() =>
     "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosLecturaCodigoBarras"
   )
 );
+
 /**
  * Corresponsalia Grupo Aval
  */
@@ -375,6 +376,31 @@ const DepositoGrupoAval = lazy(() =>
 const RetiroGrupoAval = lazy(() =>
   import(
     "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Retiro"
+  )
+);
+const RecaudoServiciosPublicosPrivadosMenuAval = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivadosMenuAval"
+  )
+);
+const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval"
+  )
+);
+const SeleccionServicioPagarAval = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/SeleccionServicioPagarAval"
+  )
+);
+const RecaudoServiciosPublicosPrivadosAval = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosAval"
+  )
+);
+const ConveniosRecaudoAval = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/ConveniosRecaudoAval"
   )
 );
 /**
@@ -909,9 +935,7 @@ const allUrlsPrivateApps = [
               },
               {
                 link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
-                label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Selección del covenio' />
-                ),
+                label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
                 component: RecaudoServiciosPublicosPrivados,
                 permission: [54],
                 show: false,
@@ -926,7 +950,7 @@ const allUrlsPrivateApps = [
           <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Grupo Aval' />
         ),
         component: CorresponsaliaGrupoAval,
-        permission: [54],
+        permission: [69, 70],
         subRoutes: [
           {
             link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente",
@@ -937,19 +961,68 @@ const allUrlsPrivateApps = [
               />
             ),
             component: AhorrosCorrienteCB,
-            permission: [54],
+            permission: [69],
             subRoutes: [
               {
                 link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/deposito",
                 label: <AppIcons Logo={"MARKETPLACE"} name='Depósitos' />,
                 component: DepositoGrupoAval,
-                permission: [54],
+                permission: [69],
               },
               {
                 link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/retiro",
                 label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
                 component: RetiroGrupoAval,
-                permission: [54],
+                permission: [69],
+              },
+            ],
+          },
+          {
+            link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados",
+            label: (
+              <AppIcons
+                Logo={"MARKETPLACE"}
+                name='Recaudo servicios públicos y privados'
+              />
+            ),
+            component: RecaudoServiciosPublicosPrivadosMenuAval,
+            permission: [69, 70],
+            subRoutes: [
+              {
+                link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/seleccion",
+                label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
+                component: SeleccionServicioPagarAval,
+                permission: [69],
+              },
+              {
+                link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/codbarras",
+                label: (
+                  <AppIcons
+                    Logo={"MARKETPLACE"}
+                    name='Recaudo código de barras'
+                  />
+                ),
+                component:
+                  RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval,
+                permission: [69],
+              },
+              {
+                link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/manual",
+                label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
+                component: RecaudoServiciosPublicosPrivadosAval,
+                permission: [69],
+                show: false,
+              },
+              {
+                link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/convenios",
+                label: (
+                  <AppIcons
+                    Logo={"MARKETPLACE"}
+                    name='Convenios recaudo AVAL'
+                  />
+                ),
+                component: ConveniosRecaudoAval,
+                permission: [70],
               },
             ],
           },
