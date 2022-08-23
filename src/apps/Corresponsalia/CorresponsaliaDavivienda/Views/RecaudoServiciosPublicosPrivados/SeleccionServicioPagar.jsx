@@ -74,8 +74,8 @@ const SeleccionServicioPagar = () => {
   };
   return (
     <>
-      <h1 className='text-3xl text-center'>
-        Recaudo servicios publicos y privados
+      <h1 className='text-3xl text-center mt-5'>
+        Recaudo servicios públicos y privados
       </h1>
       <TableEnterprise
         title='Tabla convenios Davivienda corresponsal bancario'

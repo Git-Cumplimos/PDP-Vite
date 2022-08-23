@@ -348,8 +348,8 @@ const RecaudoServiciosPublicosPrivados = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center mb-5'>
-        Recaudo servicios publicos y privados
+      <h1 className='text-3xl text-center mb-5 mt-5'>
+        Recaudo servicios públicos y privados
       </h1>
       <h1 className='text-3xl text-center mb-5'>{`Convenio: ${
         convenio?.nom_convenio_cnb ?? ""

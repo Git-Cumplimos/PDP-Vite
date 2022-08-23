@@ -413,13 +413,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center mb-10'>
-        Recaudo servicios publicos y privados
+      <h1 className='text-3xl text-center mb-10 mt-5'>
+        Recaudo servicios públicos y privados
       </h1>
       {!datosEnvio.estadoConsulta ? (
         <>
           <h1 className='text-3xl text-center mb-5'>
-            Ingrese el código de barras
+            Escanee el código de barras
           </h1>
           <Form grid onSubmit={onSubmit}>
             <Input
