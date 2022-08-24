@@ -360,8 +360,8 @@ const PagoDeProductosPropios = () => {
           label='Número de identificación'
           type='text'
           name='numeroIdentificacion'
-          minLength='5'
-          maxLength='10'
+          minLength='3'
+          maxLength='16'
           required
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
