@@ -98,6 +98,7 @@ const ConveniosRecaudoAval = () => {
   //------------------Funcion Para Subir El Formulario---------------------//
   const saveFile = useCallback(
     (e) => {
+      e.preventDefault();
       setIsUploading(true);
       const f = new Date();
       const query = {
@@ -228,7 +229,7 @@ const ConveniosRecaudoAval = () => {
               saveFile();
             }}
           /> */}
-        <Form formDir='col'>
+        <Form formDir='col' onSubmit={saveFile}>
           <h1 className='text-2xl text-center mb-10 mt-5'>
             Archivo de convenios AVAL
           </h1>
