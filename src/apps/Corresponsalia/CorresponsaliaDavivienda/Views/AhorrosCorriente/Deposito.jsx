@@ -28,8 +28,8 @@ const Deposito = () => {
   const navigate = useNavigate();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
+    max: 10000000,
+    min: 1,
   });
 
   const onChangeMoney = useMoney({

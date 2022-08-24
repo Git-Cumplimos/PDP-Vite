@@ -10,7 +10,7 @@ import { useReactToPrint } from "react-to-print";
 import {
   retiroCorresponsalGrupoAval,
   consultaCostoGrupoAval,
-} from "../../utils/fetchCorresponsaliaDavivienda";
+} from "../../utils/fetchCorresponsaliaGrupoAval";
 import { notify, notifyError } from "../../../../../utils/notify";
 import Tickets from "../../components/TicketsDavivienda";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
@@ -29,6 +29,8 @@ const Retiro = () => {
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
+
+  console.log(roleInfo)
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 3000000,
@@ -60,10 +62,11 @@ const Retiro = () => {
 
   const optionsBanco = [
     { value: "", label: "" },
-    { value: "01", label: "Banco AvVillas" },
-    { value: "02", label: "Banco Bogotá" },
-    { value: "04", label: "Banco Occidental" },
-    { value: "13", label: "Banco Popular" },
+    { value: "0052", label: "Banco AvVillas" },
+    { value: "0001", label: "Banco Bogotá" },
+    { value: "0023", label: "Banco Occidental" },
+    { value: "0002", label: "Banco Popular" },
+    { value: "0054", label: "ATH" },
   ];
 
   const optionsTipoCuenta = [
@@ -134,22 +137,24 @@ const Retiro = () => {
       const { min, max } = limitesMontos;
 
       if (valor >= min && valor < max) {
-        const formData = new FormData(e.target);
-        const userDoc = formData.get("docCliente");
-        const valorFormat = formData.get("valor");
-        const otp = formData.get("OTP");
+        // const formData = new FormData(e.target);
+        // const userDoc = formData.get("docCliente");
+        // const valorFormat = formData.get("valor");
+        // const otp = formData.get("OTP");
 
         const body = {
           idComercio: roleInfo?.id_comercio,
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
           Tipo: roleInfo?.tipo_comercio,
-          numTipoTransaccion: 2130, /// retiro
-          numTipoDocumento: tipoDocumento, /// Cedula
+          codDane: roleInfo?.codigo_dane,
+          ciudad: roleInfo?.ciudad,
+          direccion: roleInfo?.direccion,
+          ///////////////////////////////
+          idBancoAdquiriente: DataBanco?.value,
           numNumeroDocumento: userDoc,
           numValorTransaccion: valor,
-          //nomDepositante: nomDepositante,
-          // valToken: "valToken", /// De donde viene
+
         };
         fetchConsultaCostoGrupoAval(body)
           .then((res) => {
@@ -169,7 +174,7 @@ const Retiro = () => {
                 // "Numero celular": numCuenta,
                 "C.C. del depositante": userDoc,
                 "Codigo OTP": otp,
-                "Valor de retiro": valorFormat,
+                "Valor de retiro": valor,
                 "Valor cobro": formatMoney.format(
                   res?.obj?.Data?.numValorCobro
                 ),
@@ -209,23 +214,23 @@ const Retiro = () => {
     navigate(-1);
   }, [navigate]);
 
-  const nomBanco = useMemo(() => {
+  const DataBanco = useMemo(() => {
     const resp = optionsBanco?.filter((id) => id.value === banco);
-    const nomBanco = resp[0]?.label
-    return nomBanco;
+    const DataBanco = {nombre: resp[0]?.label, idBanco: resp[0]?.value}
+    return DataBanco;
   }, [optionsBanco, banco]);
 
   const onSubmitModal = useCallback((e) => {
     e.preventDefault();
     const summary = {
-      "Banco": nomBanco,
+      "Banco": DataBanco?.label,
       "Documento" : userDoc,
       "Numero celular": phone,
       "Valor cobro": formatMoney.format(valor),
     };
     setSummary(summary)
     setShowModal(true)
-  }, [banco, userDoc, phone, valor, nomBanco]);
+  }, [banco, userDoc, phone, valor, DataBanco]);
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);

@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import {
   depositoCorresponsalGrupoAval,
   consultaCostoGrupoAval,
-} from "../../utils/fetchCorresponsaliaDavivienda";
+} from "../../utils/fetchCorresponsaliaGrupoAval";
 import { notify, notifyError } from "../../../../../utils/notify";
 import MoneyInput, {
   formatMoney,

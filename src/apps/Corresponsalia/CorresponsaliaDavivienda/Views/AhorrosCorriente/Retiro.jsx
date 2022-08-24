@@ -11,7 +11,7 @@ import {
   retiroCorresponsal,
   consultaCostoCB,
 } from "../../utils/fetchCorresponsaliaDavivienda";
-import { notify, notifyError } from "../../../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../../../utils/notify";
 import Tickets from "../../components/TicketsDavivienda";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import MoneyInput, {
@@ -31,8 +31,8 @@ const Retiro = () => {
   const { roleInfo, infoTicket } = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
+    max: 10000000,
+    min: 10000,
   });
 
   const onChangeMoney = useMoney({
@@ -114,7 +114,7 @@ const Retiro = () => {
     (e) => {
       e.preventDefault();
       setIsUploading(true);
-
+      if (valor % 10000 === 0){
       const { min, max } = limitesMontos;
 
       if (valor >= min && valor < max) {
@@ -147,6 +147,7 @@ const Retiro = () => {
               setOtp("")
               return;
             } else {
+              notifyError("Recuerde verificar si posee el efectivo suficiente para continuar con el retiro")
               setDatosConsulta(res?.obj?.Data);
               const summary = {
                 "Nombre cliente": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
@@ -177,6 +178,11 @@ const Retiro = () => {
           )} y ${formatMoney.format(max)}`
         );
       }
+    }
+    else{
+      setIsUploading(false);
+      notifyError("El valor a retirar debe ser múltiplo de $10.000")
+    }
     },
     [valor, limitesMontos]
   );
@@ -320,7 +326,7 @@ const Retiro = () => {
             label='Documento cliente'
             type='text'
             autoComplete='off'
-            minLength={"7"}
+            minLength={"5"}
             maxLength={"16"}
             value={userDoc}
             onInput={(e) => {
@@ -350,7 +356,7 @@ const Retiro = () => {
           <Input
           id="valor"
           name="valor"
-          label="Valor a depositar"
+          label="Valor a retirar"
           autoComplete="off"
           type="text"
           minLength={"1"}
