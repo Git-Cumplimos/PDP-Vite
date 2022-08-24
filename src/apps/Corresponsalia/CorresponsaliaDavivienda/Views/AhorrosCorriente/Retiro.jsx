@@ -102,7 +102,7 @@ const Retiro = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
     setTipoCuenta("")
-    setTipoDocumento("")             
+    setTipoDocumento("01")             
     setValor("")
     setUserDoc("")
     setOtp("")
@@ -113,6 +113,11 @@ const Retiro = () => {
     (e) => {
       e.preventDefault();
       setIsUploading(true);
+      if (otp.length < 6) {
+        setIsUploading(false)
+        notifyError("El número OTP debe ser de 6 digitos")
+      }
+      else{
       if (valor % 10000 === 0){
       const { min, max } = limitesMontos;
 
@@ -140,7 +145,7 @@ const Retiro = () => {
             if (!res?.status) {
               notifyError(res?.msg);
               setTipoCuenta("")
-              setTipoDocumento("")             
+              setTipoDocumento("01")             
               setValor("")
               setUserDoc("")
               setOtp("")
@@ -151,8 +156,8 @@ const Retiro = () => {
               const summary = {
                 "Nombre cliente": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
                 // "Numero celular": numCuenta,
-                "C.C. del depositante": userDoc,
-                "Codigo OTP": otp,
+                "Documento del cliente": userDoc,
+                //"Codigo OTP": otp,
                 "Valor de retiro": valorFormat,
                 "Valor cobro": formatMoney.format(
                   res?.obj?.Data?.numValorCobro
@@ -182,8 +187,8 @@ const Retiro = () => {
       setIsUploading(false);
       notifyError("El valor a retirar debe ser múltiplo de $10.000")
     }
-    },
-    [valor, limitesMontos]
+    }},
+    [valor, limitesMontos, otp]
   );
 
 
@@ -255,7 +260,7 @@ const Retiro = () => {
           trxInfo: [
             [
               "Tipo",
-              res?.obj?.Data?.numTipoCuenta === "01" ? "Ahorros" : "Corriente",
+              res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
             ["",""],
             [
@@ -326,7 +331,7 @@ const Retiro = () => {
             type='text'
             autoComplete='off'
             minLength={"5"}
-            maxLength={"16"}
+            maxLength={"10"}
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
@@ -341,8 +346,8 @@ const Retiro = () => {
           label='Número OTP'
           type='text'
           name='otp'
-          minLength='6'
-          maxLength='6'
+          minLength={"6"}
+          maxLength={"6"}
           autoComplete='off'
           required
           value={otp}
