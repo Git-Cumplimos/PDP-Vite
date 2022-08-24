@@ -1,6 +1,6 @@
 import fetchData from "../../../../utils/fetchData";
 
-const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
+const urlAval = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}`;
 
 export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
   if (!bodyObj) {
@@ -8,7 +8,7 @@ export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/consulta_tabla_convenios_paginado`,
+      `${urlAval}/grupo_aval_cb_recaudo/consulta_tabla_convenios_paginado`,
       "POST",
       {},
       bodyObj,
@@ -29,7 +29,7 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/consulta_tabla_convenios_especifico`,
+      `${urlAval}davivienda_recaudo_servicios_publicos_privados/consulta_tabla_convenios_especifico`,
       "POST",
       {},
       bodyObj,
@@ -50,7 +50,7 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/codigo_barras`,
+      `${urlAval}davivienda_recaudo_servicios_publicos_privados/codigo_barras`,
       "POST",
       {},
       bodyObj,
@@ -71,7 +71,7 @@ export const postConsultaConveniosDavivienda = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/consulta_recaudo_servicios_publicos_privados`,
+      `${urlAval}davivienda_recaudo_servicios_publicos_privados/consulta_recaudo_servicios_publicos_privados`,
       "POST",
       {},
       bodyObj,
@@ -92,7 +92,7 @@ export const postRecaudoConveniosDavivienda = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_recaudo_servicios_publicos_privados/recaudo_servicios_publicos_privados`,
+      `${urlAval}davivienda_recaudo_servicios_publicos_privados/recaudo_servicios_publicos_privados`,
       "POST",
       {},
       bodyObj,

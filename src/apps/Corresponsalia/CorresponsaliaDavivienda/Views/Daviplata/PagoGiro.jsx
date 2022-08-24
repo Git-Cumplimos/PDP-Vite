@@ -414,7 +414,13 @@ const PagoGiro = () => {
               </h1>
               <h2>{`Nombre de convenio: ${datosConsulta.nombreConvenio}`}</h2>
               <h2>{`Código de convenio: ${datosConsulta.codigoConvenio}`}</h2>
-              <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
+              <h2>{`Nombre beneficiario: ${
+                datosConsulta.nombreBeneficiario.replace(/[0]/g, "") ?? ""
+              }`}</h2>
+              <h2>{`Código de Familia: ${datosTrans.codigoFamilia.replace(
+                /\w/g,
+                "*"
+              )}`}</h2>
               <h2>{`Número de identificacion: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
               <h2>{`Valor transacción: ${formatMoney.format(
                 datosConsultaIdTrx.valor
@@ -432,7 +438,10 @@ const PagoGiro = () => {
               <h1 className='text-2xl font-semibold'>
                 ¿Está seguro de realizar la transacción del giro?
               </h1>
-              <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
+              <h2>{`Código de Familia: ${datosTrans.codigoFamilia.replace(
+                /\w/g,
+                "*"
+              )}`}</h2>
               <h2>{`Número de identificación: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
               <h2>{`Valor transacción: ${formatMoney.format(
                 datosConsultaIdTrx.valor
