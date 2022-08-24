@@ -23,7 +23,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
-const { contenedorImagen } = classes;
+const { contenedorImagen, contenedorForm} = classes;
 const PpsVoluntarioDemanda = ({ ced }) => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [numDocumento, setNumDocumento] = useState(ced);
@@ -376,6 +376,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             legend="Formulario Aporte Voluntario"
             /* className="lg:col-span-3" */
           >
+            <div className={contenedorForm}>
+
             <Select
               onChange={(event) => setTipoIdentificacion(event?.target?.value)}
               id="comissionType"
@@ -455,6 +457,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               type={"text"}
               required
             ></MoneyInput>
+          </div>
           </Fieldset>
           <ButtonBar className={"lg:col-span-2"} type="">
             {
