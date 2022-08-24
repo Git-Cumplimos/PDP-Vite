@@ -49,7 +49,7 @@ const Retiro = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("01");
   const [isUploading, setIsUploading] = useState(false);
   const [userDoc, setUserDoc] = useState("")
   const [valor, setValor] = useState("")
@@ -59,7 +59,6 @@ const Retiro = () => {
  
 
   const optionsDocumento = [
-    { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
     { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },

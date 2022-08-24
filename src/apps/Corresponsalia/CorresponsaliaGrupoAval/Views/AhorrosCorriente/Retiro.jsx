@@ -69,6 +69,12 @@ const Retiro = () => {
     { value: "0054", label: "ATH" },
   ];
 
+  const DataBanco = useMemo(() => {
+    const resp = optionsBanco?.filter((id) => id.value === banco);
+    const DataBanco = {nombre: resp[0]?.label, idBanco: resp[0]?.value}
+    return DataBanco;
+  }, [optionsBanco, banco]);
+
   const optionsTipoCuenta = [
     { value: "", label: "" },
     { value: "02", label: "Corriente" },
@@ -151,7 +157,7 @@ const Retiro = () => {
           ciudad: roleInfo?.ciudad,
           direccion: roleInfo?.direccion,
           ///////////////////////////////
-          idBancoAdquiriente: DataBanco?.value,
+          idBancoAdquiriente: DataBanco?.idBanco,
           numNumeroDocumento: userDoc,
           numValorTransaccion: valor,
 
@@ -199,7 +205,7 @@ const Retiro = () => {
         );
       }
     },
-    [valor, limitesMontos]
+    [valor, limitesMontos, DataBanco]
   );
 
 
@@ -214,16 +220,10 @@ const Retiro = () => {
     navigate(-1);
   }, [navigate]);
 
-  const DataBanco = useMemo(() => {
-    const resp = optionsBanco?.filter((id) => id.value === banco);
-    const DataBanco = {nombre: resp[0]?.label, idBanco: resp[0]?.value}
-    return DataBanco;
-  }, [optionsBanco, banco]);
-
   const onSubmitModal = useCallback((e) => {
     e.preventDefault();
     const summary = {
-      "Banco": DataBanco?.label,
+      "Banco": DataBanco?.nombre,
       "Documento" : userDoc,
       "Numero celular": phone,
       "Valor cobro": formatMoney.format(valor),
