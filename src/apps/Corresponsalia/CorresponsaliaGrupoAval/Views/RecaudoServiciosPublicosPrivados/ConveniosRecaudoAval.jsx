@@ -6,9 +6,13 @@ import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
 import InputX from "../../../../../components/Base/InputX/InputX";
 import Modal from "../../../../../components/Base/Modal";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
+import fetchData from "../../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { postConsultaTablaConveniosPaginado } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+
+const url_cargueS3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_recaudo/subir_archivos_convenios`;
 
 const ConveniosRecaudoAval = () => {
   const navigate = useNavigate();
@@ -23,6 +27,8 @@ const ConveniosRecaudoAval = () => {
     idConvenio: "",
     idEAN: "",
   });
+  const [isUploading, setIsUploading] = useState(false);
+  const [file, setFile] = useState({});
   const [convenios, setConvenios] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
 
@@ -74,13 +80,13 @@ const ConveniosRecaudoAval = () => {
       })
       .catch((err) => console.error(err));
   };
-  const onChange = (files) => {
+  const onChangeFile = (files) => {
     if (Array.isArray(Array.from(files))) {
       files = Array.from(files);
       if (files.length === 1) {
         const m_file = files[0];
-        // console.log(m_file);
-        // setFile(m_file);
+        console.log(m_file);
+        setFile(m_file);
         // setFileName(m_file.name);
       } else {
         if (files.length > 1) {
@@ -89,8 +95,70 @@ const ConveniosRecaudoAval = () => {
       }
     }
   };
+  //------------------Funcion Para Subir El Formulario---------------------//
+  const saveFile = useCallback(
+    (e) => {
+      setIsUploading(true);
+      const f = new Date();
+      const query = {
+        contentType: "application/text",
+        filename: `${file.name}`,
+      };
+      fetchData(url_cargueS3, "POST", {}, query)
+        .then((respuesta) => {
+          if (!respuesta?.status) {
+            notifyError(respuesta?.msg);
+          } else {
+            // setEstadoForm(true);
+            const formData2 = new FormData();
+            if (file) {
+              for (const property in respuesta?.obj?.fields) {
+                formData2.set(
+                  `${property}`,
+                  `${respuesta?.obj?.fields[property]}`
+                );
+              }
+
+              formData2.set("file", file);
+              console.log(formData2, `${respuesta?.obj?.url}`);
+              fetch(`${respuesta?.obj?.url}`, {
+                method: "POST",
+                body: formData2,
+              }).then((res) => {
+                if (res?.ok) {
+                  console.log("subio");
+                  // setTimeout(() => {
+                  //   EstadoArchivos().then((res) => {
+                  //     if (typeof res != Object) {
+                  //       if ("Motivo" in res?.[0]) {
+                  //         closeModal();
+                  //         if (res[0]["Estado"] === 1) {
+                  //           notify(res[0]["Motivo"]);
+                  //         } else {
+                  //           notifyError(res[0]["Motivo"]);
+                  //         }
+                  //       } else {
+                  //         notifyError("Consulte con soporte");
+                  //       }
+                  //     }
+                  //   });
+                  // }, 3000);
+                } else {
+                  notifyError("No fue posible conectar con el Bucket");
+                }
+              });
+            }
+          }
+        })
+        .catch((err) => {
+          notifyError("Error al cargar Datos");
+        }); /* notify("Se ha comenzado la carga"); */
+    },
+    [file]
+  );
   return (
     <>
+      <SimpleLoading show={isUploading} />
       <TableEnterprise
         title='Tabla convenios AVAL corresponsal bancario'
         maxPage={maxPages}
@@ -160,27 +228,31 @@ const ConveniosRecaudoAval = () => {
               saveFile();
             }}
           /> */}
-        {/* <Form formDir="col" onSubmit={onSubmit}>
-            <InputX
-              id={`archivo_${archivo}`}
-              label={`Elegir archivo: ${
-                options.find(({ value }) => {
-                  return value === archivo;
-                }).label
-              }`}
-              type="file"
-              disabled={progress !== 0}
-              accept=".txt,.csv"
-              onGetFile={onChange}
-            />
-            {file && progress === 0 ? (
+        <Form formDir='col'>
+          <h1 className='text-2xl text-center mb-10 mt-5'>
+            Archivo de convenios AVAL
+          </h1>
+          <InputX
+            id={`archivo`}
+            label={file.name ? "Cambiar archivo" : `Elegir archivo`}
+            type='file'
+            // disabled={progress !== 0}
+            accept='.txt,.csv'
+            onGetFile={onChangeFile}
+          />
+          {file.name ? (
+            <>
+              <h2 className='text-l text-center mt-5'>
+                {`Archivo seleccionado: ${file.name}`}
+              </h2>
               <ButtonBar>
-                <Button type="submit">Subir</Button>
+                <Button type='submit'>Subir</Button>
               </ButtonBar>
-            ) : (
-              ""
-            )}
-          </Form> */}
+            </>
+          ) : (
+            ""
+          )}
+        </Form>
       </Modal>
     </>
   );

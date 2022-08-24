@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import {
   depositoCorresponsalGrupoAval,
   consultaCostoGrupoAval,
-} from "../../utils/fetchCorresponsaliaDavivienda";
+} from "../../utils/fetchCorresponsaliaGrupoAval";
 import { notify, notifyError } from "../../../../../utils/notify";
 import MoneyInput, {
   formatMoney,
@@ -60,16 +60,17 @@ const Deposito = () => {
 
   const optionsBanco = [
     { value: "", label: "" },
-    { value: "01", label: "Banco AvVillas" },
-    { value: "02", label: "Banco Bogotá" },
-    { value: "04", label: "Banco Occidental" },
-    { value: "13", label: "Banco Popular" },
+    { value: "0052", label: "Banco AvVillas" },
+    { value: "0001", label: "Banco Bogotá" },
+    { value: "0023", label: "Banco Occidental" },
+    { value: "0002", label: "Banco Popular" },
+    { value: "0054", label: "ATH" },
   ];
 
-  const nomBanco = useMemo(() => {
+  const DataBanco = useMemo(() => {
     const resp = optionsBanco?.filter((id) => id.value === banco);
-    const nomBanco = resp[0]?.label
-    return nomBanco;
+    const DataBanco = {nombre: resp[0]?.label, idBanco: resp[0]?.value}
+    return DataBanco;
   }, [optionsBanco, banco]);
 
   const options = [
@@ -89,14 +90,14 @@ const Deposito = () => {
   const onSubmitModal = useCallback((e) => {
     e.preventDefault();
     const summary = {
-      "Banco": nomBanco,
+      "Banco": DataBanco?.nombre,
       "Documento" : userDoc,
       "Numero celular": phone,
-      "Valor cobro": formatMoney.format(valor),
+      "Valor deposito": formatMoney.format(valor),
     };
     setSummary(summary)
     setShowModal(true)
-  }, [banco, userDoc, phone, valor, nomBanco]);
+  }, [banco, userDoc, phone, valor, DataBanco]);
   
 
   const printDiv = useRef();
@@ -147,7 +148,7 @@ const Deposito = () => {
 
   }, []);
 
-  const onSubmitDeposit = useCallback(
+  const consultarCosto = useCallback(
     (e) => {
       e.preventDefault();
       setIsUploading(true);
@@ -155,25 +156,24 @@ const Deposito = () => {
       const { min, max } = limitesMontos;
 
       if (valor >= min && valor < max) {
-        const formData = new FormData(e.target);
-        const numCuenta = formData.get("numCuenta");
-        const userDoc = formData.get("docCliente");
-        const valorFormat = formData.get("valor");
-        const nomDepositante = formData.get("nomDepositante");
+        // const formData = new FormData(e.target);
+        // const numCuenta = formData.get("numCuenta");
+        // const userDoc = formData.get("docCliente");
+        // const valorFormat = formData.get("valor");
+        // const nomDepositante = formData.get("nomDepositante");
 
         const body = {
           idComercio: roleInfo?.id_comercio,
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
           Tipo: roleInfo?.tipo_comercio,
-          numTipoTransaccion: 5706, /// Deposito
-          numTipoDocumento: tipoDocumento, /// Cedula
+          codDane: roleInfo?.codigo_dane,
+          ciudad: roleInfo?.ciudad,
+          direccion: roleInfo?.direccion,
+          ///////////////////////////////
+          idBancoAdquiriente: DataBanco?.idBanco,
           numNumeroDocumento: userDoc,
           numValorTransaccion: valor,
-          numTipoCuenta: tipoCuenta,
-          //nomDepositante: nomDepositante,
-          //valToken: "valToken", /// De donde viene
-          numNumeroDeCuenta: numCuenta,
         };
         fetchConsultaCostoGrupoAval(body)
           .then((res) => {
@@ -193,7 +193,7 @@ const Deposito = () => {
                 // "Nombre titular": res?.obj?.Data?.valNombreTitular,
                 // "Apellido titular": res?.obj?.Data?.valApellidoTitular,
                 "Número cuenta": numCuenta,
-                "Valor depósito": valorFormat,
+                "Valor depósito": valor,
                 "Valor cobro": formatMoney.format(
                   res?.obj?.Data?.numValorCobro
                 ),
@@ -218,7 +218,7 @@ const Deposito = () => {
         );
       }
     },
-    [valor, limitesMontos, tipoCuenta]
+    [valor, limitesMontos, DataBanco]
   );
 
   const onMoneyChange = useCallback(
@@ -506,7 +506,7 @@ const Deposito = () => {
                 </Button>
                 <Button
                   type='submit'
-                  onClick={onMakePayment}
+                  onClick={consultarCosto}
                   disabled={loadingDepositoCorresponsalGrupoAval}>
                   Consultar costo
                 </Button>
