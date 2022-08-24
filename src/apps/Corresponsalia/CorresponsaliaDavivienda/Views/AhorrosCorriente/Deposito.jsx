@@ -28,8 +28,8 @@ const Deposito = () => {
   const navigate = useNavigate();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
+    max: 10000000,
+    min: 1,
   });
 
   const onChangeMoney = useMoney({
@@ -48,7 +48,7 @@ const Deposito = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("01");
   const [isUploading, setIsUploading] = useState(false);
   const [numCuenta, setNumCuenta] = useState("")
   const [userDoc, setUserDoc] = useState("")
@@ -63,7 +63,6 @@ const Deposito = () => {
   ];
 
   const optionsDocumento = [
-    { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
     { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
