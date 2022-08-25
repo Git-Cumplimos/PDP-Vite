@@ -16,6 +16,11 @@ import { useNavigate } from "react-router-dom";
 import MoneyInput from "../../../components/Base/MoneyInput";
 
 const ModificarPps = () => {
+
+  const [limitesMontos] = useState({
+    max: 149000,
+    min: 5000,
+  });
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoDomiciliacion, setTipoDomiciliacion] = useState(1);
   const [sinDatosConsulta, setSinDatosConsulta] = useState(false);
@@ -310,6 +315,8 @@ const ModificarPps = () => {
                 label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}
                 value={valueAmount}
+                min={limitesMontos?.min}
+                max={limitesMontos?.max}
                 minLength="6"
                 maxLength="9"
                 onInput={(e) => {

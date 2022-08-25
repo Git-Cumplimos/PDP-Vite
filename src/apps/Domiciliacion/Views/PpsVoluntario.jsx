@@ -300,6 +300,8 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 value={valorAportar}
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
+                minLength="6"
+                maxLength="9"
                 onInput={(e) => {
                   const num = e.target.value.replace(".", "") || "";
                   setValorAportar(num.replace("$", ""));
