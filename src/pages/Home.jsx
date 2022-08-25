@@ -18,10 +18,13 @@ const Home = () => {
   // ]);
 
   const imgsCarousel = useMemo(() => {
-    const { COLPENSIONES, BANNER2 } = imgs;
+    const { SOATBANNERPAG, SOIBANNERPAGINA,FUNDACIONBANNERPAG,COLPENSIONES,SERVICIOS} = imgs;
     return [
+      { name: "Soat", url: SOATBANNERPAG },
+      { name: "Soi", url: SOIBANNERPAGINA },
+      { name: "Fundacion", url: FUNDACIONBANNERPAG },
       { name: "Colpensiones", url: COLPENSIONES },
-      { name: "Punto de pago", url: BANNER2 },
+      { name: "Servicios", url: SERVICIOS },
     ];
   }, [imgs]);
   return (

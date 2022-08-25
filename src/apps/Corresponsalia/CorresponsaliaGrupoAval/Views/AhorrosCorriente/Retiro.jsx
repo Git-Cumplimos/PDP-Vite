@@ -2,15 +2,15 @@ import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Button from "../../../../../components/Base/Button";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState, useMemo } from "react";
 import Modal from "../../../../../components/Base/Modal";
 import useQuery from "../../../../../hooks/useQuery";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import {
-  retiroCorresponsal,
-  consultaCostoCB,
-} from "../../utils/fetchCorresponsaliaDavivienda";
+  retiroCorresponsalGrupoAval,
+  consultaCostoGrupoAval,
+} from "../../utils/fetchCorresponsaliaGrupoAval";
 import { notify, notifyError } from "../../../../../utils/notify";
 import Tickets from "../../components/TicketsDavivienda";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
@@ -30,19 +30,21 @@ const Retiro = () => {
 
   const { roleInfo, infoTicket } = useAuth();
 
+  console.log(roleInfo)
+
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
+    max: 3000000,
+    min: 10000,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
   });
 
-  const [loadingRetiroCorresponsal, fetchRetiroCorresponsal] =
-    useFetch(retiroCorresponsal);
-  const [loadingConsultaCostoCB, fetchConsultaCostoCB] =
-    useFetch(consultaCostoCB);
+  const [loadingRetiroCorresponsalGrupoAval, fetchRetiroCorresponsalGrupoAval] =
+    useFetch(retiroCorresponsalGrupoAval);
+  const [loadingConsultaCostoGrupoAval, fetchConsultaCostoGrupoAval] =
+    useFetch(consultaCostoGrupoAval);
   const [, fetchTypes] = useFetch();
 
   const [showModal, setShowModal] = useState(false);
@@ -52,11 +54,32 @@ const Retiro = () => {
   const [tipoDocumento, setTipoDocumento] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [userDoc, setUserDoc] = useState("")
+  const [phone, setPhone] = useState("")
   const [valor, setValor] = useState("")
   const [otp, setOtp] = useState("")
   const [summary, setSummary] = useState([])
+  const [banco, setBanco] = useState("")
 
- 
+  const optionsBanco = [
+    { value: "", label: "" },
+    { value: "0052", label: "Banco AvVillas" },
+    { value: "0001", label: "Banco Bogotá" },
+    { value: "0023", label: "Banco Occidental" },
+    { value: "0002", label: "Banco Popular" },
+    { value: "0054", label: "ATH" },
+  ];
+
+  const DataBanco = useMemo(() => {
+    const resp = optionsBanco?.filter((id) => id.value === banco);
+    const DataBanco = {nombre: resp[0]?.label, idBanco: resp[0]?.value}
+    return DataBanco;
+  }, [optionsBanco, banco]);
+
+  const optionsTipoCuenta = [
+    { value: "", label: "" },
+    { value: "02", label: "Corriente" },
+    { value: "01", label: "Ahorros" },
+  ];
 
   const optionsDocumento = [
     { value: "", label: "" },
@@ -107,10 +130,12 @@ const Retiro = () => {
     setValor("")
     setUserDoc("")
     setOtp("")
+    setPhone("")
+    setBanco("")
     setSummary([])
   }, []);
 
-  const onSubmitRetiro = useCallback(
+  const consultaCosto = useCallback(
     (e) => {
       e.preventDefault();
       setIsUploading(true);
@@ -118,24 +143,26 @@ const Retiro = () => {
       const { min, max } = limitesMontos;
 
       if (valor >= min && valor < max) {
-        const formData = new FormData(e.target);
-        const userDoc = formData.get("docCliente");
-        const valorFormat = formData.get("valor");
-        const otp = formData.get("OTP");
+        // const formData = new FormData(e.target);
+        // const userDoc = formData.get("docCliente");
+        // const valorFormat = formData.get("valor");
+        // const otp = formData.get("OTP");
 
         const body = {
           idComercio: roleInfo?.id_comercio,
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
           Tipo: roleInfo?.tipo_comercio,
-          numTipoTransaccion: 2130, /// retiro
-          numTipoDocumento: tipoDocumento, /// Cedula
+          codDane: roleInfo?.codigo_dane,
+          ciudad: roleInfo?.ciudad,
+          direccion: roleInfo?.direccion,
+          ///////////////////////////////
+          idBancoAdquiriente: DataBanco?.idBanco,
           numNumeroDocumento: userDoc,
           numValorTransaccion: valor,
-          //nomDepositante: nomDepositante,
-          // valToken: "valToken", /// De donde viene
+
         };
-        fetchConsultaCostoCB(body)
+        fetchConsultaCostoGrupoAval(body)
           .then((res) => {
             setIsUploading(false);
             if (!res?.status) {
@@ -153,7 +180,7 @@ const Retiro = () => {
                 // "Numero celular": numCuenta,
                 "C.C. del depositante": userDoc,
                 "Codigo OTP": otp,
-                "Valor de retiro": valorFormat,
+                "Valor de retiro": valor,
                 "Valor cobro": formatMoney.format(
                   res?.obj?.Data?.numValorCobro
                 ),
@@ -178,7 +205,7 @@ const Retiro = () => {
         );
       }
     },
-    [valor, limitesMontos]
+    [valor, limitesMontos, DataBanco]
   );
 
 
@@ -192,6 +219,18 @@ const Retiro = () => {
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
+
+  const onSubmitModal = useCallback((e) => {
+    e.preventDefault();
+    const summary = {
+      "Banco": DataBanco?.nombre,
+      "Documento" : userDoc,
+      "Numero celular": phone,
+      "Valor cobro": formatMoney.format(valor),
+    };
+    setSummary(summary)
+    setShowModal(true)
+  }, [banco, userDoc, phone, valor, DataBanco]);
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
@@ -209,7 +248,7 @@ const Retiro = () => {
       cod_dane: roleInfo?.codigo_dane,
     };
 
-    fetchRetiroCorresponsal(body)
+    fetchRetiroCorresponsalGrupoAval(body)
       .then((res) => {
         setIsUploading(false);
         if (!res?.status) {
@@ -290,7 +329,7 @@ const Retiro = () => {
   }, [
     valor,
     userDoc,
-    fetchRetiroCorresponsal,
+    fetchRetiroCorresponsalGrupoAval,
     roleInfo,
     infoTicket,
     ,
@@ -303,8 +342,28 @@ const Retiro = () => {
       <SimpleLoading show={isUploading} />
       <Fragment>
         <h1 className='text-3xl mt-6'>Retiros</h1>
-        <Form onSubmit={onSubmitRetiro} grid>
+        <Form onSubmit={onSubmitModal} grid>
           <Select
+            id='banco'
+            label='Banco a Retirar'
+            options={optionsBanco}
+            value={banco}
+            onChange={(e) => {
+              setBanco(e.target.value);
+            }}
+            required
+          />
+          <Select
+            id='tipCuenta'
+            label='Tipo de cuenta'
+            options={optionsTipoCuenta}
+            value={tipoCuenta}
+            onChange={(e) => {
+              setTipoCuenta(e.target.value);
+            }}
+            required
+          />
+          {/* <Select
             id='tipoDocumento'
             label='Tipo de documento'
             options={optionsDocumento}
@@ -313,21 +372,41 @@ const Retiro = () => {
               setTipoDocumento(e.target.value);
             }}
             required
-          />
+          /> */}
           <Input
             id='docCliente'
             name='docCliente'
             label='Documento cliente'
             type='text'
             autoComplete='off'
-            minLength={"7"}
-            maxLength={"16"}
+            minLength={"5"}
+            maxLength={"12"}
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
               if (! isNaN(num)){
               setUserDoc(num)  
               }            
+            }}
+            required
+          />
+          <Input
+            id='numCliente'
+            name='numCliente'
+            label='Número celular'
+            type='text'
+            autoComplete='off'
+            minLength={"10"}
+            maxLength={"10"}
+            value={phone}
+            onInput={(e) => {
+              if ((String(e.target.value).length > 0 & String(e.target.value).slice(0,1) !== "3")) {
+                notifyError("El número de celular debe iniciar por 3");
+                setPhone("");
+              } else {
+                const num = parseInt(e.target.value) || "";
+                setPhone(num);
+              }
             }}
             required
           />
@@ -353,8 +432,8 @@ const Retiro = () => {
           label="Valor a depositar"
           autoComplete="off"
           type="text"
-          minLength={"1"}
-          maxLength={"15"}
+          minLength={"5"}
+          maxLength={"10"}
           min={limitesMontos?.min}
           max={limitesMontos?.max}
           value={makeMoneyFormatter(0).format(valor)}
@@ -362,8 +441,8 @@ const Retiro = () => {
           required
            />
           <ButtonBar className={"lg:col-span-2"}>
-            <Button type={"submit"} disabled={loadingConsultaCostoCB}>
-              Realizar retiro
+            <Button type={"submit"} disabled={loadingConsultaCostoGrupoAval}>
+              Continuar
             </Button>
           </ButtonBar>
         </Form>
@@ -372,7 +451,7 @@ const Retiro = () => {
           handleClose={
             paymentStatus
               ? () => {}
-              : loadingRetiroCorresponsal
+              : loadingRetiroCorresponsalGrupoAval
               ? () => {}
               : handleClose
           }>
@@ -390,12 +469,18 @@ const Retiro = () => {
                 <Button
                   type='submit'
                   onClick={onMakePayment}
-                  disabled={loadingRetiroCorresponsal}>
-                  Aceptar
+                  disabled={loadingRetiroCorresponsalGrupoAval}>
+                  Realizar retiro
+                </Button>
+                <Button
+                  type='submit'
+                  onClick={consultaCosto}
+                  disabled={loadingRetiroCorresponsalGrupoAval}>
+                  Consultar costo
                 </Button>
                 <Button
                   onClick={handleClose}
-                  disabled={loadingRetiroCorresponsal}>
+                  disabled={loadingRetiroCorresponsalGrupoAval}>
                   Cancelar
                 </Button>
               </ButtonBar>

@@ -1,7 +1,7 @@
 import classes from "./TicketsDavivienda.module.css";
 import LogoPDP from "../../../../../components/Base/LogoPDP/LogoPDP";
 import { useCallback, useEffect, useState } from "react";
-import { consultarMensajePublicitarioDavivienda } from "../../utils/fetchCorresponsaliaDavivienda";
+import { consultarMensajePublicitarioDavivienda } from "../../utils/fetchCorresponsaliaGrupoAval";
 // import LogoPDP from "../../../LogoPDP/LogoPDP";
 
 const TicketsDavivienda = ({
