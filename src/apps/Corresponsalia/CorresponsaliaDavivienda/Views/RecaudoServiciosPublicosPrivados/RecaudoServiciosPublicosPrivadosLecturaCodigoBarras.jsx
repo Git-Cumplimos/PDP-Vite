@@ -304,7 +304,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         ticket: objTicket,
         fecCodigDeBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[.]/g, ""),
+        valCodigoDeBarras: datosTrans.codBarras.slice(3).replace("\u001d", ""),
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -365,7 +365,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
         fecFechaCodigoBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        numValorCodigoBarras: datosTrans.codBarras.slice(3).replace(/[.]/g, ""),
+        numValorCodigoBarras: datosTrans.codBarras
+          .slice(3)
+          .replace("\u001d", ""),
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -380,7 +382,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           if (res?.status) {
             setIsUploading(false);
             notify(res?.msg);
-            console.log("consulta", res);
             let valorTrxCons =
               res?.obj?.respuesta_davivienda?.numValorTotalFactura ?? 0;
             setDatosTransaccion((old) => {
