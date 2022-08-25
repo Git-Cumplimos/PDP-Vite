@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
-import Select from "../../../components/Base/Select";
-import Input from "../../../components/Base/Input";
-import Modal from "../../../components/Base/Modal";
+import { useState, useEffect, useCallback, Fragment } from "react";
+import Select from "../../../../components/Base/Select";
+import Input from "../../../../components/Base/Input";
+import Modal from "../../../../components/Base/Modal";
 import ValidarComprobante from "./ValidarComprobante";
-import { searchReceipt } from "../utils/fetchCaja";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
+import { searchReceipt } from "../../utils/fetchCaja";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
 const headers = [
   "Id",
@@ -67,17 +67,15 @@ const PanelConsignaciones = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [consultaEstado, fecha]);
+  }, [consultaEstado, fecha, pageData]);
 
   useEffect(() => {
     buscarConsignaciones();
   }, [buscarConsignaciones]);
 
   return (
-    <>
-      <div className="w-full flex flex-col justify-center items-center my-8">
-        <h1 className="text-xl">Validación de comprobante</h1>
-      </div>
+    <Fragment>
+      <h1 className="text-3xl mt-6">Validación de comprobante</h1>
       <TableEnterprise
         title="Comprobantes relacionados"
         headers={headers}
@@ -143,7 +141,7 @@ const PanelConsignaciones = () => {
       <Modal show={showModal} handleClose={CloseModal}>
         <ValidarComprobante data={dataRes} setShowModal={setShowModal} />
       </Modal>
-    </>
+    </Fragment>
   );
 };
 

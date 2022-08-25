@@ -14,6 +14,11 @@ import { useNavigate } from "react-router-dom";
 import MoneyInput from "../../../components/Base/MoneyInput";
 
 const PpsVoluntario = ({ datosConsulta }) => {
+
+  const [limitesMontos] = useState({
+    max: 149000,
+    min: 5000,
+  });
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [numDocumento, setNumDocumento] = useState(null);
 
@@ -154,7 +159,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
       /*   notify("Valor Correcto"); */
     } else {
       notifyError(
-        "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+        "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
       );
     }
   };
@@ -293,6 +298,8 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}
                 value={valorAportar}
+                min={limitesMontos?.min}
+                max={limitesMontos?.max}
                 minLength="6"
                 maxLength="9"
                 onInput={(e) => {

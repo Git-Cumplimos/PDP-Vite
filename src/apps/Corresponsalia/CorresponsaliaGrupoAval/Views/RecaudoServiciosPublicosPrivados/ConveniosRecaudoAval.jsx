@@ -45,6 +45,7 @@ const ConveniosRecaudoAval = () => {
   }, [convenios]);
   const hideModal = () => {
     setShowModal(false);
+    setFile({});
   };
   const onSelectAutorizador = useCallback(
     (e, i) => {
@@ -98,11 +99,12 @@ const ConveniosRecaudoAval = () => {
   //------------------Funcion Para Subir El Formulario---------------------//
   const saveFile = useCallback(
     (e) => {
+      e.preventDefault();
       setIsUploading(true);
       const f = new Date();
       const query = {
         contentType: "application/text",
-        filename: `${file.name}`,
+        filename: `archivo_convenios_aval/${file.name}`,
       };
       fetchData(url_cargueS3, "POST", {}, query)
         .then((respuesta) => {
@@ -126,32 +128,20 @@ const ConveniosRecaudoAval = () => {
                 body: formData2,
               }).then((res) => {
                 if (res?.ok) {
-                  console.log("subio");
-                  // setTimeout(() => {
-                  //   EstadoArchivos().then((res) => {
-                  //     if (typeof res != Object) {
-                  //       if ("Motivo" in res?.[0]) {
-                  //         closeModal();
-                  //         if (res[0]["Estado"] === 1) {
-                  //           notify(res[0]["Motivo"]);
-                  //         } else {
-                  //           notifyError(res[0]["Motivo"]);
-                  //         }
-                  //       } else {
-                  //         notifyError("Consulte con soporte");
-                  //       }
-                  //     }
-                  //   });
-                  // }, 3000);
+                  notify("Se ha subido exitosamente el archivo");
                 } else {
                   notifyError("No fue posible conectar con el Bucket");
                 }
+                setIsUploading(false);
+                hideModal();
               });
             }
           }
         })
         .catch((err) => {
           notifyError("Error al cargar Datos");
+          setIsUploading(false);
+          hideModal();
         }); /* notify("Se ha comenzado la carga"); */
     },
     [file]
@@ -228,7 +218,7 @@ const ConveniosRecaudoAval = () => {
               saveFile();
             }}
           /> */}
-        <Form formDir='col'>
+        <Form formDir='col' onSubmit={saveFile}>
           <h1 className='text-2xl text-center mb-10 mt-5'>
             Archivo de convenios AVAL
           </h1>
