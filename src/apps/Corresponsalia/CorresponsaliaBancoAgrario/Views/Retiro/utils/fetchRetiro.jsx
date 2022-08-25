@@ -10,7 +10,7 @@ export const fetchRetiroEfectivo = async (data_) => {
     var Peticion = await fetchData(url_retiro_efectivo, "POST", {}, data_);
 
     try {
-      // console.log(Peticion);
+      console.log(Peticion);
       if (
         // Para los errores
         !Peticion?.status &&
@@ -23,11 +23,12 @@ export const fetchRetiroEfectivo = async (data_) => {
         error_msg_key.map((nombre_error) => {
           const error_msg_ind = error_msg[nombre_error];
           if (error_msg_ind?.see && error_msg_ind?.see == true) {
-            error_msg_vector.push(`${error_msg_ind?.global} [${nombre_error}]`);
+            error_msg_vector.push(`${error_msg_ind?.global} (${nombre_error})`);
           }
         });
+        console.log("gg");
         if (error_msg_vector.length > 0) {
-          notifyError(`Falla en el sistema: ${error_msg_vector.join(", ")}`);
+          notifyError(`Retiro NO EXITOSO >> ${error_msg_vector.join(", ")} `);
         }
         throw new ValidationRetiroEfectivo(`${Peticion?.msg}`);
       }

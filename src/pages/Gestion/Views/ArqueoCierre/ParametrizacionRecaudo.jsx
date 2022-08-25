@@ -1,14 +1,14 @@
-import React, { useState, useCallback, useEffect } from "react";
-import Button from "../../../components/Base/Button";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Modal from "../../../components/Base/Modal";
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import Select from "../../../components/Base/Select";
-import Fieldset from "../../../components/Base/Fieldset";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
-import { crearCompañia, buscarCompañias } from "../utils/fetchCaja";
-import { notify, notifyError } from "../../../utils/notify";
+import React, { useState, useCallback, useEffect, Fragment } from "react";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Modal from "../../../../components/Base/Modal";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import Select from "../../../../components/Base/Select";
+import Fieldset from "../../../../components/Base/Fieldset";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import { crearCompañia, buscarCompañias } from "../../utils/fetchCaja";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const ParametrizacionRecaudo = () => {
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
@@ -69,7 +69,7 @@ const ParametrizacionRecaudo = () => {
   };
   console.log(maxpages);
   return (
-    <>
+    <Fragment>
       <ButtonBar>
         <Button type="submit" onClick={() => setShowModal(true)}>
           Crear cuenta
@@ -121,36 +121,32 @@ const ParametrizacionRecaudo = () => {
                 required
               ></Input>
             </Fieldset>
-          ) : type === "1" ? (
-            <h1>Sin acceso</h1>
           ) : (
-            <></>
+            type === "1" && <h1>Sin acceso</h1>
           )}
           {type === "2" && (
-            <>
-              <ButtonBar>
+            <ButtonBar>
+              <Button type="button" onClick={closeModal}>
+                Cancelar
+              </Button>
+              {type === "1" && (
                 <Button type="button" onClick={closeModal}>
-                  Cancelar
+                  Agregar cuenta
                 </Button>
-                {type === "1" && (
-                  <Button type="button" onClick={closeModal}>
-                    Agregar cuenta
-                  </Button>
-                )}
-                <Button
-                  type="submit"
-                  onClick={(e) => {
-                    crearCuenta(e);
-                  }}
-                >
-                  Crear
-                </Button>
-              </ButtonBar>
-            </>
+              )}
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  crearCuenta(e);
+                }}
+              >
+                Crear
+              </Button>
+            </ButtonBar>
           )}
         </Form>
       </Modal>
-    </>
+    </Fragment>
   );
 };
 
