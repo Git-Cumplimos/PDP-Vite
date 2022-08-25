@@ -105,7 +105,7 @@ const Deposito = () => {
     setNomDepositante("");
     setSummary([]);
     setValor("");
-    setTipoDocumento("");
+    setTipoDocumento("01");
     setUserDoc("");
   }, []);
 
@@ -143,7 +143,7 @@ const Deposito = () => {
                 setNomDepositante("");
                 setSummary([]);
                 setValor("");
-                setTipoDocumento("");
+                setTipoDocumento("01");
                 setUserDoc("");
                 notifyError(res?.msg);
                 return;
@@ -364,6 +364,7 @@ const Deposito = () => {
             required
           />
           <Select
+            className="place-self-stretch"
             id='tipoDocumento'
             label='Tipo de documento'
             options={options}
@@ -380,7 +381,7 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"5"}
-            maxLength={"16"}
+            maxLength={"10"}
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
