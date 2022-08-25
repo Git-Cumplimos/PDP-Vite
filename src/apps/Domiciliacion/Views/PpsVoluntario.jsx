@@ -159,7 +159,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
       /*   notify("Valor Correcto"); */
     } else {
       notifyError(
-        "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+        "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
       );
     }
   };

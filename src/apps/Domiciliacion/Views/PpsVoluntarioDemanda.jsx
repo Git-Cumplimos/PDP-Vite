@@ -214,7 +214,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
                 ) {
                   notifyError(
-                    "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                    "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
                   );
                   /* navigate(`/domiciliacion`); */
                   setDisabledBtn(false);
@@ -246,7 +246,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               });
           } else {
             notifyError(
-              "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+              "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
             );
             setDisabledBtn(false);
           }
@@ -314,7 +314,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                     "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
                   ) {
                     notifyError(
-                      "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                      "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
                     );
                     /* navigate(`/domiciliacion`); */
                     setDisabledBtn(false);
@@ -335,7 +335,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 });
             } else {
               notifyError(
-                "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
               );
               setDisabledBtn(false);
             }
