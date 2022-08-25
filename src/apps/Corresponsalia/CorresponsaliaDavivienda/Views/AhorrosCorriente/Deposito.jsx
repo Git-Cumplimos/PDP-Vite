@@ -108,7 +108,7 @@ const Deposito = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
     setTipoCuenta("")
-    setTipoDocumento("")
+    setTipoDocumento("01")
     setNomDepositante("")
     setNumCuenta("")
     setValor("")
@@ -151,7 +151,7 @@ const Deposito = () => {
             if (!res?.status) {
               notifyError(res?.msg);
               setTipoCuenta("")
-              setTipoDocumento("")
+              setTipoDocumento("01")
               setNomDepositante("")
               setNumCuenta("")
               setValor("")
@@ -360,7 +360,7 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"5"}
-            maxLength={"16"}
+            maxLength={"10"}
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");

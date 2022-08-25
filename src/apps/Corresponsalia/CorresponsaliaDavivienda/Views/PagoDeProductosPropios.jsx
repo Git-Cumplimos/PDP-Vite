@@ -30,20 +30,20 @@ const PagoDeProductosPropios = () => {
   });
   const [peticion, setPeticion] = useState(0);
   const [datosTrans, setDatosTrans] = useState({
-    tipoIdentificacion: "",
+    tipoIdentificacion: "01",
     numeroIdentificacion: "",
     tipoProducto: "",
     nombreProducto: "",
     numeroProducto: "",
     codigoFamilia: "",
-    nombreTipoIdentificacion: "",
+    nombreTipoIdentificacion: "Cédula de ciudadanía",
     binTarjetaCredito: "",
     ultimosTarjetaCredito: "",
     idTrx: "",
   });
   const [tipoAbono, setTipoAbono] = useState({
-    tipoAbonoId: "",
-    tipoAbonoNombre: "",
+    tipoAbonoId: "0001",
+    tipoAbonoNombre: "Valor mínimo",
     valorAbono: "",
   });
   const [isUploading, setIsUploading] = useState(false);
@@ -122,18 +122,22 @@ const PagoDeProductosPropios = () => {
   const hideModal = () => {
     setShowModal(false);
     setDatosTrans({
-      tipoIdentificacion: "",
+      tipoIdentificacion: "01",
       numeroIdentificacion: "",
       tipoProducto: "",
       nombreProducto: "",
       numeroProducto: "",
       codigoFamilia: "",
-      nombreTipoIdentificacion: "",
+      nombreTipoIdentificacion: "Cédula de ciudadanía",
       binTarjetaCredito: "",
       ultimosTarjetaCredito: "",
       idTrx: "",
     });
-    setTipoAbono({ tipoAbonoId: "", tipoAbonoNombre: "", valorAbono: "" });
+    setTipoAbono({
+      tipoAbonoId: "0001",
+      tipoAbonoNombre: "Valor mínimo",
+      valorAbono: "",
+    });
     setObjTicketActual((old) => {
       return {
         ...old,
@@ -221,7 +225,7 @@ const PagoDeProductosPropios = () => {
       return notifyError("El valor del abono debe ser menor al valor total");
     if (tipoAbono.valorAbono > limiteRecarga.superior) {
       return notifyError(
-        `El valor del abono debe ser menor a ${formatMoney(
+        `El valor del abono debe ser menor a ${formatMoney.format(
           limiteRecarga.superior
         )}`
       );
@@ -329,14 +333,13 @@ const PagoDeProductosPropios = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl mb-10 mt-5'>Pago de productos de crédito</h1>
+      <h1 className='text-3xl mb-10 mt-5'>Pago de productos propios</h1>
       <Form grid onSubmit={onSubmit}>
         <Select
           id='tipoIdentificacion'
           name='tipoIdentificacion'
           label='Tipo de identificación'
           options={{
-            "": "",
             "Cédula de ciudadanía": "01",
             "Cédula de extranjería": "02",
             NIT: "03",
@@ -510,16 +513,19 @@ const PagoDeProductosPropios = () => {
                   name='tipoAbono'
                   label='Indique el tipo de abono'
                   options={{
-                    "": "",
                     "Valor mínimo": "0001",
                     "Valor total": "0002",
-                    ...(datosConsulta.valIndAbonoExtraordinario === "S" && {
-                      "Disminución de cuota": "0003",
-                      "Adelanto de cuota": "0004",
-                      "Abono a capital": "0005",
-                      "Indicador extraordinario": "0006",
-                      Otro: "0006",
-                    }),
+                    ...(datosConsulta.valIndAbonoExtraordinario === "S"
+                      ? {
+                          "Disminución de cuota": "0003",
+                          "Adelanto de cuota": "0004",
+                          "Abono a capital": "0005",
+                          // "Indicador extraordinario": "0006",
+                          // Otro: "0006",
+                        }
+                      : {
+                          "Pago valor diferente": "0006",
+                        }),
                   }}
                   value={tipoAbono?.tipoAbonoId}
                   onChange={(e) =>
