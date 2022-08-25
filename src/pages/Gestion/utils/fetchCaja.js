@@ -82,6 +82,18 @@ const buildPutFunction = (url) => {
 
 export const searchCash = buildGetFunction(`${urlCaja}/cash`);
 export const searchCierre = buildGetFunction(`${urlCaja}/consultacierre`);
+export const crearEntidad = buildPostFunction(`${urlCuentas}/administrar`);
+export const buscarEntidades = buildGetFunction(`${urlCuentas}/administrar`);
+export const editarEntidades = buildPutFunction(`${urlCuentas}/administrar`);
+
+export const buscarTiposComprobantes = buildGetFunction(`${urlComprobantes}/tipos`);
+export const subirComprobante = buildGetFunction(`${urlComprobantes}/upload-file`);
+export const descargarComprobante = buildGetFunction(`${urlComprobantes}/download-file`);
+export const agregarComprobante = buildPostFunction(`${urlComprobantes}/administrar`);
+export const buscarComprobantes = buildGetFunction(`${urlComprobantes}/administrar`);
+export const editarComprobante = buildPutFunction(`${urlComprobantes}/administrar`);
+
+
 
 /* export const searchCash = async (queryParam) => {
   if (!queryParam) {
@@ -195,7 +207,7 @@ export const registerReceipt = async (bodyObj) => {
   }
 };
 
-export const crearCompañia = async (bodyObj) => {
+/* export const crearCompañia = async (bodyObj) => {
   if (!bodyObj) {
     return new Promise((resolve, reject) => {
       resolve("Sin datos body");
@@ -208,8 +220,8 @@ export const crearCompañia = async (bodyObj) => {
     throw err;
   }
 };
-
-export const buscarCompañias = async (queryParam) => {
+ */
+/* export const buscarCompañias = async (queryParam) => {
   if (!queryParam) {
     return new Promise((resolve, reject) => {
       resolve("Sin datos query");
@@ -221,7 +233,7 @@ export const buscarCompañias = async (queryParam) => {
   } catch (err) {
     throw err;
   }
-};
+}; */
 
 export const searchReceipt = async (queryParam) => {
   try {

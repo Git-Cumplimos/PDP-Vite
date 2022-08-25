@@ -58,7 +58,7 @@ const AdminLayout = () => {
   const [clientWidth] = useWindowSize();
 
   const closeCash = async () => {
-    navigate(`/gestion/arqueo/panel_transacciones`);
+    navigate(`/gestion/arqueo/panel-transacciones`);
     setInfoCaja(false);
   };
 

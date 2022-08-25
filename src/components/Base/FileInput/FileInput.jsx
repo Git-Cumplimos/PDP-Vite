@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { notifyError } from "../../../utils/notify";
 import classes from "./FileInput.module.css";
 
@@ -32,6 +32,7 @@ const FileInput = ({ label, onGetFile, allowDrop = true, ...input }) => {
 
   const inputRef = useRef(null);
   const dropZoneRef = useRef(null);
+  const realZoneRef = useRef(null);
 
   const handleDrop = useCallback(
     async (e) => {
@@ -82,15 +83,16 @@ const FileInput = ({ label, onGetFile, allowDrop = true, ...input }) => {
   );
 
   useEffect(() => {
+    const zoneLocalRef = realZoneRef.current;
     if (allowDrop) {
-      window.addEventListener("dragenter", (e) => {
+      zoneLocalRef.addEventListener("dragenter", (e) => {
         showDropZone(dropZoneRef, disabled);
       });
     }
 
     return () => {
       if (allowDrop) {
-        window.removeEventListener("dragenter", (e) => {
+        zoneLocalRef.removeEventListener("dragenter", (e) => {
           showDropZone(dropZoneRef, disabled);
         });
       }
@@ -98,7 +100,7 @@ const FileInput = ({ label, onGetFile, allowDrop = true, ...input }) => {
   }, [input, onGetFile, allowDrop, disabled]);
 
   return (
-    <div className={`${formItem} ${File}`}>
+    <div className={`${formItem} ${File}`} ref={realZoneRef}>
       {label && label !== "" && (
         <label htmlFor={_id} className={`${"text-center"}`}>
           {label}
@@ -112,9 +114,9 @@ const FileInput = ({ label, onGetFile, allowDrop = true, ...input }) => {
         </label>
       )}
       {allowDrop ? (
-        <Fragment>
-          <h1>O</h1>
-          <h1>Arrasta los archivos</h1>
+        <div>
+          <h1 className="text-xl">O</h1>
+          <h1 className="text-xl">Arrasta los archivos</h1>
           {!disabled ? (
             <div
               ref={dropZoneRef}
@@ -127,7 +129,7 @@ const FileInput = ({ label, onGetFile, allowDrop = true, ...input }) => {
           ) : (
             ""
           )}
-        </Fragment>
+        </div>
       ) : ""}
     </div>
   );
