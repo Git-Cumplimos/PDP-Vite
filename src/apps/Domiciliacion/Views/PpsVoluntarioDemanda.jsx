@@ -24,7 +24,12 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const { contenedorImagen, contenedorForm} = classes;
+
 const PpsVoluntarioDemanda = ({ ced }) => {
+  const [limitesMontos] = useState({
+    max: 149000,
+    min: 5000,
+  });
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [numDocumento, setNumDocumento] = useState(ced);
   const [numCelular, setNumCelular] = useState(null);
@@ -209,7 +214,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
                 ) {
                   notifyError(
-                    "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                    "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
                   );
                   /* navigate(`/domiciliacion`); */
                   setDisabledBtn(false);
@@ -241,7 +246,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               });
           } else {
             notifyError(
-              "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+              "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
             );
             setDisabledBtn(false);
           }
@@ -309,7 +314,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                     "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
                   ) {
                     notifyError(
-                      "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                      "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
                     );
                     /* navigate(`/domiciliacion`); */
                     setDisabledBtn(false);
@@ -330,7 +335,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 });
             } else {
               notifyError(
-                "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
               );
               setDisabledBtn(false);
             }
@@ -448,8 +453,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               label={"Valor Aportar"}
               placeholder={"Ingrese Valor Aportar"}
               value={valorAportar}
-              minLength="6"
-              maxLength="9"
+              min={limitesMontos?.min}
+              max={limitesMontos?.max}
               onInput={(e) => {
                 const num = e.target.value.replace(".", "") || "";
                 setValorAportar(num.replace("$", ""));
