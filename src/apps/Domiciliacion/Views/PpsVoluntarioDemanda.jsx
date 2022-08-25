@@ -136,7 +136,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   useEffect(() => {
     infoTicket(datosRespuesta?.[0]?.["inserted_id"], 57, tickets)
       .then((resTicket) => {
-        console.log(resTicket);
+        // console.log(resTicket);
       })
       .catch((err) => {
         console.error(err);
@@ -150,11 +150,11 @@ const PpsVoluntarioDemanda = ({ ced }) => {
     /*  setShowModal(false); */
     if (cupoLogin >= valorAportar) {
       if (tipoComercio === "OFICINAS PROPIAS") {
-        console.log("entre");
+        // console.log("entre");
         setEsPropio(true);
 
         if (String(numCelular).charAt(0) === "3") {
-          console.log("es 3");
+          // console.log("es 3");
 
           if (valorAportar >= 5000 && valorAportar <= 149000) {
             fetchData(
@@ -251,7 +251,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             setDisabledBtn(false);
           }
         } else {
-          console.log("no es 3");
+          // console.log("no es 3");
           notifyError(
             "Numero invalido, el N° de celular debe comenzar con el número 3."
           );
@@ -337,6 +337,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               notifyError(
                 "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
               );
+              console.log("valor fuera de rango");
               setDisabledBtn(false);
             }
           } else {
@@ -455,6 +456,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               value={valorAportar}
               min={limitesMontos?.min}
               max={limitesMontos?.max}
+              minLength="6"
+              maxLength="9"
               onInput={(e) => {
                 const num = e.target.value.replace(".", "") || "";
                 setValorAportar(num.replace("$", ""));
