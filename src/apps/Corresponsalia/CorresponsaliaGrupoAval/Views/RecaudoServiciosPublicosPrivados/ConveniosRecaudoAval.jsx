@@ -45,6 +45,7 @@ const ConveniosRecaudoAval = () => {
   }, [convenios]);
   const hideModal = () => {
     setShowModal(false);
+    setFile({});
   };
   const onSelectAutorizador = useCallback(
     (e, i) => {
@@ -103,7 +104,7 @@ const ConveniosRecaudoAval = () => {
       const f = new Date();
       const query = {
         contentType: "application/text",
-        filename: `${file.name}`,
+        filename: `archivo_convenios_aval/${file.name}`,
       };
       fetchData(url_cargueS3, "POST", {}, query)
         .then((respuesta) => {
@@ -127,32 +128,20 @@ const ConveniosRecaudoAval = () => {
                 body: formData2,
               }).then((res) => {
                 if (res?.ok) {
-                  console.log("subio");
-                  // setTimeout(() => {
-                  //   EstadoArchivos().then((res) => {
-                  //     if (typeof res != Object) {
-                  //       if ("Motivo" in res?.[0]) {
-                  //         closeModal();
-                  //         if (res[0]["Estado"] === 1) {
-                  //           notify(res[0]["Motivo"]);
-                  //         } else {
-                  //           notifyError(res[0]["Motivo"]);
-                  //         }
-                  //       } else {
-                  //         notifyError("Consulte con soporte");
-                  //       }
-                  //     }
-                  //   });
-                  // }, 3000);
+                  notify("Se ha subido exitosamente el archivo");
                 } else {
                   notifyError("No fue posible conectar con el Bucket");
                 }
+                setIsUploading(false);
+                hideModal();
               });
             }
           }
         })
         .catch((err) => {
           notifyError("Error al cargar Datos");
+          setIsUploading(false);
+          hideModal();
         }); /* notify("Se ha comenzado la carga"); */
     },
     [file]

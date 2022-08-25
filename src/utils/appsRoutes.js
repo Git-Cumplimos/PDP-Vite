@@ -897,10 +897,7 @@ const allUrlsPrivateApps = [
           {
             link: "/corresponsalia/corresponsaliaDavivienda/pagoDeProductosPropios",
             label: (
-              <AppIcons
-                Logo={"MARKETPLACE"}
-                name='Pago de productos de crédito'
-              />
+              <AppIcons Logo={"MARKETPLACE"} name='Pago de productos propios' />
             ),
             component: PagoDeProductosPropios,
             permission: [54],
