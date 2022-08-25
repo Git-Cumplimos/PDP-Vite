@@ -21,7 +21,7 @@ import {
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
-const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
+const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
@@ -704,4 +704,4 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   );
 };
 
-export default RecaudoServiciosPublicosPrivadosLecturaCodigoBarras;
+export default RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval;

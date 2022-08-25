@@ -1,6 +1,6 @@
 import fetchData from "../../../../utils/fetchData";
 
-const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
+const urlGrupoAval = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}`;
 const urlParametrizacion = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}`;
 export const consultaGiroDaviplata = async (bodyObj) => {
   if (!bodyObj) {
@@ -10,7 +10,7 @@ export const consultaGiroDaviplata = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_cb_cashIn/consultaGiroDaviplata`,
+      `${urlGrupoAval}davivienda_cb_cashIn/consultaGiroDaviplata`,
       "POST",
       {},
       bodyObj,
@@ -35,7 +35,7 @@ export const pagoGiroDaviplata = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}/davivienda_cb_cashIn/pagoGiroDaviplata`,
+      `${urlGrupoAval}/davivienda_cb_cashIn/pagoGiroDaviplata`,
       "POST",
       {},
       bodyObj,
@@ -60,7 +60,7 @@ export const postCashOut = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}/cash-out`,
+      `${urlGrupoAval}/cash-out`,
       "POST",
       {},
       bodyObj,
@@ -82,7 +82,7 @@ export const postRealizarCashoutDavivienda = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}davivienda_cb_cashout/cashout`,
+      `${urlGrupoAval}davivienda_cb_cashout/cashout`,
       "POST",
       {},
       bodyObj,
@@ -106,7 +106,7 @@ export const consultaCostoGrupoAval = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}/davivienda_cb_deposito_retiro/consultaCostoCB`,
+      `${urlGrupoAval}/grupo_aval_cb_deposito_retiro/consultaCostoCB`,
       "POST",
       {},
       bodyObj,
@@ -131,7 +131,7 @@ export const depositoCorresponsalGrupoAval = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}/davivienda_cb_deposito_retiro/depositoCorresponsal`,
+      `${urlGrupoAval}/davivienda_cb_deposito_retiro/depositoCorresponsal`,
       "POST",
       {},
       bodyObj,
@@ -156,7 +156,7 @@ export const retiroCorresponsalGrupoAval = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}/davivienda_cb_deposito_retiro/retiroCorresponsal`,
+      `${urlGrupoAval}/davivienda_cb_deposito_retiro/retiroCorresponsal`,
       "POST",
       {},
       bodyObj,

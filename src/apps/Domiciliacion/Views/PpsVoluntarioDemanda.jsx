@@ -23,8 +23,13 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
-const { contenedorImagen } = classes;
+const { contenedorImagen, contenedorForm} = classes;
+
 const PpsVoluntarioDemanda = ({ ced }) => {
+  const [limitesMontos] = useState({
+    max: 149000,
+    min: 5000,
+  });
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [numDocumento, setNumDocumento] = useState(ced);
   const [numCelular, setNumCelular] = useState(null);
@@ -131,7 +136,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   useEffect(() => {
     infoTicket(datosRespuesta?.[0]?.["inserted_id"], 57, tickets)
       .then((resTicket) => {
-        console.log(resTicket);
+        // console.log(resTicket);
       })
       .catch((err) => {
         console.error(err);
@@ -145,11 +150,11 @@ const PpsVoluntarioDemanda = ({ ced }) => {
     /*  setShowModal(false); */
     if (cupoLogin >= valorAportar) {
       if (tipoComercio === "OFICINAS PROPIAS") {
-        console.log("entre");
+        // console.log("entre");
         setEsPropio(true);
 
         if (String(numCelular).charAt(0) === "3") {
-          console.log("es 3");
+          // console.log("es 3");
 
           if (valorAportar >= 5000 && valorAportar <= 149000) {
             fetchData(
@@ -209,7 +214,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
                 ) {
                   notifyError(
-                    "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                    "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
                   );
                   /* navigate(`/domiciliacion`); */
                   setDisabledBtn(false);
@@ -241,12 +246,12 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               });
           } else {
             notifyError(
-              "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+              "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
             );
             setDisabledBtn(false);
           }
         } else {
-          console.log("no es 3");
+          // console.log("no es 3");
           notifyError(
             "Numero invalido, el N° de celular debe comenzar con el número 3."
           );
@@ -309,7 +314,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                     "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
                   ) {
                     notifyError(
-                      "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                      "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
                     );
                     /* navigate(`/domiciliacion`); */
                     setDisabledBtn(false);
@@ -330,8 +335,9 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 });
             } else {
               notifyError(
-                "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
               );
+              console.log("valor fuera de rango");
               setDisabledBtn(false);
             }
           } else {
@@ -376,6 +382,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
             legend="Formulario Aporte Voluntario"
             /* className="lg:col-span-3" */
           >
+            <div className={contenedorForm}>
+
             <Select
               onChange={(event) => setTipoIdentificacion(event?.target?.value)}
               id="comissionType"
@@ -446,6 +454,8 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               label={"Valor Aportar"}
               placeholder={"Ingrese Valor Aportar"}
               value={valorAportar}
+              min={limitesMontos?.min}
+              max={limitesMontos?.max}
               minLength="6"
               maxLength="9"
               onInput={(e) => {
@@ -455,6 +465,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               type={"text"}
               required
             ></MoneyInput>
+          </div>
           </Fieldset>
           <ButtonBar className={"lg:col-span-2"} type="">
             {

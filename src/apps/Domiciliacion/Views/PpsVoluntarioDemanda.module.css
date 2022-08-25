@@ -3,3 +3,11 @@
   justify-content: left;
   margin-bottom: 2rem;
 }
+.contenedorForm{
+  
+
+  flex-direction: column;
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
