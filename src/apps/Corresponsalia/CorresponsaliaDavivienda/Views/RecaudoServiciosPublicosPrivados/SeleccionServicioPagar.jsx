@@ -32,7 +32,7 @@ const SeleccionServicioPagar = () => {
         }) => {
           return {
             "Id convenio": cod_convenio_cnb,
-            Convenio: nom_convenio_cnb,
+            Convenio: nom_convenio_cnb.replace(/[ ]/g, "") ?? "",
             "Id IAC": cod_iac_cnb,
           };
         }
@@ -92,6 +92,8 @@ const SeleccionServicioPagar = () => {
           label={"Buscar convenio"}
           type='text'
           autoComplete='off'
+          minLength='1'
+          maxLength='30'
           onInput={(e) => {
             setDatosTrans((old) => {
               return { ...old, convenio: e.target.value };
