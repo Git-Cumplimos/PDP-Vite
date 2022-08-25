@@ -4,7 +4,7 @@ import Cierre from "./Cierre";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { searchCash, searchCierre, searchReceipt } from "../../utils/fetchCaja";
+import { searchCash, searchCierre, buscarComprobantes } from "../../utils/fetchCaja";
 
 const Panel = () => {
   const [total, setTotal] = useState("");
@@ -37,7 +37,7 @@ const Panel = () => {
         if (res?.status) {
           setTotalCierres(res?.obj);
           query.status = "APROBADO";
-          searchReceipt(query)
+          buscarComprobantes(query)
             .then((res) => {
               console.log(res);
               setRespuestaComprobante(res?.obj?.results);

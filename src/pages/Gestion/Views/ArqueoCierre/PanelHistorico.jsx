@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, Fragment } from "react";
 import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
-import ValidarComprobante from "./ValidarComprobante";
 import { searchHistorico } from "../../utils/fetchCaja";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 

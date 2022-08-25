@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback, Fragment } from "react";
 import Select from "../../../../components/Base/Select";
 import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
-import ValidarComprobante from "./ValidarComprobante";
 import {
   buscarComprobantes,
   descargarComprobante,
+  editarComprobante,
 } from "../../utils/fetchCaja";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
@@ -16,6 +16,10 @@ import {
 } from "../../../../utils/functions";
 import Form from "../../../../components/Base/Form";
 import Magnifier from "react-magnifier";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import TextArea from "../../../../components/Base/TextArea";
+import { notifyPending } from "../../../../utils/notify";
 
 const formatMoney = makeMoneyFormatter(0);
 
@@ -34,27 +38,31 @@ const estadoRevision = new Map([
   [false, "RECHAZADO"],
 ]);
 
-const PanelConsignaciones = () => {
-  const [dataRes, setDataRes] = useState({});
+const estadoRevisionSelect = new Map([
+  [null, "1"],
+  [true, "2"],
+  [false, "3"],
+]);
 
+const PanelConsignaciones = () => {
   const [maxPages, setMaxPages] = useState(1);
-  const [showModal, setShowModal] = useState(false);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [searchInfo, setSearchInfo] = useState({
     created: "",
-    fk_estado_revision: "",
+    fk_estado_revision: "1",
   });
   const [comprobantes, setComprobantes] = useState([]);
   const [selected, setSelected] = useState(null);
   const [selectedFileUrl, setSelectedFileUrl] = useState("");
   const [stateRev, setStateRev] = useState(null);
+  const [observacionesAnalisis, setObservacionesAnalisis] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const CloseModal = useCallback(() => {
-    setShowModal(false);
     setSelected(null);
   }, []);
 
-  useEffect(() => {
+  const searchComprobantes = useCallback(() => {
     buscarComprobantes({
       ...Object.fromEntries(
         Object.entries(searchInfo)
@@ -84,6 +92,58 @@ const PanelConsignaciones = () => {
         return "Peticion fallida";
       });
   }, [searchInfo, pageData]);
+
+  const handleSubmit = useCallback(
+    (ev) => {
+      ev.preventDefault();
+
+      notifyPending(
+        editarComprobante(
+          { pk_id_comprobante: "" },
+          {
+            pk_id_comprobante: selected?.pk_id_comprobante,
+            observaciones_analisis: observacionesAnalisis,
+            fk_estado_revision: stateRev,
+          }
+        ),
+        {
+          render: () => {
+            setLoading(true);
+            return "Procesando peticion";
+          },
+        },
+        {
+          render: () => {
+            setLoading(false);
+            searchComprobantes();
+            CloseModal();
+            return "Comprobante actualizado exitosamente";
+          },
+        },
+        {
+          render: ({ data: err }) => {
+            setLoading(false);
+            if (err?.cause === "custom") {
+              return err?.message;
+            }
+            console.error(err?.message);
+            return "Peticion fallida";
+          },
+        }
+      );
+    },
+    [
+      CloseModal,
+      searchComprobantes,
+      observacionesAnalisis,
+      selected?.pk_id_comprobante,
+      stateRev,
+    ]
+  );
+
+  useEffect(() => {
+    searchComprobantes();
+  }, [searchComprobantes]);
 
   return (
     <Fragment>
@@ -124,8 +184,7 @@ const PanelConsignaciones = () => {
         )}
         onSelectRow={(_e, index) => {
           setSelected(comprobantes[index]);
-          setShowModal(true);
-          descargarComprobante(comprobantes[index].archivo)
+          descargarComprobante({ filename: comprobantes[index].archivo })
             .then((res) => setSelectedFileUrl(res?.obj ?? ""))
             .catch((err) => {
               if (err?.cause === "custom") {
@@ -154,14 +213,14 @@ const PanelConsignaciones = () => {
             { value: "2", label: "APROBADO" },
             { value: "3", label: "RECHAZADO" },
           ]}
+          defaultValue={"1"}
         />
       </TableEnterprise>
-      <Modal show={selected} handleClose={CloseModal}>
-        {/* <ValidarComprobante data={dataRes} setShowModal={setShowModal} /> */}
+      <Modal show={selected} handleClose={loading ? () => {} : CloseModal}>
         <h1 className="text-2xl mb-6 text-center font-semibold">
           Validar comprobante
         </h1>
-        <Form grid>
+        <Form onSubmit={handleSubmit} grid>
           <Input
             id="fk_nombre_entidad"
             label="Empresa"
@@ -208,15 +267,16 @@ const PanelConsignaciones = () => {
             label="Estado"
             name="fk_estado_revision"
             options={[
-              { value: "", label: "" },
               { value: "1", label: "PENDIENTE" },
               { value: "2", label: "APROBADO" },
               { value: "3", label: "RECHAZADO" },
             ]}
             value={
-              selected?.fk_estado_revision !== null
-                ? selected?.fk_estado_revision
-                : stateRev
+              estadoRevisionSelect.get(
+                selected?.fk_estado_revision !== null
+                  ? selected?.fk_estado_revision
+                  : stateRev
+              ) ?? ""
             }
             onChange={(ev) =>
               setStateRev(
@@ -229,11 +289,53 @@ const PanelConsignaciones = () => {
             }
             disabled={selected?.fk_estado_revision !== null}
           />
+          <TextArea
+            id="observaciones"
+            name="observaciones"
+            label="Observaciones"
+            className="w-full place-self-stretch"
+            autoComplete="off"
+            maxLength={"60"}
+            value={
+              selected?.fk_estado_revision !== null
+                ? selected?.observaciones_analisis
+                : observacionesAnalisis
+            }
+            onInput={(e) => {
+              setObservacionesAnalisis(e.target.value.trimLeft());
+              e.target.value = e.target.value.trimLeft();
+            }}
+            info={
+              selected?.fk_estado_revision === null && `Maximo 60 caracteres`
+            }
+            disabled={selected?.fk_estado_revision !== null}
+            required={selected?.fk_estado_revision === null}
+          />
           {selectedFileUrl && (
             <div className="my-4 mx-auto md:mx-4 gap-4">
               <Magnifier src={selectedFileUrl} zoomFactor={2} />
             </div>
           )}
+          <ButtonBar>
+            {selected?.fk_estado_revision === null && (
+              <Button type="submit" disabled={stateRev === null || loading}>
+                Aceptar
+              </Button>
+            )}
+            {selectedFileUrl && (
+              <a
+                href={selectedFileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                download="imagen_comprobante.png"
+              >
+                <Button type="button">Descargar imagen</Button>
+              </a>
+            )}
+            <Button type="button" onClick={CloseModal} disabled={loading}>
+              Salir
+            </Button>
+          </ButtonBar>
         </Form>
       </Modal>
     </Fragment>
