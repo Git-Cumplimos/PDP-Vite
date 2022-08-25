@@ -135,7 +135,7 @@ const Deposito = () => {
   });
 
   const handleClose = useCallback(() => {
-    setShowModal(false);
+    setShowModal(false)
     setTipoCuenta("")
     setTipoDocumento("")
     setNomDepositante("")
@@ -145,7 +145,6 @@ const Deposito = () => {
     setPhone("")
     setBanco("")
     setSummary([])
-
   }, []);
 
   const consultarCosto = useCallback(
@@ -180,13 +179,8 @@ const Deposito = () => {
             setIsUploading(false);
             if (!res?.status) {
               notifyError(res?.msg);
-              setTipoCuenta("")
-              setTipoDocumento("")
-              setNomDepositante("")
-              setNumCuenta("")
-              setValor("")
-              setUserDoc("")
-              return;
+              handleClose()
+              // return;
             } else {
               setDatosConsulta(res?.obj?.Data);
               const summary = {
@@ -201,8 +195,6 @@ const Deposito = () => {
               setSummary(summary)
               setShowModal(true);
             }
-
-            //notify("Transaccion satisfactoria");
           })
           .catch((err) => {
             setIsUploading(false);

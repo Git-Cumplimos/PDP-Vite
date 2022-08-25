@@ -115,7 +115,7 @@ const Retiro = () => {
       setIsUploading(true);
       if (otp.length < 6) {
         setIsUploading(false)
-        notifyError("El número OTP debe ser de 6 digitos")
+        notifyError("El número OTP debe ser de 6 dígitos")
       }
       else{
       if (valor % 10000 === 0){
