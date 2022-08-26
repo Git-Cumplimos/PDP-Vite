@@ -124,7 +124,7 @@ const CancelPin = ({
   const onSubmitCancel = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite) //// Valor = valor + IVA
+    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion) //// Valor = valor + IVA
       .then((res) => {
         setActivarNavigate(false);
         setDisabledBtn(false);
