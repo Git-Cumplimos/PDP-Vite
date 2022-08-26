@@ -8,6 +8,7 @@ import Form from "../../../../components/Base/Form";
 import { notify, notifyError } from "../../../../utils/notify";
 import { usePinesVus } from "../../utils/pinesVusHooks";
 import TextArea from "../../../../components/Base/TextArea";
+import Select from "../../../../components/Base/Select";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -33,6 +34,14 @@ const CancelPin = ({
   const { roleInfo, infoTicket } = useAuth();
 
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
+
+  const [tipCancelacion, setTipCancelacion] = useState("")
+
+  const optionsTipCancelacion = [
+    { value: "", label: "" },
+    { value: 1, label: "Cancelar pin completo" },
+    { value: 2, label: "Cancelar solo comisión premium" },
+  ];
 
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
@@ -85,14 +94,24 @@ const CancelPin = ({
         Dirección: roleInfo?.direccion,
         "Id Trx": respPinCancel?.id_trx,
       }),
-      trxInfo: [
+      trxInfo: tipCancelacion === "1" ? 
+      [
         ["Proceso", "Cancelación de Pin"],
         ["Valor Trámite", formatMoney.format(valor_tramite)],
         ["IVA Trámite",formatMoney.format(0)],
         ["Valor Pin", formatMoney.format(valor)],
         ["IVA Pin", formatMoney.format(valor*0.19)],
         ["Total", formatMoney.format(valor*1.19 + valor_tramite)], // Valor + IVA
-      ],
+      ] 
+      : 
+      [
+        ["Proceso", "Cancelación de Pin"],
+        ["Valor Pin", formatMoney.format(valor)],
+        ["IVA Pin", formatMoney.format(valor*0.19)],
+        ["Total", formatMoney.format(valor*1.19)], // Valor + IVA
+      ] 
+      
+      ,
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
@@ -119,6 +138,7 @@ const CancelPin = ({
       })
       .catch((err) => console.log("error", err));
   };
+  console.log(tipCancelacion)
 
   return (
     <>
@@ -129,6 +149,7 @@ const CancelPin = ({
             <br></br>
             <h1 className="flex flex-row justify-center text-lg font-medium">{name_tramite}</h1>
             <br></br>
+            { tipCancelacion === "1" ?
             <>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
@@ -161,21 +182,45 @@ const CancelPin = ({
                 <h1>{formatMoney.format(valor*1.19 + valor_tramite)}</h1>
               </div>
             </>
-            {/* {Object.entries(respPin).map(([key, val]) => {
-              return (
-                <>
-                  <div
-                    className="flex flex-row justify-between text-lg font-medium"
-                    key={key}
-                  >
-                    <h1>{key}</h1>
-                    <h1>{val}</h1>
-                  </div>
-                </>
-              );
-            })} */}
+            :
+            <>
+            {tipCancelacion === "2"? 
+            <>
+            <div
+              className="flex flex-row justify-between text-lg font-medium"
+            >
+              <h1>Valor Pin</h1>
+              <h1>{formatMoney.format(valor)}</h1>
+            </div>
+            <div
+              className="flex flex-row justify-between text-lg font-medium"
+            >
+              <h1>IVA Pin</h1>
+              <h1>{formatMoney.format(valor*0.19)}</h1>
+            </div>
+            <div
+              className="flex flex-row justify-between text-lg font-medium"
+            >
+              <h1>Total</h1>
+              <h1>{formatMoney.format(valor*1.19)}</h1>
+            </div>
+            </>
+            :""}
+            </>
+            }
             <div className="flex flex-col justify-center items-center mx-auto container">
               <Form onSubmit={onSubmitCancel}>
+                <Select
+                  className="place-self-stretch"
+                  id="tramite"
+                  label="Tipo de cancelación"
+                  options={optionsTipCancelacion}
+                  value={tipCancelacion}
+                  required={true}
+                  onChange={(e) => {
+                    setTipCancelacion(e.target.value);
+                  }}
+                />
                 <TextArea
                   id="motivo"
                   label="Motivo"

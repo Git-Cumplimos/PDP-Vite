@@ -235,7 +235,8 @@ const Deposito = () => {
         if (!res?.status) {
           setIsUploading(false);
           notifyError(res?.msg);
-          return;
+          handleClose()
+          // return;
         } else {
           notify("Transaccion satisfactoria");
           const trx_id = res?.obj?.Data?.valTalon ?? 0;
