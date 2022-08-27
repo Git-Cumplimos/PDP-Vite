@@ -231,15 +231,16 @@ const Deposito = () => {
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       Tipo: roleInfo?.tipo_comercio,
-      numTipoCuenta: tipoCuenta,
-      numNumeroCuenta: numCuenta,
-      numIdDepositante: userDoc,
-      //valToken: "valToken",
-      numValorConsignacion: valor,
+      codDane: roleInfo?.codigo_dane,
+      ciudad: roleInfo?.ciudad,
       direccion: roleInfo?.direccion,
-      cod_dane: roleInfo?.codigo_dane,
-      nomdepositante: nomDepositante,
-      tip_id_depositante: tipoDocumento,
+      ///////////////////////////////
+      idBancoAdquiriente: DataBanco?.idBanco,
+      numNumeroDocumento: userDoc,
+      numValorTransaccion: valor,
+      numTipoCuenta: tipoCuenta,
+      numCelular: phone,
+      numCuenta: numCuenta,
     };
 
     fetchDepositoCorresponsalGrupoAval(body)
@@ -247,8 +248,10 @@ const Deposito = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
+          handleClose()
           return;
         }
+        else{
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
@@ -312,7 +315,7 @@ const Deposito = () => {
           .catch((err) => {
             console.error(err);
             notifyError("Error guardando el ticket");
-          });
+          });}
       })
       .catch((err) => {
         setIsUploading(false);
