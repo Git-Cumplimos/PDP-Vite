@@ -10,6 +10,7 @@ import MoneyInputDec, {
   formatMoney,
 } from "../../../../../components/Base/MoneyInputDec";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import TextArea from "../../../../../components/Base/TextArea";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
@@ -418,13 +419,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
       </h1>
       {!datosEnvio.estadoConsulta ? (
         <>
-          <h1 className='text-3xl text-center mb-5'>
-            Ingrese el código de barras
-          </h1>
-          <Form grid onSubmit={onSubmit}>
-            <Input
+          
+          <Form  onSubmit={onSubmit}>
+            <TextArea
               id='codBarras'
-              label='Código de barras'
+              label='Escanee el código de barras'
               type='text'
               name='codBarras'
               required
@@ -433,6 +432,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
               autoComplete='off'
               onInput={onChangeFormat}
               onKeyDown={(ev) => {
+                if (ev.keyCode === 13 && ev.shiftKey === false) {
+                  // ev.preventDefault();
+                  onSubmit(ev);
+                  return;
+                }
                 if (ev.altKey) {
                   if (ev.keyCode !== 18) {
                     isAlt.current += ev.key;
@@ -443,16 +447,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                 if (ev.altKey === false && isAlt.current !== "") {
                   let value = String.fromCharCode(parseInt(isAlt.current));
                   isAlt.current = "";
-                  if (value === "") {
+                  if (value === "\u001d") {
                     setDatosTrans((old) => {
-                      return { ...old, codBarras: old.codBarras + "." };
+                      return { ...old, codBarras: old.codBarras + "\u001d" };
                     });
                   }
                 }
-              }}></Input>
-            <ButtonBar className='lg:col-span-2'>
-              <Button type='submit'>Realizar consulta</Button>
-            </ButtonBar>
+              }}></TextArea>
           </Form>
         </>
       ) : (
