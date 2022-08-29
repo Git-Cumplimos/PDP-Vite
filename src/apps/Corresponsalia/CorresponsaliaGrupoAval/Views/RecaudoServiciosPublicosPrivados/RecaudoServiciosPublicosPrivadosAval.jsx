@@ -87,7 +87,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
 
   const fecthTablaConveniosEspecificoFunc = () => {
     postConsultaTablaConveniosEspecifico({
-      pk_tbl_transaccional_convenios_davivienda_cb: state?.id,
+      pk_convenios_recaudo_aval: state?.id,
     })
       .then((autoArr) => {
         setConvenio(autoArr?.results[0]);
@@ -351,8 +351,8 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       <h1 className='text-3xl text-center mb-5'>
         Recaudo servicios publicos y privados
       </h1>
-      <h1 className='text-3xl text-center mb-5'>{`Convenio: ${
-        convenio?.nom_convenio_cnb ?? ""
+      <h1 className='text-2xl text-center mb-5'>{`Convenio: ${
+        convenio?.convenio ?? ""
       }`}</h1>
 
       <Form grid onSubmit={onSubmit}>

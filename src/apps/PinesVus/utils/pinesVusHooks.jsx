@@ -43,7 +43,7 @@ export const useProvidePinesVus = () => {
   const { roleInfo } = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
 
-  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite) => {
+  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion) => {
     const body = {
       valor_tramite : valor_tramite,
       Usuario: user?.id_usuario,
@@ -53,6 +53,7 @@ export const useProvidePinesVus = () => {
       NombreComercio: roleInfo?.["nombre comercio"],
       valor: parseFloat(valor),
       motivo: motivo,
+      tipCancelacion: tipCancelacion,
       id_trx: trx,
     };
     const query = {

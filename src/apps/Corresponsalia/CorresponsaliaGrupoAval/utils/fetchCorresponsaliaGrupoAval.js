@@ -131,7 +131,7 @@ export const depositoCorresponsalGrupoAval = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlGrupoAval}/davivienda_cb_deposito_retiro/depositoCorresponsal`,
+      `${urlGrupoAval}/grupo_aval_cb_deposito_retiro/depositoCorresponsal`,
       "POST",
       {},
       bodyObj,

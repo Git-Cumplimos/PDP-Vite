@@ -147,6 +147,8 @@ const ConveniosRecaudoAval = () => {
           id='searchConvenio'
           name='searchConvenio'
           label={"Buscar convenio"}
+          minLength='1'
+          maxLength='30'
           type='text'
           autoComplete='off'
           onInput={(e) => {
