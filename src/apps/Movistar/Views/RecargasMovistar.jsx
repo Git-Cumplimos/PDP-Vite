@@ -119,6 +119,8 @@ const RecargasMovistar = () => {
           ticketRecarga(result);
         } else {
           setShowModal(false);
+          setInputCelular("");
+          setInputValor("");
           switch (response_obj?.identificador) {
             case "00":
               notifyError(

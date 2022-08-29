@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import Fieldset from "../../../../components/Base/Fieldset";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Button from "../../../../components/Base/Button";
-import { notify } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 import { confirmaCierre } from "../../utils/fetchCaja";
 import { useAuth } from "../../../../hooks/AuthHooks";
 
@@ -23,16 +23,13 @@ const Cierre = ({
     maximumFractionDigits: 0,
   });
   const [trans] = useState(0);
-  /*const urls = {
-    cierreCaja: `${process.env.REACT_APP_URL_CAJA}cash`,
-  };*/
 
   const confirmCierre = useCallback(async () => {
     const body = {
       id_arqueo_caja: arqueo?.id_arqueo,
-      id_usuario: String(roleInfo?.id_usuario),
-      id_comercio: String(roleInfo?.id_comercio),
-      id_terminal: String(roleInfo?.id_dispositivo),
+      id_usuario: roleInfo?.id_usuario,
+      id_comercio: roleInfo?.id_comercio,
+      id_terminal: roleInfo?.id_dispositivo,
       total_caja: caja?.obj?.actual_caja,
       sobrante: sobra,
       faltante: falta + trans,
@@ -47,8 +44,13 @@ const Cierre = ({
           signOut();
         }
       })
-      .catch((err) => {
-        throw err;
+      .catch((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+          return;
+        }
+        console.error(error?.message);
+        notifyError("Busqueda fallida");
       });
   }, [
     arqueo?.id_arqueo,
