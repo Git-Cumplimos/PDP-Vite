@@ -10,6 +10,7 @@ import MoneyInputDec, {
   formatMoney,
 } from "../../../../../components/Base/MoneyInputDec";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import TextArea from "../../../../../components/Base/TextArea";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
@@ -303,7 +304,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         ticket: objTicket,
         fecCodigDeBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[.]/g, ""),
+        valCodigoDeBarras: datosTrans.codBarras.slice(3).replace("\u001d", ""),
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -364,7 +365,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
         fecFechaCodigoBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        numValorCodigoBarras: datosTrans.codBarras.slice(3).replace(/[.]/g, ""),
+        numValorCodigoBarras: datosTrans.codBarras
+          .slice(3)
+          .replace("\u001d", ""),
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -379,7 +382,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           if (res?.status) {
             setIsUploading(false);
             notify(res?.msg);
-            console.log("consulta", res);
             let valorTrxCons =
               res?.obj?.respuesta_davivienda?.numValorTotalFactura ?? 0;
             setDatosTransaccion((old) => {
@@ -418,13 +420,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       </h1>
       {!datosEnvio.estadoConsulta ? (
         <>
-          <h1 className='text-3xl text-center mb-5'>
+          {/* <h1 className='text-3xl text-center mb-5'>
             Escanee el código de barras
-          </h1>
-          <Form grid onSubmit={onSubmit}>
-            <Input
+          </h1> */}
+          <Form onSubmit={onSubmit}>
+            <TextArea
               id='codBarras'
-              label='Código de barras'
+              label='Escanee el código de barras'
               type='text'
               name='codBarras'
               required
@@ -433,6 +435,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               autoComplete='off'
               onInput={onChangeFormat}
               onKeyDown={(ev) => {
+                if (ev.keyCode === 13 && ev.shiftKey === false) {
+                  // ev.preventDefault();
+                  onSubmit(ev);
+                  return;
+                }
                 if (ev.altKey) {
                   if (ev.keyCode !== 18) {
                     isAlt.current += ev.key;
@@ -443,16 +450,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                 if (ev.altKey === false && isAlt.current !== "") {
                   let value = String.fromCharCode(parseInt(isAlt.current));
                   isAlt.current = "";
-                  if (value === "") {
+                  if (value === "\u001d") {
                     setDatosTrans((old) => {
-                      return { ...old, codBarras: old.codBarras + "." };
+                      return { ...old, codBarras: old.codBarras + "\u001d" };
                     });
                   }
                 }
-              }}></Input>
-            <ButtonBar className='lg:col-span-2'>
+              }}></TextArea>
+            {/* <ButtonBar>
               <Button type='submit'>Realizar consulta</Button>
-            </ButtonBar>
+            </ButtonBar> */}
           </Form>
         </>
       ) : (

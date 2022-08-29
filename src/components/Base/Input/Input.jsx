@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import classes from "./Input.module.css";
 
+import classes2 from "../Form/Form.module.css";
+const { formItem, invalid: invalidCls } = classes;
+const { div_input_form_item } = classes2;
 const Input = ({
   label,
   self = false,
@@ -9,7 +12,6 @@ const Input = ({
   invalid = "",
   ...input
 }) => {
-  const { formItem, invalid: invalidCls } = classes;
   const { id: _id, type } = input;
 
   const [timer, setTimer] = useState(null);
@@ -57,7 +59,7 @@ const Input = ({
       <input {...input} />
     </>
   ) : (
-    <div className={`${formItem}`}>
+    <div className={`${div_input_form_item} ${formItem}`}>
       {label && label !== "" && (
         <label htmlFor={_id}>
           {/* className={`${"text-right"}`}> */}

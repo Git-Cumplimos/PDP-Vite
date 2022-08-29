@@ -82,7 +82,7 @@ const Borrado_billetes = ({ route }) => {
   const borrar = (e) => {
     e.preventDefault();
     borrar_billetes(cod_distribuidor, cod_sucursal, num_sorteo).then((res) => {
-      if (!res?.status) {
+      if (res.status === false) {
         notifyError(res?.msg);
         setCod_distribuidor("");
         setCod_sucursal("");
@@ -98,7 +98,7 @@ const Borrado_billetes = ({ route }) => {
 
   useEffect(() => {
     sorteos(sorteosLOT).then((res) => {
-      if (!res?.status) {
+      if (res.status === false) {
       } else {
         setOptionsDisponibles(res?.num_sorteos);
       }

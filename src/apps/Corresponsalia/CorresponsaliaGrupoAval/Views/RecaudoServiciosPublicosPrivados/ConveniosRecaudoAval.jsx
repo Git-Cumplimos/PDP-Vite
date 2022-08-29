@@ -47,22 +47,7 @@ const ConveniosRecaudoAval = () => {
     setShowModal(false);
     setFile({});
   };
-  const onSelectAutorizador = useCallback(
-    (e, i) => {
-      // navigate(
-      //   "../corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
-      //   {
-      //     state: {
-      //       id: convenios[i]["pk_convenios_recaudo_aval"],
-      //     },
-      //   }
-      // );
-    },
-    [navigate, convenios]
-  );
-  const subirArchivos = useCallback((e) => {
-    console.log(e);
-  }, []);
+  const onSelectAutorizador = useCallback((e, i) => {}, []);
   useEffect(() => {
     fecthTablaConveniosPaginadoFunc();
   }, [datosTrans, page, limit]);
@@ -86,7 +71,7 @@ const ConveniosRecaudoAval = () => {
       files = Array.from(files);
       if (files.length === 1) {
         const m_file = files[0];
-        console.log(m_file);
+        // console.log(m_file);
         setFile(m_file);
         // setFileName(m_file.name);
       } else {
@@ -122,7 +107,7 @@ const ConveniosRecaudoAval = () => {
               }
 
               formData2.set("file", file);
-              console.log(formData2, `${respuesta?.obj?.url}`);
+              // console.log(formData2, `${respuesta?.obj?.url}`);
               fetch(`${respuesta?.obj?.url}`, {
                 method: "POST",
                 body: formData2,
@@ -162,6 +147,8 @@ const ConveniosRecaudoAval = () => {
           id='searchConvenio'
           name='searchConvenio'
           label={"Buscar convenio"}
+          minLength='1'
+          maxLength='30'
           type='text'
           autoComplete='off'
           onInput={(e) => {

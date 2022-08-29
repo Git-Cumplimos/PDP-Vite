@@ -505,9 +505,10 @@ const PagoDeProductosPropios = () => {
                 datosConsulta.valPagoTotal
               )}`}</h2>
               {datosConsulta.valPagoTotal &&
-              parseInt(datosConsulta.valPagoTotal) !== 0 &&
-              datosConsulta.valPagoMinimo &&
-              parseInt(datosConsulta.valPagoMinimo) !== 0 ? (
+              parseInt(datosConsulta.valPagoTotal) !== 0 ? (
+                // &&
+                // datosConsulta.valPagoMinimo &&
+                // parseInt(datosConsulta.valPagoMinimo) !== 0
                 <Select
                   id='tipoAbono'
                   name='tipoAbono'
@@ -567,9 +568,10 @@ const PagoDeProductosPropios = () => {
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>
                 {datosConsulta.valPagoTotal &&
-                parseInt(datosConsulta.valPagoTotal) !== 0 &&
-                datosConsulta.valPagoMinimo &&
-                parseInt(datosConsulta.valPagoMinimo) !== 0 ? (
+                parseInt(datosConsulta.valPagoTotal) !== 0 ? (
+                  // &&
+                  // datosConsulta.valPagoMinimo &&
+                  // parseInt(datosConsulta.valPagoMinimo) !== 0
                   <Button type='submit' onClick={peticionIntermedia}>
                     Aceptar
                   </Button>

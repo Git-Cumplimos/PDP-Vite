@@ -30,8 +30,6 @@ const Retiro = () => {
 
   const { roleInfo, infoTicket } = useAuth();
 
-  console.log(roleInfo)
-
   const [limitesMontos, setLimitesMontos] = useState({
     max: 3000000,
     min: 10000,
@@ -167,12 +165,7 @@ const Retiro = () => {
             setIsUploading(false);
             if (!res?.status) {
               notifyError(res?.msg);
-              setTipoCuenta("")
-              setTipoDocumento("")             
-              setValor("")
-              setUserDoc("")
-              setOtp("")
-              return;
+              handleClose()
             } else {
               setDatosConsulta(res?.obj?.Data);
               const summary = {
@@ -239,13 +232,16 @@ const Retiro = () => {
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       Tipo: roleInfo?.tipo_comercio,
-      numTipoDocumento: tipoDocumento,
-      numNumeroDocumento: userDoc,
-      numValorRetiro: valor,
-      numOtp: otp,
-      valToken: "valToken",
+      codDane: roleInfo?.codigo_dane,
+      ciudad: roleInfo?.ciudad,
       direccion: roleInfo?.direccion,
-      cod_dane: roleInfo?.codigo_dane,
+      ///////////////////////////////
+      idBancoAdquiriente: DataBanco?.idBanco,
+      numNumeroDocumento: userDoc,
+      numValorTransaccion: valor,
+      numTipoCuenta: tipoCuenta,
+      numCelular: phone,
+      otp: otp
     };
 
     fetchRetiroCorresponsalGrupoAval(body)
@@ -253,7 +249,8 @@ const Retiro = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
-          return;
+          handleClose()
+          // return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
