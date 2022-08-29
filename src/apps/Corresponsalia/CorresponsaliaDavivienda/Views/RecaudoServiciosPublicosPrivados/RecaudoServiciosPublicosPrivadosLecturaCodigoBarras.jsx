@@ -74,16 +74,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
 
-  const onChangeFormat = useCallback((ev) => {
-    const valor = ev.target.value;
-    setDatosTrans((old) => {
-      return { ...old, [ev.target.name]: valor };
-    });
-  }, []);
+  const onChangeFormat = useCallback(
+    (ev) => {
+      const valor = ev.target.value;
+      if (valor.length > datosTrans.codBarras.length) {
+        setDatosTrans((old) => {
+          return { ...old, [ev.target.name]: valor };
+        });
+      }
+    },
+    [datosTrans]
+  );
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-  const fecthTablaConveniosEspecificoFunc = useCallback((codigoBar) => {
+  const fetchTablaConveniosEspecificoFunc = useCallback((codigoBar) => {
     postConsultaCodigoBarrasConveniosEspecifico({
       codigoBarras: codigoBar,
     })
@@ -125,6 +130,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           });
         } else {
           notifyError(autoArr?.msg);
+          setDatosTrans((old) => ({ codBarras: "" }));
         }
         setIsUploading(false);
       })
@@ -132,13 +138,14 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
         console.error(err);
+        setDatosTrans((old) => ({ codBarras: "" }));
       });
   }, []);
   const onSubmit = (e) => {
     e.preventDefault();
     if (datosTrans?.codBarras.slice(0, 3) === "]C1") {
       setIsUploading(true);
-      fecthTablaConveniosEspecificoFunc(datosTrans?.codBarras);
+      fetchTablaConveniosEspecificoFunc(datosTrans?.codBarras);
     } else {
       notifyError("El codigo de barras no tiene el formato correcto");
     }
@@ -420,9 +427,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       </h1>
       {!datosEnvio.estadoConsulta ? (
         <>
-          {/* <h1 className='text-3xl text-center mb-5'>
-            Escanee el código de barras
-          </h1> */}
           <Form onSubmit={onSubmit}>
             <TextArea
               id='codBarras'
@@ -457,9 +461,17 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   }
                 }
               }}></TextArea>
-            {/* <ButtonBar>
-              <Button type='submit'>Realizar consulta</Button>
-            </ButtonBar> */}
+            {datosTrans.codBarras !== "" && (
+              <ButtonBar>
+                <Button
+                  type='button'
+                  onClick={() => {
+                    setDatosTrans({ codBarras: "" });
+                  }}>
+                  Volver a ingresar codigo de barras
+                </Button>
+              </ButtonBar>
+            )}
           </Form>
         </>
       ) : (

@@ -27,10 +27,10 @@ const PagoGiro = () => {
   // });
   const [peticion, setPeticion] = useState(0);
   const [datosTrans, setDatosTrans] = useState({
-    tipoIdentificacion: "",
+    tipoIdentificacion: "01",
     numeroIdentificacion: "",
     codigoFamilia: "",
-    nombreTipoIdentificacion: "",
+    nombreTipoIdentificacion: "Cédula de ciudadanía",
   });
   const [isUploading, setIsUploading] = useState(false);
   const [datosConsulta, setDatosConsulta] = useState({});
@@ -105,10 +105,10 @@ const PagoGiro = () => {
     }
     setShowModal(false);
     setDatosTrans({
-      tipoIdentificacion: "",
+      tipoIdentificacion: "01",
       numeroIdentificacion: "",
       codigoFamilia: "",
-      nombreTipoIdentificacion: "",
+      nombreTipoIdentificacion: "Cédula de ciudadanía",
     });
     setDatosConsultaIdTrx({
       idTrx: "",
@@ -364,7 +364,6 @@ const PagoGiro = () => {
           name='tipoIdentificacion'
           label='Tipo de identificación'
           options={{
-            "": "",
             "Cédula de ciudadanía": "01",
             "Tarjeta de identidad": "04",
             "Cédula extranjería": "02",

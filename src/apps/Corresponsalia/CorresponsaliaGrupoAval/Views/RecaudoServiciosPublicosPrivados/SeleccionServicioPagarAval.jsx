@@ -23,17 +23,13 @@ const SeleccionServicioPagarAval = () => {
 
   const tableConvenios = useMemo(() => {
     return [
-      ...convenios.map(
-        ({
-          pk_convenios_recaudo_aval, nura, convenio, ean 
-        }) => {
-          return {
-            "Id convenio": nura,
-          Convenio: convenio,
-          EAN: ean,
-          };
-        }
-      ),
+      ...convenios.map(({ pk_convenios_recaudo_aval, nura, convenio, ean }) => {
+        return {
+          "Id convenio": nura,
+          Convenio: convenio !== "" ? convenio : "N/A",
+          EAN: ean !== "" ? ean : "N/A",
+        };
+      }),
     ];
   }, [convenios]);
 
