@@ -3,6 +3,7 @@ import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import { searchHistorico } from "../../utils/fetchCaja";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import ButtonBar from "../../../../components/Base/ButtonBar";
 
 const headers = [
   "Id",
@@ -36,9 +37,6 @@ const PanelConsignaciones = () => {
   const [pageData, setPageData] = useState({});
   const [fecha, setFecha] = useState("");
   const [maxPages, setMaxPages] = useState(1);
-  const CloseModal = () => {
-    setShowModal(false);
-  };
 
   const buscarConsignaciones = useCallback(() => {
     const queries = { ...pageData };
@@ -80,7 +78,7 @@ const PanelConsignaciones = () => {
             sobrante,
             faltante,
             transportadora,
-            fecha_cierre
+            fecha_cierre,
           }) => {
             const t_total_caja = formatMoney.format(total_caja);
             const t_sobrante = formatMoney.format(sobrante);
@@ -96,7 +94,7 @@ const PanelConsignaciones = () => {
               t_sobrante,
               t_faltante,
               transportadora,
-              fechaHora
+              fechaHora,
             };
           }
         )}
@@ -107,6 +105,7 @@ const PanelConsignaciones = () => {
           type="date"
           onInput={(e) => setFecha(e.target.value)}
         />
+        <ButtonBar />
       </TableEnterprise>
     </Fragment>
   );
