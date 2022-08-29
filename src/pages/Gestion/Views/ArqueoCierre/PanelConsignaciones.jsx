@@ -327,7 +327,6 @@ const PanelConsignaciones = () => {
                 href={selectedFileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                download="imagen_comprobante.png"
               >
                 <Button type="button">Descargar imagen</Button>
               </a>
