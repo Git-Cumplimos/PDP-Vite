@@ -169,12 +169,12 @@ const Retiro = () => {
             } else {
               setDatosConsulta(res?.obj?.Data);
               const summary = {
-                "Nombre cliente": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
+                // "Nombre cliente": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
                 // "Numero celular": numCuenta,
-                "C.C. del depositante": userDoc,
+                // "C.C. del depositante": userDoc,
                 "Codigo OTP": otp,
                 "Valor de retiro": valor,
-                "Valor cobro": formatMoney.format(
+                "Costo retiro": formatMoney.format(
                   res?.obj?.Data?.numValorCobro
                 ),
               };
@@ -252,6 +252,7 @@ const Retiro = () => {
           handleClose()
           // return;
         }
+        else{
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
@@ -316,7 +317,7 @@ const Retiro = () => {
           .catch((err) => {
             console.error(err);
             notifyError("Error guardando el ticket");
-          });
+          });}
       })
       .catch((err) => {
         setIsUploading(false);
@@ -412,8 +413,8 @@ const Retiro = () => {
           label='Número OTP'
           type='text'
           name='otp'
-          minLength='6'
-          maxLength='6'
+          minLength='4'
+          maxLength='4'
           autoComplete='off'
           required
           value={otp}
@@ -438,7 +439,7 @@ const Retiro = () => {
           required
            />
           <ButtonBar className={"lg:col-span-2"}>
-            <Button type={"submit"} disabled={loadingConsultaCostoGrupoAval}>
+            <Button type={"submit"}>
               Continuar
             </Button>
           </ButtonBar>

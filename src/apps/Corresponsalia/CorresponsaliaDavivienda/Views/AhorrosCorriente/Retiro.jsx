@@ -259,7 +259,7 @@ const Retiro = () => {
           : "No hay datos",
           trxInfo: [
             [
-              "Tipo",
+              "Tipo de cuenta",
               res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
             ["",""],
