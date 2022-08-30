@@ -403,6 +403,17 @@ const ConveniosRecaudoAval = lazy(() =>
     "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/ConveniosRecaudoAval"
   )
 );
+const PagoTerceros = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/PagoTerceros/PagoTerceros"
+  )
+);
+const PagoSubsidios = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/PagoSubsidios/PagoSubsidios"
+  )
+);
+
 /**
  * API-SMS
  */
@@ -1023,6 +1034,18 @@ const allUrlsPrivateApps = [
               },
             ],
           },
+          {
+            link: "/corresponsalia/CorresponsaliaGrupoAval/pagoterceros",
+            label: <AppIcons Logo={"MARKETPLACE"} name="Pago de terceros" />,
+            component: PagoTerceros,
+            permission: [70],
+          },
+          {
+            link: "/corresponsalia/CorresponsaliaGrupoAval/pagosubsidios",
+            label: <AppIcons Logo={"MARKETPLACE"} name="Pago de subsidios" />,
+            component: PagoSubsidios,
+            permission: [70],
+          },
         ],
       },
 
@@ -1039,7 +1062,7 @@ const allUrlsPrivateApps = [
             link: "/corresponsalia/corresponsalia-banco-agrario/retiro",
             label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
             component: RetiroBancoAgrario,
-            permission: [73],
+            permission: [7],
             subRoutes: [
               {
                 link: "/corresponsalia/corresponsalia-banco-agrario/retiro/retiro-efectivo",

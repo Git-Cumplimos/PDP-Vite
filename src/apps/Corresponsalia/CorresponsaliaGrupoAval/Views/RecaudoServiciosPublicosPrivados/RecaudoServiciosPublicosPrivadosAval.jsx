@@ -87,10 +87,11 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
 
   const fecthTablaConveniosEspecificoFunc = () => {
     postConsultaTablaConveniosEspecifico({
-      pk_tbl_transaccional_convenios_davivienda_cb: state?.id,
+      pk_convenios_recaudo_aval: state?.id,
     })
       .then((autoArr) => {
         setConvenio(autoArr?.results[0]);
+        console.log(autoArr);
         setIsUploading(false);
       })
       .catch((err) => console.error(err));
@@ -348,59 +349,36 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center mb-5'>
+      <h1 className='text-3xl text-center mb-10 mt-5'>
         Recaudo servicios publicos y privados
       </h1>
-      <h1 className='text-3xl text-center mb-5'>{`Convenio: ${
-        convenio?.nom_convenio_cnb ?? ""
+      <h1 className='text-2xl text-center mb-10'>{`Convenio: ${
+        convenio?.convenio ?? ""
       }`}</h1>
 
-      <Form grid onSubmit={onSubmit}>
-        {convenio?.ctrol_ref1_cnb === "1" && (
-          <>
-            <Input
-              id='ref1'
-              label={convenio?.nom_ref1_cnb}
-              type='text'
-              name='ref1'
-              minLength='1'
-              maxLength='32'
-              required
-              value={datosTrans.ref1}
-              autoComplete='off'
-              onInput={(e) => {
-                let valor = e.target.value;
-                let num = valor.replace(/[\s\.]/g, "");
-                setDatosTrans((old) => {
-                  return { ...old, ref1: num };
-                });
-              }}></Input>
-          </>
-        )}
-        {convenio?.ctrol_ref2_cnb === "1" && (
-          <Input
-            id='ref2'
-            label={convenio?.nom_ref2_cnb}
-            type='text'
-            name='ref2'
-            minLength='1'
-            maxLength='32'
-            autoComplete='off'
-            required
-            value={datosTrans.ref2}
-            onInput={(e) => {
-              let valor = e.target.value;
-              let num = valor.replace(/[\s\.]/g, "");
-              setDatosTrans((old) => {
-                return { ...old, ref2: num };
-              });
-            }}></Input>
-        )}
-        {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb) && (
+      <Form onSubmit={onSubmit}>
+        <Input
+          id='ref1'
+          label='Referencia 1'
+          type='text'
+          name='ref1'
+          minLength='1'
+          maxLength='32'
+          required
+          value={datosTrans.ref1}
+          autoComplete='off'
+          onInput={(e) => {
+            let valor = e.target.value;
+            let num = valor.replace(/[\s\.]/g, "");
+            setDatosTrans((old) => {
+              return { ...old, ref1: num };
+            });
+          }}></Input>
+        {convenio?.parciales === "1" && (
           <MoneyInput
             id='valCashOut'
             name='valCashOut'
-            label='Valor'
+            label='Valor a pagar'
             type='text'
             autoComplete='off'
             maxLength={"15"}
@@ -408,12 +386,8 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
             onInput={onChangeMoneyLocal}
             required></MoneyInput>
         )}
-        <ButtonBar className='lg:col-span-2'>
-          <Button type='submit'>
-            {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
-              ? "Realizar pago"
-              : "Realizar consulta"}
-          </Button>
+        <ButtonBar>
+          <Button type='submit'>Realizar consulta</Button>
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={handleClose}>

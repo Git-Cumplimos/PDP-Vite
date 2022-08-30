@@ -37,8 +37,8 @@ const ConveniosRecaudoAval = () => {
       ...convenios.map(({ pk_convenios_recaudo_aval, nura, convenio, ean }) => {
         return {
           "Id convenio": nura,
-          Convenio: convenio,
-          EAN: ean,
+          Convenio: convenio !== "" ? convenio : "N/A",
+          EAN: ean !== "" ? ean : "N/A",
         };
       }),
     ];
@@ -147,6 +147,8 @@ const ConveniosRecaudoAval = () => {
           id='searchConvenio'
           name='searchConvenio'
           label={"Buscar convenio"}
+          minLength='1'
+          maxLength='30'
           type='text'
           autoComplete='off'
           onInput={(e) => {

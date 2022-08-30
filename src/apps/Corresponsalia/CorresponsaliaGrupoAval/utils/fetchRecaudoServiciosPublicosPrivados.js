@@ -29,7 +29,7 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAval}davivienda_recaudo_servicios_publicos_privados/consulta_tabla_convenios_especifico`,
+      `${urlAval}/grupo_aval_cb_recaudo/consulta_tabla_convenios_especifico`,
       "POST",
       {},
       bodyObj,
@@ -50,7 +50,7 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAval}davivienda_recaudo_servicios_publicos_privados/codigo_barras`,
+      `${urlAval}/grupo_aval_cb_recaudo/codigo_barras`,
       "POST",
       {},
       bodyObj,

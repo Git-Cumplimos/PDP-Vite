@@ -58,13 +58,11 @@ const fetchData = async (
   }
 
   async function fetchWithTimeout(resource, options, timeout) {
-  
-    
     const abortController = new AbortController();
     const id = setTimeout(() => abortController.abort(), timeout);
     const response = await fetch(resource, {
       ...options,
-      signal: abortController.signal  
+      signal: abortController.signal,
     });
     clearTimeout(id);
     return response;
