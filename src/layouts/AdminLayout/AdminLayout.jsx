@@ -16,6 +16,7 @@ import { useWindowSize } from "../../hooks/WindowSizeHooks";
 import { Outlet } from "react-router-dom";
 import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
 import { searchCierre } from "../../pages/Gestion/utils/fetchCaja";
+import { notifyError } from "../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -33,7 +34,7 @@ const AdminLayout = () => {
     saldoCupo,
     comision,
     cargar,
-    itemButtonCentered
+    itemButtonCentered,
   } = classes;
 
   const { quotaInfo, roleInfo, signOut } = useAuth();
@@ -57,7 +58,7 @@ const AdminLayout = () => {
   const [clientWidth] = useWindowSize();
 
   const closeCash = async () => {
-    navigate(`/gestion/arqueo/panel_transacciones`);
+    navigate(`/gestion/arqueo/panel-transacciones`);
     setInfoCaja(false);
   };
 
@@ -79,7 +80,12 @@ const AdminLayout = () => {
 
   useEffect(() => {
     if (roleInfo?.tipo_comercio === "OFICINAS PROPIAS") {
-      if (roleInfo !== undefined) {
+      const conditions = [
+        roleInfo?.id_usuario !== undefined,
+        roleInfo?.id_comercio !== undefined,
+        roleInfo?.id_dispositivo !== undefined,
+      ];
+      if (conditions.reduce((prev, curr) => prev && curr)) {
         const query = {
           id_usuario: roleInfo?.id_usuario,
           id_comercio: roleInfo?.id_comercio,
@@ -97,8 +103,13 @@ const AdminLayout = () => {
                 }
               }
             })
-            .catch((err) => {
-              throw err;
+            .catch((error) => {
+              if (error?.cause === "custom") {
+                notifyError(error?.message);
+                return;
+              }
+              console.error(error?.message);
+              notifyError("Busqueda fallida");
             });
         }
       }
@@ -134,7 +145,7 @@ const AdminLayout = () => {
       </header>
       <main className="container">
         <Suspense fallback={<ContentBox />}>{!infoCaja && <Outlet />}</Suspense>
-        <Modal show={infoCaja }>
+        <Modal show={infoCaja}>
           {cajaState === 1 ? (
             <div className="items-center text-center">
               <h1>

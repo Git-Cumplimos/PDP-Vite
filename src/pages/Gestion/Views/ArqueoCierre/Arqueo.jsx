@@ -6,6 +6,7 @@ import Input from "../../../../components/Base/Input";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Button from "../../../../components/Base/Button";
 import { confirmaArqueo } from "../../utils/fetchCaja";
+import { notifyError } from "../../../../utils/notify";
 
 const Arqueo = ({
   caja,
@@ -89,13 +90,18 @@ const Arqueo = ({
       .then((res) => {
         console.log(res);
         if (res?.status) {
-          setResArqueo(res);
+          setResArqueo(res?.obj?.[0]);
           setCierre(true);
           setAllowClose(false);
         }
       })
-      .catch((err) => {
-        throw err;
+      .catch((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+          return;
+        }
+        console.error(error?.message);
+        notifyError("Busqueda fallida");
       });
   }, [
     caja?.obj?.actual_caja,

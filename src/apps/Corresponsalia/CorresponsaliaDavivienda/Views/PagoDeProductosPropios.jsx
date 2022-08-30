@@ -343,7 +343,7 @@ const PagoDeProductosPropios = () => {
             "Cédula de ciudadanía": "01",
             "Cédula de extranjería": "02",
             NIT: "03",
-            "NIT Persona natural": "04",
+            "NIT Persona natural": "12",
           }}
           value={datosTrans?.tipoIdentificacion}
           onChange={(e) =>
@@ -476,7 +476,7 @@ const PagoDeProductosPropios = () => {
           {peticion === 1 && (
             <>
               <h1 className='text-2xl font-semibold'>
-                ¿Esta seguro de realizar la consulta del producto?
+                ¿Está seguro de realizar la consulta del producto?
               </h1>
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
@@ -584,7 +584,7 @@ const PagoDeProductosPropios = () => {
           {peticion === 3 && (
             <>
               <h1 className='text-2xl font-semibold'>
-                ¿Esta seguro de realizar el pago del producto de crédito?
+                ¿Está seguro de realizar el pago del producto de crédito?
               </h1>
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
