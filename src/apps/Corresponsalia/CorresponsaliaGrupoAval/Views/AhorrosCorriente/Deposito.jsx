@@ -57,6 +57,7 @@ const Deposito = () => {
   const [summary, setSummary] = useState([])
   const [banco, setBanco] = useState("")
   const [phone, setPhone] = useState("")
+  const [showBTNConsulta, setShowBTNConsulta] = useState(true)
 
   const optionsBanco = [
     { value: "", label: "" },
@@ -75,8 +76,8 @@ const Deposito = () => {
 
   const options = [
     { value: "", label: "" },
-    { value: "02", label: "Corriente" },
     { value: "01", label: "Ahorros" },
+    { value: "02", label: "Corriente" },    
   ];
 
   const optionsDocumento = [
@@ -144,6 +145,7 @@ const Deposito = () => {
     setUserDoc("")
     setPhone("")
     setBanco("")
+    setShowBTNConsulta(true)
     setSummary([])
   }, []);
 
@@ -184,16 +186,15 @@ const Deposito = () => {
             } else {
               setDatosConsulta(res?.obj?.Data);
               const summary = {
-                // "Nombre titular": res?.obj?.Data?.valNombreTitular,
-                // "Apellido titular": res?.obj?.Data?.valApellidoTitular,
-                "Número cuenta": numCuenta,
-                "Valor depósito": valor,
-                "Valor cobro": formatMoney.format(
-                  res?.obj?.Data?.numValorCobro
-                ),
+                "Banco": DataBanco?.nombre,
+                "Documento" : userDoc,
+                "Numero celular": phone,
+                "Valor deposito": formatMoney.format(valor),
+                "Costo transacción": formatMoney.format(res?.obj?.costoTrx)
               };
               setSummary(summary)
               setShowModal(true);
+              setShowBTNConsulta(false)
             }
           })
           .catch((err) => {
@@ -253,11 +254,12 @@ const Deposito = () => {
         }
         else{
         notify("Transaccion satisfactoria");
-        const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
-        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+        const trx_id = parseInt(res?.obj?.respuesta_grupo_aval["11"]) ?? 0;
+        const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
+        // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Depósito A Cuentas Davivienda",
+          title: "Depósito A Cuentas " + DataBanco?.nombre,
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -272,13 +274,12 @@ const Deposito = () => {
           },
           commerceInfo: [
             ["Id Comercio", roleInfo?.id_comercio],
-            ["No. terminal", ter],
+            ["No. de aprobación", trx_id],
+            // ["No. terminal", ter],
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
             ["Tipo de operación", "Depósito A Cuentas"],
-            ["", ""],
-            ["No. de aprobación", trx_id],
-            ["", ""],
+            ["", ""]
           ],
           commerceName: roleInfo?.["nombre comercio"]
           ? roleInfo?.["nombre comercio"]
@@ -286,17 +287,17 @@ const Deposito = () => {
           trxInfo: [
             [
             "Tipo",
-            res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
+            tipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
             ["",""],
             [
             "Nro. Cuenta",
-            `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
+            `****${String(numCuenta)?.slice(-4) ?? ""}`,
             ],
             ["",""],
             ["Valor", formatMoney.format(valor)],
             ["", ""],
-            ["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
+            ["Costo transacción", formatMoney.format(res?.obj?.costoTrx)],
             ["", ""],
             ["Total", formatMoney.format(valor)],
             ["", ""],
@@ -378,16 +379,6 @@ const Deposito = () => {
             }}
             required
           />
-          {/* <Select
-            id='tipoDocumento'
-            label='Tipo de documento'
-            options={optionsDocumento}
-            value={tipoDocumento}
-            required
-            onChange={(e) => {
-              setTipoDocumento(e.target.value);
-            }}
-          /> */}
           <Input
             id='docCliente'
             name='docCliente'
@@ -425,34 +416,6 @@ const Deposito = () => {
             }}
             required
           />
-          {/* <Input
-            id='nomDepositante'
-            name='nomDepositante'
-            label='Nombre depositante'
-            type='text'
-            minLength={"1"}
-            maxLength={"50"}
-            autoComplete='off'
-            value={nomDepositante}
-            onInput={(e) =>{
-              if (isNaN(e.target.value) || e.target.value ===""){
-              setNomDepositante(e.target.value)}
-            }
-            }
-            required
-          /> */}
-          {/* <MoneyInput
-            id='valor'
-            name='valor'
-            label='Valor a depositar'
-            autoComplete='off'
-            min={limitesMontos?.min}
-            max={limitesMontos?.max}
-            minLength={"1"}
-            maxLength={"15"}
-            onInput={onMoneyChange}
-            required
-          /> */}
           <Input
           id="valor"
           name="valor"
@@ -499,12 +462,17 @@ const Deposito = () => {
                   disabled={loadingDepositoCorresponsalGrupoAval}>
                   Realizar deposito
                 </Button>
+                {showBTNConsulta ? 
                 <Button
-                  type='submit'
-                  onClick={consultarCosto}
-                  disabled={loadingDepositoCorresponsalGrupoAval}>
-                  Consultar costo
-                </Button>
+                type='submit'
+                onClick={consultarCosto}
+                disabled={loadingDepositoCorresponsalGrupoAval}>
+                Consultar costo
+                </Button>                
+                :
+                ""
+                }
+                
                 <Button
                   onClick={handleClose}
                   disabled={loadingDepositoCorresponsalGrupoAval}>
