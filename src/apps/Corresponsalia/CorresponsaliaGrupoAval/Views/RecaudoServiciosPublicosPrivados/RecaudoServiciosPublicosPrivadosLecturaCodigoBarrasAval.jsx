@@ -366,13 +366,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
     } else {
       setIsUploading(true);
       postConsultaConveniosDavivienda({
-        tipoTransaccion: "1",
-        numNumeroConvenioIAC: datosEnvio?.datosConvenio?.cod_iac_cnb,
+        numeroConvenio: datosEnvio?.datosConvenio?.cod_iac_cnb,
         valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
-        valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
-        fecFechaCodigoBarras:
-          datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        numValorCodigoBarras: datosTrans.codBarras.slice(3).replace(/[.]/g, ""),
+        numValorCodigoBarras: datosTrans.codBarras
+          .slice(3)
+          .replace("\u001d", ""),
+        numValor: "2000",
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -382,6 +381,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         municipio: roleInfo?.["ciudad"],
         oficinaPropia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        direccion: roleInfo?.["direccion"],
       })
         .then((res) => {
           if (res?.status) {
