@@ -210,7 +210,8 @@ const PagoDeProductosPropios = () => {
         console.error(err);
       });
   };
-  const peticionIntermedia = () => {
+  const peticionIntermedia = (e) => {
+    e.preventDefault();
     if (tipoAbono.tipoAbonoId === "")
       return notifyError("Ingrese un tipo de abono");
     if (
@@ -491,7 +492,7 @@ const PagoDeProductosPropios = () => {
             </>
           )}
           {peticion === 2 && (
-            <>
+            <Form grid onSubmit={peticionIntermedia}>
               <h1 className='text-2xl font-semibold'>
                 Respuesta de consulta Davivienda
               </h1>
@@ -551,18 +552,23 @@ const PagoDeProductosPropios = () => {
                 tipoAbono.tipoAbonoId === "0006") && (
                 <MoneyInput
                   id='valorAbono'
-                  label='Valor abono'
+                  label='Valor a pagar'
                   type='text'
                   autoComplete='off'
+                  required
+                  min={1}
+                  max={1000001}
                   value={tipoAbono.valorAbono}
-                  onInput={(e, valor) =>
-                    setTipoAbono((old) => {
-                      return {
-                        ...old,
-                        valorAbono: valor,
-                      };
-                    })
-                  }
+                  onInput={(e, valor) => {
+                    if (valor.toString().length < 11) {
+                      setTipoAbono((old) => {
+                        return {
+                          ...old,
+                          valorAbono: valor,
+                        };
+                      });
+                    }
+                  }}
                 />
               )}
               <ButtonBar>
@@ -572,14 +578,17 @@ const PagoDeProductosPropios = () => {
                   // &&
                   // datosConsulta.valPagoMinimo &&
                   // parseInt(datosConsulta.valPagoMinimo) !== 0
-                  <Button type='submit' onClick={peticionIntermedia}>
+                  <Button
+                    type='submit'
+                    // onClick={peticionIntermedia}
+                  >
                     Aceptar
                   </Button>
                 ) : (
                   <></>
                 )}
               </ButtonBar>
-            </>
+            </Form>
           )}
           {peticion === 3 && (
             <>
