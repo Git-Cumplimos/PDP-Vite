@@ -31,6 +31,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   const { state } = useLocation();
   const { roleInfo } = useAuth();
   const navigate = useNavigate();
+
   const [{ showModal, estadoPeticion }, setShowModal] = useState({
     showModal: false,
     estadoPeticion: 0,
@@ -103,7 +104,50 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   });
   const onSubmit = (e) => {
     e.preventDefault();
-    setShowModal((old) => ({ ...old, showModal: true }));
+    // setShowModal((old) => ({ ...old, showModal: true }));
+    setIsUploading(true);
+    postConsultaConveniosDavivienda({
+      numeroConvenio: "635",
+      valReferencia1: "98765480",
+      numValor: "2000",
+
+      idComercio: roleInfo?.id_comercio,
+      idUsuario: roleInfo?.id_usuario,
+      idTerminal: roleInfo?.id_dispositivo,
+      issuerIdDane: roleInfo?.codigo_dane,
+      nombreComercio: roleInfo?.["nombre comercio"],
+      direccion: roleInfo?.["direccion"],
+      municipio: roleInfo?.["ciudad"],
+      oficinaPropia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+    })
+      .then((res) => {
+        if (res?.status) {
+          setIsUploading(false);
+          notify(res?.msg);
+          console.log("consulta", res);
+          let valorTrxCons =
+            res?.obj?.respuesta_davivienda?.numValorTotalFactura ?? 0;
+          // setDatosTransaccion((old) => {
+          //   return {
+          //     ...old,
+          //     showValor2: formatMoney.format(valorTrxCons) ?? "",
+          //     valor: valorTrxCons ?? "",
+          //     valorSinModificar2: valorTrxCons ?? "",
+          //   };
+          // });
+          // setPeticion(2);
+        } else {
+          setIsUploading(false);
+          notifyError(res?.msg);
+          // hideModal();
+        }
+      })
+      .catch((err) => {
+        setIsUploading(false);
+        notifyError("No se ha podido conectar al servidor");
+        console.error(err);
+      });
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();

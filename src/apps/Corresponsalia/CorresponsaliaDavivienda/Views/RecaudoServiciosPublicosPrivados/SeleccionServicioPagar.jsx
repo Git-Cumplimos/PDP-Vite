@@ -32,7 +32,7 @@ const SeleccionServicioPagar = () => {
         }) => {
           return {
             "Id convenio": cod_convenio_cnb,
-            Convenio: nom_convenio_cnb.replace(/[ ]/g, "") ?? "",
+            Convenio: nom_convenio_cnb.replace(/^\s+|\s+$/g, "") ?? "",
             "Id IAC": cod_iac_cnb,
           };
         }
