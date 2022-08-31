@@ -31,12 +31,13 @@ const Retiro = () => {
   const { roleInfo, infoTicket } = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 10000000,
+    max: 1000000,
     min: 10000,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
 
   const [loadingRetiroCorresponsal, fetchRetiroCorresponsal] =
@@ -121,7 +122,7 @@ const Retiro = () => {
       if (valor % 10000 === 0){
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
+      if (valor >= min && valor <= max) {
         const formData = new FormData(e.target);
         const userDoc = formData.get("docCliente");
         const valorFormat = formData.get("valor");
