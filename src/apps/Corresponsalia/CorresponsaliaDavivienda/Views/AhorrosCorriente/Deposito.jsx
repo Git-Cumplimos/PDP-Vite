@@ -185,7 +185,7 @@ const Deposito = () => {
         notifyError(
           `El valor del depósito debe estar entre ${(formatMoney.format(
             min
-          )).replace("$ ", "$")} y ${formatMoney.format(max).replace("$ ", "$")}`
+          )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
         );
       }
     },
