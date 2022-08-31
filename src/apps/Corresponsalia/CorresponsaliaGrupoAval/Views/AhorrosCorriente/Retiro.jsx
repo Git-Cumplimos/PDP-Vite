@@ -194,7 +194,7 @@ const Retiro = () => {
         notifyError(
           `El valor del retiro debe estar entre ${formatMoney.format(
             min
-          )} y ${formatMoney.format(max)}`
+          ).replace(" ", "")} y ${formatMoney.format(max).replace(" ", "")}`
         );
       }
     },

@@ -125,7 +125,7 @@ const Deposito = () => {
 
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor <= max) {
+      if (valor >= min && valor < max) {
         const formData = new FormData(e.target);
         const numCuenta = formData.get("numCuenta");
         const userDoc = formData.get("docCliente");
@@ -183,9 +183,9 @@ const Deposito = () => {
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del deposito debe estar entre ${formatMoney.format(
+          `El valor del depósito debe estar entre ${(formatMoney.format(
             min
-          )} y ${formatMoney.format(max)}`
+          )).replace("$ ", "$")} y ${formatMoney.format(max).replace("$ ", "$")}`
         );
       }
     },
@@ -226,6 +226,7 @@ const Deposito = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
+          handleClose();
           return;
         }
         notify("Transaccion satisfactoria");

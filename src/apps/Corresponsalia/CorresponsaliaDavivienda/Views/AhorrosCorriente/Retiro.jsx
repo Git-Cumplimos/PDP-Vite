@@ -225,6 +225,7 @@ const Retiro = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
+          handleClose();
           return;
         }
         notify("Transaccion satisfactoria");
