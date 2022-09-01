@@ -125,7 +125,7 @@ const Deposito = () => {
 
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
+      if (valor >= min && valor <= max) {
         const formData = new FormData(e.target);
         const numCuenta = formData.get("numCuenta");
         const userDoc = formData.get("docCliente");
