@@ -13,7 +13,7 @@ import MoneyInput, {
 } from "../../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
-import { enumParametrosAutorizador } from "../../utils/enumParametrosAutorizador";
+import { enumParametrosAutorizador } from "../../../../../utils/enumParametrosAutorizador";
 import { fetchParametrosAutorizadores } from "../../../../TrxParams/utils/fetchParametrosAutorizadores";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
 import HideInput from "../../../../../components/Base/HideInput";

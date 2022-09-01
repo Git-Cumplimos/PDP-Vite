@@ -18,14 +18,14 @@ import {
   postPagoProductosPropiosDavivienda,
 } from "../utils/fetchProductosPropios";
 import { fetchParametrosAutorizadores } from "../../../TrxParams/utils/fetchParametrosAutorizadores";
-import { enumParametrosAutorizador } from "../utils/enumParametrosAutorizador";
+import { enumParametrosAutorizador } from "../../../../utils/enumParametrosAutorizador";
 import Fieldset from "../../../../components/Base/Fieldset";
 
 const PagoDeProductosPropios = () => {
   const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: 720000,
+    superior: 1000000,
     inferior: 1,
   });
   const [peticion, setPeticion] = useState(0);
@@ -222,8 +222,6 @@ const PagoDeProductosPropios = () => {
       tipoAbono.valorAbono === ""
     )
       return notifyError("Ingrese el valor del abono");
-    if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
-      return notifyError("El valor del abono debe ser menor al valor total");
     if (tipoAbono.valorAbono > limiteRecarga.superior) {
       return notifyError(
         `El valor del abono debe ser menor a ${formatMoney.format(
@@ -231,6 +229,15 @@ const PagoDeProductosPropios = () => {
         )}`
       );
     }
+    if (tipoAbono.valorAbono < limiteRecarga.inferior) {
+      return notifyError(
+        `El valor del abono debe ser mayor a ${formatMoney.format(
+          limiteRecarga.inferior
+        )}`
+      );
+    }
+    if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
+      return notifyError("El valor del abono debe ser menor al valor total");
     setPeticion(3);
   };
   const peticionPagoPropios = () => {
@@ -499,7 +506,7 @@ const PagoDeProductosPropios = () => {
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
-              <h2>{`Valor de pago minimo: ${formatMoney.format(
+              <h2>{`Valor de pago mínimo: ${formatMoney.format(
                 datosConsulta.valPagoMinimo
               )}`}</h2>
               <h2>{`Valor de pago total: ${formatMoney.format(
@@ -556,8 +563,8 @@ const PagoDeProductosPropios = () => {
                   type='text'
                   autoComplete='off'
                   required
-                  min={1}
-                  max={1000001}
+                  min={limiteRecarga.inferior}
+                  max={limiteRecarga.superior}
                   value={tipoAbono.valorAbono}
                   onInput={(e, valor) => {
                     if (valor.toString().length < 11) {
