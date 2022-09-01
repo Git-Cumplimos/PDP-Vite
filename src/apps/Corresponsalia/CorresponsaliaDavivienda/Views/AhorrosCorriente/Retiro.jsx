@@ -230,6 +230,7 @@ const Retiro = () => {
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const trx_id2 = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
@@ -253,7 +254,9 @@ const Retiro = () => {
             ["Dirección", roleInfo?.direccion],
             ["Tipo de operación", "Retiro De Cuentas"],
             ["", ""],
-            ["No. de aprobación", trx_id],
+            ["No. de aprobación Banco", trx_id],
+            ["", ""],
+            ["No. de aprobación Aliado", trx_id2],
             ["", ""],
           ],
           commerceName: roleInfo?.["nombre comercio"]
