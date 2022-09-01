@@ -254,7 +254,11 @@ const PagoDeProductosPropios = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push(["Tipo de producto", datosTrans.nombreProducto]);
+    // objTicket["trxInfo"].push(["Tipo de producto", datosTrans.nombreProducto]);
+    objTicket["trxInfo"].push([
+      "Tipo de producto",
+      "Crédito o Tarjeta crédito",
+    ]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
       "Número de producto",
