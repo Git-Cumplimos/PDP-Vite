@@ -23,8 +23,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
-// image/png
-// max-age=86400,must-revalidate
+
 const AdminLayout = () => {
   const {
     adminLayout,
@@ -39,7 +38,7 @@ const AdminLayout = () => {
 
   const { quotaInfo, roleInfo, signOut } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useLocation();
 
   const { urlsPrivate: urls } = useUrls();
 
@@ -79,42 +78,40 @@ const AdminLayout = () => {
   }, [backIcon2, clientWidth]);
 
   useEffect(() => {
-    if (roleInfo?.tipo_comercio === "OFICINAS PROPIAS") {
-      const conditions = [
-        roleInfo?.id_usuario !== undefined,
-        roleInfo?.id_comercio !== undefined,
-        roleInfo?.id_dispositivo !== undefined,
-      ];
-      if (conditions.reduce((prev, curr) => prev && curr)) {
-        const query = {
-          id_usuario: roleInfo?.id_usuario,
-          id_comercio: roleInfo?.id_comercio,
-          id_terminal: roleInfo?.id_dispositivo,
-        };
-
-        if (location.pathname === "/") {
-          searchCierre(query)
-            .then((res) => {
-              if (res?.status) {
-                if (res?.obj !== 3 && res?.obj !== 2) {
-                  setInfoCaja(true);
-                  setCajaState(res?.obj);
-                } else {
-                }
-              }
-            })
-            .catch((error) => {
-              if (error?.cause === "custom") {
-                notifyError(error?.message);
-                return;
-              }
-              console.error(error?.message);
-              notifyError("Busqueda fallida");
-            });
-        }
-      }
+    const conditions = [
+      roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+      roleInfo?.id_usuario !== undefined,
+      roleInfo?.id_comercio !== undefined,
+      roleInfo?.id_dispositivo !== undefined,
+      pathname === "/",
+    ];
+    if (conditions.every((val) => val)) {
+      searchCierre({
+        id_usuario: roleInfo?.id_usuario,
+        id_comercio: roleInfo?.id_comercio,
+        id_terminal: roleInfo?.id_dispositivo,
+      })
+        .then((res) => {
+          if (res?.obj !== 3 && res?.obj !== 2) {
+            setInfoCaja(true);
+            setCajaState(res?.obj);
+          }
+        })
+        .catch((error) => {
+          if (error?.cause === "custom") {
+            notifyError(error?.message);
+          }
+          console.error(error?.message);
+          notifyError("Busqueda fallida");
+        });
     }
-  }, [roleInfo, location]);
+  }, [
+    pathname,
+    roleInfo?.id_comercio,
+    roleInfo?.id_dispositivo,
+    roleInfo?.id_usuario,
+    roleInfo?.tipo_comercio,
+  ]);
 
   return (
     <div className={adminLayout}>
