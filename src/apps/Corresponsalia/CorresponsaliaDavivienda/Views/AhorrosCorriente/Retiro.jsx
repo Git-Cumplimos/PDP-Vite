@@ -173,7 +173,7 @@ const Retiro = () => {
           .catch((err) => {
             setIsUploading(false);
             console.error(err);
-            notifyError("Error interno en la transaccion");
+            notifyError("No se ha podido conectar al servidor");
           });
       } else {
         setIsUploading(false);
@@ -300,7 +300,7 @@ const Retiro = () => {
       .catch((err) => {
         setIsUploading(false);
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
   }, [
     valor,

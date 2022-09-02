@@ -132,7 +132,7 @@ const Deposito = () => {
           })
           .catch((err) => {
             console.error(err);
-            notifyError("Error interno en la transaccion");
+            notifyError("No se ha podido conectar al servidor");
           });
       } else {
         notifyError(
@@ -259,7 +259,7 @@ const Deposito = () => {
       })
       .catch((err) => {
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
   }, [
     phone,
