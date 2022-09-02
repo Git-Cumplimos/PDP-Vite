@@ -18,14 +18,14 @@ import {
   postPagoProductosPropiosDavivienda,
 } from "../utils/fetchProductosPropios";
 import { fetchParametrosAutorizadores } from "../../../TrxParams/utils/fetchParametrosAutorizadores";
-import { enumParametrosAutorizador } from "../utils/enumParametrosAutorizador";
+import { enumParametrosAutorizador } from "../../../../utils/enumParametrosAutorizador";
 import Fieldset from "../../../../components/Base/Fieldset";
 
 const PagoDeProductosPropios = () => {
   const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: 720000,
+    superior: 1000000,
     inferior: 1,
   });
   const [peticion, setPeticion] = useState(0);
@@ -210,7 +210,8 @@ const PagoDeProductosPropios = () => {
         console.error(err);
       });
   };
-  const peticionIntermedia = () => {
+  const peticionIntermedia = (e) => {
+    e.preventDefault();
     if (tipoAbono.tipoAbonoId === "")
       return notifyError("Ingrese un tipo de abono");
     if (
@@ -221,8 +222,6 @@ const PagoDeProductosPropios = () => {
       tipoAbono.valorAbono === ""
     )
       return notifyError("Ingrese el valor del abono");
-    if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
-      return notifyError("El valor del abono debe ser menor al valor total");
     if (tipoAbono.valorAbono > limiteRecarga.superior) {
       return notifyError(
         `El valor del abono debe ser menor a ${formatMoney.format(
@@ -230,6 +229,15 @@ const PagoDeProductosPropios = () => {
         )}`
       );
     }
+    if (tipoAbono.valorAbono < limiteRecarga.inferior) {
+      return notifyError(
+        `El valor del abono debe ser mayor a ${formatMoney.format(
+          limiteRecarga.inferior
+        )}`
+      );
+    }
+    if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
+      return notifyError("El valor del abono debe ser menor al valor total");
     setPeticion(3);
   };
   const peticionPagoPropios = () => {
@@ -246,7 +254,11 @@ const PagoDeProductosPropios = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push(["Tipo de producto", datosTrans.nombreProducto]);
+    // objTicket["trxInfo"].push(["Tipo de producto", datosTrans.nombreProducto]);
+    objTicket["trxInfo"].push([
+      "Tipo de producto",
+      "Crédito o Tarjeta crédito",
+    ]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
       "Número de producto",
@@ -364,7 +376,7 @@ const PagoDeProductosPropios = () => {
           type='text'
           name='numeroIdentificacion'
           minLength='3'
-          maxLength='16'
+          maxLength='10'
           required
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
@@ -491,14 +503,14 @@ const PagoDeProductosPropios = () => {
             </>
           )}
           {peticion === 2 && (
-            <>
+            <Form grid onSubmit={peticionIntermedia}>
               <h1 className='text-2xl font-semibold'>
                 Respuesta de consulta Davivienda
               </h1>
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
-              <h2>{`Valor de pago minimo: ${formatMoney.format(
+              <h2>{`Valor de pago mínimo: ${formatMoney.format(
                 datosConsulta.valPagoMinimo
               )}`}</h2>
               <h2>{`Valor de pago total: ${formatMoney.format(
@@ -551,18 +563,23 @@ const PagoDeProductosPropios = () => {
                 tipoAbono.tipoAbonoId === "0006") && (
                 <MoneyInput
                   id='valorAbono'
-                  label='Valor abono'
+                  label='Valor a pagar'
                   type='text'
                   autoComplete='off'
+                  required
+                  min={limiteRecarga.inferior}
+                  max={limiteRecarga.superior}
                   value={tipoAbono.valorAbono}
-                  onInput={(e, valor) =>
-                    setTipoAbono((old) => {
-                      return {
-                        ...old,
-                        valorAbono: valor,
-                      };
-                    })
-                  }
+                  onInput={(e, valor) => {
+                    if (valor.toString().length < 11) {
+                      setTipoAbono((old) => {
+                        return {
+                          ...old,
+                          valorAbono: valor,
+                        };
+                      });
+                    }
+                  }}
                 />
               )}
               <ButtonBar>
@@ -572,14 +589,17 @@ const PagoDeProductosPropios = () => {
                   // &&
                   // datosConsulta.valPagoMinimo &&
                   // parseInt(datosConsulta.valPagoMinimo) !== 0
-                  <Button type='submit' onClick={peticionIntermedia}>
+                  <Button
+                    type='submit'
+                    // onClick={peticionIntermedia}
+                  >
                     Aceptar
                   </Button>
                 ) : (
                   <></>
                 )}
               </ButtonBar>
-            </>
+            </Form>
           )}
           {peticion === 3 && (
             <>

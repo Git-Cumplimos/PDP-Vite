@@ -31,12 +31,13 @@ const Retiro = () => {
   const { roleInfo, infoTicket } = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 10000000,
+    max: 1000000,
     min: 10000,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
 
   const [loadingRetiroCorresponsal, fetchRetiroCorresponsal] =
@@ -121,7 +122,7 @@ const Retiro = () => {
       if (valor % 10000 === 0){
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
+      if (valor >= min && valor <= max) {
         const formData = new FormData(e.target);
         const userDoc = formData.get("docCliente");
         const valorFormat = formData.get("valor");
@@ -179,7 +180,7 @@ const Retiro = () => {
         notifyError(
           `El valor del retiro debe estar entre ${formatMoney.format(
             min
-          )} y ${formatMoney.format(max)}`
+          ).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
         );
       }
     }
@@ -224,10 +225,12 @@ const Retiro = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
+          handleClose();
           return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const trx_id2 = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
@@ -251,7 +254,9 @@ const Retiro = () => {
             ["Dirección", roleInfo?.direccion],
             ["Tipo de operación", "Retiro De Cuentas"],
             ["", ""],
-            ["No. de aprobación", trx_id],
+            ["No. de aprobación Banco", trx_id],
+            ["", ""],
+            ["No. de aprobación Aliado", trx_id2],
             ["", ""],
           ],
           commerceName: roleInfo?.["nombre comercio"]
@@ -259,7 +264,7 @@ const Retiro = () => {
           : "No hay datos",
           trxInfo: [
             [
-              "Tipo",
+              "Tipo de cuenta",
               res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
             ["",""],

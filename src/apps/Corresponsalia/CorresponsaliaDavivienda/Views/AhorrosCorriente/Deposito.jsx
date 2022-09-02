@@ -28,12 +28,13 @@ const Deposito = () => {
   const navigate = useNavigate();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 10000000,
+    max: 1000000,
     min: 1,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
 
   const { roleInfo, infoTicket } = useAuth();
@@ -58,8 +59,8 @@ const Deposito = () => {
 
   const options = [
     { value: "", label: "" },
-    { value: "02", label: "Corriente" },
     { value: "01", label: "Ahorros" },
+    { value: "02", label: "Corriente" },    
   ];
 
   const optionsDocumento = [
@@ -124,7 +125,7 @@ const Deposito = () => {
 
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
+      if (valor >= min && valor <= max) {
         const formData = new FormData(e.target);
         const numCuenta = formData.get("numCuenta");
         const userDoc = formData.get("docCliente");
@@ -182,9 +183,9 @@ const Deposito = () => {
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del deposito debe estar entre ${formatMoney.format(
+          `El valor del depósito debe estar entre ${(formatMoney.format(
             min
-          )} y ${formatMoney.format(max)}`
+          )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
         );
       }
     },
@@ -225,10 +226,12 @@ const Deposito = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
+          handleClose();
           return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const trx_id2 = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
@@ -252,7 +255,9 @@ const Deposito = () => {
             ["Dirección", roleInfo?.direccion],
             ["Tipo de operación", "Depósito A Cuentas"],
             ["", ""],
-            ["No. de aprobación", trx_id],
+            ["No. de aprobación Banco", trx_id],
+            ["", ""],
+            ["No. de aprobación Aliado", trx_id2],
             ["", ""],
           ],
           commerceName: roleInfo?.["nombre comercio"]
@@ -260,7 +265,7 @@ const Deposito = () => {
           : "No hay datos",
           trxInfo: [
             [
-            "Tipo",
+            "Tipo de cuenta",
             res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
             ["",""],

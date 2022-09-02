@@ -11,7 +11,7 @@ import { useReactToPrint } from "react-to-print";
 import { postRealizarCashout } from "../utils/fetchMoviiRed";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
-import { enumParametrosAutorizador } from "../utils/enumParametrosAutorizador";
+import { enumParametrosAutorizador } from "../../../utils/enumParametrosAutorizador";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
