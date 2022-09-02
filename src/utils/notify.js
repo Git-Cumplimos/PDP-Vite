@@ -28,24 +28,29 @@ const notifyPending = (
   promise,
   onPending = { render: () => "Pending ..." },
   onSuccess = { render: ({ data }) => `Success ${JSON.stringify(data)}` },
-  onError = { render: ({ data }) => `Error ${data.message}` }
+  onError = { render: ({ data }) => `Error ${data.message}` },
+  options
 ) => {
-  toast.promise(promise, {
-    pending: {
-      type: "info",
-      ...onPending,
+  toast.promise(
+    promise,
+    {
+      pending: {
+        type: "info",
+        ...onPending,
+      },
+      error: {
+        type: "warning",
+        autoClose: false,
+        closeOnClick: false,
+        ...onError,
+      },
+      success: {
+        type: "info",
+        ...onSuccess,
+      },
     },
-    error: {
-      type: "warning",
-      autoClose: false,
-      closeOnClick: false,
-      ...onError,
-    },
-    success: {
-      type: "info",
-      ...onSuccess,
-    },
-  });
+    options
+  );
 };
 
 export { notify, notifyError, notifyPending };
