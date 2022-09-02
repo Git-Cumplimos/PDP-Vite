@@ -72,10 +72,13 @@ const buildPutFunction = (url) => {
 
 export const confirmaArqueo = buildPostFunction(`${urlArqueo}/administrar`);
 
-export const confirmaCierre = buildPostFunction(`${urlCaja}/cash`);
+// export const confirmaCierre = buildPostFunction(`${urlCaja}/cash`);
+export const confirmaCierre = buildPostFunction(`${urlCaja}/cierre/usuario`);
 export const searchCash = buildGetFunction(`${urlCaja}/cash`);
-export const searchCierre = buildGetFunction(`${urlCaja}/consultacierre`);
-export const searchHistorico = buildGetFunction(`${urlCaja}/consultahistoricos`);
+// export const searchCierre = buildGetFunction(`${urlCaja}/consultacierre`);
+export const searchCierre = buildGetFunction(`${urlCaja}/consulta-cierre-state`);
+// export const searchHistorico = buildGetFunction(`${urlCaja}/consultahistoricos`);
+export const searchHistorico = buildGetFunction(`${urlCaja}/cierre/usuario`);
 export const crearEntidad = buildPostFunction(`${urlCuentas}/administrar`);
 export const buscarEntidades = buildGetFunction(`${urlCuentas}/administrar`);
 export const editarEntidades = buildPutFunction(`${urlCuentas}/administrar`);
