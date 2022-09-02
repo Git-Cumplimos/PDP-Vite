@@ -18,7 +18,7 @@ import { notify, notifyError } from "../../../../../utils/notify";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
 import {
   postConsultaCodigoBarrasConveniosEspecifico,
-  postConsultaConveniosDavivienda,
+  postConsultaConveniosAval,
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
@@ -365,7 +365,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         });
     } else {
       setIsUploading(true);
-      postConsultaConveniosDavivienda({
+      postConsultaConveniosAval({
         numeroConvenio: datosEnvio?.datosConvenio?.cod_iac_cnb,
         valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
         numValorCodigoBarras: datosTrans.codBarras

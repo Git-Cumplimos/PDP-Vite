@@ -215,29 +215,30 @@ const PagoDeProductosPropios = () => {
     if (tipoAbono.tipoAbonoId === "")
       return notifyError("Ingrese un tipo de abono");
     if (
-      (tipoAbono.tipoAbonoId === "0003" ||
-        tipoAbono.tipoAbonoId === "0004" ||
-        tipoAbono.tipoAbonoId === "0005" ||
-        tipoAbono.tipoAbonoId === "0006") &&
-      tipoAbono.valorAbono === ""
-    )
-      return notifyError("Ingrese el valor del abono");
-    if (tipoAbono.valorAbono > limiteRecarga.superior) {
-      return notifyError(
-        `El valor del abono debe ser menor a ${formatMoney.format(
-          limiteRecarga.superior
-        )}`
-      );
+      tipoAbono.tipoAbonoId === "0003" ||
+      tipoAbono.tipoAbonoId === "0004" ||
+      tipoAbono.tipoAbonoId === "0005" ||
+      tipoAbono.tipoAbonoId === "0006"
+    ) {
+      if (tipoAbono.valorAbono === "")
+        return notifyError("Ingrese el valor del abono");
+      if (tipoAbono.valorAbono > limiteRecarga.superior) {
+        return notifyError(
+          `El valor del abono debe ser menor a ${formatMoney.format(
+            limiteRecarga.superior
+          )}`
+        );
+      }
+      if (tipoAbono.valorAbono < limiteRecarga.inferior) {
+        return notifyError(
+          `El valor del abono debe ser mayor a ${formatMoney.format(
+            limiteRecarga.inferior
+          )}`
+        );
+      }
+      if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
+        return notifyError("El valor del abono debe ser menor al valor total");
     }
-    if (tipoAbono.valorAbono < limiteRecarga.inferior) {
-      return notifyError(
-        `El valor del abono debe ser mayor a ${formatMoney.format(
-          limiteRecarga.inferior
-        )}`
-      );
-    }
-    if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
-      return notifyError("El valor del abono debe ser menor al valor total");
     setPeticion(3);
   };
   const peticionPagoPropios = () => {

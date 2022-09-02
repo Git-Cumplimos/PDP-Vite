@@ -22,7 +22,7 @@ import useMoney from "../../../../../hooks/useMoney";
 import { notify, notifyError } from "../../../../../utils/notify";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
 import {
-  postConsultaConveniosDavivienda,
+  postConsultaConveniosAval,
   postConsultaTablaConveniosEspecifico,
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
@@ -106,28 +106,33 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     e.preventDefault();
     // setShowModal((old) => ({ ...old, showModal: true }));
     setIsUploading(true);
-    postConsultaConveniosDavivienda({
-      numeroConvenio: "635",
-      valReferencia1: "98765480",
-      numValor: "2000",
-
-      idComercio: roleInfo?.id_comercio,
-      idUsuario: roleInfo?.id_usuario,
-      idTerminal: roleInfo?.id_dispositivo,
-      issuerIdDane: roleInfo?.codigo_dane,
-      nombreComercio: roleInfo?.["nombre comercio"],
-      direccion: roleInfo?.["direccion"],
-      municipio: roleInfo?.["ciudad"],
-      oficinaPropia:
+    postConsultaConveniosAval({
+      oficina_propia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      valor_total_trx: datosTrans.valor !== "" ? datosTrans.valor : 0,
+      nombre_comercio: roleInfo?.["nombre comercio"],
+      comercio: {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+      recaudoAval: {
+        numeroConvenio: convenio.nura,
+        valReferencia1: datosTrans.ref1,
+        location: {
+          address: roleInfo?.["direccion"],
+          dane_code: roleInfo?.codigo_dane,
+          city: roleInfo?.["ciudad"],
+        },
+      },
     })
       .then((res) => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
           console.log("consulta", res);
-          let valorTrxCons =
-            res?.obj?.respuesta_davivienda?.numValorTotalFactura ?? 0;
+          setShowModal((old) => ({ ...old, showModal: true }));
+          setDatosConsulta(res?.obj);
           // setDatosTransaccion((old) => {
           //   return {
           //     ...old,
@@ -295,49 +300,49 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         });
     } else {
       setIsUploading(true);
-      postConsultaConveniosDavivienda({
-        tipoTransaccion: "2",
-        numNumeroConvenioIAC: convenio.cod_convenio_cnb,
-        valReferencia1: datosTransValidacion?.ref1 ?? "",
-        valReferencia2: datosTransValidacion?.ref2 ?? "",
+      // postConsultaConveniosDavivienda({
+      //   tipoTransaccion: "2",
+      //   numNumeroConvenioIAC: convenio.cod_convenio_cnb,
+      //   valReferencia1: datosTransValidacion?.ref1 ?? "",
+      //   valReferencia2: datosTransValidacion?.ref2 ?? "",
 
-        idComercio: roleInfo?.id_comercio,
-        idUsuario: roleInfo?.id_usuario,
-        idTerminal: roleInfo?.id_dispositivo,
-        issuerIdDane: roleInfo?.codigo_dane,
-        nombreComercio: roleInfo?.["nombre comercio"],
-        municipio: roleInfo?.["ciudad"],
-        oficinaPropia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
-      })
-        .then((res) => {
-          if (res?.status) {
-            setIsUploading(false);
-            notify(res?.msg);
-            setDatosConsulta((old) => ({
-              ...old,
-              idTrx: res?.obj?.idTrx,
-              consultaDavivienda: res?.obj?.respuesta_davivienda,
-            }));
-            setDatosTransValidacion((old) => ({
-              ...old,
-              valor:
-                formatMoney.format(
-                  res?.obj?.respuesta_davivienda?.numValorTotalFactura
-                ) ?? "",
-            }));
-            setShowModal((old) => ({ ...old, estadoPeticion: 1 }));
-          } else {
-            setIsUploading(false);
-            notifyError(res?.msg);
-            handleClose();
-          }
-        })
-        .catch((err) => {
-          setIsUploading(false);
-          notifyError("No se ha podido conectar al servidor");
-          console.error(err);
-        });
+      //   idComercio: roleInfo?.id_comercio,
+      //   idUsuario: roleInfo?.id_usuario,
+      //   idTerminal: roleInfo?.id_dispositivo,
+      //   issuerIdDane: roleInfo?.codigo_dane,
+      //   nombreComercio: roleInfo?.["nombre comercio"],
+      //   municipio: roleInfo?.["ciudad"],
+      //   oficinaPropia:
+      //     roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      // })
+      //   .then((res) => {
+      //     if (res?.status) {
+      //       setIsUploading(false);
+      //       notify(res?.msg);
+      //       setDatosConsulta((old) => ({
+      //         ...old,
+      //         idTrx: res?.obj?.idTrx,
+      //         consultaDavivienda: res?.obj?.respuesta_davivienda,
+      //       }));
+      //       setDatosTransValidacion((old) => ({
+      //         ...old,
+      //         valor:
+      //           formatMoney.format(
+      //             res?.obj?.respuesta_davivienda?.numValorTotalFactura
+      //           ) ?? "",
+      //       }));
+      //       setShowModal((old) => ({ ...old, estadoPeticion: 1 }));
+      //     } else {
+      //       setIsUploading(false);
+      //       notifyError(res?.msg);
+      //       handleClose();
+      //     }
+      //   })
+      //   .catch((err) => {
+      //     setIsUploading(false);
+      //     notifyError("No se ha podido conectar al servidor");
+      //     console.error(err);
+      //   });
     }
   };
   const handleClose = useCallback(() => {
@@ -414,9 +419,11 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           onInput={(e) => {
             let valor = e.target.value;
             let num = valor.replace(/[\s\.]/g, "");
-            setDatosTrans((old) => {
-              return { ...old, ref1: num };
-            });
+            if (!isNaN(num)) {
+              setDatosTrans((old) => {
+                return { ...old, ref1: num };
+              });
+            }
           }}></Input>
         {convenio?.parciales === "1" && (
           <MoneyInput
@@ -438,94 +445,12 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
           {estadoPeticion === 0 ? (
             <>
-              <h1 className='text-2xl text-center mb-10 font-semibold'>
-                Ingrese nuevamente los datos de la transacción
-              </h1>
-              <Form grid onSubmit={onSubmitValidacion}>
-                {convenio?.ctrol_ref1_cnb === "1" && (
-                  <Input
-                    id='ref1'
-                    label={convenio?.nom_ref1_cnb}
-                    type='text'
-                    name='ref1'
-                    minLength='1'
-                    maxLength='32'
-                    required
-                    autoComplete='off'
-                    value={datosTransValidacion.ref1}
-                    onInput={(e) => {
-                      let valor = e.target.value;
-                      let num = valor.replace(/[\s\.]/g, "");
-                      setDatosTransValidacion((old) => {
-                        return { ...old, ref1: num };
-                      });
-                    }}></Input>
-                )}
-                {convenio?.ctrol_ref2_cnb === "1" && (
-                  <Input
-                    id='ref2'
-                    label={convenio?.nom_ref2_cnb}
-                    type='text'
-                    name='ref2'
-                    minLength='1'
-                    autoComplete='off'
-                    maxLength='32'
-                    required
-                    value={datosTransValidacion.ref2}
-                    onInput={(e) => {
-                      let valor = e.target.value;
-                      let num = valor.replace(/[\s\.]/g, "");
-                      setDatosTransValidacion((old) => {
-                        return { ...old, ref2: num };
-                      });
-                    }}></Input>
-                )}
-                {dataConveniosPagar.includes(
-                  convenio?.num_ind_consulta_cnb
-                ) && (
-                  <Input
-                    id='valor'
-                    name='valor'
-                    label='Valor a depositar'
-                    autoComplete='off'
-                    type='tel'
-                    minLength={"2"}
-                    maxLength={"20"}
-                    defaultValue={datosTransValidacion.valor ?? ""}
-                    onInput={(ev) =>
-                      setDatosTransValidacion((old) => ({
-                        ...old,
-                        valor: onChangeMoney(ev),
-                      }))
-                    }
-                    required
-                  />
-                )}
-                <ButtonBar>
-                  <Button type='button' onClick={handleClose}>
-                    cancelar
-                  </Button>
-                  <Button type='submit'>
-                    {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
-                      ? "Realizar pago"
-                      : "Realizar consulta"}
-                  </Button>
-                </ButtonBar>
-              </Form>
-            </>
-          ) : estadoPeticion === 1 ? (
-            <>
               <h1 className='text-2xl text-center mb-5 font-semibold'>
                 Resultado consulta
               </h1>
-              <h2>{`Nombre convenio: ${datosConsulta.consultaDavivienda.valNombreConvenio}`}</h2>
-              <h2>{`Número convenio: ${datosConsulta.consultaDavivienda.numNumeroConvenio}`}</h2>
-              {convenio?.ctrol_ref1_cnb === "1" && (
-                <h2>{`${convenio?.nom_ref1_cnb}: ${datosTransValidacion.ref1}`}</h2>
-              )}
-              {convenio?.ctrol_ref2_cnb === "1" && (
-                <h2>{`${convenio?.nom_ref2_cnb}: ${datosTransValidacion.ref2}`}</h2>
-              )}
+              <h2>{`Nombre convenio: ${convenio?.convenio}`}</h2>
+              <h2>{`Número convenio: ${convenio?.nura}`}</h2>
+              <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
               <h2 className='text-base'>
                 {`Valor consultado: ${formatMoney.format(
                   datosConsulta.consultaDavivienda.numValorTotalFactura

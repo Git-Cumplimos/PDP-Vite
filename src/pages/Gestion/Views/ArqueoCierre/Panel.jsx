@@ -1,106 +1,320 @@
-import { useState, useEffect, Fragment, useCallback } from "react";
-import Arqueo from "./Arqueo";
-import Cierre from "./Cierre";
+import {
+  useState,
+  useEffect,
+  Fragment,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { searchCash, searchCierre, buscarComprobantes } from "../../utils/fetchCaja";
+import { searchCierre, confirmaCierre } from "../../utils/fetchCaja";
+import { notifyPending } from "../../../../utils/notify";
+import Fieldset from "../../../../components/Base/Fieldset";
+import Input from "../../../../components/Base/Input";
+import {
+  makeMoneyFormatter,
+  onChangeNumber,
+} from "../../../../utils/functions";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import { useReactToPrint } from "react-to-print";
+import TicketCierre from "./TicketCierre";
+
+const formatMoney = makeMoneyFormatter(0);
 
 const Panel = () => {
-  const [total, setTotal] = useState("");
-  const [totalCierres, setTotalCierres] = useState(false);
-  const [allowClose, setAllowClose] = useState(true);
-  const [cierre, setCierre] = useState(false);
-  const [resArqueo, setResArqueo] = useState("");
-  const [respuestaComprobante, setRespuestaComprobante] = useState([]);
-  const [sobrante, setSobrante] = useState("");
-  const [faltante, setFaltante] = useState("");
-  const { roleInfo } = useAuth();
+  const { roleInfo, signOut } = useAuth();
 
-  // const date = new Date();
+  const [loading, setLoading] = useState(false);
+  const [estado, setEstado] = useState(false);
+  const [totalCierres, setTotalCierres] = useState(false);
+  const [denominaciones, setDenominaciones] = useState([
+    [100000, 0],
+    [50000, 0],
+    [20000, 0],
+    [10000, 0],
+    [5000, 0],
+    [2000, 0],
+    [1000, 0],
+    [500, 0],
+    [200, 0],
+    [100, 0],
+    [50, 0],
+  ]);
+  const [confirmarArqueo, setConfirmarArqueo] = useState(false);
+  const [resumenCierre, setResumenCierre] = useState(null);
+
+  const nombreComercio = useMemo(
+    () => roleInfo?.["nombre comercio"],
+    [roleInfo]
+  );
+
+  const totalArqueo = useMemo(
+    () => denominaciones.reduce((prev, [key, val]) => prev + key * val, 0),
+    [denominaciones]
+  );
 
   useEffect(() => {
-    const query = {
-      id_usuario: roleInfo?.id_usuario,
-      id_comercio: roleInfo?.id_comercio,
-      id_terminal: roleInfo?.id_dispositivo,
-    };
-    searchCash(query)
-      .then((res) => {
-        setTotal(res);
-      })
-      .catch((err) => {
-        throw err;
-      });
-    searchCierre(query)
-      .then((res) => {
-        if (res?.status) {
-          setTotalCierres(res?.obj);
-          query.status = "APROBADO";
-          buscarComprobantes(query)
-            .then((res) => {
-              console.log(res);
-              setRespuestaComprobante(res?.obj?.results);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-      })
-      .catch((err) => {
-        throw err;
-      });
-  }, [roleInfo?.id_comercio, roleInfo?.id_dispositivo, roleInfo?.id_usuario]);
+    const conditions = [
+      roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+      roleInfo?.id_usuario !== undefined,
+      roleInfo?.id_comercio !== undefined,
+      roleInfo?.id_dispositivo !== undefined,
+    ];
+    if (conditions.every((val) => val)) {
+      notifyPending(
+        searchCierre({
+          id_usuario: roleInfo?.id_usuario,
+          id_comercio: roleInfo?.id_comercio,
+          id_terminal: roleInfo?.id_dispositivo,
+        }),
+        {
+          render: () => {
+            setLoading(true);
+            return "Consultando cierre de caja";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            setLoading(false);
+            setTotalCierres(res?.obj);
+            return res?.msg;
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            setLoading(false);
+            if (error?.cause === "custom") {
+              return error?.message;
+            }
+            console.error(error?.message);
+            return "Busqueda fallida";
+          },
+        },
+        { toastId: "busqueda-cierre-123" }
+      );
+    }
+  }, [
+    roleInfo?.tipo_comercio,
+    roleInfo?.id_comercio,
+    roleInfo?.id_dispositivo,
+    roleInfo?.id_usuario,
+  ]);
 
-  const [estado, setEstado] = useState(false);
   const closeModalFunction = useCallback(() => {
     setEstado(false);
-    setCierre(false);
   }, []);
 
+  const cierreCaja = useCallback(() => {
+    notifyPending(
+      confirmaCierre({
+        id_comercio: roleInfo?.id_comercio,
+        id_terminal: roleInfo?.id_dispositivo,
+        id_usuario: roleInfo?.id_usuario,
+        arqueo: Object.fromEntries(denominaciones),
+      }),
+      {
+        render: () => {
+          setLoading(true);
+          return "Procesando peticion";
+        },
+      },
+      {
+        render: ({ data: res }) => {
+          setLoading(false);
+          const cierre = res?.obj;
+          const tempTicket = {
+            title: "Recibo de deposito",
+            timeInfo: {
+              "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+                year: "2-digit",
+                month: "2-digit",
+                day: "2-digit",
+              }).format(new Date()),
+              Hora: Intl.DateTimeFormat("es-CO", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              }).format(new Date()),
+            },
+            commerceInfo: [
+              ["Id Comercio", cierre?.id_comercio],
+              ["No. terminal", cierre?.id_terminal],
+              ["Id usuario", cierre?.id_usuario],
+              ["", ""],
+              ["Nombre comercio", nombreComercio],
+              ["", ""],
+            ],
+            cajaInfo: [
+              ["Total movimientos del dia", cierre?.total_movimientos],
+              ["", ""],
+              [
+                "Total efectivo cierre dia anterior",
+                cierre?.total_efectivo_cierre_día_anterior,
+              ],
+              ["", ""],
+              ["Total efectivo en caja", cierre?.total_efectivo_en_caja],
+              ["", ""],
+            ],
+            trxInfo: [
+              ["Total sobrante", cierre?.total_sobrante],
+              ["", ""],
+              ["Total faltante", cierre?.total_faltante],
+              ["", ""],
+              ["Total efectivo en caja", cierre?.total_efectivo_en_caja],
+              ["", ""],
+              [
+                "Total entrega transportadora",
+                cierre?.total_entregado_transportadora,
+              ],
+              ["", ""],
+              [
+                "Total recibido transportadora",
+                cierre?.total_recibido_transportadora,
+              ],
+              ["", ""],
+              ["Total consignaciones bancarias", cierre?.total_consignaciones],
+              ["", ""],
+              [
+                "Total transferencia entre cajeros",
+                cierre?.total_transferencias,
+              ],
+              ["", ""],
+              ["Total notas deito o credito", cierre?.total_notas],
+              ["", ""],
+            ],
+          };
+          setResumenCierre(tempTicket);
+          return res?.msg;
+        },
+      },
+      {
+        render: ({ data: error }) => {
+          setLoading(false);
+          if (error?.cause === "custom") {
+            return error?.message;
+          }
+          console.error(error?.message);
+          return "Busqueda fallida";
+        },
+      },
+      { toastId: "busqueda-cierre-123" }
+    );
+  }, [
+    denominaciones,
+    nombreComercio,
+    roleInfo?.id_comercio,
+    roleInfo?.id_dispositivo,
+    roleInfo?.id_usuario,
+  ]);
+
+  const printDiv = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
+
   return (
-    roleInfo.tipo_comercio === "OFICINAS PROPIAS" && (
+    roleInfo?.tipo_comercio === "OFICINAS PROPIAS" && (
       <Fragment>
         {totalCierres === 2 ? (
-          <Fragment>
-            <h1>Señor usuario la caja ya fue cerrada el día de hoy</h1>
-          </Fragment>
+          <h1 className="text-3xl mt-6">
+            Señor usuario la caja ya fue cerrada el día de hoy
+          </h1>
         ) : totalCierres === 3 || totalCierres === 1 || true ? (
-          <Fragment>
-            <Button onClick={() => setEstado(true)}>
-              Arqueo y cierre de caja
-            </Button>
-          </Fragment>
+          <Button
+            type="submit"
+            onClick={() => setEstado(true)}
+            disabled={loading}
+          >
+            Arqueo y cierre de caja
+          </Button>
         ) : (
-          <h1>Cargando...</h1>
+          <h1 className="text-3xl mt-6">Cargando...</h1>
         )}
         <Modal
           show={estado}
-          handleClose={closeModalFunction}
-          allowClose={allowClose}
+          handleClose={loading || resumenCierre ? () => {} : closeModalFunction}
         >
-          {!cierre && (
-            <Arqueo
-              caja={total}
-              respuestaComprobante={respuestaComprobante}
-              setCierre={setCierre}
-              setResArqueo={setResArqueo}
-              setSobrante={setSobrante}
-              setFaltante={setFaltante}
-              setAllowClose={setAllowClose}
-            />
-          )}
-          {cierre && (
-            <Cierre
-              arqueo={resArqueo}
-              respuestaComprobante={respuestaComprobante}
-              caja={total}
-              roleInfo={roleInfo}
-              setEstado={setEstado}
-              setCierre={setCierre}
-              sobra={sobrante}
-              falta={faltante}
-            />
+          {!resumenCierre ? (
+            !confirmarArqueo ? (
+              <Fragment>
+                <Fieldset className="col-span-2" legend={"Arqueo de caja"}>
+                  {denominaciones.map(([key, val]) => (
+                    <Input
+                      key={key}
+                      name={key}
+                      label={formatMoney.format(key)}
+                      // value={val}
+                      onChange={(ev) =>
+                        setDenominaciones((old) => {
+                          const copy = new Map(old);
+                          copy.set(
+                            key,
+                            isNaN(parseInt(onChangeNumber(ev)))
+                              ? 0
+                              : parseInt(onChangeNumber(ev))
+                          );
+                          return Array.from(copy);
+                        })
+                      }
+                      type="tel"
+                      info={formatMoney.format(key * val)}
+                    />
+                  ))}
+                </Fieldset>
+                <Fieldset legend={"Saldos"}>
+                  <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+                    <div>
+                      <h1 className="text-2xl font-semibold">
+                        Total arqueo:&nbsp;
+                        {formatMoney.format(totalArqueo)}
+                      </h1>
+                    </div>
+                  </div>
+                  <ButtonBar>
+                    <Button
+                      type="submit"
+                      onClick={() => setConfirmarArqueo(true)}
+                    >
+                      Confirmar arqueo
+                    </Button>
+                  </ButtonBar>
+                </Fieldset>
+              </Fragment>
+            ) : (
+              <PaymentSummary
+                title="¿Está seguro de los datos para el arqueo? Una vez confirmados no podrá modificarlos."
+                subtitle={`Total arqueo: ${formatMoney.format(totalArqueo)}`}
+              >
+                <ButtonBar>
+                  <Button
+                    type="submit"
+                    onClick={() => cierreCaja()}
+                    disabled={loading}
+                  >
+                    Aceptar
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => setConfirmarArqueo(false)}
+                    disabled={loading}
+                  >
+                    Cancelar
+                  </Button>
+                </ButtonBar>
+              </PaymentSummary>
+            )
+          ) : (
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+              <TicketCierre refPrint={printDiv} ticket={resumenCierre} />
+              <ButtonBar>
+                <Button onClick={handlePrint}>Imprimir</Button>
+                <Button onClick={() => signOut()}>Cerrar sesion</Button>
+              </ButtonBar>
+            </div>
           )}
         </Modal>
       </Fragment>
