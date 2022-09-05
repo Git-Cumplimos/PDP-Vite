@@ -13,7 +13,7 @@ const formatMoney = makeMoneyFormatter(0);
 
 const dateFormatter = makeDateFormatter(true);
 
-const PanelConsignaciones = () => {
+const PanelHistorico = () => {
   const [receipt, setReceipt] = useState([]);
   const [pageData, setPageData] = useState({});
   const [maxPages, setMaxPages] = useState(1);
@@ -145,25 +145,25 @@ const PanelConsignaciones = () => {
         />
         <Input
           id="id_comercio"
-          name={"id_usuario"}
+          name={"id_comercio"}
           label="Id comercio"
           type="tel"
           onInput={(ev) =>
             setSearchInfo((old) => ({
               ...old,
-              [ev.target.name]: onChangeNumber(ev.target.value),
+              [ev.target.name]: onChangeNumber(ev),
             }))
           }
         />
         <Input
           id="id_usuario"
-          name={"id_comercio"}
+          name={"id_usuario"}
           label="Id usuario"
           type="tel"
           onInput={(ev) =>
             setSearchInfo((old) => ({
               ...old,
-              [ev.target.name]: onChangeNumber(ev.target.value),
+              [ev.target.name]: onChangeNumber(ev),
             }))
           }
         />
@@ -172,4 +172,4 @@ const PanelConsignaciones = () => {
   );
 };
 
-export default PanelConsignaciones;
+export default PanelHistorico;

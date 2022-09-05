@@ -7,7 +7,7 @@ import BarIcon from "../../components/Base/BarIcon";
 import UserInfo from "../../components/Compound/UserInfo";
 import RightArrow from "../../components/Base/RightArrow";
 import { useAuth } from "../../hooks/AuthHooks";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import HNavbar from "../../components/Base/HNavbar";
 import Modal from "../../components/Base/Modal";
 import Button from "../../components/Base/Button";
@@ -17,6 +17,7 @@ import { Outlet } from "react-router-dom";
 import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
 import { searchCierre } from "../../pages/Gestion/utils/fetchCaja";
 import { notifyError } from "../../utils/notify";
+import ButtonBar from "../../components/Base/ButtonBar";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -33,7 +34,6 @@ const AdminLayout = () => {
     saldoCupo,
     comision,
     cargar,
-    itemButtonCentered,
   } = classes;
 
   const { quotaInfo, roleInfo, signOut } = useAuth();
@@ -56,10 +56,10 @@ const AdminLayout = () => {
 
   const [clientWidth] = useWindowSize();
 
-  const closeCash = async () => {
+  const closeCash = useCallback(() => {
     navigate(`/gestion/arqueo/panel-transacciones`);
     setInfoCaja(false);
-  };
+  }, [navigate]);
 
   const {
     svgs: { backIcon2 },
@@ -148,22 +148,22 @@ const AdminLayout = () => {
               <h1>
                 Señor usuario, la caja presenta cierre tardío, no se pueden
                 realizar transacciones hasta que la cierre.
-                <div className={itemButtonCentered}>
+                <ButtonBar>
                   <Button
                     className="btn mx-auto d-block"
-                    type="button"
+                    type="submit"
                     onClick={() => closeCash()}
                   >
                     Cerrar caja
                   </Button>
-                </div>
+                </ButtonBar>
               </h1>
             </div>
           ) : cajaState === 4 ? (
             <h1 className="text-center">
               Señor usuario, la caja ha sido cerrada, no se pueden realizar mas
               transacciones
-              <div className="ml-32">
+              <ButtonBar>
                 <Button
                   type="submit"
                   onClick={() => {
@@ -173,7 +173,7 @@ const AdminLayout = () => {
                 >
                   Cerrar sesión
                 </Button>
-              </div>
+              </ButtonBar>
             </h1>
           ) : (
             <></>
