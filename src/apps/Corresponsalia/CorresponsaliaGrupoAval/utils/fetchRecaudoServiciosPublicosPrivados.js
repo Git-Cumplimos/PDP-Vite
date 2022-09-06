@@ -65,13 +65,13 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
     throw err;
   }
 };
-export const postConsultaConveniosDavivienda = async (bodyObj) => {
+export const postConsultaConveniosAval = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlAval}davivienda_recaudo_servicios_publicos_privados/consulta_recaudo_servicios_publicos_privados`,
+      `${urlAval}/grupo_aval_cb_recaudo/consulta_recaudo_servicios_publicos_privados`,
       "POST",
       {},
       bodyObj,

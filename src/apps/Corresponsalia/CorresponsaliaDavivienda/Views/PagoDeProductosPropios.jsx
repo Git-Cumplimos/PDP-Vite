@@ -215,29 +215,30 @@ const PagoDeProductosPropios = () => {
     if (tipoAbono.tipoAbonoId === "")
       return notifyError("Ingrese un tipo de abono");
     if (
-      (tipoAbono.tipoAbonoId === "0003" ||
-        tipoAbono.tipoAbonoId === "0004" ||
-        tipoAbono.tipoAbonoId === "0005" ||
-        tipoAbono.tipoAbonoId === "0006") &&
-      tipoAbono.valorAbono === ""
-    )
-      return notifyError("Ingrese el valor del abono");
-    if (tipoAbono.valorAbono > limiteRecarga.superior) {
-      return notifyError(
-        `El valor del abono debe ser menor a ${formatMoney.format(
-          limiteRecarga.superior
-        )}`
-      );
+      tipoAbono.tipoAbonoId === "0003" ||
+      tipoAbono.tipoAbonoId === "0004" ||
+      tipoAbono.tipoAbonoId === "0005" ||
+      tipoAbono.tipoAbonoId === "0006"
+    ) {
+      if (tipoAbono.valorAbono === "")
+        return notifyError("Ingrese el valor del abono");
+      if (tipoAbono.valorAbono > limiteRecarga.superior) {
+        return notifyError(
+          `El valor del abono debe ser menor a ${formatMoney.format(
+            limiteRecarga.superior
+          )}`
+        );
+      }
+      if (tipoAbono.valorAbono < limiteRecarga.inferior) {
+        return notifyError(
+          `El valor del abono debe ser mayor a ${formatMoney.format(
+            limiteRecarga.inferior
+          )}`
+        );
+      }
+      if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
+        return notifyError("El valor del abono debe ser menor al valor total");
     }
-    if (tipoAbono.valorAbono < limiteRecarga.inferior) {
-      return notifyError(
-        `El valor del abono debe ser mayor a ${formatMoney.format(
-          limiteRecarga.inferior
-        )}`
-      );
-    }
-    if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
-      return notifyError("El valor del abono debe ser menor al valor total");
     setPeticion(3);
   };
   const peticionPagoPropios = () => {
@@ -507,9 +508,16 @@ const PagoDeProductosPropios = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de consulta Davivienda
               </h1>
-              <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
-              <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
+              <h2>{`Nombre del titular: ${
+                datosConsulta.valNombreTitular ?? ""
+              } ${datosConsulta.valApellidoTitular ?? ""}`}</h2>
+              <h2>{`Número de producto: ${
+                datosConsulta.numProducto ?? ""
+              }`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
+              <h2>{`Valor de la comisión: ${formatMoney.format(
+                datosConsulta.valCobro
+              )}`}</h2>
               <h2>{`Valor de pago mínimo: ${formatMoney.format(
                 datosConsulta.valPagoMinimo
               )}`}</h2>
@@ -606,10 +614,17 @@ const PagoDeProductosPropios = () => {
               <h1 className='text-2xl font-semibold'>
                 ¿Está seguro de realizar el pago del producto de crédito?
               </h1>
-              <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
-              <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
+              <h2>{`Nombre del titular: ${
+                datosConsulta.valNombreTitular ?? ""
+              } ${datosConsulta.valApellidoTitular ?? ""}`}</h2>
+              <h2>{`Número de producto: ${
+                datosConsulta.numProducto ?? ""
+              }`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
-              <h2>{`Número producto: ${tipoAbono.tipoAbonoNombre}`}</h2>
+              <h2>{`Tipo de abono: ${tipoAbono.tipoAbonoNombre}`}</h2>
+              <h2>{`Valor de la comisión: ${formatMoney.format(
+                datosConsulta.valCobro
+              )}`}</h2>
               <h2>{`Valor a pagar: ${formatMoney.format(
                 tipoAbono.tipoAbonoId === "0001"
                   ? datosConsulta.valPagoMinimo
