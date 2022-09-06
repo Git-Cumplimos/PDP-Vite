@@ -24,7 +24,7 @@ const ModifiLimiteCanje = () => {
   const [inputId, setinputId] = useState(false);
   const limitesMontos = {
     max: 9999999999,
-    min: -9999999999,
+    min: 0,
   };
   const { roleInfo } = useAuth();
   const navegateValid = useNavigate();
