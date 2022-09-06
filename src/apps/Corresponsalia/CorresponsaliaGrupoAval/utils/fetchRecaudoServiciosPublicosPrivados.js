@@ -86,13 +86,13 @@ export const postConsultaConveniosAval = async (bodyObj) => {
     throw err;
   }
 };
-export const postRecaudoConveniosDavivienda = async (bodyObj) => {
+export const postRecaudoConveniosAval = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlAval}davivienda_recaudo_servicios_publicos_privados/recaudo_servicios_publicos_privados`,
+      `${urlAval}/grupo_aval_cb_recaudo/recaudo_servicios_publicos_privados`,
       "POST",
       {},
       bodyObj,
