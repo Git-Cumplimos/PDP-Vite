@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 const NotasDebito = () => {
   const navigate = useNavigate();
-  const { roleInfo } = useAuth();
+  const { roleInfo, userInfo } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [datosNota, setDatosNota] = useState(
@@ -75,9 +75,15 @@ const NotasDebito = () => {
       copy.set("id_comercio", roleInfo?.id_comercio);
       copy.set("id_usuario", roleInfo?.id_usuario);
       copy.set("id_terminal", roleInfo?.id_dispositivo);
+      copy.set("responsable", userInfo?.attributes?.name);
       return new Map(copy);
     });
-  }, [roleInfo?.id_comercio, roleInfo?.id_usuario, roleInfo?.id_dispositivo]);
+  }, [
+    roleInfo?.id_comercio,
+    roleInfo?.id_usuario,
+    roleInfo?.id_dispositivo,
+    userInfo?.attributes?.name,
+  ]);
 
   return (
     <Fragment>
@@ -107,6 +113,14 @@ const NotasDebito = () => {
               return new Map(copy);
             })
           }
+          required
+        />
+        <Input
+          id="responsable"
+          name="responsable"
+          label={"Responsable"}
+          value={userInfo?.attributes?.name ?? ""}
+          readOnly
           required
         />
         <Input
