@@ -36,7 +36,7 @@ const AdminLayout = () => {
     cargar,
   } = classes;
 
-  const { quotaInfo, roleInfo, signOut } = useAuth();
+  const { quotaInfo, roleInfo, signOut, userPermissions } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -83,7 +83,8 @@ const AdminLayout = () => {
       roleInfo?.id_usuario !== undefined,
       roleInfo?.id_comercio !== undefined,
       roleInfo?.id_dispositivo !== undefined,
-      pathname === "/",
+      pathname !== "/gestion/arqueo/panel-transacciones",
+      userPermissions?.map(({id_permission}) => id_permission).includes(74)
     ];
     if (conditions.every((val) => val)) {
       searchCierre({
@@ -111,6 +112,7 @@ const AdminLayout = () => {
     roleInfo?.id_dispositivo,
     roleInfo?.id_usuario,
     roleInfo?.tipo_comercio,
+    userPermissions,
   ]);
 
   return (
