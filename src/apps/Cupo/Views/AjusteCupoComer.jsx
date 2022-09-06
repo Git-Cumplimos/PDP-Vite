@@ -21,7 +21,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
 
   const limitesMontos = {
     max: 9999999999,
-    min: -9999999999,
+    min: 0,
   };
 
   const { roleInfo } = useAuth();

@@ -148,41 +148,56 @@ const Panel = () => {
               ["", ""],
             ],
             cajaInfo: [
-              ["Total movimientos del dia", cierre?.total_movimientos],
+              [
+                "Total movimientos del dia",
+                formatMoney.format(cierre?.total_movimientos),
+              ],
               ["", ""],
               [
                 "Total efectivo cierre dia anterior",
-                cierre?.total_efectivo_cierre_día_anterior,
+                formatMoney.format(cierre?.total_efectivo_cierre_día_anterior),
               ],
               ["", ""],
-              ["Total efectivo en caja", cierre?.total_efectivo_en_caja],
+              [
+                "Total efectivo en caja",
+                formatMoney.format(cierre?.total_efectivo_en_caja),
+              ],
               ["", ""],
             ],
             trxInfo: [
-              ["Total sobrante", cierre?.total_sobrante],
+              ["Total sobrante", formatMoney.format(cierre?.total_sobrante)],
               ["", ""],
-              ["Total faltante", cierre?.total_faltante],
+              ["Total faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
-              ["Total efectivo en caja", cierre?.total_efectivo_en_caja],
+              [
+                "Total efectivo en caja",
+                formatMoney.format(cierre?.total_efectivo_en_caja),
+              ],
               ["", ""],
               [
                 "Total entrega transportadora",
-                cierre?.total_entregado_transportadora,
+                formatMoney.format(cierre?.total_entregado_transportadora),
               ],
               ["", ""],
               [
                 "Total recibido transportadora",
-                cierre?.total_recibido_transportadora,
+                formatMoney.format(cierre?.total_recibido_transportadora),
               ],
               ["", ""],
-              ["Total consignaciones bancarias", cierre?.total_consignaciones],
+              [
+                "Total consignaciones bancarias",
+                formatMoney.format(cierre?.total_consignaciones),
+              ],
               ["", ""],
               [
                 "Total transferencia entre cajeros",
-                cierre?.total_transferencias,
+                formatMoney.format(cierre?.total_transferencias),
               ],
               ["", ""],
-              ["Total notas deito o credito", cierre?.total_notas],
+              [
+                "Total notas deito o credito",
+                formatMoney.format(cierre?.total_notas),
+              ],
               ["", ""],
             ],
           };

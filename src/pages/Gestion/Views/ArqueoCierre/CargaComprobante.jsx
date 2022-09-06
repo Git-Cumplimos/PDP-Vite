@@ -207,10 +207,10 @@ const CargaComprobante = () => {
       })
       .catch((err) => {
         if (err?.cause === "custom") {
-          return err?.message;
+          notifyError(err?.message);
         }
         console.error(err?.message);
-        return "Peticion fallida";
+        notifyError("Peticion fallida");
       });
   }, []);
 
