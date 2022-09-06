@@ -53,7 +53,7 @@ const ParametrizacionRecaudo = () => {
         Object.entries(Object.fromEntries(formData)).map(([key, val]) => [
           key,
           key === "pk_is_transportadora"
-            ? val === "true"
+            ? val === "2"
             : key === "pk_nombre_entidad"
             ? val.trim()
             : val,
@@ -176,7 +176,7 @@ const ParametrizacionRecaudo = () => {
               name="pk_is_transportadora"
               label="Tipo de entidad"
               options={[
-                { value: "0", label: "" },
+                { value: "", label: "" },
                 { value: "1", label: "Bancos" },
                 { value: "2", label: "Transportadora" },
               ]}
