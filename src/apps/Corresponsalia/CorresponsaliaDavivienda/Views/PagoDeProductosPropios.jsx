@@ -25,7 +25,7 @@ const PagoDeProductosPropios = () => {
   const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: 1000000,
+    superior: 9900001,
     inferior: 1,
   });
   const [peticion, setPeticion] = useState(0);
@@ -214,31 +214,40 @@ const PagoDeProductosPropios = () => {
     e.preventDefault();
     if (tipoAbono.tipoAbonoId === "")
       return notifyError("Ingrese un tipo de abono");
-    if (
-      tipoAbono.tipoAbonoId === "0003" ||
-      tipoAbono.tipoAbonoId === "0004" ||
-      tipoAbono.tipoAbonoId === "0005" ||
-      tipoAbono.tipoAbonoId === "0006"
-    ) {
-      if (tipoAbono.valorAbono === "")
-        return notifyError("Ingrese el valor del abono");
-      if (tipoAbono.valorAbono > limiteRecarga.superior) {
-        return notifyError(
-          `El valor del abono debe ser menor a ${formatMoney.format(
-            limiteRecarga.superior
-          )}`
-        );
-      }
-      if (tipoAbono.valorAbono < limiteRecarga.inferior) {
-        return notifyError(
-          `El valor del abono debe ser mayor a ${formatMoney.format(
-            limiteRecarga.inferior
-          )}`
-        );
-      }
-      if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
-        return notifyError("El valor del abono debe ser menor al valor total");
+    let valorPagar = 0;
+    if (tipoAbono.tipoAbonoId === "0001") {
+      valorPagar = datosConsulta?.valPagoMinimo;
+    } else if (tipoAbono.tipoAbonoId === "0002") {
+      valorPagar = datosConsulta?.valPagoTotal;
+    } else {
+      valorPagar = tipoAbono.valorAbono;
     }
+    // if (
+    //   tipoAbono.tipoAbonoId === "0003" ||
+    //   tipoAbono.tipoAbonoId === "0004" ||
+    //   tipoAbono.tipoAbonoId === "0005" ||
+    //   tipoAbono.tipoAbonoId === "0006"
+    // ) {
+    if (valorPagar === 0) return notifyError("Ingrese el valor del abono");
+    if (valorPagar > limiteRecarga.superior) {
+      return notifyError(
+        `El valor de la transacción debe ser menor a ${formatMoney.format(
+          limiteRecarga.superior
+        )}`
+      );
+    }
+    if (valorPagar < limiteRecarga.inferior) {
+      return notifyError(
+        `El valor de la transacción debe ser mayor a ${formatMoney.format(
+          limiteRecarga.inferior
+        )}`
+      );
+    }
+    if (valorPagar > datosConsulta.valPagoTotal)
+      return notifyError(
+        "El valor de la transacción debe ser menor al valor total"
+      );
+    // }
     setPeticion(3);
   };
   const peticionPagoPropios = () => {

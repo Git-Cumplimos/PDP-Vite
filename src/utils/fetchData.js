@@ -39,7 +39,7 @@ const fetchData = async (
     url += `?${queries}`;
   }
 
-  const fetchOptions = { method: method };
+  const fetchOptions = { method: method, cors: "no-cors" };
   const _headers = {};
   if (authenticate) {
     _headers.Authorization = `Bearer ${session?.idToken?.jwtToken}`;
