@@ -386,7 +386,7 @@ const Retiro = () => {
           show={showModal}
           handleClose={
             paymentStatus
-              ? () => {}
+              ? goToRecaudo
               : loadingRetiroCorresponsal
               ? () => {}
               : handleClose

@@ -427,11 +427,12 @@ const Deposito = () => {
           show={showModal}
           handleClose={
             paymentStatus
-              ? () => {}
+              ? goToRecaudo
               : loadingDepositoCorresponsal
               ? () => {}
               : handleClose
           }
+
           >
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
