@@ -514,9 +514,16 @@ const PagoDeProductosPropios = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de consulta Davivienda
               </h1>
-              <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
-              <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
+              <h2>{`Nombre del titular: ${
+                datosConsulta.valNombreTitular ?? ""
+              } ${datosConsulta.valApellidoTitular ?? ""}`}</h2>
+              <h2>{`Número de producto: ${
+                datosConsulta.numProducto ?? ""
+              }`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
+              <h2>{`Valor de la comisión: ${formatMoney.format(
+                datosConsulta.valCobro
+              )}`}</h2>
               <h2>{`Valor de pago mínimo: ${formatMoney.format(
                 datosConsulta.valPagoMinimo
               )}`}</h2>
@@ -613,10 +620,17 @@ const PagoDeProductosPropios = () => {
               <h1 className='text-2xl font-semibold'>
                 ¿Está seguro de realizar el pago del producto de crédito?
               </h1>
-              <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
-              <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
+              <h2>{`Nombre del titular: ${
+                datosConsulta.valNombreTitular ?? ""
+              } ${datosConsulta.valApellidoTitular ?? ""}`}</h2>
+              <h2>{`Número de producto: ${
+                datosConsulta.numProducto ?? ""
+              }`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
-              <h2>{`Número producto: ${tipoAbono.tipoAbonoNombre}`}</h2>
+              <h2>{`Tipo de abono: ${tipoAbono.tipoAbonoNombre}`}</h2>
+              <h2>{`Valor de la comisión: ${formatMoney.format(
+                datosConsulta.valCobro
+              )}`}</h2>
               <h2>{`Valor a pagar: ${formatMoney.format(
                 tipoAbono.tipoAbonoId === "0001"
                   ? datosConsulta.valPagoMinimo

@@ -319,7 +319,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         ticket: objTicket,
         fecCodigDeBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        valCodigoDeBarras: datosTrans.codBarras.slice(3).replace("\u001d", ""),
+        valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -373,6 +373,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         });
     } else {
       setIsUploading(true);
+      let dataCodBarras = datosTrans.codBarras.slice(3).replace(/[\x1D]/g, "");
       postConsultaConveniosDavivienda({
         tipoTransaccion: "1",
         numNumeroConvenioIAC: datosEnvio?.datosConvenio?.cod_iac_cnb,
@@ -380,9 +381,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
         fecFechaCodigoBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        numValorCodigoBarras: datosTrans.codBarras
-          .slice(3)
-          .replace("\u001d", ""),
+        numValorCodigoBarras: dataCodBarras,
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,

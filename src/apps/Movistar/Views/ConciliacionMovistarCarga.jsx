@@ -87,8 +87,8 @@ const ConciliacionMovistarCarga = () => {
       .catch((error) => {
         const errormom = error?.split(">>>>");
         const error_id = errormom[0].match(/\d/g);
-        const error_vector_usuario = [1, 3, 4, 5];
-        const error_vector_sistema = [0, 2, 6, 7, 8, 9];
+        const error_vector_usuario = [1, 3, 4, 5, 7];
+        const error_vector_sistema = [0, 2, 6, 8, 9, 10];
         const error_concidencia_usuario = error_vector_usuario.filter(
           (error_ind) => error_ind == error_id
         );

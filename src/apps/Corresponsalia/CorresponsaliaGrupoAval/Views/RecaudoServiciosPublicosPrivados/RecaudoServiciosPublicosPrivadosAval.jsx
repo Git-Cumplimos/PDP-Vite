@@ -24,6 +24,7 @@ import TicketsDavivienda from "../../components/TicketsDavivienda";
 import {
   postConsultaConveniosAval,
   postConsultaTablaConveniosEspecifico,
+  postRecaudoConveniosAval,
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
@@ -40,11 +41,8 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     ref1: "",
     ref2: "",
     valor: "",
-  });
-  const [datosTransValidacion, setDatosTransValidacion] = useState({
-    ref1: "",
-    ref2: "",
-    valor: "",
+    valorConst: "",
+    valorVar: "",
   });
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de Pago de Recaudo de Facturas",
@@ -71,10 +69,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     trxInfo: [],
     disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
   });
-  const [datosConsulta, setDatosConsulta] = useState({
-    idTrx: "",
-    consultaDavivienda: {},
-  });
+  const [datosConsulta, setDatosConsulta] = useState({});
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
   const dataConveniosPagar = ["3", "0"];
@@ -130,22 +125,16 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          console.log("consulta", res);
           setShowModal((old) => ({ ...old, showModal: true }));
           setDatosConsulta(res?.obj);
-          // setDatosTransaccion((old) => {
-          //   return {
-          //     ...old,
-          //     showValor2: formatMoney.format(valorTrxCons) ?? "",
-          //     valor: valorTrxCons ?? "",
-          //     valorSinModificar2: valorTrxCons ?? "",
-          //   };
-          // });
-          // setPeticion(2);
+          setDatosTrans((old) => ({
+            ...old,
+            valorConst: formatMoney.format(res?.obj?.valorTrx) ?? "",
+            valorVar: res?.obj?.valorTrx,
+          }));
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
-          // hideModal();
         }
       })
       .catch((err) => {
@@ -156,208 +145,97 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();
-    if (estadoPeticion !== 1) {
-      if (convenio?.ctrol_ref1_cnb === "1") {
-        if (datosTrans.ref1 !== datosTransValidacion.ref1)
-          return notifyError("Los datos ingresados son diferentes");
-      }
-      if (convenio?.ctrol_ref2_cnb === "1") {
-        if (datosTrans.ref2 !== datosTransValidacion.ref2)
-          return notifyError("Los datos ingresados son diferentes");
-      }
-      if (dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)) {
-        if (datosTrans.valor !== datosTransValidacion.valor) {
-          return notifyError("El valor ingresado es diferente");
-        }
-      }
-    }
-    if (
-      dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb) ||
-      estadoPeticion === 1
-    ) {
-      let valorTransaccion = 0;
-      if (estadoPeticion === 1) {
-        if (typeof datosTransValidacion?.valor == "string") {
-          valorTransaccion = datosTransValidacion?.valor.replace(/[$ .]/g, "");
-          valorTransaccion = parseInt(valorTransaccion);
-        } else {
-          valorTransaccion = datosTransValidacion?.valor;
-        }
-        if (convenio?.ind_valor_exacto_cnb === "0") {
-          if (
-            convenio?.ind_mayor_vlr_cnb === "0" &&
-            valorTransaccion >
-              datosConsulta.consultaDavivienda?.numValorTotalFactura
-          )
-            return notifyError("No esta permitido el pago mayor al consultado");
-          if (
-            convenio?.ind_menor_vlr_cnb === "0" &&
-            valorTransaccion <
-              datosConsulta.consultaDavivienda?.numValorTotalFactura
-          ) {
-            if (
-              !(convenio?.ind_valor_ceros_cnb === "1" && valorTransaccion === 0)
-            ) {
-              return notifyError(
-                "No esta permitido el pago menor al consultado"
-              );
-            }
-          }
-          if (convenio?.ind_valor_ceros_cnb === "0" && valorTransaccion === 0) {
-            return notifyError("No esta permitido el pago en ceros");
-          }
-        }
-      } else {
-        valorTransaccion = datosTransValidacion?.valor ?? "0";
-      }
-      const hoy = new Date();
-      const fecha =
-        hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
-      /*hora actual */
-      const hora =
-        hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-      const objTicket = { ...objTicketActual };
-      objTicket["timeInfo"]["Fecha de venta"] = fecha;
-      objTicket["timeInfo"]["Hora"] = hora;
-      objTicket["trxInfo"].push(["Convenio", convenio.nom_convenio_cnb]);
-      objTicket["trxInfo"].push(["", ""]);
-      objTicket["trxInfo"].push(["Código convenio", convenio.cod_convenio_cnb]);
-      objTicket["trxInfo"].push(["", ""]);
-      objTicket["trxInfo"].push([
-        "Referencia 1",
-        datosTransValidacion?.ref1 ?? "",
-      ]);
-      objTicket["trxInfo"].push(["", ""]);
-      objTicket["trxInfo"].push([
-        "Referencia 2",
-        datosTransValidacion?.ref2 ?? "",
-      ]);
-      objTicket["trxInfo"].push(["", ""]);
-      setIsUploading(true);
-      postRecaudoConveniosDavivienda({
-        valTipoConsultaConvenio: "2",
-        numConvenio: convenio.cod_convenio_cnb,
-        numTipoProductoRecaudo: convenio.tipo_cta_recaudo_cnb,
-        numProductoRecaudo: convenio.nro_cta_recaudo_cnb,
-        valTipoProdDestinoRecaudoCent: convenio.tipo_cta_destino_cnb,
-        valProdDestinoRecaudoCent: convenio.nro_cta_destino_cnb,
-        valCodigoIAC: "0",
-        valor: valorTransaccion,
-        valReferencia1: datosTransValidacion?.ref1 ?? "",
-        valReferencia2: datosTransValidacion?.ref2 ?? "",
-        nomConvenio: convenio.nom_convenio_cnb,
-        ticket: objTicket,
-
-        idComercio: roleInfo?.id_comercio,
-        idUsuario: roleInfo?.id_usuario,
-        idTerminal: roleInfo?.id_dispositivo,
-        issuerIdDane: roleInfo?.codigo_dane,
-        nombreComercio: roleInfo?.["nombre comercio"],
-        municipio: roleInfo?.["ciudad"],
-        oficinaPropia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
-      })
-        .then((res) => {
-          if (res?.status) {
-            setIsUploading(false);
-            notify(res?.msg);
-            objTicket["commerceInfo"][1] = [
-              "No. terminal",
-              res?.obj?.codigoTotal,
-            ];
-            objTicket["commerceInfo"].push([
-              "No. de aprobación Banco",
-              res?.obj?.respuestaDavivienda?.valTalonOut,
-            ]);
-            objTicket["commerceInfo"].push(["", ""]);
-            objTicket["trxInfo"].push([
-              "Valor",
-              formatMoney.format(res?.obj?.valor),
-            ]);
-            objTicket["trxInfo"].push(["", ""]);
-            objTicket["trxInfo"].push([
-              "Costo transacción",
-              formatMoney.format(0),
-            ]);
-            objTicket["trxInfo"].push(["", ""]);
-            objTicket["trxInfo"].push([
-              "Total",
-              formatMoney.format(res?.obj?.valor),
-            ]);
-            objTicket["trxInfo"].push(["", ""]);
-            setObjTicketActual(objTicket);
-            setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
-          } else {
-            setIsUploading(false);
-            notifyError(res?.msg);
-            handleClose();
-          }
-        })
-        .catch((err) => {
+    let valorTransaccion = datosTrans?.valorVar ?? 0;
+    const hoy = new Date();
+    const fecha =
+      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+    /*hora actual */
+    const hora =
+      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+    const objTicket = { ...objTicketActual };
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"].push(["Convenio", convenio.convenio]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push(["Referencia 1", datosTrans?.ref1 ?? ""]);
+    objTicket["trxInfo"].push(["", ""]);
+    setIsUploading(true);
+    postRecaudoConveniosAval({
+      oficina_propia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      valor_total_trx: valorTransaccion,
+      nombre_comercio: roleInfo?.["nombre comercio"],
+      comercio: {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+      recaudoAval: {
+        54: datosConsulta?.tipoRecaudo?.["54"] ?? "",
+        62: datosConsulta?.tipoRecaudo?.["62"] ?? "",
+        103: datosConsulta?.tipoRecaudo?.["103"] ?? "",
+        104: datosConsulta?.tipoRecaudo?.["104"] ?? "",
+        location: {
+          address: roleInfo?.["direccion"],
+          dane_code: roleInfo?.codigo_dane,
+          city: roleInfo?.["ciudad"],
+        },
+      },
+    })
+      .then((res) => {
+        console.log(res);
+        if (res?.status) {
           setIsUploading(false);
-          notifyError("No se ha podido conectar al servidor");
-          console.error(err);
-        });
-    } else {
-      setIsUploading(true);
-      // postConsultaConveniosDavivienda({
-      //   tipoTransaccion: "2",
-      //   numNumeroConvenioIAC: convenio.cod_convenio_cnb,
-      //   valReferencia1: datosTransValidacion?.ref1 ?? "",
-      //   valReferencia2: datosTransValidacion?.ref2 ?? "",
-
-      //   idComercio: roleInfo?.id_comercio,
-      //   idUsuario: roleInfo?.id_usuario,
-      //   idTerminal: roleInfo?.id_dispositivo,
-      //   issuerIdDane: roleInfo?.codigo_dane,
-      //   nombreComercio: roleInfo?.["nombre comercio"],
-      //   municipio: roleInfo?.["ciudad"],
-      //   oficinaPropia:
-      //     roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
-      // })
-      //   .then((res) => {
-      //     if (res?.status) {
-      //       setIsUploading(false);
-      //       notify(res?.msg);
-      //       setDatosConsulta((old) => ({
-      //         ...old,
-      //         idTrx: res?.obj?.idTrx,
-      //         consultaDavivienda: res?.obj?.respuesta_davivienda,
-      //       }));
-      //       setDatosTransValidacion((old) => ({
-      //         ...old,
-      //         valor:
-      //           formatMoney.format(
-      //             res?.obj?.respuesta_davivienda?.numValorTotalFactura
-      //           ) ?? "",
-      //       }));
-      //       setShowModal((old) => ({ ...old, estadoPeticion: 1 }));
-      //     } else {
-      //       setIsUploading(false);
-      //       notifyError(res?.msg);
-      //       handleClose();
-      //     }
-      //   })
-      //   .catch((err) => {
-      //     setIsUploading(false);
-      //     notifyError("No se ha podido conectar al servidor");
-      //     console.error(err);
-      //   });
-    }
+          notify(res?.msg);
+          // objTicket["commerceInfo"][1] = [
+          //   "No. terminal",
+          //   res?.obj?.codigoTotal,
+          // ];
+          // objTicket["commerceInfo"].push([
+          //   "No. de aprobación Banco",
+          //   res?.obj?.respuestaDavivienda?.valTalonOut,
+          // ]);
+          // objTicket["commerceInfo"].push(["", ""]);
+          // objTicket["trxInfo"].push([
+          //   "Valor",
+          //   formatMoney.format(res?.obj?.valor),
+          // ]);
+          // objTicket["trxInfo"].push(["", ""]);
+          // objTicket["trxInfo"].push([
+          //   "Costo transacción",
+          //   formatMoney.format(0),
+          // ]);
+          // objTicket["trxInfo"].push(["", ""]);
+          // objTicket["trxInfo"].push([
+          //   "Total",
+          //   formatMoney.format(res?.obj?.valor),
+          // ]);
+          // objTicket["trxInfo"].push(["", ""]);
+          setObjTicketActual(objTicket);
+          setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
+        } else {
+          setIsUploading(false);
+          notifyError(res?.msg);
+          handleClose();
+        }
+      })
+      .catch((err) => {
+        setIsUploading(false);
+        notifyError("No se ha podido conectar al servidor");
+        console.error(err);
+      });
   };
   const handleClose = useCallback(() => {
     setShowModal((old) => ({ ShowModal: false, estadoPeticion: 0 }));
-    setDatosTransValidacion((old) => ({
-      ...old,
-      ref1: "",
-      ref2: "",
-      valor: "",
-    }));
     setDatosTrans((old) => ({
       ...old,
       ref1: "",
       ref2: "",
       valor: "",
+      valorConst: "",
+      valorVar: "",
     }));
     setObjTicketActual((old) => {
       return {
@@ -453,37 +331,37 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
               <h2 className='text-base'>
                 {`Valor consultado: ${formatMoney.format(
-                  datosConsulta.consultaDavivienda.numValorTotalFactura
+                  datosConsulta?.valorTrx ?? "0"
                 )} `}
               </h2>
-              {convenio?.ind_valor_exacto_cnb === "0" &&
-                (convenio?.ind_valor_ceros_cnb !== "0" ||
-                  convenio?.ind_menor_vlr_cnb !== "0" ||
-                  convenio?.ind_mayor_vlr_cnb !== "0") && (
-                  <Form grid onSubmit={onSubmitValidacion}>
-                    <Input
-                      id='valor'
-                      name='valor'
-                      label='Valor a depositar'
-                      autoComplete='off'
-                      type='tel'
-                      minLength={"2"}
-                      maxLength={"20"}
-                      defaultValue={datosTransValidacion.valor ?? ""}
-                      onInput={(ev) =>
-                        setDatosTransValidacion((old) => ({
-                          ...old,
-                          valor: onChangeMoney(ev),
-                        }))
-                      }
-                      required
-                    />
-                    <ButtonBar>
-                      <Button onClick={handleClose}>Cancelar</Button>
-                      <Button type='submit'>Realizar pago</Button>
-                    </ButtonBar>
-                  </Form>
-                )}
+              {convenio?.parciales === "1" && (
+                <Form grid onSubmit={onSubmitValidacion}>
+                  <Input
+                    id='valor'
+                    name='valor'
+                    label='Valor a pagar'
+                    autoComplete='off'
+                    type='tel'
+                    minLength={"2"}
+                    maxLength={"20"}
+                    defaultValue={datosTrans.valorConst ?? ""}
+                    onInput={(ev) =>
+                      setDatosTrans((old) => ({
+                        ...old,
+                        valorConst: onChangeMoney(ev),
+                        valorVar: onChangeMoney(ev),
+                      }))
+                    }
+                    required
+                  />
+                </Form>
+              )}
+              <ButtonBar>
+                <Button onClick={handleClose}>Cancelar</Button>
+                <Button type='submit' onClick={onSubmitValidacion}>
+                  Realizar pago
+                </Button>
+              </ButtonBar>
             </>
           ) : estadoPeticion === 3 ? (
             <>
