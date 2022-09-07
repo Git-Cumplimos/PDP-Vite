@@ -24,6 +24,7 @@ import TicketsDavivienda from "../../components/TicketsDavivienda";
 import {
   postConsultaConveniosAval,
   postConsultaTablaConveniosEspecifico,
+  postRecaudoConveniosAval,
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
@@ -41,6 +42,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     ref2: "",
     valor: "",
     valorConst: "",
+    valorVar: "",
   });
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de Pago de Recaudo de Facturas",
@@ -128,6 +130,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           setDatosTrans((old) => ({
             ...old,
             valorConst: formatMoney.format(res?.obj?.valorTrx) ?? "",
+            valorVar: res?.obj?.valorTrx,
           }));
         } else {
           setIsUploading(false);
@@ -142,97 +145,87 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();
-    let valorTransaccion = datosTrans?.valorConst ?? "0";
-    console.log(valorTransaccion);
-    return;
-    // const hoy = new Date();
-    // const fecha =
-    //   hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
-    // /*hora actual */
-    // const hora =
-    //   hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-    // const objTicket = { ...objTicketActual };
-    // objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    // objTicket["timeInfo"]["Hora"] = hora;
-    // objTicket["trxInfo"].push(["Convenio", convenio.nom_convenio_cnb]);
-    // objTicket["trxInfo"].push(["", ""]);
-    // objTicket["trxInfo"].push(["Código convenio", convenio.cod_convenio_cnb]);
-    // objTicket["trxInfo"].push(["", ""]);
-    // objTicket["trxInfo"].push([
-    //   "Referencia 1",
-    //   datosTransValidacion?.ref1 ?? "",
-    // ]);
-    // objTicket["trxInfo"].push(["", ""]);
-    // objTicket["trxInfo"].push([
-    //   "Referencia 2",
-    //   datosTransValidacion?.ref2 ?? "",
-    // ]);
-    // objTicket["trxInfo"].push(["", ""]);
-    // setIsUploading(true);
-    // postRecaudoConveniosDavivienda({
-    //   valTipoConsultaConvenio: "2",
-    //   numConvenio: convenio.cod_convenio_cnb,
-    //   numTipoProductoRecaudo: convenio.tipo_cta_recaudo_cnb,
-    //   numProductoRecaudo: convenio.nro_cta_recaudo_cnb,
-    //   valTipoProdDestinoRecaudoCent: convenio.tipo_cta_destino_cnb,
-    //   valProdDestinoRecaudoCent: convenio.nro_cta_destino_cnb,
-    //   valCodigoIAC: "0",
-    //   // valor: valorTransaccion,
-    //   // valReferencia1: datosTransValidacion?.ref1 ?? "",
-    //   // valReferencia2: datosTransValidacion?.ref2 ?? "",
-    //   nomConvenio: convenio.nom_convenio_cnb,
-    //   ticket: objTicket,
-
-    //   idComercio: roleInfo?.id_comercio,
-    //   idUsuario: roleInfo?.id_usuario,
-    //   idTerminal: roleInfo?.id_dispositivo,
-    //   issuerIdDane: roleInfo?.codigo_dane,
-    //   nombreComercio: roleInfo?.["nombre comercio"],
-    //   municipio: roleInfo?.["ciudad"],
-    //   oficinaPropia:
-    //     roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
-    // })
-    //   .then((res) => {
-    //     if (res?.status) {
-    //       setIsUploading(false);
-    //       notify(res?.msg);
-    //       objTicket["commerceInfo"][1] = [
-    //         "No. terminal",
-    //         res?.obj?.codigoTotal,
-    //       ];
-    //       objTicket["commerceInfo"].push([
-    //         "No. de aprobación Banco",
-    //         res?.obj?.respuestaDavivienda?.valTalonOut,
-    //       ]);
-    //       objTicket["commerceInfo"].push(["", ""]);
-    //       objTicket["trxInfo"].push([
-    //         "Valor",
-    //         formatMoney.format(res?.obj?.valor),
-    //       ]);
-    //       objTicket["trxInfo"].push(["", ""]);
-    //       objTicket["trxInfo"].push([
-    //         "Costo transacción",
-    //         formatMoney.format(0),
-    //       ]);
-    //       objTicket["trxInfo"].push(["", ""]);
-    //       objTicket["trxInfo"].push([
-    //         "Total",
-    //         formatMoney.format(res?.obj?.valor),
-    //       ]);
-    //       objTicket["trxInfo"].push(["", ""]);
-    //       setObjTicketActual(objTicket);
-    //       setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
-    //     } else {
-    //       setIsUploading(false);
-    //       notifyError(res?.msg);
-    //       handleClose();
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     setIsUploading(false);
-    //     notifyError("No se ha podido conectar al servidor");
-    //     console.error(err);
-    //   });
+    let valorTransaccion = datosTrans?.valorVar ?? 0;
+    const hoy = new Date();
+    const fecha =
+      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+    /*hora actual */
+    const hora =
+      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+    const objTicket = { ...objTicketActual };
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"].push(["Convenio", convenio.convenio]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push(["Referencia 1", datosTrans?.ref1 ?? ""]);
+    objTicket["trxInfo"].push(["", ""]);
+    setIsUploading(true);
+    postRecaudoConveniosAval({
+      oficina_propia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      valor_total_trx: valorTransaccion,
+      nombre_comercio: roleInfo?.["nombre comercio"],
+      comercio: {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+      recaudoAval: {
+        54: datosConsulta?.tipoRecaudo?.["54"] ?? "",
+        62: datosConsulta?.tipoRecaudo?.["62"] ?? "",
+        103: datosConsulta?.tipoRecaudo?.["103"] ?? "",
+        104: datosConsulta?.tipoRecaudo?.["104"] ?? "",
+        location: {
+          address: roleInfo?.["direccion"],
+          dane_code: roleInfo?.codigo_dane,
+          city: roleInfo?.["ciudad"],
+        },
+      },
+    })
+      .then((res) => {
+        console.log(res);
+        if (res?.status) {
+          setIsUploading(false);
+          notify(res?.msg);
+          // objTicket["commerceInfo"][1] = [
+          //   "No. terminal",
+          //   res?.obj?.codigoTotal,
+          // ];
+          // objTicket["commerceInfo"].push([
+          //   "No. de aprobación Banco",
+          //   res?.obj?.respuestaDavivienda?.valTalonOut,
+          // ]);
+          // objTicket["commerceInfo"].push(["", ""]);
+          // objTicket["trxInfo"].push([
+          //   "Valor",
+          //   formatMoney.format(res?.obj?.valor),
+          // ]);
+          // objTicket["trxInfo"].push(["", ""]);
+          // objTicket["trxInfo"].push([
+          //   "Costo transacción",
+          //   formatMoney.format(0),
+          // ]);
+          // objTicket["trxInfo"].push(["", ""]);
+          // objTicket["trxInfo"].push([
+          //   "Total",
+          //   formatMoney.format(res?.obj?.valor),
+          // ]);
+          // objTicket["trxInfo"].push(["", ""]);
+          setObjTicketActual(objTicket);
+          setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
+        } else {
+          setIsUploading(false);
+          notifyError(res?.msg);
+          handleClose();
+        }
+      })
+      .catch((err) => {
+        setIsUploading(false);
+        notifyError("No se ha podido conectar al servidor");
+        console.error(err);
+      });
   };
   const handleClose = useCallback(() => {
     setShowModal((old) => ({ ShowModal: false, estadoPeticion: 0 }));
@@ -241,6 +234,8 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       ref1: "",
       ref2: "",
       valor: "",
+      valorConst: "",
+      valorVar: "",
     }));
     setObjTicketActual((old) => {
       return {
@@ -354,6 +349,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
                       setDatosTrans((old) => ({
                         ...old,
                         valorConst: onChangeMoney(ev),
+                        valorVar: onChangeMoney(ev),
                       }))
                     }
                     required
