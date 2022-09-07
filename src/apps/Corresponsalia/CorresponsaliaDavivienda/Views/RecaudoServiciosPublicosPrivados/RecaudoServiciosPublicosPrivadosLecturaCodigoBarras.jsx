@@ -266,10 +266,18 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       }
       const hoy = new Date();
       const fecha =
-        hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+      Intl.DateTimeFormat("es-CO", {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date())
       /*hora actual */
       const hora =
-        hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+      Intl.DateTimeFormat("es-CO", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }).format(new Date())
       const objTicket = { ...objTicketActual };
       objTicket["timeInfo"]["Fecha de venta"] = fecha;
       objTicket["timeInfo"]["Hora"] = hora;

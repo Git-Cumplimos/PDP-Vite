@@ -63,7 +63,7 @@ const Retiro = () => {
     { value: "01", label: "Cédula Ciudadanía" },
     { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
-    { value: "13", label: "Regitro Civil" },
+    { value: "13", label: "Registro Civil" },
   ];
 
   const printDiv = useRef();
