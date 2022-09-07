@@ -350,6 +350,7 @@ const Deposito = () => {
         handleClose={
           paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
         }
+        allowClose = {false} 
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
