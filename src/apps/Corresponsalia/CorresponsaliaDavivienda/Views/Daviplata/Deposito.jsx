@@ -443,7 +443,7 @@ const Deposito = () => {
         <Modal
           show={showModal}
           handleClose={
-            paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
+            paymentStatus ? goToRecaudo : loadingCashIn ? () => {} : handleClose
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
