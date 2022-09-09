@@ -12,7 +12,7 @@ export const PeticionRecarga = async (data_) => {
     if ((Peticion.status != undefined) == false) {
       // Api getwey
       notifyError(
-        "Error con fetch - no conecta con el servicio del recargas timed out"
+        "Error con fetch, timed out con el servicio de recargas"
       );
     }
     return Peticion;
@@ -130,6 +130,12 @@ export const PeticionConciliacionCargar = async (file_, params_ = "") => {
       }
     );
     const response = Peticion.json();
+    if ((Peticion.status != undefined) == false) {
+      // Api getwey
+      notifyError(
+        "Error con fetch, timed out con el servicio de cargar archivos"
+      );
+    }
     return response;
   } catch (error) {
     notifyError(
