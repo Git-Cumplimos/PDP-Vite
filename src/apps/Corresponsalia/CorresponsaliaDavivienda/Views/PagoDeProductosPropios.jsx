@@ -252,17 +252,17 @@ const PagoDeProductosPropios = () => {
   };
   const peticionPagoPropios = () => {
     const hoy = new Date();
-    const fecha =Intl.DateTimeFormat("es-CO", {
+    const fecha = Intl.DateTimeFormat("es-CO", {
       year: "2-digit",
       month: "2-digit",
       day: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     /*hora actual */
-    const hora =Intl.DateTimeFormat("es-CO", {
+    const hora = Intl.DateTimeFormat("es-CO", {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     let numeroProducto =
       datosTrans.tipoProducto === "01"
         ? datosTrans.binTarjetaCredito
@@ -371,6 +371,7 @@ const PagoDeProductosPropios = () => {
             "Cédula de ciudadanía": "01",
             "Cédula de extranjería": "02",
             NIT: "03",
+            "Tarjeta de identidad": "04",
             "NIT Persona natural": "12",
           }}
           value={datosTrans?.tipoIdentificacion}
