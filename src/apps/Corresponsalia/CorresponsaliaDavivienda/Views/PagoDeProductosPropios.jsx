@@ -393,7 +393,7 @@ const PagoDeProductosPropios = () => {
           type='text'
           name='numeroIdentificacion'
           minLength='3'
-          maxLength='10'
+          maxLength={datosTrans.tipoIdentificacion === "04" ? 11 : 10}
           required
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
