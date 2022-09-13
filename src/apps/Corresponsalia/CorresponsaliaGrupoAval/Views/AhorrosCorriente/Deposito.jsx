@@ -80,13 +80,13 @@ const Deposito = () => {
     { value: "02", label: "Corriente" },    
   ];
 
-  const optionsDocumento = [
-    { value: "", label: "" },
-    { value: "01", label: "Cédula Ciudadanía" },
-    { value: "02", label: "Cédula Extranjería" },
-    { value: "04", label: "Tarjeta Identidad" },
-    { value: "13", label: "Registro Civil" },
-  ];
+  // const optionsDocumento = [
+  //   { value: "", label: "" },
+  //   { value: "01", label: "Cédula Ciudadanía" },
+  //   { value: "02", label: "Cédula Extranjería" },
+  //   { value: "04", label: "Tarjeta Identidad" },
+  //   { value: "13", label: "Registro Civil" },
+  // ];
 
   const onSubmitModal = useCallback((e) => {
     e.preventDefault();
@@ -98,7 +98,7 @@ const Deposito = () => {
     };
     setSummary(summary)
     setShowModal(true)
-  }, [banco, userDoc, phone, valor, DataBanco]);
+  }, [userDoc, phone, valor, DataBanco]);
   
 
   const printDiv = useRef();

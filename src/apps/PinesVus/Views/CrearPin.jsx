@@ -301,6 +301,33 @@ const CrearPin = () => {
 
   const onSubmitModal = (e) => {
     e.preventDefault();
+    // Control de edad _____________________________________________________
+    let edad_correcta = false
+    const year = Intl.DateTimeFormat("es-CO", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    }).format(new Date())
+    console.log(fechaNacimiento, year)
+    if (year.split("/")[2] - fechaNacimiento.split("-")[0] > 16){
+      edad_correcta = true  
+    } 
+    else if (year.split("/")[2] - fechaNacimiento.split("-")[0] === 16){
+      console.log(year.split("/")[1] - fechaNacimiento.split("-")[1])
+      if (year.split("/")[1] - fechaNacimiento.split("-")[1] > 0){
+        edad_correcta = true
+      }
+      else if (year.split("/")[1] - fechaNacimiento.split("-")[1] === 0){
+        console.log(year.split("/")[1] - fechaNacimiento.split("-")[1])
+        if (year.split("/")[0] - fechaNacimiento.split("-")[2] > 0){
+          console.log(year.split("/")[0] - fechaNacimiento.split("-")[2])
+          edad_correcta = true
+        }  
+      }
+    }
+    console.log(edad_correcta)
+    //-------------------------------------------------------------------------
+    if (edad_correcta){
     if (firma === "") {
       notifyError("Asegúrese de tener la fimar del cliente en físico")
     }
@@ -310,6 +337,10 @@ const CrearPin = () => {
     }
     else{
       notifyError("Agregue municipio y departamento de residencia")
+    }
+    }
+    else{
+      notifyError("El cliente debe tener más de 16 años, verifique la fecha de nacimiento")
     }
     
     
