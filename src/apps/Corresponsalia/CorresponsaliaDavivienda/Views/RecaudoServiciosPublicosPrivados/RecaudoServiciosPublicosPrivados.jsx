@@ -161,17 +161,17 @@ const RecaudoServiciosPublicosPrivados = () => {
         valorTransaccion = datosTransValidacion?.valor ?? "0";
       }
       const hoy = new Date();
-      const fecha =Intl.DateTimeFormat("es-CO", {
+      const fecha = Intl.DateTimeFormat("es-CO", {
         year: "2-digit",
         month: "2-digit",
         day: "2-digit",
-      }).format(new Date())
+      }).format(new Date());
       /*hora actual */
-      const hora =Intl.DateTimeFormat("es-CO", {
+      const hora = Intl.DateTimeFormat("es-CO", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-      }).format(new Date())
+      }).format(new Date());
       const objTicket = { ...objTicketActual };
       objTicket["timeInfo"]["Fecha de venta"] = fecha;
       objTicket["timeInfo"]["Hora"] = hora;
@@ -565,6 +565,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                     type='submit'
                     onClick={() => {
                       handleClose();
+                      navigate(-1);
                     }}>
                     Aceptar
                   </Button>

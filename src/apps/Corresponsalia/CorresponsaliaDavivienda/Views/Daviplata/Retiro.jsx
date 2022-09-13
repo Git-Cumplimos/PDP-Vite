@@ -17,9 +17,11 @@ import { enumParametrosAutorizador } from "../../../../../utils/enumParametrosAu
 import { fetchParametrosAutorizadores } from "../../../../TrxParams/utils/fetchParametrosAutorizadores";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
 import HideInput from "../../../../../components/Base/HideInput";
+import { useNavigate } from "react-router-dom";
 
 const Retiro = () => {
   const { roleInfo } = useAuth();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
     superior: 720000,
@@ -156,19 +158,17 @@ const Retiro = () => {
 
   const peticionCashOut = () => {
     const hoy = new Date();
-    const fecha =
-    Intl.DateTimeFormat("es-CO", {
+    const fecha = Intl.DateTimeFormat("es-CO", {
       year: "2-digit",
       month: "2-digit",
       day: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     /*hora actual */
-    const hora =
-    Intl.DateTimeFormat("es-CO", {
+    const hora = Intl.DateTimeFormat("es-CO", {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
@@ -353,6 +353,7 @@ const Retiro = () => {
                     type='submit'
                     onClick={() => {
                       hideModal();
+                      navigate(-1);
                     }}>
                     Aceptar
                   </Button>
