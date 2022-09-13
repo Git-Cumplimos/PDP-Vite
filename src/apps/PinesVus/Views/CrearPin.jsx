@@ -308,19 +308,17 @@ const CrearPin = () => {
       month: "numeric",
       day: "numeric",
     }).format(new Date())
-    console.log(fechaNacimiento, year)
     if (year.split("/")[2] - fechaNacimiento.split("-")[0] > 16){
       edad_correcta = true  
     } 
     else if (year.split("/")[2] - fechaNacimiento.split("-")[0] === 16){
-      console.log(year.split("/")[1] - fechaNacimiento.split("-")[1])
       if (year.split("/")[1] - fechaNacimiento.split("-")[1] > 0){
         edad_correcta = true
       }
       else if (year.split("/")[1] - fechaNacimiento.split("-")[1] === 0){
-        console.log(year.split("/")[1] - fechaNacimiento.split("-")[1])
-        if (year.split("/")[0] - fechaNacimiento.split("-")[2] > 0){
-          console.log(year.split("/")[0] - fechaNacimiento.split("-")[2])
+        console.log(year.split("/")[0] - fechaNacimiento.split("-")[2])
+        console.log(year.split("/")[0] , fechaNacimiento.split("-")[2])
+        if (year.split("/")[0] - fechaNacimiento.split("-")[2] >= 0){
           edad_correcta = true
         }  
       }
