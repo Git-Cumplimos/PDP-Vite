@@ -79,7 +79,7 @@ function bytesToHex(bytes) {
 export const pinBlock = (pinX) => {
     
     let pin = pinX
-    let pan = '4473990256113499' /////// Verificar en donde poner el PAN
+    let pan = process.env.REACT_APP_PAN_AVAL; /////// Verificar en donde poner el PAN
     const L = pin.length
         
     pin = `0${L}${pin}ffffffffffffffff`     
@@ -98,7 +98,8 @@ export const pinBlock = (pinX) => {
     
     console.log('pinBLock', result)
 
-    const resultEncrip = encrypt3DES(result, '533471F0AA3648BA')
+    const key = process.env.REACT_APP_KEY_ENCRIP_AVAL
+    const resultEncrip = encrypt3DES(result, key)
 
     console.log(resultEncrip)
 

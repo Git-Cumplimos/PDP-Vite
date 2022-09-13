@@ -65,7 +65,6 @@ const Retiro = () => {
   
   const otpEncrip = useMemo(() => {
     let x
-    console.log(otp)
     if (otp.length === 4){
       x = pinBlock(otp)
     }
@@ -240,7 +239,7 @@ const Retiro = () => {
     setSummary(summary)
     setShowModal(true)
   }, [banco, userDoc, phone, valor, DataBanco]);
-  console.log(roleInfo)
+
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
     
