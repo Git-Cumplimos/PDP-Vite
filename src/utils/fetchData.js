@@ -1,4 +1,5 @@
 import { Auth } from "@aws-amplify/auth";
+import https from "https";
 
 const fetchData = async (
   url = "",
@@ -39,7 +40,9 @@ const fetchData = async (
     url += `?${queries}`;
   }
 
-  const fetchOptions = { method: method };
+  const fetchOptions = {
+    method: method,
+  };
   const _headers = {};
   if (authenticate) {
     _headers.Authorization = `Bearer ${session?.idToken?.jwtToken}`;

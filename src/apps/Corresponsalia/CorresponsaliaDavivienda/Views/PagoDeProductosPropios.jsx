@@ -25,7 +25,7 @@ const PagoDeProductosPropios = () => {
   const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: 1000000,
+    superior: 9900001,
     inferior: 1,
   });
   const [peticion, setPeticion] = useState(0);
@@ -214,46 +214,55 @@ const PagoDeProductosPropios = () => {
     e.preventDefault();
     if (tipoAbono.tipoAbonoId === "")
       return notifyError("Ingrese un tipo de abono");
-    if (
-      tipoAbono.tipoAbonoId === "0003" ||
-      tipoAbono.tipoAbonoId === "0004" ||
-      tipoAbono.tipoAbonoId === "0005" ||
-      tipoAbono.tipoAbonoId === "0006"
-    ) {
-      if (tipoAbono.valorAbono === "")
-        return notifyError("Ingrese el valor del abono");
-      if (tipoAbono.valorAbono > limiteRecarga.superior) {
-        return notifyError(
-          `El valor del abono debe ser menor a ${formatMoney.format(
-            limiteRecarga.superior
-          )}`
-        );
-      }
-      if (tipoAbono.valorAbono < limiteRecarga.inferior) {
-        return notifyError(
-          `El valor del abono debe ser mayor a ${formatMoney.format(
-            limiteRecarga.inferior
-          )}`
-        );
-      }
-      if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
-        return notifyError("El valor del abono debe ser menor al valor total");
+    let valorPagar = 0;
+    if (tipoAbono.tipoAbonoId === "0001") {
+      valorPagar = datosConsulta?.valPagoMinimo;
+    } else if (tipoAbono.tipoAbonoId === "0002") {
+      valorPagar = datosConsulta?.valPagoTotal;
+    } else {
+      valorPagar = tipoAbono.valorAbono;
     }
+    // if (
+    //   tipoAbono.tipoAbonoId === "0003" ||
+    //   tipoAbono.tipoAbonoId === "0004" ||
+    //   tipoAbono.tipoAbonoId === "0005" ||
+    //   tipoAbono.tipoAbonoId === "0006"
+    // ) {
+    if (valorPagar === 0) return notifyError("Ingrese el valor del abono");
+    if (valorPagar > limiteRecarga.superior) {
+      return notifyError(
+        `El valor de la transacción debe ser menor a ${formatMoney.format(
+          limiteRecarga.superior
+        )}`
+      );
+    }
+    if (valorPagar < limiteRecarga.inferior) {
+      return notifyError(
+        `El valor de la transacción debe ser mayor a ${formatMoney.format(
+          limiteRecarga.inferior
+        )}`
+      );
+    }
+    if (valorPagar > datosConsulta.valPagoTotal)
+      return notifyError(
+        "El valor de la transacción debe ser menor al valor total"
+      );
+    // }
     setPeticion(3);
   };
   const peticionPagoPropios = () => {
     const hoy = new Date();
-    const fecha =Intl.DateTimeFormat("es-CO", {
+    const fecha = Intl.DateTimeFormat("es-CO", {
       year: "2-digit",
       month: "2-digit",
       day: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     /*hora actual */
-    const hora =Intl.DateTimeFormat("es-CO", {
+    const hora = Intl.DateTimeFormat("es-CO", {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     let numeroProducto =
       datosTrans.tipoProducto === "01"
         ? datosTrans.binTarjetaCredito
@@ -362,6 +371,7 @@ const PagoDeProductosPropios = () => {
             "Cédula de ciudadanía": "01",
             "Cédula de extranjería": "02",
             NIT: "03",
+            "Tarjeta de identidad": "04",
             "NIT Persona natural": "12",
           }}
           value={datosTrans?.tipoIdentificacion}
@@ -383,7 +393,7 @@ const PagoDeProductosPropios = () => {
           type='text'
           name='numeroIdentificacion'
           minLength='3'
-          maxLength='10'
+          maxLength={datosTrans.tipoIdentificacion === "04" ? 11 : 10}
           required
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}

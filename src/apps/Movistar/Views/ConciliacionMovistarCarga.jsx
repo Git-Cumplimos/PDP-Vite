@@ -87,25 +87,22 @@ const ConciliacionMovistarCarga = () => {
       .catch((error) => {
         const errormom = error?.split(">>>>");
         const error_id = errormom[0].match(/\d/g);
-        const error_vector_usuario = [1, 3, 4, 5, 7];
-        const error_vector_sistema = [0, 2, 6, 8, 9, 10];
+        const error_vector_usuario = [2, 4, 5, 6, 9];
         const error_concidencia_usuario = error_vector_usuario.filter(
           (error_ind) => error_ind == error_id
         );
-        const error_concidencia_sistema = error_vector_sistema.filter(
-          (error_ind) => error_ind == error_id
-        );
-        if (error_concidencia_sistema.length > 0) {
+
+        if (error_concidencia_usuario.length > 0) {
+          console.log(errormom[1]);
+          setError_msg(errormom[1]);
+        } else {
           setTypePaymentSummary(2);
           setTitleCarga("No se pudo cargar el archivo movistar");
           setSubTitleCarga("Resumen");
           setSummary({
-            uno: "Falla en el sistema: " + errormom[0],
+            uno: `Falla en el sistema: \n${errormom[0]} \n${errormom[1]}`,
             dos: "Inténtelo más tarde",
           });
-        }
-        if (error_concidencia_usuario.length > 0) {
-          setError_msg(errormom[1]);
         }
       });
   }
@@ -175,7 +172,8 @@ const ConciliacionMovistarCarga = () => {
                 setFile(e.target.files[0]);
               }}
             />
-            <label>{error_msg}</label>
+            <label className="whitespace-pre-line">{error_msg}</label>
+
             {!loadingConciliacionCargar ? (
               <ButtonBar>
                 <Button type="button" onClick={uploadFile}>
@@ -195,10 +193,9 @@ const ConciliacionMovistarCarga = () => {
 
         {typePaymentSummary == 2 && !loadingConciliacionCargar ? (
           <PaymentSummary title={titleCarga} subtitle={subTitleCarga}>
-            <label>{summary.uno}</label>
-            <label className="text-2xl font-semibold">{summary.dos}</label>
+            <label className="whitespace-pre-line">{summary.uno}</label>
+            <label className="text-2xl font-semibold ">{summary.dos}</label>
             <label>{summary.tres}</label>
-
             <ButtonBar>
               <Button type="button" onClick={handleClose}>
                 Cerrar
