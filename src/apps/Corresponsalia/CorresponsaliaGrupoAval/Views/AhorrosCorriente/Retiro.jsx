@@ -24,8 +24,10 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import HideInput from "../../../../../components/Base/HideInput";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import useMoney from "../../../../../hooks/useMoney";
+import { pinBlock } from "../../utils/pinBlock";
 
 const Retiro = () => {
+
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
@@ -38,6 +40,8 @@ const Retiro = () => {
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
   });
+
+  
 
   const [loadingRetiroCorresponsalGrupoAval, fetchRetiroCorresponsalGrupoAval] =
     useFetch(retiroCorresponsalGrupoAval);
@@ -58,6 +62,18 @@ const Retiro = () => {
   const [summary, setSummary] = useState([])
   const [banco, setBanco] = useState("")
   const [showBTNConsulta, setShowBTNConsulta] = useState(true)
+  
+  const otpEncrip = useMemo(() => {
+    let x
+    console.log(otp)
+    if (otp.length === 4){
+      x = pinBlock(otp)
+    }
+    else{
+      x = ""
+    }
+    return x;
+  }, [otp]);
 
   const optionsBanco = [
     { value: "", label: "" },
@@ -224,24 +240,36 @@ const Retiro = () => {
     setSummary(summary)
     setShowModal(true)
   }, [banco, userDoc, phone, valor, DataBanco]);
-
+  console.log(roleInfo)
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
+    
     const body = {
-      idComercio: roleInfo?.id_comercio,
-      idUsuario: roleInfo?.id_usuario,
-      idDispositivo: roleInfo?.id_dispositivo,
-      Tipo: roleInfo?.tipo_comercio,
-      codDane: roleInfo?.codigo_dane,
-      ciudad: roleInfo?.ciudad,
-      direccion: roleInfo?.direccion,
-      ///////////////////////////////
-      idBancoAdquiriente: DataBanco?.idBanco,
-      numNumeroDocumento: userDoc,
-      numValorTransaccion: valor,
-      numTipoCuenta: tipoCuenta,
-      numCelular: phone,
-      otp: otp
+      comercio : {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+
+      oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+      nombre_comercio: roleInfo?.['nombre comercio'],
+      valor_total_trx: valor,
+
+      retiroCuentas: {
+        idBancoAdquiriente: DataBanco?.idBanco,
+        numNumeroDocumento: userDoc,
+        numValorTransaccion: valor,
+        numTipoCuenta: tipoCuenta,
+        numCelular: phone,
+        otp: otpEncrip,
+
+        location: {
+          codDane: roleInfo?.codigo_dane,
+          ciudad: roleInfo?.ciudad,
+          direccion: roleInfo?.direccion,
+
+        }
+      }        
     };
 
     fetchRetiroCorresponsalGrupoAval(body)
@@ -333,6 +361,7 @@ const Retiro = () => {
     ,
     datosConsulta,
     tipoDocumento,
+    otpEncrip
   ]);
 
   return (

@@ -301,7 +301,9 @@ const CrearPin = () => {
 
   const onSubmitModal = (e) => {
     e.preventDefault();
-    if (firma !== "") {
+    if (firma === "") {
+      notifyError("Asegúrese de tener la fimar del cliente en físico")
+    }
     if(!isNaN(infoCliente?.municipio)){
     e.preventDefault();
     setShowModal(true)
@@ -309,10 +311,8 @@ const CrearPin = () => {
     else{
       notifyError("Agregue municipio y departamento de residencia")
     }
-    }
-    else{
-      notifyError("Es necesario que el cliente autorice el uso de datos personales a Punto de Pago")
-    }
+    
+    
   };
 
   const onSubmitCliente = (e) => {
