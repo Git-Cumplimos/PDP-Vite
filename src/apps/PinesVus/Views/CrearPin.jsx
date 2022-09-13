@@ -48,6 +48,7 @@ const CrearPin = () => {
   const [showModal, setShowModal] = useState(false);
   const [showModalFirma, setShowModalFirma] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
+  const [disabledBtnsContinuar, setDisabledBtnsContinuar] = useState(false);
   const [respPin, setRespPin] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
   const [tipoPin, setTipoPin] = useState("");
@@ -327,7 +328,7 @@ const CrearPin = () => {
     //-------------------------------------------------------------------------
     if (edad_correcta){
     if (firma === "") {
-      notifyError("Asegúrese de tener la fimar del cliente en físico")
+      notifyError("Asegúrese de tener la firma del cliente en físico ")
     }
     if(!isNaN(infoCliente?.municipio)){
     e.preventDefault();
@@ -346,7 +347,7 @@ const CrearPin = () => {
 
   const onSubmitCliente = (e) => {
     e.preventDefault();
-    setDisabledBtns(true);
+    setDisabledBtnsContinuar(true);
     setShowFormulario(false)
     consultaClientes(documento,olimpia,idPin).then((resp) => {
       if (!resp?.status){
@@ -412,7 +413,6 @@ const CrearPin = () => {
         ])
       }
     }}
-    setDisabledBtns(false);
     });
   };
 
@@ -562,6 +562,11 @@ const CrearPin = () => {
         value={tipoDocumento}
         onChange={(e) => {
           setTipoDocumento(e.target.value);
+          setDisabledBtnsContinuar(false)
+          setShowFormulario(false)
+          setTipoPin("")
+          setTramite("")
+          setCategoria("")
         }}
         required
       />  
@@ -577,6 +582,11 @@ const CrearPin = () => {
         onInput={(e) => {
           const num = parseInt(e.target.value) || "";
           setDocumento(num);
+          setDisabledBtnsContinuar(false)
+          setShowFormulario(false)
+          setTipoPin("")
+          setTramite("")
+          setCategoria("")
         }}
       />
       <Select
@@ -591,6 +601,11 @@ const CrearPin = () => {
         value={olimpia}
         onChange={(e) => {
           setOlimpia(e.target.value);
+          setDisabledBtnsContinuar(false)
+          setShowFormulario(false)
+          setTipoPin("")
+          setTramite("")
+          setCategoria("")
         }}
       />
       {olimpia === "true" ? 
@@ -612,7 +627,7 @@ const CrearPin = () => {
       </>
       :"" }
       <ButtonBar className="lg:col-span-2">
-      <Button type="submit" disabled={disabledBtns}>
+      <Button type="submit" disabled={disabledBtnsContinuar}>
         Continuar
       </Button>
       </ButtonBar>
