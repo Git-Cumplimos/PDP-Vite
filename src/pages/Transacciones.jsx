@@ -71,6 +71,9 @@ const Transacciones = () => {
         day: "numeric",
       }).format(fecha_fin);
     }
+    if (userPermissions
+      .map(({ id_permission }) => id_permission)
+      .includes(5) || queries.id_comercio !== -1){
     fetchData(url, "GET", queries)
       .then((res) => {
         if (res?.status) {
@@ -80,7 +83,7 @@ const Transacciones = () => {
           throw new Error(res?.msg);
         }
       })
-      .catch(() => {});
+      .catch(() => {});}
 
     if (tipoComercio !== null) {
       const acumQueries = { ...queries, oficina_propia: tipoComercio };
