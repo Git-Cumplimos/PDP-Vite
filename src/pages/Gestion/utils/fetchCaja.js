@@ -6,14 +6,14 @@ const urlCaja = `${process.env.REACT_APP_URL_CAJA}/caja`;
 const urlComprobantes = `${process.env.REACT_APP_URL_CAJA}/comprobantes`;
 const urlCuentas = `${process.env.REACT_APP_URL_CAJA}/cuentas`;
 const urlNotas = `${process.env.REACT_APP_URL_CAJA}/notas`;
-// const urlReportes = `${process.env.REACT_APP_URL_CAJA}/reportes`;
+const urlReportes = `${process.env.REACT_APP_URL_CAJA}/reportes`;
 
 // const urlArqueo = `http://localhost:5000/arqueo`;
 // const urlCaja = `http://localhost:5000/caja`;
 // const urlComprobantes = `http://localhost:5000/comprobantes`;
 // const urlCuentas = `http://localhost:5000/cuentas`;
 // const urlNotas = `http://localhost:5000/notas`;
-const urlReportes = `http://localhost:5000/reportes`;
+// const urlReportes = `http://localhost:5000/reportes`;
 
 const buildGetFunction = (url) => {
   return async (args = {}) => {
