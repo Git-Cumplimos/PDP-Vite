@@ -91,7 +91,6 @@ const RecaudoServiciosPublicosPrivados = () => {
     })
       .then((autoArr) => {
         setConvenio(autoArr?.results[0]);
-        console.log(autoArr?.results[0]);
         setIsUploading(false);
       })
       .catch((err) => console.error(err));
