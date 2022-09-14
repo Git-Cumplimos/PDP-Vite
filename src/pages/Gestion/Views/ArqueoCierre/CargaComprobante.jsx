@@ -129,7 +129,7 @@ const CargaComprobante = () => {
         fk_tipo_comprobante: movementType,
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
-        id_dispositivo: roleInfo?.id_dispositivo,
+        id_terminal: roleInfo?.id_dispositivo,
         nro_comprobante: comprobanteNumber,
         valor_movimiento: valorComprobante,
         observaciones: observaciones,
