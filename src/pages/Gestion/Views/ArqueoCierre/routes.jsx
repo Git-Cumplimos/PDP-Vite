@@ -18,6 +18,8 @@ const PanelConsignaciones = lazy(() => import("./PanelConsignaciones"));
 const ParametrizacionRecaudo = lazy(() => import("./ParametrizacionRecaudo"));
 const NotasCDHistorico = lazy(() => import("./Notas/NotasHistorico"));
 
+const ReportesCierre = lazy(() => import("./ReportesCierre"));
+
 export const rutasArqueo = [
   {
     link: "/gestion/arqueo/panel-transacciones",
@@ -74,5 +76,11 @@ export const rutasArqueo = [
     label: <AppIcons Logo={"RECAUDO"} name="Historico notas debito y credito" />,
     component: NotasCDHistorico,
     permission: [81],
+  },
+  {
+    link: "/gestion/arqueo/reporte-arqueo",
+    label: <AppIcons Logo={"RECAUDO"} name="Reportes arqueo y cierre de caja" />,
+    component: ReportesCierre,
+    permission: [82],
   },
 ];

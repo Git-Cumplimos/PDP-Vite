@@ -55,7 +55,7 @@ const useMoney = ({
           ? ","
           : "";
       ev.target.value =
-        moneyValue === 0 ? "$ " : moneyFormatter.format(moneyValue) + toAdd;
+        moneyValue === 0 ? "$ 0" : moneyFormatter.format(moneyValue) + toAdd;
 
       ev.target.focus();
       caret_pos += ev.target.value.length - len;
