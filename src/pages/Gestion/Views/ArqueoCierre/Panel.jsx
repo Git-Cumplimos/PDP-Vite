@@ -169,10 +169,7 @@ const Panel = () => {
               ["", ""],
               ["Total faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
-              [
-                "Total efectivo en caja",
-                formatMoney.format(cierre?.total_efectivo_en_caja),
-              ],
+              ["Total arqueo", formatMoney.format(cierre?.total_arqueo)],
               ["", ""],
               [
                 "Total entrega transportadora",
