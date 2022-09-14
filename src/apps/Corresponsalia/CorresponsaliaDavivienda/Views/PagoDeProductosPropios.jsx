@@ -20,9 +20,11 @@ import {
 import { fetchParametrosAutorizadores } from "../../../TrxParams/utils/fetchParametrosAutorizadores";
 import { enumParametrosAutorizador } from "../../../../utils/enumParametrosAutorizador";
 import Fieldset from "../../../../components/Base/Fieldset";
+import { useNavigate } from "react-router-dom";
 
 const PagoDeProductosPropios = () => {
   const { roleInfo } = useAuth();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
     superior: 9900001,
@@ -666,6 +668,7 @@ const PagoDeProductosPropios = () => {
                     type='submit'
                     onClick={() => {
                       hideModal();
+                      navigate(-1);
                     }}>
                     Aceptar
                   </Button>
