@@ -164,17 +164,28 @@ const Deposito = () => {
         // const nomDepositante = formData.get("nomDepositante");
 
         const body = {
-          idComercio: roleInfo?.id_comercio,
-          idUsuario: roleInfo?.id_usuario,
-          idDispositivo: roleInfo?.id_dispositivo,
-          Tipo: roleInfo?.tipo_comercio,
-          codDane: roleInfo?.codigo_dane,
-          ciudad: roleInfo?.ciudad,
-          direccion: roleInfo?.direccion,
-          ///////////////////////////////
-          idBancoAdquiriente: DataBanco?.idBanco,
-          numNumeroDocumento: userDoc,
-          numValorTransaccion: valor,
+          comercio : {
+            id_comercio: roleInfo?.id_comercio,
+            id_usuario: roleInfo?.id_usuario,
+            id_terminal: roleInfo?.id_dispositivo,
+          },
+    
+          oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+          nombre_comercio: roleInfo?.['nombre comercio'],
+          valor_total_trx: valor,
+    
+          consultaCosto: {
+            idBancoAdquiriente: DataBanco?.idBanco,
+            numNumeroDocumento: userDoc,
+            numValorTransaccion: valor,
+    
+            location: {
+              codDane: roleInfo?.codigo_dane,
+              ciudad: roleInfo?.ciudad,
+              direccion: roleInfo?.direccion,
+    
+            }
+          }        
         };
         fetchConsultaCostoGrupoAval(body)
           .then((res) => {
@@ -211,7 +222,7 @@ const Deposito = () => {
         );
       }
     },
-    [valor, limitesMontos, DataBanco]
+    [valor, limitesMontos, DataBanco, roleInfo, userDoc]
   );
 
   const onMoneyChange = useCallback(
@@ -228,20 +239,31 @@ const Deposito = () => {
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
     const body = {
-      idComercio: roleInfo?.id_comercio,
-      idUsuario: roleInfo?.id_usuario,
-      idDispositivo: roleInfo?.id_dispositivo,
-      Tipo: roleInfo?.tipo_comercio,
-      codDane: roleInfo?.codigo_dane,
-      ciudad: roleInfo?.ciudad,
-      direccion: roleInfo?.direccion,
-      ///////////////////////////////
-      idBancoAdquiriente: DataBanco?.idBanco,
-      numNumeroDocumento: userDoc,
-      numValorTransaccion: valor,
-      numTipoCuenta: tipoCuenta,
-      numCelular: phone,
-      numCuenta: numCuenta,
+      comercio : {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+
+      oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+      nombre_comercio: roleInfo?.['nombre comercio'],
+      valor_total_trx: valor,
+
+      depositoCuentas: {
+        idBancoAdquiriente: DataBanco?.idBanco,
+        numNumeroDocumento: userDoc,
+        numValorTransaccion: valor,
+        numTipoCuenta: tipoCuenta,
+        numCelular: phone,
+        numCuenta: numCuenta,
+
+        location: {
+          codDane: roleInfo?.codigo_dane,
+          ciudad: roleInfo?.ciudad,
+          direccion: roleInfo?.direccion,
+
+        }
+      }
     };
 
     fetchDepositoCorresponsalGrupoAval(body)
