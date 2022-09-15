@@ -160,15 +160,20 @@ const Deposito = () => {
               return;
             } else {
               setDatosConsulta(res?.obj?.Data);
-              const summary = {
+              let summary = {
                 // "Nombre titular": res?.obj?.Data?.valNombreTitular,
                 // "Apellido titular": res?.obj?.Data?.valApellidoTitular,
                 "Número cuenta": numCuenta,
                 "Valor depósito": valorFormat,
-                "Valor cobro": formatMoney.format(
-                  res?.obj?.Data?.numValorCobro
-                ),
               };
+              console.log(process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA)
+              if (process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true'){
+                summary["Valor cobro"]= formatMoney.format(
+                  res?.obj?.Data?.numValorCobro
+                )
+              }
+                
+                
               setSummary(summary)
               setShowModal(true);
             }
@@ -274,19 +279,18 @@ const Deposito = () => {
             `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
             ],
             ["",""],
-            ["Valor", formatMoney.format(valor)],
+            ["Valor", formatMoney.format(valor)],            
             ["", ""],
-            ["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
-            ["", ""],
-            ["Total", formatMoney.format(valor)],
-            ["", ""],
-            // ["Identificación depositante", userDoc],
-            // ["", ""],
-            // ["Nombre depositante", nomDepositante],
-            // ["", ""],
           ],
           disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
         };
+        if (process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true'){
+          tempTicket['trxInfo'].push(["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)]);
+          tempTicket['trxInfo'].push(["", ""]);
+        }
+
+        tempTicket['trxInfo'].push(["Total", formatMoney.format(valor)]);
+        tempTicket['trxInfo'].push(["", ""]);
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
           .then((resTicket) => {
