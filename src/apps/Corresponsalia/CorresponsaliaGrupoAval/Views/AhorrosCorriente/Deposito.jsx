@@ -94,7 +94,7 @@ const Deposito = () => {
       "Banco": DataBanco?.nombre,
       "Número de cuenta": numCuenta,
       "Documento" : userDoc,
-      "Numero celular": phone,
+      "Número celular": phone,
       "Valor depósito": formatMoney.format(valor),
     };
     setSummary(summary)

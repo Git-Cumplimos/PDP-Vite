@@ -79,9 +79,9 @@ const Retiro = () => {
     { value: "", label: "" },
     { value: "0052", label: "Banco AvVillas" },
     { value: "0001", label: "Banco Bogotá" },
-    { value: "0023", label: "Banco Occidental" },
+    { value: "0023", label: "Banco Occidente" },
     { value: "0002", label: "Banco Popular" },
-    { value: "0054", label: "ATH" },
+    // { value: "0054", label: "ATH" },
   ];
 
   const DataBanco = useMemo(() => {
