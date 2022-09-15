@@ -172,6 +172,8 @@ const Panel = () => {
               ["", ""],
               ["Total faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
+              ["Total movimientos pendiente aprobación", formatMoney.format(cierre?.total_comprobantes_pendientes)],
+              ["", ""],
               ["Total arqueo", formatMoney.format(cierre?.total_arqueo)],
               ["", ""],
               [
