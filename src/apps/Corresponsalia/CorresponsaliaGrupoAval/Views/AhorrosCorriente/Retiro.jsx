@@ -34,11 +34,12 @@ const Retiro = () => {
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 3000000,
-    min: 10000,
+    min: 5000,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
 
   
@@ -157,11 +158,7 @@ const Retiro = () => {
 
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
-        // const formData = new FormData(e.target);
-        // const userDoc = formData.get("docCliente");
-        // const valorFormat = formData.get("valor");
-        // const otp = formData.get("OTP");
+      if (valor >= min && valor <= max) {
 
         const body = {
           comercio : {
@@ -199,7 +196,7 @@ const Retiro = () => {
               const summary = {
                 "Banco": DataBanco?.nombre,
                 "Documento" : userDoc,
-                "Numero celular": phone,
+                "Número celular": phone,
                 "Valor deposito": formatMoney.format(valor),
                 "Costo transacción": formatMoney.format(res?.obj?.costoTrx)
               };
@@ -218,13 +215,13 @@ const Retiro = () => {
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del retiro debe estar entre ${formatMoney.format(
+          `El valor del retiro debe estar entre ${(formatMoney.format(
             min
-          ).replace(" ", "")} y ${formatMoney.format(max).replace(" ", "")}`
+          )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
         );
       }
     },
-    [valor, limitesMontos, DataBanco]
+    [valor, limitesMontos, DataBanco, roleInfo]
   );
 
 
@@ -244,16 +241,17 @@ const Retiro = () => {
     const summary = {
       "Banco": DataBanco?.nombre,
       "Documento" : userDoc,
-      "Numero celular": phone,
+      "Número celular": phone,
       "Valor cobro": formatMoney.format(valor),
     };
     setSummary(summary)
     setShowModal(true)
-  }, [banco, userDoc, phone, valor, DataBanco]);
+  }, [userDoc, phone, valor, DataBanco]);
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
-    
+    const { min, max } = limitesMontos;
+    if (valor >= min && valor <= max) {
     const body = {
       comercio : {
         id_comercio: roleInfo?.id_comercio,
@@ -362,6 +360,15 @@ const Retiro = () => {
         console.error(err);
         notifyError("No se ha podido conectar al servidor");
       });
+    }
+    else {
+      setIsUploading(false);
+      notifyError(
+        `El valor del retiro debe estar entre ${(formatMoney.format(
+          min
+        )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
+      );
+    }
   }, [
     valor,
     userDoc,
@@ -477,18 +484,18 @@ const Retiro = () => {
           show={showModal}
           handleClose={
             paymentStatus
-              ? () => {}
+              ? goToRecaudo
               : loadingRetiroCorresponsalGrupoAval
               ? () => {}
               : handleClose
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <PaymentSummary summaryTrx={summary}>

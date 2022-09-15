@@ -184,9 +184,9 @@ const TicketsDavivienda = ({
             <h1 className='text-center my-1 text-xs font-normal whitespace-pre-wrap'>
               {disclamer}
             </h1>
-            <h1 className='text-center my-1 text-xs font-normal whitespace-pre-wrap'>
+            {/* <h1 className='text-center my-1 text-xs font-normal whitespace-pre-wrap'>
               {`${mensajePubli}`}
-            </h1>
+            </h1> */}
           </div>
         </div>
         <div className='flex px-2'>
@@ -209,7 +209,7 @@ const TicketsDavivienda = ({
               Punto De Pago
             </h1>
             <h1 className='text-center my-1 text-xs font-normal'>
-              Punto Daviplata - Corresponsal Bancario Davivienda
+              Corresponsal Bancario Grupo Aval
             </h1>
           </div>
         </div>
