@@ -9,11 +9,10 @@ const url_movistar_conciliacion_archivo_movistar = `${process.env.REACT_APP_URL_
 export const PeticionRecarga = async (data_) => {
   try {
     const Peticion = await fetchData(URL_Recarga, "POST", {}, data_);
+    console.log(Peticion);
     if ((Peticion.status != undefined) == false) {
       // Api getwey
-      notifyError(
-        "Error con fetch, timed out con el servicio de recargas"
-      );
+      notifyError("Error con fetch, timed out con el servicio de recargas");
     }
     return Peticion;
   } catch (error) {
