@@ -285,7 +285,7 @@ const Retiro = () => {
 
             //["Usuario de venta", "Nombre propietario del punto"],
           ],
-          disclamer: "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
+          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
         };
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
