@@ -308,7 +308,7 @@ const Deposito = () => {
           trxInfo: [
             [
             "Tipo",
-            tipoCuenta === 1 ? "Ahorros" : "Corriente",
+            tipoCuenta === "01" ? "Ahorros" : "Corriente",
             ],
             ["",""],
             [
