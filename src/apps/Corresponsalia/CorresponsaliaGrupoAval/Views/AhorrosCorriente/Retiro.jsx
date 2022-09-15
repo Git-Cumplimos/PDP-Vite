@@ -195,6 +195,7 @@ const Retiro = () => {
               setDatosConsulta(res?.obj?.Data);
               const summary = {
                 "Banco": DataBanco?.nombre,
+                "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
                 "Documento" : userDoc,
                 "Número celular": phone,
                 "Valor deposito": formatMoney.format(valor),
@@ -221,7 +222,7 @@ const Retiro = () => {
         );
       }
     },
-    [valor, limitesMontos, DataBanco, roleInfo]
+    [valor, limitesMontos, DataBanco, roleInfo, tipoCuenta]
   );
 
 
@@ -240,13 +241,14 @@ const Retiro = () => {
     e.preventDefault();
     const summary = {
       "Banco": DataBanco?.nombre,
+      "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
       "Documento" : userDoc,
       "Número celular": phone,
       "Valor cobro": formatMoney.format(valor),
     };
     setSummary(summary)
     setShowModal(true)
-  }, [userDoc, phone, valor, DataBanco]);
+  }, [userDoc, phone, valor, DataBanco, tipoCuenta]);
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);

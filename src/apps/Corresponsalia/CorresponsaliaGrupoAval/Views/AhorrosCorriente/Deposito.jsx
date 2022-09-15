@@ -92,14 +92,15 @@ const Deposito = () => {
     e.preventDefault();
     const summary = {
       "Banco": DataBanco?.nombre,
-      "Número de cuenta": numCuenta,
+      "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
+      "Número de cuenta": numCuenta,      
       "Documento" : userDoc,
       "Número celular": phone,
       "Valor depósito": formatMoney.format(valor),
     };
     setSummary(summary)
     setShowModal(true)
-  }, [userDoc, phone, valor, DataBanco,numCuenta]);
+  }, [userDoc, phone, valor, DataBanco,numCuenta, tipoCuenta]);
   
 
   const printDiv = useRef();
@@ -194,7 +195,8 @@ const Deposito = () => {
               setDatosConsulta(res?.obj?.Data);
               const summary = {
                 "Banco": DataBanco?.nombre,
-                "Número de cuenta": numCuenta,
+                "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
+                "Número de cuenta": numCuenta,                
                 "Documento" : userDoc,
                 "Número celular": phone,
                 "Valor depósito": formatMoney.format(valor),
@@ -219,7 +221,7 @@ const Deposito = () => {
         );
       }
     },
-    [valor, limitesMontos, DataBanco, roleInfo, userDoc, numCuenta,phone]
+    [valor, limitesMontos, DataBanco, roleInfo, userDoc, numCuenta,phone, tipoCuenta]
   );
 
   const onMoneyChange = useCallback(
@@ -307,7 +309,7 @@ const Deposito = () => {
           : "No hay datos",
           trxInfo: [
             [
-            "Tipo",
+            "Tipo de cuenta",
             tipoCuenta === "01" ? "Ahorros" : "Corriente",
             ],
             ["",""],
