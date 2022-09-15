@@ -48,6 +48,7 @@ const CrearPin = () => {
   const [showModal, setShowModal] = useState(false);
   const [showModalFirma, setShowModalFirma] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
+  const [disabledBtnsContinuar, setDisabledBtnsContinuar] = useState(false);
   const [respPin, setRespPin] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
   const [tipoPin, setTipoPin] = useState("");
@@ -301,7 +302,34 @@ const CrearPin = () => {
 
   const onSubmitModal = (e) => {
     e.preventDefault();
-    if (firma !== "") {
+    // Control de edad _____________________________________________________
+    let edad_correcta = false
+    const year = Intl.DateTimeFormat("es-CO", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    }).format(new Date())
+    if (year.split("/")[2] - fechaNacimiento.split("-")[0] > 16){
+      edad_correcta = true  
+    } 
+    else if (year.split("/")[2] - fechaNacimiento.split("-")[0] === 16){
+      if (year.split("/")[1] - fechaNacimiento.split("-")[1] > 0){
+        edad_correcta = true
+      }
+      else if (year.split("/")[1] - fechaNacimiento.split("-")[1] === 0){
+        console.log(year.split("/")[0] - fechaNacimiento.split("-")[2])
+        console.log(year.split("/")[0] , fechaNacimiento.split("-")[2])
+        if (year.split("/")[0] - fechaNacimiento.split("-")[2] >= 0){
+          edad_correcta = true
+        }  
+      }
+    }
+    console.log(edad_correcta)
+    //-------------------------------------------------------------------------
+    if (edad_correcta){
+    if (firma === "") {
+      notifyError("Asegúrese de tener la firma del cliente en físico ")
+    }
     if(!isNaN(infoCliente?.municipio)){
     e.preventDefault();
     setShowModal(true)
@@ -311,13 +339,15 @@ const CrearPin = () => {
     }
     }
     else{
-      notifyError("Es necesario que el cliente autorice el uso de datos personales a Punto de Pago")
+      notifyError("El cliente debe tener más de 16 años, verifique la fecha de nacimiento")
     }
+    
+    
   };
 
   const onSubmitCliente = (e) => {
     e.preventDefault();
-    setDisabledBtns(true);
+    setDisabledBtnsContinuar(true);
     setShowFormulario(false)
     consultaClientes(documento,olimpia,idPin).then((resp) => {
       if (!resp?.status){
@@ -383,7 +413,6 @@ const CrearPin = () => {
         ])
       }
     }}
-    setDisabledBtns(false);
     });
   };
 
@@ -533,6 +562,11 @@ const CrearPin = () => {
         value={tipoDocumento}
         onChange={(e) => {
           setTipoDocumento(e.target.value);
+          setDisabledBtnsContinuar(false)
+          setShowFormulario(false)
+          setTipoPin("")
+          setTramite("")
+          setCategoria("")
         }}
         required
       />  
@@ -548,6 +582,11 @@ const CrearPin = () => {
         onInput={(e) => {
           const num = parseInt(e.target.value) || "";
           setDocumento(num);
+          setDisabledBtnsContinuar(false)
+          setShowFormulario(false)
+          setTipoPin("")
+          setTramite("")
+          setCategoria("")
         }}
       />
       <Select
@@ -562,6 +601,11 @@ const CrearPin = () => {
         value={olimpia}
         onChange={(e) => {
           setOlimpia(e.target.value);
+          setDisabledBtnsContinuar(false)
+          setShowFormulario(false)
+          setTipoPin("")
+          setTramite("")
+          setCategoria("")
         }}
       />
       {olimpia === "true" ? 
@@ -583,7 +627,7 @@ const CrearPin = () => {
       </>
       :"" }
       <ButtonBar className="lg:col-span-2">
-      <Button type="submit" disabled={disabledBtns}>
+      <Button type="submit" disabled={disabledBtnsContinuar}>
         Continuar
       </Button>
       </ButtonBar>

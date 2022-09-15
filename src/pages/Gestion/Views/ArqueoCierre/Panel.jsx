@@ -129,7 +129,7 @@ const Panel = () => {
           setLoading(false);
           const cierre = res?.obj;
           const tempTicket = {
-            title: "Recibo de deposito",
+            title: "Cierre de caja y arqueo",
             timeInfo: {
               "Fecha de venta": Intl.DateTimeFormat("es-CO", {
                 year: "2-digit",
@@ -172,10 +172,7 @@ const Panel = () => {
               ["", ""],
               ["Total faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
-              [
-                "Total efectivo en caja",
-                formatMoney.format(cierre?.total_efectivo_en_caja),
-              ],
+              ["Total arqueo", formatMoney.format(cierre?.total_arqueo)],
               ["", ""],
               [
                 "Total entrega transportadora",
@@ -198,7 +195,7 @@ const Panel = () => {
               ],
               ["", ""],
               [
-                "Total notas deito o credito",
+                "Total notas débito o crédito",
                 formatMoney.format(cierre?.total_notas),
               ],
               ["", ""],
@@ -281,6 +278,7 @@ const Panel = () => {
                         })
                       }
                       type="tel"
+                      maxLength="4"
                       info={formatMoney.format(key * val)}
                     />
                   ))}
@@ -332,7 +330,7 @@ const Panel = () => {
               <TicketCierre refPrint={printDiv} ticket={resumenCierre} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
-                <Button onClick={() => signOut()}>Cerrar sesion</Button>
+                <Button onClick={() => signOut()}>Cerrar sesión</Button>
               </ButtonBar>
             </div>
           )}

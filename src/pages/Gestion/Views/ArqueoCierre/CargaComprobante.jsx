@@ -107,6 +107,26 @@ const CargaComprobante = () => {
        */
       const { url, fields } = resFile.obj;
       const filename = fields.key;
+
+      /**
+       * Subir informaacion a db
+       */
+      const reqBody = {
+        fk_nombre_entidad: selectedEntity,
+        fk_tipo_comprobante: movementType,
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+        nro_comprobante: comprobanteNumber,
+        valor_movimiento: valorComprobante,
+        observaciones: observaciones,
+        archivo: filename,
+      };
+      if (movementType === "Consignación Bancaría") {
+        reqBody["nro_cuenta"] = accountNumber;
+      }
+      /* const resComprobante =  */ await agregarComprobante(reqBody);
+
       const formData = new FormData();
       for (var key in fields) {
         formData.append(key, fields[key]);
@@ -120,26 +140,6 @@ const CargaComprobante = () => {
 
       console.log(resFile);
       console.log(resUploadFile);
-
-      /**
-       * Subir informaacion a db
-       */
-      const reqBody = {
-        fk_nombre_entidad: selectedEntity,
-        fk_tipo_comprobante: movementType,
-        id_comercio: roleInfo?.id_comercio,
-        id_usuario: roleInfo?.id_usuario,
-        id_dispositivo: roleInfo?.id_dispositivo,
-        nro_comprobante: comprobanteNumber,
-        valor_movimiento: valorComprobante,
-        observaciones: observaciones,
-        archivo: filename,
-      };
-      if (movementType === "Consignación Bancaría") {
-        reqBody["nro_cuenta"] = accountNumber;
-      }
-      /* const resComprobante =  */ await agregarComprobante(reqBody);
-
       // console.log(resComprobante);
     } catch (error) {
       throw error;

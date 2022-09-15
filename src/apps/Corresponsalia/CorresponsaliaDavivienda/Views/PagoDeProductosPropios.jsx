@@ -20,9 +20,11 @@ import {
 import { fetchParametrosAutorizadores } from "../../../TrxParams/utils/fetchParametrosAutorizadores";
 import { enumParametrosAutorizador } from "../../../../utils/enumParametrosAutorizador";
 import Fieldset from "../../../../components/Base/Fieldset";
+import { useNavigate } from "react-router-dom";
 
 const PagoDeProductosPropios = () => {
   const { roleInfo } = useAuth();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
     superior: 9900001,
@@ -252,17 +254,17 @@ const PagoDeProductosPropios = () => {
   };
   const peticionPagoPropios = () => {
     const hoy = new Date();
-    const fecha =Intl.DateTimeFormat("es-CO", {
+    const fecha = Intl.DateTimeFormat("es-CO", {
       year: "2-digit",
       month: "2-digit",
       day: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     /*hora actual */
-    const hora =Intl.DateTimeFormat("es-CO", {
+    const hora = Intl.DateTimeFormat("es-CO", {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     let numeroProducto =
       datosTrans.tipoProducto === "01"
         ? datosTrans.binTarjetaCredito
@@ -371,6 +373,7 @@ const PagoDeProductosPropios = () => {
             "Cédula de ciudadanía": "01",
             "Cédula de extranjería": "02",
             NIT: "03",
+            "Tarjeta de identidad": "04",
             "NIT Persona natural": "12",
           }}
           value={datosTrans?.tipoIdentificacion}
@@ -392,7 +395,7 @@ const PagoDeProductosPropios = () => {
           type='text'
           name='numeroIdentificacion'
           minLength='3'
-          maxLength='10'
+          maxLength={datosTrans.tipoIdentificacion === "04" ? 11 : 10}
           required
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
@@ -665,6 +668,7 @@ const PagoDeProductosPropios = () => {
                     type='submit'
                     onClick={() => {
                       hideModal();
+                      navigate(-1);
                     }}>
                     Aceptar
                   </Button>

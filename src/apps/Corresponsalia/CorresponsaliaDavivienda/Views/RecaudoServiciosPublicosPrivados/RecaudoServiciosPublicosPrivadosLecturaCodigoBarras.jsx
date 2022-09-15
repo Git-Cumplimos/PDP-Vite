@@ -24,6 +24,7 @@ import {
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   const { roleInfo } = useAuth();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
   const formatMoney = makeMoneyFormatter(2);
@@ -265,19 +266,17 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valorTransaccion = datosTransaccion.valor ?? 0;
       }
       const hoy = new Date();
-      const fecha =
-      Intl.DateTimeFormat("es-CO", {
+      const fecha = Intl.DateTimeFormat("es-CO", {
         year: "2-digit",
         month: "2-digit",
         day: "2-digit",
-      }).format(new Date())
+      }).format(new Date());
       /*hora actual */
-      const hora =
-      Intl.DateTimeFormat("es-CO", {
+      const hora = Intl.DateTimeFormat("es-CO", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-      }).format(new Date())
+      }).format(new Date());
       const objTicket = { ...objTicketActual };
       objTicket["timeInfo"]["Fecha de venta"] = fecha;
       objTicket["timeInfo"]["Hora"] = hora;
@@ -712,7 +711,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   <h2>
                     <ButtonBar>
                       <Button onClick={handlePrint}>Imprimir</Button>
-                      <Button type='submit' onClick={hideModalReset}>
+                      <Button
+                        type='submit'
+                        onClick={() => {
+                          hideModalReset();
+                          navigate(-1);
+                        }}>
                         Aceptar
                       </Button>
                     </ButtonBar>

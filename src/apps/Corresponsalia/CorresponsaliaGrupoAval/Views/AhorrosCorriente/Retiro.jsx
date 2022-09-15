@@ -24,20 +24,25 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import HideInput from "../../../../../components/Base/HideInput";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import useMoney from "../../../../../hooks/useMoney";
+import { pinBlock } from "../../utils/pinBlock";
 
 const Retiro = () => {
+
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 3000000,
-    min: 10000,
+    min: 5000,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
+
+  
 
   const [loadingRetiroCorresponsalGrupoAval, fetchRetiroCorresponsalGrupoAval] =
     useFetch(retiroCorresponsalGrupoAval);
@@ -58,6 +63,17 @@ const Retiro = () => {
   const [summary, setSummary] = useState([])
   const [banco, setBanco] = useState("")
   const [showBTNConsulta, setShowBTNConsulta] = useState(true)
+  
+  const otpEncrip = useMemo(() => {
+    let x
+    if (otp.length === 4){
+      x = pinBlock(otp)
+    }
+    else{
+      x = ""
+    }
+    return x;
+  }, [otp]);
 
   const optionsBanco = [
     { value: "", label: "" },
@@ -142,24 +158,31 @@ const Retiro = () => {
 
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
-        // const formData = new FormData(e.target);
-        // const userDoc = formData.get("docCliente");
-        // const valorFormat = formData.get("valor");
-        // const otp = formData.get("OTP");
+      if (valor >= min && valor <= max) {
 
         const body = {
-          idComercio: roleInfo?.id_comercio,
-          idUsuario: roleInfo?.id_usuario,
-          idDispositivo: roleInfo?.id_dispositivo,
-          Tipo: roleInfo?.tipo_comercio,
-          codDane: roleInfo?.codigo_dane,
-          ciudad: roleInfo?.ciudad,
-          direccion: roleInfo?.direccion,
-          ///////////////////////////////
-          idBancoAdquiriente: DataBanco?.idBanco,
-          numNumeroDocumento: userDoc,
-          numValorTransaccion: valor,
+          comercio : {
+            id_comercio: roleInfo?.id_comercio,
+            id_usuario: roleInfo?.id_usuario,
+            id_terminal: roleInfo?.id_dispositivo,
+          },
+    
+          oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+          nombre_comercio: roleInfo?.['nombre comercio'],
+          valor_total_trx: valor,
+    
+          consultaCosto: {
+            idBancoAdquiriente: DataBanco?.idBanco,
+            numNumeroDocumento: userDoc,
+            numValorTransaccion: valor,
+    
+            location: {
+              codDane: roleInfo?.codigo_dane,
+              ciudad: roleInfo?.ciudad,
+              direccion: roleInfo?.direccion,
+    
+            }
+          }      
 
         };
         fetchConsultaCostoGrupoAval(body)
@@ -173,7 +196,7 @@ const Retiro = () => {
               const summary = {
                 "Banco": DataBanco?.nombre,
                 "Documento" : userDoc,
-                "Numero celular": phone,
+                "Número celular": phone,
                 "Valor deposito": formatMoney.format(valor),
                 "Costo transacción": formatMoney.format(res?.obj?.costoTrx)
               };
@@ -192,13 +215,13 @@ const Retiro = () => {
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del retiro debe estar entre ${formatMoney.format(
+          `El valor del retiro debe estar entre ${(formatMoney.format(
             min
-          ).replace(" ", "")} y ${formatMoney.format(max).replace(" ", "")}`
+          )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
         );
       }
     },
-    [valor, limitesMontos, DataBanco]
+    [valor, limitesMontos, DataBanco, roleInfo]
   );
 
 
@@ -218,30 +241,43 @@ const Retiro = () => {
     const summary = {
       "Banco": DataBanco?.nombre,
       "Documento" : userDoc,
-      "Numero celular": phone,
+      "Número celular": phone,
       "Valor cobro": formatMoney.format(valor),
     };
     setSummary(summary)
     setShowModal(true)
-  }, [banco, userDoc, phone, valor, DataBanco]);
+  }, [userDoc, phone, valor, DataBanco]);
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
+    const { min, max } = limitesMontos;
+    if (valor >= min && valor <= max) {
     const body = {
-      idComercio: roleInfo?.id_comercio,
-      idUsuario: roleInfo?.id_usuario,
-      idDispositivo: roleInfo?.id_dispositivo,
-      Tipo: roleInfo?.tipo_comercio,
-      codDane: roleInfo?.codigo_dane,
-      ciudad: roleInfo?.ciudad,
-      direccion: roleInfo?.direccion,
-      ///////////////////////////////
-      idBancoAdquiriente: DataBanco?.idBanco,
-      numNumeroDocumento: userDoc,
-      numValorTransaccion: valor,
-      numTipoCuenta: tipoCuenta,
-      numCelular: phone,
-      otp: otp
+      comercio : {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+
+      oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+      nombre_comercio: roleInfo?.['nombre comercio'],
+      valor_total_trx: valor,
+
+      retiroCuentas: {
+        idBancoAdquiriente: DataBanco?.idBanco,
+        numNumeroDocumento: userDoc,
+        numValorTransaccion: valor,
+        numTipoCuenta: tipoCuenta,
+        numCelular: phone,
+        otp: otpEncrip,
+
+        location: {
+          codDane: roleInfo?.codigo_dane,
+          ciudad: roleInfo?.ciudad,
+          direccion: roleInfo?.direccion,
+
+        }
+      }        
     };
 
     fetchRetiroCorresponsalGrupoAval(body)
@@ -324,6 +360,15 @@ const Retiro = () => {
         console.error(err);
         notifyError("No se ha podido conectar al servidor");
       });
+    }
+    else {
+      setIsUploading(false);
+      notifyError(
+        `El valor del retiro debe estar entre ${(formatMoney.format(
+          min
+        )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
+      );
+    }
   }, [
     valor,
     userDoc,
@@ -333,6 +378,7 @@ const Retiro = () => {
     ,
     datosConsulta,
     tipoDocumento,
+    otpEncrip
   ]);
 
   return (
@@ -438,18 +484,18 @@ const Retiro = () => {
           show={showModal}
           handleClose={
             paymentStatus
-              ? () => {}
+              ? goToRecaudo
               : loadingRetiroCorresponsalGrupoAval
               ? () => {}
               : handleClose
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <PaymentSummary summaryTrx={summary}>
