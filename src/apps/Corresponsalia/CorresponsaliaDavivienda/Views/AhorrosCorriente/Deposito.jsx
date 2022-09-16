@@ -23,13 +23,14 @@ import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
 
 const Deposito = () => {
   const navigate = useNavigate();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 720000,
-    min: 1,
+    max: enumParametrosDavivienda.maxDepositoCuentas,
+    min: enumParametrosDavivienda.minDepositoCuentas,
   });
 
   const onChangeMoney = useMoney({
@@ -282,7 +283,7 @@ const Deposito = () => {
             ["Valor", formatMoney.format(valor)],            
             ["", ""],
           ],
-          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+          disclamer: "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
         };
         if (process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true'){
           tempTicket['trxInfo'].push(["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)]);
