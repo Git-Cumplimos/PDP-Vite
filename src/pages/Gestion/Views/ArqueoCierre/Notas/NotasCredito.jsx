@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 const NotasCredito = () => {
   const navigate = useNavigate();
-  const { roleInfo, pdpUser } = useAuth();
+  const { pdpUser } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [datosNota, setDatosNota] = useState(
@@ -72,18 +72,10 @@ const NotasCredito = () => {
   useEffect(() => {
     setDatosNota((old) => {
       const copy = new Map(old);
-      copy.set("id_comercio", roleInfo?.id_comercio);
-      copy.set("id_usuario", roleInfo?.id_usuario);
-      copy.set("id_terminal", roleInfo?.id_dispositivo);
       copy.set("responsable", pdpUser?.uuid);
       return new Map(copy);
     });
-  }, [
-    roleInfo?.id_comercio,
-    roleInfo?.id_usuario,
-    roleInfo?.id_dispositivo,
-    pdpUser?.uuid,
-  ]);
+  }, [pdpUser?.uuid]);
 
   return (
     <Fragment>
@@ -95,8 +87,43 @@ const NotasCredito = () => {
           label="Id de comercio"
           type="tel"
           autoComplete="off"
-          value={roleInfo?.id_comercio ?? ""}
-          readOnly
+          onChange={(ev) =>
+            setDatosNota((old) => {
+              const copy = new Map(old);
+              copy.set(ev.target.name, onChangeNumber(ev));
+              return new Map(copy);
+            })
+          }
+          required
+        />
+        <Input
+          id="id_usuario"
+          name="id_usuario"
+          label="Id de usuario"
+          type="tel"
+          autoComplete="off"
+          onChange={(ev) =>
+            setDatosNota((old) => {
+              const copy = new Map(old);
+              copy.set(ev.target.name, onChangeNumber(ev));
+              return new Map(copy);
+            })
+          }
+          required
+        />
+        <Input
+          id="id_terminal"
+          name="id_terminal"
+          label="Id de terminal"
+          type="tel"
+          autoComplete="off"
+          onChange={(ev) =>
+            setDatosNota((old) => {
+              const copy = new Map(old);
+              copy.set(ev.target.name, onChangeNumber(ev));
+              return new Map(copy);
+            })
+          }
           required
         />
         <Input
