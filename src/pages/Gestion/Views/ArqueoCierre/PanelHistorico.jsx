@@ -67,7 +67,7 @@ const PanelHistorico = () => {
           "Total recibido transportadora",
           "Total consignaciones bancarias",
           "Total transferencias cajeros",
-          "Total notas debito o credito",
+          "Total notas débito o crédito",
           "Fecha y hora cierre",
         ]}
         maxPage={maxPages}

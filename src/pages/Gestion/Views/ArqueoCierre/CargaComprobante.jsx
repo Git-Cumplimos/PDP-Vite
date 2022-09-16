@@ -235,7 +235,7 @@ const CargaComprobante = () => {
         <ButtonBar />
         {Boolean(movementType) && (
           <Fieldset
-            legend={"Informacion del movimiento"}
+            legend={"Información del movimiento"}
             className="lg:col-span-2"
           >
             {Object.entries(staticInfo).map(([key, val]) => (
@@ -324,7 +324,7 @@ const CargaComprobante = () => {
                 setObservaciones(e.target.value.trimLeft());
                 e.target.value = e.target.value.trimLeft();
               }}
-              info={`Maximo 60 caracteres`}
+              info={`Máximo 60 caracteres`}
               required
             />
             {!file ? (
