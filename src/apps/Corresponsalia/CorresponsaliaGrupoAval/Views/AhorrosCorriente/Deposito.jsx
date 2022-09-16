@@ -23,13 +23,14 @@ import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
+import {enumParametrosGrupoAval} from "../../utils/enumParametrosGrupoAval";
 
 const Deposito = () => {
   const navigate = useNavigate();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 10000000,
-    min: 5000,
+    max: enumParametrosGrupoAval.maxDepositoCuentas,
+    min: enumParametrosGrupoAval.minDepositoCuentas,
   });
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
@@ -90,6 +91,8 @@ const Deposito = () => {
 
   const onSubmitModal = useCallback((e) => {
     e.preventDefault();
+    const { min, max } = limitesMontos;
+    if (valor >= min && valor <= max) {
     const summary = {
       "Banco": DataBanco?.nombre,
       "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
@@ -100,7 +103,15 @@ const Deposito = () => {
     };
     setSummary(summary)
     setShowModal(true)
-  }, [userDoc, phone, valor, DataBanco,numCuenta, tipoCuenta]);
+    } else {
+      setIsUploading(false);
+      notifyError(
+        `El valor del depósito debe estar entre ${(formatMoney.format(
+          min
+        )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
+      );
+    }
+  }, [userDoc, phone, valor, DataBanco,numCuenta, tipoCuenta, limitesMontos]);
   
 
   const printDiv = useRef();
@@ -156,70 +167,58 @@ const Deposito = () => {
       e.preventDefault();
       setIsUploading(true);
 
-      const { min, max } = limitesMontos;
-
-      if (valor >= min && valor <= max) {
-
-        const body = {
-          comercio : {
-            id_comercio: roleInfo?.id_comercio,
-            id_usuario: roleInfo?.id_usuario,
-            id_terminal: roleInfo?.id_dispositivo,
-          },
-    
-          oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
-          nombre_comercio: roleInfo?.['nombre comercio'],
-          valor_total_trx: valor,
-    
-          consultaCosto: {
-            idBancoAdquiriente: DataBanco?.idBanco,
-            numNumeroDocumento: userDoc,
-            numValorTransaccion: valor,
-    
-            location: {
-              codDane: roleInfo?.codigo_dane,
-              ciudad: roleInfo?.ciudad,
-              direccion: roleInfo?.direccion,
-    
-            }
-          }        
-        };
-        fetchConsultaCostoGrupoAval(body)
-          .then((res) => {
-            setIsUploading(false);
-            if (!res?.status) {
-              notifyError(res?.msg);
-              handleClose()
-              // return;
-            } else {
-              setDatosConsulta(res?.obj?.Data);
-              const summary = {
-                "Banco": DataBanco?.nombre,
-                "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
-                "Número de cuenta": numCuenta,                
-                "Documento" : userDoc,
-                "Número celular": phone,
-                "Valor depósito": formatMoney.format(valor),
-                "Costo transacción": formatMoney.format(res?.obj?.costoTrx)
-              };
-              setSummary(summary)
-              setShowModal(true);
-              setShowBTNConsulta(false)
-            }
-          })
-          .catch((err) => {
-            setIsUploading(false);
-            console.error(err);
-            notifyError("No se ha podido conectar al servidor");
-          });
-      } else {
-        setIsUploading(false);
-        notifyError(
-          `El valor del depósito debe estar entre ${(formatMoney.format(
-            min
-          )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
-        );
-      }
+      const body = {
+        comercio : {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+  
+        oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+        nombre_comercio: roleInfo?.['nombre comercio'],
+        valor_total_trx: valor,
+  
+        consultaCosto: {
+          idBancoAdquiriente: DataBanco?.idBanco,
+          numNumeroDocumento: userDoc,
+          numValorTransaccion: valor,
+  
+          location: {
+            codDane: roleInfo?.codigo_dane,
+            ciudad: roleInfo?.ciudad,
+            direccion: roleInfo?.direccion,
+  
+          }
+        }        
+      };
+      fetchConsultaCostoGrupoAval(body)
+        .then((res) => {
+          setIsUploading(false);
+          if (!res?.status) {
+            notifyError(res?.msg);
+            handleClose()
+            // return;
+          } else {
+            setDatosConsulta(res?.obj?.Data);
+            const summary = {
+              "Banco": DataBanco?.nombre,
+              "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
+              "Número de cuenta": numCuenta,                
+              "Documento" : userDoc,
+              "Número celular": phone,
+              "Valor depósito": formatMoney.format(valor),
+              "Costo transacción": formatMoney.format(res?.obj?.costoTrx)
+            };
+            setSummary(summary)
+            setShowModal(true);
+            setShowBTNConsulta(false)
+          }
+        })
+        .catch((err) => {
+          setIsUploading(false);
+          console.error(err);
+          notifyError("No se ha podido conectar al servidor");
+        });
     },
     [valor, limitesMontos, DataBanco, roleInfo, userDoc, numCuenta,phone, tipoCuenta]
   );
@@ -237,8 +236,6 @@ const Deposito = () => {
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
-    const { min, max } = limitesMontos;
-    if (valor >= min && valor <= max) {
     const body = {
       comercio : {
         id_comercio: roleInfo?.id_comercio,
@@ -346,15 +343,7 @@ const Deposito = () => {
         console.error(err);
         notifyError("No se ha podido conectar al servidor");
       });
-    }
-    else {
-      setIsUploading(false);
-        notifyError(
-          `El valor del depósito debe estar entre ${(formatMoney.format(
-            min
-          )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
-        );
-    }
+
   }, [
     numCuenta,
     valor,
@@ -365,6 +354,7 @@ const Deposito = () => {
     infoTicket,
     ,
     datosConsulta,
+    DataBanco
   ]);
 
   return (

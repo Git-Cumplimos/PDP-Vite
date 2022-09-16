@@ -24,6 +24,7 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import HideInput from "../../../../../components/Base/HideInput";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import useMoney from "../../../../../hooks/useMoney";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
 
 const Retiro = () => {
   const navigate = useNavigate();
@@ -31,8 +32,8 @@ const Retiro = () => {
   const { roleInfo, infoTicket } = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 1000000,
-    min: 10000,
+    max: enumParametrosDavivienda.maxRetiroCuentas,
+    min: enumParametrosDavivienda.minRetiroCuentas,
   });
 
   const onChangeMoney = useMoney({

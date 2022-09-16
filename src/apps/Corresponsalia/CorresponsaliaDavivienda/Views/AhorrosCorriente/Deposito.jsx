@@ -23,13 +23,14 @@ import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
 
 const Deposito = () => {
   const navigate = useNavigate();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 720000,
-    min: 1,
+    max: enumParametrosDavivienda.maxDepositoCuentas,
+    min: enumParametrosDavivienda.minDepositoCuentas,
   });
 
   const onChangeMoney = useMoney({
