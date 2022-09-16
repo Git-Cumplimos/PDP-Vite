@@ -105,6 +105,21 @@ const Panel = () => {
 
   const closeModalFunction = useCallback(() => {
     setEstado(false);
+    setTotalCierres(false);
+    setDenominaciones([
+      [100000, 0],
+      [50000, 0],
+      [20000, 0],
+      [10000, 0],
+      [5000, 0],
+      [2000, 0],
+      [1000, 0],
+      [500, 0],
+      [200, 0],
+      [100, 0],
+      [50, 0],
+    ]);
+    setConfirmarArqueo(false);
   }, []);
 
   const cierreCaja = useCallback(() => {
@@ -128,7 +143,7 @@ const Panel = () => {
           const tempTicket = {
             title: "Cierre de caja y arqueo",
             timeInfo: {
-              "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+              "Fecha de cierre": Intl.DateTimeFormat("es-CO", {
                 year: "2-digit",
                 month: "2-digit",
                 day: "2-digit",
@@ -149,12 +164,12 @@ const Panel = () => {
             ],
             cajaInfo: [
               [
-                "Total movimientos del dia",
+                "Total movimientos del día",
                 formatMoney.format(cierre?.total_movimientos),
               ],
               ["", ""],
               [
-                "Total efectivo cierre dia anterior",
+                "Total efectivo cierre día anterior",
                 formatMoney.format(cierre?.total_efectivo_cierre_día_anterior),
               ],
               ["", ""],

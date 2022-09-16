@@ -13,6 +13,7 @@ import {
   makeMoneyFormatter,
   makeDateFormatter,
   toAccountNumber,
+  onChangeNumber,
 } from "../../../../utils/functions";
 import Form from "../../../../components/Base/Form";
 import Magnifier from "react-magnifier";
@@ -198,7 +199,10 @@ const PanelConsignaciones = () => {
         onChange={(ev) =>
           setSearchInfo((old) => ({
             ...old,
-            [ev.target.name]: ev.target.value,
+            [ev.target.name]:
+              ev.target.name === "id_comercio"
+                ? onChangeNumber(ev)
+                : ev.target.value,
           }))
         }
       >
@@ -214,6 +218,12 @@ const PanelConsignaciones = () => {
             { value: "3", label: "RECHAZADO" },
           ]}
           defaultValue={"1"}
+        />
+        <Input
+          id="id_comercio"
+          name={"id_comercio"}
+          label="Id comercio"
+          type="tel"
         />
       </TableEnterprise>
       <Modal show={selected} handleClose={loading ? () => {} : CloseModal}>
@@ -231,7 +241,7 @@ const PanelConsignaciones = () => {
           {Boolean(selected?.nro_cuenta) && (
             <Input
               id="nro_cuenta"
-              label="Numero de cuenta"
+              label="Número de cuenta"
               type="text"
               value={selected?.nro_cuenta}
               disabled
@@ -239,7 +249,7 @@ const PanelConsignaciones = () => {
           )}
           <Input
             id="nro_comprobante"
-            label="Numero de comprobante"
+            label="Número de comprobante"
             type="text"
             value={selected?.nro_comprobante ?? ""}
             disabled
@@ -306,7 +316,7 @@ const PanelConsignaciones = () => {
               e.target.value = e.target.value.trimLeft();
             }}
             info={
-              selected?.fk_estado_revision === null && `Maximo 60 caracteres`
+              selected?.fk_estado_revision === null && `Máximo 60 caracteres`
             }
             disabled={selected?.fk_estado_revision !== null}
             required={selected?.fk_estado_revision === null}

@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 const NotasDebito = () => {
   const navigate = useNavigate();
-  const { roleInfo, userInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [datosNota, setDatosNota] = useState(
@@ -75,19 +75,19 @@ const NotasDebito = () => {
       copy.set("id_comercio", roleInfo?.id_comercio);
       copy.set("id_usuario", roleInfo?.id_usuario);
       copy.set("id_terminal", roleInfo?.id_dispositivo);
-      copy.set("responsable", userInfo?.attributes?.name);
+      copy.set("responsable", pdpUser?.uuid);
       return new Map(copy);
     });
   }, [
     roleInfo?.id_comercio,
     roleInfo?.id_usuario,
     roleInfo?.id_dispositivo,
-    userInfo?.attributes?.name,
+    pdpUser?.uuid,
   ]);
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-10 mb-8">Creacion nota debito</h1>
+      <h1 className="text-3xl mt-10 mb-8">Creación nota débito</h1>
       <Form onSubmit={onSubmit} grid>
         <Input
           id="id_comercio"
@@ -118,15 +118,15 @@ const NotasDebito = () => {
         <Input
           id="responsable"
           name="responsable"
-          label={"Responsable"}
-          value={userInfo?.attributes?.name ?? ""}
+          label={"Id de responsable"}
+          value={pdpUser?.uuid ?? ""}
           readOnly
           required
         />
         <Input
           id="valor_nota"
           name="valor_nota"
-          label="Valor nota debito"
+          label="Valor nota débito"
           type="tel"
           minLength={"5"}
           maxLength={"13"}
@@ -146,7 +146,7 @@ const NotasDebito = () => {
           className="w-full place-self-stretch"
           autoComplete="off"
           maxLength={"100"}
-          label={"Razon ajuste"}
+          label={"Razón ajuste"}
           onInput={(ev) => {
             setDatosNota((old) => {
               const copy = new Map(old);
@@ -159,7 +159,7 @@ const NotasDebito = () => {
         />
         <ButtonBar className={"lg:col-span-2"}>
           <Button type="submit" disabled={loading}>
-            Realizar nota debito
+            Realizar nota débito
           </Button>
         </ButtonBar>
       </Form>
