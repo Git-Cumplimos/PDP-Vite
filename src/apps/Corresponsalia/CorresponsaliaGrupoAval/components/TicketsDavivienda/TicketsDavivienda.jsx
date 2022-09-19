@@ -180,13 +180,13 @@ const TicketsDavivienda = ({
               FINANCIERA DE COLOMBIA
             </h1>
           </div>
-          <div className='block justify-center items-center'>
+          <div className='block justify-center items-center mx-3'>
             <h1 className='text-center my-1 text-xs font-normal whitespace-pre-wrap'>
               {disclamer}
             </h1>
-            <h1 className='text-center my-1 text-xs font-normal whitespace-pre-wrap'>
+            {/* <h1 className='text-center my-1 text-xs font-normal whitespace-pre-wrap'>
               {`${mensajePubli}`}
-            </h1>
+            </h1> */}
           </div>
         </div>
         <div className='flex px-2'>
@@ -205,11 +205,11 @@ const TicketsDavivienda = ({
             </h1>
           </div>
           <div>
-            <h1 className='text-center my-1 text-xs font-normal'>
+            <h1 className='text-center my-1 text-xs font-normal mx-5'>
               Punto De Pago
             </h1>
-            <h1 className='text-center my-1 text-xs font-normal'>
-              Punto Daviplata - Corresponsal Bancario Davivienda
+            <h1 className='text-center my-1 text-xs font-normal mx-5'>
+              Corresponsal Bancario Grupo Aval
             </h1>
           </div>
         </div>

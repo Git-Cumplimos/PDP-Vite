@@ -23,17 +23,18 @@ import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
+import {enumParametrosGrupoAval} from "../../utils/enumParametrosGrupoAval";
 
 const Deposito = () => {
   const navigate = useNavigate();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
+    max: enumParametrosGrupoAval.maxDepositoCuentas,
+    min: enumParametrosGrupoAval.minDepositoCuentas,
   });
-
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
 
   const { roleInfo, infoTicket } = useAuth();
@@ -58,14 +59,14 @@ const Deposito = () => {
   const [banco, setBanco] = useState("")
   const [phone, setPhone] = useState("")
   const [showBTNConsulta, setShowBTNConsulta] = useState(true)
-
+  console.log(valor)
   const optionsBanco = [
     { value: "", label: "" },
     { value: "0052", label: "Banco AvVillas" },
     { value: "0001", label: "Banco Bogotá" },
-    { value: "0023", label: "Banco Occidental" },
+    { value: "0023", label: "Banco Occidente" },
     { value: "0002", label: "Banco Popular" },
-    { value: "0054", label: "ATH" },
+    // { value: "0054", label: "ATH" },
   ];
 
   const DataBanco = useMemo(() => {
@@ -90,15 +91,27 @@ const Deposito = () => {
 
   const onSubmitModal = useCallback((e) => {
     e.preventDefault();
+    const { min, max } = limitesMontos;
+    if (valor >= min && valor <= max) {
     const summary = {
       "Banco": DataBanco?.nombre,
+      "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
+      "Número de cuenta": numCuenta,      
       "Documento" : userDoc,
-      "Numero celular": phone,
-      "Valor deposito": formatMoney.format(valor),
+      "Número celular": phone,
+      "Valor depósito": formatMoney.format(valor),
     };
     setSummary(summary)
     setShowModal(true)
-  }, [userDoc, phone, valor, DataBanco]);
+    } else {
+      setIsUploading(false);
+      notifyError(
+        `El valor del depósito debe estar entre ${(formatMoney.format(
+          min
+        )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
+      );
+    }
+  }, [userDoc, phone, valor, DataBanco,numCuenta, tipoCuenta, limitesMontos]);
   
 
   const printDiv = useRef();
@@ -154,75 +167,60 @@ const Deposito = () => {
       e.preventDefault();
       setIsUploading(true);
 
-      const { min, max } = limitesMontos;
-
-      if (valor >= min && valor < max) {
-        // const formData = new FormData(e.target);
-        // const numCuenta = formData.get("numCuenta");
-        // const userDoc = formData.get("docCliente");
-        // const valorFormat = formData.get("valor");
-        // const nomDepositante = formData.get("nomDepositante");
-
-        const body = {
-          comercio : {
-            id_comercio: roleInfo?.id_comercio,
-            id_usuario: roleInfo?.id_usuario,
-            id_terminal: roleInfo?.id_dispositivo,
-          },
-    
-          oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
-          nombre_comercio: roleInfo?.['nombre comercio'],
-          valor_total_trx: valor,
-    
-          consultaCosto: {
-            idBancoAdquiriente: DataBanco?.idBanco,
-            numNumeroDocumento: userDoc,
-            numValorTransaccion: valor,
-    
-            location: {
-              codDane: roleInfo?.codigo_dane,
-              ciudad: roleInfo?.ciudad,
-              direccion: roleInfo?.direccion,
-    
-            }
-          }        
-        };
-        fetchConsultaCostoGrupoAval(body)
-          .then((res) => {
-            setIsUploading(false);
-            if (!res?.status) {
-              notifyError(res?.msg);
-              handleClose()
-              // return;
-            } else {
-              setDatosConsulta(res?.obj?.Data);
-              const summary = {
-                "Banco": DataBanco?.nombre,
-                "Documento" : userDoc,
-                "Numero celular": phone,
-                "Valor deposito": formatMoney.format(valor),
-                "Costo transacción": formatMoney.format(res?.obj?.costoTrx)
-              };
-              setSummary(summary)
-              setShowModal(true);
-              setShowBTNConsulta(false)
-            }
-          })
-          .catch((err) => {
-            setIsUploading(false);
-            console.error(err);
-            notifyError("No se ha podido conectar al servidor");
-          });
-      } else {
-        setIsUploading(false);
-        notifyError(
-          `El valor del deposito debe estar entre ${formatMoney.format(
-            min
-          )} y ${formatMoney.format(max)}`
-        );
-      }
+      const body = {
+        comercio : {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+  
+        oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+        nombre_comercio: roleInfo?.['nombre comercio'],
+        valor_total_trx: valor,
+  
+        consultaCosto: {
+          idBancoAdquiriente: DataBanco?.idBanco,
+          numNumeroDocumento: userDoc,
+          numValorTransaccion: valor,
+  
+          location: {
+            codDane: roleInfo?.codigo_dane,
+            ciudad: roleInfo?.ciudad,
+            direccion: roleInfo?.direccion,
+  
+          }
+        }        
+      };
+      fetchConsultaCostoGrupoAval(body)
+        .then((res) => {
+          setIsUploading(false);
+          if (!res?.status) {
+            notifyError(res?.msg);
+            handleClose()
+            // return;
+          } else {
+            setDatosConsulta(res?.obj?.Data);
+            const summary = {
+              "Banco": DataBanco?.nombre,
+              "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
+              "Número de cuenta": numCuenta,                
+              "Documento" : userDoc,
+              "Número celular": phone,
+              "Valor depósito": formatMoney.format(valor),
+              "Costo transacción": formatMoney.format(res?.obj?.costoTrx)
+            };
+            setSummary(summary)
+            setShowModal(true);
+            setShowBTNConsulta(false)
+          }
+        })
+        .catch((err) => {
+          setIsUploading(false);
+          console.error(err);
+          notifyError("No se ha podido conectar al servidor");
+        });
     },
-    [valor, limitesMontos, DataBanco, roleInfo, userDoc]
+    [valor, limitesMontos, DataBanco, roleInfo, userDoc, numCuenta,phone, tipoCuenta]
   );
 
   const onMoneyChange = useCallback(
@@ -308,8 +306,8 @@ const Deposito = () => {
           : "No hay datos",
           trxInfo: [
             [
-            "Tipo",
-            tipoCuenta === 1 ? "Ahorros" : "Corriente",
+            "Tipo de cuenta",
+            tipoCuenta === "01" ? "Ahorros" : "Corriente",
             ],
             ["",""],
             [
@@ -345,6 +343,7 @@ const Deposito = () => {
         console.error(err);
         notifyError("No se ha podido conectar al servidor");
       });
+
   }, [
     numCuenta,
     valor,
@@ -355,6 +354,7 @@ const Deposito = () => {
     infoTicket,
     ,
     datosConsulta,
+    DataBanco
   ]);
 
   return (
@@ -366,7 +366,7 @@ const Deposito = () => {
         <Form onSubmit={onSubmitModal} grid>
           <Select
             id='banco'
-            label='Banco a Retirar'
+            label='Banco a depositar'
             options={optionsBanco}
             value={banco}
             onChange={(e) => {
@@ -444,7 +444,7 @@ const Deposito = () => {
           label="Valor a depositar"
           autoComplete="off"
           type="text"
-          minLength={"1"}
+          minLength={"15"}
           maxLength={"15"}
           min={limitesMontos?.min}
           max={limitesMontos?.max}
@@ -462,18 +462,18 @@ const Deposito = () => {
           show={showModal}
           handleClose={
             paymentStatus
-              ? () => {}
+              ? goToRecaudo
               : loadingDepositoCorresponsalGrupoAval
               ? () => {}
               : handleClose
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <PaymentSummary summaryTrx={summary}>

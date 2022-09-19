@@ -107,19 +107,6 @@ const CargaComprobante = () => {
        */
       const { url, fields } = resFile.obj;
       const filename = fields.key;
-      const formData = new FormData();
-      for (var key in fields) {
-        formData.append(key, fields[key]);
-      }
-      formData.set("file", file);
-      const resUploadFile = await fetch(url, {
-        method: "POST",
-        body: formData,
-        mode: "no-cors",
-      });
-
-      console.log(resFile);
-      console.log(resUploadFile);
 
       /**
        * Subir informaacion a db
@@ -140,6 +127,19 @@ const CargaComprobante = () => {
       }
       /* const resComprobante =  */ await agregarComprobante(reqBody);
 
+      const formData = new FormData();
+      for (var key in fields) {
+        formData.append(key, fields[key]);
+      }
+      formData.set("file", file);
+      const resUploadFile = await fetch(url, {
+        method: "POST",
+        body: formData,
+        mode: "no-cors",
+      });
+
+      console.log(resFile);
+      console.log(resUploadFile);
       // console.log(resComprobante);
     } catch (error) {
       throw error;
@@ -235,7 +235,7 @@ const CargaComprobante = () => {
         <ButtonBar />
         {Boolean(movementType) && (
           <Fieldset
-            legend={"Informacion del movimiento"}
+            legend={"Información del movimiento"}
             className="lg:col-span-2"
           >
             {Object.entries(staticInfo).map(([key, val]) => (
@@ -324,7 +324,7 @@ const CargaComprobante = () => {
                 setObservaciones(e.target.value.trimLeft());
                 e.target.value = e.target.value.trimLeft();
               }}
-              info={`Maximo 60 caracteres`}
+              info={`Máximo 60 caracteres`}
               required
             />
             {!file ? (

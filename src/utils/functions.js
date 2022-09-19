@@ -93,5 +93,4 @@ export const onUpdateSW = (registration) => {
   registration.update().then(() => {
     window.location.reload();
   });
-
 };

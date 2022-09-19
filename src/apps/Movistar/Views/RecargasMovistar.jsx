@@ -19,7 +19,7 @@ import {
 } from "../utils/fetchMovistar";
 
 const minValor = 1000;
-const maxValor = 500000;
+const maxValor = 100000;
 const tipo_operacion = 77;
 
 const RecargasMovistar = () => {
@@ -62,41 +62,24 @@ const RecargasMovistar = () => {
   const onSubmitCheck = (e) => {
     e.preventDefault();
     //validar datos de la recarga
-    let realizarRecarga = 0;
-    if (inputCelular[0] == 3) {
-      realizarRecarga++;
-    } else {
+    if (inputCelular[0] != 3) {
       notifyError(
         "Número inválido, el No. de celular debe comenzar con el número 3"
       );
-    }
-    const minValorFormato = formatMoney.format(minValor).replace(/\s+/g, "");
-    const maxValorFormato = formatMoney.format(maxValor).replace(/\s+/g, "");
-
-    if (inputValor >= minValor && inputValor <= maxValor) {
-      realizarRecarga++;
-    } else if (inputValor < minValor) {
-      notifyError(
-        `Valor de la recarga inválido, debe ser mayor o igual a ${minValorFormato}`
-      );
-    } else if (inputValor > maxValor) {
-      notifyError(
-        `Valor de la recarga inválido, debe ser menor o igual a ${maxValorFormato}`
-      );
+      return;
     }
 
     //Realizar recarga
-    if (realizarRecarga == 2) {
-      setShowModal(true);
-      setSummary({
-        Celular: `${inputCelular.slice(0, 3)} ${inputCelular.slice(3, 6)} 
+    setShowModal(true);
+    setSummary({
+      Celular: `${inputCelular.slice(0, 3)} ${inputCelular.slice(3, 6)} 
         ${inputCelular.slice(6)}`,
-        Valor: formatMoney.format(inputValor),
-      });
-    }
+      Valor: formatMoney.format(inputValor),
+    });
   };
 
   const recargaMovistar = () => {
+    console.log(roleInfo);
     const data = {
       celular: inputCelular,
       valor: inputValor,
@@ -114,6 +97,7 @@ const RecargasMovistar = () => {
         const response_obj = response?.obj;
         const result = response_obj?.result;
         if (response?.status == true) {
+          notify("Recarga exitosa");
           setFlagRecarga(true);
           ticketRecarga(result);
         } else {

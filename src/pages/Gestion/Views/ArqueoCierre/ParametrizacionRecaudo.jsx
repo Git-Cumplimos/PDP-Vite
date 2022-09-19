@@ -230,7 +230,7 @@ const ParametrizacionRecaudo = () => {
               value={selectedEntity?.pk_nombre_entidad ?? ""}
               readOnly
             />
-            <Fieldset legend={"Parmetros"}>
+            <Fieldset legend={"Parámetros"}>
               {Object.entries(selectedEntity?.parametros ?? {}).map(
                 ([key, val], ind) => (
                   <div
@@ -296,7 +296,7 @@ const ParametrizacionRecaudo = () => {
                           })
                         }
                       >
-                        Eliminar parametro
+                        Eliminar parámetro
                       </Button>
                     </ButtonBar>
                   </div>
@@ -318,12 +318,12 @@ const ParametrizacionRecaudo = () => {
                     })
                   }
                 >
-                  Agregar parametro
+                  Agregar parámetro
                 </Button>
               </ButtonBar>
             </Fieldset>
             <ButtonBar>
-              <Button type="submit">Actualizar informacion</Button>
+              <Button type="submit">Actualizar información</Button>
               <Button type="button" onClick={closeModal}>
                 Cancelar
               </Button>

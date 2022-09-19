@@ -58,7 +58,7 @@ const NotasHistorico = () => {
   return (
     <Fragment>
       <TableEnterprise
-        title="Históricos - Cierre de Caja"
+        title="Históricos - Notas Débito y Crédito"
         headers={[
           "Id nota",
           "Id comercio",
@@ -66,7 +66,7 @@ const NotasHistorico = () => {
           "Tipo de movimiento",
           "Fecha y hora",
           "Responsable",
-          "Razon ajuste",
+          "Razón ajuste",
           "Valor nota",
         ]}
         maxPage={maxPages}
@@ -84,7 +84,7 @@ const NotasHistorico = () => {
             pk_id_nota,
             id_comercio,
             id_cajero,
-            tipo_nota: tipo_nota ? "Debito" : "Credito",
+            tipo_nota: tipo_nota ? "Débito" : "Crédito",
             created: dateFormatter.format(new Date(created)),
             responsable,
             razon_ajuste: <p>{razon_ajuste}</p>,

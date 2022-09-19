@@ -18,10 +18,12 @@ const PanelConsignaciones = lazy(() => import("./PanelConsignaciones"));
 const ParametrizacionRecaudo = lazy(() => import("./ParametrizacionRecaudo"));
 const NotasCDHistorico = lazy(() => import("./Notas/NotasHistorico"));
 
+const ReportesCierre = lazy(() => import("./ReportesCierre"));
+
 export const rutasArqueo = [
   {
-    link: "/gestion/arqueo/panel-transacciones",
-    label: <AppIcons Logo={"RECAUDO"} name="Panel de transacciones" />,
+    link: "/gestion/arqueo/arqueo-cierre",
+    label: <AppIcons Logo={"RECAUDO"} name="Arqueo y cierre" />,
     component: Panel,
     permission: [74],
   },
@@ -51,19 +53,19 @@ export const rutasArqueo = [
   },
   {
     link: "/gestion/arqueo/notas",
-    label: <AppIcons Logo={"RECAUDO"} name="Notas debito y credito" />,
+    label: <AppIcons Logo={"RECAUDO"} name="Notas débito y crédito" />,
     component: NotasCD,
     permission: [78, 80],
     subRoutes: [
       {
         link: "/gestion/arqueo/notas/debito",
-        label: <AppIcons Logo={"RECAUDO"} name="Notas debito" />,
+        label: <AppIcons Logo={"RECAUDO"} name="Notas débito" />,
         component: NotasDebito,
         permission: [78],
       },
       {
         link: "/gestion/arqueo/notas/credito",
-        label: <AppIcons Logo={"RECAUDO"} name="Notas credito" />,
+        label: <AppIcons Logo={"RECAUDO"} name="Notas crédito" />,
         component: NotasCredito,
         permission: [80],
       },
@@ -71,8 +73,14 @@ export const rutasArqueo = [
   },
   {
     link: "/gestion/arqueo/notas-historico",
-    label: <AppIcons Logo={"RECAUDO"} name="Historico notas debito y credito" />,
+    label: <AppIcons Logo={"RECAUDO"} name="Históricos notas débito y crédito" />,
     component: NotasCDHistorico,
     permission: [81],
+  },
+  {
+    link: "/gestion/arqueo/reporte-arqueo",
+    label: <AppIcons Logo={"RECAUDO"} name="Reportes arqueo y cierre de caja" />,
+    component: ReportesCierre,
+    permission: [82],
   },
 ];

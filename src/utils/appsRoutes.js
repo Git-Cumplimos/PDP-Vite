@@ -1062,7 +1062,7 @@ const allUrlsPrivateApps = [
             link: "/corresponsalia/corresponsalia-banco-agrario/retiro",
             label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
             component: RetiroBancoAgrario,
-            permission: [7],
+            permission: [72],
             subRoutes: [
               {
                 link: "/corresponsalia/corresponsalia-banco-agrario/retiro/retiro-efectivo",
