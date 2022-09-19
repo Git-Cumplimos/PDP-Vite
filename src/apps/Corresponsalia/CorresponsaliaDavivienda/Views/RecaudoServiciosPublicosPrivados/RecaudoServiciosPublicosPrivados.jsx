@@ -222,6 +222,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         municipio: roleInfo?.["ciudad"],
         oficinaPropia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        direccion: roleInfo?.direccion,
       })
         .then((res) => {
           if (res?.status) {
