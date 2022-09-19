@@ -11,7 +11,6 @@ import rutasColpatria from "../apps/Colpatria/routes";
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 import ProvidepinesVus from "../apps/PinesVus/components/ProvidepinesVus";
-
 /**
  * * Logos
  */
@@ -275,6 +274,11 @@ const CorresponsaliaBancoAgrario = lazy(() =>
     "../apps/Corresponsalia/CorresponsaliaBancoAgrario/CorresponsaliaBancoAgrario"
   )
 );
+const TrxCuentasBancoAgrario = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/CorresponsaliaBancoAgrario"
+  )
+);
 const RetiroBancoAgrario = lazy(() =>
   import(
     "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/Retiro/RetiroBancoAgrario"
@@ -282,7 +286,12 @@ const RetiroBancoAgrario = lazy(() =>
 );
 const RetiroEfectivoBancoAgrario = lazy(() =>
   import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/Retiro/Views/RetiroEfectivo"
+    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/TrxCuentas/RetiroEfectivo"
+  )
+);
+const DepositoBancoAgrario = lazy(() =>
+  import(
+    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/TrxCuentas/DepositoEfectivo"
   )
 );
 
@@ -1059,21 +1068,45 @@ const allUrlsPrivateApps = [
         permission: [71],
         subRoutes: [
           {
-            link: "/corresponsalia/corresponsalia-banco-agrario/retiro",
-            label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
-            component: RetiroBancoAgrario,
+            link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas",
+            label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones cuentas Banco Agrario" />,
+            component: TrxCuentasBancoAgrario,
             permission: [72],
             subRoutes: [
               {
-                link: "/corresponsalia/corresponsalia-banco-agrario/retiro/retiro-efectivo",
+                link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/deposito",
                 label: (
-                  <AppIcons Logo={"MARKETPLACE"} name="Retiro en efectivo" />
+                  <AppIcons Logo={"MARKETPLACE"} name="Depósito" />
+                ),
+                component: DepositoBancoAgrario,
+                permission: [73],
+              },
+              {
+                link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/retiro",
+                label: (
+                  <AppIcons Logo={"MARKETPLACE"} name="Retiro" />
                 ),
                 component: RetiroEfectivoBancoAgrario,
                 permission: [73],
               },
             ],
           },
+          // {
+          //   link: "/corresponsalia/corresponsalia-banco-agrario/retiro",
+          //   label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
+          //   component: RetiroBancoAgrario,
+          //   permission: [72],
+          //   subRoutes: [
+          //     {
+          //       link: "/corresponsalia/corresponsalia-banco-agrario/retiro/retiro-efectivo",
+          //       label: (
+          //         <AppIcons Logo={"MARKETPLACE"} name="Retiro en efectivo" />
+          //       ),
+          //       component: RetiroEfectivoBancoAgrario,
+          //       permission: [73],
+          //     },
+          //   ],
+          // },
         ],
       },
     ],
