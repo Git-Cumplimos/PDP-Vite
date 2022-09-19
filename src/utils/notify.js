@@ -40,7 +40,6 @@ const notifyPending = (
       },
       error: {
         type: "warning",
-        autoClose: false,
         closeOnClick: false,
         ...onError,
       },

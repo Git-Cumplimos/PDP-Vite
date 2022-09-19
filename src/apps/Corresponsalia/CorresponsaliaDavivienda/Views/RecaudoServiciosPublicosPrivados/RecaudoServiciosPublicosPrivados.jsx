@@ -91,7 +91,6 @@ const RecaudoServiciosPublicosPrivados = () => {
     })
       .then((autoArr) => {
         setConvenio(autoArr?.results[0]);
-        console.log(autoArr?.results[0]);
         setIsUploading(false);
       })
       .catch((err) => console.error(err));
@@ -354,7 +353,7 @@ const RecaudoServiciosPublicosPrivados = () => {
     if (!isNaN(valor)) {
       const num = valor;
       setDatosTrans((old) => {
-        return { ...old, valor: num };
+        return { ...old, valor: onChangeMoney(ev) };
       });
     }
   };
@@ -423,23 +422,34 @@ const RecaudoServiciosPublicosPrivados = () => {
             }}></Input>
         )}
         {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb) && (
-          <Input
-            id='valor'
-            name='valor'
+          <MoneyInput
+            id='valCashOut'
+            name='valCashOut'
             label='Valor'
+            type='text'
             autoComplete='off'
-            type='tel'
-            minLength={"0"}
-            maxLength={"20"}
-            defaultValue={datosTrans.valor ?? ""}
-            onInput={(ev) =>
-              setDatosTrans((old) => ({
-                ...old,
-                valor: onChangeMoney(ev),
-              }))
-            }
-            required
-          />
+            maxLength={"15"}
+            value={datosTrans.valor ?? ""}
+            onInput={onChangeMoneyLocal}
+            required></MoneyInput>
+
+          // <Input
+          //   id='valor'
+          //   name='valor'
+          //   label='Valor'
+          //   autoComplete='off'
+          //   type='tel'
+          //   minLength={"0"}
+          //   maxLength={"20"}
+          //   value={datosTrans.valor ?? ""}
+          //   onInput={(ev) =>
+          //     setDatosTrans((old) => ({
+          //       ...old,
+          //       valor: onChangeMoney(ev),
+          //     }))
+          //   }
+          //   required
+          // />
         )}
         <ButtonBar
           className={

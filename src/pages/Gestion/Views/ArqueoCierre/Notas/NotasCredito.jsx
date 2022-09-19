@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 const NotasCredito = () => {
   const navigate = useNavigate();
-  const { roleInfo, userInfo } = useAuth();
+  const { pdpUser } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [datosNota, setDatosNota] = useState(
@@ -72,22 +72,14 @@ const NotasCredito = () => {
   useEffect(() => {
     setDatosNota((old) => {
       const copy = new Map(old);
-      copy.set("id_comercio", roleInfo?.id_comercio);
-      copy.set("id_usuario", roleInfo?.id_usuario);
-      copy.set("id_terminal", roleInfo?.id_dispositivo);
-      copy.set("responsable", userInfo?.attributes?.name);
+      copy.set("responsable", pdpUser?.uuid);
       return new Map(copy);
     });
-  }, [
-    roleInfo?.id_comercio,
-    roleInfo?.id_usuario,
-    roleInfo?.id_dispositivo,
-    userInfo?.attributes?.name,
-  ]);
+  }, [pdpUser?.uuid]);
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-10 mb-8">Creacion nota credito</h1>
+      <h1 className="text-3xl mt-10 mb-8">Creación nota crédito</h1>
       <Form onSubmit={onSubmit} grid>
         <Input
           id="id_comercio"
@@ -95,8 +87,43 @@ const NotasCredito = () => {
           label="Id de comercio"
           type="tel"
           autoComplete="off"
-          value={roleInfo?.id_comercio ?? ""}
-          readOnly
+          onChange={(ev) =>
+            setDatosNota((old) => {
+              const copy = new Map(old);
+              copy.set(ev.target.name, onChangeNumber(ev));
+              return new Map(copy);
+            })
+          }
+          required
+        />
+        <Input
+          id="id_usuario"
+          name="id_usuario"
+          label="Id de usuario"
+          type="tel"
+          autoComplete="off"
+          onChange={(ev) =>
+            setDatosNota((old) => {
+              const copy = new Map(old);
+              copy.set(ev.target.name, onChangeNumber(ev));
+              return new Map(copy);
+            })
+          }
+          required
+        />
+        <Input
+          id="id_terminal"
+          name="id_terminal"
+          label="Id de terminal"
+          type="tel"
+          autoComplete="off"
+          onChange={(ev) =>
+            setDatosNota((old) => {
+              const copy = new Map(old);
+              copy.set(ev.target.name, onChangeNumber(ev));
+              return new Map(copy);
+            })
+          }
           required
         />
         <Input
@@ -118,15 +145,15 @@ const NotasCredito = () => {
         <Input
           id="responsable"
           name="responsable"
-          label={"Responsable"}
-          value={userInfo?.attributes?.name ?? ""}
+          label={"Id de responsable"}
+          value={pdpUser?.uuid ?? ""}
           readOnly
           required
         />
         <Input
           id="valor_nota"
           name="valor_nota"
-          label="Valor nota credito"
+          label="Valor nota crédito"
           type="tel"
           minLength={"5"}
           maxLength={"13"}
@@ -146,7 +173,7 @@ const NotasCredito = () => {
           className="w-full place-self-stretch"
           autoComplete="off"
           maxLength={"100"}
-          label={"Razon ajuste"}
+          label={"Razón ajuste"}
           onInput={(ev) => {
             setDatosNota((old) => {
               const copy = new Map(old);
@@ -159,7 +186,7 @@ const NotasCredito = () => {
         />
         <ButtonBar className={"lg:col-span-2"}>
           <Button type="submit" disabled={loading}>
-            Realizar nota credito
+            Realizar nota crédito
           </Button>
         </ButtonBar>
       </Form>
