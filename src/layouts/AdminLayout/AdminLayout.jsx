@@ -57,7 +57,7 @@ const AdminLayout = () => {
   const [clientWidth] = useWindowSize();
 
   const closeCash = useCallback(() => {
-    navigate(`/gestion/arqueo/panel-transacciones`);
+    navigate(`/gestion/arqueo/arqueo-cierre`);
     setInfoCaja(false);
   }, [navigate]);
 
@@ -83,7 +83,7 @@ const AdminLayout = () => {
       roleInfo?.id_usuario !== undefined,
       roleInfo?.id_comercio !== undefined,
       roleInfo?.id_dispositivo !== undefined,
-      pathname !== "/gestion/arqueo/panel-transacciones",
+      pathname !== "/gestion/arqueo/arqueo-cierre",
       userPermissions?.map(({id_permission}) => id_permission).includes(74)
     ];
     if (conditions.every((val) => val)) {
