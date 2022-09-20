@@ -7,8 +7,7 @@ const AppIcons = lazy(() => import("../../../../components/Base/AppIcons"));
 const Panel = lazy(() => import("./Panel"));
 const CargaComprobante = lazy(() => import("./CargaComprobante"));
 const NotasCD = lazy(() => import("./Notas"));
-const NotasDebito = lazy(() => import("./Notas/NotasDebito"));
-const NotasCredito = lazy(() => import("./Notas/NotasCredito"));
+const Notas = lazy(() => import("./Notas/Notas"));
 
 /**
  * COMPONENTES ROL ANALISTA
@@ -60,13 +59,13 @@ export const rutasArqueo = [
       {
         link: "/gestion/arqueo/notas/debito",
         label: <AppIcons Logo={"RECAUDO"} name="Notas débito" />,
-        component: NotasDebito,
+        component: () => <Notas type={true} />,
         permission: [78],
       },
       {
         link: "/gestion/arqueo/notas/credito",
         label: <AppIcons Logo={"RECAUDO"} name="Notas crédito" />,
-        component: NotasCredito,
+        component: () => <Notas type={false} />,
         permission: [80],
       },
     ]
