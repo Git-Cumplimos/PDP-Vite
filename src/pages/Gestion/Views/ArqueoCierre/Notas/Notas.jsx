@@ -11,18 +11,17 @@ import { onChangeNumber } from "../../../../../utils/functions";
 import { agregarNota } from "../../../utils/fetchCaja";
 import { useNavigate } from "react-router-dom";
 
-const NotasDebito = () => {
+const Notas = ({ type }) => {
   const navigate = useNavigate();
   const { pdpUser } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [datosNota, setDatosNota] = useState(
     new Map([
-      ["tipo_nota", true],
+      ["tipo_nota", type],
       ["id_usuario", ""],
       ["id_terminal", ""],
       ["id_comercio", ""],
-      ["id_cajero", ""],
       ["responsable", ""],
       ["valor_nota", ""],
       ["razon_ajuste", ""],
@@ -77,9 +76,13 @@ const NotasDebito = () => {
     });
   }, [pdpUser?.uuid]);
 
+  if (type === null || type === undefined || typeof type !== "boolean") {
+    throw new Error("Tipo de nota invalido");
+  }
+
   return (
     <Fragment>
-      <h1 className="text-3xl mt-10 mb-8">Creación nota débito</h1>
+      <h1 className="text-3xl mt-10 mb-8">Creación nota {type ? "débito": "crédito"}</h1>
       <Form onSubmit={onSubmit} grid>
         <Input
           id="id_comercio"
@@ -127,22 +130,6 @@ const NotasDebito = () => {
           required
         />
         <Input
-          id="id_cajero"
-          name="id_cajero"
-          label="Id de cajero"
-          type="tel"
-          maxLength="10"
-          autoComplete="off"
-          onChange={(ev) =>
-            setDatosNota((old) => {
-              const copy = new Map(old);
-              copy.set(ev.target.name, onChangeNumber(ev));
-              return new Map(copy);
-            })
-          }
-          required
-        />
-        <Input
           id="responsable"
           name="responsable"
           label={"Id de responsable"}
@@ -153,7 +140,7 @@ const NotasDebito = () => {
         <Input
           id="valor_nota"
           name="valor_nota"
-          label="Valor nota débito"
+          label={`Valor nota ${type ? "débito": "crédito"}`}
           type="tel"
           minLength={"5"}
           maxLength={"13"}
@@ -186,7 +173,7 @@ const NotasDebito = () => {
         />
         <ButtonBar className={"lg:col-span-2"}>
           <Button type="submit" disabled={loading}>
-            Realizar nota débito
+            Realizar nota {type ? "débito": "crédito"}
           </Button>
         </ButtonBar>
       </Form>
@@ -194,4 +181,4 @@ const NotasDebito = () => {
   );
 };
 
-export default NotasDebito;
+export default Notas;
