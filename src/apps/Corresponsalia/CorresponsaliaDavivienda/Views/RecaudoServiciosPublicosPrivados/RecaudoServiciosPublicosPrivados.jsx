@@ -222,6 +222,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         municipio: roleInfo?.["ciudad"],
         oficinaPropia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        direccion: roleInfo?.direccion,
       })
         .then((res) => {
           if (res?.status) {
@@ -538,7 +539,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                 )}
                 <ButtonBar>
                   <Button type='button' onClick={handleClose}>
-                    cancelar
+                    Cancelar
                   </Button>
                   <Button type='submit'>
                     {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
