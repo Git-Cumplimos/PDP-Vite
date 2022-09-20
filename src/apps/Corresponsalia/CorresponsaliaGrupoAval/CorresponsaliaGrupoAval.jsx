@@ -17,38 +17,27 @@ const CorresponsaliaGrupoAval = ({ subRoutes }) => {
     }
   }, []);
   const fetchIdTotalComercio = useCallback(() => {
-    postConsultaTotalDavivienda({
-      pk_comercio: roleInfo?.id_comercio ?? 0,
-    })
-      .then((autoArr) => {
-        if (!autoArr?.status) {
-          notifyError("El comercio no tiene un ID relacionado a Grupo Aval");
-          // navigate("/");
-          return;
-        }
-        let hasKeys = true;
-        const keys = [
-          "id_comercio",
-          "id_usuario",
-          "tipo_comercio",
-          "id_dispositivo",
-          "ciudad",
-          "direccion",
-        ];
-        for (const key of keys) {
-          if (!(key in roleInfo)) {
-            hasKeys = false;
-            break;
-          }
-        }
-        if (!hasKeys) {
-          notifyError(
-            "El usuario no cuenta con datos de comercio, no se permite la transaccion"
-          );
-          navigate("/");
-        }
-      })
-      .catch((err) => console.error(err));
+    let hasKeys = true;
+    const keys = [
+      "id_comercio",
+      "id_usuario",
+      "tipo_comercio",
+      "id_dispositivo",
+      "ciudad",
+      "direccion",
+    ];
+    for (const key of keys) {
+      if (!(key in roleInfo)) {
+        hasKeys = false;
+        break;
+      }
+    }
+    if (!hasKeys) {
+      notifyError(
+        "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+      );
+      navigate("/");
+    }
   }, [roleInfo, navigate]);
 
   return <HNavbar links={subRoutes} isIcon />;
