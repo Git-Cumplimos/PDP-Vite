@@ -54,7 +54,7 @@ const Retiro = () => {
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
-  const [tipoCuenta, setTipoCuenta] = useState("");
+  const [tipoCuenta, setTipoCuenta] = useState("01");
   const [tipoDocumento, setTipoDocumento] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [userDoc, setUserDoc] = useState("")
@@ -92,7 +92,6 @@ const Retiro = () => {
   }, [optionsBanco, banco]);
 
   const optionsTipoCuenta = [
-    { value: "", label: "" },
     { value: "01", label: "Ahorros" },
     { value: "02", label: "Corriente" },    
   ];
@@ -141,7 +140,7 @@ const Retiro = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setTipoCuenta("")
+    setTipoCuenta("01")
     setTipoDocumento("")             
     setValor("")
     setUserDoc("")

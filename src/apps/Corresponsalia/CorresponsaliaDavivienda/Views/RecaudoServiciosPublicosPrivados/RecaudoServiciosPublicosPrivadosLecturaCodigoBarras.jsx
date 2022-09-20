@@ -177,6 +177,28 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     });
     setShowModal(false);
     setPeticion(0);
+    setObjTicketActual((old) => {
+      return {
+        ...old,
+        commerceInfo: [
+          /*id transaccion recarga*/
+          /*id_comercio*/
+          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : ""],
+          /*id_dispositivo*/
+          [
+            "No. terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : "",
+          ],
+          /*ciudad*/
+          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : ""],
+          /*direccion*/
+          ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : ""],
+          ["Tipo de operación", "Recaudo de facturas"],
+          ["", ""],
+        ],
+        trxInfo: [],
+      };
+    });
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
@@ -362,7 +384,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           } else {
             setIsUploading(false);
             notifyError(res?.msg);
-            hideModal();
+            hideModalReset();
           }
         })
         .catch((err) => {
@@ -409,7 +431,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           } else {
             setIsUploading(false);
             notifyError(res?.msg);
-            hideModal();
+            hideModalReset();
           }
         })
         .catch((err) => {
