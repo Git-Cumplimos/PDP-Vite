@@ -151,8 +151,8 @@ const NotasHistorico = () => {
           name="tipo_nota"
           options={[
             { value: "", label: "" },
-            { value: "d", label: "Debito" },
-            { value: "c", label: "Credito" },
+            { value: "d", label: "Débito" },
+            { value: "c", label: "Crédito" },
           ]}
           onChange={(ev) =>
             setSearchInfo((old) => {
