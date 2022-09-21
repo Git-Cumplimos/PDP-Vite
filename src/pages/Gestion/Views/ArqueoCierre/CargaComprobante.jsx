@@ -1,4 +1,11 @@
-import { useState, useCallback, useMemo, useEffect, Fragment } from "react";
+import {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  Fragment,
+  useRef,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import Form from "../../../../components/Base/Form";
 import Select from "../../../../components/Base/Select";
@@ -23,11 +30,13 @@ const CargaComprobante = () => {
   const navigate = useNavigate();
   const { roleInfo } = useAuth();
 
+  const formRef = useRef(null);
+
   const [tiposComprobantes, setTiposComprobantes] = useState([]);
 
   const [movementType, setMovementType] = useState("");
   const [foundEntities, setFoundEntities] = useState([]);
-  const [selectedEntity, setSelectedEntity] = useState(null);
+  const [selectedEntity, setSelectedEntity] = useState("");
   const [file, setFile] = useState(null);
   const [accountNumber, setAccountNumber] = useState("");
   const [comprobanteNumber, setComprobanteNumber] = useState("");
@@ -45,8 +54,8 @@ const CargaComprobante = () => {
 
   const staticInfo = useMemo(
     () => ({
-      "Id comercio": roleInfo?.id_comercio,
-      "Id usuario": roleInfo?.id_usuario,
+      "Id comercio": roleInfo?.id_comercio ?? 59,
+      "Id usuario": roleInfo?.id_usuario ?? 8202,
     }),
     [roleInfo?.id_comercio, roleInfo?.id_usuario]
   );
@@ -214,10 +223,12 @@ const CargaComprobante = () => {
       });
   }, []);
 
+  console.log(formRef);
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-10 mb-8">Transportadora y Consignaciones</h1>
-      <Form onSubmit={onSubmit} grid>
+      <Form grid>
         <Select
           id="searchByType"
           name="tipoComp"
@@ -225,15 +236,16 @@ const CargaComprobante = () => {
           options={[{ value: "", label: "" }, ...tiposComprobantes]}
           onChange={(e) => {
             const val = e.target.value ?? "";
+            formRef.current?.reset?.();
+            setSelectedEntity(null);
             setMovementType(val);
-            if (val === "") {
-              setSelectedEntity(null);
-            }
             searchEntities(val !== "Consignación Bancaría");
           }}
         />
         <ButtonBar />
-        {Boolean(movementType) && (
+      </Form>
+      {Boolean(movementType) && (
+        <Form onSubmit={onSubmit} ref={formRef} grid>
           <Fieldset
             legend={"Información del movimiento"}
             className="lg:col-span-2"
@@ -277,6 +289,7 @@ const CargaComprobante = () => {
                   max: tempMap.get(e.target.value)?.monto_maximo ?? old.max,
                 }));
               }}
+              required
             />
             {movementType === "Consignación Bancaría" && (
               <Input
@@ -355,8 +368,8 @@ const CargaComprobante = () => {
               </Button>
             </ButtonBar>
           </Fieldset>
-        )}
-      </Form>
+        </Form>
+      )}
     </Fragment>
   );
 };
