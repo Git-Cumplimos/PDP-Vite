@@ -82,7 +82,7 @@ const SeleccionServicioPagarAval = () => {
         <Input
           id='searchConvenio'
           name='searchConvenio'
-          label={"Buscar convenio"}
+          label={"Nopmbre convenio"}
           minLength='1'
           maxLength='30'
           type='text'
@@ -95,7 +95,7 @@ const SeleccionServicioPagarAval = () => {
         />
         <Input
           id='idConvenio'
-          label='Id convenio'
+          label='Código convenio'
           type='text'
           name='idConvenio'
           minLength='1'

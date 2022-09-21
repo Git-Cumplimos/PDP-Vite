@@ -89,7 +89,7 @@ const SeleccionServicioPagar = () => {
         <Input
           id='searchConvenio'
           name='searchConvenio'
-          label={"Buscar convenio"}
+          label={"Nombre convenio"}
           type='text'
           autoComplete='off'
           minLength='1'
@@ -102,7 +102,7 @@ const SeleccionServicioPagar = () => {
         />
         <Input
           id='idConvenio'
-          label='Id convenio'
+          label='Código convenio'
           type='text'
           name='idConvenio'
           minLength='1'
