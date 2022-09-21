@@ -326,12 +326,20 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       postRecaudoConveniosDavivienda({
         valTipoConsultaConvenio: "1",
         numConvenio: datosEnvio?.datosConvenio?.cod_convenio_cnb,
-        numTipoProductoRecaudo: datosEnvio?.datosConvenio?.tipo_cta_recaudo_cnb,
-        numProductoRecaudo: datosEnvio?.datosConvenio?.nro_cta_recaudo_cnb,
+
+        // numTipoProductoRecaudo: datosEnvio?.datosConvenio?.tipo_cta_recaudo_cnb,
+        // numProductoRecaudo: datosEnvio?.datosConvenio?.nro_cta_recaudo_cnb,
+        // valTipoProdDestinoRecaudoCent:
+        //   datosEnvio?.datosConvenio?.tipo_cta_destino_cnb,
+        // valProdDestinoRecaudoCent:
+        //   datosEnvio?.datosConvenio?.nro_cta_destino_cnb,
+        numTipoProductoRecaudo: datosEnvio?.datosConvenio?.tipo_cta_destino_cnb,
+        numProductoRecaudo: datosEnvio?.datosConvenio?.nro_cta_destino_cnb,
         valTipoProdDestinoRecaudoCent:
-          datosEnvio?.datosConvenio?.tipo_cta_destino_cnb,
+          datosEnvio?.datosConvenio?.tipo_cta_recaudo_cnb,
         valProdDestinoRecaudoCent:
-          datosEnvio?.datosConvenio?.nro_cta_destino_cnb,
+          datosEnvio?.datosConvenio?.nro_cta_recaudo_cnb,
+
         valCodigoIAC: datosEnvio?.datosConvenio?.cod_iac_cnb,
         valor: valorTransaccion,
         valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
