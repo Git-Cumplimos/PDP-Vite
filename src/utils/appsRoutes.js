@@ -1047,13 +1047,13 @@ const allUrlsPrivateApps = [
             link: "/corresponsalia/CorresponsaliaGrupoAval/pagoterceros",
             label: <AppIcons Logo={"MARKETPLACE"} name="Pago de terceros" />,
             component: PagoTerceros,
-            permission: [70],
+            permission: [69],
           },
           {
             link: "/corresponsalia/CorresponsaliaGrupoAval/pagosubsidios",
             label: <AppIcons Logo={"MARKETPLACE"} name="Pago de subsidios" />,
             component: PagoSubsidios,
-            permission: [70],
+            permission: [69],
           },
         ],
       },
@@ -1069,23 +1069,24 @@ const allUrlsPrivateApps = [
         subRoutes: [
           {
             link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas",
-            label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones cuentas Banco Agrario" />,
+            label: (
+              <AppIcons
+                Logo={"MARKETPLACE"}
+                name="Transacciones cuentas Banco Agrario"
+              />
+            ),
             component: TrxCuentasBancoAgrario,
             permission: [72],
             subRoutes: [
               {
                 link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/deposito",
-                label: (
-                  <AppIcons Logo={"MARKETPLACE"} name="Depósito" />
-                ),
+                label: <AppIcons Logo={"MARKETPLACE"} name="Depósito" />,
                 component: DepositoBancoAgrario,
                 permission: [73],
               },
               {
                 link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/retiro",
-                label: (
-                  <AppIcons Logo={"MARKETPLACE"} name="Retiro" />
-                ),
+                label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
                 component: RetiroEfectivoBancoAgrario,
                 permission: [73],
               },
