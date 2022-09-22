@@ -28,12 +28,12 @@ const SeleccionServicioPagar = () => {
           pk_tbl_transaccional_convenios_davivienda_cb,
           nom_convenio_cnb,
           cod_convenio_cnb,
-          cod_iac_cnb,
+          // cod_iac_cnb,
         }) => {
           return {
             "Id convenio": cod_convenio_cnb,
             Convenio: nom_convenio_cnb.replace(/^\s+|\s+$/g, "") ?? "",
-            "Id IAC": cod_iac_cnb,
+            // "Id IAC": cod_iac_cnb,
           };
         }
       ),
@@ -80,7 +80,7 @@ const SeleccionServicioPagar = () => {
       <TableEnterprise
         title='Tabla convenios Davivienda corresponsal bancario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "Id IAC"]}
+        headers={["Código convenio", "Convenio"]}
         data={tableConvenios}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
@@ -117,7 +117,7 @@ const SeleccionServicioPagar = () => {
               });
             }
           }}></Input>
-        <Input
+        {/* <Input
           id='idIAC'
           label='Id IAC'
           type='text'
@@ -133,7 +133,7 @@ const SeleccionServicioPagar = () => {
                 return { ...old, idIAC: num };
               });
             }
-          }}></Input>
+          }}></Input> */}
       </TableEnterprise>
     </>
   );
