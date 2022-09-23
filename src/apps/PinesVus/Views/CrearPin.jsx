@@ -8,7 +8,8 @@ import { usePinesVus } from "../utils/pinesVusHooks";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notifyError } from "../../../utils/notify";
-import Tickets from "../../../components/Base/Tickets";
+import TicketsPines from "../components/TicketsPines/TicketsPines"
+import Tickets from "../../../components/Base/Tickets"
 import { useReactToPrint } from "react-to-print";
 import Select from "../../../components/Base/Select";
 import { useNavigate } from "react-router-dom";
@@ -467,7 +468,7 @@ const CrearPin = () => {
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago: " + tramiteData?.descripcion,
+      title: "Recibo de pago: Servicio voluntario de impresión premium",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -493,11 +494,46 @@ const CrearPin = () => {
         ["Proceso", "Creación de Pin"],
         // ["Código", respPin?.cod_hash_pin],
         ["Vence", respPin?.fecha_vencimiento],
-        ["Valor Trámite", formatMoney.format(tramiteData?.valor)],
-        ["IVA Trámite",formatMoney.format(tramiteData?.iva)],
         ["Valor Pin", formatMoney.format(respPin?.valor)],
         ["IVA Pin",formatMoney.format(respPin?.valor_iva)],
-        ["Total", formatMoney.format(respPin?.valor_total)],
+        ["Total", formatMoney.format(respPin?.valor + respPin?.valor_iva)],
+      ],
+      disclamer:
+        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    };
+  }, [roleInfo, respPin, pinData, tramiteData]);
+
+  const tickets2 = useMemo(() => {
+    return {
+      title: "Recibo de pago: " + tramiteData?.descripcion,
+      timeInfo: {
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: false,
+        }).format(new Date()),
+      },
+      commerceInfo: Object.entries({
+        "Id Comercio": roleInfo?.id_comercio,
+        "No. terminal": roleInfo?.id_dispositivo,
+        Municipio: roleInfo?.ciudad,
+        Dirección: roleInfo?.direccion,
+        "Id Trx": respPin?.transacciones_id_trx?.creacion,
+      }),
+      commerceName: "Tramite generación de licencia",
+      trxInfo: [
+        ["Proceso", "Creación de Pin"],
+        // ["Código", respPin?.cod_hash_pin],
+        ["Vence", respPin?.fecha_vencimiento],
+        ["Valor Trámite", formatMoney.format(tramiteData?.valor)],
+        ["IVA Trámite",formatMoney.format(tramiteData?.iva)],
+        ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)],
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -508,9 +544,12 @@ const CrearPin = () => {
     infoTicket(
       respPin?.transacciones_id_trx?.creacion,
       respPin?.tipo_trx,
-      tickets
+      {
+      ticket1 : tickets,
+      ticket2 : tickets2
+      },
     );
-  }, [infoTicket, respPin, tickets]);
+  }, [infoTicket, respPin, tickets, tickets2]);
   
   const hora = useMemo(() => {    
     return Intl.DateTimeFormat("es-CO", {
@@ -899,8 +938,21 @@ const CrearPin = () => {
 
       <Modal show={showModal} handleClose={() => closeModal()}>
         {respPin !== ""? 
-        <div className="flex flex-col justify-center items-center">
-          <Tickets refPrint={printDiv} ticket={tickets} />
+        <div className="flex flex-col justify-center items-center" ref={printDiv}>
+          <>
+          <Tickets
+            refPrint={null} 
+            ticket={tickets} 
+            // type={type}
+            // stateTrx={stateTrx}
+          />
+          <TicketsPines
+            refPrint={null} 
+            ticket={tickets2}
+            // type={type}
+            // stateTrx={stateTrx}
+          />
+          </>
           <ButtonBar>
             <Button
               onClick={() => {
