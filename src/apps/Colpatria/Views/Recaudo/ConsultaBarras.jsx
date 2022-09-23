@@ -96,10 +96,10 @@ const ConsultaBarras = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Consulta recaudo codigo de barras</h1>
-      <Form onSubmit={searchCodigo} grid>
+      <h1 className="text-3xl mt-6">Consulta recaudo código de barras</h1>
+      <Form onSubmit={searchCodigo} formDir="col">
         <TextArea
-          label={"Codigo de barras"}
+          label={"Código de barras"}
           name="codigo_barras"
           // onLazyInput={{ callback: () => {}, timeOut: 500 }}
           // onChange={(ev) => {
@@ -132,7 +132,7 @@ const ConsultaBarras = () => {
         />
         <ButtonBar className="lg:col-span-2">
           <Button type="submit" disabled={searchingData}>
-            Consultar codigo de barras
+            Consultar código de barras
           </Button>
         </ButtonBar>
       </Form>

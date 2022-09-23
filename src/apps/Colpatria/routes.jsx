@@ -24,7 +24,7 @@ const ConveniosRecaudo = lazy(() => import("./Views/Admin/ConveniosRecaudo"));
 
 const rutasColpatria = {
   link: "/corresponsalia/colpatria",
-  label: <AppIcons Logo={"RECAUDO"} name={"Colpatria"} />,
+  label: <AppIcons Logo={"MARKETPLACE"} name={"Corresponsalía Colpatria"} />,
   component: colpatriaTrx,
   permission: [67, 68],
   subRoutes: [
@@ -57,7 +57,7 @@ const rutasColpatria = {
     },
     {
       link: "/corresponsalia/colpatria/recaudo-barras",
-      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Barras en Efectivo"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Código de Barras en Efectivo"} />,
       component: ConsultaBarras,
       permission: [67],
     },
@@ -70,7 +70,7 @@ const rutasColpatria = {
     },
     {
       link: "/corresponsalia/colpatria/gestion",
-      label: <AppIcons Logo={"RECAUDO"} name={"Gestion"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Gestión"} />,
       component: AdminColpatria,
       permission: [68],
       subRoutes: [

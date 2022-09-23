@@ -1118,6 +1118,7 @@ const allUrlsPrivateApps = [
           // },
         ],
       },
+      rutasColpatria,
     ],
   },
 
@@ -1533,7 +1534,6 @@ const allUrlsPrivateApps = [
     component: iFoodAportes,
     permission: [1],
   },
-  rutasColpatria,
 ];
 
 export { allUrlsPrivateApps };

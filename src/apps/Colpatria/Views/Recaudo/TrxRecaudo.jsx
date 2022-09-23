@@ -383,7 +383,7 @@ const TrxRecaudo = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Recaudo PSP en Efectivo</h1>
+      <h1 className="text-3xl mt-6 mb-10">Recaudo PSP en Efectivo</h1>
       <Form
         onSubmit={
           inquiryStatus
@@ -396,14 +396,14 @@ const TrxRecaudo = () => {
         grid
       >
         <Input
-          label="Numero de convenio"
+          label="Número de convenio"
           type="text"
           autoComplete="off"
           value={datosConvenio.pk_codigo_convenio}
           disabled
         />
         <Input
-          label="Codigo ean o iac"
+          label="Código ean o iac"
           type="text"
           autoComplete="off"
           value={datosConvenio.codigo_ean_iac}
@@ -425,6 +425,7 @@ const TrxRecaudo = () => {
               label={datosConvenio[`referencia_${ref}`]}
               name={`referencia_${ref}`}
               type="text"
+              maxLength="19"
               autoComplete="off"
               value={userReferences?.[`referencia_${ref}`] ?? ""}
               onInput={(ev) =>
