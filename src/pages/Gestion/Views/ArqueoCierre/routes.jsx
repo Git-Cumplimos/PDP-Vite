@@ -5,6 +5,7 @@ const AppIcons = lazy(() => import("../../../../components/Base/AppIcons"));
  * COMPONENTES ROL CAJERO
  */
 const Panel = lazy(() => import("./Panel"));
+const ReporteTrx = lazy(() => import("./ReporteTrx"));
 const CargaComprobante = lazy(() => import("./CargaComprobante"));
 const NotasCD = lazy(() => import("./Notas"));
 const Notas = lazy(() => import("./Notas/Notas"));
@@ -25,6 +26,13 @@ export const rutasArqueo = [
     label: <AppIcons Logo={"RECAUDO"} name="Arqueo y cierre" />,
     component: Panel,
     permission: [74],
+  },
+  {
+    link: "/gestion/arqueo/reporte-arqueo-cierre",
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
+    component: ReporteTrx,
+    permission: [74],
+    show: false,
   },
   {
     link: "/gestion/arqueo/carga-comprobante",

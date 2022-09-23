@@ -21,6 +21,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import TicketCierre from "./TicketCierre";
+import ButtonLink from "../../../../components/Base/ButtonLink";
 
 const formatMoney = makeMoneyFormatter(0);
 
@@ -184,9 +185,15 @@ const Panel = () => {
               ["", ""],
               ["Total faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
-              ["Total estimación faltantes", formatMoney.format(cierre?.total_estimacion_faltante)],
+              [
+                "Total estimación faltantes",
+                formatMoney.format(cierre?.total_estimacion_faltante),
+              ],
               ["", ""],
-              ["Total movimientos pendiente aprobación", formatMoney.format(cierre?.total_comprobantes_pendientes)],
+              [
+                "Total movimientos pendiente aprobación",
+                formatMoney.format(cierre?.total_comprobantes_pendientes),
+              ],
               ["", ""],
               ["Total arqueo", formatMoney.format(cierre?.total_arqueo)],
               ["", ""],
@@ -255,13 +262,18 @@ const Panel = () => {
             Señor usuario la caja ya fue cerrada el día de hoy
           </h1>
         ) : totalCierres === 3 || totalCierres === 1 || true ? (
-          <Button
-            type="submit"
-            onClick={() => setEstado(true)}
-            disabled={loading}
-          >
-            Arqueo y cierre de caja
-          </Button>
+          <ButtonBar>
+            <Button
+              type="submit"
+              onClick={() => setEstado(true)}
+              disabled={loading}
+            >
+              Arqueo y cierre de caja
+            </Button>
+            <ButtonLink to={"/gestion/arqueo/reporte-arqueo-cierre"}>
+              Ver reporte de transacciones
+            </ButtonLink>
+          </ButtonBar>
         ) : (
           <h1 className="text-3xl mt-6">Cargando...</h1>
         )}
