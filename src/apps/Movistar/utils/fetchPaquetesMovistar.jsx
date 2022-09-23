@@ -1,5 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 import { notifyError } from "../../../utils/notify";
+import { Auth } from "@aws-amplify/auth";
 
 export const fetchCustom = async (url_, metodo_, name_, data_ = {}) => {
   let Peticion;
@@ -14,7 +15,6 @@ export const fetchCustom = async (url_, metodo_, name_, data_ = {}) => {
     throw new ErrorCustom(error.message);
   }
 
-  console.log(Peticion);
   //para los errores customizados del backend
   try {
     if (
@@ -27,7 +27,7 @@ export const fetchCustom = async (url_, metodo_, name_, data_ = {}) => {
       const error_msg_vector = [];
       error_msg_key.map((nombre_error) => {
         const error_msg_ind = error_msg[nombre_error];
-        if (error_msg_ind?.damage && error_msg_ind?.damage == true) {
+        if (error_msg_ind?.damage == true) {
           error_msg_vector.push(`${error_msg_ind?.description}`);
         }
       });
@@ -56,6 +56,92 @@ export const fetchCustom = async (url_, metodo_, name_, data_ = {}) => {
   return Peticion;
 };
 
+export const fetchUploadFile = async (url_, file_, name_) => {
+  const session = await Auth.currentSession();
+
+  let formData = new FormData();
+  formData.append("file", file_);
+  try {
+    const resPeticion = await fetch(url_, {
+      headers: {
+        Authorization: `Bearer ${session?.idToken?.jwtToken}`,
+      },
+      method: "POST",
+      body: formData,
+    });
+    const Peticion = resPeticion.json();
+    if (Peticion.status != undefined) {
+      // Api getwey
+      notifyError(`Error con fetch, timed out con el servicio ${name_}`);
+      throw `Error con fetch, timed out con el servicio ${name_}`;
+    }
+    return Peticion;
+  } catch (error) {
+    notifyError(`Falla en el sistema: no conecta al servicio ${name_}`);
+    throw `Falla en el sistema: no conecta al servicio ${name_}`;
+  }
+};
+
+export const fetchUploadFileCustom = async (url_, file_, name_) => {
+  let Peticion;
+  try {
+    Peticion = await fetchUploadFile(url_, file_, name_);
+  } catch (error) {
+    throw new ErrorCustom(error);
+  }
+  try {
+    console.log(Peticion);
+    if (
+      Peticion?.status == false &&
+      Peticion?.obj?.error == true &&
+      Peticion?.obj?.error_msg
+    ) {
+      const error_msg = Peticion?.obj?.error_msg;
+      const error_msg_key = Object.keys(error_msg);
+      const error_msg_vector_not_damage = [];
+      const error_msg_vector_damage = [];
+
+      error_msg_key.map((nombre_error) => {
+        const error_msg_ind = error_msg[nombre_error];
+        if (error_msg_ind?.damage == false) {
+          error_msg_vector_not_damage.push(`${error_msg_ind?.description}`);
+        } else {
+          error_msg_vector_damage.push(`${error_msg_ind?.description}`);
+        }
+      });
+      if (error_msg_vector_not_damage.length > 0) {
+        throw new ErrorCustomBackendUser(
+          error_msg_vector_not_damage,
+          error_msg_key
+        );
+      } else {
+        throw new ErrorCustomBackend(error_msg_vector_damage, error_msg_key);
+      }
+    }
+    // cuando status es false pero no hay errores
+    if (
+      Peticion?.status == false &&
+      Peticion?.obj?.error == false &&
+      Peticion?.msg
+    ) {
+      throw new msgCustomBackend(`${Peticion?.msg}`);
+    }
+  } catch (error) {
+    if (error instanceof ErrorCustomBackendUser) {
+      throw new ErrorCustomBackendUser(error.message, error.type);
+    } else if (error instanceof ErrorCustomBackend) {
+      throw new ErrorCustomBackend(error.message, error.type);
+    } else if (error instanceof msgCustomBackend) {
+      throw new msgCustomBackend(error.message);
+    } else {
+      notifyError("Falla en el sistema: error de código");
+      throw new ErrorCustom("Falla en el sistema: error de código");
+    }
+  }
+
+  return Peticion;
+};
+
 export class ErrorCustom extends Error {
   constructor(message) {
     super(message);
@@ -64,6 +150,14 @@ export class ErrorCustom extends Error {
 }
 
 export class ErrorCustomBackend extends Error {
+  constructor(message, type_) {
+    super(message);
+    this.type = type_;
+    this.name = "ErrorCustomBackend";
+  }
+}
+
+export class ErrorCustomBackendUser extends Error {
   constructor(message, type_) {
     super(message);
     this.type = type_;

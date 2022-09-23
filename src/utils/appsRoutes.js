@@ -454,7 +454,7 @@ const TypesTrxs = lazy(() =>
 const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
 
 /**
- * RecargasMovistar
+ * Servicio Movistar
  */
 const Movistar = lazy(() => import("../apps/Movistar/Movistar"));
 
@@ -466,6 +466,14 @@ const PaquetesMovistar = lazy(() =>
 );
 const SubPaquetesMovistar = lazy(() =>
   import("../apps/Movistar/Views/SubPaquetesMovistar.jsx")
+);
+
+const OperadorPDPMovistar = lazy(() =>
+  import("../apps/Movistar/Views/OperadorPDPMovistar")
+);
+
+const CargarPaquetesMovistar = lazy(() =>
+  import("../apps/Movistar/Views/CargaPaquetesMovistar")
 );
 
 const ConcilacionMovistar = lazy(() =>
@@ -1174,6 +1182,7 @@ const allUrlsPrivateApps = [
   //   ],
   // },
 
+  //servicio movistar
   {
     link: "/movistar",
     label: <AppIcons Logo={"LOTERIA"} name="Movistar" />,
@@ -1213,22 +1222,38 @@ const allUrlsPrivateApps = [
         ],
       },
       {
-        link: "/movistar/concilacion",
-        label: <AppIcons Logo={"SORTEOS"} name="Conciliación" />,
-        component: ConcilacionMovistar,
+        link: "/movistar/operador-pdp",
+        label: <AppIcons Logo={"SORTEOS"} name="Operador PDP" />,
+        component: OperadorPDPMovistar,
         permission: [66],
         subRoutes: [
           {
-            link: "/movistar/concilacion/descarga",
-            label: <AppIcons Logo={"SORTEOS"} name="Decargar archivos" />,
-            component: ConcilacionMovistarDescarga,
+            link: "/movistar/operador-pdp/cargar-paquetes",
+            label: (
+              <AppIcons Logo={"SORTEOS"} name="Cargar paquetes de movistar" />
+            ),
+            component: CargarPaquetesMovistar,
             permission: [66],
           },
           {
-            link: "/movistar/concilacion/carga",
-            label: <AppIcons Logo={"SORTEOS"} name="Cargar archivos" />,
-            component: ConciliacionMovistarCarga,
+            link: "/movistar/operador-pdp/concilacion",
+            label: <AppIcons Logo={"SORTEOS"} name="Conciliación" />,
+            component: ConcilacionMovistar,
             permission: [66],
+            subRoutes: [
+              {
+                link: "/movistar/operador-pdp/concilacion/descarga",
+                label: <AppIcons Logo={"SORTEOS"} name="Decargar archivos" />,
+                component: ConcilacionMovistarDescarga,
+                permission: [66],
+              },
+              {
+                link: "/movistar/operador-pdp/concilacion/carga",
+                label: <AppIcons Logo={"SORTEOS"} name="Cargar archivos" />,
+                component: ConciliacionMovistarCarga,
+                permission: [66],
+              },
+            ],
           },
         ],
       },
