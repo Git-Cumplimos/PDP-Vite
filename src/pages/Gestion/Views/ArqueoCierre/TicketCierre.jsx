@@ -152,7 +152,7 @@ const TicketCierre = ({
                             : "justify-end"
                         } flex-auto gap-2`}
                       >
-                        <h1 className="font-semibold w-max">
+                        <h1 className="font-semibold">
                           {key ? `${key}:` : ""}
                         </h1>
                         <h1>{val}</h1>

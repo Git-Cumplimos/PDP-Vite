@@ -116,7 +116,7 @@ const FileInput = ({ label, onGetFile, allowDrop = true, ...input }) => {
       {allowDrop ? (
         <div>
           <h1 className="text-sm">O</h1>
-          <h1 className="text-sm">Arrasta los archivos</h1>
+          <h1 className="text-sm">Arrastra los archivos</h1>
           {!disabled ? (
             <div
               ref={dropZoneRef}

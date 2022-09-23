@@ -61,6 +61,9 @@ const PanelConsignaciones = () => {
 
   const CloseModal = useCallback(() => {
     setSelected(null);
+    setSelectedFileUrl("");
+    setStateRev(null);
+    setObservacionesAnalisis("");
   }, []);
 
   const searchComprobantes = useCallback(() => {

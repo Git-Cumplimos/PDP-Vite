@@ -79,7 +79,6 @@ const RecargasMovistar = () => {
   };
 
   const recargaMovistar = () => {
-    console.log(roleInfo);
     const data = {
       celular: inputCelular,
       valor: inputValor,
