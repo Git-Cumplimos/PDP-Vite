@@ -597,7 +597,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               <Input
                 id='valor'
                 name='valor'
-                label='Valor a depositar'
+                label='Valor a pagar'
                 autoComplete='off'
                 type='tel'
                 minLength={"5"}
@@ -635,7 +635,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     data: "",
                   });
                 }}>
-                Volver a ingresar codigo de barras
+                Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
                 <Button type='submit'>
