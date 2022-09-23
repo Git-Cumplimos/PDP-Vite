@@ -457,9 +457,17 @@ const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
  * RecargasMovistar
  */
 const Movistar = lazy(() => import("../apps/Movistar/Movistar"));
+
 const RecargasMovistar = lazy(() =>
   import("../apps/Movistar/Views/RecargasMovistar.jsx")
 );
+const PaquetesMovistar = lazy(() =>
+  import("../apps/Movistar/Views/PaquetesMovistar.jsx")
+);
+const SubPaquetesMovistar = lazy(() =>
+  import("../apps/Movistar/Views/SubPaquetesMovistar.jsx")
+);
+
 const ConcilacionMovistar = lazy(() =>
   import("../apps/Movistar/Views/ConcilacionMovistar")
 );
@@ -1177,6 +1185,32 @@ const allUrlsPrivateApps = [
         label: <AppIcons Logo={"SORTEOS"} name="Recargas Movistar " />,
         component: RecargasMovistar,
         permission: [65],
+      },
+      {
+        link: "/movistar/paquetes-movistar",
+        label: <AppIcons Logo={"SORTEOS"} name="Paquetes Movistar " />,
+        component: PaquetesMovistar,
+        permission: [65],
+        subRoutes: [
+          {
+            link: "/movistar/paquetes-movistar/combo",
+            label: <AppIcons Logo={"SORTEOS"} name="Combos" />,
+            component: SubPaquetesMovistar,
+            permission: [65],
+          },
+          {
+            link: "/movistar/paquetes-movistar/paquete-voz",
+            label: <AppIcons Logo={"SORTEOS"} name="Paquete de Voz" />,
+            component: SubPaquetesMovistar,
+            permission: [65],
+          },
+          {
+            link: "/movistar/paquetes-movistar/paquete-datos",
+            label: <AppIcons Logo={"SORTEOS"} name="Paquete de Datos" />,
+            component: SubPaquetesMovistar,
+            permission: [65],
+          },
+        ],
       },
       {
         link: "/movistar/concilacion",
