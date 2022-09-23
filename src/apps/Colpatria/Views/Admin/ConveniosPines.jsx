@@ -248,7 +248,7 @@ const ConveniosPines = () => {
       </ButtonBar>
       <TableEnterprise
         title="Convenios de pines"
-        headers={["Codigo convenio", "Codigo pin", "Nombre convenio", "Estado"]}
+        headers={["Código convenio", "Código pin", "Nombre convenio", "Estado"]}
         data={listaConveniosPines.map(
           ({
             pk_codigo_convenio,
@@ -281,7 +281,7 @@ const ConveniosPines = () => {
       >
         <Input
           id={"pk_codigo_convenio"}
-          label={"Codigo de convenio"}
+          label={"Código de convenio"}
           name={"pk_codigo_convenio"}
           type="tel"
           autoComplete="off"
@@ -295,7 +295,7 @@ const ConveniosPines = () => {
         />
         <Input
           id={"codigo_pin_search"}
-          label={"Codigo pin"}
+          label={"Código pin"}
           name={"codigo_pin"}
           type="tel"
           autoComplete="off"
@@ -312,7 +312,7 @@ const ConveniosPines = () => {
           name={"nombre_convenio"}
           type="text"
           autoComplete="off"
-          maxLength={"255"}
+          maxLength={"50"}
           defaultValue={selected?.nombre_convenio ?? ""}
           required
         />
@@ -337,7 +337,7 @@ const ConveniosPines = () => {
             />
             <TextArea
               id={"filename"}
-              label={"Archivo selecionado"}
+              label={"Archivo seleccionado"}
               value={massiveFile?.name ?? ""}
               disabled
               readOnly
@@ -348,7 +348,7 @@ const ConveniosPines = () => {
               </div>
             )}
             <ButtonBar>
-              <Button type={"submit"}>Realizar carge</Button>
+              <Button type={"submit"}>Realizar cargue</Button>
             </ButtonBar>
           </Form>
         ) : (
@@ -359,7 +359,7 @@ const ConveniosPines = () => {
             <Form onSubmit={handleConvenio} grid>
               <Input
                 id={"pk_codigo_convenio"}
-                label={"Codigo de convenio"}
+                label={"Código de convenio"}
                 name={"pk_codigo_convenio"}
                 type="tel"
                 autoComplete="off"
@@ -373,7 +373,7 @@ const ConveniosPines = () => {
               />
               <Input
                 id={"codigo_pin"}
-                label={"Codigo pin"}
+                label={"Código pin"}
                 name={"codigo_pin"}
                 type="tel"
                 autoComplete="off"
@@ -390,7 +390,7 @@ const ConveniosPines = () => {
                 name={"nombre_convenio"}
                 type="text"
                 autoComplete="off"
-                maxLength={"255"}
+                maxLength={"50"}
                 defaultValue={selected?.nombre_convenio ?? ""}
                 required
               />
@@ -409,7 +409,7 @@ const ConveniosPines = () => {
                 name={"referencia_1"}
                 type="text"
                 autoComplete="off"
-                maxLength={"255"}
+                maxLength={"30"}
                 defaultValue={selected?.referencia_1 ?? ""}
                 required
               />
@@ -419,7 +419,7 @@ const ConveniosPines = () => {
                 name={"referencia_2"}
                 type="text"
                 autoComplete="off"
-                maxLength={"255"}
+                maxLength={"30"}
                 defaultValue={selected?.referencia_2 ?? ""}
               />
               <Input
@@ -428,7 +428,7 @@ const ConveniosPines = () => {
                 name={"referencia_3"}
                 type="text"
                 autoComplete="off"
-                maxLength={"255"}
+                maxLength={"30"}
                 defaultValue={selected?.referencia_3 ?? ""}
               />
               <Input
@@ -437,7 +437,7 @@ const ConveniosPines = () => {
                 name={"referencia_4"}
                 type="text"
                 autoComplete="off"
-                maxLength={"255"}
+                maxLength={"30"}
                 defaultValue={selected?.referencia_4 ?? ""}
               />
               <Input
@@ -446,7 +446,7 @@ const ConveniosPines = () => {
                 name={"referencia_5"}
                 type="text"
                 autoComplete="off"
-                maxLength={"255"}
+                maxLength={"30"}
                 defaultValue={selected?.referencia_5 ?? ""}
               />
               {selected && (

@@ -1,0 +1,15 @@
+/* Style the buttons that are used to open and close the accordion panel */
+.accordion {
+  @apply cursor-pointer border-0 outline-none p-4 w-full text-left;
+  @apply bg-primary-extra-light text-black transition-colors duration-300;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .accordion:hover {
+  @apply bg-primary-light;
+}
+
+/* Style the accordion panel. Note: hidden by default */
+.panel {
+  @apply py-0 pl-4 overflow-hidden bg-white;
+}

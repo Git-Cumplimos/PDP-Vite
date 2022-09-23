@@ -17,6 +17,7 @@ import MoneyInput, {
   formatMoney,
 } from "../../../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { notify, notifyError } from "../../../../../utils/notify";
@@ -45,7 +46,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     valorVar: "",
   });
   const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago de Recaudo de Facturas",
+    title: "Recibo de Pago de Recaudo de Facturas Banco de Occidente",
     timeInfo: {
       "Fecha de venta": "",
       Hora: "",
@@ -67,12 +68,12 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       ? roleInfo?.["nombre comercio"]
       : "Sin datos",
     trxInfo: [],
-    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+    disclamer:
+      "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652 Opción X",
   });
   const [datosConsulta, setDatosConsulta] = useState({});
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
-  const dataConveniosPagar = ["3", "0"];
   useEffect(() => {
     if (state?.id) {
       fecthTablaConveniosEspecificoFunc();
@@ -87,7 +88,6 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     })
       .then((autoArr) => {
         setConvenio(autoArr?.results[0]);
-        console.log(autoArr);
         setIsUploading(false);
       })
       .catch((err) => console.error(err));
@@ -140,26 +140,37 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        handleClose();
         console.error(err);
       });
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();
-    let valorTransaccion = datosTrans?.valorVar ?? 0;
-    const hoy = new Date();
-    const fecha =
-      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+    let valorTransaccion = parseInt(datosTrans?.valorVar) ?? 0;
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
     /*hora actual */
-    const hora =
-      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["trxInfo"].push(["Convenio", convenio.convenio]);
     objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
+    // objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
+    // objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push(["No factura", datosTrans?.ref1 ?? ""]);
     objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Referencia 1", datosTrans?.ref1 ?? ""]);
+    objTicket["trxInfo"].push([
+      "Valor factura",
+      formatMoney.format(valorTransaccion ?? "0"),
+    ]);
     objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
     postRecaudoConveniosAval({
@@ -167,12 +178,14 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
       },
       recaudoAval: {
+        pila: datosConsulta?.["pila"] ?? "",
         54: datosConsulta?.tipoRecaudo?.["54"] ?? "",
         62: datosConsulta?.tipoRecaudo?.["62"] ?? "",
         103: datosConsulta?.tipoRecaudo?.["103"] ?? "",
@@ -185,34 +198,20 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       },
     })
       .then((res) => {
-        console.log(res);
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          // objTicket["commerceInfo"][1] = [
-          //   "No. terminal",
-          //   res?.obj?.codigoTotal,
-          // ];
-          // objTicket["commerceInfo"].push([
-          //   "No. de aprobación Banco",
-          //   res?.obj?.respuestaDavivienda?.valTalonOut,
-          // ]);
-          // objTicket["commerceInfo"].push(["", ""]);
-          // objTicket["trxInfo"].push([
-          //   "Valor",
-          //   formatMoney.format(res?.obj?.valor),
-          // ]);
-          // objTicket["trxInfo"].push(["", ""]);
-          // objTicket["trxInfo"].push([
-          //   "Costo transacción",
-          //   formatMoney.format(0),
-          // ]);
-          // objTicket["trxInfo"].push(["", ""]);
-          // objTicket["trxInfo"].push([
-          //   "Total",
-          //   formatMoney.format(res?.obj?.valor),
-          // ]);
-          // objTicket["trxInfo"].push(["", ""]);
+          objTicket["commerceInfo"].push([
+            "No. de aprobación Banco",
+            res?.obj?.codigo_autorizacion,
+          ]);
+          objTicket["commerceInfo"].push(["", ""]);
+          objTicket["commerceInfo"].push([
+            "No. de aprobación PDP",
+            res?.obj?.id_trx,
+          ]);
+          objTicket["commerceInfo"].push(["", ""]);
+
           setObjTicketActual(objTicket);
           setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
         } else {
@@ -224,6 +223,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        handleClose();
         console.error(err);
       });
   };
@@ -372,14 +372,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
                     type='submit'
                     onClick={() => {
                       handleClose();
+                      navigate(-1);
                     }}>
                     Aceptar
                   </Button>
                 </ButtonBar>
               </h2>
-              <TicketsDavivienda
-                ticket={objTicketActual}
-                refPrint={printDiv}></TicketsDavivienda>
+              <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
             </>
           ) : (
             <></>
