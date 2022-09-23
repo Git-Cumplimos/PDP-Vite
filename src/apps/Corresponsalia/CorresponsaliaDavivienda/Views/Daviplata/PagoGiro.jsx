@@ -27,10 +27,10 @@ const PagoGiro = () => {
   // });
   const [peticion, setPeticion] = useState(0);
   const [datosTrans, setDatosTrans] = useState({
-    tipoIdentificacion: "",
+    tipoIdentificacion: "01",
     numeroIdentificacion: "",
     codigoFamilia: "",
-    nombreTipoIdentificacion: "",
+    nombreTipoIdentificacion: "Cédula de ciudadanía",
   });
   const [isUploading, setIsUploading] = useState(false);
   const [datosConsulta, setDatosConsulta] = useState({});
@@ -105,10 +105,10 @@ const PagoGiro = () => {
     }
     setShowModal(false);
     setDatosTrans({
-      tipoIdentificacion: "",
+      tipoIdentificacion: "01",
       numeroIdentificacion: "",
       codigoFamilia: "",
-      nombreTipoIdentificacion: "",
+      nombreTipoIdentificacion: "Cédula de ciudadanía",
     });
     setDatosConsultaIdTrx({
       idTrx: "",
@@ -310,7 +310,7 @@ const PagoGiro = () => {
           type='text'
           name='numeroIdentificacion'
           minLength='5'
-          maxLength='16'
+          maxLength='10'
           required
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
@@ -364,7 +364,6 @@ const PagoGiro = () => {
           name='tipoIdentificacion'
           label='Tipo de identificación'
           options={{
-            "": "",
             "Cédula de ciudadanía": "01",
             "Tarjeta de identidad": "04",
             "Cédula extranjería": "02",
@@ -415,7 +414,7 @@ const PagoGiro = () => {
               <h2>{`Nombre de convenio: ${datosConsulta.nombreConvenio}`}</h2>
               <h2>{`Código de convenio: ${datosConsulta.codigoConvenio}`}</h2>
               <h2>{`Nombre beneficiario: ${
-                datosConsulta.nombreBeneficiario ?? ""
+                datosConsulta.nombreBeneficiario.replace(/[0]/g, "") ?? ""
               }`}</h2>
               <h2>{`Código de Familia: ${datosTrans.codigoFamilia.replace(
                 /\w/g,

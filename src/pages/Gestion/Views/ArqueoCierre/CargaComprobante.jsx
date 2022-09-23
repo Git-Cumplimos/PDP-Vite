@@ -1,254 +1,376 @@
-import { useState, useCallback, useEffect, Fragment } from "react";
-//import { useNavigate } from "react-router-dom";
+import {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  Fragment,
+  useRef,
+} from "react";
+import { useNavigate } from "react-router-dom";
 import Form from "../../../../components/Base/Form";
-import MoneyInput from "../../../../components/Base/MoneyInput";
 import Select from "../../../../components/Base/Select";
 import FileInput from "../../../../components/Base/FileInput";
+import Fieldset from "../../../../components/Base/Fieldset";
 import TextArea from "../../../../components/Base/TextArea";
 import Button from "../../../../components/Base/Button";
-import { notify, notifyError } from "../../../../utils/notify";
+import { notifyError, notifyPending } from "../../../../utils/notify";
+import { onChangeAccountNumber } from "../../../../utils/functions";
 import {
-  createUrlFile,
-  registerReceipt,
-  buscarCompañias,
+  buscarEntidades,
+  subirComprobante,
+  agregarComprobante,
+  buscarTiposComprobantes,
 } from "../../utils/fetchCaja";
-import useForm from "../../../../hooks/useForm";
 import { useAuth } from "../../../../hooks/AuthHooks";
+import useMoney from "../../../../hooks/useMoney";
 import ButtonBar from "../../../../components/Base/ButtonBar";
+import Input from "../../../../components/Base/Input";
 
 const CargaComprobante = () => {
-  const [label, setLabel] = useState(" ");
-  const [tipoCons, setTipoCons] = useState("");
-  const [attributes, setAttributes] = useState(false);
-  const [transportadora, setTransportadora] = useState([]);
-  const [file, setFile] = useState([]);
-  const [data, handleChange] = useForm({
-    transport: "",
-    bank: "",
-    account: "",
-    nro: "",
-    valor: "",
-    obs: "",
-  });
-
-  //const navigate = useNavigate();
-
+  const navigate = useNavigate();
   const { roleInfo } = useAuth();
 
-  const onFileChange = useCallback((files) => {
-    files = Array.from(files);
-    setFile(files);
+  const formRef = useRef(null);
+
+  const [tiposComprobantes, setTiposComprobantes] = useState([]);
+
+  const [movementType, setMovementType] = useState("");
+  const [foundEntities, setFoundEntities] = useState([]);
+  const [selectedEntity, setSelectedEntity] = useState("");
+  const [file, setFile] = useState(null);
+  const [accountNumber, setAccountNumber] = useState("");
+  const [comprobanteNumber, setComprobanteNumber] = useState("");
+  const [valorComprobante, setValorComprobante] = useState(0.0);
+  const [observaciones, setObservaciones] = useState("");
+
+  const [limitesMontos, setLimitesMontos] = useState({
+    max: 9999999,
+    min: 5000,
+  });
+
+  const onChangeMoney = useMoney({
+    limits: [limitesMontos.min, limitesMontos.max],
+  });
+
+  const staticInfo = useMemo(
+    () => ({
+      "Id comercio": roleInfo?.id_comercio ?? 59,
+      "Id usuario": roleInfo?.id_usuario ?? 8202,
+    }),
+    [roleInfo?.id_comercio, roleInfo?.id_usuario]
+  );
+
+  const searchEntities = useCallback((is_transport) => {
+    buscarEntidades({
+      pk_is_transportadora: is_transport,
+      limit: 50,
+    })
+      .then((res) => {
+        if (Array.isArray(res?.obj?.results)) {
+          setFoundEntities(res?.obj?.results);
+          if (res?.obj?.results?.length === 0) {
+            notifyError("No se encontradon datos de entidades");
+          }
+          return;
+        }
+        throw new Error("Objeto recibido erroneo");
+      })
+      .catch((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+          return;
+        }
+        console.error(error?.message);
+        notifyError("Busqueda fallida");
+      });
   }, []);
 
-  useEffect(() => {
-    const number = tipoCons === "2" || tipoCons === "3" ? 2 : 0;
-    const queries = { tipo: number };
-    buscarCompañias(queries)
-      .then((res) => {
-        setTransportadora(res?.obj?.results);
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
+  const uploadComprobante = useCallback(async () => {
+    try {
+      if (!selectedEntity) {
+        throw new Error("No se ha seleccionado una entidad", {
+          cause: "custom",
+        });
+      }
+
+      if (!file) {
+        throw new Error("No se ha seleccionado un archivo", {
+          cause: "custom",
+        });
+      }
+
+      /**
+       * Pedir url prefirmada
+       */
+      const resFile = await subirComprobante({
+        filename: `comprobantes/${roleInfo?.id_comercio};${
+          roleInfo?.id_comercio
+        }_${roleInfo?.id_usuario}_${roleInfo?.id_dispositivo}_comprobante.${
+          file?.name?.split(/\./)?.[1]
+        }`,
+        contentType: file?.type,
       });
-  }, [tipoCons]);
+
+      /**
+       * Armar peticion para subir a s3
+       */
+      const { url, fields } = resFile.obj;
+      const filename = fields.key;
+
+      /**
+       * Subir informaacion a db
+       */
+      const reqBody = {
+        fk_nombre_entidad: selectedEntity,
+        fk_tipo_comprobante: movementType,
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+        nro_comprobante: comprobanteNumber,
+        valor_movimiento: valorComprobante,
+        observaciones: observaciones,
+        archivo: filename,
+      };
+      if (movementType === "Consignación Bancaría") {
+        reqBody["nro_cuenta"] = accountNumber;
+      }
+      /* const resComprobante =  */ await agregarComprobante(reqBody);
+
+      const formData = new FormData();
+      for (var key in fields) {
+        formData.append(key, fields[key]);
+      }
+      formData.set("file", file);
+      const resUploadFile = await fetch(url, {
+        method: "POST",
+        body: formData,
+        mode: "no-cors",
+      });
+
+      console.log(resFile);
+      console.log(resUploadFile);
+      // console.log(resComprobante);
+    } catch (error) {
+      throw error;
+    }
+  }, [
+    file,
+    movementType,
+    selectedEntity,
+    roleInfo?.id_comercio,
+    roleInfo?.id_usuario,
+    roleInfo?.id_dispositivo,
+    accountNumber,
+    comprobanteNumber,
+    valorComprobante,
+    observaciones,
+  ]);
+
+  const onFileChange = useCallback((files) => {
+    const _files = Array.from(files);
+    if (_files.length > 0) {
+      setFile(_files[0]);
+    }
+  }, []);
 
   const onSubmit = useCallback(
     async (e) => {
       e.preventDefault();
 
-      const formData = new FormData();
-      if (file?.length > 0) {
-        if (data?.valor?.length > 2) {
-          const query = {
-            filename: file?.[0]?.name,
-            contentType: file?.[0]?.type,
-            location: tipoCons,
-          };
-          createUrlFile(query)
-            .then((res) => {
-              console.log(res);
-              for (const key in res?.obj?.fields) {
-                formData.set(`${key}`, `${res?.obj?.fields[key]}`);
-              }
-              formData.set("file", file[0]);
-              fetch(`${res?.obj?.url}`, { method: "POST", body: formData })
-                .then((res) => {})
-                .catch((err) => {
-                  setFile([]);
-                  setAttributes(false);
-                });
-              const regex = /(\d+)/g;
-              const comma = /(,+)/g;
-              if (tipoCons > 1) {
-                let body = {
-                  id_comercio: roleInfo?.id_comercio,
-                  id_usuario: roleInfo?.id_usuario,
-                  id_terminal: roleInfo?.id_dispositivo,
-                  valor: parseInt(
-                    String(data?.valor?.match(regex))?.replace(comma, "")
-                  ),
-                  archivo: formData.get("key"),
-                  obs_cajero: data?.obs,
-                  compañia: data?.transport,
-                  status: "PENDIENTE",
-                };
-                registerReceipt(body)
-                  .then((res) => {
-                    console.log(res);
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                  });
-              } else {
-                let body = {
-                  id_comercio: roleInfo?.id_comercio,
-                  id_usuario: roleInfo?.id_usuario,
-                  id_terminal: roleInfo?.id_dispositivo,
-                  valor: parseInt(
-                    String(data?.valor?.match(regex))?.replace(comma, "")
-                  ),
-                  archivo: file?.[0]?.name,
-                  obs_cajero: data?.obs,
-                  compañia: data?.transport,
-                  cuenta: data?.account,
-                  nro_comprobante: "",
-                };
-                console.log(body, roleInfo);
-                registerReceipt(body)
-                  .then((res) => {
-                    console.log(res);
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                  });
-              }
-            })
-            .catch((err) => {
-              throw err;
-            });
-        } else {
-          notify("Reporte un valor para poder continuar");
+      notifyPending(
+        uploadComprobante(),
+        {
+          render: () => {
+            return "Procesando peticion";
+          },
+        },
+        {
+          render: () => {
+            navigate("/gestion/arqueo");
+            return "Comprobante subido exitosamente";
+          },
+        },
+        {
+          render: ({ data: err }) => {
+            if (err?.cause === "custom") {
+              return err?.message;
+            }
+            console.error(err?.message);
+            return "Peticion fallida";
+          },
         }
-      } else {
-        notifyError("Por favor adjunte un archivo");
-      }
-      handleChange();
+      );
     },
-    [
-      data?.account,
-      data?.obs,
-      data?.transport,
-      data?.valor,
-      file,
-      handleChange,
-      roleInfo,
-      tipoCons,
-    ]
+    [uploadComprobante, navigate]
   );
+
+  useEffect(() => {
+    buscarTiposComprobantes()
+      .then((res) => {
+        setTiposComprobantes(
+          (res?.obj ?? []).map(({ nombre_comprobante }) => ({
+            value: nombre_comprobante,
+            label: nombre_comprobante,
+          }))
+        );
+      })
+      .catch((err) => {
+        if (err?.cause === "custom") {
+          notifyError(err?.message);
+        }
+        console.error(err?.message);
+        notifyError("Peticion fallida");
+      });
+  }, []);
+
+  console.log(formRef);
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Transportadora y Consignaciones</h1>
-      <Form onSubmit={onSubmit} grid>
+      <h1 className="text-3xl mt-10 mb-8">Transportadora y Consignaciones</h1>
+      <Form grid>
         <Select
           id="searchByType"
           name="tipoComp"
-          label="Tipo"
-          options={[
-            { value: 0, label: "" },
-            { value: 1, label: "Consignación bancaria" },
-            { value: 1, label: "Entrega transportadora" },
-            { value: 1, label: "Recibido transportadora" },
-          ]}
+          label="Tipo de movimiento"
+          options={[{ value: "", label: "" }, ...tiposComprobantes]}
           onChange={(e) => {
-            handleChange(e);
-            setTipoCons(e.target.value);
-            if (e.target.value === "1") {
-              setLabel("Valor consignado");
-              setAttributes(true);
-            }
-            if (e.target.value === "2") {
-              setLabel("Valor entregado");
-              setAttributes(true);
-            }
-            if (e.target.value === "3") {
-              setLabel("Valor recibido");
-              setAttributes(true);
-            }
+            const val = e.target.value ?? "";
+            formRef.current?.reset?.();
+            setSelectedEntity(null);
+            setMovementType(val);
+            searchEntities(val !== "Consignación Bancaría");
           }}
         />
-        {attributes ? (
-          <div>
-            {tipoCons === "2" || tipoCons === "3" ? (
-              <Select
-                id="searchByTransport"
-                name="transport"
-                label="Transportadora"
-                options={[
-                  { value: "", label: "" },
-                  ...(transportadora?.map(({ nombre_compañia }) => {
-                    const name = nombre_compañia ? nombre_compañia : "";
-                    return {
-                      value: `${name}`,
-                      label: `${name}`,
-                    };
-                  }) ?? []),
-                ]}
-                onChange={(e) => {
-                  handleChange(e);
-                  console.log(e.target.value);
-                }}
+        <ButtonBar />
+      </Form>
+      {Boolean(movementType) && (
+        <Form onSubmit={onSubmit} ref={formRef} grid>
+          <Fieldset
+            legend={"Información del movimiento"}
+            className="lg:col-span-2"
+          >
+            {Object.entries(staticInfo).map(([key, val]) => (
+              <Input
+                key={key}
+                id={key}
+                label={key}
+                type="text"
+                value={val}
+                disabled
+              />
+            ))}
+            <Select
+              id="searchEntities"
+              name="tipoComp"
+              label={`Buscar ${
+                movementType === "Consignación Bancaría"
+                  ? "bancos"
+                  : "transportadoras"
+              }`}
+              options={[
+                { value: "", label: "" },
+                ...foundEntities.map(({ pk_nombre_entidad }) => ({
+                  value: pk_nombre_entidad,
+                  label: pk_nombre_entidad,
+                })),
+              ]}
+              value={selectedEntity}
+              onChange={(e) => {
+                const tempMap = new Map(
+                  foundEntities.map(({ pk_nombre_entidad, parametros }) => [
+                    pk_nombre_entidad,
+                    parametros,
+                  ])
+                );
+                setSelectedEntity(e.target.value);
+                setLimitesMontos((old) => ({
+                  min: tempMap.get(e.target.value)?.monto_minimo ?? old.min,
+                  max: tempMap.get(e.target.value)?.monto_maximo ?? old.max,
+                }));
+              }}
+              required
+            />
+            {movementType === "Consignación Bancaría" && (
+              <Input
+                id="accountNum"
+                name="accountNum"
+                label="Número de cuenta"
+                type="tel"
+                autoComplete="off"
+                minLength={"19"}
+                maxLength={"19"}
+                onInput={(ev) => setAccountNumber(onChangeAccountNumber(ev))}
                 required
               />
-            ) : (
-              tipoCons === "1" && <></>
             )}
-            {tipoCons !== "1" ? (
-              <Fragment>
-                <MoneyInput
-                  id="valorCons"
-                  name="valor"
-                  onChange={handleChange}
-                  label={label}
-                  required
-                ></MoneyInput>
-                <TextArea
-                  id="obsCashier"
-                  name="obs"
-                  label="Observación"
-                  type="input"
-                  minLength="1"
-                  maxLength="160"
-                  autoComplete="off"
-                  onInput={handleChange}
-                ></TextArea>
-                <FileInput
-                  label={"Elegir archivo plataforma"}
-                  onGetFile={onFileChange}
-                  name="file"
-                  accept=".png,.jpg,.jpeg"
-                  allowDrop={true}
-                />
-                {file.length > 0 && (
-                  <>
-                    <h6 className="text-center">Nombre: {file?.[0]?.name}</h6>
-                    <Button type="submit" className="text-center">
-                      Subir archivo para revisión
-                    </Button>
-                  </>
-                )}
-              </Fragment>
+            <Input
+              id="comprobanteNum"
+              name="comprobanteNum"
+              label="Número de comprobante"
+              type="tel"
+              autoComplete="off"
+              minLength={"19"}
+              maxLength={"19"}
+              onInput={(ev) => setComprobanteNumber(onChangeAccountNumber(ev))}
+              required
+            />
+            <Input
+              id="valor"
+              name="valor"
+              label={`Valor ${movementType.split(/\s/)[0].toLowerCase()}`}
+              autoComplete="off"
+              type="tel"
+              minLength={"5"}
+              maxLength={"13"}
+              onInput={(ev) => setValorComprobante(onChangeMoney(ev))}
+              required
+            />
+            <TextArea
+              id="observaciones"
+              name="observaciones"
+              label="Observaciones"
+              className="w-full place-self-stretch"
+              autoComplete="off"
+              maxLength={"60"}
+              onInput={(e) => {
+                setObservaciones(e.target.value.trimLeft());
+                e.target.value = e.target.value.trimLeft();
+              }}
+              info={`Máximo 60 caracteres`}
+              required
+            />
+            {!file ? (
+              <FileInput
+                label={"Elegir archivo (comprobante)"}
+                onGetFile={onFileChange}
+                name="file"
+                accept=".png,.jpg,.jpeg"
+                allowDrop={true}
+              />
             ) : (
-              <h1 className="text-center">Sin acceso</h1>
+              <div className="text-center my-4 mx-auto md:mx-4 flex flex-row flex-wrap justify-around">
+                <div className="">
+                  <div className="flex flex-row justify-center">
+                    <span className="bi bi-file-earmark-image text-5xl" />
+                    <span
+                      className="bi bi-x-lg text-2xl self-center cursor-pointer"
+                      onClick={() => setFile(null)}
+                    />
+                  </div>
+                  <h3 className="text-sm">{file?.name ?? ""}</h3>
+                </div>
+              </div>
             )}
-          </div>
-        ) : (
-          <ButtonBar />
-        )}
-      </Form>
+            <ButtonBar className="lg:col-span-2">
+              <Button type="submit" className="text-center">
+                Realizar movimiento
+              </Button>
+            </ButtonBar>
+          </Fieldset>
+        </Form>
+      )}
     </Fragment>
-
   );
 };
 

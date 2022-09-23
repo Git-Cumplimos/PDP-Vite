@@ -10,6 +10,7 @@ import MoneyInputDec, {
   formatMoney,
 } from "../../../../../components/Base/MoneyInputDec";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import TextArea from "../../../../../components/Base/TextArea";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
@@ -73,16 +74,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
 
-  const onChangeFormat = useCallback((ev) => {
-    const valor = ev.target.value;
-    setDatosTrans((old) => {
-      return { ...old, [ev.target.name]: valor };
-    });
-  }, []);
+  const onChangeFormat = useCallback(
+    (ev) => {
+      const valor = ev.target.value;
+      if (valor.length > datosTrans.codBarras.length) {
+        setDatosTrans((old) => {
+          return { ...old, [ev.target.name]: valor };
+        });
+      }
+    },
+    [datosTrans]
+  );
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-  const fecthTablaConveniosEspecificoFunc = useCallback((codigoBar) => {
+  const fetchTablaConveniosEspecificoFunc = useCallback((codigoBar) => {
     postConsultaCodigoBarrasConveniosEspecifico({
       codigoBarras: codigoBar,
     })
@@ -124,6 +130,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           });
         } else {
           notifyError(autoArr?.msg);
+          setDatosTrans((old) => ({ codBarras: "" }));
         }
         setIsUploading(false);
       })
@@ -131,13 +138,14 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
         console.error(err);
+        setDatosTrans((old) => ({ codBarras: "" }));
       });
   }, []);
   const onSubmit = (e) => {
     e.preventDefault();
     if (datosTrans?.codBarras.slice(0, 3) === "]C1") {
       setIsUploading(true);
-      fecthTablaConveniosEspecificoFunc(datosTrans?.codBarras);
+      fetchTablaConveniosEspecificoFunc(datosTrans?.codBarras);
     } else {
       notifyError("El codigo de barras no tiene el formato correcto");
     }
@@ -303,7 +311,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         ticket: objTicket,
         fecCodigDeBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[.]/g, ""),
+        valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -357,6 +365,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         });
     } else {
       setIsUploading(true);
+      let dataCodBarras = datosTrans.codBarras.slice(3).replace(/[\x1D]/g, "");
       postConsultaConveniosDavivienda({
         tipoTransaccion: "1",
         numNumeroConvenioIAC: datosEnvio?.datosConvenio?.cod_iac_cnb,
@@ -364,7 +373,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
         fecFechaCodigoBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        numValorCodigoBarras: datosTrans.codBarras.slice(3).replace(/[.]/g, ""),
+        numValorCodigoBarras: dataCodBarras,
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -379,7 +388,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           if (res?.status) {
             setIsUploading(false);
             notify(res?.msg);
-            console.log("consulta", res);
             let valorTrxCons =
               res?.obj?.respuesta_davivienda?.numValorTotalFactura ?? 0;
             setDatosTransaccion((old) => {
@@ -418,13 +426,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       </h1>
       {!datosEnvio.estadoConsulta ? (
         <>
-          <h1 className='text-3xl text-center mb-5'>
-            Escanee el código de barras
-          </h1>
-          <Form grid onSubmit={onSubmit}>
-            <Input
+          <Form onSubmit={onSubmit}>
+            <TextArea
               id='codBarras'
-              label='Código de barras'
+              label='Escanee el código de barras'
               type='text'
               name='codBarras'
               required
@@ -433,6 +438,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               autoComplete='off'
               onInput={onChangeFormat}
               onKeyDown={(ev) => {
+                if (ev.keyCode === 13 && ev.shiftKey === false) {
+                  // ev.preventDefault();
+                  onSubmit(ev);
+                  return;
+                }
                 if (ev.altKey) {
                   if (ev.keyCode !== 18) {
                     isAlt.current += ev.key;
@@ -443,16 +453,24 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                 if (ev.altKey === false && isAlt.current !== "") {
                   let value = String.fromCharCode(parseInt(isAlt.current));
                   isAlt.current = "";
-                  if (value === "") {
+                  if (value === "\u001d") {
                     setDatosTrans((old) => {
-                      return { ...old, codBarras: old.codBarras + "." };
+                      return { ...old, codBarras: old.codBarras + "\u001d" };
                     });
                   }
                 }
-              }}></Input>
-            <ButtonBar className='lg:col-span-2'>
-              <Button type='submit'>Realizar consulta</Button>
-            </ButtonBar>
+              }}></TextArea>
+            {datosTrans.codBarras !== "" && (
+              <ButtonBar>
+                <Button
+                  type='button'
+                  onClick={() => {
+                    setDatosTrans({ codBarras: "" });
+                  }}>
+                  Volver a ingresar codigo de barras
+                </Button>
+              </ButtonBar>
+            )}
           </Form>
         </>
       ) : (

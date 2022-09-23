@@ -348,14 +348,14 @@ const RecaudoServiciosPublicosPrivados = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center mb-5 mt-5'>
+      <h1 className='text-3xl text-center mb-10 mt-5'>
         Recaudo servicios públicos y privados
       </h1>
-      <h1 className='text-3xl text-center mb-5'>{`Convenio: ${
+      <h1 className='text-2xl text-center mb-10'>{`Convenio: ${
         convenio?.nom_convenio_cnb ?? ""
       }`}</h1>
 
-      <Form grid onSubmit={onSubmit}>
+      <Form onSubmit={onSubmit}>
         {convenio?.ctrol_ref1_cnb === "1" && (
           <>
             <Input
@@ -371,9 +371,11 @@ const RecaudoServiciosPublicosPrivados = () => {
               onInput={(e) => {
                 let valor = e.target.value;
                 let num = valor.replace(/[\s\.]/g, "");
-                setDatosTrans((old) => {
-                  return { ...old, ref1: num };
-                });
+                if (!isNaN(num)) {
+                  setDatosTrans((old) => {
+                    return { ...old, ref1: num };
+                  });
+                }
               }}></Input>
           </>
         )}
@@ -391,9 +393,11 @@ const RecaudoServiciosPublicosPrivados = () => {
             onInput={(e) => {
               let valor = e.target.value;
               let num = valor.replace(/[\s\.]/g, "");
-              setDatosTrans((old) => {
-                return { ...old, ref2: num };
-              });
+              if (!isNaN(num)) {
+                setDatosTrans((old) => {
+                  return { ...old, ref2: num };
+                });
+              }
             }}></Input>
         )}
         {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb) && (
@@ -408,7 +412,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             onInput={onChangeMoneyLocal}
             required></MoneyInput>
         )}
-        <ButtonBar className='lg:col-span-2'>
+        <ButtonBar>
           <Button type='submit'>
             {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
               ? "Realizar pago"
@@ -438,9 +442,11 @@ const RecaudoServiciosPublicosPrivados = () => {
                     onInput={(e) => {
                       let valor = e.target.value;
                       let num = valor.replace(/[\s\.]/g, "");
-                      setDatosTransValidacion((old) => {
-                        return { ...old, ref1: num };
-                      });
+                      if (!isNaN(num)) {
+                        setDatosTransValidacion((old) => {
+                          return { ...old, ref1: num };
+                        });
+                      }
                     }}></Input>
                 )}
                 {convenio?.ctrol_ref2_cnb === "1" && (
@@ -457,9 +463,11 @@ const RecaudoServiciosPublicosPrivados = () => {
                     onInput={(e) => {
                       let valor = e.target.value;
                       let num = valor.replace(/[\s\.]/g, "");
-                      setDatosTransValidacion((old) => {
-                        return { ...old, ref2: num };
-                      });
+                      if (!isNaN(num)) {
+                        setDatosTransValidacion((old) => {
+                          return { ...old, ref2: num };
+                        });
+                      }
                     }}></Input>
                 )}
                 {dataConveniosPagar.includes(
@@ -468,7 +476,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                   <Input
                     id='valor'
                     name='valor'
-                    label='Valor a depositar'
+                    label='Valor a pagar'
                     autoComplete='off'
                     type='tel'
                     minLength={"2"}
@@ -521,7 +529,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                     <Input
                       id='valor'
                       name='valor'
-                      label='Valor a depositar'
+                      label='Valor a pagar'
                       autoComplete='off'
                       type='tel'
                       minLength={"2"}

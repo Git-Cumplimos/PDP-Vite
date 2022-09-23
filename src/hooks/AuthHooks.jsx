@@ -430,7 +430,7 @@ export const useProvideAuth = () => {
       const changePassword = await Auth.forgotPassword(email);
       console.log(changePassword);
     } catch (error) {}
-  });
+  }, []);
 
   const forgotPasswordSubmit = useCallback(async (email, code, confirmPass) => {
     try {
@@ -443,7 +443,7 @@ export const useProvideAuth = () => {
     } catch (error) {
       throw error;
     }
-  });
+  }, []);
 
   const handlesetPreferredMFA = useCallback(
     async (totp) => {

@@ -28,12 +28,13 @@ const Deposito = () => {
   const navigate = useNavigate();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
+    max: 1000000,
+    min: 1,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
 
   const { roleInfo, infoTicket } = useAuth();
@@ -48,7 +49,7 @@ const Deposito = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("01");
   const [isUploading, setIsUploading] = useState(false);
   const [numCuenta, setNumCuenta] = useState("")
   const [userDoc, setUserDoc] = useState("")
@@ -58,12 +59,11 @@ const Deposito = () => {
 
   const options = [
     { value: "", label: "" },
-    { value: "02", label: "Corriente" },
     { value: "01", label: "Ahorros" },
+    { value: "02", label: "Corriente" },    
   ];
 
   const optionsDocumento = [
-    { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
     { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
@@ -109,7 +109,7 @@ const Deposito = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
     setTipoCuenta("")
-    setTipoDocumento("")
+    setTipoDocumento("01")
     setNomDepositante("")
     setNumCuenta("")
     setValor("")
@@ -125,7 +125,7 @@ const Deposito = () => {
 
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
+      if (valor >= min && valor <= max) {
         const formData = new FormData(e.target);
         const numCuenta = formData.get("numCuenta");
         const userDoc = formData.get("docCliente");
@@ -152,7 +152,7 @@ const Deposito = () => {
             if (!res?.status) {
               notifyError(res?.msg);
               setTipoCuenta("")
-              setTipoDocumento("")
+              setTipoDocumento("01")
               setNomDepositante("")
               setNumCuenta("")
               setValor("")
@@ -178,14 +178,14 @@ const Deposito = () => {
           .catch((err) => {
             setIsUploading(false);
             console.error(err);
-            notifyError("Error interno en la transaccion");
+            notifyError("No se ha podido conectar al servidor");
           });
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del deposito debe estar entre ${formatMoney.format(
+          `El valor del depósito debe estar entre ${(formatMoney.format(
             min
-          )} y ${formatMoney.format(max)}`
+          )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
         );
       }
     },
@@ -226,10 +226,12 @@ const Deposito = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
+          handleClose();
           return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const trx_id2 = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
@@ -253,7 +255,9 @@ const Deposito = () => {
             ["Dirección", roleInfo?.direccion],
             ["Tipo de operación", "Depósito A Cuentas"],
             ["", ""],
-            ["No. de aprobación", trx_id],
+            ["No. de aprobación Banco", trx_id],
+            ["", ""],
+            ["No. de aprobación Aliado", trx_id2],
             ["", ""],
           ],
           commerceName: roleInfo?.["nombre comercio"]
@@ -261,7 +265,7 @@ const Deposito = () => {
           : "No hay datos",
           trxInfo: [
             [
-            "Tipo",
+            "Tipo de cuenta",
             res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
             ["",""],
@@ -296,7 +300,7 @@ const Deposito = () => {
       .catch((err) => {
         setIsUploading(false);
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
   }, [
     numCuenta,
@@ -361,7 +365,7 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"5"}
-            maxLength={"16"}
+            maxLength={"10"}
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");

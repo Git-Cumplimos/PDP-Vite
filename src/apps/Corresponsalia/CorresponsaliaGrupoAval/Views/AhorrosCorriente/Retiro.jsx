@@ -10,7 +10,7 @@ import { useReactToPrint } from "react-to-print";
 import {
   retiroCorresponsalGrupoAval,
   consultaCostoGrupoAval,
-} from "../../utils/fetchCorresponsaliaDavivienda";
+} from "../../utils/fetchCorresponsaliaGrupoAval";
 import { notify, notifyError } from "../../../../../utils/notify";
 import Tickets from "../../components/TicketsDavivienda";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
@@ -57,19 +57,27 @@ const Retiro = () => {
   const [otp, setOtp] = useState("")
   const [summary, setSummary] = useState([])
   const [banco, setBanco] = useState("")
+  const [showBTNConsulta, setShowBTNConsulta] = useState(true)
 
   const optionsBanco = [
     { value: "", label: "" },
-    { value: "01", label: "Banco AvVillas" },
-    { value: "02", label: "Banco Bogotá" },
-    { value: "04", label: "Banco Occidental" },
-    { value: "13", label: "Banco Popular" },
+    { value: "0052", label: "Banco AvVillas" },
+    { value: "0001", label: "Banco Bogotá" },
+    { value: "0023", label: "Banco Occidental" },
+    { value: "0002", label: "Banco Popular" },
+    { value: "0054", label: "ATH" },
   ];
+
+  const DataBanco = useMemo(() => {
+    const resp = optionsBanco?.filter((id) => id.value === banco);
+    const DataBanco = {nombre: resp[0]?.label, idBanco: resp[0]?.value}
+    return DataBanco;
+  }, [optionsBanco, banco]);
 
   const optionsTipoCuenta = [
     { value: "", label: "" },
-    { value: "02", label: "Corriente" },
     { value: "01", label: "Ahorros" },
+    { value: "02", label: "Corriente" },    
   ];
 
   const optionsDocumento = [
@@ -123,6 +131,7 @@ const Retiro = () => {
     setOtp("")
     setPhone("")
     setBanco("")
+    setShowBTNConsulta(true)
     setSummary([])
   }, []);
 
@@ -134,47 +143,42 @@ const Retiro = () => {
       const { min, max } = limitesMontos;
 
       if (valor >= min && valor < max) {
-        const formData = new FormData(e.target);
-        const userDoc = formData.get("docCliente");
-        const valorFormat = formData.get("valor");
-        const otp = formData.get("OTP");
+        // const formData = new FormData(e.target);
+        // const userDoc = formData.get("docCliente");
+        // const valorFormat = formData.get("valor");
+        // const otp = formData.get("OTP");
 
         const body = {
           idComercio: roleInfo?.id_comercio,
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
           Tipo: roleInfo?.tipo_comercio,
-          numTipoTransaccion: 2130, /// retiro
-          numTipoDocumento: tipoDocumento, /// Cedula
+          codDane: roleInfo?.codigo_dane,
+          ciudad: roleInfo?.ciudad,
+          direccion: roleInfo?.direccion,
+          ///////////////////////////////
+          idBancoAdquiriente: DataBanco?.idBanco,
           numNumeroDocumento: userDoc,
           numValorTransaccion: valor,
-          //nomDepositante: nomDepositante,
-          // valToken: "valToken", /// De donde viene
+
         };
         fetchConsultaCostoGrupoAval(body)
           .then((res) => {
             setIsUploading(false);
             if (!res?.status) {
               notifyError(res?.msg);
-              setTipoCuenta("")
-              setTipoDocumento("")             
-              setValor("")
-              setUserDoc("")
-              setOtp("")
-              return;
+              handleClose()
             } else {
               setDatosConsulta(res?.obj?.Data);
               const summary = {
-                "Nombre cliente": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
-                // "Numero celular": numCuenta,
-                "C.C. del depositante": userDoc,
-                "Codigo OTP": otp,
-                "Valor de retiro": valorFormat,
-                "Valor cobro": formatMoney.format(
-                  res?.obj?.Data?.numValorCobro
-                ),
+                "Banco": DataBanco?.nombre,
+                "Documento" : userDoc,
+                "Numero celular": phone,
+                "Valor deposito": formatMoney.format(valor),
+                "Costo transacción": formatMoney.format(res?.obj?.costoTrx)
               };
               setSummary(summary)
+              setShowBTNConsulta(false)
               setShowModal(true);
             }
 
@@ -183,18 +187,18 @@ const Retiro = () => {
           .catch((err) => {
             setIsUploading(false);
             console.error(err);
-            notifyError("Error interno en la transaccion");
+            notifyError("No se ha podido conectar al servidor");
           });
       } else {
         setIsUploading(false);
         notifyError(
           `El valor del retiro debe estar entre ${formatMoney.format(
             min
-          )} y ${formatMoney.format(max)}`
+          ).replace(" ", "")} y ${formatMoney.format(max).replace(" ", "")}`
         );
       }
     },
-    [valor, limitesMontos]
+    [valor, limitesMontos, DataBanco]
   );
 
 
@@ -209,23 +213,17 @@ const Retiro = () => {
     navigate(-1);
   }, [navigate]);
 
-  const nomBanco = useMemo(() => {
-    const resp = optionsBanco?.filter((id) => id.value === banco);
-    const nomBanco = resp[0]?.label
-    return nomBanco;
-  }, [optionsBanco, banco]);
-
   const onSubmitModal = useCallback((e) => {
     e.preventDefault();
     const summary = {
-      "Banco": nomBanco,
+      "Banco": DataBanco?.nombre,
       "Documento" : userDoc,
       "Numero celular": phone,
       "Valor cobro": formatMoney.format(valor),
     };
     setSummary(summary)
     setShowModal(true)
-  }, [banco, userDoc, phone, valor, nomBanco]);
+  }, [banco, userDoc, phone, valor, DataBanco]);
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
@@ -234,13 +232,16 @@ const Retiro = () => {
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       Tipo: roleInfo?.tipo_comercio,
-      numTipoDocumento: tipoDocumento,
-      numNumeroDocumento: userDoc,
-      numValorRetiro: valor,
-      numOtp: otp,
-      valToken: "valToken",
+      codDane: roleInfo?.codigo_dane,
+      ciudad: roleInfo?.ciudad,
       direccion: roleInfo?.direccion,
-      cod_dane: roleInfo?.codigo_dane,
+      ///////////////////////////////
+      idBancoAdquiriente: DataBanco?.idBanco,
+      numNumeroDocumento: userDoc,
+      numValorTransaccion: valor,
+      numTipoCuenta: tipoCuenta,
+      numCelular: phone,
+      otp: otp
     };
 
     fetchRetiroCorresponsalGrupoAval(body)
@@ -248,11 +249,14 @@ const Retiro = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
-          return;
+          handleClose()
+          // return;
         }
+        else{
         notify("Transaccion satisfactoria");
-        const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
-        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+        const trx_id = parseInt(res?.obj?.respuesta_grupo_aval["11"]) ?? 0;
+        const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
+        // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
           title: "Retiro De Cuentas Davivienda",
@@ -270,13 +274,12 @@ const Retiro = () => {
           },
           commerceInfo: [
             ["Id Comercio", roleInfo?.id_comercio],
-            ["No. terminal", ter],
+            ["No. de aprobación", trx_id],
+            // ["No. terminal", ter],
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
             ["Tipo de operación", "Retiro De Cuentas"],
-            ["", ""],
-            ["No. de aprobación", trx_id],
-            ["", ""],
+            ["", ""]            
           ],
           commerceName: roleInfo?.["nombre comercio"]
           ? roleInfo?.["nombre comercio"]
@@ -284,19 +287,19 @@ const Retiro = () => {
           trxInfo: [
             [
               "Tipo",
-              res?.obj?.Data?.numTipoCuenta === "01" ? "Ahorros" : "Corriente",
+              tipoCuenta === "01" ? "Ahorros" : "Corriente",
             ],
             ["",""],
             [
               "Nro. Cuenta",
-              `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
+              `****${String(numCuenta)?.slice(-4) ?? ""}`,
             ],
             ["",""],
             ["Valor", formatMoney.format(valor)],
             ["",""],
             [
               "Costo transacción",
-              formatMoney.format(res?.obj?.Data?.numValorCobro),
+              formatMoney.format(res?.obj?.costoTrx),
             ],
             ["",""],
             ["Total", formatMoney.format(valor)],
@@ -314,12 +317,12 @@ const Retiro = () => {
           .catch((err) => {
             console.error(err);
             notifyError("Error guardando el ticket");
-          });
+          });}
       })
       .catch((err) => {
         setIsUploading(false);
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
   }, [
     valor,
@@ -358,16 +361,6 @@ const Retiro = () => {
             }}
             required
           />
-          {/* <Select
-            id='tipoDocumento'
-            label='Tipo de documento'
-            options={optionsDocumento}
-            value={tipoDocumento}
-            onChange={(e) => {
-              setTipoDocumento(e.target.value);
-            }}
-            required
-          /> */}
           <Input
             id='docCliente'
             name='docCliente'
@@ -410,8 +403,8 @@ const Retiro = () => {
           label='Número OTP'
           type='text'
           name='otp'
-          minLength='6'
-          maxLength='6'
+          minLength='4'
+          maxLength='4'
           autoComplete='off'
           required
           value={otp}
@@ -436,7 +429,7 @@ const Retiro = () => {
           required
            />
           <ButtonBar className={"lg:col-span-2"}>
-            <Button type={"submit"} disabled={loadingConsultaCostoGrupoAval}>
+            <Button type={"submit"}>
               Continuar
             </Button>
           </ButtonBar>
@@ -467,12 +460,16 @@ const Retiro = () => {
                   disabled={loadingRetiroCorresponsalGrupoAval}>
                   Realizar retiro
                 </Button>
+                {showBTNConsulta ? 
                 <Button
-                  type='submit'
-                  onClick={consultaCosto}
-                  disabled={loadingRetiroCorresponsalGrupoAval}>
-                  Consultar costo
-                </Button>
+                type='submit'
+                onClick={consultaCosto}
+                disabled={loadingRetiroCorresponsalGrupoAval}>
+                Consultar costo
+                </Button>                
+                :
+                ""
+                }
                 <Button
                   onClick={handleClose}
                   disabled={loadingRetiroCorresponsalGrupoAval}>

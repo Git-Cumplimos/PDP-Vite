@@ -11,7 +11,7 @@ import {
   retiroCorresponsal,
   consultaCostoCB,
 } from "../../utils/fetchCorresponsaliaDavivienda";
-import { notify, notifyError } from "../../../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../../../utils/notify";
 import Tickets from "../../components/TicketsDavivienda";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import MoneyInput, {
@@ -31,12 +31,13 @@ const Retiro = () => {
   const { roleInfo, infoTicket } = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
+    max: 1000000,
+    min: 10000,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
 
   const [loadingRetiroCorresponsal, fetchRetiroCorresponsal] =
@@ -49,7 +50,7 @@ const Retiro = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("01");
   const [isUploading, setIsUploading] = useState(false);
   const [userDoc, setUserDoc] = useState("")
   const [valor, setValor] = useState("")
@@ -59,7 +60,6 @@ const Retiro = () => {
  
 
   const optionsDocumento = [
-    { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
     { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
@@ -103,7 +103,7 @@ const Retiro = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
     setTipoCuenta("")
-    setTipoDocumento("")             
+    setTipoDocumento("01")             
     setValor("")
     setUserDoc("")
     setOtp("")
@@ -114,10 +114,15 @@ const Retiro = () => {
     (e) => {
       e.preventDefault();
       setIsUploading(true);
-
+      if (otp.length < 6) {
+        setIsUploading(false)
+        notifyError("El número OTP debe ser de 6 dígitos")
+      }
+      else{
+      if (valor % 10000 === 0){
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
+      if (valor >= min && valor <= max) {
         const formData = new FormData(e.target);
         const userDoc = formData.get("docCliente");
         const valorFormat = formData.get("valor");
@@ -141,18 +146,19 @@ const Retiro = () => {
             if (!res?.status) {
               notifyError(res?.msg);
               setTipoCuenta("")
-              setTipoDocumento("")             
+              setTipoDocumento("01")             
               setValor("")
               setUserDoc("")
               setOtp("")
               return;
             } else {
+              notifyError("Recuerde verificar si posee el efectivo suficiente para continuar con el retiro")
               setDatosConsulta(res?.obj?.Data);
               const summary = {
                 "Nombre cliente": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
                 // "Numero celular": numCuenta,
-                "C.C. del depositante": userDoc,
-                "Codigo OTP": otp,
+                "Documento del cliente": userDoc,
+                //"Codigo OTP": otp,
                 "Valor de retiro": valorFormat,
                 "Valor cobro": formatMoney.format(
                   res?.obj?.Data?.numValorCobro
@@ -167,18 +173,23 @@ const Retiro = () => {
           .catch((err) => {
             setIsUploading(false);
             console.error(err);
-            notifyError("Error interno en la transaccion");
+            notifyError("No se ha podido conectar al servidor");
           });
       } else {
         setIsUploading(false);
         notifyError(
           `El valor del retiro debe estar entre ${formatMoney.format(
             min
-          )} y ${formatMoney.format(max)}`
+          ).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
         );
       }
-    },
-    [valor, limitesMontos]
+    }
+    else{
+      setIsUploading(false);
+      notifyError("El valor a retirar debe ser múltiplo de $10.000")
+    }
+    }},
+    [valor, limitesMontos, otp]
   );
 
 
@@ -214,10 +225,12 @@ const Retiro = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
+          handleClose();
           return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const trx_id2 = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
@@ -241,7 +254,9 @@ const Retiro = () => {
             ["Dirección", roleInfo?.direccion],
             ["Tipo de operación", "Retiro De Cuentas"],
             ["", ""],
-            ["No. de aprobación", trx_id],
+            ["No. de aprobación Banco", trx_id],
+            ["", ""],
+            ["No. de aprobación Aliado", trx_id2],
             ["", ""],
           ],
           commerceName: roleInfo?.["nombre comercio"]
@@ -249,8 +264,8 @@ const Retiro = () => {
           : "No hay datos",
           trxInfo: [
             [
-              "Tipo",
-              res?.obj?.Data?.numTipoCuenta === "01" ? "Ahorros" : "Corriente",
+              "Tipo de cuenta",
+              res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
             ["",""],
             [
@@ -285,7 +300,7 @@ const Retiro = () => {
       .catch((err) => {
         setIsUploading(false);
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
   }, [
     valor,
@@ -320,8 +335,8 @@ const Retiro = () => {
             label='Documento cliente'
             type='text'
             autoComplete='off'
-            minLength={"7"}
-            maxLength={"16"}
+            minLength={"5"}
+            maxLength={"10"}
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
@@ -336,8 +351,8 @@ const Retiro = () => {
           label='Número OTP'
           type='text'
           name='otp'
-          minLength='6'
-          maxLength='6'
+          minLength={"6"}
+          maxLength={"6"}
           autoComplete='off'
           required
           value={otp}
@@ -350,7 +365,7 @@ const Retiro = () => {
           <Input
           id="valor"
           name="valor"
-          label="Valor a depositar"
+          label="Valor a retirar"
           autoComplete="off"
           type="text"
           minLength={"1"}

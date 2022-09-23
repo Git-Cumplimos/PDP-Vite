@@ -45,7 +45,7 @@ const Deposito = () => {
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("01");
   const [isUploading, setIsUploading] = useState(false);
 
   const [limitesMontos, setLimitesMontos] = useState({
@@ -59,7 +59,6 @@ const Deposito = () => {
   });
 
   const options = [
-    { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
     { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
@@ -106,7 +105,7 @@ const Deposito = () => {
     setNomDepositante("");
     setSummary([]);
     setValor("");
-    setTipoDocumento("");
+    setTipoDocumento("01");
     setUserDoc("");
   }, []);
 
@@ -144,7 +143,7 @@ const Deposito = () => {
                 setNomDepositante("");
                 setSummary([]);
                 setValor("");
-                setTipoDocumento("");
+                setTipoDocumento("01");
                 setUserDoc("");
                 notifyError(res?.msg);
                 return;
@@ -173,7 +172,7 @@ const Deposito = () => {
             .catch((err) => {
               setIsUploading(false);
               console.error(err);
-              notifyError("Error interno en la transaccion");
+              notifyError("No se ha podido conectar al servidor");
             });
         } else {
           setIsUploading(false);
@@ -182,9 +181,9 @@ const Deposito = () => {
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del deposito debe estar entre ${formatMoney.format(
+          `El valor del depósito debe estar entre ${formatMoney.format(
             min
-          )} y ${formatMoney.format(max)}`
+          ).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
         );
       }
     },
@@ -236,7 +235,8 @@ const Deposito = () => {
         if (!res?.status) {
           setIsUploading(false);
           notifyError(res?.msg);
-          return;
+          handleClose()
+          // return;
         } else {
           notify("Transaccion satisfactoria");
           const trx_id = res?.obj?.Data?.valTalon ?? 0;
@@ -299,7 +299,7 @@ const Deposito = () => {
       .catch((err) => {
         setIsUploading(false);
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
   }, [
     phone,
@@ -349,18 +349,24 @@ const Deposito = () => {
             maxLength={"10"}
             value={verificacionTel}
             onInput={(e) => {
-              if ((String(e.target.value).length > 0 & String(e.target.value).slice(0,1) !== "3")) {
+              console.log((String(e.target.value).length>2 & String(verificacionTel).length<1))
+              if ((String(e.target.value).length> 2 & String(verificacionTel).length< 1)){
+                notifyError("Debe digitar el número celular y no pegarlo")
+              }
+              else{
+              if ((String(e.target.value).length > 0 & String(e.target.value).slice(0,1) !== "3")){
                 notifyError("El número de celular debe iniciar por 3");
                 setVerificacionTel("");
               } else {
                 const num = parseInt(e.target.value) || "";
                 setVerificacionTel(num);
-              }
+              }}
             }}
             required
           />
           <Select
-            id='tipoCuenta'
+            className="place-self-stretch"
+            id='tipoDocumento'
             label='Tipo de documento'
             options={options}
             value={tipoDocumento}
@@ -376,7 +382,7 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"5"}
-            maxLength={"16"}
+            maxLength={"10"}
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
