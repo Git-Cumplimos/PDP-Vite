@@ -356,7 +356,7 @@ const VentaPines = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Venta de Pines de Recaudo</h1>
+      <h1 className="text-3xl mt-6 mb-10">Venta de Pines de Recaudo</h1>
       <Form
         onSubmit={
           inquiryStatus
@@ -369,14 +369,14 @@ const VentaPines = () => {
         grid
       >
         <Input
-          label="Numero de convenio pin"
+          label="Número de convenio pin"
           type="text"
           autoComplete="off"
           value={datosConvenio.pk_codigo_convenio}
           disabled
         />
         <Input
-          label="Numero de pin"
+          label="Número de pin"
           type="text"
           autoComplete="off"
           value={datosConvenio.codigo_pin}
