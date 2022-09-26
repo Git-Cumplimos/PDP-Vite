@@ -6,7 +6,7 @@ import Modal from "../../../../../components/Base/Modal";
 import useQuery from "../../../../../hooks/useQuery";
 import { Fragment, useState, useCallback, useRef, useEffect, useMemo } from "react";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
-import Tickets from "../../components/TicketsDavivienda";
+import Tickets from "../../../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import {
@@ -321,7 +321,7 @@ const Deposito = () => {
             // ["Nombre depositante", nomDepositante],
             // ["", ""],
           ],
-          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+          disclamer: `Corresponsal bancario para ${DataBanco?.nombre}. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652 Opción X`,
         };
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////

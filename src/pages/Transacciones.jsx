@@ -276,7 +276,7 @@ const Transacciones = () => {
         )}
       </TableEnterprise>
       <Modal show={showModal} handleClose={closeModal}>
-        {selected?.ticket && selected?.id_autorizador === 13 ? (
+        {selected?.ticket && JSON.stringify(selected?.ticket) !== '{}'  && selected?.id_autorizador === 13 ? (
           <div className='flex flex-col justify-center items-center'>
             <TicketsDavivienda
               refPrint={printDiv}
@@ -289,7 +289,7 @@ const Transacciones = () => {
               <Button onClick={() => closeModal()}>Cerrar</Button>
             </ButtonBar>
           </div>
-        ) : selected?.ticket && selected?.id_tipo_transaccion === 43 ? (
+        ) : selected?.ticket && JSON.stringify(selected?.ticket) !== '{}' &&  selected?.id_tipo_transaccion === 43 ? (
           <div ref={printDiv} div className='flex flex-col justify-center items-center'>
           {selected?.ticket?.ticket2 ?
           <>
@@ -320,7 +320,7 @@ const Transacciones = () => {
               <Button onClick={() => closeModal()}>Cerrar</Button>
             </ButtonBar>
         </div>  
-        ) : selected?.ticket ? (
+        ) : selected?.ticket && JSON.stringify(selected?.ticket) !== '{}' ? (
           <div className='flex flex-col justify-center items-center'>
             <Tickets
               refPrint={printDiv}
