@@ -6,6 +6,8 @@ const urlColpatriaParams = `${process.env.REACT_APP_URL_COLPATRIA}/params`;
 // const urlColpatriaTrx = `http://localhost:5000/trx`;
 // const urlColpatriaParams = `http://localhost:5000/params`;
 
+
+
 export const makeDeposit = async (bodyDep) => {
   if (!bodyDep) {
     throw new Error("sin datos de deposito", { cause: "custom" });

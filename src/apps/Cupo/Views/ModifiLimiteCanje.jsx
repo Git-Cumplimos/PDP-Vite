@@ -4,7 +4,9 @@ import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
+import Modal from "../../../components/Base/Modal";
 import MoneyInput from "../../../components/Base/MoneyInput";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
 
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
@@ -22,9 +24,10 @@ const ModifiLimiteCanje = () => {
   const [limit] = useState(10);
   const [page] = useState(1);
   const [inputId, setinputId] = useState(false);
+  const [submitName, setSubmitName] = useState("");
   const limitesMontos = {
     max: 9999999999,
-    min: -9999999999,
+    min: 0,
   };
   const { roleInfo } = useAuth();
   const navegateValid = useNavigate();
@@ -57,9 +60,8 @@ const ModifiLimiteCanje = () => {
 
   const onSubmitDeposit = useCallback(
     (e) => {
-      e.preventDefault();
       if (
-        e.nativeEvent.submitter.name === "AsignarLimiteCupo" &&
+        submitName === "AsignarLimiteCupo" &&
         valor !== null &&
         valor !== ""
       ) {
@@ -98,6 +100,7 @@ const ModifiLimiteCanje = () => {
       page,
       navegateValid,
       cupoComer,
+      submitName,
     ]
   );
   const onMoneyChange = useCallback((e, valor) => {
@@ -154,7 +157,13 @@ const ModifiLimiteCanje = () => {
       </Form>
       {cupoComer?.results.length === 1 ? (
         <Fragment>
-          <Form onSubmit={onSubmitDeposit} grid>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setSubmitName(e.nativeEvent.submitter.name);
+            }}
+            grid
+          >
             <MoneyInput
               id="cupo_limite"
               name="cupo_limite"
@@ -163,7 +172,7 @@ const ModifiLimiteCanje = () => {
               maxLength={"14"}
               min={limitesMontos?.min}
               max={limitesMontos?.max}
-              defaultValue={parseInt(cupoComer?.results?.[0]?.limite_cupo)}
+              value={valor ?? parseInt(cupoComer?.results?.[0]?.limite_cupo)}
               onInput={onMoneyChange}
               required
             />
@@ -195,6 +204,21 @@ const ModifiLimiteCanje = () => {
               </Button>
             </ButtonBar>
           </Form>
+          <Modal show={submitName} handleClose={() => setSubmitName("")}>
+            <PaymentSummary
+              title="Esta seguro de modificar el limite de cupo del comercio?"
+              subtitle=""
+            >
+              <ButtonBar className={"lg:col-span-2"}>
+                <Button type={"submit"} onClick={onSubmitDeposit}>
+                  Aceptar
+                </Button>
+                <Button type={"button"} onClick={() => setSubmitName("")}>
+                  Cancelar
+                </Button>
+              </ButtonBar>
+            </PaymentSummary>
+          </Modal>
         </Fragment>
       ) : (
         ""

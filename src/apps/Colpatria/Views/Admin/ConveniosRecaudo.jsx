@@ -249,8 +249,8 @@ const ConveniosRecaudo = () => {
       <TableEnterprise
         title="Convenios de recaudo"
         headers={[
-          "Codigo convenio",
-          "Codigo ean o iac",
+          "Código convenio",
+          "Código ean o iac",
           "Nombre convenio",
           "Estado",
         ]}
@@ -286,7 +286,7 @@ const ConveniosRecaudo = () => {
       >
         <Input
           id={"pk_codigo_convenio"}
-          label={"Codigo de convenio"}
+          label={"Código de convenio"}
           name={"pk_codigo_convenio"}
           type="tel"
           autoComplete="off"
@@ -300,7 +300,7 @@ const ConveniosRecaudo = () => {
         />
         <Input
           id={"codigo_ean_iac_search"}
-          label={"Codigo ean o iac"}
+          label={"Código ean o iac"}
           name={"codigo_ean_iac"}
           type="tel"
           autoComplete="off"
@@ -317,7 +317,7 @@ const ConveniosRecaudo = () => {
           name={"nombre_convenio"}
           type="text"
           autoComplete="off"
-          maxLength={"255"}
+          maxLength={"50"}
           defaultValue={selected?.nombre_convenio ?? ""}
           required
         />
@@ -342,7 +342,7 @@ const ConveniosRecaudo = () => {
             />
             <TextArea
               id={"filename"}
-              label={"Archivo selecionado"}
+              label={"Archivo seleccionado"}
               value={massiveFile?.name ?? ""}
               disabled
               readOnly
@@ -353,7 +353,7 @@ const ConveniosRecaudo = () => {
               </div>
             )}
             <ButtonBar>
-              <Button type={"submit"}>Realizar carge</Button>
+              <Button type={"submit"}>Realizar cargue</Button>
             </ButtonBar>
           </Form>
         ) : (
@@ -364,7 +364,7 @@ const ConveniosRecaudo = () => {
             <Form onSubmit={handleConvenio} grid>
               <Input
                 id={"pk_codigo_convenio"}
-                label={"Codigo de convenio"}
+                label={"Código de convenio"}
                 name={"pk_codigo_convenio"}
                 type="tel"
                 autoComplete="off"
@@ -378,7 +378,7 @@ const ConveniosRecaudo = () => {
               />
               <Input
                 id={"codigo_ean_iac"}
-                label={"Codigo ean o iac"}
+                label={"Código ean o iac"}
                 name={"codigo_ean_iac"}
                 type="tel"
                 autoComplete="off"
@@ -396,7 +396,7 @@ const ConveniosRecaudo = () => {
                 name={"nombre_convenio"}
                 type="text"
                 autoComplete="off"
-                maxLength={"255"}
+                maxLength={"50"}
                 defaultValue={selected?.nombre_convenio ?? ""}
                 required
               />
@@ -415,7 +415,7 @@ const ConveniosRecaudo = () => {
                 name={"referencia_1"}
                 type="text"
                 autoComplete="off"
-                maxLength={"255"}
+                maxLength={"30"}
                 defaultValue={selected?.referencia_1 ?? ""}
                 required
               />
@@ -425,7 +425,7 @@ const ConveniosRecaudo = () => {
                 name={"referencia_2"}
                 type="text"
                 autoComplete="off"
-                maxLength={"255"}
+                maxLength={"30"}
                 defaultValue={selected?.referencia_2 ?? ""}
               />
               <Input
@@ -434,7 +434,7 @@ const ConveniosRecaudo = () => {
                 name={"referencia_3"}
                 type="text"
                 autoComplete="off"
-                maxLength={"255"}
+                maxLength={"30"}
                 defaultValue={selected?.referencia_3 ?? ""}
               />
               {selected && (

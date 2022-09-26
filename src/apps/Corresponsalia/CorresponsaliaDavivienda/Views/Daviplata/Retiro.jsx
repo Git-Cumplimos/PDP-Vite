@@ -13,13 +13,15 @@ import MoneyInput, {
 } from "../../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
-import { enumParametrosAutorizador } from "../../utils/enumParametrosAutorizador";
+import { enumParametrosAutorizador } from "../../../../../utils/enumParametrosAutorizador";
 import { fetchParametrosAutorizadores } from "../../../../TrxParams/utils/fetchParametrosAutorizadores";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
 import HideInput from "../../../../../components/Base/HideInput";
+import { useNavigate } from "react-router-dom";
 
 const Retiro = () => {
   const { roleInfo } = useAuth();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
     superior: 720000,
@@ -156,11 +158,17 @@ const Retiro = () => {
 
   const peticionCashOut = () => {
     const hoy = new Date();
-    const fecha =
-      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
     /*hora actual */
-    const hora =
-      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
@@ -345,6 +353,7 @@ const Retiro = () => {
                     type='submit'
                     onClick={() => {
                       hideModal();
+                      navigate(-1);
                     }}>
                     Aceptar
                   </Button>

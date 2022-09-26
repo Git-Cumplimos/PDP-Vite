@@ -29,7 +29,7 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAval}davivienda_recaudo_servicios_publicos_privados/consulta_tabla_convenios_especifico`,
+      `${urlAval}/grupo_aval_cb_recaudo/consulta_tabla_convenios_especifico`,
       "POST",
       {},
       bodyObj,
@@ -50,7 +50,7 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAval}davivienda_recaudo_servicios_publicos_privados/codigo_barras`,
+      `${urlAval}/grupo_aval_cb_recaudo/codigo_barras`,
       "POST",
       {},
       bodyObj,
@@ -65,13 +65,13 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
     throw err;
   }
 };
-export const postConsultaConveniosDavivienda = async (bodyObj) => {
+export const postConsultaConveniosAval = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlAval}davivienda_recaudo_servicios_publicos_privados/consulta_recaudo_servicios_publicos_privados`,
+      `${urlAval}/grupo_aval_cb_recaudo/consulta_recaudo_servicios_publicos_privados`,
       "POST",
       {},
       bodyObj,
@@ -86,13 +86,13 @@ export const postConsultaConveniosDavivienda = async (bodyObj) => {
     throw err;
   }
 };
-export const postRecaudoConveniosDavivienda = async (bodyObj) => {
+export const postRecaudoConveniosAval = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlAval}davivienda_recaudo_servicios_publicos_privados/recaudo_servicios_publicos_privados`,
+      `${urlAval}/grupo_aval_cb_recaudo/recaudo_servicios_publicos_privados`,
       "POST",
       {},
       bodyObj,

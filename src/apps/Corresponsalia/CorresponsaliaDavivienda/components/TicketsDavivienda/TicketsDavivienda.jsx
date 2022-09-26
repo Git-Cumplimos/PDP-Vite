@@ -209,7 +209,7 @@ const TicketsDavivienda = ({
               Punto De Pago
             </h1>
             <h1 className='text-center my-1 text-xs font-normal'>
-              Punto Daviplata - Corresponsal Bancario Davivienda
+              Punto DaviPlata - Corresponsal Bancario Davivienda
             </h1>
           </div>
         </div>

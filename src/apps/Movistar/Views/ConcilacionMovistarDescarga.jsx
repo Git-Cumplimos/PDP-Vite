@@ -64,7 +64,7 @@ const ConcilacionMovistarDescarga = () => {
               Fecha: inf.fechabusqueda,
               ArchivoPuntoDePago: inf.ptopago.status,
               ArchivoMovistar: inf.movistar.status,
-              Diferencias: inf.diferencias.status,
+              ArchivoDiferencias: inf.diferencias.status,
             })) ?? []
           }
           onSelectRow={(e, i) => {

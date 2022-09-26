@@ -25,10 +25,7 @@ import {
 } from "../../utils/fetchFunctions";
 
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import {
-  makeMoneyFormatter,
-  onChangeNumber,
-} from "../../../../utils/functions";
+import { makeMoneyFormatter } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
 
 const formatMoney = makeMoneyFormatter(2);
@@ -42,8 +39,7 @@ const VentaPines = () => {
 
   const [searchingConvData, setSearchingConvData] = useState(false);
   const [datosConvenio, setDatosConvenio] = useState(null);
-  const [userDocument, setUserDocument] = useState("");
-  const [userReferences, setUserReferences] = useState(null);
+  const [userReferences, setUserReferences] = useState({});
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
@@ -73,12 +69,17 @@ const VentaPines = () => {
 
   const summary = useMemo(
     () => ({
-      "C.C. del depositante": userDocument,
+      ...Object.fromEntries(
+        Object.entries(userReferences).map(([, val], index) => [
+          datosConvenio[`referencia_${index + 1}`],
+          val,
+        ])
+      ),
       "Valor de deposito": formatMoney.format(valVentaPines),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
-    [userDocument, valVentaPines]
+    [userReferences, datosConvenio, valVentaPines]
   );
 
   const handleClose = useCallback(() => {
@@ -100,7 +101,7 @@ const VentaPines = () => {
 
         // Datos trx colpatria
         colpatria: {
-          user_document: userDocument,
+          ...userReferences,
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -136,7 +137,7 @@ const VentaPines = () => {
         }
       );
     },
-    [userDocument, userAddress, valVentaPines, roleInfo]
+    [userReferences, userAddress, valVentaPines, roleInfo]
   );
 
   const onMakePayment = useCallback(
@@ -153,7 +154,7 @@ const VentaPines = () => {
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
         colpatria: {
-          user_document: userDocument,
+          ...userReferences,
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -201,11 +202,17 @@ const VentaPines = () => {
               ],
               commerceName: "Colpatria",
               trxInfo: [
-                ["C.C. del depositante", userDocument],
-                ["", ""],
+                ...Object.entries(userReferences).map(([, val], index) => [
+                  datosConvenio[`referencia_${index + 1}`],
+                  val,
+                ]),
                 ["Valor de deposito", formatMoney.format(valVentaPines)],
-                ["", ""],
-              ],
+              ].reduce((list, elem, i) => {
+                list.push(elem);
+                if ((i + 1) % 1 === 0) list.push(["", ""]);
+                return list;
+              }, []),
+              /* ["", ""] */
               disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
             };
             setPaymentStatus(tempTicket);
@@ -233,7 +240,8 @@ const VentaPines = () => {
       );
     },
     [
-      userDocument,
+      datosConvenio,
+      userReferences,
       userAddress,
       valVentaPines,
       inquiryStatus,
@@ -348,7 +356,7 @@ const VentaPines = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Venta de Pines de Recaudo</h1>
+      <h1 className="text-3xl mt-6 mb-10">Venta de Pines de Recaudo</h1>
       <Form
         onSubmit={
           inquiryStatus
@@ -361,14 +369,14 @@ const VentaPines = () => {
         grid
       >
         <Input
-          label="Numero de convenio pin"
+          label="Número de convenio pin"
           type="text"
           autoComplete="off"
           value={datosConvenio.pk_codigo_convenio}
           disabled
         />
         <Input
-          label="Numero de pin"
+          label="Número de pin"
           type="text"
           autoComplete="off"
           value={datosConvenio.codigo_pin}
@@ -401,18 +409,6 @@ const VentaPines = () => {
               required
             />
           ))}
-        <Input
-          id="docCliente"
-          name="docCliente"
-          label="CC del comprador"
-          type="tel"
-          autoComplete="off"
-          minLength={"7"}
-          maxLength={"13"}
-          value={`${userDocument}`}
-          onInput={(ev) => setUserDocument(onChangeNumber(ev))}
-          required
-        />
         {datosConvenio.fk_tipo_valor === 1 || inquiryStatus ? (
           <Input
             id="valor"

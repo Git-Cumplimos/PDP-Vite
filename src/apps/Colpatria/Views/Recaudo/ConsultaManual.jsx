@@ -1,7 +1,6 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Navigate } from "react-router-dom";
-import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import InputSuggestions from "../../../../components/Base/InputSuggestions";
 import { useAuth } from "../../../../hooks/AuthHooks";
@@ -41,7 +40,7 @@ const ConsultaManual = () => {
           if (Array.isArray(res?.obj)) {
             setFoundConv(res?.obj);
             if (res?.obj.length === 0) {
-              notifyError("No se encontradon datos de convenio");
+              notifyError("No se encontraron datos de convenio");
             }
             return;
           }
@@ -99,12 +98,12 @@ const ConsultaManual = () => {
         onSubmit={(ev) => {
           ev.preventDefault();
         }}
-        grid
       >
         <InputSuggestions
           id={"searchConv"}
           label={"Buscar convenio"}
           type={"search"}
+          maxLength="30"
           autoComplete="off"
           suggestions={mapSuggestions || []}
           onLazyInput={{
@@ -112,7 +111,6 @@ const ConsultaManual = () => {
             timeOut: 500,
           }}
         />
-        <ButtonBar></ButtonBar>
       </Form>
     </Fragment>
   );

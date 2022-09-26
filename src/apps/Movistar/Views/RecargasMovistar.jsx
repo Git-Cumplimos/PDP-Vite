@@ -19,7 +19,7 @@ import {
 } from "../utils/fetchMovistar";
 
 const minValor = 1000;
-const maxValor = 500000;
+const maxValor = 100000;
 const tipo_operacion = 77;
 
 const RecargasMovistar = () => {
@@ -62,38 +62,20 @@ const RecargasMovistar = () => {
   const onSubmitCheck = (e) => {
     e.preventDefault();
     //validar datos de la recarga
-    let realizarRecarga = 0;
-    if (inputCelular[0] == 3) {
-      realizarRecarga++;
-    } else {
+    if (inputCelular[0] != 3) {
       notifyError(
         "Número inválido, el No. de celular debe comenzar con el número 3"
       );
-    }
-    const minValorFormato = formatMoney.format(minValor).replace(/\s+/g, "");
-    const maxValorFormato = formatMoney.format(maxValor).replace(/\s+/g, "");
-
-    if (inputValor >= minValor && inputValor <= maxValor) {
-      realizarRecarga++;
-    } else if (inputValor < minValor) {
-      notifyError(
-        `Valor de la recarga inválido, debe ser mayor o igual a ${minValorFormato}`
-      );
-    } else if (inputValor > maxValor) {
-      notifyError(
-        `Valor de la recarga inválido, debe ser menor o igual a ${maxValorFormato}`
-      );
+      return;
     }
 
     //Realizar recarga
-    if (realizarRecarga == 2) {
-      setShowModal(true);
-      setSummary({
-        Celular: `${inputCelular.slice(0, 3)} ${inputCelular.slice(3, 6)} 
+    setShowModal(true);
+    setSummary({
+      Celular: `${inputCelular.slice(0, 3)} ${inputCelular.slice(3, 6)} 
         ${inputCelular.slice(6)}`,
-        Valor: formatMoney.format(inputValor),
-      });
-    }
+      Valor: formatMoney.format(inputValor),
+    });
   };
 
   const recargaMovistar = () => {
@@ -111,23 +93,25 @@ const RecargasMovistar = () => {
 
     fetchRecarga(data)
       .then((response) => {
-        console.log(response);
         const response_obj = response?.obj;
         const result = response_obj?.result;
         if (response?.status == true) {
+          notify("Recarga exitosa");
           setFlagRecarga(true);
           ticketRecarga(result);
         } else {
           setShowModal(false);
+          setInputCelular("");
+          setInputValor("");
           switch (response_obj?.identificador) {
             case "00":
               notifyError(
-                "Recarga NO EXITOSA [Falla en el sistema >> datos de entrada al servicio erróneos (Error:00)]"
+                "Recarga no exitosa, datos de entrada al servicio erróneos (Error:00)"
               );
               break;
             case "01":
               notifyError(
-                "Recarga NO EXITOSA [Falla en el sistema >> servicio transaccional caído (Error:01)]"
+                "Recarga no exitosa, el servicio transaccional se encuentra caído (Error:01)"
               );
               break;
             case "02":
@@ -135,28 +119,21 @@ const RecargasMovistar = () => {
               break;
             case "03":
               notifyError(
-                "Recarga NO EXITOSA [Falla en el sistema >> error con la conexión inicial a la base de datos (Error:03)]"
+                "Recarga no exitosa, error con la conexión inicial a la base de datos (Error:03)"
               );
               break;
             case "04":
               notifyError(
-                "Recarga NO EXITOSA [Falla en el sistema >> error con la trama de envió  (Error:04)]"
+                "Recarga no exitosa, error con la trama enviada  (Error:04)]"
               );
               break;
-            case "05":
+            case "06":
               notifyError(
-                "Recarga NO EXITOSA [Falla en el sistema >> error con la conexión telnet (Error:05)]"
-              );
-              break;
-            case "10":
-              notifyError(
-                "Recarga NO EXITOSA [Falla en el sistema >> error con la trama recibida (Error:10)]"
+                "Recarga no exitosa, error con la conexión (Error:06)]"
               );
               break;
             case "11":
-              notifyError(
-                `Recarga RECHAZADA por parte de movistar [${result.descripcion_codigo_error}]`
-              );
+              notifyError(result.descripcion_codigo_error);
               break;
             default:
               break;

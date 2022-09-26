@@ -23,6 +23,8 @@ import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
+
 
 const Deposito = () => {
   const navigate = useNavigate();
@@ -49,8 +51,8 @@ const Deposito = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max:1000000,
-    min: 10000,
+    max: enumParametrosDavivienda.maxCashInDaviplata ,
+    min: enumParametrosDavivienda.minCashInDaviplata,
   });
 
   const onChangeMoney = useMoney({
@@ -172,7 +174,7 @@ const Deposito = () => {
             .catch((err) => {
               setIsUploading(false);
               console.error(err);
-              notifyError("Error interno en la transaccion");
+              notifyError("No se ha podido conectar al servidor");
             });
         } else {
           setIsUploading(false);
@@ -181,9 +183,9 @@ const Deposito = () => {
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del deposito debe estar entre ${formatMoney.format(
+          `El valor del depósito debe estar entre ${formatMoney.format(
             min
-          )} y ${formatMoney.format(max)}`
+          ).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
         );
       }
     },
@@ -235,7 +237,8 @@ const Deposito = () => {
         if (!res?.status) {
           setIsUploading(false);
           notifyError(res?.msg);
-          return;
+          handleClose()
+          // return;
         } else {
           notify("Transaccion satisfactoria");
           const trx_id = res?.obj?.Data?.valTalon ?? 0;
@@ -298,7 +301,7 @@ const Deposito = () => {
       .catch((err) => {
         setIsUploading(false);
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
   }, [
     phone,
@@ -381,7 +384,7 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"5"}
-            maxLength={"10"}
+            maxLength={"11"}
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
@@ -442,7 +445,7 @@ const Deposito = () => {
         <Modal
           show={showModal}
           handleClose={
-            paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
+            paymentStatus ? goToRecaudo : loadingCashIn ? () => {} : handleClose
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>

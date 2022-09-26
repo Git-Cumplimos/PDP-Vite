@@ -16,37 +16,30 @@ const SeleccionServicioPagarAval = () => {
   const [datosTrans, setDatosTrans] = useState({
     convenio: "",
     idConvenio: "",
-    idIAC: "",
+    idEAN: "",
   });
   const [convenios, setConvenios] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
 
   const tableConvenios = useMemo(() => {
     return [
-      ...convenios.map(
-        ({
-          pk_tbl_transaccional_convenios_davivienda_cb,
-          nom_convenio_cnb,
-          cod_convenio_cnb,
-          cod_iac_cnb,
-        }) => {
-          return {
-            "Id convenio": cod_convenio_cnb,
-            Convenio: nom_convenio_cnb,
-            "Id IAC": cod_iac_cnb,
-          };
-        }
-      ),
+      ...convenios.map(({ pk_convenios_recaudo_aval, nura, convenio, ean }) => {
+        return {
+          "Id convenio": nura,
+          Convenio: convenio !== "" ? convenio : "N/A",
+          EAN: ean !== "" ? ean : "N/A",
+        };
+      }),
     ];
   }, [convenios]);
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
       navigate(
-        "../corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
+        "../corresponsalia/corresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/manual",
         {
           state: {
-            id: convenios[i]["pk_tbl_transaccional_convenios_davivienda_cb"],
+            id: convenios[i]["pk_convenios_recaudo_aval"],
           },
         }
       );
@@ -60,9 +53,9 @@ const SeleccionServicioPagarAval = () => {
 
   const fecthTablaConveniosPaginadoFunc = () => {
     postConsultaTablaConveniosPaginado({
-      nom_convenio_cnb: datosTrans.convenio,
-      cod_convenio_cnb: datosTrans.idConvenio,
-      cod_iac_cnb: datosTrans.idIAC,
+      convenio: datosTrans.convenio,
+      nura: datosTrans.idConvenio,
+      ean: datosTrans.ean,
       page,
       limit,
     })
@@ -78,9 +71,9 @@ const SeleccionServicioPagarAval = () => {
         Recaudo servicios publicos y privados
       </h1>
       <TableEnterprise
-        title='Tabla convenios Davivienda corresponsal bancario'
+        title='Tabla convenios AVAL corresponsal bancario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "Id IAC"]}
+        headers={["Id", "Convenio", "Ean"]}
         data={tableConvenios}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
@@ -89,7 +82,9 @@ const SeleccionServicioPagarAval = () => {
         <Input
           id='searchConvenio'
           name='searchConvenio'
-          label={"Buscar convenio"}
+          label={"Nopmbre convenio"}
+          minLength='1'
+          maxLength='30'
           type='text'
           autoComplete='off'
           onInput={(e) => {
@@ -100,7 +95,7 @@ const SeleccionServicioPagarAval = () => {
         />
         <Input
           id='idConvenio'
-          label='Id convenio'
+          label='Código convenio'
           type='text'
           name='idConvenio'
           minLength='1'
@@ -116,19 +111,19 @@ const SeleccionServicioPagarAval = () => {
             }
           }}></Input>
         <Input
-          id='idIAC'
-          label='Id IAC'
+          id='ean'
+          label='Ean'
           type='text'
-          name='idIAC'
+          name='ean'
           minLength='1'
           maxLength='13'
           required
-          value={datosTrans.idIAC}
+          value={datosTrans.ean}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               const num = e.target.value;
               setDatosTrans((old) => {
-                return { ...old, idIAC: num };
+                return { ...old, ean: num };
               });
             }
           }}></Input>

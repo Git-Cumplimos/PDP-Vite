@@ -24,22 +24,26 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import HideInput from "../../../../../components/Base/HideInput";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import useMoney from "../../../../../hooks/useMoney";
+import { pinBlock } from "../../utils/pinBlock";
+import {enumParametrosGrupoAval} from "../../utils/enumParametrosGrupoAval";
 
 const Retiro = () => {
+
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
 
-  console.log(roleInfo)
-
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 3000000,
-    min: 10000,
+    max: enumParametrosGrupoAval.maxRetiroCuentas,
+    min: enumParametrosGrupoAval.minRetiroCuentas,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
+
+  
 
   const [loadingRetiroCorresponsalGrupoAval, fetchRetiroCorresponsalGrupoAval] =
     useFetch(retiroCorresponsalGrupoAval);
@@ -50,7 +54,7 @@ const Retiro = () => {
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
-  const [tipoCuenta, setTipoCuenta] = useState("");
+  const [tipoCuenta, setTipoCuenta] = useState("01");
   const [tipoDocumento, setTipoDocumento] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [userDoc, setUserDoc] = useState("")
@@ -59,14 +63,26 @@ const Retiro = () => {
   const [otp, setOtp] = useState("")
   const [summary, setSummary] = useState([])
   const [banco, setBanco] = useState("")
+  const [showBTNConsulta, setShowBTNConsulta] = useState(true)
+  
+  const otpEncrip = useMemo(() => {
+    let x
+    if (otp.length === 4){
+      x = pinBlock(otp)
+    }
+    else{
+      x = ""
+    }
+    return x;
+  }, [otp]);
 
   const optionsBanco = [
     { value: "", label: "" },
     { value: "0052", label: "Banco AvVillas" },
     { value: "0001", label: "Banco Bogotá" },
-    { value: "0023", label: "Banco Occidental" },
+    { value: "0023", label: "Banco Occidente" },
     { value: "0002", label: "Banco Popular" },
-    { value: "0054", label: "ATH" },
+    // { value: "0054", label: "ATH" },
   ];
 
   const DataBanco = useMemo(() => {
@@ -76,9 +92,8 @@ const Retiro = () => {
   }, [optionsBanco, banco]);
 
   const optionsTipoCuenta = [
-    { value: "", label: "" },
-    { value: "02", label: "Corriente" },
     { value: "01", label: "Ahorros" },
+    { value: "02", label: "Corriente" },    
   ];
 
   const optionsDocumento = [
@@ -86,7 +101,7 @@ const Retiro = () => {
     { value: "01", label: "Cédula Ciudadanía" },
     { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
-    { value: "13", label: "Regitro Civil" },
+    { value: "13", label: "Registro Civil" },
   ];
 
   const printDiv = useRef();
@@ -125,13 +140,14 @@ const Retiro = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setTipoCuenta("")
+    setTipoCuenta("01")
     setTipoDocumento("")             
     setValor("")
     setUserDoc("")
     setOtp("")
     setPhone("")
     setBanco("")
+    setShowBTNConsulta(true)
     setSummary([])
   }, []);
 
@@ -140,72 +156,61 @@ const Retiro = () => {
       e.preventDefault();
       setIsUploading(true);
 
-      const { min, max } = limitesMontos;
-
-      if (valor >= min && valor < max) {
-        // const formData = new FormData(e.target);
-        // const userDoc = formData.get("docCliente");
-        // const valorFormat = formData.get("valor");
-        // const otp = formData.get("OTP");
-
-        const body = {
-          idComercio: roleInfo?.id_comercio,
-          idUsuario: roleInfo?.id_usuario,
-          idDispositivo: roleInfo?.id_dispositivo,
-          Tipo: roleInfo?.tipo_comercio,
-          codDane: roleInfo?.codigo_dane,
-          ciudad: roleInfo?.ciudad,
-          direccion: roleInfo?.direccion,
-          ///////////////////////////////
+      const body = {
+        comercio : {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+  
+        oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+        nombre_comercio: roleInfo?.['nombre comercio'],
+        valor_total_trx: valor,
+  
+        consultaCosto: {
           idBancoAdquiriente: DataBanco?.idBanco,
           numNumeroDocumento: userDoc,
           numValorTransaccion: valor,
+  
+          location: {
+            codDane: roleInfo?.codigo_dane,
+            ciudad: roleInfo?.ciudad,
+            direccion: roleInfo?.direccion,
+  
+          }
+        }      
 
-        };
-        fetchConsultaCostoGrupoAval(body)
-          .then((res) => {
-            setIsUploading(false);
-            if (!res?.status) {
-              notifyError(res?.msg);
-              setTipoCuenta("")
-              setTipoDocumento("")             
-              setValor("")
-              setUserDoc("")
-              setOtp("")
-              return;
-            } else {
-              setDatosConsulta(res?.obj?.Data);
-              const summary = {
-                "Nombre cliente": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
-                // "Numero celular": numCuenta,
-                "C.C. del depositante": userDoc,
-                "Codigo OTP": otp,
-                "Valor de retiro": valor,
-                "Valor cobro": formatMoney.format(
-                  res?.obj?.Data?.numValorCobro
-                ),
-              };
-              setSummary(summary)
-              setShowModal(true);
-            }
+      };
+      fetchConsultaCostoGrupoAval(body)
+        .then((res) => {
+          setIsUploading(false);
+          if (!res?.status) {
+            notifyError(res?.msg);
+            handleClose()
+          } else {
+            setDatosConsulta(res?.obj?.Data);
+            const summary = {
+              "Banco": DataBanco?.nombre,
+              "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
+              "Documento" : userDoc,
+              "Número celular": phone,
+              "Valor retiro": formatMoney.format(valor),
+              "Costo transacción": formatMoney.format(res?.obj?.costoTrx)
+            };
+            setSummary(summary)
+            setShowBTNConsulta(false)
+            setShowModal(true);
+          }
 
-            //notify("Transaccion satisfactoria");
-          })
-          .catch((err) => {
-            setIsUploading(false);
-            console.error(err);
-            notifyError("Error interno en la transaccion");
-          });
-      } else {
-        setIsUploading(false);
-        notifyError(
-          `El valor del retiro debe estar entre ${formatMoney.format(
-            min
-          )} y ${formatMoney.format(max)}`
-        );
-      }
+          //notify("Transaccion satisfactoria");
+        })
+        .catch((err) => {
+          setIsUploading(false);
+          console.error(err);
+          notifyError("No se ha podido conectar al servidor");
+        });
     },
-    [valor, limitesMontos, DataBanco]
+    [valor, DataBanco, roleInfo, tipoCuenta]
   );
 
 
@@ -222,30 +227,62 @@ const Retiro = () => {
 
   const onSubmitModal = useCallback((e) => {
     e.preventDefault();
+    if ( otp.length === 4) {
+    const { min, max } = limitesMontos;
+    if (valor >= min && valor <= max) {
     const summary = {
       "Banco": DataBanco?.nombre,
+      "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
       "Documento" : userDoc,
-      "Numero celular": phone,
-      "Valor cobro": formatMoney.format(valor),
+      "Número celular": phone,
+      "Valor retiro": formatMoney.format(valor),
     };
     setSummary(summary)
     setShowModal(true)
-  }, [banco, userDoc, phone, valor, DataBanco]);
+     }
+    else {
+      setIsUploading(false);
+      notifyError(
+        `El valor del retiro debe estar entre ${(formatMoney.format(
+          min
+        )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
+      );
+    }
+  }
+  else{
+    setIsUploading(false)
+    notifyError("La longitud del otp no es correcta")
+  }
+  }, [userDoc, phone, valor, DataBanco, tipoCuenta, limitesMontos, otp]);
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
     const body = {
-      idComercio: roleInfo?.id_comercio,
-      idUsuario: roleInfo?.id_usuario,
-      idDispositivo: roleInfo?.id_dispositivo,
-      Tipo: roleInfo?.tipo_comercio,
-      numTipoDocumento: tipoDocumento,
-      numNumeroDocumento: userDoc,
-      numValorRetiro: valor,
-      numOtp: otp,
-      valToken: "valToken",
-      direccion: roleInfo?.direccion,
-      cod_dane: roleInfo?.codigo_dane,
+      comercio : {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+
+      oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+      nombre_comercio: roleInfo?.['nombre comercio'],
+      valor_total_trx: valor,
+
+      retiroCuentas: {
+        idBancoAdquiriente: DataBanco?.idBanco,
+        numNumeroDocumento: userDoc,
+        numValorTransaccion: valor,
+        numTipoCuenta: tipoCuenta,
+        numCelular: phone,
+        otp: otpEncrip,
+
+        location: {
+          codDane: roleInfo?.codigo_dane,
+          ciudad: roleInfo?.ciudad,
+          direccion: roleInfo?.direccion,
+
+        }
+      }        
     };
 
     fetchRetiroCorresponsalGrupoAval(body)
@@ -253,14 +290,17 @@ const Retiro = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
-          return;
+          handleClose()
+          // return;
         }
+        else{
         notify("Transaccion satisfactoria");
-        const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
-        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+        const trx_id = parseInt(res?.obj?.respuesta_grupo_aval["11"]) ?? 0;
+        // const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
+        // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Retiro De Cuentas Davivienda",
+          title: "Retiro De Cuentas " + DataBanco?.nombre,
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -275,33 +315,32 @@ const Retiro = () => {
           },
           commerceInfo: [
             ["Id Comercio", roleInfo?.id_comercio],
-            ["No. terminal", ter],
+            ["No. de aprobación", trx_id],
+            // ["No. terminal", ter],
             ["Municipio", roleInfo?.ciudad],
             ["Dirección", roleInfo?.direccion],
             ["Tipo de operación", "Retiro De Cuentas"],
-            ["", ""],
-            ["No. de aprobación", trx_id],
-            ["", ""],
+            ["", ""]            
           ],
           commerceName: roleInfo?.["nombre comercio"]
           ? roleInfo?.["nombre comercio"]
           : "No hay datos",
           trxInfo: [
             [
-              "Tipo",
-              res?.obj?.Data?.numTipoCuenta === "01" ? "Ahorros" : "Corriente",
+              "Tipo de cuenta",
+              tipoCuenta === "01" ? "Ahorros" : "Corriente",
             ],
             ["",""],
-            [
-              "Nro. Cuenta",
-              `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
-            ],
-            ["",""],
+            // [
+            //   "Nro. Cuenta",
+            //   `****${String(numCuenta)?.slice(-4) ?? ""}`,
+            // ],
+            // ["",""],
             ["Valor", formatMoney.format(valor)],
             ["",""],
             [
               "Costo transacción",
-              formatMoney.format(res?.obj?.Data?.numValorCobro),
+              formatMoney.format(res?.obj?.costoTrx),
             ],
             ["",""],
             ["Total", formatMoney.format(valor)],
@@ -319,13 +358,15 @@ const Retiro = () => {
           .catch((err) => {
             console.error(err);
             notifyError("Error guardando el ticket");
-          });
+          });}
       })
       .catch((err) => {
         setIsUploading(false);
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
+    
+
   }, [
     valor,
     userDoc,
@@ -335,6 +376,8 @@ const Retiro = () => {
     ,
     datosConsulta,
     tipoDocumento,
+    otpEncrip,
+    DataBanco
   ]);
 
   return (
@@ -363,16 +406,6 @@ const Retiro = () => {
             }}
             required
           />
-          {/* <Select
-            id='tipoDocumento'
-            label='Tipo de documento'
-            options={optionsDocumento}
-            value={tipoDocumento}
-            onChange={(e) => {
-              setTipoDocumento(e.target.value);
-            }}
-            required
-          /> */}
           <Input
             id='docCliente'
             name='docCliente'
@@ -415,21 +448,22 @@ const Retiro = () => {
           label='Número OTP'
           type='text'
           name='otp'
-          minLength='6'
-          maxLength='6'
+          minLength={'4'}
+          maxLength={'4'}
           autoComplete='off'
-          required
           value={otp}
           onInput={(e, valor) => {
             let num = valor.replace(/[\s\.]/g, "");
             if (!isNaN(valor)) {
               setOtp(num);
             }
-          }}></HideInput>
+          }}
+          required
+          ></HideInput>
           <Input
           id="valor"
           name="valor"
-          label="Valor a depositar"
+          label="Valor a retirar"
           autoComplete="off"
           type="text"
           minLength={"5"}
@@ -441,7 +475,7 @@ const Retiro = () => {
           required
            />
           <ButtonBar className={"lg:col-span-2"}>
-            <Button type={"submit"} disabled={loadingConsultaCostoGrupoAval}>
+            <Button type={"submit"}>
               Continuar
             </Button>
           </ButtonBar>
@@ -450,18 +484,18 @@ const Retiro = () => {
           show={showModal}
           handleClose={
             paymentStatus
-              ? () => {}
+              ? goToRecaudo
               : loadingRetiroCorresponsalGrupoAval
               ? () => {}
               : handleClose
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <PaymentSummary summaryTrx={summary}>
@@ -472,12 +506,16 @@ const Retiro = () => {
                   disabled={loadingRetiroCorresponsalGrupoAval}>
                   Realizar retiro
                 </Button>
+                {showBTNConsulta ? 
                 <Button
-                  type='submit'
-                  onClick={consultaCosto}
-                  disabled={loadingRetiroCorresponsalGrupoAval}>
-                  Consultar costo
-                </Button>
+                type='submit'
+                onClick={consultaCosto}
+                disabled={loadingRetiroCorresponsalGrupoAval}>
+                Consultar costo
+                </Button>                
+                :
+                ""
+                }
                 <Button
                   onClick={handleClose}
                   disabled={loadingRetiroCorresponsalGrupoAval}>
