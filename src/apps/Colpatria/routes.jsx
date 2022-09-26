@@ -30,7 +30,7 @@ const rutasColpatria = {
   subRoutes: [
     {
       link: "/corresponsalia/colpatria/deposito",
-      label: <AppIcons Logo={"RECAUDO"} name={"Deposito"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Depósito"} />,
       component: Deposito,
       permission: [67],
     },
