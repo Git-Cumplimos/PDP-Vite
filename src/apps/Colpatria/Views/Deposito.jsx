@@ -259,7 +259,7 @@ const Deposito = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Depositos Colpatria</h1>
+      <h1 className="text-3xl mt-6">Depósitos Colpatria</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
@@ -316,7 +316,7 @@ const Deposito = () => {
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar deposito</Button>
+          <Button type={"submit"}>Realizar depósito</Button>
         </ButtonBar>
       </Form>
       <Modal

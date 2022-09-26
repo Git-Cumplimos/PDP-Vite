@@ -27,6 +27,7 @@ import {
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { makeMoneyFormatter } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
+import ScreenBlocker from "../../components/ScreenBlocker";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -431,6 +432,7 @@ const VentaPines = () => {
           </Button>
         </ButtonBar>
       </Form>
+      <ScreenBlocker show={loadingInquiry} />
       <Modal
         show={showModal}
         handleClose={paymentStatus || loadingSell ? () => {} : handleClose}

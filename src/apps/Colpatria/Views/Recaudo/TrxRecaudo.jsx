@@ -35,6 +35,7 @@ import {
   // onChangeNumber,
 } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
+import ScreenBlocker from "../../components/ScreenBlocker";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -466,6 +467,7 @@ const TrxRecaudo = () => {
           </Button>
         </ButtonBar>
       </Form>
+      <ScreenBlocker show={loadingInquiry} />
       <Modal
         show={showModal}
         handleClose={paymentStatus || loadingSell ? () => {} : handleClose}
