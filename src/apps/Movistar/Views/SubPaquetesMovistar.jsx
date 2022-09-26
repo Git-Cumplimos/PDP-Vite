@@ -42,7 +42,6 @@ const SubPaquetesMovistar = () => {
   const [dataServiceConsult, setDataServiceConsult] = useState(null);
   const [dataPackage, setDataPackage] = useState(null);
   const [inputData, setInputData] = useState(dataInputInitial);
-  const [invalidCelular, setInvalidCelular] = useState("");
   const [infTicket, setInfTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
@@ -91,14 +90,12 @@ const SubPaquetesMovistar = () => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
 
     if (valueInput[0] != 3) {
-      setInvalidCelular("Número inválido");
       if (valueInput.length == 1 && inputData.celular == "") {
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
+        return;
       }
-    } else {
-      setInvalidCelular("");
     }
 
     setInputData((anterior) => ({
@@ -107,11 +104,7 @@ const SubPaquetesMovistar = () => {
     }));
   }
 
-  const AdquirirPaquete = () => {
-    setTypeInfo("AdquirirPaquete");
-  };
-
-  function onSubmitCheck(e) {
+  function ValidarAntesCompraPaquete(e) {
     e.preventDefault();
     // validar datos
     if (inputData.celular[0] != "3") {
@@ -167,10 +160,10 @@ const SubPaquetesMovistar = () => {
 
   function CompraPaquetesExitosa(result_) {
     const voucher = {
-      title: "Recibo de pago de terceros ",
+      title: "Recibo de compra de paquetes movistar",
       timeInfo: {
-        "Fecha de venta": result_.fecha,
-        Hora: result_.hora,
+        "Fecha de venta": result_.fecha_final_ptopago,
+        Hora: result_.hora_final_ptopago,
       },
       commerceInfo: [
         ["Id Comercio", roleInfo.id_comercio],
@@ -178,9 +171,9 @@ const SubPaquetesMovistar = () => {
         ["Municipio", roleInfo.ciudad],
         ["Dirección", roleInfo.direccion],
         ["Id Trx", result_.pk_trx],
-        ["Id Transacción", result_.id_trx],
+        ["Id Transacción", result_.transaccion_ptopago],
       ],
-      commerceName: "PAGO DE TERCEROS",
+      commerceName: `${tipodeoferta} MOVISTAR`,
       trxInfo: [
         ["Celular", inputData.celular],
         ["", ""],
@@ -191,7 +184,7 @@ const SubPaquetesMovistar = () => {
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
     };
 
-    notify("Pago de terceros exitoso");
+    notify("Compra de paquetes exitosa");
     setInfTicket(voucher);
     setTypeInfo("InfRecibo");
     guardarTicket(result_.id_trx, tipo_operacion, voucher)
@@ -253,31 +246,26 @@ const SubPaquetesMovistar = () => {
         }}
       ></TableEnterprise>
 
-      <Modal show={showModal} handleClose={HandleCloseFirst}>
-        {/******************************Resumen del paquete*******************************************************/}
+      <Modal
+        show={showModal}
+        handleClose={
+          typeInfo == "InfRecibo"
+            ? HandleCloseResRecibo
+            : loadingPeticionCompraPaquetes
+            ? () => {}
+            : HandleCloseFirst
+        }
+      >
+        {/******************************ResumenPaquete*******************************************************/}
         {typeInfo == "ResumenPaquete" && (
-          <PaymentSummary title="Paquete movistar " subtitle="Resumen">
+          <PaymentSummary title="Paquete movistar" subtitle="">
             <label className="whitespace-pre-line">
               {dataPackage?.descripciondelaoferta}
             </label>
-            <ButtonBar>
-              <Button onClick={AdquirirPaquete}>Comprar</Button>
-              <Button onClick={HandleCloseFirst}>Cancelar</Button>
-            </ButtonBar>
-          </PaymentSummary>
-        )}
-        {/******************************Resumen del paquete*******************************************************/}
-
-        {/******************************Adquirir del paquete*******************************************************/}
-        {typeInfo == "AdquirirPaquete" && (
-          <PaymentSummary
-            title="Ingresar el número de celular"
-            subtitle=""
-            summaryTrx={{
-              Valor: formatMoney.format(dataPackage.valordelaoferta),
-            }}
-          >
-            <Form onChange={onChangeInput} onSubmit={onSubmitCheck}>
+            <label>
+              {`Valor: ${formatMoney.format(dataPackage.valordelaoferta)}`}
+            </label>
+            <Form onChange={onChangeInput}>
               <Input
                 name="celular"
                 label="Número de celular"
@@ -285,18 +273,14 @@ const SubPaquetesMovistar = () => {
                 autoComplete="off"
                 minLength={"10"}
                 maxLength={"10"}
-                invalid={invalidCelular}
                 value={inputData.celular}
                 required
               />
-              <br></br>
-              <ButtonBar>
-                <Button type={"submit"} onClick={ComprarPaquete}>
-                  Comprar
-                </Button>
-                <Button onClick={HandleCloseFirst}>Cancelar</Button>
-              </ButtonBar>
             </Form>
+            <ButtonBar>
+              <Button onClick={ValidarAntesCompraPaquete}>Comprar</Button>
+              <Button onClick={HandleCloseFirst}>Cancelar</Button>
+            </ButtonBar>
           </PaymentSummary>
         )}
         {/******************************Adquirir del paquete*******************************************************/}
