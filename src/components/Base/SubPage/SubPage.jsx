@@ -4,7 +4,7 @@ import Button from "../Button";
 const SubPage = ({ label, children }) => {
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col md:flex-row justify-evenly w-full">
+    <div className="flex flex-col md:flex-row justify-evenly w-full gap-4">
       <div className="flex flex-col mr-4">
         <div className="hidden md:block">{label}</div>
         <div>
@@ -13,7 +13,7 @@ const SubPage = ({ label, children }) => {
           </Button>
         </div>
       </div>
-      <div className="grid grid-flow-row place-items-center flex-1">
+      <div className="grid grid-flow-row place-items-center flex-1 gap-4">
         {children}
       </div>
     </div>
