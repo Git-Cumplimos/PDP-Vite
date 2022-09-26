@@ -13,6 +13,7 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import { formatMoney } from "../../../components/Base/MoneyInput";
+import Select from "../../../components/Base/Select";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
@@ -26,8 +27,13 @@ import {
   msgCustomBackend,
 } from "../utils/fetchPaquetesMovistar";
 
-const dataInputInitial = {
+const inputDataInitial = {
   celular: "",
+};
+const inputDataInitialSearch = {
+  tipodeoferta: null,
+  tipodebusqueda: null,
+  busqueda: null,
 };
 const tipo_operacion = 104;
 const url_get_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/paquetes`;
@@ -41,7 +47,10 @@ const SubPaquetesMovistar = () => {
   const [pageData, setPageData] = useState(1);
   const [dataServiceConsult, setDataServiceConsult] = useState(null);
   const [dataPackage, setDataPackage] = useState(null);
-  const [inputData, setInputData] = useState(dataInputInitial);
+  const [inputData, setInputData] = useState(inputDataInitial);
+  const [inputDataSearch, setInputDataSearch] = useState(
+    inputDataInitialSearch
+  );
   const [infTicket, setInfTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
@@ -56,13 +65,26 @@ const SubPaquetesMovistar = () => {
     let arrayParamts = [];
     if (urlLocation == "/movistar/paquetes-movistar/combo") {
       arrayParamts.push("tipodeoferta=combo");
-      setTipodeoferta("COMBOS");
+      setTipodeoferta("Combos");
     } else if (urlLocation == "/movistar/paquetes-movistar/paquete-voz") {
       arrayParamts.push("tipodeoferta=paquetedevoz");
-      setTipodeoferta("PAQUETES DE VOZ");
+      setTipodeoferta("Paquetes de voz");
     } else if (urlLocation == "/movistar/paquetes-movistar/paquete-datos") {
       arrayParamts.push("tipodeoferta=paquetededatos");
-      setTipodeoferta("PAQUETES DE DATOS");
+      setTipodeoferta("Paquetes de datos");
+    } else if (urlLocation == "/movistar/paquetes-movistar/prepagada") {
+      arrayParamts.push("tipodeoferta=prepagada");
+      setTipodeoferta("Prepagada");
+    }
+
+    if (inputDataSearch.tipodebusqueda == "codigodelaoferta") {
+      if (inputDataSearch.busqueda != null) {
+        arrayParamts.push(`codigodelaoferta=${inputDataSearch.busqueda}`);
+      }
+    } else if (inputDataSearch.tipodebusqueda == "descripcioncorta") {
+      if (inputDataSearch.busqueda != null) {
+        arrayParamts.push(`descripcioncorta=${inputDataSearch.busqueda}`);
+      }
     }
 
     arrayParamts.push(`page=${pageData}&limit=${limit}`);
@@ -72,6 +94,7 @@ const SubPaquetesMovistar = () => {
       .then((response) => {
         if (response?.status == true) {
           setDataServiceConsult(response?.obj?.result?.results);
+          setMaxPage(response?.obj?.result?.maxPages);
         }
       })
       .catch((error) => {
@@ -84,7 +107,7 @@ const SubPaquetesMovistar = () => {
           notifyError("consulta paquetes no exitoso");
         }
       });
-  }, [urlLocation, pageData, limit]);
+  }, [urlLocation, pageData, limit, inputDataSearch]);
 
   function onChangeInput(e) {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
@@ -176,9 +199,10 @@ const SubPaquetesMovistar = () => {
       commerceName: `${tipodeoferta} MOVISTAR`,
       trxInfo: [
         ["Celular", inputData.celular],
-        ["", ""],
         ["Valor", formatMoney.format(dataPackage.valordelaoferta)],
+        ["Código paquete", dataPackage.codigodelaoferta],
         ["", ""],
+        ["Descripción corta", dataPackage.descripcioncorta],
       ],
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
@@ -205,13 +229,13 @@ const SubPaquetesMovistar = () => {
     setTypeInfo("Ninguno");
     setShowModal(false);
     setDataPackage(null);
-    setInputData(dataInputInitial);
+    setInputData(inputDataInitial);
   }, []);
 
   const HandleCloseResRecibo = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);
-    setInputData(dataInputInitial);
+    setInputData(inputDataInitial);
     navigateValid("/movistar/paquetes-movistar");
   }, []);
 
@@ -244,7 +268,37 @@ const SubPaquetesMovistar = () => {
           setPageData(pagedata.page);
           setLimit(pagedata.limit);
         }}
-      ></TableEnterprise>
+      >
+        <Select
+          name="tipodebusqueda"
+          label="Tipo de búsqueda"
+          options={{
+            "": "",
+            "Descripción corta": "descripcioncorta",
+            "Código Paquete": "codigodelaoferta",
+          }}
+          // value={paramts.filtro}
+          onChange={(e) => {
+            setInputDataSearch((anterior) => ({
+              ...anterior,
+              [e.target.name]: e.target.value,
+            }));
+          }}
+        />
+        <Input
+          name="busqueda"
+          label="Buscar"
+          type="text"
+          autoComplete="off"
+          // value={paramts.fechafinal}
+          onChange={(e) => {
+            setInputDataSearch((anterior) => ({
+              ...anterior,
+              [e.target.name]: e.target.value,
+            }));
+          }}
+        />
+      </TableEnterprise>
 
       <Modal
         show={showModal}
@@ -258,7 +312,7 @@ const SubPaquetesMovistar = () => {
       >
         {/******************************ResumenPaquete*******************************************************/}
         {typeInfo == "ResumenPaquete" && (
-          <PaymentSummary title="Paquete movistar" subtitle="">
+          <PaymentSummary title="Paquete Movistar" subtitle={tipodeoferta}>
             <label className="whitespace-pre-line">
               {dataPackage?.descripciondelaoferta}
             </label>
@@ -288,12 +342,12 @@ const SubPaquetesMovistar = () => {
         {/******************************Resumen de trx*******************************************************/}
         {typeInfo == "ResumenTrx" && (
           <PaymentSummary
-            title="¿Está seguro de realizar la transaccion?"
+            title="¿Está seguro de realizar la transacción?"
             subtitle="Resumen de transacción"
             summaryTrx={{
-              celular: inputData.celular,
+              Celular: inputData.celular,
               Valor: formatMoney.format(dataPackage.valordelaoferta),
-              "Tipo de Oferta": dataPackage.tipodeoferta,
+              "Tipo de Oferta": tipodeoferta,
               "Descripción Corta": dataPackage.descripcioncorta,
               "Código de la Oferta": dataPackage.codigodelaoferta,
             }}
