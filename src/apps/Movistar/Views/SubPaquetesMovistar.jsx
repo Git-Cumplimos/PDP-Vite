@@ -340,7 +340,7 @@ const SubPaquetesMovistar = () => {
             <label>
               {`Valor: ${formatMoney.format(dataPackage.valordelaoferta)}`}
             </label>
-            <Form onChange={onChangeInput}>
+            <Form onChange={onChangeInput} onSubmit={ValidarAntesCompraPaquete}>
               <Input
                 name="celular"
                 label="Número de celular"
@@ -351,11 +351,11 @@ const SubPaquetesMovistar = () => {
                 value={inputData.celular}
                 required
               />
+              <ButtonBar>
+                <Button type={"submit"}>Comprar</Button>
+                <Button onClick={HandleCloseFirst}>Cancelar</Button>
+              </ButtonBar>
             </Form>
-            <ButtonBar>
-              <Button onClick={ValidarAntesCompraPaquete}>Comprar</Button>
-              <Button onClick={HandleCloseFirst}>Cancelar</Button>
-            </ButtonBar>
           </PaymentSummary>
         )}
         {/******************************Adquirir del paquete*******************************************************/}
