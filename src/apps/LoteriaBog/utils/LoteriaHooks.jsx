@@ -256,7 +256,7 @@ export const useProvideLoteria = () => {
           loteria: sort[2],
           num_loteria: num,
           serie: ser,
-          sorteo: parseInt(sort[0]),
+          sorteo: sort[0],
           numero: page,
           fisico: fisico,
         },
@@ -290,7 +290,7 @@ export const useProvideLoteria = () => {
             loteria: sort[2],
             num_loteria: num,
             serie: ser,
-            sorteo: parseInt(sort[0]),
+            sorteo: sort[0],
             numero: page,
             fisico: fisico,
             cod_distribuidor: codigosOficina?.cod_oficina_lot,
@@ -319,7 +319,7 @@ export const useProvideLoteria = () => {
 
       console.log(roleInfo);
       const req = {
-        num_sorteo: parseInt(sort[0]),
+        num_sorteo: sort[0],
         num_billete: `${selected.Num_billete}`,
         serie: `${selected.serie}`,
         val_pago:
@@ -361,7 +361,7 @@ export const useProvideLoteria = () => {
       }
       console.log(selecFrac);
       const req = {
-        num_sorteo: parseInt(sort[0]),
+        num_sorteo: sort[0],
         num_billete: `${selected.Num_billete}`,
         serie: `${selected.serie}`,
         val_pago:
