@@ -13,7 +13,6 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import { formatMoney } from "../../../components/Base/MoneyInput";
-import Select from "../../../components/Base/Select";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
@@ -21,6 +20,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetch } from "../../../hooks/useFetch";
 import { notify, notifyError } from "../../../utils/notify";
 import {
+  fetchCompraPaquetes,
   fetchCustom,
   ErrorCustom,
   ErrorCustomBackend,
@@ -32,12 +32,11 @@ const inputDataInitial = {
 };
 const inputDataInitialSearch = {
   tipodeoferta: null,
-  tipodebusqueda: null,
-  busqueda: null,
+  codigodelaoferta: "",
+  descripcioncorta: "",
 };
 const tipo_operacion = 104;
 const url_get_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/paquetes`;
-const url_compra_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/comprar`;
 
 const SubPaquetesMovistar = () => {
   const { pathname: urlLocation } = useLocation(); //Hook para averiguar en que URL est
@@ -59,7 +58,7 @@ const SubPaquetesMovistar = () => {
   const [loadingPeticionGetPaquetes, PeticionGetPaquetes] =
     useFetch(fetchCustom);
   const [loadingPeticionCompraPaquetes, PeticionCompraPaquetes] =
-    useFetch(fetchCustom);
+    useFetch(fetchCompraPaquetes);
 
   useEffect(() => {
     let arrayParamts = [];
@@ -77,14 +76,11 @@ const SubPaquetesMovistar = () => {
       setTipodeoferta("Prepagada");
     }
 
-    if (inputDataSearch.tipodebusqueda == "codigodelaoferta") {
-      if (inputDataSearch.busqueda != null) {
-        arrayParamts.push(`codigodelaoferta=${inputDataSearch.busqueda}`);
-      }
-    } else if (inputDataSearch.tipodebusqueda == "descripcioncorta") {
-      if (inputDataSearch.busqueda != null) {
-        arrayParamts.push(`descripcioncorta=${inputDataSearch.busqueda}`);
-      }
+    if (inputDataSearch.codigodelaoferta != "") {
+      arrayParamts.push(`codigodelaoferta=${inputDataSearch.codigodelaoferta}`);
+    }
+    if (inputDataSearch.descripcioncorta != "") {
+      arrayParamts.push(`descripcioncorta=${inputDataSearch.descripcioncorta}`);
     }
 
     arrayParamts.push(`page=${pageData}&limit=${limit}`);
@@ -157,26 +153,53 @@ const SubPaquetesMovistar = () => {
       codigodelaoferta: parseInt(dataPackage.codigodelaoferta),
     };
 
-    PeticionCompraPaquetes(
-      url_compra_paquetes,
-      "POST",
-      "/compra-paquetes/comprar",
-      data
-    )
+    PeticionCompraPaquetes(data)
       .then((response) => {
+        const response_obj = response?.obj;
+        const result = response_obj?.result;
         if (response?.status == true) {
           CompraPaquetesExitosa(response?.obj?.result);
+        } else {
+          HandleCloseFirst();
+          switch (response_obj?.identificador) {
+            case "00":
+              notifyError(
+                "Compra de paquete no exitosa, datos de entrada al servicio erróneos (Error:00)"
+              );
+              break;
+            case "01":
+              notifyError(
+                "Compra de paquete no exitosa, el servicio transaccional se encuentra caído (Error:01)"
+              );
+              break;
+            case "02":
+              notify("No tiene cupo");
+              break;
+            case "03":
+              notifyError(
+                "Compra de paquete no exitosa, error con la conexión inicial a la base de datos (Error:03)"
+              );
+              break;
+            case "04":
+              notifyError(
+                "Compra de paquete no exitosa, error con la trama enviada  (Error:04)]"
+              );
+              break;
+            case "06":
+              notifyError(
+                "Compra de paquete no exitosa, error con la conexión (Error:06)]"
+              );
+              break;
+            case "11":
+              notifyError(result.descripcion_codigo_error);
+              break;
+            default:
+              break;
+          }
         }
       })
       .catch((error) => {
-        if (error instanceof ErrorCustom) {
-        } else if (error instanceof ErrorCustomBackend) {
-          notifyError(`Pago de terceros no exitoso: ${error.message}`);
-        } else if (error instanceof msgCustomBackend) {
-          notify(`${error.message}`);
-        } else {
-          notifyError("Pago de terceros no exitoso");
-        }
+        notifyError("Falla en el sistema >> " + error);
         HandleCloseFirst();
       });
   };
@@ -202,7 +225,7 @@ const SubPaquetesMovistar = () => {
         ["Valor", formatMoney.format(dataPackage.valordelaoferta)],
         ["Código paquete", dataPackage.codigodelaoferta],
         ["", ""],
-        ["Descripción corta", dataPackage.descripcioncorta],
+        ["Descripción", dataPackage.descripcioncorta],
       ],
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
@@ -211,7 +234,7 @@ const SubPaquetesMovistar = () => {
     notify("Compra de paquetes exitosa");
     setInfTicket(voucher);
     setTypeInfo("InfRecibo");
-    guardarTicket(result_.id_trx, tipo_operacion, voucher)
+    guardarTicket(result_.transaccion_ptopago, tipo_operacion, voucher)
       .then((resTicket) => {
         console.log("Ticket guardado exitosamente");
       })
@@ -269,15 +292,12 @@ const SubPaquetesMovistar = () => {
           setLimit(pagedata.limit);
         }}
       >
-        <Select
-          name="tipodebusqueda"
-          label="Tipo de búsqueda"
-          options={{
-            "": "",
-            "Descripción corta": "descripcioncorta",
-            "Código Paquete": "codigodelaoferta",
-          }}
-          // value={paramts.filtro}
+        <Input
+          name="codigodelaoferta"
+          label="Código de la oferta"
+          type="text"
+          autoComplete="off"
+          value={inputDataSearch.codigodelaoferta}
           onChange={(e) => {
             setInputDataSearch((anterior) => ({
               ...anterior,
@@ -285,12 +305,13 @@ const SubPaquetesMovistar = () => {
             }));
           }}
         />
+
         <Input
-          name="busqueda"
-          label="Buscar"
+          name="descripcioncorta"
+          label="Descripción"
           type="text"
           autoComplete="off"
-          // value={paramts.fechafinal}
+          value={inputDataSearch.descripcioncorta}
           onChange={(e) => {
             setInputDataSearch((anterior) => ({
               ...anterior,

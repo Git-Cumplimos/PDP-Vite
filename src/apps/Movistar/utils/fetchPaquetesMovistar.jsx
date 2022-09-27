@@ -1,6 +1,23 @@
 import fetchData from "../../../utils/fetchData";
 import { notifyError } from "../../../utils/notify";
 import { Auth } from "@aws-amplify/auth";
+const url_compra_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/comprar`;
+
+export const fetchCompraPaquetes = async (data_) => {
+  try {
+    const Peticion = await fetchData(url_compra_paquetes, "POST", {}, data_);
+    console.log(Peticion);
+    if ((Peticion.status != undefined) == false) {
+      // Api getwey
+      notifyError(
+        "Error con fetch, timed out con el servicio de compra de paquetes"
+      );
+    }
+    return Peticion;
+  } catch (error) {
+    throw "Error con fetch - no conecta con el servicio de compra de paquetes";
+  }
+};
 
 export const fetchCustom = async (url_, metodo_, name_, data_ = {}) => {
   let Peticion;
