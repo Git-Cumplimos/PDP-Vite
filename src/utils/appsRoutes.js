@@ -1220,6 +1220,12 @@ const allUrlsPrivateApps = [
             component: SubPaquetesMovistar,
             permission: [65],
           },
+          {
+            link: "/movistar/paquetes-movistar/prepagada",
+            label: <AppIcons Logo={"SORTEOS"} name="Prepagada" />,
+            component: SubPaquetesMovistar,
+            permission: [65],
+          },
         ],
       },
       {

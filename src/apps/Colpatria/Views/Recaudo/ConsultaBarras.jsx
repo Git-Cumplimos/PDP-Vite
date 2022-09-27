@@ -113,6 +113,10 @@ const ConsultaBarras = () => {
           // }}
           className={"place-self-stretch w-full"}
           onKeyDown={(ev) => {
+            if (ev.keyCode === 13 && ev.shiftKey === false) {
+              searchCodigo(ev);
+              return;
+            }
             if (ev.altKey) {
               if (ev.keyCode !== 18) {
                 isAlt.current += ev.key;
