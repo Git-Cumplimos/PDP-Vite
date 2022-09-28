@@ -450,7 +450,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 20000000],
+    limits: [0, 9900000],
     decimalDigits: 2,
   });
   const printDiv = useRef();
