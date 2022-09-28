@@ -82,15 +82,15 @@ const TrxRecaudo = () => {
     () => ({
       ...Object.fromEntries(
         Object.entries(userReferences).map(([, val], index) => [
-          `Referencia ${index + 1}`,
+          datosConvenio[`referencia_${index + 1}`],
           val,
         ])
       ),
-      "Valor de deposito": formatMoney.format(valTrxRecaudo),
+      "Valor": formatMoney.format(valTrxRecaudo),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
-    [userReferences, valTrxRecaudo]
+    [userReferences, datosConvenio, valTrxRecaudo]
   );
 
   const handleClose = useCallback(() => {
@@ -141,7 +141,7 @@ const TrxRecaudo = () => {
         {
           render: ({ data: error }) => {
             setLoadingInquiry(false);
-            navigate("/corresponsalia/colpatria");
+            navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
               return error?.message;
             }
@@ -252,7 +252,7 @@ const TrxRecaudo = () => {
         {
           render: ({ data: error }) => {
             setLoadingSell(false);
-            navigate("/corresponsalia/colpatria");
+            navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
               return error?.message;
             }
