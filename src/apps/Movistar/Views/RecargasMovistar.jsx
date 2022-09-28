@@ -13,10 +13,7 @@ import { formatMoney } from "../../../components/Base/MoneyInput";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetch } from "../../../hooks/useFetch";
 import { notify, notifyError } from "../../../utils/notify";
-import {
-  PeticionRecarga,
-  PeticionConciliacionCargar,
-} from "../utils/fetchMovistar";
+import { PeticionRecarga } from "../utils/fetchMovistar";
 
 const minValor = 1000;
 const maxValor = 100000;

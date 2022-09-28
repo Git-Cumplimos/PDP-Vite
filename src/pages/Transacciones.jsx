@@ -290,7 +290,8 @@ const Transacciones = () => {
             </ButtonBar>
           </div>
         ) : selected?.ticket && JSON.stringify(selected?.ticket) !== '{}' &&  selected?.id_tipo_transaccion === 43 ? (
-          <div ref={printDiv} div className='flex flex-col justify-center items-center'>
+          <div className='flex flex-col justify-center items-center'>
+          <div ref={printDiv}>
           {selected?.ticket?.ticket2 ?
           <>
           <Tickets
@@ -313,8 +314,8 @@ const Transacciones = () => {
           type='Reimpresión'
           stateTrx={selected?.status_trx}
           />          
-          }
-          
+          }   
+          </div>       
           <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={() => closeModal()}>Cerrar</Button>
