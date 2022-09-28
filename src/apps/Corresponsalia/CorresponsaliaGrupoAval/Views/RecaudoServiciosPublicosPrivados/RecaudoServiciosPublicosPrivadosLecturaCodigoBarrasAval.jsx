@@ -343,6 +343,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
               autoComplete='off'
               onInput={onChangeFormat}
               onKeyDown={(ev) => {
+                console.log(ev);
                 if (ev.keyCode === 13 && ev.shiftKey === false) {
                   // ev.preventDefault();
                   onSubmit(ev);
