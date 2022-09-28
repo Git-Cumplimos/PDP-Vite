@@ -1240,7 +1240,7 @@ const allUrlsPrivateApps = [
               <AppIcons Logo={"SORTEOS"} name="Cargar paquetes de movistar" />
             ),
             component: CargarPaquetesMovistar,
-            permission: [66],
+            permission: [66], //66
           },
           {
             link: "/movistar/operador-pdp/concilacion",
