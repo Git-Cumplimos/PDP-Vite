@@ -76,7 +76,7 @@ const VentaPines = () => {
           val,
         ])
       ),
-      "Valor de deposito": formatMoney.format(valVentaPines),
+      "Valor": formatMoney.format(valVentaPines),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
@@ -131,7 +131,7 @@ const VentaPines = () => {
         {
           render: ({ data: error }) => {
             setLoadingInquiry(false);
-            navigate("/corresponsalia/colpatria");
+            navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
               return error?.message;
             }
@@ -141,7 +141,14 @@ const VentaPines = () => {
         }
       );
     },
-    [datosConvenio, userReferences, userAddress, valVentaPines, roleInfo, navigate]
+    [
+      datosConvenio,
+      userReferences,
+      userAddress,
+      valVentaPines,
+      roleInfo,
+      navigate,
+    ]
   );
 
   const onMakePayment = useCallback(
@@ -220,7 +227,8 @@ const VentaPines = () => {
                 return list;
               }, []),
               /* ["", ""] */
-              disclamer: "Para cualquier reclamo es indispensable presentar este recibo o comuníquese a los Tel. en Bogotá 7561616 o gratis en el resto del país 018000-522222.",
+              disclamer:
+                "Para cualquier reclamo es indispensable presentar este recibo o comuníquese a los Tel. en Bogotá 7561616 o gratis en el resto del país 018000-522222.",
             };
             setPaymentStatus(tempTicket);
             infoTicket(trx_id, id_type_trx, tempTicket)
@@ -237,7 +245,7 @@ const VentaPines = () => {
         {
           render: ({ data: error }) => {
             setLoadingSell(false);
-            navigate("/corresponsalia/colpatria");
+            navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
               return error?.message;
             }
@@ -451,7 +459,9 @@ const VentaPines = () => {
             <Tickets refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/corresponsalia/colpatria")}>Cerrar</Button>
+              <Button onClick={() => navigate("/corresponsalia/colpatria")}>
+                Cerrar
+              </Button>
             </ButtonBar>
           </div>
         ) : (
