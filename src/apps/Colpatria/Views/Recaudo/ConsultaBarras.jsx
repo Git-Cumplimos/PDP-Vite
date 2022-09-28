@@ -14,52 +14,55 @@ const ConsultaBarras = () => {
 
   const [searchingData, setSearchingData] = useState(false);
 
-  const searchCodigo = useCallback((ev) => {
-    ev.preventDefault();
-    const formData = new FormData(ev.target);
-    notifyPending(
-      searchConveniosRecaudoBarras(Object.fromEntries(formData)),
-      {
-        render: () => {
-          setSearchingData(true);
-          return "Buscando informacion";
+  const searchCodigo = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      const formData = new FormData(ev.target);
+      notifyPending(
+        searchConveniosRecaudoBarras(Object.fromEntries(formData)),
+        {
+          render: () => {
+            setSearchingData(true);
+            return "Buscando informacion";
+          },
         },
-      },
-      {
-        render: ({ data: res }) => {
-          setSearchingData(false);
-          console.log(res?.obj);
+        {
+          render: ({ data: res }) => {
+            setSearchingData(false);
+            console.log(res?.obj);
 
-          const refs = Object.fromEntries(
-            Object.entries(res?.obj?.barcode ?? {}).filter(([key]) =>
-              key.includes("referencia_")
-            )
-          );
+            const refs = Object.fromEntries(
+              Object.entries(res?.obj?.barcode ?? {}).filter(([key]) =>
+                key.includes("referencia_")
+              )
+            );
 
-          const builderSP = new URLSearchParams();
-          builderSP.append("refs", JSON.stringify(refs));
-          builderSP.append("valor", res?.obj?.barcode?.valor ?? "0");
+            const builderSP = new URLSearchParams();
+            builderSP.append("refs", JSON.stringify(refs));
+            builderSP.append("valor", res?.obj?.barcode?.valor ?? "0");
 
-          const pk_codigo_convenio =
-            res?.obj?.convenio?.pk_codigo_convenio ?? "";
-          navigate(
-            `/corresponsalia/colpatria/recaudo/${pk_codigo_convenio}?${builderSP.toString()}`
-          );
-          return "Consulta exitosa";
+            const pk_codigo_convenio =
+              res?.obj?.convenio?.pk_codigo_convenio ?? "";
+            navigate(
+              `/corresponsalia/colpatria/recaudo/${pk_codigo_convenio}?${builderSP.toString()}`
+            );
+            return "Consulta exitosa";
+          },
         },
-      },
-      {
-        render: ({ data: error }) => {
-          setSearchingData(false);
-          if (error?.cause === "custom") {
-            return error?.message;
-          }
-          console.error(error?.message);
-          return "Consulta fallida";
-        },
-      }
-    );
-  }, [navigate]);
+        {
+          render: ({ data: error }) => {
+            setSearchingData(false);
+            if (error?.cause === "custom") {
+              return error?.message;
+            }
+            console.error(error?.message);
+            return "Consulta fallida";
+          },
+        }
+      );
+    },
+    [navigate]
+  );
   const isAlt = useRef("");
 
   /**
@@ -113,6 +116,14 @@ const ConsultaBarras = () => {
           // }}
           className={"place-self-stretch w-full"}
           onKeyDown={(ev) => {
+            if (ev.keyCode === 13 && ev.shiftKey === false) {
+              searchCodigo(ev);
+              return;
+            }
+            if (ev.keyCode === 8 && ev.shiftKey === false) {
+              ev.preventDefault();
+              return;
+            }
             if (ev.altKey) {
               if (ev.keyCode !== 18) {
                 isAlt.current += ev.key;
@@ -124,15 +135,19 @@ const ConsultaBarras = () => {
               let value = String.fromCharCode(parseInt(isAlt.current));
               isAlt.current = "";
               if (value === "\u001d") {
-                ev.target.value += "\u001d"
+                ev.target.value += "\u001d";
               }
             }
           }}
           required
         />
         <ButtonBar className="lg:col-span-2">
-          <Button type="submit" disabled={searchingData}>
-            Consultar código de barras
+          <Button
+            type="button"
+            disabled={searchingData}
+            onClick={(ev) => ev.target.form.reset()}
+          >
+            Volver a ingresar código de barras
           </Button>
         </ButtonBar>
       </Form>

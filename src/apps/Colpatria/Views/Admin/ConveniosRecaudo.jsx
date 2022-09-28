@@ -317,7 +317,7 @@ const ConveniosRecaudo = () => {
           name={"nombre_convenio"}
           type="text"
           autoComplete="off"
-          maxLength={"50"}
+          maxLength={"30"}
           defaultValue={selected?.nombre_convenio ?? ""}
           required
         />
@@ -396,7 +396,7 @@ const ConveniosRecaudo = () => {
                 name={"nombre_convenio"}
                 type="text"
                 autoComplete="off"
-                maxLength={"50"}
+                maxLength={"30"}
                 defaultValue={selected?.nombre_convenio ?? ""}
                 required
               />

@@ -33,7 +33,7 @@ import fetchData from "../../../utils/fetchData";
 const accountTypes = {
   10: "Cuenta ahorros",
   20: "Cuenta corriente",
-  30: "Cuenta de credito",
+  30: "Cuenta de crédito",
 };
 
 const formatMoney = makeMoneyFormatter(2);
@@ -176,6 +176,7 @@ const Deposito = () => {
         {
           render({data: err}) {
             setLoadingDeposit(false);
+            navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
               return err?.message;
             }
@@ -193,6 +194,7 @@ const Deposito = () => {
       valDeposito,
       roleInfo,
       infoTicket,
+      navigate,
     ]
   );
 
@@ -259,7 +261,7 @@ const Deposito = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Depositos Colpatria</h1>
+      <h1 className="text-3xl mt-6">Depósitos Colpatria</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
@@ -316,7 +318,7 @@ const Deposito = () => {
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar deposito</Button>
+          <Button type={"submit"}>Realizar depósito</Button>
         </ButtonBar>
       </Form>
       <Modal

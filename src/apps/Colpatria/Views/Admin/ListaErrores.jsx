@@ -37,8 +37,8 @@ const ListaErrores = () => {
         title="Lista de errores"
         headers={[
           "Id error",
-          "Codigo de error",
-          "Codigo de error base 64",
+          "Código de error",
+          "Código de error base 64",
           "Mensaje de error",
         ]}
         data={listaErrores.map(

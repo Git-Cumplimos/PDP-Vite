@@ -351,7 +351,7 @@ const Retiro = () => {
           disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
         };
         setPaymentStatus(tempTicket);
-        infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
+        infoTicket(trx_id, res?.obj?.tipo_trx, tempTicket) ////////////////////////////////////
           .then((resTicket) => {
             console.log(resTicket);
           })

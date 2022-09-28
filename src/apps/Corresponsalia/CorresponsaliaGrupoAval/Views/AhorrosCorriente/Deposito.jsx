@@ -324,7 +324,7 @@ const Deposito = () => {
           disclamer: `Corresponsal bancario para ${DataBanco?.nombre}. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652 Opción X`,
         };
         setPaymentStatus(tempTicket);
-        infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
+        infoTicket(trx_id, res?.obj?.tipo_trx, tempTicket) ////////////////////////////////////
           .then((resTicket) => {
             console.log(resTicket);
           })

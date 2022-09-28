@@ -1220,6 +1220,12 @@ const allUrlsPrivateApps = [
             component: SubPaquetesMovistar,
             permission: [65],
           },
+          {
+            link: "/movistar/paquetes-movistar/prepagada",
+            label: <AppIcons Logo={"SORTEOS"} name="Prepagada" />,
+            component: SubPaquetesMovistar,
+            permission: [65],
+          },
         ],
       },
       {
@@ -1234,7 +1240,7 @@ const allUrlsPrivateApps = [
               <AppIcons Logo={"SORTEOS"} name="Cargar paquetes de movistar" />
             ),
             component: CargarPaquetesMovistar,
-            permission: [66],
+            permission: [66], //66
           },
           {
             link: "/movistar/operador-pdp/concilacion",

@@ -1,63 +1,45 @@
-import { Fragment, useCallback, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { Navigate } from "react-router-dom";
-import Form from "../../../../components/Base/Form";
-import InputSuggestions from "../../../../components/Base/InputSuggestions";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+
+import Input from "../../../../components/Base/Input";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { useAuth } from "../../../../hooks/AuthHooks";
+import { onChangeNumber } from "../../../../utils/functions";
 import { notifyError } from "../../../../utils/notify";
-import { searchConveniosPinesList } from "../../utils/fetchFunctions";
+import { getConveniosPinesList } from "../../utils/fetchFunctions";
 
 const ConsultaPines = () => {
+  const navigate = useNavigate();
   const { roleInfo } = useAuth();
 
-  const [foundConv, setFoundConv] = useState([]);
+  const [listaConveniosPines, setListaConveniosPines] = useState([]);
+  const [maxPages, setMaxPages] = useState(0);
+  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [searchFilters, setSearchFilters] = useState({
+    pk_codigo_convenio: "",
+    codigo_pin: "",
+    nombre_convenio: "",
+    activo: true,
+  });
 
-  const mapSuggestions = useMemo(() => {
-    return foundConv.map(
-      ({ pk_codigo_convenio, codigo_pin, nombre_convenio }) => {
-        return (
-          <Link to={`/corresponsalia/colpatria/pines/${pk_codigo_convenio}`}>
-            <div className="grid grid-cols-1 place-items-center px-4 py-2">
-              <h1 className="text-sm">
-                {pk_codigo_convenio} &nbsp;&nbsp;|&nbsp;&nbsp; {codigo_pin}
-              </h1>
-              <h1 className="text-base">{nombre_convenio}</h1>
-            </div>
-          </Link>
-        );
-      }
-    );
-  }, [foundConv]);
-
-  const searchConvenios = useCallback((e) => {
-    const _consulta = e.target.value;
-    if (_consulta.length > 1) {
-      searchConveniosPinesList({
-        consulta: _consulta,
-        limit: 5,
+  const getConvPines = useCallback(() => {
+    getConveniosPinesList({ ...pageData, ...searchFilters })
+      .then((res) => {
+        setListaConveniosPines(res?.obj?.results ?? []);
+        setMaxPages(res?.obj?.maxPages ?? []);
       })
-        .then((res) => {
-          if (Array.isArray(res?.obj)) {
-            setFoundConv(res?.obj);
-            if (res?.obj.length === 0) {
-              notifyError("No se encontraron datos de convenio");
-            }
-            return;
-          }
-          throw new Error("Objeto recibido erroneo");
-        })
-        .catch((error) => {
-          if (error?.cause === "custom") {
-            notifyError(error?.message);
-            return;
-          }
-          console.error(error?.message);
-          notifyError("Busqueda fallida");
-        });
-    } else {
-      setFoundConv([]);
-    }
-  }, []);
+      .catch((err) => {
+        if (err?.cause === "custom") {
+          notifyError(err?.message);
+          return;
+        }
+        console.error(err?.message);
+      });
+  }, [pageData, searchFilters]);
+
+  useEffect(() => {
+    getConvPines();
+  }, [getConvPines]);
 
   /**
    * Check if has commerce data
@@ -94,24 +76,68 @@ const ConsultaPines = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Consulta de Pines de Recaudo</h1>
-      <Form
-        onSubmit={(ev) => {
-          ev.preventDefault();
-        }}
+      <TableEnterprise
+        title="Convenios de pines"
+        headers={["Código convenio", "Código pin", "Nombre convenio"]}
+        data={listaConveniosPines.map(
+          ({
+            pk_codigo_convenio,
+            codigo_pin,
+            nombre_convenio,
+          }) => ({
+            pk_codigo_convenio,
+            codigo_pin,
+            nombre_convenio,
+          })
+        )}
+        maxPage={maxPages}
+        onSetPageData={setPageData}
+        onSelectRow={(e, i) =>
+          navigate(
+            `/corresponsalia/colpatria/pines/${listaConveniosPines[i]?.pk_codigo_convenio}`
+          )
+        }
+        onChange={(ev) =>
+          setSearchFilters((old) => ({
+            ...old,
+            [ev.target.name]: ev.target.value,
+          }))
+        }
       >
-        <InputSuggestions
-          id={"searchConv"}
-          label={"Buscar convenio"}
-          type={"search"}
-          maxLength="30"
+        <Input
+          id={"pk_codigo_convenio"}
+          label={"Código de convenio"}
+          name={"pk_codigo_convenio"}
+          type="tel"
           autoComplete="off"
-          suggestions={mapSuggestions || []}
-          onLazyInput={{
-            callback: searchConvenios,
-            timeOut: 500,
+          maxLength={"6"}
+          onChange={(ev) => {
+            ev.target.value = onChangeNumber(ev);
           }}
+          required
         />
-      </Form>
+        <Input
+          id={"codigo_pin_search"}
+          label={"Código pin"}
+          name={"codigo_pin"}
+          type="tel"
+          autoComplete="off"
+          maxLength={"4"}
+          onChange={(ev) => {
+            ev.target.value = onChangeNumber(ev);
+          }}
+          required
+        />
+        <Input
+          id={"nombre_convenio"}
+          label={"Nombre del Convenio"}
+          name={"nombre_convenio"}
+          type="text"
+          autoComplete="off"
+          maxLength={"30"}
+          required
+        />
+      </TableEnterprise>
     </Fragment>
   );
 };

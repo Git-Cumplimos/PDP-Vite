@@ -4,7 +4,7 @@ import { lazy } from "react";
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 
 /** Rutas */
-const colpatriaTrx = lazy(() => import("./ColpatriaTrx"));
+const ColpatriaTrx = lazy(() => import("./ColpatriaTrx"));
 const Deposito = lazy(() => import("./Views/Deposito"));
 
 
@@ -25,12 +25,12 @@ const ConveniosRecaudo = lazy(() => import("./Views/Admin/ConveniosRecaudo"));
 const rutasColpatria = {
   link: "/corresponsalia/colpatria",
   label: <AppIcons Logo={"MARKETPLACE"} name={"Corresponsalía Colpatria"} />,
-  component: colpatriaTrx,
+  component: ColpatriaTrx,
   permission: [67, 68],
   subRoutes: [
     {
       link: "/corresponsalia/colpatria/deposito",
-      label: <AppIcons Logo={"RECAUDO"} name={"Deposito"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Depósito"} />,
       component: Deposito,
       permission: [67],
     },
@@ -50,23 +50,31 @@ const rutasColpatria = {
       ],
     },
     {
-      link: "/corresponsalia/colpatria/recaudo-manual",
-      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Manual en Efectivo"} />,
-      component: ConsultaManual,
+      link: "/corresponsalia/colpatria/recaudo",
+      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo Servicios Públicos y Privados"} />,
+      component: ColpatriaTrx,
       permission: [67],
-    },
-    {
-      link: "/corresponsalia/colpatria/recaudo-barras",
-      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Código de Barras en Efectivo"} />,
-      component: ConsultaBarras,
-      permission: [67],
-    },
-    {
-      link: "/corresponsalia/colpatria/recaudo/:id_convenio_pin",
-      label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP en Efectivo"} />,
-      component: TrxRecaudo,
-      permission: [67],
-      show: false,
+      subRoutes: [
+        {
+          link: "/corresponsalia/colpatria/recaudo/manual",
+          label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Manual en Efectivo"} />,
+          component: ConsultaManual,
+          permission: [67],
+        },
+        {
+          link: "/corresponsalia/colpatria/recaudo/barras",
+          label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Código de Barras en Efectivo"} />,
+          component: ConsultaBarras,
+          permission: [67],
+        },
+        {
+          link: "/corresponsalia/colpatria/recaudo/:id_convenio_pin",
+          label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP en Efectivo"} />,
+          component: TrxRecaudo,
+          permission: [67],
+          show: false,
+        },
+      ]
     },
     {
       link: "/corresponsalia/colpatria/gestion",
