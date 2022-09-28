@@ -52,6 +52,7 @@ const buildPostFunction = (url) => {
     }
   };
 };
+
 const buildPutFunction = (url) => {
   return async (args, body) => {
     if (!args || !body) {
@@ -112,7 +113,9 @@ export const editarComprobante = buildPutFunction(
 export const agregarNota = buildPostFunction(`${urlNotas}/administrar`);
 export const buscarNotas = buildGetFunction(`${urlNotas}/administrar`);
 
-export const buscarReporteTrxArqueo = buildGetFunction(`${urlReportes}/trx-arqueo-usuario`);
+export const buscarReporteTrxArqueo = buildGetFunction(
+  `${urlReportes}/trx-arqueo-usuario`
+);
 
 export const buscarReportesArqueo = async (args) => {
   try {
