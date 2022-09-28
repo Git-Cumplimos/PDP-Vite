@@ -12,14 +12,14 @@ const ConsultaBarras = () => {
   const { roleInfo } = useAuth();
   const navigate = useNavigate();
 
+  const formRef = useRef(null);
+
   const [searchingData, setSearchingData] = useState(false);
 
   const searchCodigo = useCallback(
-    (ev) => {
-      ev.preventDefault();
-      const formData = new FormData(ev.target);
+    (info) => {
       notifyPending(
-        searchConveniosRecaudoBarras(Object.fromEntries(formData)),
+        searchConveniosRecaudoBarras(info),
         {
           render: () => {
             setSearchingData(true);
@@ -100,7 +100,15 @@ const ConsultaBarras = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Consulta recaudo código de barras</h1>
-      <Form onSubmit={searchCodigo} formDir="col">
+      <Form
+        onSubmit={(ev) => {
+          ev.preventDefault();
+          const formData = new FormData(ev.target);
+          searchCodigo(Object.fromEntries(formData));
+        }}
+        formDir="col"
+        ref={formRef}
+      >
         <TextArea
           label={"Código de barras"}
           name="codigo_barras"
@@ -117,7 +125,7 @@ const ConsultaBarras = () => {
           className={"place-self-stretch w-full"}
           onKeyDown={(ev) => {
             if (ev.keyCode === 13 && ev.shiftKey === false) {
-              searchCodigo(ev);
+              searchCodigo({ codigo_barras: ev.target.value });
               return;
             }
             if (ev.keyCode === 8 && ev.shiftKey === false) {
