@@ -938,8 +938,8 @@ const CrearPin = () => {
 
       <Modal show={showModal} handleClose={() => closeModal()}>
         {respPin !== ""? 
-        <div className="flex flex-col justify-center items-center" ref={printDiv}>
-          <>
+        <div className="flex flex-col justify-center items-center" >
+          <div ref={printDiv}>
           <Tickets
             refPrint={null} 
             ticket={tickets} 
@@ -952,7 +952,7 @@ const CrearPin = () => {
             // type={type}
             // stateTrx={stateTrx}
           />
-          </>
+          </div>
           <ButtonBar>
             <Button
               onClick={() => {
