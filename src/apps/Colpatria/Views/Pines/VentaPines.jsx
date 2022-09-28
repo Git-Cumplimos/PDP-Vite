@@ -102,6 +102,8 @@ const VentaPines = () => {
 
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio: datosConvenio?.pk_codigo_convenio,
+          codigo_pin: datosConvenio?.codigo_pin,
           ...userReferences,
           location: {
             address: userAddress,
@@ -129,6 +131,7 @@ const VentaPines = () => {
         {
           render: ({ data: error }) => {
             setLoadingInquiry(false);
+            navigate("/corresponsalia/colpatria");
             if (error?.cause === "custom") {
               return error?.message;
             }
@@ -138,7 +141,7 @@ const VentaPines = () => {
         }
       );
     },
-    [userReferences, userAddress, valVentaPines, roleInfo]
+    [datosConvenio, userReferences, userAddress, valVentaPines, roleInfo, navigate]
   );
 
   const onMakePayment = useCallback(
@@ -150,11 +153,13 @@ const VentaPines = () => {
           id_terminal: roleInfo?.id_dispositivo,
         },
         oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
-        valor_total_trx: valVentaPines,
+        valor_total_trx: inquiryStatus?.valor,
 
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio: datosConvenio?.pk_codigo_convenio,
+          codigo_pin: datosConvenio?.codigo_pin,
           ...userReferences,
           location: {
             address: userAddress,
@@ -198,23 +203,24 @@ const VentaPines = () => {
                 ["Municipio", roleInfo?.ciudad],
                 ["Dirección", roleInfo?.direccion],
                 ["Id Trx", trx_id],
-                ["codigo autorizacion", codigo_autorizacion],
+                ["Código autorizacion", codigo_autorizacion],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
               ],
               commerceName: "Colpatria",
               trxInfo: [
+                ["Convenio", datosConvenio?.nombre_convenio],
                 ...Object.entries(userReferences).map(([, val], index) => [
                   datosConvenio[`referencia_${index + 1}`],
                   val,
                 ]),
-                ["Valor de deposito", formatMoney.format(valVentaPines)],
+                ["Valor", formatMoney.format(valVentaPines)],
               ].reduce((list, elem, i) => {
                 list.push(elem);
                 if ((i + 1) % 1 === 0) list.push(["", ""]);
                 return list;
               }, []),
               /* ["", ""] */
-              disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+              disclamer: "Para cualquier reclamo es indispensable presentar este recibo o comuníquese a los Tel. en Bogotá 7561616 o gratis en el resto del país 018000-522222.",
             };
             setPaymentStatus(tempTicket);
             infoTicket(trx_id, id_type_trx, tempTicket)
@@ -231,6 +237,7 @@ const VentaPines = () => {
         {
           render: ({ data: error }) => {
             setLoadingSell(false);
+            navigate("/corresponsalia/colpatria");
             if (error?.cause === "custom") {
               return error?.message;
             }
@@ -248,6 +255,7 @@ const VentaPines = () => {
       inquiryStatus,
       roleInfo,
       infoTicket,
+      navigate,
     ]
   );
 
@@ -407,6 +415,7 @@ const VentaPines = () => {
                   [ev.target.name]: ev.target.value,
                 }))
               }
+              readOnly={inquiryStatus}
               required
             />
           ))}
@@ -442,7 +451,7 @@ const VentaPines = () => {
             <Tickets refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/colpatria")}>Cerrar</Button>
+              <Button onClick={() => navigate("/corresponsalia/colpatria")}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
