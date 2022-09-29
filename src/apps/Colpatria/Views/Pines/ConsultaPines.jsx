@@ -23,7 +23,12 @@ const ConsultaPines = () => {
   });
 
   const getConvPines = useCallback(() => {
-    getConveniosPinesList({ ...pageData, ...searchFilters })
+    getConveniosPinesList({
+      ...pageData,
+      ...Object.fromEntries(
+        Object.entries(searchFilters).filter(([, val]) => val)
+      ),
+    })
       .then((res) => {
         setListaConveniosPines(res?.obj?.results ?? []);
         setMaxPages(res?.obj?.maxPages ?? []);
@@ -80,11 +85,7 @@ const ConsultaPines = () => {
         title="Convenios de pines"
         headers={["Código convenio", "Código pin", "Nombre convenio"]}
         data={listaConveniosPines.map(
-          ({
-            pk_codigo_convenio,
-            codigo_pin,
-            nombre_convenio,
-          }) => ({
+          ({ pk_codigo_convenio, codigo_pin, nombre_convenio }) => ({
             pk_codigo_convenio,
             codigo_pin,
             nombre_convenio,

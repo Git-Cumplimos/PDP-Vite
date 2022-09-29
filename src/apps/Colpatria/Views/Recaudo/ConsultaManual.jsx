@@ -22,7 +22,12 @@ const ConsultaManual = () => {
   });
 
   const getConvRecaudo = useCallback(() => {
-    getConveniosRecaudoList({ ...pageData, ...searchFilters })
+    getConveniosRecaudoList({
+      ...pageData,
+      ...Object.fromEntries(
+        Object.entries(searchFilters).filter(([, val]) => val)
+      ),
+    })
       .then((res) => {
         setListaConveniosRecaudo(res?.obj?.results ?? []);
         setMaxPages(res?.obj?.maxPages ?? []);
@@ -36,7 +41,6 @@ const ConsultaManual = () => {
       });
   }, [pageData, searchFilters]);
 
-  
   useEffect(() => {
     getConvRecaudo();
   }, [getConvRecaudo]);
@@ -78,17 +82,9 @@ const ConsultaManual = () => {
       <h1 className="text-3xl mt-6">Consulta recaudo manual</h1>
       <TableEnterprise
         title="Convenios de recaudo"
-        headers={[
-          "Código convenio",
-          "Código ean o iac",
-          "Nombre convenio",
-        ]}
+        headers={["Código convenio", "Código ean o iac", "Nombre convenio"]}
         data={listaConveniosRecaudo.map(
-          ({
-            pk_codigo_convenio,
-            codigo_ean_iac,
-            nombre_convenio,
-          }) => ({
+          ({ pk_codigo_convenio, codigo_ean_iac, nombre_convenio }) => ({
             pk_codigo_convenio,
             codigo_ean_iac,
             nombre_convenio,

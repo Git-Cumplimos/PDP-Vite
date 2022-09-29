@@ -61,7 +61,6 @@ const TrxRecaudo = () => {
     min: 5000,
   });
 
-  const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [inquiryStatus, setInquiryStatus] = useState(null);
 
@@ -86,16 +85,34 @@ const TrxRecaudo = () => {
           val,
         ])
       ),
-      "Valor": formatMoney.format(valTrxRecaudo),
+      Valor:
+        datosConvenio?.fk_tipo_valor !== 3 ? (
+          formatMoney.format(valTrxRecaudo)
+        ) : (
+          <Input
+            id="valor"
+            name="valor"
+            // label="Valor a pagar"
+            autoComplete="off"
+            type="tel"
+            minLength={"5"}
+            maxLength={"10"}
+            value={formatMoney.format(valTrxRecaudo)}
+            onInput={(ev) => setValTrxRecaudo(onChangeMoney(ev))}
+            required
+          />
+        ),
+      // "Valor": formatMoney.format(valTrxRecaudo),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
-    [userReferences, datosConvenio, valTrxRecaudo]
+    [userReferences, datosConvenio, valTrxRecaudo, onChangeMoney]
   );
 
   const handleClose = useCallback(() => {
-    setShowModal(false);
-  }, []);
+    notifyError("Transaccion cancelada por el usuario");
+    navigate("/corresponsalia/colpatria");
+  }, [navigate]);
 
   const onMakeInquiry = useCallback(
     (ev) => {
@@ -163,6 +180,10 @@ const TrxRecaudo = () => {
 
   const onMakePayment = useCallback(
     (ev) => {
+      if (valTrxRecaudo <= 0) {
+        notifyError("El valor del pin debe ser mayor a cero");
+        return;
+      }
       const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
@@ -200,7 +221,7 @@ const TrxRecaudo = () => {
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
             const tempTicket = {
-              title: "Recibo de deposito",
+              title: "Recibo de pago",
               timeInfo: {
                 "Fecha de venta": Intl.DateTimeFormat("es-CO", {
                   year: "2-digit",
@@ -222,7 +243,7 @@ const TrxRecaudo = () => {
                 ["Código autorizacion", codigo_autorizacion],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
               ],
-              commerceName: "Colpatria",
+              commerceName: "Recaudo PSP en Efectivo",
               trxInfo: [
                 ["Convenio", datosConvenio?.nombre_convenio],
                 ...Object.entries(userReferences).map(([, val], index) => [
@@ -235,7 +256,8 @@ const TrxRecaudo = () => {
                 if ((i + 1) % 1 === 0) list.push(["", ""]);
                 return list;
               }, []),
-              disclamer: "Para cualquier reclamo es indispensable presentar este recibo o comuníquese a los Tel. en Bogotá 7561616 o gratis en el resto del país 018000-522222.",
+              disclamer:
+                "Para cualquier reclamo es indispensable presentar este recibo o comuníquese a los Tel. en Bogotá 7561616 o gratis en el resto del país 018000-522222.",
             };
             setPaymentStatus(tempTicket);
             infoTicket(trx_id, id_type_trx, tempTicket)
@@ -394,7 +416,7 @@ const TrxRecaudo = () => {
   if (searchingConvData || !(searchingConvData || datosConvenio)) {
     return (
       <Fragment>
-        <h1 className="text-3xl mt-6">Recaudo PSP Manual en Efectivo</h1>
+        <h1 className="text-3xl mt-6">Recaudo PSP en Efectivo</h1>
         <h1 className="text-xl mt-6">
           {searchingConvData
             ? "Buscando infomacion de convenio ..."
@@ -408,14 +430,7 @@ const TrxRecaudo = () => {
     <Fragment>
       <h1 className="text-3xl mt-6 mb-10">Recaudo PSP en Efectivo</h1>
       <Form
-        onSubmit={
-          inquiryStatus
-            ? (ev) => {
-                ev.preventDefault();
-                setShowModal(true);
-              }
-            : onMakeInquiry
-        }
+        onSubmit={inquiryStatus ? (ev) => ev.preventDefault() : onMakeInquiry}
         grid
       >
         <Input
@@ -461,7 +476,7 @@ const TrxRecaudo = () => {
               required
             />
           ))}
-        {datosConvenio.fk_tipo_valor === 1 || inquiryStatus || valTrxRecaudo ? (
+        {datosConvenio.fk_tipo_valor === 1 || valTrxRecaudo ? (
           <Input
             id="valor"
             name="valor"
@@ -472,12 +487,7 @@ const TrxRecaudo = () => {
             maxLength={"10"}
             value={valTrxRecaudo ? formatMoney.format(valTrxRecaudo) : ""}
             onInput={(ev) => setValTrxRecaudo(onChangeMoney(ev))}
-            readOnly={
-              (!inquiryStatus &&
-                valTrxRecaudo &&
-                datosConvenio.fk_tipo_valor !== 1) ||
-              (inquiryStatus && datosConvenio.fk_tipo_valor !== 3)
-            }
+            readOnly={valTrxRecaudo && datosConvenio.fk_tipo_valor !== 1}
             required
           />
         ) : (
@@ -491,7 +501,7 @@ const TrxRecaudo = () => {
       </Form>
       <ScreenBlocker show={loadingInquiry} />
       <Modal
-        show={showModal}
+        show={inquiryStatus}
         handleClose={paymentStatus || loadingSell ? () => {} : handleClose}
       >
         {paymentStatus ? (
