@@ -108,6 +108,7 @@ const Transacciones = () => {
     tipoOp,
     usuario,
     tipoComercio,
+    userPermissions,
   ]);
 
   const closeModal = useCallback(async () => {
