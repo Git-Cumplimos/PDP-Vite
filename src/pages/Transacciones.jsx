@@ -108,6 +108,7 @@ const Transacciones = () => {
     tipoOp,
     usuario,
     tipoComercio,
+    userPermissions,
   ]);
 
   const closeModal = useCallback(async () => {
@@ -131,7 +132,7 @@ const Transacciones = () => {
     tempArr.forEach((types_trx) =>
       types_trx.forEach((val) => allTypes.push(val))
     );
-    setTiposOp([...allTypes]);
+    setTiposOp([...allTypes.sort((a, b) => a.Nombre.localeCompare(b.Nombre))]);
 
     setIdComercio(roleInfo?.id_comercio || -1);
     setUsuario(roleInfo?.id_usuario || -1);
@@ -212,17 +213,15 @@ const Transacciones = () => {
           onInput={(e) => setFechaFinal(e.target.value)}
         />
         <Select
-          className='place-self-stretch'
-          id='searchBySorteo'
-          label='Tipo de busqueda'
-          options={
-            Object.fromEntries([
-              ["", ""],
-              ...tiposOp.map(({ Nombre, id_tipo_operacion }) => {
-                return [Nombre, id_tipo_operacion];
-              }),
-            ]) || { "": "" }
-          }
+          className="place-self-stretch"
+          id="searchBySorteo"
+          label="Tipo de busqueda"
+          options={[
+            { value: "", label: "" },
+            ...tiposOp.map(({ Nombre, id_tipo_operacion }) => {
+              return { label: Nombre, value: id_tipo_operacion };
+            }),
+          ]}
           value={tipoOp}
           required={true}
           onChange={(e) => setTipoOp(parseInt(e.target.value) ?? "")}

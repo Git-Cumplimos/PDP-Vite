@@ -150,11 +150,7 @@ const ConsultaBarras = () => {
           required
         />
         <ButtonBar className="lg:col-span-2">
-          <Button
-            type="button"
-            disabled={searchingData}
-            onClick={(ev) => ev.target.form.reset()}
-          >
+          <Button type="reset" disabled={searchingData}>
             Volver a ingresar código de barras
           </Button>
         </ButtonBar>
