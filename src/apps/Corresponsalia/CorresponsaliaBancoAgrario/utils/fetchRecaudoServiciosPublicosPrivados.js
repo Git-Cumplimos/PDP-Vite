@@ -1,6 +1,6 @@
 import fetchData from "../../../../utils/fetchData";
 
-const urlAval = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}`;
+const urlBancoAgrario = `${process.env.REACT_APP_URL_BANCO_AGRARIO}`;
 
 export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
   if (!bodyObj) {
@@ -8,7 +8,28 @@ export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAval}/grupo_aval_cb_recaudo/consulta_tabla_convenios_paginado`,
+      `${urlBancoAgrario}/banco-agrario/banco_agrario_cb_recaudo/consulta_tabla_convenios_paginado`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res?.obj;
+  } catch (err) {
+    throw err;
+  }
+};
+export const postConsultaTablaConveniosPaginadoTotal = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlBancoAgrario}/banco-agrario/banco_agrario_cb_recaudo/consulta_tabla_convenios_paginado_total`,
       "POST",
       {},
       bodyObj,
@@ -29,7 +50,7 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAval}/grupo_aval_cb_recaudo/consulta_tabla_convenios_especifico`,
+      `${urlBancoAgrario}/banco-agrario/banco_agrario_cb_recaudo/consulta_tabla_convenios_especifico`,
       "POST",
       {},
       bodyObj,
@@ -50,7 +71,7 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAval}/grupo_aval_cb_recaudo/codigo_barras`,
+      `${urlBancoAgrario}/grupo_aval_cb_recaudo/codigo_barras`,
       "POST",
       {},
       bodyObj,
@@ -71,7 +92,7 @@ export const postConsultaConveniosAval = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAval}/grupo_aval_cb_recaudo/consulta_recaudo_servicios_publicos_privados`,
+      `${urlBancoAgrario}/grupo_aval_cb_recaudo/consulta_recaudo_servicios_publicos_privados`,
       "POST",
       {},
       bodyObj,
@@ -92,7 +113,7 @@ export const postRecaudoConveniosAval = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlAval}/grupo_aval_cb_recaudo/recaudo_servicios_publicos_privados`,
+      `${urlBancoAgrario}/grupo_aval_cb_recaudo/recaudo_servicios_publicos_privados`,
       "POST",
       {},
       bodyObj,
