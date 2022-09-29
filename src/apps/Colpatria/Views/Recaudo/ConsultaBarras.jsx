@@ -12,54 +12,57 @@ const ConsultaBarras = () => {
   const { roleInfo } = useAuth();
   const navigate = useNavigate();
 
+  const formRef = useRef(null);
+
   const [searchingData, setSearchingData] = useState(false);
 
-  const searchCodigo = useCallback((ev) => {
-    ev.preventDefault();
-    const formData = new FormData(ev.target);
-    notifyPending(
-      searchConveniosRecaudoBarras(Object.fromEntries(formData)),
-      {
-        render: () => {
-          setSearchingData(true);
-          return "Buscando informacion";
+  const searchCodigo = useCallback(
+    (info) => {
+      notifyPending(
+        searchConveniosRecaudoBarras(info),
+        {
+          render: () => {
+            setSearchingData(true);
+            return "Buscando informacion";
+          },
         },
-      },
-      {
-        render: ({ data: res }) => {
-          setSearchingData(false);
-          console.log(res?.obj);
+        {
+          render: ({ data: res }) => {
+            setSearchingData(false);
+            console.log(res?.obj);
 
-          const refs = Object.fromEntries(
-            Object.entries(res?.obj?.barcode ?? {}).filter(([key]) =>
-              key.includes("referencia_")
-            )
-          );
+            const refs = Object.fromEntries(
+              Object.entries(res?.obj?.barcode ?? {}).filter(([key]) =>
+                key.includes("referencia_")
+              )
+            );
 
-          const builderSP = new URLSearchParams();
-          builderSP.append("refs", JSON.stringify(refs));
-          builderSP.append("valor", res?.obj?.barcode?.valor ?? "0");
+            const builderSP = new URLSearchParams();
+            builderSP.append("refs", JSON.stringify(refs));
+            builderSP.append("valor", res?.obj?.barcode?.valor ?? "0");
 
-          const pk_codigo_convenio =
-            res?.obj?.convenio?.pk_codigo_convenio ?? "";
-          navigate(
-            `/corresponsalia/colpatria/recaudo/${pk_codigo_convenio}?${builderSP.toString()}`
-          );
-          return "Consulta exitosa";
+            const pk_codigo_convenio =
+              res?.obj?.convenio?.pk_codigo_convenio ?? "";
+            navigate(
+              `/corresponsalia/colpatria/recaudo/${pk_codigo_convenio}?${builderSP.toString()}`
+            );
+            return "Consulta exitosa";
+          },
         },
-      },
-      {
-        render: ({ data: error }) => {
-          setSearchingData(false);
-          if (error?.cause === "custom") {
-            return error?.message;
-          }
-          console.error(error?.message);
-          return "Consulta fallida";
-        },
-      }
-    );
-  }, [navigate]);
+        {
+          render: ({ data: error }) => {
+            setSearchingData(false);
+            if (error?.cause === "custom") {
+              return error?.message;
+            }
+            console.error(error?.message);
+            return "Consulta fallida";
+          },
+        }
+      );
+    },
+    [navigate]
+  );
   const isAlt = useRef("");
 
   /**
@@ -97,7 +100,15 @@ const ConsultaBarras = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Consulta recaudo código de barras</h1>
-      <Form onSubmit={searchCodigo} formDir="col">
+      <Form
+        onSubmit={(ev) => {
+          ev.preventDefault();
+          const formData = new FormData(ev.target);
+          searchCodigo(Object.fromEntries(formData));
+        }}
+        formDir="col"
+        ref={formRef}
+      >
         <TextArea
           label={"Código de barras"}
           name="codigo_barras"
@@ -114,7 +125,11 @@ const ConsultaBarras = () => {
           className={"place-self-stretch w-full"}
           onKeyDown={(ev) => {
             if (ev.keyCode === 13 && ev.shiftKey === false) {
-              searchCodigo(ev);
+              searchCodigo({ codigo_barras: ev.target.value });
+              return;
+            }
+            if (ev.keyCode === 8 && ev.shiftKey === false) {
+              ev.preventDefault();
               return;
             }
             if (ev.altKey) {
@@ -128,15 +143,19 @@ const ConsultaBarras = () => {
               let value = String.fromCharCode(parseInt(isAlt.current));
               isAlt.current = "";
               if (value === "\u001d") {
-                ev.target.value += "\u001d"
+                ev.target.value += "\u001d";
               }
             }
           }}
           required
         />
         <ButtonBar className="lg:col-span-2">
-          <Button type="submit" disabled={searchingData}>
-            Consultar código de barras
+          <Button
+            type="button"
+            disabled={searchingData}
+            onClick={(ev) => ev.target.form.reset()}
+          >
+            Volver a ingresar código de barras
           </Button>
         </ButtonBar>
       </Form>

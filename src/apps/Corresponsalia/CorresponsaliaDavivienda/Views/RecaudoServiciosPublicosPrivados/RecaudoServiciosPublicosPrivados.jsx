@@ -363,7 +363,7 @@ const RecaudoServiciosPublicosPrivados = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 20000000],
+    limits: [0, 9900000],
     decimalDigits: 2,
   });
   return (
@@ -434,6 +434,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             type='text'
             autoComplete='off'
             maxLength={"15"}
+            max={9900000}
             value={datosTrans.valor ?? ""}
             onInput={onChangeMoneyLocal}
             required></MoneyInput>

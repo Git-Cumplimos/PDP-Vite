@@ -16,14 +16,13 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
-import TicketsDavivienda from "../../components/TicketsDavivienda";
 import {
   postConsultaCodigoBarrasConveniosEspecifico,
   postConsultaConveniosAval,
   postRecaudoConveniosAval,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
-const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
+const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
@@ -535,4 +534,4 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   );
 };
 
-export default RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval;
+export default RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario;

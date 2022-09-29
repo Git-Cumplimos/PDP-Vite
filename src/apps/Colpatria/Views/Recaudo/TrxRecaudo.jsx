@@ -82,15 +82,15 @@ const TrxRecaudo = () => {
     () => ({
       ...Object.fromEntries(
         Object.entries(userReferences).map(([, val], index) => [
-          `Referencia ${index + 1}`,
+          datosConvenio[`referencia_${index + 1}`],
           val,
         ])
       ),
-      "Valor de deposito": formatMoney.format(valTrxRecaudo),
+      "Valor": formatMoney.format(valTrxRecaudo),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
-    [userReferences, valTrxRecaudo]
+    [userReferences, datosConvenio, valTrxRecaudo]
   );
 
   const handleClose = useCallback(() => {
@@ -112,6 +112,7 @@ const TrxRecaudo = () => {
 
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio: datosConvenio?.pk_codigo_convenio,
           ...userReferences,
           location: {
             address: userAddress,
@@ -133,12 +134,14 @@ const TrxRecaudo = () => {
           render: ({ data: res }) => {
             setLoadingInquiry(false);
             setInquiryStatus(res?.obj);
+            setValTrxRecaudo(res?.obj?.valor);
             return "Consulta satisfactoria";
           },
         },
         {
           render: ({ data: error }) => {
             setLoadingInquiry(false);
+            navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
               return error?.message;
             }
@@ -148,7 +151,14 @@ const TrxRecaudo = () => {
         }
       );
     },
-    [userReferences, userAddress, valTrxRecaudo, roleInfo]
+    [
+      datosConvenio,
+      userReferences,
+      userAddress,
+      valTrxRecaudo,
+      roleInfo,
+      navigate,
+    ]
   );
 
   const onMakePayment = useCallback(
@@ -165,6 +175,7 @@ const TrxRecaudo = () => {
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio: datosConvenio?.pk_codigo_convenio,
           ...userReferences,
           location: {
             address: userAddress,
@@ -208,15 +219,23 @@ const TrxRecaudo = () => {
                 ["Municipio", roleInfo?.ciudad],
                 ["Dirección", roleInfo?.direccion],
                 ["Id Trx", trx_id],
-                ["codigo autorizacion", codigo_autorizacion],
+                ["Código autorizacion", codigo_autorizacion],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
               ],
               commerceName: "Colpatria",
               trxInfo: [
-                ["Valor de deposito", formatMoney.format(valTrxRecaudo)],
-                ["", ""],
-              ],
-              disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+                ["Convenio", datosConvenio?.nombre_convenio],
+                ...Object.entries(userReferences).map(([, val], index) => [
+                  datosConvenio[`referencia_${index + 1}`],
+                  val,
+                ]),
+                ["Valor", formatMoney.format(valTrxRecaudo)],
+              ].reduce((list, elem, i) => {
+                list.push(elem);
+                if ((i + 1) % 1 === 0) list.push(["", ""]);
+                return list;
+              }, []),
+              disclamer: "Para cualquier reclamo es indispensable presentar este recibo o comuníquese a los Tel. en Bogotá 7561616 o gratis en el resto del país 018000-522222.",
             };
             setPaymentStatus(tempTicket);
             infoTicket(trx_id, id_type_trx, tempTicket)
@@ -233,6 +252,7 @@ const TrxRecaudo = () => {
         {
           render: ({ data: error }) => {
             setLoadingSell(false);
+            navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
               return error?.message;
             }
@@ -243,12 +263,14 @@ const TrxRecaudo = () => {
       );
     },
     [
+      datosConvenio,
       userReferences,
       userAddress,
       valTrxRecaudo,
       inquiryStatus,
       roleInfo,
       infoTicket,
+      navigate,
     ]
   );
 
@@ -477,7 +499,9 @@ const TrxRecaudo = () => {
             <Tickets refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/colpatria")}>Cerrar</Button>
+              <Button onClick={() => navigate("/corresponsalia/colpatria")}>
+                Cerrar
+              </Button>
             </ButtonBar>
           </div>
         ) : (

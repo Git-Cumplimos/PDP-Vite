@@ -33,7 +33,7 @@ import fetchData from "../../../utils/fetchData";
 const accountTypes = {
   10: "Cuenta ahorros",
   20: "Cuenta corriente",
-  30: "Cuenta de credito",
+  30: "Cuenta de crédito",
 };
 
 const formatMoney = makeMoneyFormatter(2);
@@ -176,6 +176,7 @@ const Deposito = () => {
         {
           render({data: err}) {
             setLoadingDeposit(false);
+            navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
               return err?.message;
             }
@@ -193,6 +194,7 @@ const Deposito = () => {
       valDeposito,
       roleInfo,
       infoTicket,
+      navigate,
     ]
   );
 
