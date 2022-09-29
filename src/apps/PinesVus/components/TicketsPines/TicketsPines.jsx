@@ -1,6 +1,6 @@
 import classes from "./Tickets.module.css";
 import LogoVus from "../../../../components/Base/LogoVus/LogoVus";
-import LogoMiLicensia from "../../../../components/Base/LogoMiLicensia";
+import LogoMiLicencia from "../../../../components/Base/LogoMiLicencia";
 
 const TicketsPines = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, logo }) => {
   const { divPrint } = classes;
@@ -19,7 +19,7 @@ const TicketsPines = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, lo
           {logo === 'LogoVus' ? 
           <LogoVus xsmall />
           :
-          <LogoMiLicensia xsmall />
+          <LogoMiLicencia xsmall />
           }
           
         </div>

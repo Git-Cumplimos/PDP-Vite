@@ -10,7 +10,7 @@ const images = {
   Loteria_de_Bogota: `${urlAssets}/assets/img/Loteria_de_Bogota.png`,
   personas: `${urlAssets}/assets/img/personas.png`,
   PINVUS: `${urlAssets}/assets/img/LogoPinVus.jpg`,
-  MiLicensia: `${urlAssets}/assets/img/logo-milicencia.jpg`
+  MiLicencia: `${urlAssets}/assets/img/logo-milicencia.jpg`
 };
 
 const svgs = {
