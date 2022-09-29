@@ -1,5 +1,4 @@
 import { Fragment, useCallback, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
@@ -16,7 +15,6 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
-import TicketsDavivienda from "../../components/TicketsDavivienda";
 import {
   postConsultaCodigoBarrasConveniosEspecifico,
   postConsultaConveniosAval,

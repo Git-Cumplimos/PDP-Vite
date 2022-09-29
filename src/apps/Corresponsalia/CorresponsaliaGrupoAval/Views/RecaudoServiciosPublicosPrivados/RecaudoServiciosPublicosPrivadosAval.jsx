@@ -213,7 +213,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           objTicket["commerceInfo"].push(["", ""]);
 
           setObjTicketActual(objTicket);
-          setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
+          setShowModal((old) => ({ ...old, estadoPeticion: 4 }));
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
@@ -265,7 +265,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     if (!isNaN(valor)) {
       const num = valor;
       setDatosTrans((old) => {
-        return { ...old, valor: num };
+        return { ...old, valor: onChangeMoney(ev) };
       });
     }
   };
@@ -310,7 +310,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
             label='Valor a pagar'
             type='text'
             autoComplete='off'
-            maxLength={"15"}
+            maxLength={"12"}
             value={datosTrans.valor ?? ""}
             onInput={onChangeMoneyLocal}
             required></MoneyInput>
@@ -334,16 +334,37 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
                   datosConsulta?.valorTrx ?? "0"
                 )} `}
               </h2>
-              {convenio?.parciales === "1" && (
-                <Form grid onSubmit={onSubmitValidacion}>
-                  <Input
+              {convenio?.parciales === "1" ? (
+                <Form
+                  grid
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
+                  }}>
+                  <MoneyInput
+                    id='valCashOut'
+                    name='valCashOut'
+                    label='Valor a pagar'
+                    type='text'
+                    autoComplete='off'
+                    maxLength={"12"}
+                    value={datosTrans.valorConst ?? ""}
+                    onInput={(ev) =>
+                      setDatosTrans((old) => ({
+                        ...old,
+                        valorConst: onChangeMoney(ev),
+                        valorVar: onChangeMoney(ev),
+                      }))
+                    }
+                    required></MoneyInput>
+                  {/* <Input
                     id='valor'
                     name='valor'
                     label='Valor a pagar'
                     autoComplete='off'
                     type='tel'
                     minLength={"2"}
-                    maxLength={"20"}
+                    maxLength={"12"}
                     defaultValue={datosTrans.valorConst ?? ""}
                     onInput={(ev) =>
                       setDatosTrans((old) => ({
@@ -353,17 +374,51 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
                       }))
                     }
                     required
-                  />
+                  /> */}
+                  <ButtonBar>
+                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button type='submit'>Realizar pago</Button>
+                  </ButtonBar>
                 </Form>
+              ) : (
+                <>
+                  <ButtonBar>
+                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button
+                      type='submit'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
+                      }}>
+                      Realizar pago
+                    </Button>
+                  </ButtonBar>
+                </>
               )}
-              <ButtonBar>
-                <Button onClick={handleClose}>Cancelar</Button>
-                <Button type='submit' onClick={onSubmitValidacion}>
-                  Realizar pago
-                </Button>
-              </ButtonBar>
             </>
           ) : estadoPeticion === 3 ? (
+            <>
+              <h1 className='text-2xl text-center mb-5 font-semibold'>
+                ¿Está seguro de realizar el recaudo?
+              </h1>
+              <h2>{`Nombre convenio: ${convenio?.convenio}`}</h2>
+              <h2>{`Número convenio: ${convenio?.nura}`}</h2>
+              <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
+              <h2 className='text-base'>
+                {`Valor a pagar: ${formatMoney.format(
+                  datosTrans.valorConst ?? "0"
+                )} `}
+              </h2>
+              <>
+                <ButtonBar>
+                  <Button onClick={handleClose}>Cancelar</Button>
+                  <Button type='submit' onClick={onSubmitValidacion}>
+                    Realizar pago
+                  </Button>
+                </ButtonBar>
+              </>
+            </>
+          ) : estadoPeticion === 4 ? (
             <>
               <h2>
                 <ButtonBar>

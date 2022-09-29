@@ -433,8 +433,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             label='Valor'
             type='text'
             autoComplete='off'
-            maxLength={"15"}
-            max={9900000}
+            maxLength={"12"}
             value={datosTrans.valor ?? ""}
             onInput={onChangeMoneyLocal}
             required></MoneyInput>
@@ -531,7 +530,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                     autoComplete='off'
                     type='tel'
                     minLength={"0"}
-                    maxLength={"20"}
+                    maxLength={"12"}
                     defaultValue={datosTransValidacion.valor ?? ""}
                     onInput={(ev) =>
                       setDatosTransValidacion((old) => ({
