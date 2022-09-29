@@ -1,7 +1,8 @@
 import classes from "./Tickets.module.css";
 import LogoVus from "../../../../components/Base/LogoVus/LogoVus";
+import LogoMiLicensia from "../../../../components/Base/LogoMiLicensia";
 
-const TicketsPines = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) => {
+const TicketsPines = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, logo }) => {
   const { divPrint } = classes;
 
   if (!ticket) {
@@ -10,12 +11,17 @@ const TicketsPines = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) 
 
   const { title, timeInfo, commerceInfo, commerceName, trxInfo, disclamer } =
     ticket;
-
+  console.log(logo)
   return (
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
         <div className="flex flex-row justify-center items-center w-full">
+          {logo === 'LogoVus' ? 
           <LogoVus xsmall />
+          :
+          <LogoMiLicensia xsmall />
+          }
+          
         </div>
         <h1 className="text-xl font-semibold text-center uppercase">{title}</h1>
         <hr className="border-gray-400 my-3" />
