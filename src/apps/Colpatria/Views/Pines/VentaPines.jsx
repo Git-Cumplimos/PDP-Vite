@@ -51,7 +51,6 @@ const VentaPines = () => {
     min: 5000,
   });
 
-  const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [inquiryStatus, setInquiryStatus] = useState(null);
 
@@ -76,16 +75,34 @@ const VentaPines = () => {
           val,
         ])
       ),
-      "Valor": formatMoney.format(valVentaPines),
+      Valor:
+        datosConvenio?.fk_tipo_valor !== 3 ? (
+          formatMoney.format(valVentaPines)
+        ) : (
+          <Input
+            id="valor"
+            name="valor"
+            // label="Valor a pagar"
+            autoComplete="off"
+            type="tel"
+            minLength={"5"}
+            maxLength={"10"}
+            value={formatMoney.format(valVentaPines)}
+            onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
+            required
+          />
+        ),
+      // "Valor": formatMoney.format(valVentaPines),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
-    [userReferences, datosConvenio, valVentaPines]
+    [userReferences, datosConvenio, valVentaPines, onChangeMoney]
   );
 
   const handleClose = useCallback(() => {
-    setShowModal(false);
-  }, []);
+    notifyError("Transaccion cancelada por el usuario");
+    navigate("/corresponsalia/colpatria");
+  }, [navigate]);
 
   const onMakeInquiry = useCallback(
     (ev) => {
@@ -125,6 +142,7 @@ const VentaPines = () => {
           render: ({ data: res }) => {
             setLoadingInquiry(false);
             setInquiryStatus(res?.obj);
+            setValVentaPines(res?.obj?.valor);
             return "Consulta satisfactoria";
           },
         },
@@ -153,6 +171,10 @@ const VentaPines = () => {
 
   const onMakePayment = useCallback(
     (ev) => {
+      if (valVentaPines <= 0) {
+        notifyError("El valor del pin debe ser mayor a cero");
+        return;
+      }
       const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
@@ -160,7 +182,7 @@ const VentaPines = () => {
           id_terminal: roleInfo?.id_dispositivo,
         },
         oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
-        valor_total_trx: inquiryStatus?.valor,
+        valor_total_trx: valVentaPines,
 
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
@@ -191,7 +213,7 @@ const VentaPines = () => {
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
             const tempTicket = {
-              title: "Recibo de deposito",
+              title: "Recibo de pago",
               timeInfo: {
                 "Fecha de venta": Intl.DateTimeFormat("es-CO", {
                   year: "2-digit",
@@ -213,7 +235,7 @@ const VentaPines = () => {
                 ["Código autorizacion", codigo_autorizacion],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
               ],
-              commerceName: "Colpatria",
+              commerceName: "Venta de Pines de Recaudo",
               trxInfo: [
                 ["Convenio", datosConvenio?.nombre_convenio],
                 ...Object.entries(userReferences).map(([, val], index) => [
@@ -375,14 +397,7 @@ const VentaPines = () => {
     <Fragment>
       <h1 className="text-3xl mt-6 mb-10">Venta de Pines de Recaudo</h1>
       <Form
-        onSubmit={
-          inquiryStatus
-            ? (ev) => {
-                ev.preventDefault();
-                setShowModal(true);
-              }
-            : onMakeInquiry
-        }
+        onSubmit={inquiryStatus ? (ev) => ev.preventDefault() : onMakeInquiry}
         grid
       >
         <Input
@@ -427,7 +442,7 @@ const VentaPines = () => {
               required
             />
           ))}
-        {datosConvenio.fk_tipo_valor === 1 || inquiryStatus ? (
+        {datosConvenio.fk_tipo_valor === 1 ? (
           <Input
             id="valor"
             name="valor"
@@ -437,7 +452,6 @@ const VentaPines = () => {
             minLength={"5"}
             maxLength={"10"}
             onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
-            readOnly={inquiryStatus && datosConvenio.fk_tipo_valor !== 3}
             required
           />
         ) : (
@@ -451,7 +465,7 @@ const VentaPines = () => {
       </Form>
       <ScreenBlocker show={loadingInquiry} />
       <Modal
-        show={showModal}
+        show={inquiryStatus}
         handleClose={paymentStatus || loadingSell ? () => {} : handleClose}
       >
         {paymentStatus ? (
