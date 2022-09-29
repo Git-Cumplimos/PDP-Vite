@@ -1,5 +1,4 @@
 import { Fragment, useCallback, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
