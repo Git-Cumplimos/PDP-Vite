@@ -292,17 +292,19 @@ const Transacciones = () => {
           <div ref={printDiv}>
           {selected?.ticket?.ticket2 ?
           <>
-          <Tickets
+          <TicketsPines
           refPrint={null} 
           ticket={selected?.ticket?.ticket1} 
           type='Reimpresión'
           stateTrx={selected?.status_trx}
+          logo = 'LogoMiLicensia'
           />
           <TicketsPines
             refPrint={null} 
             ticket={selected?.ticket?.ticket2}
             type='Reimpresión'
             stateTrx={selected?.status_trx}
+            logo = 'LogoVus'
           /> 
           </>         
           :

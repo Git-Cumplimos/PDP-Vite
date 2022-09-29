@@ -363,7 +363,7 @@ const RecaudoServiciosPublicosPrivados = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 20000000],
+    limits: [0, 9900000],
     decimalDigits: 2,
   });
   return (
@@ -433,7 +433,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             label='Valor'
             type='text'
             autoComplete='off'
-            maxLength={"15"}
+            maxLength={"12"}
             value={datosTrans.valor ?? ""}
             onInput={onChangeMoneyLocal}
             required></MoneyInput>
@@ -530,7 +530,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                     autoComplete='off'
                     type='tel'
                     minLength={"0"}
-                    maxLength={"20"}
+                    maxLength={"12"}
                     defaultValue={datosTransValidacion.valor ?? ""}
                     onInput={(ev) =>
                       setDatosTransValidacion((old) => ({

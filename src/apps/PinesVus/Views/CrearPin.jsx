@@ -940,17 +940,15 @@ const CrearPin = () => {
         {respPin !== ""? 
         <div className="flex flex-col justify-center items-center" >
           <div ref={printDiv}>
-          <Tickets
+          <TicketsPines
             refPrint={null} 
             ticket={tickets} 
-            // type={type}
-            // stateTrx={stateTrx}
+            logo = 'LogoMiLicensia'
           />
           <TicketsPines
             refPrint={null} 
             ticket={tickets2}
-            // type={type}
-            // stateTrx={stateTrx}
+            logo = 'LogoVus'
           />
           </div>
           <ButtonBar>

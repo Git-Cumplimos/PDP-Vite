@@ -358,6 +358,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         municipio: roleInfo?.["ciudad"],
         oficinaPropia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        direccion: roleInfo?.direccion,
       })
         .then((res) => {
           if (res?.status) {
@@ -450,7 +451,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 20000000],
+    limits: [0, 9900000],
     decimalDigits: 2,
   });
   const printDiv = useRef();
@@ -601,7 +602,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                 autoComplete='off'
                 type='tel'
                 minLength={"5"}
-                maxLength={"20"}
+                maxLength={"12"}
                 defaultValue={datosTransaccion.showValor ?? ""}
                 onInput={(ev) =>
                   setDatosTransaccion((old) => ({
@@ -706,34 +707,41 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     )} `}
                   </h2>
                   {datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0" &&
-                    (datosEnvio?.datosConvenio?.ind_valor_ceros_cnb !== "0" ||
-                      datosEnvio?.datosConvenio?.ind_menor_vlr_cnb !== "0" ||
-                      datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb !== "0") && (
-                      <Form grid onSubmit={onSubmitPago}>
-                        <Input
-                          id='valor'
-                          name='valor'
-                          label='Valor a depositar'
-                          autoComplete='off'
-                          type='tel'
-                          minLength={"5"}
-                          maxLength={"20"}
-                          defaultValue={datosTransaccion.showValor2 ?? ""}
-                          onInput={(ev) =>
-                            setDatosTransaccion((old) => ({
-                              ...old,
-                              valor: onChangeMoney(ev),
-                              showValor2: onChangeMoney(ev),
-                            }))
-                          }
-                          required
-                        />
-                        <ButtonBar>
-                          <Button onClick={hideModalReset}>Cancelar</Button>
-                          <Button type='submit'>Realizar pago</Button>
-                        </ButtonBar>
-                      </Form>
-                    )}
+                  (datosEnvio?.datosConvenio?.ind_valor_ceros_cnb !== "0" ||
+                    datosEnvio?.datosConvenio?.ind_menor_vlr_cnb !== "0" ||
+                    datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb !== "0") ? (
+                    <Form grid onSubmit={onSubmitPago}>
+                      <Input
+                        id='valor'
+                        name='valor'
+                        label='Valor a depositar'
+                        autoComplete='off'
+                        type='tel'
+                        minLength={"5"}
+                        maxLength={"12"}
+                        defaultValue={datosTransaccion.showValor2 ?? ""}
+                        onInput={(ev) =>
+                          setDatosTransaccion((old) => ({
+                            ...old,
+                            valor: onChangeMoney(ev),
+                            showValor2: onChangeMoney(ev),
+                          }))
+                        }
+                        required
+                      />
+                      <ButtonBar>
+                        <Button onClick={hideModalReset}>Cancelar</Button>
+                        <Button type='submit'>Realizar pago</Button>
+                      </ButtonBar>
+                    </Form>
+                  ) : (
+                    <ButtonBar>
+                      <Button onClick={hideModalReset}>Cancelar</Button>
+                      <Button type='submit' onClick={onSubmitPago}>
+                        Realizar pago
+                      </Button>
+                    </ButtonBar>
+                  )}
                 </>
               )}
               {peticion === 4 && (

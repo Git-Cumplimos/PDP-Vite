@@ -1,0 +1,25 @@
+.logoMiLicencia {
+  @apply p-0 m-0;
+}
+
+.logoMiLicencia.lgImg {
+  @apply w-72 md:w-72;
+}
+
+.logoMiLicencia.smImg {
+  @apply w-64 md:w-80;
+}
+
+.logoMiLicencia.xsImg {
+  @apply w-64 md:w-52;
+}
+
+.logoMiLicencia > div {
+  @apply aspect-w-14 aspect-h-5;
+}
+
+.logoMiLicencia > div > img {
+  @apply object-center object-cover;
+}
+
+
