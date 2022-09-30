@@ -77,6 +77,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   const onChangeFormat = useCallback(
     (ev) => {
       const valor = ev.target.value;
+      console.log(valor);
       if (valor.length > datosTrans.codBarras.length) {
         setDatosTrans((old) => {
           return { ...old, [ev.target.name]: valor };
@@ -321,6 +322,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   });
   const printDiv = useRef();
   const isAlt = useRef("");
+  const isAltCR = useRef({"data":"",state: false});
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -341,15 +343,19 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
               autoComplete='off'
               onInput={onChangeFormat}
               onKeyDown={(ev) => {
-                console.log(ev);
                 if (ev.keyCode === 13 && ev.shiftKey === false) {
                   // ev.preventDefault();
                   onSubmit(ev);
                   return;
                 }
                 if (ev.altKey) {
+                  if(isAltCR.current.state){
+                    isAltCR.current = ({...isAltCR.current,data: isAltCR.current.data + ev.key})
+                  }
                   if (ev.keyCode !== 18) {
                     isAlt.current += ev.key;
+                  }else{
+                    isAltCR.current = ({...isAltCR.current,state:true})
                   }
                 }
               }}
@@ -362,6 +368,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                       return { ...old, codBarras: old.codBarras + "\u001d" };
                     });
                   }
+                }
+                if(ev.keyCode === 18){
+                  if(isAltCR.current.data === "013"){
+                    onSubmit(ev);
+                  }
+                  isAltCR.current = ({...isAltCR.current,state:false,data:""})
                 }
               }}></TextArea>
             {datosTrans.codBarras !== "" && (

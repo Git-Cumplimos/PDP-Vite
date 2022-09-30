@@ -1,3 +1,5 @@
+import { isValidElement } from "react";
+
 const PaymentSummary = ({
   title = "¿Está seguro de realizar la transacción?",
   subtitle = "Resumen de transacción",
@@ -10,7 +12,10 @@ const PaymentSummary = ({
       <h1 className="text-xl font-semibold">{subtitle}</h1>
       <ul className="grid grid-flow-row auto-rows-fr gap-2 place-items-stretch">
         {Object.entries(summaryTrx ?? {}).map(([key, val]) => {
-          if (Array.isArray(val) || typeof val === "object") {
+          if (
+            Array.isArray(val) ||
+            (typeof val === "object" && !isValidElement(val))
+          ) {
             val = JSON.stringify(val);
           }
           return (

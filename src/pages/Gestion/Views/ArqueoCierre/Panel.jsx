@@ -275,7 +275,7 @@ const Panel = () => {
             >
               Arqueo y cierre de caja
             </Button>
-            <ButtonLink to={"/gestion/arqueo/reporte-arqueo-cierre"}>
+            <ButtonLink to={"/gestion/arqueo/arqueo-cierre/reporte"}>
               Ver reporte de transacciones
             </ButtonLink>
           </ButtonBar>
