@@ -82,7 +82,7 @@ const ConsultaManual = () => {
       <h1 className="text-3xl mt-6">Consulta recaudo manual</h1>
       <TableEnterprise
         title="Convenios de recaudo"
-        headers={["Código convenio", "Código ean o iac", "Nombre convenio"]}
+        headers={["Código convenio", "Código EAN o IAC", "Nombre convenio"]}
         data={listaConveniosRecaudo.map(
           ({ pk_codigo_convenio, codigo_ean_iac, nombre_convenio }) => ({
             pk_codigo_convenio,
@@ -118,7 +118,7 @@ const ConsultaManual = () => {
         />
         <Input
           id={"codigo_ean_iac_search"}
-          label={"Código ean o iac"}
+          label={"Código EAN o IAC"}
           name={"codigo_ean_iac"}
           type="tel"
           autoComplete="off"
@@ -130,7 +130,7 @@ const ConsultaManual = () => {
         />
         <Input
           id={"nombre_convenio"}
-          label={"Nombre del Convenio"}
+          label={"Nombre del convenio"}
           name={"nombre_convenio"}
           type="text"
           autoComplete="off"

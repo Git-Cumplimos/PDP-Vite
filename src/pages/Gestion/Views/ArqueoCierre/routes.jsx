@@ -28,7 +28,7 @@ export const rutasArqueo = [
     permission: [74],
   },
   {
-    link: "/gestion/arqueo/reporte-arqueo-cierre",
+    link: "/gestion/arqueo/arqueo-cierre/reporte",
     label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
     component: ReporteTrx,
     permission: [74],

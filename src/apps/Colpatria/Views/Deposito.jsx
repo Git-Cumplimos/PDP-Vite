@@ -95,7 +95,7 @@ const Deposito = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valDeposito,
 
         // Datos trx colpatria

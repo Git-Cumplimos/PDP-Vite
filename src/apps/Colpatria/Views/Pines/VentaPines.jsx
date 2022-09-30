@@ -114,7 +114,7 @@ const VentaPines = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valVentaPines,
 
         // Datos trx colpatria
@@ -181,7 +181,7 @@ const VentaPines = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valVentaPines,
 
         id_trx: inquiryStatus?.id_trx,
