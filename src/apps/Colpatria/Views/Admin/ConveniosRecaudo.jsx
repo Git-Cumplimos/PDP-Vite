@@ -250,7 +250,7 @@ const ConveniosRecaudo = () => {
         title="Convenios de recaudo"
         headers={[
           "Código convenio",
-          "Código ean o iac",
+          "Código EAN o IAC",
           "Nombre convenio",
           "Estado",
         ]}
@@ -300,7 +300,7 @@ const ConveniosRecaudo = () => {
         />
         <Input
           id={"codigo_ean_iac_search"}
-          label={"Código ean o iac"}
+          label={"Código EAN o IAC"}
           name={"codigo_ean_iac"}
           type="tel"
           autoComplete="off"
@@ -313,7 +313,7 @@ const ConveniosRecaudo = () => {
         />
         <Input
           id={"nombre_convenio"}
-          label={"Nombre del Convenio"}
+          label={"Nombre del convenio"}
           name={"nombre_convenio"}
           type="text"
           autoComplete="off"
@@ -378,7 +378,7 @@ const ConveniosRecaudo = () => {
               />
               <Input
                 id={"codigo_ean_iac"}
-                label={"Código ean o iac"}
+                label={"Código EAN o IAC"}
                 name={"codigo_ean_iac"}
                 type="tel"
                 autoComplete="off"
