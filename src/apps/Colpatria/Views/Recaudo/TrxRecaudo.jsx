@@ -124,7 +124,7 @@ const TrxRecaudo = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valTrxRecaudo,
 
         // Datos trx colpatria
@@ -190,7 +190,7 @@ const TrxRecaudo = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valTrxRecaudo,
 
         id_trx: inquiryStatus?.id_trx,
@@ -441,7 +441,7 @@ const TrxRecaudo = () => {
           disabled
         />
         <Input
-          label="Código ean o iac"
+          label="Código EAN o IAC"
           type="text"
           autoComplete="off"
           value={datosConvenio.codigo_ean_iac}
