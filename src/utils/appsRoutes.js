@@ -312,7 +312,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = lazy(() =>
 );
 const SeleccionServicioPagarAgrario = lazy(() =>
   import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivados/SeleccionServicioPagarAval"
+    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivados/SeleccionServicioPagarAgrario"
   )
 );
 const RecaudoServiciosPublicosPrivadosMenuAgrario = lazy(() =>
