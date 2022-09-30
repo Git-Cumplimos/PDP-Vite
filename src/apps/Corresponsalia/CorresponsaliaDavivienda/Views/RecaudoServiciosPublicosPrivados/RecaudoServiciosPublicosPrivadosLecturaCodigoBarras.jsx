@@ -456,6 +456,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   });
   const printDiv = useRef();
   const isAlt = useRef("");
+  const isAltCR = useRef({"data":"",state: false});
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -482,8 +483,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   return;
                 }
                 if (ev.altKey) {
+                  if(isAltCR.current.state){
+                    isAltCR.current = ({...isAltCR.current,data: isAltCR.current.data + ev.key})
+                  }
                   if (ev.keyCode !== 18) {
                     isAlt.current += ev.key;
+                  }else{
+                    isAltCR.current = ({...isAltCR.current,state:true})
                   }
                 }
               }}
@@ -496,6 +502,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                       return { ...old, codBarras: old.codBarras + "\u001d" };
                     });
                   }
+                }
+                if(ev.keyCode === 18){
+                  if(isAltCR.current.data === "013"){
+                    onSubmit(ev);
+                  }
+                  isAltCR.current = ({...isAltCR.current,state:false,data:""})
                 }
               }}></TextArea>
             {datosTrans.codBarras !== "" && (
