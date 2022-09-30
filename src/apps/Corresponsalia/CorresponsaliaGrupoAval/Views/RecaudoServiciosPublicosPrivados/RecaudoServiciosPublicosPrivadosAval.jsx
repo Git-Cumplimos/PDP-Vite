@@ -21,7 +21,7 @@ import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { notify, notifyError } from "../../../../../utils/notify";
-import TicketsDavivienda from "../../components/TicketsDavivienda";
+import TicketsAval from "../../components/TicketsAval";
 import {
   postConsultaConveniosAval,
   postConsultaTablaConveniosEspecifico,

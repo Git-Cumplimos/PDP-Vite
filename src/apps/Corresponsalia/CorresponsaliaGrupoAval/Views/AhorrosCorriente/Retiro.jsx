@@ -12,7 +12,7 @@ import {
   consultaCostoGrupoAval,
 } from "../../utils/fetchCorresponsaliaGrupoAval";
 import { notify, notifyError } from "../../../../../utils/notify";
-import Tickets from "../../components/TicketsDavivienda";
+import TicketsAval from "../../components/TicketsAval";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import MoneyInput, {
   formatMoney,
@@ -202,7 +202,7 @@ const Retiro = () => {
             setShowModal(true);
           }
 
-          //notify("Transaccion satisfactoria");
+          notify("Transacción satisfactoria");
         })
         .catch((err) => {
           setIsUploading(false);
@@ -251,7 +251,7 @@ const Retiro = () => {
   }
   else{
     setIsUploading(false)
-    notifyError("La longitud del otp no es correcta")
+    notifyError("La longitud del OTP no es correcta")
   }
   }, [userDoc, phone, valor, DataBanco, tipoCuenta, limitesMontos, otp]);
 
@@ -294,13 +294,13 @@ const Retiro = () => {
           // return;
         }
         else{
-        notify("Transaccion satisfactoria");
+        notify("Transacción satisfactoria");
         const trx_id = parseInt(res?.obj?.respuesta_grupo_aval["11"]) ?? 0;
         // const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
         // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Retiro De Cuentas " + DataBanco?.nombre,
+          title: "Recibo de Pago",
           timeInfo: {
             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
@@ -314,18 +314,20 @@ const Retiro = () => {
             }).format(new Date()),
           },
           commerceInfo: [
-            ["Id Comercio", roleInfo?.id_comercio],
-            ["No. de aprobación", trx_id],
-            // ["No. terminal", ter],
-            ["Municipio", roleInfo?.ciudad],
+            ["Comercio", roleInfo?.["nombre comercio"]],
+            ["No. Terminal", roleInfo?.id_dispositivo],
             ["Dirección", roleInfo?.direccion],
-            ["Tipo de operación", "Retiro De Cuentas"],
-            ["", ""]            
+            ["Teléfono", roleInfo?.telefono],
+            ["Id trx", trx_id],
+            ["Id Aut", trx_id],        
           ],
-          commerceName: roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "No hay datos",
+          commerceName: "Transación de Retiro a Cuentas",
           trxInfo: [
+[
+              "Entidad financiera",
+              DataBanco?.nombre,
+            ],
+            ["",""],
             [
               "Tipo de cuenta",
               tipoCuenta === "01" ? "Ahorros" : "Corriente",
@@ -337,18 +339,11 @@ const Retiro = () => {
             // ],
             // ["",""],
             ["Valor", formatMoney.format(valor)],
-            ["",""],
-            [
-              "Costo transacción",
-              formatMoney.format(res?.obj?.costoTrx),
-            ],
-            ["",""],
-            ["Total", formatMoney.format(valor)],
-            ["",""],
-
-            //["Usuario de venta", "Nombre propietario del punto"],
+            ["", ""],
+            ["Costo transacción", formatMoney.format(res?.obj?.costoTrx)],
+            ["", ""],
           ],
-          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+          disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652 Opción X`,
         };
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.tipo_trx, tempTicket) ////////////////////////////////////
@@ -491,7 +486,7 @@ const Retiro = () => {
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
+              <TicketsAval refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>

@@ -13,6 +13,7 @@ import { formatMoney } from "../components/Base/MoneyInput";
 import PaymentSummary from "../components/Compound/PaymentSummary";
 import TicketsDavivienda from "../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
 import TicketsPines from "../apps/PinesVus/components/TicketsPines"
+import TicketsAval from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -288,7 +289,20 @@ const Transacciones = () => {
               <Button onClick={() => closeModal()}>Cerrar</Button>
             </ButtonBar>
           </div>
-        ) : selected?.ticket && JSON.stringify(selected?.ticket) !== '{}' &&  selected?.id_tipo_transaccion === 43 ? (
+        )  : selected?.ticket && JSON.stringify(selected?.ticket) !== '{}'  && selected?.id_autorizador === 17 ? (
+          <div className='flex flex-col justify-center items-center'>
+            <TicketsAval
+              refPrint={printDiv}
+              type='Reimpresión'
+              ticket={selected?.ticket}
+              stateTrx={selected?.status_trx}
+            />
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button onClick={() => closeModal()}>Cerrar</Button>
+            </ButtonBar>
+          </div>
+        ) :selected?.ticket && JSON.stringify(selected?.ticket) !== '{}' &&  selected?.id_tipo_transaccion === 43 ? (
           <div className='flex flex-col justify-center items-center'>
           <div ref={printDiv}>
           {selected?.ticket?.ticket2 ?
@@ -321,7 +335,7 @@ const Transacciones = () => {
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={() => closeModal()}>Cerrar</Button>
             </ButtonBar>
-        </div>  
+          </div>  
         ) : selected?.ticket && JSON.stringify(selected?.ticket) !== '{}' ? (
           <div className='flex flex-col justify-center items-center'>
             <Tickets

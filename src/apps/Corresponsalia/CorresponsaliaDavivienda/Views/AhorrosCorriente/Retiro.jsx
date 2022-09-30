@@ -216,7 +216,7 @@ const Retiro = () => {
       numNumeroDocumento: userDoc,
       numValorRetiro: valor,
       numOtp: otp,
-      valToken: "valToken",
+      // valToken: "valToken",
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
     };
