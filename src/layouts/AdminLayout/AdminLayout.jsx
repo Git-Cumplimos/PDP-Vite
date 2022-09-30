@@ -83,7 +83,7 @@ const AdminLayout = () => {
       roleInfo?.id_usuario !== undefined,
       roleInfo?.id_comercio !== undefined,
       roleInfo?.id_dispositivo !== undefined,
-      pathname.startsWith("/gestion/arqueo/arqueo-cierre"),
+      !pathname.startsWith("/gestion/arqueo/arqueo-cierre"),
       userPermissions?.map(({id_permission}) => id_permission).includes(74)
     ];
     if (conditions.every((val) => val)) {
