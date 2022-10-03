@@ -12,7 +12,7 @@ import TableEnterprise from "../components/Base/TableEnterprise";
 import { formatMoney } from "../components/Base/MoneyInput";
 import PaymentSummary from "../components/Compound/PaymentSummary";
 import TicketsDavivienda from "../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
-import TicketsPines from "../apps/PinesVus/components/TicketsPines"
+import TicketsPines from "../apps/PinesVus/components/TicketsPines";
 import TicketsAval from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
 import TicketColpatria from "../apps/Colpatria/components/TicketColpatria";
 
@@ -74,19 +74,21 @@ const Transacciones = () => {
         day: "numeric",
       }).format(fecha_fin);
     }
-    if (userPermissions
-      .map(({ id_permission }) => id_permission)
-      .includes(5) || queries.id_comercio !== -1){
-    fetchData(url, "GET", queries)
-      .then((res) => {
-        if (res?.status) {
-          setMaxPages(res?.obj?.maxpages);
-          setTrxs(res?.obj?.trxs);
-        } else {
-          throw new Error(res?.msg);
-        }
-      })
-      .catch(() => {});}
+    if (
+      userPermissions.map(({ id_permission }) => id_permission).includes(5) ||
+      queries.id_comercio !== -1
+    ) {
+      fetchData(url, "GET", queries)
+        .then((res) => {
+          if (res?.status) {
+            setMaxPages(res?.obj?.maxpages);
+            setTrxs(res?.obj?.trxs);
+          } else {
+            throw new Error(res?.msg);
+          }
+        })
+        .catch(() => {});
+    }
 
     if (tipoComercio !== null) {
       const acumQueries = { ...queries, oficina_propia: tipoComercio };
@@ -302,38 +304,32 @@ const Transacciones = () => {
                 stateTrx={selected?.status_trx}
               />
             ) : selected?.id_tipo_transaccion === 43 ? (
-              <div className="flex flex-col justify-center items-center">
-                <div ref={printDiv}>
-                  {selected?.ticket?.ticket2 ? (
-                    <>
-                      <TicketsPines
-                        refPrint={null}
-                        ticket={selected?.ticket?.ticket1}
-                        type="Reimpresión"
-                        stateTrx={selected?.status_trx}
-                        logo="LogoMiLicensia"
-                      />
-                      <TicketsPines
-                        refPrint={null}
-                        ticket={selected?.ticket?.ticket2}
-                        type="Reimpresión"
-                        stateTrx={selected?.status_trx}
-                        logo="LogoVus"
-                      />
-                    </>
-                  ) : (
-                    <Tickets
+              <div ref={printDiv}>
+                {selected?.ticket?.ticket2 ? (
+                  <>
+                    <TicketsPines
                       refPrint={null}
-                      ticket={selected?.ticket}
+                      ticket={selected?.ticket?.ticket1}
                       type="Reimpresión"
                       stateTrx={selected?.status_trx}
+                      logo="LogoMiLicensia"
                     />
-                  )}
-                </div>
-                <ButtonBar>
-                  <Button onClick={handlePrint}>Imprimir</Button>
-                  <Button onClick={() => closeModal()}>Cerrar</Button>
-                </ButtonBar>
+                    <TicketsPines
+                      refPrint={null}
+                      ticket={selected?.ticket?.ticket2}
+                      type="Reimpresión"
+                      stateTrx={selected?.status_trx}
+                      logo="LogoVus"
+                    />
+                  </>
+                ) : (
+                  <Tickets
+                    refPrint={null}
+                    ticket={selected?.ticket}
+                    type="Reimpresión"
+                    stateTrx={selected?.status_trx}
+                  />
+                )}
               </div>
             ) : (
               <Tickets
