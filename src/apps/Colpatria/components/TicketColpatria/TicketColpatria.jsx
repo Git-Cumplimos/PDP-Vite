@@ -24,9 +24,8 @@ const TicketColpatria = ({
   return (
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
-        <div className="flex flex-row justify-center items-center w-full">
-          <LogoPDP xsmall />
-          <div className={`w-64 md:w-52`}>
+        <div className="flex flex-col justify-center items-center w-full">
+          <div className={`my-2 w-72`}>
             <div className="aspect-w-13 aspect-h-1">
               <img
                 src={ScotiabankColpatria}
@@ -35,6 +34,7 @@ const TicketColpatria = ({
               />
             </div>
           </div>
+          <LogoPDP xsmall />
         </div>
         <h1 className="text-xl font-semibold text-center uppercase">{title}</h1>
         <hr className="border-gray-400 my-3" />
