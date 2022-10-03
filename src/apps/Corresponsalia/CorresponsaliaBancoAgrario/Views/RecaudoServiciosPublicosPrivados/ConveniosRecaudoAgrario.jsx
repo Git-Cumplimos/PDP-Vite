@@ -15,6 +15,8 @@ import { notify, notifyError } from "../../../../../utils/notify";
 import {
   postConsultaTablaConveniosPaginado,
   postConsultaTablaConveniosPaginadoTotal,
+  postCrearConvenio,
+  putModificarConvenio,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const url_cargueS3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_recaudo/subir_archivos_convenios`;
@@ -38,7 +40,7 @@ const ConveniosRecaudoAgrario = () => {
   const [dataConvenios, setDataConvenios] = useState({
     codigo: "",
     ean: "",
-    estado: false,
+    estado: true,
     nit: "",
     nombre_convenio: "",
     pk_tbl_convenios_banco_agrario: 0,
@@ -82,7 +84,7 @@ const ConveniosRecaudoAgrario = () => {
     setDataConvenios({
       codigo: "",
       ean: "",
-      estado: false,
+      estado: true,
       nit: "",
       nombre_convenio: "",
       pk_tbl_convenios_banco_agrario: 0,
@@ -96,27 +98,52 @@ const ConveniosRecaudoAgrario = () => {
       ],
     });
   };
-  const onSelectConvenio = useCallback((e, i) => {}, []);
-  const createUpdateConvenio = useCallback(
-    (e) => {
-      e.preventDefault();
-      for (let i = 0; i < dataConvenios.referencias.length; i++) {
-        const element = dataConvenios.referencias[i];
-        if (element.longitud_max_ref1 == 0 || element.longitud_min_ref1 == 0) {
-          return notifyError(
-            `La longitud maxima o minima debe ser diferente de 0`
-          );
-        }
-        if (element.longitud_min_ref1 > element.longitud_max_ref1) {
-          return notifyError(`La longitud minima debe ser menor a la maxima`);
+  const onSelectConvenio = useCallback(
+    (e, i) => {
+      console.log(convenios[i]);
+      const refTemp = [];
+      if (convenios[i].nombre_ref1 !== "" && convenios[i].nombre_ref1) {
+        refTemp.push({
+          nombre_ref1: convenios[i].nombre_ref1,
+          longitud_min_ref1: convenios[i].longitud_min_ref1,
+          longitud_max_ref1: convenios[i].longitud_max_ref1,
+          algoritmo_ref1: convenios[i].algoritmo_ref1,
+        });
+        if (convenios[i].nombre_ref2 !== "" && convenios[i].nombre_ref2) {
+          refTemp.push({
+            nombre_ref2: convenios[i].nombre_ref2,
+            longitud_min_ref2: convenios[i].longitud_min_ref2,
+            longitud_max_ref2: convenios[i].longitud_max_ref2,
+            algoritmo_ref2: convenios[i].algoritmo_ref2,
+          });
+          if (convenios[i].nombre_ref3 !== "" && convenios[i].nombre_ref3) {
+            refTemp.push({
+              nombre_ref3: convenios[i].nombre_ref3,
+              longitud_min_ref3: convenios[i].longitud_min_ref3,
+              longitud_max_ref3: convenios[i].longitud_max_ref3,
+              algoritmo_ref3: convenios[i].algoritmo_ref3,
+            });
+          }
         }
       }
-      if (dataConvenios?.pk_tbl_convenios_banco_agrario !== 0) {
-      } else {
-      }
+      setDataConvenios({
+        codigo: convenios[i].codigo,
+        ean: convenios[i].ean,
+        estado: convenios[i].estado,
+        nit: convenios[i].nit,
+        nombre_convenio: convenios[i].nombre_convenio,
+        pk_tbl_convenios_banco_agrario:
+          convenios[i].pk_tbl_convenios_banco_agrario,
+        referencias: refTemp,
+      });
+      setShowModal((old) => ({ estado: 1, showModal: true }));
     },
-    [dataConvenios]
+    [convenios]
   );
+  const createUpdateConvenio = useCallback((e) => {
+    e.preventDefault();
+    setShowModal((old) => ({ estado: 2, showModal: true }));
+  }, []);
   useEffect(() => {
     fecthTablaConveniosPaginadoFunc();
   }, [datosTrans, page, limit]);
@@ -175,10 +202,10 @@ const ConveniosRecaudoAgrario = () => {
   const onChangeFormatNumberVect = useCallback(
     (i) => (ev) => {
       const valor = ev.target.value;
-      let num = valor.replace(/[\s\.]/g, "");
+      let num = valor === "" ? 0 : valor.replace(/[\s\.]/g, "");
       if (!isNaN(num)) {
         const tempData = { ...dataConvenios };
-        tempData.referencias[i][ev.target.name] = ev.target.value;
+        tempData.referencias[i][ev.target.name] = parseInt(num);
         setDataConvenios(tempData);
       }
     },
@@ -263,6 +290,76 @@ const ConveniosRecaudoAgrario = () => {
         }); /* notify("Se ha comenzado la carga"); */
     },
     [file]
+  );
+  const onSubmit = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      for (let i = 0; i < dataConvenios.referencias.length; i++) {
+        const element = dataConvenios.referencias[i];
+        if (
+          element.longitud_max_ref1 === 0 ||
+          element.longitud_min_ref1 === 0
+        ) {
+          return notifyError(
+            `La longitud maxima o minima debe ser diferente de 0`
+          );
+        }
+        if (element.longitud_min_ref1 > element.longitud_max_ref1) {
+          return notifyError(`La longitud minima debe ser menor a la maxima`);
+        }
+      }
+      setIsUploading(true);
+      let dataTemp = { ...dataConvenios };
+      for (let id = 0; id < dataConvenios.referencias.length; id++) {
+        const element = dataConvenios.referencias[id];
+        dataTemp[`nombre_ref${id + 1}`] = element[`nombre_ref${id + 1}`];
+        dataTemp[`longitud_min_ref${id + 1}`] =
+          element[`longitud_min_ref${id + 1}`];
+        dataTemp[`longitud_max_ref${id + 1}`] =
+          element[`longitud_max_ref${id + 1}`];
+        dataTemp[`algoritmo_ref${id + 1}`] = element[`algoritmo_ref${id + 1}`];
+      }
+      delete dataTemp["referencias"];
+      if (dataConvenios.pk_tbl_convenios_banco_agrario !== 0) {
+        putModificarConvenio(dataConvenios.pk_tbl_convenios_banco_agrario, {
+          ...dataTemp,
+        })
+          .then((res) => {
+            setIsUploading(false);
+            if (res?.status) {
+              notify(res?.msg);
+              navigate(-1);
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => {
+            setIsUploading(false);
+            notifyError("No se ha podido conectar al servidor");
+            console.error(err);
+          });
+      } else {
+        delete dataTemp["pk_tbl_convenios_banco_agrario"];
+        postCrearConvenio({
+          ...dataTemp,
+        })
+          .then((res) => {
+            setIsUploading(false);
+            if (res?.status) {
+              notify(res?.msg);
+              navigate(-1);
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => {
+            setIsUploading(false);
+            notifyError("No se ha podido conectar al servidor");
+            console.error(err);
+          });
+      }
+    },
+    [dataConvenios, navigate]
   );
   return (
     <>
@@ -387,6 +484,16 @@ const ConveniosRecaudoAgrario = () => {
                   disabled></Input>
               )}
               <Input
+                id='codigo'
+                label='Código convenio'
+                type='text'
+                name='codigo'
+                minLength='1'
+                maxLength='80'
+                required
+                value={dataConvenios?.codigo}
+                onInput={onChangeFormat}></Input>
+              <Input
                 id='nombre_convenio'
                 label='Nombre convenio'
                 type='text'
@@ -412,10 +519,23 @@ const ConveniosRecaudoAgrario = () => {
                 type='text'
                 name='nit'
                 minLength='1'
-                maxLength='7'
+                maxLength='10'
                 required
                 value={dataConvenios?.nit}
                 onInput={onChangeFormatNumber}></Input>
+              <Select
+                className='place-self-stretch'
+                id='estado'
+                name='estado'
+                label='Estado del convenio'
+                required={true}
+                options={{
+                  Inactivo: false,
+                  Activo: true,
+                }}
+                onChange={onChangeFormat}
+                value={dataConvenios?.estado}
+              />
             </Fieldset>
             {dataConvenios.referencias.map((item, id) => (
               <Fieldset
@@ -483,100 +603,35 @@ const ConveniosRecaudoAgrario = () => {
                 </Button>
               )}
             </ButtonBar>
-
-            {/* <Fieldset
-              legend='Información del referencia 2'
-              className='lg:col-span-2'>
-              <Input
-                id='nombre_ref2'
-                label='Nombre referencia 2'
-                type='text'
-                name='nombre_ref2'
-                minLength='1'
-                maxLength='50'
-                value={dataConvenios?.nombre_ref2}
-                onInput={onChangeFormat}></Input>
-              <Select
-                className='place-self-stretch'
-                id='algoritmo_ref2'
-                name='algoritmo_ref2'
-                label='Tipo de algoritmo referencia 2'
-                options={{
-                  "": "",
-                  "N 010 Numérico": "N 010 Numérico",
-                  "A 000 Alfanumérico Números": "A 000 Alfanumérico Números",
-                }}
-                onChange={onChangeFormat}
-                value={dataConvenios?.algoritmo_ref2}
-              />
-              <Input
-                id='longitud_min_ref2'
-                label='longitud minima referencia 2'
-                type='text'
-                name='longitud_min_ref2'
-                minLength='0'
-                maxLength='2'
-                value={dataConvenios?.longitud_min_ref2}
-                onInput={onChangeFormatNumber}></Input>
-              <Input
-                id='longitud_max_ref1'
-                label='longitud maxima referencia 1'
-                type='text'
-                name='longitud_max_ref1'
-                minLength='0'
-                maxLength='2'
-                value={dataConvenios?.longitud_max_ref2}
-                onInput={onChangeFormatNumber}></Input>
-            </Fieldset>
-            <Fieldset
-              legend='Información del referencia 3'
-              className='lg:col-span-2'>
-              <Input
-                id='nombre_ref3'
-                label='Nombre referencia 3'
-                type='text'
-                name='nombre_ref3'
-                minLength='1'
-                maxLength='50'
-                value={dataConvenios?.nombre_ref3}
-                onInput={onChangeFormat}></Input>
-              <Select
-                className='place-self-stretch'
-                id='algoritmo_ref3'
-                name='algoritmo_ref3'
-                label='Tipo de algoritmo referencia 3'
-                options={{
-                  "": "",
-                  "N 010 Numérico": "N 010 Numérico",
-                  "A 000 Alfanumérico Números": "A 000 Alfanumérico Números",
-                }}
-                onChange={onChangeFormat}
-                value={dataConvenios?.algoritmo_ref3}
-              />
-              <Input
-                id='longitud_min_ref3'
-                label='longitud minima referencia 3'
-                type='text'
-                name='longitud_min_ref3'
-                minLength='0'
-                maxLength='2'
-                value={dataConvenios?.longitud_min_ref3}
-                onInput={onChangeFormatNumber}></Input>
-              <Input
-                id='longitud_max_ref3'
-                label='longitud maxima referencia 3'
-                type='text'
-                name='longitud_max_ref3'
-                minLength='0'
-                maxLength='2'
-                value={dataConvenios?.longitud_max_ref3}
-                onInput={onChangeFormatNumber}></Input>
-            </Fieldset> */}
             <ButtonBar>
               <Button onClick={hideModal}>Cancelar</Button>
-              <Button type='submit'>Aceptar</Button>
+              <Button type='submit'>
+                {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
+                  ? "Editar convenio"
+                  : "Crear convenio"}
+              </Button>
             </ButtonBar>
           </Form>
+        ) : estado === 2 ? (
+          <>
+            <h1 className='text-2xl text-center mb-5 font-semibold'>
+              {`¿Está seguro de ${
+                dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
+                  ? "editar el convenio"
+                  : "crear el convenio"
+              }?`}
+            </h1>
+            <>
+              <ButtonBar>
+                <Button onClick={hideModal}>Cancelar</Button>
+                <Button type='submit' onClick={onSubmit}>
+                  {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
+                    ? "Editar convenio"
+                    : "Crear convenio"}
+                </Button>
+              </ButtonBar>
+            </>
+          </>
         ) : (
           <></>
         )}
