@@ -68,12 +68,12 @@ const SeleccionServicioPagarAgrario = () => {
   return (
     <>
       <h1 className='text-3xl text-center'>
-        Recaudo servicios publicos y privados
+        Recaudo servicios públicos y privados
       </h1>
       <TableEnterprise
         title='Tabla convenios AVAL corresponsal bancario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "Ean"]}
+        headers={["Id", "Convenio", "EAN"]}
         data={tableConvenios}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
@@ -112,7 +112,7 @@ const SeleccionServicioPagarAgrario = () => {
           }}></Input>
         <Input
           id='ean'
-          label='Ean'
+          label='EAN'
           type='text'
           name='ean'
           minLength='1'
