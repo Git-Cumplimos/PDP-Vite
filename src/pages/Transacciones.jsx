@@ -14,6 +14,7 @@ import PaymentSummary from "../components/Compound/PaymentSummary";
 import TicketsDavivienda from "../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
 import TicketsPines from "../apps/PinesVus/components/TicketsPines"
 import TicketsAval from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
+import TicketColpatria from "../apps/Colpatria/components/TicketColpatria";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -148,10 +149,10 @@ const Transacciones = () => {
     transacciones();
   }, [transacciones]);
   return (
-    <div className='w-full flex flex-col justify-center items-center my-8'>
-      <h1 className='text-3xl'>Transacciones</h1>
+    <div className="w-full flex flex-col justify-center items-center my-8">
+      <h1 className="text-3xl">Transacciones</h1>
       <TableEnterprise
-        title='Transacciones'
+        title="Transacciones"
         headers={[
           "Id transaccion",
           "Operación",
@@ -198,18 +199,19 @@ const Transacciones = () => {
           });
           setShowModal(true);
         }}
-        onSetPageData={setPageData}>
+        onSetPageData={setPageData}
+      >
         <Input
-          id='dateInit'
-          label='Fecha inicial'
-          type='date'
+          id="dateInit"
+          label="Fecha inicial"
+          type="date"
           value={fechaInicial}
           onInput={(e) => setFechaInicial(e.target.value)}
         />
         <Input
-          id='dateEnd'
-          label='Fecha final'
-          type='date'
+          id="dateEnd"
+          label="Fecha final"
+          type="date"
           value={fechaFinal}
           onInput={(e) => setFechaFinal(e.target.value)}
         />
@@ -245,9 +247,9 @@ const Transacciones = () => {
           .includes(5) ? (
           <>
             <Input
-              id='id_comercio'
-              label='Id comercio'
-              type='numeric'
+              id="id_comercio"
+              label="Id comercio"
+              type="numeric"
               value={idComercio}
               onChange={(e) => {
                 setIdComercio(e.target.value);
@@ -258,9 +260,9 @@ const Transacciones = () => {
               }}
             />
             <Input
-              id='id_usuario'
-              label='Id usuario'
-              type='numeric'
+              id="id_usuario"
+              label="Id usuario"
+              type="numeric"
               value={usuario}
               onChange={(e) => {
                 setUsuario(e.target.value);
@@ -276,86 +278,84 @@ const Transacciones = () => {
         )}
       </TableEnterprise>
       <Modal show={showModal} handleClose={closeModal}>
-        {selected?.ticket && JSON.stringify(selected?.ticket) !== '{}'  && selected?.id_autorizador === 13 ? (
-          <div className='flex flex-col justify-center items-center'>
-            <TicketsDavivienda
-              refPrint={printDiv}
-              type='Reimpresión'
-              ticket={selected?.ticket}
-              stateTrx={selected?.status_trx}
-            />
-            <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => closeModal()}>Cerrar</Button>
-            </ButtonBar>
-          </div>
-        )  : selected?.ticket && JSON.stringify(selected?.ticket) !== '{}'  && selected?.id_autorizador === 17 ? (
-          <div className='flex flex-col justify-center items-center'>
-            <TicketsAval
-              refPrint={printDiv}
-              type='Reimpresión'
-              ticket={selected?.ticket}
-              stateTrx={selected?.status_trx}
-            />
-            <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => closeModal()}>Cerrar</Button>
-            </ButtonBar>
-          </div>
-        ) :selected?.ticket && JSON.stringify(selected?.ticket) !== '{}' &&  selected?.id_tipo_transaccion === 43 ? (
-          <div className='flex flex-col justify-center items-center'>
-          <div ref={printDiv}>
-          {selected?.ticket?.ticket2 ?
-          <>
-          <TicketsPines
-          refPrint={null} 
-          ticket={selected?.ticket?.ticket1} 
-          type='Reimpresión'
-          stateTrx={selected?.status_trx}
-          logo = 'LogoMiLicensia'
-          />
-          <TicketsPines
-            refPrint={null} 
-            ticket={selected?.ticket?.ticket2}
-            type='Reimpresión'
-            stateTrx={selected?.status_trx}
-            logo = 'LogoVus'
-          /> 
-          </>         
-          :
-          <Tickets
-          refPrint={null} 
-          ticket={selected?.ticket} 
-          type='Reimpresión'
-          stateTrx={selected?.status_trx}
-          />          
-          }   
-          </div>       
-          <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => closeModal()}>Cerrar</Button>
-            </ButtonBar>
-          </div>  
-        ) : selected?.ticket && JSON.stringify(selected?.ticket) !== '{}' ? (
-          <div className='flex flex-col justify-center items-center'>
-            <Tickets
-              refPrint={printDiv}
-              type='Reimpresión'
-              ticket={selected?.ticket}
-              stateTrx={selected?.status_trx}
-            />
+        {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (
+          <div className="flex flex-col justify-center items-center">
+            {selected?.id_autorizador === 13 ? (
+              <TicketsDavivienda
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 14 ? (
+              <TicketColpatria
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 17 ? (
+              <TicketsAval
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_tipo_transaccion === 43 ? (
+              <div className="flex flex-col justify-center items-center">
+                <div ref={printDiv}>
+                  {selected?.ticket?.ticket2 ? (
+                    <>
+                      <TicketsPines
+                        refPrint={null}
+                        ticket={selected?.ticket?.ticket1}
+                        type="Reimpresión"
+                        stateTrx={selected?.status_trx}
+                        logo="LogoMiLicensia"
+                      />
+                      <TicketsPines
+                        refPrint={null}
+                        ticket={selected?.ticket?.ticket2}
+                        type="Reimpresión"
+                        stateTrx={selected?.status_trx}
+                        logo="LogoVus"
+                      />
+                    </>
+                  ) : (
+                    <Tickets
+                      refPrint={null}
+                      ticket={selected?.ticket}
+                      type="Reimpresión"
+                      stateTrx={selected?.status_trx}
+                    />
+                  )}
+                </div>
+                <ButtonBar>
+                  <Button onClick={handlePrint}>Imprimir</Button>
+                  <Button onClick={() => closeModal()}>Cerrar</Button>
+                </ButtonBar>
+              </div>
+            ) : (
+              <Tickets
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            )}
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={() => closeModal()}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
-          <div className='flex flex-col justify-center items-center mx-auto container'>
+          <div className="flex flex-col justify-center items-center mx-auto container">
             <PaymentSummary
-              title='Resumen transaccion'
-              subtitle=''
-              summaryTrx={summaryTrx}>
-              <h1 className='text-3xl mt-6 text-aling'>
+              title="Resumen transaccion"
+              subtitle=""
+              summaryTrx={summaryTrx}
+            >
+              <h1 className="text-3xl mt-6 text-aling">
                 No hay ticket registrado
               </h1>
               <ButtonBar>
