@@ -136,7 +136,17 @@ const Transacciones = () => {
     tempArr.forEach((types_trx) =>
       types_trx.forEach((val) => allTypes.push(val))
     );
-    setTiposOp([...allTypes.sort((a, b) => a.Nombre.localeCompare(b.Nombre))]);
+    setTiposOp([
+      ...allTypes
+        .sort((a, b) => a.Nombre.localeCompare(b.Nombre))
+        .filter(
+          (value, index, self) =>
+            index ===
+            self.findIndex(
+              (t) => t.id_tipo_operacion === value.id_tipo_operacion
+            )
+        ),
+    ]);
 
     setIdComercio(roleInfo?.id_comercio || -1);
     setUsuario(roleInfo?.id_usuario || -1);
