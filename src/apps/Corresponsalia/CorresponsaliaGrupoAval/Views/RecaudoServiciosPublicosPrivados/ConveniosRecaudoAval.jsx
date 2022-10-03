@@ -137,7 +137,7 @@ const ConveniosRecaudoAval = () => {
       <TableEnterprise
         title='Tabla convenios AVAL corresponsal bancario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "Ean"]}
+        headers={["Id", "Convenio", "EAN"]}
         data={tableConvenios}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
@@ -175,7 +175,7 @@ const ConveniosRecaudoAval = () => {
           }}></Input>
         <Input
           id='ean'
-          label='Ean'
+          label='EAN'
           type='text'
           name='ean'
           minLength='1'

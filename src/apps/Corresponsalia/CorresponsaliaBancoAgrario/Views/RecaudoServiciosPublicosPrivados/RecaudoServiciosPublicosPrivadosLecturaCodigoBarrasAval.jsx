@@ -147,7 +147,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       setIsUploading(true);
       fetchTablaConveniosEspecificoFunc(datosTrans?.codBarras);
     } else {
-      notifyError("El codigo de barras no tiene el formato correcto");
+      notifyError("El código de barras no tiene el formato correcto");
     }
   };
   const habilitarModal = () => {
@@ -325,7 +325,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     <>
       <SimpleLoading show={isUploading} />
       <h1 className='text-3xl text-center mb-10 mt-5'>
-        Recaudo servicios publicos y privados
+        Recaudo servicios públicos y privados
       </h1>
       {!datosEnvio.estadoConsulta ? (
         <>
@@ -371,7 +371,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   onClick={() => {
                     setDatosTrans({ codBarras: "" });
                   }}>
-                  Volver a ingresar codigo de barras
+                  Volver a ingresar código de barras
                 </Button>
               </ButtonBar>
             )}
@@ -456,7 +456,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                     data: "",
                   });
                 }}>
-                Volver a ingresar codigo de barras
+                Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
                 <Button type='submit'>Realizar consulta</Button>

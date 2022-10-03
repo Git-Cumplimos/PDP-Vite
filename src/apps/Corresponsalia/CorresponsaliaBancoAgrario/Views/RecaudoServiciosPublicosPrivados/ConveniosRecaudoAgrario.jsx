@@ -97,23 +97,26 @@ const ConveniosRecaudoAgrario = () => {
     });
   };
   const onSelectConvenio = useCallback((e, i) => {}, []);
-  const createUpdateConvenio = useCallback((e) => {
-    e.preventDefault()
-    for (let i = 0; i < dataConvenios.referencias.length; i++) {
-      const element = dataConvenios.referencias[i];
-      if (element.longitud_max_ref1 == 0 || element.longitud_min_ref1 == 0 ){
-        return notifyError(`La longitud maxima o minima debe ser diferente de 0`)
+  const createUpdateConvenio = useCallback(
+    (e) => {
+      e.preventDefault();
+      for (let i = 0; i < dataConvenios.referencias.length; i++) {
+        const element = dataConvenios.referencias[i];
+        if (element.longitud_max_ref1 == 0 || element.longitud_min_ref1 == 0) {
+          return notifyError(
+            `La longitud maxima o minima debe ser diferente de 0`
+          );
+        }
+        if (element.longitud_min_ref1 > element.longitud_max_ref1) {
+          return notifyError(`La longitud minima debe ser menor a la maxima`);
+        }
       }
-      if (element.longitud_min_ref1 > element.longitud_max_ref1){
-        return notifyError(`La longitud minima debe ser menor a la maxima`)
+      if (dataConvenios?.pk_tbl_convenios_banco_agrario !== 0) {
+      } else {
       }
-    }
-    if(dataConvenios?.pk_tbl_convenios_banco_agrario !== 0){
-      
-    }else{
-
-    }
-  }, [dataConvenios]);
+    },
+    [dataConvenios]
+  );
   useEffect(() => {
     fecthTablaConveniosPaginadoFunc();
   }, [datosTrans, page, limit]);
@@ -161,43 +164,55 @@ const ConveniosRecaudoAgrario = () => {
       });
     }
   }, []);
-  const onChangeFormatVect = useCallback((i)=>(ev) => {
-    const tempData = {...dataConvenios}
-    tempData.referencias[i][ev.target.name] = ev.target.value
-    setDataConvenios(tempData);
-  }, [dataConvenios]);
-  const onChangeFormatNumberVect = useCallback((i)=>(ev) => {
-    const valor = ev.target.value;
-    let num = valor.replace(/[\s\.]/g, "");
-    if (!isNaN(num)) {
-      const tempData = {...dataConvenios}
-      tempData.referencias[i][ev.target.name] = ev.target.value
+  const onChangeFormatVect = useCallback(
+    (i) => (ev) => {
+      const tempData = { ...dataConvenios };
+      tempData.referencias[i][ev.target.name] = ev.target.value;
       setDataConvenios(tempData);
-    }
-  }, [dataConvenios]);
-  const addReferencia= useCallback((ev) => {
-    ev.preventDefault();
-    const tempData = {...dataConvenios}
-    const lenData = tempData.referencias.length
-    if(lenData <3){
-      tempData.referencias.push({
-      [`nombre_ref${lenData+1}`]: "",
-      [`longitud_min_ref${lenData+1}`]: 0,
-      [`longitud_max_ref${lenData+1}`]: 0,
-      [`algoritmo_ref${lenData+1}`]: "",
-      })
-      setDataConvenios(tempData)
-    }
-  }, [dataConvenios]);
-  const deleteReferencia = useCallback((ev) => {
-    ev.preventDefault();
-    const tempData = {...dataConvenios}
-    const lenData = tempData.referencias.length
-    if(lenData >1 ){
-      tempData.referencias.pop()
-      setDataConvenios(tempData)
-    }
-  }, [dataConvenios]);
+    },
+    [dataConvenios]
+  );
+  const onChangeFormatNumberVect = useCallback(
+    (i) => (ev) => {
+      const valor = ev.target.value;
+      let num = valor.replace(/[\s\.]/g, "");
+      if (!isNaN(num)) {
+        const tempData = { ...dataConvenios };
+        tempData.referencias[i][ev.target.name] = ev.target.value;
+        setDataConvenios(tempData);
+      }
+    },
+    [dataConvenios]
+  );
+  const addReferencia = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      const tempData = { ...dataConvenios };
+      const lenData = tempData.referencias.length;
+      if (lenData < 3) {
+        tempData.referencias.push({
+          [`nombre_ref${lenData + 1}`]: "",
+          [`longitud_min_ref${lenData + 1}`]: 0,
+          [`longitud_max_ref${lenData + 1}`]: 0,
+          [`algoritmo_ref${lenData + 1}`]: "",
+        });
+        setDataConvenios(tempData);
+      }
+    },
+    [dataConvenios]
+  );
+  const deleteReferencia = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      const tempData = { ...dataConvenios };
+      const lenData = tempData.referencias.length;
+      if (lenData > 1) {
+        tempData.referencias.pop();
+        setDataConvenios(tempData);
+      }
+    },
+    [dataConvenios]
+  );
 
   //------------------Funcion Para Subir El Formulario---------------------//
   const saveFile = useCallback(
@@ -253,21 +268,20 @@ const ConveniosRecaudoAgrario = () => {
     <>
       <SimpleLoading show={isUploading} />
       <TableEnterprise
-        title="Tabla convenios AVAL corresponsal bancario"
+        title='Tabla convenios AVAL corresponsal bancario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "Ean", "Estado"]}
+        headers={["Id", "Convenio", "EAN", "Estado"]}
         data={tableConvenios}
         onSelectRow={onSelectConvenio}
-        onSetPageData={setPageData}
-      >
+        onSetPageData={setPageData}>
         <Input
-          id="searchConvenio"
-          name="searchConvenio"
+          id='searchConvenio'
+          name='searchConvenio'
           label={"Buscar convenio"}
-          minLength="1"
-          maxLength="30"
-          type="text"
-          autoComplete="off"
+          minLength='1'
+          maxLength='30'
+          type='text'
+          autoComplete='off'
           onInput={(e) => {
             setDatosTrans((old) => {
               return { ...old, convenio: e.target.value };
@@ -275,12 +289,12 @@ const ConveniosRecaudoAgrario = () => {
           }}
         />
         <Input
-          id="idConvenio"
-          label="Id convenio"
-          type="text"
-          name="idConvenio"
-          minLength="1"
-          maxLength="13"
+          id='idConvenio'
+          label='Id convenio'
+          type='text'
+          name='idConvenio'
+          minLength='1'
+          maxLength='13'
           value={datosTrans.idConvenio}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -289,15 +303,14 @@ const ConveniosRecaudoAgrario = () => {
                 return { ...old, idConvenio: num };
               });
             }
-          }}
-        ></Input>
+          }}></Input>
         <Input
-          id="ean"
-          label="Ean"
-          type="text"
-          name="ean"
-          minLength="1"
-          maxLength="13"
+          id='ean'
+          label='EAN'
+          type='text'
+          name='ean'
+          minLength='1'
+          maxLength='13'
           value={datosTrans.ean}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -306,48 +319,45 @@ const ConveniosRecaudoAgrario = () => {
                 return { ...old, ean: num };
               });
             }
-          }}
-        ></Input>
+          }}></Input>
         <ButtonBar>
           <Button
-            type="submit"
+            type='submit'
             onClick={() =>
               setShowModal((old) => ({ estado: 0, showModal: true }))
-            }
-          >
+            }>
             Subir convenios
           </Button>
           <Button
-            type="submit"
+            type='submit'
             onClick={() =>
               setShowModal((old) => ({ estado: 1, showModal: true }))
-            }
-          >
+            }>
             Crear convenios
           </Button>
         </ButtonBar>
       </TableEnterprise>
       <Modal show={showModal} handleClose={hideModal}>
         {estado === 0 ? (
-          <Form formDir="col" onSubmit={saveFile}>
-            <h1 className="text-2xl text-center mb-10 mt-5">
+          <Form formDir='col' onSubmit={saveFile}>
+            <h1 className='text-2xl text-center mb-10 mt-5'>
               Archivo de convenios AVAL
             </h1>
             <InputX
               id={`archivo`}
               label={file.name ? "Cambiar archivo" : `Elegir archivo`}
-              type="file"
+              type='file'
               // disabled={progress !== 0}
-              accept=".txt,.csv"
+              accept='.txt,.csv'
               onGetFile={onChangeFile}
             />
             {file.name ? (
               <>
-                <h2 className="text-l text-center mt-5">
+                <h2 className='text-l text-center mt-5'>
                   {`Archivo seleccionado: ${file.name}`}
                 </h2>
                 <ButtonBar>
-                  <Button type="submit">Subir</Button>
+                  <Button type='submit'>Subir</Button>
                 </ButtonBar>
               </>
             ) : (
@@ -355,118 +365,112 @@ const ConveniosRecaudoAgrario = () => {
             )}
           </Form>
         ) : estado === 1 ? (
-          <Form
-            grid
-            onSubmit={createUpdateConvenio}
-          >
-            <h1 className="text-2xl font-semibold text-center">
+          <Form grid onSubmit={createUpdateConvenio}>
+            <h1 className='text-2xl font-semibold text-center'>
               {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
                 ? "Editar convenio Agrario"
                 : "Crear convenio Agrario"}
             </h1>
             <Fieldset
-              legend="Información del convenio"
-              className="lg:col-span-2"
-            >
+              legend='Información del convenio'
+              className='lg:col-span-2'>
               {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0 && (
                 <Input
-                  id="pk_tbl_convenios_banco_agrario"
-                  label="Id comercio"
-                  type="text"
-                  name="pk_tbl_convenios_banco_agrario"
-                  minLength="1"
-                  maxLength="32"
+                  id='pk_tbl_convenios_banco_agrario'
+                  label='Id comercio'
+                  type='text'
+                  name='pk_tbl_convenios_banco_agrario'
+                  minLength='1'
+                  maxLength='32'
                   value={dataConvenios?.pk_tbl_convenios_banco_agrario}
                   onInput={onChangeFormat}
-                  disabled
-                ></Input>
+                  disabled></Input>
               )}
               <Input
-                id="nombre_convenio"
-                label="Nombre convenio"
-                type="text"
-                name="nombre_convenio"
-                minLength="1"
-                maxLength="80"
+                id='nombre_convenio'
+                label='Nombre convenio'
+                type='text'
+                name='nombre_convenio'
+                minLength='1'
+                maxLength='80'
                 required
                 value={dataConvenios?.nombre_convenio}
-                onInput={onChangeFormat}
-              ></Input>
+                onInput={onChangeFormat}></Input>
               <Input
-                id="ean"
-                label="EAN"
-                type="text"
-                name="ean"
-                minLength="1"
-                maxLength="13"
+                id='ean'
+                label='EAN'
+                type='text'
+                name='ean'
+                minLength='1'
+                maxLength='13'
                 required
                 value={dataConvenios?.ean}
-                onInput={onChangeFormatNumber}
-              ></Input>
+                onInput={onChangeFormatNumber}></Input>
               <Input
-                id="nit"
-                label="NIT"
-                type="text"
-                name="nit"
-                minLength="1"
-                maxLength="7"
+                id='nit'
+                label='NIT'
+                type='text'
+                name='nit'
+                minLength='1'
+                maxLength='7'
                 required
                 value={dataConvenios?.nit}
-                onInput={onChangeFormatNumber}
-              ></Input>
+                onInput={onChangeFormatNumber}></Input>
             </Fieldset>
             {dataConvenios.referencias.map((item, id) => (
               <Fieldset
-                legend={`Información del referencia ${id+1}`}
-                className="lg:col-span-2"
-                key={id}
-              >
+                legend={`Información del referencia ${id + 1}`}
+                className='lg:col-span-2'
+                key={id}>
                 <Input
-                  id={`nombre_ref${id+1}`}
-                  label={`Nombre referencia ${id+1}`}
-                  type="text"
-                  name={`nombre_ref${id+1}`}
-                  minLength="1"
-                  maxLength="50"
+                  id={`nombre_ref${id + 1}`}
+                  label={`Nombre referencia ${id + 1}`}
+                  type='text'
+                  name={`nombre_ref${id + 1}`}
+                  minLength='1'
+                  maxLength='50'
                   required
-                  value={dataConvenios?.referencias[id][`nombre_ref${id+1}`]}
-                  onInput={onChangeFormatVect(id)}
-                ></Input>
+                  value={dataConvenios?.referencias[id][`nombre_ref${id + 1}`]}
+                  onInput={onChangeFormatVect(id)}></Input>
                 <Select
-                  className="place-self-stretch"
-                  id={`algoritmo_ref${id+1}`}
-                  name={`algoritmo_ref${id+1}`}
-                  label={`Tipo de algoritmo referencia ${id+1}`}
+                  className='place-self-stretch'
+                  id={`algoritmo_ref${id + 1}`}
+                  name={`algoritmo_ref${id + 1}`}
+                  label={`Tipo de algoritmo referencia ${id + 1}`}
                   required={true}
                   options={{
                     "N 010 Numérico": "N 010 Numérico",
                     "A 000 Alfanumérico Números": "A 000 Alfanumérico Números",
                   }}
                   onChange={onChangeFormatVect(id)}
-                  value={dataConvenios?.referencias[id][`algoritmo_ref${id+1}`]}
+                  value={
+                    dataConvenios?.referencias[id][`algoritmo_ref${id + 1}`]
+                  }
                 />
                 <Input
-                  id={`longitud_min_ref${id+1}`}
-                  label={`longitud minima referencia ${id+1}`}
-                  type="text"
-                  name={`longitud_min_ref${id+1}`}
-                  minLength="1"
-                  maxLength="2"
+                  id={`longitud_min_ref${id + 1}`}
+                  label={`longitud minima referencia ${id + 1}`}
+                  type='text'
+                  name={`longitud_min_ref${id + 1}`}
+                  minLength='1'
+                  maxLength='2'
                   required
-                  value={dataConvenios?.referencias[id][`longitud_min_ref${id+1}`]}
-                  onInput={onChangeFormatNumberVect(id)}
-                ></Input>
+                  value={
+                    dataConvenios?.referencias[id][`longitud_min_ref${id + 1}`]
+                  }
+                  onInput={onChangeFormatNumberVect(id)}></Input>
                 <Input
-                  id={`longitud_max_ref${id+1}`}
-                  label={`longitud maxima referencia ${id+1}`}
-                  type="text"
-                  name={`longitud_max_ref${id+1}`}
-                  minLength="1"
-                  maxLength="2"
+                  id={`longitud_max_ref${id + 1}`}
+                  label={`longitud maxima referencia ${id + 1}`}
+                  type='text'
+                  name={`longitud_max_ref${id + 1}`}
+                  minLength='1'
+                  maxLength='2'
                   required
-                  value={dataConvenios?.referencias[id][`longitud_max_ref${id+1}`]}
-                  onInput={onChangeFormatNumberVect(id)}
-                ></Input>
+                  value={
+                    dataConvenios?.referencias[id][`longitud_max_ref${id + 1}`]
+                  }
+                  onInput={onChangeFormatNumberVect(id)}></Input>
               </Fieldset>
             ))}
             <ButtonBar className='lg:col-span-2'>
@@ -474,14 +478,10 @@ const ConveniosRecaudoAgrario = () => {
                 <Button onClick={deleteReferencia}>Eliminar Referencia</Button>
               )}
               {dataConvenios.referencias.length < 3 && (
-                <Button
-                type="button"
-                onClick={addReferencia}
-              >
-                Agregar referencia
-              </Button>
+                <Button type='button' onClick={addReferencia}>
+                  Agregar referencia
+                </Button>
               )}
-              
             </ButtonBar>
 
             {/* <Fieldset
@@ -574,7 +574,7 @@ const ConveniosRecaudoAgrario = () => {
             </Fieldset> */}
             <ButtonBar>
               <Button onClick={hideModal}>Cancelar</Button>
-              <Button type="submit">Aceptar</Button>
+              <Button type='submit'>Aceptar</Button>
             </ButtonBar>
           </Form>
         ) : (

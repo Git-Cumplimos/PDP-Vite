@@ -148,7 +148,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       setIsUploading(true);
       fetchTablaConveniosEspecificoFunc(datosTrans?.codBarras);
     } else {
-      notifyError("El codigo de barras no tiene el formato correcto");
+      notifyError("El código de barras no tiene el formato correcto");
     }
   };
   const habilitarModal = () => {
@@ -456,7 +456,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   });
   const printDiv = useRef();
   const isAlt = useRef("");
-  const isAltCR = useRef({"data":"",state: false});
+  const isAltCR = useRef({ data: "", state: false });
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -483,13 +483,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   return;
                 }
                 if (ev.altKey) {
-                  if(isAltCR.current.state){
-                    isAltCR.current = ({...isAltCR.current,data: isAltCR.current.data + ev.key})
+                  if (isAltCR.current.state) {
+                    isAltCR.current = {
+                      ...isAltCR.current,
+                      data: isAltCR.current.data + ev.key,
+                    };
                   }
                   if (ev.keyCode !== 18) {
                     isAlt.current += ev.key;
-                  }else{
-                    isAltCR.current = ({...isAltCR.current,state:true})
+                  } else {
+                    isAltCR.current = { ...isAltCR.current, state: true };
                   }
                 }
               }}
@@ -503,11 +506,15 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     });
                   }
                 }
-                if(ev.keyCode === 18){
-                  if(isAltCR.current.data === "013"){
+                if (ev.keyCode === 18) {
+                  if (isAltCR.current.data === "013") {
                     onSubmit(ev);
                   }
-                  isAltCR.current = ({...isAltCR.current,state:false,data:""})
+                  isAltCR.current = {
+                    ...isAltCR.current,
+                    state: false,
+                    data: "",
+                  };
                 }
               }}></TextArea>
             {datosTrans.codBarras !== "" && (
@@ -517,7 +524,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   onClick={() => {
                     setDatosTrans({ codBarras: "" });
                   }}>
-                  Volver a ingresar codigo de barras
+                  Volver a ingresar código de barras
                 </Button>
               </ButtonBar>
             )}
