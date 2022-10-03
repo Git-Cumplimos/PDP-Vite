@@ -41,7 +41,12 @@ const ConveniosPines = () => {
   const [loading, setLoading] = useState(false);
 
   const getConvPines = useCallback(() => {
-    getConveniosPinesList({ ...pageData, ...searchFilters })
+    getConveniosPinesList({
+      ...pageData,
+      ...Object.fromEntries(
+        Object.entries(searchFilters).filter(([, val]) => val)
+      ),
+    })
       .then((res) => {
         setListaConveniosPines(res?.obj?.results ?? []);
         setMaxPages(res?.obj?.maxPages ?? []);

@@ -41,7 +41,12 @@ const ConveniosRecaudo = () => {
   const [loading, setLoading] = useState(false);
 
   const getConvRecaudo = useCallback(() => {
-    getConveniosRecaudoList({ ...pageData, ...searchFilters })
+    getConveniosRecaudoList({
+      ...pageData,
+      ...Object.fromEntries(
+        Object.entries(searchFilters).filter(([, val]) => val)
+      ),
+    })
       .then((res) => {
         setListaConveniosRecaudo(res?.obj?.results ?? []);
         setMaxPages(res?.obj?.maxPages ?? []);

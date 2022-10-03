@@ -68,12 +68,12 @@ const SeleccionServicioPagarAval = () => {
   return (
     <>
       <h1 className='text-3xl text-center'>
-        Recaudo servicios publicos y privados
+        Recaudo servicios públicos y privados
       </h1>
       <TableEnterprise
         title='Tabla convenios AVAL corresponsal bancario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "Ean"]}
+        headers={["Id", "Convenio", "EAN"]}
         data={tableConvenios}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
@@ -82,7 +82,7 @@ const SeleccionServicioPagarAval = () => {
         <Input
           id='searchConvenio'
           name='searchConvenio'
-          label={"Nopmbre convenio"}
+          label={"Nombre convenio"}
           minLength='1'
           maxLength='30'
           type='text'
@@ -112,7 +112,7 @@ const SeleccionServicioPagarAval = () => {
           }}></Input>
         <Input
           id='ean'
-          label='Ean'
+          label='EAN'
           type='text'
           name='ean'
           minLength='1'
