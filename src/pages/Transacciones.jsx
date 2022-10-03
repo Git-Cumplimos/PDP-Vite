@@ -72,16 +72,21 @@ const Transacciones = () => {
         day: "numeric",
       }).format(fecha_fin);
     }
-    fetchData(url, "GET", queries)
-      .then((res) => {
-        if (res?.status) {
-          setMaxPages(res?.obj?.maxpages);
-          setTrxs(res?.obj?.trxs);
-        } else {
-          throw new Error(res?.msg);
-        }
-      })
-      .catch(() => {});
+    if (
+      userPermissions.map(({ id_permission }) => id_permission).includes(5) ||
+      queries.id_comercio !== -1
+    ) {
+      fetchData(url, "GET", queries)
+        .then((res) => {
+          if (res?.status) {
+            setMaxPages(res?.obj?.maxpages);
+            setTrxs(res?.obj?.trxs);
+          } else {
+            throw new Error(res?.msg);
+          }
+        })
+        .catch(() => {});
+    }
 
     if (tipoComercio !== null) {
       const acumQueries = { ...queries, oficina_propia: tipoComercio };
@@ -105,6 +110,7 @@ const Transacciones = () => {
     tipoOp,
     usuario,
     tipoComercio,
+    userPermissions,
   ]);
 
   const closeModal = useCallback(async () => {
@@ -128,7 +134,17 @@ const Transacciones = () => {
     tempArr.forEach((types_trx) =>
       types_trx.forEach((val) => allTypes.push(val))
     );
-    setTiposOp([...allTypes.sort((a, b) => a.Nombre.localeCompare(b.Nombre))]);
+    setTiposOp([
+      ...allTypes
+        .sort((a, b) => a.Nombre.localeCompare(b.Nombre))
+        .filter(
+          (value, index, self) =>
+            index ===
+            self.findIndex(
+              (t) => t.id_tipo_operacion === value.id_tipo_operacion
+            )
+        ),
+    ]);
 
     setIdComercio(roleInfo?.id_comercio || -1);
     setUsuario(roleInfo?.id_usuario || -1);
@@ -142,7 +158,6 @@ const Transacciones = () => {
   useEffect(() => {
     transacciones();
   }, [transacciones]);
-
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Transacciones</h1>
@@ -289,47 +304,6 @@ const Transacciones = () => {
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.id_autorizador === 17 ? (
-              <TicketsAval
-                refPrint={printDiv}
-                type="Reimpresión"
-                ticket={selected?.ticket}
-                stateTrx={selected?.status_trx}
-              />
-            ) : selected?.id_tipo_transaccion === 43 ? (
-              <div className="flex flex-col justify-center items-center">
-                <div ref={printDiv}>
-                  {selected?.ticket?.ticket2 ? (
-                    <>
-                      <TicketsPines
-                        refPrint={null}
-                        ticket={selected?.ticket?.ticket1}
-                        type="Reimpresión"
-                        stateTrx={selected?.status_trx}
-                        logo="LogoMiLicensia"
-                      />
-                      <TicketsPines
-                        refPrint={null}
-                        ticket={selected?.ticket?.ticket2}
-                        type="Reimpresión"
-                        stateTrx={selected?.status_trx}
-                        logo="LogoVus"
-                      />
-                    </>
-                  ) : (
-                    <Tickets
-                      refPrint={null}
-                      ticket={selected?.ticket}
-                      type="Reimpresión"
-                      stateTrx={selected?.status_trx}
-                    />
-                  )}
-                </div>
-                <ButtonBar>
-                  <Button onClick={handlePrint}>Imprimir</Button>
-                  <Button onClick={() => closeModal()}>Cerrar</Button>
-                </ButtonBar>
-              </div>
             ) : (
               <Tickets
                 refPrint={printDiv}
