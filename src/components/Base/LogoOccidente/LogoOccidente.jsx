@@ -10,7 +10,7 @@ const LogoOccidente = memo(({ large = false, small = false, xsmall = false }) =>
     imgs: { LogoOccidente: LogoPng },
   } = useImgs();
   return (
-    <div className="mr-2 grid" style = {{width: "70mm"}}>
+    <div className="mr-3 mb-2 grid" style = {{width: "70mm"}}>
     <div
       className={`${logoOccidente} ${large ? lgImg : ""} ${small ? smImg : ""} ${
         xsmall ? xsImg : ""
