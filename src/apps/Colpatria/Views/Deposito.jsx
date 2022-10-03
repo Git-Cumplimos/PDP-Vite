@@ -15,7 +15,6 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import Select from "../../../components/Base/Select";
-import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import useMoney from "../../../hooks/useMoney";
@@ -29,6 +28,7 @@ import {
   toAccountNumber,
 } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
+import TicketColpatria from "../components/TicketColpatria";
 
 const accountTypes = {
   10: "Cuenta ahorros",
@@ -327,7 +327,7 @@ const Deposito = () => {
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={paymentStatus} />
+            <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={() => navigate("/colpatria")}>Cerrar</Button>
