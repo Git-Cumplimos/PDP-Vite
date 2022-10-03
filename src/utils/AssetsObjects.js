@@ -12,6 +12,7 @@ const images = {
   PINVUS: `${urlAssets}/assets/img/LogoPinVus.jpg`,
   MiLicencia: `${urlAssets}/assets/img/logo-milicencia.jpg`,
   LogoOccidente: `${urlAssets}/assets/img/banco-de-occidente.png`,
+  ScotiabankColpatria: `${urlAssets}/assets/img/ScotiabankColpatria.webp`,
 };
 
 const svgs = {

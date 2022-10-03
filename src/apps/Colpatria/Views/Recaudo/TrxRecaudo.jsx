@@ -19,7 +19,6 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
-import Tickets from "../../../../components/Base/Tickets";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import useMoney from "../../../../hooks/useMoney";
@@ -36,6 +35,7 @@ import {
 } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
 import ScreenBlocker from "../../components/ScreenBlocker";
+import TicketColpatria from "../../components/TicketColpatria";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -506,7 +506,7 @@ const TrxRecaudo = () => {
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={paymentStatus} />
+            <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={() => navigate("/corresponsalia/colpatria")}>
