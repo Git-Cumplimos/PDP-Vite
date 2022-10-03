@@ -5,12 +5,11 @@ import Button from "../../../../../components/Base/Button";
 import Modal from "../../../../../components/Base/Modal";
 import { Fragment, useState, useCallback, useRef, useEffect, useMemo } from "react";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
-import Tickets from "../../components/TicketsBancoAgrario/ModalTicket";
+import Tickets from "../../../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import {
   depositoBancoAgrario,
-  consultaCostoBancoAgrario
 } from "../../utils/fetchDeposito";
 import { notify, notifyError } from "../../../../../utils/notify";
 import MoneyInput, {
@@ -49,6 +48,30 @@ const Deposito = () => {
   const [numCuenta, setNumCuenta] = useState("")
   const [valor, setValor] = useState("")
   const [summary, setSummary] = useState([])
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "Recibo de Pago",
+    timeInfo: {
+      "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date()),
+      Hora: Intl.DateTimeFormat("es-CO", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }).format(new Date()),
+    },
+    commerceInfo: [
+      ["Comercio", roleInfo?.["nombre comercio"]],
+      ["No. Terminal", roleInfo?.id_dispositivo],
+      ["Dirección", roleInfo?.direccion],
+      ["Teléfono", roleInfo?.telefono],
+    ],
+    commerceName: "Depósito",
+    trxInfo: [],
+    disclamer: `Corresponsal bancario para Banco Agrario. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
+  })
 
   const options = [
     { value: "01", label: "Ahorros" },
@@ -132,6 +155,35 @@ const Deposito = () => {
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
+    const objTicket = { ...objTicketActual };
+    objTicket["timeInfo"]["Fecha de pago"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"].push([
+      "Tipo de cuenta",
+      tipoCuenta === "01" ? "Ahorros" : "Corriente",
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Valor",
+      formatMoney.format(valor ?? "0"),
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Nro. Cuenta",
+      `****${String(numCuenta)?.slice(-4) ?? ""}`,
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
     const body = {
       comercio : {
         id_comercio: roleInfo?.id_comercio,
@@ -154,7 +206,8 @@ const Deposito = () => {
           direccion: roleInfo?.direccion,
 
         }
-      }
+      },
+      ticket: objTicket,
     };
 
     fetchDepositoCorresponsalBancoAgrario(body)
@@ -167,65 +220,17 @@ const Deposito = () => {
         }
         else{
         notify("Transaccion satisfactoria");
-        const trx_id = parseInt(res?.obj?.respuesta_grupo_aval["11"]) ?? 0;
-        const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
-        // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
-
-        const tempTicket = {
-          title: "Depósito A Cuentas Banco Agrario",
-          timeInfo: {
-            "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-            }).format(new Date()),
-            Hora: Intl.DateTimeFormat("es-CO", {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            }).format(new Date()),
-          },
-          commerceInfo: [
-            ["Id Comercio", roleInfo?.id_comercio],
-            ["No. de aprobación", trx_id],
-            // ["No. terminal", ter],
-            ["Municipio", roleInfo?.ciudad],
-            ["Dirección", roleInfo?.direccion],
-            ["Tipo de operación", "Depósito A Cuentas"],
-            ["", ""]
-          ],
-          commerceName: roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "No hay datos",
-          trxInfo: [
-            [
-            "Tipo de cuenta",
-            tipoCuenta === "01" ? "Ahorros" : "Corriente",
-            ],
-            ["",""],
-            [
-            "Nro. Cuenta",
-            `****${String(numCuenta)?.slice(-4) ?? ""}`,
-            ],
-            ["",""],
-            ["Valor", formatMoney.format(valor)],
-            ["", ""],
-            ["Costo transacción", formatMoney.format(res?.obj?.costoTrx)],
-            ["", ""],
-            ["Total", formatMoney.format(valor)],
-            ["", ""],
-          ],
-          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
-        };
-        setPaymentStatus(tempTicket);
-        infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
-          .then((resTicket) => {
-            console.log(resTicket);
-          })
-          .catch((err) => {
-            console.error(err);
-            notifyError("Error guardando el ticket");
-          });}
+        objTicket["commerceInfo"].push([
+          "Id Trx",
+          res?.obj?.id_trx,
+        ]);
+        objTicket["commerceInfo"].push([
+          "Id Auth",
+          res?.obj?.codigo_autorizacion,
+        ]);
+        setObjTicketActual(objTicket);
+        setPaymentStatus(objTicket);
+        }
       })
       .catch((err) => {
         setIsUploading(false);
@@ -239,9 +244,9 @@ const Deposito = () => {
     tipoCuenta,
     fetchDepositoCorresponsalBancoAgrario,
     roleInfo,
-    infoTicket,
+    // infoTicket,
   ]);
-
+  console.log(objTicketActual)
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -307,7 +312,7 @@ const Deposito = () => {
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
+              <Tickets ticket={objTicketActual} refPrint={printDiv}/>
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
