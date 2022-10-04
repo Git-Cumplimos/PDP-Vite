@@ -128,3 +128,45 @@ export const postRecaudoConveniosAval = async (bodyObj) => {
     throw err;
   }
 };
+export const postCrearConvenio = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlBancoAgrario}/banco-agrario/banco_agrario_cb_recaudo/crear_convenio`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+export const putModificarConvenio = async (pkConvenio, bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlBancoAgrario}/banco-agrario/banco_agrario_cb_recaudo/actualizar_convenio?pk_tbl_convenios_banco_agrario=${pkConvenio}`,
+      "PUT",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
