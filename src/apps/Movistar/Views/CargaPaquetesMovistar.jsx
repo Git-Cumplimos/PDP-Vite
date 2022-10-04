@@ -142,7 +142,7 @@ const CargaPaquetesMovistar = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Cargar paquetes al sistema</h1>
+      <h1 className="text-3xl mt-6">Cargue de paquetes de movistar</h1>
       <Form onSubmit={summaryFile}>
         <Input
           type="file"
