@@ -12,7 +12,7 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
-import { formatMoney } from "../../../components/Base/MoneyInput";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
@@ -34,6 +34,7 @@ const inputDataInitialSearch = {
   tipodeoferta: null,
   codigodelaoferta: "",
   descripcioncorta: "",
+  valordelaoferta: "",
 };
 const tipo_operacion = 104;
 const url_get_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/paquetes`;
@@ -81,6 +82,13 @@ const SubPaquetesMovistar = () => {
     }
     if (inputDataSearch.descripcioncorta != "") {
       arrayParamts.push(`descripcioncorta=${inputDataSearch.descripcioncorta}`);
+    }
+
+    if (
+      inputDataSearch.valordelaoferta != "" &&
+      inputDataSearch.valordelaoferta != 0
+    ) {
+      arrayParamts.push(`valordelaoferta=${inputDataSearch.valordelaoferta}`);
     }
 
     arrayParamts.push(`page=${pageData}&limit=${limit}`);
@@ -255,6 +263,14 @@ const SubPaquetesMovistar = () => {
     setInputData(inputDataInitial);
   }, []);
 
+  const HandleCloseSecond = useCallback(() => {
+    setTypeInfo("Ninguno");
+    setShowModal(false);
+    setDataPackage(null);
+    setInputData(inputDataInitial);
+    notify("Compra cancelada");
+  }, []);
+
   const HandleCloseResRecibo = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);
@@ -319,6 +335,20 @@ const SubPaquetesMovistar = () => {
             }));
           }}
         />
+
+        <MoneyInput
+          name="valordelaoferta"
+          label="Valor"
+          autoComplete="off"
+          value={inputDataSearch.valordelaoferta}
+          onInput={(e, value) => {
+            setInputDataSearch((anterior) => ({
+              ...anterior,
+              [e.target.name]: value,
+            }));
+          }}
+          required
+        />
       </TableEnterprise>
 
       <Modal
@@ -377,7 +407,7 @@ const SubPaquetesMovistar = () => {
               <>
                 <ButtonBar>
                   <Button onClick={ComprarPaquete}>Aceptar</Button>
-                  <Button onClick={HandleCloseFirst}>Cancelar</Button>
+                  <Button onClick={HandleCloseSecond}>Cancelar</Button>
                 </ButtonBar>
               </>
             ) : (
