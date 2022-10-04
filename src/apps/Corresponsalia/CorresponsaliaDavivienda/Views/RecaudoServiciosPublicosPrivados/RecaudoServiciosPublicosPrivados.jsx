@@ -363,6 +363,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                 }
               }
             } else {
+              notifyError(res?.msg ?? res?.message ?? "");
               setIsUploading(false);
               handleClose();
             }
