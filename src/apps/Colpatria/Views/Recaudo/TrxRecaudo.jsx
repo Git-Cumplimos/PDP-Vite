@@ -110,7 +110,7 @@ const TrxRecaudo = () => {
   );
 
   const handleClose = useCallback(() => {
-    notifyError("Transaccion cancelada por el usuario");
+    notifyError("Transacción cancelada por el usuario");
     navigate("/corresponsalia/colpatria");
   }, [navigate]);
 
@@ -235,12 +235,12 @@ const TrxRecaudo = () => {
                 }).format(new Date()),
               },
               commerceInfo: [
-                ["Id Comercio", roleInfo?.id_comercio],
+                ["Comercio", roleInfo?.["nombre comercio"]],
                 ["No. terminal", roleInfo?.id_dispositivo],
-                ["Municipio", roleInfo?.ciudad],
                 ["Dirección", roleInfo?.direccion],
+                ["Telefono", roleInfo?.telefono],
                 ["Id Trx", trx_id],
-                ["Código autorizacion", codigo_autorizacion],
+                ["Id Aut", codigo_autorizacion],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
               ],
               commerceName: "Recaudo PSP en Efectivo",
