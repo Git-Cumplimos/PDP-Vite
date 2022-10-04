@@ -200,9 +200,8 @@ const Retiro = () => {
             setSummary(summary)
             setShowBTNConsulta(false)
             setShowModal(true);
+            notify("Transacción satisfactoria");
           }
-
-          notify("Transacción satisfactoria");
         })
         .catch((err) => {
           setIsUploading(false);
@@ -296,13 +295,14 @@ const Retiro = () => {
         else{
         notify("Transacción satisfactoria");
         const trx_id = parseInt(res?.obj?.respuesta_grupo_aval["11"]) ?? 0;
+        const id_auth = parseInt(res?.obj?.respuesta_grupo_aval["38"]) ?? 0;
         // const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
         // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
           title: "Recibo de Pago",
           timeInfo: {
-            "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+            "Fecha de pago": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
               month: "2-digit",
               day: "2-digit",
@@ -319,9 +319,9 @@ const Retiro = () => {
             ["Dirección", roleInfo?.direccion],
             ["Teléfono", roleInfo?.telefono],
             ["Id trx", trx_id],
-            ["Id Aut", trx_id],        
+            ["Id Aut", id_auth],        
           ],
-          commerceName: "Transación de Retiro a Cuentas",
+          commerceName: "Retiro",
           trxInfo: [
 [
               "Entidad financiera",
@@ -343,7 +343,7 @@ const Retiro = () => {
             ["Costo transacción", formatMoney.format(res?.obj?.costoTrx)],
             ["", ""],
           ],
-          disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652 Opción X`,
+          disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
         };
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.tipo_trx, tempTicket) ////////////////////////////////////
@@ -512,7 +512,10 @@ const Retiro = () => {
                 ""
                 }
                 <Button
-                  onClick={handleClose}
+                  onClick={(e) => {
+                    handleClose()
+                    notifyError("Transacción cancelada por el usuario")
+                    }}
                   disabled={loadingRetiroCorresponsalGrupoAval}>
                   Cancelar
                 </Button>

@@ -11,7 +11,11 @@ import {
   retiroCorresponsal,
   consultaCostoCB,
 } from "../../utils/fetchCorresponsaliaDavivienda";
-import { notify, notifyError, notifyPending } from "../../../../../utils/notify";
+import {
+  notify,
+  notifyError,
+  notifyPending,
+} from "../../../../../utils/notify";
 import Tickets from "../../components/TicketsDavivienda";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import MoneyInput, {
@@ -38,7 +42,7 @@ const Retiro = () => {
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
-    equalError: false
+    equalError: false,
   });
 
   const [loadingRetiroCorresponsal, fetchRetiroCorresponsal] =
@@ -53,12 +57,10 @@ const Retiro = () => {
   const [tipoCuenta, setTipoCuenta] = useState("");
   const [tipoDocumento, setTipoDocumento] = useState("01");
   const [isUploading, setIsUploading] = useState(false);
-  const [userDoc, setUserDoc] = useState("")
-  const [valor, setValor] = useState("")
-  const [otp, setOtp] = useState("")
-  const [summary, setSummary] = useState([])
-
- 
+  const [userDoc, setUserDoc] = useState("");
+  const [valor, setValor] = useState("");
+  const [otp, setOtp] = useState("");
+  const [summary, setSummary] = useState([]);
 
   const optionsDocumento = [
     { value: "01", label: "Cédula Ciudadanía" },
@@ -103,12 +105,12 @@ const Retiro = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setTipoCuenta("")
-    setTipoDocumento("01")             
-    setValor("")
-    setUserDoc("")
-    setOtp("")
-    setSummary([])
+    setTipoCuenta("");
+    setTipoDocumento("01");
+    setValor("");
+    setUserDoc("");
+    setOtp("");
+    setSummary([]);
   }, []);
 
   const onSubmitRetiro = useCallback(
@@ -116,87 +118,92 @@ const Retiro = () => {
       e.preventDefault();
       setIsUploading(true);
       if (otp.length < 6) {
-        setIsUploading(false)
-        notifyError("El número OTP debe ser de 6 dígitos")
-      }
-      else{
-      if (valor % 10000 === 0){
-      const { min, max } = limitesMontos;
-
-      if (valor >= min && valor <= max) {
-        const formData = new FormData(e.target);
-        const userDoc = formData.get("docCliente");
-        const valorFormat = formData.get("valor");
-        const otp = formData.get("OTP");
-
-        const body = {
-          idComercio: roleInfo?.id_comercio,
-          idUsuario: roleInfo?.id_usuario,
-          idDispositivo: roleInfo?.id_dispositivo,
-          Tipo: roleInfo?.tipo_comercio,
-          numTipoTransaccion: 2130, /// retiro
-          numTipoDocumento: tipoDocumento, /// Cedula
-          numNumeroDocumento: userDoc,
-          numValorTransaccion: valor,
-          //nomDepositante: nomDepositante,
-          // valToken: "valToken", /// De donde viene
-        };
-        fetchConsultaCostoCB(body)
-          .then((res) => {
-            setIsUploading(false);
-            if (!res?.status) {
-              notifyError(res?.msg);
-              setTipoCuenta("")
-              setTipoDocumento("01")             
-              setValor("")
-              setUserDoc("")
-              setOtp("")
-              return;
-            } else {
-              notifyError("Recuerde verificar si posee el efectivo suficiente para continuar con el retiro")
-              setDatosConsulta(res?.obj?.Data);
-              const summary = {
-                "Nombre cliente": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
-                // "Numero celular": numCuenta,
-                "Documento del cliente": userDoc,
-                //"Codigo OTP": otp,
-                "Valor de retiro": valorFormat,
-                "Valor cobro": formatMoney.format(
-                  res?.obj?.Data?.numValorCobro
-                ),
-              };
-              setSummary(summary)
-              setShowModal(true);
-            }
-
-            //notify("Transaccion satisfactoria");
-          })
-          .catch((err) => {
-            setIsUploading(false);
-            console.error(err);
-            notifyError("No se ha podido conectar al servidor");
-          });
-      } else {
         setIsUploading(false);
-        notifyError(
-          `El valor del retiro debe estar entre ${formatMoney.format(
-            min
-          ).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
-        );
+        notifyError("El número OTP debe ser de 6 dígitos");
+      } else {
+        if (valor % 10000 === 0) {
+          const { min, max } = limitesMontos;
+
+          if (valor >= min && valor <= max) {
+            const formData = new FormData(e.target);
+            const userDoc = formData.get("docCliente");
+            const valorFormat = formData.get("valor");
+            const otp = formData.get("OTP");
+
+            const body = {
+              idComercio: roleInfo?.id_comercio,
+              idUsuario: roleInfo?.id_usuario,
+              idDispositivo: roleInfo?.id_dispositivo,
+              Tipo: roleInfo?.tipo_comercio,
+              numTipoTransaccion: 2130, /// retiro
+              numTipoDocumento: tipoDocumento, /// Cedula
+              numNumeroDocumento: userDoc,
+              numValorTransaccion: valor,
+              //nomDepositante: nomDepositante,
+              // valToken: "valToken", /// De donde viene
+            };
+            fetchConsultaCostoCB(body)
+              .then((res) => {
+                setIsUploading(false);
+                if (!res?.status) {
+                  notifyError(res?.msg);
+                  setTipoCuenta("");
+                  setTipoDocumento("01");
+                  setValor("");
+                  setUserDoc("");
+                  setOtp("");
+                  return;
+                } else {
+                  notifyError(
+                    "Recuerde verificar si posee el efectivo suficiente para continuar con el retiro"
+                  );
+                  setDatosConsulta(res?.obj?.Data);
+                  const summary = {
+                    "Nombre cliente":
+                      res?.obj?.Data?.valNombreTitular +
+                      " " +
+                      res?.obj?.Data?.valApellidoTitular,
+                    // "Numero celular": numCuenta,
+                    "Documento del cliente": userDoc,
+                    //"Codigo OTP": otp,
+                    "Valor de retiro": valorFormat,
+                    "Valor cobro": formatMoney.format(
+                      res?.obj?.Data?.numValorCobro
+                    ),
+                  };
+                  setSummary(summary);
+                  setShowModal(true);
+                }
+
+                //notify("Transaccion satisfactoria");
+              })
+              .catch((err) => {
+                setIsUploading(false);
+                console.error(err);
+                notifyError("No se ha podido conectar al servidor");
+              });
+          } else {
+            setIsUploading(false);
+            notifyError(
+              `El valor del retiro debe estar entre ${formatMoney
+                .format(min)
+                .replace(/(\$\s)/g, "$")} y ${formatMoney
+                .format(max)
+                .replace(/(\$\s)/g, "$")}`
+            );
+          }
+        } else {
+          setIsUploading(false);
+          notifyError("El valor a retirar debe ser múltiplo de $10.000");
+        }
       }
-    }
-    else{
-      setIsUploading(false);
-      notifyError("El valor a retirar debe ser múltiplo de $10.000")
-    }
-    }},
+    },
     [valor, limitesMontos, otp]
   );
 
-
   const onMoneyChange = useCallback(
     (e, valor) => {
-      setValor(valor)
+      setValor(valor);
     },
     [valor]
   );
@@ -261,32 +268,35 @@ const Retiro = () => {
             ["", ""],
           ],
           commerceName: roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "No hay datos",
+            ? roleInfo?.["nombre comercio"]
+            : "No hay datos",
           trxInfo: [
             [
               "Tipo de cuenta",
               res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
-            ["",""],
+            ["", ""],
             [
               "Nro. Cuenta",
-              `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
+              `****${
+                String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""
+              }`,
             ],
-            ["",""],
+            ["", ""],
             ["Valor", formatMoney.format(valor)],
-            ["",""],
+            ["", ""],
             [
               "Costo transacción",
               formatMoney.format(res?.obj?.Data?.numValorCobro),
             ],
-            ["",""],
+            ["", ""],
             ["Total", formatMoney.format(valor)],
-            ["",""],
+            ["", ""],
 
             //["Usuario de venta", "Nombre propietario del punto"],
           ],
-          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+          disclamer:
+            "Línea de atención personalizada: #688\nMensaje de texto: 85888",
         };
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
@@ -309,7 +319,6 @@ const Retiro = () => {
     fetchRetiroCorresponsal,
     roleInfo,
     infoTicket,
-    ,
     datosConsulta,
     tipoDocumento,
   ]);
@@ -341,42 +350,42 @@ const Retiro = () => {
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
-              if (! isNaN(num)){
-              setUserDoc(num)  
-              }            
+              if (!isNaN(num)) {
+                setUserDoc(num);
+              }
             }}
             required
           />
           <HideInput
-          id='otp'
-          label='Número OTP'
-          type='text'
-          name='otp'
-          minLength={"6"}
-          maxLength={"6"}
-          autoComplete='off'
-          required
-          value={otp}
-          onInput={(e, valor) => {
-            let num = valor.replace(/[\s\.]/g, "");
-            if (!isNaN(valor)) {
-              setOtp(num);
-            }
-          }}></HideInput>
+            id='otp'
+            label='Número OTP'
+            type='text'
+            name='otp'
+            minLength={"6"}
+            maxLength={"6"}
+            autoComplete='off'
+            required
+            value={otp}
+            onInput={(e, valor) => {
+              let num = valor.replace(/[\s\.]/g, "");
+              if (!isNaN(valor)) {
+                setOtp(num);
+              }
+            }}></HideInput>
           <Input
-          id="valor"
-          name="valor"
-          label="Valor a retirar"
-          autoComplete="off"
-          type="text"
-          minLength={"1"}
-          maxLength={"15"}
-          min={limitesMontos?.min}
-          max={limitesMontos?.max}
-          value={makeMoneyFormatter(0).format(valor)}
-          onInput={(ev) => setValor(onChangeMoney(ev))}
-          required
-           />
+            id='valor'
+            name='valor'
+            label='Valor a retirar'
+            autoComplete='off'
+            type='text'
+            minLength={"1"}
+            maxLength={"15"}
+            min={limitesMontos?.min}
+            max={limitesMontos?.max}
+            value={makeMoneyFormatter(0).format(valor)}
+            onInput={(ev) => setValor(onChangeMoney(ev))}
+            required
+          />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"} disabled={loadingConsultaCostoCB}>
               Realizar retiro
