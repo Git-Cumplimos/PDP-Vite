@@ -206,9 +206,9 @@ const Deposito = () => {
             };
             setSummary(summary)
             setShowModal(true);
+            notify("Transacción satisfactoria");
             setShowBTNConsulta(false)
           }
-          notify("Transacción satisfactoria");
         })
         .catch((err) => {
           setIsUploading(false);

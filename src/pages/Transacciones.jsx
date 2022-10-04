@@ -15,6 +15,7 @@ import TicketsDavivienda from "../apps/Corresponsalia/CorresponsaliaDavivienda/c
 import TicketsPines from "../apps/PinesVus/components/TicketsPines";
 import TicketsAval from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
 import TicketColpatria from "../apps/Colpatria/components/TicketColpatria";
+import TicketsAgrario from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -308,6 +309,20 @@ const Transacciones = () => {
               />
             ) : selected?.id_autorizador === 17 ? (
               <TicketsAval
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 14 ? (
+              <TicketColpatria
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 16 ? (
+              <TicketsAgrario
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
