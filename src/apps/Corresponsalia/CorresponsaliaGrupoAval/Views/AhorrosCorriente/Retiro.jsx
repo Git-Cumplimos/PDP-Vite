@@ -200,9 +200,8 @@ const Retiro = () => {
             setSummary(summary)
             setShowBTNConsulta(false)
             setShowModal(true);
+            notify("Transacción satisfactoria");
           }
-
-          notify("Transacción satisfactoria");
         })
         .catch((err) => {
           setIsUploading(false);

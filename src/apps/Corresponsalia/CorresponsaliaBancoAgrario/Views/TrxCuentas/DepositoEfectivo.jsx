@@ -5,7 +5,7 @@ import Button from "../../../../../components/Base/Button";
 import Modal from "../../../../../components/Base/Modal";
 import { Fragment, useState, useCallback, useRef, useEffect, useMemo } from "react";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
-import Tickets from "../../../../../components/Base/Tickets";
+import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import {
@@ -175,13 +175,13 @@ const Deposito = () => {
     ]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
-      "Valor",
-      formatMoney.format(valor ?? "0"),
+      "Número Cuenta",
+      `****${String(numCuenta)?.slice(-4) ?? ""}`,
     ]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
-      "Nro. Cuenta",
-      `****${String(numCuenta)?.slice(-4) ?? ""}`,
+      "Valor transacción",
+      formatMoney.format(valor ?? "0"),
     ]);
     objTicket["trxInfo"].push(["", ""]);
     const body = {
@@ -221,13 +221,18 @@ const Deposito = () => {
         else{
         notify("Transaccion satisfactoria");
         objTicket["commerceInfo"].push([
-          "Id Trx",
+          "No. Trx",
           res?.obj?.id_trx,
         ]);
         objTicket["commerceInfo"].push([
-          "Id Auth",
+          "No. Aprobación",
           res?.obj?.codigo_autorizacion,
         ]);
+        objTicket["trxInfo"].push([
+          "Costo transacción",
+          formatMoney.format(res?.obj?.costoTrx,0)
+        ]);
+        objTicket["trxInfo"].push(["", ""]);
         setObjTicketActual(objTicket);
         setPaymentStatus(objTicket);
         }
@@ -271,7 +276,7 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"10"}
-            maxLength={"14"}
+            maxLength={"12"}
             value={numCuenta}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
@@ -312,7 +317,7 @@ const Deposito = () => {
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-              <Tickets ticket={objTicketActual} refPrint={printDiv}/>
+              <TicketsAgrario ticket={objTicketActual} refPrint={printDiv}/>
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
