@@ -10,6 +10,7 @@ const Deposito = lazy(() => import("./Views/Deposito"));
 
 const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
 const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
+const RetiroPin = lazy(() => import("./Views/RetiroPin"));
 
 
 const ConsultaManual = lazy(() => import("./Views/Recaudo/ConsultaManual"));
@@ -106,6 +107,12 @@ const rutasColpatria = {
           show: false,
         },
       ]
+    },
+    {
+      link: "/corresponsalia/colpatria/retiro-pin",
+      label: <AppIcons Logo={"RECAUDO"} name={"Retiro con PIN"} />,
+      component: RetiroPin,
+      permission: [90],
     },
     rutasGestionColpatria
   ],
