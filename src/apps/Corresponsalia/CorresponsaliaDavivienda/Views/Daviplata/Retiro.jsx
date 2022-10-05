@@ -18,6 +18,7 @@ import { fetchParametrosAutorizadores } from "../../../../TrxParams/utils/fetchP
 import TicketsDavivienda from "../../components/TicketsDavivienda";
 import HideInput from "../../../../../components/Base/HideInput";
 import { useNavigate } from "react-router-dom";
+import { cifrarAES } from "../../../../../utils/cryptoUtils";
 
 const Retiro = () => {
   const { roleInfo } = useAuth();
@@ -185,7 +186,11 @@ const Retiro = () => {
       ticket: objTicket,
       numCelular: datosTrans.numeroTelefono,
       municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "No hay datos",
-      otp: datosTrans.otp,
+      otp: cifrarAES(
+        `${process.env.REACT_APP_LLAVE_AES_CASHOUT_DAV}`,
+        `${process.env.REACT_APP_IV_AES_CASHOUT_DAV}`,
+        datosTrans.otp
+      ),
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
       direccion: roleInfo?.direccion ? roleInfo?.direccion : "",

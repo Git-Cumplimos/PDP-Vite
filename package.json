@@ -23,6 +23,7 @@
     "aws-sdk": "^2.1048.0",
     "bootstrap-icons": "^1.7.2",
     "chart.js": "^3.7.0",
+    "crypto-js": "^4.1.1",
     "export-to-csv": "^0.2.1",
     "file-saver": "^2.0.5",
     "postcss": "^7.0.39",

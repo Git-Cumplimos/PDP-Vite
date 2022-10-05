@@ -150,7 +150,10 @@ const RecargasMovistar = () => {
     validNavigate("/movistar");
   }, []);
 
-  const handleClose = useCallback(() => setShowModal(false), []);
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+    notify("Recarga cancelada");
+  }, []);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
