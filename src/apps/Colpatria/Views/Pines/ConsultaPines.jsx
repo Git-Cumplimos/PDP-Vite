@@ -131,7 +131,7 @@ const ConsultaPines = () => {
         />
         <Input
           id={"nombre_convenio"}
-          label={"Nombre del Convenio"}
+          label={"Nombre del convenio"}
           name={"nombre_convenio"}
           type="text"
           autoComplete="off"

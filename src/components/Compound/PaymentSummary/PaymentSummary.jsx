@@ -10,7 +10,7 @@ const PaymentSummary = ({
     <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
       <h1 className="text-2xl font-semibold">{title}</h1>
       <h1 className="text-xl font-semibold">{subtitle}</h1>
-      <ul className="grid grid-flow-row auto-rows-fr gap-2 place-items-stretch">
+      <ul className="grid grid-flow-row gap-2 justify-center align-middle">
         {Object.entries(summaryTrx ?? {}).map(([key, val]) => {
           if (
             Array.isArray(val) ||
@@ -20,7 +20,7 @@ const PaymentSummary = ({
           }
           return (
             <li key={key}>
-              <h1 className="grid grid-flow-col auto-cols-fr gap-6 place-items-center">
+              <h1 className="grid grid-flow-col auto-cols-fr gap-6">
                 <strong className="justify-self-end">{key}:</strong>
                 <p>{val}</p>
               </h1>
