@@ -91,7 +91,7 @@ const RetiroPin = () => {
         // Datos trx colpatria
         colpatria: {
           user_document: userDocument,
-          pin_number: pinNumber,
+          numero_pin: pinNumber,
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
