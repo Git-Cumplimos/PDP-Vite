@@ -149,7 +149,11 @@ const ConveniosRecaudo = () => {
 
   const downloadMasive = useCallback(() => {
     notifyPending(
-      getConveniosRecaudoListMassive({ ...searchFilters }),
+      getConveniosRecaudoListMassive({
+        ...Object.fromEntries(
+          Object.entries(searchFilters).filter(([, val]) => val)
+        ),
+      }),
       {
         render() {
           setLoading(true);
