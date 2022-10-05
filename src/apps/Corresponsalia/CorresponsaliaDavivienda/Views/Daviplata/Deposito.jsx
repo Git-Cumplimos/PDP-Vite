@@ -292,7 +292,7 @@ const Deposito = () => {
       setIsUploading(false);
       handleClose()
     }
-  }, []);
+  }, [valor]);
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);

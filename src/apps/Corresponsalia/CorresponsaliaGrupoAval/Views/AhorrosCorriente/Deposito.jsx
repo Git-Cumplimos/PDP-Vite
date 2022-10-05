@@ -274,7 +274,7 @@ const Deposito = () => {
         else{
         notify("Transacción satisfactoria");
         const trx_id = parseInt(res?.obj?.respuesta_grupo_aval["11"]) ?? 0;
-        const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
+        const numCuenta = (res?.obj?.respuesta_grupo_aval["102"]) ?? 0;
         const id_auth = parseInt(res?.obj?.respuesta_grupo_aval["38"]) ?? 0;
         // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 

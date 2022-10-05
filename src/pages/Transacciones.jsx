@@ -202,11 +202,11 @@ const Transacciones = () => {
           const fecha = new Date(trxs[index]?.created);
           fecha.setHours(fecha.getHours() + 5);
           setSummaryTrx({
-            "Tipo transaccion": trxs[index]?.["Tipo transaccion"],
+            "Tipo transacción": trxs[index]?.["Tipo transaccion"],
             Fecha: dateFormatter.format(fecha),
             "Mensaje de respuesta trx": trxs[index]?.message_trx,
             Monto: formatMoney.format(trxs[index]?.monto),
-            "Estado de la trasaccion": trxs[index]?.status_trx
+            "Estado de la transacción": trxs[index]?.status_trx
               ? "Transaccion aprobada"
               : "Transaccion rechazada",
           });
@@ -372,7 +372,7 @@ const Transacciones = () => {
         ) : (
           <div className="flex flex-col justify-center items-center mx-auto container">
             <PaymentSummary
-              title="Resumen transaccion"
+              title="Resumen transacción"
               subtitle=""
               summaryTrx={summaryTrx}
             >
