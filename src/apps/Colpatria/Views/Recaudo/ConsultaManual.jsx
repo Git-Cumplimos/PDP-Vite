@@ -110,7 +110,7 @@ const ConsultaManual = () => {
           name={"pk_codigo_convenio"}
           type="tel"
           autoComplete="off"
-          maxLength={"6"}
+          maxLength={"4"}
           onChange={(ev) => {
             ev.target.value = onChangeNumber(ev);
           }}
@@ -122,7 +122,7 @@ const ConsultaManual = () => {
           name={"codigo_ean_iac"}
           type="tel"
           autoComplete="off"
-          maxLength={"4"}
+          maxLength={"13"}
           onChange={(ev) => {
             ev.target.value = onChangeNumber(ev);
           }}

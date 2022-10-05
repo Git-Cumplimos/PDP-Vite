@@ -181,7 +181,7 @@ const TrxRecaudo = () => {
   const onMakePayment = useCallback(
     (ev) => {
       if (valTrxRecaudo <= 0) {
-        notifyError("El valor del pin debe ser mayor a cero");
+        notifyError("El valor debe ser mayor a cero");
         return;
       }
       const data = {
@@ -211,7 +211,7 @@ const TrxRecaudo = () => {
         {
           render: () => {
             setLoadingSell(true);
-            return "Procesando transaccion";
+            return "Procesando transacción";
           },
         },
         {
@@ -236,9 +236,9 @@ const TrxRecaudo = () => {
               },
               commerceInfo: [
                 ["Comercio", roleInfo?.["nombre comercio"]],
-                ["No. terminal", roleInfo?.id_dispositivo],
+                ["No. Terminal", roleInfo?.id_dispositivo],
                 ["Dirección", roleInfo?.direccion],
-                ["Telefono", roleInfo?.telefono],
+                ["Teléfono", roleInfo?.telefono],
                 ["Id Trx", trx_id],
                 ["Id Aut", codigo_autorizacion],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
@@ -268,7 +268,7 @@ const TrxRecaudo = () => {
                 console.error(err);
                 notifyError("Error guardando el ticket");
               });
-            return "Transaccion satisfactoria";
+            return "Transacción satisfactoria";
           },
         },
         {
@@ -279,7 +279,7 @@ const TrxRecaudo = () => {
               return error?.message;
             }
             console.error(error?.message);
-            return "Transaccion fallida";
+            return "Transacción fallida";
           },
         }
       );
@@ -321,7 +321,7 @@ const TrxRecaudo = () => {
       })
       .catch((err) => {
         console.error(err);
-        notifyError("Error consultando parametros de la transaccion");
+        notifyError("Error consultando parametros de la transacción");
       });
   }, []);
 
@@ -408,7 +408,7 @@ const TrxRecaudo = () => {
 
   if (!hasData) {
     notifyError(
-      "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+      "El usuario no cuenta con datos de comercio, no se permite la transacción"
     );
     return <Navigate to={"/"} replace />;
   }
@@ -502,7 +502,7 @@ const TrxRecaudo = () => {
       <ScreenBlocker show={loadingInquiry} />
       <Modal
         show={inquiryStatus}
-        handleClose={paymentStatus || loadingSell ? () => {} : handleClose}
+        handleClose={loadingSell ? () => {} : handleClose}
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
