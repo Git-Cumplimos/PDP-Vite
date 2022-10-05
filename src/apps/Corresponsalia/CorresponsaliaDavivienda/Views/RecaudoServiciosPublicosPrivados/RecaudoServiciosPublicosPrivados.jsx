@@ -239,7 +239,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             ];
             objTicket["commerceInfo"].push([
               "No. de aprobación Banco",
-              res?.obj?.respuestaDavivienda?.valTalonOut,
+              res?.obj?.respuestaDavivienda?.valTalonOut ?? res?.obj?.idTrx,
             ]);
             objTicket["commerceInfo"].push(["", ""]);
             objTicket["trxInfo"].push([
@@ -415,6 +415,7 @@ const RecaudoServiciosPublicosPrivados = () => {
           }
         })
         .catch((err) => {
+          handleClose()
           setIsUploading(false);
           notifyError("No se ha podido conectar al servidor");
           console.error(err);
@@ -575,7 +576,7 @@ const RecaudoServiciosPublicosPrivados = () => {
           </Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal} >
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
           {estadoPeticion === 0 ? (
             <>
