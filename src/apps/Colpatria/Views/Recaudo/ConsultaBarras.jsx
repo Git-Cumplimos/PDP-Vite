@@ -5,8 +5,8 @@ import Form from "../../../../components/Base/Form";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { searchConveniosRecaudoBarras } from "../../utils/fetchFunctions";
-import TextArea from "../../../../components/Base/TextArea";
 import Button from "../../../../components/Base/Button";
+import BarcodeReader from "../../../../components/Base/BarcodeReader";
 
 const ConsultaBarras = () => {
   const { roleInfo } = useAuth();
@@ -63,7 +63,6 @@ const ConsultaBarras = () => {
     },
     [navigate]
   );
-  const isAlt = useRef("");
 
   /**
    * Check if has commerce data
@@ -109,45 +108,8 @@ const ConsultaBarras = () => {
         formDir="col"
         ref={formRef}
       >
-        <TextArea
-          label={"Código de barras"}
-          name="codigo_barras"
-          // onLazyInput={{ callback: () => {}, timeOut: 500 }}
-          // onChange={(ev) => {
-          //   console.log(ev.target.value.at(-1));
-          //   console.log(ev.target.value.charAt(ev.target.value.length-1));
-          //   console.log(ev.target.value.charCodeAt(ev.target.value.length-1));
-          //   console.log(String.fromCharCode(ev.target.value.charCodeAt(ev.target.value.length-1)));
-          //   if (ev.target.value.at(-1) === "\u001d") {
-          //     ev.target.value += "\u001d"
-          //   }
-          // }}
-          className={"place-self-stretch w-full"}
-          onKeyDown={(ev) => {
-            if (ev.keyCode === 13 && ev.shiftKey === false) {
-              searchCodigo({ codigo_barras: ev.target.value });
-              return;
-            }
-            if (ev.keyCode === 8 && ev.shiftKey === false) {
-              ev.preventDefault();
-              return;
-            }
-            if (ev.altKey) {
-              if (ev.keyCode !== 18) {
-                isAlt.current += ev.key;
-              }
-            }
-          }}
-          onKeyUp={(ev) => {
-            if (ev.altKey === false && isAlt.current !== "") {
-              let value = String.fromCharCode(parseInt(isAlt.current));
-              isAlt.current = "";
-              if (value === "\u001d") {
-                ev.target.value += "\u001d";
-              }
-            }
-          }}
-          required
+        <BarcodeReader
+          onSearchCodigo={(codigo) => searchCodigo({ codigo_barras: codigo })}
         />
         <ButtonBar className="lg:col-span-2">
           <Button type="reset" disabled={searchingData}>
