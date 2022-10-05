@@ -431,6 +431,7 @@ const VentaPines = () => {
               name={`referencia_${ref}`}
               type="text"
               autoComplete="off"
+              maxLength="19"
               value={userReferences?.[`referencia_${ref}`] ?? ""}
               onInput={(ev) =>
                 setUserReferences((old) => ({
