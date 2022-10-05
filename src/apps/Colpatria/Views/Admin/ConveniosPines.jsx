@@ -149,7 +149,11 @@ const ConveniosPines = () => {
 
   const downloadMasive = useCallback(() => {
     notifyPending(
-      getConveniosPinesListMassive({ ...searchFilters }),
+      getConveniosPinesListMassive({
+        ...Object.fromEntries(
+          Object.entries(searchFilters).filter(([, val]) => val)
+        ),
+      }),
       {
         render() {
           setLoading(true);
