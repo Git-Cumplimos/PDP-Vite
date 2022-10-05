@@ -35,7 +35,7 @@ export const pagoGiroDaviplata = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}/davivienda_cb_cashIn/pagoGiroDaviplata`,
+      `${urlDaviplata}davivienda_cb_cashIn/pagoGiroDaviplata`,
       "POST",
       {},
       bodyObj,
@@ -60,7 +60,7 @@ export const postCashOut = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}/cash-out`,
+      `${urlDaviplata}cash-out`,
       "POST",
       {},
       bodyObj,
@@ -106,7 +106,7 @@ export const consultaCostoCB = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}/davivienda_cb_deposito_retiro/consultaCostoCB`,
+      `${urlDaviplata}davivienda_cb_deposito_retiro/consultaCostoCB`,
       "POST",
       {},
       bodyObj,
@@ -131,7 +131,7 @@ export const depositoCorresponsal = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}/davivienda_cb_deposito_retiro/depositoCorresponsal`,
+      `${urlDaviplata}davivienda_cb_deposito_retiro/depositoCorresponsal`,
       "POST",
       {},
       bodyObj,
@@ -156,7 +156,7 @@ export const retiroCorresponsal = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlDaviplata}/davivienda_cb_deposito_retiro/retiroCorresponsal`,
+      `${urlDaviplata}davivienda_cb_deposito_retiro/retiroCorresponsal`,
       "POST",
       {},
       bodyObj,
