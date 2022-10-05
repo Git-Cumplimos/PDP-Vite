@@ -9,8 +9,8 @@ const LogoAgrario = ({ large = false, small = false, xsmall = false }) => {
     imgs: { LogoAgrario: LogoPng },
   } = useImgs();
   return (
-    <div className="flex flex-row flex-nowrap ml-4" style={{width:'80mm'}}>
-    <div className="flex flex-row flex-nowrap my-8" style={{width:'40mm'}}>
+    <div className="flex flex-row flex-nowrap ml-5" style={{width:'70mm'}}>
+    <div className="flex flex-row flex-nowrap my-10" style={{width:'30mm'}}>
     <LogoPDP xsmall/>
     </div>
     <div
