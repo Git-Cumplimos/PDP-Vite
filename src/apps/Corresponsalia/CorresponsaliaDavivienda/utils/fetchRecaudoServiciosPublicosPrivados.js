@@ -98,7 +98,7 @@ export const postConsultaConveniosDavivienda = async (bodyObj) => {
 //       bodyObj,
 //       {},
 //       true,
-//       30000
+//       80000
 //     );
 //     if (!res?.status) {
 //       console.error(res?.msg ?? res?.message ?? "");
@@ -122,7 +122,7 @@ export const postCheckReintentoRecaudoConveniosDavivienda = async (bodyObj) => {
       bodyObj,
       {},
       true,
-      30000
+      80000
     );
     if (!res?.status) {
       console.error(res?.msg ?? res?.message ?? "");
