@@ -18,12 +18,9 @@ const formatMoney = makeMoneyFormatter(2);
 
 const GridRow = ({ cols = [], self = false, onClick = () => {} }) => (
   <div
-    className={`grid ${
+    className={`grid grid-cols-${cols?.length || 1} ${
       self ? "gap-4 py-4 px-2 bg-secondary-light" : ""
     } cursor-pointer`}
-    style={{
-      gridTemplateColumns: `repeat(${cols?.length || 1}, minmax(0, 1fr))`,
-    }}
     onClick={onClick}
   >
     {cols.map((val, ind) => (
