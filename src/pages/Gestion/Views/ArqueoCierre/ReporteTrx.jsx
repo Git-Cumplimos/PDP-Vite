@@ -77,6 +77,7 @@ const ReporteTrx = () => {
   const [trxState, setTrxState] = useState("true");
 
   const [trxTree, setTrxTree] = useState({});
+  const [montoTotal, setMontoTotal] = useState(0.0);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [summaryTrx, setSummaryTrx] = useState(null);
@@ -113,6 +114,7 @@ const ReporteTrx = () => {
           render: ({ data: res }) => {
             setLoading(false);
             setTrxTree(res?.obj?.results);
+            setMontoTotal(res?.obj?.monto);
             return res?.msg;
           },
         },
@@ -156,6 +158,11 @@ const ReporteTrx = () => {
           />
           <ButtonBar />
         </Form>
+        <Accordion
+          titulo={
+            <GridRow cols={["", "Total", formatMoney.format(montoTotal), "", ""]} />
+          }
+        />
         <TreeView
           tree={trxTree}
           onClickLastChild={(info, ev) => {
