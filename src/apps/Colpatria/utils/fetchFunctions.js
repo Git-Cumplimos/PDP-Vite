@@ -34,7 +34,7 @@ export const makeDeposit = async (bodyDep) => {
   }
 };
 
-export const makeRetiroPin = async (bodyDep) => {
+export const makePinPago = async (bodyDep) => {
   if (!bodyDep) {
     throw new Error("sin datos de pin de pago", { cause: "custom" });
   }
