@@ -323,7 +323,13 @@ const Retiro = () => {
           ],
           commerceName: "Retiro",
           trxInfo: [
-[
+            [
+              "Número celular",
+              phone,
+            ],
+            ["",""],
+            
+            [
               "Entidad financiera",
               DataBanco?.nombre,
             ],
@@ -372,7 +378,8 @@ const Retiro = () => {
     datosConsulta,
     tipoDocumento,
     otpEncrip,
-    DataBanco
+    DataBanco,
+    phone
   ]);
 
   return (

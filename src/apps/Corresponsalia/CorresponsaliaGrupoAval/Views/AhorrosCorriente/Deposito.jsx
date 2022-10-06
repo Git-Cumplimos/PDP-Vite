@@ -303,6 +303,11 @@ const Deposito = () => {
           commerceName: "Depósito",
           trxInfo: [
             [
+              "Número celular",
+              phone,
+            ],
+            ["",""],
+            [
               "Entidad financiera",
               DataBanco?.nombre,
             ],
@@ -350,7 +355,8 @@ const Deposito = () => {
     infoTicket,
     ,
     datosConsulta,
-    DataBanco
+    DataBanco,
+    phone
   ]);
 
   return (
