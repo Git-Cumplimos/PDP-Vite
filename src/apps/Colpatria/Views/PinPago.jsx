@@ -17,7 +17,7 @@ import Modal from "../../../components/Base/Modal";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import useMoney from "../../../hooks/useMoney";
-import { makeRetiroPin } from "../utils/fetchFunctions";
+import { makePinPago } from "../utils/fetchFunctions";
 
 import { notifyPending, notifyError } from "../../../utils/notify";
 import {
@@ -30,7 +30,7 @@ import TicketColpatria from "../components/TicketColpatria";
 
 const formatMoney = makeMoneyFormatter(2);
 
-const RetiroPin = () => {
+const PinPago = () => {
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
@@ -40,7 +40,7 @@ const RetiroPin = () => {
     roleInfo?.direccion ?? ""
   );
   const [pinNumber, setAccountNumber] = useState("");
-  const [valRetiroPin, setValRetiroPin] = useState(0);
+  const [valPinPago, setValPinPago] = useState(0);
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
@@ -54,7 +54,7 @@ const RetiroPin = () => {
     limits: [limitesMontos.min, limitesMontos.max],
   });
 
-  const [loadingRetiroPin, setLoadingRetiroPin] = useState(false);
+  const [loadingPinPago, setLoadingPinPago] = useState(false);
 
   const printDiv = useRef();
 
@@ -66,9 +66,9 @@ const RetiroPin = () => {
     () => ({
       "No. Identificación": userDocument,
       "No. De PIN": toAccountNumber(pinNumber),
-      "Valor a Retirar": formatMoney.format(valRetiroPin),
+      "Valor a Retirar": formatMoney.format(valPinPago),
     }),
-    [pinNumber, userDocument, valRetiroPin]
+    [pinNumber, userDocument, valPinPago]
   );
 
   const handleClose = useCallback(() => {
@@ -86,7 +86,7 @@ const RetiroPin = () => {
           id_terminal: roleInfo?.id_dispositivo,
         },
         oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
-        valor_total_trx: valRetiroPin,
+        valor_total_trx: valPinPago,
 
         // Datos trx colpatria
         colpatria: {
@@ -100,16 +100,16 @@ const RetiroPin = () => {
         },
       };
       notifyPending(
-        makeRetiroPin(data),
+        makePinPago(data),
         {
           render() {
-            setLoadingRetiroPin(true);
+            setLoadingPinPago(true);
             return "Procesando transacción";
           },
         },
         {
           render({ data: res }) {
-            setLoadingRetiroPin(false);
+            setLoadingPinPago(false);
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
@@ -142,7 +142,7 @@ const RetiroPin = () => {
                 ["", ""],
                 ["No. De PIN", pinNumber],
                 ["", ""],
-                ["Valor a Retirar", formatMoney.format(valRetiroPin)],
+                ["Valor a Retirar", formatMoney.format(valPinPago)],
                 ["", ""],
               ],
               disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
@@ -162,7 +162,7 @@ const RetiroPin = () => {
         },
         {
           render({ data: err }) {
-            setLoadingRetiroPin(false);
+            setLoadingPinPago(false);
             navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
               return err?.message;
@@ -177,7 +177,7 @@ const RetiroPin = () => {
       pinNumber,
       userDocument,
       userAddress,
-      valRetiroPin,
+      valPinPago,
       roleInfo,
       infoTicket,
       navigate,
@@ -285,7 +285,7 @@ const RetiroPin = () => {
           type="tel"
           minLength={"5"}
           maxLength={"11"}
-          onInput={(ev) => setValRetiroPin(onChangeMoney(ev))}
+          onInput={(ev) => setValPinPago(onChangeMoney(ev))}
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
@@ -294,7 +294,7 @@ const RetiroPin = () => {
       </Form>
       <Modal
         show={showModal}
-        handleClose={paymentStatus || loadingRetiroPin ? () => {} : handleClose}
+        handleClose={paymentStatus || loadingPinPago ? () => {} : handleClose}
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
@@ -312,11 +312,11 @@ const RetiroPin = () => {
               <Button
                 type="submit"
                 onClick={onMakePayment}
-                disabled={loadingRetiroPin}
+                disabled={loadingPinPago}
               >
                 Aceptar
               </Button>
-              <Button onClick={handleClose} disabled={loadingRetiroPin}>
+              <Button onClick={handleClose} disabled={loadingPinPago}>
                 Cancelar
               </Button>
             </ButtonBar>
@@ -327,4 +327,4 @@ const RetiroPin = () => {
   );
 };
 
-export default RetiroPin;
+export default PinPago;
