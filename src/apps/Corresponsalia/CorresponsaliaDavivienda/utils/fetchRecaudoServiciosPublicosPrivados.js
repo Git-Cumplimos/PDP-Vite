@@ -146,7 +146,7 @@ export const postRecaudoConveniosDavivienda = async (bodyObj) => {
       bodyObj,
       {},
       true,
-      30000
+      80000
     );
     if (!res?.status) {
       console.error(res?.msg);

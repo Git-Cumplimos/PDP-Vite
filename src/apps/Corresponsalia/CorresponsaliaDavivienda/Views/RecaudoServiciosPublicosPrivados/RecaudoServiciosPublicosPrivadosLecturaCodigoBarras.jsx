@@ -349,7 +349,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         ticket: objTicket,
         fecCodigDeBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
+          valCodigoDeBarras: valorTransaccion,
+        // valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -443,7 +444,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                               ];
                               objTicket["commerceInfo"].push([
                                 "No. de aprobación Banco",
-                                res?.obj?.respuestaDavivienda?.valTalonOut,
+                                res?.obj?.respuestaDavivienda?.valTalonOut ?? res?.obj?.idTrx ,
                               ]);
                               objTicket["commerceInfo"].push(["", ""]);
                               objTicket["trxInfo"].push([
@@ -474,7 +475,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                           } else {
                             // notifyError(res?.msg ?? res?.message ?? "");
                             setIsUploading(false);
-                            // handleClose();
+                            hideModalReset()
                             resolve(false);
                           }
                         })
@@ -487,7 +488,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   );
                   if (prom === true) {
                     setIsUploading(false);
-                    // handleClose();
+                    hideModalReset()
                     break;
                   }
                 } catch (error) {
@@ -497,12 +498,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             } else {
               setIsUploading(false);
               notifyError(res?.msg ?? res?.message ?? "");
-              // handleClose();
+              hideModalReset()
             }
           }
         })
         .catch((err) => {
           setIsUploading(false);
+          hideModalReset()
           notifyError("No se ha podido conectar al servidor");
           console.error(err);
         });
@@ -552,6 +554,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           setIsUploading(false);
           notifyError("No se ha podido conectar al servidor");
           console.error(err);
+          hideModalReset()
         });
     }
   };
@@ -773,7 +776,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               )}
             </ButtonBar>
           </Form>
-          <Modal show={showModal} handleClose={hideModal}>
+          <Modal show={showModal} >
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
               {peticion === 1 && (
                 <>
@@ -801,7 +804,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     datosTransaccion.valor
                   )}`}</h2>
                   <ButtonBar>
-                    <Button onClick={hideModal}>Cancelar</Button>
+                    <Button onClick={hideModalReset}>Cancelar</Button>
                     <Button type='submit' onClick={onSubmitPago}>
                       Aceptar
                     </Button>

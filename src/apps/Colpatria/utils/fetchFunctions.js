@@ -34,6 +34,34 @@ export const makeDeposit = async (bodyDep) => {
   }
 };
 
+export const makePinPago = async (bodyDep) => {
+  if (!bodyDep) {
+    throw new Error("sin datos de pin de pago", { cause: "custom" });
+  }
+
+  try {
+    const res = await fetchData(
+      `${urlColpatriaTrx}/pin-de-pago`,
+      "POST",
+      {},
+      bodyDep
+    );
+    if (!res?.status) {
+      if (res?.msg) {
+        throw new Error(
+          res?.obj?.error_user_msg ? res?.obj?.error_user_msg : res?.msg,
+          { cause: "custom" }
+        );
+      }
+
+      throw new Error(res, { cause: "custom" });
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const makeSellPin = async (bodyDep) => {
   if (!bodyDep) {
     throw new Error("sin datos de venta de pin", { cause: "custom" });

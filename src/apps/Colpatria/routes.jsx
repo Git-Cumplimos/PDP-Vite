@@ -10,6 +10,7 @@ const Deposito = lazy(() => import("./Views/Deposito"));
 
 const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
 const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
+const PinPago = lazy(() => import("./Views/PinPago"));
 
 
 const ConsultaManual = lazy(() => import("./Views/Recaudo/ConsultaManual"));
@@ -106,6 +107,12 @@ const rutasColpatria = {
           show: false,
         },
       ]
+    },
+    {
+      link: "/corresponsalia/colpatria/pin-de-pago",
+      label: <AppIcons Logo={"RECAUDO"} name={"Pin de pago"} />,
+      component: PinPago,
+      permission: [90],
     },
     rutasGestionColpatria
   ],

@@ -209,6 +209,7 @@ const PagoDeProductosPropios = () => {
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        hideModal()
         console.error(err);
       });
   };
@@ -356,6 +357,7 @@ const PagoDeProductosPropios = () => {
       })
       .catch((err) => {
         setIsUploading(false);
+        hideModal()
         notifyError("No se ha podido conectar al servidor");
         console.error(err);
       });
