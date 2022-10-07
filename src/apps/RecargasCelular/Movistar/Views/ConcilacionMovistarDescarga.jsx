@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import Input from "../../../components/Base/Input";
-import Select from "../../../components/Base/Select";
-import Form from "../../../components/Base/Form";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
-import { notifyError } from "../../../utils/notify";
+import Input from "../../../../components/Base/Input";
+import Select from "../../../../components/Base/Select";
+import Form from "../../../../components/Base/Form";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import { notifyError } from "../../../../utils/notify";
+import { useFetch } from "../../../../hooks/useFetch";
 import {
   PeticionConciliacionBuscar,
   PeticionDescargar,
 } from "../utils/fetchMovistar";
-import { useFetch } from "../../../hooks/useFetch";
 
 const URL = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/buscar`;
 const URLDescarga = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/descargar`;

@@ -480,36 +480,45 @@ const TypesTrxs = lazy(() =>
 const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
 
 /**
- * Servicio Movistar
+ * Modulo Recargas
  */
-const Movistar = lazy(() => import("../apps/Movistar/Movistar"));
+const RecargasCelular = lazy(() =>
+  import("../apps/RecargasCelular/RecargasCelular")
+);
+
+/**
+ * Modulo Movistar
+ */
+const Movistar = lazy(() =>
+  import("../apps/RecargasCelular/Movistar/Movistar.jsx")
+);
 
 const RecargasMovistar = lazy(() =>
-  import("../apps/Movistar/Views/RecargasMovistar.jsx")
+  import("../apps/RecargasCelular/Movistar/Views/RecargasMovistar")
 );
 const PaquetesMovistar = lazy(() =>
-  import("../apps/Movistar/Views/PaquetesMovistar.jsx")
+  import("../apps/RecargasCelular/Movistar/Views/PaquetesMovistar.jsx")
 );
 const SubPaquetesMovistar = lazy(() =>
-  import("../apps/Movistar/Views/SubPaquetesMovistar.jsx")
+  import("../apps/RecargasCelular/Movistar/Views/SubPaquetesMovistar.jsx")
 );
 
 const OperadorPDPMovistar = lazy(() =>
-  import("../apps/Movistar/Views/OperadorPDPMovistar")
+  import("../apps/RecargasCelular/Movistar/Views/OperadorPDPMovistar")
 );
 
 const CargarPaquetesMovistar = lazy(() =>
-  import("../apps/Movistar/Views/CargaPaquetesMovistar")
+  import("../apps/RecargasCelular/Movistar/Views/CargaPaquetesMovistar")
 );
 
 const ConcilacionMovistar = lazy(() =>
-  import("../apps/Movistar/Views/ConcilacionMovistar")
+  import("../apps/RecargasCelular/Movistar/Views/ConcilacionMovistar")
 );
 const ConcilacionMovistarDescarga = lazy(() =>
-  import("../apps/Movistar/Views/ConcilacionMovistarDescarga")
+  import("../apps/RecargasCelular/Movistar/Views/ConcilacionMovistarDescarga")
 );
 const ConciliacionMovistarCarga = lazy(() =>
-  import("../apps/Movistar/Views/ConciliacionMovistarCarga")
+  import("../apps/RecargasCelular/Movistar/Views/ConciliacionMovistarCarga")
 );
 
 const CARGAR =
@@ -1258,85 +1267,100 @@ const allUrlsPrivateApps = [
   //   ],
   // },
 
-  //servicio movistar
+  //Modulo RecargasCelular
   {
-    link: "/movistar",
-    label: <AppIcons Logo={"LOTERIA"} name="Movistar" />,
-    component: Movistar,
+    link: "/recargas-celular",
+    label: <AppIcons Logo={"SORTEOS"} name="Recargas Celular" />,
+    component: RecargasCelular,
     permission: [65, 66],
     subRoutes: [
+      //Modulo Movistar
       {
-        link: "/movistar/recargas-movistar",
-        label: <AppIcons Logo={"SORTEOS"} name="Recargas Movistar " />,
-        component: RecargasMovistar,
-        permission: [65],
-      },
-      {
-        link: "/movistar/paquetes-movistar",
-        label: <AppIcons Logo={"SORTEOS"} name="Paquetes Movistar " />,
-        component: PaquetesMovistar,
-        permission: [65],
+        link: "/movistar",
+        label: <AppIcons Logo={"MOVISTAR"} name="Movistar" />,
+        component: Movistar,
+        permission: [65, 66],
         subRoutes: [
           {
-            link: "/movistar/paquetes-movistar/combo",
-            label: <AppIcons Logo={"SORTEOS"} name="Combos" />,
-            component: SubPaquetesMovistar,
-            permission: [65],
-          },
-          {
-            link: "/movistar/paquetes-movistar/paquete-voz",
-            label: <AppIcons Logo={"SORTEOS"} name="Paquete de Voz" />,
-            component: SubPaquetesMovistar,
-            permission: [65],
-          },
-          {
-            link: "/movistar/paquetes-movistar/paquete-datos",
-            label: <AppIcons Logo={"SORTEOS"} name="Paquete de Datos" />,
-            component: SubPaquetesMovistar,
-            permission: [65],
-          },
-          {
-            link: "/movistar/paquetes-movistar/prepagada",
-            label: <AppIcons Logo={"SORTEOS"} name="Prepagada" />,
-            component: SubPaquetesMovistar,
-            permission: [65],
-          },
-        ],
-      },
-      {
-        link: "/movistar/operador-pdp",
-        label: <AppIcons Logo={"SORTEOS"} name="Operador PDP" />,
-        component: OperadorPDPMovistar,
-        permission: [66],
-        subRoutes: [
-          {
-            link: "/movistar/operador-pdp/cargar-paquetes",
+            link: "/movistar/recargas-movistar",
             label: (
-              <AppIcons
-                Logo={"SORTEOS"}
-                name="Cargue de paquetes de movistar"
-              />
+              <AppIcons Logo={"RECARGASMOVISTAR"} name="Recargas Movistar " />
             ),
-            component: CargarPaquetesMovistar,
-            permission: [66], //66
+            component: RecargasMovistar,
+            permission: [65],
           },
           {
-            link: "/movistar/operador-pdp/concilacion",
-            label: <AppIcons Logo={"SORTEOS"} name="Conciliación" />,
-            component: ConcilacionMovistar,
+            link: "/movistar/paquetes-movistar",
+            label: (
+              <AppIcons Logo={"PAQUETESMOVISTAR"} name="Paquetes Movistar " />
+            ),
+            component: PaquetesMovistar,
+            permission: [65],
+            subRoutes: [
+              {
+                link: "/movistar/paquetes-movistar/combo",
+                label: <AppIcons Logo={"SORTEOS"} name="Combos" />,
+                component: SubPaquetesMovistar,
+                permission: [65],
+              },
+              {
+                link: "/movistar/paquetes-movistar/paquete-voz",
+                label: <AppIcons Logo={"SORTEOS"} name="Paquete de Voz" />,
+                component: SubPaquetesMovistar,
+                permission: [65],
+              },
+              {
+                link: "/movistar/paquetes-movistar/paquete-datos",
+                label: <AppIcons Logo={"SORTEOS"} name="Paquete de Datos" />,
+                component: SubPaquetesMovistar,
+                permission: [65],
+              },
+              {
+                link: "/movistar/paquetes-movistar/prepagada",
+                label: <AppIcons Logo={"SORTEOS"} name="Prepagada" />,
+                component: SubPaquetesMovistar,
+                permission: [65],
+              },
+            ],
+          },
+          {
+            link: "/movistar/operador-pdp",
+            label: <AppIcons Logo={"SORTEOS"} name="Operador PDP" />,
+            component: OperadorPDPMovistar,
             permission: [66],
             subRoutes: [
               {
-                link: "/movistar/operador-pdp/concilacion/descarga",
-                label: <AppIcons Logo={"SORTEOS"} name="Decargar archivos" />,
-                component: ConcilacionMovistarDescarga,
-                permission: [66],
+                link: "/movistar/operador-pdp/cargar-paquetes",
+                label: (
+                  <AppIcons
+                    Logo={"SORTEOS"}
+                    name="Cargue de paquetes de movistar"
+                  />
+                ),
+                component: CargarPaquetesMovistar,
+                permission: [66], //66
               },
               {
-                link: "/movistar/operador-pdp/concilacion/carga",
-                label: <AppIcons Logo={"SORTEOS"} name="Cargar archivos" />,
-                component: ConciliacionMovistarCarga,
+                link: "/movistar/operador-pdp/concilacion",
+                label: <AppIcons Logo={"SORTEOS"} name="Conciliación" />,
+                component: ConcilacionMovistar,
                 permission: [66],
+                subRoutes: [
+                  {
+                    link: "/movistar/operador-pdp/concilacion/descarga",
+                    label: (
+                      <AppIcons Logo={"SORTEOS"} name="Decargar archivos" />
+                    ),
+                    component: ConcilacionMovistarDescarga,
+                    permission: [66],
+                  },
+                  {
+                    link: "/movistar/operador-pdp/concilacion/carga",
+                    label: <AppIcons Logo={"SORTEOS"} name="Cargar archivos" />,
+                    component: ConciliacionMovistarCarga,
+                    permission: [66],
+                  },
+                ],
               },
             ],
           },

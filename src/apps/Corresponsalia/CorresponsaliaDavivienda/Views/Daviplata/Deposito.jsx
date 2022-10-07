@@ -148,6 +148,7 @@ const Deposito = () => {
                 setTipoDocumento("01");
                 setUserDoc("");
                 notifyError(res?.msg);
+                handleClose();
                 return;
               } else {
                 setIsUploading(false);
@@ -168,13 +169,13 @@ const Deposito = () => {
                 setSummary(summary);
                 setShowModal(true);
               }
-
               //notify("Transaccion satisfactoria");
             })
             .catch((err) => {
               setIsUploading(false);
               console.error(err);
               notifyError("No se ha podido conectar al servidor");
+              handleClose();
             });
         } else {
           setIsUploading(false);

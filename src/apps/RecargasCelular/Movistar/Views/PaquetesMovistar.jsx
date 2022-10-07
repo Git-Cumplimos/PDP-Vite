@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import HNavbar from "../../../components/Base/HNavbar";
+import HNavbar from "../../../../components/Base/HNavbar";
 
 const PaquetesMovistar = ({ subRoutes }) => {
   return (
