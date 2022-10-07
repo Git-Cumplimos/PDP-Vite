@@ -100,9 +100,11 @@ const VentaPines = () => {
   );
 
   const handleClose = useCallback(() => {
-    notifyError("Transacción cancelada por el usuario");
+    if (!paymentStatus) {
+      notifyError("Transacción cancelada por el usuario");
+    }
     navigate("/corresponsalia/colpatria");
-  }, [navigate]);
+  }, [navigate, paymentStatus]);
 
   const onMakeInquiry = useCallback(
     (ev) => {
@@ -474,9 +476,7 @@ const VentaPines = () => {
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/corresponsalia/colpatria")}>
-                Cerrar
-              </Button>
+              <Button onClick={handleClose}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
