@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import HNavbar from "../../../components/Base/HNavbar";
+import HNavbar from "../../../../components/Base/HNavbar";
 
 const ConcilacionMovistar = ({ subRoutes }) => {
   return (

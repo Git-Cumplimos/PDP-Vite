@@ -1,8 +1,8 @@
 import React from "react";
 import HNavbar from "../../components/Base/HNavbar";
 
-const Movistar = ({ subRoutes }) => {
+const RecargasCelular = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default Movistar;
+export default RecargasCelular;

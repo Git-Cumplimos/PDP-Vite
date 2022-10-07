@@ -1,5 +1,5 @@
-import fetchData from "../../../utils/fetchData";
-import { notifyError } from "../../../utils/notify";
+import fetchData from "../../../../utils/fetchData";
+import { notifyError } from "../../../../utils/notify";
 import { Auth } from "@aws-amplify/auth";
 const url_compra_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/comprar`;
 
