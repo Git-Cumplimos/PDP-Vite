@@ -142,14 +142,6 @@ export const PeticionConciliacionCargar = async (file_, params_ = "") => {
   }
 };
 
-export const fetchMovistarTrx = async (
-  url_,
-  metodo_,
-  name_,
-  params_ = {},
-  data_ = {}
-) => {};
-
 export const fetchCustom = async (
   url_,
   metodo_,
