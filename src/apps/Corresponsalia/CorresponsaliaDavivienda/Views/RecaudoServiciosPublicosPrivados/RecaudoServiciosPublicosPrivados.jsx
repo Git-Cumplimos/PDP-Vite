@@ -381,6 +381,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         numNumeroConvenioIAC: convenio.cod_convenio_cnb,
         valReferencia1: datosTransValidacion?.ref1 ?? "",
         valReferencia2: datosTransValidacion?.ref2 ?? "",
+        numValorTotalDebito: datosTransValidacion.valor ?? 0,
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -415,7 +416,7 @@ const RecaudoServiciosPublicosPrivados = () => {
           }
         })
         .catch((err) => {
-          handleClose()
+          handleClose();
           setIsUploading(false);
           notifyError("No se ha podido conectar al servidor");
           console.error(err);
@@ -576,7 +577,7 @@ const RecaudoServiciosPublicosPrivados = () => {
           </Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} >
+      <Modal show={showModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
           {estadoPeticion === 0 ? (
             <>
