@@ -1,18 +1,18 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import Input from "../../../components/Base/Input";
-import Form from "../../../components/Base/Form";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
-import { notifyError } from "../../../utils/notify";
+import Input from "../../../../components/Base/Input";
+import Form from "../../../../components/Base/Form";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import Modal from "../../../../components/Base/Modal";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import { notifyError } from "../../../../utils/notify";
+import { useFetch } from "../../../../hooks/useFetch";
 import {
   PeticionConciliacionCargar,
   PeticionDescargar,
   PeticionConciliacionBuscar,
 } from "../utils/fetchMovistar";
-import Modal from "../../../components/Base/Modal";
-import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Button from "../../../components/Base/Button";
-import { useFetch } from "../../../hooks/useFetch";
 
 const URL = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/buscar`;
 const URLDescarga = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/descargar`;

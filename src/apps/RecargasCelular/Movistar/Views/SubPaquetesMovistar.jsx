@@ -7,18 +7,20 @@ import React, {
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom"; //son hook usados para la routes
 import { useReactToPrint } from "react-to-print";
-import Button from "../../../components/Base/Button";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import Modal from "../../../components/Base/Modal";
-import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
-import Tickets from "../../../components/Base/Tickets";
-import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import { useAuth } from "../../../hooks/AuthHooks";
-import { useFetch } from "../../../hooks/useFetch";
-import { notify, notifyError } from "../../../utils/notify";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import Modal from "../../../../components/Base/Modal";
+import MoneyInput, {
+  formatMoney,
+} from "../../../../components/Base/MoneyInput";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import Tickets from "../../../../components/Base/Tickets";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import { useFetch } from "../../../../hooks/useFetch";
+import { notify, notifyError } from "../../../../utils/notify";
 import {
   fetchCompraPaquetes,
   fetchCustom,

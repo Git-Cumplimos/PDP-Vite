@@ -73,9 +73,11 @@ const PinPago = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    notifyError("Transacción cancelada por el usuario");
+    if (!paymentStatus) {
+      notifyError("Transacción cancelada por el usuario");
+    }
     navigate("/corresponsalia/colpatria");
-  }, [navigate]);
+  }, [navigate, paymentStatus]);
 
   const onMakePayment = useCallback(
     (ev) => {
@@ -294,16 +296,14 @@ const PinPago = () => {
       </Form>
       <Modal
         show={showModal}
-        handleClose={paymentStatus || loadingPinPago ? () => {} : handleClose}
+        handleClose={loadingPinPago ? () => {} : handleClose}
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/corresponsalia/colpatria")}>
-                Cerrar
-              </Button>
+              <Button onClick={handleClose}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (

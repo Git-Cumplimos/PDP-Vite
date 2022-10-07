@@ -349,7 +349,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         ticket: objTicket,
         fecCodigDeBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-          valCodigoDeBarras: valorTransaccion,
+        valCodigoDeBarras: valorTransaccion,
         // valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
 
         idComercio: roleInfo?.id_comercio,
@@ -444,7 +444,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                               ];
                               objTicket["commerceInfo"].push([
                                 "No. de aprobación Banco",
-                                res?.obj?.respuestaDavivienda?.valTalonOut ?? res?.obj?.idTrx ,
+                                res?.obj?.respuestaDavivienda?.valTalonOut ??
+                                  res?.obj?.idTrx,
                               ]);
                               objTicket["commerceInfo"].push(["", ""]);
                               objTicket["trxInfo"].push([
@@ -475,7 +476,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                           } else {
                             // notifyError(res?.msg ?? res?.message ?? "");
                             setIsUploading(false);
-                            hideModalReset()
+                            hideModalReset();
                             resolve(false);
                           }
                         })
@@ -488,7 +489,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   );
                   if (prom === true) {
                     setIsUploading(false);
-                    hideModalReset()
+                    hideModalReset();
                     break;
                   }
                 } catch (error) {
@@ -498,13 +499,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             } else {
               setIsUploading(false);
               notifyError(res?.msg ?? res?.message ?? "");
-              hideModalReset()
+              hideModalReset();
             }
           }
         })
         .catch((err) => {
           setIsUploading(false);
-          hideModalReset()
+          hideModalReset();
           notifyError("No se ha podido conectar al servidor");
           console.error(err);
         });
@@ -518,7 +519,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
         fecFechaCodigoBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        numValorCodigoBarras: dataCodBarras,
+        numValorCodigoBarras: datosTransaccion.valor ?? 0,
+        // numValorCodigoBarras: dataCodBarras,
+        numValor: datosTransaccion.valor ?? 0,
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -554,7 +557,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           setIsUploading(false);
           notifyError("No se ha podido conectar al servidor");
           console.error(err);
-          hideModalReset()
+          hideModalReset();
         });
     }
   };
@@ -776,7 +779,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               )}
             </ButtonBar>
           </Form>
-          <Modal show={showModal} >
+          <Modal show={showModal}>
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
               {peticion === 1 && (
                 <>
