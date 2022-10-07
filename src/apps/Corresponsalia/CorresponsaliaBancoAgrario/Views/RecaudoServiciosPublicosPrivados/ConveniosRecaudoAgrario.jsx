@@ -249,7 +249,7 @@ const ConveniosRecaudoAgrario = () => {
       const f = new Date();
       const query = {
         contentType: "application/text",
-        filename: `archivo_convenios_aval/${file.name}`,
+        filename: `archivo_convenios_agrario/${file.name}`,
       };
       fetchData(url_cargueS3, "POST", {}, query)
         .then((respuesta) => {
@@ -365,7 +365,7 @@ const ConveniosRecaudoAgrario = () => {
     <>
       <SimpleLoading show={isUploading} />
       <TableEnterprise
-        title='Tabla convenios AVAL corresponsal bancario'
+        title='Tabla convenios Agrario corresponsal bancario'
         maxPage={maxPages}
         headers={["Id", "Convenio", "EAN", "Estado"]}
         data={tableConvenios}
@@ -438,14 +438,14 @@ const ConveniosRecaudoAgrario = () => {
         {estado === 0 ? (
           <Form formDir='col' onSubmit={saveFile}>
             <h1 className='text-2xl text-center mb-10 mt-5'>
-              Archivo de convenios AVAL
+              Archivo de convenios Agrario
             </h1>
             <InputX
               id={`archivo`}
               label={file.name ? "Cambiar archivo" : `Elegir archivo`}
               type='file'
               // disabled={progress !== 0}
-              accept='.txt,.csv'
+              accept='.csv,.txt'
               onGetFile={onChangeFile}
             />
             {file.name ? (
