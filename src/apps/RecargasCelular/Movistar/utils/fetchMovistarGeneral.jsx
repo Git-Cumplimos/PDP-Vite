@@ -137,24 +137,24 @@ export class ErrorCustomFetch extends ErrorCustom {
 
 export class ErrorCustomTimeout extends ErrorCustom {
   constructor(message, error_msg) {
-    super(message, "ErrorCustomTimeout", error_msg, "");
+    super(message, "ErrorCustomTimeout", error_msg, null);
   }
 }
 
 export class ErrorCustomBackend extends ErrorCustom {
   constructor(message, error_msg) {
-    super(message, "ErrorCustomBackend", error_msg, "");
+    super(message, "ErrorCustomBackend", error_msg, null);
   }
 }
 
 export class ErrorCustomBackendUser extends ErrorCustom {
   constructor(message, error_msg) {
-    super(message, "ErrorCustomBackendUser", error_msg, "");
+    super(message, "ErrorCustomBackendUser", error_msg, null);
   }
 }
 
 export class msgCustomBackend extends ErrorCustom {
   constructor(message, error_msg) {
-    super(message, "msgCustomBackend", error_msg, "");
+    super(message, "msgCustomBackend", error_msg, null);
   }
 }
