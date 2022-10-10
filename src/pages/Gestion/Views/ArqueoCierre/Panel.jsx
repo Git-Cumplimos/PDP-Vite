@@ -246,11 +246,8 @@ const Panel = () => {
   }, [
     denominaciones,
     nombreComercio,
-    roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
-    roleInfo?.id_usuario,
+    roleInfo,
     userInfo?.attributes?.name,
-    roleInfo?.direccion,
   ]);
 
   const printDiv = useRef();
