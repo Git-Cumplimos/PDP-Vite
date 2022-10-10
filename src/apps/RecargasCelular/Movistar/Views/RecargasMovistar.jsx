@@ -17,10 +17,10 @@ import Tickets from "../../../../components/Base/Tickets";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { useFetch } from "../../../../hooks/useFetch";
 import { notify, notifyError } from "../../../../utils/notify";
-import { fetchCustom, ErrorCustom } from "../utils/fetchMovistarGeneral";
+import { ErrorCustom } from "../utils/fetchMovistarGeneral";
 import { useFetchMovistar } from "../hook/useFetchMovistar";
+import { toPhoneNumber } from "../../../../utils/functions";
 
 const minValor = 1000;
 const maxValor = 100000;
@@ -34,12 +34,9 @@ const RecargasMovistar = () => {
   const validNavigate = useNavigate();
   const [inputCelular, setInputCelular] = useState("");
   const [inputValor, setInputValor] = useState("");
-  const [invalidCelular, setInvalidCelular] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [summary, setSummary] = useState({});
   const [infTicket, setInfTicket] = useState(null);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
-  const [contador, setContador] = useState(30);
 
   const [loadingPeticionRecarga, peticionRecarga] = useFetchMovistar(
     url_recargas_movistar,
@@ -70,11 +67,6 @@ const RecargasMovistar = () => {
     //Realizar recarga
     setShowModal(true);
     setTypeInfo("ResumenRecarga");
-    setSummary({
-      Celular: `${inputCelular.slice(0, 3)} ${inputCelular.slice(3, 6)} 
-        ${inputCelular.slice(6)}`,
-      Valor: formatMoney.format(inputValor),
-    });
   };
 
   const recargaMovistar = () => {
@@ -103,7 +95,7 @@ const RecargasMovistar = () => {
         if (error instanceof ErrorCustom) {
           switch (error.name) {
             case "ErrorCustomBackend":
-              msg += `: ${error.message}`;
+              msg = `${msg}: ${error.message}`;
               const error_msg_key = Object.keys(error.error_msg);
               const find = error_msg_key.find(
                 (keyInd) => keyInd == "ErrorTrxRefuse"
@@ -112,6 +104,9 @@ const RecargasMovistar = () => {
               notifyError(msg);
               break;
             default:
+              if (error.notificacion == null) {
+                notifyError(`${msg}: ${error.message}`);
+              }
               break;
           }
         } else {
@@ -137,7 +132,6 @@ const RecargasMovistar = () => {
     setInputCelular("");
     setInputValor("");
     setInfTicket(null);
-    setSummary({});
   }, []);
 
   const handlePrint = useReactToPrint({
@@ -154,6 +148,8 @@ const RecargasMovistar = () => {
       commerceInfo: [
         ["Id Transacción", result_.transaccion_ptopago],
         ["No. terminal", roleInfo.id_dispositivo],
+        ["Id Movistar", result_.pk_trx],
+        ["Id Comercio", roleInfo.id_comercio],
         ["Comercio", roleInfo["nombre comercio"]],
         ["", ""],
         ["Municipio", roleInfo.ciudad],
@@ -161,11 +157,11 @@ const RecargasMovistar = () => {
         ["Dirección", roleInfo.direccion],
         ["", ""],
       ],
-      commerceName: "RECARGA MOVISTAR",
+      commerceName: "RECARGAS MOVISTAR",
       trxInfo: [
-        ["Número celular", summary.Celular],
+        ["Número celular", toPhoneNumber(inputCelular)],
         ["", ""],
-        ["Valor recarga", summary.Valor],
+        ["Valor recarga", formatMoney.format(inputValor)],
         ["", ""],
       ],
       disclamer:
@@ -194,8 +190,7 @@ const RecargasMovistar = () => {
           autoComplete="off"
           minLength={"10"}
           maxLength={"10"}
-          invalid={invalidCelular}
-          value={inputCelular ?? ""}
+          value={inputCelular}
           onChange={onCelChange}
           required
         />
@@ -208,7 +203,7 @@ const RecargasMovistar = () => {
           max={maxValor}
           minLength={"4"}
           maxLength={"9"}
-          value={inputValor ?? ""}
+          value={inputValor}
           onInput={onMoneyChange}
           required
         />
@@ -223,7 +218,10 @@ const RecargasMovistar = () => {
           <PaymentSummary
             title="¿Está seguro de realizar la transacción?"
             subtitle="Resumen de transacción"
-            summaryTrx={summary}
+            summaryTrx={{
+              Celular: toPhoneNumber(inputCelular),
+              Valor: formatMoney.format(inputValor),
+            }}
           >
             {!loadingPeticionRecarga ? (
               <>

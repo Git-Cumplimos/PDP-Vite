@@ -21,14 +21,14 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { useFetch } from "../../../../hooks/useFetch";
 import { notify, notifyError } from "../../../../utils/notify";
-import {
-  fetchCompraPaquetes,
-  fetchCustom,
-  ErrorCustom,
-  ErrorCustomBackend,
-  msgCustomBackend,
-} from "../utils/fetchPaquetesMovistar";
+import { toPhoneNumber } from "../../../../utils/functions";
+import { fetchCustom, ErrorCustom } from "../utils/fetchMovistarGeneral";
+import { useFetchMovistar } from "../hook/useFetchMovistar";
 
+//----------constantes------------
+const tipo_operacion = 104;
+const url_get_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/paquetes`;
+const url_paquetes_movistar = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/metodo1/comprar`;
 const inputDataInitial = {
   celular: "",
 };
@@ -38,8 +38,12 @@ const inputDataInitialSearch = {
   descripcioncorta: "",
   valordelaoferta: "",
 };
-const tipo_operacion = 104;
-const url_get_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/paquetes`;
+const fetchGetPaquetes = fetchCustom(
+  url_get_paquetes,
+  "GET",
+  "consulta paquetes"
+);
+//----------------------------------
 
 const SubPaquetesMovistar = () => {
   const { pathname: urlLocation } = useLocation(); //Hook para averiguar en que URL est
@@ -59,58 +63,66 @@ const SubPaquetesMovistar = () => {
   const { roleInfo, infoTicket: guardarTicket } = useAuth();
   const navigateValid = useNavigate();
   const [loadingPeticionGetPaquetes, PeticionGetPaquetes] =
-    useFetch(fetchCustom);
+    useFetch(fetchGetPaquetes);
   const [loadingPeticionCompraPaquetes, PeticionCompraPaquetes] =
-    useFetch(fetchCompraPaquetes);
+    useFetchMovistar(url_paquetes_movistar, "compra paquetes movistar");
 
   useEffect(() => {
-    let arrayParamts = [];
+    let paramsGetPaquetes = {};
     if (urlLocation == "/movistar/paquetes-movistar/combo") {
-      arrayParamts.push("tipodeoferta=combo");
+      paramsGetPaquetes["tipodeoferta"] = "combo";
       setTipodeoferta("Combos");
     } else if (urlLocation == "/movistar/paquetes-movistar/paquete-voz") {
-      arrayParamts.push("tipodeoferta=paquetedevoz");
+      paramsGetPaquetes["tipodeoferta"] = "paquetedevoz";
       setTipodeoferta("Paquetes de voz");
     } else if (urlLocation == "/movistar/paquetes-movistar/paquete-datos") {
-      arrayParamts.push("tipodeoferta=paquetededatos");
+      paramsGetPaquetes["tipodeoferta"] = "paquetededatos";
       setTipodeoferta("Paquetes de datos");
     } else if (urlLocation == "/movistar/paquetes-movistar/prepagada") {
-      arrayParamts.push("tipodeoferta=prepagada");
+      paramsGetPaquetes["tipodeoferta"] = "prepagada";
       setTipodeoferta("Prepagada");
     }
 
     if (inputDataSearch.codigodelaoferta != "") {
-      arrayParamts.push(`codigodelaoferta=${inputDataSearch.codigodelaoferta}`);
+      paramsGetPaquetes["codigodelaoferta"] = inputDataSearch.codigodelaoferta;
     }
     if (inputDataSearch.descripcioncorta != "") {
-      arrayParamts.push(`descripcioncorta=${inputDataSearch.descripcioncorta}`);
+      paramsGetPaquetes["descripcioncorta"] = inputDataSearch.descripcioncorta;
     }
 
     if (
       inputDataSearch.valordelaoferta != "" &&
       inputDataSearch.valordelaoferta != 0
     ) {
-      arrayParamts.push(`valordelaoferta=${inputDataSearch.valordelaoferta}`);
+      paramsGetPaquetes["valordelaoferta"] = inputDataSearch.valordelaoferta;
     }
 
-    arrayParamts.push(`page=${pageData}&limit=${limit}`);
-    const params = arrayParamts.length > 0 ? `?${arrayParamts.join("&")}` : "";
+    paramsGetPaquetes["page"] = pageData;
+    paramsGetPaquetes["limit"] = limit;
 
-    PeticionGetPaquetes(url_get_paquetes + params, "GET", "paquetes")
+    PeticionGetPaquetes(paramsGetPaquetes, {})
       .then((response) => {
+        console.log(response);
         if (response?.status == true) {
           setDataServiceConsult(response?.obj?.result?.results);
           setMaxPage(response?.obj?.result?.maxPages);
         }
       })
       .catch((error) => {
+        let msg = "consulta paquetes no exitoso";
         if (error instanceof ErrorCustom) {
-        } else if (error instanceof ErrorCustomBackend) {
-          notifyError(`consulta paquetes no exitoso: ${error.message}`);
-        } else if (error instanceof msgCustomBackend) {
-          notify(`${error.message}`);
+          switch (error.name) {
+            case "ErrorCustomBackend":
+              notifyError(`${msg}: ${error.message}`);
+              break;
+            default:
+              if (error.notificacion == null) {
+                notifyError(`${msg}: ${error.message}`);
+              }
+              break;
+          }
         } else {
-          notifyError("consulta paquetes no exitoso");
+          notifyError(msg);
         }
       });
   }, [urlLocation, pageData, limit, inputDataSearch]);
@@ -135,16 +147,11 @@ const SubPaquetesMovistar = () => {
 
   function ValidarAntesCompraPaquete(e) {
     e.preventDefault();
-    // validar datos
-    if (inputData.celular[0] != "3") {
-      notifyError(
-        "Número inválido, el No. de celular debe comenzar con el número 3"
-      );
-      return;
-    }
+    //RealizarCompra
     setShowModal(true);
     setTypeInfo("ResumenTrx");
   }
+
   const ComprarPaquete = () => {
     let oficinaPropia;
     if (roleInfo.tipo_comercio != "OFICINASPROPIAS") {
@@ -165,77 +172,68 @@ const SubPaquetesMovistar = () => {
 
     PeticionCompraPaquetes(data)
       .then((response) => {
-        const response_obj = response?.obj;
-        const result = response_obj?.result;
         if (response?.status == true) {
           CompraPaquetesExitosa(response?.obj?.result);
-        } else {
-          HandleCloseFirst();
-          switch (response_obj?.identificador) {
-            case "00":
-              notifyError(
-                "Compra de paquete no exitosa, datos de entrada al servicio erróneos (Error:00)"
-              );
-              break;
-            case "01":
-              notifyError(
-                "Compra de paquete no exitosa, el servicio transaccional se encuentra caído (Error:01)"
-              );
-              break;
-            case "02":
-              notify("No tiene cupo");
-              break;
-            case "03":
-              notifyError(
-                "Compra de paquete no exitosa, error con la conexión inicial a la base de datos (Error:03)"
-              );
-              break;
-            case "04":
-              notifyError(
-                "Compra de paquete no exitosa, error con la trama enviada  (Error:04)]"
-              );
-              break;
-            case "06":
-              notifyError(
-                "Compra de paquete no exitosa, error con la conexión (Error:06)]"
-              );
-              break;
-            case "11":
-              notifyError(result.descripcion_codigo_error);
-              break;
-            default:
-              break;
-          }
         }
       })
       .catch((error) => {
-        notifyError("Falla en el sistema >> " + error);
         HandleCloseFirst();
+        let msg = "compra de paquetes no exitosa";
+        if (error instanceof ErrorCustom) {
+          switch (error.name) {
+            case "ErrorCustomBackend":
+              msg = `${msg}: ${error.message}`;
+              const error_msg_key = Object.keys(error.error_msg);
+              const find = error_msg_key.find(
+                (keyInd) => keyInd == "ErrorTrxRefuse"
+              );
+              msg = find != undefined ? error.message : msg;
+              notifyError(msg);
+              break;
+            default:
+              if (error.notificacion == null) {
+                notifyError(`${msg}: ${error.message}`);
+              }
+              break;
+          }
+        } else {
+          notifyError(msg);
+        }
       });
   };
 
   function CompraPaquetesExitosa(result_) {
     const voucher = {
-      title: "Recibo de compra de paquetes movistar",
+      title: "Recibo de pago",
       timeInfo: {
         "Fecha de venta": result_.fecha_final_ptopago,
         Hora: result_.hora_final_ptopago,
       },
       commerceInfo: [
-        ["Id Comercio", roleInfo.id_comercio],
-        ["No. terminal", roleInfo.id_dispositivo],
-        ["Municipio", roleInfo.ciudad],
-        ["Dirección", roleInfo.direccion],
-        ["Id Trx", result_.pk_trx],
         ["Id Transacción", result_.transaccion_ptopago],
+        ["No. terminal", roleInfo.id_dispositivo],
+        ["Id Movistar", result_.pk_trx],
+        ["Id Comercio", roleInfo.id_comercio],
+        ["Comercio", roleInfo["nombre comercio"]],
+        ["", ""],
+        ["Municipio", roleInfo.ciudad],
+        ["", ""],
+        ["Dirección", roleInfo.direccion],
+        ["", ""],
+        // ["Id Trx", result_.pk_trx],
       ],
-      commerceName: `${tipodeoferta} MOVISTAR`,
+      commerceName: "PAQUETES MOVISTAR",
       trxInfo: [
-        ["Celular", inputData.celular],
-        ["Valor", formatMoney.format(dataPackage.valordelaoferta)],
+        ["Tipo paquete", tipodeoferta],
+        ["", ""],
+        ["Número celular", toPhoneNumber(inputData.celular)],
+        ["", ""],
+        ["Valor paquete", formatMoney.format(dataPackage.valordelaoferta)],
+        ["", ""],
         ["Código paquete", dataPackage.codigodelaoferta],
         ["", ""],
         ["Descripción", dataPackage.descripcioncorta],
+        ["", ""],
       ],
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
@@ -398,7 +396,7 @@ const SubPaquetesMovistar = () => {
             title="¿Está seguro de realizar la transacción?"
             subtitle="Resumen de transacción"
             summaryTrx={{
-              Celular: inputData.celular,
+              Celular: toPhoneNumber(inputData.celular),
               Valor: formatMoney.format(dataPackage.valordelaoferta),
               "Tipo de Oferta": tipodeoferta,
               "Descripción Corta": dataPackage.descripcioncorta,

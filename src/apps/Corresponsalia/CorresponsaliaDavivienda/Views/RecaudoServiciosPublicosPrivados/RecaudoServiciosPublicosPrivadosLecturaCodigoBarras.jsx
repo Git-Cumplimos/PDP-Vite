@@ -522,6 +522,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         numValorCodigoBarras: datosTransaccion.valor ?? 0,
         // numValorCodigoBarras: dataCodBarras,
         numValor: datosTransaccion.valor ?? 0,
+        numValorTotalDebito: datosTransaccion.valor ?? 0,
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
