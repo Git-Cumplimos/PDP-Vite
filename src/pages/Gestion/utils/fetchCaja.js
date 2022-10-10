@@ -21,7 +21,7 @@ const buildGetFunction = (url) => {
       const res = await fetchData(url, "GET", args);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
+          throw new Error("Error en la peticion", { cause: "custom" });
         }
 
         throw new Error(res, { cause: "custom" });
@@ -41,7 +41,7 @@ const buildPostFunction = (url) => {
       const res = await fetchData(url, "POST", {}, body);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
+          throw new Error("Error en la peticion", { cause: "custom" });
         }
 
         throw new Error(res, { cause: "custom" });
@@ -64,7 +64,7 @@ const buildPutFunction = (url) => {
       const res = await fetchData(url, "PUT", args, body);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
+          throw new Error("Error en la peticion", { cause: "custom" });
         }
 
         throw new Error(res, { cause: "custom" });
@@ -136,7 +136,7 @@ export const buscarReportesArqueo = async (args) => {
     const res = await response.json();
     if (!res?.status) {
       if (res?.msg) {
-        throw new Error(res?.msg, { cause: "custom" });
+        throw new Error("Error al intentar crear el reporte", { cause: "custom" });
       }
 
       throw new Error(res, { cause: "custom" });
