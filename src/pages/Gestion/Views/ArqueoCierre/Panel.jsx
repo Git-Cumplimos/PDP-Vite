@@ -26,7 +26,7 @@ import ButtonLink from "../../../../components/Base/ButtonLink";
 const formatMoney = makeMoneyFormatter(0);
 
 const Panel = () => {
-  const { roleInfo, signOut } = useAuth();
+  const { roleInfo, userInfo, signOut } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [estado, setEstado] = useState(false);
@@ -129,6 +129,9 @@ const Panel = () => {
         id_comercio: roleInfo?.id_comercio,
         id_terminal: roleInfo?.id_dispositivo,
         id_usuario: roleInfo?.id_usuario,
+        nombre_comercio: nombreComercio,
+        nombre_usuario: userInfo?.attributes?.name,
+        direccion_comercio: roleInfo?.direccion,
         arqueo: Object.fromEntries(denominaciones),
       }),
       {
@@ -243,9 +246,8 @@ const Panel = () => {
   }, [
     denominaciones,
     nombreComercio,
-    roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
-    roleInfo?.id_usuario,
+    roleInfo,
+    userInfo?.attributes?.name,
   ]);
 
   const printDiv = useRef();

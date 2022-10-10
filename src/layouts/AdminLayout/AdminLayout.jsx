@@ -36,7 +36,7 @@ const AdminLayout = () => {
     cargar,
   } = classes;
 
-  const { quotaInfo, roleInfo, signOut, userPermissions } = useAuth();
+  const { quotaInfo, roleInfo, signOut, userPermissions, userInfo } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -53,6 +53,11 @@ const AdminLayout = () => {
   const comisionTotal = useMemo(() => {
     return formatMoney.format(quotaInfo?.comision ?? 0);
   }, [quotaInfo?.comision]);
+
+  const nombreComercio = useMemo(
+    () => roleInfo?.["nombre comercio"],
+    [roleInfo]
+  );
 
   const [clientWidth] = useWindowSize();
 
@@ -91,6 +96,9 @@ const AdminLayout = () => {
         id_usuario: roleInfo?.id_usuario,
         id_comercio: roleInfo?.id_comercio,
         id_terminal: roleInfo?.id_dispositivo,
+        nombre_comercio: nombreComercio,
+        nombre_usuario: userInfo?.attributes?.name,
+        direccion_comercio: roleInfo?.direccion,
       })
         .then((res) => {
           if (res?.obj !== 3 && res?.obj !== 2) {
@@ -108,11 +116,10 @@ const AdminLayout = () => {
     }
   }, [
     pathname,
-    roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
-    roleInfo?.id_usuario,
-    roleInfo?.tipo_comercio,
+    roleInfo,
+    nombreComercio,
     userPermissions,
+    userInfo?.attributes?.name,
   ]);
 
   return (
