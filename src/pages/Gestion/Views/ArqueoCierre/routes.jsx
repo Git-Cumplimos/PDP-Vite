@@ -48,7 +48,7 @@ export const rutasArqueo = [
   },
   {
     link: "/gestion/arqueo/parametrizar-cuenta",
-    label: <AppIcons Logo={"RECAUDO"} name="Parametrizar cuenta(s) recaudo" />,
+    label: <AppIcons Logo={"RECAUDO"} name="Parametrizar Transportadoras y Entidades Bancarias" />,
     component: ParametrizacionRecaudo,
     permission: [77],
   },
