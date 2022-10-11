@@ -70,6 +70,9 @@ const Panel = () => {
           id_usuario: roleInfo?.id_usuario,
           id_comercio: roleInfo?.id_comercio,
           id_terminal: roleInfo?.id_dispositivo,
+          nombre_comercio: nombreComercio,
+          nombre_usuario: userInfo?.attributes?.name,
+          direccion_comercio: roleInfo?.direccion,
         }),
         {
           render: () => {
@@ -97,12 +100,7 @@ const Panel = () => {
         { toastId: "busqueda-cierre-123" }
       );
     }
-  }, [
-    roleInfo?.tipo_comercio,
-    roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
-    roleInfo?.id_usuario,
-  ]);
+  }, [nombreComercio, roleInfo, userInfo?.attributes?.name]);
 
   const closeModalFunction = useCallback(() => {
     setEstado(false);
@@ -243,12 +241,7 @@ const Panel = () => {
       },
       { toastId: "busqueda-cierre-123" }
     );
-  }, [
-    denominaciones,
-    nombreComercio,
-    roleInfo,
-    userInfo?.attributes?.name,
-  ]);
+  }, [denominaciones, nombreComercio, roleInfo, userInfo?.attributes?.name]);
 
   const printDiv = useRef();
 
