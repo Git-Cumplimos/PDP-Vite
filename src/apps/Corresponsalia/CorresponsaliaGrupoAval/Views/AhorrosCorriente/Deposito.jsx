@@ -484,7 +484,7 @@ const Deposito = () => {
                   type='submit'
                   onClick={onMakePayment}
                   disabled={loadingDepositoCorresponsalGrupoAval}>
-                  Realizar deposito
+                  Realizar depósito
                 </Button>
                 {showBTNConsulta ? 
                 <Button

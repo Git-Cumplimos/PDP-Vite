@@ -320,7 +320,7 @@ const TramitePines = () => {
             />
             <ButtonBar className="col-auto md:col-span-2">
               <Button type="submit" disabled={disabledBtn}>
-                Reenviar codigo
+                Reenviar código
               </Button>
               <Button 
                 type="button"

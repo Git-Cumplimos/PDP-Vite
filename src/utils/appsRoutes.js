@@ -521,11 +521,6 @@ const ConciliacionMovistarCarga = lazy(() =>
   import("../apps/RecargasCelular/Movistar/Views/ConciliacionMovistarCarga")
 );
 
-const CARGAR =
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_1-P9wrhr8RWkx5zt3f64Ogy-Yr5DoQ_5ww&usqp=CAU";
-const DESCARGAR =
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5Ra0nfafOoCnsF9kD-Q1BH_J-kkz4CsP4Yw&usqp=CAU";
-
 const allUrlsPrivateApps = [
   {
     link: "https://portal.solucionesenred.co/",
@@ -564,19 +559,21 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/cargar`,
-          label: <AppIcons Logo={CARGAR} name="Carga de archivos" />,
+          label: <AppIcons Logo={"CARGAR"} name="Carga de archivos" />,
           component: CargaArchivos,
           permission: [4],
         },
         {
           link: `/loteria/${name}/descargar`,
-          label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+          label: <AppIcons Logo={"DESCARGAR"} name="Descarga de archivos" />,
           component: Descargas,
           permission: [6],
           subRoutes: [
             {
               link: `/loteria/${name}/descargar/descarga_reportes`,
-              label: <AppIcons Logo={DESCARGAR} name="Descarga de archivos" />,
+              label: (
+                <AppIcons Logo={"DESCARGAR"} name="Descarga de archivos" />
+              ),
               component: DescargarArchivosS3,
               permission: [6],
             },

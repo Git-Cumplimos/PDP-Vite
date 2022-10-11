@@ -30,6 +30,8 @@ const svgs = {
   right_arrow: `${urlAssets}/assets/svg/right-arrow.svg`,
   SORTEOS: `${urlAssets}/assets/svg/SORTEO-01.svg`,
   SUSER: `${urlAssets}/assets/svg/SUSER-01.svg`,
+  CARGAR: `${urlAssets}/assets/svg/CARGAR.svg`,
+  DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
   //MOVISTAR
   MOVISTAR: `${urlAssets}/assets/svg/movistar/MOVISTAR_PRINCIPAL.svg`,
   RECARGASMOVISTAR: `${urlAssets}/assets/svg/movistar/MOVISTAR_RECARGAS.svg`,
