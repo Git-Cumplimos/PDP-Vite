@@ -90,7 +90,6 @@ const AdminLayout = () => {
       roleInfo?.id_dispositivo !== undefined,
       roleInfo?.direccion !== undefined,
       nombreComercio !== undefined,
-      !pathname.startsWith("/gestion/arqueo/arqueo-cierre"),
       userPermissions?.map(({id_permission}) => id_permission).includes(74)
     ];
     if (conditions.every((val) => val)) {
@@ -154,7 +153,7 @@ const AdminLayout = () => {
       <main className="container">
         <Suspense fallback={<ContentBox />}>{!infoCaja && <Outlet />}</Suspense>
         <Modal show={infoCaja}>
-          {cajaState === 1 ? (
+          {cajaState === 1 && !pathname.startsWith("/gestion/arqueo/arqueo-cierre") ? (
             <div className="items-center text-center">
               <h1>
                 Señor usuario, la caja presenta cierre tardío, no se pueden
@@ -178,8 +177,8 @@ const AdminLayout = () => {
                 <Button
                   type="submit"
                   onClick={() => {
+                    navigate("/", { replace: true });
                     signOut();
-                    navigate("/login", { replace: true });
                   }}
                 >
                   Cerrar sesión
