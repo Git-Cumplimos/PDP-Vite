@@ -4,6 +4,7 @@ import TicketsDavivienda from "../../../../apps/Corresponsalia/CorresponsaliaDav
 import Accordion from "../../../../components/Base/Accordion";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
+import ButtonLink from "../../../../components/Base/ButtonLink";
 import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
 import Select from "../../../../components/Base/Select";
@@ -11,7 +12,7 @@ import Tickets from "../../../../components/Base/Tickets";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { makeMoneyFormatter } from "../../../../utils/functions";
-import { notifyPending } from "../../../../utils/notify";
+import { notifyError } from "../../../../utils/notify";
 import { buscarReporteTrxArqueo } from "../../utils/fetchCaja";
 
 const formatMoney = makeMoneyFormatter(2);
@@ -97,39 +98,26 @@ const ReporteTrx = () => {
       roleInfo?.id_dispositivo !== null,
     ];
     if (conditions.every((val) => val)) {
-      notifyPending(
-        buscarReporteTrxArqueo({
-          id_usuario: roleInfo?.id_usuario,
-          id_comercio: roleInfo?.id_comercio,
-          id_terminal: roleInfo?.id_dispositivo,
-          status: trxState,
-        }),
-        {
-          render: () => {
-            setLoading(true);
-            return "Consultando datos de transacciones";
-          },
-        },
-        {
-          render: ({ data: res }) => {
-            setLoading(false);
-            setTrxTree(res?.obj?.results);
-            setMontoTotal(res?.obj?.monto);
-            return res?.msg;
-          },
-        },
-        {
-          render: ({ data: error }) => {
-            setLoading(false);
-            if (error?.cause === "custom") {
-              return error?.message;
-            }
-            console.error(error?.message);
-            return "Consulta fallida";
-          },
-        },
-        { toastId: "busqueda-reporte-arqueo-trx-123" }
-      );
+      setLoading(true);
+      buscarReporteTrxArqueo({
+        id_usuario: roleInfo?.id_usuario,
+        id_comercio: roleInfo?.id_comercio,
+        id_terminal: roleInfo?.id_dispositivo,
+        status: trxState,
+      })
+        .then((res) => {
+          setTrxTree(res?.obj?.results);
+          setMontoTotal(res?.obj?.monto);
+        })
+        .catch((error) => {
+          if (error?.cause === "custom") {
+            notifyError(error?.message);
+            return;
+          }
+          console.error(error?.message);
+          notifyError("Consulta fallida");
+        })
+        .finally(() => setLoading(false));
     }
   }, [
     roleInfo?.id_comercio,
@@ -160,7 +148,9 @@ const ReporteTrx = () => {
         </Form>
         <Accordion
           titulo={
-            <GridRow cols={["", "Total", formatMoney.format(montoTotal), "", ""]} />
+            <GridRow
+              cols={["", "Total", formatMoney.format(montoTotal), "", ""]}
+            />
           }
         />
         <TreeView
@@ -220,6 +210,14 @@ const ReporteTrx = () => {
           </div>
         )}
       </Modal>
+      <ButtonBar>
+        <ButtonLink
+          className="px-4 py-2 bg-primary text-white rounded-full transition-opacity duration-300"
+          to={"/gestion/arqueo/arqueo-cierre"}
+        >
+          Realizar arqueo y cierre de caja
+        </ButtonLink>
+      </ButtonBar>
     </Fragment>
   );
 };

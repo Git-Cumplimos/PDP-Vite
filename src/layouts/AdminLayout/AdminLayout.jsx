@@ -62,7 +62,7 @@ const AdminLayout = () => {
   const [clientWidth] = useWindowSize();
 
   const closeCash = useCallback(() => {
-    navigate(`/gestion/arqueo/arqueo-cierre`);
+    navigate(`/gestion/arqueo/arqueo-cierre/reporte`);
     setInfoCaja(false);
   }, [navigate]);
 
@@ -88,6 +88,8 @@ const AdminLayout = () => {
       roleInfo?.id_usuario !== undefined,
       roleInfo?.id_comercio !== undefined,
       roleInfo?.id_dispositivo !== undefined,
+      roleInfo?.direccion !== undefined,
+      nombreComercio !== undefined,
       !pathname.startsWith("/gestion/arqueo/arqueo-cierre"),
       userPermissions?.map(({id_permission}) => id_permission).includes(74)
     ];

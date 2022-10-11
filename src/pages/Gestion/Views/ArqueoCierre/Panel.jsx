@@ -21,15 +21,16 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import TicketCierre from "./TicketCierre";
-import ButtonLink from "../../../../components/Base/ButtonLink";
+import { useNavigate } from "react-router-dom";
 
 const formatMoney = makeMoneyFormatter(0);
 
 const Panel = () => {
+  const navigate = useNavigate();
   const { roleInfo, userInfo, signOut } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const [estado, setEstado] = useState(false);
+  const [estado, setEstado] = useState(true);
   const [totalCierres, setTotalCierres] = useState(false);
   const [denominaciones, setDenominaciones] = useState([
     [100000, 0],
@@ -103,6 +104,7 @@ const Panel = () => {
   }, [nombreComercio, roleInfo, userInfo?.attributes?.name]);
 
   const closeModalFunction = useCallback(() => {
+    navigate(-1);
     setEstado(false);
     setTotalCierres(false);
     setDenominaciones([
@@ -119,7 +121,7 @@ const Panel = () => {
       [50, 0],
     ]);
     setConfirmarArqueo(false);
-  }, []);
+  }, [navigate]);
 
   const cierreCaja = useCallback(() => {
     notifyPending(
@@ -265,9 +267,6 @@ const Panel = () => {
             >
               Arqueo y cierre de caja
             </Button>
-            <ButtonLink to={"/gestion/arqueo/arqueo-cierre/reporte"}>
-              Ver reporte de transacciones
-            </ButtonLink>
           </ButtonBar>
         ) : (
           <h1 className="text-3xl mt-6">Cargando...</h1>
