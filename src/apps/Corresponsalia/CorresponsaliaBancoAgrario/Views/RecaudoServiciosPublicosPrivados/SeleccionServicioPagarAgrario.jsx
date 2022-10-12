@@ -23,23 +23,24 @@ const SeleccionServicioPagarAgrario = () => {
 
   const tableConvenios = useMemo(() => {
     return [
-      ...convenios.map(({ pk_convenios_recaudo_aval, nura, convenio, ean }) => {
-        return {
-          "Id convenio": nura,
-          Convenio: convenio !== "" ? convenio : "N/A",
-          EAN: ean !== "" ? ean : "N/A",
-        };
-      }),
+      ...convenios.map(
+        ({ pk_convenios_recaudo_aval, codigo, nombre_convenio }) => {
+          return {
+            "Id convenio": codigo,
+            Convenio: nombre_convenio !== "" ? nombre_convenio : "N/A",
+          };
+        }
+      ),
     ];
   }, [convenios]);
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
       navigate(
-        "../corresponsalia/corresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/manual",
+        "../corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/manual",
         {
           state: {
-            id: convenios[i]["pk_convenios_recaudo_aval"],
+            id: convenios[i]["pk_tbl_convenios_banco_agrario"],
           },
         }
       );
@@ -53,9 +54,8 @@ const SeleccionServicioPagarAgrario = () => {
 
   const fecthTablaConveniosPaginadoFunc = () => {
     postConsultaTablaConveniosPaginado({
-      convenio: datosTrans.convenio,
-      nura: datosTrans.idConvenio,
-      ean: datosTrans.ean,
+      nombre_convenio: datosTrans.convenio,
+      codigo: datosTrans.idConvenio,
       page,
       limit,
     })
@@ -71,9 +71,9 @@ const SeleccionServicioPagarAgrario = () => {
         Recaudo servicios públicos y privados
       </h1>
       <TableEnterprise
-        title='Tabla convenios AVAL corresponsal bancario'
+        title='Tabla convenios Agrario corresponsal bancario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "EAN"]}
+        headers={["Código", "Convenio"]}
         data={tableConvenios}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
@@ -82,7 +82,7 @@ const SeleccionServicioPagarAgrario = () => {
         <Input
           id='searchConvenio'
           name='searchConvenio'
-          label={"Nopmbre convenio"}
+          label={"Nombre convenio"}
           minLength='1'
           maxLength='30'
           type='text'
@@ -107,23 +107,6 @@ const SeleccionServicioPagarAgrario = () => {
               const num = e.target.value;
               setDatosTrans((old) => {
                 return { ...old, idConvenio: num };
-              });
-            }
-          }}></Input>
-        <Input
-          id='ean'
-          label='EAN'
-          type='text'
-          name='ean'
-          minLength='1'
-          maxLength='13'
-          required
-          value={datosTrans.ean}
-          onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
-              setDatosTrans((old) => {
-                return { ...old, ean: num };
               });
             }
           }}></Input>

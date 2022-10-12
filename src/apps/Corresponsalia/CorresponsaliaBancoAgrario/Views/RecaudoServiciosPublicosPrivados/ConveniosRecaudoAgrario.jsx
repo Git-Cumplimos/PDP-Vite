@@ -561,6 +561,8 @@ const ConveniosRecaudoAgrario = () => {
                   options={{
                     "N 010 Numérico": "N 010 Numérico",
                     "A 000 Alfanumérico Números": "A 000 Alfanumérico Números",
+                    "Q 108 Modlo 10": "Q 108 Modlo 10",
+                    "U 109 Base 9": "U 109 Base 9",
                   }}
                   onChange={onChangeFormatVect(id)}
                   value={

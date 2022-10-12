@@ -28,7 +28,7 @@ import {
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
-const RecaudoServiciosPublicosPrivadosAval = () => {
+const RecaudoServiciosPublicosPrivadosAgrario = () => {
   const { state } = useLocation();
   const { roleInfo } = useAuth();
   const navigate = useNavigate();
@@ -84,7 +84,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
 
   const fecthTablaConveniosEspecificoFunc = () => {
     postConsultaTablaConveniosEspecifico({
-      pk_convenios_recaudo_aval: state?.id,
+      pk_tbl_convenios_banco_agrario: state?.id,
     })
       .then((autoArr) => {
         setConvenio(autoArr?.results[0]);
@@ -282,29 +282,32 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         Recaudo servicios públicos y privados
       </h1>
       <h1 className='text-2xl text-center mb-10'>{`Convenio: ${
-        convenio?.convenio ?? ""
+        convenio?.nombre_convenio ?? ""
       }`}</h1>
 
       <Form onSubmit={onSubmit}>
-        <Input
-          id='ref1'
-          label='Referencia 1'
-          type='text'
-          name='ref1'
-          minLength='1'
-          maxLength='32'
-          required
-          value={datosTrans.ref1}
-          autoComplete='off'
-          onInput={(e) => {
-            let valor = e.target.value;
-            let num = valor.replace(/[\s\.]/g, "");
-            if (!isNaN(num)) {
-              setDatosTrans((old) => {
-                return { ...old, ref1: num };
-              });
-            }
-          }}></Input>
+        {!convenio?.nombre_ref1?.match(/-/g) && (
+          <Input
+            id='ref1'
+            label={convenio?.nombre_ref1}
+            type='text'
+            name='ref1'
+            minLength={convenio?.longitud_min_ref1}
+            maxLength={convenio?.longitud_max_ref1}
+            required
+            value={datosTrans.ref1}
+            autoComplete='off'
+            onInput={(e) => {
+              let valor = e.target.value;
+              let num = valor.replace(/[\s\.]/g, "");
+              if (!isNaN(num)) {
+                setDatosTrans((old) => {
+                  return { ...old, ref1: num };
+                });
+              }
+            }}></Input>
+        )}
+
         {convenio?.parciales === "1" && (
           <MoneyInput
             id='valCashOut'
@@ -446,4 +449,4 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   );
 };
 
-export default RecaudoServiciosPublicosPrivadosAval;
+export default RecaudoServiciosPublicosPrivadosAgrario;
