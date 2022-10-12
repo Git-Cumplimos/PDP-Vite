@@ -19,7 +19,7 @@ import { toPhoneNumber } from "../../../../utils/functions";
 const minValor = 1000;
 const maxValor = 100000;
 const tipo_operacion = 77;
-const url_recargas_movistar = `http://movistarcertificacion-env.eba-v22wngkz.us-east-2.elasticbeanstalk.com/recargasmovistar/metodo1/prepago`;
+const url_recargas_movistar = `${process.env.REACT_APP_URL_MOVISTAR}/recargasmovistar/metodo1/prepago`;
 
 const RecargasMovistar = () => {
   //Variables
