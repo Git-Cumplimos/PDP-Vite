@@ -43,7 +43,6 @@ const AdminLayout = () => {
   const { urlsPrivate: urls } = useUrls();
 
   const [showModal, setShowModal] = useState(false);
-  const [infoCaja, setInfoCaja] = useState(false);
   const [cajaState, setCajaState] = useState("");
 
   const saldoDisponible = useMemo(() => {
@@ -63,7 +62,6 @@ const AdminLayout = () => {
 
   const closeCash = useCallback(() => {
     navigate(`/gestion/arqueo/arqueo-cierre/reporte`);
-    setInfoCaja(false);
   }, [navigate]);
 
   const {
@@ -90,7 +88,7 @@ const AdminLayout = () => {
       roleInfo?.id_dispositivo !== undefined,
       roleInfo?.direccion !== undefined,
       nombreComercio !== undefined,
-      userPermissions?.map(({id_permission}) => id_permission).includes(74)
+      userPermissions?.map(({ id_permission }) => id_permission).includes(74),
     ];
     if (conditions.every((val) => val)) {
       searchCierre({
@@ -102,10 +100,9 @@ const AdminLayout = () => {
         direccion_comercio: roleInfo?.direccion,
       })
         .then((res) => {
-          if (res?.obj !== 3 && res?.obj !== 2) {
-            setInfoCaja(true);
-            setCajaState(res?.obj);
-          }
+          setCajaState(res?.obj);
+          // if (res?.obj !== 3 && res?.obj !== 2) {
+          // }
         })
         .catch((error) => {
           if (error?.cause === "custom") {
@@ -122,6 +119,14 @@ const AdminLayout = () => {
     userPermissions,
     userInfo?.attributes?.name,
   ]);
+
+  const infoCaja = useMemo(() => {
+    return (
+      (cajaState === 1 &&
+        !pathname.startsWith("/gestion/arqueo/arqueo-cierre")) ||
+      cajaState === 4
+    );
+  }, [cajaState, pathname]);
 
   return (
     <div className={adminLayout}>
@@ -153,7 +158,7 @@ const AdminLayout = () => {
       <main className="container">
         <Suspense fallback={<ContentBox />}>{!infoCaja && <Outlet />}</Suspense>
         <Modal show={infoCaja}>
-          {cajaState === 1 && !pathname.startsWith("/gestion/arqueo/arqueo-cierre") ? (
+          {cajaState === 1 ? (
             <div className="items-center text-center">
               <h1>
                 Señor usuario, la caja presenta cierre tardío, no se pueden
@@ -186,7 +191,7 @@ const AdminLayout = () => {
               </ButtonBar>
             </h1>
           ) : (
-            <></>
+            ""
           )}
         </Modal>
       </main>
