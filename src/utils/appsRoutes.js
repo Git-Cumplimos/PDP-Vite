@@ -11,6 +11,7 @@ import rutasColpatria from "../apps/Colpatria/routes";
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 import ProvidepinesVus from "../apps/PinesVus/components/ProvidepinesVus";
+import rutasDaviviendaCB from "../apps/Corresponsalia/CorresponsaliaDavivienda/routes";
 
 /**
  * * Logos
@@ -896,119 +897,7 @@ const allUrlsPrivateApps = [
     component: Corresponsalia,
     permission: [54],
     subRoutes: [
-      {
-        //corresponsaliaDavivienda
-        link: "/corresponsalia/corresponsaliaDavivienda",
-        label: (
-          <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Davivienda' />
-        ),
-        component: CorresponsaliaDavivienda,
-        permission: [54],
-        subRoutes: [
-          {
-            link: "/corresponsalia/corresponsaliaDavivienda/Daviplata",
-            label: <AppIcons Logo={"MARKETPLACE"} name='DaviPlata' />,
-            component: DaviplataCB,
-            permission: [54],
-            subRoutes: [
-              {
-                link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashIn",
-                label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Depósito DaviPlata' />
-                ),
-                component: CashIn,
-                permission: [54],
-              },
-              {
-                link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashOut",
-                label: (
-                  <AppIcons Logo={"MARKETPLACE"} name='Retiro DaviPlata' />
-                ),
-                component: CashOut,
-                permission: [54],
-              },
-            ],
-          },
-
-          {
-            link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente",
-            label: (
-              <AppIcons
-                Logo={"MARKETPLACE"}
-                name='Retiros y Depósitos Davivienda'
-              />
-            ),
-            component: AhorrosCorrienteCB,
-            permission: [54],
-            subRoutes: [
-              {
-                link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente/deposito",
-                label: <AppIcons Logo={"MARKETPLACE"} name='Depósitos' />,
-                component: DepositoCB,
-                permission: [54],
-              },
-              {
-                link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente/retiro",
-                label: <AppIcons Logo={"MARKETPLACE"} name='Retiros' />,
-                component: RetiroCB,
-                permission: [54],
-              },
-            ],
-          },
-          {
-            link: "/corresponsalia/corresponsaliaDavivienda/Daviplatapagos_giros",
-            label: <AppIcons Logo={"MARKETPLACE"} name='Pago por giro' />,
-            component: PagoGiro,
-            permission: [54],
-          },
-
-          {
-            link: "/corresponsalia/corresponsaliaDavivienda/pagoDeProductosPropios",
-            label: (
-              <AppIcons Logo={"MARKETPLACE"} name='Pago de productos propios' />
-            ),
-            component: PagoDeProductosPropios,
-            permission: [54],
-          },
-          {
-            link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados",
-            label: (
-              <AppIcons
-                Logo={"MARKETPLACE"}
-                name='Recaudo servicios públicos y privados'
-              />
-            ),
-            component: RecaudoServiciosPublicosPrivadosMenu,
-            permission: [54],
-            subRoutes: [
-              {
-                link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccion",
-                label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
-                component: SeleccionServicioPagar,
-                permission: [54],
-              },
-              {
-                link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/codbarras",
-                label: (
-                  <AppIcons
-                    Logo={"MARKETPLACE"}
-                    name='Recaudo código de barras'
-                  />
-                ),
-                component: RecaudoServiciosPublicosPrivadosLecturaCodigoBarras,
-                permission: [54],
-              },
-              {
-                link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
-                label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
-                component: RecaudoServiciosPublicosPrivados,
-                permission: [54],
-                show: false,
-              },
-            ],
-          },
-        ],
-      },
+      rutasDaviviendaCB,
       {
         link: "/corresponsalia/CorresponsaliaGrupoAval",
         label: (
