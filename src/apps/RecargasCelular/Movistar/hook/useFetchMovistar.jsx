@@ -18,17 +18,16 @@ const sleepEvent = (millisecons) => {
 export const useFetchMovistar = (url_ = "", name_ = "") => {
   const [state, setState] = useState(false);
 
-  const fetchPaso1 = fetchCustom(url_, "POST", `'crear ${name_}'`);
-  const fetchPaso2 = fetchCustom(url_, "PUT", `'modificar ${name_}'`);
-  const fetchPaso3 = fetchCustom(url_, "GET", `'consultar ${name_}'`);
-  let PeticionPaso1;
-  let PeticionPaso2;
-  let PeticionPaso3;
-  let banderaPaso3 = false;
-  let response;
-
   const fetchMovistarTrx = useCallback(
     async (data_ = {}) => {
+      const fetchPaso1 = fetchCustom(url_, "POST", `'crear ${name_}'`);
+      const fetchPaso2 = fetchCustom(url_, "PUT", `'modificar ${name_}'`);
+      const fetchPaso3 = fetchCustom(url_, "GET", `'consultar ${name_}'`);
+      let PeticionPaso1;
+      let PeticionPaso2;
+      let PeticionPaso3;
+      let banderaPaso3 = false;
+      let response;
       setState(true);
       // paso 1
       try {
@@ -56,8 +55,10 @@ export const useFetchMovistar = (url_ = "", name_ = "") => {
 
         //realizar peticion de consulta
         try {
-          //PeticionPaso2?.obj?.result?.transaccion_ptopago
-          PeticionPaso3 = await fetchPaso3({ id_trx: 26515 }, {});
+          PeticionPaso3 = await fetchPaso3(
+            { id_trx: PeticionPaso2?.obj?.result?.transaccion_ptopago },
+            {}
+          );
         } catch (error) {
           setState(false);
           throw error;
