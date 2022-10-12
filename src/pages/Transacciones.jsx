@@ -25,25 +25,23 @@ const Transacciones = () => {
   const { roleInfo, userPermissions } = useAuth();
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
-  const [montoAcumulado, setMontoAcumulado] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
   const [summaryTrx, setSummaryTrx] = useState(null);
 
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
-
+  // 27034
   const [maxPages, setMaxPages] = useState(1);
+  const [idTrxIpt, setIdTrxIpt] = useState("");
   const [idComercio, setIdComercio] = useState(-1);
   const [usuario, setUsuario] = useState(-1);
-  const [tipoComercio, setTipoComercio] = useState(null);
   const [tipoOp, setTipoOp] = useState("");
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
 
   const transacciones = useCallback(() => {
     const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
-    const urlAcumulado = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-acumulado`;
     const queries = { ...pageData };
     if (!(idComercio === -1 || idComercio === "")) {
       queries.id_comercio = parseInt(idComercio);
@@ -53,6 +51,9 @@ const Transacciones = () => {
     }
     if (tipoOp) {
       queries.id_tipo_transaccion = tipoOp;
+    }
+    if (idTrxIpt) {
+      queries.id_trx = idTrxIpt;
     }
     if (fechaInicial && fechaFinal) {
       const fecha_ini = new Date(fechaInicial);
@@ -81,21 +82,6 @@ const Transacciones = () => {
         }
       })
       .catch(() => {});
-
-    if (tipoComercio !== null) {
-      const acumQueries = { ...queries, oficina_propia: tipoComercio };
-      delete acumQueries.limit;
-      delete acumQueries.page;
-      fetchData(urlAcumulado, "GET", acumQueries)
-        .then((res) => {
-          if (res?.status) {
-            setMontoAcumulado(res?.obj);
-          } else {
-            throw new Error(res?.msg);
-          }
-        })
-        .catch(() => {});
-    }
   }, [
     pageData,
     idComercio,
@@ -103,7 +89,7 @@ const Transacciones = () => {
     fechaInicial,
     tipoOp,
     usuario,
-    tipoComercio,
+    idTrxIpt,
   ]);
 
   const closeModal = useCallback(async () => {
@@ -131,11 +117,6 @@ const Transacciones = () => {
 
     setIdComercio(roleInfo?.id_comercio || -1);
     setUsuario(roleInfo?.id_usuario || -1);
-    setTipoComercio(
-      "tipo_comercio" in roleInfo
-        ? roleInfo.tipo_comercio === "OFICINAS PROPIAS"
-        : null
-    );
   }, [userPermissions, roleInfo]);
 
   useEffect(() => {
@@ -143,10 +124,10 @@ const Transacciones = () => {
   }, [transacciones]);
 
   return (
-    <div className='w-full flex flex-col justify-center items-center my-8'>
-      <h1 className='text-3xl'>Transacciones</h1>
+    <div className="w-full flex flex-col justify-center items-center my-8">
+      <h1 className="text-3xl">Transacciones</h1>
       <TableEnterprise
-        title='Transacciones'
+        title="Transacciones"
         headers={[
           "Id transaccion",
           "Operación",
@@ -193,25 +174,26 @@ const Transacciones = () => {
           });
           setShowModal(true);
         }}
-        onSetPageData={setPageData}>
+        onSetPageData={setPageData}
+      >
         <Input
-          id='dateInit'
-          label='Fecha inicial'
-          type='date'
+          id="dateInit"
+          label="Fecha inicial"
+          type="date"
           value={fechaInicial}
           onInput={(e) => setFechaInicial(e.target.value)}
         />
         <Input
-          id='dateEnd'
-          label='Fecha final'
-          type='date'
+          id="dateEnd"
+          label="Fecha final"
+          type="date"
           value={fechaFinal}
           onInput={(e) => setFechaFinal(e.target.value)}
         />
         <Select
-          className='place-self-stretch'
-          id='searchBySorteo'
-          label='Tipo de busqueda'
+          className="place-self-stretch"
+          id="searchBySorteo"
+          label="Tipo de busqueda"
           options={
             Object.fromEntries([
               ["", ""],
@@ -224,27 +206,21 @@ const Transacciones = () => {
           required={true}
           onChange={(e) => setTipoOp(parseInt(e.target.value) ?? "")}
         />
-        {userPermissions
-          .map(({ id_permission }) => id_permission)
-          .includes(58) &&
-          tipoComercio !== null && (
-            <Fragment>
-              <Input
-                label="Monto acumulado"
-                type="tel"
-                value={formatMoney.format(montoAcumulado ?? 0)}
-                readOnly
-              />
-            </Fragment>
-          )}
+        <Input
+          id="id_trx"
+          label="Id de transaccion"
+          type="numeric"
+          value={idTrxIpt}
+          onChange={(e) => setIdTrxIpt(e.target.value)}
+        />
         {userPermissions
           .map(({ id_permission }) => id_permission)
           .includes(5) ? (
           <>
             <Input
-              id='id_comercio'
-              label='Id comercio'
-              type='numeric'
+              id="id_comercio"
+              label="Id comercio"
+              type="numeric"
               value={idComercio}
               onChange={(e) => {
                 setIdComercio(e.target.value);
@@ -255,9 +231,9 @@ const Transacciones = () => {
               }}
             />
             <Input
-              id='id_usuario'
-              label='Id usuario'
-              type='numeric'
+              id="id_usuario"
+              label="Id usuario"
+              type="numeric"
               value={usuario}
               onChange={(e) => {
                 setUsuario(e.target.value);
@@ -274,10 +250,10 @@ const Transacciones = () => {
       </TableEnterprise>
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket && selected?.id_autorizador === 13 ? (
-          <div className='flex flex-col justify-center items-center'>
+          <div className="flex flex-col justify-center items-center">
             <TicketsDavivienda
               refPrint={printDiv}
-              type='Reimpresión'
+              type="Reimpresión"
               ticket={selected?.ticket}
               stateTrx={selected?.status_trx}
             />
@@ -287,10 +263,10 @@ const Transacciones = () => {
             </ButtonBar>
           </div>
         ) : selected?.ticket ? (
-          <div className='flex flex-col justify-center items-center'>
+          <div className="flex flex-col justify-center items-center">
             <Tickets
               refPrint={printDiv}
-              type='Reimpresión'
+              type="Reimpresión"
               ticket={selected?.ticket}
               stateTrx={selected?.status_trx}
             />
@@ -300,12 +276,13 @@ const Transacciones = () => {
             </ButtonBar>
           </div>
         ) : (
-          <div className='flex flex-col justify-center items-center mx-auto container'>
+          <div className="flex flex-col justify-center items-center mx-auto container">
             <PaymentSummary
-              title='Resumen transaccion'
-              subtitle=''
-              summaryTrx={summaryTrx}>
-              <h1 className='text-3xl mt-6 text-aling'>
+              title="Resumen transaccion"
+              subtitle=""
+              summaryTrx={summaryTrx}
+            >
+              <h1 className="text-3xl mt-6 text-aling">
                 No hay ticket registrado
               </h1>
               <ButtonBar>
