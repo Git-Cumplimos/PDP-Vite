@@ -220,7 +220,7 @@ const RecargasMovistar = () => {
             {!loadingPeticionRecarga ? (
               <>
                 <ButtonBar>
-                  <Button type="button" onClick={recargaMovistar}>
+                  <Button type="submit" onClick={recargaMovistar}>
                     Aceptar
                   </Button>
                   <Button onClick={handleCloseCancelada}>Cancelar</Button>

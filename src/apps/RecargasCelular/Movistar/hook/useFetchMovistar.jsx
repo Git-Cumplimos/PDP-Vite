@@ -42,7 +42,7 @@ export const useFetchMovistar = (url_ = "", name_ = "") => {
         response = PeticionPaso2;
       } catch (error) {
         setState(false);
-        if (error.name == "ErrorCustomTimeout") {
+        if (error.name === "ErrorCustomTimeout") {
           banderaPaso3 = true;
         } else {
           throw error;

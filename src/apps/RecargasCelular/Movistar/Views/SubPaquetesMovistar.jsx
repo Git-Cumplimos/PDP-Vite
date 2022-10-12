@@ -383,7 +383,7 @@ const SubPaquetesMovistar = () => {
                 required
               />
               <ButtonBar>
-                <Button type={"submit"}>Comprar</Button>
+                <Button type="submit">Comprar</Button>
                 <Button onClick={HandleCloseFirst}>Cancelar</Button>
               </ButtonBar>
             </Form>
