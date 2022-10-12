@@ -9,6 +9,11 @@ const images = {
   pdpHorizontal: `${urlAssets}/assets/img/LogofinalPDP.svg`,
   Loteria_de_Bogota: `${urlAssets}/assets/img/Loteria_de_Bogota.png`,
   personas: `${urlAssets}/assets/img/personas.png`,
+  PINVUS: `${urlAssets}/assets/img/LogoPinVus.jpg`,
+  MiLicencia: `${urlAssets}/assets/img/logo-milicencia.jpg`,
+  LogoOccidente: `${urlAssets}/assets/img/banco-de-occidente.png`,
+  ScotiabankColpatria: `${urlAssets}/assets/img/ScotiabankColpatria.webp`,
+  LogoAgrario: `${urlAssets}/assets/img/Banco-agrario.jpg`,
 };
 
 const svgs = {
@@ -25,6 +30,12 @@ const svgs = {
   right_arrow: `${urlAssets}/assets/svg/right-arrow.svg`,
   SORTEOS: `${urlAssets}/assets/svg/SORTEO-01.svg`,
   SUSER: `${urlAssets}/assets/svg/SUSER-01.svg`,
+  CARGAR: `${urlAssets}/assets/svg/CARGAR.svg`,
+  DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
+  //MOVISTAR
+  MOVISTAR: `${urlAssets}/assets/svg/movistar/MOVISTAR_PRINCIPAL.svg`,
+  RECARGASMOVISTAR: `${urlAssets}/assets/svg/movistar/MOVISTAR_RECARGAS.svg`,
+  PAQUETESMOVISTAR: `${urlAssets}/assets/svg/movistar/MOVISTAR_PAQUETES.svg`,
   // Recaudo
   CATALOGOS_Y_REVISTAS: `${urlAssets}/assets/svg/recaudo/CATALOGOS&REVISTAS.svg`,
   EPS_Y_SALUD: `${urlAssets}/assets/svg/recaudo/EPS&SALUD.svg`,

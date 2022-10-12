@@ -41,7 +41,12 @@ const ConveniosPines = () => {
   const [loading, setLoading] = useState(false);
 
   const getConvPines = useCallback(() => {
-    getConveniosPinesList({ ...pageData, ...searchFilters })
+    getConveniosPinesList({
+      ...pageData,
+      ...Object.fromEntries(
+        Object.entries(searchFilters).filter(([, val]) => val)
+      ),
+    })
       .then((res) => {
         setListaConveniosPines(res?.obj?.results ?? []);
         setMaxPages(res?.obj?.maxPages ?? []);
@@ -144,7 +149,11 @@ const ConveniosPines = () => {
 
   const downloadMasive = useCallback(() => {
     notifyPending(
-      getConveniosPinesListMassive({ ...searchFilters }),
+      getConveniosPinesListMassive({
+        ...Object.fromEntries(
+          Object.entries(searchFilters).filter(([, val]) => val)
+        ),
+      }),
       {
         render() {
           setLoading(true);
@@ -312,7 +321,7 @@ const ConveniosPines = () => {
           name={"nombre_convenio"}
           type="text"
           autoComplete="off"
-          maxLength={"50"}
+          maxLength={"30"}
           defaultValue={selected?.nombre_convenio ?? ""}
           required
         />
@@ -390,7 +399,7 @@ const ConveniosPines = () => {
                 name={"nombre_convenio"}
                 type="text"
                 autoComplete="off"
-                maxLength={"50"}
+                maxLength={"30"}
                 defaultValue={selected?.nombre_convenio ?? ""}
                 required
               />

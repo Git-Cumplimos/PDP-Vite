@@ -22,6 +22,7 @@ import useMoney from "../../../../../hooks/useMoney";
 import { notify, notifyError } from "../../../../../utils/notify";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
 import {
+  postCheckReintentoRecaudoConveniosDavivienda,
   postConsultaConveniosDavivienda,
   postConsultaTablaConveniosEspecifico,
   postRecaudoConveniosDavivienda,
@@ -228,7 +229,7 @@ const RecaudoServiciosPublicosPrivados = () => {
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
         direccion: roleInfo?.direccion,
       })
-        .then((res) => {
+        .then(async (res) => {
           if (res?.status) {
             setIsUploading(false);
             notify(res?.msg);
@@ -238,7 +239,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             ];
             objTicket["commerceInfo"].push([
               "No. de aprobación Banco",
-              res?.obj?.respuestaDavivienda?.valTalonOut,
+              res?.obj?.respuestaDavivienda?.valTalonOut ?? res?.obj?.idTrx,
             ]);
             objTicket["commerceInfo"].push(["", ""]);
             objTicket["trxInfo"].push([
@@ -259,9 +260,113 @@ const RecaudoServiciosPublicosPrivados = () => {
             setObjTicketActual(objTicket);
             setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
           } else {
-            setIsUploading(false);
-            notifyError(res?.msg);
-            handleClose();
+            // notifyError(res?.msg ?? res?.message ?? "");
+            if (res?.message === "Endpoint request timed out") {
+              const formatDate = Intl.DateTimeFormat("es-CO", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              }).format(hoy);
+              const formatDateTimeIni = Intl.DateTimeFormat("es-CO", {
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+                hour12: false,
+              }).format(hoy);
+              const newDate = new Date(hoy.getTime() + 2 * 60000);
+              const formatDateTimeFin = Intl.DateTimeFormat("es-CO", {
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+                hour12: false,
+              }).format(newDate);
+              for (let i = 0; i < 5; i++) {
+                try {
+                  const prom = await new Promise((resolve, reject) =>
+                    setTimeout(() => {
+                      postCheckReintentoRecaudoConveniosDavivienda({
+                        dateIni: `${formatDate} ${formatDateTimeIni}`,
+                        dateEnd: `${formatDate} ${formatDateTimeFin}`,
+
+                        idComercio: roleInfo?.id_comercio,
+                        idUsuario: roleInfo?.id_usuario,
+                        idTerminal: roleInfo?.id_dispositivo,
+                        issuerIdDane: roleInfo?.codigo_dane,
+                        nombreComercio: roleInfo?.["nombre comercio"],
+                        municipio: roleInfo?.["ciudad"],
+                        oficinaPropia:
+                          roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
+                            ? true
+                            : false,
+                        direccion: roleInfo?.direccion,
+                      })
+                        .then((res) => {
+                          if (res?.msg !== "No ha terminado el reintento") {
+                            if (res?.status) {
+                              setIsUploading(false);
+                              notify(res?.msg);
+                              objTicket["commerceInfo"][1] = [
+                                "No. terminal",
+                                res?.obj?.codigoTotal,
+                              ];
+                              objTicket["commerceInfo"].push([
+                                "No. de aprobación Banco",
+                                res?.obj?.respuestaDavivienda?.valTalonOut,
+                              ]);
+                              objTicket["commerceInfo"].push(["", ""]);
+                              objTicket["trxInfo"].push([
+                                "Valor",
+                                formatMoney.format(res?.obj?.valor),
+                              ]);
+                              objTicket["trxInfo"].push(["", ""]);
+                              objTicket["trxInfo"].push([
+                                "Costo transacción",
+                                formatMoney.format(0),
+                              ]);
+                              objTicket["trxInfo"].push(["", ""]);
+                              objTicket["trxInfo"].push([
+                                "Total",
+                                formatMoney.format(res?.obj?.valor),
+                              ]);
+                              objTicket["trxInfo"].push(["", ""]);
+                              setObjTicketActual(objTicket);
+                              setShowModal((old) => ({
+                                ...old,
+                                estadoPeticion: 3,
+                              }));
+                              resolve(true);
+                            } else {
+                              notifyError(res?.msg ?? res?.message ?? "");
+                              resolve(true);
+                            }
+                          } else {
+                            // notifyError(res?.msg ?? res?.message ?? "");
+                            setIsUploading(false);
+                            handleClose();
+                            resolve(false);
+                          }
+                        })
+                        .catch((err) => {
+                          setIsUploading(false);
+                          // notifyError("No se ha podido conectar al servidor");
+                          console.error(err);
+                        });
+                    }, 15000)
+                  );
+                  if (prom === true) {
+                    setIsUploading(false);
+                    handleClose();
+                    break;
+                  }
+                } catch (error) {
+                  console.error(error);
+                }
+              }
+            } else {
+              notifyError(res?.msg ?? res?.message ?? "");
+              setIsUploading(false);
+              handleClose();
+            }
           }
         })
         .catch((err) => {
@@ -276,6 +381,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         numNumeroConvenioIAC: convenio.cod_convenio_cnb,
         valReferencia1: datosTransValidacion?.ref1 ?? "",
         valReferencia2: datosTransValidacion?.ref2 ?? "",
+        numValorTotalDebito: datosTransValidacion.valor ?? 0,
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -310,6 +416,7 @@ const RecaudoServiciosPublicosPrivados = () => {
           }
         })
         .catch((err) => {
+          handleClose();
           setIsUploading(false);
           notifyError("No se ha podido conectar al servidor");
           console.error(err);
@@ -363,7 +470,7 @@ const RecaudoServiciosPublicosPrivados = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 20000000],
+    limits: [0, 9900000],
     decimalDigits: 2,
   });
   return (
@@ -433,7 +540,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             label='Valor'
             type='text'
             autoComplete='off'
-            maxLength={"15"}
+            maxLength={"12"}
             value={datosTrans.valor ?? ""}
             onInput={onChangeMoneyLocal}
             required></MoneyInput>
@@ -470,7 +577,7 @@ const RecaudoServiciosPublicosPrivados = () => {
           </Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
           {estadoPeticion === 0 ? (
             <>
@@ -530,7 +637,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                     autoComplete='off'
                     type='tel'
                     minLength={"0"}
-                    maxLength={"20"}
+                    maxLength={"12"}
                     defaultValue={datosTransValidacion.valor ?? ""}
                     onInput={(ev) =>
                       setDatosTransValidacion((old) => ({

@@ -17,6 +17,7 @@ import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
 import {
+  postCheckReintentoRecaudoConveniosDavivienda,
   postConsultaCodigoBarrasConveniosEspecifico,
   postConsultaConveniosDavivienda,
   postRecaudoConveniosDavivienda,
@@ -148,7 +149,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       setIsUploading(true);
       fetchTablaConveniosEspecificoFunc(datosTrans?.codBarras);
     } else {
-      notifyError("El codigo de barras no tiene el formato correcto");
+      notifyError("El código de barras no tiene el formato correcto");
     }
   };
   const habilitarModal = () => {
@@ -348,7 +349,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         ticket: objTicket,
         fecCodigDeBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
+        valCodigoDeBarras: valorTransaccion,
+        // valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -358,8 +360,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         municipio: roleInfo?.["ciudad"],
         oficinaPropia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        direccion: roleInfo?.direccion,
       })
-        .then((res) => {
+        .then(async (res) => {
           if (res?.status) {
             setIsUploading(false);
             notify(res?.msg);
@@ -390,13 +393,119 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             setObjTicketActual(objTicket);
             setPeticion(4);
           } else {
-            setIsUploading(false);
-            notifyError(res?.msg);
-            hideModalReset();
+            // notifyError(res?.msg ?? res?.message ?? "");
+            if (res?.message === "Endpoint request timed out") {
+              const formatDate = Intl.DateTimeFormat("es-CO", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              }).format(hoy);
+              const formatDateTimeIni = Intl.DateTimeFormat("es-CO", {
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+                hour12: false,
+              }).format(hoy);
+              const newDate = new Date(hoy.getTime() + 2 * 60000);
+              const formatDateTimeFin = Intl.DateTimeFormat("es-CO", {
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+                hour12: false,
+              }).format(newDate);
+              for (let i = 0; i < 5; i++) {
+                try {
+                  const prom = await new Promise((resolve, reject) =>
+                    setTimeout(() => {
+                      postCheckReintentoRecaudoConveniosDavivienda({
+                        dateIni: `${formatDate} ${formatDateTimeIni}`,
+                        dateEnd: `${formatDate} ${formatDateTimeFin}`,
+
+                        idComercio: roleInfo?.id_comercio,
+                        idUsuario: roleInfo?.id_usuario,
+                        idTerminal: roleInfo?.id_dispositivo,
+                        issuerIdDane: roleInfo?.codigo_dane,
+                        nombreComercio: roleInfo?.["nombre comercio"],
+                        municipio: roleInfo?.["ciudad"],
+                        oficinaPropia:
+                          roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
+                            ? true
+                            : false,
+                        direccion: roleInfo?.direccion,
+                      })
+                        .then((res) => {
+                          if (res?.msg !== "No ha terminado el reintento") {
+                            if (res?.status) {
+                              setIsUploading(false);
+                              notify(res?.msg);
+                              objTicket["commerceInfo"][1] = [
+                                "No. terminal",
+                                res?.obj?.codigoTotal,
+                              ];
+                              objTicket["commerceInfo"].push([
+                                "No. de aprobación Banco",
+                                res?.obj?.respuestaDavivienda?.valTalonOut ??
+                                  res?.obj?.idTrx,
+                              ]);
+                              objTicket["commerceInfo"].push(["", ""]);
+                              objTicket["trxInfo"].push([
+                                "Valor",
+                                formatMoney.format(res?.obj?.valor),
+                              ]);
+                              objTicket["trxInfo"].push(["", ""]);
+                              objTicket["trxInfo"].push([
+                                "Costo transacción",
+                                formatMoney.format(0),
+                              ]);
+                              objTicket["trxInfo"].push(["", ""]);
+                              objTicket["trxInfo"].push([
+                                "Total",
+                                formatMoney.format(res?.obj?.valor),
+                              ]);
+                              objTicket["trxInfo"].push(["", ""]);
+                              setObjTicketActual(objTicket);
+                              setShowModal((old) => ({
+                                ...old,
+                                estadoPeticion: 3,
+                              }));
+                              resolve(true);
+                            } else {
+                              notifyError(res?.msg ?? res?.message ?? "");
+                              resolve(true);
+                            }
+                          } else {
+                            // notifyError(res?.msg ?? res?.message ?? "");
+                            setIsUploading(false);
+                            hideModalReset();
+                            resolve(false);
+                          }
+                        })
+                        .catch((err) => {
+                          setIsUploading(false);
+                          // notifyError("No se ha podido conectar al servidor");
+                          console.error(err);
+                        });
+                    }, 15000)
+                  );
+                  if (prom === true) {
+                    setIsUploading(false);
+                    hideModalReset();
+                    break;
+                  }
+                } catch (error) {
+                  console.error(error);
+                }
+              }
+            } else {
+              setIsUploading(false);
+              notifyError(res?.msg ?? res?.message ?? "");
+              hideModalReset();
+            }
           }
         })
         .catch((err) => {
           setIsUploading(false);
+          hideModalReset();
           notifyError("No se ha podido conectar al servidor");
           console.error(err);
         });
@@ -410,7 +519,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
         fecFechaCodigoBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
-        numValorCodigoBarras: dataCodBarras,
+        numValorCodigoBarras: datosTransaccion.valor ?? 0,
+        // numValorCodigoBarras: dataCodBarras,
+        numValor: datosTransaccion.valor ?? 0,
+        numValorTotalDebito: datosTransaccion.valor ?? 0,
 
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
@@ -446,15 +558,17 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           setIsUploading(false);
           notifyError("No se ha podido conectar al servidor");
           console.error(err);
+          hideModalReset();
         });
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 20000000],
+    limits: [0, 9900000],
     decimalDigits: 2,
   });
   const printDiv = useRef();
   const isAlt = useRef("");
+  const isAltCR = useRef({ data: "", state: false });
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -481,8 +595,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   return;
                 }
                 if (ev.altKey) {
+                  if (isAltCR.current.state) {
+                    isAltCR.current = {
+                      ...isAltCR.current,
+                      data: isAltCR.current.data + ev.key,
+                    };
+                  }
                   if (ev.keyCode !== 18) {
                     isAlt.current += ev.key;
+                  } else {
+                    isAltCR.current = { ...isAltCR.current, state: true };
                   }
                 }
               }}
@@ -496,6 +618,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     });
                   }
                 }
+                if (ev.keyCode === 18) {
+                  if (isAltCR.current.data === "013") {
+                    onSubmit(ev);
+                  }
+                  isAltCR.current = {
+                    ...isAltCR.current,
+                    state: false,
+                    data: "",
+                  };
+                }
               }}></TextArea>
             {datosTrans.codBarras !== "" && (
               <ButtonBar>
@@ -504,7 +636,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   onClick={() => {
                     setDatosTrans({ codBarras: "" });
                   }}>
-                  Volver a ingresar codigo de barras
+                  Volver a ingresar código de barras
                 </Button>
               </ButtonBar>
             )}
@@ -601,7 +733,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                 autoComplete='off'
                 type='tel'
                 minLength={"5"}
-                maxLength={"20"}
+                maxLength={"12"}
                 defaultValue={datosTransaccion.showValor ?? ""}
                 onInput={(ev) =>
                   setDatosTransaccion((old) => ({
@@ -648,7 +780,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               )}
             </ButtonBar>
           </Form>
-          <Modal show={showModal} handleClose={hideModal}>
+          <Modal show={showModal}>
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
               {peticion === 1 && (
                 <>
@@ -676,7 +808,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     datosTransaccion.valor
                   )}`}</h2>
                   <ButtonBar>
-                    <Button onClick={hideModal}>Cancelar</Button>
+                    <Button onClick={hideModalReset}>Cancelar</Button>
                     <Button type='submit' onClick={onSubmitPago}>
                       Aceptar
                     </Button>
@@ -706,34 +838,41 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     )} `}
                   </h2>
                   {datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0" &&
-                    (datosEnvio?.datosConvenio?.ind_valor_ceros_cnb !== "0" ||
-                      datosEnvio?.datosConvenio?.ind_menor_vlr_cnb !== "0" ||
-                      datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb !== "0") && (
-                      <Form grid onSubmit={onSubmitPago}>
-                        <Input
-                          id='valor'
-                          name='valor'
-                          label='Valor a depositar'
-                          autoComplete='off'
-                          type='tel'
-                          minLength={"5"}
-                          maxLength={"20"}
-                          defaultValue={datosTransaccion.showValor2 ?? ""}
-                          onInput={(ev) =>
-                            setDatosTransaccion((old) => ({
-                              ...old,
-                              valor: onChangeMoney(ev),
-                              showValor2: onChangeMoney(ev),
-                            }))
-                          }
-                          required
-                        />
-                        <ButtonBar>
-                          <Button onClick={hideModalReset}>Cancelar</Button>
-                          <Button type='submit'>Realizar pago</Button>
-                        </ButtonBar>
-                      </Form>
-                    )}
+                  (datosEnvio?.datosConvenio?.ind_valor_ceros_cnb !== "0" ||
+                    datosEnvio?.datosConvenio?.ind_menor_vlr_cnb !== "0" ||
+                    datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb !== "0") ? (
+                    <Form grid onSubmit={onSubmitPago}>
+                      <Input
+                        id='valor'
+                        name='valor'
+                        label='Valor a depositar'
+                        autoComplete='off'
+                        type='tel'
+                        minLength={"5"}
+                        maxLength={"12"}
+                        defaultValue={datosTransaccion.showValor2 ?? ""}
+                        onInput={(ev) =>
+                          setDatosTransaccion((old) => ({
+                            ...old,
+                            valor: onChangeMoney(ev),
+                            showValor2: onChangeMoney(ev),
+                          }))
+                        }
+                        required
+                      />
+                      <ButtonBar>
+                        <Button onClick={hideModalReset}>Cancelar</Button>
+                        <Button type='submit'>Realizar pago</Button>
+                      </ButtonBar>
+                    </Form>
+                  ) : (
+                    <ButtonBar>
+                      <Button onClick={hideModalReset}>Cancelar</Button>
+                      <Button type='submit' onClick={onSubmitPago}>
+                        Realizar pago
+                      </Button>
+                    </ButtonBar>
+                  )}
                 </>
               )}
               {peticion === 4 && (

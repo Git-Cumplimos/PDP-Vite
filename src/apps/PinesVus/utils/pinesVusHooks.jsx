@@ -15,6 +15,7 @@ const urls = {
   cupoQX: `${process.env.REACT_APP_URL_PinesVus}/cupoQX`,
   ingresarIdQX: `${process.env.REACT_APP_URL_PinesVus}/ingresarIdQX`,
   consultaEpsArl: `${process.env.REACT_APP_URL_PinesVus}/consultaEpsArl`,
+  reenvioHash: `${process.env.REACT_APP_URL_PinesVus}/reenviarCodigoHash`,
 };
 
 export const pinesVusContext = createContext({
@@ -31,6 +32,7 @@ export const pinesVusContext = createContext({
   modificarCupoQX: () => {},
   ingresarIdQX: () => {},
   consultaEpsArl: () => {},
+  reenvioHash: () => {},
   activarNavigate: null,
   setActivarNavigate: null,
 });
@@ -333,6 +335,21 @@ export const useProvidePinesVus = () => {
     []
   );
 
+  const reenvioHash = useCallback(
+    async (
+      doc_cliente
+    ) => {
+      const query = { doc_cliente : doc_cliente };
+      try {
+        const res = await fetchData(urls.reenvioHash, "GET", query);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
+
   return {
     cancelPinVus,
     crearPinVus,
@@ -351,5 +368,6 @@ export const useProvidePinesVus = () => {
     activarNavigate,
     setActivarNavigate,
     consultaEpsArl,
+    reenvioHash
   };
 };

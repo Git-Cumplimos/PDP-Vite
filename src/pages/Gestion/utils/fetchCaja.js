@@ -21,7 +21,7 @@ const buildGetFunction = (url) => {
       const res = await fetchData(url, "GET", args);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
+          throw new Error("Error en la peticion", { cause: "custom" });
         }
 
         throw new Error(res, { cause: "custom" });
@@ -41,7 +41,7 @@ const buildPostFunction = (url) => {
       const res = await fetchData(url, "POST", {}, body);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
+          throw new Error("Error en la peticion", { cause: "custom" });
         }
 
         throw new Error(res, { cause: "custom" });
@@ -52,6 +52,7 @@ const buildPostFunction = (url) => {
     }
   };
 };
+
 const buildPutFunction = (url) => {
   return async (args, body) => {
     if (!args || !body) {
@@ -63,7 +64,7 @@ const buildPutFunction = (url) => {
       const res = await fetchData(url, "PUT", args, body);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
+          throw new Error("Error en la peticion", { cause: "custom" });
         }
 
         throw new Error(res, { cause: "custom" });
@@ -112,7 +113,9 @@ export const editarComprobante = buildPutFunction(
 export const agregarNota = buildPostFunction(`${urlNotas}/administrar`);
 export const buscarNotas = buildGetFunction(`${urlNotas}/administrar`);
 
-export const buscarReporteTrxArqueo = buildGetFunction(`${urlReportes}/trx-arqueo-usuario`);
+export const buscarReporteTrxArqueo = buildGetFunction(
+  `${urlReportes}/trx-arqueo-usuario`
+);
 
 export const buscarReportesArqueo = async (args) => {
   try {
@@ -133,7 +136,7 @@ export const buscarReportesArqueo = async (args) => {
     const res = await response.json();
     if (!res?.status) {
       if (res?.msg) {
-        throw new Error(res?.msg, { cause: "custom" });
+        throw new Error("Error al intentar crear el reporte", { cause: "custom" });
       }
 
       throw new Error(res, { cause: "custom" });

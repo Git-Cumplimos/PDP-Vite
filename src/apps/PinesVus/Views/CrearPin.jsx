@@ -938,21 +938,19 @@ const CrearPin = () => {
 
       <Modal show={showModal} handleClose={() => closeModal()}>
         {respPin !== ""? 
-        <div className="flex flex-col justify-center items-center" ref={printDiv}>
-          <>
-          <Tickets
+        <div className="flex flex-col justify-center items-center" >
+          <div ref={printDiv}>
+          <TicketsPines
             refPrint={null} 
             ticket={tickets} 
-            // type={type}
-            // stateTrx={stateTrx}
+            logo = 'LogoMiLicensia'
           />
           <TicketsPines
             refPrint={null} 
             ticket={tickets2}
-            // type={type}
-            // stateTrx={stateTrx}
+            logo = 'LogoVus'
           />
-          </>
+          </div>
           <ButtonBar>
             <Button
               onClick={() => {

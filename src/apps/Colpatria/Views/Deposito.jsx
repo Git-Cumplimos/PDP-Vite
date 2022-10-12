@@ -15,7 +15,6 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import Select from "../../../components/Base/Select";
-import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import useMoney from "../../../hooks/useMoney";
@@ -29,11 +28,12 @@ import {
   toAccountNumber,
 } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
+import TicketColpatria from "../components/TicketColpatria";
 
 const accountTypes = {
   10: "Cuenta ahorros",
   20: "Cuenta corriente",
-  30: "Cuenta de credito",
+  30: "Cuenta de crédito",
 };
 
 const formatMoney = makeMoneyFormatter(2);
@@ -95,7 +95,7 @@ const Deposito = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valDeposito,
 
         // Datos trx colpatria
@@ -176,6 +176,7 @@ const Deposito = () => {
         {
           render({data: err}) {
             setLoadingDeposit(false);
+            navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
               return err?.message;
             }
@@ -193,6 +194,7 @@ const Deposito = () => {
       valDeposito,
       roleInfo,
       infoTicket,
+      navigate,
     ]
   );
 
@@ -259,7 +261,7 @@ const Deposito = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Depositos Colpatria</h1>
+      <h1 className="text-3xl mt-6">Depósitos Colpatria</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
@@ -316,7 +318,7 @@ const Deposito = () => {
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar deposito</Button>
+          <Button type={"submit"}>Realizar depósito</Button>
         </ButtonBar>
       </Form>
       <Modal
@@ -325,7 +327,7 @@ const Deposito = () => {
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={paymentStatus} />
+            <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={() => navigate("/colpatria")}>Cerrar</Button>

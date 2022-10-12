@@ -352,17 +352,17 @@ const CrearComercios = () => {
             type='text'
             name='nombre_comercio'
             minLength='1'
-            maxLength='32'
+            maxLength='50'
             required
             value={comercio?.nombre_comercio}
             onInput={onChangeFormat}></Input>
           <Input
             id='email_comercio'
             label='Email comercio'
-            type='text'
+            type='email'
             name='email_comercio'
             minLength='1'
-            maxLength='32'
+            maxLength='50'
             required
             value={comercio?.email_comercio}
             onInput={onChangeFormat}></Input>

@@ -19,7 +19,6 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
-import Tickets from "../../../../components/Base/Tickets";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import useMoney from "../../../../hooks/useMoney";
@@ -35,6 +34,8 @@ import {
   // onChangeNumber,
 } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
+import ScreenBlocker from "../../components/ScreenBlocker";
+import TicketColpatria from "../../components/TicketColpatria";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -60,7 +61,6 @@ const TrxRecaudo = () => {
     min: 5000,
   });
 
-  const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [inquiryStatus, setInquiryStatus] = useState(null);
 
@@ -81,20 +81,40 @@ const TrxRecaudo = () => {
     () => ({
       ...Object.fromEntries(
         Object.entries(userReferences).map(([, val], index) => [
-          `Referencia ${index + 1}`,
+          datosConvenio[`referencia_${index + 1}`],
           val,
         ])
       ),
-      "Valor de deposito": formatMoney.format(valTrxRecaudo),
+      Valor:
+        datosConvenio?.fk_tipo_valor !== 3 ? (
+          formatMoney.format(valTrxRecaudo)
+        ) : (
+          <Input
+            id="valor"
+            name="valor"
+            // label="Valor a pagar"
+            autoComplete="off"
+            type="tel"
+            minLength={"5"}
+            maxLength={"10"}
+            value={formatMoney.format(valTrxRecaudo)}
+            onInput={(ev) => setValTrxRecaudo(onChangeMoney(ev))}
+            required
+          />
+        ),
+      // "Valor": formatMoney.format(valTrxRecaudo),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
-    [userReferences, valTrxRecaudo]
+    [userReferences, datosConvenio, valTrxRecaudo, onChangeMoney]
   );
 
   const handleClose = useCallback(() => {
-    setShowModal(false);
-  }, []);
+    if (!paymentStatus) {
+      notifyError("Transacción cancelada por el usuario");
+    }
+    navigate("/corresponsalia/colpatria");
+  }, [navigate, paymentStatus]);
 
   const onMakeInquiry = useCallback(
     (ev) => {
@@ -106,11 +126,12 @@ const TrxRecaudo = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valTrxRecaudo,
 
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio: datosConvenio?.pk_codigo_convenio,
           ...userReferences,
           location: {
             address: userAddress,
@@ -132,12 +153,14 @@ const TrxRecaudo = () => {
           render: ({ data: res }) => {
             setLoadingInquiry(false);
             setInquiryStatus(res?.obj);
+            setValTrxRecaudo(res?.obj?.valor);
             return "Consulta satisfactoria";
           },
         },
         {
           render: ({ data: error }) => {
             setLoadingInquiry(false);
+            navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
               return error?.message;
             }
@@ -147,23 +170,35 @@ const TrxRecaudo = () => {
         }
       );
     },
-    [userReferences, userAddress, valTrxRecaudo, roleInfo]
+    [
+      datosConvenio,
+      userReferences,
+      userAddress,
+      valTrxRecaudo,
+      roleInfo,
+      navigate,
+    ]
   );
 
   const onMakePayment = useCallback(
     (ev) => {
+      if (valTrxRecaudo <= 0) {
+        notifyError("El valor debe ser mayor a cero");
+        return;
+      }
       const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valTrxRecaudo,
 
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio: datosConvenio?.pk_codigo_convenio,
           ...userReferences,
           location: {
             address: userAddress,
@@ -178,7 +213,7 @@ const TrxRecaudo = () => {
         {
           render: () => {
             setLoadingSell(true);
-            return "Procesando transaccion";
+            return "Procesando transacción";
           },
         },
         {
@@ -188,7 +223,7 @@ const TrxRecaudo = () => {
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
             const tempTicket = {
-              title: "Recibo de deposito",
+              title: "Recibo de pago",
               timeInfo: {
                 "Fecha de venta": Intl.DateTimeFormat("es-CO", {
                   year: "2-digit",
@@ -202,20 +237,29 @@ const TrxRecaudo = () => {
                 }).format(new Date()),
               },
               commerceInfo: [
-                ["Id Comercio", roleInfo?.id_comercio],
-                ["No. terminal", roleInfo?.id_dispositivo],
-                ["Municipio", roleInfo?.ciudad],
+                ["Comercio", roleInfo?.["nombre comercio"]],
+                ["No. Terminal", roleInfo?.id_dispositivo],
                 ["Dirección", roleInfo?.direccion],
+                ["Teléfono", roleInfo?.telefono],
                 ["Id Trx", trx_id],
-                ["codigo autorizacion", codigo_autorizacion],
+                ["Id Aut", codigo_autorizacion],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
               ],
-              commerceName: "Colpatria",
+              commerceName: "Recaudo PSP en Efectivo",
               trxInfo: [
-                ["Valor de deposito", formatMoney.format(valTrxRecaudo)],
-                ["", ""],
-              ],
-              disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+                ["Convenio", datosConvenio?.nombre_convenio],
+                ...Object.entries(userReferences).map(([, val], index) => [
+                  datosConvenio[`referencia_${index + 1}`],
+                  val,
+                ]),
+                ["Valor", formatMoney.format(valTrxRecaudo)],
+              ].reduce((list, elem, i) => {
+                list.push(elem);
+                if ((i + 1) % 1 === 0) list.push(["", ""]);
+                return list;
+              }, []),
+              disclamer:
+                "Para cualquier reclamo es indispensable presentar este recibo o comuníquese a los Tel. en Bogotá 7561616 o gratis en el resto del país 018000-522222.",
             };
             setPaymentStatus(tempTicket);
             infoTicket(trx_id, id_type_trx, tempTicket)
@@ -226,28 +270,31 @@ const TrxRecaudo = () => {
                 console.error(err);
                 notifyError("Error guardando el ticket");
               });
-            return "Transaccion satisfactoria";
+            return "Transacción satisfactoria";
           },
         },
         {
           render: ({ data: error }) => {
             setLoadingSell(false);
+            navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
               return error?.message;
             }
             console.error(error?.message);
-            return "Transaccion fallida";
+            return "Transacción fallida";
           },
         }
       );
     },
     [
+      datosConvenio,
       userReferences,
       userAddress,
       valTrxRecaudo,
       inquiryStatus,
       roleInfo,
       infoTicket,
+      navigate,
     ]
   );
 
@@ -276,7 +323,7 @@ const TrxRecaudo = () => {
       })
       .catch((err) => {
         console.error(err);
-        notifyError("Error consultando parametros de la transaccion");
+        notifyError("Error consultando parametros de la transacción");
       });
   }, []);
 
@@ -363,7 +410,7 @@ const TrxRecaudo = () => {
 
   if (!hasData) {
     notifyError(
-      "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+      "El usuario no cuenta con datos de comercio, no se permite la transacción"
     );
     return <Navigate to={"/"} replace />;
   }
@@ -371,7 +418,7 @@ const TrxRecaudo = () => {
   if (searchingConvData || !(searchingConvData || datosConvenio)) {
     return (
       <Fragment>
-        <h1 className="text-3xl mt-6">Recaudo PSP Manual en Efectivo</h1>
+        <h1 className="text-3xl mt-6">Recaudo PSP en Efectivo</h1>
         <h1 className="text-xl mt-6">
           {searchingConvData
             ? "Buscando infomacion de convenio ..."
@@ -385,14 +432,7 @@ const TrxRecaudo = () => {
     <Fragment>
       <h1 className="text-3xl mt-6 mb-10">Recaudo PSP en Efectivo</h1>
       <Form
-        onSubmit={
-          inquiryStatus
-            ? (ev) => {
-                ev.preventDefault();
-                setShowModal(true);
-              }
-            : onMakeInquiry
-        }
+        onSubmit={inquiryStatus ? (ev) => ev.preventDefault() : onMakeInquiry}
         grid
       >
         <Input
@@ -403,7 +443,7 @@ const TrxRecaudo = () => {
           disabled
         />
         <Input
-          label="Código ean o iac"
+          label="Código EAN o IAC"
           type="text"
           autoComplete="off"
           value={datosConvenio.codigo_ean_iac}
@@ -438,7 +478,7 @@ const TrxRecaudo = () => {
               required
             />
           ))}
-        {datosConvenio.fk_tipo_valor === 1 || inquiryStatus || valTrxRecaudo ? (
+        {datosConvenio.fk_tipo_valor === 1 || valTrxRecaudo ? (
           <Input
             id="valor"
             name="valor"
@@ -449,12 +489,7 @@ const TrxRecaudo = () => {
             maxLength={"10"}
             value={valTrxRecaudo ? formatMoney.format(valTrxRecaudo) : ""}
             onInput={(ev) => setValTrxRecaudo(onChangeMoney(ev))}
-            readOnly={
-              (!inquiryStatus &&
-                valTrxRecaudo &&
-                datosConvenio.fk_tipo_valor !== 1) ||
-              (inquiryStatus && datosConvenio.fk_tipo_valor !== 3)
-            }
+            readOnly={valTrxRecaudo && datosConvenio.fk_tipo_valor !== 1}
             required
           />
         ) : (
@@ -466,16 +501,17 @@ const TrxRecaudo = () => {
           </Button>
         </ButtonBar>
       </Form>
+      <ScreenBlocker show={loadingInquiry} />
       <Modal
-        show={showModal}
-        handleClose={paymentStatus || loadingSell ? () => {} : handleClose}
+        show={inquiryStatus}
+        handleClose={loadingSell ? () => {} : handleClose}
       >
         {paymentStatus ? (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={paymentStatus} />
+            <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/colpatria")}>Cerrar</Button>
+              <Button onClick={handleClose}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (

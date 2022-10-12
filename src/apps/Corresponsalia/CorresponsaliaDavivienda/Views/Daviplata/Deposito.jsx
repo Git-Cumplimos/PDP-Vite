@@ -148,6 +148,7 @@ const Deposito = () => {
                 setTipoDocumento("01");
                 setUserDoc("");
                 notifyError(res?.msg);
+                handleClose();
                 return;
               } else {
                 setIsUploading(false);
@@ -168,13 +169,13 @@ const Deposito = () => {
                 setSummary(summary);
                 setShowModal(true);
               }
-
               //notify("Transaccion satisfactoria");
             })
             .catch((err) => {
               setIsUploading(false);
               console.error(err);
               notifyError("No se ha podido conectar al servidor");
+              handleClose();
             });
         } else {
           setIsUploading(false);
@@ -211,6 +212,89 @@ const Deposito = () => {
     navigate(-1);
   }, [navigate]);
 
+  const onMakePaymentReintento = useCallback((response,body) => {
+    setIsUploading(true);
+    if (response?.obj?.reintento){
+      body.reintento = true
+      fetchCashIn(body)
+      .then((res) => {
+        if (!res?.status) {
+          notifyError(res?.msg);
+          setIsUploading(false);
+          handleClose()          
+          // return;
+        } else {
+          setIsUploading(false);
+          notify("Transaccion satisfactoria");
+          const trx_id = res?.obj?.Data?.valTalon ?? 0;
+          const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
+          const total = parseInt(comision) + valor;
+          const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+          const tempTicket = {
+            title: "Recibo de Depósito a Daviplata",
+            timeInfo: {
+              "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+                year: "2-digit",
+                month: "2-digit",
+                day: "2-digit",
+              }).format(new Date()),
+              Hora: Intl.DateTimeFormat("es-CO", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              }).format(new Date()),
+            },
+            commerceInfo: [
+              ["Id Comercio", roleInfo?.id_comercio],
+              ["No. terminal", ter],
+              ["Municipio", roleInfo?.ciudad],
+              ["Dirección", roleInfo?.direccion],
+              ["Tipo de operación", "Depósito a DaviPlata"],
+              ["", ""],
+              ["No. de aprobación", trx_id],
+              ["", ""],
+            ],
+            commerceName: roleInfo?.["nombre comercio"]
+              ? roleInfo?.["nombre comercio"]
+              : "No hay datos",
+            trxInfo: [
+              ["Número DaviPlata", `****${String(phone)?.slice(-4) ?? ""}`],
+              ["", ""],
+              ["Valor", formatMoney.format(valor)],
+              ["", ""],
+              ["Costo transacción", formatMoney.format(comision)],
+              ["", ""],
+              ["Total", formatMoney.format(total)],
+              ["", ""],
+            ],
+            disclamer:
+              "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+          };
+
+          setPaymentStatus(tempTicket);
+          infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
+            .then((resTicket) => {
+              console.log(resTicket);
+            })
+            .catch((err) => {
+              setIsUploading(false);
+              console.error(err);
+              notifyError("Error guardando el ticket");
+            });
+        }
+      })
+      .catch((err) => {
+        setIsUploading(false);
+        console.error(err);
+        notifyError("No se ha podido conectar al servidor");
+      });
+
+    }else{
+      setIsUploading(false);
+      handleClose()
+    }
+  }, [valor]);
+
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
     const body = {
@@ -235,9 +319,8 @@ const Deposito = () => {
       .then((res) => {
         setIsUploading(false);
         if (!res?.status) {
-          setIsUploading(false);
           notifyError(res?.msg);
-          handleClose()
+          onMakePaymentReintento(res,body)
           // return;
         } else {
           notify("Transaccion satisfactoria");

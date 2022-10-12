@@ -6,7 +6,7 @@ import Modal from "../../../../../components/Base/Modal";
 import useQuery from "../../../../../hooks/useQuery";
 import { Fragment, useState, useCallback, useRef, useEffect, useMemo } from "react";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
-import Tickets from "../../components/TicketsDavivienda";
+import TicketsAval from "../../components/TicketsAval";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import {
@@ -206,6 +206,7 @@ const Deposito = () => {
             };
             setSummary(summary)
             setShowModal(true);
+            notify("Transacción satisfactoria");
             setShowBTNConsulta(false)
           }
         })
@@ -228,6 +229,9 @@ const Deposito = () => {
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
+
+
+  console.log(roleInfo)
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
@@ -268,15 +272,16 @@ const Deposito = () => {
           return;
         }
         else{
-        notify("Transaccion satisfactoria");
+        notify("Transacción satisfactoria");
         const trx_id = parseInt(res?.obj?.respuesta_grupo_aval["11"]) ?? 0;
-        const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
+        const numCuenta = (res?.obj?.respuesta_grupo_aval["102"]) ?? 0;
+        const id_auth = parseInt(res?.obj?.respuesta_grupo_aval["38"]) ?? 0;
         // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
-          title: "Depósito A Cuentas " + DataBanco?.nombre,
+          title: "Recibo de Pago",
           timeInfo: {
-            "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+            "Fecha de pago": Intl.DateTimeFormat("es-CO", {
               year: "2-digit",
               month: "2-digit",
               day: "2-digit",
@@ -288,43 +293,44 @@ const Deposito = () => {
             }).format(new Date()),
           },
           commerceInfo: [
-            ["Id Comercio", roleInfo?.id_comercio],
-            ["No. de aprobación", trx_id],
-            // ["No. terminal", ter],
-            ["Municipio", roleInfo?.ciudad],
+            ["Comercio", roleInfo?.["nombre comercio"]],
+            ["No. Terminal", roleInfo?.id_dispositivo],
             ["Dirección", roleInfo?.direccion],
-            ["Tipo de operación", "Depósito A Cuentas"],
-            ["", ""]
+            ["Teléfono", roleInfo?.telefono],
+            ["Id trx", trx_id],
+            ["Id Aut", id_auth],
           ],
-          commerceName: roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "No hay datos",
+          commerceName: "Depósito",
           trxInfo: [
             [
-            "Tipo de cuenta",
-            tipoCuenta === "01" ? "Ahorros" : "Corriente",
+              "Número celular",
+              phone,
             ],
             ["",""],
             [
-            "Nro. Cuenta",
-            `****${String(numCuenta)?.slice(-4) ?? ""}`,
+              "Entidad financiera",
+              DataBanco?.nombre,
+            ],
+            ["",""],
+            [
+              "Tipo de cuenta",
+              tipoCuenta === "01" ? "Ahorros" : "Corriente",
+            ],
+            ["",""],
+            [
+              "Nro. Cuenta",
+              `****${String(numCuenta)?.slice(-4) ?? ""}`,
             ],
             ["",""],
             ["Valor", formatMoney.format(valor)],
             ["", ""],
             ["Costo transacción", formatMoney.format(res?.obj?.costoTrx)],
             ["", ""],
-            ["Total", formatMoney.format(valor)],
-            ["", ""],
-            // ["Identificación depositante", userDoc],
-            // ["", ""],
-            // ["Nombre depositante", nomDepositante],
-            // ["", ""],
           ],
-          disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+          disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
         };
         setPaymentStatus(tempTicket);
-        infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
+        infoTicket(trx_id, res?.obj?.tipo_trx, tempTicket) ////////////////////////////////////
           .then((resTicket) => {
             console.log(resTicket);
           })
@@ -349,7 +355,8 @@ const Deposito = () => {
     infoTicket,
     ,
     datosConsulta,
-    DataBanco
+    DataBanco,
+    phone
   ]);
 
   return (
@@ -464,7 +471,7 @@ const Deposito = () => {
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
+              <TicketsAval refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
@@ -477,7 +484,7 @@ const Deposito = () => {
                   type='submit'
                   onClick={onMakePayment}
                   disabled={loadingDepositoCorresponsalGrupoAval}>
-                  Realizar deposito
+                  Realizar depósito
                 </Button>
                 {showBTNConsulta ? 
                 <Button
@@ -491,7 +498,10 @@ const Deposito = () => {
                 }
                 
                 <Button
-                  onClick={handleClose}
+                  onClick={(e) => {
+                    handleClose()
+                    notifyError("Transacción cancelada por el usuario")
+                    }}
                   disabled={loadingDepositoCorresponsalGrupoAval}>
                   Cancelar
                 </Button>

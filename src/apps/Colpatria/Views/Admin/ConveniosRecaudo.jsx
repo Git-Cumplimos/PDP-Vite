@@ -41,7 +41,12 @@ const ConveniosRecaudo = () => {
   const [loading, setLoading] = useState(false);
 
   const getConvRecaudo = useCallback(() => {
-    getConveniosRecaudoList({ ...pageData, ...searchFilters })
+    getConveniosRecaudoList({
+      ...pageData,
+      ...Object.fromEntries(
+        Object.entries(searchFilters).filter(([, val]) => val)
+      ),
+    })
       .then((res) => {
         setListaConveniosRecaudo(res?.obj?.results ?? []);
         setMaxPages(res?.obj?.maxPages ?? []);
@@ -144,7 +149,11 @@ const ConveniosRecaudo = () => {
 
   const downloadMasive = useCallback(() => {
     notifyPending(
-      getConveniosRecaudoListMassive({ ...searchFilters }),
+      getConveniosRecaudoListMassive({
+        ...Object.fromEntries(
+          Object.entries(searchFilters).filter(([, val]) => val)
+        ),
+      }),
       {
         render() {
           setLoading(true);
@@ -250,7 +259,7 @@ const ConveniosRecaudo = () => {
         title="Convenios de recaudo"
         headers={[
           "Código convenio",
-          "Código ean o iac",
+          "Código EAN o IAC",
           "Nombre convenio",
           "Estado",
         ]}
@@ -290,7 +299,7 @@ const ConveniosRecaudo = () => {
           name={"pk_codigo_convenio"}
           type="tel"
           autoComplete="off"
-          maxLength={"6"}
+          maxLength={"4"}
           onChange={(ev) => {
             ev.target.value = onChangeNumber(ev);
           }}
@@ -300,11 +309,11 @@ const ConveniosRecaudo = () => {
         />
         <Input
           id={"codigo_ean_iac_search"}
-          label={"Código ean o iac"}
+          label={"Código EAN o IAC"}
           name={"codigo_ean_iac"}
           type="tel"
           autoComplete="off"
-          maxLength={"4"}
+          maxLength={"13"}
           onChange={(ev) => {
             ev.target.value = onChangeNumber(ev);
           }}
@@ -313,11 +322,11 @@ const ConveniosRecaudo = () => {
         />
         <Input
           id={"nombre_convenio"}
-          label={"Nombre del Convenio"}
+          label={"Nombre del convenio"}
           name={"nombre_convenio"}
           type="text"
           autoComplete="off"
-          maxLength={"50"}
+          maxLength={"30"}
           defaultValue={selected?.nombre_convenio ?? ""}
           required
         />
@@ -368,7 +377,7 @@ const ConveniosRecaudo = () => {
                 name={"pk_codigo_convenio"}
                 type="tel"
                 autoComplete="off"
-                maxLength={"6"}
+                maxLength={"4"}
                 onChange={(ev) => {
                   ev.target.value = onChangeNumber(ev);
                 }}
@@ -378,7 +387,7 @@ const ConveniosRecaudo = () => {
               />
               <Input
                 id={"codigo_ean_iac"}
-                label={"Código ean o iac"}
+                label={"Código EAN o IAC"}
                 name={"codigo_ean_iac"}
                 type="tel"
                 autoComplete="off"
@@ -396,7 +405,7 @@ const ConveniosRecaudo = () => {
                 name={"nombre_convenio"}
                 type="text"
                 autoComplete="off"
-                maxLength={"50"}
+                maxLength={"30"}
                 defaultValue={selected?.nombre_convenio ?? ""}
                 required
               />
