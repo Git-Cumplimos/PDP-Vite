@@ -112,7 +112,7 @@ const rutasColpatria = {
       link: "/corresponsalia/colpatria/pin-de-pago",
       label: <AppIcons Logo={"RECAUDO"} name={"Pin de pago"} />,
       component: PinPago,
-      permission: [90],
+      permission: [6005],
     },
     rutasGestionColpatria
   ],
