@@ -1,13 +1,12 @@
 import { Fragment, useCallback, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
 import Modal from "../../../../../components/Base/Modal";
-import MoneyInputDec, {
-  formatMoney,
-} from "../../../../../components/Base/MoneyInputDec";
+import MoneyInputDec from "../../../../../components/Base/MoneyInputDec";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import TextArea from "../../../../../components/Base/TextArea";
 import Tickets from "../../../../../components/Base/Tickets";
@@ -23,34 +22,36 @@ import {
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   const { roleInfo } = useAuth();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
   const formatMoney = makeMoneyFormatter(2);
   const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago de Recaudo de Facturas Banco de Occidente",
+    title: "Recibo de Pago",
     timeInfo: {
-      "Fecha de venta": "",
+      "Fecha de pago": "",
       Hora: "",
     },
     commerceInfo: [
       /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
+      /*comercio*/
+      [
+        "Comercio",
+        roleInfo?.["nombre comercio"]
+          ? roleInfo?.["nombre comercio"]
+          : "Sin datos",
+      ],
       /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
+      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["Tipo de operación", "Recaudo de facturas"],
-      ["", ""],
+      /*telefono*/
+      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
     ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "Sin datos",
+    commerceName: "Recaudo de facturas",
     trxInfo: [],
     disclamer:
-      "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652 Opción X",
+      "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación, verifique la información. Este es el unico recibo oficial de pago. Requerimientos 018000 514652.",
   });
   const [datosTrans, setDatosTrans] = useState({
     codBarras: "",
@@ -77,6 +78,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   const onChangeFormat = useCallback(
     (ev) => {
       const valor = ev.target.value;
+      console.log(valor);
       if (valor.length > datosTrans.codBarras.length) {
         setDatosTrans((old) => {
           return { ...old, [ev.target.name]: valor };
@@ -157,6 +159,34 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   const hideModal = () => {
     setPeticion(0);
     setShowModal(false);
+    setObjTicketActual((old) => {
+      return {
+        ...old,
+        commerceInfo: [
+          /*id transaccion recarga*/
+          /*comercio*/
+          [
+            "Comercio",
+            roleInfo?.["nombre comercio"]
+              ? roleInfo?.["nombre comercio"]
+              : "Sin datos",
+          ],
+          /*id_dispositivo*/
+          [
+            "No. Terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+          ],
+          /*direccion*/
+          [
+            "Dirección",
+            roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
+          ],
+          /*telefono*/
+          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+        ],
+        trxInfo: [],
+      };
+    });
   };
   const hideModalReset = () => {
     setDatosEnvio({
@@ -176,6 +206,34 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     });
     setShowModal(false);
     setPeticion(0);
+    setObjTicketActual((old) => {
+      return {
+        ...old,
+        commerceInfo: [
+          /*id transaccion recarga*/
+          /*comercio*/
+          [
+            "Comercio",
+            roleInfo?.["nombre comercio"]
+              ? roleInfo?.["nombre comercio"]
+              : "Sin datos",
+          ],
+          /*id_dispositivo*/
+          [
+            "No. Terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+          ],
+          /*direccion*/
+          [
+            "Dirección",
+            roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
+          ],
+          /*telefono*/
+          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+        ],
+        trxInfo: [],
+      };
+    });
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
@@ -234,7 +292,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     setIsUploading(true);
     const valorTransaccion = parseInt(datosTransaccion.valor) ?? 0;
     const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
+      year: "numeric",
       month: "2-digit",
       day: "2-digit",
     }).format(new Date());
@@ -245,20 +303,17 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       second: "2-digit",
     }).format(new Date());
     const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["trxInfo"].push([
       "Convenio",
       datosEnvio?.datosConvenio?.convenio,
     ]);
     objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "No factura",
-      datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
-    ]);
+    objTicket["trxInfo"].push(["Referencia de pago", datosTrans?.ref1 ?? ""]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
-      "Valor factura",
+      "Valor",
       formatMoney.format(valorTransaccion ?? "0"),
     ]);
     objTicket["trxInfo"].push(["", ""]);
@@ -291,14 +346,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
+          objTicket["commerceInfo"].push(["Id Trx", res?.obj?.id_trx]);
           objTicket["commerceInfo"].push([
-            "No. de aprobación Banco",
+            "Id Aut",
             res?.obj?.codigo_autorizacion,
-          ]);
-          objTicket["commerceInfo"].push(["", ""]);
-          objTicket["commerceInfo"].push([
-            "No. de aprobación PDP",
-            res?.obj?.id_trx,
           ]);
           objTicket["commerceInfo"].push(["", ""]);
           setObjTicketActual(objTicket);
@@ -321,6 +372,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   });
   const printDiv = useRef();
   const isAlt = useRef("");
+  const isAltCR = useRef({ data: "", state: false });
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -341,15 +393,22 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
               autoComplete='off'
               onInput={onChangeFormat}
               onKeyDown={(ev) => {
-                console.log(ev);
                 if (ev.keyCode === 13 && ev.shiftKey === false) {
                   // ev.preventDefault();
                   onSubmit(ev);
                   return;
                 }
                 if (ev.altKey) {
+                  if (isAltCR.current.state) {
+                    isAltCR.current = {
+                      ...isAltCR.current,
+                      data: isAltCR.current.data + ev.key,
+                    };
+                  }
                   if (ev.keyCode !== 18) {
                     isAlt.current += ev.key;
+                  } else {
+                    isAltCR.current = { ...isAltCR.current, state: true };
                   }
                 }
               }}
@@ -362,6 +421,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                       return { ...old, codBarras: old.codBarras + "\u001d" };
                     });
                   }
+                }
+                if (ev.keyCode === 18) {
+                  if (isAltCR.current.data === "013") {
+                    onSubmit(ev);
+                  }
+                  isAltCR.current = {
+                    ...isAltCR.current,
+                    state: false,
+                    data: "",
+                  };
                 }
               }}></TextArea>
             {datosTrans.codBarras !== "" && (
@@ -515,7 +584,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   <h2>
                     <ButtonBar>
                       <Button onClick={handlePrint}>Imprimir</Button>
-                      <Button type='submit' onClick={hideModalReset}>
+                      <Button
+                        type='submit'
+                        onClick={() => {
+                          hideModalReset();
+                          navigate(-1);
+                        }}>
                         Aceptar
                       </Button>
                     </ButtonBar>

@@ -43,7 +43,6 @@ const AdminLayout = () => {
   const { urlsPrivate: urls } = useUrls();
 
   const [showModal, setShowModal] = useState(false);
-  const [infoCaja, setInfoCaja] = useState(false);
   const [cajaState, setCajaState] = useState("");
 
   const saldoDisponible = useMemo(() => {
@@ -62,8 +61,7 @@ const AdminLayout = () => {
   const [clientWidth] = useWindowSize();
 
   const closeCash = useCallback(() => {
-    navigate(`/gestion/arqueo/arqueo-cierre`);
-    setInfoCaja(false);
+    navigate(`/gestion/arqueo/arqueo-cierre/reporte`);
   }, [navigate]);
 
   const {
@@ -88,8 +86,9 @@ const AdminLayout = () => {
       roleInfo?.id_usuario !== undefined,
       roleInfo?.id_comercio !== undefined,
       roleInfo?.id_dispositivo !== undefined,
-      !pathname.startsWith("/gestion/arqueo/arqueo-cierre"),
-      userPermissions?.map(({id_permission}) => id_permission).includes(74)
+      roleInfo?.direccion !== undefined,
+      nombreComercio !== undefined,
+      userPermissions?.map(({ id_permission }) => id_permission).includes(74),
     ];
     if (conditions.every((val) => val)) {
       searchCierre({
@@ -101,10 +100,9 @@ const AdminLayout = () => {
         direccion_comercio: roleInfo?.direccion,
       })
         .then((res) => {
-          if (res?.obj !== 3 && res?.obj !== 2) {
-            setInfoCaja(true);
-            setCajaState(res?.obj);
-          }
+          setCajaState(res?.obj);
+          // if (res?.obj !== 3 && res?.obj !== 2) {
+          // }
         })
         .catch((error) => {
           if (error?.cause === "custom") {
@@ -121,6 +119,14 @@ const AdminLayout = () => {
     userPermissions,
     userInfo?.attributes?.name,
   ]);
+
+  const infoCaja = useMemo(() => {
+    return (
+      (cajaState === 1 &&
+        !pathname.startsWith("/gestion/arqueo/arqueo-cierre")) ||
+      cajaState === 4
+    );
+  }, [cajaState, pathname]);
 
   return (
     <div className={adminLayout}>
@@ -176,8 +182,8 @@ const AdminLayout = () => {
                 <Button
                   type="submit"
                   onClick={() => {
+                    navigate("/", { replace: true });
                     signOut();
-                    navigate("/login", { replace: true });
                   }}
                 >
                   Cerrar sesión
@@ -185,7 +191,7 @@ const AdminLayout = () => {
               </ButtonBar>
             </h1>
           ) : (
-            <></>
+            ""
           )}
         </Modal>
       </main>

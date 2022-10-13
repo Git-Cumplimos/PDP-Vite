@@ -45,30 +45,31 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     valorVar: "",
   });
   const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago de Recaudo de Facturas Banco de Occidente",
+    title: "Recibo de Pago",
     timeInfo: {
-      "Fecha de venta": "",
+      "Fecha de pago": "",
       Hora: "",
     },
     commerceInfo: [
       /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
+      /*comercio*/
+      [
+        "Comercio",
+        roleInfo?.["nombre comercio"]
+          ? roleInfo?.["nombre comercio"]
+          : "Sin datos",
+      ],
       /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
+      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["Tipo de operación", "Recaudo de facturas"],
-      ["", ""],
+      /*telefono*/
+      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
     ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "Sin datos",
+    commerceName: "Recaudo de facturas",
     trxInfo: [],
     disclamer:
-      "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652 Opción X",
+      "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación, verifique la información. Este es el unico recibo oficial de pago. Requerimientos 018000 514652.",
   });
   const [datosConsulta, setDatosConsulta] = useState({});
   const [isUploading, setIsUploading] = useState(true);
@@ -83,7 +84,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
 
   const fecthTablaConveniosEspecificoFunc = () => {
     postConsultaTablaConveniosEspecifico({
-      pk_convenios_recaudo_aval: state?.id,
+      pk_tbl_convenios_banco_agrario: state?.id,
     })
       .then((autoArr) => {
         setConvenio(autoArr?.results[0]);
@@ -147,7 +148,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     e.preventDefault();
     let valorTransaccion = parseInt(datosTrans?.valorVar) ?? 0;
     const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
+      year: "numeric",
       month: "2-digit",
       day: "2-digit",
     }).format(new Date());
@@ -158,16 +159,16 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       second: "2-digit",
     }).format(new Date());
     const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["trxInfo"].push(["Convenio", convenio.convenio]);
     objTicket["trxInfo"].push(["", ""]);
     // objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
     // objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["No factura", datosTrans?.ref1 ?? ""]);
+    objTicket["trxInfo"].push(["Referencia de pago", datosTrans?.ref1 ?? ""]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
-      "Valor factura",
+      "Valor",
       formatMoney.format(valorTransaccion ?? "0"),
     ]);
     objTicket["trxInfo"].push(["", ""]);
@@ -200,19 +201,15 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
+          objTicket["commerceInfo"].push(["Id Trx", res?.obj?.id_trx]);
           objTicket["commerceInfo"].push([
-            "No. de aprobación Banco",
+            "Id Aut",
             res?.obj?.codigo_autorizacion,
-          ]);
-          objTicket["commerceInfo"].push(["", ""]);
-          objTicket["commerceInfo"].push([
-            "No. de aprobación PDP",
-            res?.obj?.id_trx,
           ]);
           objTicket["commerceInfo"].push(["", ""]);
 
           setObjTicketActual(objTicket);
-          setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
+          setShowModal((old) => ({ ...old, estadoPeticion: 4 }));
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
@@ -241,19 +238,25 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         ...old,
         commerceInfo: [
           /*id transaccion recarga*/
-          /*id_comercio*/
-          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : ""],
+          /*comercio*/
+          [
+            "Comercio",
+            roleInfo?.["nombre comercio"]
+              ? roleInfo?.["nombre comercio"]
+              : "Sin datos",
+          ],
           /*id_dispositivo*/
           [
-            "No. terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : "",
+            "No. Terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
           ],
-          /*ciudad*/
-          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : ""],
           /*direccion*/
-          ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : ""],
-          ["Tipo de operación", "Recaudo de facturas"],
-          ["", ""],
+          [
+            "Dirección",
+            roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
+          ],
+          /*telefono*/
+          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
         ],
         trxInfo: [],
       };
@@ -264,7 +267,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     if (!isNaN(valor)) {
       const num = valor;
       setDatosTrans((old) => {
-        return { ...old, valor: num };
+        return { ...old, valor: onChangeMoney(ev) };
       });
     }
   };
@@ -279,29 +282,32 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         Recaudo servicios públicos y privados
       </h1>
       <h1 className='text-2xl text-center mb-10'>{`Convenio: ${
-        convenio?.convenio ?? ""
+        convenio?.nombre_convenio ?? ""
       }`}</h1>
 
       <Form onSubmit={onSubmit}>
-        <Input
-          id='ref1'
-          label='Referencia 1'
-          type='text'
-          name='ref1'
-          minLength='1'
-          maxLength='32'
-          required
-          value={datosTrans.ref1}
-          autoComplete='off'
-          onInput={(e) => {
-            let valor = e.target.value;
-            let num = valor.replace(/[\s\.]/g, "");
-            if (!isNaN(num)) {
-              setDatosTrans((old) => {
-                return { ...old, ref1: num };
-              });
-            }
-          }}></Input>
+        {!convenio?.nombre_ref1?.match(/-/g) && (
+          <Input
+            id='ref1'
+            label={convenio?.nombre_ref1}
+            type='text'
+            name='ref1'
+            minLength={convenio?.longitud_min_ref1}
+            maxLength={convenio?.longitud_max_ref1}
+            required
+            value={datosTrans.ref1}
+            autoComplete='off'
+            onInput={(e) => {
+              let valor = e.target.value;
+              let num = valor.replace(/[\s\.]/g, "");
+              if (!isNaN(num)) {
+                setDatosTrans((old) => {
+                  return { ...old, ref1: num };
+                });
+              }
+            }}></Input>
+        )}
+
         {convenio?.parciales === "1" && (
           <MoneyInput
             id='valCashOut'
@@ -309,7 +315,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
             label='Valor a pagar'
             type='text'
             autoComplete='off'
-            maxLength={"15"}
+            maxLength={"12"}
             value={datosTrans.valor ?? ""}
             onInput={onChangeMoneyLocal}
             required></MoneyInput>
@@ -333,16 +339,37 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                   datosConsulta?.valorTrx ?? "0"
                 )} `}
               </h2>
-              {convenio?.parciales === "1" && (
-                <Form grid onSubmit={onSubmitValidacion}>
-                  <Input
+              {convenio?.parciales === "1" ? (
+                <Form
+                  grid
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
+                  }}>
+                  <MoneyInput
+                    id='valCashOut'
+                    name='valCashOut'
+                    label='Valor a pagar'
+                    type='text'
+                    autoComplete='off'
+                    maxLength={"12"}
+                    value={datosTrans.valorConst ?? ""}
+                    onInput={(ev) =>
+                      setDatosTrans((old) => ({
+                        ...old,
+                        valorConst: onChangeMoney(ev),
+                        valorVar: onChangeMoney(ev),
+                      }))
+                    }
+                    required></MoneyInput>
+                  {/* <Input
                     id='valor'
                     name='valor'
                     label='Valor a pagar'
                     autoComplete='off'
                     type='tel'
                     minLength={"2"}
-                    maxLength={"20"}
+                    maxLength={"12"}
                     defaultValue={datosTrans.valorConst ?? ""}
                     onInput={(ev) =>
                       setDatosTrans((old) => ({
@@ -352,17 +379,51 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                       }))
                     }
                     required
-                  />
+                  /> */}
+                  <ButtonBar>
+                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button type='submit'>Realizar pago</Button>
+                  </ButtonBar>
                 </Form>
+              ) : (
+                <>
+                  <ButtonBar>
+                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button
+                      type='submit'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowModal((old) => ({ ...old, estadoPeticion: 3 }));
+                      }}>
+                      Realizar pago
+                    </Button>
+                  </ButtonBar>
+                </>
               )}
-              <ButtonBar>
-                <Button onClick={handleClose}>Cancelar</Button>
-                <Button type='submit' onClick={onSubmitValidacion}>
-                  Realizar pago
-                </Button>
-              </ButtonBar>
             </>
           ) : estadoPeticion === 3 ? (
+            <>
+              <h1 className='text-2xl text-center mb-5 font-semibold'>
+                ¿Está seguro de realizar el recaudo?
+              </h1>
+              <h2>{`Nombre convenio: ${convenio?.convenio}`}</h2>
+              <h2>{`Número convenio: ${convenio?.nura}`}</h2>
+              <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
+              <h2 className='text-base'>
+                {`Valor a pagar: ${formatMoney.format(
+                  datosTrans.valorConst ?? "0"
+                )} `}
+              </h2>
+              <>
+                <ButtonBar>
+                  <Button onClick={handleClose}>Cancelar</Button>
+                  <Button type='submit' onClick={onSubmitValidacion}>
+                    Realizar pago
+                  </Button>
+                </ButtonBar>
+              </>
+            </>
+          ) : estadoPeticion === 4 ? (
             <>
               <h2>
                 <ButtonBar>

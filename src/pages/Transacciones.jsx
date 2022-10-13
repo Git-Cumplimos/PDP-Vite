@@ -29,25 +29,23 @@ const Transacciones = () => {
   const { roleInfo, userPermissions } = useAuth();
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
-  const [montoAcumulado, setMontoAcumulado] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
   const [summaryTrx, setSummaryTrx] = useState(null);
 
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
-
+  // 27034
   const [maxPages, setMaxPages] = useState(1);
+  const [idTrxIpt, setIdTrxIpt] = useState("");
   const [idComercio, setIdComercio] = useState(-1);
   const [usuario, setUsuario] = useState(-1);
-  const [tipoComercio, setTipoComercio] = useState(null);
   const [tipoOp, setTipoOp] = useState("");
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
 
   const transacciones = useCallback(() => {
     const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
-    const urlAcumulado = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-acumulado`;
     const queries = { ...pageData };
     if (!(idComercio === -1 || idComercio === "")) {
       queries.id_comercio = parseInt(idComercio);
@@ -57,6 +55,9 @@ const Transacciones = () => {
     }
     if (tipoOp) {
       queries.id_tipo_transaccion = tipoOp;
+    }
+    if (idTrxIpt) {
+      queries.id_trx = idTrxIpt;
     }
     if (fechaInicial && fechaFinal) {
       const fecha_ini = new Date(fechaInicial);
@@ -75,36 +76,16 @@ const Transacciones = () => {
         day: "numeric",
       }).format(fecha_fin);
     }
-    if (
-      userPermissions.map(({ id_permission }) => id_permission).includes(5) ||
-      queries.id_comercio !== -1
-    ) {
-      fetchData(url, "GET", queries)
-        .then((res) => {
-          if (res?.status) {
-            setMaxPages(res?.obj?.maxpages);
-            setTrxs(res?.obj?.trxs);
-          } else {
-            throw new Error(res?.msg);
-          }
-        })
-        .catch(() => {});
-    }
-
-    if (tipoComercio !== null) {
-      const acumQueries = { ...queries, oficina_propia: tipoComercio };
-      delete acumQueries.limit;
-      delete acumQueries.page;
-      fetchData(urlAcumulado, "GET", acumQueries)
-        .then((res) => {
-          if (res?.status) {
-            setMontoAcumulado(res?.obj);
-          } else {
-            throw new Error(res?.msg);
-          }
-        })
-        .catch(() => {});
-    }
+    fetchData(url, "GET", queries)
+      .then((res) => {
+        if (res?.status) {
+          setMaxPages(res?.obj?.maxpages);
+          setTrxs(res?.obj?.trxs);
+        } else {
+          throw new Error(res?.msg);
+        }
+      })
+      .catch(() => {});
   }, [
     pageData,
     idComercio,
@@ -112,8 +93,7 @@ const Transacciones = () => {
     fechaInicial,
     tipoOp,
     usuario,
-    tipoComercio,
-    userPermissions,
+    idTrxIpt,
   ]);
 
   const closeModal = useCallback(async () => {
@@ -151,11 +131,6 @@ const Transacciones = () => {
 
     setIdComercio(roleInfo?.id_comercio || -1);
     setUsuario(roleInfo?.id_usuario || -1);
-    setTipoComercio(
-      "tipo_comercio" in roleInfo
-        ? roleInfo.tipo_comercio === "OFICINAS PROPIAS"
-        : null
-    );
   }, [userPermissions, roleInfo]);
 
   useEffect(() => {
@@ -242,19 +217,13 @@ const Transacciones = () => {
           required={true}
           onChange={(e) => setTipoOp(parseInt(e.target.value) ?? "")}
         />
-        {userPermissions
-          .map(({ id_permission }) => id_permission)
-          .includes(58) &&
-          tipoComercio !== null && (
-            <Fragment>
-              <Input
-                label="Monto acumulado"
-                type="tel"
-                value={formatMoney.format(montoAcumulado ?? 0)}
-                readOnly
-              />
-            </Fragment>
-          )}
+        <Input
+          id="id_trx"
+          label="Id de transaccion"
+          type="numeric"
+          value={idTrxIpt}
+          onChange={(e) => setIdTrxIpt(e.target.value)}
+        />
         {userPermissions
           .map(({ id_permission }) => id_permission)
           .includes(5) ? (

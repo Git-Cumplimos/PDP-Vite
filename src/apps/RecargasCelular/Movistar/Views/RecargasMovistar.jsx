@@ -1,10 +1,4 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Fragment, useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../components/Base/Button";
@@ -84,7 +78,7 @@ const RecargasMovistar = () => {
 
     peticionRecarga(data)
       .then((response) => {
-        if (response?.status == true) {
+        if (response?.status === true) {
           notify("Recarga exitosa");
           RecargaExitosa(response?.obj?.result);
         }
@@ -98,9 +92,9 @@ const RecargasMovistar = () => {
               msg = `${msg}: ${error.message}`;
               const error_msg_key = Object.keys(error.error_msg);
               const find = error_msg_key.find(
-                (keyInd) => keyInd == "ErrorTrxRefuse"
+                (keyInd) => keyInd === "ErrorTrxRefuse"
               );
-              msg = find != undefined ? error.message : msg;
+              msg = find !== undefined ? error.message : msg;
               notifyError(msg);
               break;
             default:
@@ -214,7 +208,7 @@ const RecargasMovistar = () => {
 
       <Modal show={showModal} handleClose={() => {}}>
         {/**************** Resumen de la recarga **********************/}
-        {typeInfo == "ResumenRecarga" && (
+        {typeInfo === "ResumenRecarga" && (
           <PaymentSummary
             title="¿Está seguro de realizar la transacción?"
             subtitle="Resumen de transacción"
@@ -226,7 +220,7 @@ const RecargasMovistar = () => {
             {!loadingPeticionRecarga ? (
               <>
                 <ButtonBar>
-                  <Button type="button" onClick={recargaMovistar}>
+                  <Button type="submit" onClick={recargaMovistar}>
                     Aceptar
                   </Button>
                   <Button onClick={handleCloseCancelada}>Cancelar</Button>
@@ -240,7 +234,7 @@ const RecargasMovistar = () => {
         {/**************** Resumen de la recarga **********************/}
 
         {/**************** Recarga Exitosa **********************/}
-        {infTicket && typeInfo == "RecargaExitosa" && (
+        {infTicket && typeInfo === "RecargaExitosa" && (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <Tickets refPrint={printDiv} ticket={infTicket} />
             <ButtonBar>

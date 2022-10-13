@@ -69,16 +69,16 @@ const SubPaquetesMovistar = () => {
 
   useEffect(() => {
     let paramsGetPaquetes = {};
-    if (urlLocation == "/movistar/paquetes-movistar/combo") {
+    if (urlLocation === "/movistar/paquetes-movistar/combo") {
       paramsGetPaquetes["tipodeoferta"] = "combo";
       setTipodeoferta("Combos");
-    } else if (urlLocation == "/movistar/paquetes-movistar/paquete-voz") {
+    } else if (urlLocation === "/movistar/paquetes-movistar/paquete-voz") {
       paramsGetPaquetes["tipodeoferta"] = "paquetedevoz";
       setTipodeoferta("Paquetes de voz");
-    } else if (urlLocation == "/movistar/paquetes-movistar/paquete-datos") {
+    } else if (urlLocation === "/movistar/paquetes-movistar/paquete-datos") {
       paramsGetPaquetes["tipodeoferta"] = "paquetededatos";
       setTipodeoferta("Paquetes de datos");
-    } else if (urlLocation == "/movistar/paquetes-movistar/prepagada") {
+    } else if (urlLocation === "/movistar/paquetes-movistar/prepagada") {
       paramsGetPaquetes["tipodeoferta"] = "prepagada";
       setTipodeoferta("Prepagada");
     }
@@ -192,6 +192,7 @@ const SubPaquetesMovistar = () => {
               break;
             default:
               if (error.notificacion == null) {
+                console.log("hola");
                 notifyError(`${msg}: ${error.message}`);
               }
               break;
@@ -354,7 +355,7 @@ const SubPaquetesMovistar = () => {
       <Modal
         show={showModal}
         handleClose={
-          typeInfo == "InfRecibo"
+          typeInfo === "InfRecibo"
             ? HandleCloseResRecibo
             : loadingPeticionCompraPaquetes
             ? () => {}
@@ -362,7 +363,7 @@ const SubPaquetesMovistar = () => {
         }
       >
         {/******************************ResumenPaquete*******************************************************/}
-        {typeInfo == "ResumenPaquete" && (
+        {typeInfo === "ResumenPaquete" && (
           <PaymentSummary title="Paquete Movistar" subtitle={tipodeoferta}>
             <label className="whitespace-pre-line">
               {dataPackage?.descripciondelaoferta}
@@ -382,7 +383,7 @@ const SubPaquetesMovistar = () => {
                 required
               />
               <ButtonBar>
-                <Button type={"submit"}>Comprar</Button>
+                <Button type="submit">Comprar</Button>
                 <Button onClick={HandleCloseFirst}>Cancelar</Button>
               </ButtonBar>
             </Form>
@@ -391,7 +392,7 @@ const SubPaquetesMovistar = () => {
         {/******************************Adquirir del paquete*******************************************************/}
 
         {/******************************Resumen de trx*******************************************************/}
-        {typeInfo == "ResumenTrx" && (
+        {typeInfo === "ResumenTrx" && (
           <PaymentSummary
             title="¿Está seguro de realizar la transacción?"
             subtitle="Resumen de transacción"
@@ -406,7 +407,9 @@ const SubPaquetesMovistar = () => {
             {!loadingPeticionCompraPaquetes ? (
               <>
                 <ButtonBar>
-                  <Button onClick={ComprarPaquete}>Aceptar</Button>
+                  <Button type={"submit"} onClick={ComprarPaquete}>
+                    Aceptar
+                  </Button>
                   <Button onClick={HandleCloseSecond}>Cancelar</Button>
                 </ButtonBar>
               </>
@@ -419,7 +422,7 @@ const SubPaquetesMovistar = () => {
 
         {/******************************inf recibo *******************************************************/}
         <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-          {infTicket && typeInfo == "InfRecibo" && (
+          {infTicket && typeInfo === "InfRecibo" && (
             <Fragment>
               <Tickets refPrint={printDiv} ticket={infTicket} />
               <ButtonBar>

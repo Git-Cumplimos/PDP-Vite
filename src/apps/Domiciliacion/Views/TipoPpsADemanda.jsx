@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Select from "../../../components/Base/Select";
+import PpsObligatorioDemanda from "./PpsObligatorioDemanda";
 import PpsVoluntarioDemanda from "./PpsVoluntarioDemanda";
 
 const TipoPpsADemanda = ({ numCed }) => {
@@ -24,7 +25,7 @@ const TipoPpsADemanda = ({ numCed }) => {
       {tipoPps === "Pps Voluntario A Demanda" ? (
         <PpsVoluntarioDemanda ced={numCed}></PpsVoluntarioDemanda>
       ) : tipoPps === "Pps Obligatorio A Demanda" ? (
-        "adios"
+        <PpsObligatorioDemanda ced={numCed}></PpsObligatorioDemanda>
       ) : (
         ""
       )}
