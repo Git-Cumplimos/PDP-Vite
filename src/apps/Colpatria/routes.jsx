@@ -27,13 +27,13 @@ export const rutasGestionColpatria = {
   link: "/corresponsalia/colpatria/gestion",
   label: <AppIcons Logo={"RECAUDO"} name={"Gestión"} />,
   component: AdminColpatria,
-  permission: [68],
+  permission: [6002],
   subRoutes: [
     {
       link: "/corresponsalia/colpatria/gestion/lista-errores",
       label: <AppIcons Logo={"RECAUDO"} name={"Lista de errores"} />,
       component: ListaErrores,
-      permission: [68],
+      permission: [6002],
     },
     {
       link: "/corresponsalia/colpatria/gestion/lista-convenios-pines",
@@ -41,7 +41,7 @@ export const rutasGestionColpatria = {
         <AppIcons Logo={"RECAUDO"} name={"Convenios de pines de recaudo"} />
       ),
       component: ConveniosPines,
-      permission: [68],
+      permission: [6002],
     },
     {
       link: "/corresponsalia/colpatria/gestion/lista-convenios-recaudo",
@@ -49,7 +49,7 @@ export const rutasGestionColpatria = {
         <AppIcons Logo={"RECAUDO"} name={"Convenios de recaudo"} />
       ),
       component: ConveniosRecaudo,
-      permission: [68],
+      permission: [6002],
     },
   ],
 }
@@ -58,25 +58,25 @@ const rutasColpatria = {
   link: "/corresponsalia/colpatria",
   label: <AppIcons Logo={"MARKETPLACE"} name={"Corresponsalía Colpatria"} />,
   component: ColpatriaTrx,
-  permission: [67, 68, 88, 89],
+  permission: [6001, 6002, 6003, 6004, 6005],
   subRoutes: [
     {
       link: "/corresponsalia/colpatria/deposito",
       label: <AppIcons Logo={"RECAUDO"} name={"Depósito"} />,
       component: Deposito,
-      permission: [67],
+      permission: [6001],
     },
     {
       link: "/corresponsalia/colpatria/pines",
       label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines de Recaudo"} />,
       component: PinesConsulta,
-      permission: [88],
+      permission: [6003],
       subRoutes: [
         {
           link: "/corresponsalia/colpatria/pines/:id_convenio_pin",
           label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines de Recaudo"} />,
           component: PinesVenta,
-          permission: [88],
+          permission: [6003],
           show: false,
         },
       ],
@@ -85,25 +85,25 @@ const rutasColpatria = {
       link: "/corresponsalia/colpatria/recaudo",
       label: <AppIcons Logo={"RECAUDO"} name={"Recaudo Servicios Públicos y Privados"} />,
       component: ColpatriaTrx,
-      permission: [89],
+      permission: [6004],
       subRoutes: [
         {
           link: "/corresponsalia/colpatria/recaudo/manual",
           label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Manual en Efectivo"} />,
           component: ConsultaManual,
-          permission: [89],
+          permission: [6004],
         },
         {
           link: "/corresponsalia/colpatria/recaudo/barras",
           label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP Código de Barras en Efectivo"} />,
           component: ConsultaBarras,
-          permission: [89],
+          permission: [6004],
         },
         {
           link: "/corresponsalia/colpatria/recaudo/:id_convenio_pin",
           label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP en Efectivo"} />,
           component: TrxRecaudo,
-          permission: [89],
+          permission: [6004],
           show: false,
         },
       ]
@@ -112,7 +112,7 @@ const rutasColpatria = {
       link: "/corresponsalia/colpatria/pin-de-pago",
       label: <AppIcons Logo={"RECAUDO"} name={"Pin de pago"} />,
       component: PinPago,
-      permission: [90],
+      permission: [6005],
     },
     rutasGestionColpatria
   ],
