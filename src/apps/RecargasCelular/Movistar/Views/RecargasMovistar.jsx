@@ -57,7 +57,6 @@ const RecargasMovistar = () => {
 
   const onSubmitCheck = (e) => {
     e.preventDefault();
-
     //Realizar recarga
     setShowModal(true);
     setTypeInfo("ResumenRecarga");
@@ -84,7 +83,7 @@ const RecargasMovistar = () => {
         }
       })
       .catch((error) => {
-        handleClose();
+        handleCloseError();
         let msg = "Recarga no exitosa";
         if (error instanceof ErrorCustom) {
           switch (error.name) {
@@ -111,10 +110,14 @@ const RecargasMovistar = () => {
 
   const handleCloseRecarga = useCallback(() => {
     setShowModal(false);
+    setTypeInfo("Ninguno");
+    setInputCelular("");
+    setInputValor("");
+    setInfTicket(null);
     validNavigate("/movistar");
-  }, []);
+  }, [validNavigate]);
 
-  const handleClose = useCallback(() => {
+  const handleCloseError = useCallback(() => {
     setShowModal(false);
     setTypeInfo("Ninguno");
   }, []);
@@ -128,6 +131,17 @@ const RecargasMovistar = () => {
     setInfTicket(null);
   }, []);
 
+  const handleCloseModal = useCallback(() => {
+    if (typeInfo === "ResumenRecarga" && !loadingPeticionRecarga) {
+      handleCloseCancelada();
+    } else if (typeInfo === "RecargaExitosa") {
+      handleCloseRecarga();
+    } else if (loadingPeticionRecarga) {
+      notify("Se está procesando transacción, por favor esperar");
+    }
+  }, [typeInfo, loadingPeticionRecarga, handleCloseCancelada, handleCloseRecarga]);
+
+  
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
@@ -206,7 +220,7 @@ const RecargasMovistar = () => {
         </ButtonBar>
       </Form>
 
-      <Modal show={showModal} handleClose={() => {}}>
+      <Modal show={showModal} handleClose={handleCloseModal}>
         {/**************** Resumen de la recarga **********************/}
         {typeInfo === "ResumenRecarga" && (
           <PaymentSummary
