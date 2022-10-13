@@ -293,12 +293,14 @@ const Deposito = () => {
             }).format(new Date()),
           },
           commerceInfo: [
-            ["Comercio", roleInfo?.["nombre comercio"]],
             ["No. Terminal", roleInfo?.id_dispositivo],
-            ["Dirección", roleInfo?.direccion],
             ["Teléfono", roleInfo?.telefono],
             ["Id trx", trx_id],
             ["Id Aut", id_auth],
+            ["Comercio", roleInfo?.["nombre comercio"]],
+            ["",""],
+            ["Dirección", roleInfo?.direccion],
+            ["",""],            
           ],
           commerceName: "Depósito",
           trxInfo: [
