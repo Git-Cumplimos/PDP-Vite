@@ -220,6 +220,11 @@ const Deposito = () => {
         }
         else{
         notify("Transaccion satisfactoria");
+        const comercio = objTicket["commerceInfo"]
+        delete objTicket["commerceInfo"]
+        objTicket["commerceInfo"] = []
+        objTicket["commerceInfo"].push(comercio[1]);
+        objTicket["commerceInfo"].push(comercio[3]);
         objTicket["commerceInfo"].push([
           "No. Trx",
           res?.obj?.id_trx,
@@ -228,6 +233,10 @@ const Deposito = () => {
           "No. Aprobación",
           res?.obj?.codigo_autorizacion,
         ]);
+        objTicket["commerceInfo"].push(comercio[0]);
+        objTicket["commerceInfo"].push(["",""]);
+        objTicket["commerceInfo"].push(comercio[2]);
+        objTicket["commerceInfo"].push(["",""]);
         objTicket["trxInfo"].push([
           "Costo transacción",
           formatMoney.format(res?.obj?.costoTrx,0)

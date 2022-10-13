@@ -2,23 +2,8 @@ import fetchData from "../../../../utils/fetchData";
 import { notifyError } from "../../../../utils/notify";
 import { Auth } from "@aws-amplify/auth";
 
-const URL_Recarga = `${process.env.REACT_APP_URL_MOVISTAR}/recargasmovistar/prepago`;
 const url_movistar_conciliacion_buscar = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/buscar`;
 const url_movistar_conciliacion_archivo_movistar = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/archivo-movistar`;
-
-export const PeticionRecarga = async (data_) => {
-  try {
-    const Peticion = await fetchData(URL_Recarga, "POST", {}, data_);
-    if ((Peticion.status != undefined) == false) {
-      // Api getwey
-      notifyError("Error con fetch, timed out con el servicio de recargas");
-    }
-    return Peticion;
-  } catch (error) {
-    console.log(error);
-    throw "Error con fetch - no conecta con el servicio del recargas";
-  }
-};
 
 export const PeticionConciliacionBuscar = async (params_ = "") => {
   try {

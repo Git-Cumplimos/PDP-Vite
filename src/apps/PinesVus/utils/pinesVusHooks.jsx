@@ -80,6 +80,7 @@ export const useProvidePinesVus = () => {
       Comercio: user?.Comercio,
       Tipo: user?.Tipo,
       NombreComercio: roleInfo?.["nombre comercio"],
+      DireccionComercio: roleInfo?.direccion,
       infoCliente: infoCliente,
       olimpia: olimpia,
       categoria: categoria,

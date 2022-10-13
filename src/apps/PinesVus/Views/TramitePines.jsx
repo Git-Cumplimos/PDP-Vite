@@ -159,8 +159,6 @@ const TramitePines = () => {
                 <Button type="submit" disabled={disabledBtn}>
                   Consultar Pin
                 </Button>
-              </ButtonBar>
-              <ButtonBar className="col-auto md:col-span-2">
                 <Button 
                   type="button" 
                   onClick = { () => {
@@ -169,7 +167,7 @@ const TramitePines = () => {
                   >
                   Reenviar Código
                 </Button>
-            </ButtonBar>
+              </ButtonBar>
             </Form>
             
           </>
@@ -300,14 +298,14 @@ const TramitePines = () => {
       </Modal>
       <Modal show={showModalReenvio} handleClose={() => {setShowModalReenvio(false); setDoc_cliente("")}}>
         <div className="flex flex-col w-1/2 mx-auto ">
-          <h1 className="text-3xl mt-3 mx-auto">Reenvio Código Pin</h1>
+          <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
           <br></br>
         </div>  
         <div className="flex flex-col justify-center items-center mx-auto container">          
           <Form onSubmit={onSubmitReenvio} grid>
             <Input
               id="docCliente"
-              label="Documento"
+              label="Número documento"
               type="text"
               minLength="5"
               maxLength="12"

@@ -69,29 +69,29 @@ const SubPaquetesMovistar = () => {
 
   useEffect(() => {
     let paramsGetPaquetes = {};
-    if (urlLocation == "/movistar/paquetes-movistar/combo") {
+    if (urlLocation === "/movistar/paquetes-movistar/combo") {
       paramsGetPaquetes["tipodeoferta"] = "combo";
       setTipodeoferta("Combos");
-    } else if (urlLocation == "/movistar/paquetes-movistar/paquete-voz") {
+    } else if (urlLocation === "/movistar/paquetes-movistar/paquete-voz") {
       paramsGetPaquetes["tipodeoferta"] = "paquetedevoz";
       setTipodeoferta("Paquetes de voz");
-    } else if (urlLocation == "/movistar/paquetes-movistar/paquete-datos") {
+    } else if (urlLocation === "/movistar/paquetes-movistar/paquete-datos") {
       paramsGetPaquetes["tipodeoferta"] = "paquetededatos";
       setTipodeoferta("Paquetes de datos");
-    } else if (urlLocation == "/movistar/paquetes-movistar/prepagada") {
+    } else if (urlLocation === "/movistar/paquetes-movistar/prepagada") {
       paramsGetPaquetes["tipodeoferta"] = "prepagada";
       setTipodeoferta("Prepagada");
     }
 
-    if (inputDataSearch.codigodelaoferta != "") {
+    if (inputDataSearch.codigodelaoferta !== "") {
       paramsGetPaquetes["codigodelaoferta"] = inputDataSearch.codigodelaoferta;
     }
-    if (inputDataSearch.descripcioncorta != "") {
+    if (inputDataSearch.descripcioncorta !== "") {
       paramsGetPaquetes["descripcioncorta"] = inputDataSearch.descripcioncorta;
     }
 
     if (
-      inputDataSearch.valordelaoferta != "" &&
+      inputDataSearch.valordelaoferta !== "" &&
       inputDataSearch.valordelaoferta != 0
     ) {
       paramsGetPaquetes["valordelaoferta"] = inputDataSearch.valordelaoferta;
@@ -102,8 +102,7 @@ const SubPaquetesMovistar = () => {
 
     PeticionGetPaquetes(paramsGetPaquetes, {})
       .then((response) => {
-        console.log(response);
-        if (response?.status == true) {
+        if (response?.status === true) {
           setDataServiceConsult(response?.obj?.result?.results);
           setMaxPage(response?.obj?.result?.maxPages);
         }
@@ -125,7 +124,7 @@ const SubPaquetesMovistar = () => {
           notifyError(msg);
         }
       });
-  }, [urlLocation, pageData, limit, inputDataSearch]);
+  }, [urlLocation, pageData, limit, inputDataSearch, PeticionGetPaquetes]);
 
   function onChangeInput(e) {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
@@ -153,10 +152,6 @@ const SubPaquetesMovistar = () => {
   }
 
   const ComprarPaquete = () => {
-    let oficinaPropia;
-    if (roleInfo.tipo_comercio != "OFICINASPROPIAS") {
-      oficinaPropia = false;
-    }
     const data = {
       celular: inputData.celular,
       valor: dataPackage.valordelaoferta,
@@ -172,7 +167,7 @@ const SubPaquetesMovistar = () => {
 
     PeticionCompraPaquetes(data)
       .then((response) => {
-        if (response?.status == true) {
+        if (response?.status === true) {
           CompraPaquetesExitosa(response?.obj?.result);
         }
       })
@@ -185,13 +180,14 @@ const SubPaquetesMovistar = () => {
               msg = `${msg}: ${error.message}`;
               const error_msg_key = Object.keys(error.error_msg);
               const find = error_msg_key.find(
-                (keyInd) => keyInd == "ErrorTrxRefuse"
+                (keyInd) => keyInd === "ErrorTrxRefuse"
               );
               msg = find != undefined ? error.message : msg;
               notifyError(msg);
               break;
             default:
               if (error.notificacion == null) {
+                console.log("hola");
                 notifyError(`${msg}: ${error.message}`);
               }
               break;
@@ -276,7 +272,25 @@ const SubPaquetesMovistar = () => {
     setShowModal(false);
     setInputData(inputDataInitial);
     navigateValid("/movistar/paquetes-movistar");
-  }, []);
+  }, [navigateValid]);
+
+  const handleCloseModal = useCallback(() => {
+    if (typeInfo === "ResumenPaquete") {
+      HandleCloseFirst();
+    } else if (typeInfo === "ResumenTrx" && !loadingPeticionCompraPaquetes) {
+      HandleCloseSecond();
+    } else if (typeInfo === "InfRecibo") {
+      HandleCloseResRecibo();
+    } else if (loadingPeticionCompraPaquetes) {
+      notify("Se está procesando transacción, por favor esperar");
+    }
+  }, [
+    typeInfo,
+    loadingPeticionCompraPaquetes,
+    HandleCloseFirst,
+    HandleCloseSecond,
+    HandleCloseResRecibo,
+  ]);
 
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
@@ -351,18 +365,9 @@ const SubPaquetesMovistar = () => {
         />
       </TableEnterprise>
 
-      <Modal
-        show={showModal}
-        handleClose={
-          typeInfo == "InfRecibo"
-            ? HandleCloseResRecibo
-            : loadingPeticionCompraPaquetes
-            ? () => {}
-            : HandleCloseFirst
-        }
-      >
+      <Modal show={showModal} handleClose={handleCloseModal}>
         {/******************************ResumenPaquete*******************************************************/}
-        {typeInfo == "ResumenPaquete" && (
+        {typeInfo === "ResumenPaquete" && (
           <PaymentSummary title="Paquete Movistar" subtitle={tipodeoferta}>
             <label className="whitespace-pre-line">
               {dataPackage?.descripciondelaoferta}
@@ -382,7 +387,7 @@ const SubPaquetesMovistar = () => {
                 required
               />
               <ButtonBar>
-                <Button type={"submit"}>Comprar</Button>
+                <Button type="submit">Comprar</Button>
                 <Button onClick={HandleCloseFirst}>Cancelar</Button>
               </ButtonBar>
             </Form>
@@ -391,7 +396,7 @@ const SubPaquetesMovistar = () => {
         {/******************************Adquirir del paquete*******************************************************/}
 
         {/******************************Resumen de trx*******************************************************/}
-        {typeInfo == "ResumenTrx" && (
+        {typeInfo === "ResumenTrx" && (
           <PaymentSummary
             title="¿Está seguro de realizar la transacción?"
             subtitle="Resumen de transacción"
@@ -406,7 +411,9 @@ const SubPaquetesMovistar = () => {
             {!loadingPeticionCompraPaquetes ? (
               <>
                 <ButtonBar>
-                  <Button onClick={ComprarPaquete}>Aceptar</Button>
+                  <Button type={"submit"} onClick={ComprarPaquete}>
+                    Aceptar
+                  </Button>
                   <Button onClick={HandleCloseSecond}>Cancelar</Button>
                 </ButtonBar>
               </>
@@ -419,7 +426,7 @@ const SubPaquetesMovistar = () => {
 
         {/******************************inf recibo *******************************************************/}
         <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-          {infTicket && typeInfo == "InfRecibo" && (
+          {infTicket && typeInfo === "InfRecibo" && (
             <Fragment>
               <Tickets refPrint={printDiv} ticket={infTicket} />
               <ButtonBar>
