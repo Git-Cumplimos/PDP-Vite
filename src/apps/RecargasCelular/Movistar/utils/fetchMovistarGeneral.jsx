@@ -33,22 +33,47 @@ export const fetchCustom = (url_, metodo_, name_) => {
       } else if (metodo_ === "POST") {
         Peticion = await fetchData(urlCompleto, "POST", {}, data_, true);
       }
-      if ((Peticion.status !== undefined) === false) {
-        // Api getwey
-
-        throw new ErrorCustomTimeout(
-          `Falla en el sistema: timeout con el servicio '${name_}'`,
-          "timeout"
-        );
-      }
     } catch (error) {
-      console.log(error.message);
       throw new ErrorCustomFetch(
         `Falla en el sistema: no conecta con el servicio ${name_}`,
         error.message
       );
     }
-    //evaluar la respuesta
+    //evaluar respuesta de api gateway
+    try {
+      if (
+        Peticion?.hasOwnProperty("status") === false &&
+        Peticion?.hasOwnProperty("status") === false
+      ) {
+        //No es una respuesta directamente del servicio sino del api gateway
+        if (Peticion?.hasOwnProperty("message") === true) {
+          if (Peticion.message === "Endpoint request timed out") {
+            throw new ErrorCustomTimeout(
+              `Falla en el sistema: timeout con el servicio ${name_}`,
+              "timeout"
+            );
+          } else {
+            throw new ErrorCustomFetch(
+              `Falla en el sistema: error no controlado de la respuesta del servicio ${name_}`,
+              Peticion.message
+            );
+          }
+        }
+      }
+    } catch (error) {
+      if (error instanceof ErrorCustomTimeout) {
+        throw error;
+      } else if (error instanceof ErrorCustomFetch) {
+        throw error;
+      } else {
+        throw new ErrorCustomFetch(
+          `Falla en el sistema: no conecta con el servicio ${name_}`,
+          `no conecta con el servicio ${name_}`
+        );
+      }
+    }
+
+    //evaluar la respuesta que llega del backend
     try {
       return EvaluateResponse(Peticion);
     } catch (error) {
@@ -129,8 +154,7 @@ export class ErrorCustom extends Error {
     this.notificacion = notificacion;
     if (this.notificacion === "notifyError") {
       notifyError(message);
-    }
-    if (this.notificacion === "notify") {
+    } else if (this.notificacion === "notify") {
       notify(message);
     }
   }

@@ -83,15 +83,15 @@ const SubPaquetesMovistar = () => {
       setTipodeoferta("Prepagada");
     }
 
-    if (inputDataSearch.codigodelaoferta != "") {
+    if (inputDataSearch.codigodelaoferta !== "") {
       paramsGetPaquetes["codigodelaoferta"] = inputDataSearch.codigodelaoferta;
     }
-    if (inputDataSearch.descripcioncorta != "") {
+    if (inputDataSearch.descripcioncorta !== "") {
       paramsGetPaquetes["descripcioncorta"] = inputDataSearch.descripcioncorta;
     }
 
     if (
-      inputDataSearch.valordelaoferta != "" &&
+      inputDataSearch.valordelaoferta !== "" &&
       inputDataSearch.valordelaoferta != 0
     ) {
       paramsGetPaquetes["valordelaoferta"] = inputDataSearch.valordelaoferta;
@@ -102,8 +102,7 @@ const SubPaquetesMovistar = () => {
 
     PeticionGetPaquetes(paramsGetPaquetes, {})
       .then((response) => {
-        console.log(response);
-        if (response?.status == true) {
+        if (response?.status === true) {
           setDataServiceConsult(response?.obj?.result?.results);
           setMaxPage(response?.obj?.result?.maxPages);
         }
@@ -125,7 +124,7 @@ const SubPaquetesMovistar = () => {
           notifyError(msg);
         }
       });
-  }, [urlLocation, pageData, limit, inputDataSearch]);
+  }, [urlLocation, pageData, limit, inputDataSearch, PeticionGetPaquetes]);
 
   function onChangeInput(e) {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
@@ -153,10 +152,6 @@ const SubPaquetesMovistar = () => {
   }
 
   const ComprarPaquete = () => {
-    let oficinaPropia;
-    if (roleInfo.tipo_comercio != "OFICINASPROPIAS") {
-      oficinaPropia = false;
-    }
     const data = {
       celular: inputData.celular,
       valor: dataPackage.valordelaoferta,
@@ -172,7 +167,7 @@ const SubPaquetesMovistar = () => {
 
     PeticionCompraPaquetes(data)
       .then((response) => {
-        if (response?.status == true) {
+        if (response?.status === true) {
           CompraPaquetesExitosa(response?.obj?.result);
         }
       })
@@ -185,7 +180,7 @@ const SubPaquetesMovistar = () => {
               msg = `${msg}: ${error.message}`;
               const error_msg_key = Object.keys(error.error_msg);
               const find = error_msg_key.find(
-                (keyInd) => keyInd == "ErrorTrxRefuse"
+                (keyInd) => keyInd === "ErrorTrxRefuse"
               );
               msg = find != undefined ? error.message : msg;
               notifyError(msg);
@@ -277,7 +272,25 @@ const SubPaquetesMovistar = () => {
     setShowModal(false);
     setInputData(inputDataInitial);
     navigateValid("/movistar/paquetes-movistar");
-  }, []);
+  }, [navigateValid]);
+
+  const handleCloseModal = useCallback(() => {
+    if (typeInfo === "ResumenPaquete") {
+      HandleCloseFirst();
+    } else if (typeInfo === "ResumenTrx" && !loadingPeticionCompraPaquetes) {
+      HandleCloseSecond();
+    } else if (typeInfo === "InfRecibo") {
+      HandleCloseResRecibo();
+    } else if (loadingPeticionCompraPaquetes) {
+      notify("Se está procesando transacción, por favor esperar");
+    }
+  }, [
+    typeInfo,
+    loadingPeticionCompraPaquetes,
+    HandleCloseFirst,
+    HandleCloseSecond,
+    HandleCloseResRecibo,
+  ]);
 
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
@@ -352,16 +365,7 @@ const SubPaquetesMovistar = () => {
         />
       </TableEnterprise>
 
-      <Modal
-        show={showModal}
-        handleClose={
-          typeInfo === "InfRecibo"
-            ? HandleCloseResRecibo
-            : loadingPeticionCompraPaquetes
-            ? () => {}
-            : HandleCloseFirst
-        }
-      >
+      <Modal show={showModal} handleClose={handleCloseModal}>
         {/******************************ResumenPaquete*******************************************************/}
         {typeInfo === "ResumenPaquete" && (
           <PaymentSummary title="Paquete Movistar" subtitle={tipodeoferta}>
