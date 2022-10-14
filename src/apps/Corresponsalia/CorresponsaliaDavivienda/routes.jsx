@@ -47,8 +47,8 @@ const rutasDaviviendaCB = {
   permission: [
     enumPermisosDavivienda.davivienda_cb_depositos,
     enumPermisosDavivienda.davivienda_cb_retiros,
-    enumPermisosDavivienda.daviplata_cash_in,
-    enumPermisosDavivienda.daviplata_cash_out,
+    enumPermisosDavivienda.davivienda_cb_cash_in,
+    enumPermisosDavivienda.davivienda_cb_cash_out,
     enumPermisosDavivienda.davivienda_cb_pago_por_giro,
     enumPermisosDavivienda.davivienda_cb_pago_productos_propios,
     enumPermisosDavivienda.davivienda_cb_recaudo,
@@ -59,21 +59,21 @@ const rutasDaviviendaCB = {
       label: <AppIcons Logo={"MARKETPLACE"} name='DaviPlata' />,
       component: DaviplataCB,
       permission: [
-        enumPermisosDavivienda.daviplata_cash_in,
-        enumPermisosDavivienda.daviplata_cash_out,
+        enumPermisosDavivienda.davivienda_cb_cash_in,
+        enumPermisosDavivienda.davivienda_cb_cash_out,
       ],
       subRoutes: [
         {
           link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashIn",
           label: <AppIcons Logo={"MARKETPLACE"} name='Depósito DaviPlata' />,
           component: CashIn,
-          permission: [enumPermisosDavivienda.daviplata_cash_in],
+          permission: [enumPermisosDavivienda.davivienda_cb_cash_in],
         },
         {
           link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashOut",
           label: <AppIcons Logo={"MARKETPLACE"} name='Retiro DaviPlata' />,
           component: CashOut,
-          permission: [enumPermisosDavivienda.daviplata_cash_out],
+          permission: [enumPermisosDavivienda.davivienda_cb_cash_out],
         },
       ],
     },
