@@ -350,7 +350,14 @@ const Panel = () => {
               <TicketCierre refPrint={printDiv} ticket={resumenCierre} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
-                <Button onClick={() => signOut()}>Cerrar sesión</Button>
+                <Button
+                  onClick={() => {
+                    navigate("/");
+                    signOut();
+                  }}
+                >
+                  Cerrar sesión
+                </Button>
               </ButtonBar>
             </div>
           )}
