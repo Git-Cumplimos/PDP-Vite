@@ -214,6 +214,7 @@ const VentaPines = () => {
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
+            const pin_encriptado = res?.obj?.pin_encriptado ?? "";
             const tempTicket = {
               title: "Recibo de pago",
               timeInfo: {
@@ -240,6 +241,7 @@ const VentaPines = () => {
               commerceName: "Venta de Pines de Recaudo",
               trxInfo: [
                 ["Convenio", datosConvenio?.nombre_convenio],
+                ["No. Pin", pin_encriptado],
                 ...Object.entries(userReferences).map(([, val], index) => [
                   datosConvenio[`referencia_${index + 1}`],
                   val,
