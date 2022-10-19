@@ -173,7 +173,7 @@ const SubPaquetesMovistar = () => {
       })
       .catch((error) => {
         HandleCloseFirst();
-        let msg = "compra de paquetes no exitosa";
+        let msg = "Compra de paquetes no exitosa";
         if (error instanceof ErrorCustom) {
           switch (error.name) {
             case "ErrorCustomBackend":
