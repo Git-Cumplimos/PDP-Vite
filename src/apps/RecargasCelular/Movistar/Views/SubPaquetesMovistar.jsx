@@ -282,7 +282,7 @@ const SubPaquetesMovistar = () => {
     } else if (typeInfo === "InfRecibo") {
       HandleCloseResRecibo();
     } else if (loadingPeticionCompraPaquetes) {
-      notify("Se está procesando transacción, por favor esperar");
+      notify("Se está procesando la transacción, por favor esperar");
     }
   }, [
     typeInfo,
