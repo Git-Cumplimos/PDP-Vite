@@ -237,15 +237,17 @@ const TrxRecaudo = () => {
                 }).format(new Date()),
               },
               commerceInfo: [
-                ["Comercio", roleInfo?.["nombre comercio"]],
                 ["No. Terminal", roleInfo?.id_dispositivo],
-                ["Dirección", roleInfo?.direccion],
                 ["Teléfono", roleInfo?.telefono],
                 ["Id Trx", trx_id],
                 ["Id Aut", codigo_autorizacion],
+                ["Comercio", roleInfo?.["nombre comercio"]],
+                ["", ""],
+                ["Dirección", roleInfo?.direccion],
+                ["", ""],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
               ],
-              commerceName: "Recaudo PSP en Efectivo",
+              commerceName: "Recaudo PSP",
               trxInfo: [
                 ["Convenio", datosConvenio?.nombre_convenio],
                 ...Object.entries(userReferences).map(([, val], index) => [
