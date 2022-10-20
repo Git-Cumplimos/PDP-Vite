@@ -36,6 +36,7 @@ const PinPago = () => {
   const { roleInfo, infoTicket } = useAuth();
 
   const [userDocument, setUserDocument] = useState("");
+  const [userDocumentDate, setUserDocumentDate] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
@@ -94,6 +95,8 @@ const PinPago = () => {
         colpatria: {
           user_document: userDocument,
           numero_pin: pinNumber,
+          fecha_expedicion: userDocumentDate,
+          is_persona_natural: true,
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -178,6 +181,7 @@ const PinPago = () => {
     [
       pinNumber,
       userDocument,
+      userDocumentDate,
       userAddress,
       valPinPago,
       roleInfo,
@@ -267,6 +271,16 @@ const PinPago = () => {
           maxLength={"12"}
           value={userDocument}
           onInput={(ev) => setUserDocument(onChangeNumber(ev))}
+          required
+        />
+        <Input
+          id="docClienteDate"
+          name="docClienteDate"
+          label="Fecha expedicion identificacion"
+          type="date"
+          autoComplete="off"
+          value={userDocumentDate}
+          onInput={(ev) => setUserDocumentDate(ev.target.value)}
           required
         />
         <Input
