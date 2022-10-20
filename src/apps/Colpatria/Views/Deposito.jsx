@@ -149,7 +149,7 @@ const Deposito = () => {
                 ["", ""],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
               ],
-              commerceName: "Colpatria",
+              commerceName: "Deposito",
               trxInfo: [
                 ["Tipo de cuenta", accountTypes?.[accountType] ?? "No type"],
                 ["", ""],

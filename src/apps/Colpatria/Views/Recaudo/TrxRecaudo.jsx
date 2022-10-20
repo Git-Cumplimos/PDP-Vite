@@ -247,7 +247,7 @@ const TrxRecaudo = () => {
                 ["", ""],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
               ],
-              commerceName: "Recaudo PSP en Efectivo",
+              commerceName: "Recaudo PSP",
               trxInfo: [
                 ["Convenio", datosConvenio?.nombre_convenio],
                 ...Object.entries(userReferences).map(([, val], index) => [

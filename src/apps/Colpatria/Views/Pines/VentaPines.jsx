@@ -240,7 +240,7 @@ const VentaPines = () => {
                 ["", ""],
                 // ["Id Transacción", res?.obj?.IdTransaccion],
               ],
-              commerceName: "Venta de Pines de Recaudo",
+              commerceName: "Recaudo Pin",
               trxInfo: [
                 ["Convenio", datosConvenio?.nombre_convenio],
                 ["No. Pin", pin_encriptado],
