@@ -12,14 +12,16 @@ const InfInicial = ({
   return (
     <Fragment>
       <PaymentSummary
-        title="¿Está seguro de realizar la transaccion?"
+        title="¿Está seguro de realizar la transacción?"
         subtitle="Resumen de transacción"
         summaryTrx={summaryInitial}
       >
         {!loadingPeticion ? (
           <>
             <ButtonBar>
-              <Button onClick={Peticion}>Aceptar</Button>
+              <Button type={"submit"} onClick={Peticion}>
+                Aceptar
+              </Button>
               <Button onClick={HandleClose}>Cancelar</Button>
             </ButtonBar>
           </>
