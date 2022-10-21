@@ -28,14 +28,27 @@ import {
 import fetchData from "../../../utils/fetchData";
 import TicketColpatria from "../components/TicketColpatria";
 import { buildTicket } from "../utils/functions";
+import Select from "../../../components/Base/Select";
 
 const formatMoney = makeMoneyFormatter(2);
+
+const ObjTiposPersonas = {
+  "0661240136": "Persona natural",
+  "068335": "Persona juridica",
+};
+
+const ObjTiposDocumentos = {
+  "0003": "CC",
+  "0004": "Nit",
+};
 
 const PinPago = () => {
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
 
+  const [tipoPersona, setTipoPersona] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("");
   const [userDocument, setUserDocument] = useState("");
   const [userDocumentDate, setUserDocumentDate] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
@@ -97,7 +110,7 @@ const PinPago = () => {
           user_document: userDocument,
           numero_pin: pinNumber,
           fecha_expedicion: userDocumentDate,
-          is_persona_natural: true,
+          codigo_convenio: `${tipoPersona}${tipoDocumento}`,
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -160,6 +173,8 @@ const PinPago = () => {
       );
     },
     [
+      tipoPersona,
+      tipoDocumento,
       pinNumber,
       userDocument,
       userDocumentDate,
@@ -242,6 +257,38 @@ const PinPago = () => {
         }}
         grid
       >
+        <Select
+          id="accType"
+          name="accType"
+          label="Seleccionar"
+          options={[
+            { label: "", value: "" },
+            ...Object.entries(ObjTiposPersonas).map(([value, label]) => ({
+              value,
+              label,
+            })),
+          ]}
+          value={tipoPersona}
+          onChange={(ev) => setTipoPersona(ev.target.value)}
+          required
+        />
+        {tipoPersona === "068335" && (
+          <Select
+            id="accType"
+            name="accType"
+            label="Tipo documento"
+            options={[
+              { label: "", value: "" },
+              ...Object.entries(ObjTiposDocumentos).map(([value, label]) => ({
+                value,
+                label,
+              })),
+            ]}
+            value={tipoDocumento}
+            onChange={(ev) => setTipoDocumento(ev.target.value)}
+            required
+          />
+        )}
         <Input
           id="docCliente"
           name="docCliente"
