@@ -20,11 +20,7 @@ import useMoney from "../../../hooks/useMoney";
 import { makePinPago } from "../utils/fetchFunctions";
 
 import { notifyPending, notifyError } from "../../../utils/notify";
-import {
-  makeMoneyFormatter,
-  onChangeNumber,
-  toAccountNumber,
-} from "../../../utils/functions";
+import { makeMoneyFormatter, onChangeNumber } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 import TicketColpatria from "../components/TicketColpatria";
 import { buildTicket } from "../utils/functions";
@@ -85,7 +81,7 @@ const PinPago = () => {
           ? `${ObjTiposDocumentos?.[tipoDocumento]} `
           : "C.C."
       }${userDocument}`,
-      "No. De PIN": toAccountNumber(pinNumber),
+      "No. De PIN": pinNumber,
       "Valor a Retirar": formatMoney.format(valPinPago),
     }),
     [pinNumber, userDocument, valPinPago, tipoPersona, tipoDocumento]
