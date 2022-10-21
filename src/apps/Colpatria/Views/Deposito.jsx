@@ -29,6 +29,7 @@ import {
 } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 import TicketColpatria from "../components/TicketColpatria";
+import { buildTicket } from "../utils/functions";
 
 const accountTypes = {
   10: "Cuenta ahorros",
@@ -124,33 +125,12 @@ const Deposito = () => {
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
-            const tempTicket = {
-              title: "Recibo de deposito",
-              timeInfo: {
-                "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-                  year: "2-digit",
-                  month: "2-digit",
-                  day: "2-digit",
-                }).format(new Date()),
-                Hora: Intl.DateTimeFormat("es-CO", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                }).format(new Date()),
-              },
-              commerceInfo: [
-                ["No. Terminal", roleInfo?.id_dispositivo],
-                ["Teléfono", roleInfo?.telefono],
-                ["Id Trx", trx_id],
-                ["Id Aut", codigo_autorizacion],
-                ["Comercio", roleInfo?.["nombre comercio"]],
-                ["", ""],
-                ["Dirección", roleInfo?.direccion],
-                ["", ""],
-                // ["Id Transacción", res?.obj?.IdTransaccion],
-              ],
-              commerceName: "Deposito",
-              trxInfo: [
+            const tempTicket = buildTicket(
+              roleInfo,
+              trx_id,
+              codigo_autorizacion,
+              "Deposito",
+              [
                 ["Tipo de cuenta", accountTypes?.[accountType] ?? "No type"],
                 ["", ""],
                 ["Numero de cuenta", toAccountNumber(accountNumber)],
@@ -159,9 +139,8 @@ const Deposito = () => {
                 ["", ""],
                 ["Valor de deposito", formatMoney.format(valDeposito)],
                 ["", ""],
-              ],
-              disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
-            };
+              ]
+            );
             setPaymentStatus(tempTicket);
             infoTicket(trx_id, id_type_trx, tempTicket)
               .then((resTicket) => {

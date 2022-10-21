@@ -27,14 +27,28 @@ import {
 } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 import TicketColpatria from "../components/TicketColpatria";
+import { buildTicket } from "../utils/functions";
+import Select from "../../../components/Base/Select";
 
 const formatMoney = makeMoneyFormatter(2);
+
+const ObjTiposPersonas = {
+  "0661240136": "Persona natural",
+  "068335": "Persona juridica",
+};
+
+const ObjTiposDocumentos = {
+  "0003": "C.C.",
+  "0004": "Nit",
+};
 
 const PinPago = () => {
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
 
+  const [tipoPersona, setTipoPersona] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("");
   const [userDocument, setUserDocument] = useState("");
   const [userDocumentDate, setUserDocumentDate] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
@@ -65,11 +79,16 @@ const PinPago = () => {
 
   const summary = useMemo(
     () => ({
-      "No. Identificación": userDocument,
+      "Tipo de persona": ObjTiposPersonas[tipoPersona],
+      "No. Identificación": `${
+        tipoDocumento !== ""
+          ? `${ObjTiposDocumentos?.[tipoDocumento]} `
+          : "C.C."
+      }${userDocument}`,
       "No. De PIN": toAccountNumber(pinNumber),
       "Valor a Retirar": formatMoney.format(valPinPago),
     }),
-    [pinNumber, userDocument, valPinPago]
+    [pinNumber, userDocument, valPinPago, tipoPersona, tipoDocumento]
   );
 
   const handleClose = useCallback(() => {
@@ -96,7 +115,7 @@ const PinPago = () => {
           user_document: userDocument,
           numero_pin: pinNumber,
           fecha_expedicion: userDocumentDate,
-          is_persona_natural: true,
+          codigo_convenio: `${tipoPersona}${tipoDocumento}`,
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -118,42 +137,29 @@ const PinPago = () => {
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
-            const tempTicket = {
-              title: "Recibo de retiro de pin",
-              timeInfo: {
-                "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-                  year: "2-digit",
-                  month: "2-digit",
-                  day: "2-digit",
-                }).format(new Date()),
-                Hora: Intl.DateTimeFormat("es-CO", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                }).format(new Date()),
-              },
-              commerceInfo: [
-                ["No. Terminal", roleInfo?.id_dispositivo],
-                ["Teléfono", roleInfo?.telefono],
-                ["Id Trx", trx_id],
-                ["Id Aut", codigo_autorizacion],
-                ["Comercio", roleInfo?.["nombre comercio"]],
+            const tempTicket = buildTicket(
+              roleInfo,
+              trx_id,
+              codigo_autorizacion,
+              "Retiro de pin",
+              [
+                ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
                 ["", ""],
-                ["Dirección", roleInfo?.direccion],
-                ["", ""],
-                // ["Id Transacción", res?.obj?.IdTransaccion],
-              ],
-              commerceName: "Colpatria",
-              trxInfo: [
-                ["No. Identificación", userDocument],
+                [
+                  "No. Identificación",
+                  `${
+                    tipoDocumento !== ""
+                      ? `${ObjTiposDocumentos?.[tipoDocumento]} `
+                      : "C.C."
+                  }${userDocument}`,
+                ],
                 ["", ""],
                 ["No. De PIN", pinNumber],
                 ["", ""],
                 ["Valor a Retirar", formatMoney.format(valPinPago)],
                 ["", ""],
-              ],
-              disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
-            };
+              ]
+            );
             setPaymentStatus(tempTicket);
             infoTicket(trx_id, id_type_trx, tempTicket)
               .then((resTicket) => {
@@ -181,6 +187,8 @@ const PinPago = () => {
       );
     },
     [
+      tipoPersona,
+      tipoDocumento,
       pinNumber,
       userDocument,
       userDocumentDate,
@@ -263,6 +271,38 @@ const PinPago = () => {
         }}
         grid
       >
+        <Select
+          id="accType"
+          name="accType"
+          label="Seleccionar"
+          options={[
+            { label: "", value: "" },
+            ...Object.entries(ObjTiposPersonas).map(([value, label]) => ({
+              value,
+              label,
+            })),
+          ]}
+          value={tipoPersona}
+          onChange={(ev) => setTipoPersona(ev.target.value)}
+          required
+        />
+        {tipoPersona === "068335" && (
+          <Select
+            id="accType"
+            name="accType"
+            label="Tipo documento"
+            options={[
+              { label: "", value: "" },
+              ...Object.entries(ObjTiposDocumentos).map(([value, label]) => ({
+                value,
+                label,
+              })),
+            ]}
+            value={tipoDocumento}
+            onChange={(ev) => setTipoDocumento(ev.target.value)}
+            required
+          />
+        )}
         <Input
           id="docCliente"
           name="docCliente"
