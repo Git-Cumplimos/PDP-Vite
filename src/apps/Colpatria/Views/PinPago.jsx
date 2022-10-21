@@ -38,7 +38,7 @@ const ObjTiposPersonas = {
 };
 
 const ObjTiposDocumentos = {
-  "0003": "CC",
+  "0003": "C.C.",
   "0004": "Nit",
 };
 
@@ -79,11 +79,16 @@ const PinPago = () => {
 
   const summary = useMemo(
     () => ({
-      "No. Identificación": userDocument,
+      "Tipo de persona": ObjTiposPersonas[tipoPersona],
+      "No. Identificación": `${
+        tipoDocumento !== ""
+          ? `${ObjTiposDocumentos?.[tipoDocumento]} `
+          : "C.C."
+      }${userDocument}`,
       "No. De PIN": toAccountNumber(pinNumber),
       "Valor a Retirar": formatMoney.format(valPinPago),
     }),
-    [pinNumber, userDocument, valPinPago]
+    [pinNumber, userDocument, valPinPago, tipoPersona, tipoDocumento]
   );
 
   const handleClose = useCallback(() => {
@@ -138,7 +143,16 @@ const PinPago = () => {
               codigo_autorizacion,
               "Retiro de pin",
               [
-                ["No. Identificación", userDocument],
+                ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
+                ["", ""],
+                [
+                  "No. Identificación",
+                  `${
+                    tipoDocumento !== ""
+                      ? `${ObjTiposDocumentos?.[tipoDocumento]} `
+                      : "C.C."
+                  }${userDocument}`,
+                ],
                 ["", ""],
                 ["No. De PIN", pinNumber],
                 ["", ""],
