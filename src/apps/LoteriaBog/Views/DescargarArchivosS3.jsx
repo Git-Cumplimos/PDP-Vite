@@ -1,16 +1,16 @@
 import { useState, useCallback } from "react";
-import Button from "../../../../components/Base/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import { useLoteria } from "../../utils/LoteriaHooks";
-import Form from "../../../../components/Base/Form";
-import Table from "../../../../components/Base/Table";
-import Input from "../../../../components/Base/Input";
-import Modal from "../../../../components/Base/Modal";
-import DescargaForm from "../../components/DescargaForm/DescargaForm";
-import SubPage from "../../../../components/Base/SubPage/SubPage";
-import ReportVentasForm from "../../components/ReportVentasForm/ReportVentasForm";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import { notify, notifyError } from "../../../../utils/notify";
+import Button from "../../../components/Base/Button";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import { useLoteria } from "../utils/LoteriaHooks";
+import Form from "../../../components/Base/Form";
+import Table from "../../../components/Base/Table";
+import Input from "../../../components/Base/Input";
+import Modal from "../../../components/Base/Modal";
+import DescargaForm from "../components/DescargaForm/DescargaForm";
+import SubPage from "../../../components/Base/SubPage/SubPage";
+import ReportVentasForm from "../components/ReportVentasForm/ReportVentasForm";
+import { useAuth } from "../../../hooks/AuthHooks";
+import { notify, notifyError } from "../../../utils/notify";
 
 const DescargarArchivosS3 = ({ route }) => {
   const { label } = route;
