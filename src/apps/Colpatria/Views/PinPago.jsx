@@ -29,13 +29,8 @@ import Select from "../../../components/Base/Select";
 const formatMoney = makeMoneyFormatter(2);
 
 const ObjTiposPersonas = {
-  "0661240136": "Persona natural",
-  "068335": "Persona juridica",
-};
-
-const ObjTiposDocumentos = {
-  "0003": "C.C.",
-  "0004": "Nit",
+  t: "Persona natural",
+  f: "Persona juridica",
 };
 
 const PinPago = () => {
@@ -44,7 +39,6 @@ const PinPago = () => {
   const { roleInfo, infoTicket } = useAuth();
 
   const [tipoPersona, setTipoPersona] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("");
   const [userDocument, setUserDocument] = useState("");
   const [userDocumentDate, setUserDocumentDate] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
@@ -76,15 +70,12 @@ const PinPago = () => {
   const summary = useMemo(
     () => ({
       "Tipo de persona": ObjTiposPersonas[tipoPersona],
-      "No. Identificación": `${
-        tipoDocumento !== ""
-          ? `${ObjTiposDocumentos?.[tipoDocumento]} `
-          : "C.C."
-      }${userDocument}`,
+      "No. Identificación": userDocument,
+      "Fecha de expedicion identificacion": userDocumentDate,
       "No. De PIN": pinNumber,
       "Valor a Retirar": formatMoney.format(valPinPago),
     }),
-    [pinNumber, userDocument, valPinPago, tipoPersona, tipoDocumento]
+    [pinNumber, userDocument, valPinPago, tipoPersona, userDocumentDate]
   );
 
   const handleClose = useCallback(() => {
@@ -111,7 +102,7 @@ const PinPago = () => {
           user_document: userDocument,
           numero_pin: pinNumber,
           fecha_expedicion: userDocumentDate,
-          codigo_convenio: `${tipoPersona}${tipoDocumento}`,
+          is_persona_natural: tipoPersona === "t",
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -141,14 +132,9 @@ const PinPago = () => {
               [
                 ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
                 ["", ""],
-                [
-                  "No. Identificación",
-                  `${
-                    tipoDocumento !== ""
-                      ? `${ObjTiposDocumentos?.[tipoDocumento]} `
-                      : "C.C."
-                  }${userDocument}`,
-                ],
+                ["No. Identificación", userDocument],
+                ["", ""],
+                ["Fecha de expedicion identificacion", userDocumentDate],
                 ["", ""],
                 ["No. De PIN", pinNumber],
                 ["", ""],
@@ -184,7 +170,6 @@ const PinPago = () => {
     },
     [
       tipoPersona,
-      tipoDocumento,
       pinNumber,
       userDocument,
       userDocumentDate,
@@ -282,23 +267,6 @@ const PinPago = () => {
           onChange={(ev) => setTipoPersona(ev.target.value)}
           required
         />
-        {tipoPersona === "068335" && (
-          <Select
-            id="accType"
-            name="accType"
-            label="Tipo documento"
-            options={[
-              { label: "", value: "" },
-              ...Object.entries(ObjTiposDocumentos).map(([value, label]) => ({
-                value,
-                label,
-              })),
-            ]}
-            value={tipoDocumento}
-            onChange={(ev) => setTipoDocumento(ev.target.value)}
-            required
-          />
-        )}
         <Input
           id="docCliente"
           name="docCliente"
