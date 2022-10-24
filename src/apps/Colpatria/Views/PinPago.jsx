@@ -20,22 +20,27 @@ import useMoney from "../../../hooks/useMoney";
 import { makePinPago } from "../utils/fetchFunctions";
 
 import { notifyPending, notifyError } from "../../../utils/notify";
-import {
-  makeMoneyFormatter,
-  onChangeNumber,
-  toAccountNumber,
-} from "../../../utils/functions";
+import { makeMoneyFormatter, onChangeNumber } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 import TicketColpatria from "../components/TicketColpatria";
+import { buildTicket } from "../utils/functions";
+import Select from "../../../components/Base/Select";
 
 const formatMoney = makeMoneyFormatter(2);
+
+const ObjTiposPersonas = {
+  t: "Persona natural",
+  f: "Persona juridica",
+};
 
 const PinPago = () => {
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
 
+  const [tipoPersona, setTipoPersona] = useState("");
   const [userDocument, setUserDocument] = useState("");
+  const [userDocumentDate, setUserDocumentDate] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
@@ -64,11 +69,13 @@ const PinPago = () => {
 
   const summary = useMemo(
     () => ({
+      "Tipo de persona": ObjTiposPersonas[tipoPersona],
       "No. Identificación": userDocument,
-      "No. De PIN": toAccountNumber(pinNumber),
+      "Fecha de expedicion identificacion": userDocumentDate,
+      "No. De PIN": pinNumber,
       "Valor a Retirar": formatMoney.format(valPinPago),
     }),
-    [pinNumber, userDocument, valPinPago]
+    [pinNumber, userDocument, valPinPago, tipoPersona, userDocumentDate]
   );
 
   const handleClose = useCallback(() => {
@@ -94,6 +101,8 @@ const PinPago = () => {
         colpatria: {
           user_document: userDocument,
           numero_pin: pinNumber,
+          fecha_expedicion: userDocumentDate,
+          is_persona_natural: tipoPersona === "t",
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -115,40 +124,24 @@ const PinPago = () => {
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
-            const tempTicket = {
-              title: "Recibo de retiro de pin",
-              timeInfo: {
-                "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-                  year: "2-digit",
-                  month: "2-digit",
-                  day: "2-digit",
-                }).format(new Date()),
-                Hora: Intl.DateTimeFormat("es-CO", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                }).format(new Date()),
-              },
-              commerceInfo: [
-                ["Comercio", roleInfo?.["nombre comercio"]],
-                ["No. terminal", roleInfo?.id_dispositivo],
-                ["Dirección", roleInfo?.direccion],
-                ["Telefono", roleInfo?.telefono],
-                ["Id Trx", trx_id],
-                ["Id Aut", codigo_autorizacion],
-                // ["Id Transacción", res?.obj?.IdTransaccion],
-              ],
-              commerceName: "Colpatria",
-              trxInfo: [
+            const tempTicket = buildTicket(
+              roleInfo,
+              trx_id,
+              codigo_autorizacion,
+              "Retiro de pin",
+              [
+                ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
+                ["", ""],
                 ["No. Identificación", userDocument],
+                ["", ""],
+                ["Fecha de expedicion identificacion", userDocumentDate],
                 ["", ""],
                 ["No. De PIN", pinNumber],
                 ["", ""],
                 ["Valor a Retirar", formatMoney.format(valPinPago)],
                 ["", ""],
-              ],
-              disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
-            };
+              ]
+            );
             setPaymentStatus(tempTicket);
             infoTicket(trx_id, id_type_trx, tempTicket)
               .then((resTicket) => {
@@ -176,8 +169,10 @@ const PinPago = () => {
       );
     },
     [
+      tipoPersona,
       pinNumber,
       userDocument,
+      userDocumentDate,
       userAddress,
       valPinPago,
       roleInfo,
@@ -257,6 +252,21 @@ const PinPago = () => {
         }}
         grid
       >
+        <Select
+          id="accType"
+          name="accType"
+          label="Seleccionar"
+          options={[
+            { label: "", value: "" },
+            ...Object.entries(ObjTiposPersonas).map(([value, label]) => ({
+              value,
+              label,
+            })),
+          ]}
+          value={tipoPersona}
+          onChange={(ev) => setTipoPersona(ev.target.value)}
+          required
+        />
         <Input
           id="docCliente"
           name="docCliente"
@@ -267,6 +277,16 @@ const PinPago = () => {
           maxLength={"12"}
           value={userDocument}
           onInput={(ev) => setUserDocument(onChangeNumber(ev))}
+          required
+        />
+        <Input
+          id="docClienteDate"
+          name="docClienteDate"
+          label="Fecha expedicion identificacion"
+          type="date"
+          autoComplete="off"
+          value={userDocumentDate}
+          onInput={(ev) => setUserDocumentDate(ev.target.value)}
           required
         />
         <Input

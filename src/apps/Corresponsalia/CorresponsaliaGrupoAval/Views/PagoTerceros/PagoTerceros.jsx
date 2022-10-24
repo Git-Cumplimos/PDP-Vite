@@ -9,9 +9,9 @@ import Modal from "../../../../../components/Base/Modal";
 import MoneyInput, {
   formatMoney,
 } from "../../../../../components/Base/MoneyInput";
-import Select from "../../../../../components/Base/Select";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { useFetch } from "../../../../../hooks/useFetch";
+import { toPhoneNumber } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
 import InfInicial from "../../components/PagoTerceros-PagoSubsidio/InfInicial";
 import InfRecibo from "../../components/PagoTerceros-PagoSubsidio/InfRecibo";
@@ -23,7 +23,7 @@ import {
 } from "../../utils/fetchPagoSubsidios_PagoTerceros";
 
 const minValor = 1000;
-const maxValor = 300000;
+const maxValor = 300001;
 const dataInputInitial = {
   documento: "",
   numeroCelular: "",
@@ -47,12 +47,12 @@ const PagoTerceros = () => {
 
   function onChangeInput(e) {
     let valueInput = "";
-    if (e.target.name == "valor_total_trx" || e.target.name == "otp") {
+    if (e.target.name === "valor_total_trx" || e.target.name === "otp") {
       return;
     }
-    if (e.target.name == "documento" || e.target.name == "numeroCelular") {
+    if (e.target.name === "documento" || e.target.name === "numeroCelular") {
       valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-      if (e.target.name == "numeroCelular") {
+      if (e.target.name === "numeroCelular") {
         if (valueInput[0] != 3) {
           setInvalidNumeroCelular("Número inválido");
           if (valueInput.length == 1 && inputData.numeroCelular == "") {
@@ -73,10 +73,10 @@ const PagoTerceros = () => {
 
   function onChangeInputSecond(e, value) {
     let valueInput = "";
-    if (e.target.name == "otp") {
+    if (e.target.name === "otp") {
       valueInput = ((value ?? "").match(/\d/g) ?? []).join("");
     }
-    if (e.target.name == "valor_total_trx") {
+    if (e.target.name === "valor_total_trx") {
       valueInput = value;
     }
     setInputData((anterior) => ({
@@ -92,6 +92,13 @@ const PagoTerceros = () => {
     if (inputData.numeroCelular[0] != "3") {
       notifyError(
         "Número inválido, el No. de celular debe comenzar con el número 3"
+      );
+      return;
+    }
+
+    if (inputData.otp.length < 4) {
+      notifyError(
+        "La cantidad de dígitos de la OTP debe ser mayor o igual a 4"
       );
       return;
     }
@@ -125,7 +132,7 @@ const PagoTerceros = () => {
       dataTerceros
     )
       .then((response) => {
-        if (response?.status == true) {
+        if (response?.status === true) {
           PagoTercerosExitoso(response?.obj?.result);
         }
       })
@@ -150,18 +157,20 @@ const PagoTerceros = () => {
         Hora: result_.hora,
       },
       commerceInfo: [
-        ["Id Comercio", roleInfo.id_comercio],
         ["No. terminal", roleInfo.id_dispositivo],
-        ["Municipio", roleInfo.ciudad],
-        ["Dirección", roleInfo.direccion],
+        ["Teléfono", 4567890],
         ["Id Trx", result_.id_trx],
-        ["Id Transacción", result_.id_trx],
+        ["Teléfono", 987654],
+        ["Comercio", roleInfo["nombre comercio"]],
+        ["", ""],
+        ["Dirección", roleInfo.direccion],
+        ["", ""],
       ],
       commerceName: "PAGO DE TERCEROS",
       trxInfo: [
         ["Documento", inputData.documento],
         ["", ""],
-        ["Celular", inputData.numeroCelular],
+        ["Celular", toPhoneNumber(inputData.numeroCelular)],
         ["", ""],
         ["Valor", formatMoney.format(inputData.valor_total_trx)],
         ["", ""],
@@ -184,6 +193,8 @@ const PagoTerceros = () => {
   const HandleCloseInicial = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);
+    notify("Transacción cancelada");
+    setInputData(dataInputInitial);
   }, []);
 
   const HandleCloseSecond = useCallback(() => {
@@ -207,7 +218,7 @@ const PagoTerceros = () => {
           name="documento"
           label="Número de identificación"
           type="text"
-          minLength="1"
+          minLength="5"
           maxLength="12"
           autoComplete="off"
           value={inputData.documento}
@@ -228,7 +239,7 @@ const PagoTerceros = () => {
           name="otp"
           label="Número de OTP"
           type="text"
-          minLength="1"
+          minLength="4"
           maxLength="12"
           autoComplete="off"
           value={inputData.otp}
@@ -252,11 +263,11 @@ const PagoTerceros = () => {
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={() => {}}>
-        {typeInfo == "Inicial" && (
+        {typeInfo === "Inicial" && (
           <InfInicial
             summaryInitial={{
               Documento: inputData.documento,
-              Celular: inputData.numeroCelular,
+              Celular: toPhoneNumber(inputData.numeroCelular),
               Valor: formatMoney.format(inputData.valor_total_trx),
             }}
             loadingPeticion={loadingPeticionPagoTerceros}
@@ -265,7 +276,7 @@ const PagoTerceros = () => {
           ></InfInicial>
         )}
 
-        {typeInfo == "InfRecibo" && (
+        {typeInfo === "InfRecibo" && (
           <InfRecibo
             infTicket={infTicket}
             HandleClose={HandleCloseResRecibo}

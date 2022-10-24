@@ -1,7 +1,13 @@
 import classes from "./TicketsAval.module.css";
 import LogoOccidente from "../../../../../components/Base/LogoOccidente";
 
-const TicketsAval = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, logo }) => {
+const TicketsAval = ({
+  refPrint,
+  type = "ORIGINAL",
+  ticket,
+  stateTrx = true,
+  logo,
+}) => {
   const { divPrint } = classes;
 
   if (!ticket) {
@@ -10,12 +16,12 @@ const TicketsAval = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, log
 
   const { title, timeInfo, commerceInfo, commerceName, trxInfo, disclamer } =
     ticket;
-  console.log(logo)
+
   return (
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
         <div className="flex flex-row justify-center items-center w-full">
-        <LogoOccidente xsmall />
+          <LogoOccidente xsmall />
         </div>
         <h1 className="text-xl font-semibold text-center uppercase">{title}</h1>
         <hr className="border-gray-400 my-3" />

@@ -38,11 +38,11 @@ export const useFetchMovistar = (url_ = "", name_ = "") => {
         switch (cantTimerInterval) {
           case 1:
             notify(
-              "Estamos procesando transacción, puede tardar hasta 50 segundos"
+              "Estamos procesando la transacción, puede tardar hasta 50 segundos"
             );
             break;
           case 3:
-            notify("Continuamos procesando transacción, por favor esperar");
+            notify("Continuamos procesando la transacción, por favor esperar");
             break;
           default:
             if (cantTimerInterval >= 5) {

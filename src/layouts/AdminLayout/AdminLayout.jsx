@@ -109,7 +109,7 @@ const AdminLayout = () => {
             notifyError(error?.message);
           }
           console.error(error?.message);
-          notifyError("Busqueda fallida");
+          // notifyError("Busqueda fallida");
         });
     }
   }, [

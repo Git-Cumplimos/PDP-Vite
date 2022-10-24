@@ -173,7 +173,7 @@ const SubPaquetesMovistar = () => {
       })
       .catch((error) => {
         HandleCloseFirst();
-        let msg = "compra de paquetes no exitosa";
+        let msg = "Compra de paquetes no exitosa";
         if (error instanceof ErrorCustom) {
           switch (error.name) {
             case "ErrorCustomBackend":
@@ -282,7 +282,7 @@ const SubPaquetesMovistar = () => {
     } else if (typeInfo === "InfRecibo") {
       HandleCloseResRecibo();
     } else if (loadingPeticionCompraPaquetes) {
-      notify("Se está procesando transacción, por favor esperar");
+      notify("Se está procesando la transacción, por favor esperar");
     }
   }, [
     typeInfo,

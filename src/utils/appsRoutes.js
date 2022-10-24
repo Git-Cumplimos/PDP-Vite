@@ -3,7 +3,7 @@ import { lazy } from "react";
 /**
  * Rutas
  */
-import rutasColpatria from "../apps/Colpatria/routes";
+import rutasColpatria, { listPermissionsColpatria } from "../apps/Colpatria/routes";
 
 /**
  * * Providers
@@ -895,7 +895,7 @@ const allUrlsPrivateApps = [
     link: "/corresponsalia",
     label: <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía' />,
     component: Corresponsalia,
-    permission: [54],
+    permission: [54, ...listPermissionsColpatria],
     subRoutes: [
       rutasDaviviendaCB,
       {

@@ -226,7 +226,7 @@ const Transacciones = () => {
         />
         {userPermissions
           .map(({ id_permission }) => id_permission)
-          .includes(5) ? (
+          .includes(91) ? (
           <>
             <Input
               id="id_comercio"

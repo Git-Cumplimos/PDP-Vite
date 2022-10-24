@@ -28,6 +28,7 @@ import { makeMoneyFormatter } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
 import ScreenBlocker from "../../components/ScreenBlocker";
 import TicketColpatria from "../../components/TicketColpatria";
+import { buildTicket } from "../../utils/functions";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -214,32 +215,15 @@ const VentaPines = () => {
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
-            const tempTicket = {
-              title: "Recibo de pago",
-              timeInfo: {
-                "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-                  year: "2-digit",
-                  month: "2-digit",
-                  day: "2-digit",
-                }).format(new Date()),
-                Hora: Intl.DateTimeFormat("es-CO", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                }).format(new Date()),
-              },
-              commerceInfo: [
-                ["Comercio", roleInfo?.["nombre comercio"]],
-                ["No. Terminal", roleInfo?.id_dispositivo],
-                ["Dirección", roleInfo?.direccion],
-                ["Teléfono", roleInfo?.telefono],
-                ["Id Trx", trx_id],
-                ["Id Aut", codigo_autorizacion],
-                // ["Id Transacción", res?.obj?.IdTransaccion],
-              ],
-              commerceName: "Venta de Pines de Recaudo",
-              trxInfo: [
+            const pin_encriptado = res?.obj?.pin_encriptado ?? "";
+            const tempTicket = buildTicket(
+              roleInfo,
+              trx_id,
+              codigo_autorizacion,
+              "Recaudo Pin",
+              [
                 ["Convenio", datosConvenio?.nombre_convenio],
+                ["No. Pin", pin_encriptado],
                 ...Object.entries(userReferences).map(([, val], index) => [
                   datosConvenio[`referencia_${index + 1}`],
                   val,
@@ -249,11 +233,8 @@ const VentaPines = () => {
                 list.push(elem);
                 if ((i + 1) % 1 === 0) list.push(["", ""]);
                 return list;
-              }, []),
-              /* ["", ""] */
-              disclamer:
-                "Para cualquier reclamo es indispensable presentar este recibo o comuníquese a los Tel. en Bogotá 7561616 o gratis en el resto del país 018000-522222.",
-            };
+              }, [])
+            );
             setPaymentStatus(tempTicket);
             infoTicket(trx_id, id_type_trx, tempTicket)
               .then((resTicket) => {

@@ -137,7 +137,7 @@ const RecargasMovistar = () => {
     } else if (typeInfo === "RecargaExitosa") {
       handleCloseRecarga();
     } else if (loadingPeticionRecarga) {
-      notify("Se está procesando transacción, por favor esperar");
+      notify("Se está procesando la transacción, por favor esperar");
     }
   }, [typeInfo, loadingPeticionRecarga, handleCloseCancelada, handleCloseRecarga]);
 

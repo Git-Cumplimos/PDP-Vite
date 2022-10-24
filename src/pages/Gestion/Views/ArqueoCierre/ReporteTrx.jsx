@@ -1,6 +1,10 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
+import TicketColpatria from "../../../../apps/Colpatria/components/TicketColpatria";
+import TicketsAgrario from "../../../../apps/Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
 import TicketsDavivienda from "../../../../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
+import TicketsAval from "../../../../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
+import TicketsPines from "../../../../apps/PinesVus/components/TicketsPines";
 import Accordion from "../../../../components/Base/Accordion";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -162,7 +166,7 @@ const ReporteTrx = () => {
               Fecha: info?.date_trx,
               "Mensaje de respuesta trx": info?.message_trx,
               Monto: formatMoney.format(info?.monto),
-              "Estado de la trasaccion": info?.status_trx
+              "Estado de la trasaccion": info?.status
                 ? "Transaccion aprobada"
                 : "Transaccion rechazada",
             });
@@ -171,7 +175,8 @@ const ReporteTrx = () => {
       </div>
       <Modal show={selected} handleClose={handleClose}>
         {selected?.ticket &&
-        Object.entries(selected?.ticket ?? {}).length > 0 ? (
+        Object.entries(selected?.ticket ?? {}).length > 0 &&
+        JSON.stringify(selected?.ticket) !== "{}" ? (
           <div className="flex flex-col justify-center items-center">
             {selected?.id_autorizador === 13 ? (
               <TicketsDavivienda
@@ -180,6 +185,62 @@ const ReporteTrx = () => {
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
+            ) : selected?.id_autorizador === 14 ? (
+              <TicketColpatria
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 17 ? (
+              <TicketsAval
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 14 ? (
+              <TicketColpatria
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 16 ? (
+              <TicketsAgrario
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_tipo_transaccion === 43 ? (
+              <div ref={printDiv}>
+                {selected?.ticket?.ticket2 ? (
+                  <>
+                    <TicketsPines
+                      refPrint={null}
+                      ticket={selected?.ticket?.ticket1}
+                      type="Reimpresión"
+                      stateTrx={selected?.status_trx}
+                      logo="LogoMiLicensia"
+                    />
+                    <TicketsPines
+                      refPrint={null}
+                      ticket={selected?.ticket?.ticket2}
+                      type="Reimpresión"
+                      stateTrx={selected?.status_trx}
+                      logo="LogoVus"
+                    />
+                  </>
+                ) : (
+                  <Tickets
+                    refPrint={null}
+                    ticket={selected?.ticket}
+                    type="Reimpresión"
+                    stateTrx={selected?.status_trx}
+                  />
+                )}
+              </div>
             ) : (
               <Tickets
                 refPrint={printDiv}
