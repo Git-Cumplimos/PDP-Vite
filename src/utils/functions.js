@@ -54,6 +54,42 @@ export const onChangeNumber = (ev) => {
   return ev.target.value;
 };
 
+export const toPhoneNumber = (num = "") => {
+  let reg = /(\d{1,3}[-.\s]?)?(\d{1,3}[-.\s]?)?(\d{1,4})/;
+  return (
+    num
+      .match(reg)
+      ?.filter((val, ind) => ind > 0 && val !== undefined)
+      .map((val) => val.trim().replace("-", ""))
+      .join(" ") ?? num
+  );
+};
+
+/**
+ * On change for just number inputs
+ * @param {*} ev
+ * @returns digits in text
+ */
+export const onChangePhoneNumber = (ev) => {
+  let caret_pos = ev.target.selectionStart ?? 0;
+  const len = ev.target.value.length;
+
+  ev.target.value = toPhoneNumber(ev.target.value ?? "");
+  if (ev.target.value.length > 0 && ev.target.value[0] !== "3") {
+    ev.target.setCustomValidity(
+      "Número inválido, el No. de celular debe comenzar con el número 3"
+    );
+  } else {
+    ev.target.setCustomValidity("");
+  }
+
+  ev.target.focus();
+  caret_pos += ev.target.value.length - len;
+  ev.target.setSelectionRange(caret_pos, caret_pos);
+
+  return ev.target.value;
+};
+
 export const toAccountNumber = (num = "") =>
   num.replace(/(.{4})/g, "$1 ").trim();
 

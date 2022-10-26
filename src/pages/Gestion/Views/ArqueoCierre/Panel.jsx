@@ -21,15 +21,16 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import TicketCierre from "./TicketCierre";
-import ButtonLink from "../../../../components/Base/ButtonLink";
+import { useNavigate } from "react-router-dom";
 
 const formatMoney = makeMoneyFormatter(0);
 
 const Panel = () => {
-  const { roleInfo, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { roleInfo, userInfo, signOut } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const [estado, setEstado] = useState(false);
+  const [estado, setEstado] = useState(true);
   const [totalCierres, setTotalCierres] = useState(false);
   const [denominaciones, setDenominaciones] = useState([
     [100000, 0],
@@ -70,6 +71,9 @@ const Panel = () => {
           id_usuario: roleInfo?.id_usuario,
           id_comercio: roleInfo?.id_comercio,
           id_terminal: roleInfo?.id_dispositivo,
+          nombre_comercio: nombreComercio,
+          nombre_usuario: userInfo?.attributes?.name,
+          direccion_comercio: roleInfo?.direccion,
         }),
         {
           render: () => {
@@ -97,14 +101,10 @@ const Panel = () => {
         { toastId: "busqueda-cierre-123" }
       );
     }
-  }, [
-    roleInfo?.tipo_comercio,
-    roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
-    roleInfo?.id_usuario,
-  ]);
+  }, [nombreComercio, roleInfo, userInfo?.attributes?.name]);
 
   const closeModalFunction = useCallback(() => {
+    navigate(-1);
     setEstado(false);
     setTotalCierres(false);
     setDenominaciones([
@@ -121,7 +121,7 @@ const Panel = () => {
       [50, 0],
     ]);
     setConfirmarArqueo(false);
-  }, []);
+  }, [navigate]);
 
   const cierreCaja = useCallback(() => {
     notifyPending(
@@ -129,6 +129,9 @@ const Panel = () => {
         id_comercio: roleInfo?.id_comercio,
         id_terminal: roleInfo?.id_dispositivo,
         id_usuario: roleInfo?.id_usuario,
+        nombre_comercio: nombreComercio,
+        nombre_usuario: userInfo?.attributes?.name,
+        direccion_comercio: roleInfo?.direccion,
         arqueo: Object.fromEntries(denominaciones),
       }),
       {
@@ -240,13 +243,7 @@ const Panel = () => {
       },
       { toastId: "busqueda-cierre-123" }
     );
-  }, [
-    denominaciones,
-    nombreComercio,
-    roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
-    roleInfo?.id_usuario,
-  ]);
+  }, [denominaciones, nombreComercio, roleInfo, userInfo?.attributes?.name]);
 
   const printDiv = useRef();
 
@@ -270,9 +267,6 @@ const Panel = () => {
             >
               Arqueo y cierre de caja
             </Button>
-            <ButtonLink to={"/gestion/arqueo/reporte-arqueo-cierre"}>
-              Ver reporte de transacciones
-            </ButtonLink>
           </ButtonBar>
         ) : (
           <h1 className="text-3xl mt-6">Cargando...</h1>
