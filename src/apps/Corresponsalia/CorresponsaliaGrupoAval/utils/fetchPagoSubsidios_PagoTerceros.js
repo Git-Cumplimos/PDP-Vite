@@ -1,5 +1,5 @@
 import fetchData from "../../../../utils/fetchData";
-import { notify, notifyError } from "../../../../utils/notify";
+import { notifyError } from "../../../../utils/notify";
 
 export const fetchCustomPost = async (url_, name_, data_) => {
   let Peticion;
@@ -10,11 +10,12 @@ export const fetchCustomPost = async (url_, name_, data_) => {
     throw new ErrorCustom(error.message);
   }
 
+  console.log(Peticion);
   //para los errores customizados del backend
   try {
     if (
-      Peticion?.status == false &&
-      Peticion?.obj?.error == true &&
+      Peticion?.status === false &&
+      Peticion?.obj?.error_status === true &&
       Peticion?.obj?.error_msg
     ) {
       const error_msg = Peticion?.obj?.error_msg;
@@ -22,17 +23,18 @@ export const fetchCustomPost = async (url_, name_, data_) => {
       const error_msg_vector = [];
       error_msg_key.map((nombre_error) => {
         const error_msg_ind = error_msg[nombre_error];
-        if (error_msg_ind?.damage && error_msg_ind?.damage == true) {
+        if (error_msg_ind?.blocker === true) {
           error_msg_vector.push(`${error_msg_ind?.description}`);
         }
       });
+
       throw new ErrorCustomBackend(error_msg_vector, error_msg_key);
     }
 
     // cuando status es false pero no hay errores
     if (
-      Peticion?.status == false &&
-      Peticion?.obj?.error == false &&
+      Peticion?.status === false &&
+      Peticion?.obj?.error_status === false &&
       Peticion?.msg
     ) {
       throw new msgCustomBackend(`${Peticion?.msg}`);

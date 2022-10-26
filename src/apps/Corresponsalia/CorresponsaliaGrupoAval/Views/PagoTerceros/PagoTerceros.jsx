@@ -208,7 +208,22 @@ const PagoTerceros = () => {
     setShowModal(false);
     setInputData(dataInputInitial);
     navigateValid("/corresponsalia/CorresponsaliaGrupoAval");
-  }, []);
+  }, [navigateValid]);
+
+  const handleCloseModal = useCallback(() => {
+    if (typeInfo === "Inicial" && !loadingPeticionPagoTerceros) {
+      HandleCloseInicial();
+    } else if (typeInfo === "InfRecibo") {
+      HandleCloseResRecibo();
+    } else if (loadingPeticionPagoTerceros) {
+      notify("Se está procesando la transacción, por favor esperar");
+    }
+  }, [
+    typeInfo,
+    loadingPeticionPagoTerceros,
+    HandleCloseInicial,
+    HandleCloseResRecibo,
+  ]);
 
   return (
     <Fragment>
@@ -262,7 +277,7 @@ const PagoTerceros = () => {
           <Button type={"submit"}>Continuar</Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={() => {}}>
+      <Modal show={showModal} handleClose={handleCloseModal}>
         {typeInfo === "Inicial" && (
           <InfInicial
             summaryInitial={{
