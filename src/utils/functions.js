@@ -93,17 +93,6 @@ export const onChangePhoneNumber = (ev) => {
 export const toAccountNumber = (num = "") =>
   num.replace(/(.{4})/g, "$1 ").trim();
 
-export const toPhoneNumber = (num = "") => {
-  let reg = /(\d{1,3}[-.\s]?)?(\d{1,3}[-.\s]?)?(\d{1,4})/;
-  return (
-    num
-      .match(reg)
-      ?.filter((val, ind) => ind > 0 && val !== undefined)
-      .map((val) => val.trim().replace("-", ""))
-      .join(" ") ?? num
-  );
-};
-
 /**
  * On change for account number inputs
  * @param {*} ev
