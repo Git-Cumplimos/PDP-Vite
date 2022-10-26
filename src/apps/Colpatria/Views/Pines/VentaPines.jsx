@@ -28,7 +28,7 @@ import { makeMoneyFormatter } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
 import ScreenBlocker from "../../components/ScreenBlocker";
 import TicketColpatria from "../../components/TicketColpatria";
-import { buildTicket } from "../../utils/functions";
+import { buildTicket, decryptPin } from "../../utils/functions";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -216,6 +216,7 @@ const VentaPines = () => {
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
             const pin_encriptado = res?.obj?.pin_encriptado ?? "";
+            const pin_desencriptado = decryptPin(pin_encriptado);
             const tempTicket = buildTicket(
               roleInfo,
               trx_id,
@@ -223,7 +224,7 @@ const VentaPines = () => {
               "Recaudo Pin",
               [
                 ["Convenio", datosConvenio?.nombre_convenio],
-                ["No. Pin", pin_encriptado],
+                ["No. Pin", pin_desencriptado],
                 ...Object.entries(userReferences).map(([, val], index) => [
                   datosConvenio[`referencia_${index + 1}`],
                   val,
