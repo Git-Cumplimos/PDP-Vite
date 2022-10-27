@@ -10,13 +10,8 @@ import { notifyError } from "../../../../utils/notify";
 import { useFetch } from "../../../../hooks/useFetch";
 import {
   PeticionConciliacionCargar,
-  PeticionDescargar,
   PeticionConciliacionBuscar,
 } from "../utils/fetchMovistar";
-
-const URL = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/buscar`;
-const URLDescarga = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/descargar`;
-const PrefijoNombreMovistar = "RECARGAS_GESTORES_PM_PDP_";
 
 const ConciliacionMovistarCarga = () => {
   const [paramts, setParamts] = useState({
@@ -73,7 +68,7 @@ const ConciliacionMovistarCarga = () => {
       .then((resultPeticion) => {
         if (resultPeticion?.status) {
           setTypePaymentSummary(2);
-          setTitleCarga("Carga de archivo movistar EXITOSA");
+          setTitleCarga("Carga de archivo Movistar EXITOSA");
           setSubTitleCarga("Resumen");
           setSummary({
             uno: "Nombre del Archivo: ",
@@ -97,7 +92,7 @@ const ConciliacionMovistarCarga = () => {
           setError_msg(errormom[1]);
         } else {
           setTypePaymentSummary(2);
-          setTitleCarga("No se pudo cargar el archivo movistar");
+          setTitleCarga("No se pudo cargar el archivo Movistar");
           setSubTitleCarga("Resumen");
           setSummary({
             uno: `Falla en el sistema: \n${errormom[0]} \n${errormom[1]}`,
@@ -135,7 +130,7 @@ const ConciliacionMovistarCarga = () => {
             setTypePaymentSummary(1);
             setFechaBusqueda(data?.[i].fechabusqueda);
             setSubTitleCarga(
-              `¿Está seguro de ${especificar} el archivo del día ${data?.[i].fechabusqueda}`
+              `¿Está seguro de ${especificar} el archivo del día ${data?.[i].fechabusqueda}?`
             );
             setShowModal(true);
           }}
@@ -161,9 +156,9 @@ const ConciliacionMovistarCarga = () => {
         </TableEnterprise>
       </Form>
       <Modal show={showModal} handleClose={handleClose}>
-        {typePaymentSummary == 1 ? (
+        {typePaymentSummary === 1 ? (
           <PaymentSummary
-            title="Cargar archivo movistar"
+            title="Cargar archivo Movistar"
             subtitle={subTitleCarga}
           >
             <Input
@@ -191,7 +186,7 @@ const ConciliacionMovistarCarga = () => {
           <></>
         )}
 
-        {typePaymentSummary == 2 && !loadingConciliacionCargar ? (
+        {typePaymentSummary === 2 && !loadingConciliacionCargar ? (
           <PaymentSummary title={titleCarga} subtitle={subTitleCarga}>
             <label className="whitespace-pre-line">{summary.uno}</label>
             <label className="text-2xl font-semibold ">{summary.dos}</label>

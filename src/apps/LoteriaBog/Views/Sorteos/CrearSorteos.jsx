@@ -1,16 +1,16 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import Form from "../../../components/Base/Form";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Button from "../../../components/Base/Button";
-import Modal from "../../../components/Base/Modal";
-import SortForm from "../components/SortForm/SortForm";
-import CloseForm from "../components/SortForm/CloseForm";
-import { useLoteria } from "../utils/LoteriaHooks";
-import SubPage from "../../../components/Base/SubPage/SubPage";
-import { useAuth } from "../../../hooks/AuthHooks";
-import fetchData from "../../../utils/fetchData";
-import { notify, notifyError } from "../../../utils/notify";
-import ParamsForm from "../components/ParamsFomr/ParamsForm";
+import Form from "../../../../components/Base/Form";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import Modal from "../../../../components/Base/Modal";
+import SortForm from "../../components/SortForm/SortForm";
+import CloseForm from "../../components/SortForm/CloseForm";
+import { useLoteria } from "../../utils/LoteriaHooks";
+import SubPage from "../../../../components/Base/SubPage/SubPage";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import fetchData from "../../../../utils/fetchData";
+import { notify, notifyError } from "../../../../utils/notify";
+import ParamsForm from "../../components/ParamsFomr/ParamsForm";
 
 const url_consultaParams = `${process.env.REACT_APP_URL_LOTERIAS}/con_params`;
 

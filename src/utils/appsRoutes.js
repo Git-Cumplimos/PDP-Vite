@@ -37,13 +37,13 @@ const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
 const venta = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
 const Descargas = lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
 const DescargarArchivosS3 = lazy(() =>
-  import("../apps/LoteriaBog/Views/Descargas/DescargarArchivosS3")
+  import("../apps/LoteriaBog/Views/DescargarArchivosS3")
 );
 const BorrarBilletes = lazy(() =>
-  import("../apps/LoteriaBog/Views/Descargas/Borrado_billetes")
+  import("../apps/LoteriaBog/Views/Sorteos/Borrado_billetes")
 );
 const CrearSorteos = lazy(() =>
-  import("../apps/LoteriaBog/Views/CrearSorteos")
+  import("../apps/LoteriaBog/Views/Sorteos/CrearSorteos")
 );
 const CargaArchivos = lazy(() =>
   import("../apps/LoteriaBog/Views/CargaArchivos")
@@ -565,21 +565,19 @@ const allUrlsPrivateApps = [
           permission: [4],
         },
         {
-          link: `/loteria/${name}/descargar`,
-          label: <AppIcons Logo={"DESCARGAR"} name='Descarga de archivos' />,
+          link: `/loteria/${name}/sorteos`,
+          label: <AppIcons Logo={"REPORTE"} name='Sorteos' />,
           component: Descargas,
-          permission: [6],
+          permission: [5,6],
           subRoutes: [
             {
-              link: `/loteria/${name}/descargar/descarga_reportes`,
-              label: (
-                <AppIcons Logo={"DESCARGAR"} name='Descarga de archivos' />
-              ),
-              component: DescargarArchivosS3,
-              permission: [6],
+              link: `/loteria/${name}/sorteos/tramitarSorteos`,
+              label: <AppIcons Logo={"REPORTE"} name='Sorteos' />,
+              component: CrearSorteos,
+              permission: [5],
             },
             {
-              link: `/loteria/${name}/descargar/borrar_billetes`,
+              link: `/loteria/${name}/sorteos/borrar_billetes`,
               label: <AppIcons Logo={"REPORTE"} name='Eliminar Billeteria' />,
               component: BorrarBilletes,
               permission: [6],
@@ -587,10 +585,12 @@ const allUrlsPrivateApps = [
           ],
         },
         {
-          link: `/loteria/${name}/sorteos`,
-          label: <AppIcons Logo={"REPORTE"} name='Sorteos' />,
-          component: CrearSorteos,
-          permission: [5],
+          link: `/loteria/${name}/descargar/descarga_reportes`,
+          label: (
+            <AppIcons Logo={"DESCARGAR"} name='Descarga de archivos' />
+          ),
+          component: DescargarArchivosS3,
+          permission: [6],
         },
         {
           link: `/loteria/${name}/premios`,
