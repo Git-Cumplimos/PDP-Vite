@@ -1,4 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import TicketsDavivienda from "../../../../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
 import Accordion from "../../../../components/Base/Accordion";
@@ -68,6 +69,7 @@ const TreeView = ({ tree = {}, onClickLastChild = (info, ev) => {} }) =>
 
 const ReporteTrx = () => {
   const { roleInfo } = useAuth();
+  const { pathname } = useLocation();
 
   const printDiv = useRef();
 
@@ -210,14 +212,16 @@ const ReporteTrx = () => {
           </div>
         )}
       </Modal>
-      <ButtonBar>
-        <ButtonLink
-          className="px-4 py-2 bg-primary text-white rounded-full transition-opacity duration-300"
-          to={"/gestion/arqueo/arqueo-cierre"}
-        >
-          Realizar arqueo y cierre de caja
-        </ButtonLink>
-      </ButtonBar>
+      {pathname === "/gestion/arqueo/arqueo-cierre/reporte" && (
+        <ButtonBar>
+          <ButtonLink
+            className="px-4 py-2 bg-primary text-white rounded-full transition-opacity duration-300"
+            to={"/gestion/arqueo/arqueo-cierre"}
+          >
+            Realizar arqueo y cierre de caja
+          </ButtonLink>
+        </ButtonBar>
+      )}
     </Fragment>
   );
 };

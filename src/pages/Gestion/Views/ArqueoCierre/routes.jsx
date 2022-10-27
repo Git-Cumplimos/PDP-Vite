@@ -36,6 +36,13 @@ export const rutasArqueo = [
     permission: [74],
   },
   {
+    link: "/gestion/arqueo/arqueo-cierre/reporte-trxs",
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
+    // label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
+    component: ReporteTrx,
+    permission: [74],
+  },
+  {
     link: "/gestion/arqueo/carga-comprobante",
     label: <AppIcons Logo={"RECAUDO"} name="Transportadora y Consignaciones" />,
     component: CargaComprobante,
