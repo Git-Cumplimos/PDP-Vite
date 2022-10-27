@@ -164,7 +164,7 @@ const ReporteTrx = () => {
               Fecha: info?.date_trx,
               "Mensaje de respuesta trx": info?.message_trx,
               Monto: formatMoney.format(info?.monto),
-              "Estado de la trasaccion": info?.status_trx
+              "Estado de la trasaccion": info?.status
                 ? "Transaccion aprobada"
                 : "Transaccion rechazada",
             });
@@ -173,7 +173,8 @@ const ReporteTrx = () => {
       </div>
       <Modal show={selected} handleClose={handleClose}>
         {selected?.ticket &&
-        Object.entries(selected?.ticket ?? {}).length > 0 ? (
+        Object.entries(selected?.ticket ?? {}).length > 0 &&
+        JSON.stringify(selected?.ticket) !== "{}" ? (
           <div className="flex flex-col justify-center items-center">
             {selected?.id_autorizador === 13 ? (
               <TicketsDavivienda
