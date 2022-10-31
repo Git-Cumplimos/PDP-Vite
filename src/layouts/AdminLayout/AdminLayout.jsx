@@ -88,7 +88,8 @@ const AdminLayout = () => {
       roleInfo?.id_dispositivo !== undefined,
       roleInfo?.direccion !== undefined,
       nombreComercio !== undefined,
-      userPermissions?.map(({ id_permission }) => id_permission).includes(74),
+      userPermissions?.map(({ id_permission }) => id_permission).includes(6101),
+      false
     ];
     if (conditions.every((val) => val)) {
       searchCierre({

@@ -24,7 +24,7 @@ const buildGetFunction = (url) => {
           throw new Error("Error en la peticion", { cause: "custom" });
         }
 
-        throw new Error(res, { cause: "custom" });
+        throw new Error("Error interno del servicio", { cause: "custom" });
       }
       return res;
     } catch (err) {
@@ -44,7 +44,7 @@ const buildPostFunction = (url) => {
           throw new Error("Error en la peticion", { cause: "custom" });
         }
 
-        throw new Error(res, { cause: "custom" });
+        throw new Error("Error interno del servicio", { cause: "custom" });
       }
       return res;
     } catch (err) {
@@ -67,7 +67,7 @@ const buildPutFunction = (url) => {
           throw new Error("Error en la peticion", { cause: "custom" });
         }
 
-        throw new Error(res, { cause: "custom" });
+        throw new Error("Error interno del servicio", { cause: "custom" });
       }
       return res;
     } catch (err) {
