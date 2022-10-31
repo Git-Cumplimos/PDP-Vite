@@ -1,3 +1,35 @@
+import { encrypt3DES, decrypt3DES } from "../../../utils/functions";
+
+/**
+ * Encrypt 3DES using Node.js's crypto module
+ * @param pin a string
+ * @returns {*} a utf8 hex string
+ */
+export function encryptPin(pin) {
+  return encrypt3DES(
+    `${pin}`.padStart(16, "0"),
+    "EFBAE60423DCF2FE",
+    "8F7973DFABEA3D97",
+    "EFBAE60423DCF2FE"
+  );
+}
+
+/**
+ * Decrypt 3DES using Node.js's crypto module
+ * @param pin_encriptado a hex string
+ * @returns {*} a utf8 string
+ */
+export function decryptPin(pin_encriptado) {
+  return Number(
+    decrypt3DES(
+      pin_encriptado,
+      "EFBAE60423DCF2FE",
+      "8F7973DFABEA3D97",
+      "EFBAE60423DCF2FE"
+    )
+  );
+}
+
 export const buildTicket = (
   roleInfo,
   trx_id,

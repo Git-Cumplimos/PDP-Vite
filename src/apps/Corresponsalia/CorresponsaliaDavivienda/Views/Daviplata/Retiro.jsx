@@ -237,6 +237,7 @@ const Retiro = () => {
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        hideModal();
         console.error(err);
       });
   };

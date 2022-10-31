@@ -23,8 +23,9 @@ import { notifyPending, notifyError } from "../../../utils/notify";
 import { makeMoneyFormatter, onChangeNumber } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 import TicketColpatria from "../components/TicketColpatria";
-import { buildTicket } from "../utils/functions";
+import { buildTicket, encryptPin } from "../utils/functions";
 import Select from "../../../components/Base/Select";
+
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -100,7 +101,7 @@ const PinPago = () => {
         // Datos trx colpatria
         colpatria: {
           user_document: userDocument,
-          numero_pin: pinNumber,
+          numero_pin: encryptPin(pinNumber),
           fecha_expedicion: userDocumentDate,
           is_persona_natural: tipoPersona === "t",
           location: {

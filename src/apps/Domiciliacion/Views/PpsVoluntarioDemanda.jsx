@@ -23,11 +23,18 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
-const { contenedorImagen, contenedorForm} = classes;
+const {
+  contenedorImagen,
+  contenedorForm,
+  contenedorCampos,
+  contenedorPrincipal,
+  contenedorSecundario,
+  contenedorLabel,
+} = classes;
 
 const PpsVoluntarioDemanda = ({ ced }) => {
   const [limitesMontos] = useState({
-    max: 149000,
+    max: 149100,
     min: 5000,
   });
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
@@ -44,7 +51,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
 
   const [{ numCuenta, userDoc, valor, nomDepositante, summary }, setQuery] =
     useQuery();
-  console.log(quotaInfo);
+  console.log(roleInfo);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
   const [idComercio, setIdComercio] = useState(roleInfo?.["id_comercio"]);
   const [idusuario, setIdUsuario] = useState(roleInfo?.["id_usuario"]);
@@ -95,7 +102,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: " COLPENSIONES \nRecibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -112,11 +119,13 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       commerceName: tipoComercio,
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
+        Comercio: roleInfo["nombre comercio"],
         "No. terminal": roleInfo?.id_dispositivo,
         Municipio: roleInfo?.ciudad,
         Dirección: roleInfo?.direccion,
         "Id Trx": datosRespuesta?.[0]?.["inserted_id"] /* "22" */,
       }),
+
       trxInfo: [
         ["Proceso", "Aporte Voluntario A Demanda"],
         ["Valor", formatMoney.format(valorAportar)],
@@ -124,7 +133,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       ],
 
       disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
     };
   }, [
     roleInfo,
@@ -377,68 +386,71 @@ const PpsVoluntarioDemanda = ({ ced }) => {
         <div className={contenedorImagen}>
           <LogoPDP xsmall></LogoPDP>
         </div>
-        <Form onSubmit={(e) => enviar(e)}>
+        <Form grid onSubmit={(e) => enviar(e)}>
           <Fieldset
-            legend="Formulario Aporte Voluntario"
+            legend="Piso de Protección Social Voluntario"
             /* className="lg:col-span-3" */
           >
             <div className={contenedorForm}>
-
-            <Select
-              onChange={(event) => setTipoIdentificacion(event?.target?.value)}
-              id="comissionType"
-              label="Tipo Identificación"
-              required
-              options={{
-                "": "",
-                "Cédula de Ciudadania": "1",
-                "Cédula de Extranjeria": "2",
-                "Tarjeta de Identidad": "4",
-                "Registro Civil": "5",
-                "Pasaporte ": "6",
-                "Carnét Diplomático": "7",
-                "Salvo conducto permanencia": "8",
-                "Permiso especial permanencia": "9",
-              }}
-            ></Select>
-
-            <Input
-              label={"N° Documento"}
-              placeholder={"Ingrese su Numero Documento"}
-              value={numDocumento}
-              minLength="6"
-              maxLength="11"
-              onInput={(e) => {
-                const num = e.target.value || "";
-                setNumDocumento(num.toString());
-              }}
-              type={"text"}
-              required
-              disabled
-            ></Input>
-            <Input
-              id="celular"
-              name="celular"
-              label="Celular: "
-              type="tel"
-              autoComplete="off"
-              minLength="10"
-              maxLength="10"
-              value={numCelular ?? ""}
-              onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                if (e.target.value.length === 1) {
-                  if (e.target.value != 3) {
-                    notifyError(
-                      "Número inválido, el N° de celular debe comenzar con el número 3."
-                    );
-                  }
+              <Select
+                onChange={(event) =>
+                  setTipoIdentificacion(event?.target?.value)
                 }
-                setNumCelular(num);
-              }}
-              required
-            />
-            {/*             <Input
+                id="comissionType"
+                label="Tipo Identificación: "
+                required
+                options={{
+                  "": "",
+                  "Cédula de Ciudadania": "1",
+                  "Cédula de Extranjeria": "2",
+                  "Tarjeta de Identidad": "4",
+                  "Registro Civil": "5",
+                  "Pasaporte ": "6",
+                  "Carnét Diplomático": "7",
+                  "Salvo conducto permanencia": "8",
+                  "Permiso especial permanencia": "9",
+                }}
+              ></Select>
+
+              <Input
+                label={"N° Documento: "}
+                placeholder={"Ingrese su Numero Documento"}
+                value={numDocumento}
+                minLength="6"
+                maxLength="11"
+                onInput={(e) => {
+                  const num = e.target.value || "";
+                  setNumDocumento(num.toString());
+                }}
+                type={"text"}
+                required
+                disabled
+              ></Input>
+
+              <Input
+                id="celular"
+                name="celular"
+                label="N° Celular: "
+                type="tel"
+                autoComplete="off"
+                minLength="10"
+                maxLength="10"
+                value={numCelular ?? ""}
+                onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+                  if (e.target.value.length === 1) {
+                    if (e.target.value != 3) {
+                      notifyError(
+                        "Número inválido, el N° de celular debe comenzar con el número 3."
+                      );
+                    }
+                  }
+                  setNumCelular(num);
+                }}
+                required
+              />
+
+              {/*             <Input
               name="celular"
               label="Celular"
               type="tel"
@@ -450,22 +462,22 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               onChange={onCelChange}
               required
             /> */}
-            <MoneyInput
-              label={"Valor Aportar"}
-              placeholder={"Ingrese Valor Aportar"}
-              value={valorAportar}
-              min={limitesMontos?.min}
-              max={limitesMontos?.max}
-              minLength="6"
-              maxLength="9"
-              onInput={(e) => {
-                const num = e.target.value.replace(".", "") || "";
-                setValorAportar(num.replace("$", ""));
-              }}
-              type={"text"}
-              required
-            ></MoneyInput>
-          </div>
+              <MoneyInput
+                label={"Valor Aportar: "}
+                placeholder={"Ingrese Valor Aportar"}
+                value={valorAportar}
+                min={limitesMontos?.min}
+                max={limitesMontos?.max}
+                minLength="6"
+                maxLength="9"
+                onInput={(e) => {
+                  const num = e.target.value.replace(".", "") || "";
+                  setValorAportar(num.replace("$", ""));
+                }}
+                type={"text"}
+                required
+              ></MoneyInput>
+            </div>
           </Fieldset>
           <ButtonBar className={"lg:col-span-2"} type="">
             {
