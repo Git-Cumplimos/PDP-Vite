@@ -137,7 +137,7 @@ const Deposito = () => {
           idComercio: roleInfo?.id_comercio,
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
-          Tipo: roleInfo?.tipo_comercio,
+          // Tipo: roleInfo?.tipo_comercio,
           numTipoTransaccion: 5706, /// Deposito
           numTipoDocumento: tipoDocumento, /// Cedula
           numNumeroDocumento: userDoc,

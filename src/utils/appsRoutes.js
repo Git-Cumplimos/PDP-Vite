@@ -465,11 +465,6 @@ const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
 const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 
 /**
- * Consorcio CIRCULEMOS
- */
-const CirculemosComp = lazy(() => import("../apps/Circulemos/Circulemos"));
-
-/**
  * Editar parametros tipos de transacciones
  */
 const ParamsOperations = lazy(() =>
@@ -1552,12 +1547,6 @@ const allUrlsPrivateApps = [
         permission: [57],
       },
     ],
-  },
-  {
-    link: "/circulemos",
-    label: <AppIcons Logo={"RECAUDO"} name={"Consorcio circulemos"} />,
-    component: CirculemosComp,
-    permission: [],
   },
   {
     link: "/pagos-ifood",
