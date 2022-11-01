@@ -30,7 +30,6 @@ const BuscarCedulaPpsADemanda = () => {
     contendorBoton,
     tituloNotificacion,
     contenedorImagen,
-    contenedorBuscador,
   } = classes;
 
   //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
@@ -105,56 +104,56 @@ const BuscarCedulaPpsADemanda = () => {
   };
   return (
     <div>
-      {Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
-        <div>
-          <Modal show={showModal} handleClose={handleClose}>
-            <div className={contenedorImagen}>
-              <LogoPDP></LogoPDP>
-            </div>
-            <div className={contenedorForm}>
-              <div className={contenedorDatos}>
-                <div className={contenedorTitulos}>
-                  <h2 className={tituloDatos}>{`Tipo Pps: `}</h2>
-                  <h2 className={tituloDatos}>{`Célular: `}</h2>
-                  <h2 className={tituloDatos}>{`Estado: `}</h2>
-                </div>
-                <div className={contenedorValoresTitulos}>
-                  <h2
-                    className={tituloDatos}
-                  >{`${datosConsulta[0]["tipo_pps"]}`}</h2>
-                  <h2
-                    className={tituloDatos}
-                  >{`${datosConsulta[0]["celular"]}`}</h2>
-                  <h2
-                    className={tituloDatos}
-                  >{`${datosConsulta[0]["estado"]}`}</h2>
-                </div>
-                <div className={contenedorTitulos}>
-                  <h2 className={tituloDatos}>{`Id Usuario: `}</h2>
-                  <h2 className={tituloDatos}>{`Id Comercio: `}</h2>
-                  <h2 className={tituloDatos}>{`Id Dispositivo: `}</h2>
-                </div>
-                <div className={contenedorTitulos}>
-                  <h2
-                    className={tituloDatos}
-                  >{`${datosConsulta[0]["id_usuario"]}`}</h2>
-                  <h2
-                    className={tituloDatos}
-                  >{`${datosConsulta[0]["id_comercio"]}`}</h2>
-                  <h2
-                    className={tituloDatos}
-                  >{` ${datosConsulta[0]["id_dispositivo"]}`}</h2>
-                </div>
+      {(datosConsulta?.length >= 0) & estado ? (
+        <TipoPpsADemanda numCed={buscarCedula}></TipoPpsADemanda>
+      ) : Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
+        <Modal show={showModal} handleClose={handleClose}>
+          <div className={contenedorImagen}>
+            <LogoPDP></LogoPDP>
+          </div>
+          <div className={contenedorForm}>
+            <div className={contenedorDatos}>
+              <div className={contenedorTitulos}>
+                <h2 className={tituloDatos}>{`Tipo Pps: `}</h2>
+                <h2 className={tituloDatos}>{`Célular: `}</h2>
+                <h2 className={tituloDatos}>{`Estado: `}</h2>
               </div>
-              <span className={tituloNotificacion}>
-                No se puede realizar el aporte, el número de documento se
-                encuentra domiciliado.
-              </span>
+              <div className={contenedorValoresTitulos}>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["tipo_pps"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["celular"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["estado"]}`}</h2>
+              </div>
+              <div className={contenedorTitulos}>
+                <h2 className={tituloDatos}>{`Id Usuario: `}</h2>
+                <h2 className={tituloDatos}>{`Id Comercio: `}</h2>
+                <h2 className={tituloDatos}>{`Id Dispositivo: `}</h2>
+              </div>
+              <div className={contenedorTitulos}>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["id_usuario"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{`${datosConsulta[0]["id_comercio"]}`}</h2>
+                <h2
+                  className={tituloDatos}
+                >{` ${datosConsulta[0]["id_dispositivo"]}`}</h2>
+              </div>
             </div>
-          </Modal>
-        </div>
+            <span className={tituloNotificacion}>
+              No se puede realizar el aporte, el número de documento se
+              encuentra domiciliado.
+            </span>
+          </div>
+        </Modal>
       ) : (
-        <div className={contenedorBuscador}>
+        <div>
           <Form grid onSubmit={(e) => BuscarCedula(e)}>
             {/*             <Input
               label={"N° Identificación"}
@@ -182,7 +181,6 @@ const BuscarCedulaPpsADemanda = () => {
               onChange={onCedChange}
               required
             />
-
             <ButtonBar className={"lg:col-span-2"} type="">
               {
                 <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>
@@ -191,11 +189,6 @@ const BuscarCedulaPpsADemanda = () => {
               }
             </ButtonBar>
           </Form>
-          {(datosConsulta?.length >= 0) & estado ? (
-            <TipoPpsADemanda numCed={buscarCedula}></TipoPpsADemanda>
-          ) : (
-            ""
-          )}
         </div>
       )}
     </div>
