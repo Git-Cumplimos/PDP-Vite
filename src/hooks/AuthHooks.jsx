@@ -427,19 +427,17 @@ export const useProvideAuth = () => {
 
   const forgotPassword = useCallback(async (email) => {
     try {
-      const changePassword = await Auth.forgotPassword(email);
-      console.log(changePassword);
+      await Auth.forgotPassword(email);
     } catch (error) {}
   }, []);
 
   const forgotPasswordSubmit = useCallback(async (email, code, confirmPass) => {
     try {
-      const confirmChangePassword = await Auth.forgotPasswordSubmit(
+      await Auth.forgotPasswordSubmit(
         email,
         code,
         confirmPass
       );
-      console.log(confirmChangePassword);
     } catch (error) {
       throw error;
     }

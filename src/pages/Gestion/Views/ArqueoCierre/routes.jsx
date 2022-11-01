@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import { PermissionsCaja } from "./permissionsEnum";
 const AppIcons = lazy(() => import("../../../../components/Base/AppIcons"));
 
 /**
@@ -25,7 +26,7 @@ export const rutasArqueo = [
     link: "/gestion/arqueo/arqueo-cierre",
     label: <AppIcons Logo={"RECAUDO"} name="Arqueo y cierre" />,
     component: Panel,
-    permission: [74],
+    permission: [PermissionsCaja.RealizarArqueoCierre],
     show: false,
   },
   {
@@ -33,56 +34,56 @@ export const rutasArqueo = [
     label: <AppIcons Logo={"RECAUDO"} name="Arqueo y cierre" />,
     // label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
     component: ReporteTrx,
-    permission: [74],
+    permission: [PermissionsCaja.RealizarArqueoCierre],
   },
   {
     link: "/gestion/arqueo/arqueo-cierre/reporte-trxs",
     label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
     // label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
     component: ReporteTrx,
-    permission: [74],
+    permission: [PermissionsCaja.VerReporteTrxCierre],
   },
   {
     link: "/gestion/arqueo/carga-comprobante",
     label: <AppIcons Logo={"RECAUDO"} name="Transportadora y Consignaciones" />,
     component: CargaComprobante,
-    permission: [75],
+    permission: [PermissionsCaja.AgregaComprobantes],
   },
   {
     link: "/gestion/arqueo/validar-comprobante",
     label: <AppIcons Logo={"RECAUDO"} name="Análisis de comprobante" />,
     component: PanelConsignaciones,
-    permission: [76],
+    permission: [PermissionsCaja.AnalizarComprobantes],
   },
   {
     link: "/gestion/arqueo/parametrizar-cuenta",
     label: <AppIcons Logo={"RECAUDO"} name="Parametrizar Transportadoras y Entidades Bancarias" />,
     component: ParametrizacionRecaudo,
-    permission: [77],
+    permission: [PermissionsCaja.AgregarEntidades],
   },
   {
     link: "/gestion/arqueo/historial-cierre",
     label: <AppIcons Logo={"RECAUDO"} name="Históricos de cierre de caja" />,
     component: PanelHistorico,
-    permission: [82],
+    permission: [PermissionsCaja.VerHistoricoCierresCaja],
   },
   {
     link: "/gestion/arqueo/notas",
     label: <AppIcons Logo={"RECAUDO"} name="Notas débito y crédito" />,
     component: NotasCD,
-    permission: [78, 80],
+    permission: [PermissionsCaja.AgregarNotasDebito, PermissionsCaja.AgregarNotasCredito],
     subRoutes: [
       {
         link: "/gestion/arqueo/notas/debito",
         label: <AppIcons Logo={"RECAUDO"} name="Notas débito" />,
         component: () => <Notas type={true} />,
-        permission: [78],
+        permission: [PermissionsCaja.AgregarNotasDebito],
       },
       {
         link: "/gestion/arqueo/notas/credito",
         label: <AppIcons Logo={"RECAUDO"} name="Notas crédito" />,
         component: () => <Notas type={false} />,
-        permission: [80],
+        permission: [PermissionsCaja.AgregarNotasCredito],
       },
     ]
   },
@@ -90,12 +91,16 @@ export const rutasArqueo = [
     link: "/gestion/arqueo/notas-historico",
     label: <AppIcons Logo={"RECAUDO"} name="Históricos notas débito y crédito" />,
     component: NotasCDHistorico,
-    permission: [81],
+    permission: [PermissionsCaja.VerHistoricoNotasDebitoCredito],
   },
   {
     link: "/gestion/arqueo/reporte-arqueo",
     label: <AppIcons Logo={"RECAUDO"} name="Reportes arqueo y cierre de caja" />,
     component: ReportesCierre,
-    permission: [82],
+    permission: [PermissionsCaja.VerHistoricoCierresCaja],
   },
 ];
+
+const listPermissions = Object.values(PermissionsCaja);
+
+export const listPermissionsCaja = listPermissions.splice(listPermissions.length / 2)

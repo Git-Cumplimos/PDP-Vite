@@ -112,6 +112,10 @@ const PpsObligatorioDemanda = ({ ced }) => {
 
               setDisabledBtn(false);
 
+              if (respuesta.obj["datos_recibidos"].ResponseCode == "SUCCESS") {
+                notify("Pago Exitoso.");
+                setShowModalVoucher(true);
+              }
               if (respuesta.obj["datos_recibidos"].ResponseCode == "FAILED") {
                 notifyError(respuesta.obj["datos_recibidos"].messageError);
               }
@@ -163,7 +167,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: [["", ""], "COLPENSIONES", ["", ""], "Recibo de pago"],
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -178,20 +182,24 @@ const PpsObligatorioDemanda = ({ ced }) => {
         }).format(new Date()),
       },
       commerceName: datosComercio?.["tipoComercio"],
-      commerceInfo: Object.entries({
-        "Id Comercio": roleInfo?.id_comercio,
-        "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
-        "Id Trx": datosComercio?.["idTrx"] /* "22" */,
-      }),
+      commerceInfo: [
+        ["Id Comercio", roleInfo?.id_comercio],
+        ["No. terminal", roleInfo?.id_dispositivo],
+        ["Municipio", roleInfo?.ciudad],
+        ["", ""],
+        ["Dirección", roleInfo?.direccion],
+        ["", ""],
+        ["Id_Transaccion ", datosComercio?.["idTrx"]],
+      ],
       trxInfo: [
+        ["", ""],
+        ["PISO DE PROTECCION SOCIAL"],
         ["Proceso", "Aporte Obligatorio A Demanda"],
         ["Valor", formatMoney.format(datosAportante?.["valorAportar"])],
       ],
 
       disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
     };
   }, [
     roleInfo,

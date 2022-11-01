@@ -102,7 +102,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
 
   const tickets = useMemo(() => {
     return {
-      title: " COLPENSIONES \nRecibo de pago",
+      title: " COLPENSIONES Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -116,20 +116,26 @@ const PpsVoluntarioDemanda = ({ ced }) => {
           hour12: false,
         }).format(new Date()),
       },
-      commerceName: tipoComercio,
-      commerceInfo: Object.entries({
-        "Id Comercio": roleInfo?.id_comercio,
-        Comercio: roleInfo["nombre comercio"],
-        "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
-        "Id Trx": datosRespuesta?.[0]?.["inserted_id"] /* "22" */,
-      }),
+      /*  commerceName: tipoComercio, */
+      commerceInfo: [
+        ["Id Comercio", roleInfo?.id_comercio],
+        ["No. terminal", roleInfo?.id_dispositivo],
+        ["Municipio", roleInfo?.ciudad],
+        ["", ""],
+        ["Dirección", roleInfo?.direccion],
+        ["", ""],
+      ],
 
       trxInfo: [
-        ["Proceso", "Aporte Voluntario A Demanda"],
+        ["PISO DE PROTECCION SOCIAL - APORTE VOLUNTARIO"],
+        ["", ""],
+        ["Id Transaccion ", datosRespuesta?.[0]?.["inserted_id"]],
+        /* ["Proceso", "Aporte Voluntario A Demanda"], */
+        ["", ""],
         ["Valor", formatMoney.format(valorAportar)],
+        ["", ""],
         ["N° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
+        ["", ""],
       ],
 
       disclamer:
@@ -233,6 +239,15 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   "Lo Sentimos, Falló el Servicio De Colpensiones"
                 ) {
                   notifyError("Lo sentimos, falló el servicio de colpensiones");
+                  navigate(`/domiciliacion`);
+                }
+                if (
+                  respuesta?.msg?.["respuesta_colpensiones"] ===
+                  "Transacci\u00f3n recibida fuera del horario."
+                ) {
+                  notifyError(
+                    "Lo sentimos, transacción recibida fuera del horario."
+                  );
                   navigate(`/domiciliacion`);
                 }
                 /* if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {

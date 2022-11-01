@@ -1,13 +1,13 @@
 const CryptoJS = require('crypto-js');
 
 // /**
-//  * Encrypt 3DES using Node.js's crypto module * 
+//  * Encrypt AES using Node.js's crypto module * 
 //  * @param data A utf8 string
 //  * @param key Key would be hashed by md5 and shorten to maximum of 192 bits,
 //  * @returns {*} A base64 string
 //  */
 
-function encrypt3DES(data, key) {
+function encryptAES(data, key) {
 
     key = CryptoJS.enc.Hex.parse(key);
     const encrypted = CryptoJS.AES.encrypt(data, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.NoPadding }).toString();
@@ -16,12 +16,12 @@ function encrypt3DES(data, key) {
 }
 
 /**
- * Decrypt 3DES using Node.js's crypto module 
+ * Decrypt AES using Node.js's crypto module 
  * @param data a base64 string
  * @param key Key would be hashed by md5 and shorten to max 192 bits,
  * @returns {*} a utf8 string
  */
-function decrypt3DES(data, key) {
+function decryptAES(data, key) {
     key = CryptoJS.MD5(key).toString()
     const encrypted = CryptoJS.AES.decrypt(data, key).toString(CryptoJS.enc.Utf8)
     return encrypted;
@@ -99,11 +99,11 @@ export const pinBlock = (pinX) => {
     console.log('pinBLock', result)
 
     const key = process.env.REACT_APP_KEY_ENCRIP_AVAL
-    const resultEncrip = encrypt3DES(result, key)
+    const resultEncrip = encryptAES(result, key)
 
     console.log(resultEncrip)
 
-    // console.log(decrypt3DES(resultEncrip,'533471F0AA3648BA'))
+    // console.log(decryptAES(resultEncrip,'533471F0AA3648BA'))
     
   
     return resultEncrip;  
