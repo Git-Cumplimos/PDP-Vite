@@ -16,6 +16,5 @@ export const decryptAES = (llave,iv,data) => {
   const encrypted = CryptoJS.AES.decrypt(dataSin64, derived_key,{
     iv: iv,
   }).toString(CryptoJS.enc.Utf8)
-  console.log("Data decrypt",encrypted)
   return encrypted;
 }
