@@ -36,7 +36,6 @@ const url_pago_terceros = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grup
 
 const PagoTerceros = () => {
   const [inputData, setInputData] = useState(dataInputInitial);
-  const [invalidNumeroCelular, setInvalidNumeroCelular] = useState("");
   const [infTicket, setInfTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
@@ -50,19 +49,19 @@ const PagoTerceros = () => {
     if (e.target.name === "valor_total_trx" || e.target.name === "otp") {
       return;
     }
-    if (e.target.name === "documento" || e.target.name === "numeroCelular") {
+    if (e.target.name === "documento") {
       valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-      if (e.target.name === "numeroCelular") {
-        if (valueInput[0] != 3) {
-          setInvalidNumeroCelular("Número inválido");
-          if (valueInput.length == 1 && inputData.numeroCelular == "") {
-            notifyError(
-              "Número inválido, el No. de celular debe comenzar con el número 3"
-            );
-          }
-        } else {
-          setInvalidNumeroCelular("");
-        }
+    }
+    if (e.target.name === "numeroCelular") {
+      const valueInputCel = ((e.target.value ?? "").match(/\d/g) ?? []).join(
+        ""
+      );
+      if (valueInputCel[0] != 3) {
+        notifyError(
+          "Número inválido, el No. de celular debe comenzar con el número 3"
+        );
+      } else {
+        valueInput = valueInputCel;
       }
     }
     setInputData((anterior) => ({
@@ -108,9 +107,9 @@ const PagoTerceros = () => {
   }
 
   function PagoTerceros() {
-    let oficinaPropia;
-    if (roleInfo.tipo_comercio != "OFICINASPROPIAS") {
-      oficinaPropia = false;
+    let oficinaPropia_ = false;
+    if (roleInfo.tipo_comercio === "OFICINASPROPIAS") {
+      oficinaPropia_ = true;
     }
     const dataTerceros = {
       comercio: {
@@ -118,12 +117,17 @@ const PagoTerceros = () => {
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
       },
-      nombre_comercio: "rrr",
-      oficina_propia: oficinaPropia,
+      nombre_comercio: roleInfo["nombre comercio"],
+      oficina_propia: oficinaPropia_,
       valor_total_trx: inputData.valor_total_trx,
       numeroCelular: inputData.numeroCelular,
       documento: inputData.documento,
       otp: inputData.otp,
+      location: {
+        address: roleInfo.direccion,
+        city: roleInfo.ciudad,
+        dane_code: roleInfo.codigo_dane,
+      },
     };
 
     PeticionPagoTerceros(
@@ -234,7 +238,7 @@ const PagoTerceros = () => {
           label="Número de identificación"
           type="text"
           minLength="5"
-          maxLength="12"
+          maxLength="10"
           autoComplete="off"
           value={inputData.documento}
           required
@@ -246,7 +250,6 @@ const PagoTerceros = () => {
           minLength="10"
           maxLength="10"
           autoComplete="off"
-          invalid={invalidNumeroCelular}
           value={inputData.numeroCelular}
           required
         ></Input>

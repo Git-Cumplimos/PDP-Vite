@@ -12,8 +12,8 @@ const InfInicial = ({
   return (
     <Fragment>
       <PaymentSummary
-        title="¿Está seguro de realizar la transacción?"
-        subtitle="Resumen de transacción"
+        title="¿Está seguro de realizar consulta?"
+        subtitle="Resumen de la consulta"
         summaryTrx={summaryInitial}
       >
         {!loadingPeticion ? (

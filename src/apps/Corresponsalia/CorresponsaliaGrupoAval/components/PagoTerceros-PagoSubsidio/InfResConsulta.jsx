@@ -1,7 +1,6 @@
 import React, { Fragment } from "react";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
-import { formatMoney } from "../../../../../components/Base/MoneyInput";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 
 const InfResConsulta = ({
@@ -9,7 +8,8 @@ const InfResConsulta = ({
   summaryResConsulta,
   loadingPeticion,
   Peticion,
-  HandleClose,
+  HandleClose1,
+  HandleClose2,
 }) => {
   return (
     <Fragment>
@@ -23,12 +23,18 @@ const InfResConsulta = ({
         {!loadingPeticion ? (
           <>
             <ButtonBar>
-              {value > 0 && (
-                <Button onClick={Peticion}>Retirar subsidio</Button>
+              {value > 0 ? (
+                <Fragment>
+                  <Button type={"submit"} onClick={Peticion}>
+                    Retirar subsidio
+                  </Button>
+                  <Button onClick={HandleClose1}>Cancelar</Button>
+                </Fragment>
+              ) : (
+                <Button type={"submit"} onClick={HandleClose2}>
+                  Aceptar
+                </Button>
               )}
-              <Button onClick={HandleClose}>
-                {value > 0 ? "Cancelar" : "Aceptar"}
-              </Button>
             </ButtonBar>
           </>
         ) : (

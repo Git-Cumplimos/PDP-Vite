@@ -12,6 +12,7 @@ import MoneyInput, {
 import Select from "../../../../../components/Base/Select";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { useFetch } from "../../../../../hooks/useFetch";
+import { toPhoneNumber } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
 import InfInicial from "../../components/PagoTerceros-PagoSubsidio/InfInicial";
 import InfRecibo from "../../components/PagoTerceros-PagoSubsidio/InfRecibo";
@@ -35,8 +36,8 @@ const url_pago_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grup
 
 const PagoSubsidios = () => {
   const [inputData, setInputData] = useState(dataInputInitial);
-  const [invalidNumeroCelular, setInvalidNumeroCelular] = useState("");
   const [value, setValue] = useState(0);
+  const [idTrx, setIdTrx] = useState(null);
   const [infTicket, setInfTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
@@ -49,22 +50,22 @@ const PagoSubsidios = () => {
 
   function onChangeInput(e) {
     let valueInput = "";
-    if (e.target.name == "otp") {
+    if (e.target.name === "otp") {
       return;
     }
-    if (e.target.name == "documento" || e.target.name == "numeroCelular") {
+    if (e.target.name === "documento") {
       valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-      if (e.target.name == "numeroCelular") {
-        if (valueInput[0] != 3) {
-          setInvalidNumeroCelular("Número inválido");
-          if (valueInput.length == 1 && inputData.numeroCelular == "") {
-            notifyError(
-              "Número inválido, el No. de celular debe comenzar con el número 3"
-            );
-          }
-        } else {
-          setInvalidNumeroCelular("");
-        }
+    }
+    if (e.target.name === "numeroCelular") {
+      const valueInputCel = ((e.target.value ?? "").match(/\d/g) ?? []).join(
+        ""
+      );
+      if (valueInputCel[0] != 3) {
+        notifyError(
+          "Número inválido, el No. de celular debe comenzar con el número 3"
+        );
+      } else {
+        valueInput = valueInputCel;
       }
     }
     setInputData((anterior) => ({
@@ -86,12 +87,21 @@ const PagoSubsidios = () => {
 
   function onSubmitContinue(e) {
     e.preventDefault();
+    // validar datos
     if (inputData.numeroCelular[0] != "3") {
       notifyError(
         "Número inválido, el No. de celular debe comenzar con el número 3"
       );
       return;
     }
+
+    if (inputData.otp.length < 4) {
+      notifyError(
+        "La cantidad de dígitos de la OTP debe ser mayor o igual a 4"
+      );
+      return;
+    }
+
     setShowModal(true);
     setTypeInfo("Inicial");
   }
@@ -100,6 +110,11 @@ const PagoSubsidios = () => {
     const dataConsult = {
       documento: inputData.documento,
       otp: inputData.otp,
+      comercio: {
+        id_comercio: roleInfo.id_comercio,
+        id_usuario: roleInfo.id_usuario,
+        id_terminal: roleInfo.id_dispositivo,
+      },
     };
 
     PeticionConsultaSubsidio(
@@ -108,9 +123,10 @@ const PagoSubsidios = () => {
       dataConsult
     )
       .then((response) => {
-        if (response?.status == true) {
+        if (response?.status === true) {
           notify("Consulta exitosa");
           setValue(response?.obj?.result?.valor);
+          setIdTrx(response?.obj?.result?.id_trx);
           setTypeInfo("resConsulta");
         }
       })
@@ -138,12 +154,18 @@ const PagoSubsidios = () => {
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
       },
-      nombre_comercio: "rrr",
+      nombre_comercio: roleInfo["nombre comercio"],
       oficina_propia: oficinaPropia,
       valor_total_trx: value,
       numeroCelular: inputData.numeroCelular,
       documento: inputData.documento,
       otp: inputData.otp,
+      // id_trx: idTrx,
+      location: {
+        address: roleInfo.direccion,
+        city: roleInfo.ciudad,
+        dane_code: roleInfo.codigo_dane,
+      },
     };
 
     PeticionRetirarSubsidio(
@@ -152,7 +174,7 @@ const PagoSubsidios = () => {
       dataSubsidio
     )
       .then((response) => {
-        if (response?.status == true) {
+        if (response?.status === true) {
           PagoSubsidioExitoso(response?.obj?.result);
         }
       })
@@ -209,25 +231,54 @@ const PagoSubsidios = () => {
       });
   };
 
-  const HandleCloseInicial = useCallback(() => {
-    setTypeInfo("Ninguno");
-    setShowModal(false);
-  }, []);
-
   const HandleCloseSecond = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);
     setInputData(dataInputInitial);
-    setValue(value);
+    setValue(0);
+  }, []);
+
+  const HandleCloseSecondCancelada = useCallback((msg) => {
+    notify(`${msg} cancelada`);
+    setTypeInfo("Ninguno");
+    setShowModal(false);
+    setInputData(dataInputInitial);
+    setValue(0);
   }, []);
 
   const HandleCloseResRecibo = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);
     setInputData(dataInputInitial);
-    setValue(value);
+    setValue(0);
     navigateValid("/corresponsalia/CorresponsaliaGrupoAval");
-  }, []);
+  }, [navigateValid]);
+
+  const handleCloseModal = useCallback(() => {
+    if (typeInfo === "Inicial" && !loadingPeticionConsultaSubsidio) {
+      HandleCloseSecondCancelada("Consulta pago subsidios");
+    } else if (typeInfo === "resConsulta" && !loadingPeticionRetirarSubsidio) {
+      if (value > 0) {
+        HandleCloseSecondCancelada("Pago subsidios");
+      } else {
+        HandleCloseSecond();
+      }
+    } else if (typeInfo === "InfRecibo") {
+      HandleCloseResRecibo();
+    } else if (loadingPeticionConsultaSubsidio) {
+      notify("Se está procesando consulta, por favor esperar");
+    } else if (loadingPeticionRetirarSubsidio) {
+      notify("Se está procesando transacción, por favor esperar");
+    }
+  }, [
+    value,
+    typeInfo,
+    loadingPeticionConsultaSubsidio,
+    loadingPeticionRetirarSubsidio,
+    HandleCloseSecond,
+    HandleCloseSecondCancelada,
+    HandleCloseResRecibo,
+  ]);
 
   return (
     <Fragment>
@@ -250,7 +301,6 @@ const PagoSubsidios = () => {
           minLength="10"
           maxLength="10"
           autoComplete="off"
-          invalid={invalidNumeroCelular}
           value={inputData.numeroCelular}
           required
         ></Input>
@@ -269,20 +319,22 @@ const PagoSubsidios = () => {
           <Button type={"submit"}>Continuar</Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={() => {}}>
-        {typeInfo == "Inicial" && (
+      <Modal show={showModal} handleClose={handleCloseModal}>
+        {typeInfo === "Inicial" && (
           <InfInicial
             summaryInitial={{
               Documento: inputData.documento,
-              Celular: inputData.numeroCelular,
+              Celular: toPhoneNumber(inputData.numeroCelular),
             }}
             loadingPeticion={loadingPeticionConsultaSubsidio}
             Peticion={ConsultarSubsidio}
-            HandleClose={HandleCloseInicial}
+            HandleClose={() =>
+              HandleCloseSecondCancelada("Consulta pago subsidios")
+            }
           ></InfInicial>
         )}
 
-        {typeInfo == "resConsulta" && (
+        {typeInfo === "resConsulta" && (
           <InfResConsulta
             value={value}
             summaryResConsulta={{
@@ -290,11 +342,12 @@ const PagoSubsidios = () => {
             }}
             loadingPeticion={loadingPeticionRetirarSubsidio}
             Peticion={RetirarSubsidio}
-            HandleClose={HandleCloseSecond}
+            HandleClose1={() => HandleCloseSecondCancelada("Pago subsidios")}
+            HandleClose2={HandleCloseSecond}
           ></InfResConsulta>
         )}
 
-        {typeInfo == "InfRecibo" && (
+        {typeInfo === "InfRecibo" && (
           <InfRecibo
             infTicket={infTicket}
             HandleClose={HandleCloseResRecibo}
