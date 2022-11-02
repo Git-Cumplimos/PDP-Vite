@@ -1,3 +1,4 @@
+import { cifrarAES, decryptAES } from "../../../../utils/cryptoUtils";
 import fetchData from "../../../../utils/fetchData";
 
 const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
@@ -80,12 +81,19 @@ export const postRealizarCashoutDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
+  let parseObj = JSON.stringify(bodyObj)
+  let dataObj = {data: cifrarAES(
+    `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
+    `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+    parseObj
+  )}
+
   try {
     const res = await fetchData(
       `${urlDaviplata}davivienda_cb_cashout/cashout`,
       "POST",
       {},
-      bodyObj,
+      dataObj,
       {},
       true
     );
