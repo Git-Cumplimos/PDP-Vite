@@ -440,7 +440,6 @@ const Deposito = () => {
             maxLength={"10"}
             value={verificacionTel}
             onInput={(e) => {
-              console.log((String(e.target.value).length>2 & String(verificacionTel).length<1))
               if ((String(e.target.value).length> 2 & String(verificacionTel).length< 1)){
                 notifyError("Debe digitar el número celular y no pegarlo")
               }
