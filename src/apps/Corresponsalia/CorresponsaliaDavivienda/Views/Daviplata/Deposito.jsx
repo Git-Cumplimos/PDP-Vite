@@ -24,7 +24,7 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
-
+import { decryptAES } from "../../../../../utils/cryptoUtils";
 
 const Deposito = () => {
   const navigate = useNavigate();

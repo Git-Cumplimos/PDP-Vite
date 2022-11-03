@@ -3,18 +3,25 @@ import fetchData from "../../../../utils/fetchData";
 
 const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
 const urlParametrizacion = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}`;
+
 export const consultaGiroDaviplata = async (bodyObj) => {
   if (!bodyObj) {
     return new Promise((resolve, reject) => {
       resolve("Sin datos body");
     });
   }
+  let parseObj = JSON.stringify(bodyObj)
+  let dataObj = {data: cifrarAES(
+    `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+    `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+    parseObj
+  )}
   try {
     const res = await fetchData(
       `${urlDaviplata}davivienda_cb_cashIn/consultaGiroDaviplata`,
       "POST",
       {},
-      bodyObj,
+      dataObj,
       {},
       {},
       40000
@@ -22,6 +29,20 @@ export const consultaGiroDaviplata = async (bodyObj) => {
     if (!res?.status) {
       console.error(res?.msg);
     }
+    if(res?.obj !== {}){ 
+      console.log(`${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
+      `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`)
+      console.log((res?.obj?.data?.substring(2,res?.obj?.data?.length - 1)))
+      const dataDecrypt = res?.obj?.data?.substring(2,res?.obj?.data?.length - 1)
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        dataDecrypt
+      )
+      console.log("Decrypt: ",obj)
+      res.obj= JSON.parse(obj)
+    }
+
     return res;
   } catch (err) {
     throw err;
@@ -83,8 +104,8 @@ export const postRealizarCashoutDavivienda = async (bodyObj) => {
   }
   let parseObj = JSON.stringify(bodyObj)
   let dataObj = {data: cifrarAES(
-    `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
-    `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+    `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+    `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
     parseObj
   )}
 
@@ -112,6 +133,12 @@ export const consultaCostoCB = async (bodyObj) => {
       resolve("Sin datos body");
     });
   }
+  // let parseObj = JSON.stringify(bodyObj)
+  // let dataObj = {data: cifrarAES(
+  //   `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+  //   `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+  //   parseObj
+  // )}
   try {
     const res = await fetchData(
       `${urlDaviplata}davivienda_cb_deposito_retiro/consultaCostoCB`,
