@@ -33,10 +33,7 @@ export const consultaGiroDaviplata = async (bodyObj) => {
       console.error(res?.msg);
     }
     if (res?.obj !== {}) {
-      const dataDecrypt = res?.obj?.data?.substring(
-        2,
-        res?.obj?.data?.length - 1
-      );
+      const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
         `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
         `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
@@ -80,10 +77,7 @@ export const pagoGiroDaviplata = async (bodyObj) => {
     }
 
     if (res?.obj !== {}) {
-      const dataDecrypt = res?.obj?.data?.substring(
-        2,
-        res?.obj?.data?.length - 1
-      );
+      const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
         `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
         `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
@@ -190,10 +184,7 @@ export const consultaCostoCB = async (bodyObj) => {
     }
 
     if (res?.obj !== {}) {
-      const dataDecrypt = res?.obj?.data?.substring(
-        2,
-        res?.obj?.data?.length - 1
-      );
+      const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
         `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
         `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
@@ -239,10 +230,7 @@ export const depositoCorresponsal = async (bodyObj) => {
     }
 
     if (res?.obj !== {}) {
-      const dataDecrypt = res?.obj?.data?.substring(
-        2,
-        res?.obj?.data?.length - 1
-      );
+      const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
         `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
         `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
@@ -288,10 +276,7 @@ export const retiroCorresponsal = async (bodyObj) => {
     }
 
     if (res?.obj !== {}) {
-      const dataDecrypt = res?.obj?.data?.substring(
-        2,
-        res?.obj?.data?.length - 1
-      );
+      const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
         `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
         `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
