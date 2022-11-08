@@ -76,16 +76,23 @@ const Transacciones = () => {
         day: "numeric",
       }).format(fecha_fin);
     }
-    fetchData(url, "GET", queries)
-      .then((res) => {
-        if (res?.status) {
-          setMaxPages(res?.obj?.maxpages);
-          setTrxs(res?.obj?.trxs);
-        } else {
-          throw new Error(res?.msg);
-        }
-      })
-      .catch(() => {});
+    console.log(userPermissions
+      .map(({ id_permission }) => id_permission)
+      .includes(5), queries.id_comercio)
+    if (userPermissions
+      .map(({ id_permission }) => id_permission)
+      .includes(5) || usuario !== -1){
+      fetchData(url, "GET", queries)
+        .then((res) => {
+          if (res?.status) {
+            setMaxPages(res?.obj?.maxpages);
+            setTrxs(res?.obj?.trxs);
+          } else {
+            throw new Error(res?.msg);
+          }
+        })
+        .catch(() => {});
+      }
   }, [
     pageData,
     idComercio,
