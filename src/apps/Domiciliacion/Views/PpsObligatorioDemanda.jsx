@@ -272,13 +272,13 @@ const PpsObligatorioDemanda = ({ ced }) => {
         <div className={contenedorImagen}>
           <LogoPDP xsmall></LogoPDP>
         </div>
-        <Form onSubmit={(e) => enviar(e)}>
+        <Form grid onSubmit={(e) => enviar(e)}>
           <Fieldset
             // className={contenedorFieldset}
-            legend="Formulario Aporte Obligatorio"
+            legend="Piso de Protección Social Obligatorio"
             /* className="lg:col-span-3" */
           >
-            <div /* className={contenedorForm} */>
+            <div className={contenedorForm}>
               <Select
                 onChange={(event) =>
                   // setTipoIdentificacion(event?.target?.value)
