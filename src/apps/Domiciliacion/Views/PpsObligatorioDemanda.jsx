@@ -26,14 +26,15 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
-
+// const url = process.env.REACT_APP_URL_COLPENSIONES;
+const url = "http://127.0.0.1:5000";
 const PpsObligatorioDemanda = ({ ced }) => {
   const { quotaInfo, roleInfo, infoTicket } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
   const [limitesMontos] = useState({
-    max: 149000,
+    max: 149100,
     min: 5000,
   });
   // const [numDocumento, setNumDocumento] = useState(ced);
@@ -52,6 +53,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
       roleInfo?.tipocomercio === "OFICINAS PROPIAS" ? true : false,
     cupoLogin: quotaInfo?.["quota"],
     tipoComercio: roleInfo?.["tipo_comercio"],
+    nombreComercio: roleInfo?.["nombre comercio"],
     idTrx: "",
   });
   const [procesandoTrx, setProcesandoTrx] = useState(false);
@@ -63,6 +65,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
     content: () => printDiv.current,
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
+
   const enviar = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
@@ -74,8 +77,8 @@ const PpsObligatorioDemanda = ({ ced }) => {
       ) {
         if (datosAportante?.["valorAportar"] % 100 == 0) {
           fetchData(
-            // `${url}/CrearPlanillaDemandaObligatorioOfPropias`,
-            `http://127.0.0.1:5000/pps_obligatorio_demada_colpensiones`,
+            `${url}/pps_obligatorio_demada_colpensiones`,
+            // `http://127.0.0.1:5000/pps_obligatorio_demada_colpensiones`,
             "POST",
             {},
             {
@@ -86,6 +89,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
               },
               oficina_propia: datosComercio?.["oficina_propia"],
               valor_total_trx: datosAportante?.["valorAportar"],
+              nombre_comercio: datosComercio?.["nombreComercio"],
               obligatorioDemanda: {
                 Identificacion: datosAportante?.["numDocumento"],
                 PlanillaCode: datosAportante?.["numPlanilla"],
@@ -97,43 +101,71 @@ const PpsObligatorioDemanda = ({ ced }) => {
             true
           )
             .then((respuesta) => {
-              console.log("RESPUESTA:", respuesta);
-              setDatosAportante((old) => {
+              // console.log("RESPUESTA:", respuesta);
+              setProcesandoTrx(false);
+              setDatosComercio((old) => {
                 return {
                   ...old,
                   idTrx:
                     respuesta?.obj?.datos_recibidos
-                      ?.trazabilityFinancialInstitutionCode,
+                      ?.trazabilityFinanciialInstitutionCode,
                 };
               });
-              setProcesandoTrx(false);
-              console.log(respuesta);
-              // console.log(respuesta.obj["datos_recibidos"]);
 
+              console.log("DATOS RECIBIDOS:", respuesta?.obj?.datos_recibidos);
+              console.log(
+                "idtrx:",
+                respuesta?.obj?.datos_recibidos
+                  ?.trazabilityFinanciialInstitutionCode
+              );
+
+              console.log("MENSJAE", datosComercio?.["idTrx"]);
               setDisabledBtn(false);
 
-              if (respuesta.obj["datos_recibidos"].ResponseCode == "SUCCESS") {
-                notify("Pago Exitoso.");
+              if (
+                respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "SUCCESS"
+              ) {
+                notify(
+                  "Transaccion Colpensiones PPS obligatorio demanda Exitosa."
+                );
                 setShowModalVoucher(true);
               }
-              if (respuesta.obj["datos_recibidos"].ResponseCode == "FAILED") {
-                notifyError(respuesta.obj["datos_recibidos"].messageError);
-              }
-              if (respuesta?.obj?.ResponseCode == "FAILED") {
-                notifyError(respuesta?.obj?.messageError);
-              }
+
+              //si la respuesta de colpensiones viene vacia entra a este if
               if (
-                respuesta?.msg[0] ==
-                "Lo Sentimos, Error pago, la planilla no se puede pagar"
+                Object.entries(respuesta?.obj?.datos_recibidos).length === 0
               ) {
-                notifyError(respuesta?.msg[0]);
+                notifyError(respuesta?.msg);
               }
+
               if (
-                respuesta.obj["datos_recibidos"] ==
-                "Error pago, la planilla no se puede pagar"
+                respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "FAILED"
               ) {
-                notifyError(respuesta.obj["datos_recibidos"]);
+                notifyError(respuesta?.obj?.datos_recibidos?.["messageError"]);
               }
+
+              // if (respuesta.obj["datos_recibidos"].ResponseCode == "SUCCESS") {
+              //   notify("Pago Exitoso.");
+              //   setShowModalVoucher(true);
+              // }
+              // if (respuesta.obj["datos_recibidos"].ResponseCode == "FAILED") {
+              //   notifyError(respuesta.obj["datos_recibidos"].messageError);
+              // }
+              // if (respuesta?.obj?.ResponseCode == "FAILED") {
+              //   notifyError(respuesta?.obj?.messageError);
+              // }
+              // if (
+              //   respuesta?.msg[0] ==
+              //   "Lo Sentimos, Error pago, la planilla no se puede pagar"
+              // ) {
+              //   notifyError(respuesta?.msg[0]);
+              // }
+              // if (
+              //   respuesta.obj["datos_recibidos"] ==
+              //   "Error pago, la planilla no se puede pagar"
+              // ) {
+              //   notifyError(respuesta.obj["datos_recibidos"]);
+              // }
 
               /* if (respuesta?.msg?.respuesta_colpensiones) {
                 notifyError(respuesta?.msg?.respuesta_colpensiones);
@@ -164,10 +196,12 @@ const PpsObligatorioDemanda = ({ ced }) => {
       navigate(`/domiciliacion`);
     }
   };
-
+  useEffect(() => {}, [datosComercio]);
   const tickets = useMemo(() => {
     return {
-      title: [["", ""], "COLPENSIONES", ["", ""], "Recibo de pago"],
+      title: ["COLPENSIONES Recibo de pago"],
+      // title: [["Recibo De Pago"]],
+      // "COLPENSIONES Recibo de pago"],
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -181,7 +215,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
           hour12: false,
         }).format(new Date()),
       },
-      commerceName: datosComercio?.["tipoComercio"],
+      // commerceName: datosComercio?.["tipoComercio"],
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
@@ -189,13 +223,19 @@ const PpsObligatorioDemanda = ({ ced }) => {
         ["", ""],
         ["Dirección", roleInfo?.direccion],
         ["", ""],
-        ["Id_Transaccion ", datosComercio?.["idTrx"]],
       ],
+
       trxInfo: [
+        ["PISO DE PROTECCION SOCIAL - APORTE OBLIGATORIO"],
         ["", ""],
-        ["PISO DE PROTECCION SOCIAL"],
-        ["Proceso", "Aporte Obligatorio A Demanda"],
+        ["Número de documento", datosAportante?.["numDocumento"]],
+        ["", ""],
+        ["Número de autorización: ", datosComercio?.["idTrx"]],
+        ["", ""],
+        ["N° Planilla", datosAportante?.["numPlanilla"]],
+        ["", ""],
         ["Valor", formatMoney.format(datosAportante?.["valorAportar"])],
+        ["", ""],
       ],
 
       disclamer:
@@ -211,7 +251,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
   useEffect(() => {
     infoTicket(datosComercio?.["idTrx"], 108, tickets)
       .then((resTicket) => {
-        // console.log(resTicket);
+        console.log("RESTICKET:", resTicket);
       })
       .catch((err) => {
         console.error(err);
