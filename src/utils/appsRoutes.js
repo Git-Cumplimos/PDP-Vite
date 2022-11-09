@@ -838,7 +838,7 @@ const allUrlsPrivateApps = [
     link: "/corresponsalia",
     label: <AppIcons Logo={"Corresponsalia"} name='Corresponsalía' />,
     component: Corresponsalia,
-    permission: [54, ...listPermissionsColpatria, ...listPermissionsDavivienda],
+    permission: [54, ...listPermissionsColpatria],
     subRoutes: [
       {
         //corresponsaliaDavivienda
