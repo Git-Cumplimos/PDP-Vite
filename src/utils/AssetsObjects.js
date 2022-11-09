@@ -82,6 +82,7 @@ const svgs = {
   Transacciones: `${urlAssets}/assets/img/transacciones.png`,
   Ventas: `${urlAssets}/assets/img/ventas.png`,
   VerPagoParticipacion: `${urlAssets}/assets/img/VER PAGO PARTICIPACION-01.png`,
+  CorresponsaliaDavivienda: `${urlAssets}/assets/svg/CORRESPOSALIA DAVIVIENDA-01.svg`,
 };
 
 export { images, svgs };
