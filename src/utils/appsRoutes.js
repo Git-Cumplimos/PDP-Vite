@@ -18,6 +18,7 @@ import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamuj
 import ProvidepinesVus from "../apps/PinesVus/components/ProvidepinesVus";
 
 /**
+
  * * Logos
  */
 const AppIcons = lazy(() => import("../components/Base/AppIcons"));

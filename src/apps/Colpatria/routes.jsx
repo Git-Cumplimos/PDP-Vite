@@ -23,27 +23,27 @@ const ConveniosRecaudo = lazy(() => import("./Views/Admin/ConveniosRecaudo"));
 
 export const rutasGestionColpatria = {
   link: "/corresponsalia/colpatria/gestion",
-  label: <AppIcons Logo={"RECAUDO"} name={"Gestión"} />,
+  label: <AppIcons Logo={"Reporte"} name={"Gestión"} />,
   component: AdminColpatria,
   permission: [PermissionsColpatria.gestion],
   subRoutes: [
     {
       link: "/corresponsalia/colpatria/gestion/lista-errores",
-      label: <AppIcons Logo={"RECAUDO"} name={"Lista de errores"} />,
+      label: <AppIcons Logo={"Reporte"} name={"Lista de errores"} />,
       component: ListaErrores,
       permission: [PermissionsColpatria.gestion],
     },
     {
       link: "/corresponsalia/colpatria/gestion/lista-convenios-pines",
       label: (
-        <AppIcons Logo={"RECAUDO"} name={"Convenios de pines de recaudo"} />
+        <AppIcons Logo={"Reporte"} name={"Convenios de pines de recaudo"} />
       ),
       component: ConveniosPines,
       permission: [PermissionsColpatria.gestion],
     },
     {
       link: "/corresponsalia/colpatria/gestion/lista-convenios-recaudo",
-      label: <AppIcons Logo={"RECAUDO"} name={"Convenios de recaudo"} />,
+      label: <AppIcons Logo={"Reporte"} name={"Convenios de recaudo"} />,
       component: ConveniosRecaudo,
       permission: [PermissionsColpatria.gestion],
     },
@@ -56,26 +56,26 @@ export const listPermissionsColpatria = listPermissions.splice(listPermissions.l
 
 const rutasColpatria = {
   link: "/corresponsalia/colpatria",
-  label: <AppIcons Logo={"MARKETPLACE"} name={"Corresponsalía Colpatria"} />,
+  label: <AppIcons Logo={"CorresponsalBancario"} name={"Corresponsalía Colpatria"} />,
   component: ColpatriaTrx,
   permission: listPermissionsColpatria,
   subRoutes: [
     {
       link: "/corresponsalia/colpatria/deposito",
-      label: <AppIcons Logo={"RECAUDO"} name={"Depósito"} />,
+      label: <AppIcons Logo={"Depositos"} name={"Depósito"} />,
       component: Deposito,
       permission: [PermissionsColpatria.deposito],
     },
     {
       link: "/corresponsalia/colpatria/pines",
-      label: <AppIcons Logo={"RECAUDO"} name={"Venta de Pines de Recaudo"} />,
+      label: <AppIcons Logo={"CrearPines"} name={"Venta de Pines de Recaudo"} />,
       component: PinesConsulta,
       permission: [PermissionsColpatria.venta_pines],
       subRoutes: [
         {
           link: "/corresponsalia/colpatria/pines/:id_convenio_pin",
           label: (
-            <AppIcons Logo={"RECAUDO"} name={"Venta de Pines de Recaudo"} />
+            <AppIcons Logo={"CrearPines"} name={"Venta de Pines de Recaudo"} />
           ),
           component: PinesVenta,
           permission: [PermissionsColpatria.venta_pines],
@@ -87,7 +87,7 @@ const rutasColpatria = {
       link: "/corresponsalia/colpatria/recaudo",
       label: (
         <AppIcons
-          Logo={"RECAUDO"}
+          Logo={"Recaudo"}
           name={"Recaudo Servicios Públicos y Privados"}
         />
       ),
@@ -98,7 +98,7 @@ const rutasColpatria = {
           link: "/corresponsalia/colpatria/recaudo/manual",
           label: (
             <AppIcons
-              Logo={"RECAUDO"}
+              Logo={"RecaudoManual"}
               name={"Recaudo PSP Manual en Efectivo"}
             />
           ),
@@ -109,7 +109,7 @@ const rutasColpatria = {
           link: "/corresponsalia/colpatria/recaudo/barras",
           label: (
             <AppIcons
-              Logo={"RECAUDO"}
+              Logo={"RecaudoCodigoDeBarras"}
               name={"Recaudo PSP Código de Barras en Efectivo"}
             />
           ),
@@ -118,7 +118,7 @@ const rutasColpatria = {
         },
         {
           link: "/corresponsalia/colpatria/recaudo/:id_convenio_pin",
-          label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP en Efectivo"} />,
+          label: <AppIcons Logo={"Recaudo"} name={"Recaudo PSP en Efectivo"} />,
           component: TrxRecaudo,
           permission: [PermissionsColpatria.recaudo],
           show: false,
@@ -127,7 +127,7 @@ const rutasColpatria = {
     },
     {
       link: "/corresponsalia/colpatria/pago-de-giro",
-      label: <AppIcons Logo={"RECAUDO"} name={"Pago de giro"} />,
+      label: <AppIcons Logo={"PagoPorGiro"} name={"Pago de giro"} />,
       component: PinPago,
       permission: [PermissionsColpatria.pago_giro],
     },
