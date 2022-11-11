@@ -16,9 +16,8 @@ import { useNavigate } from "react-router-dom";
 import MoneyInput from "../../../components/Base/MoneyInput";
 
 const ModificarPps = () => {
-
   const [limitesMontos] = useState({
-    max: 149000,
+    max: 149100,
     min: 5000,
   });
   const [datosConsulta, setDatosConsulta] = useState("");
@@ -176,7 +175,7 @@ const ModificarPps = () => {
               celular: celular.toString(),
               num_pago_pdp: numPagosPdp,
               estado: estadoComercioString,
-              tipo_domiciliacion:tipoDomiciliacion,
+              tipo_domiciliacion: tipoDomiciliacion,
             },
             {},
             {}
@@ -257,9 +256,7 @@ const ModificarPps = () => {
             <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>
               Buscar Cliente
             </Button>
-            
           }
-     
         </ButtonBar>
       </Form>
       {/*       {estadoUsuarioNoEncontrado && sinDatosConsulta ? (
@@ -350,29 +347,31 @@ const ModificarPps = () => {
               />
 
               <div className={contenedorLogo}>
-              <Input
-                name="N° Pagos Punto Pago"
-                label="N° Pagos Punto Pago"
-                type="tel"
-                autoComplete="off"
-                minLength={"1"}
-                maxLength={"2"}
-                /* invalid={invalidCedula} */
-                value={numPagosPdp}
-                onChange={(event) => setNumPagosPdp(event?.target?.value)}
-                required
-              />
-              <Select
-                onChange={(event) => setTipoDomiciliacion(event?.target?.value)}
-                id="comissionType"
-                label="Tipo de Domiciliación"
-                value={tipoDomiciliacion}
-                options={{
-                  Mensual: 1,
-                  Quincenal: 2,
-                  Semanal: 3,
-                }}
-              ></Select>
+                <Input
+                  name="N° Pagos Punto Pago"
+                  label="N° Pagos Punto Pago"
+                  type="tel"
+                  autoComplete="off"
+                  minLength={"1"}
+                  maxLength={"2"}
+                  /* invalid={invalidCedula} */
+                  value={numPagosPdp}
+                  onChange={(event) => setNumPagosPdp(event?.target?.value)}
+                  required
+                />
+                <Select
+                  onChange={(event) =>
+                    setTipoDomiciliacion(event?.target?.value)
+                  }
+                  id="comissionType"
+                  label="Tipo de Domiciliación"
+                  value={tipoDomiciliacion}
+                  options={{
+                    Mensual: 1,
+                    Quincenal: 2,
+                    Semanal: 3,
+                  }}
+                ></Select>
                 <ToggleInput
                   checked={estadoComercio}
                   onClick={() => setEstadoComercio((old) => !old)}
