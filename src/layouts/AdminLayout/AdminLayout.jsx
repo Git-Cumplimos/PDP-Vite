@@ -82,14 +82,15 @@ const AdminLayout = () => {
 
   useEffect(() => {
     const conditions = [
-      roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+      roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO",
       roleInfo?.id_usuario !== undefined,
       roleInfo?.id_comercio !== undefined,
       roleInfo?.id_dispositivo !== undefined,
       roleInfo?.direccion !== undefined,
       nombreComercio !== undefined,
       userPermissions?.map(({ id_permission }) => id_permission).includes(6101),
-      false
+      false,
     ];
     if (conditions.every((val) => val)) {
       searchCierre({
@@ -156,37 +157,35 @@ const AdminLayout = () => {
           </div>
         </Modal>
       </header>
-      <main className="container">
+      <main className='container'>
         <Suspense fallback={<ContentBox />}>{!infoCaja && <Outlet />}</Suspense>
         <Modal show={infoCaja}>
           {cajaState === 1 ? (
-            <div className="items-center text-center">
+            <div className='items-center text-center'>
               <h1>
                 Señor usuario, la caja presenta cierre tardío, no se pueden
                 realizar transacciones hasta que la cierre.
                 <ButtonBar>
                   <Button
-                    className="btn mx-auto d-block"
-                    type="submit"
-                    onClick={() => closeCash()}
-                  >
+                    className='btn mx-auto d-block'
+                    type='submit'
+                    onClick={() => closeCash()}>
                     Cerrar caja
                   </Button>
                 </ButtonBar>
               </h1>
             </div>
           ) : cajaState === 4 ? (
-            <h1 className="text-center">
+            <h1 className='text-center'>
               Señor usuario, la caja ha sido cerrada, no se pueden realizar mas
               transacciones
               <ButtonBar>
                 <Button
-                  type="submit"
+                  type='submit'
                   onClick={() => {
                     navigate("/", { replace: true });
                     signOut();
-                  }}
-                >
+                  }}>
                   Cerrar sesión
                 </Button>
               </ButtonBar>

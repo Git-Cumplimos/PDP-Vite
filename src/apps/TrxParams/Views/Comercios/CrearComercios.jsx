@@ -63,6 +63,7 @@ const CrearComercios = () => {
   const [tipoNivelComercio, setTipoNivelComercio] = useState([]);
 
   const [docTypes, setDocTypes] = useState({ "": "" });
+  const [docTypesContact, setDocTypesContact] = useState({ "": "" });
   const [comercio, setComercio] = useState({
     apellido_contacto1_comercio: "",
     apellido_contacto2_comercio: "",
@@ -84,7 +85,11 @@ const CrearComercios = () => {
     longitud_comercio: "",
     nombre_comercio: "",
     nombre_contacto1_comercio: "",
+    documento_contacto1_comercio: "",
+    tipo_documento_contacto1_comercio: "",
     nombre_contacto2_comercio: "",
+    documento_contacto2_comercio: "",
+    tipo_documento_contacto2_comercio: "",
     numero_identificacion: "",
     obtener_mejor_tarifa: "",
     pk_comercio: "",
@@ -168,11 +173,14 @@ const CrearComercios = () => {
     fetchData(`${url_types}/type-doc`, "GET", {}, {})
       .then((res) => {
         const temp = { "": "" };
+        const tempContact = { "": "" };
         if (res?.status) {
           for (const { id_doc, Nombre, nombre_corto } of res?.obj) {
             temp[`${Nombre} (${nombre_corto})`] = id_doc;
+            tempContact[`${Nombre} (${nombre_corto})`] = nombre_corto;
           }
           setDocTypes(temp);
+          setDocTypesContact(tempContact);
         } else {
           notifyError(res?.msg);
         }
@@ -218,7 +226,11 @@ const CrearComercios = () => {
             longitud_comercio: "",
             nombre_comercio: "",
             nombre_contacto1_comercio: "",
+            documento_contacto1_comercio: "",
+            tipo_documento_contacto1_comercio: "",
             nombre_contacto2_comercio: "",
+            documento_contacto2_comercio: "",
+            tipo_documento_contacto2_comercio: "",
             numero_identificacion: "",
             obtener_mejor_tarifa: "",
             pk_comercio: "",
@@ -592,7 +604,7 @@ const CrearComercios = () => {
         <Fieldset legend='Contacto 1' className='lg:col-span-2'>
           <Input
             id='nombre_contacto1_comercio'
-            label='Nombre contacto 1'
+            label='Nombre'
             type='text'
             name='nombre_contacto1_comercio'
             minLength='1'
@@ -602,7 +614,7 @@ const CrearComercios = () => {
             onInput={onChangeFormat}></Input>
           <Input
             id='apellido_contacto1_comercio'
-            label='Apellido contacto 1'
+            label='Apellido'
             type='text'
             name='apellido_contacto1_comercio'
             minLength='1'
@@ -612,7 +624,7 @@ const CrearComercios = () => {
             onInput={onChangeFormat}></Input>
           <Input
             id='tel_contacto1_comercio'
-            label='Telefono contacto 1'
+            label='Telefono'
             type='text'
             name='tel_contacto1_comercio'
             minLength='1'
@@ -627,11 +639,38 @@ const CrearComercios = () => {
                 });
               }
             }}></Input>
+          <Select
+            className='place-self-stretch'
+            id='tipo_documento_contacto1_comercio'
+            name='tipo_documento_contacto1_comercio'
+            label='Tipo de documento'
+            required={true}
+            options={docTypesContact ?? []}
+            onChange={onChangeFormat}
+            value={comercio?.tipo_documento_contacto1_comercio}
+          />
+          <Input
+            id='documento_contacto1_comercio'
+            label='Documento'
+            type='text'
+            name='documento_contacto1_comercio'
+            minLength='1'
+            maxLength='18'
+            required
+            value={comercio?.documento_contacto1_comercio}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, documento_contacto1_comercio: num };
+                });
+              }
+            }}></Input>
         </Fieldset>
         <Fieldset legend='Contacto 2' className='lg:col-span-2'>
           <Input
             id='nombre_contacto2_comercio'
-            label='Nombre contacto 2'
+            label='Nombre'
             type='text'
             name='nombre_contacto2_comercio'
             minLength='1'
@@ -640,7 +679,7 @@ const CrearComercios = () => {
             onInput={onChangeFormat}></Input>
           <Input
             id='apellido_contacto2_comercio'
-            label='Apellido contacto 2'
+            label='Apellido'
             type='text'
             name='apellido_contacto2_comercio'
             minLength='1'
@@ -649,7 +688,7 @@ const CrearComercios = () => {
             onInput={onChangeFormat}></Input>
           <Input
             id='tel_contacto2_comercio'
-            label='Telefono contacto 2'
+            label='Telefono'
             type='text'
             name='tel_contacto2_comercio'
             minLength='1'
@@ -660,6 +699,31 @@ const CrearComercios = () => {
               if (!isNaN(num)) {
                 setComercio((old) => {
                   return { ...old, tel_contacto2_comercio: num };
+                });
+              }
+            }}></Input>
+          <Select
+            className='place-self-stretch'
+            id='tipo_documento_contacto2_comercio'
+            name='tipo_documento_contacto2_comercio'
+            label='Tipo de documento'
+            options={docTypesContact ?? []}
+            onChange={onChangeFormat}
+            value={comercio?.tipo_documento_contacto2_comercio}
+          />
+          <Input
+            id='documento_contacto1_comercio'
+            label='Documento'
+            type='text'
+            name='documento_contacto2_comercio'
+            minLength='1'
+            maxLength='18'
+            value={comercio?.documento_contacto2_comercio}
+            onInput={(e) => {
+              const num = e.target.value;
+              if (!isNaN(num)) {
+                setComercio((old) => {
+                  return { ...old, documento_contacto2_comercio: num };
                 });
               }
             }}></Input>

@@ -81,11 +81,11 @@ const VentaPines = () => {
           formatMoney.format(valVentaPines)
         ) : (
           <Input
-            id="valor"
-            name="valor"
+            id='valor'
+            name='valor'
             // label="Valor a pagar"
-            autoComplete="off"
-            type="tel"
+            autoComplete='off'
+            type='tel'
             minLength={"5"}
             maxLength={"10"}
             value={formatMoney.format(valVentaPines)}
@@ -117,7 +117,10 @@ const VentaPines = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valVentaPines,
 
         // Datos trx colpatria
@@ -184,7 +187,9 @@ const VentaPines = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valVentaPines,
 
         id_trx: inquiryStatus?.id_trx,
@@ -367,8 +372,8 @@ const VentaPines = () => {
   if (searchingConvData || !(searchingConvData || datosConvenio)) {
     return (
       <Fragment>
-        <h1 className="text-3xl mt-6">Venta de Pines de Recaudo</h1>
-        <h1 className="text-xl mt-6">
+        <h1 className='text-3xl mt-6'>Venta de Pines de Recaudo</h1>
+        <h1 className='text-xl mt-6'>
           {searchingConvData
             ? "Buscando infomacion de convenio ..."
             : "No se ha encontrado informacion del convenio"}
@@ -379,29 +384,28 @@ const VentaPines = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6 mb-10">Venta de Pines de Recaudo</h1>
+      <h1 className='text-3xl mt-6 mb-10'>Venta de Pines de Recaudo</h1>
       <Form
         onSubmit={inquiryStatus ? (ev) => ev.preventDefault() : onMakeInquiry}
-        grid
-      >
+        grid>
         <Input
-          label="Número de convenio pin"
-          type="text"
-          autoComplete="off"
+          label='Número de convenio pin'
+          type='text'
+          autoComplete='off'
           value={datosConvenio.pk_codigo_convenio}
           disabled
         />
         <Input
-          label="Número de pin"
-          type="text"
-          autoComplete="off"
+          label='Número de pin'
+          type='text'
+          autoComplete='off'
           value={datosConvenio.codigo_pin}
           disabled
         />
         <Input
-          label="Nombre de convenio pin"
-          type="text"
-          autoComplete="off"
+          label='Nombre de convenio pin'
+          type='text'
+          autoComplete='off'
           value={datosConvenio.nombre_convenio}
           disabled
         />
@@ -413,9 +417,9 @@ const VentaPines = () => {
               id={`referencia_${ref}`}
               label={datosConvenio[`referencia_${ref}`]}
               name={`referencia_${ref}`}
-              type="text"
-              autoComplete="off"
-              maxLength="19"
+              type='text'
+              autoComplete='off'
+              maxLength='19'
               value={userReferences?.[`referencia_${ref}`] ?? ""}
               onInput={(ev) =>
                 setUserReferences((old) => ({
@@ -429,11 +433,11 @@ const VentaPines = () => {
           ))}
         {datosConvenio.fk_tipo_valor === 1 ? (
           <Input
-            id="valor"
-            name="valor"
-            label="Valor a pagar"
-            autoComplete="off"
-            type="tel"
+            id='valor'
+            name='valor'
+            label='Valor a pagar'
+            autoComplete='off'
+            type='tel'
             minLength={"5"}
             maxLength={"10"}
             onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
@@ -451,10 +455,9 @@ const VentaPines = () => {
       <ScreenBlocker show={loadingInquiry} />
       <Modal
         show={inquiryStatus}
-        handleClose={loadingSell ? () => {} : handleClose}
-      >
+        handleClose={loadingSell ? () => {} : handleClose}>
         {paymentStatus ? (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -465,10 +468,9 @@ const VentaPines = () => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type="submit"
+                type='submit'
                 onClick={onMakePayment}
-                disabled={loadingSell}
-              >
+                disabled={loadingSell}>
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingSell}>

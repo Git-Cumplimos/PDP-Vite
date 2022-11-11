@@ -146,7 +146,9 @@ const Retiro = () => {
       id_comercio: roleInfo?.id_comercio,
       id_usuario: roleInfo?.id_usuario,
       id_terminal: roleInfo?.id_dispositivo,
-      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+      oficina_propia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO",
       // idcliente: 5,
       // idpersona: 240,
       // NoidentificacionCajero: "52389030",
@@ -251,14 +253,14 @@ const Retiro = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Retiros Daviplata</h1>
+      <h1 className='text-3xl mt-6'>Retiros Daviplata</h1>
       <Form onSubmit={onSubmitDeposit} onChange={onChange} grid>
         <Input
-          id="numCliente"
-          name="numCliente"
-          label="Número telefónico de cliente"
-          type="text"
-          autoComplete="off"
+          id='numCliente'
+          name='numCliente'
+          label='Número telefónico de cliente'
+          type='text'
+          autoComplete='off'
           minLength={"10"}
           maxLength={"10"}
           value={phone ?? ""}
@@ -266,11 +268,11 @@ const Retiro = () => {
           required
         />
         <Input
-          id="docCliente"
-          name="docCliente"
-          label="CC de quien retira"
-          type="text"
-          autoComplete="off"
+          id='docCliente'
+          name='docCliente'
+          label='CC de quien retira'
+          type='text'
+          autoComplete='off'
           minLength={"7"}
           maxLength={"13"}
           value={userDoc ?? ""}
@@ -278,22 +280,22 @@ const Retiro = () => {
           required
         />
         <Input
-          id="OTP"
-          name="OTP"
-          label="Token de retiro"
-          type="text"
-          minLength="6"
-          maxLength="6"
-          autoComplete="off"
+          id='OTP'
+          name='OTP'
+          label='Token de retiro'
+          type='text'
+          minLength='6'
+          maxLength='6'
+          autoComplete='off'
           value={otp ?? ""}
           onChange={() => {}}
           required
         />
         <MoneyInput
-          id="valor"
-          name="valor"
-          label="Valor a retirar"
-          autoComplete="off"
+          id='valor'
+          name='valor'
+          label='Valor a retirar'
+          autoComplete='off'
           min={limitesMontos?.min}
           max={limitesMontos?.max}
           onInput={onMoneyChange}
@@ -307,10 +309,9 @@ const Retiro = () => {
         show={showModal}
         handleClose={
           paymentStatus ? () => {} : loadingCashOut ? () => {} : handleClose
-        }
-      >
+        }>
         {paymentStatus ? (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <Tickets refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -321,10 +322,9 @@ const Retiro = () => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type="submit"
+                type='submit'
                 onClick={onMakePayment}
-                disabled={loadingCashOut}
-              >
+                disabled={loadingCashOut}>
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingCashOut}>

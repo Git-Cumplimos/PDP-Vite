@@ -13,11 +13,9 @@ import Tickets from "../../../components/Base/Tickets";
 import useForm from "../../../hooks/useForm";
 import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
 import TextArea from "../../../components/Base/TextArea";
-import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
+import { useAuth } from "../../../hooks/AuthHooks";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import useQuery from "../../../hooks/useQuery";
-
-const url_permissions = `${process.env.REACT_APP_URL_IAM_PDP}/users-groups`;
 
 /* URLS para consultar información de oficinas de donde hay que hacer el reverso*/
 const url_USERS = process.env.REACT_APP_URL_IAM_PDP;
@@ -31,7 +29,6 @@ const Reversos = () => {
     ingresoreversorecibo,
   } = useMujer();
 
-  const { roleInfo, pdpUser } = useAuth();
   const formatMoney = new Intl.NumberFormat("es-CO", {
     style: "currency",
     currency: "COP",
@@ -334,9 +331,9 @@ const Reversos = () => {
   console.log(selectedUsers);
   return (
     <>
-      <h1 className="text-3xl mt-6">Reversos</h1>
+      <h1 className='text-3xl mt-6'>Reversos</h1>
       <TableEnterprise
-        title="Comercios"
+        title='Comercios'
         maxPage={maxPageUsers}
         onChange={onChange}
         headers={["Id", "Nombre completo", "E-mail"]}
@@ -346,43 +343,40 @@ const Reversos = () => {
         onSelectRow={(e, i) => {
           ConsultaComercio(usuariosDB[i].email);
         }}
-        onSetPageData={setPageData}
-      >
+        onSetPageData={setPageData}>
         <Input
-          id="email"
-          name="email"
+          id='email'
+          name='email'
           label={"email"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           defaultValue={email}
         />
         <Input
-          id="nombre"
-          name="nombre"
+          id='nombre'
+          name='nombre'
           label={"nombre"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           defaultValue={nombre}
         />
       </TableEnterprise>
 
       <Modal show={showModal} handleClose={() => closeModal(ticket)}>
         {ticket !== false ? (
-          <div className="flex flex-col justify-center items-center">
+          <div className='flex flex-col justify-center items-center'>
             <Tickets refPrint={printDiv} ticket={tickets} />
             <ButtonBar>
               <Button
                 onClick={() => {
                   handlePrint();
-                }}
-              >
+                }}>
                 Imprimir
               </Button>
               <Button
                 onClick={() => {
                   closeModal(ticket);
-                }}
-              >
+                }}>
                 Cerrar
               </Button>
             </ButtonBar>
@@ -390,59 +384,55 @@ const Reversos = () => {
         ) : (
           <>
             <>
-              <h1 className="sm:text-center font-semibold">
+              <h1 className='sm:text-center font-semibold'>
                 ¿Esta seguro del reverso de la obligación?
               </h1>
               <Form onSubmit={reverse} grid>
                 <Input
-                  id="idTrx"
-                  name="idTrx"
-                  label="ID de transacción"
-                  type="text"
-                  autoComplete="off"
+                  id='idTrx'
+                  name='idTrx'
+                  label='ID de transacción'
+                  type='text'
+                  autoComplete='off'
                   value={selected?.id_trx}
-                  disabled
-                ></Input>
+                  disabled></Input>
                 <Input
-                  id="nroCredito"
-                  name="credit"
-                  label="Número crédito"
-                  type="text"
-                  autoComplete="off"
+                  id='nroCredito'
+                  name='credit'
+                  label='Número crédito'
+                  type='text'
+                  autoComplete='off'
                   minLength={"7"}
                   maxLength={"12"}
                   value={data?.credit ?? ""}
                   onInput={handleChange}
-                  required
-                ></Input>
+                  required></Input>
                 <MoneyInput
-                  id="valCredito"
-                  name="val"
-                  label="Valor crédito"
-                  type="text"
-                  autoComplete="off"
+                  id='valCredito'
+                  name='val'
+                  label='Valor crédito'
+                  type='text'
+                  autoComplete='off'
                   maxLength={"15"}
                   value={value ?? ""}
                   // onInput={(e, valor) => {
                   //   const num = valor || "";
                   //   setValue(num);
                   // }}
-                  required
-                ></MoneyInput>
+                  required></MoneyInput>
                 <Input
-                  id="refCredito"
-                  name="reference"
-                  label="Referencia"
-                  type="text"
-                  autoComplete="off"
+                  id='refCredito'
+                  name='reference'
+                  label='Referencia'
+                  type='text'
+                  autoComplete='off'
                   value={data?.reference ?? ""}
-                  onInput={handleChange}
-                ></Input>
+                  onInput={handleChange}></Input>
                 <TextArea
-                  id="motivo"
-                  label="Motivo"
-                  type="text"
-                  autoComplete="off"
+                  id='motivo'
+                  label='Motivo'
+                  type='text'
+                  autoComplete='off'
                   value={motivo}
                   required
                   onInput={(e) => {
@@ -450,7 +440,7 @@ const Reversos = () => {
                   }}
                 />
                 <ButtonBar>
-                  <Button type="submit" disabled={stop}>
+                  <Button type='submit' disabled={stop}>
                     Aceptar
                   </Button>
                 </ButtonBar>
@@ -461,11 +451,11 @@ const Reversos = () => {
       </Modal>
       {Array.isArray(trxs) && trxs.length > 0 ? (
         <>
-          <h1 className="text-2xl mt-6">
+          <h1 className='text-2xl mt-6'>
             Transacciones de {comercio["nombre comercio"]}
           </h1>
           <TableEnterprise
-            title="Recaudos"
+            title='Recaudos'
             maxPage={maxPages}
             // onChange={onChangeRecaudos}
             headers={[
@@ -504,8 +494,7 @@ const Reversos = () => {
               setShowModal(true);
               setValue(parseFloat(trxs[index]?.monto));
             }}
-            onSetPageData={setPageDataRecaudos}
-          ></TableEnterprise>
+            onSetPageData={setPageDataRecaudos}></TableEnterprise>
         </>
       ) : (
         ""

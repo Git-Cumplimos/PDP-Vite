@@ -15,6 +15,7 @@ import { notify, notifyError } from "../../../../utils/notify";
 import { ErrorCustom } from "../utils/fetchMovistarGeneral";
 import { useFetchMovistar } from "../hook/useFetchMovistar";
 import { toPhoneNumber } from "../../../../utils/functions";
+import usePermissionTrx from "../hook/usePermissionTrx";
 
 const minValor = 1000;
 const maxValor = 100000;
@@ -25,6 +26,9 @@ const RecargasMovistar = () => {
   //Variables
   const printDiv = useRef();
   const { roleInfo, infoTicket } = useAuth();
+  const statePermissionTrx = usePermissionTrx(
+    "No se podra realizar recargas a movistar porque el usuario no es un comercio, ni oficina propia o kiosko."
+  );
   const validNavigate = useNavigate();
   const [inputCelular, setInputCelular] = useState("");
   const [inputValor, setInputValor] = useState("");
@@ -57,17 +61,28 @@ const RecargasMovistar = () => {
 
   const onSubmitCheck = (e) => {
     e.preventDefault();
+    //Validar si es un comercio, oficina propia o kiosko
+    if (statePermissionTrx === false) {
+      notify(
+        "No se puede realizar la recarga a movistar porque el usuario no es un comercio, ni oficina propia o kiosko."
+      );
+      return;
+    }
     //Realizar recarga
     setShowModal(true);
     setTypeInfo("ResumenRecarga");
   };
 
   const recargaMovistar = () => {
+    const tipo__comerio = roleInfo.tipo_comercio.toLowerCase();
     const data = {
       celular: inputCelular,
       valor: inputValor,
       codigo_comercio: roleInfo.id_comercio,
-      tipo_comercio: roleInfo.tipo_comercio,
+      tipo_comercio:
+        tipo__comerio.search("kiosco") >= 0
+          ? "OFICINAS PROPIAS"
+          : roleInfo.tipo_comercio,
       id_dispositivo: roleInfo.id_dispositivo,
       id_usuario: roleInfo.id_usuario,
       direccion: roleInfo.direccion,
@@ -139,9 +154,13 @@ const RecargasMovistar = () => {
     } else if (loadingPeticionRecarga) {
       notify("Se está procesando la transacción, por favor esperar");
     }
-  }, [typeInfo, loadingPeticionRecarga, handleCloseCancelada, handleCloseRecarga]);
+  }, [
+    typeInfo,
+    loadingPeticionRecarga,
+    handleCloseCancelada,
+    handleCloseRecarga,
+  ]);
 
-  
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
