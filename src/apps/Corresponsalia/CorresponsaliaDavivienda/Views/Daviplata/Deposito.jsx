@@ -305,7 +305,10 @@ const Deposito = () => {
       idDispositivo: roleInfo?.id_dispositivo,
       // Tipo: roleInfo?.tipo_comercio,
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       numIdentificacionDepositante: userDoc,
       nomDepositante: nomDepositante,
       numDaviplata: phone,

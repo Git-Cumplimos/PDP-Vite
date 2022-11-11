@@ -142,7 +142,10 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     setIsUploading(true);
     postRecaudoConveniosAval({
       oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
       ticket: objTicket,

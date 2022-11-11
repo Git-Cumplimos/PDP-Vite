@@ -359,7 +359,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         nombreComercio: roleInfo?.["nombre comercio"],
         municipio: roleInfo?.["ciudad"],
         oficinaPropia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
         direccion: roleInfo?.direccion,
       })
         .then(async (res) => {
@@ -428,7 +431,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                         nombreComercio: roleInfo?.["nombre comercio"],
                         municipio: roleInfo?.["ciudad"],
                         oficinaPropia:
-                          roleInfo?.tipo_comercio === "OFICINAS PROPIAS"
+                          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+                          roleInfo?.tipo_comercio === "KIOSCO"
                             ? true
                             : false,
                         direccion: roleInfo?.direccion,
@@ -531,7 +535,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         nombreComercio: roleInfo?.["nombre comercio"],
         municipio: roleInfo?.["ciudad"],
         oficinaPropia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
       })
         .then((res) => {
           if (res?.status) {
