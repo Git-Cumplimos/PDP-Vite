@@ -216,10 +216,11 @@ const Deposito = () => {
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       // Tipo: roleInfo?.tipo_comercio,
-      oficinaPropia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-      roleInfo?.tipo_comercio === "KIOSCO"
-        ? true
-        : false,
+      oficinaPropia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       numTipoCuenta: tipoCuenta,
       numNumeroCuenta: numCuenta,
       numIdDepositante: userDoc,
