@@ -24,6 +24,7 @@ import { notify, notifyError } from "../../../../utils/notify";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { fetchCustom, ErrorCustom } from "../utils/fetchMovistarGeneral";
 import { useFetchMovistar } from "../hook/useFetchMovistar";
+import usePermissionTrx from "../hook/usePermissionTrx";
 
 //----------constantes------------
 const tipo_operacion = 104;
@@ -46,6 +47,9 @@ const fetchGetPaquetes = fetchCustom(
 //----------------------------------
 
 const SubPaquetesMovistar = () => {
+  const statePermissionTrx = usePermissionTrx(
+    "No se podra realizar la compra de paquetes a movistar porque el usuario no es un comercio, ni oficina propia o kiosko."
+  );
   const { pathname: urlLocation } = useLocation(); //Hook para averiguar en que URL est
   const [tipodeoferta, setTipodeoferta] = useState("");
   const [maxPage, setMaxPage] = useState(1);
@@ -62,8 +66,7 @@ const SubPaquetesMovistar = () => {
   const [typeInfo, setTypeInfo] = useState("Ninguno");
   const { roleInfo, infoTicket: guardarTicket } = useAuth();
   const navigateValid = useNavigate();
-  const [loadingPeticionGetPaquetes, PeticionGetPaquetes] =
-    useFetch(fetchGetPaquetes);
+  const [, PeticionGetPaquetes] = useFetch(fetchGetPaquetes);
   const [loadingPeticionCompraPaquetes, PeticionCompraPaquetes] =
     useFetchMovistar(url_paquetes_movistar, "compra paquetes movistar");
 
@@ -146,17 +149,27 @@ const SubPaquetesMovistar = () => {
 
   function ValidarAntesCompraPaquete(e) {
     e.preventDefault();
+    if (statePermissionTrx === false) {
+      notify(
+        "No se podra realizar la compra de paquetes a movistar porque el usuario no es un comercio, ni oficina propia o kiosko."
+      );
+      return;
+    }
     //RealizarCompra
     setShowModal(true);
     setTypeInfo("ResumenTrx");
   }
 
   const ComprarPaquete = () => {
+    const tipo__comerio = roleInfo.tipo_comercio.toLowerCase();
     const data = {
       celular: inputData.celular,
       valor: dataPackage.valordelaoferta,
       codigo_comercio: roleInfo.id_comercio,
-      tipo_comercio: roleInfo.tipo_comercio,
+      tipo_comercio:
+        tipo__comerio.search("kiosco") >= 0
+          ? "OFICINAS PROPIAS"
+          : roleInfo.tipo_comercio,
       id_dispositivo: roleInfo.id_dispositivo,
       id_usuario: roleInfo.id_usuario,
       direccion: roleInfo.direccion,

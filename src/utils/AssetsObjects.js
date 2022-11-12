@@ -44,6 +44,7 @@ const svgs = {
   MOVISTAR: `${urlAssets}/assets/svg/movistar/MOVISTAR_PRINCIPAL.svg`,
   RECARGASMOVISTAR: `${urlAssets}/assets/svg/movistar/MOVISTAR_RECARGAS.svg`,
   PAQUETESMOVISTAR: `${urlAssets}/assets/svg/movistar/MOVISTAR_PAQUETES.svg`,
+
   // Recaudo
   CATALOGOS_Y_REVISTAS: `${urlAssets}/assets/svg/recaudo/CATALOGOS&REVISTAS.svg`,
   EPS_Y_SALUD: `${urlAssets}/assets/svg/recaudo/EPS&SALUD.svg`,
@@ -91,6 +92,8 @@ const svgs = {
   Transacciones: `${urlAssets}/assets/img/transacciones.png`,
 
   VerPagoParticipacion: `${urlAssets}/assets/img/VER PAGO PARTICIPACION-01.png`,
+  CorresponsaliaDavivienda: `${urlAssets}/assets/svg/CORRESPOSALIA DAVIVIENDA-01.svg`,
+  LogoRecargasCelular: `${urlAssets}/assets/img/RecargasCelular.png`,
 };
 
 export { images, svgs };
