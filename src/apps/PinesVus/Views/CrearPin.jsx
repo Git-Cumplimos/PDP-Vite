@@ -65,6 +65,7 @@ const CrearPin = () => {
   const [arl, setArl] = useState("")
   const [idPin, setIdPin] = useState("")
   const [firma, setFirma] = useState("")
+  const [pedirFirma, setPedirFirma] = useState(true)
 
   const [olimpia, setOlimpia] = useState("")
 
@@ -304,46 +305,33 @@ const CrearPin = () => {
   const onSubmitModal = (e) => {
     e.preventDefault();
     // Control de edad _____________________________________________________
-    let edad_correcta = false
-    const year = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-    }).format(new Date())
-    if (year.split("/")[2] - fechaNacimiento.split("-")[0] > 16){
-      edad_correcta = true  
-    } 
-    else if (year.split("/")[2] - fechaNacimiento.split("-")[0] === 16){
-      if (year.split("/")[1] - fechaNacimiento.split("-")[1] > 0){
-        edad_correcta = true
-      }
-      else if (year.split("/")[1] - fechaNacimiento.split("-")[1] === 0){
-        console.log(year.split("/")[0] - fechaNacimiento.split("-")[2])
-        console.log(year.split("/")[0] , fechaNacimiento.split("-")[2])
-        if (year.split("/")[0] - fechaNacimiento.split("-")[2] >= 0){
-          edad_correcta = true
-        }  
-      }
-    }
-    console.log(edad_correcta)
+    // let edad_correcta = false
+    // const year = Intl.DateTimeFormat("es-CO", {
+    //   year: "numeric",
+    //   month: "numeric",
+    //   day: "numeric",
+    // }).format(new Date())
+    // if (year.split("/")[2] - fechaNacimiento.split("-")[0] > 16){
+    //   edad_correcta = true  
+    // } 
+    // else if (year.split("/")[2] - fechaNacimiento.split("-")[0] === 16){
+    //   if (year.split("/")[1] - fechaNacimiento.split("-")[1] > 0){
+    //     edad_correcta = true
+    //   }
+    //   else if (year.split("/")[1] - fechaNacimiento.split("-")[1] === 0){
+    //     console.log(year.split("/")[0] - fechaNacimiento.split("-")[2])
+    //     console.log(year.split("/")[0] , fechaNacimiento.split("-")[2])
+    //     if (year.split("/")[0] - fechaNacimiento.split("-")[2] >= 0){
+    //       edad_correcta = true
+    //     }  
+    //   }
+    // }
+    // console.log(edad_correcta)
     //-------------------------------------------------------------------------
-    if (edad_correcta){
-    if (firma === "") {
+    if (firma === "" && pedirFirma) {
       notifyError("Asegúrese de tener la firma del cliente en físico ")
     }
-    if(!isNaN(infoCliente?.municipio)){
-    e.preventDefault();
-    setShowModal(true)
-    }
-    else{
-      notifyError("Agregue municipio y departamento de residencia")
-    }
-    }
-    else{
-      notifyError("El cliente debe tener más de 16 años, verifique la fecha de nacimiento")
-    }
-    
-    
+    setShowModal(true) 
   };
 
   const onSubmitCliente = (e) => {
@@ -354,6 +342,7 @@ const CrearPin = () => {
       if (!resp?.status){
         notifyError(resp?.msg)
       }else{
+      setPedirFirma(!resp?.obj?.existe_firma)
       setShowFormulario(true)    
       if (resp?.obj?.results?.length > 0) {
         const fecha_nacimiento = new Date(resp?.obj?.results?.[0]?.fecha_nacimiento);
@@ -674,7 +663,7 @@ const CrearPin = () => {
       {showFormulario? 
       <Form onSubmit={onSubmitModal} grid>
       <Fieldset legend="Datos cliente" className="lg:col-span-2">
-        <Input
+        {/* <Input
           id="nombre"
           label="Nombre"
           type="text"
@@ -718,7 +707,7 @@ const CrearPin = () => {
           onChange={(e) => {
             setGenero(e.target.value);
           }}
-        />
+        /> */}
         <Input
           id="celular"
           label="Celular"
@@ -753,7 +742,7 @@ const CrearPin = () => {
             setEmail(text);
           }}
         />
-        <InputSuggestions
+        {/* <InputSuggestions
         id={"searchEps"}
         label={"Eps"}
         name={"nameEps"}
@@ -787,9 +776,9 @@ const CrearPin = () => {
           timeOut: 500,
         }}
         />
-        <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/>
+        <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/> */}
       </Fieldset>
-      <Fieldset legend="Datos Vehículo" className="lg:col-span-2">
+      {/* <Fieldset legend="Datos Vehículo" className="lg:col-span-2">
         <Select
           id="tieneVehiculo"
           label="¿Tiene Vehículo?"
@@ -869,7 +858,7 @@ const CrearPin = () => {
           />
             : "" }
         </Fieldset>
-      </Fieldset>     
+      </Fieldset>      */}
       <Fieldset legend="Datos Trámite" className="lg:col-span-2">
         <Select
           className="place-self-stretch"
@@ -927,6 +916,7 @@ const CrearPin = () => {
         onClick={() => {
           setShowModalFirma(true)
         }}
+        disabled={pedirFirma}
         >
           Firma
         </Button>

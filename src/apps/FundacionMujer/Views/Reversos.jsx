@@ -307,8 +307,12 @@ const Reversos = () => {
 
   const reverse = (e) => {
     e.preventDefault();
+    let tipo_comercio = comercio?.tipo_comercio
+    if (comercio?.tipo_comercio === "KIOSCO"){
+      tipo_comercio = "OFICINAS PROPIAS"
+    }
     const values = {
-      tipo: comercio?.tipo_comercio,
+      tipo: tipo_comercio,
       dispositivo: comercio?.id_dispositivo,
       usuario: comercio?.id_usuario,
       comercio: comercio?.id_comercio,

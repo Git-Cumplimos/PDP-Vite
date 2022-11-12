@@ -488,7 +488,7 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/loteria",
-    label: <AppIcons Logo={"LOTERIA"} name='Loteria' />,
+    label: <AppIcons Logo={"Loteria"} name='Loteria' />,
     component: LoteriaBog,
     provider: ProvideLoteria,
     permission: [3, 4, 5, 6, 44, 45, 46, 47],
@@ -496,22 +496,24 @@ const allUrlsPrivateApps = [
       {
         link: "loteria-de-bogota",
         label: "Lotería de Bogotá",
+        logo: "LoteriaBogota",
         permission: [3, 4, 5, 6],
       },
       {
         link: "loteria-del-tolima",
         label: "Lotería del Tolima",
+        logo: "LoteriaTolima",
         permission: [44, 45, 46, 47],
       },
-    ].map(({ link: name, label, permission }) => ({
+    ].map(({ link: name, label, logo,permission }) => ({
       link: `/loteria/${name}`,
-      label: <AppIcons Logo={"LOTERIA"} name={label} />,
+      label: <AppIcons Logo={logo} name={label} />,
       component: LoteriaBog,
       permission: permission,
       subRoutes: [
         {
           link: `/loteria/${name}/ventas`,
-          label: <AppIcons Logo={"SORTEOS"} name='Ventas' />,
+          label: <AppIcons Logo={"Ventas"} name='Ventas' />,
           component: venta,
           permission: [3],
         },
@@ -523,13 +525,13 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/sorteos`,
-          label: <AppIcons Logo={"REPORTE"} name='Sorteos' />,
+          label: <AppIcons Logo={"SORTEO01"} name='Sorteos' />,
           component: Descargas,
           permission: [5, 6],
           subRoutes: [
             {
               link: `/loteria/${name}/sorteos/tramitarSorteos`,
-              label: <AppIcons Logo={"REPORTE"} name='Sorteos' />,
+              label: <AppIcons Logo={"SORTEO01"} name='Sorteos' />,
               component: CrearSorteos,
               permission: [5],
             },
@@ -549,14 +551,14 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/premios`,
-          label: <AppIcons Logo={"PAGO"} name='Premios' />,
+          label: <AppIcons Logo={"Premio"} name='Premios' />,
           component: Premios,
           extern: false,
           permission: [3], ///////////////////////////////////////////////////////////////////
         },
         {
           link: `/loteria/${name}/arqueo`,
-          label: <AppIcons Logo={"PAGO"} name='Arqueo Billetes' />,
+          label: <AppIcons Logo={"ArqueoBilletes"} name='Arqueo Billetes' />,
           component: ArqueoBilletes,
           extern: false,
           permission: [3, 6], ///////////////////////////////////////////////////////////////////
@@ -606,32 +608,32 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/funmujer",
-    label: <AppIcons Logo={"RECAUDO"} name='Fundación de la mujer' />,
+    label: <AppIcons Logo={"Fundacion"} name='Fundación de la mujer' />,
     component: FunMujer,
     permission: [17, 27, 28],
     provider: ProvideFundamujer,
     subRoutes: [
       {
         link: "/funmujer/recaudo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
+        label: <AppIcons Logo={"Recaudo"} name={"Recaudo"} />,
         component: recMujer,
         permission: [17],
       },
       {
         link: "/funmujer/desembolso",
-        label: <AppIcons Logo={"RECAUDO"} name={"Desembolso"} />,
+        label: <AppIcons Logo={"Desembolso"} name={"Desembolso"} />,
         component: DesembolsoFDLM,
         permission: [28, 17],
       },
       {
         link: "/funmujer/reversorecaudo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Reverso Manual"} />,
+        label: <AppIcons Logo={"Reverso"} name={"Reverso Manual"} />,
         component: revMujer,
         permission: [27],
       },
       {
         link: "/funmujer/reporte",
-        label: <AppIcons Logo={"RECAUDO"} name={"Reporte"} />,
+        label: <AppIcons Logo={"Reporte"} name={"Reporte"} />,
         component: reportFDLM,
         permission: [28, 17],
       },
@@ -640,39 +642,39 @@ const allUrlsPrivateApps = [
 
   {
     link: "/PinesVus",
-    label: <AppIcons Logo={"RECAUDO"} name='Pines' />,
+    label: <AppIcons Logo={"CrearPines"} name='Pines' />,
     component: PinesVus,
     permission: [53, 63],
     provider: ProvidepinesVus,
     subRoutes: [
       {
         link: "/PinesVus/Crear",
-        label: <AppIcons Logo={"RECAUDO"} name={"Crear Pin"} />,
+        label: <AppIcons Logo={"CrearPines"} name={"Crear Pin"} />,
         component: CrearPines,
         permission: [53],
       },
       {
         link: "/PinesVus/Tramitar",
-        label: <AppIcons Logo={"RECAUDO"} name={"Tramitar Pines"} />,
+        label: <AppIcons Logo={"TramitarPines"} name={"Tramitar Pines"} />,
         component: TramitarPines,
         permission: [53],
       },
       {
         link: "/PinesVus/Participacion",
-        label: <AppIcons Logo={"RECAUDO"} name={"Participación Pines"} />,
+        label: <AppIcons Logo={"PagoParticipacion"} name={"Participación Pines"} />,
         component: PagoParticipantes,
         permission: [53],
         subRoutes: [
           {
             link: "/PinesVus/Participacion/PagoParticipacion",
-            label: <AppIcons Logo={"RECAUDO"} name={"Pago participación"} />,
+            label: <AppIcons Logo={"PagoParticipacion"} name={"Pago participación"} />,
             component: ParticipacionPines,
             permission: [53],
           },
           {
             link: "/PinesVus/Participacion/VerPagoParticipacion",
             label: (
-              <AppIcons Logo={"RECAUDO"} name={"Ver pago participación"} />
+              <AppIcons Logo={"ReportePines"} name={"Ver pago participación"} />
             ),
             component: VerParticipacionPines,
             permission: [53],
@@ -681,20 +683,20 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/PinesVus/Reportes",
-        label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
+        label: <AppIcons Logo={"ReportePines"} name={"Reportes Pines"} />,
         component: ReportePines,
         permission: [53, 63],
         subRoutes: [
           {
             link: "/PinesVus/Reporte/VerReportes",
-            label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
+            label: <AppIcons Logo={"ReportePines"} name={"Reportes Pines"} />,
             component: ReportePinesVer,
             permission: [53, 63],
           },
           {
             link: "/PinesVus/Reporte/DescargarReportes",
             label: (
-              <AppIcons Logo={"RECAUDO"} name={"Descargar Reportes Pines"} />
+              <AppIcons Logo={"DescargarReporte"} name={"Descargar Reportes Pines"} />
             ),
             component: ReportePinesDescargar,
             permission: [63],
@@ -1075,7 +1077,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/API_SMS/reporteSMS",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Reporte' />,
+        label: <AppIcons Logo={"Reporte"} name='Reporte' />,
         component: reporteSMS,
         permission: [26],
       },
@@ -1111,7 +1113,7 @@ const allUrlsPrivateApps = [
   //Modulo RecargasCelular
   {
     link: "/recargas-celular",
-    label: <AppIcons Logo={"SORTEOS"} name='Recargas Celular' />,
+    label: <AppIcons Logo={"RecargaCelular"} name='Recargas Celular' />,
     component: RecargasCelular,
     permission: [65, 66],
     subRoutes: [
@@ -1140,25 +1142,25 @@ const allUrlsPrivateApps = [
             subRoutes: [
               {
                 link: "/movistar/paquetes-movistar/combo",
-                label: <AppIcons Logo={"SORTEOS"} name='Combos' />,
+                label: <AppIcons Logo={"SORTEO01"} name='Combos' />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/paquete-voz",
-                label: <AppIcons Logo={"SORTEOS"} name='Paquete de Voz' />,
+                label: <AppIcons Logo={"SORTEO01"} name='Paquete de Voz' />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/paquete-datos",
-                label: <AppIcons Logo={"SORTEOS"} name='Paquete de Datos' />,
+                label: <AppIcons Logo={"SORTEO01"} name='Paquete de Datos' />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/prepagada",
-                label: <AppIcons Logo={"SORTEOS"} name='Prepagada' />,
+                label: <AppIcons Logo={"SORTEO01"} name='Prepagada' />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
@@ -1166,7 +1168,7 @@ const allUrlsPrivateApps = [
           },
           {
             link: "/movistar/operador-pdp",
-            label: <AppIcons Logo={"SORTEOS"} name='Operador PDP' />,
+            label: <AppIcons Logo={"OperadorPdp"} name='Operador PDP' />,
             component: OperadorPDPMovistar,
             permission: [66],
             subRoutes: [
@@ -1174,7 +1176,7 @@ const allUrlsPrivateApps = [
                 link: "/movistar/operador-pdp/cargar-paquetes",
                 label: (
                   <AppIcons
-                    Logo={"SORTEOS"}
+                    Logo={"SORTEO01"}
                     name='Cargue de paquetes de movistar'
                   />
                 ),
@@ -1183,21 +1185,21 @@ const allUrlsPrivateApps = [
               },
               {
                 link: "/movistar/operador-pdp/concilacion",
-                label: <AppIcons Logo={"SORTEOS"} name='Conciliación' />,
+                label: <AppIcons Logo={"SORTEO01"} name='Conciliación' />,
                 component: ConcilacionMovistar,
                 permission: [66],
                 subRoutes: [
                   {
                     link: "/movistar/operador-pdp/concilacion/descarga",
                     label: (
-                      <AppIcons Logo={"SORTEOS"} name='Decargar archivos' />
+                      <AppIcons Logo={"SORTEO01"} name='Decargar archivos' />
                     ),
                     component: ConcilacionMovistarDescarga,
                     permission: [66],
                   },
                   {
                     link: "/movistar/operador-pdp/concilacion/carga",
-                    label: <AppIcons Logo={"SORTEOS"} name='Cargar archivos' />,
+                    label: <AppIcons Logo={"SORTEO01"} name='Cargar archivos' />,
                     component: ConciliacionMovistarCarga,
                     permission: [66],
                   },

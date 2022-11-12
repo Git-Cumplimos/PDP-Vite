@@ -180,9 +180,13 @@ const Recaudo = () => {
   const bankCollection = (e) => {
     e.preventDefault();
     setStop(true);
+    let tipo_comercio = roleInfo?.tipo_comercio
+    if (roleInfo?.tipo_comercio === "KIOSCO"){
+      tipo_comercio = "OFICINAS PROPIAS"
+    }
 
     const body = {
-      Tipo: roleInfo?.tipo_comercio,
+      Tipo: tipo_comercio,
       Usuario: roleInfo?.id_usuario,
       Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,

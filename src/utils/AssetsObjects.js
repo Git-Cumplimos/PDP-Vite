@@ -23,15 +23,23 @@ const svgs = {
   backIcon: `${urlAssets}/assets/svg/back-icon.svg`,
   bar: `${urlAssets}/assets/svg/bar.svg`,
   BarThin: `${urlAssets}/assets/svg/BarThin.svg`,
-  LOTERIA: `${urlAssets}/assets/svg/LOTERIA-DE-BOGOTA-01.svg`,
+  //LOTERIA
+  Loteria: `${urlAssets}/assets/img/LOTERIA.png`,
+  LoteriaBogota: `${urlAssets}/assets/img/loteria bogota.png`,
+  LoteriaTolima: `${urlAssets}/assets/img/loteria tolima.png`,
+  Ventas: `${urlAssets}/assets/img/ventas.png`,
+  CARGAR: `${urlAssets}/assets/svg/CARGAR.svg`,
+  DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
+  SORTEO01: `${urlAssets}/assets/img/SORTEO-01.png`,
+  ArqueoBilletes: `${urlAssets}/assets/img/arqueo de billetes.png`,
+  Premio: `${urlAssets}/assets/img/premio.png`,
+
   MARKETPLACE: `${urlAssets}/assets/svg/MARKETPLACE-01.svg`,
   PAGO: `${urlAssets}/assets/svg/PAGO-01.svg`,
   REPORTE: `${urlAssets}/assets/svg/REPORTES-01.svg`,
-  right_arrow: `${urlAssets}/assets/svg/right-arrow.svg`,
-  SORTEOS: `${urlAssets}/assets/svg/SORTEO-01.svg`,
+  right_arrow: `${urlAssets}/assets/svg/right-arrow.svg`,  
   SUSER: `${urlAssets}/assets/svg/SUSER-01.svg`,
-  CARGAR: `${urlAssets}/assets/svg/CARGAR.svg`,
-  DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
+
   //MOVISTAR
   MOVISTAR: `${urlAssets}/assets/svg/movistar/MOVISTAR_PRINCIPAL.svg`,
   RECARGASMOVISTAR: `${urlAssets}/assets/svg/movistar/MOVISTAR_RECARGAS.svg`,
@@ -47,40 +55,41 @@ const svgs = {
   SERVICIOS_PUBLICOS: `${urlAssets}/assets/svg/recaudo/SERVICIOS_PUBLICOS.svg`,
   UNIVERSIDADES: `${urlAssets}/assets/svg/recaudo/UNIVERSIDADES.svg`,
 
-  ArqueoBilletes: `${urlAssets}/assets/img/arqueo de billetes.png`,
+  //PINES VUS
+  CrearPines: `${urlAssets}/assets/img/CREAR PINES.png`,
+  PagoParticipacion: `${urlAssets}/assets/img/pago participacion.png`,
+  ReportePines: `${urlAssets}/assets/img/reporte pines.png`,
+  TramitarPines: `${urlAssets}/assets/img/TRAMITAR PINES.png`,
+  
   CorresponsalBancario: `${urlAssets}/assets/img/CORRESPONSAL BANCARIO.png`,
   Corresponsalia: `${urlAssets}/assets/img/CORRESPONSALIA.png`,
-  CrearPines: `${urlAssets}/assets/img/CREAR PINES.png`,
   Daviplata: `${urlAssets}/assets/img/DAVIPLATA.png`,
   DepositoDaviplata: `${urlAssets}/assets/img/DEPÓSITO DAVIPLATA.png`,
   Depositos: `${urlAssets}/assets/img/DEPÓSITOS.png`,
   DescargarReporte: `${urlAssets}/assets/img/descargar reporte.png`,
   Desembolso: `${urlAssets}/assets/img/DESEMBOLSO.png`,
   Fundacion: `${urlAssets}/assets/img/FUNDACION.jpg`,
-  LoteriaBogota: `${urlAssets}/assets/img/loteria bogota.png`,
-  loteriaTolima: `${urlAssets}/assets/img/loteria tolima.png`,
-  Loteria: `${urlAssets}/assets/img/LOTERIA.png`,
-  OperadorPdp: `${urlAssets}/assets/img/operador pdp.png`,
-  PagoParticipacion: `${urlAssets}/assets/img/pago participacion.png`,
+  
+  OperadorPdp: `${urlAssets}/assets/img/operador pdp.png`,  
   PagoPorGiro: `${urlAssets}/assets/img/PAGO POR GIRO.png`,
   PagoProductosPropios: `${urlAssets}/assets/img/PAGO PRODUCTOS PROPIOS.png`,
   PinesEntretenimiento: `${urlAssets}/assets/img/pines entretenimiento.png`,
-  Premio: `${urlAssets}/assets/img/premio.png`,
-  RecargaCelular: `${urlAssets}/assets/img/recarga celular.png`,
+
+  RecargaCelular: `${urlAssets}/assets/img/RecargasCelular.png`,
   RecaudoCodigoDeBarras: `${urlAssets}/assets/img/recaudo codigo de barras.png`,
   RecaudoManual: `${urlAssets}/assets/img/RECAUDO MANUAL.png`,
   Recaudo: `${urlAssets}/assets/img/RECAUDO.png`,
-  ReportePines: `${urlAssets}/assets/img/reporte pines.png`,
+  
   Reporte: `${urlAssets}/assets/img/REPORTE.png`,
   RetiroDaviplata: `${urlAssets}/assets/img/RETIRO DAVIPLATA.png`,
   Retiro: `${urlAssets}/assets/img/RETIRO.png`,
   RetirosYDepositos: `${urlAssets}/assets/img/RETIROS Y DEPÓSITOS.png`,
   Reverso: `${urlAssets}/assets/img/REVERSO.png`,
   ServiciosPublicos: `${urlAssets}/assets/img/servicios publicos.jpg`,
-  SORTEO01: `${urlAssets}/assets/img/SORTEO-01.png`,
-  TramitarPines: `${urlAssets}/assets/img/TRAMITAR PINES.png`,
+
+  
   Transacciones: `${urlAssets}/assets/img/transacciones.png`,
-  Ventas: `${urlAssets}/assets/img/ventas.png`,
+
   VerPagoParticipacion: `${urlAssets}/assets/img/VER PAGO PARTICIPACION-01.png`,
 };
 

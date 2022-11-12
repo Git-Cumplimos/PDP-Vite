@@ -219,7 +219,10 @@ const Retiro = () => {
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       // Tipo: roleInfo?.tipo_comercio,
-      oficinaPropia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+      oficinaPropia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+      roleInfo?.tipo_comercio === "KIOSCO"
+        ? true
+        : false,
       numTipoDocumento: tipoDocumento,
       numNumeroDocumento: userDoc,
       numValorRetiro: valor,
@@ -228,7 +231,7 @@ const Retiro = () => {
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
     };
-
+    
     fetchRetiroCorresponsal(body)
       .then((res) => {
         setIsUploading(false);
