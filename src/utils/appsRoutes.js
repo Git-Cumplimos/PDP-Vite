@@ -10,6 +10,12 @@ import rutasDaviviendaCB, {
   listPermissionsDavivienda,
 } from "../apps/Corresponsalia/CorresponsaliaDavivienda/routes";
 
+import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
+import {
+  rutasRecargas,
+  rutasPines,
+  rutasSoat,
+} from "../apps/Practisistemas/routes";
 /**
  * * Providers
  */
@@ -645,9 +651,10 @@ const allUrlsPrivateApps = [
     link: "/PinesVus",
     label: <AppIcons Logo={"CrearPines"} name='Pines' />,
     component: PinesVus,
-    permission: [53, 63],
+    permission: [53, 63, enumPermisosPractisistemas.practisistemasPines],
     provider: ProvidepinesVus,
     subRoutes: [
+      rutasPines,
       {
         link: "/PinesVus/Crear",
         label: <AppIcons Logo={"CrearPines"} name={"Crear Pin"} />,
@@ -1224,7 +1231,7 @@ const allUrlsPrivateApps = [
       },
     ],
   },
-
+  rutasRecargas,
   {
     link: "/movii-pdp",
     label: <AppIcons Logo={"MARKETPLACE"} name='MOVII PDP' />,
@@ -1239,7 +1246,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/movii-pdp/cash-out-reversos",
-        label: <AppIcons Logo={"MARKETPLACE"} name='Reversos cash out' />,
+        label: <AppIcons Logo={"SORTEOS"} name='Reversos cash out' />,
         component: MoviiPDPReverseCashOut,
         permission: [52],
       },
@@ -1430,6 +1437,7 @@ const allUrlsPrivateApps = [
     component: iFoodAportes,
     permission: [1],
   },
+  rutasSoat,
 ];
 
 export { allUrlsPrivateApps };
