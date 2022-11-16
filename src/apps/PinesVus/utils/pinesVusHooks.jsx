@@ -354,9 +354,10 @@ export const useProvidePinesVus = () => {
 
   const reenvioHash = useCallback(
     async (
-      doc_cliente
+      doc_cliente,
+      reenviarFormulario
     ) => {
-      const query = { doc_cliente : doc_cliente };
+      const query = { doc_cliente : doc_cliente, reenviarFormulario : reenviarFormulario };
       try {
         const res = await fetchData(urls.reenvioHash, "GET", query);
         return res;

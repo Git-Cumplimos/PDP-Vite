@@ -342,7 +342,7 @@ const CrearPin = () => {
       if (!resp?.status){
         notifyError(resp?.msg)
       }else{
-      setPedirFirma(!resp?.obj?.existe_firma)
+      setPedirFirma(!resp?.obj?.firma)
       setShowFormulario(true)    
       if (resp?.obj?.results?.length > 0) {
         const fecha_nacimiento = new Date(resp?.obj?.results?.[0]?.fecha_nacimiento);
@@ -916,7 +916,7 @@ const CrearPin = () => {
         onClick={() => {
           setShowModalFirma(true)
         }}
-        disabled={pedirFirma}
+        disabled={!pedirFirma}
         >
           Firma
         </Button>
