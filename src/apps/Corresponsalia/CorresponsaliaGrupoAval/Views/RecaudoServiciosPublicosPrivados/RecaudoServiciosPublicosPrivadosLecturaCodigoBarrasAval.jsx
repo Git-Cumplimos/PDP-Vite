@@ -34,6 +34,14 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
     },
     commerceInfo: [
       /*id transaccion recarga*/
+      /*id_dispositivo*/
+      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      /*telefono*/
+      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+      /*Id trx*/
+      ["Id Trx", ""],
+      /*Id Aut*/
+      ["Id Aut", ""],
       /*comercio*/
       [
         "Comercio",
@@ -41,12 +49,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           ? roleInfo?.["nombre comercio"]
           : "Sin datos",
       ],
-      /*id_dispositivo*/
-      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      ["", ""],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      /*telefono*/
-      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+      ["", ""],
     ],
     commerceName: "Recaudo de facturas",
     trxInfo: [],
@@ -164,6 +170,17 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         ...old,
         commerceInfo: [
           /*id transaccion recarga*/
+          /*id_dispositivo*/
+          [
+            "No. Terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+          ],
+          /*telefono*/
+          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+          /*Id trx*/
+          ["Id Trx", ""],
+          /*Id Aut*/
+          ["Id Aut", ""],
           /*comercio*/
           [
             "Comercio",
@@ -171,18 +188,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
               ? roleInfo?.["nombre comercio"]
               : "Sin datos",
           ],
-          /*id_dispositivo*/
-          [
-            "No. Terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
+          ["", ""],
           /*direccion*/
           [
             "Dirección",
             roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
           ],
-          /*telefono*/
-          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+          ["", ""],
         ],
         trxInfo: [],
       };
@@ -211,6 +223,17 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         ...old,
         commerceInfo: [
           /*id transaccion recarga*/
+          /*id_dispositivo*/
+          [
+            "No. Terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+          ],
+          /*telefono*/
+          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+          /*Id trx*/
+          ["Id Trx", ""],
+          /*Id Aut*/
+          ["Id Aut", ""],
           /*comercio*/
           [
             "Comercio",
@@ -218,18 +241,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
               ? roleInfo?.["nombre comercio"]
               : "Sin datos",
           ],
-          /*id_dispositivo*/
-          [
-            "No. Terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
+          ["", ""],
           /*direccion*/
           [
             "Dirección",
             roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
           ],
-          /*telefono*/
-          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+          ["", ""],
         ],
         trxInfo: [],
       };
@@ -313,7 +331,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
       datosEnvio?.datosConvenio?.convenio,
     ]);
     objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Referencia de pago", datosTrans?.ref1 ?? ""]);
+    objTicket["trxInfo"].push([
+      "Referencia de pago",
+      datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
+    ]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
       "Valor",
@@ -352,12 +373,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          objTicket["commerceInfo"].push(["Id Trx", res?.obj?.id_trx]);
-          objTicket["commerceInfo"].push([
+          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
+          objTicket["commerceInfo"][3] = [
             "Id Aut",
             res?.obj?.codigo_autorizacion,
-          ]);
-          objTicket["commerceInfo"].push(["", ""]);
+          ];
           setObjTicketActual(objTicket);
           setPeticion(4);
         } else {

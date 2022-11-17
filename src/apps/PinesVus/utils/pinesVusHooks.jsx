@@ -46,12 +46,16 @@ export const useProvidePinesVus = () => {
   const [activarNavigate, setActivarNavigate] = useState(true);
 
   const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion) => {
+    let tipo_comercio = user?.tipo_comercio
+    if (user?.tipo_comercio === "KIOSCO"){
+      tipo_comercio = "OFICINAS PROPIAS"
+    }
     const body = {
       valor_tramite : valor_tramite,
       Usuario: user?.id_usuario,
       Dispositivo: user?.id_dispositivo,
       Comercio: user?.id_comercio,
-      Tipo: user?.tipo_comercio,
+      Tipo: tipo_comercio,
       NombreComercio: roleInfo?.["nombre comercio"],
       valor: parseFloat(valor),
       motivo: motivo,
@@ -70,6 +74,10 @@ export const useProvidePinesVus = () => {
   }, []);
   
   const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma) => {
+    let tipo_comercio = user?.Tipo
+    if (user?.Tipo === "KIOSCO"){
+      tipo_comercio = "OFICINAS PROPIAS"
+    }
     const body = {
       tipo_tramite: tramite,
       infoTramite: infoTramite,
@@ -78,7 +86,7 @@ export const useProvidePinesVus = () => {
       Usuario: user?.Usuario,
       Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,
-      Tipo: user?.Tipo,
+      Tipo: tipo_comercio,
       NombreComercio: roleInfo?.["nombre comercio"],
       DireccionComercio: roleInfo?.direccion,
       infoCliente: infoCliente,
@@ -99,11 +107,15 @@ export const useProvidePinesVus = () => {
 
   const usarPinVus = useCallback(
     async (valor, trx, num_tramite, user, id_pin) => {
+      let tipo_comercio = user?.tipo_comercio
+      if (user?.tipo_comercio === "KIOSCO"){
+        tipo_comercio = "OFICINAS PROPIAS"
+      }
       const body = {
         Usuario: user?.id_usuario,
         Dispositivo: user?.id_dispositivo,
         Comercio: user?.id_comercio,
-        Tipo: user?.tipo_comercio,
+        Tipo: tipo_comercio,
         NombreComercio: roleInfo?.["nombre comercio"],
         valor: parseFloat(valor),
         id_trx: trx,
@@ -220,6 +232,10 @@ export const useProvidePinesVus = () => {
     fecha_participacion
     // voucher
     ) => {
+    let tipo_comercio = roleInfo.tipo_comercio
+    if (roleInfo?.tipo_comercio === "KIOSCO"){
+      tipo_comercio = "OFICINAS PROPIAS"
+    }
     const body = {
       participante: participante, 
       // banco: banco, 
@@ -232,7 +248,7 @@ export const useProvidePinesVus = () => {
       Usuario: roleInfo?.id_usuario,
       Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
-      Tipo: roleInfo?.tipo_comercio,
+      Tipo: tipo_comercio,
     };
     try {
       const res = await fetchData(urls.registroPagoParticipacion, "POST", {}, body);
@@ -338,9 +354,10 @@ export const useProvidePinesVus = () => {
 
   const reenvioHash = useCallback(
     async (
-      doc_cliente
+      doc_cliente,
+      reenviarFormulario
     ) => {
-      const query = { doc_cliente : doc_cliente };
+      const query = { doc_cliente : doc_cliente, reenviarFormulario : reenviarFormulario };
       try {
         const res = await fetchData(urls.reenvioHash, "GET", query);
         return res;

@@ -321,7 +321,7 @@ const Deposito = () => {
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
     };
-
+    console.log(body)
     fetchCashIn(body)
       .then((res) => {
         setIsUploading(false);
