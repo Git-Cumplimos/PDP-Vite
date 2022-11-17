@@ -1141,25 +1141,29 @@ const allUrlsPrivateApps = [
             subRoutes: [
               {
                 link: "/movistar/paquetes-movistar/combo",
-                label: <AppIcons Logo={"SORTEOS"} name="Combos" />,
+                label: <AppIcons Logo={"PAQUETESMOVISTAR"} name="Combos" />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/paquete-voz",
-                label: <AppIcons Logo={"SORTEOS"} name="Paquete de Voz" />,
+                label: (
+                  <AppIcons Logo={"PAQUETESMOVISTAR"} name="Paquete de Voz" />
+                ),
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/paquete-datos",
-                label: <AppIcons Logo={"SORTEOS"} name="Paquete de Datos" />,
+                label: (
+                  <AppIcons Logo={"PAQUETESMOVISTAR"} name="Paquete de Datos" />
+                ),
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/prepagada",
-                label: <AppIcons Logo={"SORTEOS"} name="Prepagada" />,
+                label: <AppIcons Logo={"PAQUETESMOVISTAR"} name="Prepagada" />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
@@ -1175,7 +1179,7 @@ const allUrlsPrivateApps = [
                 link: "/movistar/operador-pdp/cargar-paquetes",
                 label: (
                   <AppIcons
-                    Logo={"Reporte"}
+                    Logo={"CARGAR"}
                     name="Cargue de paquetes de movistar"
                   />
                 ),
@@ -1184,26 +1188,21 @@ const allUrlsPrivateApps = [
               },
               {
                 link: "/movistar/operador-pdp/concilacion",
-                label: (
-                  <AppIcons
-                    Logo={"DescargarReporte"}
-                    name="Descargar Conciliación"
-                  />
-                ),
+                label: <AppIcons Logo={"Reporte"} name="Conciliaciones" />,
                 component: ConcilacionMovistar,
                 permission: [66],
                 subRoutes: [
                   {
                     link: "/movistar/operador-pdp/concilacion/descarga",
                     label: (
-                      <AppIcons Logo={"SORTEOS"} name="Decargar archivos" />
+                      <AppIcons Logo={"DESCARGAR"} name="Decargar archivos" />
                     ),
                     component: ConcilacionMovistarDescarga,
                     permission: [66],
                   },
                   {
                     link: "/movistar/operador-pdp/concilacion/carga",
-                    label: <AppIcons Logo={"SORTEOS"} name="Cargar archivos" />,
+                    label: <AppIcons Logo={"CARGAR"} name="Cargar archivos" />,
                     component: ConciliacionMovistarCarga,
                     permission: [66],
                   },
