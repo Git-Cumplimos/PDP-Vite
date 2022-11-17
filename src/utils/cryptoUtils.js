@@ -7,7 +7,6 @@ export const cifrarAES = (llave, iv, texto) => {
     iv: iv,
   }).toString();
 };
-// XpAr8ou2/PfVA6gyd9l+MQ==
 export const decryptAES = (llave,iv,data) => {
   let dataSin64 = CryptoJS.enc.Base64.parse(data)
   dataSin64 = CryptoJS.enc.Base64.stringify(dataSin64)
