@@ -25,6 +25,7 @@ import ProvidepinesVus from "../apps/PinesVus/components/ProvidepinesVus";
 import rutasAvalCB, {
   listPermissionsAval,
 } from "../apps/Corresponsalia/CorresponsaliaGrupoAval/routes";
+import rutasAgrarioCB, { listPermissionsAgrario } from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/routes";
 
 /**
 
@@ -240,118 +241,8 @@ const Corresponsalia = lazy(() =>
   import("../apps/Corresponsalia/Corresponsalia")
 );
 
-/**
- * Corresponsalia Banco Agrario
- */
-const CorresponsaliaBancoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/CorresponsaliaBancoAgrario"
-  )
-);
-const TrxCuentasBancoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/CorresponsaliaBancoAgrario"
-  )
-);
-const RetiroBancoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/Retiro/RetiroBancoAgrario"
-  )
-);
-const RetiroEfectivoBancoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/TrxCuentas/RetiroEfectivo"
-  )
-);
-const DepositoBancoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/TrxCuentas/DepositoEfectivo"
-  )
-);
-const ConveniosRecaudoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivados/ConveniosRecaudoAgrario"
-  )
-);
-const RecaudoServiciosPublicosPrivadosAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosAgrario"
-  )
-);
-const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario"
-  )
-);
-const SeleccionServicioPagarAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivados/SeleccionServicioPagarAgrario"
-  )
-);
-const RecaudoServiciosPublicosPrivadosMenuAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivadosMenuAval"
-  )
-);
 
-/**
- * Corresponsalia Grupo Aval
- */
-const CorresponsaliaGrupoAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/CorresponsaliaGrupoAval"
-  )
-);
-// const AhorrosCorrienteGrupoAval = lazy(() =>
-//  import(
-//    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/AhorrosCorriente"
-//  )
-// );
-const DepositoGrupoAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Deposito"
-  )
-);
-const RetiroGrupoAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Retiro"
-  )
-);
-const RecaudoServiciosPublicosPrivadosMenuAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivadosMenuAval"
-  )
-);
-const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval"
-  )
-);
-const SeleccionServicioPagarAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/SeleccionServicioPagarAval"
-  )
-);
-const RecaudoServiciosPublicosPrivadosAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosAval"
-  )
-);
-const ConveniosRecaudoAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/ConveniosRecaudoAval"
-  )
-);
-const PagoTerceros = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/PagoTerceros/PagoTerceros"
-  )
-);
-const PagoSubsidios = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/PagoSubsidios/PagoSubsidios"
-  )
-);
+
 
 /**
  * API-SMS
@@ -809,111 +700,12 @@ const allUrlsPrivateApps = [
       ...listPermissionsColpatria,
       ...listPermissionsDavivienda,
       ...listPermissionsAval,
+      ...listPermissionsAgrario
     ],
     subRoutes: [
       rutasDaviviendaCB,
-      rutasAvalCB,
-      //CorresponsaliaBancoAgrario
-      {
-        link: "/corresponsalia/corresponsalia-banco-agrario",
-        label: (
-          <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Banco Agrario' />
-        ),
-        component: CorresponsaliaBancoAgrario,
-        permission: [71],
-        subRoutes: [
-          {
-            link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas",
-            label: (
-              <AppIcons
-                Logo={"MARKETPLACE"}
-                name='Transacciones cuentas Banco Agrario'
-              />
-            ),
-            component: TrxCuentasBancoAgrario,
-            permission: [72],
-            subRoutes: [
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/deposito",
-                label: <AppIcons Logo={"MARKETPLACE"} name='Depósito' />,
-                component: DepositoBancoAgrario,
-                permission: [73],
-              },
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/retiro",
-                label: <AppIcons Logo={"MARKETPLACE"} name='Retiro' />,
-                component: RetiroEfectivoBancoAgrario,
-                permission: [73],
-              },
-            ],
-          },
-          {
-            link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados",
-            label: (
-              <AppIcons
-                Logo={"MARKETPLACE"}
-                name='Recaudo servicios públicos y privados'
-              />
-            ),
-            component: RecaudoServiciosPublicosPrivadosMenuAgrario,
-            permission: [71],
-            subRoutes: [
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/seleccion",
-                label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
-                component: SeleccionServicioPagarAgrario,
-                permission: [71],
-              },
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/codbarras",
-                label: (
-                  <AppIcons
-                    Logo={"MARKETPLACE"}
-                    name='Recaudo código de barras'
-                  />
-                ),
-                component:
-                  RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario,
-                permission: [69],
-              },
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/manual",
-                label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
-                component: RecaudoServiciosPublicosPrivadosAgrario,
-                permission: [69],
-                show: false,
-              },
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/convenios",
-                label: (
-                  <AppIcons
-                    Logo={"MARKETPLACE"}
-                    name='Convenios recaudo Agrario'
-                  />
-                ),
-                component: ConveniosRecaudoAgrario,
-                permission: [70],
-              },
-            ],
-          },
-          // {
-          //   link: "/corresponsalia/corresponsalia-banco-agrario/retiro",
-          //   label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
-          //   component: RetiroBancoAgrario,
-          //   permission: [72],
-          //   subRoutes: [
-          //     {
-          //       link: "/corresponsalia/corresponsalia-banco-agrario/retiro/retiro-efectivo",
-          //       label: (
-          //         <AppIcons Logo={"MARKETPLACE"} name="Retiro en efectivo" />
-          //       ),
-          //       component: RetiroEfectivoBancoAgrario,
-          //       permission: [73],
-          //     },
-          //   ],
-          // },
-        ],
-      },
+      rutasAvalCB,    
+      rutasAgrarioCB,  
       rutasColpatria,
     ],
   },
