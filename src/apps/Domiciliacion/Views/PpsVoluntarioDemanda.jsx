@@ -18,6 +18,7 @@ import Tickets from "../../../components/Base/Tickets";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import useQuery from "../../../hooks/useQuery";
 import classes from "./PpsVoluntarioDemanda.module.css";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
@@ -61,6 +62,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const [tipoComercio, setTipoComercio] = useState(roleInfo["tipo_comercio"]);
   const [esPropio, setEsPropio] = useState(false);
   const [voucher, setVoucher] = useState(false);
+  const [procesandoTrx, setProcesandoTrx] = useState(false);
 
   const [disabledBtn, setDisabledBtn] = useState(false);
 
@@ -129,12 +131,17 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       trxInfo: [
         ["PISO DE PROTECCION SOCIAL - APORTE VOLUNTARIO"],
         ["", ""],
-        ["Id Transaccion ", datosRespuesta?.[0]?.["inserted_id"]],
+        [
+          "Número de documento",
+          /* "33" */ datosRespuesta?.[1]?.["Identificacion"],
+        ],
+        ["", ""],
+        ["Número de autorización ", datosRespuesta?.[0]?.["inserted_id"]],
         /* ["Proceso", "Aporte Voluntario A Demanda"], */
         ["", ""],
-        ["Valor", formatMoney.format(valorAportar)],
-        ["", ""],
         ["N° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
+        ["", ""],
+        ["Valor", formatMoney.format(valorAportar)],
         ["", ""],
       ],
 
@@ -162,6 +169,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const enviar = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
+    setProcesandoTrx(true);
     /*  setShowModal(false); */
     if (cupoLogin >= valorAportar) {
       if (tipoComercio === "OFICINAS PROPIAS") {
@@ -194,6 +202,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               true
             )
               .then((respuesta) => {
+                setProcesandoTrx(false);
                 console.log(respuesta);
                 if (
                   respuesta?.msg?.["respuesta_colpensiones"] ===
@@ -397,6 +406,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   };
   return (
     <div>
+      <SimpleLoading show={procesandoTrx}></SimpleLoading>
       <Modal show={showModal} handleClose={handleClose}>
         <div className={contenedorImagen}>
           <LogoPDP xsmall></LogoPDP>

@@ -192,7 +192,10 @@ const Retiro = () => {
         datosTrans.otp
       ),
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       direccion: roleInfo?.direccion ? roleInfo?.direccion : "",
     })
       .then((res) => {

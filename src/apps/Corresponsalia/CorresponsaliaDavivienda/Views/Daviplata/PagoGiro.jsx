@@ -153,7 +153,7 @@ const PagoGiro = () => {
       year: "2-digit",
       month: "2-digit",
       day: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     /*hora actual */
     const hora = Intl.DateTimeFormat("es-CO", {
       year: "2-digit",
@@ -180,7 +180,10 @@ const PagoGiro = () => {
       nombreComercio: roleInfo?.["nombre comercio"],
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       ticket: objTicket,
     })
       .then((res) => {
@@ -233,13 +236,13 @@ const PagoGiro = () => {
       year: "2-digit",
       month: "2-digit",
       day: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     /*hora actual */
     const hora = Intl.DateTimeFormat("es-CO", {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-    }).format(new Date())
+    }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
@@ -256,7 +259,10 @@ const PagoGiro = () => {
       nombreComercio: roleInfo?.["nombre comercio"],
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       ticket: objTicket,
       direccion: roleInfo?.direccion,
       idTrx: datosConsultaIdTrx.idTrx,

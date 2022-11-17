@@ -91,11 +91,11 @@ const TrxRecaudo = () => {
           formatMoney.format(valTrxRecaudo)
         ) : (
           <Input
-            id="valor"
-            name="valor"
+            id='valor'
+            name='valor'
             // label="Valor a pagar"
-            autoComplete="off"
-            type="tel"
+            autoComplete='off'
+            type='tel'
             minLength={"5"}
             maxLength={"10"}
             value={formatMoney.format(valTrxRecaudo)}
@@ -127,7 +127,10 @@ const TrxRecaudo = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valTrxRecaudo,
 
         // Datos trx colpatria
@@ -193,7 +196,9 @@ const TrxRecaudo = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valTrxRecaudo,
 
         id_trx: inquiryStatus?.id_trx,
@@ -398,8 +403,8 @@ const TrxRecaudo = () => {
   if (searchingConvData || !(searchingConvData || datosConvenio)) {
     return (
       <Fragment>
-        <h1 className="text-3xl mt-6">Recaudo PSP en Efectivo</h1>
-        <h1 className="text-xl mt-6">
+        <h1 className='text-3xl mt-6'>Recaudo PSP en Efectivo</h1>
+        <h1 className='text-xl mt-6'>
           {searchingConvData
             ? "Buscando infomacion de convenio ..."
             : "No se ha encontrado informacion del convenio"}
@@ -410,29 +415,28 @@ const TrxRecaudo = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6 mb-10">Recaudo PSP en Efectivo</h1>
+      <h1 className='text-3xl mt-6 mb-10'>Recaudo PSP en Efectivo</h1>
       <Form
         onSubmit={inquiryStatus ? (ev) => ev.preventDefault() : onMakeInquiry}
-        grid
-      >
+        grid>
         <Input
-          label="Número de convenio"
-          type="text"
-          autoComplete="off"
+          label='Número de convenio'
+          type='text'
+          autoComplete='off'
           value={datosConvenio.pk_codigo_convenio}
           disabled
         />
         <Input
-          label="Código EAN o IAC"
-          type="text"
-          autoComplete="off"
+          label='Código EAN o IAC'
+          type='text'
+          autoComplete='off'
           value={datosConvenio.codigo_ean_iac}
           disabled
         />
         <Input
-          label="Nombre de convenio"
-          type="text"
-          autoComplete="off"
+          label='Nombre de convenio'
+          type='text'
+          autoComplete='off'
           value={datosConvenio.nombre_convenio}
           disabled
         />
@@ -444,9 +448,9 @@ const TrxRecaudo = () => {
               id={`referencia_${ref}`}
               label={datosConvenio[`referencia_${ref}`]}
               name={`referencia_${ref}`}
-              type="text"
-              maxLength="19"
-              autoComplete="off"
+              type='text'
+              maxLength='19'
+              autoComplete='off'
               value={userReferences?.[`referencia_${ref}`] ?? ""}
               onInput={(ev) =>
                 setUserReferences((old) => ({
@@ -460,11 +464,11 @@ const TrxRecaudo = () => {
           ))}
         {datosConvenio.fk_tipo_valor === 1 || valTrxRecaudo ? (
           <Input
-            id="valor"
-            name="valor"
-            label="Valor a pagar"
-            autoComplete="off"
-            type="tel"
+            id='valor'
+            name='valor'
+            label='Valor a pagar'
+            autoComplete='off'
+            type='tel'
             minLength={"5"}
             maxLength={"10"}
             value={valTrxRecaudo ? formatMoney.format(valTrxRecaudo) : ""}
@@ -484,10 +488,9 @@ const TrxRecaudo = () => {
       <ScreenBlocker show={loadingInquiry} />
       <Modal
         show={inquiryStatus}
-        handleClose={loadingSell ? () => {} : handleClose}
-      >
+        handleClose={loadingSell ? () => {} : handleClose}>
         {paymentStatus ? (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -498,10 +501,9 @@ const TrxRecaudo = () => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type="submit"
+                type='submit'
                 onClick={onMakePayment}
-                disabled={loadingSell}
-              >
+                disabled={loadingSell}>
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingSell}>

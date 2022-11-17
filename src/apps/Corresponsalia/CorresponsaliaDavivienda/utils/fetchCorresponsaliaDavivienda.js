@@ -3,18 +3,28 @@ import fetchData from "../../../../utils/fetchData";
 
 const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
 const urlParametrizacion = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}`;
+
 export const consultaGiroDaviplata = async (bodyObj) => {
   if (!bodyObj) {
     return new Promise((resolve, reject) => {
       resolve("Sin datos body");
     });
   }
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      parseObj
+    ),
+  };
+
   try {
     const res = await fetchData(
       `${urlDaviplata}davivienda_cb_cashIn/consultaGiroDaviplata`,
       "POST",
       {},
-      bodyObj,
+      dataObj,
       {},
       {},
       40000
@@ -22,6 +32,16 @@ export const consultaGiroDaviplata = async (bodyObj) => {
     if (!res?.status) {
       console.error(res?.msg);
     }
+    if (res?.obj !== {}) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
+    }
+
     return res;
   } catch (err) {
     throw err;
@@ -34,18 +54,36 @@ export const pagoGiroDaviplata = async (bodyObj) => {
       resolve("Sin datos body");
     });
   }
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      parseObj
+    ),
+  };
   try {
     const res = await fetchData(
       `${urlDaviplata}davivienda_cb_cashIn/pagoGiroDaviplata`,
       "POST",
       {},
-      bodyObj,
+      dataObj,
       {},
       {},
       80000
     );
     if (!res?.status) {
       console.error(res?.msg);
+    }
+
+    if (res?.obj !== {}) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
     }
     return res;
   } catch (err) {
@@ -81,12 +119,14 @@ export const postRealizarCashoutDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
-  let parseObj = JSON.stringify(bodyObj)
-  let dataObj = {data: cifrarAES(
-    `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
-    `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
-    parseObj
-  )}
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      parseObj
+    ),
+  };
 
   try {
     const res = await fetchData(
@@ -100,6 +140,15 @@ export const postRealizarCashoutDavivienda = async (bodyObj) => {
     if (!res?.status) {
       console.error(res?.msg);
     }
+    if (res?.obj !== {}) {
+      const dataDecrypt = res?.obj?.data ?? "";
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
+    }
     return res;
   } catch (err) {
     throw err;
@@ -112,12 +161,20 @@ export const consultaCostoCB = async (bodyObj) => {
       resolve("Sin datos body");
     });
   }
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      parseObj
+    ),
+  };
   try {
     const res = await fetchData(
       `${urlDaviplata}davivienda_cb_deposito_retiro/consultaCostoCB`,
       "POST",
       {},
-      bodyObj,
+      dataObj,
       {},
       {},
       40000
@@ -125,6 +182,17 @@ export const consultaCostoCB = async (bodyObj) => {
     if (!res?.status) {
       console.error(res?.msg);
     }
+
+    if (res?.obj !== {}) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
+    }
+
     return res;
   } catch (err) {
     throw err;
@@ -137,12 +205,22 @@ export const depositoCorresponsal = async (bodyObj) => {
       resolve("Sin datos body");
     });
   }
+
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      parseObj
+    ),
+  };
+
   try {
     const res = await fetchData(
       `${urlDaviplata}davivienda_cb_deposito_retiro/depositoCorresponsal`,
       "POST",
       {},
-      bodyObj,
+      dataObj,
       {},
       {},
       40000
@@ -150,6 +228,17 @@ export const depositoCorresponsal = async (bodyObj) => {
     if (!res?.status) {
       console.error(res?.msg);
     }
+
+    if (res?.obj !== {}) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
+    }
+
     return res;
   } catch (err) {
     throw err;
@@ -162,12 +251,22 @@ export const retiroCorresponsal = async (bodyObj) => {
       resolve("Sin datos body");
     });
   }
+
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      parseObj
+    ),
+  };
+
   try {
     const res = await fetchData(
       `${urlDaviplata}davivienda_cb_deposito_retiro/retiroCorresponsal`,
       "POST",
       {},
-      bodyObj,
+      dataObj,
       {},
       {},
       40000
@@ -175,6 +274,17 @@ export const retiroCorresponsal = async (bodyObj) => {
     if (!res?.status) {
       console.error(res?.msg);
     }
+
+    if (res?.obj !== {}) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
+    }
+
     return res;
   } catch (err) {
     throw err;

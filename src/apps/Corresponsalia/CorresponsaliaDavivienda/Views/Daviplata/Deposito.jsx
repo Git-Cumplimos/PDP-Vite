@@ -24,7 +24,7 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
-
+import { decryptAES } from "../../../../../utils/cryptoUtils";
 
 const Deposito = () => {
   const navigate = useNavigate();
@@ -51,13 +51,13 @@ const Deposito = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: enumParametrosDavivienda.maxCashInDaviplata ,
+    max: enumParametrosDavivienda.maxCashInDaviplata,
     min: enumParametrosDavivienda.minCashInDaviplata,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
-    equalError: false
+    equalError: false,
   });
 
   const options = [
@@ -184,9 +184,11 @@ const Deposito = () => {
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del depósito debe estar entre ${formatMoney.format(
-            min
-          ).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
+          `El valor del depósito debe estar entre ${formatMoney
+            .format(min)
+            .replace(/(\$\s)/g, "$")} y ${formatMoney
+            .format(max)
+            .replace(/(\$\s)/g, "$")}`
         );
       }
     },
@@ -221,7 +223,7 @@ const Deposito = () => {
   //       if (!res?.status) {
   //         notifyError(res?.msg);
   //         setIsUploading(false);
-  //         handleClose()          
+  //         handleClose()
   //         // return;
   //       } else {
   //         setIsUploading(false);
@@ -302,7 +304,11 @@ const Deposito = () => {
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       // Tipo: roleInfo?.tipo_comercio,
-      oficinaPropia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
+      oficinaPropia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       numIdentificacionDepositante: userDoc,
       nomDepositante: nomDepositante,
       numDaviplata: phone,
@@ -315,25 +321,23 @@ const Deposito = () => {
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
     };
-
+    console.log(body)
     fetchCashIn(body)
       .then((res) => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
           setIsUploading(false);
-          handleClose()
+          handleClose();
           // onMakePaymentReintento(res,body)
           // return;
         } else {
           notify("Transaccion satisfactoria");
-          const trx_id = res?.obj?.respuestaDavivienda
-          ?.valTalon ?? 0;
-          const comision = res?.obj?.respuestaDavivienda
-          ?.valComisionGiroDaviplata ?? 0;
+          const trx_id = res?.obj?.respuestaDavivienda?.valTalon ?? 0;
+          const comision =
+            res?.obj?.respuestaDavivienda?.valComisionGiroDaviplata ?? 0;
           const total = parseInt(comision) + valor;
-          const ter = res?.obj?.respuestaDavivienda
-          ?.total;
+          const ter = res?.obj?.respuestaDavivienda?.total;
           const tempTicket = {
             title: "Recibo de Depósito a Daviplata",
             timeInfo: {
@@ -420,7 +424,10 @@ const Deposito = () => {
             maxLength={"10"}
             value={phone}
             onInput={(e) => {
-              if ((String(e.target.value).length > 0 & String(e.target.value).slice(0,1) !== "3")) {
+              if (
+                (String(e.target.value).length > 0) &
+                (String(e.target.value).slice(0, 1) !== "3")
+              ) {
                 notifyError("El número de celular debe iniciar por 3");
                 setPhone("");
               } else {
@@ -440,23 +447,28 @@ const Deposito = () => {
             maxLength={"10"}
             value={verificacionTel}
             onInput={(e) => {
-              console.log((String(e.target.value).length>2 & String(verificacionTel).length<1))
-              if ((String(e.target.value).length> 2 & String(verificacionTel).length< 1)){
-                notifyError("Debe digitar el número celular y no pegarlo")
-              }
-              else{
-              if ((String(e.target.value).length > 0 & String(e.target.value).slice(0,1) !== "3")){
-                notifyError("El número de celular debe iniciar por 3");
-                setVerificacionTel("");
+              if (
+                (String(e.target.value).length > 2) &
+                (String(verificacionTel).length < 1)
+              ) {
+                notifyError("Debe digitar el número celular y no pegarlo");
               } else {
-                const num = parseInt(e.target.value) || "";
-                setVerificacionTel(num);
-              }}
+                if (
+                  (String(e.target.value).length > 0) &
+                  (String(e.target.value).slice(0, 1) !== "3")
+                ) {
+                  notifyError("El número de celular debe iniciar por 3");
+                  setVerificacionTel("");
+                } else {
+                  const num = parseInt(e.target.value) || "";
+                  setVerificacionTel(num);
+                }
+              }
             }}
             required
           />
           <Select
-            className="place-self-stretch"
+            className='place-self-stretch'
             id='tipoDocumento'
             label='Tipo de documento'
             options={options}
@@ -477,9 +489,9 @@ const Deposito = () => {
             value={userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
-              if (! isNaN(num)){
-              setUserDoc(num)  
-              }    
+              if (!isNaN(num)) {
+                setUserDoc(num);
+              }
             }}
             required
           />

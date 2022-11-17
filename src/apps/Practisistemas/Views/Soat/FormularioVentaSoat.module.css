@@ -1,0 +1,4 @@
+.contenedorbtn{
+    display: flex;
+    flex-direction: row;
+}
