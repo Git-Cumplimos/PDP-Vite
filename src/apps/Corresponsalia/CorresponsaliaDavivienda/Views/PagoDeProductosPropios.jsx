@@ -187,7 +187,10 @@ const PagoDeProductosPropios = () => {
       nombreComercio: roleInfo?.["nombre comercio"],
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
     })
       .then((res) => {
         if (res?.status) {
@@ -209,7 +212,7 @@ const PagoDeProductosPropios = () => {
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
-        hideModal()
+        hideModal();
         console.error(err);
       });
   };
@@ -309,7 +312,10 @@ const PagoDeProductosPropios = () => {
       ticket: objTicket,
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       direccion: roleInfo?.direccion,
       idTrx: datosTrans?.idTrx,
     })
@@ -357,7 +363,7 @@ const PagoDeProductosPropios = () => {
       })
       .catch((err) => {
         setIsUploading(false);
-        hideModal()
+        hideModal();
         notifyError("No se ha podido conectar al servidor");
         console.error(err);
       });

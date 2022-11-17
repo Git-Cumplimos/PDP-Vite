@@ -8,9 +8,8 @@ import SkeletonLoading from "./components/Base/SkeletonLoading";
 import ProvideAuth from "./components/Compound/ProvideAuth";
 import ProvideUrls from "./components/Compound/ProvideUrls";
 import ProvideImgs from "./components/Compound/ProvideImgs";
-import MessengerCustomerChat from "react-messenger-customer-chat";
 import IdleTimeOut from "./components/Compound/IdleTimeOut/IdleTimeOut";
-// import ContactMenu from "./components/Compound/ContactMenu";
+
 
 Amplify.configure(awsconfig);
 
@@ -29,16 +28,6 @@ function App() {
         </ProvideImgs>
         <IdleTimeOut />
       </ProvideAuth>
-      <MessengerCustomerChat
-        pageId='455201114671494'
-        appId='603779204002555'
-        language='es_LA'
-      />
-      {/* <ContactMenu
-        wa="573102976460"
-        tl="PDP_MultibancoBot"
-        msg="Hola, requiero más información"
-      /> */}
     </Router>
   );
 }

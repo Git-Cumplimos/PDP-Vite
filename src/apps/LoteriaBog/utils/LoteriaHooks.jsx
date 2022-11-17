@@ -316,7 +316,10 @@ export const useProvideLoteria = () => {
       if (sort[1] === "true") {
         fisico = true;
       }
-
+      let tipo_comercio = roleInfo.tipo_comercio
+      if (roleInfo.tipo_comercio === "KIOSCO"){
+        tipo_comercio = "OFICINAS PROPIAS"
+      }
       console.log(roleInfo);
       const req = {
         num_sorteo: sort[0],
@@ -337,7 +340,7 @@ export const useProvideLoteria = () => {
 
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
-        tipo_comercio: roleInfo.tipo_comercio,
+        tipo_comercio: tipo_comercio,
         tipoPago: tiposOperaciones?.Venta_Virtual, /// Venta - Virtual
       };
 
@@ -358,6 +361,10 @@ export const useProvideLoteria = () => {
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
         fisico = true;
+      }
+      let tipo_comercio = roleInfo.tipo_comercio
+      if (roleInfo.tipo_comercio === "KIOSCO"){
+        tipo_comercio = "OFICINAS PROPIAS"
       }
       console.log(selecFrac);
       const req = {
@@ -381,7 +388,7 @@ export const useProvideLoteria = () => {
           (el) => !selecFrac?.includes(el)
         ),
         cod_dane: roleInfo.codigo_dane,
-        tipo_comercio: roleInfo.tipo_comercio,
+        tipo_comercio: tipo_comercio,
         tipoPago: tipoPago !== null ? tipoPago : tiposOperaciones?.Venta_Fisica, /// Venta lotería de Bogotá - Intercambio/Fisica
       };
 
@@ -495,6 +502,10 @@ export const useProvideLoteria = () => {
 
   const pagopremio = useCallback(
     async (sorteo, billete, serie, hash, customer, respagar, phone) => {
+      let tipo_comercio = roleInfo.tipo_comercio
+      if (roleInfo.tipo_comercio === "KIOSCO"){
+        tipo_comercio = "OFICINAS PROPIAS"
+      }
       const req = {
         nombre:
           customer.primer_nombre +
@@ -520,7 +531,7 @@ export const useProvideLoteria = () => {
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
-        tipo_comercio: roleInfo.tipo_comercio,
+        tipo_comercio: tipo_comercio,
         cod_distribuidor: codigosOficina?.cod_oficina_lot,
         tipo_Operacion: tiposOperaciones?.Pago, /// Pago premios
       };
@@ -538,6 +549,10 @@ export const useProvideLoteria = () => {
 
   const pagopremiofisico = useCallback(
     async (sorteo, billete, serie, customer2, respagar, fracciones) => {
+      let tipo_comercio = roleInfo.tipo_comercio
+      if (roleInfo.tipo_comercio === "KIOSCO"){
+        tipo_comercio = "OFICINAS PROPIAS"
+      }
       const req = {
         nombre:
           customer2.primer_nombre +
@@ -563,7 +578,7 @@ export const useProvideLoteria = () => {
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
-        tipo_comercio: roleInfo.tipo_comercio,
+        tipo_comercio: tipo_comercio,
         cod_distribuidor: codigosOficina?.cod_oficina_lot,
         tipo_Operacion: tiposOperaciones?.Pago, /// Pago premios
       };

@@ -68,7 +68,7 @@ const TramitePines = () => {
   //////////////////////
   const onSubmitReenvio = (e) => {
     e.preventDefault();
-    reenvioHash(doc_cliente)
+    reenvioHash(doc_cliente,"enviarFormulario")
       .then((res) => {
         if (!res?.status) {
           notifyError(res?.msg);

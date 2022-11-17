@@ -4,7 +4,7 @@ import HNavbar from "../../../../components/Base/HNavbar";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notifyError } from "../../../../utils/notify";
 
-const CorresponsaliaDavivienda = ({ subRoutes }) => {
+const CorresponsaliaAval = ({ subRoutes }) => {
   const navigate = useNavigate();
   const { roleInfo } = useAuth();
 
@@ -39,4 +39,4 @@ const CorresponsaliaDavivienda = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default CorresponsaliaDavivienda;
+export default CorresponsaliaAval;

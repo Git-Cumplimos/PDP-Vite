@@ -1,11 +1,4 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../../components/Base/Button";
@@ -17,7 +10,6 @@ import MoneyInput, {
   formatMoney,
 } from "../../../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
-import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { notify, notifyError } from "../../../../../utils/notify";
@@ -26,7 +18,6 @@ import {
   postConsultaConveniosAval,
   postConsultaTablaConveniosEspecifico,
   postRecaudoConveniosAval,
-  postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const RecaudoServiciosPublicosPrivadosAval = () => {
@@ -53,6 +44,14 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     },
     commerceInfo: [
       /*id transaccion recarga*/
+      /*id_dispositivo*/
+      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      /*telefono*/
+      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+      /*Id trx*/
+      ["Id Trx", ""],
+      /*Id Aut*/
+      ["Id Aut", ""],
       /*comercio*/
       [
         "Comercio",
@@ -60,12 +59,10 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           ? roleInfo?.["nombre comercio"]
           : "Sin datos",
       ],
-      /*id_dispositivo*/
-      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      ["", ""],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      /*telefono*/
-      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+      ["", ""],
     ],
     commerceName: "Recaudo de facturas",
     trxInfo: [],
@@ -104,7 +101,10 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     setIsUploading(true);
     postConsultaConveniosAval({
       oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       valor_total_trx: datosTrans.valor !== "" ? datosTrans.valor : 0,
       nombre_comercio: roleInfo?.["nombre comercio"],
       comercio: {
@@ -176,7 +176,10 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     setIsUploading(true);
     postRecaudoConveniosAval({
       oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
       ticket: objTicket,
@@ -202,13 +205,11 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          objTicket["commerceInfo"].push(["Id Trx", res?.obj?.id_trx]);
-          objTicket["commerceInfo"].push([
+          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
+          objTicket["commerceInfo"][3] = [
             "Id Aut",
             res?.obj?.codigo_autorizacion,
-          ]);
-          objTicket["commerceInfo"].push(["", ""]);
-
+          ];
           setObjTicketActual(objTicket);
           setShowModal((old) => ({ ...old, estadoPeticion: 4 }));
         } else {
@@ -239,6 +240,17 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         ...old,
         commerceInfo: [
           /*id transaccion recarga*/
+          /*id_dispositivo*/
+          [
+            "No. Terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+          ],
+          /*telefono*/
+          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+          /*Id trx*/
+          ["Id Trx", ""],
+          /*Id Aut*/
+          ["Id Aut", ""],
           /*comercio*/
           [
             "Comercio",
@@ -246,18 +258,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               ? roleInfo?.["nombre comercio"]
               : "Sin datos",
           ],
-          /*id_dispositivo*/
-          [
-            "No. Terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
+          ["", ""],
           /*direccion*/
           [
             "Dirección",
             roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
           ],
-          /*telefono*/
-          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+          ["", ""],
         ],
         trxInfo: [],
       };
@@ -409,7 +416,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
               <h2 className='text-base'>
                 {`Valor a pagar: ${formatMoney.format(
-                  datosTrans.valorConst ?? "0"
+                  datosTrans.valorVar ?? "0"
                 )} `}
               </h2>
               <>

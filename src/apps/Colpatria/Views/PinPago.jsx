@@ -26,7 +26,6 @@ import TicketColpatria from "../components/TicketColpatria";
 import { buildTicket, encryptPin } from "../utils/functions";
 import Select from "../../../components/Base/Select";
 
-
 const formatMoney = makeMoneyFormatter(2);
 
 const ObjTiposPersonas = {
@@ -95,7 +94,9 @@ const PinPago = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valPinPago,
 
         // Datos trx colpatria
@@ -245,18 +246,17 @@ const PinPago = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Retiros con PIN</h1>
+      <h1 className='text-3xl mt-6'>Retiros con PIN</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
           setShowModal(true);
         }}
-        grid
-      >
+        grid>
         <Select
-          id="accType"
-          name="accType"
-          label="Seleccionar"
+          id='accType'
+          name='accType'
+          label='Seleccionar'
           options={[
             { label: "", value: "" },
             ...Object.entries(ObjTiposPersonas).map(([value, label]) => ({
@@ -269,11 +269,11 @@ const PinPago = () => {
           required
         />
         <Input
-          id="docCliente"
-          name="docCliente"
-          label="No. Identificación"
-          type="tel"
-          autoComplete="off"
+          id='docCliente'
+          name='docCliente'
+          label='No. Identificación'
+          type='tel'
+          autoComplete='off'
           minLength={"5"}
           maxLength={"12"}
           value={userDocument}
@@ -281,31 +281,31 @@ const PinPago = () => {
           required
         />
         <Input
-          id="docClienteDate"
-          name="docClienteDate"
-          label="Fecha expedicion identificacion"
-          type="date"
-          autoComplete="off"
+          id='docClienteDate'
+          name='docClienteDate'
+          label='Fecha expedicion identificacion'
+          type='date'
+          autoComplete='off'
           value={userDocumentDate}
           onInput={(ev) => setUserDocumentDate(ev.target.value)}
           required
         />
         <Input
-          id="numPin"
-          name="numPin"
-          label="No. De PIN"
-          type="text"
-          autoComplete="off"
+          id='numPin'
+          name='numPin'
+          label='No. De PIN'
+          type='text'
+          autoComplete='off'
           maxLength={"12"}
           onInput={(ev) => setAccountNumber(ev.target.value)}
           required
         />
         <Input
-          id="valor"
-          name="valor"
-          label="Valor a Retirar"
-          autoComplete="off"
-          type="tel"
+          id='valor'
+          name='valor'
+          label='Valor a Retirar'
+          autoComplete='off'
+          type='tel'
           minLength={"5"}
           maxLength={"11"}
           onInput={(ev) => setValPinPago(onChangeMoney(ev))}
@@ -317,10 +317,9 @@ const PinPago = () => {
       </Form>
       <Modal
         show={showModal}
-        handleClose={loadingPinPago ? () => {} : handleClose}
-      >
+        handleClose={loadingPinPago ? () => {} : handleClose}>
         {paymentStatus ? (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -331,10 +330,9 @@ const PinPago = () => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type="submit"
+                type='submit'
                 onClick={onMakePayment}
-                disabled={loadingPinPago}
-              >
+                disabled={loadingPinPago}>
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingPinPago}>

@@ -173,8 +173,12 @@ export const useProvideFDLM = () => {
 
   const desembolsospin = useCallback(async (info, user) => {
     console.log(info);
+    let tipo_comercio = user?.Tipo
+    if (user?.Tipo === "KIOSCO"){
+      tipo_comercio = "OFICINAS PROPIAS"
+    }
     const body = {
-      Tipo: user?.Tipo,
+      Tipo: tipo_comercio,
       Usuario: user?.Usuario,
       Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,

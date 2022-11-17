@@ -46,7 +46,12 @@ export const listPermissionsDavivienda = listPermissions.splice(
 const rutasDaviviendaCB = {
   //corresponsaliaDavivienda
   link: "/corresponsalia/corresponsaliaDavivienda",
-  label: <AppIcons Logo={"Corresponsalia"} name='Corresponsalía Davivienda' />,
+  label: (
+    <AppIcons
+      Logo={"CorresponsaliaDavivienda"}
+      name='Corresponsalía Davivienda'
+    />
+  ),
   component: CorresponsaliaDavivienda,
   permission: listPermissionsDavivienda,
   subRoutes: [

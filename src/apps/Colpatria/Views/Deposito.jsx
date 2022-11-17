@@ -96,7 +96,9 @@ const Deposito = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valDeposito,
 
         // Datos trx colpatria
@@ -155,7 +157,7 @@ const Deposito = () => {
           },
         },
         {
-          render({data: err}) {
+          render({ data: err }) {
             setLoadingDeposit(false);
             navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
@@ -163,7 +165,7 @@ const Deposito = () => {
             }
             console.error(err?.message);
             return "Transaccion fallida";
-          }
+          },
         }
       );
     },
@@ -242,18 +244,17 @@ const Deposito = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Depósitos Colpatria</h1>
+      <h1 className='text-3xl mt-6'>Depósitos Colpatria</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
           setShowModal(true);
         }}
-        grid
-      >
+        grid>
         <Select
-          id="accType"
-          name="accType"
-          label="Tipo de cuenta"
+          id='accType'
+          name='accType'
+          label='Tipo de cuenta'
           options={{
             "": "",
             ...Object.fromEntries(
@@ -265,22 +266,22 @@ const Deposito = () => {
           required
         />
         <Input
-          id="numCuenta"
-          name="numCuenta"
-          label="Número de cuenta"
-          type="tel"
-          autoComplete="off"
+          id='numCuenta'
+          name='numCuenta'
+          label='Número de cuenta'
+          type='tel'
+          autoComplete='off'
           minLength={"19"}
           maxLength={"19"}
           onInput={(ev) => setAccountNumber(onChangeAccountNumber(ev))}
           required
         />
         <Input
-          id="docCliente"
-          name="docCliente"
-          label="CC de quien deposita"
-          type="text"
-          autoComplete="off"
+          id='docCliente'
+          name='docCliente'
+          label='CC de quien deposita'
+          type='text'
+          autoComplete='off'
           minLength={"7"}
           maxLength={"13"}
           value={userDocument}
@@ -288,11 +289,11 @@ const Deposito = () => {
           required
         />
         <Input
-          id="valor"
-          name="valor"
-          label="Valor a depositar"
-          autoComplete="off"
-          type="tel"
+          id='valor'
+          name='valor'
+          label='Valor a depositar'
+          autoComplete='off'
+          type='tel'
           minLength={"5"}
           maxLength={"20"}
           onInput={(ev) => setValDeposito(onChangeMoney(ev))}
@@ -304,10 +305,9 @@ const Deposito = () => {
       </Form>
       <Modal
         show={showModal}
-        handleClose={paymentStatus || loadingDeposit ? () => {} : handleClose}
-      >
+        handleClose={paymentStatus || loadingDeposit ? () => {} : handleClose}>
         {paymentStatus ? (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -318,10 +318,9 @@ const Deposito = () => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type="submit"
+                type='submit'
                 onClick={onMakePayment}
-                disabled={loadingDeposit}
-              >
+                disabled={loadingDeposit}>
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingDeposit}>

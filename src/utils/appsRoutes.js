@@ -10,12 +10,24 @@ import rutasDaviviendaCB, {
   listPermissionsDavivienda,
 } from "../apps/Corresponsalia/CorresponsaliaDavivienda/routes";
 
+import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
+import {
+  rutasRecargas,
+  rutasPines,
+  rutasSoat,
+} from "../apps/Practisistemas/routes";
 /**
  * * Providers
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 import ProvidepinesVus from "../apps/PinesVus/components/ProvidepinesVus";
+import rutasAvalCB, {
+  listPermissionsAval,
+} from "../apps/Corresponsalia/CorresponsaliaGrupoAval/routes";
+import rutasAgrarioCB, {
+  listPermissionsAgrario,
+} from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/routes";
 
 /**
 
@@ -232,188 +244,6 @@ const Corresponsalia = lazy(() =>
 );
 
 /**
- * Corresponsalia Banco Agrario
- */
-const CorresponsaliaBancoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/CorresponsaliaBancoAgrario"
-  )
-);
-const TrxCuentasBancoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/CorresponsaliaBancoAgrario"
-  )
-);
-const RetiroBancoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/Retiro/RetiroBancoAgrario"
-  )
-);
-const RetiroEfectivoBancoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/TrxCuentas/RetiroEfectivo"
-  )
-);
-const DepositoBancoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/TrxCuentas/DepositoEfectivo"
-  )
-);
-const ConveniosRecaudoAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivados/ConveniosRecaudoAgrario"
-  )
-);
-const RecaudoServiciosPublicosPrivadosAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosAgrario"
-  )
-);
-const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario"
-  )
-);
-const SeleccionServicioPagarAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivados/SeleccionServicioPagarAgrario"
-  )
-);
-const RecaudoServiciosPublicosPrivadosMenuAgrario = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaBancoAgrario/Views/RecaudoServiciosPublicosPrivadosMenuAval"
-  )
-);
-
-/**
- * Corresponsalia Davivienda
- */
-const CorresponsaliaDavivienda = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/CorresponsaliaDavivienda"
-  )
-);
-const DaviplataCB = lazy(() =>
-  import("../apps/Corresponsalia/CorresponsaliaDavivienda/Views/Daviplata")
-);
-const CashIn = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/Daviplata/Deposito"
-  )
-);
-const CashOut = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/Daviplata/Retiro"
-  )
-);
-const PagoGiro = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/Daviplata/PagoGiro"
-  )
-);
-
-const AhorrosCorrienteCB = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/AhorrosCorriente"
-  )
-);
-const DepositoCB = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/AhorrosCorriente/Deposito"
-  )
-);
-const RetiroCB = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/AhorrosCorriente/Retiro"
-  )
-);
-const PagoDeProductosPropios = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/PagoDeProductosPropios"
-  )
-);
-const SeleccionServicioPagar = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/SeleccionServicioPagar"
-  )
-);
-const RecaudoServiciosPublicosPrivados = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivados"
-  )
-);
-const RecaudoServiciosPublicosPrivadosMenu = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivadosMenu"
-  )
-);
-
-const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosLecturaCodigoBarras"
-  )
-);
-
-/**
- * Corresponsalia Grupo Aval
- */
-const CorresponsaliaGrupoAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/CorresponsaliaGrupoAval"
-  )
-);
-// const AhorrosCorrienteGrupoAval = lazy(() =>
-//  import(
-//    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/AhorrosCorriente"
-//  )
-// );
-const DepositoGrupoAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Deposito"
-  )
-);
-const RetiroGrupoAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/AhorrosCorriente/Retiro"
-  )
-);
-const RecaudoServiciosPublicosPrivadosMenuAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivadosMenuAval"
-  )
-);
-const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval"
-  )
-);
-const SeleccionServicioPagarAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/SeleccionServicioPagarAval"
-  )
-);
-const RecaudoServiciosPublicosPrivadosAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosAval"
-  )
-);
-const ConveniosRecaudoAval = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/RecaudoServiciosPublicosPrivados/ConveniosRecaudoAval"
-  )
-);
-const PagoTerceros = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/PagoTerceros/PagoTerceros"
-  )
-);
-const PagoSubsidios = lazy(() =>
-  import(
-    "../apps/Corresponsalia/CorresponsaliaGrupoAval/Views/PagoSubsidios/PagoSubsidios"
-  )
-);
-
-/**
  * API-SMS
  */
 const API_SMS = lazy(() => import("../apps/API-SMS/API_SMS"));
@@ -489,7 +319,7 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/loteria",
-    label: <AppIcons Logo={"LOTERIA"} name="Loteria" />,
+    label: <AppIcons Logo={"Loteria"} name="Loteria" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
     permission: [3, 4, 5, 6, 44, 45, 46, 47],
@@ -497,22 +327,24 @@ const allUrlsPrivateApps = [
       {
         link: "loteria-de-bogota",
         label: "Lotería de Bogotá",
+        logo: "LoteriaBogota",
         permission: [3, 4, 5, 6],
       },
       {
         link: "loteria-del-tolima",
         label: "Lotería del Tolima",
+        logo: "LoteriaTolima",
         permission: [44, 45, 46, 47],
       },
-    ].map(({ link: name, label, permission }) => ({
+    ].map(({ link: name, label, logo, permission }) => ({
       link: `/loteria/${name}`,
-      label: <AppIcons Logo={"LOTERIA"} name={label} />,
+      label: <AppIcons Logo={logo} name={label} />,
       component: LoteriaBog,
       permission: permission,
       subRoutes: [
         {
           link: `/loteria/${name}/ventas`,
-          label: <AppIcons Logo={"SORTEOS"} name="Ventas" />,
+          label: <AppIcons Logo={"Ventas"} name="Ventas" />,
           component: venta,
           permission: [3],
         },
@@ -524,13 +356,13 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/sorteos`,
-          label: <AppIcons Logo={"REPORTE"} name="Sorteos" />,
+          label: <AppIcons Logo={"SORTEO01"} name="Sorteos" />,
           component: Descargas,
           permission: [5, 6],
           subRoutes: [
             {
               link: `/loteria/${name}/sorteos/tramitarSorteos`,
-              label: <AppIcons Logo={"REPORTE"} name="Sorteos" />,
+              label: <AppIcons Logo={"SORTEO01"} name="Sorteos" />,
               component: CrearSorteos,
               permission: [5],
             },
@@ -550,14 +382,14 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/premios`,
-          label: <AppIcons Logo={"PAGO"} name="Premios" />,
+          label: <AppIcons Logo={"Premio"} name="Premios" />,
           component: Premios,
           extern: false,
           permission: [3], ///////////////////////////////////////////////////////////////////
         },
         {
           link: `/loteria/${name}/arqueo`,
-          label: <AppIcons Logo={"PAGO"} name="Arqueo Billetes" />,
+          label: <AppIcons Logo={"ArqueoBilletes"} name="Arqueo Billetes" />,
           component: ArqueoBilletes,
           extern: false,
           permission: [3, 6], ///////////////////////////////////////////////////////////////////
@@ -607,32 +439,32 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/funmujer",
-    label: <AppIcons Logo={"RECAUDO"} name="Fundación de la mujer" />,
+    label: <AppIcons Logo={"Fundacion"} name="Fundación de la mujer" />,
     component: FunMujer,
     permission: [17, 27, 28],
     provider: ProvideFundamujer,
     subRoutes: [
       {
         link: "/funmujer/recaudo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
+        label: <AppIcons Logo={"Recaudo"} name={"Recaudo"} />,
         component: recMujer,
         permission: [17],
       },
       {
         link: "/funmujer/desembolso",
-        label: <AppIcons Logo={"RECAUDO"} name={"Desembolso"} />,
+        label: <AppIcons Logo={"Desembolso"} name={"Desembolso"} />,
         component: DesembolsoFDLM,
         permission: [28, 17],
       },
       {
         link: "/funmujer/reversorecaudo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Reverso Manual"} />,
+        label: <AppIcons Logo={"Reverso"} name={"Reverso Manual"} />,
         component: revMujer,
         permission: [27],
       },
       {
         link: "/funmujer/reporte",
-        label: <AppIcons Logo={"RECAUDO"} name={"Reporte"} />,
+        label: <AppIcons Logo={"Reporte"} name={"Reporte"} />,
         component: reportFDLM,
         permission: [28, 17],
       },
@@ -641,39 +473,47 @@ const allUrlsPrivateApps = [
 
   {
     link: "/PinesVus",
-    label: <AppIcons Logo={"RECAUDO"} name="Pines" />,
+    label: <AppIcons Logo={"CrearPines"} name="Pines" />,
     component: PinesVus,
-    permission: [53, 63],
+    permission: [53, 63, enumPermisosPractisistemas.practisistemasPines],
     provider: ProvidepinesVus,
     subRoutes: [
+      rutasPines,
       {
         link: "/PinesVus/Crear",
-        label: <AppIcons Logo={"RECAUDO"} name={"Crear Pin"} />,
+        label: <AppIcons Logo={"CrearPines"} name={"Crear Pin"} />,
         component: CrearPines,
         permission: [53],
       },
       {
         link: "/PinesVus/Tramitar",
-        label: <AppIcons Logo={"RECAUDO"} name={"Tramitar Pines"} />,
+        label: <AppIcons Logo={"TramitarPines"} name={"Tramitar Pines"} />,
         component: TramitarPines,
         permission: [53],
       },
       {
         link: "/PinesVus/Participacion",
-        label: <AppIcons Logo={"RECAUDO"} name={"Participación Pines"} />,
+        label: (
+          <AppIcons Logo={"PagoParticipacion"} name={"Participación Pines"} />
+        ),
         component: PagoParticipantes,
         permission: [53],
         subRoutes: [
           {
             link: "/PinesVus/Participacion/PagoParticipacion",
-            label: <AppIcons Logo={"RECAUDO"} name={"Pago participación"} />,
+            label: (
+              <AppIcons
+                Logo={"PagoParticipacion"}
+                name={"Pago participación"}
+              />
+            ),
             component: ParticipacionPines,
             permission: [53],
           },
           {
             link: "/PinesVus/Participacion/VerPagoParticipacion",
             label: (
-              <AppIcons Logo={"RECAUDO"} name={"Ver pago participación"} />
+              <AppIcons Logo={"ReportePines"} name={"Ver pago participación"} />
             ),
             component: VerParticipacionPines,
             permission: [53],
@@ -682,20 +522,23 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/PinesVus/Reportes",
-        label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
+        label: <AppIcons Logo={"ReportePines"} name={"Reportes Pines"} />,
         component: ReportePines,
         permission: [53, 63],
         subRoutes: [
           {
             link: "/PinesVus/Reporte/VerReportes",
-            label: <AppIcons Logo={"RECAUDO"} name={"Reportes Pines"} />,
+            label: <AppIcons Logo={"ReportePines"} name={"Reportes Pines"} />,
             component: ReportePinesVer,
             permission: [53, 63],
           },
           {
             link: "/PinesVus/Reporte/DescargarReportes",
             label: (
-              <AppIcons Logo={"RECAUDO"} name={"Descargar Reportes Pines"} />
+              <AppIcons
+                Logo={"DescargarReporte"}
+                name={"Descargar Reportes Pines"}
+              />
             ),
             component: ReportePinesDescargar,
             permission: [63],
@@ -851,209 +694,14 @@ const allUrlsPrivateApps = [
     link: "/corresponsalia",
     label: <AppIcons Logo={"Corresponsalia"} name="Corresponsalía" />,
     component: Corresponsalia,
-    permission: [54, ...listPermissionsColpatria, ...listPermissionsDavivienda],
-    subRoutes: [
-      rutasDaviviendaCB,
-      {
-        link: "/corresponsalia/CorresponsaliaGrupoAval",
-        label: (
-          <AppIcons Logo={"MARKETPLACE"} name="Corresponsalía Grupo Aval" />
-        ),
-        component: CorresponsaliaGrupoAval,
-        permission: [69, 70],
-        subRoutes: [
-          {
-            link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente",
-            label: (
-              <AppIcons
-                Logo={"MARKETPLACE"}
-                name="Transacciones cuentas Grupo Aval"
-              />
-            ),
-            component: AhorrosCorrienteCB,
-            permission: [69],
-            subRoutes: [
-              {
-                link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/deposito",
-                label: <AppIcons Logo={"MARKETPLACE"} name="Depósitos" />,
-                component: DepositoGrupoAval,
-                permission: [69],
-              },
-              {
-                link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/retiro",
-                label: <AppIcons Logo={"MARKETPLACE"} name="Retiros" />,
-                component: RetiroGrupoAval,
-                permission: [69],
-              },
-            ],
-          },
-          {
-            link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados",
-            label: (
-              <AppIcons
-                Logo={"MARKETPLACE"}
-                name="Recaudo servicios públicos y privados"
-              />
-            ),
-            component: RecaudoServiciosPublicosPrivadosMenuAval,
-            permission: [69, 70],
-            subRoutes: [
-              {
-                link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/seleccion",
-                label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
-                component: SeleccionServicioPagarAval,
-                permission: [69],
-              },
-              {
-                link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/codbarras",
-                label: (
-                  <AppIcons
-                    Logo={"MARKETPLACE"}
-                    name="Recaudo código de barras"
-                  />
-                ),
-                component:
-                  RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval,
-                permission: [69],
-              },
-              {
-                link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/manual",
-                label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
-                component: RecaudoServiciosPublicosPrivadosAval,
-                permission: [69],
-                show: false,
-              },
-              {
-                link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/convenios",
-                label: (
-                  <AppIcons
-                    Logo={"MARKETPLACE"}
-                    name="Convenios recaudo AVAL"
-                  />
-                ),
-                component: ConveniosRecaudoAval,
-                permission: [70],
-              },
-            ],
-          },
-          {
-            link: "/corresponsalia/CorresponsaliaGrupoAval/pagoterceros",
-            label: <AppIcons Logo={"MARKETPLACE"} name="Pago de terceros" />,
-            component: PagoTerceros,
-            permission: [69],
-          },
-          {
-            link: "/corresponsalia/CorresponsaliaGrupoAval/pagosubsidios",
-            label: <AppIcons Logo={"MARKETPLACE"} name="Pago de subsidios" />,
-            component: PagoSubsidios,
-            permission: [69],
-          },
-        ],
-      },
-
-      //CorresponsaliaBancoAgrario
-      {
-        link: "/corresponsalia/corresponsalia-banco-agrario",
-        label: (
-          <AppIcons Logo={"MARKETPLACE"} name="Corresponsalía Banco Agrario" />
-        ),
-        component: CorresponsaliaBancoAgrario,
-        permission: [71],
-        subRoutes: [
-          {
-            link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas",
-            label: (
-              <AppIcons
-                Logo={"MARKETPLACE"}
-                name="Transacciones cuentas Banco Agrario"
-              />
-            ),
-            component: TrxCuentasBancoAgrario,
-            permission: [72],
-            subRoutes: [
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/deposito",
-                label: <AppIcons Logo={"MARKETPLACE"} name="Depósito" />,
-                component: DepositoBancoAgrario,
-                permission: [73],
-              },
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/retiro",
-                label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
-                component: RetiroEfectivoBancoAgrario,
-                permission: [73],
-              },
-            ],
-          },
-          {
-            link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados",
-            label: (
-              <AppIcons
-                Logo={"MARKETPLACE"}
-                name="Recaudo servicios públicos y privados"
-              />
-            ),
-            component: RecaudoServiciosPublicosPrivadosMenuAgrario,
-            permission: [71],
-            subRoutes: [
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/seleccion",
-                label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
-                component: SeleccionServicioPagarAgrario,
-                permission: [71],
-              },
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/codbarras",
-                label: (
-                  <AppIcons
-                    Logo={"MARKETPLACE"}
-                    name="Recaudo código de barras"
-                  />
-                ),
-                component:
-                  RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario,
-                permission: [69],
-              },
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/manual",
-                label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
-                component: RecaudoServiciosPublicosPrivadosAgrario,
-                permission: [69],
-                show: false,
-              },
-              {
-                link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/convenios",
-                label: (
-                  <AppIcons
-                    Logo={"MARKETPLACE"}
-                    name="Convenios recaudo Agrario"
-                  />
-                ),
-                component: ConveniosRecaudoAgrario,
-                permission: [70],
-              },
-            ],
-          },
-          // {
-          //   link: "/corresponsalia/corresponsalia-banco-agrario/retiro",
-          //   label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
-          //   component: RetiroBancoAgrario,
-          //   permission: [72],
-          //   subRoutes: [
-          //     {
-          //       link: "/corresponsalia/corresponsalia-banco-agrario/retiro/retiro-efectivo",
-          //       label: (
-          //         <AppIcons Logo={"MARKETPLACE"} name="Retiro en efectivo" />
-          //       ),
-          //       component: RetiroEfectivoBancoAgrario,
-          //       permission: [73],
-          //     },
-          //   ],
-          // },
-        ],
-      },
-      rutasColpatria,
+    permission: [
+      54,
+      ...listPermissionsColpatria,
+      ...listPermissionsDavivienda,
+      ...listPermissionsAval,
+      ...listPermissionsAgrario,
     ],
+    subRoutes: [rutasDaviviendaCB, rutasAvalCB, rutasAgrarioCB, rutasColpatria],
   },
 
   {
@@ -1076,7 +724,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/API_SMS/reporteSMS",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Reporte" />,
+        label: <AppIcons Logo={"Reporte"} name="Reporte" />,
         component: reporteSMS,
         permission: [26],
       },
@@ -1112,7 +760,7 @@ const allUrlsPrivateApps = [
   //Modulo RecargasCelular
   {
     link: "/recargas-celular",
-    label: <AppIcons Logo={"LogoRecargasCelular"} name="Recargas Celular" />,
+    label: <AppIcons Logo={"RecargaCelular"} name="Recargas Celular" />,
     component: RecargasCelular,
     permission: [65, 66],
     subRoutes: [
@@ -1171,7 +819,7 @@ const allUrlsPrivateApps = [
           },
           {
             link: "/movistar/operador-pdp",
-            label: <AppIcons Logo={"SORTEOS"} name="Operador PDP" />,
+            label: <AppIcons Logo={"OperadorPdp"} name="Operador PDP" />,
             component: OperadorPDPMovistar,
             permission: [66],
             subRoutes: [
@@ -1214,16 +862,16 @@ const allUrlsPrivateApps = [
       },
     ],
   },
-
+  rutasRecargas,
   {
     link: "/movii-pdp",
-    label: <AppIcons Logo={"LOTERIA"} name="MOVII PDP" />,
+    label: <AppIcons Logo={"MARKETPLACE"} name="MOVII PDP" />,
     component: MoviiPDP,
     permission: [48],
     subRoutes: [
       {
         link: "/movii-pdp/cash-out",
-        label: <AppIcons Logo={"SORTEOS"} name="Cash out" />,
+        label: <AppIcons Logo={"MARKETPLACE"} name="Cash out" />,
         component: MoviiPDPCashOut,
         permission: [49],
       },
@@ -1420,6 +1068,7 @@ const allUrlsPrivateApps = [
     component: iFoodAportes,
     permission: [1],
   },
+  rutasSoat,
 ];
 
 export { allUrlsPrivateApps };

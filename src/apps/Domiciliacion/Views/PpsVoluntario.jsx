@@ -193,7 +193,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
           <div className={contenedorImagen}>
             <LogoPDP xsmall></LogoPDP>
           </div>
-          <Form onSubmit={(e) => enviar(e)}>
+          <Form grid onSubmit={(e) => enviar(e)}>
             <Fieldset
               legend="Formulario Aporte Voluntario"
               /* className="lg:col-span-3" */
@@ -263,7 +263,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 <Input
                   id="celular"
                   name="celular"
-                  label="Celular: "
+                  label="Celular "
                   type="tel"
                   autoComplete="off"
                   minLength="10"
@@ -348,11 +348,14 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   label="N° Pagos Punto Pago"
                   type="tel"
                   autoComplete="off"
-                  minLength={"1"}
-                  maxLength={"2"}
+                  minLength="1"
+                  maxLength="2"
                   /* invalid={invalidCedula} */
                   value={numPagosPdp}
-                  onChange={(event) => setNumPagosPdp(event?.target?.value)}
+                  onInput={(e) => {
+                    const num = parseInt(e.target.value) || "";
+                    setNumPagosPdp(num);
+                  }}
                   required
                 />
               </div>
@@ -364,7 +367,14 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 </Button>
                 /*  ) : null */
               }
-              <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+              <Button
+                onClick={() => {
+                  navigate(`/domiciliacion`);
+                  setShowModal(false);
+                }}
+              >
+                Cancelar
+              </Button>
             </ButtonBar>
           </Form>
         </Modal>
