@@ -1,9 +1,9 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Input from "../../../../components/Base/Input";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import { notify, notifyError } from "../../../../utils/notify";
-import { postConsultaPines, postConsultaPin } from "../../utils/fetchBackPines";
+import { postConsultaPin } from "../../utils/fetchBackPines";
+import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 
 const InformacionPin = () => {
@@ -36,12 +36,12 @@ const InformacionPin = () => {
     pin: "",
   });
 
-  const tableConvenios = useMemo(() => {
+  const tableTipoPin = useMemo(() => {
     return [
       ...pines?.map(({ productDesc, sell, validity }) => {
         return {
           "Nombre del Pin": productDesc,
-          Valor: sell,
+          Valor: formatMoney.format(sell) ,
           "Días de validez": validity * 1,
         };
       }),
@@ -66,12 +66,13 @@ const InformacionPin = () => {
   }, [datosTrans]);
 
   const fecthTablaConveniosPaginadoFunc = () => {
+    console.log('pin', datosTrans.pin)
     postConsultaPin({
       idcomercio: roleInfo?.["id_comercio"],
       producto: state.op,
+      pin: datosTrans.pin,
     })
       .then((autoArr) => {
-        // setMaxPages(autoArr?.maxPages);
         setConvenios(autoArr?.results ?? []);
       })
       .catch((err) => console.error(err));
@@ -83,7 +84,7 @@ const InformacionPin = () => {
       <TableEnterprise
         title="Tabla pines"
         headers={["Nombre del tipo de Pin", "Valor", "Días de validez"]}
-        data={tableConvenios}
+        data={tableTipoPin}
         onSelectRow={onSelectAutorizador}
       >
         <Input
@@ -96,7 +97,7 @@ const InformacionPin = () => {
           autoComplete="off"
           onInput={(e) => {
             setDatosTrans((old) => {
-              return { ...old, convenio: e.target.value };
+              return { ...old, pin: e.target.value };
             });
           }}
         />

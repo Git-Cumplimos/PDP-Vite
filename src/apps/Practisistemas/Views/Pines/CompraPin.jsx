@@ -83,13 +83,17 @@ const CompraPin = () => {
 
   const onSubmitCheck = (e) => {
     e.preventDefault();
-
-    //Venta del Pin
-    setShowModal(true);
-    setTypeInfo("ResumenVentaPin");
+    if (String(inputCelular).charAt(0) === "3") {  
+        setShowModal(true);
+        setTypeInfo("ResumenVentaPin");     
+    } else {
+      notifyError(
+        "Número inválido, el N° de celular debe comenzar con el número 3."
+      );
+    }
   };
 
-  const compraPines = () => {   
+  const compraPines = () => {
     setShowLoading(true);
 
     const uniqueId = v4();
@@ -104,17 +108,20 @@ const CompraPin = () => {
     const seconds = dateActual.getSeconds();
     const hora = hour + ":" + minutes + ":" + seconds;
 
-    const newVoucher = {...infTicket}
-      
-    newVoucher["timeInfo"]["Fecha de venta"] = fecha
-    newVoucher["timeInfo"]["Hora"] = hora
+    const newVoucher = { ...infTicket };
 
-    newVoucher["trxInfo"][0] = ["Nombre del Pin", state.desc]
-    newVoucher["trxInfo"][1] = ["", ""]
-    newVoucher["trxInfo"][2] = ["Número celular", toPhoneNumber(inputCelular)]
-    newVoucher["trxInfo"][3] = ["", ""]
-    newVoucher["trxInfo"][4] = [ "Valor del Pin", formatMoney.format(state.sell ? state.sell : inputValor),]
-    newVoucher["trxInfo"][5] = ["", ""]
+    newVoucher["timeInfo"]["Fecha de venta"] = fecha;
+    newVoucher["timeInfo"]["Hora"] = hora;
+
+    newVoucher["trxInfo"][0] = ["Nombre del Pin", state.desc];
+    newVoucher["trxInfo"][1] = ["", ""];
+    newVoucher["trxInfo"][2] = ["Número celular", toPhoneNumber(inputCelular)];
+    newVoucher["trxInfo"][3] = ["", ""];
+    newVoucher["trxInfo"][4] = [
+      "Valor del Pin",
+      formatMoney.format(state.sell ? state.sell : inputValor),
+    ];
+    newVoucher["trxInfo"][5] = ["", ""];
 
     fetchData(
       `${url_compra_pines}/transacciones`,
@@ -136,16 +143,16 @@ const CompraPin = () => {
           operador: state?.op,
           valor: state.sell ? state.sell : inputValor,
           jsonAdicional: {
-            "nombre_usuario": userInfo?.attributes?.name,
-            "id_uuid_trx": uniqueId,
+            nombre_usuario: userInfo?.attributes?.name,
+            id_uuid_trx: uniqueId,
           },
         },
         ///////////////
-        ticket: newVoucher
+        ticket: newVoucher,
         //////////////
       },
       {},
-      false, 
+      false,
       29000
     )
       .then((res) => {
@@ -177,16 +184,19 @@ const CompraPin = () => {
         for (let i = 0; i <= 8; i++) {
           try {
             const promesa = await new Promise((resolve, reject) =>
-            setTimeout(() => {
+              setTimeout(() => {
                 postCheckReintentoPines({
                   idComercio: roleInfo?.id_comercio,
                   idUsuario: roleInfo?.id_usuario,
                   idTerminal: roleInfo?.id_dispositivo,
                   id_uuid_trx: uniqueId,
                 })
-                  .then((res) => {                    
+                  .then((res) => {
                     if (res?.msg !== "No ha terminado el reintento") {
-                      if (res?.status === true || res?.obj?.response?.estado == "00") {
+                      if (
+                        res?.status === true ||
+                        res?.obj?.response?.estado == "00"
+                      ) {
                         notify("Venta exitosa");
                         VentaExitosa(res?.obj?.response, fecha, hora);
                         setShowLoading(false);
@@ -199,9 +209,9 @@ const CompraPin = () => {
                         resolve(true);
                       }
                     } else {
-                        setShowLoading(true);
-                        resolve(false);
-                      }
+                      setShowLoading(true);
+                      resolve(false);
+                    }
                   })
                   .catch((err) => {
                     console.error("Entró al catch del setTimeOut");
@@ -271,7 +281,7 @@ const CompraPin = () => {
 
   const handleClosePin = useCallback(() => {
     setShowModal(false);
-    validNavigate("/pines");
+    validNavigate("/Pines");
   }, []);
 
   const handleClose = useCallback(() => {
@@ -297,8 +307,8 @@ const CompraPin = () => {
       trxInfo: [],
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
-    })
-    validNavigate("/pines");
+    });
+    validNavigate("/Pines");
   }, []);
 
   const handleCloseCancelada = useCallback(() => {

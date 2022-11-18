@@ -40,7 +40,7 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
         {
           state: {
             valor_paquete: paquetes[i]["sell"],
-            operador:state?.producto,
+            descripcion: paquetes[i]["productDesc"],
             operador_recargar: state?.operador_recargar,
           },
         }        
@@ -84,7 +84,7 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
       <TableEnterprise
         title='Tabla servicio de venta de paquetes'
         maxPage={maxPages}
-        headers={["Descripcion","Valor del paquete"]}
+        headers={["Descripción","Valor del paquete"]}
         data={tablePaquetes}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
