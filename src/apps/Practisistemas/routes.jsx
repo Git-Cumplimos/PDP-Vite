@@ -75,14 +75,14 @@ export const rutasSoat = {
 
 export const rutasRecargas = {
     link: "/recargas-paquetes",
-    label: <AppIcons Logo={"SORTEOS"} name="Recargas y venta de paquetes" />,
+    label: <AppIcons Logo={"RecargaCelular"} name="Recargas y venta de paquetes" />,
     component: RecargasPaquetes,
     permission: [enumPermisosPractisistemas.practisistemasRecargas],
     subRoutes: [
       {
         link: "/recargas-paquetes/Recargar",
         label: (
-          <AppIcons Logo={"SORTEOS"} name="Recargas y venta de paquetes" />
+          <AppIcons Logo={"RecargaCelular"} name="Recargas y venta de paquetes" />
         ),
         component: RecargasOperadores,
         permission: [enumPermisosPractisistemas.practisistemasSoat],
@@ -91,14 +91,14 @@ export const rutasRecargas = {
       {
         link: "/recargas-paquetes/Venta-paquetes",
         label: (
-          <AppIcons Logo={"SORTEOS"} name="Recargas y venta de paquetes" />
+          <AppIcons Logo={"RecargaCelular"} name="Recargas y venta de paquetes" />
         ),
         component: SubPaquetesMoviles,
         permission: [enumPermisosPractisistemas.practisistemasRecargas],
       },
       {
         link: "/recargas-paquetes/Recargar-paquete",
-        label: <AppIcons Logo={"SORTEOS"} name="Venta de paquetes" />,
+        label: <AppIcons Logo={"RecargaCelular"} name="Venta de paquetes" />,
         component: RecargarPaquetes,
         permission: [enumPermisosPractisistemas.practisistemasRecargas],
         show: false,
