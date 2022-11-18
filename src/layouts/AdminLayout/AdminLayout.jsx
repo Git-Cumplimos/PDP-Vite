@@ -144,18 +144,9 @@ const AdminLayout = () => {
             <div className={saldoCupo}>
               Saldo cupo {saldoDisponible || "$0.00"}
             </div>
-            <div className={comision}>Comisión {comisionTotal || "$0.00"}</div>
-            <button className={cargar} onClick={() => setShowModal(true)}>
-              Carga tu billetera
-            </button>
           </div>
         </div>
         <HNavbar links={urls} isText />
-        <Modal show={showModal} handleClose={() => setShowModal(false)}>
-          <div>
-            <h1>Carga tu billetera</h1>
-          </div>
-        </Modal>
       </header>
       <main className='container'>
         <Suspense fallback={<ContentBox />}>{!infoCaja && <Outlet />}</Suspense>
