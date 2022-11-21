@@ -18,6 +18,7 @@ import LocationFormPinVus from "../components/LocationForm/LocationFormPinesVus"
 import { enumParametrosPines } from "../utils/enumParametrosPines";
 import InputSuggestions from "../../../components/Base/InputSuggestions";
 import FirmaTratamientoDatos from "../components/FirmaTratamientoDatos/FirmaTratamientoDatos";
+import TextArea from "../../../components/Base/TextArea";
 
 const dateFormatter = Intl.DateTimeFormat("az", {
   year: "numeric",
@@ -68,6 +69,8 @@ const CrearPin = () => {
   const [pedirFirma, setPedirFirma] = useState(true)
 
   const [olimpia, setOlimpia] = useState("")
+
+  const [motivoCompra, setMotivoCompra] = useState("")
 
   const homeLocation = {
     municipio: useState(""),
@@ -421,7 +424,7 @@ const CrearPin = () => {
       notifyError("Para evitar fallas no se permite realizar la transacción, hora cierre: " + horaCierre[0] + ":" + horaCierre[1])
       navigate("/PinesVus",{replace:true});
     }else{
-    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin,firma)
+    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin,firma, motivoCompra)
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -740,6 +743,19 @@ const CrearPin = () => {
           onInput={(e) => {
             const text = e.target.value.toUpperCase()
             setEmail(text);
+          }}
+        />
+        <TextArea
+          id="motivo"
+          label="Motivo compra"
+          type="input"
+          minLength="1"
+          maxLength="160"
+          autoComplete="off"
+          value={motivoCompra}
+          required
+          onInput={(e) => {
+            setMotivoCompra(e.target.value);
           }}
         />
         {/* <InputSuggestions
