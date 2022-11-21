@@ -8,7 +8,7 @@ import { notify, notifyError } from "../../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { fetchConveniosMany } from "../../utils/fetchRevalConvenios";
+import { fetchConveniosUnique } from "../../utils/fetchRevalConvenios";
 import {
   fetchComisionesPagar,
   postComisionesPagar,
@@ -216,8 +216,8 @@ const CreateComision = () => {
       setdata([]);
     }
   }, [selectedOpt, page, tipoTrx, comercio, convenio, autorizador]);
-  const fetchConveniosFunc = () => {
-    fetchConveniosMany({ tags: "", page })
+  const fetchConveniosFunc = useCallback(() => {
+    fetchConveniosUnique({ tags: "", page, limit })
       .then((res) => {
         setdata(
           [...res?.results].map(({ id_convenio, nombre_convenio }) => {
@@ -229,8 +229,26 @@ const CreateComision = () => {
         );
         setMaxPages(res?.maxPages);
       })
-      .catch((err) => console.error(err));
-  };
+      .catch((err) => {
+        notifyError("No se ha podido conectar al servidor");
+        console.error(err);
+      });
+  }, [page, limit]);
+  // const fetchConveniosFunc = () => {
+  //   fetchConveniosMany({ tags: "", page })
+  //     .then((res) => {
+  //       setdata(
+  //         [...res?.results].map(({ id_convenio, nombre_convenio }) => {
+  //           return {
+  //             "Id convenio": id_convenio,
+  //             "Nombre convenio": nombre_convenio,
+  //           };
+  //         })
+  //       );
+  //       setMaxPages(res?.maxPages);
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
   const fetchAutorizadoresFunc = () => {
     fetchAutorizadores({ page })
       .then((res) => {
