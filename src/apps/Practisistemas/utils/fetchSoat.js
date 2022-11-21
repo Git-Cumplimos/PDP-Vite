@@ -1,5 +1,6 @@
 import fetchData from "../../../utils/fetchData";
-const urlSoat = process.env.REACT_APP_PRACTISISTEMAS+'/ventaSoat';
+// const urlSoat = process.env.REACT_APP_PRACTISISTEMAS+'/ventaSoat';
+const urlSoat = process.env.REACT_APP_PRACTISISTEMAS + "/ventaSoat";
 
 export const fetchConsultarSoat = async (bodyObj) => {
   if (!bodyObj) {

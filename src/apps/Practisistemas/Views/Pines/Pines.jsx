@@ -76,7 +76,8 @@ const Pines = () => {
     postConsultaPines({
       idcomercio: roleInfo?.["id_comercio"],
       page,
-      limit
+      limit,
+      pin: datosTrans.pin
     })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
@@ -88,7 +89,7 @@ const Pines = () => {
   return (
     <>
       <h1 className="text-3xl text-center">
-        Servicio de venta de Pines de Servicio y Contenido
+        Servicio de venta de pines de servicio y contenido
       </h1>
       <TableEnterprise
         title="Tabla pines"

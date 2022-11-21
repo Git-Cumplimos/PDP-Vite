@@ -92,7 +92,7 @@ const RecargasPaquetes = ({ subRoutes }) => {
       <TableEnterprise
         title='Tabla servicio de recargas'
         maxPage={maxPages}
-        headers={["Descripcion","Servicio"]}
+        headers={["Descripción","Servicio"]}
         data={tableOperadores}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}

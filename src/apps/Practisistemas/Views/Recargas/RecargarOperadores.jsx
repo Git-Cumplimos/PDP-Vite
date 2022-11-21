@@ -11,6 +11,7 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
+import useMoney from "../../../../hooks/useMoney";
 import Modal from "../../../../components/Base/Modal";
 import MoneyInput from "../../../../components/Base/MoneyInput";
 import Tickets from "../../../../components/Base/Tickets";
@@ -45,27 +46,25 @@ const RecargasOperadores = () => {
       "Hora": "",
     },
     commerceInfo: [
-      ["No. terminal", roleInfo.id_dispositivo],
       ["Id Comercio", roleInfo.id_comercio],
+      ["No. terminal", roleInfo.id_dispositivo],
       ["Comercio", roleInfo["nombre comercio"]],
+      ["", ""],
+      ["Municipio", roleInfo.ciudad],
       ["", ""],
       ["Dirección", roleInfo.direccion],
       ["", ""],
     ],
-    commerceName: "RECARGAS A CELULAR",
-    trxInfo: [
-      ["Operador", state?.operador_recargar],
-      ["", ""],
-    ],
+    commerceName: "RECARGA " +state?.operador_recargar,
+    trxInfo: [],
     disclamer:
       "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
   });
-
-  const onMoneyChange = (e, valor) => {
-    if (!isNaN(valor)) {
-      setInputValor(valor);
-    }
-  };
+  console.log(roleInfo)
+  const onChangeMoney = useMoney({
+    limits: [minValor,maxValor],
+    equalError: false
+  });
 
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
@@ -89,7 +88,13 @@ const RecargasOperadores = () => {
     }
     else{
       notify(`El valor de la recarga debe ser mayor a ${formatMoney.format(minValor)}`)
-    }        
+    } 
+    if (inputCelular[0] != 3) {
+      notifyError(
+        "Número inválido, el No. de celular debe comenzar con el número 3"
+      );
+      handleClose();
+    }     
   };
   
   const fecthEnvioTransaccion = () => {
@@ -129,14 +134,15 @@ const RecargasOperadores = () => {
           operador:state?.producto,
           valor: parseInt(inputValor),
           jsonAdicional:{
-            "nombre_usuario": userInfo?.attributes?.name
+            "nombre_usuario": userInfo?.attributes?.name,
+            "operador": state?.operador_recargar
           } 
       }
     })
     .then((res) => {
       if (res?.status === true) {
-        notify(res?.msg);
-        infTicketFinal["commerceInfo"].push(["Id Trx", res?.obj?.response?.["idtrans"]]);
+        notify("Recarga exitosa");
+        infTicketFinal["commerceInfo"].push(["Id Transacción", res?.obj?.response?.["idtrans"]]);
         infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);
         setInfTicket(infTicketFinal)
         setRespuesta(false);
@@ -163,7 +169,8 @@ const RecargasOperadores = () => {
               })
               .then((res) => {
                 if (res?.msg !== "No ha terminado el reintento") {
-                  if (res?.status === true || res?.obj?.response?.estado == "00") {        
+                  if (res?.status === true || res?.obj?.response?.estado == "00") {  
+                    notify("Recarga exitosa");      
                     infTicketFinal["commerceInfo"].push(["Id Trx", res?.obj?.response?.["idtrans"]]);
                     infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);
                     setInfTicket(infTicketFinal)
@@ -209,17 +216,17 @@ const RecargasOperadores = () => {
       return {
         ...old,
         commerceInfo: [
-          ["No. terminal", roleInfo.id_dispositivo],
           ["Id Comercio", roleInfo.id_comercio],
+          ["No. terminal", roleInfo.id_dispositivo],
           ["Comercio", roleInfo["nombre comercio"]],
+          ["", ""],
+          ["Municipio", roleInfo.ciudad],
           ["", ""],
           ["Dirección", roleInfo.direccion],
           ["", ""],
         ],
-        trxInfo: [
-          ["Operador", state?.operador_recargar],
-          ["", ""],
-        ],
+        commerceName: "RECARGA " +state?.operador_recargar,
+        trxInfo: [],
       };
     });
   }, []);
@@ -274,7 +281,7 @@ const RecargasOperadores = () => {
           minLength={"4"}
           maxLength={"9"}
           value={inputValor}
-          onInput={onMoneyChange}
+          onInput={(ev) => setInputValor(onChangeMoney(ev))}
           required
         />
         <ButtonBar className={"lg:col-span-2"}>

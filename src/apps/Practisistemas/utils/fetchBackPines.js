@@ -27,7 +27,7 @@ export const postConsultaPines = async (bodyObj) => {
 export const postConsultaPin = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
-  }  
+  }
   try {
     const res = await fetchData(
       `${urlPines}/consultaPin`,
@@ -80,7 +80,7 @@ export const postRevisarTransaccion = async (bodyObj) => {
       {},
       bodyObj,
       {},
-      true,
+      true
     );
     if (!res?.status) {
       console.error(res?.msg);
