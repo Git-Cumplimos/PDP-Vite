@@ -9,7 +9,10 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import fetchData from "../../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../../utils/notify";
-import { postConsultaTablaConveniosPaginado } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import {
+  postCheckEstadoConveniosAval,
+  postConsultaTablaConveniosPaginado,
+} from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 import { v4 as uuidv4 } from "uuid";
 
 const url_cargueS3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_recaudo/subir_archivos_convenios`;
@@ -113,12 +116,57 @@ const ConveniosRecaudoAval = () => {
                 method: "POST",
                 body: formData2,
               })
-                .then((res) => {
+                .then(async (res) => {
                   if (res?.ok) {
-                    notify("Se ha subido exitosamente el archivo");
+                    notify(
+                      "Se ha subido exitosamente el archivo, espere un momento se esta realizando el cargue a la base de datos"
+                    );
+                    for (let i = 0; i < 3; i++) {
+                      try {
+                        const prom = await new Promise((resolve, reject) =>
+                          setTimeout(() => {
+                            postCheckEstadoConveniosAval({
+                              uuid: uniqueId,
+                            })
+                              .then((res) => {
+                                if (
+                                  res?.msg !== "No ha terminado el reintento"
+                                ) {
+                                  if (res?.status) {
+                                    setIsUploading(false);
+                                    notify(res?.msg);
+                                    resolve(true);
+                                  } else {
+                                    notifyError(res?.msg ?? res?.message ?? "");
+                                    resolve(true);
+                                  }
+                                } else {
+                                  // notifyError(res?.msg ?? res?.message ?? "");
+                                  setIsUploading(false);
+                                  hideModal();
+                                  resolve(false);
+                                }
+                              })
+                              .catch((err) => {
+                                setIsUploading(false);
+                                // notifyError("No se ha podido conectar al servidor");
+                                console.error(err);
+                              });
+                          }, 15000)
+                        );
+                        if (prom === true) {
+                          setIsUploading(false);
+                          hideModal();
+                          break;
+                        }
+                      } catch (error) {
+                        console.error(error);
+                      }
+                    }
                   } else {
                     notifyError("No fue posible conectar con el Bucket");
                   }
+                  fecthTablaConveniosPaginadoFunc();
                   setIsUploading(false);
                   hideModal();
                 })

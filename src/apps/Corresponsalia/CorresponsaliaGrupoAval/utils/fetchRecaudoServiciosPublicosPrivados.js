@@ -107,3 +107,24 @@ export const postRecaudoConveniosAval = async (bodyObj) => {
     throw err;
   }
 };
+export const postCheckEstadoConveniosAval = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlAval}/grupo_aval_cb_recaudo/comprobar_cargue_archivo`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
