@@ -25,7 +25,7 @@ const FormularioVentaSoat = () => {
   const { contenedorbtn, contenedorTitulos } = classes;
   const navigate = useNavigate();
   const printDiv = useRef();
-  const { roleInfo, infoTicket, userInfo } = useAuth();
+  const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
   //******************* Datos del propietario (Variables) ***************
   const [datosPropietarioSoat, setDatosPropietarioSoat] = useState({
     tipoDocumento: "1",
@@ -78,7 +78,7 @@ const FormularioVentaSoat = () => {
       });
       fetchConsultarSoat({
         oficina_propia:
-          roleInfo?.tipocomercio == "OFICINAS PROPIAS" ? true : false,
+          roleInfo?.tipo_comercio == "OFICINAS PROPIAS" ? true : false,
         nombre_comercio: roleInfo?.["nombre comercio"],
         // valor_total_trx: datosPropietarioSoat?.valorSoat,
         valor_total_trx: "0",
@@ -200,7 +200,7 @@ const FormularioVentaSoat = () => {
       commerceName: "SERVICIO VENTA SOAT",
       trxInfo: [
         ["", ""],
-        ["DATOS DEL PROPIETARIO DEL VEHICULO"],
+        ["", "DATOS DEL PROPIETARIO DEL VEHICULO"],
         ["Nombre", datosPropietarioSoat?.nombrePropietario],
         ["Apellido", datosPropietarioSoat?.apellidoPropietario],
         ["Placa", datosPropietarioSoat?.numPlacaPropietario],
@@ -222,7 +222,7 @@ const FormularioVentaSoat = () => {
     });
     fetchTransaccionSoat({
       oficina_propia:
-        roleInfo?.tipocomercio == "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio == "OFICINAS PROPIAS" ? true : false,
       nombre_comercio: roleInfo?.["nombre comercio"],
       valor_total_trx: datosPropietarioSoat?.valorSoat,
       ticket: tickets,
@@ -271,7 +271,13 @@ const FormularioVentaSoat = () => {
             };
           });
         } else {
-          notifyError(res?.msg);
+          notifyError(
+            `“No cuenta con cupo para realizar la transacción: Cupo Actual: ${formatMoney.format(
+              quotaInfo?.quota
+            )} Cupo necesario: ${formatMoney.format(
+              datosPropietarioSoat?.valorSoat
+            )}”`
+          );
           setShowAllmodals((old) => {
             return { ...old, showLoading: false };
           });
