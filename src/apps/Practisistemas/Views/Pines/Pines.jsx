@@ -47,7 +47,6 @@ const Pines = () => {
       producto: op,
     })
       .then((autoArr) => {
-        // setMaxPages(autoArr?.maxPages);
         setPin(autoArr?.results ?? []);
 
         if (autoArr.results.length == 0) {
@@ -69,10 +68,11 @@ const Pines = () => {
   };
 
   useEffect(() => {
-    fecthTablaPinesPaginadoFunc();
+    fecthTablaPines();
   }, [datosTrans, page, limit]);
 
-  const fecthTablaPinesPaginadoFunc = () => {
+  const fecthTablaPines = () => {
+    console.log('pines', datosTrans.pin)
     postConsultaPines({
       idcomercio: roleInfo?.["id_comercio"],
       page,

@@ -147,9 +147,7 @@ const CompraPin = () => {
             id_uuid_trx: uniqueId,
           },
         },
-        ///////////////
         ticket: newVoucher,
-        //////////////
       },
       {},
       false,
@@ -157,6 +155,7 @@ const CompraPin = () => {
     )
       .then((res) => {
         if (res?.status === true) {
+          notify("Venta exitosa");
           setShowLoading(false);
           VentaExitosa(res?.obj?.response, fecha, hora);
         } else {

@@ -11,27 +11,19 @@ const InformacionPin = () => {
   ////////////////////
 
   const { state } = useLocation();
-  // const [{ searchConvenio = "" }, setQuery] = useQuery();
 
-  const [pines, setConvenios] = useState([]);
-  // const [maxPages, setMaxPages] = useState(0);
+  const [pines, setPines] = useState([]);
 
   useEffect(() => {
     if (state?.op) {
-      fecthTablaConveniosPaginadoFunc();
+      fecthTablaTiposPines();
     } else {
       navigate("../");
     }
   }, [state?.op]);
 
-  ////////////////////
-
   const { roleInfo, infoTicket } = useAuth();
 
-  // const [{ page, limit }, setPageData] = useState({
-  //   page: 1,
-  //   limit: 10,
-  // });
   const [datosTrans, setDatosTrans] = useState({
     pin: "",
   });
@@ -62,18 +54,18 @@ const InformacionPin = () => {
   );
 
   useEffect(() => {
-    fecthTablaConveniosPaginadoFunc();
+    fecthTablaTiposPines();
   }, [datosTrans]);
 
-  const fecthTablaConveniosPaginadoFunc = () => {
-    console.log('pin', datosTrans.pin)
+  const fecthTablaTiposPines = () => {
+    console.log('info ', datosTrans.pin)
     postConsultaPin({
       idcomercio: roleInfo?.["id_comercio"],
       producto: state.op,
       pin: datosTrans.pin,
     })
       .then((autoArr) => {
-        setConvenios(autoArr?.results ?? []);
+        setPines(autoArr?.results ?? []);
       })
       .catch((err) => console.error(err));
   };
@@ -88,8 +80,8 @@ const InformacionPin = () => {
         onSelectRow={onSelectAutorizador}
       >
         <Input
-          id="searchConvenio"
-          name="searchConvenio"
+          id="searchPin"
+          name="searchPin"
           label={"Nombre del tipo de Pin"}
           minLength="1"
           maxLength="30"
