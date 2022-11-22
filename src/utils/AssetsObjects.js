@@ -1,11 +1,6 @@
 const urlAssets = process.env.REACT_APP_ASSETS_URL;
 
 const images = {
-  SOIBANNERPAGINA: `${urlAssets}/assets/img/SOI-BANNERPAGINA.jpg`,
-  SOATBANNERPAG: `${urlAssets}/assets/img/SOATBANNERPAG.jpg`,
-  FUNDACIONBANNERPAG: `${urlAssets}/assets/img/FUNDACIONBANNERPAG.jpg`,
-  COLPENSIONES: `${urlAssets}/assets/img/COLPENSIONES-BANNER.jpg`,
-  SERVICIOS: `${urlAssets}/assets/img/BANNER SERVICIOS.jpg`,
   pdpHorizontal: `${urlAssets}/assets/img/LogofinalPDP.svg`,
   Loteria_de_Bogota: `${urlAssets}/assets/img/Loteria_de_Bogota.png`,
   personas: `${urlAssets}/assets/img/personas.png`,
@@ -96,4 +91,11 @@ const svgs = {
   LogoRecargasCelular: `${urlAssets}/assets/img/RecargasCelular.png`,
 };
 
-export { images, svgs };
+const banners = {
+  SOI: `${urlAssets}/assets/img/SOI-BANNERPAGINA.jpg`,
+  FUNDACION_DE_LA_MUJER: `${urlAssets}/assets/img/FUNDACIONBANNERPAG.jpg`,
+  COLPENSIONES: `${urlAssets}/assets/img/COLPENSIONES-BANNER.jpg`,
+  SERVICIOS: `${urlAssets}/assets/img/BANNER SERVICIOS.jpg`,
+}
+
+export { images, svgs, banners };

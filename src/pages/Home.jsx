@@ -10,7 +10,7 @@ import { useImgs } from "../hooks/ImgsHooks";
 
 const Home = () => {
   const { urlsPrivateApps } = useUrls();
-  const { imgs } = useImgs();
+  const { banners } = useImgs();
 
   // const [emails, setEmails] = useState([
   //   "directora.mercadeo@puntodepago.com.co",
@@ -18,15 +18,8 @@ const Home = () => {
   // ]);
 
   const imgsCarousel = useMemo(() => {
-    const { SOATBANNERPAG, SOIBANNERPAGINA,FUNDACIONBANNERPAG,COLPENSIONES,SERVICIOS} = imgs;
-    return [
-      { name: "Soat", url: SOATBANNERPAG },
-      { name: "Soi", url: SOIBANNERPAGINA },
-      { name: "Fundacion", url: FUNDACIONBANNERPAG },
-      { name: "Colpensiones", url: COLPENSIONES },
-      { name: "Servicios", url: SERVICIOS },
-    ];
-  }, [imgs]);
+    return Object.entries(banners).map(([name, url]) => ({ name, url }));
+  }, [banners]);
   return (
     <>
       <Carousel
