@@ -21,7 +21,7 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
 
 const TramitePines = () => {
   const navigate = useNavigate();
-  const { consultaPinesVus, reenvioHash, activarNavigate, setActivarNavigate } =
+  const { consultaPinesVus, reenvioHash, activarNavigate, setActivarNavigate, consultaCierreManual } =
     usePinesVus();
 
   const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -50,7 +50,20 @@ const TramitePines = () => {
   const [id_pin, setId_pin] = useState("")
   const [showModalReenvio, setShowModalReenvio] = useState(false)
   const [doc_cliente, setDoc_cliente] = useState("")
+  const [cierreManual, setCierreManual] = useState(false)
 
+  useEffect(() => {
+    ///////////////
+    consultaCierreManual()
+    .then((res) => {
+      if (!res?.status) {
+        setCierreManual(false)
+      } else {
+        setCierreManual(true)
+      }
+    })
+    .catch(() => console.log("Falla en consulta estado cierre manual"));
+  }, []);
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
@@ -131,6 +144,47 @@ const TramitePines = () => {
   const onSubmitUsar = (e) => {
     setModalUsar(true);
   };
+
+  const hora = useMemo(() => {    
+    return Intl.DateTimeFormat("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).format(new Date())
+  }, [parametroBusqueda]);
+
+  const horaCierre = useMemo(() => { 
+    const dia = (new Date()).getDay()  
+    if (dia === enumParametrosPines.diaFinSemana) {
+      return enumParametrosPines.horaCierreFinSemana.split(":")
+    }
+    else{
+      return enumParametrosPines.horaCierre.split(":")
+    }
+     
+  }, [hora]);
+
+  useEffect(() => {
+    
+    const horaActual = hora.split(":")
+    const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
+    const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
+    if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
+      notifyError("Módulo cerrado a partir de las " + horaCierre[0] + ":" + horaCierre[1])
+      navigate("/Pines/PinesVus",{replace:true});
+    }
+    else if (cierreManual){
+      notifyError("Módulo cerrado de manera manual")
+      navigate("/Pines/PinesVus",{replace:true});
+    }
+    else if ((deltaHora ===1 & deltaMinutos<-50)){
+      notifyError("El módulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
+    }
+    else if ((deltaHora ===0 & deltaMinutos<10)){
+      notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
+    }
+
+  }, [parametroBusqueda, hora, horaCierre, navigate, cierreManual])
 
   return (
     <>

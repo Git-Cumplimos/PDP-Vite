@@ -16,6 +16,8 @@ const urls = {
   ingresarIdQX: `${process.env.REACT_APP_URL_PinesVus}/ingresarIdQX`,
   consultaEpsArl: `${process.env.REACT_APP_URL_PinesVus}/consultaEpsArl`,
   reenvioHash: `${process.env.REACT_APP_URL_PinesVus}/reenviarCodigoHash`,
+  cierreManual: `${process.env.REACT_APP_URL_PinesVus}/cierreManual`,
+  consultaEstadoCierre: `${process.env.REACT_APP_URL_PinesVus}/consultaCierreManual`,
 };
 
 export const pinesVusContext = createContext({
@@ -33,6 +35,8 @@ export const pinesVusContext = createContext({
   ingresarIdQX: () => {},
   consultaEpsArl: () => {},
   reenvioHash: () => {},
+  cierreManual: () => {},
+  consultaEstadoCierre: () => {},
   activarNavigate: null,
   setActivarNavigate: null,
 });
@@ -369,6 +373,32 @@ export const useProvidePinesVus = () => {
     []
   );
 
+  const cierreManual = useCallback(
+    async () => {
+      const body = { pk_id_comercio : roleInfo?.id_comercio };
+      try {
+        const res = await fetchData(urls.cierreManual, "POST", {}, body);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
+
+  const consultaCierreManual = useCallback(
+    async () => {
+      const body = { pk_id_comercio : roleInfo?.id_comercio };
+      try {
+        const res = await fetchData(urls.consultaEstadoCierre, "POST",{}, body);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
+
   return {
     cancelPinVus,
     crearPinVus,
@@ -387,6 +417,8 @@ export const useProvidePinesVus = () => {
     activarNavigate,
     setActivarNavigate,
     consultaEpsArl,
-    reenvioHash
+    reenvioHash,
+    cierreManual,
+    consultaCierreManual
   };
 };

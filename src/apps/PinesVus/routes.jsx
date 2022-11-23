@@ -12,7 +12,9 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
  const PinesVus = lazy(() => import("./PinesVus"));
  const CrearPines = lazy(() => import("./Views/CrearPin"));
  const TramitarPines = lazy(() => import("./Views/TramitePines"));
+ const AdministrarPines = lazy(() => import("./Views/AdministrarPines"));
  const ReportePines = lazy(() => import("./Views/ReportePines"));
+ const CierreManual = lazy(() => import("./Views/CierreManual"))
  const ReportePinesVer = lazy(() =>
    import("./Views/Reportes/ReportePines")
  );
@@ -49,71 +51,86 @@ export const rutasPinesVus = {
       component: TramitarPines,
       permission: [enumPermisosPinesVus.operarPinesVus],
     },
-    {
-      link: "/PinesVus/Participacion",
-      label: (
-        <AppIcons Logo={"PagoParticipacion"} name={"Participación Pines"} />
-      ),
-      component: PagoParticipantes,
-      permission: [enumPermisosPinesVus.operarPinesVus],
-      subRoutes: [
-        {
-          link: "/PinesVus/Participacion/PagoParticipacion",
-          label: (
-            <AppIcons
-              Logo={"PagoParticipacion"}
-              name={"Pago participación"}
-            />
-          ),
-          component: ParticipacionPines,
-          permission: [enumPermisosPinesVus.operarPinesVus],
-        },
-        {
-          link: "/PinesVus/Participacion/VerPagoParticipacion",
-          label: (
-            <AppIcons Logo={"ReportePines"} name={"Ver pago participación"} />
-          ),
-          component: VerParticipacionPines,
-          permission: [enumPermisosPinesVus.operarPinesVus],
-        },
-      ],
-    },
-    {
-      link: "/PinesVus/Reportes",
-      label: <AppIcons Logo={"ReportePines"} name={"Reportes Pines"} />,
-      component: ReportePines,
+    {      
+      link: "/PinesVus/Administrar",
+      label: <AppIcons Logo={"ReportePines"} name={"Administrar Pines"} />,
+      component: AdministrarPines,
       permission: [enumPermisosPinesVus.operarPinesVus, enumPermisosPinesVus.administrarPinesVus],
       subRoutes: [
         {
-          link: "/PinesVus/Reporte/VerReportes",
-          label: <AppIcons Logo={"ReportePines"} name={"Reportes Pines"} />,
-          component: ReportePinesVer,
-          permission: [enumPermisosPinesVus.operarPinesVus, enumPermisosPinesVus.administrarPinesVus],
+          link: "/PinesVus/Administrar/Participacion",
+          label: (
+            <AppIcons Logo={"PagoParticipacion"} name={"Participación Pines"} />
+          ),
+          component: PagoParticipantes,
+          permission: [enumPermisosPinesVus.operarPinesVus],
+          subRoutes: [
+            {
+              link: "/PinesVus/Administrar/Participacion/PagoParticipacion",
+              label: (
+                <AppIcons
+                  Logo={"PagoParticipacion"}
+                  name={"Pago participación"}
+                />
+              ),
+              component: ParticipacionPines,
+              permission: [enumPermisosPinesVus.operarPinesVus],
+            },
+            {
+              link: "/PinesVus/Administrar/Participacion/VerPagoParticipacion",
+              label: (
+                <AppIcons Logo={"ReportePines"} name={"Ver pago participación"} />
+              ),
+              component: VerParticipacionPines,
+              permission: [enumPermisosPinesVus.operarPinesVus],
+            },
+          ],
         },
         {
-          link: "/PinesVus/Reporte/DescargarReportes",
-          label: (
-            <AppIcons
-              Logo={"DescargarReporte"}
-              name={"Descargar Reportes Pines"}
-            />
-          ),
-          component: ReportePinesDescargar,
-          permission: [enumPermisosPinesVus.administrarPinesVus],
+          link: "/PinesVus/Administrar/Reportes",
+          label: <AppIcons Logo={"ReportePines"} name={"Reportes Pines"} />,
+          component: ReportePines,
+          permission: [enumPermisosPinesVus.operarPinesVus, enumPermisosPinesVus.administrarPinesVus],
+          subRoutes: [
+            {
+              link: "/PinesVus/Administrar/Reporte/VerReportes",
+              label: <AppIcons Logo={"ReportePines"} name={"Reportes Pines"} />,
+              component: ReportePinesVer,
+              permission: [enumPermisosPinesVus.operarPinesVus, enumPermisosPinesVus.administrarPinesVus],
+            },
+            {
+              link: "/PinesVus/Administrar/Reporte/DescargarReportes",
+              label: (
+                <AppIcons
+                  Logo={"DescargarReporte"}
+                  name={"Descargar Reportes Pines"}
+                />
+              ),
+              component: ReportePinesDescargar,
+              permission: [enumPermisosPinesVus.administrarPinesVus],
+            },
+          ],
         },
-      ],
-    },
-    // {
-    //   link: "/PinesVus/EspejoQX",
-    //   label: <AppIcons Logo={"RECAUDO"} name={"Espejo Cupo QX"} />,
-    //   component: EspejoQX,
-    //   permission: [enumPermisosPinesVus.administrarPinesVus],
-    // },
-    {
-      link: "/PinesVus/QX",
-      label: <AppIcons Logo={"RECAUDO"} name={"QX"} />,
-      component: QX,
-      permission: [enumPermisosPinesVus.administrarPinesVus, enumPermisosPinesVus.operarPinesVus],
+        // {
+        //   link: "/PinesVus/EspejoQX",
+        //   label: <AppIcons Logo={"RECAUDO"} name={"Espejo Cupo QX"} />,
+        //   component: EspejoQX,
+        //   permission: [enumPermisosPinesVus.administrarPinesVus],
+        // },
+        {
+          link: "/PinesVus/Administrar/CierreManual",
+          label: <AppIcons Logo={"RECAUDO"} name={"Cierre Manual"} />,
+          component: CierreManual,
+          permission: [enumPermisosPinesVus.operarPinesVus],
+        },
+
+        {
+          link: "/PinesVus/Administrar/QX",
+          label: <AppIcons Logo={"RECAUDO"} name={"QX"} />,
+          component: QX,
+          permission: [enumPermisosPinesVus.administrarPinesVus, enumPermisosPinesVus.operarPinesVus],
+        },     
+      ]
     },
   ],
 };

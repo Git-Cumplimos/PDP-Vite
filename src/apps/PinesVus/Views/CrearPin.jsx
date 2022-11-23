@@ -41,7 +41,7 @@ const CrearPin = () => {
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const { crearPinVus, con_estado_tipoPin, consultaTramite, consultaClientes, consultaEpsArl } = usePinesVus();
+  const { crearPinVus, con_estado_tipoPin, consultaTramite, consultaClientes, consultaEpsArl, consultaCierreManual} = usePinesVus();
   const { infoTicket } = useAuth();
 
   const { roleInfo } = useAuth();
@@ -187,6 +187,7 @@ const CrearPin = () => {
   const [foundArl, setFoundArl] = useState([])
   const [optionsEps, setOptionsEps] = useState([])
   const [optionsArl, setOptionsArl] = useState([])
+  const [cierreManual, setCierreManual] = useState(false)
 
   const searchEps = useCallback((e) => {
     const query = (e.target.value);
@@ -268,6 +269,17 @@ const CrearPin = () => {
       }
     })
     .catch(() => setDisabledBtns(false));
+
+    ///////////////
+    consultaCierreManual()
+    .then((res) => {
+      if (!res?.status) {
+        setCierreManual(false)
+      } else {
+        setCierreManual(true)
+      }
+    })
+    .catch(() => console.log("Falla en consulta estado cierre manual"));
   }, []);
 
   const pinData = useMemo(() => {
@@ -422,7 +434,7 @@ const CrearPin = () => {
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(hora[1])
     if (deltaHora<0 || (deltaHora===0 & deltaMinutos<5) ){
       notifyError("Para evitar fallas no se permite realizar la transacción, hora cierre: " + horaCierre[0] + ":" + horaCierre[1])
-      navigate("/PinesVus",{replace:true});
+      navigate("/Pines/PinesVus",{replace:true});
     }else{
     crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin,firma, motivoCompra)
       .then((res) => {
@@ -569,7 +581,11 @@ const CrearPin = () => {
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
     if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
       notifyError("Módulo cerrado a partir de las " + horaCierre[0] + ":" + horaCierre[1])
-      navigate("/PinesVus",{replace:true});
+      navigate("/Pines/PinesVus",{replace:true});
+    }
+    else if (cierreManual){
+      notifyError("Módulo cerrado de manera manual")
+      navigate("/Pines/PinesVus",{replace:true});
     }
     else if ((deltaHora ===1 & deltaMinutos<-50)){
       notifyError("El módulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
@@ -578,7 +594,7 @@ const CrearPin = () => {
       notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
     }
 
-  }, [venderVehiculo,tipoPin, hora, horaCierre, navigate])
+  }, [venderVehiculo,tipoPin, hora, horaCierre, navigate, cierreManual])
   
   return (
     <>
