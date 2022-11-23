@@ -1,19 +1,19 @@
-import { useHistory } from "react-router-dom";
-import { useAuth } from "../../../utils/AuthHooks";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 const AuthButton = () => {
-  const auth = useAuth();
+  const { isSignedIn, signOut } = useAuth();
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
-  return auth.isSignedIn ? (
+  return isSignedIn ? (
     <button
       onClick={() => {
-        auth.signOut();
-        history.push("/login");
+        signOut();
+        navigate("/login", { replace: true });
       }}
     >
-      Cerrar sesion
+      Cerrar sesión
     </button>
   ) : (
     ""

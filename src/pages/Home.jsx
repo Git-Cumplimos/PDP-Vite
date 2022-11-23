@@ -1,23 +1,25 @@
-import HNavbar from "../components/Base/HNavbar/HNavbar";
-import { useUrls } from "../utils/UrlsHooks";
+import { useUrls } from "../hooks/UrlsHooks";
+
+import HNavbar from "../components/Base/HNavbar";
 
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { useImgs } from "../hooks/ImgsHooks";
+// import ReconoSERID from "../components/Compound/ReconoSERID/ReconoSERID";
 
 const Home = () => {
-  const { urlsPrivApps: urls } = useUrls();
+  const { urlsPrivateApps } = useUrls();
+  const { banners } = useImgs();
 
-  const [imgs, setImgs] = useState([]);
+  // const [emails, setEmails] = useState([
+  //   "directora.mercadeo@puntodepago.com.co",
+  //   "maria.valero@puntodepago.com.co",
+  // ]);
 
-  useEffect(() => {
-    setImgs([
-      { name: "Ad1", url: "https://picsum.photos/600/100" },
-      { name: "Ad2", url: "https://picsum.photos/600" },
-      { name: "Ad3", url: "https://picsum.photos/100" },
-    ]);
-  }, []);
-
+  const imgsCarousel = useMemo(() => {
+    return Object.entries(banners).map(([name, url]) => ({ name, url }));
+  }, [banners]);
   return (
     <>
       <Carousel
@@ -29,18 +31,16 @@ const Home = () => {
         showThumbs={false}
         showStatus={false}
       >
-        {imgs.map(({ name, url }) => {
+        {imgsCarousel.map(({ name, url }) => {
           return (
-            <div
-              className="aspect-w-2 aspect-h-1 md:aspect-w-5 md:aspect-h-1"
-              key={url}
-            >
+            <div className="aspect-w-16 aspect-h-5" key={url}>
               <img alt={name} src={url} className="object-cover" />
             </div>
           );
         })}
       </Carousel>
-      <HNavbar links={urls} isIcon />
+      <HNavbar links={urlsPrivateApps} isIcon />
+      {/* <ReconoSERID /> */}
     </>
   );
 };

@@ -3,13 +3,15 @@
 }
 
 .formItem > button {
-  @apply px-4 py-2 bg-secondary-light text-black rounded-full transition-opacity duration-300;
+  @apply px-4 py-2 bg-secondary-dark text-white rounded-full transition-opacity duration-300;
 }
 
 .formItem > button[type="submit"] {
   @apply bg-primary text-white;
 }
-
+.formItem > button[type=""] {
+  @apply bg-primary text-white;
+}
 .formItem > button:disabled {
   @apply opacity-40 cursor-default;
 }

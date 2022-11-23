@@ -1,5 +1,10 @@
 import classes from "./Voucher.module.css";
 import LogoPDP from "../../../../components/Base/LogoPDP/LogoPDP";
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
 
 const VoucherPago = ({ setPrintDiv, refPrint, ...info }) => {
   const { divPrint } = classes;
@@ -34,7 +39,7 @@ const VoucherPago = ({ setPrintDiv, refPrint, ...info }) => {
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">No. terminal:</h1>
-            <h1>15924</h1>
+            <h1>{info['No.terminal']}</h1>
           </div>
         </div>
         <div className="flex flex-row justify-between w-full">
@@ -44,17 +49,17 @@ const VoucherPago = ({ setPrintDiv, refPrint, ...info }) => {
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Telefono:</h1>
-            <h1>3002204195</h1>
+            <h1>{info.telefono}</h1>
           </div>
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
             <h1 className="font-semibold">Id Trx:</h1>
-            <h1>12345</h1>
+            <h1>{info["Id_registro"]}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Id Transacción:</h1>
-            <h1>{info["Id Transacción"]}</h1>
+            <h1>{info.id_transaccion}</h1> 
           </div>
         </div>
       </div>
@@ -74,8 +79,26 @@ const VoucherPago = ({ setPrintDiv, refPrint, ...info }) => {
         </div>
         <div className="flex flex-row justify-center w-full">
           <div className="flex flex-row justify-center flex-auto gap-2">
-            <h1 className="font-semibold">Valor pago:</h1>
-            <h1>{info["Valor pagado"]}</h1>
+            <h1 className="font-semibold">Valor ganado:</h1>
+            <h1>{formatMoney.format(info["Valor bruto"])}</h1>
+          </div>
+        </div>
+        <div className="flex flex-row justify-center w-full">
+          <div className="flex flex-row justify-center flex-auto gap-2">
+            <h1 className="font-semibold">Descuento 17%:</h1>
+            <h1>{formatMoney.format(info["Valor 17percent"])}</h1>
+          </div>
+        </div>
+        <div className="flex flex-row justify-center w-full">
+          <div className="flex flex-row justify-center flex-auto gap-2">
+            <h1 className="font-semibold">Descuento 20%:</h1>
+            <h1>{formatMoney.format(info["Valor 20percent"])}</h1>
+          </div>
+        </div>
+        <div className="flex flex-row justify-center w-full">
+          <div className="flex flex-row justify-center flex-auto gap-2">
+            <h1 className="font-semibold">Total:</h1>
+            <h1>{formatMoney.format(info["Valor pagado"])}</h1>
           </div>
         </div>
       </div>

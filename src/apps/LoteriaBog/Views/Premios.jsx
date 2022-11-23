@@ -1,25 +1,27 @@
 import { useState, useCallback, useEffect } from "react";
 import { useLoteria } from "../utils/LoteriaHooks";
 
-
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Button from "../../../components/Base/Button/Button";
-import Input from "../../../components/Base/Input/Input";
-import Form from "../../../components/Base/Form/Form";
+import ButtonBar from "../../../components/Base/ButtonBar";
+import Button from "../../../components/Base/Button";
+import Input from "../../../components/Base/Input";
+import Form from "../../../components/Base/Form";
 import { toast } from "react-toastify";
 //////////////////////
-import Modal from "../../../components/Base/Modal/Modal";
+import Modal from "../../../components/Base/Modal";
 import PagarForm from "../components/SendForm/PagarForm";
-import PagarFormFisico from "../components/SendForm/PagarFormFisico"
+import PagarFormFisico from "../components/SendForm/PagarFormFisico";
 import PagoResp from "../components/SellResp/PagoResp";
 
-const Premios = () => {
+import SubPage from "../../../components/Base/SubPage/SubPage";
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
+const Premios = ({ route }) => {
+  const { label } = route;
   const {
-    infoLoto: {
-      pagoresponse,
-      setPagoresponse,
-    },
-    
+    infoLoto: { pagoresponse, setPagoresponse },
   } = useLoteria();
 
   const [sorteo, setSorteo] = useState("");
@@ -32,50 +34,46 @@ const Premios = () => {
   const [tipopago, setTipopago] = useState("");
   const [fracciones_fisi, setFracciones_fisi] = useState("");
 
-  
-
   const [winner, setWinner] = useState(false);
   const [isSelf, setIsSelf] = useState(false);
   ///////////////////////////////////////////////////////
   const [showModal, setShowModal] = useState(false);
-  const [customer, setCustomer] = useState(
-    {
-      doc_id:"",
-      primer_nombre:"",
-      segundo_nombre:"",
-      primer_apellido:"",
-      segundo_apellido:"",
-      direccion:"",
-      telefono:"",
-      fracciones:"",
+  const [customer, setCustomer] = useState({
+    doc_id: "",
+    primer_nombre: "",
+    segundo_nombre: "",
+    primer_apellido: "",
+    segundo_apellido: "",
+    direccion: "",
+    telefono: "",
+    fracciones: "",
+  });
 
-    });
-
-    const [customer2, setCustomer2] = useState(
-      {
-        doc_id:"",
-        primer_nombre:"",
-        segundo_nombre:"",
-        primer_apellido:"",
-        segundo_apellido:"",
-        direccion:"",
-        telefono:"",
-        fracciones:"",
-  
-      }); 
-  
-  
-  
   const closeModal = useCallback(() => {
     setShowModal(false);
-    setWinner('')
-    setPhone('')
-    setHash('')
+    setWinner("");
+    setPhone("");
+    setHash("");
+    setFracciones_fisi("");
+    setCustomer({
+      doc_id: "",
+      primer_nombre: "",
+      segundo_nombre: "",
+      primer_apellido: "",
+      segundo_apellido: "",
+      direccion: "",
+      telefono: "",
+      fracciones: "",
+    });
   });
   ///////////////////////////////////////////////////////
   const [disabledBtns, setDisabledBtns] = useState(false);
 
-  const { isWinner, makePayment, makePayment2, pagopremio, pagopremiofisico} = useLoteria();
+  const { isWinner, makePayment, makePayment2, pagopremio, pagopremiofisico } =
+    useLoteria();
+
+  const [fracbill, setFracbill] = useState([]);
+  const [selecFrac, setSelecFrac] = useState([]);
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -90,7 +88,7 @@ const Premios = () => {
   };
 
   const notifyError = (msg) => {
-    toast.error(msg, {
+    toast.warn(msg, {
       position: "top-center",
       autoClose: 5000,
       hideProgressBar: false,
@@ -105,26 +103,40 @@ const Premios = () => {
     setDisabledBtns(true);
 
     e.preventDefault();
-
     isWinner(sorteo, billete, serie)
       .then((res) => {
+        fracbill.length = 0;
+        console.log(res, "res");
         setDisabledBtns(false);
-        setTipopago(res[0]['Tipo'])
-        console.log(tipopago)
-        if (res[0]['Estado'] === false) {
-          notify("No ganador");
+
+        if ("msg" in res) {
+          notifyError(res.msg);
           setWinner(false);
           setIsSelf(false);
-        } else {
-          if(res[0]['Tipo']===2) {
-          notify("Ganador");
-          setWinner(true);
-          setIsSelf(true);
-        }else{
-          notify("Ganador!! pero no vendido por Punto de Pago");
-          setWinner(true);
-          setIsSelf(false);  
         }
+        if (res[0]["Estado"] === false) {
+          notifyError("No ganador");
+          setWinner(false);
+          setIsSelf(false);
+        }
+        if (res[0]["Estado"] === true) {
+          if (res[0]["Tipo"] === 2) {
+            notify("Ganador con billete virtual");
+            setTipopago(res[0]["Tipo"]);
+            setWinner(true);
+            setIsSelf(true);
+          } else {
+            notify("Ganador con billete físico");
+            for (var i = 0; i < res[0].cantidad_frac_billete; i++) {
+              fracbill.push(i + 1);
+            }
+            setTipopago(res[0]["Tipo"]);
+            setCheckedState(
+              new Array(res[0].cantidad_frac_billete).fill(false)
+            );
+            setWinner(true);
+            setIsSelf(false);
+          }
         }
       })
       .catch(() => setDisabledBtns(false));
@@ -138,15 +150,21 @@ const Premios = () => {
       .then((res) => {
         setShowModal(true);
         setDisabledBtns(false);
-        setRespagar(res)
-        //console.log(res)
+        setRespagar(res);
+
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
-          //notify(JSON.stringify(res));
+          if (res?.Tipo === 0) {
+            notifyError(
+              "El valor a pagar supera la capacidad de la oficina " +
+                formatMoney.format(res["valor ganado"])
+            );
+          } else {
+          }
         }
       })
-      
+
       .catch(() => setDisabledBtns(false));
   };
 
@@ -154,22 +172,50 @@ const Premios = () => {
     setDisabledBtns(true);
     e.preventDefault();
 
-    makePayment2(sorteo, billete, serie, fracciones_fisi)
+    makePayment2(sorteo, billete, serie, selecFrac)
       .then((res) => {
         setShowModal(true);
         setDisabledBtns(false);
-        setRespagar(res)
-        //console.log(res)
+        setRespagar(res);
+        console.log(res);
+
         if ("msg" in res) {
           notifyError(res.msg);
         } else {
-          //notify(JSON.stringify(res));
+          if (res?.Tipo === 0) {
+            notifyError(
+              "El valor a pagar supera la capacidad de la oficina: " +
+                formatMoney.format(res["valor ganado"])
+            );
+          } else {
+          }
         }
       })
-      
+
       .catch(() => setDisabledBtns(false));
   };
-  console.log(respagar)
+
+  const [checkedState, setCheckedState] = useState();
+
+  const handleOnChange = (position) => {
+    selecFrac.length = 0;
+    const updatedCheckedState = checkedState.map((item, frac) =>
+      frac === position ? !item : item
+    );
+
+    setCheckedState(updatedCheckedState);
+
+    for (var i = 0; i < fracbill.length; i++) {
+      if (updatedCheckedState[i] === true) {
+        selecFrac.push(fracbill[i]);
+      }
+    }
+  };
+  useEffect(() => {
+    if (pagoresponse != null && "msg" in pagoresponse) {
+      notifyError(pagoresponse.msg);
+    }
+  }, [pagoresponse]);
   return (
     <>
       <Form onSubmit={onSubmit} grid>
@@ -177,170 +223,203 @@ const Premios = () => {
           id="numSorteo"
           label="Numero de sorteo"
           type="text"
-          minLength="4"
+          minLength="1"
           maxLength="4"
-          autoComplete="false"
+          required
+          autoComplete="off"
           value={sorteo}
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setSorteo(num);
+            if (!isNaN(e.target.value)) {
+              const num = e.target.value;
+              setSorteo(num);
+            }
           }}
         />
         <Input
           id="numBillete"
           label="Numero de billete"
           type="text"
-          minLength="1"/*Verificar para que se puedan poner ceros a la izquierda*/ 
+          minLength="4" /*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="4"
-          autoComplete="false"
+          required
+          autoComplete="off"
           value={billete}
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setBillete(num);
+            if (!isNaN(e.target.value)) {
+              const num = e.target.value;
+              setBillete(num);
+            }
           }}
         />
         <Input
           id="numSerie"
           label="Numero de serie"
           type="text"
-          minLength="1"/*Verificar para que se puedan poner ceros a la izquierda*/
+          minLength="3" /*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="3"
-          autoComplete="false"
+          required
+          autoComplete="off"
           value={serie}
           onInput={(e) => {
-            const num = parseInt(e.target.value) || "";
-            setSerie(num);
+            if (!isNaN(e.target.value)) {
+              const num = e.target.value;
+              setSerie(num);
+            }
           }}
         />
-        <ButtonBar className="col-auto md:col-span-2">
+        <ButtonBar className="lg:col-span-2">
           <Button type="submit" disabled={disabledBtns}>
             Consultar
           </Button>
         </ButtonBar>
       </Form>
-      {winner ? (<>
-        {tipopago===2? (
-        <Form onSubmit={onPay1} grid>
-          <>
-            <Input
-              id="numCel"
-              label="Numero de celular"
-              type="text"
-              autoComplete="false"
-              required={true}
-              value={phone}
-              onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setPhone(num);
-              }}
-            />
-            {isSelf ? (
-              <Input
-                id="codHash"
-                label="Codigo de seguridad"
-                type="text"
-                autoComplete="false"
-                required={true}
-                value={hash}
-                onInput={(e) => {
-                  setHash(e.target.value);
-                }}
-              />
-            ) : (
-              ""
-            )}
-          </>
-          <ButtonBar className="col-auto md:col-span-2">
-            <Button type="submit" disabled={disabledBtns}>
-              Pagar
-            </Button>
-          </ButtonBar>
-        </Form>
-        ):
-        <Form onSubmit={onPay2} grid>
-          <>
-            {/* <h2>Este numero no fue vendido por Punto de pago, solicite el billete</h2> */}
-            <Input
-              id="frac"
-              label="Numero de fracciones"
-              type="text"
-              autoComplete="false"
-              required={true}
-              value={fracciones_fisi}
-              onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setFracciones_fisi(num);
-              }}
-            />  
-          </>
-          <ButtonBar className="col-auto md:col-span-2">
-            <Button type="submit" disabled={disabledBtns}>
-              Pagar
-            </Button>
-          </ButtonBar>
-        </Form>
-        }
+      {winner ? (
+        <>
+          {tipopago === 2 ? (
+            <Form onSubmit={onPay1} grid>
+              <>
+                <Input
+                  id="numCel"
+                  label="Numero de celular"
+                  type="text"
+                  autoComplete="off"
+                  required
+                  value={phone}
+                  onInput={(e) => {
+                    if (!isNaN(e.target.value)) {
+                      const num = e.target.value;
+                      setPhone(num);
+                    }
+                  }}
+                />
+                {isSelf ? (
+                  <Input
+                    id="codHash"
+                    label="Codigo de seguridad"
+                    type="text"
+                    autoComplete="off"
+                    required
+                    value={hash}
+                    onInput={(e) => {
+                      setHash(e.target.value);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
+              </>
+              <ButtonBar className="col-auto md:col-span-2">
+                <Button type="submit" disabled={disabledBtns}>
+                  Pagar
+                </Button>
+              </ButtonBar>
+            </Form>
+          ) : (
+            <Form onSubmit={onPay2} grid>
+              {/* <h2>Este numero no fue vendido por Punto de pago, solicite el billete</h2> */}
+
+              {fracbill.map((frac, index) => {
+                return (
+                  <Input
+                    id={frac}
+                    label={`Fracción ${frac}:`}
+                    type="checkbox"
+                    value={frac}
+                    checked={checkedState[index]}
+                    onChange={() => handleOnChange(index)}
+                  />
+                );
+              })}
+
+              {selecFrac.length >= 1 ? (
+                <ButtonBar className="col-auto md:col-span-2">
+                  <Button type="submit" disabled={disabledBtns}>
+                    Pagar
+                  </Button>
+                </ButtonBar>
+              ) : (
+                ""
+              )}
+            </Form>
+          )}
         </>
-        
-      
-        
       ) : (
         ""
       )}
-      
-      {(respagar['msg']===undefined) ? <>
-      <Modal show={showModal} num_tele={phone} handleClose={() => closeModal()}>
-        
-        {pagoresponse===null ? <>
-          {tipopago===2? 
-            (<PagarForm
-              selected={respagar}
-              customer={customer}
-              setCustomer={setCustomer}
-              closeModal={closeModal}
-              handleSubmit={(event) => {
-                event.preventDefault();
-                pagopremio(sorteo, billete, serie, hash, customer, respagar, phone);
-                setSorteo('')
-                setBillete('')
-                setSerie('')
-                setPhone('')
-                setHash('')
-                setWinner('')
-              }}
-            />):
-            (<PagarFormFisico
-              selected={respagar}
-              customer={customer}
-              setCustomer={setCustomer}
-              closeModal={closeModal}
-              handleSubmit={(event) => {
-                event.preventDefault();
-                pagopremiofisico(sorteo, billete, serie, customer,respagar);
-                setSorteo('')
-                setBillete('')
-                setSerie('')
-                setPhone('')
-                setHash('')
-                setWinner('')
-          }}
-        />)
-        }
-        </> :
-        (
-          <PagoResp
-            pagoresponse={pagoresponse}
-            setPagoresponse={setPagoresponse}
-            closeModal={closeModal}
-            setCustomer={setCustomer}
-          />
-        )
-       
-        }        
-        
-      </Modal>
-      </>: ""}
-      
+
+      {respagar["msg"] === undefined && respagar?.Tipo != 0 ? (
+        <>
+          <Modal
+            show={showModal}
+            num_tele={phone}
+            handleClose={() => closeModal()}
+          >
+            {pagoresponse === null || "msg" in pagoresponse ? (
+              <>
+                {tipopago === 2 ? (
+                  <PagarForm
+                    selected={respagar}
+                    customer={customer}
+                    setCustomer={setCustomer}
+                    closeModal={closeModal}
+                    handleSubmit={() => {
+                      pagopremio(
+                        sorteo,
+                        billete,
+                        serie,
+                        hash,
+                        customer,
+                        respagar,
+                        phone
+                      );
+                      setSorteo("");
+                      setBillete("");
+                      setSerie("");
+                      setPhone("");
+                      setHash("");
+                      setWinner("");
+                    }}
+                  />
+                ) : (
+                  <PagarFormFisico
+                    selected={respagar}
+                    canFrac={fracciones_fisi}
+                    customer={customer}
+                    setCustomer={setCustomer}
+                    closeModal={closeModal}
+                    handleSubmit={() => {
+                      pagopremiofisico(
+                        sorteo,
+                        billete,
+                        serie,
+                        customer,
+                        respagar,
+                        selecFrac
+                      );
+                      setSorteo("");
+                      setBillete("");
+                      setSerie("");
+                      setPhone("");
+                      setHash("");
+                      setWinner("");
+                      setFracciones_fisi("");
+                    }}
+                  />
+                )}
+              </>
+            ) : (
+              <PagoResp
+                pagoresponse={pagoresponse}
+                setPagoresponse={setPagoresponse}
+                closeModal={closeModal}
+                setCustomer={setCustomer}
+              />
+            )}
+          </Modal>
+        </>
+      ) : (
+        ""
+      )}
     </>
   );
 };

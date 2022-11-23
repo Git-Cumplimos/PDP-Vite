@@ -1,0 +1,10 @@
+.contenedorImagen {
+  display: flex;
+  justify-content: left;
+  margin-bottom: 3rem;
+}
+.contenedorFormulario{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}

@@ -1,10 +1,18 @@
 import classes from "./Voucher.module.css";
 import LogoPDP from "../../../../components/Base/LogoPDP/LogoPDP";
 
-const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
+
+const formatMoney = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
+
+const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
   const { divPrint } = classes;
 
   return (
+    
     <div className={divPrint} ref={refPrint}>
       <div className="flex flex-row justify-center items-center w-full">
         <LogoPDP xsmall />
@@ -29,28 +37,28 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
       <div className="flex flex-col gap-2 px-2 text-xs text-left">
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">Comercio:</h1>
+            <h1 className="font-semibold">Id Comercio:</h1>
             <h1>{info.Comercio}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">No. terminal:</h1>
-            <h1>15924</h1>
+            <h1>{info['No.terminal']}</h1>
           </div>
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
-            <h1 className="font-semibold">Direccion:</h1>
-            <h1>{info["Dirección"]}</h1>
+            <h1 className="font-semibold">Municipio:</h1>
+            <h1>{info.ciudad}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
-            <h1 className="font-semibold">Telefono:</h1>
-            <h1>3002204195</h1>
+            <h1 className="font-semibold">Dirección:</h1>
+            <h1>{info.Dirección}</h1>
           </div>
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-row justify-start flex-auto gap-2">
             <h1 className="font-semibold">Id Trx:</h1>
-            <h1>12345</h1>
+            <h1>{info.id_trx}</h1>
           </div>
           <div className="flex flex-row justify-end flex-auto gap-2">
             <h1 className="font-semibold">Id Transacción:</h1>
@@ -71,11 +79,15 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
             <h1 className="font-semibold">Serie:</h1>
             <h1>{info.Serie}</h1>
           </div>
+          <div className="flex flex-row justify-start flex-auto gap-2">
+            <h1 className="font-semibold">Fracciones:</h1>
+            <h1>{info.Fracciones}</h1>
+          </div>
         </div>
         <div className="flex flex-row justify-center w-full">
           <div className="flex flex-row justify-center flex-auto gap-2">
             <h1 className="font-semibold">Valor pago:</h1>
-            <h1>{info["Valor pagado"]}</h1>
+            <h1>{formatMoney.format(info["Valor pagado"])}</h1>
           </div>
         </div>
       </div>
@@ -84,7 +96,7 @@ const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
         ***ORIGINAL***
       </h1>
       <h1 className="text-center my-3 text-xs font-normal">
-        Disclaimer
+        Para quejas o reclamos comuniquese al *num PDP*
       </h1>
     </div>
   );

@@ -1,25 +1,7 @@
-import { useAuth } from "../../utils/AuthHooks";
-import ProvideLoteria from "./components/ProvideLoteria";
-import AdminLoteria from "./Roles/AdminLoteria";
-import CashierLoteria from "./Roles/CashierLoteria";
+import HNavbar from "../../components/Base/HNavbar";
 
-const LoteriaBog = () => {
-  const { roleInfo } = useAuth();
-  return (
-    <ProvideLoteria>
-      <div className="w-full flex flex-col justify-center items-center">
-        {roleInfo !== undefined && roleInfo !== null ? (
-          roleInfo.role === 0 ? (
-            <AdminLoteria />
-          ) : (
-            <CashierLoteria />
-          )
-        ) : (
-          ""
-        )}
-      </div>
-    </ProvideLoteria>
-  );
+const LoteriaBog = ({ subRoutes }) => {
+  return <HNavbar links={subRoutes} isIcon />;
 };
 
 export default LoteriaBog;

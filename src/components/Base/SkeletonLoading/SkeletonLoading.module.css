@@ -1,0 +1,52 @@
+header.headerPDP {
+  @apply flex flex-col justify-center items-center px-2 md:px-4;
+}
+
+header.headerPDP > .topHeader {
+  @apply flex flex-row flex-wrap items-center justify-center;
+}
+
+header.headerPDP .usrData {
+  @apply flex flex-row flex-wrap items-center justify-center px-0 md:px-4 py-4 gap-0;
+}
+
+span.logoSk {
+  @apply w-64 md:w-72 h-20 md:h-20;
+  @apply bg-gray-500 rounded-md;
+}
+
+.userInfo {
+  @apply relative w-auto h-auto flex flex-col gap-3;
+}
+
+span.textCls {
+  @apply w-64 md:w-80 h-6 md:h-6;
+  @apply bg-gray-500 rounded-md;
+}
+
+button.btnCls {
+  @apply w-36 md:w-36 h-12 md:h-12 mx-3;
+  @apply bg-gray-500 rounded-full;
+}
+
+nav.navbar {
+  @apply px-4 flex mb-16;
+}
+
+nav.navbar > ul.list {
+  @apply flex flex-row flex-wrap gap-4;
+}
+
+nav.navbar > ul.list > li {
+  @apply flex;
+}
+
+span.textClsSm {
+  @apply w-30 md:w-30 h-8 md:h-8;
+  @apply bg-gray-500 rounded-md;
+}
+
+span.contentBox {
+  @apply w-full mx-auto h-30 md:h-72;
+  @apply bg-gray-500 rounded-md;
+}

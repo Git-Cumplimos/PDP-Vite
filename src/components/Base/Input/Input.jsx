@@ -1,113 +1,39 @@
-import { useCallback, useRef, useState } from "react";
-import { toast } from "react-toastify";
+import { useEffect, useRef, useState } from "react";
 import classes from "./Input.module.css";
 
-const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
-  const { formItem, dropzone, File } = classes;
-  const { id: _id, type, disabled } = input;
+import classes2 from "../Form/Form.module.css";
+const { formItem, invalid: invalidCls } = classes;
+const { div_input_form_item } = classes2;
+const Input = ({
+  label,
+  self = false,
+  onLazyInput,
+  info = "",
+  invalid = "",
+  ...input
+}) => {
+  const { id: _id, type } = input;
 
   const [timer, setTimer] = useState(null);
 
   const inputRef = useRef(null);
-  const dropZoneRef = useRef(null);
 
-  const notifyError = (msg) => {
-    toast.error(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const showDropZone = useCallback(() => {
-    if (
-      !disabled &&
-      dropZoneRef.current !== null &&
-      dropZoneRef.current !== undefined
-    ) {
-      const dropZone = dropZoneRef.current;
-      dropZone.style.display = "block";
+  useEffect(() => {
+    if (type === "email") {
+      // for email
+      // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+      input.pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     }
-  }, [disabled]);
-
-  const hideDropZone = useCallback(() => {
-    const dropZone = dropZoneRef.current;
-    dropZone.style.display = "none";
-  }, []);
-
-  const allowDrag = useCallback((e) => {
-    if (true) {
-      // Test that the item being dragged is a valid one
-      e.dataTransfer.dropEffect = "copy";
-      e.preventDefault();
-    }
-  }, []);
-
-  const handleDrop = useCallback(
-    async (e) => {
-      e.preventDefault();
-      hideDropZone();
-
-      const items = e.dataTransfer.items;
-
-      const tempFiles = [];
-
-      const GetFileTree = async (item, path) => {
-        path = path || "";
-        const initialItem = item;
-        item = item.webkitGetAsEntry(); //Might be renamed to GetAsEntry() in 2020
-        // console.log(item);
-        if (!item) return;
-        if (item.isFile) {
-          const file = initialItem.getAsFile();
-          // console.log("file", file);
-          tempFiles.push(file);
-        } else if (item.isDirectory) {
-          notifyError("Solo se permiten archivos, no carpetas");
-          // tempFiles.splice(0, tempFiles.length);
-          // console.log(item.fullPath); //console.log(item.name)
-
-          // Get folder contents
-          // let dirReader = item.createReader();
-          // dirReader.readEntries(async (entries) => {
-          //   entries.forEach(async (entry) => {
-          //     GetFileTree(entry, path + item.name + "/");
-          //   });
-          // });
-        }
-      };
-      for (let i = 0; i < items.length; i++) {
-        let item = items[i];
-        GetFileTree(item);
-      }
-
-      console.log(tempFiles);
-      onGetFile([...tempFiles]);
-    },
-    [onGetFile, hideDropZone]
-  );
-
-  if (type === "file") {
-    input.onChange = (e) => {
-      onGetFile(e.target.files);
-    };
-    window.addEventListener("dragenter", (e) => {
-      showDropZone();
-    });
-  }
+  }, [input, type]);
 
   if (onLazyInput !== undefined) {
     const { callback, timeOut } = onLazyInput;
 
     if (callback !== undefined && timeOut !== undefined) {
-      const onInputCallback = input.onInput;
+      const onInputCallback = input?.onInput;
 
       input.onInput = (e) => {
-        onInputCallback(e);
+        onInputCallback?.(e);
 
         if (timer) {
           clearTimeout(timer);
@@ -124,53 +50,37 @@ const Input = ({ label, self = false, onLazyInput, onGetFile, ...input }) => {
 
   return self ? (
     <>
-      {label && label !== "" && <label htmlFor={_id}>{label}</label>}
-      <input {...input} ref={inputRef} />
-      {type === "file" ? (
-        <>
-          <h1>O</h1>
-          <h1>Arrasta los archivos</h1>
-          {!disabled ? (
-            <div
-              ref={dropZoneRef}
-              className={dropzone}
-              onDragEnter={allowDrag}
-              onDragOver={allowDrag}
-              onDragLeave={() => hideDropZone()}
-              onDrop={handleDrop}
-            ></div>
-          ) : (
-            ""
-          )}
-        </>
-      ) : (
-        ""
+      {label && label !== "" && (
+        <label htmlFor={_id}>
+          {/* className={`${"text-right"}`}> */}
+          {label}
+        </label>
       )}
+      <input {...input} />
     </>
   ) : (
-    <div className={`${formItem} ${type === "file" ? File : ""}`}>
-      {label && label !== "" && <label htmlFor={_id}>{label}</label>}
-      <input {...input} ref={inputRef} />
-      {type === "file" ? (
-        <>
-          <h1>O</h1>
-          <h1>Arrasta los archivos</h1>
-          {!disabled ? (
-            <div
-              ref={dropZoneRef}
-              className={dropzone}
-              onDragEnter={allowDrag}
-              onDragOver={allowDrag}
-              onDragLeave={() => hideDropZone()}
-              onDrop={handleDrop}
-            ></div>
+    <div className={`${div_input_form_item} ${formItem}`}>
+      {label && label !== "" && (
+        <label htmlFor={_id}>
+          {/* className={`${"text-right"}`}> */}
+          {label}
+        </label>
+      )}
+      <div>
+        <input {...input} ref={inputRef} />
+        {info ? <p>{info}</p> : ""}
+        {inputRef.current?.value !== "" ? (
+          invalid ? (
+            <p className={`${invalidCls}`}>{invalid}</p>
+          ) : inputRef.current?.validity?.valid ? (
+            ""
           ) : (
             ""
-          )}
-        </>
-      ) : (
-        ""
-      )}
+          )
+        ) : (
+          ""
+        )}
+      </div>
     </div>
   );
 };

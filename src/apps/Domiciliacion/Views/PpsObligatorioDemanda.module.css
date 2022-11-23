@@ -1,0 +1,13 @@
+.contenedorFieldset {
+    display: flex;
+    justify-content: center;
+}
+
+.contenedorForm {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+
+}

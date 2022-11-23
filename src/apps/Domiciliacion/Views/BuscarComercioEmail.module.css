@@ -1,0 +1,66 @@
+.principalConsulta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tituloConsultaInscripcion {
+  font-size: x-large;
+  display: flex;
+  justify-content: center;
+  margin-top: 3vw;
+  margin-bottom: 3vw;
+}
+.contenedorNumeroProceso {
+  @apply flex flex-col;
+}
+.contenedorForm {
+  display: block;
+}
+.contenedorBotones {
+  display: flex;
+  align-items: flex-end;
+}
+.estadoConsulta {
+  font-size: 22px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.4vw;
+  text-align: justify;
+  font-weight: bold;
+}
+.contenedorDatos {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: 0.5vw;
+  margin-top: 1.2vw;
+}
+.contenedorTitulos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.contenedorValoresTitulos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 2vw;
+}
+.tituloDatos {
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.4vw;
+}
+.contendorBoton {
+  background-color: #e26a22;
+  border-radius: 7px;
+  width: 3vw;
+  height: 3vw;
+  color: aliceblue;
+  font-size: small;
+}
+.contenedorImagen {
+  display: flex;
+  justify-content: center;
+}

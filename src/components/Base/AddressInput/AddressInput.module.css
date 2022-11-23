@@ -1,0 +1,23 @@
+.AddressInput {
+  @apply flex flex-col md:flex-row flex-wrap justify-center items-center;
+  @apply text-center my-4 mx-auto md:mx-4 gap-2;
+}
+
+.AddressInput > select {
+  @apply px-2 py-2 rounded-md bg-secondary-light text-black self-stretch;
+}
+
+.AddressInput > input {
+  /* flex: 1 1 50%; */
+  @apply px-2 py-2 rounded-md bg-secondary-light text-black self-stretch;
+}
+
+.AddressInput > input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.AddressInput > input::-webkit-outer-spin-button,
+.AddressInput > input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

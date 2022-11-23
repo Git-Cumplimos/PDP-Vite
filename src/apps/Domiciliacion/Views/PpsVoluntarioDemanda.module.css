@@ -1,0 +1,39 @@
+.contenedorImagen {
+  display: flex;
+  justify-content: left;
+  margin-bottom: 2rem;
+}
+
+.contenedorForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+
+}
+
+.contenedorCampos {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.contenedorPrincipal {
+  max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.contenedorSecundario {
+  align-items: center;
+}
+
+.contenedorLabel {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}

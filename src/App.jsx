@@ -1,36 +1,34 @@
-import Admin from "./layouts/Admin/Admin";
-import ProvideAuth from "./components/Compound/ProvideAuth/ProvideAuth";
-import ProvideUrls from "./components/Compound/ProvideUrls/ProvideUrls";
-
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-
-import Amplify from "aws-amplify";
+import { Amplify } from "aws-amplify";
 import awsconfig from "./aws-exports";
-import { ToastContainer } from "react-toastify";
+
+import { Suspense } from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import { UrlsContext } from "./hooks/UrlsHooks";
+import SkeletonLoading from "./components/Base/SkeletonLoading";
+import ProvideAuth from "./components/Compound/ProvideAuth";
+import ProvideUrls from "./components/Compound/ProvideUrls";
+import ProvideImgs from "./components/Compound/ProvideImgs";
+import IdleTimeOut from "./components/Compound/IdleTimeOut/IdleTimeOut";
+
 
 Amplify.configure(awsconfig);
 
 function App() {
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    if (pathname === "/login") {
-      document.body.classList.remove("loggedBackground");
-      document.body.classList.add("loginBackground");
-    } else {
-      document.body.classList.remove("loginBackground");
-      document.body.classList.add("loggedBackground");
-    }
-  }, [pathname]);
-
   return (
-    <ProvideAuth>
-      <ProvideUrls>
-        <ToastContainer />
-        <Admin />
-      </ProvideUrls>
-    </ProvideAuth>
+    <Router>
+      <ProvideAuth>
+        <ProvideImgs>
+          <ProvideUrls>
+            <UrlsContext.Consumer>
+              {({ allRoutes }) => (
+                <Suspense fallback={<SkeletonLoading />}>{allRoutes}</Suspense>
+              )}
+            </UrlsContext.Consumer>
+          </ProvideUrls>
+        </ProvideImgs>
+        <IdleTimeOut />
+      </ProvideAuth>
+    </Router>
   );
 }
 

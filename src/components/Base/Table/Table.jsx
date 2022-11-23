@@ -26,6 +26,7 @@ const Table = ({ headers, data, onSelectRow, className = "", ...tableAtt }) => {
                     key={`${key}_${index}`}
                     style={{
                       cursor: onSelectRow !== undefined ? "pointer" : "initial",
+                      whiteSpace: "pre",
                     }}
                   >
                     {value}

@@ -1,5 +1,5 @@
 form.Grid {
-  @apply grid gap-4 xl:w-full;
+  @apply grid gap-6 xl:w-full my-4;
 
   grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
 }
@@ -7,9 +7,29 @@ form.Grid {
 form.Flex {
   @apply flex flex-wrap justify-evenly content-center;
 }
+form.Flex .div_input_form_item {
+  width: 480px;
+  margin: 10px;
+}
+
+form.Flex > .form_div_Button_Bar {
+  width: 100%;
+}
 
 @media (max-width: 768px) {
   form.Grid {
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  }
+  form.Flex .div_input_form_item {
+    width: 420px;
+  }
+}
+
+@media (max-width: 640px) {
+  form.Grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+  form.Flex .div_input_form_item {
+    width: 300px;
   }
 }
