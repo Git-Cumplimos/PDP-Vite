@@ -1,5 +1,4 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
@@ -10,12 +9,15 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import fetchData from "../../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../../utils/notify";
-import { postConsultaTablaConveniosPaginado } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import {
+  postCheckEstadoConveniosAval,
+  postConsultaTablaConveniosPaginado,
+} from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import { v4 as uuidv4 } from "uuid";
 
 const url_cargueS3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_recaudo/subir_archivos_convenios`;
 
 const ConveniosRecaudoAval = () => {
-  const navigate = useNavigate();
   // const [{ searchConvenio = "" }, setQuery] = useQuery();
   const [showModal, setShowModal] = useState(false);
   const [{ page, limit }, setPageData] = useState({
@@ -47,7 +49,7 @@ const ConveniosRecaudoAval = () => {
     setShowModal(false);
     setFile({});
   };
-  const onSelectAutorizador = useCallback((e, i) => {}, []);
+  const onSelectConvenio = useCallback((e, i) => {}, []);
   useEffect(() => {
     fecthTablaConveniosPaginadoFunc();
   }, [datosTrans, page, limit]);
@@ -87,7 +89,9 @@ const ConveniosRecaudoAval = () => {
       e.preventDefault();
       setIsUploading(true);
       const f = new Date();
+      const uniqueId = uuidv4();
       const query = {
+        uuid: uniqueId,
         contentType: "application/text",
         filename: `archivo_convenios_aval/${file.name}`,
       };
@@ -95,6 +99,8 @@ const ConveniosRecaudoAval = () => {
         .then((respuesta) => {
           if (!respuesta?.status) {
             notifyError(respuesta?.msg);
+            setIsUploading(false);
+            hideModal();
           } else {
             // setEstadoForm(true);
             const formData2 = new FormData();
@@ -105,21 +111,71 @@ const ConveniosRecaudoAval = () => {
                   `${respuesta?.obj?.fields[property]}`
                 );
               }
-
               formData2.set("file", file);
-              // console.log(formData2, `${respuesta?.obj?.url}`);
               fetch(`${respuesta?.obj?.url}`, {
                 method: "POST",
                 body: formData2,
-              }).then((res) => {
-                if (res?.ok) {
-                  notify("Se ha subido exitosamente el archivo");
-                } else {
-                  notifyError("No fue posible conectar con el Bucket");
-                }
-                setIsUploading(false);
-                hideModal();
-              });
+              })
+                .then(async (res) => {
+                  if (res?.ok) {
+                    notify(
+                      "Se ha subido exitosamente el archivo, espere un momento se esta realizando el cargue a la base de datos"
+                    );
+                    for (let i = 0; i < 3; i++) {
+                      try {
+                        const prom = await new Promise((resolve, reject) =>
+                          setTimeout(() => {
+                            postCheckEstadoConveniosAval({
+                              uuid: uniqueId,
+                            })
+                              .then((res) => {
+                                if (
+                                  res?.msg !== "No ha terminado el reintento"
+                                ) {
+                                  if (res?.status) {
+                                    setIsUploading(false);
+                                    notify(res?.msg);
+                                    resolve(true);
+                                  } else {
+                                    notifyError(res?.msg ?? res?.message ?? "");
+                                    resolve(true);
+                                  }
+                                } else {
+                                  // notifyError(res?.msg ?? res?.message ?? "");
+                                  setIsUploading(false);
+                                  hideModal();
+                                  resolve(false);
+                                }
+                              })
+                              .catch((err) => {
+                                setIsUploading(false);
+                                // notifyError("No se ha podido conectar al servidor");
+                                console.error(err);
+                              });
+                          }, 15000)
+                        );
+                        if (prom === true) {
+                          setIsUploading(false);
+                          hideModal();
+                          break;
+                        }
+                      } catch (error) {
+                        console.error(error);
+                      }
+                    }
+                  } else {
+                    notifyError("No fue posible conectar con el Bucket");
+                  }
+                  fecthTablaConveniosPaginadoFunc();
+                  setIsUploading(false);
+                  hideModal();
+                })
+                .catch((err) => {
+                  notifyError("Error al cargar el archivo");
+                  console.error(err);
+                  setIsUploading(false);
+                  hideModal();
+                }); /* notify("Se ha comenzado la carga"); */
             }
           }
         })
@@ -139,7 +195,7 @@ const ConveniosRecaudoAval = () => {
         maxPage={maxPages}
         headers={["Id", "Convenio", "EAN"]}
         data={tableConvenios}
-        onSelectRow={onSelectAutorizador}
+        onSelectRow={onSelectConvenio}
         onSetPageData={setPageData}
         // onChange={onChange}
       >
@@ -223,6 +279,9 @@ const ConveniosRecaudoAval = () => {
                 {`Archivo seleccionado: ${file.name}`}
               </h2>
               <ButtonBar>
+                <Button type='button' onClick={hideModal}>
+                  Cancelar
+                </Button>
                 <Button type='submit'>Subir</Button>
               </ButtonBar>
             </>
