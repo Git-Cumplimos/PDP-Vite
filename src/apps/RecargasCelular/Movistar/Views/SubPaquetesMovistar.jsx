@@ -130,14 +130,13 @@ const SubPaquetesMovistar = () => {
   }, [urlLocation, pageData, limit, inputDataSearch, PeticionGetPaquetes]);
 
   function onChangeInput(e) {
-    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-
+    let valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
     if (valueInput[0] != 3) {
       if (valueInput != "") {
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
-        return;
+        valueInput = "";
       }
     }
     setInputData((anterior) => ({

@@ -53,13 +53,15 @@ const PagoTerceros = () => {
       valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
     }
     if (e.target.name === "numeroCelular") {
-      const valueInputCel = ((e.target.value ?? "").match(/\d/g) ?? []).join(
-        ""
-      );
+      let valueInputCel = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+
       if (valueInputCel[0] != 3) {
-        notifyError(
-          "Número inválido, el No. de celular debe comenzar con el número 3"
-        );
+        if (valueInputCel != "") {
+          notifyError(
+            "Número inválido, el No. de celular debe comenzar con el número 3"
+          );
+          valueInput = "";
+        }
       } else {
         valueInput = valueInputCel;
       }
@@ -108,7 +110,7 @@ const PagoTerceros = () => {
 
   function PagoTerceros() {
     let oficinaPropia_ = false;
-    if (roleInfo.tipo_comercio === "OFICINASPROPIAS") {
+    if (roleInfo.tipo_comercio === "OFICINAS PROPIAS" || roleInfo.tipo_comercio === "KIOSCO"){
       oficinaPropia_ = true;
     }
     const dataTerceros = {
