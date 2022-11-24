@@ -15,16 +15,18 @@ import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
+import { formatMoney } from "../../../../components/Base/MoneyInput";
 import {
   estadoReintentoPagoSoat,
   fetchConsultarSoat,
   fetchTransaccionSoat,
 } from "../../utils/fetchSoat";
 const FormularioVentaSoat = () => {
-  const { contenedorbtn } = classes;
+  const { contenedorbtn, contenedorTitulos } = classes;
   const navigate = useNavigate();
   const printDiv = useRef();
-  const { roleInfo, infoTicket, userInfo } = useAuth();
+  const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
+  //******************* Datos del propietario (Variables) ***************
   const [datosPropietarioSoat, setDatosPropietarioSoat] = useState({
     tipoDocumento: "1",
     nombrePropietario: "",
@@ -46,7 +48,7 @@ const FormularioVentaSoat = () => {
     respuestaConsulta: "",
     codigoauth: "",
   });
-
+  // **************************************************************
   //******************* Variables de estado MODALES***************
   const [showAllmodals, setShowAllmodals] = useState({
     showModalVoucher: false,
@@ -76,7 +78,7 @@ const FormularioVentaSoat = () => {
       });
       fetchConsultarSoat({
         oficina_propia:
-          roleInfo?.tipocomercio == "OFICINAS PROPIAS" ? true : false,
+          roleInfo?.tipo_comercio == "OFICINAS PROPIAS" ? true : false,
         nombre_comercio: roleInfo?.["nombre comercio"],
         // valor_total_trx: datosPropietarioSoat?.valorSoat,
         valor_total_trx: "0",
@@ -194,19 +196,17 @@ const FormularioVentaSoat = () => {
         ["", ""],
         ["Dirección", roleInfo?.direccion],
         ["", ""],
-        ["SERVICIO VENTA SOAT"],
       ],
+      commerceName: "SERVICIO VENTA SOAT",
       trxInfo: [
         ["", ""],
-        ["DATOS DEL PROPIETARIO DEL VEHICULO"],
+        ["", "DATOS DEL PROPIETARIO DEL VEHICULO"],
         ["Nombre", datosPropietarioSoat?.nombrePropietario],
         ["Apellido", datosPropietarioSoat?.apellidoPropietario],
         ["Placa", datosPropietarioSoat?.numPlacaPropietario],
         ["Celular", datosPropietarioSoat?.numCelular],
         ["Linea", datosPropietarioSoat?.linea],
-        ["Valor", datosPropietarioSoat?.valorSoat],
-        ["", ""],
-        ["Proceso", "Transacción Venta SOAT"],
+        ["Valor", formatMoney.format(datosPropietarioSoat?.valorSoat)],
       ],
 
       disclamer:
@@ -222,7 +222,7 @@ const FormularioVentaSoat = () => {
     });
     fetchTransaccionSoat({
       oficina_propia:
-        roleInfo?.tipocomercio == "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio == "OFICINAS PROPIAS" ? true : false,
       nombre_comercio: roleInfo?.["nombre comercio"],
       valor_total_trx: datosPropietarioSoat?.valorSoat,
       ticket: tickets,
@@ -259,7 +259,7 @@ const FormularioVentaSoat = () => {
     })
       .then((res) => {
         if (res?.status === true) {
-          notify("Transaccion exitosa");
+          notify("Transacción exitosa");
           setShowAllmodals((old) => {
             return { ...old, showLoading: false };
           });
@@ -271,7 +271,13 @@ const FormularioVentaSoat = () => {
             };
           });
         } else {
-          notifyError(res?.msg);
+          notifyError(
+            `“No cuenta con cupo para realizar la transacción: Cupo Actual: ${formatMoney.format(
+              quotaInfo?.quota
+            )} Cupo necesario: ${formatMoney.format(
+              datosPropietarioSoat?.valorSoat
+            )}”`
+          );
           setShowAllmodals((old) => {
             return { ...old, showLoading: false };
           });
@@ -296,7 +302,7 @@ const FormularioVentaSoat = () => {
                         res?.status === true ||
                         res?.obj?.response?.estado == "00"
                       ) {
-                        notify("Transaccion exitosa");
+                        notify("Transacción exitosa");
                         setShowAllmodals((old) => {
                           return { ...old, showLoading: false };
                         });
@@ -464,7 +470,7 @@ const FormularioVentaSoat = () => {
   return (
     <>
       <SimpleLoading show={showAllmodals.showLoading} />
-      <h1 className="text-3xl">Datos del propietario del vehiculo</h1>
+      <h1 className="text-3xl">Datos del propietario del vehículo</h1>
       <Form onSubmit={(e) => consultarSoat(e)} grid>
         {/************Selección tipo de documento******************* */}
         <Select
@@ -482,7 +488,7 @@ const FormularioVentaSoat = () => {
         {/************Input Numero de documento******************* */}
         <Input
           id="numDocumento"
-          label="Documento"
+          label="Número de documento"
           type="text"
           required
           minLength="8"
@@ -499,7 +505,7 @@ const FormularioVentaSoat = () => {
         {/************Input PLACA vehiculo******************* */}
         <Input
           id="numPlaca" //la puse pero debo invocarla
-          label="# Placa"
+          label="Número de placa"
           type="text"
           required
           minLength="5"
@@ -537,41 +543,43 @@ const FormularioVentaSoat = () => {
           <Fieldset legend="Datos Propietario">
             <Form onSubmit={(e) => consultarSoat(e)} className="lg:col-span-2">
               <div className="grid gap-4 hover:gap-6">
-                <div className="m-2 space-x-48">
+                <div className={contenedorTitulos}>
                   <label className="font-semibold text-xl">{`Nombre:`}</label>
-                  <label className="font-medium">{`${datosPropietarioSoat?.nombrePropietario}`}</label>
+                  <label className="font-medium ml-20">{`${datosPropietarioSoat?.nombrePropietario}`}</label>
                 </div>
-                <div className="m-2 space-x-48">
+                <div className={contenedorTitulos}>
                   <label className="font-semibold text-xl">{`Apellido:`}</label>
-                  <label className="font-medium">{`${datosPropietarioSoat?.apellidoPropietario}`}</label>
+                  <label className="font-medium ml-20">{`${datosPropietarioSoat?.apellidoPropietario}`}</label>
                 </div>
-                <div className="m-2 space-x-56">
-                  <label className="content-center font-semibold text-xl">{`Marca:`}</label>
-                  <label className="font-medium">{`${datosPropietarioSoat?.marca}`}</label>
+                <div className={contenedorTitulos}>
+                  <label className="content-center font-semibold text-xl">{`Marca vehículo:`}</label>
+                  <label className="font-medium ml-20">{`${datosPropietarioSoat?.marca}`}</label>
                 </div>
-                <div className="m-2 space-x-52">
-                  <label className="font-semibold text-xl">{`Modelo:`}</label>
-                  <label className="font-medium">{`${datosPropietarioSoat?.modelo}`}</label>
+                <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Modelo vehículo:`}</label>
+                  <label className="font-medium ml-20">{`${datosPropietarioSoat?.modelo}`}</label>
                 </div>
-                <div className="m-2 space-x-48">
-                  <label className="font-semibold text-xl">{`Linea:`}</label>
-                  <label className="font-medium">{`${datosPropietarioSoat?.linea}`}</label>
+                <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Línea vehículo:`}</label>
+                  <label className="font-medium ml-20">{`${datosPropietarioSoat?.linea}`}</label>
                 </div>
-                <div className="m-2 space-x-52">
+                <div className={contenedorTitulos}>
                   <label className="font-semibold text-xl">{`Clase Soat:`}</label>
-                  <label className="font-medium">{`${datosPropietarioSoat?.claseSoat}`}</label>
+                  <label className="font-medium ml-20">{`${datosPropietarioSoat?.claseSoat}`}</label>
                 </div>
-                <div className="m-2 space-x-28">
+                <div className={contenedorTitulos}>
                   <label className="font-semibold text-xl">{`Número del Motor:`}</label>
-                  <label className="font-medium">{`${datosPropietarioSoat?.numeroChasis}`}</label>
+                  <label className="font-medium ml-20">{`${datosPropietarioSoat?.numeroChasis}`}</label>
                 </div>
-                <div className="m-2 space-x-24">
+                <div className={contenedorTitulos}>
                   <label className="font-semibold text-xl">{`Número de Celular:`}</label>
-                  <label className="font-medium">{`${datosPropietarioSoat?.numCelular}`}</label>
+                  <label className="font-medium ml-20">{`${datosPropietarioSoat?.numCelular}`}</label>
                 </div>
-                <div className="m-2 space-x-48">
+                <div className={contenedorTitulos}>
                   <label className="font-semibold text-xl">{`Valor Soat:`}</label>
-                  <label className="font-medium">{`${datosPropietarioSoat?.valorSoat}`}</label>
+                  <label className="font-medium ml-20">{`${formatMoney.format(
+                    datosPropietarioSoat?.valorSoat
+                  )}`}</label>
                 </div>
               </div>
               <div className={contenedorbtn}>
@@ -611,7 +619,7 @@ const FormularioVentaSoat = () => {
               Nombre: datosPropietarioSoat?.nombrePropietario,
               Apellido: datosPropietarioSoat?.apellidoPropietario,
               Celular: datosPropietarioSoat?.numCelular,
-              Valor: datosPropietarioSoat?.valorSoat,
+              Valor: formatMoney.format(datosPropietarioSoat?.valorSoat),
             }}>
             <>
               <ButtonBar>

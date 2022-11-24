@@ -40,18 +40,17 @@ const RecargarPaquetes = () => {
       "Hora": "",
     },
     commerceInfo: [
-      ["No. terminal", roleInfo.id_dispositivo],
       ["Id Comercio", roleInfo.id_comercio],
+      ["No. terminal", roleInfo.id_dispositivo],
       ["Comercio", roleInfo["nombre comercio"]],
+      ["", ""],
+      ["Municipio", roleInfo.ciudad],
       ["", ""],
       ["Dirección", roleInfo.direccion],
       ["", ""],
     ],
-    commerceName: "RECARGAS A CELULAR",
-    trxInfo: [
-      ["Operador", state?.operador_recargar],
-      ["", ""],
-    ],
+    commerceName: state?.operador_recargar,
+    trxInfo: [],
     disclamer:
       "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
   });
@@ -73,6 +72,12 @@ const RecargarPaquetes = () => {
     e.preventDefault();
     setShowModal(true);
     setTypeInfo("ResumenRecarga");
+    if (inputCelular[0] != 3) {
+      notifyError(
+        "Número inválido, el No. de celular debe comenzar con el número 3"
+      );
+      handleClose();
+    }
   };
 
   const fecthEnvioTransaccion = () => {
@@ -93,8 +98,9 @@ const RecargarPaquetes = () => {
     infTicketFinal["timeInfo"]["Hora"] = hora;
     infTicketFinal["trxInfo"].push(["Número celular", toPhoneNumber(inputCelular) ?? "0"]);
     infTicketFinal["trxInfo"].push(["", ""]);
-    infTicketFinal["trxInfo"].push(["Valor recarga", formatMoney.format(state?.valor_paquete) ?? "0"]);
+    infTicketFinal["trxInfo"].push(["Valor paquete", formatMoney.format(state?.valor_paquete) ?? "0"]);
     infTicketFinal["trxInfo"].push(["", ""]);
+    infTicketFinal["trxInfo"].push(["Descripción", state?.descripcion ?? ""]);
     postEnvioTrans({
       comercio: {
         id_comercio:roleInfo.id_comercio,
@@ -102,7 +108,7 @@ const RecargarPaquetes = () => {
         id_usuario: roleInfo.id_usuario,
         id_uuid_trx: id_uuid
       },
-      oficina_propia: roleInfo?.tipocomercio === "OFICINAS PROPIAS" ? true : false,
+      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
       nombre_comercio: roleInfo["nombre comercio"],
       valor_total_trx: parseInt(state?.valor_paquete),
       ticket: infTicketFinal,
@@ -112,14 +118,15 @@ const RecargarPaquetes = () => {
           operador:state?.operador_recargar,
           valor: parseInt(state?.valor_paquete),
           jsonAdicional:{
-            "nombre_usuario": userInfo?.attributes?.name
+            "nombre_usuario": userInfo?.attributes?.name,
+            "operador": state?.operador_recargar
           } 
       }
     })
     .then((res) => {
       if (res?.status === true) {
-        notify(res?.msg);
-        infTicketFinal["commerceInfo"].push(["Id Trx", res?.obj?.response?.["idtrans"]]);
+        notify("Compra de paquete exitosa");
+        infTicketFinal["commerceInfo"].push(["Id Transacción", res?.obj?.response?.["idtrans"]]);
         infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);
         setInfTicket(infTicketFinal)
         setRespuesta(false);
@@ -190,17 +197,17 @@ const RecargarPaquetes = () => {
       return {
         ...old,
         commerceInfo: [
-          ["No. terminal", roleInfo.id_dispositivo],
           ["Id Comercio", roleInfo.id_comercio],
+          ["No. terminal", roleInfo.id_dispositivo],
           ["Comercio", roleInfo["nombre comercio"]],
+          ["", ""],
+          ["Municipio", roleInfo.ciudad],
           ["", ""],
           ["Dirección", roleInfo.direccion],
           ["", ""],
         ],
-        trxInfo: [
-          ["Operador", state?.operador_recargar],
-          ["", ""],
-        ],
+        commerceName: state?.operador_recargar,
+        trxInfo: [],
       };
     });
   }, []);
@@ -233,7 +240,9 @@ const RecargarPaquetes = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Recargas de {state?.operador_recargar}</h1>
+      <h1 className="text-3xl mt-6">{state?.operador_recargar}</h1>
+      <p> {state?.descripcion} </p>
+      <p> Valor: {formatMoney.format(state?.valor_paquete)} </p>
       <Form onSubmit={onSubmitCheck} grid>
         <Input
           name="celular"
@@ -261,6 +270,7 @@ const RecargarPaquetes = () => {
             summaryTrx={{
               Celular: toPhoneNumber(inputCelular),
               Valor: formatMoney.format(state?.valor_paquete),
+              Descripción: state?.descripcion,
             }}
           >
             <>

@@ -47,14 +47,20 @@ const RecargasMovistar = () => {
 
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-
     if (valueInput[0] != 3) {
-      if (valueInput.length == 1 && inputCelular == "") {
+      if (valueInput != "") {
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
         return;
       }
+
+      // if (valueInput.length == 1 && inputCelular == "") {
+      //   notifyError(
+      //     "Número inválido, el No. de celular debe comenzar con el número 3"
+      //   );
+      //   return;
+      // }
     }
     setInputCelular(valueInput);
   };

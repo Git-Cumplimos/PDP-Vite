@@ -10,7 +10,6 @@ import MoneyInput from "../../../../components/Base/MoneyInput";
 import Select from "../../../../components/Base/Select";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import useQuery from "../../../../hooks/useQuery";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 import {
@@ -19,11 +18,6 @@ import {
   postCrearComercio,
   putModificarComercio,
 } from "../../utils/fetchComercios";
-import {
-  fetchParametrosAutorizadores,
-  postParametrosAutorizadores,
-  putParametrosAutorizadores,
-} from "../../utils/fetchParametrosAutorizadores";
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const vectorCodigosInstitucionales = [
   ...process.env.REACT_APP_CODIGOS_INSTITUCIONALES_COMERCIOS.split("/").map(

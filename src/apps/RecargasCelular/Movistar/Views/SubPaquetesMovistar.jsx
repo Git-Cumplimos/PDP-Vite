@@ -133,14 +133,13 @@ const SubPaquetesMovistar = () => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
 
     if (valueInput[0] != 3) {
-      if (valueInput.length == 1 && inputData.celular == "") {
+      if (valueInput != "") {
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
         return;
       }
     }
-
     setInputData((anterior) => ({
       ...anterior,
       [e.target.name]: valueInput,

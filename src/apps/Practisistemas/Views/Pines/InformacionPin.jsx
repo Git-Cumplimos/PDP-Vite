@@ -1,9 +1,9 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Input from "../../../../components/Base/Input";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import { notify, notifyError } from "../../../../utils/notify";
-import { postConsultaPines, postConsultaPin } from "../../utils/fetchBackPines";
+import { postConsultaPin } from "../../utils/fetchBackPines";
+import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 
 const InformacionPin = () => {
@@ -11,37 +11,29 @@ const InformacionPin = () => {
   ////////////////////
 
   const { state } = useLocation();
-  // const [{ searchConvenio = "" }, setQuery] = useQuery();
 
-  const [pines, setConvenios] = useState([]);
-  // const [maxPages, setMaxPages] = useState(0);
+  const [pines, setPines] = useState([]);
 
   useEffect(() => {
     if (state?.op) {
-      fecthTablaConveniosPaginadoFunc();
+      fecthTablaTiposPines();
     } else {
       navigate("../");
     }
   }, [state?.op]);
 
-  ////////////////////
-
   const { roleInfo, infoTicket } = useAuth();
 
-  // const [{ page, limit }, setPageData] = useState({
-  //   page: 1,
-  //   limit: 10,
-  // });
   const [datosTrans, setDatosTrans] = useState({
     pin: "",
   });
 
-  const tableConvenios = useMemo(() => {
+  const tableTipoPin = useMemo(() => {
     return [
       ...pines?.map(({ productDesc, sell, validity }) => {
         return {
           "Nombre del Pin": productDesc,
-          Valor: sell,
+          Valor: formatMoney.format(sell) ,
           "Días de validez": validity * 1,
         };
       }),
@@ -62,17 +54,18 @@ const InformacionPin = () => {
   );
 
   useEffect(() => {
-    fecthTablaConveniosPaginadoFunc();
+    fecthTablaTiposPines();
   }, [datosTrans]);
 
-  const fecthTablaConveniosPaginadoFunc = () => {
+  const fecthTablaTiposPines = () => {
+    console.log('info ', datosTrans.pin)
     postConsultaPin({
       idcomercio: roleInfo?.["id_comercio"],
       producto: state.op,
+      pin: datosTrans.pin,
     })
       .then((autoArr) => {
-        // setMaxPages(autoArr?.maxPages);
-        setConvenios(autoArr?.results ?? []);
+        setPines(autoArr?.results ?? []);
       })
       .catch((err) => console.error(err));
   };
@@ -83,12 +76,12 @@ const InformacionPin = () => {
       <TableEnterprise
         title="Tabla pines"
         headers={["Nombre del tipo de Pin", "Valor", "Días de validez"]}
-        data={tableConvenios}
+        data={tableTipoPin}
         onSelectRow={onSelectAutorizador}
       >
         <Input
-          id="searchConvenio"
-          name="searchConvenio"
+          id="searchPin"
+          name="searchPin"
           label={"Nombre del tipo de Pin"}
           minLength="1"
           maxLength="30"
@@ -96,7 +89,7 @@ const InformacionPin = () => {
           autoComplete="off"
           onInput={(e) => {
             setDatosTrans((old) => {
-              return { ...old, convenio: e.target.value };
+              return { ...old, pin: e.target.value };
             });
           }}
         />

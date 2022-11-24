@@ -47,7 +47,6 @@ const Pines = () => {
       producto: op,
     })
       .then((autoArr) => {
-        // setMaxPages(autoArr?.maxPages);
         setPin(autoArr?.results ?? []);
 
         if (autoArr.results.length == 0) {
@@ -69,14 +68,16 @@ const Pines = () => {
   };
 
   useEffect(() => {
-    fecthTablaPinesPaginadoFunc();
+    fecthTablaPines();
   }, [datosTrans, page, limit]);
 
-  const fecthTablaPinesPaginadoFunc = () => {
+  const fecthTablaPines = () => {
+    console.log('pines', datosTrans.pin)
     postConsultaPines({
       idcomercio: roleInfo?.["id_comercio"],
       page,
-      limit
+      limit,
+      pin: datosTrans.pin
     })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
@@ -88,7 +89,7 @@ const Pines = () => {
   return (
     <>
       <h1 className="text-3xl text-center">
-        Servicio de venta de Pines de Servicio y Contenido
+        Servicio de venta de pines de servicio y contenido
       </h1>
       <TableEnterprise
         title="Tabla pines"
