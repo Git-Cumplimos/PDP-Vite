@@ -16,8 +16,8 @@ const TipoPpsADemanda = ({ numCed }) => {
         /* label="Tipo de PPS" */
         options={{
           "": "",
-          "Pps Voluntario": "Pps Voluntario A Demanda",
-          "Pps Obligatorio": "Pps Obligatorio A Demanda",
+          "PPS Voluntario": "Pps Voluntario A Demanda",
+          "PPS Obligatorio": "Pps Obligatorio A Demanda",
         }}
         /*  info={"      Seleccione un Tipo de PPS"} */
       ></Select>
