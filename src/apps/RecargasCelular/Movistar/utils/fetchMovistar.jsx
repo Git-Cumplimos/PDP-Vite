@@ -2,8 +2,8 @@ import fetchData from "../../../../utils/fetchData";
 import { notifyError } from "../../../../utils/notify";
 import { Auth } from "@aws-amplify/auth";
 
-const url_movistar_conciliacion_buscar = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/buscar`;
-const url_movistar_conciliacion_archivo_movistar = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/archivo-movistar`;
+const url_movistar_conciliacion_buscar = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-conciliaciones/get-conciliacion`;
+const url_movistar_conciliacion_archivo_movistar = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-conciliaciones/subir-conciliacion-movistar`;
 
 export const PeticionConciliacionBuscar = async (params_ = "") => {
   try {

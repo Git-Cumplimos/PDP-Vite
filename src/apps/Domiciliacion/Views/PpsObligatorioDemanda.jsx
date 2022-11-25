@@ -26,8 +26,8 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
-// const url = process.env.REACT_APP_URL_COLPENSIONES;
-const url = "http://127.0.0.1:5000";
+const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
+/* const url = "http://127.0.0.1:5000"; */
 const PpsObligatorioDemanda = ({ ced }) => {
   const { quotaInfo, roleInfo, infoTicket } = useAuth();
   const navigate = useNavigate();

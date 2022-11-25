@@ -17,10 +17,7 @@ import {
   rutasSoat,
 } from "../apps/Practisistemas/routes";
 
-
-import {
-  rutasPinesVus
-} from "../apps/PinesVus/routes";
+import { rutasPinesVus } from "../apps/PinesVus/routes";
 import { enumPermisosPinesVus } from "../apps/PinesVus/enumPermisosPinesVus";
 /**
  * * Providers
@@ -195,6 +192,10 @@ const ListarMensajePublicitario = lazy(() =>
  * Domiciliacion PPS
  */
 const Domiciliacion = lazy(() => import("../apps/Domiciliacion/Domiciliacion"));
+
+const moduloDomiciliacion = lazy(() =>
+  import("../apps/Domiciliacion/Views/ModuloDomiciliacion")
+);
 const comprobarEmail = lazy(() =>
   import("../apps/Domiciliacion/Views/BuscarComercioEmail")
 );
@@ -462,14 +463,12 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={"CrearPines"} name="Pines" />,
     component: PinesVus,
     permission: [
-      enumPermisosPinesVus.administrarPinesVus, 
-      enumPermisosPinesVus.operarPinesVus, 
-      enumPermisosPractisistemas.practisistemasPines],
-    provider: ProvidepinesVus,
-    subRoutes: [
-      rutasPines,
-      rutasPinesVus
+      enumPermisosPinesVus.administrarPinesVus,
+      enumPermisosPinesVus.operarPinesVus,
+      enumPermisosPractisistemas.practisistemasPines,
     ],
+    provider: ProvidepinesVus,
+    subRoutes: [rutasPines, rutasPinesVus],
   },
 
   {
@@ -739,7 +738,7 @@ const allUrlsPrivateApps = [
                 link: "/movistar/operador-pdp/cargar-paquetes",
                 label: (
                   <AppIcons
-                    Logo={"CARGAR"}
+                    Logo={"SORTEO01"}
                     name="Cargue de paquetes de movistar"
                   />
                 ),
@@ -748,21 +747,23 @@ const allUrlsPrivateApps = [
               },
               {
                 link: "/movistar/operador-pdp/concilacion",
-                label: <AppIcons Logo={"Reporte"} name="Conciliaciones" />,
+                label: <AppIcons Logo={"SORTEO01"} name="Conciliación" />,
                 component: ConcilacionMovistar,
                 permission: [66],
                 subRoutes: [
                   {
                     link: "/movistar/operador-pdp/concilacion/descarga",
                     label: (
-                      <AppIcons Logo={"DESCARGAR"} name="Decargar archivos" />
+                      <AppIcons Logo={"SORTEO01"} name="Decargar archivos" />
                     ),
                     component: ConcilacionMovistarDescarga,
                     permission: [66],
                   },
                   {
                     link: "/movistar/operador-pdp/concilacion/carga",
-                    label: <AppIcons Logo={"CARGAR"} name="Cargar archivos" />,
+                    label: (
+                      <AppIcons Logo={"SORTEO01"} name="Cargar archivos" />
+                    ),
                     component: ConciliacionMovistarCarga,
                     permission: [66],
                   },
@@ -940,25 +941,47 @@ const allUrlsPrivateApps = [
   },
 
   {
-    link: "/domiciliacion",
-    label: <AppIcons Logo={"RECAUDO"} name={"Domiciliación"} />,
+    link: "/colpensiones",
+    label: <AppIcons Logo={"RECAUDO"} name={"Colpensiones"} />,
     component: Domiciliacion,
     permission: [55, 56, 57],
     subRoutes: [
       {
-        link: "/domiciliacion/formulario",
+        link: "/colpensiones/domiciliacion",
+        label: <AppIcons Logo={"RETIRO"} name={"Domiciliación"} />,
+        component: moduloDomiciliacion,
+        permission: [56, 57],
+        subRoutes: [
+          {
+            link: "/colpensiones/formulario",
+            label: (
+              <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />
+            ),
+            component: comprobarEmail,
+            permission: [55],
+          },
+          {
+            link: "/colpensiones/modificar",
+            label: <AppIcons Logo={"ACTUALIZACION"} name={"Modificar"} />,
+            component: ModificarPps,
+            permission: [56],
+          },
+        ],
+      },
+      /*       {
+        link: "/colpensiones/formulario",
         label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />,
         component: comprobarEmail,
         permission: [55],
-      },
-      {
-        link: "/domiciliacion/modificar",
+      }, */
+      /*    {
+        link: "/colpensiones/modificar",
         label: <AppIcons Logo={"ACTUALIZACION"} name={"Modificar"} />,
         component: ModificarPps,
         permission: [56],
-      },
+      }, */
       {
-        link: "/domiciliacion/voluntariodemanda",
+        link: "/colpensiones/voluntariodemanda",
         label: (
           <AppIcons Logo={"ACTUALIZACION"} name={"Voluntario a Demanda"} />
         ),
@@ -967,8 +990,8 @@ const allUrlsPrivateApps = [
         show: false,
       },
       {
-        link: "/domiciliacion/ppspordemanda",
-        label: <AppIcons Logo={"ACTUALIZACION"} name={"Pps A Demanda"} />,
+        link: "/colpensiones/ppspordemanda",
+        label: <AppIcons Logo={"ACTUALIZACION"} name={"PPS Demanda"} />,
         component: BuscarCedulaPpsADemanda,
         permission: [57],
       },

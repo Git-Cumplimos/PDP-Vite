@@ -27,12 +27,13 @@ import { useFetchMovistar } from "../hook/useFetchMovistar";
 import usePermissionTrx from "../hook/usePermissionTrx";
 
 //----------constantes------------
-const tipo_operacion = 104;
-const url_get_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/paquetes`;
-const url_paquetes_movistar = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/compra-paquetes/metodo1/comprar`;
+const url_get_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-compra-paquetes/get-paquetes`;
+const url_trx_compra_paquete = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-compra-paquetes/metodo1/trx-compra-paquete`;
+const url_consulta_compra_paquete = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-compra-paquetes/metodo1/consulta-compra-paquete`;
 const inputDataInitial = {
   celular: "",
 };
+
 const inputDataInitialSearch = {
   tipodeoferta: null,
   codigodelaoferta: "",
@@ -68,7 +69,11 @@ const SubPaquetesMovistar = () => {
   const navigateValid = useNavigate();
   const [, PeticionGetPaquetes] = useFetch(fetchGetPaquetes);
   const [loadingPeticionCompraPaquetes, PeticionCompraPaquetes] =
-    useFetchMovistar(url_paquetes_movistar, "compra paquetes movistar");
+    useFetchMovistar(
+      url_trx_compra_paquete,
+      url_consulta_compra_paquete,
+      "compra paquetes movistar"
+    );
 
   useEffect(() => {
     let paramsGetPaquetes = {};
@@ -130,14 +135,13 @@ const SubPaquetesMovistar = () => {
   }, [urlLocation, pageData, limit, inputDataSearch, PeticionGetPaquetes]);
 
   function onChangeInput(e) {
-    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-
+    let valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
     if (valueInput[0] != 3) {
       if (valueInput != "") {
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
-        return;
+        valueInput = "";
       }
     }
     setInputData((anterior) => ({
@@ -161,25 +165,30 @@ const SubPaquetesMovistar = () => {
 
   const ComprarPaquete = () => {
     const tipo__comerio = roleInfo.tipo_comercio.toLowerCase();
+  
     const data = {
       celular: inputData.celular,
       valor: dataPackage.valordelaoferta,
-      codigo_comercio: roleInfo.id_comercio,
+      id_comercio: roleInfo.id_comercio,
       tipo_comercio:
         tipo__comerio.search("kiosco") >= 0
           ? "OFICINAS PROPIAS"
           : roleInfo.tipo_comercio,
-      id_dispositivo: roleInfo.id_dispositivo,
+      id_terminal: roleInfo.id_dispositivo,
       id_usuario: roleInfo.id_usuario,
       direccion: roleInfo.direccion,
       ciudad: roleInfo.ciudad,
       codigo_dane: roleInfo.codigo_dane,
+    };
+
+    const data_additional = {
       codigodelaoferta: parseInt(dataPackage.codigodelaoferta),
     };
 
-    PeticionCompraPaquetes(data)
+    PeticionCompraPaquetes(data, data_additional)
       .then((response) => {
         if (response?.status === true) {
+          notify("Compra de paquetes exitosa");
           CompraPaquetesExitosa(response?.obj?.result);
         }
       })
@@ -199,7 +208,6 @@ const SubPaquetesMovistar = () => {
               break;
             default:
               if (error.notificacion == null) {
-                console.log("hola");
                 notifyError(`${msg}: ${error.message}`);
               }
               break;
@@ -218,9 +226,9 @@ const SubPaquetesMovistar = () => {
         Hora: result_.hora_final_ptopago,
       },
       commerceInfo: [
-        ["Id Transacción", result_.transaccion_ptopago],
+        ["Id Transacción", result_.id_trx],
         ["No. terminal", roleInfo.id_dispositivo],
-        ["Id Movistar", result_.pk_trx],
+        ["Id Movistar", result_.id_movistar],
         ["Id Comercio", roleInfo.id_comercio],
         ["Comercio", roleInfo["nombre comercio"]],
         ["", ""],
@@ -228,7 +236,6 @@ const SubPaquetesMovistar = () => {
         ["", ""],
         ["Dirección", roleInfo.direccion],
         ["", ""],
-        // ["Id Trx", result_.pk_trx],
       ],
       commerceName: "PAQUETES MOVISTAR",
       trxInfo: [
@@ -247,10 +254,9 @@ const SubPaquetesMovistar = () => {
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
     };
 
-    notify("Compra de paquetes exitosa");
     setInfTicket(voucher);
     setTypeInfo("InfRecibo");
-    guardarTicket(result_.transaccion_ptopago, tipo_operacion, voucher)
+    guardarTicket(result_.id_trx, result_.id_tipo_transaccion, voucher)
       .then((resTicket) => {
         console.log("Ticket guardado exitosamente");
       })
