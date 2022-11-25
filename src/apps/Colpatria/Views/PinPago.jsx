@@ -129,7 +129,7 @@ const PinPago = () => {
               roleInfo,
               trx_id,
               codigo_autorizacion,
-              "Retiro de pin",
+              "Pin de giro",
               [
                 ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
                 ["", ""],
@@ -245,7 +245,7 @@ const PinPago = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Retiros con PIN</h1>
+      <h1 className="text-3xl mt-6">Pin de giro</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
