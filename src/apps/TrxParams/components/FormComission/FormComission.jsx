@@ -167,7 +167,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                         id={`${key}_${ind}`}
                         label={key}
                         name={`${key}|${ind}`}
-                        type={"number"}
+                        type={"text"}
                         value={val}
                         // onChange={() => {}}
                         onInput={(e) => {
