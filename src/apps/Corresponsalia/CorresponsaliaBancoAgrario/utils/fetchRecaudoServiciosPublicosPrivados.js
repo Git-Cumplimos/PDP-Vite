@@ -170,3 +170,24 @@ export const putModificarConvenio = async (pkConvenio, bodyObj) => {
     throw err;
   }
 };
+export const postCheckEstadoConveniosAgrario = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlBancoAgrario}/banco-agrario/banco_agrario_cb_recaudo/comprobar_cargue_archivo`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};

@@ -17,22 +17,21 @@ import {
 } from "../../utils/fetchComisionesCobrar";
 import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Pagination from "../../../../components/Compound/Pagination/Pagination";
 import Modal from "../../../../components/Base/Modal/Modal";
 import Input from "../../../../components/Base/Input/Input";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
-const initComissionData = {
-  type: "",
-  ranges: [
-    {
-      "Rango minimo": 0,
-      "Rango maximo": "",
-      "Comision porcentual": 0,
-      "Comision fija": 0,
-    },
-  ],
-};
+// const initComissionData = {
+//   type: "trx",
+//   ranges: [
+//     {
+//       "Rango minimo": 0,
+//       "Rango maximo": "",
+//       "Comision porcentual": 0,
+//       "Comision fija": 0,
+//     },
+//   ],
+// };
 
 const CreateComisionCobrada = () => {
   const navigate = useNavigate();
@@ -43,7 +42,17 @@ const CreateComisionCobrada = () => {
   ] = useQuery();
 
   const [selectecConv, setSelectecConv] = useState(null);
-  const [comissionData, setComissionData] = useState(initComissionData);
+  const [comissionData, setComissionData] = useState({
+    type: "trx",
+    ranges: [
+      {
+        "Rango minimo": 0,
+        "Rango maximo": "",
+        "Comision porcentual": 0,
+        "Comision fija": 0,
+      },
+    ],
+  });
   const [newComision, setNewComision] = useState({
     "Nombre comision": "",
   });
