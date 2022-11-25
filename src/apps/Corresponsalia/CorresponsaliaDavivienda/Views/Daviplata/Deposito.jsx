@@ -337,7 +337,7 @@ const Deposito = () => {
           const comision =
             res?.obj?.respuestaDavivienda?.valComisionGiroDaviplata ?? 0;
           const total = parseInt(comision) + valor;
-          const ter = res?.obj?.respuestaDavivienda?.total;
+          const ter = res?.obj?.codigoTotal;
           const tempTicket = {
             title: "Recibo de Depósito a Daviplata",
             timeInfo: {
