@@ -700,25 +700,25 @@ const allUrlsPrivateApps = [
             subRoutes: [
               {
                 link: "/movistar/paquetes-movistar/combo",
-                label: <AppIcons Logo={"SORTEO01"} name="Combos" />,
+                label: <AppIcons Logo={"MOVISTAR"} name="Combos" />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/paquete-voz",
-                label: <AppIcons Logo={"SORTEO01"} name="Paquete de Voz" />,
+                label: <AppIcons Logo={"MOVISTAR"} name="Paquete de Voz" />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/paquete-datos",
-                label: <AppIcons Logo={"SORTEO01"} name="Paquete de Datos" />,
+                label: <AppIcons Logo={"MOVISTAR"} name="Paquete de Datos" />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/prepagada",
-                label: <AppIcons Logo={"SORTEO01"} name="Prepagada" />,
+                label: <AppIcons Logo={"MOVISTAR"} name="Prepagada" />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
