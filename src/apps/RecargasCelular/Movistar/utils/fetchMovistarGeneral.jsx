@@ -33,12 +33,29 @@ export const fetchCustom = (url_, metodo_, name_) => {
       } else if (metodo_ === "POST") {
         Peticion = await fetchData(urlCompleto, "POST", {}, data_, true);
       }
+      console.log("hh", Peticion);
     } catch (error) {
+      console.log(error);
       throw new ErrorCustomFetch(
         `Falla en el sistema: no conecta con el servicio ${name_}`,
         error.message
       );
     }
+
+    //Evaluar si la respuesta es json
+    try {
+      if (typeof Peticion !== "object") {
+        throw new ErrorCustomFetch(
+          `Falla en el sistema: servicio no encontrado ${name_}`,
+          "404 not found"
+        );
+      }
+    } catch (error) {
+      throw error;
+    }
+
+    console.log(Peticion?.hasOwnProperty("status") === false);
+    console.log(typeof {});
     //evaluar respuesta de api gateway
     try {
       if (

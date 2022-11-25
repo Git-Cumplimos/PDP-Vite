@@ -19,8 +19,8 @@ import usePermissionTrx from "../hook/usePermissionTrx";
 
 const minValor = 1000;
 const maxValor = 100000;
-const tipo_operacion = 77;
-const url_recargas_movistar = `${process.env.REACT_APP_URL_MOVISTAR}/recargasmovistar/metodo1/prepago`;
+const url_trx_recarga = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-recargas/metodo1/trx-recarga`;
+const url_consulta_recarga = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-recargas/metodo1/consulta-recarga`;
 
 const RecargasMovistar = () => {
   //Variables
@@ -37,7 +37,8 @@ const RecargasMovistar = () => {
   const [typeInfo, setTypeInfo] = useState("Ninguno");
 
   const [loadingPeticionRecarga, peticionRecarga] = useFetchMovistar(
-    url_recargas_movistar,
+    url_trx_recarga,
+    url_consulta_recarga,
     "recargas movistar"
   );
 
@@ -77,19 +78,19 @@ const RecargasMovistar = () => {
     const data = {
       celular: inputCelular,
       valor: inputValor,
-      codigo_comercio: roleInfo.id_comercio,
+      id_comercio: roleInfo.id_comercio,
       tipo_comercio:
         tipo__comerio.search("kiosco") >= 0
           ? "OFICINAS PROPIAS"
           : roleInfo.tipo_comercio,
-      id_dispositivo: roleInfo.id_dispositivo,
+      id_terminal: roleInfo.id_dispositivo,
       id_usuario: roleInfo.id_usuario,
       direccion: roleInfo.direccion,
       ciudad: roleInfo.ciudad,
       codigo_dane: roleInfo.codigo_dane,
     };
 
-    peticionRecarga(data)
+    peticionRecarga(data, {})
       .then((response) => {
         if (response?.status === true) {
           notify("Recarga exitosa");
@@ -172,9 +173,9 @@ const RecargasMovistar = () => {
         Hora: result_.hora_final_ptopago,
       },
       commerceInfo: [
-        ["Id Transacción", result_.transaccion_ptopago],
+        ["Id Transacción", result_.id_trx],
         ["No. terminal", roleInfo.id_dispositivo],
-        ["Id Movistar", result_.pk_trx],
+        ["Id Movistar", result_.id_movistar],
         ["Id Comercio", roleInfo.id_comercio],
         ["Comercio", roleInfo["nombre comercio"]],
         ["", ""],
@@ -193,9 +194,10 @@ const RecargasMovistar = () => {
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
     };
+
     setTypeInfo("RecargaExitosa");
     setInfTicket(voucher);
-    infoTicket(result_.transaccion_ptopago, tipo_operacion, voucher)
+    infoTicket(result_.id_trx, result_.id_tipo_transaccion, voucher)
       .then((resTicket) => {
         console.log(resTicket);
       })

@@ -10,8 +10,8 @@ import {
   PeticionDescargar,
 } from "../utils/fetchMovistar";
 
-const URL = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/buscar`;
-const URLDescarga = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/conciliacion/descargar`;
+const URL = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-conciliaciones/get-conciliacion`;
+const URLDescarga = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-conciliaciones/descargar_conciliacion`;
 
 const ConcilacionMovistarDescarga = () => {
   const [paramts, setParamts] = useState({
