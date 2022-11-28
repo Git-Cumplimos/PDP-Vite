@@ -72,6 +72,7 @@ const ArqueoBilletes = lazy(() =>
   import("../apps/LoteriaBog/Views/ArqueoBilletes")
 );
 const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
+const Inventario = lazy(() => import("../apps/LoteriaBog/Views/Inventario"));
 
 /**
  * ColCard
@@ -378,6 +379,13 @@ const allUrlsPrivateApps = [
           link: `/loteria/${name}/arqueo`,
           label: <AppIcons Logo={"ArqueoBilletes"} name="Arqueo Billetes" />,
           component: ArqueoBilletes,
+          extern: false,
+          permission: [3, 6], ///////////////////////////////////////////////////////////////////
+        },
+        {
+          link: `/loteria/${name}/inventario`,
+          label: <AppIcons Logo={"REPORTE"} name="Inventario Billetes" />,
+          component: Inventario,
           extern: false,
           permission: [3, 6], ///////////////////////////////////////////////////////////////////
         },
