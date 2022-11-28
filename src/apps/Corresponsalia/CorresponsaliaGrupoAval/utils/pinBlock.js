@@ -10,24 +10,10 @@ const CryptoJS = require('crypto-js');
 function encryptAES(data, key) {
 
     key = CryptoJS.enc.Hex.parse(key);
-    const encrypted = CryptoJS.AES.encrypt(data, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.NoPadding }).toString();
+    const encrypted = CryptoJS.TripleDES.encrypt(data, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.NoPadding }).toString();
     console.log(encrypted)
     return encrypted;
 }
-
-/**
- * Decrypt AES using Node.js's crypto module 
- * @param data a base64 string
- * @param key Key would be hashed by md5 and shorten to max 192 bits,
- * @returns {*} a utf8 string
- */
-function decryptAES(data, key) {
-    key = CryptoJS.MD5(key).toString()
-    const encrypted = CryptoJS.AES.decrypt(data, key).toString(CryptoJS.enc.Utf8)
-    return encrypted;
-}
-
-
 
 function hexToBytes(hex) {
   let  bytes = ""
@@ -101,10 +87,7 @@ export const pinBlock = (pinX) => {
     const key = process.env.REACT_APP_KEY_ENCRIP_AVAL
     const resultEncrip = encryptAES(result, key)
 
-    console.log(resultEncrip)
-
-    // console.log(decryptAES(resultEncrip,'533471F0AA3648BA'))
-    
+    console.log(resultEncrip)    
   
     return resultEncrip;  
 };

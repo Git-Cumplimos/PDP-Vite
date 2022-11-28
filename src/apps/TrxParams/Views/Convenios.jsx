@@ -468,7 +468,7 @@ const Convenios = () => {
           <Fieldset legend={"Tags"}>
             {selectedConvenio?.Tags?.map((val, ind) => {
               return (
-                <div className='grid grid-cols-2' key={ind}>
+                <div className='flex align-middle justify-center' key={ind}>
                   <Input
                     key={ind}
                     id={`tagsConvenio_${ind}`}
@@ -479,20 +479,22 @@ const Convenios = () => {
                     onChange={() => {}}
                     required
                   />
-                  <ButtonBar>
-                    <Button
-                      type='button'
-                      onClick={() => {
-                        if (selectedConvenio?.Tags.length < 2) {
-                          return;
-                        }
-                        const copy = { ...selectedConvenio };
-                        copy?.Tags.splice(ind, 1);
-                        setSelectedConvenio({ ...copy });
-                      }}>
-                      Eliminar tag
-                    </Button>
-                  </ButtonBar>
+                  {selectedConvenio?.Tags.length > 1 && (
+                    <ButtonBar className='w-52'>
+                      <Button
+                        type='button'
+                        onClick={() => {
+                          if (selectedConvenio?.Tags.length < 2) {
+                            return;
+                          }
+                          const copy = { ...selectedConvenio };
+                          copy?.Tags.splice(ind, 1);
+                          setSelectedConvenio({ ...copy });
+                        }}>
+                        Eliminar tag
+                      </Button>
+                    </ButtonBar>
+                  )}
                 </div>
               );
             })}

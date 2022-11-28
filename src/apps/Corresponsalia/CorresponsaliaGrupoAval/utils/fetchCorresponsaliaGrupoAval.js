@@ -81,7 +81,7 @@ export const retiroCorresponsalGrupoAval = async (bodyObj) => {
 export const consultarMensajePublicitarioDavivienda = async () => {
   try {
     const res = await fetchData(
-      `${urlParametrizacion}//mensajes_publicitarios/consultar`,
+      `${urlParametrizacion}/mensajes_publicitarios/consultar`,
       "POST",
       {},
       {

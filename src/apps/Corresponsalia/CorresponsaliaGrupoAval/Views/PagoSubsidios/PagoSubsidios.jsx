@@ -144,9 +144,12 @@ const PagoSubsidios = () => {
   }
 
   function RetirarSubsidio() {
-    let oficinaPropia;
-    if (roleInfo.tipo_comercio != "OFICINASPROPIAS") {
-      oficinaPropia = false;
+    let oficinaPropia_;
+    if (
+      roleInfo.tipo_comercio === "OFICINAS PROPIAS" ||
+      roleInfo.tipo_comercio === "KIOSCO"
+    ) {
+      oficinaPropia_ = true;
     }
     const dataSubsidio = {
       comercio: {
@@ -155,7 +158,7 @@ const PagoSubsidios = () => {
         id_terminal: roleInfo.id_dispositivo,
       },
       nombre_comercio: roleInfo["nombre comercio"],
-      oficina_propia: oficinaPropia,
+      oficina_propia: oficinaPropia_,
       valor_total_trx: value,
       numeroCelular: inputData.numeroCelular,
       documento: inputData.documento,

@@ -20,17 +20,17 @@ import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
 
-const initComissionData = {
-  type: "",
-  ranges: [
-    {
-      "Rango minimo": 0,
-      "Rango maximo": "",
-      "Comision porcentual": 0,
-      "Comision fija": 0,
-    },
-  ],
-};
+// const initComissionData = {
+//   type: "trx",
+//   ranges: [
+//     {
+//       "Rango minimo": 0,
+//       "Rango maximo": 0,
+//       "Comision porcentual": 0,
+//       "Comision fija": 0,
+//     },
+//   ],
+// };
 
 const CreateComision = () => {
   const navigate = useNavigate();
@@ -48,7 +48,17 @@ const CreateComision = () => {
 
   const [headersTable, setHeadersTable] = useState([]);
   const [idComercios, setIdComercios] = useState([]);
-  const [comissionData, setComissionData] = useState(initComissionData);
+  const [comissionData, setComissionData] = useState({
+    type: "trx",
+    ranges: [
+      {
+        "Rango minimo": 0,
+        "Rango maximo": 0,
+        "Comision porcentual": 0,
+        "Comision fija": 0,
+      },
+    ],
+  });
   const [newComision, setNewComision] = useState({
     "Id comercio": "",
     "Nombre comision": "",
