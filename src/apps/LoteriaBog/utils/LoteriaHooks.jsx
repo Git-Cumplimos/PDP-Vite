@@ -49,7 +49,7 @@ const urls = {
   codigos_loteria: `${process.env.REACT_APP_URL_LOTERIAS}/codigos_loteria`,
   consulta_operaciones: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_operaciones`,
   consulta_codigos_oficina: `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`,
-  consultaInventario: `${process.env.REACT_APP_URL_LOTERIAS}/consultaInventario`,
+  consultaInventario: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_numeros_inventario`,
 };
 export const LoteriaContext = createContext({
   infoLoto: {
@@ -709,9 +709,9 @@ export const useProvideLoteria = () => {
   }, []);
 
   const consultaInventario = useCallback(
-    async (numLoteria, numSorteo) => {
+    async (numSorteo, numLoteria) => {
       try {
-        const res = await fetchData(urls.descargaVentas_S3, "GET", {
+        const res = await fetchData(urls.consultaInventario, "POST",{},{
           num_sorteo : numSorteo, 
           num_loteria : numLoteria,
           cod_distribuidor: codigosOficina?.cod_oficina_lot,
@@ -723,7 +723,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [nit_loteria]
+    [codigosOficina]
   );
 
   return {

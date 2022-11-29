@@ -101,14 +101,15 @@ const Inventario = () => {
 
   return (
   <Select
-          disabled={serie !== "" || numero !== ""}
           id="selectSorteo"
           label="Tipo de sorteo"
           options={opcionesdisponibles}
           value={sorteo}
           onChange={(e) => {
             setSorteo(e.target.value)
-            consultaInventario(e.target.value.split[0],e.target.value.split[1]).then((res) => {
+            console.log(e.target.value)
+            if(e.target.value !== "")
+            consultaInventario(e.target.value.split("-")[0],e.target.value.split("-")[1]).then((res) => {
               console.log(res)
             });
           }
