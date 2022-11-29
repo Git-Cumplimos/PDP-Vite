@@ -5,12 +5,14 @@ import Select from "../../../components/Base/Select";
 import classes from "./Inventario.module.css";
 
 import { useLoteria } from "../utils/LoteriaHooks";
-import { notifyError } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 import Input from "../../../components/Base/Input";
 import InputX from "../../../components/Base/InputX/InputX";
 import Button from "../../../components/Base/Button";
 import Form from "../../../components/Base/Form";
 import ButtonBar from "../../../components/Base/ButtonBar";
+import BarcodeReader from "../../../components/Base/BarcodeReader";
+import TextArea from "../../../components/Base/TextArea";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 const { contenedorPrincipal } = classes;
@@ -25,7 +27,18 @@ const Inventario = () => {
   const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
   const [sorteo, setSorteo] = useState("");
   const [datosAzar, setDatosAzar] = useState("");
+  const [cantidadBilletes, setCantidadBilletes] = useState("");
   const [showCrearInventario, setShowCrearInventario] = useState(false);
+  const [datosEscaneados, setDatosEscaneados] = useState({
+    escaneado1: "",
+    escaneado2: "",
+    escaneado3: "",
+  });
+  const [datosEscaneadosValidados, setDatosEscaneadosValidados] = useState({
+    escaneado1Validados: false,
+    escaneado2Validados: false,
+    escaneado3Validados: false,
+  });
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -103,46 +116,199 @@ const Inventario = () => {
         onChange={(e) => {
           setShowCrearInventario(false);
           setSorteo(e.target.value);
-          if(e.target.value !== ""){
-          consultaInventario(
-            e.target.value.split("-")[0],
-            e.target.value.split("-")[1]
-          ).then((res) => {
-            if (!res?.status) {
-              notifyError(res?.response);
-            } else {
-              setDatosAzar(res?.response);
-              setShowCrearInventario(true);
-            }
-          });
-        }
+          if (e.target.value !== "") {
+            consultaInventario(
+              e.target.value.split("-")[0],
+              e.target.value.split("-")[1]
+            ).then((res) => {
+              if (!res?.status) {
+                notifyError(res?.response);
+              } else {
+                setDatosAzar(res?.response);
+                setShowCrearInventario(true);
+              }
+            });
+          }
         }}
       />
       {datosAzar && showCrearInventario ? (
         <>
           <Form>
+            <InputX
+              label="Cantidad de billetes"
+              type="tel"
+              value={cantidadBilletes}
+              onInput={(e) => {
+                const cantidad = parseInt(e.target.value) || "";
+
+                setCantidadBilletes(cantidad);
+              }}
+            ></InputX>
             <div className={contenedorPrincipal}>
               <div>
-                <InputX label="Billete" type="search"></InputX>
-                <InputX label="Billete" type="search"></InputX>
-                <InputX label="Billete" type="search"></InputX>
+                <InputX
+                  value={datosAzar?.[0] ?? ""}
+                  label="Billete"
+                  type="search"
+                  disabled
+                ></InputX>
+                <InputX
+                  value={datosAzar[1]}
+                  label="Billete"
+                  type="search"
+                  disabled
+                ></InputX>
+                <InputX
+                  value={datosAzar[2]}
+                  label="Billete"
+                  type="search"
+                  disabled
+                ></InputX>
               </div>
+              {/*               <div>
+                <Button type="submit">Scan</Button>
+                <Button type="submit">Scan</Button>
+                <Button type="submit">Scan</Button>
+              </div> */}
               <div>
-                <Button type="submit">Scan</Button>
-                <Button type="submit">Scan</Button>
-                <Button type="submit">Scan</Button>
-              </div>
-              <div>
-                <InputX label="Billete" type="search"></InputX>
-                <InputX label="Billete" type="search"></InputX>
-                <InputX label="Billete" type="search"></InputX>
+                <InputX
+                  label="Escanee el código de barras"
+                  type="search"
+                  onInput={(e) => {
+                    const num = e.target.value || "";
+
+                    setDatosEscaneados((old) => {
+                      return { ...old, escaneado1: num.toString() };
+                    });
+                    console.log(datosAzar[0].split("-")[0]);
+                    if (e.target.value?.length == 20) {
+                      /* console.log(e.target.value.substr(-9, 4)); */
+                      console.log(
+                        String(e.target.value.substr(-5, 3)),
+                        String(datosAzar[0].split("-")[1])
+                      );
+                      if (
+                        (String(e.target.value.substr(-9, 4)) !==
+                          String(datosAzar[0].split("-")[0])) &
+                        (String(e.target.value.substr(-5, 3)) !==
+                          String(datosAzar[0].split("-")[1]))
+                      ) {
+                        notifyError("Número de billete y serie no coinciden");
+                      } else if (
+                        String(e.target.value.substr(-9, 4)) !==
+                        String(datosAzar[0].split("-")[0])
+                      ) {
+                        notifyError("Número de billete no coincide");
+                      } else if (
+                        String(e.target.value.substr(-5, 3)) !==
+                        String(datosAzar[0].split("-")[1])
+                      ) {
+                        notifyError("Número de serie no coincide");
+                      } else {
+                        setDatosEscaneadosValidados((old) => {
+                          return { ...old, escaneado1Validados: true };
+                        });
+                      }
+                    }
+                  }}
+                ></InputX>
+                <InputX
+                  label="Escanee el código de barras"
+                  type="search"
+                  onInput={(e) => {
+                    const num2 = e.target.value || "";
+
+                    setDatosEscaneados((old) => {
+                      return { ...old, escaneado2: num2.toString() };
+                    });
+
+                    if (e.target.value?.length == 20) {
+                      /* console.log(e.target.value.substr(-9, 4)); */
+                      console.log(
+                        String(e.target.value.substr(-9, 4)),
+                        String(datosAzar[1].split("-")[0])
+                      );
+                      if (
+                        (String(e.target.value.substr(-9, 4)) !==
+                          String(datosAzar[1].split("-")[0])) &
+                        (String(e.target.value.substr(-5, 3)) !==
+                          String(datosAzar[1].split("-")[1]))
+                      ) {
+                        notifyError("Número de billete y serie no coinciden");
+                      } else if (
+                        String(e.target.value.substr(-9, 4)) !==
+                        String(datosAzar[1].split("-")[0])
+                      ) {
+                        notifyError("Número de billete no coincide");
+                      } else if (
+                        String(e.target.value.substr(-5, 3)) !==
+                        String(datosAzar[1].split("-")[1])
+                      ) {
+                        notifyError("Número de serie no coincide");
+                      } else {
+                        setDatosEscaneadosValidados((old) => {
+                          return { ...old, escaneado2Validados: true };
+                        });
+                      }
+                    }
+                  }}
+                ></InputX>
+                <InputX
+                  label="Escanee el código de barras"
+                  type="search"
+                  onInput={(e) => {
+                    const num3 = e.target.value || "";
+
+                    setDatosEscaneados((old) => {
+                      return { ...old, escaneado3: num3.toString() };
+                    });
+                    if (e.target.value?.length == 20) {
+                      /* console.log(e.target.value.substr(-9, 4)); */
+                      console.log(
+                        String(e.target.value.substr(-9, 4)),
+                        String(datosAzar[2].split("-")[0])
+                      );
+                      if (
+                        (String(e.target.value.substr(-9, 4)) !==
+                          String(datosAzar[2].split("-")[0])) &
+                        (String(e.target.value.substr(-5, 3)) !==
+                          String(datosAzar[2].split("-")[1]))
+                      ) {
+                        notifyError("Número de billete y serie no coinciden");
+                      } else if (
+                        String(e.target.value.substr(-9, 4)) !==
+                        String(datosAzar[2].split("-")[0])
+                      ) {
+                        notifyError("Número de billete no coincide");
+                      } else if (
+                        String(e.target.value.substr(-5, 3)) !==
+                        String(datosAzar[2].split("-")[1])
+                      ) {
+                        notifyError("Número de serie no coincide");
+                      } else {
+                        setDatosEscaneadosValidados((old) => {
+                          return { ...old, escaneado3Validados: true };
+                        });
+                      }
+                    }
+                  }}
+                ></InputX>
               </div>
             </div>
+            <ButtonBar>
+              <Button
+                type="submit"
+                disabled={
+                  !datosEscaneadosValidados["escaneado1Validados"] &&
+                  !datosEscaneadosValidados["escaneado2Validados"] &&
+                  !datosEscaneadosValidados["escaneado3Validados"]
+                }
+              >
+                Guardar inventario
+              </Button>
+              <Button type="onsubmit">Inventario errado</Button>
+            </ButtonBar>
           </Form>
-          <ButtonBar>
-            <Button type="submit">Guardar inventario</Button>
-            <Button type="onsubmit">Inventario errado</Button>
-          </ButtonBar>
         </>
       ) : (
         ""
