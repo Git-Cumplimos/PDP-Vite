@@ -1,6 +1,6 @@
 import React from "react";
 import fetchData from "../../../utils/fetchData";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useCallback } from "react";
 import Select from "../../../components/Base/Select";
 import classes from "./Inventario.module.css";
 
@@ -20,6 +20,7 @@ const Inventario = () => {
   const {
     infoLoto: { numero, setNumero, serie, setSerie, loterias, setLoterias },
     consultaInventario,
+    registrarInventario,
     codigos_lot,
   } = useLoteria();
 
@@ -106,6 +107,22 @@ const Inventario = () => {
     SetOpcionesDisponibles([...copy]);
   }, [sorteoExtrafisico, sorteoOrdifisico, sorteosLOT, codigos_lot]);
 
+  const onSubmitInventario = useCallback(
+    (e) => {
+      e.preventDefault();
+      registrarInventario(
+        sorteo.split("-")[0],
+        sorteo.split("-")[1],
+        "",// comentario
+        "",//numero_total
+        "",//numero_completo
+        "",//inconcistencia
+      )
+      
+    },
+    [sorteo]
+  );
+
   return (
     <>
       <Select
@@ -133,7 +150,7 @@ const Inventario = () => {
       />
       {datosAzar && showCrearInventario ? (
         <>
-          <Form>
+          <Form onSubmit={onSubmitInventario} grid>
             <InputX
               label="Cantidad de billetes"
               type="tel"
