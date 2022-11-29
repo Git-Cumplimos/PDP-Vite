@@ -96,16 +96,17 @@ const Inventario = () => {
   return (
     <>
       <Select
-        disabled={serie !== "" || numero !== ""}
         id="selectSorteo"
         label="Tipo de sorteo"
         options={opcionesdisponibles}
         value={sorteo}
         onChange={(e) => {
+          setShowCrearInventario(false);
           setSorteo(e.target.value);
+          if(e.target.value !== ""){
           consultaInventario(
-            e.target.value.split[0],
-            e.target.value.split[1]
+            e.target.value.split("-")[0],
+            e.target.value.split("-")[1]
           ).then((res) => {
             if (!res?.status) {
               notifyError(res?.response);
@@ -114,6 +115,7 @@ const Inventario = () => {
               setShowCrearInventario(true);
             }
           });
+        }
         }}
       />
       {datosAzar && showCrearInventario ? (
