@@ -214,6 +214,7 @@ export const useProvideLoteria = () => {
       //Consulta codigos de oficina y sucursal por lotería
       if (roleInfo?.id_comercio !== undefined) {
         consulta_codigos_oficina(nit).then((res) => {
+          console.log("repueta", res);
           if ("msg" in res) {
             console.log(res?.msg);
             setCodigosOficina({
@@ -317,9 +318,9 @@ export const useProvideLoteria = () => {
       if (sort[1] === "true") {
         fisico = true;
       }
-      let tipo_comercio = roleInfo.tipo_comercio
-      if (roleInfo.tipo_comercio === "KIOSCO"){
-        tipo_comercio = "OFICINAS PROPIAS"
+      let tipo_comercio = roleInfo.tipo_comercio;
+      if (roleInfo.tipo_comercio === "KIOSCO") {
+        tipo_comercio = "OFICINAS PROPIAS";
       }
       console.log(roleInfo);
       const req = {
@@ -363,9 +364,9 @@ export const useProvideLoteria = () => {
       if (sort[1] === "true") {
         fisico = true;
       }
-      let tipo_comercio = roleInfo.tipo_comercio
-      if (roleInfo.tipo_comercio === "KIOSCO"){
-        tipo_comercio = "OFICINAS PROPIAS"
+      let tipo_comercio = roleInfo.tipo_comercio;
+      if (roleInfo.tipo_comercio === "KIOSCO") {
+        tipo_comercio = "OFICINAS PROPIAS";
       }
       console.log(selecFrac);
       const req = {
@@ -503,9 +504,9 @@ export const useProvideLoteria = () => {
 
   const pagopremio = useCallback(
     async (sorteo, billete, serie, hash, customer, respagar, phone) => {
-      let tipo_comercio = roleInfo.tipo_comercio
-      if (roleInfo.tipo_comercio === "KIOSCO"){
-        tipo_comercio = "OFICINAS PROPIAS"
+      let tipo_comercio = roleInfo.tipo_comercio;
+      if (roleInfo.tipo_comercio === "KIOSCO") {
+        tipo_comercio = "OFICINAS PROPIAS";
       }
       const req = {
         nombre:
@@ -550,9 +551,9 @@ export const useProvideLoteria = () => {
 
   const pagopremiofisico = useCallback(
     async (sorteo, billete, serie, customer2, respagar, fracciones) => {
-      let tipo_comercio = roleInfo.tipo_comercio
-      if (roleInfo.tipo_comercio === "KIOSCO"){
-        tipo_comercio = "OFICINAS PROPIAS"
+      let tipo_comercio = roleInfo.tipo_comercio;
+      if (roleInfo.tipo_comercio === "KIOSCO") {
+        tipo_comercio = "OFICINAS PROPIAS";
       }
       const req = {
         nombre:

@@ -86,34 +86,14 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
     throw err;
   }
 };
-export const postConsultaConveniosAval = async (bodyObj) => {
+
+export const postRecaudoConveniosAgrario = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlBancoAgrario}/grupo_aval_cb_recaudo/consulta_recaudo_servicios_publicos_privados`,
-      "POST",
-      {},
-      bodyObj,
-      {},
-      true
-    );
-    if (!res?.status) {
-      console.error(res?.msg);
-    }
-    return res;
-  } catch (err) {
-    throw err;
-  }
-};
-export const postRecaudoConveniosAval = async (bodyObj) => {
-  if (!bodyObj) {
-    return "Sin datos body";
-  }
-  try {
-    const res = await fetchData(
-      `${urlBancoAgrario}/grupo_aval_cb_recaudo/recaudo_servicios_publicos_privados`,
+      `${urlBancoAgrario}/banco-agrario/banco_agrario_cb_recaudo/recaudo_servicios_publicos_privados`,
       "POST",
       {},
       bodyObj,

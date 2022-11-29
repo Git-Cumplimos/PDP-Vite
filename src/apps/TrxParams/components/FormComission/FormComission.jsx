@@ -116,7 +116,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           value={val}
                           onInput={(e) => {
                             let valor = e.target.value;
-                            let num = valor.replace(/[\s.]/g, "");
+                            let num = valor.replace(/[\s.-]/g, "");
                             num = num.replace(/^0[0-9]/, "");
                             if (!isNaN(num)) {
                               let copyData = { ...comissionData };
@@ -167,12 +167,12 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                         id={`${key}_${ind}`}
                         label={key}
                         name={`${key}|${ind}`}
-                        type={"number"}
+                        type={"text"}
                         value={val}
                         // onChange={() => {}}
                         onInput={(e) => {
                           let valor = e.target.value;
-                          let num = valor.replace(/[\s\.]/g, "");
+                          let num = valor.replace(/[\s-]/g, "");
                           num = num.replace(/^0[0-9]/, "");
                           if (!isNaN(num)) {
                             let copyData = { ...comissionData };
