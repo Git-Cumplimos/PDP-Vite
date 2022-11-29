@@ -140,7 +140,7 @@ const Inventario = () => {
               if (!res?.status) {
                 notifyError(res?.response);
               } else {
-                setDatosAzar(res?.response);
+                setDatosAzar(res?.response?.numerosAzar);
                 setShowCrearInventario(true);
               }
             });
@@ -196,7 +196,7 @@ const Inventario = () => {
                     setDatosEscaneados((old) => {
                       return { ...old, escaneado1: num.toString() };
                     });
-                    console.log(datosAzar[0].split("-")[0]);
+
                     if (e.target.value?.length == 20) {
                       /* console.log(e.target.value.substr(-9, 4)); */
                       console.log(
