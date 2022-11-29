@@ -15,7 +15,7 @@ import fetchData from "../../../utils/fetchData";
 const nitsLoterias = {
   "loteria-de-bogota": "899.999.270-1",
   "loteria-del-tolima": "809.008.775-0",
-  "loteria-de-cundinamarca": "86.003.723-4"
+  "loteria-de-cundinamarca": "86.003.723-4",
 };
 //////////////////////////////////////////////
 
@@ -709,11 +709,11 @@ export const useProvideLoteria = () => {
   }, []);
 
   const consultaInventario = useCallback(
-    async (numLoteria, numSorteo) => {
+    async (numSorteo, numLoteria) => {
       try {
         const res = await fetchData(urls.descargaVentas_S3, "GET", {
-          num_sorteo : numSorteo, 
-          num_loteria : numLoteria,
+          num_sorteo: numSorteo,
+          num_loteria: numLoteria,
           cod_distribuidor: codigosOficina?.cod_oficina_lot,
           cod_sucursal: codigosOficina?.cod_sucursal_lot,
         });

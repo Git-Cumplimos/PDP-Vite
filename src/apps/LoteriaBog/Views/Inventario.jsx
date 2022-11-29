@@ -2,32 +2,31 @@ import React from "react";
 import fetchData from "../../../utils/fetchData";
 import { useMemo, useEffect, useState } from "react";
 import Select from "../../../components/Base/Select";
-
+import classes from "./Inventario.module.css";
 
 import { useLoteria } from "../utils/LoteriaHooks";
-
+import { notifyError } from "../../../utils/notify";
+import Input from "../../../components/Base/Input";
+import InputX from "../../../components/Base/InputX/InputX";
+import Button from "../../../components/Base/Button";
+import Form from "../../../components/Base/Form";
+import ButtonBar from "../../../components/Base/ButtonBar";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
-
+const { contenedorPrincipal } = classes;
 const Inventario = () => {
   const {
-    infoLoto: {
-      numero,
-      setNumero,
-      serie,
-      setSerie,
-      loterias,
-      setLoterias,
-    },
+    infoLoto: { numero, setNumero, serie, setSerie, loterias, setLoterias },
     consultaInventario,
     codigos_lot,
   } = useLoteria();
 
-
   const [sorteoOrdifisico, setSorteofisico] = useState(null);
   const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
-  const [sorteo, setSorteo] = useState("")
-  
+  const [sorteo, setSorteo] = useState("");
+  const [datosAzar, setDatosAzar] = useState("");
+  const [showCrearInventario, setShowCrearInventario] = useState(false);
+
   const sorteosLOT = useMemo(() => {
     var cod = "";
     console.log(codigos_lot?.length);
@@ -92,29 +91,61 @@ const Inventario = () => {
       });
     }
     SetOpcionesDisponibles([...copy]);
-  }, [
-    sorteoExtrafisico,
-    sorteoOrdifisico,
-    sorteosLOT,
-    codigos_lot,
-  ]);
+  }, [sorteoExtrafisico, sorteoOrdifisico, sorteosLOT, codigos_lot]);
 
   return (
-  <Select
-          disabled={serie !== "" || numero !== ""}
-          id="selectSorteo"
-          label="Tipo de sorteo"
-          options={opcionesdisponibles}
-          value={sorteo}
-          onChange={(e) => {
-            setSorteo(e.target.value)
-            consultaInventario(e.target.value.split[0],e.target.value.split[1]).then((res) => {
-              console.log(res)
-            });
-          }
-          }
-        />
-  
+    <>
+      <Select
+        disabled={serie !== "" || numero !== ""}
+        id="selectSorteo"
+        label="Tipo de sorteo"
+        options={opcionesdisponibles}
+        value={sorteo}
+        onChange={(e) => {
+          setSorteo(e.target.value);
+          consultaInventario(
+            e.target.value.split[0],
+            e.target.value.split[1]
+          ).then((res) => {
+            if (!res?.status) {
+              notifyError(res?.response);
+            } else {
+              setDatosAzar(res?.response);
+              setShowCrearInventario(true);
+            }
+          });
+        }}
+      />
+      {datosAzar && showCrearInventario ? (
+        <>
+          <Form>
+            <div className={contenedorPrincipal}>
+              <div>
+                <InputX label="Billete" type="search"></InputX>
+                <InputX label="Billete" type="search"></InputX>
+                <InputX label="Billete" type="search"></InputX>
+              </div>
+              <div>
+                <Button type="submit">Scan</Button>
+                <Button type="submit">Scan</Button>
+                <Button type="submit">Scan</Button>
+              </div>
+              <div>
+                <InputX label="Billete" type="search"></InputX>
+                <InputX label="Billete" type="search"></InputX>
+                <InputX label="Billete" type="search"></InputX>
+              </div>
+            </div>
+          </Form>
+          <ButtonBar>
+            <Button type="submit">Guardar inventario</Button>
+            <Button type="onsubmit">Inventario errado</Button>
+          </ButtonBar>
+        </>
+      ) : (
+        ""
+      )}
+    </>
   );
 };
 
