@@ -15,6 +15,7 @@ import fetchData from "../../../utils/fetchData";
 const nitsLoterias = {
   "loteria-de-bogota": "899.999.270-1",
   "loteria-del-tolima": "809.008.775-0",
+  "loteria-de-cundinamarca": "86.003.723-4"
 };
 //////////////////////////////////////////////
 

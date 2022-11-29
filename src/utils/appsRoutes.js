@@ -323,6 +323,12 @@ const allUrlsPrivateApps = [
         logo: "LoteriaTolima",
         permission: [44, 45, 46, 47],
       },
+      {
+        link: "loteria-de-cundinamarca",
+        label: "Lotería de Cundinamarca",
+        logo: "LoteriaTolima",
+        permission: [44, 45, 46, 47],
+      }
     ].map(({ link: name, label, logo, permission }) => ({
       link: `/loteria/${name}`,
       label: <AppIcons Logo={logo} name={label} />,
