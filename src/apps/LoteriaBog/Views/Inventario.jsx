@@ -15,7 +15,7 @@ import BarcodeReader from "../../../components/Base/BarcodeReader";
 import TextArea from "../../../components/Base/TextArea";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
-const { contenedorPrincipal } = classes;
+const { contenedorPrincipal, contenedorBotones } = classes;
 const Inventario = () => {
   const {
     infoLoto: { numero, setNumero, serie, setSerie, loterias, setLoterias },
@@ -23,7 +23,7 @@ const Inventario = () => {
     registrarInventario,
     codigos_lot,
   } = useLoteria();
-
+  const [texto, setTexto] = useState("");
   const [sorteoOrdifisico, setSorteofisico] = useState(null);
   const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
   const [sorteo, setSorteo] = useState("");
@@ -113,12 +113,11 @@ const Inventario = () => {
       registrarInventario(
         sorteo.split("-")[0],
         sorteo.split("-")[1],
-        "",// comentario
-        "",//numero_total
-        "",//numero_completo
-        "",//inconcistencia
-      )
-      
+        "", // comentario
+        "", //numero_total
+        "", //numero_completo
+        "" //inconcistencia
+      );
     },
     [sorteo]
   );
@@ -150,7 +149,7 @@ const Inventario = () => {
       />
       {datosAzar && showCrearInventario ? (
         <>
-          <Form onSubmit={onSubmitInventario} grid>
+          <Form onSubmit={onSubmitInventario}>
             <InputX
               label="Cantidad de billetes"
               type="tel"
@@ -190,7 +189,7 @@ const Inventario = () => {
               <div>
                 <InputX
                   label="Escanee el código de barras"
-                  type="search"
+                  type="text"
                   onInput={(e) => {
                     const num = e.target.value || "";
 
@@ -312,7 +311,7 @@ const Inventario = () => {
                 ></InputX>
               </div>
             </div>
-            <ButtonBar>
+            <div className={contenedorBotones}>
               <Button
                 type="submit"
                 disabled={
@@ -324,8 +323,9 @@ const Inventario = () => {
                 Guardar inventario
               </Button>
               <Button type="onsubmit">Inventario errado</Button>
-            </ButtonBar>
+            </div>
           </Form>
+          <ButtonBar></ButtonBar>
         </>
       ) : (
         ""
