@@ -1,6 +1,7 @@
 import React from "react";
 import fetchData from "../../../utils/fetchData";
 import { useMemo, useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Select from "../../../components/Base/Select";
 import classes from "./Inventario.module.css";
 
@@ -16,6 +17,7 @@ import TextArea from "../../../components/Base/TextArea";
 import Modal from "../../../components/Base/Modal";
 import LogoPDP from "../../../components/Base/LogoPDP";
 import Fieldset from "../../../components/Base/Fieldset";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 const {
@@ -27,6 +29,7 @@ const {
   autorizacionMensajes,
 } = classes;
 const Inventario = () => {
+  const navigate = useNavigate();
   const {
     infoLoto: { numero, setNumero, serie, setSerie, loterias, setLoterias },
     consultaInventario,
@@ -44,6 +47,8 @@ const Inventario = () => {
   const [mensajeCausal, setMensajeCausal] = useState("");
   const [mensajeInventarioInvalido, setMensajeInventarioInvalido] =
     useState("");
+  const [mensajeInventarioInvalido2, setMensajeInventarioInvalido2] =
+    useState("");
   const [showCrearInventario, setShowCrearInventario] = useState(false);
   const [datosEscaneados, setDatosEscaneados] = useState({
     escaneado1: "",
@@ -59,7 +64,7 @@ const Inventario = () => {
     habilitarBtnAgregarInconsistencia,
     setHabilitarBtnAgregarInconsistencia,
   ] = useState(false);
-
+  const [procesandoTrx, setProcesandoTrx] = useState(false);
   const sorteosLOT = useMemo(() => {
     var cod = "";
     console.log(codigos_lot?.length);
@@ -132,27 +137,48 @@ const Inventario = () => {
       registrarInventario(
         sorteo.split("-")[0],
         sorteo.split("-")[1],
-        "", // comentario
+        "Inventario registrado con éxito", // comentario
         cantidadBilletes, //numero_total
-        "", //numero_completo
-        "" //inconcistencia-bool
+        [
+          datosEscaneados?.["escaneado1"],
+          datosEscaneados?.["escaneado2"],
+          datosEscaneados?.["escaneado3"],
+        ], //numero_completo
+        "true" //inconcistencia-bool
       );
     },
-    [sorteo]
+    [sorteo, datosEscaneados, cantidadBilletes]
   );
   const onSubmitMensajeInconsistencia = useCallback(
     (e) => {
       e.preventDefault();
+      setHabilitarBtnAgregarInconsistencia(true);
+      setProcesandoTrx(true);
       registrarInventario(
         sorteo.split("-")[0],
         sorteo.split("-")[1],
-        `${mensajeInventarioInvalido}${mensajeCausal}`, // comentario
+        `${mensajeInventarioInvalido},${mensajeInventarioInvalido2}, ${mensajeCausal}`, // comentario
         cantidadBilletes, //numero_total
-        ["2131-123123", "12312-123123", "21323-123232"], //numero_completo
+        [
+          datosEscaneados?.["escaneado1"],
+          datosEscaneados?.["escaneado2"],
+          datosEscaneados?.["escaneado3"],
+        ], //numero_completo
         "false" //inconcistencia-bool
-      );
+      ).then((res) => {
+        if (res?.response === "Registro exitoso") {
+          notify("Inconsistencia agregada exitosamente.");
+          setHabilitarBtnAgregarInconsistencia(true);
+          navigate(`/loteria`);
+          setProcesandoTrx(false);
+        } else {
+          notifyError("Error inconsistencia no agregada.");
+          setHabilitarBtnAgregarInconsistencia(false);
+          setProcesandoTrx(false);
+        }
+      });
     },
-    [sorteo, cantidadBilletes, mensajeCausal]
+    [sorteo, cantidadBilletes, mensajeCausal, datosEscaneados]
   );
   /* 
   const inventarioErrado = (e)=>{
@@ -162,54 +188,57 @@ const Inventario = () => {
   return (
     <>
       {showModal ? (
-        <Modal show={showModal} /* handleClose={handleClose} */>
-          <div className={contenedorImagen}>
-            <LogoPDP xsmall></LogoPDP>
-          </div>
-          {/* <Form grid onSubmit={(e) => enviar(e)}> */}
-          <Form grid onSubmit={(e) => onSubmitMensajeInconsistencia(e)}>
-            <Fieldset className="lg:col-span-3">
-              <div className={autorizacionMensajes}>
-                <span className={titulosSecundarios}>
-                  Si existe alguna inconsistencia al realizar el inventario, por
-                  favor agregue su comentario.
-                </span>
-              </div>
-              <textarea
-                className={textTarea}
-                type="input"
-                minLength="1"
-                maxLength="160"
-                autoComplete="off"
-                value={mensajeCausal}
-                onInput={(e) => {
-                  setMensajeCausal(e.target.value);
-                }}
-                required
-              ></textarea>
-            </Fieldset>
-            <ButtonBar className={"lg:col-span-2"} type="">
-              {
-                <Button
-                  type="submit"
-                  /*      disabled={disabledBtn}
+        <>
+          <SimpleLoading show={procesandoTrx}></SimpleLoading>
+          <Modal show={showModal} /* handleClose={handleClose} */>
+            <div className={contenedorImagen}>
+              <LogoPDP xsmall></LogoPDP>
+            </div>
+            {/* <Form grid onSubmit={(e) => enviar(e)}> */}
+            <Form grid onSubmit={(e) => onSubmitMensajeInconsistencia(e)}>
+              <Fieldset className="lg:col-span-3">
+                <div className={autorizacionMensajes}>
+                  <span className={titulosSecundarios}>
+                    Si existe alguna inconsistencia al realizar el inventario,
+                    por favor agregue su comentario.
+                  </span>
+                </div>
+                <textarea
+                  className={textTarea}
+                  type="input"
+                  minLength="1"
+                  maxLength="160"
+                  autoComplete="off"
+                  value={mensajeCausal}
+                  onInput={(e) => {
+                    setMensajeCausal(e.target.value);
+                  }}
+                  required
+                ></textarea>
+              </Fieldset>
+              <ButtonBar className={"lg:col-span-2"} type="">
+                {
+                  <Button
+                    type="submit"
+                    /*      disabled={disabledBtn}
                   onSubmit={(e) => enviar(e)} */
-                  /*   onSubmit={(e) => {
+                    /*   onSubmit={(e) => {
                     if (mensajeCausal) {
                       setHabilitarBtnAgregarInconsistencia(false);
                       onSubmitMensajeInconsistencia(e);
                     }
                   }} */
-                  disabled={habilitarBtnAgregarInconsistencia}
-                >
-                  Agregar inconsistencia
-                </Button>
-                /*  ) : null */
-              }
-              <Button onClick={() => setShowModal(false)}>Cancelar</Button>
-            </ButtonBar>
-          </Form>
-        </Modal>
+                    disabled={habilitarBtnAgregarInconsistencia}
+                  >
+                    Agregar inconsistencia
+                  </Button>
+                  /*  ) : null */
+                }
+                <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+              </ButtonBar>
+            </Form>
+          </Modal>
+        </>
       ) : (
         ""
       )}
@@ -261,13 +290,13 @@ const Inventario = () => {
                   disabled
                 ></InputX>
                 <InputX
-                  value={datosAzar[1]}
+                  value={datosAzar[1] ?? ""}
                   label="Billete"
                   type="search"
                   disabled
                 ></InputX>
                 <InputX
-                  value={datosAzar[2]}
+                  value={datosAzar[2] ?? ""}
                   label="Billete"
                   type="search"
                   disabled
@@ -288,7 +317,9 @@ const Inventario = () => {
                     setDatosEscaneados((old) => {
                       return { ...old, escaneado1: num.toString() };
                     });
-
+                    setDatosEscaneadosValidados((old) => {
+                      return { ...old, escaneado1Validados: false };
+                    });
                     if (e.target.value?.length == 20) {
                       /* console.log(e.target.value.substr(-9, 4)); */
                       console.log(
@@ -329,7 +360,9 @@ const Inventario = () => {
                     setDatosEscaneados((old) => {
                       return { ...old, escaneado2: num2.toString() };
                     });
-
+                    setDatosEscaneadosValidados((old) => {
+                      return { ...old, escaneado2Validados: false };
+                    });
                     if (e.target.value?.length == 20) {
                       /* console.log(e.target.value.substr(-9, 4)); */
                       console.log(
@@ -370,6 +403,9 @@ const Inventario = () => {
                     setDatosEscaneados((old) => {
                       return { ...old, escaneado3: num3.toString() };
                     });
+                    setDatosEscaneadosValidados((old) => {
+                      return { ...old, escaneado3Validados: false };
+                    });
                     if (e.target.value?.length == 20) {
                       /* console.log(e.target.value.substr(-9, 4)); */
                       console.log(
@@ -407,31 +443,128 @@ const Inventario = () => {
               <Button
                 type="submit"
                 disabled={
-                  !datosEscaneadosValidados["escaneado1Validados"] &&
-                  !datosEscaneadosValidados["escaneado2Validados"] &&
-                  !datosEscaneadosValidados["escaneado3Validados"]
+                  !datosEscaneadosValidados["escaneado1Validados"] ||
+                  !datosEscaneadosValidados["escaneado2Validados"] ||
+                  !datosEscaneadosValidados["escaneado3Validados"] ||
+                  datosCantidadBilletes !== cantidadBilletes
                 }
               >
                 Guardar inventario
               </Button>
               <Button
+                disabled={
+                  datosEscaneadosValidados["escaneado1Validados"] &&
+                  datosEscaneadosValidados["escaneado2Validados"] &&
+                  datosEscaneadosValidados["escaneado3Validados"] &&
+                  datosCantidadBilletes === cantidadBilletes
+                }
                 onClick={() => {
-                  //   if (cantidadBilletes >= 1) {
-                  //     setShowModal(true);
-                  //   } else {
+                  //   if (cantidadBilletes < 1) {
                   //     notifyError("Ingrese la cantidad de billetes");
+                  //   } else if (datosCantidadBilletes !== cantidadBilletes) {
+                  //     notifyError(
+                  //       "La cantidad de billetes no corresponde al del inventario lógico"
+                  //     );
+                  //     setMensajeInventarioInvalido(
+                  //       `La cantidad de billetes no coinciden,inventario logico: ${datosCantidadBilletes}, inventario fisico: ${cantidadBilletes}, `
+                  //     );
+                  //     setShowModal(true);
+                  //   } else if (
+                  //     !datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[0]},${datosAzar?.[1]},${datosAzar?.[2]} `
+                  //     );
+                  //   } else if (
+                  //     datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[1]},${datosAzar?.[2]} `
+                  //     );
+                  //   } else if (
+                  //     !datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[0]},${datosAzar?.[2]} `
+                  //     );
+                  //   } else if (
+                  //     !datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[0]},${datosAzar?.[1]} `
+                  //     );
+                  //   } else if (
+                  //     datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes:${datosAzar?.[2]} `
+                  //     );
+                  //   } else if (
+                  //     datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[1]} `
+                  //     );
+                  //   } else if (
+                  //     !datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[0]} `
+                  //     );
+                  //   } else {
+                  //     setShowModal(true);
                   //   }
                   if (cantidadBilletes < 1) {
                     notifyError("Ingrese la cantidad de billetes");
-                  } else if (datosCantidadBilletes !== cantidadBilletes) {
-                    notifyError(
-                      "La cantidad de billetes no corresponde al del inventario lógico"
-                    );
-                    setMensajeInventarioInvalido(
-                      `La cantidad de billetes no coinciden,inventario logico: ${datosCantidadBilletes}, inventario fisico: ${cantidadBilletes}, `
-                    );
-                    setShowModal(true);
                   } else {
+                    const Strcaso1 = !datosEscaneadosValidados[
+                      "escaneado1Validados"
+                    ]
+                      ? `${datosAzar?.[0]}, `
+                      : "";
+                    const Strcaso2 = !datosEscaneadosValidados[
+                      "escaneado2Validados"
+                    ]
+                      ? `${datosAzar?.[1]}, `
+                      : "";
+                    const Strcaso3 = !datosEscaneadosValidados[
+                      "escaneado3Validados"
+                    ]
+                      ? `${datosAzar?.[2]}`
+                      : "";
+                    if (datosCantidadBilletes !== cantidadBilletes) {
+                      notifyError(
+                        "La cantidad de billetes no corresponde al del inventario lógico"
+                      );
+                      setMensajeInventarioInvalido(
+                        `La cantidad de billetes no coinciden, inventario logico: ${datosCantidadBilletes}, inventario fisico: ${cantidadBilletes}`
+                      );
+                      setShowModal(true);
+                    }
+                    if (
+                      !datosEscaneadosValidados["escaneado1Validados"] ||
+                      !datosEscaneadosValidados["escaneado2Validados"] ||
+                      !datosEscaneadosValidados["escaneado3Validados"]
+                    ) {
+                      setMensajeInventarioInvalido2(
+                        ` No se encontraron los siguientes billetes: ${Strcaso1}${Strcaso2}${Strcaso3}`
+                      );
+                    }
+
                     setShowModal(true);
                   }
                 }}
