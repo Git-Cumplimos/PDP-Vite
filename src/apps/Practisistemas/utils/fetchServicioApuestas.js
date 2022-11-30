@@ -1,14 +1,15 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlPines = `${process.env.REACT_APP_PRACTISISTEMAS}/pines`;
+// const urlRecargasCelular = `${process.env.REACT_APP_RECARGAS_CELULAR}`;
+const urlApuestasDeportivas = process.env.REACT_APP_PRACTISISTEMAS+'/apuestasDeportivas';
 
-export const postConsultaPines = async (bodyObj) => {
+export const postConsultaCasasApuestas = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlPines}/consultaPines`,
+      `${urlApuestasDeportivas}/TablaCasaApuestas`,
       "POST",
       {},
       bodyObj,
@@ -24,13 +25,13 @@ export const postConsultaPines = async (bodyObj) => {
   }
 };
 
-export const postConsultaPin = async (bodyObj) => {
+export const postCasaApuestas = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlPines}/consultaPin`,
+      `${urlApuestasDeportivas}/casaApuestas`,
       "POST",
       {},
       bodyObj,
@@ -46,19 +47,63 @@ export const postConsultaPin = async (bodyObj) => {
   }
 };
 
-export const postCheckReintentoPines = async (bodyObj) => {
+export const postInsertCasaApuestas = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlPines}/revisionpines`,
+      `${urlApuestasDeportivas}/insercionTablaCasaApuestas`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res?.obj;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const postDeleteCasaApuestas = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlApuestasDeportivas}/eliminacionTablaCasaApuestas`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res?.obj;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const postEnvioTrans = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlApuestasDeportivas}/recarga`,
       "POST",
       {},
       bodyObj,
       {},
       true,
-      10000
+      8000
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -69,61 +114,19 @@ export const postCheckReintentoPines = async (bodyObj) => {
   }
 };
 
-export const postRevisarTransaccion = async (bodyObj) => {
-  if (!bodyObj) {
-    return "No hay datos en el body";
-  }
-  try {
-    const res = await fetchData(
-      `${urlPines}/revisarTransaccion`,
-      "POST",
-      {},
-      bodyObj,
-      {},
-      true
-    );
-    if (!res?.status) {
-      console.error(res?.msg);
-    }
-    return res;
-  } catch (err) {
-    throw err;
-  }
-};
-
-export const fetchConsultaPinEPM = async (bodyObj) => {
+export const postCheckReintentoRecargas = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlPines}/consultaPinEPM`,
+      `${urlApuestasDeportivas}/reintento_recarga`,
       "POST",
       {},
       bodyObj,
       {},
-      true
-    );
-    if (!res?.status) {
-      console.error(res?.msg);
-    }
-    return res;
-  } catch (err) {
-    throw err;
-  }
-};
-export const fetchConsultaPinSNR = async (bodyObj) => {
-  if (!bodyObj) {
-    return "Sin datos body";
-  }
-  try {
-    const res = await fetchData(
-      `${urlPines}/consultaPinSNR`,
-      "POST",
-      {},
-      bodyObj,
-      {},
-      true
+      true,
+      35000
     );
     if (!res?.status) {
       console.error(res?.msg);

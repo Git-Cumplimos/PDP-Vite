@@ -45,6 +45,7 @@ const InformacionPin = () => {
       navigate("../Pines/PinesContenido/CompraPin", {
         state: {
           desc: pines[i]["productDesc"],
+          cod: pines[i]["internalCod"],
           sell: pines[i]["sell"],
           op: state.op,
         },
@@ -58,7 +59,6 @@ const InformacionPin = () => {
   }, [datosTrans]);
 
   const fecthTablaTiposPines = () => {
-    console.log('info ', datosTrans.pin)
     postConsultaPin({
       idcomercio: roleInfo?.["id_comercio"],
       producto: state.op,
