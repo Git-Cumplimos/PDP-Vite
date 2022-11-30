@@ -144,7 +144,23 @@ const Inventario = () => {
               legend="Agregar mensaje inconsistencia"
               /* className="lg:col-span-3" */
             >
-              <div /* className={contenedorForm} */></div>
+              <div className={autorizacionMensajes}>
+                <span className={titulosSecundarios}>
+                  Si el Comercio no cumple con los requisitos, por favor agrege
+                  un causal de rechazo.
+                </span>
+              </div>
+              <textarea
+                className={textTarea}
+                type="input"
+                minLength="1"
+                maxLength="160"
+                autoComplete="off"
+                value={mensajeCausal}
+                onInput={(e) => {
+                  setMensajeCausal(e.target.value);
+                }}
+              ></textarea>
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"} type="">
               {
