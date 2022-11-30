@@ -7,10 +7,28 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Input from "../../../../components/Base/Input";
 import { fetchComisionesPagar } from "../../utils/fetchComisionesPagar";
 import { fetchComisionesCobrar } from "../../utils/fetchComisionesCobrar";
+import { getComisionesPlanes } from "../../utils/fetchComisionesPlanes";
+import { getComisionesPlanesCampanas } from "../../utils/fetchComisionesPlanesCampanas";
+import Select from "../../../../components/Base/Select";
 
 const SearchComissions = ({ comissionFace, onSelectItem }) => {
   const [
-    { tipoTrx = "", comercio = "", convenio = "", autorizador = "" },
+    {
+      tipoTrx = "",
+      comercio = "",
+      convenio = "",
+      autorizador = "",
+      fecha_inicio = "",
+      nombre_comision = "",
+      id_comision = "",
+
+      comisiones = [],
+      fecha_creacion = "",
+      fecha_modificacion = "",
+      nombre_plan_comision = "",
+      fecha_final = "",
+      pk_planes_comisiones = "",
+    },
     setQuery,
   ] = useQuery();
   const navigate = useNavigate();
@@ -31,7 +49,6 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     if (headers.includes("id_comision_pagada")) {
       newHeaders.push("Id comisión");
     }
-
     if (headers.includes("id_comision_cobrada")) {
       newHeaders.push("Id comisión");
     }
@@ -52,6 +69,30 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     }
     if (headers.includes("estado")) {
       newHeaders.push("Estado");
+    }
+    // if (headers.includes("comisiones")) {
+    //   newHeaders.push("Comisiones");
+    // }
+    if (headers.includes("pk_planes_comisiones")) {
+      newHeaders.push("Id Plan");
+    }
+    if (headers.includes("fecha_creacion")) {
+      newHeaders.push("Fecha de Creación");
+    }
+    // if (headers.includes("fecha_modificacion")) {
+    //   newHeaders.push("Fecha de modificación");
+    // }
+    if (headers.includes("nombre_plan_comision")) {
+      newHeaders.push("Nombre Plan de Comisión");
+    }
+    if (headers.includes("fecha_inicio")) {
+      newHeaders.push("Fecha de Inicio");
+    }
+    if (headers.includes("fecha_final")) {
+      newHeaders.push("Fecha Final");
+    }
+    if (headers.includes("nombre_plan_comision_campana")) {
+      newHeaders.push("Nombre Campaña");
     }
     return newHeaders;
   }, [comissions]);
@@ -82,6 +123,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
             "Id comercio": id_comercio ?? "",
             Autorizador: nombre_autorizador ?? "",
             Estado: estado ? "Activo" : "Inactivo",
+            "Fecha de inicio": fecha_inicio,
           };
         }
       );
@@ -111,6 +153,114 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
         }
       );
     }
+    if (comissionFace === "plans") {
+      return comissions.map(
+        ({
+          comisiones,
+          fecha_creacion,
+          fecha_modificacion,
+          nombre_plan_comision,
+          pk_planes_comisiones,
+        }) => {
+          return {
+            "Id Plan": pk_planes_comisiones,
+            // Comisiones: comisiones,
+            "Fecha de Creación":
+              Intl.DateTimeFormat("es-CO", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              }).format(
+                new Date(fecha_creacion).setHours(
+                  new Date(fecha_creacion + "-5").getHours()
+                )
+              ) ?? "",
+            // "Fecha de Modificación": fecha_modificacion ?? "",
+            "Nombre Plan de Comisión": nombre_plan_comision ?? "",
+          };
+        }
+      );
+    }
+    if (comissionFace === "campaigns") {
+      return comissions.map(
+        ({
+          comisiones,
+          fecha_creacion,
+          fecha_inicio,
+          fecha_final,
+          nombre_plan_comision,
+          nombre_plan_comision_campana,
+          pk_planes_comisiones,
+        }) => {
+          return {
+            "Id Plan": pk_planes_comisiones,
+
+            // Comisiones: comisiones,
+            // "Fecha de Creación": fecha_creacion ?? "",
+            "Nombre Plan de Comisión": nombre_plan_comision ?? "",
+            "Fecha Inicio":
+              fecha_inicio === null
+                ? "No definida"
+                : Intl.DateTimeFormat("es-CO", {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                  }).format(
+                    new Date(fecha_inicio).setHours(
+                      new Date(fecha_inicio + "-5").getHours()
+                    )
+                  ) ?? "",
+            "Fecha Final":
+              fecha_final === null
+                ? "No definida"
+                : Intl.DateTimeFormat("es-CO", {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                  }).format(
+                    new Date(fecha_final).setHours(
+                      new Date(fecha_final + "-5").getHours()
+                    )
+                  ) ?? "",
+            "Nombre Campaña": nombre_plan_comision_campana ?? "No definida",
+          };
+        }
+      );
+    } else {
+      return comissions.map(
+        ({
+          id_comision_pagada,
+          id_tipo_op,
+          id_convenio,
+          id_comercio,
+          id_autorizador,
+          comisiones,
+          fecha_inicio,
+          fecha_fin,
+          estado,
+          nombre_comision,
+          nombre_operacion,
+          nombre_convenio,
+          nombre_autorizador,
+        }) => {
+          return {
+            "Id Comisión": id_comision_pagada,
+            "Nombre comisión": nombre_comision ?? "",
+            Convenio: nombre_convenio ?? "",
+            Operacion: nombre_operacion ?? "",
+            "Id comercio": id_comercio ?? "",
+            Autorizador: nombre_autorizador ?? "",
+            Estado: estado ? "Activo" : "Inactivo",
+          };
+        }
+      );
+    }
   }, [comissions, comissionFace]);
 
   const onChange = useCallback(
@@ -122,6 +272,9 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     (ev, indx) => {
       const _id_comision_pagada = comissions?.[indx]?.["id_comision_pagada"];
       const _id_comision_cobrada = comissions?.[indx]?.["id_comision_cobrada"];
+      const _id_plan_comision = comissions?.[indx]?.["pk_planes_comisiones"];
+      const _id_plan_comision_campana =
+        comissions?.[indx]?.["pk_planes_comisiones"];
       // const _id_tipo_trx = comissions?.[indx]?.["id_tipo_op"];
       // const _id_comercio = comissions?.[indx]?.["id_comercio"];
       // const _id_autorizador = comissions?.[indx]?.Autorizador;
@@ -134,6 +287,14 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
       if (_id_comision_cobrada) {
         urlParams.append("id_comision_cobrada", _id_comision_cobrada);
       }
+      if (comissionFace === "plans") {
+        urlParams.append("id_plan_comision", _id_plan_comision);
+      }
+
+      if (comissionFace === "campaigns") {
+        urlParams.append("id_plan_comision_campana", _id_plan_comision_campana);
+      }
+
       // if (_id_tipo_trx) {
       //   urlParams.append("id_tipo_trx", _id_tipo_trx);
       // }
@@ -168,8 +329,22 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
       fecthComisionesPagarFunc();
     } else if (comissionFace === "collect") {
       fecthComisionesCobrarFunc();
+    } else if (comissionFace === "plans") {
+      fetchPlans();
+    } else if (comissionFace === "campaigns") {
+      fetchCampaignPlans();
     }
-  }, [convenio, comercio, tipoTrx, autorizador, page, limit]);
+  }, [
+    convenio,
+    comercio,
+    tipoTrx,
+    autorizador,
+    page,
+    limit,
+    nombre_comision,
+    fecha_inicio,
+    id_comision,
+  ]);
   const fecthComisionesPagarFunc = () => {
     let obj = { page, limit };
     if (convenio !== "") obj["nombre_convenio"] = convenio;
@@ -196,67 +371,108 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
       .catch((err) => console.error(err));
   };
 
+  const fetchPlans = () => {
+    let obj = { page, limit };
+    if (pk_planes_comisiones !== "")
+      obj["pk_planes_comisiones"] = pk_planes_comisiones;
+    if (comisiones !== "") obj["comisiones"] = comisiones;
+    if (fecha_creacion !== "") obj["fecha_creacion"] = fecha_creacion;
+    if (fecha_modificacion !== "")
+      obj["fecha_modificacion"] = fecha_modificacion;
+    if (nombre_plan_comision !== "")
+      obj["nombre_plan_comision"] = nombre_plan_comision;
+
+    getComisionesPlanes(obj)
+      .then((res) => {
+        // console.log(res);
+        setComissions(res?.results);
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const fetchCampaignPlans = () => {
+    let obj = { page, limit };
+    if (comisiones !== "") obj["comisiones"] = comisiones;
+    if (fecha_creacion !== "") obj["fecha_creacion"] = fecha_creacion;
+    if (fecha_inicio !== "") obj["fecha_inicio"] = fecha_inicio;
+    if (fecha_final !== "") obj["fecha_final"] = fecha_final;
+    if (nombre_plan_comision !== "")
+      obj["nombre_plan_comision"] = nombre_plan_comision;
+
+    getComisionesPlanesCampanas(obj)
+      .then((res) => {
+        console.log(res);
+        setComissions(res?.results);
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <Fragment>
       {/* <Pagination maxPage={maxPages} onChange={onChange} grid></Pagination> */}
       <TableEnterprise
         title={
-          comissionFace === "pay" ? "Comisiones a pagar" : "Comisiones a cobrar"
+          comissionFace === "pay"
+            ? "Comisiones por pagar"
+            : comissionFace === "collect"
+            ? "Comisiones por cobrar"
+            : comissionFace === "plans"
+            ? "Lista de Planes de Comisión"
+            : comissionFace === "campaigns"
+            ? "Lista de Campañas"
+            : ""
         }
         maxPage={maxPages}
         onChange={onChange}
         headers={headersTable}
         data={dataTable}
         onSelectRow={onSelectItem ? passItem : onSelectRow}
-        onSetPageData={setPageData}>
+        onSetPageData={setPageData}
+      >
         <Input
-          id={"convenioComissions"}
-          label={"Convenio"}
-          name={"convenio"}
+          id={"nombre_comision"}
+          label={"Nombre comisión"}
+          name={"nombre_comision"}
           type={"text"}
-          autoComplete='off'
-          defaultValue={convenio}
+          autoComplete="off"
+          defaultValue={nombre_comision}
         />
         <Input
           id={"tipoTrx"}
-          label={"Tipo de operación"}
+          label={"Tipo de transacción"}
           name={"tipoTrx"}
           type={"text"}
-          autoComplete='off'
+          autoComplete="off"
           defaultValue={tipoTrx}
         />
-        {comissionFace === "pay" ? (
-          <Fragment>
-            <Input
-              id={"comercioComissions"}
-              label={"Id comercio"}
-              name={"comercio"}
-              type='number'
-              step={"1"}
-              autoComplete='off'
-              defaultValue={comercio}
-            />
-            <Input
-              id={"autorizadorComissions"}
-              label={"Autorizador"}
-              name={"autorizador"}
-              type={"text"}
-              autoComplete='off'
-              defaultValue={autorizador}
-            />
-          </Fragment>
-        ) : comissionFace === "collect" ? (
-          <Input
-            id={"autorizadorComissions"}
-            label={"Autorizador"}
-            name={"autorizador"}
-            type={"text"}
-            autoComplete='off'
-            defaultValue={autorizador}
-          />
-        ) : (
-          ""
-        )}
+        <Input
+          id={"id_comision"}
+          label={"Id comisión"}
+          name={"id_comision"}
+          type="number"
+          // step={"1"}
+          autoComplete="off"
+          defaultValue={comercio}
+        />
+        {/* <Select
+          id="tipoTrx"
+          name="tipoTrx"
+          label="Tipo de transacción"
+          options={{ Cobrar: "cobrar", Pagar: "pagar" }}
+          value={tipoTrx}
+          // defaultValue={comissionData?.type}
+          required
+        /> */}
+        {/* <Input
+          id={"fecha_inicio"}
+          label={"Fecha inicio"}
+          name={"fecha_inicio"}
+          type={"date"}
+          autoComplete="off"
+          defaultValue={fecha_inicio}
+        /> */}
       </TableEnterprise>
     </Fragment>
   );
