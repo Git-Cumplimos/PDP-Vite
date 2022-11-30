@@ -35,8 +35,8 @@ const SendForm = ({
   };
 
   const { tiposOperaciones } = useLoteria();
-
-  const operacion = useMemo(() => {
+  console.log(tiposOperaciones)
+  const operacion = useMemo(() => {    
     return tiposOperaciones;
   }, [tiposOperaciones]);
 
@@ -86,6 +86,7 @@ const SendForm = ({
   // }
 
   const formPago = (value) => {
+    console.log(value)
     setTipoPago(value);
   };
 
