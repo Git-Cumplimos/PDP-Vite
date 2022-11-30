@@ -1,6 +1,7 @@
 import React from "react";
 import fetchData from "../../../utils/fetchData";
 import { useMemo, useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Select from "../../../components/Base/Select";
 import classes from "./Inventario.module.css";
 
@@ -13,10 +14,22 @@ import Form from "../../../components/Base/Form";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import BarcodeReader from "../../../components/Base/BarcodeReader";
 import TextArea from "../../../components/Base/TextArea";
+import Modal from "../../../components/Base/Modal";
+import LogoPDP from "../../../components/Base/LogoPDP";
+import Fieldset from "../../../components/Base/Fieldset";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
-const { contenedorPrincipal, contenedorBotones } = classes;
+const {
+  contenedorPrincipal,
+  contenedorBotones,
+  contenedorImagen,
+  titulosSecundarios,
+  textTarea,
+  autorizacionMensajes,
+} = classes;
 const Inventario = () => {
+  const navigate = useNavigate();
   const {
     infoLoto: { numero, setNumero, serie, setSerie, loterias, setLoterias },
     consultaInventario,
@@ -27,8 +40,15 @@ const Inventario = () => {
   const [sorteoOrdifisico, setSorteofisico] = useState(null);
   const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
   const [sorteo, setSorteo] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const [datosAzar, setDatosAzar] = useState("");
+  const [datosCantidadBilletes, setDatosCantidadBilletes] = useState("");
   const [cantidadBilletes, setCantidadBilletes] = useState("");
+  const [mensajeCausal, setMensajeCausal] = useState("");
+  const [mensajeInventarioInvalido, setMensajeInventarioInvalido] =
+    useState("");
+  const [mensajeInventarioInvalido2, setMensajeInventarioInvalido2] =
+    useState("");
   const [showCrearInventario, setShowCrearInventario] = useState(false);
   const [datosEscaneados, setDatosEscaneados] = useState({
     escaneado1: "",
@@ -40,7 +60,11 @@ const Inventario = () => {
     escaneado2Validados: false,
     escaneado3Validados: false,
   });
-
+  const [
+    habilitarBtnAgregarInconsistencia,
+    setHabilitarBtnAgregarInconsistencia,
+  ] = useState(false);
+  const [procesandoTrx, setProcesandoTrx] = useState(false);
   const sorteosLOT = useMemo(() => {
     var cod = "";
     console.log(codigos_lot?.length);
@@ -113,17 +137,131 @@ const Inventario = () => {
       registrarInventario(
         sorteo.split("-")[0],
         sorteo.split("-")[1],
-        "", // comentario
-        "", //numero_total
-        "", //numero_completo
-        "" //inconcistencia
+        "Inventario registrado con éxito", // comentario
+        cantidadBilletes, //numero_total
+        [
+          datosEscaneados?.["escaneado1"],
+          datosEscaneados?.["escaneado2"],
+          datosEscaneados?.["escaneado3"],
+        ], //numero_completo
+        "true" //inconcistencia-bool
       );
     },
-    [sorteo]
+    [sorteo, datosEscaneados, cantidadBilletes]
+  );
+  const onSubmitMensajeInconsistencia = useCallback(
+    (e) => {
+      e.preventDefault();
+      setHabilitarBtnAgregarInconsistencia(true);
+      setProcesandoTrx(true);
+      registrarInventario(
+        sorteo.split("-")[0],
+        sorteo.split("-")[1],
+        `${mensajeInventarioInvalido},${mensajeInventarioInvalido2}, ${mensajeCausal}`, // comentario
+        cantidadBilletes, //numero_total
+        [
+          datosEscaneados?.["escaneado1"],
+          datosEscaneados?.["escaneado2"],
+          datosEscaneados?.["escaneado3"],
+        ], //numero_completo
+        "false" //inconcistencia-bool
+      ).then((res) => {
+        if (res?.response === "Registro exitoso") {
+          notify("Inconsistencia agregada exitosamente.");
+          setHabilitarBtnAgregarInconsistencia(true);
+          navigate(`/loteria`);
+          setProcesandoTrx(false);
+        } else {
+          notifyError("Error inconsistencia no agregada.");
+          setHabilitarBtnAgregarInconsistencia(false);
+          setProcesandoTrx(false);
+        }
+      });
+    },
+    [sorteo, cantidadBilletes, mensajeCausal, datosEscaneados]
+  );
+  /* 
+  const inventarioErrado = (e)=>{
+    e.preventDefault();
+
+  } */
+
+  /* const validarEntradaScanner = (validarNum) => {
+    if (validarNum[0] === "]") {
+      console.log(validarNum.replace("]", ""));
+      setDatosEscaneados((old) => {
+        return { ...old, escaneado1: validarNum.replace("]", " ") };
+      });
+      console.log(datosEscaneados["escaneado1"]);
+    }
+  }; */
+  const validarEntradaScanner = useCallback(
+    (validarNum) => {
+      if (validarNum[0] === "]") {
+        console.log(validarNum.replace("]C1", ""));
+        return validarNum.replace("]C1", "");
+      }
+    },
+    [datosEscaneados, datosEscaneados["escaneado1"]]
   );
 
   return (
     <>
+      {showModal ? (
+        <>
+          <SimpleLoading show={procesandoTrx}></SimpleLoading>
+          <Modal show={showModal} /* handleClose={handleClose} */>
+            <div className={contenedorImagen}>
+              <LogoPDP xsmall></LogoPDP>
+            </div>
+            {/* <Form grid onSubmit={(e) => enviar(e)}> */}
+            <Form grid onSubmit={(e) => onSubmitMensajeInconsistencia(e)}>
+              <Fieldset className="lg:col-span-3">
+                <div className={autorizacionMensajes}>
+                  <span className={titulosSecundarios}>
+                    Si existe alguna inconsistencia al realizar el inventario,
+                    por favor agregue su comentario.
+                  </span>
+                </div>
+                <textarea
+                  className={textTarea}
+                  type="input"
+                  minLength="1"
+                  maxLength="160"
+                  autoComplete="off"
+                  value={mensajeCausal}
+                  onInput={(e) => {
+                    setMensajeCausal(e.target.value);
+                  }}
+                  required
+                ></textarea>
+              </Fieldset>
+              <ButtonBar className={"lg:col-span-2"} type="">
+                {
+                  <Button
+                    type="submit"
+                    /*      disabled={disabledBtn}
+                  onSubmit={(e) => enviar(e)} */
+                    /*   onSubmit={(e) => {
+                    if (mensajeCausal) {
+                      setHabilitarBtnAgregarInconsistencia(false);
+                      onSubmitMensajeInconsistencia(e);
+                    }
+                  }} */
+                    disabled={habilitarBtnAgregarInconsistencia}
+                  >
+                    Agregar inconsistencia
+                  </Button>
+                  /*  ) : null */
+                }
+                <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+              </ButtonBar>
+            </Form>
+          </Modal>
+        </>
+      ) : (
+        ""
+      )}
       <Select
         id="selectSorteo"
         label="Tipo de sorteo"
@@ -140,8 +278,10 @@ const Inventario = () => {
               if (!res?.status) {
                 notifyError(res?.response);
               } else {
-                setDatosAzar(res?.response?.numerosAzar
-                  );
+                setDatosAzar(res?.response?.numerosAzar);
+                setDatosCantidadBilletes(
+                  res?.response?.numero_total_asignaciones
+                );
                 setShowCrearInventario(true);
               }
             });
@@ -170,13 +310,13 @@ const Inventario = () => {
                   disabled
                 ></InputX>
                 <InputX
-                  value={datosAzar[1]}
+                  value={datosAzar[1] ?? ""}
                   label="Billete"
                   type="search"
                   disabled
                 ></InputX>
                 <InputX
-                  value={datosAzar[2]}
+                  value={datosAzar[2] ?? ""}
                   label="Billete"
                   type="search"
                   disabled
@@ -191,29 +331,36 @@ const Inventario = () => {
                 <InputX
                   label="Escanee el código de barras"
                   type="text"
+                  value={datosEscaneados["escaneado1"]}
                   onInput={(e) => {
                     const num = e.target.value || "";
 
                     setDatosEscaneados((old) => {
-                      return { ...old, escaneado1: num.toString() };
+                      return { ...old, escaneado1: validarEntradaScanner(num) };
                     });
-                    if (e.target.value?.length === 20) {
-                      /* console.log(e.target.value.substr(-9, 4)); */
-                      
+                    setDatosEscaneadosValidados((old) => {
+                      return { ...old, escaneado1Validados: false };
+                    });
+                    if (num?.length == 20) {
+                      /* console.log(num.substr(-9, 4)); */
+                      /*  console.log(
+                        String(num.substr(-5, 3)),
+                        String(datosAzar[0].split("-")[1])
+                      ); */
                       if (
-                        (String(e.target.value.substr(-9, 4)) !==
+                        (String(num.substr(-9, 4)) !==
                           String(datosAzar[0].split("-")[0])) &
-                        (String(e.target.value.substr(-5, 3)) !==
+                        (String(num.substr(-5, 3)) !==
                           String(datosAzar[0].split("-")[1]))
                       ) {
                         notifyError("Número de billete y serie no coinciden");
                       } else if (
-                        String(e.target.value.substr(-9, 4)) !==
+                        String(num.substr(-9, 4)) !==
                         String(datosAzar[0].split("-")[0])
                       ) {
                         notifyError("Número de billete no coincide");
                       } else if (
-                        String(e.target.value.substr(-5, 3)) !==
+                        String(num.substr(-5, 3)) !==
                         String(datosAzar[0].split("-")[1])
                       ) {
                         notifyError("Número de serie no coincide");
@@ -234,27 +381,29 @@ const Inventario = () => {
                     setDatosEscaneados((old) => {
                       return { ...old, escaneado2: num2.toString() };
                     });
-
-                    if (e.target.value?.length == 20) {
+                    setDatosEscaneadosValidados((old) => {
+                      return { ...old, escaneado2Validados: false };
+                    });
+                    if (num2?.length == 20) {
                       /* console.log(e.target.value.substr(-9, 4)); */
                       console.log(
-                        String(e.target.value.substr(-9, 4)),
+                        String(num2.substr(-9, 4)),
                         String(datosAzar[1].split("-")[0])
                       );
                       if (
-                        (String(e.target.value.substr(-9, 4)) !==
+                        (String(num2.substr(-9, 4)) !==
                           String(datosAzar[1].split("-")[0])) &
-                        (String(e.target.value.substr(-5, 3)) !==
+                        (String(num2.substr(-5, 3)) !==
                           String(datosAzar[1].split("-")[1]))
                       ) {
                         notifyError("Número de billete y serie no coinciden");
                       } else if (
-                        String(e.target.value.substr(-9, 4)) !==
+                        String(num2.substr(-9, 4)) !==
                         String(datosAzar[1].split("-")[0])
                       ) {
                         notifyError("Número de billete no coincide");
                       } else if (
-                        String(e.target.value.substr(-5, 3)) !==
+                        String(num2.substr(-5, 3)) !==
                         String(datosAzar[1].split("-")[1])
                       ) {
                         notifyError("Número de serie no coincide");
@@ -275,23 +424,29 @@ const Inventario = () => {
                     setDatosEscaneados((old) => {
                       return { ...old, escaneado3: num3.toString() };
                     });
-                    if (e.target.value?.length == 20) {
-                      /* console.log(e.target.value.substr(-9, 4)); */
-                      
+                    setDatosEscaneadosValidados((old) => {
+                      return { ...old, escaneado3Validados: false };
+                    });
+                    if (num3?.length == 20) {
+                      /* console.log(num3.substr(-9, 4)); */
+                      console.log(
+                        String(num3.substr(-9, 4)),
+                        String(datosAzar[2].split("-")[0])
+                      );
                       if (
-                        (String(e.target.value.substr(-9, 4)) !==
+                        (String(num3.substr(-9, 4)) !==
                           String(datosAzar[2].split("-")[0])) &
-                        (String(e.target.value.substr(-5, 3)) !==
+                        (String(num3.substr(-5, 3)) !==
                           String(datosAzar[2].split("-")[1]))
                       ) {
                         notifyError("Número de billete y serie no coinciden");
                       } else if (
-                        String(e.target.value.substr(-9, 4)) !==
+                        String(num3.substr(-9, 4)) !==
                         String(datosAzar[2].split("-")[0])
                       ) {
                         notifyError("Número de billete no coincide");
                       } else if (
-                        String(e.target.value.substr(-5, 3)) !==
+                        String(num3.substr(-5, 3)) !==
                         String(datosAzar[2].split("-")[1])
                       ) {
                         notifyError("Número de serie no coincide");
@@ -309,14 +464,134 @@ const Inventario = () => {
               <Button
                 type="submit"
                 disabled={
-                  !datosEscaneadosValidados["escaneado1Validados"] &&
-                  !datosEscaneadosValidados["escaneado2Validados"] &&
-                  !datosEscaneadosValidados["escaneado3Validados"]
+                  !datosEscaneadosValidados["escaneado1Validados"] ||
+                  !datosEscaneadosValidados["escaneado2Validados"] ||
+                  !datosEscaneadosValidados["escaneado3Validados"] ||
+                  datosCantidadBilletes !== cantidadBilletes
                 }
               >
                 Guardar inventario
               </Button>
-              <Button type="onsubmit">Inventario errado</Button>
+              <Button
+                disabled={
+                  datosEscaneadosValidados["escaneado1Validados"] &&
+                  datosEscaneadosValidados["escaneado2Validados"] &&
+                  datosEscaneadosValidados["escaneado3Validados"] &&
+                  datosCantidadBilletes === cantidadBilletes
+                }
+                onClick={() => {
+                  //   if (cantidadBilletes < 1) {
+                  //     notifyError("Ingrese la cantidad de billetes");
+                  //   } else if (datosCantidadBilletes !== cantidadBilletes) {
+                  //     notifyError(
+                  //       "La cantidad de billetes no corresponde al del inventario lógico"
+                  //     );
+                  //     setMensajeInventarioInvalido(
+                  //       `La cantidad de billetes no coinciden,inventario logico: ${datosCantidadBilletes}, inventario fisico: ${cantidadBilletes}, `
+                  //     );
+                  //     setShowModal(true);
+                  //   } else if (
+                  //     !datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[0]},${datosAzar?.[1]},${datosAzar?.[2]} `
+                  //     );
+                  //   } else if (
+                  //     datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[1]},${datosAzar?.[2]} `
+                  //     );
+                  //   } else if (
+                  //     !datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[0]},${datosAzar?.[2]} `
+                  //     );
+                  //   } else if (
+                  //     !datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[0]},${datosAzar?.[1]} `
+                  //     );
+                  //   } else if (
+                  //     datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes:${datosAzar?.[2]} `
+                  //     );
+                  //   } else if (
+                  //     datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     !datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[1]} `
+                  //     );
+                  //   } else if (
+                  //     !datosEscaneadosValidados["escaneado1Validados"] &&
+                  //     datosEscaneadosValidados["escaneado2Validados"] &&
+                  //     datosEscaneadosValidados["escaneado3Validados"]
+                  //   ) {
+                  //     console.log(
+                  //       `Inconsistencia en los siguientes billetes: ${datosAzar?.[0]} `
+                  //     );
+                  //   } else {
+                  //     setShowModal(true);
+                  //   }
+                  if (cantidadBilletes < 1) {
+                    notifyError("Ingrese la cantidad de billetes");
+                  } else {
+                    const Strcaso1 = !datosEscaneadosValidados[
+                      "escaneado1Validados"
+                    ]
+                      ? `${datosAzar?.[0]}, `
+                      : "";
+                    const Strcaso2 = !datosEscaneadosValidados[
+                      "escaneado2Validados"
+                    ]
+                      ? `${datosAzar?.[1]}, `
+                      : "";
+                    const Strcaso3 = !datosEscaneadosValidados[
+                      "escaneado3Validados"
+                    ]
+                      ? `${datosAzar?.[2]}`
+                      : "";
+                    if (datosCantidadBilletes !== cantidadBilletes) {
+                      notifyError(
+                        "La cantidad de billetes no corresponde al del inventario lógico"
+                      );
+                      setMensajeInventarioInvalido(
+                        `La cantidad de billetes no coinciden, inventario logico: ${datosCantidadBilletes}, inventario fisico: ${cantidadBilletes}`
+                      );
+                      setShowModal(true);
+                    }
+                    if (
+                      !datosEscaneadosValidados["escaneado1Validados"] ||
+                      !datosEscaneadosValidados["escaneado2Validados"] ||
+                      !datosEscaneadosValidados["escaneado3Validados"]
+                    ) {
+                      setMensajeInventarioInvalido2(
+                        ` No se encontraron los siguientes billetes: ${Strcaso1}${Strcaso2}${Strcaso3}`
+                      );
+                    }
+
+                    setShowModal(true);
+                  }
+                }}
+              >
+                Inventario errado
+              </Button>
             </div>
           </Form>
           <ButtonBar></ButtonBar>
