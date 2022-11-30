@@ -31,6 +31,12 @@ import rutasAvalCB, {
 import rutasAgrarioCB, {
   listPermissionsAgrario,
 } from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/routes";
+import CreatePlanComision from "../apps/TrxParams/Views/Comisiones/CreatePlanComision";
+import MainPlanComisiones from "../apps/TrxParams/Views/Comisiones/MainPlanComisiones";
+import MainAsignaciones from "../apps/TrxParams/Views/Comisiones/MainAsignaciones";
+import Assigns from "../apps/TrxParams/Views/Comisiones/Assigns";
+import MainPlanComisionesCampana from "../apps/TrxParams/Views/Comisiones/MainPlanComisionesCampana";
+import CreatePlanComisionCampana from "../apps/TrxParams/Views/Comisiones/CreatePlanComisionCampana";
 
 /**
 
@@ -859,6 +865,67 @@ const allUrlsPrivateApps = [
                 permission: [19],
               },
             ],
+          },
+          {
+            link: "/params-operations/comisiones/asignaciones",
+            label: (
+              <AppIcons Logo={"IMPUESTO"} name={"Asignación de comisiones"} />
+            ),
+            component: MainAsignaciones,
+            permission: [18],
+            subRoutes: [
+              {
+                link: "/params-operations/comisiones/asignaciones/crear",
+                label: (
+                  <AppIcons
+                    Logo={"IMPUESTO"}
+                    name={"Comisiones a cobrar por autorizador"}
+                  />
+                ),
+                component: Assigns,
+                permission: [19],
+              },
+            ],
+          },
+          {
+            link: "/params-operations/comisiones/plan-comisiones",
+            label: <AppIcons Logo={"IMPUESTO"} name={"Plan de comisiones"} />,
+            component: MainPlanComisiones,
+            permission: [18],
+            subRoutes: [
+              {
+                link: "/params-operations/comisiones/plan-comisiones/crear",
+                label: (
+                  <AppIcons Logo={"IMPUESTO"} name={"Crear plan de comisión"} />
+                ),
+                component: CreatePlanComision,
+                permission: [19],
+              },
+            ],
+          },
+          {
+            link: "/params-operations/comisiones/plan-comisiones-campana",
+            label: (
+              <AppIcons
+                Logo={"IMPUESTO"}
+                name={"Plan de comisiones campañas"}
+              />
+            ),
+            component: MainPlanComisionesCampana,
+            permission: [18],
+            // subRoutes: [
+            //   {
+            //     link: "/params-operations/comisiones/plan-comisiones/campana/crear",
+            //     label: (
+            //       <AppIcons
+            //         Logo={"IMPUESTO"}
+            //         name={"Crear plan de comisión campaña"}
+            //       />
+            //     ),
+            //     component: CreatePlanComisionCampana,
+            //     permission: [19],
+            //   },
+            // ],
           },
         ],
       },
