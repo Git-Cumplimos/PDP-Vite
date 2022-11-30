@@ -13,6 +13,9 @@ import Form from "../../../components/Base/Form";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import BarcodeReader from "../../../components/Base/BarcodeReader";
 import TextArea from "../../../components/Base/TextArea";
+import Modal from "../../../components/Base/Modal";
+import LogoPDP from "../../../components/Base/LogoPDP";
+import Fieldset from "../../../components/Base/Fieldset";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 const { contenedorPrincipal, contenedorBotones } = classes;
@@ -27,6 +30,7 @@ const Inventario = () => {
   const [sorteoOrdifisico, setSorteofisico] = useState(null);
   const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
   const [sorteo, setSorteo] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const [datosAzar, setDatosAzar] = useState("");
   const [cantidadBilletes, setCantidadBilletes] = useState("");
   const [showCrearInventario, setShowCrearInventario] = useState(false);
@@ -114,16 +118,52 @@ const Inventario = () => {
         sorteo.split("-")[0],
         sorteo.split("-")[1],
         "", // comentario
-        "", //numero_total
+        cantidadBilletes, //numero_total
         "", //numero_completo
-        "" //inconcistencia
+        "" //inconcistencia-bool
       );
     },
     [sorteo]
   );
+  /* 
+  const inventarioErrado = (e)=>{
+    e.preventDefault();
 
+  } */
   return (
     <>
+      {showModal ? (
+        <Modal show={showModal} /* handleClose={handleClose} */>
+          <div /* className={contenedorImagen} */>
+            <LogoPDP xsmall></LogoPDP>
+          </div>
+          {/* <Form grid onSubmit={(e) => enviar(e)}> */}
+          <Form grid>
+            <Fieldset
+              // className={contenedorFieldset}
+              legend="Agregar mensaje inconsistencia"
+              /* className="lg:col-span-3" */
+            >
+              <div /* className={contenedorForm} */></div>
+            </Fieldset>
+            <ButtonBar className={"lg:col-span-2"} type="">
+              {
+                <Button
+                  type="submit"
+                  /*      disabled={disabledBtn}
+                  onSubmit={(e) => enviar(e)} */
+                >
+                  Realizar Aporte
+                </Button>
+                /*  ) : null */
+              }
+              <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            </ButtonBar>
+          </Form>
+        </Modal>
+      ) : (
+        ""
+      )}
       <Select
         id="selectSorteo"
         label="Tipo de sorteo"
@@ -322,7 +362,9 @@ const Inventario = () => {
               >
                 Guardar inventario
               </Button>
-              <Button type="onsubmit">Inventario errado</Button>
+              <Button onClick={() => setShowModal(true)}>
+                Inventario errado
+              </Button>
             </div>
           </Form>
           <ButtonBar></ButtonBar>
