@@ -18,7 +18,14 @@ import LogoPDP from "../../../components/Base/LogoPDP";
 import Fieldset from "../../../components/Base/Fieldset";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
-const { contenedorPrincipal, contenedorBotones } = classes;
+const {
+  contenedorPrincipal,
+  contenedorBotones,
+  contenedorImagen,
+  titulosSecundarios,
+  textTarea,
+  autorizacionMensajes,
+} = classes;
 const Inventario = () => {
   const {
     infoLoto: { numero, setNumero, serie, setSerie, loterias, setLoterias },
@@ -32,7 +39,11 @@ const Inventario = () => {
   const [sorteo, setSorteo] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [datosAzar, setDatosAzar] = useState("");
+  const [datosCantidadBilletes, setDatosCantidadBilletes] = useState("");
   const [cantidadBilletes, setCantidadBilletes] = useState("");
+  const [mensajeCausal, setMensajeCausal] = useState("");
+  const [mensajeInventarioInvalido, setMensajeInventarioInvalido] =
+    useState("");
   const [showCrearInventario, setShowCrearInventario] = useState(false);
   const [datosEscaneados, setDatosEscaneados] = useState({
     escaneado1: "",
@@ -44,6 +55,10 @@ const Inventario = () => {
     escaneado2Validados: false,
     escaneado3Validados: false,
   });
+  const [
+    habilitarBtnAgregarInconsistencia,
+    setHabilitarBtnAgregarInconsistencia,
+  ] = useState(false);
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -125,6 +140,20 @@ const Inventario = () => {
     },
     [sorteo]
   );
+  const onSubmitMensajeInconsistencia = useCallback(
+    (e) => {
+      e.preventDefault();
+      registrarInventario(
+        sorteo.split("-")[0],
+        sorteo.split("-")[1],
+        `${mensajeInventarioInvalido}${mensajeCausal}`, // comentario
+        cantidadBilletes, //numero_total
+        ["2131-123123", "12312-123123", "21323-123232"], //numero_completo
+        "false" //inconcistencia-bool
+      );
+    },
+    [sorteo, cantidadBilletes, mensajeCausal]
+  );
   /* 
   const inventarioErrado = (e)=>{
     e.preventDefault();
@@ -134,20 +163,16 @@ const Inventario = () => {
     <>
       {showModal ? (
         <Modal show={showModal} /* handleClose={handleClose} */>
-          <div /* className={contenedorImagen} */>
+          <div className={contenedorImagen}>
             <LogoPDP xsmall></LogoPDP>
           </div>
           {/* <Form grid onSubmit={(e) => enviar(e)}> */}
-          <Form grid>
-            <Fieldset
-              // className={contenedorFieldset}
-              legend="Agregar mensaje inconsistencia"
-              /* className="lg:col-span-3" */
-            >
+          <Form grid onSubmit={(e) => onSubmitMensajeInconsistencia(e)}>
+            <Fieldset className="lg:col-span-3">
               <div className={autorizacionMensajes}>
                 <span className={titulosSecundarios}>
-                  Si el Comercio no cumple con los requisitos, por favor agrege
-                  un causal de rechazo.
+                  Si existe alguna inconsistencia al realizar el inventario, por
+                  favor agregue su comentario.
                 </span>
               </div>
               <textarea
@@ -160,6 +185,7 @@ const Inventario = () => {
                 onInput={(e) => {
                   setMensajeCausal(e.target.value);
                 }}
+                required
               ></textarea>
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"} type="">
@@ -168,8 +194,15 @@ const Inventario = () => {
                   type="submit"
                   /*      disabled={disabledBtn}
                   onSubmit={(e) => enviar(e)} */
+                  /*   onSubmit={(e) => {
+                    if (mensajeCausal) {
+                      setHabilitarBtnAgregarInconsistencia(false);
+                      onSubmitMensajeInconsistencia(e);
+                    }
+                  }} */
+                  disabled={habilitarBtnAgregarInconsistencia}
                 >
-                  Realizar Aporte
+                  Agregar inconsistencia
                 </Button>
                 /*  ) : null */
               }
@@ -197,6 +230,9 @@ const Inventario = () => {
                 notifyError(res?.response);
               } else {
                 setDatosAzar(res?.response?.numerosAzar);
+                setDatosCantidadBilletes(
+                  res?.response?.numero_total_asignaciones
+                );
                 setShowCrearInventario(true);
               }
             });
@@ -378,7 +414,28 @@ const Inventario = () => {
               >
                 Guardar inventario
               </Button>
-              <Button onClick={() => setShowModal(true)}>
+              <Button
+                onClick={() => {
+                  //   if (cantidadBilletes >= 1) {
+                  //     setShowModal(true);
+                  //   } else {
+                  //     notifyError("Ingrese la cantidad de billetes");
+                  //   }
+                  if (cantidadBilletes < 1) {
+                    notifyError("Ingrese la cantidad de billetes");
+                  } else if (datosCantidadBilletes !== cantidadBilletes) {
+                    notifyError(
+                      "La cantidad de billetes no corresponde al del inventario lógico"
+                    );
+                    setMensajeInventarioInvalido(
+                      `La cantidad de billetes no coinciden,inventario logico: ${datosCantidadBilletes}, inventario fisico: ${cantidadBilletes}, `
+                    );
+                    setShowModal(true);
+                  } else {
+                    setShowModal(true);
+                  }
+                }}
+              >
                 Inventario errado
               </Button>
             </div>
