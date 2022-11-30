@@ -198,12 +198,8 @@ const Inventario = () => {
   const validarEntradaScanner = useCallback(
     (validarNum) => {
       if (validarNum[0] === "]") {
-        console.log(validarNum.replace("]", ""));
-        setDatosEscaneados((old) => {
-          console.log("old", old);
-          return { ...old, escaneado1: validarNum.replace("]", "") };
-        });
-        console.log(datosEscaneados["escaneado1"]);
+        console.log(validarNum.replace("]C1", ""));
+        return validarNum.replace("]C1", "");
       }
     },
     [datosEscaneados, datosEscaneados["escaneado1"]]
@@ -338,9 +334,9 @@ const Inventario = () => {
                   value={datosEscaneados["escaneado1"]}
                   onInput={(e) => {
                     const num = e.target.value || "";
-                    validarEntradaScanner(num);
+
                     setDatosEscaneados((old) => {
-                      return { ...old, escaneado1: num.toString() };
+                      return { ...old, escaneado1: validarEntradaScanner(num) };
                     });
                     setDatosEscaneadosValidados((old) => {
                       return { ...old, escaneado1Validados: false };
