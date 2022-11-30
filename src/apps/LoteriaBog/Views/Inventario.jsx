@@ -375,11 +375,15 @@ const Inventario = () => {
                 <InputX
                   label="Escanee el código de barras"
                   type="search"
+                  value={datosEscaneados["escaneado2"]}
                   onInput={(e) => {
                     const num2 = e.target.value || "";
 
                     setDatosEscaneados((old) => {
-                      return { ...old, escaneado2: num2.toString() };
+                      return {
+                        ...old,
+                        escaneado2: validarEntradaScanner(num2),
+                      };
                     });
                     setDatosEscaneadosValidados((old) => {
                       return { ...old, escaneado2Validados: false };
@@ -418,11 +422,15 @@ const Inventario = () => {
                 <InputX
                   label="Escanee el código de barras"
                   type="search"
+                  value={datosEscaneados["escaneado3"]}
                   onInput={(e) => {
                     const num3 = e.target.value || "";
 
                     setDatosEscaneados((old) => {
-                      return { ...old, escaneado3: num3.toString() };
+                      return {
+                        ...old,
+                        escaneado3: validarEntradaScanner(num3),
+                      };
                     });
                     setDatosEscaneadosValidados((old) => {
                       return { ...old, escaneado3Validados: false };
