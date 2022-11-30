@@ -26,6 +26,8 @@ const FormularioVentaSoat = () => {
   const navigate = useNavigate();
   const printDiv = useRef();
   const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
+  console.log("roleInfo", roleInfo);
+
   //******************* Datos del propietario (Variables) ***************
   const [datosPropietarioSoat, setDatosPropietarioSoat] = useState({
     tipoDocumento: "1",

@@ -1,0 +1,11 @@
+.contenedorbtn {
+    display: flex;
+    flex-direction: row;
+}
+
+.contenedorTitulos {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0.5rem;
+}
