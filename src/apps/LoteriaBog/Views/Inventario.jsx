@@ -185,6 +185,30 @@ const Inventario = () => {
     e.preventDefault();
 
   } */
+
+  /* const validarEntradaScanner = (validarNum) => {
+    if (validarNum[0] === "]") {
+      console.log(validarNum.replace("]", ""));
+      setDatosEscaneados((old) => {
+        return { ...old, escaneado1: validarNum.replace("]", " ") };
+      });
+      console.log(datosEscaneados["escaneado1"]);
+    }
+  }; */
+  const validarEntradaScanner = useCallback(
+    (validarNum) => {
+      if (validarNum[0] === "]") {
+        console.log(validarNum.replace("]", ""));
+        setDatosEscaneados((old) => {
+          console.log("old", old);
+          return { ...old, escaneado1: validarNum.replace("]", "") };
+        });
+        console.log(datosEscaneados["escaneado1"]);
+      }
+    },
+    [datosEscaneados, datosEscaneados["escaneado1"]]
+  );
+
   return (
     <>
       {showModal ? (
@@ -311,35 +335,36 @@ const Inventario = () => {
                 <InputX
                   label="Escanee el código de barras"
                   type="text"
+                  value={datosEscaneados["escaneado1"]}
                   onInput={(e) => {
                     const num = e.target.value || "";
-
+                    validarEntradaScanner(num);
                     setDatosEscaneados((old) => {
                       return { ...old, escaneado1: num.toString() };
                     });
                     setDatosEscaneadosValidados((old) => {
                       return { ...old, escaneado1Validados: false };
                     });
-                    if (e.target.value?.length == 20) {
-                      /* console.log(e.target.value.substr(-9, 4)); */
-                      console.log(
-                        String(e.target.value.substr(-5, 3)),
+                    if (num?.length == 20) {
+                      /* console.log(num.substr(-9, 4)); */
+                      /*  console.log(
+                        String(num.substr(-5, 3)),
                         String(datosAzar[0].split("-")[1])
-                      );
+                      ); */
                       if (
-                        (String(e.target.value.substr(-9, 4)) !==
+                        (String(num.substr(-9, 4)) !==
                           String(datosAzar[0].split("-")[0])) &
-                        (String(e.target.value.substr(-5, 3)) !==
+                        (String(num.substr(-5, 3)) !==
                           String(datosAzar[0].split("-")[1]))
                       ) {
                         notifyError("Número de billete y serie no coinciden");
                       } else if (
-                        String(e.target.value.substr(-9, 4)) !==
+                        String(num.substr(-9, 4)) !==
                         String(datosAzar[0].split("-")[0])
                       ) {
                         notifyError("Número de billete no coincide");
                       } else if (
-                        String(e.target.value.substr(-5, 3)) !==
+                        String(num.substr(-5, 3)) !==
                         String(datosAzar[0].split("-")[1])
                       ) {
                         notifyError("Número de serie no coincide");
@@ -363,26 +388,26 @@ const Inventario = () => {
                     setDatosEscaneadosValidados((old) => {
                       return { ...old, escaneado2Validados: false };
                     });
-                    if (e.target.value?.length == 20) {
+                    if (num2?.length == 20) {
                       /* console.log(e.target.value.substr(-9, 4)); */
                       console.log(
-                        String(e.target.value.substr(-9, 4)),
+                        String(num2.substr(-9, 4)),
                         String(datosAzar[1].split("-")[0])
                       );
                       if (
-                        (String(e.target.value.substr(-9, 4)) !==
+                        (String(num2.substr(-9, 4)) !==
                           String(datosAzar[1].split("-")[0])) &
-                        (String(e.target.value.substr(-5, 3)) !==
+                        (String(num2.substr(-5, 3)) !==
                           String(datosAzar[1].split("-")[1]))
                       ) {
                         notifyError("Número de billete y serie no coinciden");
                       } else if (
-                        String(e.target.value.substr(-9, 4)) !==
+                        String(num2.substr(-9, 4)) !==
                         String(datosAzar[1].split("-")[0])
                       ) {
                         notifyError("Número de billete no coincide");
                       } else if (
-                        String(e.target.value.substr(-5, 3)) !==
+                        String(num2.substr(-5, 3)) !==
                         String(datosAzar[1].split("-")[1])
                       ) {
                         notifyError("Número de serie no coincide");
@@ -406,26 +431,26 @@ const Inventario = () => {
                     setDatosEscaneadosValidados((old) => {
                       return { ...old, escaneado3Validados: false };
                     });
-                    if (e.target.value?.length == 20) {
-                      /* console.log(e.target.value.substr(-9, 4)); */
+                    if (num3?.length == 20) {
+                      /* console.log(num3.substr(-9, 4)); */
                       console.log(
-                        String(e.target.value.substr(-9, 4)),
+                        String(num3.substr(-9, 4)),
                         String(datosAzar[2].split("-")[0])
                       );
                       if (
-                        (String(e.target.value.substr(-9, 4)) !==
+                        (String(num3.substr(-9, 4)) !==
                           String(datosAzar[2].split("-")[0])) &
-                        (String(e.target.value.substr(-5, 3)) !==
+                        (String(num3.substr(-5, 3)) !==
                           String(datosAzar[2].split("-")[1]))
                       ) {
                         notifyError("Número de billete y serie no coinciden");
                       } else if (
-                        String(e.target.value.substr(-9, 4)) !==
+                        String(num3.substr(-9, 4)) !==
                         String(datosAzar[2].split("-")[0])
                       ) {
                         notifyError("Número de billete no coincide");
                       } else if (
-                        String(e.target.value.substr(-5, 3)) !==
+                        String(num3.substr(-5, 3)) !==
                         String(datosAzar[2].split("-")[1])
                       ) {
                         notifyError("Número de serie no coincide");
