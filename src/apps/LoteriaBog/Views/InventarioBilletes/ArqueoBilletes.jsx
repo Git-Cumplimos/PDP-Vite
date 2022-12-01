@@ -60,6 +60,7 @@ const ArqueoBilletes = ({ route }) => {
   const [datosArqueo, setDatosArqueo] = useState([]);
   const [date_init, setDate_init] = useState("");
   const [date_end, setDate_end] = useState("");
+  const [showInput, setShowInput] = useState(false)
 
   const { codigos_lot, setCodigos_lot, codigosOficina, setCodigosOficina } =
     useLoteria();
@@ -205,6 +206,7 @@ const ArqueoBilletes = ({ route }) => {
 
   const reportVentas = useCallback(
     async (fecha_ini, fecha_fin, sorteo) => {
+      if(sorteo !== ""){
       try {
         const query = {
           fecha_ini: fecha_ini.substr(0, 10),
@@ -225,6 +227,7 @@ const ArqueoBilletes = ({ route }) => {
         return res;
       } catch (err) {
         console.error(err);
+      }
       }
     },
     [sorteosLOT, codigosOficina]
@@ -263,6 +266,7 @@ const ArqueoBilletes = ({ route }) => {
 
   const consultaArqueoBilletes = useCallback(
     async (page, fecha_ini, fecha_fin, sorteo, Comercio) => {
+      if(sorteo !== ""){
       try {
         const query = {
           numero: page,
@@ -284,6 +288,7 @@ const ArqueoBilletes = ({ route }) => {
       } catch (err) {
         console.error(err);
       }
+    }
     },
     []
   );
@@ -561,19 +566,23 @@ const ArqueoBilletes = ({ route }) => {
                 setSorteo(e.target.value);
                 setShowArqueo(false);
                 setFracDisp(null);
+                if(e.target.value !== ""){
                 reportVentas(fecha_ini, fecha_fin, e.target.value).then(
                   (res) => {
+                    setShowInput(false)
                     if ("msg" in res) {
-                      notifyError(res.msg);
+                      notifyError("El comercio no ha realizado ventas, no es necesario realizar arqueo");
+                      setShowInput(false)
                       // setDisabledBtns(true);
                     } else {
                       // setResp_report(res.data);
                       setTotal(res.total);
+                      setShowInput(true)
                       // setDisabledBtns(false);
                     }
                   }
                 );
-
+                                
                 consultaArqueoBilletes(
                   1,
                   fecha_ini,
@@ -583,16 +592,15 @@ const ArqueoBilletes = ({ route }) => {
                 ).then((res) => {
                   if (!res.status) {
                     notifyError(res.msg);
-                    // setDisabledBtns(true);
                   } else {
                     // setResp_report(res.data);
                     setId_arqueo(res?.obj?.data?.[0].id_arqueo);
-                    // setDisabledBtns(false);
                   }
                 });
+              }
               }}
             />
-            {sorteo !== "" ? (
+            {sorteo !== "" && showInput ? (
               <>
                 <Input
                   id="frac_disponibles"
