@@ -22,7 +22,7 @@ const CargaArchivos = ({ route }) => {
   const options = [
     { value: "", label: "" },
     { value: "PlanDePremios", label: "Plan de premios" },
-    { value: "Asignacion", label: "Asignacion" },
+    { value: "Asignacion", label: "Asignación" },
     { value: "Resultados", label: "Resultados" },
     { value: "Liquidacion", label: "Liquidacion de premios" },
   ];
