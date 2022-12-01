@@ -79,7 +79,7 @@ const ParamsForm = ({ closeModal, params, setParams }) => {
         <Form onSubmit={onSubmit} grid>
           <div className="flex flex-col justify-center items-center mx-auto container grid">
             <h1 className="text-3xl font-semibold my-4">
-              ¿Desea cambiar algún parametro?
+              ¿Desea cambiar algún parámetro?
             </h1>
             <h1 className="text-2xl font-semibold">UVT</h1>
             <Input
