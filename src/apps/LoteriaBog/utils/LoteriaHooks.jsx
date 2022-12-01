@@ -248,7 +248,9 @@ export const useProvideLoteria = () => {
 		if (sort[1] === "true") {
 			fisico = true;
 		}
-		if (num === "" && ser === "") return;
+		if (num === "" && ser === "") {
+      setLoadConsulta(false)
+      return};
 
 		try {
 			const { Resultado: res, Num_Datos } = await fetchData(
@@ -284,7 +286,9 @@ export const useProvideLoteria = () => {
 				fisico = true;
 			}
 
-			if (num === "" && ser === "") return;
+			if (num === "" && ser === "") {
+        setLoadConsulta(false)
+        return};
 
 			try {
 				const { Resultado: res, Num_Datos } = await fetchData(
