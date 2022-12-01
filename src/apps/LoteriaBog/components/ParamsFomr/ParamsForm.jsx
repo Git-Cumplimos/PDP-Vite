@@ -100,7 +100,7 @@ const ParamsForm = ({ closeModal, params, setParams }) => {
               onInput={onMoneyChange2}
               required="true"
             />
-            <h1 className="text-2xl font-semibold">Valor maximo de pago</h1>
+            <h1 className="text-2xl font-semibold">Valor máximo de pago</h1>
             <Input
               id="max_pago"
               label="Valor actual"
