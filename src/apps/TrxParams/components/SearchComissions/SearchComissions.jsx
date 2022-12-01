@@ -313,7 +313,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
       // }
       navigate(`?${urlParams.toString()}`);
     },
-    [navigate, comissions]
+    [navigate, comissions, comissionFace]
   );
 
   const passItem = useCallback(
@@ -344,10 +344,15 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     nombre_comision,
     fecha_inicio,
     id_comision,
+    nombre_plan_comision,
+    pk_planes_comisiones,
+    comissionFace,
   ]);
   const fecthComisionesPagarFunc = () => {
     let obj = { page, limit };
+    if (id_comision) obj["id_comision"] = id_comision;
     if (convenio !== "") obj["nombre_convenio"] = convenio;
+    if (nombre_comision !== "") obj["nombre_comision"] = nombre_comision;
     if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
     if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
     if (comercio !== "") obj["id_comercio"] = parseInt(comercio);
@@ -360,6 +365,8 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
   };
   const fecthComisionesCobrarFunc = () => {
     let obj = { page, limit };
+    if (id_comision) obj["id_comision"] = id_comision;
+    if (nombre_comision !== "") obj["nombre_comision"] = nombre_comision;
     if (convenio !== "") obj["nombre_convenio"] = convenio;
     if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
     if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
@@ -372,6 +379,8 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
   };
 
   const fetchPlans = () => {
+    console.log("fecthComisionescomisiones");
+
     let obj = { page, limit };
     if (pk_planes_comisiones !== "")
       obj["pk_planes_comisiones"] = pk_planes_comisiones;
@@ -384,7 +393,6 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
 
     getComisionesPlanes(obj)
       .then((res) => {
-        // console.log(res);
         setComissions(res?.results);
         setMaxPages(res?.maxPages);
       })
@@ -431,31 +439,138 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
         onSelectRow={onSelectItem ? passItem : onSelectRow}
         onSetPageData={setPageData}
       >
-        <Input
-          id={"nombre_comision"}
-          label={"Nombre comisión"}
-          name={"nombre_comision"}
-          type={"text"}
-          autoComplete="off"
-          defaultValue={nombre_comision}
-        />
-        <Input
-          id={"tipoTrx"}
-          label={"Tipo de transacción"}
-          name={"tipoTrx"}
-          type={"text"}
-          autoComplete="off"
-          defaultValue={tipoTrx}
-        />
-        <Input
-          id={"id_comision"}
-          label={"Id comisión"}
-          name={"id_comision"}
-          type="number"
-          // step={"1"}
-          autoComplete="off"
-          defaultValue={comercio}
-        />
+        {comissionFace === "pay" ? (
+          <>
+            <Input
+              id={"convenio"}
+              label={"Nombre convenio"}
+              name={"convenio"}
+              type={"text"}
+              autoComplete="off"
+              defaultValue={convenio}
+            />
+            <Input
+              id={"nombre_comision"}
+              label={"Nombre comision"}
+              name={"nombre_comision"}
+              type={"text"}
+              autoComplete="off"
+              defaultValue={nombre_comision}
+            />
+            <Input
+              id={"tipoTrx"}
+              label={"Tipo de transacción"}
+              name={"tipoTrx"}
+              type={"text"}
+              autoComplete="off"
+              defaultValue={tipoTrx}
+            />
+            <Input
+              id={"id_comision"}
+              label={"Id comisión"}
+              name={"id_comision"}
+              type="number"
+              step={"1"}
+              autoComplete="off"
+              defaultValue={id_comision}
+            />
+          </>
+        ) : null}
+        {comissionFace === "collect" ? (
+          <>
+            <Input
+              id={"convenio"}
+              label={"Nombre convenio"}
+              name={"convenio"}
+              type={"text"}
+              autoComplete="off"
+              defaultValue={convenio}
+            />
+            <Input
+              id={"nombre_comision"}
+              label={"Nombre comision"}
+              name={"nombre_comision"}
+              type={"text"}
+              autoComplete="off"
+              defaultValue={nombre_comision}
+            />
+            <Input
+              id={"tipoTrx"}
+              label={"Tipo de transacción"}
+              name={"tipoTrx"}
+              type={"text"}
+              autoComplete="off"
+              defaultValue={tipoTrx}
+            />
+            <Input
+              id={"id_comision"}
+              label={"Id comisión"}
+              name={"id_comision"}
+              type="number"
+              step={"1"}
+              autoComplete="off"
+              defaultValue={id_comision}
+            />
+          </>
+        ) : null}
+        {comissionFace === "plans" ? (
+          <>
+            <Input
+              id={"nombre_plan_comision"}
+              label={"Nombre comisión"}
+              name={"nombre_plan_comision"}
+              type={"text"}
+              autoComplete="off"
+              defaultValue={nombre_plan_comision}
+            />
+            <Input
+              id={"tipoTrx"}
+              label={"Tipo de transacción"}
+              name={"tipoTrx"}
+              type={"text"}
+              autoComplete="off"
+              defaultValue={tipoTrx}
+            />
+            <Input
+              id={"pk_planes_comisiones"}
+              label={"Id plan"}
+              name={"pk_planes_comisiones"}
+              type="number"
+              step={"1"}
+              autoComplete="off"
+              defaultValue={pk_planes_comisiones}
+            />
+          </>
+        ) : null}
+        {comissionFace === "campaigns" ? (
+          <>
+            <Input
+              id={"nombre_comision"}
+              label={"Nombre comisión"}
+              name={"nombre_comision"}
+              type={"text"}
+              autoComplete="off"
+              defaultValue={nombre_comision}
+            />
+            <Input
+              id={"tipoTrx"}
+              label={"Tipo de transacción"}
+              name={"tipoTrx"}
+              type={"text"}
+              autoComplete="off"
+              defaultValue={tipoTrx}
+            />
+            <Input
+              id={"id_comision"}
+              label={"Id comisión"}
+              name={"id_comision"}
+              type="number"
+              // step={"1"}
+              autoComplete="off"
+              defaultValue={comercio}
+            />
+          </>
+        ) : null}
         {/* <Select
           id="tipoTrx"
           name="tipoTrx"

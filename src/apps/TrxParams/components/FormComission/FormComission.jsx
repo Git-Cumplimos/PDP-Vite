@@ -114,7 +114,10 @@ const FormComission = ({ outerState, onSubmit, children }) => {
               >
                 {Object.entries(_comission).map(([key, val], idx) => {
                   if (key === "Rango minimo" || key === "Rango maximo") {
-                    if (comissionData?.type === "trx")
+                    if (
+                      comissionData?.type === "trx" ||
+                      comissionData?.type === "trxEsc"
+                    )
                       return (
                         <Input
                           key={`${key}_${ind}`}

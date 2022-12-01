@@ -66,7 +66,6 @@ const CreateComision = () => {
     "Fecha inicio": "",
     "Fecha fin": "",
   });
-  const [planesComisiones, setPlanesComisiones] = useState([]);
   const [data, setdata] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
   const [{ page, limit }, setPageData] = useState({
@@ -243,7 +242,6 @@ const CreateComision = () => {
   const fetchPlanesComisiones = useCallback(() => {
     getComisionesPlanes()
       .then((res) => {
-        console.log(res);
         setdata(
           [...res?.results].map(
             ({ pk_planes_comisiones, nombre_plan_comision }) => {
@@ -426,6 +424,18 @@ const CreateComision = () => {
       setIdComercios(temp);
     },
     [idComercios]
+  );
+
+  const onSelectPlan = useCallback(
+    (e, i) => {
+      setNewComision((old) => ({
+        ...old,
+        "Id plan": data[i]?.["Id plan"],
+        Plan: data[i]?.["Nombre plan"],
+      }));
+      handleClose();
+    },
+    [data, handleClose]
   );
 
   return (
@@ -630,7 +640,9 @@ const CreateComision = () => {
             maxPage={maxPages}
             headers={headersTable}
             data={data}
-            onSelectRow={onSelectConvenio}
+            onSelectRow={
+              selectedOpt === "comision" ? onSelectConvenio : onSelectPlan
+            }
             onSetPageData={setPageData}
             onChange={onChange}
           >
