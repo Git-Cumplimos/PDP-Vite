@@ -36,7 +36,6 @@ const CrearSorteos = ({ route }) => {
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
-    console.log(codigos_lot?.length);
     if (codigos_lot?.length === 2) {
       cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
     } else {
@@ -105,7 +104,6 @@ const CrearSorteos = ({ route }) => {
   const con_params = useCallback(async () => {
     try {
       const res = await fetchData(url_consultaParams, "GET", {});
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -116,7 +114,6 @@ const CrearSorteos = ({ route }) => {
     setShowparams(false);
     setParams(null);
   });
-  console.log(resp_con);
   return (
     <>
       <div>
@@ -184,7 +181,6 @@ const CrearSorteos = ({ route }) => {
                   setDisabledBtns(true);
                 } else {
                   setParams(res);
-                  console.log(res);
                   setDisabled_params(false);
                   setShowparams(true);
                 }

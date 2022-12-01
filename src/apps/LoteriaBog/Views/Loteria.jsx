@@ -173,11 +173,11 @@ const Loteria = ({ route }) => {
     }
     SetOpcionesDisponibles([...copy]);
   }, [
-    setCustomer,
-    setLoterias,
-    setNumero,
-    setSellResponse,
-    setSerie,
+    // setCustomer,
+    // setLoterias,
+    // setNumero,
+    // setSellResponse,
+    // setSerie,
     sorteoExtra,
     sorteoExtrafisico,
     sorteoOrdi,
@@ -218,18 +218,21 @@ const Loteria = ({ route }) => {
           value={sorteo}
           onChange={(e) => setSorteo(e.target.value)}
         />
-
+        { sorteo !== "" ? 
+        <>
         <InputX
           label="Escanee el código de barras"
           type="search"
           value={datosEscaneados}
           onInput={(e) => {
             const num = e.target.value || "";
-
-            if (num?.length === 23 || num?.length === 0) {
-              setDatosEscaneados(validarEntradaScanner(num));
+            setDatosEscaneados(validarEntradaScanner(num));
+            if (num?.length === 20) {              
               setNumero(String(num.substr(-9, 4)));
               setSerie(String(num.substr(-5, 3)));
+            }else{
+              setNumero("");
+              setSerie("");
             }
           }}
         ></InputX>
@@ -335,6 +338,8 @@ const Loteria = ({ route }) => {
             Siguiente
           </Button>
         </ButtonBar>
+        </>
+        : ""}
       </Form>
       {Array.isArray(loterias) && loterias.length > 0 ? (
         <>

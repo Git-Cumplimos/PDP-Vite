@@ -26,7 +26,6 @@ const Borrado_billetes = ({ route }) => {
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
-    console.log(codigos_lot?.length);
     if (codigos_lot?.length === 2) {
       cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
     } else {
@@ -43,10 +42,8 @@ const Borrado_billetes = ({ route }) => {
         cod_sucursal: cod_sucursal,
         sorteo: num_sorteo,
       };
-      console.log(query);
       try {
         const res = await fetchData(url_BorrarBilletes, "GET", query);
-        console.log(res);
         closeModal();
         return res;
       } catch (err) {
@@ -63,7 +60,6 @@ const Borrado_billetes = ({ route }) => {
       const res = await fetchData(url_sorteos, "GET", {
         codigos_loteria: sorteosLOT,
       });
-      console.log(res);
       return res;
     } catch (err) {
       closeModal();
@@ -127,7 +123,6 @@ const Borrado_billetes = ({ route }) => {
             value={num_sorteo}
             required
             onChange={(e) => {
-              console.log(e.target.value);
               setNum_sorteo(e.target.value);
             }}
           />

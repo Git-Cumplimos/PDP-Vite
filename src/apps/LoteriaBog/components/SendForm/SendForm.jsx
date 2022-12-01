@@ -29,14 +29,13 @@ const SendForm = ({
     "Valor por fracción": selected
       ? formatMoney.format(selected.Valor_fraccion)
       : "",
-    Número: selected ? selected.Num_billete : "",
+    "Número": selected ? selected.Num_billete : "",
     Serie: selected ? selected.serie : "",
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
   };
 
   const { tiposOperaciones } = useLoteria();
-  console.log(tiposOperaciones);
-  const operacion = useMemo(() => {
+  const operacion = useMemo(() => {    
     return tiposOperaciones;
   }, [tiposOperaciones]);
 
@@ -89,7 +88,6 @@ const SendForm = ({
     setTipoPago(value);
   };
 
-  console.log(tipoPago);
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">
@@ -105,8 +103,7 @@ const SendForm = ({
           );
         })}
       </div>
-      <div /* className="flex flex-col justify-center items-center mx-auto container" */
-      >
+      <div className="flex flex-col justify-center items-center mx-auto container">
         <Form onSubmit={onSubmit} grid>
           {sorteo.split("-")[1] === "true" ? (
             <>
