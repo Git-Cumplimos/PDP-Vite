@@ -102,6 +102,8 @@ export const LoteriaContext = createContext({
 	setTiposOperaciones: null,
 	codigosOficina: null,
 	setCodigosOficina: null,
+  loadConsulta: null,
+	setLoadConsulta: null,
 });
 
 export const useLoteria = () => {
@@ -136,6 +138,7 @@ export const useProvideLoteria = () => {
 	const [tiposOperaciones, setTiposOperaciones] = useState(null);
 	const [codigosOficina, setCodigosOficina] = useState(null);
 	const [nit_loteria, setNit_loteria] = useState(null);
+  const [loadConsulta, setLoadConsulta] = useState(false)
 
 	useEffect(() => {
 		if (numero === "" && serie === "") {
@@ -239,6 +242,7 @@ export const useProvideLoteria = () => {
 	}, [codigos_lot]);
 
 	const searchLoteria = useCallback(async (sorteo, num, ser, page) => {
+    setLoadConsulta(true)
 		let fisico = false;
 		const sort = sorteo.split("-");
 		if (sort[1] === "true") {
@@ -261,15 +265,19 @@ export const useProvideLoteria = () => {
 				{}
 			);
 			setLoterias(res);
+      setLoadConsulta(false)
 			return Num_Datos;
 		} catch (err) {
 			setLoterias([]);
 			console.error(err);
+      setLoadConsulta(false)
 		}
+    
 	}, []);
 
 	const searchLoteriafisica = useCallback(
 		async (sorteo, num, ser, page) => {
+      setLoadConsulta(true)
 			let fisico = false;
 			const sort = sorteo.split("-");
 			if (sort[1] === "true") {
@@ -296,11 +304,14 @@ export const useProvideLoteria = () => {
 				);
 
 				setLoterias(res);
+        setLoadConsulta(false)
 				return Num_Datos;
 			} catch (err) {
 				setLoterias([]);
+        setLoadConsulta(false)
 				console.error(err);
 			}
+      
 		},
 		[roleInfo, codigosOficina]
 	);
@@ -806,5 +817,7 @@ export const useProvideLoteria = () => {
 		setTiposOperaciones,
 		codigosOficina,
 		setCodigosOficina,
+    loadConsulta,
+		setLoadConsulta,
 	};
 };
