@@ -61,7 +61,7 @@ const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
 
 /** Loteria Bogota */
 const venta = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
-const Descargas = lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
+const Sorteos = lazy(() => import("../apps/LoteriaBog/Views/Sorteos"));
 const DescargarArchivosS3 = lazy(() =>
   import("../apps/LoteriaBog/Views/DescargarArchivosS3")
 );
@@ -75,12 +75,13 @@ const CargaArchivos = lazy(() =>
   import("../apps/LoteriaBog/Views/CargaArchivos")
 );
 const ArqueoBilletes = lazy(() =>
-  import("../apps/LoteriaBog/Views/ArqueoBilletes")
+  import("../apps/LoteriaBog/Views/InventarioBilletes/ArqueoBilletes")
 );
 const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
-const Inventario = lazy(() => import("../apps/LoteriaBog/Views/Inventario"));
+const Inventario =lazy(() => import("../apps/LoteriaBog/Views/Inventario"))
+const CrearInventario = lazy(() => import("../apps/LoteriaBog/Views/InventarioBilletes/Inventario"));
 const ReportInventario = lazy(() =>
-  import("../apps/LoteriaBog/Views/ReportesInventario")
+  import("../apps/LoteriaBog/Views/InventarioBilletes/ReportesInventario")
 );
 
 /**
@@ -360,7 +361,7 @@ const allUrlsPrivateApps = [
         {
           link: `/loteria/${name}/sorteos`,
           label: <AppIcons Logo={"SORTEO01"} name="Sorteos" />,
-          component: Descargas,
+          component: Sorteos,
           permission: [5, 6],
           subRoutes: [
             {
@@ -391,28 +392,38 @@ const allUrlsPrivateApps = [
           permission: [3], ///////////////////////////////////////////////////////////////////
         },
         {
-          link: `/loteria/${name}/arqueo`,
-          label: <AppIcons Logo={"ArqueoBilletes"} name="Arqueo Billetes" />,
-          component: ArqueoBilletes,
-          extern: false,
-          permission: [3, 6], ///////////////////////////////////////////////////////////////////
-        },
-        {
           link: `/loteria/${name}/inventario`,
           label: <AppIcons Logo={"REPORTE"} name="Inventario Billetes" />,
           component: Inventario,
           extern: false,
           permission: [3, 6], ///////////////////////////////////////////////////////////////////
+          subRoutes: [
+            {
+              link: `/loteria/${name}/arqueo`,
+              label: <AppIcons Logo={"ArqueoBilletes"} name="Arqueo Billetes" />,
+              component: ArqueoBilletes,
+              extern: false,
+              permission: [3, 6], ///////////////////////////////////////////////////////////////////
+            },
+            {
+              link: `/loteria/${name}/inventario/crear`,
+              label: <AppIcons Logo={"REPORTE"} name="Crear Inventario Billetes" />,
+              component: CrearInventario,
+              extern: false,
+              permission: [3], ///////////////////////////////////////////////////////////////////
+            },
+            {
+              link: `/loteria/${name}/inventario/reportes`,
+              label: (
+                <AppIcons Logo={"REPORTE"} name="Reportes Inventario Billetes" />
+              ),
+              component: ReportInventario,
+              extern: false,
+              permission: [3, 6], ///////////////////////////////////////////////////////////////////
+            },
+          ]
         },
-        {
-          link: `/loteria/${name}/reportesInventario`,
-          label: (
-            <AppIcons Logo={"REPORTE"} name="Reportes Inventario Billetes" />
-          ),
-          component: ReportInventario,
-          extern: false,
-          permission: [3, 6], ///////////////////////////////////////////////////////////////////
-        },
+
       ],
     })),
   },

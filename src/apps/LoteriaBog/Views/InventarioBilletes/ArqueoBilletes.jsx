@@ -1,18 +1,18 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import Button from "../../../components/Base/Button";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import { useLoteria } from "../utils/LoteriaHooks";
-import Form from "../../../components/Base/Form";
-import Table from "../../../components/Base/Table";
-import Input from "../../../components/Base/Input";
-import Modal from "../../../components/Base/Modal";
-import DescargaForm from "../components/DescargaForm/DescargaForm";
-import SubPage from "../../../components/Base/SubPage/SubPage";
-import ReportVentasForm from "../components/ReportVentasForm/ReportVentasForm";
-import { useAuth } from "../../../hooks/AuthHooks";
-import { notify, notifyError } from "../../../utils/notify";
-import fetchData from "../../../../src/utils/fetchData";
-import Select from "../../../components/Base/Select";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import { useLoteria } from "../../utils/LoteriaHooks";
+import Form from "../../../../components/Base/Form";
+import Table from "../../../../components/Base/Table";
+import Input from "../../../../components/Base/Input";
+import Modal from "../../../../components/Base/Modal";
+import DescargaForm from "../../components/DescargaForm/DescargaForm";
+import SubPage from "../../../../components/Base/SubPage/SubPage";
+import ReportVentasForm from "../../components/ReportVentasForm/ReportVentasForm";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import { notify, notifyError } from "../../../../utils/notify";
+import fetchData from "../../../../utils/fetchData";
+import Select from "../../../../components/Base/Select";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -27,10 +27,7 @@ const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 const ArqueoBilletes = ({ route }) => {
   /*__________ Fechas para consulta de transacciones del día________________ */
   const fecha = new Date();
-  console.log(fecha);
   const fecha_ini = fecha.toISOString();
-  console.log(fecha_ini);
-
   fecha.setDate(fecha.getDate() + 1);
   const fecha_fin = fecha.toISOString();
   /*_________________________________________________________ */
@@ -51,7 +48,6 @@ const ArqueoBilletes = ({ route }) => {
   const [id_arqueo, setId_arqueo] = useState("");
   const { roleInfo } = useAuth();
 
-  console.log(roleInfo);
   const { con_SortVentas_S3 } = useLoteria();
   const [showModal2, setShowModal2] = useState(false);
 
@@ -70,13 +66,11 @@ const ArqueoBilletes = ({ route }) => {
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
-    console.log(codigos_lot?.length);
     if (codigos_lot?.length === 2) {
       cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
     } else {
       cod = `${codigos_lot?.[0]?.cod_loteria}`;
     }
-    console.log(cod);
     return cod;
   }, [codigos_lot]);
 
@@ -95,26 +89,6 @@ const ArqueoBilletes = ({ route }) => {
         setSorteoExtra(null);
         setSorteofisico(null);
         setSorteofisicoextraordinario(null);
-        console.log(res);
-        // const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
-        //   return tip_sorteo === 1 && !fisico;
-        // });
-        // const sortExt = res.filter(({ tip_sorteo, fisico }) => {
-        //   return tip_sorteo === 2 && !fisico;
-        // });
-        // if (sortOrd.length > 0) {
-        //   setSorteoOrdi(sortOrd[0]);
-        // } else {
-        //   /*  notifyError("No se encontraron sorteos ordinarios"); */
-        // }
-        // if (sortExt.length > 0) {
-        //   setSorteoExtra(sortExt[0]);
-        // } else {
-        //   /* notifyError("No se encontraron sorteos extraordinarios"); */
-        // }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-
         ///sorteo fisico
         const sortOrdfisico = res.filter(({ tip_sorteo, fisico }) => {
           return tip_sorteo === 1 && fisico;
@@ -143,7 +117,6 @@ const ArqueoBilletes = ({ route }) => {
   ]);
 
   useEffect(() => {
-    console.log(sorteoOrdi);
     const copy = [{ value: "", label: "" }];
     if (sorteoOrdi !== null) {
       copy.push({
@@ -198,7 +171,6 @@ const ArqueoBilletes = ({ route }) => {
               notifyError(res.msg);
               // setDisabledBtns(true);
             } else {
-              console.log(res);
               // setResp_report(res.data);
               setId_arqueo(res?.obj?.data?.[0].id_arqueo);
               // setDisabledBtns(false);
@@ -220,7 +192,6 @@ const ArqueoBilletes = ({ route }) => {
               notifyError(res.msg);
               // setDisabledBtns(true);
             } else {
-              console.log(res);
               // setResp_report(res.data);
               setId_arqueo(res?.obj?.data?.[0].id_arqueo);
               // setDisabledBtns(false);
@@ -292,7 +263,6 @@ const ArqueoBilletes = ({ route }) => {
 
   const consultaArqueoBilletes = useCallback(
     async (page, fecha_ini, fecha_fin, sorteo, Comercio) => {
-      console.log(Comercio);
       try {
         const query = {
           numero: page,
@@ -358,7 +328,6 @@ const ArqueoBilletes = ({ route }) => {
     setShowModal2(false);
   }, []);
 
-  console.log(datosArqueo);
   return (
     <>
       <Form formDir="col" onSubmit={onSubmit}>
@@ -384,7 +353,6 @@ const ArqueoBilletes = ({ route }) => {
                     sorteo,
                     idComercio
                   ).then((res) => {
-                    console.log(res?.obj?.data)
                     if (!res.status) {
                       notifyError(res.msg);
                       // setDisabledBtns(true);
@@ -393,7 +361,6 @@ const ArqueoBilletes = ({ route }) => {
                       notifyError("No hay arqueos registrados")
                     }                    
                     else {
-                      console.log(res?.obj?.maxpage);
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
                       setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
@@ -429,7 +396,6 @@ const ArqueoBilletes = ({ route }) => {
                       notifyError("No hay arqueos registrados")
                     } 
                     else {
-                      console.log(res?.obj?.maxpage);
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
                       setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
@@ -467,7 +433,6 @@ const ArqueoBilletes = ({ route }) => {
                       notifyError("No hay arqueos registrados")
                     }
                     else {
-                      console.log(res?.obj?.length);
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
                       setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
@@ -497,7 +462,6 @@ const ArqueoBilletes = ({ route }) => {
                             notifyError(res.msg);
                             // setDisabledBtns(true);
                           } else {
-                            console.log(res?.obj?.maxpage);
                             // setResp_report(res.data);
                             setDatosArqueo(res?.obj?.data);
                             setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
@@ -526,7 +490,6 @@ const ArqueoBilletes = ({ route }) => {
                             notifyError(res.msg);
                             // setDisabledBtns(true);
                           } else {
-                            console.log(res?.obj?.maxpage);
                             // setResp_report(res.data);
                             setDatosArqueo(res?.obj?.data);
                             setMaxPages(Math.ceil(res?.obj?.maxpage / 10));
@@ -576,7 +539,7 @@ const ArqueoBilletes = ({ route }) => {
                     }
                   )}
                   onSelectRow={(e, index) => {
-                    console.log(datosArqueo[index].sorteo);
+                    // console.log(datosArqueo[index].sorteo);
                     // setSelected(datosArqueo[index]);
                     // setShowModal(true);
                   }}
@@ -604,7 +567,6 @@ const ArqueoBilletes = ({ route }) => {
                       notifyError(res.msg);
                       // setDisabledBtns(true);
                     } else {
-                      console.log(res);
                       // setResp_report(res.data);
                       setTotal(res.total);
                       // setDisabledBtns(false);
@@ -623,7 +585,6 @@ const ArqueoBilletes = ({ route }) => {
                     notifyError(res.msg);
                     // setDisabledBtns(true);
                   } else {
-                    console.log(res);
                     // setResp_report(res.data);
                     setId_arqueo(res?.obj?.data?.[0].id_arqueo);
                     // setDisabledBtns(false);

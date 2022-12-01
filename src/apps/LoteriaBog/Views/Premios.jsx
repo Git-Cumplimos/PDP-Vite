@@ -106,7 +106,6 @@ const Premios = ({ route }) => {
     isWinner(sorteo, billete, serie)
       .then((res) => {
         fracbill.length = 0;
-        console.log(res, "res");
         setDisabledBtns(false);
 
         if ("msg" in res) {
@@ -177,7 +176,6 @@ const Premios = ({ route }) => {
         setShowModal(true);
         setDisabledBtns(false);
         setRespagar(res);
-        console.log(res);
 
         if ("msg" in res) {
           notifyError(res.msg);

@@ -48,13 +48,11 @@ const Loteria = ({ route }) => {
 
 	const sorteosLOT = useMemo(() => {
 		var cod = "";
-		console.log(codigos_lot?.length);
 		if (codigos_lot?.length === 2) {
 			cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
 		} else {
 			cod = `${codigos_lot?.[0]?.cod_loteria}`;
 		}
-		console.log(cod);
 		return cod;
 	}, [codigos_lot]);
 
@@ -69,7 +67,6 @@ const Loteria = ({ route }) => {
 				setSorteoExtra(null);
 				setSorteofisico(null);
 				setSorteofisicoextraordinario(null);
-				console.log(res);
 				const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
 					return tip_sorteo === 1 && !fisico;
 				});
@@ -130,7 +127,6 @@ const Loteria = ({ route }) => {
 		setPage(1);
 		setMaxPages(1);
 
-		console.log(sorteoOrdi);
 		const copy = [{ value: "", label: "" }];
 		if (sorteoOrdi !== null) {
 			copy.push({
@@ -313,7 +309,7 @@ const Loteria = ({ route }) => {
 					</div>
 					<Table
 						headers={[
-							"Numero",
+							"Número",
 							"Serie",
 							"Fracciones disponibles",
 							// "Valor por fraccion",
@@ -326,7 +322,6 @@ const Loteria = ({ route }) => {
 							};
 						})}
 						onSelectRow={(e, index) => {
-							console.log(loterias[index].Fracciones);
 							setSelected(loterias[index]);
 							setShowModal(true);
 						}}

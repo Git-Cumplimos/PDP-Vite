@@ -1,8 +1,8 @@
-import Table from "../../../components/Base/Table";
+import Table from "../../../../components/Base/Table";
 import { useEffect, useState } from "react";
-import { useLoteria } from "../utils/LoteriaHooks";
-import { notifyError } from "../../../utils/notify";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
+import { useLoteria } from "../../utils/LoteriaHooks";
+import { notifyError } from "../../../../utils/notify";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
 const ReporteInventario = ({ subRoutes, route: { label } }) => {
 	const initReporte = [
@@ -34,7 +34,7 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 			} else {
 				setReporteInventario(res?.Respuesta);
 				setShowTabla(true);
-				console.log("reportese _ a", reporteInventario);
+				// console.log("reportese _ a", reporteInventario);
 			}
 		});
 	};

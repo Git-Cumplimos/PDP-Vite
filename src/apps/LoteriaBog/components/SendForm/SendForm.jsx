@@ -26,10 +26,10 @@ const SendForm = ({
   setTipoPago,
 }) => {
   const details = {
-    "Valor por fraccion": selected
+    "Valor por fracción": selected
       ? formatMoney.format(selected.Valor_fraccion)
       : "",
-    Numero: selected ? selected.Num_billete : "",
+    "Número": selected ? selected.Num_billete : "",
     Serie: selected ? selected.serie : "",
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
   };
@@ -86,7 +86,6 @@ const SendForm = ({
   // }
 
   const formPago = (value) => {
-    console.log(value)
     setTipoPago(value);
   };
 
@@ -166,7 +165,15 @@ const SendForm = ({
             value={phone}
             required={true}
             onInput={(e) => {
-              if (!isNaN(e.target.value)) {
+              if (
+                (String(e.target.value).length > 0) &
+                (String(e.target.value).slice(0, 1) !== "3")
+              ) {
+                notifyError("El número de celular debe iniciar por 3");
+                const cus = { fracciones, phone, doc_id };
+                cus.phone = "";
+                setCustomer({ ...cus });
+              } else {
                 const cus = { fracciones, phone, doc_id };
                 cus.phone = e.target.value;
                 setCustomer({ ...cus });
@@ -178,6 +185,8 @@ const SendForm = ({
             label="Documento de identidad"
             type="text"
             value={doc_id}
+            minLength="5"
+            maxLength="12"
             required={true}
             onInput={(e) => {
               if (!isNaN(e.target.value)) {
