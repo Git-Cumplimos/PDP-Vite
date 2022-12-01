@@ -54,7 +54,7 @@ const CargaArchivos = ({ route }) => {
 
   const optionsFisiVir = [
     { value: "", label: "" },
-    { value: "Fisico/", label: `${archivo} Fisicos` },
+    { value: "Fisico/", label: `${archivo} físicos` },
     { value: "Virtual/", label: `${archivo} Virtuales` },
   ];
 
@@ -271,7 +271,7 @@ const CargaArchivos = ({ route }) => {
         {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
           <Select
             id="FisiVir"
-            label={`${archivo} fisicos/Virtuales`}
+            label={`${archivo} físicos/Virtuales`}
             options={optionsFisiVir}
             disabled={progress !== 0 && progress !== 100}
             value={fisiVirtual}
