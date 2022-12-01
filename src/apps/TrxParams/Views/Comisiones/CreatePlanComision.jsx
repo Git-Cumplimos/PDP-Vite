@@ -203,7 +203,7 @@ const CreatePlanComision = () => {
   const onChangeNewComision = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
     const newData = [];
-    ["Tipo de comision", "Nombre plan de comision"].forEach((col) => {
+    ["Nombre plan de comision"].forEach((col) => {
       let data = null;
       data = formData.get(col);
       newData.push([col, data]);
@@ -294,7 +294,7 @@ const CreatePlanComision = () => {
   const fecthComisionesPagarFunc = () => {
     let obj = { page };
     if (convenio !== "") obj["nombre_convenio"] = convenio;
-    if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
+    // if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
     if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
     if (comercio !== "") obj["id_comercio"] = parseInt(comercio);
     getComisionesPlanes(obj)
@@ -326,15 +326,15 @@ const CreatePlanComision = () => {
   return (
     <Fragment>
       <h1 className="text-3xl">Crear plan de comisión:</h1>
-      <Form onChange={onChangeNewComision} grid>
-        <Select
+      <Form onChange={onChangeNewComision}>
+        {/* <Select
           name="Tipo de comision"
           label="Tipo de comision"
           options={{ NA: "", Cobrar: "COBRAR", Pagar: "PAGAR" }}
           value={newComision?.["Tipo de comision"]}
           onChange={() => {}}
           // defaultValue={""}
-        />
+        /> */}
         <Input
           id="Nombre plan de comision"
           name="Nombre plan de comision"

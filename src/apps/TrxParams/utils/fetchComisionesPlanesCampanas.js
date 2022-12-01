@@ -66,13 +66,13 @@ export const putComisionesPlanesCampanas = async (obj) => {
   const { id_plan_comision_campana, ...bodyObj } = obj;
   try {
     const res = await fetchData(
-      `${urlComisiones}/servicio-planes-campanas-comisiones/actualizar-planes-campanas-comision?pk_planes_comisiones_campanas=${id_plan_comision_campana}`,
+      `${urlComisiones}/servicio-planes-campanas-comisiones/actualizar-planes-campanas-comision?pk_planes_comisiones_campanas`,
       "PUT",
       {},
       bodyObj
     );
     if (res?.status) {
-      return { ...res?.obj };
+      return { ...res };
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };

@@ -71,7 +71,7 @@ export const putComisionesPlanes = async (obj) => {
       bodyObj
     );
     if (res?.status) {
-      return { ...res?.obj };
+      return { ...res };
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };

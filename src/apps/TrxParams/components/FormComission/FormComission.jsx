@@ -241,7 +241,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                         autoComplete="off"
                         maxLength={"15"}
                         value={val}
-                        max="10"
+                        max="10000"
                         onInput={(e, valor) => {
                           if (!isNaN(valor)) {
                             const num = valor;

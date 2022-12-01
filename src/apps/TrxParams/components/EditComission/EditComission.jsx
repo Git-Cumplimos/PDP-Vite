@@ -43,9 +43,8 @@ const EditComission = () => {
     setQuery,
   ] = useQuery();
 
-  const [editedComission, setEditedComission] = useState({
-    nombre_plan_comision: "",
-  });
+  const [editedComission, setEditedComission] = useState(null);
+  const [campaignStatus, setCampaignStatus] = useState(null);
   const [comissions, setComissions] = useState({
     nombre_comision: "",
   });
@@ -145,51 +144,13 @@ const EditComission = () => {
           })
           .catch((err) => console.error(err));
       } else if (id_plan_comision) {
-        putComisionesCobrada(
-          { id_comision_cobrada },
-          {
-            nombre_comision: comissions?.["nombre_comision"],
-            estado: comissions?.["estado"],
-            comisiones: {
-              ...editedComission,
-              ranges: editedComission?.ranges.map(
-                ({
-                  "Rango minimo": Minimo,
-                  "Rango maximo": Maximo,
-                  "Comision porcentual": Porcentaje,
-                  "Comision fija": Fija,
-                }) => {
-                  return {
-                    Minimo,
-                    Maximo: !Maximo ? -1 : Maximo,
-                    Porcentaje: Porcentaje / 100,
-                    Fija,
-                  };
-                }
-              ),
-            },
-          }
-        )
-          .then((res) => {
-            if (res?.status) {
-              notify(res?.msg);
-              navigate(-1, { replace: true });
-            } else {
-              notifyError(res?.msg);
-            }
-          })
-          .catch((err) => console.error(err));
-      } else if (id_plan_comision_campana) {
-        console.log(comissions);
-        postComisionesPlanCampanas({
-          nombre_plan_comision_campana:
-            editedComission?.["nombre_plan_comision_campana"],
-          fecha_inicio: editedComission?.["fecha_inicio"],
-          fecha_final: editedComission?.["fecha_final"],
-          fk_planes_comisiones: id_plan_comision_campana,
-          comisiones_campanas: {
-            // ...editedComission,
-            ranges: comissions?.comisiones?.ranges.map(
+        putComisionesPlanes({
+          id_plan_comision: id_plan_comision,
+          pk_planes_comisiones: id_plan_comision,
+          nombre_plan_comision: editedComission?.nombre_plan_comision,
+          comisiones: {
+            ...editedComission,
+            ranges: editedComission?.ranges.map(
               ({
                 "Rango minimo": Minimo,
                 "Rango maximo": Maximo,
@@ -216,6 +177,98 @@ const EditComission = () => {
             }
           })
           .catch((err) => console.error(err));
+      } else if (id_plan_comision_campana) {
+        if (campaignStatus) {
+          console.log("edit campaign");
+          putComisionesPlanesCampanas({
+            id_plan_comision_campana: id_plan_comision_campana,
+            nombre_plan_comision_campana:
+              editedComission?.["nombre_plan_comision_campana"],
+            fecha_inicio: editedComission?.["fecha_inicio"],
+            // fecha inicio
+            // fecha_inicio: Intl.DateTimeFormat("es-CO", {
+            //   year: "numeric",
+            //   month: "numeric",
+            //   day: "numeric",
+            //   hour: "numeric",
+            //   minute: "numeric",
+            //   second: "numeric",
+            // })
+            //   .format(
+            //     new Date(comissions?.["fecha_inicio"]).setHours(
+            //       new Date(comissions?.["fecha_inicio"] + "-5").getHours()
+            //     )
+            //   )
+            //   .split(",")
+            //   .join("")
+            //   .split("/")
+            //   .join("-"),
+            // fecha_inicio: editedComission?.["fecha_inicio"],
+            fecha_final: editedComission?.["fecha_final"],
+            pk_planes_comisiones_campanas: id_plan_comision_campana,
+            comisiones_campanas: {
+              // ...editedComission,
+              type: comissions?.comisiones?.type,
+              ranges: comissions?.comisiones?.ranges?.map(
+                ({ Fija, Maximo, Minimo, Porcentaje }) => {
+                  return {
+                    Minimo: Minimo,
+                    Maximo: Maximo === -1 ? "" : Maximo,
+                    Porcentaje: parseFloat(Porcentaje * 100),
+                    Fija: parseFloat(Fija),
+                  };
+                }
+              ),
+            },
+          })
+            .then((res) => {
+              console.log(res);
+              if (res?.status) {
+                notify(res?.msg);
+                navigate(-1, { replace: true });
+              } else {
+                notifyError(res?.msg);
+              }
+            })
+            .catch((err) => console.error(err));
+        } else {
+          console.log("create campaign");
+          postComisionesPlanCampanas({
+            nombre_plan_comision_campana:
+              editedComission?.["nombre_plan_comision_campana"],
+            fecha_inicio: editedComission?.["fecha_inicio"],
+            fecha_final: editedComission?.["fecha_final"],
+            fk_planes_comisiones: id_plan_comision_campana,
+            comisiones_campanas: {
+              // ...editedComission,
+              ranges: editedComission?.ranges.map(
+                ({
+                  "Rango minimo": Minimo,
+                  "Rango maximo": Maximo,
+                  "Comision porcentual": Porcentaje,
+                  "Comision fija": Fija,
+                }) => {
+                  return {
+                    Minimo,
+                    Maximo: !Maximo ? -1 : Maximo,
+                    Porcentaje: Porcentaje / 100,
+                    Fija,
+                  };
+                }
+              ),
+            },
+          })
+            .then((res) => {
+              console.log(res);
+              if (res?.status) {
+                notify(res?.msg);
+                navigate(-1, { replace: true });
+              } else {
+                notifyError(res?.msg);
+              }
+            })
+            .catch((err) => console.error(err));
+        }
       }
     },
     [
@@ -223,6 +276,8 @@ const EditComission = () => {
       navigate,
       id_comision_pagada,
       id_comision_cobrada,
+      id_plan_comision,
+      id_plan_comision_campana,
       comissions,
     ]
   );
@@ -243,8 +298,6 @@ const EditComission = () => {
     if (id_plan_comision_campana) {
       [
         // "nombre_plan_comision",
-        "fecha_inicio",
-        "fecha_final",
         "nombre_plan_comision_campana",
       ].forEach((col) => {
         let data = null;
@@ -257,6 +310,15 @@ const EditComission = () => {
       }));
     }
   }, []);
+
+  const onChangeDates = (ev) => {
+    const key = ev.target.name;
+    const value = ev.target.value;
+    setEditedComission((old) => ({
+      ...old,
+      [key]: value,
+    }));
+  };
 
   useEffect(() => {
     if (id_comision_pagada) {
@@ -277,10 +339,21 @@ const EditComission = () => {
   const fetchPlanesComisiones = () => {
     getComisionesPlanesUnique({ id_plan_comision })
       .then((res) => {
-        // console.log("res", res);
+        console.log("res", res);
         setComissions(res?.results?.[0]);
         setEditedComission({
           nombre_plan_comision: res?.results?.[0]?.nombre_plan_comision,
+          type: res?.results[0]?.comisiones?.type,
+          ranges: res?.results?.[0]?.comisiones?.ranges?.map(
+            ({ Fija, Maximo, Minimo, Porcentaje }) => {
+              return {
+                "Rango minimo": Minimo,
+                "Rango maximo": Maximo === -1 ? "" : Maximo,
+                "Comision porcentual": parseFloat(Porcentaje * 100),
+                "Comision fija": parseFloat(Fija),
+              };
+            }
+          ),
         });
       })
       .catch((err) => console.error(err));
@@ -292,12 +365,35 @@ const EditComission = () => {
         console.log("res", res);
         setComissions(res?.results?.[0]);
         setEditedComission({
-          // nombre_plan_comision: res?.results?.[0]?.nombre_plan_comision,
+          nombre_plan_comision: res?.results?.[0]?.nombre_plan_comision,
           nombre_plan_comision_campana:
             res?.results?.[0]?.nombre_plan_comision_campana,
           fecha_inicio: res?.results?.[0]?.fecha_inicio,
           fecha_final: res?.results?.[0]?.fecha_final,
+          type: res?.results[0]?.comisiones?.type
+            ? res?.results[0]?.comisiones?.type
+            : "",
+          ranges:
+            res?.results?.[0]?.comisiones?.ranges?.length > 0
+              ? res?.results?.[0]?.comisiones?.ranges?.map(
+                  ({ Fija, Maximo, Minimo, Porcentaje }) => {
+                    return {
+                      "Rango minimo": Minimo,
+                      "Rango maximo": Maximo === -1 ? "" : Maximo,
+                      "Comision porcentual": parseFloat(Porcentaje * 100),
+                      "Comision fija": parseFloat(Fija),
+                    };
+                  }
+                )
+              : [],
         });
+        if (res?.results?.[0]?.comisiones?.ranges?.length > 0) {
+          console.log("edition");
+          setCampaignStatus(true);
+        } else {
+          console.log("creation");
+          setCampaignStatus(false);
+        }
       })
       .catch((err) => console.error(err));
   };
@@ -352,6 +448,7 @@ const EditComission = () => {
     console.log(comissions);
     if (id_plan_comision) {
       console.log("plans", editedComission);
+      onSubmit(ev);
     }
     if (id_plan_comision_campana) {
       console.log("campana", editedComission);
@@ -366,8 +463,12 @@ const EditComission = () => {
   return (
     <Fragment>
       <h1 className="text-3xl">
+        {id_comision_cobrada && "Editar comisión a cobrar"}
+        {id_comision_pagada && "Editar comisión a pagar"}
         {id_plan_comision && "Editar plan de comisión"}
-        {id_plan_comision_campana && "Crear campaña"}
+        {id_plan_comision_campana && !campaignStatus
+          ? "Crear campaña"
+          : "Editar campaña"}
       </h1>
       <Form onChange={onChangeNewComision} grid>
         {/* <Input
@@ -527,7 +628,7 @@ const EditComission = () => {
         )}
         {id_plan_comision && (
           <>
-            {JSON.stringify(comissions)}
+            {/* {JSON.stringify(comissions)} */}
             {/* {JSON.stringify(editedComission)} */}
             <Input
               id="id_plan_comision"
@@ -573,16 +674,16 @@ const EditComission = () => {
               readOnly
               disabled
             />
-            <ButtonBar className="lg:col-span-2">
+            {/* <ButtonBar className="lg:col-span-2">
               <Button type="submit" onClick={onSubmitComission}>
                 Actualizar comisión
               </Button>
-            </ButtonBar>
+            </ButtonBar> */}
           </>
         )}
         {id_plan_comision_campana && (
           <>
-            {/* {JSON.stringify(comissions)} */}
+            {JSON.stringify(comissions)}
             {/* {JSON.stringify(editedComission)} */}
             <Input
               id="id_plan_comision"
@@ -618,7 +719,17 @@ const EditComission = () => {
               label={"Fecha de inicio"}
               type={"datetime-local"}
               autoComplete="off"
-              value={editedComission?.["fecha_inicio"]}
+              onChange={onChangeDates}
+              min="2022-01-01T00:00"
+              max="2025-01-01T00:00"
+              value={
+                // to ISO string
+                dateIsValid(editedComission?.["fecha_inicio"])
+                  ? new Date(editedComission?.["fecha_inicio"])
+                      .toISOString()
+                      .split(".")[0]
+                  : ""
+              }
             />
             <Input
               id="fecha_final"
@@ -626,13 +737,18 @@ const EditComission = () => {
               label={"Fecha de fin"}
               type={"datetime-local"}
               autoComplete="off"
-              value={editedComission?.["fecha_final"]}
+              onChange={onChangeDates}
+              min="2022-01-01T00:00"
+              max="2025-01-01T00:00"
+              value={
+                // to ISO string
+                dateIsValid(editedComission?.["fecha_final"])
+                  ? new Date(editedComission?.["fecha_final"])
+                      .toISOString()
+                      .split(".")[0]
+                  : ""
+              }
             />
-            <ButtonBar className="lg:col-span-2">
-              <Button type="submit" onClick={onSubmitComission}>
-                Crear campaña
-              </Button>
-            </ButtonBar>
           </>
         )}
       </Form>
@@ -644,23 +760,21 @@ const EditComission = () => {
         Eliminar comisión
       </Button> */}
       <h1 className="text-3xl">Comision</h1>
-      {/* <FormComission
-        outerState={[
-          {
-            type: comissions?.type,
-            ranges: comissions?.comisiones?.map((rango) => {
-              return {
-                ...rango,
-                "Rango minimo": rango.Minimo,
-                "Rango maximo": rango.Maximo,
-                "Comision porcentual": rango.Porcentaje,
-                "Comision fija": rango.Fija,
-              };
-            }),
-          },
-        ]}
+      <FormComission
+        outerState={[editedComission, setEditedComission]}
         onSubmit={onSubmit}
-      ></FormComission> */}
+      >
+        <ButtonBar className="lg:col-span-2">
+          <Button type="submit">
+            {id_comision_cobrada && "Actualizar comisión"}
+            {id_comision_pagada && "Actualizar comisión"}
+            {id_plan_comision && "Actualizar plan de comisión"}
+            {id_plan_comision_campana && !campaignStatus
+              ? "Crear campaña"
+              : "Actualizar campaña"}
+          </Button>
+        </ButtonBar>
+      </FormComission>
     </Fragment>
   );
 };
