@@ -141,9 +141,9 @@ const Inventario = () => {
           datosEscaneados?.["escaneado3"],
         ], //numero_completo
         "true" //inconcistencia-bool
-      ).then((res) => {
-        console.log("res", res);
-        if (res?.response === "Registro exitoso") {
+      ).then((resp) => {
+        console.log("resOK", resp);
+        if (resp?.response === "Registro exitoso") {
           notify("Inventario agregado exitosamente.");
           navigate(`/loteria`);
           setProcesandoTrx(false);
@@ -173,6 +173,7 @@ const Inventario = () => {
         ], //numero_completo
         "false" //inconcistencia-bool
       ).then((res) => {
+        console.log("Resfalse", res);
         if (res?.response === "Registro exitoso") {
           notify("Inconsistencia agregada exitosamente.");
           setHabilitarBtnAgregarInconsistencia(true);
@@ -482,6 +483,7 @@ const Inventario = () => {
                 Guardar inventario
               </Button>
               <Button
+                type="button"
                 disabled={
                   datosEscaneadosValidados["escaneado1Validados"] &&
                   datosEscaneadosValidados["escaneado2Validados"] &&
