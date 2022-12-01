@@ -141,7 +141,18 @@ const Inventario = () => {
           datosEscaneados?.["escaneado3"],
         ], //numero_completo
         "true" //inconcistencia-bool
-      );
+      ).then((res) => {
+        console.log("res", res);
+        if (res?.response === "Registro exitoso") {
+          notify("Inventario agregado exitosamente.");
+          navigate(`/loteria`);
+          setProcesandoTrx(false);
+        } else {
+          notifyError("Error inconsistencia no agregada.");
+          setHabilitarBtnAgregarInconsistencia(false);
+          setProcesandoTrx(false);
+        }
+      });
     },
     [sorteo, datosEscaneados, cantidadBilletes]
   );
