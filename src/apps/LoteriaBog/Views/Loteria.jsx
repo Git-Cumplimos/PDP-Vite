@@ -173,11 +173,11 @@ const Loteria = ({ route }) => {
     }
     SetOpcionesDisponibles([...copy]);
   }, [
-    // setCustomer,
-    // setLoterias,
-    // setNumero,
-    // setSellResponse,
-    // setSerie,
+    setCustomer,
+    setLoterias,
+    setNumero,
+    setSellResponse,
+    setSerie,
     sorteoExtra,
     sorteoExtrafisico,
     sorteoOrdi,

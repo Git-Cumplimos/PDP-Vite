@@ -338,7 +338,7 @@ const ArqueoBilletes = ({ route }) => {
       <Form formDir="col" onSubmit={onSubmit}>
         {userPermissions
           .map(({ id_permission }) => id_permission)
-          .includes(4) ? (
+          .includes(500) ? (
           <>
             <Input
               id="dateInit"
