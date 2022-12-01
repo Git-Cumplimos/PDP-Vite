@@ -13,6 +13,7 @@ import { notifyError } from "../utils/notify";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
+const urlComisiones = `${process.env.REACT_APP_URL_BACK_COMISIONES}/servicio-wallet-comisiones/consulta-wallet-comercio`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
@@ -221,8 +222,27 @@ const reducerAuth = (userState, action) => {
         .then((quota) => {
           const tempRole = { quota: 0, comision: 0 };
           tempRole.quota = quota["cupo disponible"];
-          tempRole.comision = quota["comisiones"];
-          dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } });
+          fetchData(
+            urlComisiones,
+            "POST",
+            {},
+            {
+              id_comercio: id_comercio,
+              id_terminal: id_dispositivo,
+            }
+          )
+            .then((comision) => {
+              if (!comision.status)
+                dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } });
+              let comisionTemp = comision.obj.results;
+              tempRole.comision = comisionTemp[0]["saldo"] ?? 0;
+              dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } });
+            })
+            .catch(() =>
+              dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } })
+            );
+          // tempRole.comision = quota["comisiones"];
+          // dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } });
         })
         .catch(() =>
           dispatch?.({
@@ -433,11 +453,7 @@ export const useProvideAuth = () => {
 
   const forgotPasswordSubmit = useCallback(async (email, code, confirmPass) => {
     try {
-      await Auth.forgotPasswordSubmit(
-        email,
-        code,
-        confirmPass
-      );
+      await Auth.forgotPasswordSubmit(email, code, confirmPass);
     } catch (error) {
       throw error;
     }

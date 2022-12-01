@@ -145,6 +145,11 @@ const AdminLayout = () => {
               Saldo cupo {saldoDisponible || "$0.00"}
             </div>
           </div>
+          <div className={usrData}>
+            <div className={comision}>
+              Comisiones {comisionTotal || "$0.00"}
+            </div>
+          </div>
         </div>
         <HNavbar links={urls} isText />
       </header>
