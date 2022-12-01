@@ -328,7 +328,7 @@ const Inventario = () => {
               <div>
                 <InputX
                   label="Escanee el código de barras"
-                  type="text"
+                  type="search"
                   value={datosEscaneados["escaneado1"]}
                   onInput={(e) => {
                     const num = e.target.value || "";
