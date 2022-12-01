@@ -119,7 +119,7 @@ const CargaArchivos = ({ route }) => {
                         }
                       }
                     });
-                  }, 3000);
+                  }, 5000);
                 } else {
                   notifyError("No fue posible conectar con el Bucket");
                 }

@@ -208,22 +208,22 @@ export const useProvideLoteria = () => {
 
 			//Consulta codigos de oficina y sucursal por lotería
 			if (roleInfo?.id_comercio !== undefined) {
-        try{
-				consulta_codigos_oficina(nit).then((res) => {
-					// console.log("repueta", res);
-					if ("msg" in res) {
-						setCodigosOficina({
-							cod_oficina_lot: "PPVIR",
-							cod_sucursal_lot: "00",
-						});
-					} else {
-						setCodigosOficina(res);
-					}
-				});
-        } catch (err) {
-          notifyError("Error")
-          console.error(err);
-        }
+				try {
+					consulta_codigos_oficina(nit).then((res) => {
+						// console.log("repueta", res);
+						if ("msg" in res) {
+							setCodigosOficina({
+								cod_oficina_lot: "PPVIR",
+								cod_sucursal_lot: "00",
+							});
+						} else {
+							setCodigosOficina(res);
+						}
+					});
+				} catch (err) {
+					notifyError("Error");
+					console.error(err);
+				}
 			}
 		}
 	}, [pathname, roleInfo]);
@@ -703,20 +703,23 @@ export const useProvideLoteria = () => {
 		[codigosOficina]
 	);
 
-	const consultaInventarioReporte = useCallback(async () => {
-		try {
-			const data = {
-				num_sorteo: "",
-				num_loteria: codigos_lot,
-			};
-			// console.log("data inventario reporte", data);
-			const res = await fetchData(urls.consultaInventarioReporte, "POST", {}, data);
-			// console.log("respuesta inventario reporte", res);
-			return res;
-		} catch (err) {
-			console.error(err);
-		}
-	}, [codigos_lot]);
+	const consultaInventarioReporte = useCallback(
+		async (num_sorteo) => {
+			try {
+				const data = {
+					num_sorteo: num_sorteo,
+					num_loteria: codigos_lot,
+				};
+				// console.log("data inventario reporte", data);
+				const res = await fetchData(urls.consultaInventarioReporte, "POST", {}, data);
+				// console.log("respuesta inventario reporte", res);
+				return res;
+			} catch (err) {
+				console.error(err);
+			}
+		},
+		[codigos_lot]
+	);
 
 	const registrarInventario = useCallback(
 		async (numSorteo, numLoteria, comentario, numero_total, numero_completo, inconcistencia) => {

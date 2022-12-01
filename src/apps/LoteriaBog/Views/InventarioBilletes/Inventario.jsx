@@ -156,9 +156,9 @@ const Inventario = () => {
         `${mensajeInventarioInvalido},${mensajeInventarioInvalido2}, ${mensajeCausal}`, // comentario
         cantidadBilletes, //numero_total
         [
-          datosEscaneados?.["escaneado1"],
-          datosEscaneados?.["escaneado2"],
-          datosEscaneados?.["escaneado3"],
+          datosEscaneados?.["escaneado1"] /* ?? "" */,
+          datosEscaneados?.["escaneado2"] /* ?? "" */,
+          datosEscaneados?.["escaneado3"] /* ?? "" */,
         ], //numero_completo
         "false" //inconcistencia-bool
       ).then((res) => {
@@ -196,6 +196,8 @@ const Inventario = () => {
       if (validarNum[0] === "]") {
         // console.log(validarNum.replace("]C1", ""));
         return validarNum.replace("]C1", "");
+      } else {
+        return validarNum;
       }
     },
     [datosEscaneados]
@@ -326,7 +328,7 @@ const Inventario = () => {
               <div>
                 <InputX
                   label="Escanee el código de barras"
-                  type="text"
+                  type="search"
                   value={datosEscaneados["escaneado1"]}
                   onInput={(e) => {
                     const num = e.target.value || "";

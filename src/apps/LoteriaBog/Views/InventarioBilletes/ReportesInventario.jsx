@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { notifyError } from "../../../../utils/notify";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import Input from "../../../../components/Base/Input";
 
 const ReporteInventario = ({ subRoutes, route: { label } }) => {
 	const initReporte = [
@@ -18,17 +19,18 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 			comentario: "",
 		},
 	];
-	const { consultaInventarioReporte } = useLoteria();
+
 	const [reporteInventario, setReporteInventario] = useState(initReporte);
+	const [numeroSorteo, setNumeroSorteo] = useState("");
 	const [showTabla, setShowTabla] = useState(false);
-
+	const { consultaInventarioReporte } = useLoteria();
 	useEffect(() => {
-		loadDocument();
+		loadDocument(numeroSorteo);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [numeroSorteo]);
 
-	const loadDocument = async () => {
-		consultaInventarioReporte().then((res) => {
+	const loadDocument = async (numeroSorteo) => {
+		consultaInventarioReporte(numeroSorteo).then((res) => {
 			if (!res?.status) {
 				notifyError("error");
 			} else {
@@ -38,6 +40,7 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 			}
 		});
 	};
+
 	return (
 		<div>
 			{showTabla ? (
@@ -46,7 +49,8 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 					headers={[
 						"Sorteo",
 						"Loteria",
-						"Estado",
+						"cod_distribuidor",
+						"cod_sucursal",
 						"Fecha Inicio",
 						"Inventario",
 						"Total Asignado",
@@ -60,7 +64,8 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 							({
 								num_sorteo,
 								num_loteria,
-								estado_sorteo,
+								cod_distribuidor,
+								cod_sucursal,
 								fecha_creacion,
 								inventario,
 								total_asignaciones,
@@ -71,7 +76,8 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 								return {
 									num_sorteo,
 									num_loteria,
-									estado_sorteo,
+									cod_distribuidor,
+									cod_sucursal,
 									fecha_creacion,
 									inventario,
 									total_asignaciones,
@@ -83,7 +89,15 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 						)
 					}
 					// onSelectRow={console.log("a")}
-				/>
+				>
+					<Input
+						id="numSorteo"
+						label="Numero de sorte: "
+						type="text"
+						value={numeroSorteo}
+						onInput={(e) => setNumeroSorteo(e.target.value)}
+					/>
+				</TableEnterprise>
 			) : (
 				""
 			)}
