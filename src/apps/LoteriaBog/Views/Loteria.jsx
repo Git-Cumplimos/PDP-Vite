@@ -141,6 +141,7 @@ const Loteria = ({ route }) => {
 
   useEffect(() => {
     setSellResponse(null);
+    setDatosEscaneados("")
     setNumero("");
     setSerie("");
     setCustomer({ fracciones: "", phone: "", doc_id: "" });
@@ -210,7 +211,6 @@ const Loteria = ({ route }) => {
     setSellResponse,
     sorteo,
   ]);
-  console.log(loadConsulta, "WWWWWWWWWWWWWWWWW")
   return (
     <>
         <SimpleLoading show={loadConsulta}></SimpleLoading>
@@ -234,7 +234,7 @@ const Loteria = ({ route }) => {
           const num = e.target.value || "";
           setDatosEscaneados(validarEntradaScanner(num));
           if (num?.length === 20) {       
-            searchLoteria(sorteo, String(num.substr(-9, 4)), String(num.substr(-5, 3)), 1)
+            searchLoteriafisica(sorteo, String(num.substr(-9, 4)), String(num.substr(-5, 3)), 1)
             .then((max) => {
               if (max !== undefined) {
                 setMaxPages(Math.ceil(max / 10));
@@ -377,6 +377,7 @@ const Loteria = ({ route }) => {
               }
             )}
             onSelectRow={(e, index) => {
+              console.log(loterias[index])
               setSelected(loterias[index]);
               setShowModal(true);
             }}

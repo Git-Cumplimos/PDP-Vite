@@ -242,17 +242,15 @@ export const useProvideLoteria = () => {
 	}, [codigos_lot]);
 
 	const searchLoteria = useCallback(async (sorteo, num, ser, page) => {
-    setLoadConsulta(true)
 		let fisico = false;
 		const sort = sorteo.split("-");
 		if (sort[1] === "true") {
 			fisico = true;
 		}
-		if (num === "" && ser === "") {
-      setLoadConsulta(false)
-      return};
+		if (num === "" && ser === "") return;
 
 		try {
+      setLoadConsulta(true)
 			const { Resultado: res, Num_Datos } = await fetchData(
 				urls.ordinario,
 				"GET",
@@ -279,18 +277,17 @@ export const useProvideLoteria = () => {
 
 	const searchLoteriafisica = useCallback(
 		async (sorteo, num, ser, page) => {
-      setLoadConsulta(true)
+      
 			let fisico = false;
 			const sort = sorteo.split("-");
 			if (sort[1] === "true") {
 				fisico = true;
 			}
 
-			if (num === "" && ser === "") {
-        setLoadConsulta(false)
-        return};
+			if (num === "" && ser === "") return;
 
 			try {
+        setLoadConsulta(true)
 				const { Resultado: res, Num_Datos } = await fetchData(
 					urls.ordinariofisico,
 					"GET",
