@@ -37,10 +37,10 @@ const MainAsignaciones = () => {
       {!id_comision_pagada ? (
         <Fragment>
           <ButtonBar>
-            <Button onClick={() => navigate("crear")}>Crear comision</Button>
-            <Button onClick={generateReport}>
+            <Button onClick={() => navigate("crear")}>Crear asignación de comisión</Button>
+            {/* <Button onClick={generateReport}>
               Generar reporte de comisiones
-            </Button>
+            </Button> */}
           </ButtonBar>
           <SearchComissions comissionFace="assigns" />
         </Fragment>

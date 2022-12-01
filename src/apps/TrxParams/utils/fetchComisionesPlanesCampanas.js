@@ -41,6 +41,24 @@ export const getComisionesPlanesCampanas = async () => {
     throw err;
   }
 };
+export const getAssingsCommissions = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-asignacion-comisiones/consultar-asignacion-comision`,
+      "GET",
+      obj,
+      {}
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
 
 export const getComisionesPlanesCampanaUnique = async ({
   id_plan_comision_campana,
