@@ -8,6 +8,7 @@ import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useLoteria } from "../../utils/LoteriaHooks";
+import { useNavigate } from "react-router-dom";
 
 const url_BorrarBilletes = `${process.env.REACT_APP_URL_LOTERIAS}/eliminar_asignacion`;
 const url_sorteos = `${process.env.REACT_APP_URL_LOTERIAS}/num_sorteo`;
@@ -19,6 +20,9 @@ const Borrado_billetes = ({ route }) => {
   const [optionsDisponibles, setOptionsDisponibles] = useState([]);
   const [num_sorteo, setNum_sorteo] = useState("");
   const { codigos_lot, setCodigos_lot } = useLoteria();
+
+  const navigate = useNavigate();
+  
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -132,7 +136,7 @@ const Borrado_billetes = ({ route }) => {
             label="Distribuidor"
             type="text"
             minLength="5"
-            maxLength="5"
+            maxLength="6"
             required
             autoComplete="false"
             value={cod_distribuidor}
