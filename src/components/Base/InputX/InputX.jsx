@@ -131,7 +131,7 @@ const InputX = ({
       {type === "file" ? (
         <>
           <h1>O</h1>
-          <h1>Arrasta los archivos</h1>
+          <h1>Arrastar los archivos</h1>
           {!disabled ? (
             <div
               ref={dropZoneRef}
@@ -178,7 +178,7 @@ const InputX = ({
       {type === "file" ? (
         <>
           <h1>O</h1>
-          <h1>Arrasta los archivos</h1>
+          <h1>Arrastar los archivos</h1>
           {!disabled ? (
             <div
               ref={dropZoneRef}

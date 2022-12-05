@@ -29,6 +29,8 @@ const Pines = () => {
       ...pines.map(({ desc, op }) => {
         return {
           "Nombre del Pin": desc,
+          "Categoría": "Pin de Contenido",
+          "Categoría": op == "em" || op == "cb" || op == "hv" ? "Pin de Servicio" : "Pin de Contenido"
         };
       }),
     ];
@@ -72,7 +74,6 @@ const Pines = () => {
   }, [datosTrans, page, limit]);
 
   const fecthTablaPines = () => {
-    console.log('pines', datosTrans.pin)
     postConsultaPines({
       idcomercio: roleInfo?.["id_comercio"],
       page,
@@ -94,11 +95,10 @@ const Pines = () => {
       <TableEnterprise
         title="Tabla pines"
         maxPage={maxPages}
-        headers={["Nombre del Pin"]}
+        headers={["Nombre del Pin", "Categoría"]}
         data={tablePines}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
-        // onChange={onChange}
       >
         <Input
           id="searchPin"
@@ -113,7 +113,7 @@ const Pines = () => {
               return { ...old, pin: e.target.value };
             });
           }}
-        />
+        />        
       </TableEnterprise>
     </>
   );

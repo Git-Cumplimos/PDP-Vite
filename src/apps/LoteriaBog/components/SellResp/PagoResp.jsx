@@ -162,7 +162,6 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
   useEffect(() => {
     infoTicket(pagoresponse["id_trx"], 13, ticket);
   }, [infoTicket, pagoresponse, ticket]);
-  console.log(pagoresponse);
   //////////////////////////////////////////
   return "msg" in pagoresponse ? (
     <div className="flex flex-col justify-center items-center">

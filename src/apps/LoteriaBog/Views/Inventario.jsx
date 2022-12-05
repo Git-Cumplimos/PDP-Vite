@@ -1,7 +1,7 @@
 import HNavbar from "../../../components/Base/HNavbar";
 
-const Descargas = ({ subRoutes, route: { label } }) => {
+const Inventario = ({ subRoutes, route: { label } }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default Descargas;
+export default Inventario;

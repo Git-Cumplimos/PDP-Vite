@@ -1,0 +1,43 @@
+.contenedorPrincipal {
+    display: grid;
+    grid-template-rows: 10px 10px 10px 10px;
+    grid-template-columns: 1fr
+        /* 0.5fr  */
+        1fr;
+    grid-gap: 50px;
+}
+
+.contenedorBotones {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.titulosSecundarios {
+    margin-bottom: 0.5rem;
+    gap: 1rem;
+    font-size: large;
+}
+
+.textTarea {
+    display: flex;
+    justify-content: center;
+    width: 80%;
+    display: grid;
+    width: 100%;
+    border-width: 1px;
+    border-color: #6B7280;
+    border-style: solid;
+    gap: 1rem;
+}
+
+.autorizacionMensajes {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.contenedorImagen {
+    display: flex;
+    justify-content: center;
+}

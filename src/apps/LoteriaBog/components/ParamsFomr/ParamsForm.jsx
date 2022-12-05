@@ -20,10 +20,10 @@ const url_cambioParams = `${process.env.REACT_APP_URL_LOTERIAS}/cambio_params`;
 const ParamsForm = ({ closeModal, params, setParams }) => {
   const cambio_params = useCallback(async (uvt, max_pago) => {
     const query = { params: `{"uvt":${uvt},"max_pago":${max_pago}}` };
-    console.log(query);
+    // console.log(query);
     try {
       const res = await fetchData(url_cambioParams, "GET", query);
-      console.log(res);
+      // console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -43,7 +43,8 @@ const ParamsForm = ({ closeModal, params, setParams }) => {
         notifyError(res.msg);
         setDisabledBtns(true);
       } else {
-        console.log(res);
+        notify("Modificado");
+        // console.log(res);
       }
     });
     closeModal();
@@ -72,14 +73,14 @@ const ParamsForm = ({ closeModal, params, setParams }) => {
     [setUvt, uvt]
   );
 
-  console.log(max_pago, uvt);
+  // console.log(max_pago, uvt);
   return (
     <>
       <div className="flex flex-col justify-center items-center mx-auto container">
         <Form onSubmit={onSubmit} grid>
           <div className="flex flex-col justify-center items-center mx-auto container grid">
             <h1 className="text-3xl font-semibold my-4">
-              ¿Desea cambiar algún parametro?
+              ¿Desea cambiar algún parámetro?
             </h1>
             <h1 className="text-2xl font-semibold">UVT</h1>
             <Input
@@ -100,7 +101,7 @@ const ParamsForm = ({ closeModal, params, setParams }) => {
               onInput={onMoneyChange2}
               required="true"
             />
-            <h1 className="text-2xl font-semibold">Valor maximo de pago</h1>
+            <h1 className="text-2xl font-semibold">Valor máximo de pago</h1>
             <Input
               id="max_pago"
               label="Valor actual"
