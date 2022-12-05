@@ -44,12 +44,14 @@ const TreeView = ({ tree = {}, onClickLastChild = (info, ev) => {} }) =>
       key,
       info?.nombre ?? "",
       formatMoney.format(info?.monto) ?? "No data",
-      info?.status === true
-        ? "Transaccion exitosa"
-        : info?.status === false
-        ? "Transaccion fallida"
-        : "",
-      info?.date_trx ?? "",
+      "status" in info
+        ? info?.status === true
+          ? "Transaccion exitosa"
+          : info?.status === false
+          ? "Transaccion fallida"
+          : ""
+        : "No. txns",
+      info?.date_trx ?? info?.total_trxs ?? "",
     ];
 
     if (info?.nodes) {
@@ -157,14 +159,14 @@ const ReporteTrx = () => {
         <Accordion
           titulo={
             <GridRow
-              cols={["", "No. Transacciones", totalTransacciones, "", ""]}
+              cols={["", "Total Valor", "No. Transacciones", "", ""]}
             />
           }
         />
         <Accordion
           titulo={
             <GridRow
-              cols={["", "Total", formatMoney.format(montoTotal), "", ""]}
+              cols={["", formatMoney.format(montoTotal), totalTransacciones, "", ""]}
             />
           }
         />
