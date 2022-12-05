@@ -85,6 +85,7 @@ const ReporteTrx = () => {
 
   const [trxTree, setTrxTree] = useState({});
   const [montoTotal, setMontoTotal] = useState(0.0);
+  const [totalTransacciones, setTotalTransacciones] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [summaryTrx, setSummaryTrx] = useState(null);
@@ -114,6 +115,7 @@ const ReporteTrx = () => {
         .then((res) => {
           setTrxTree(res?.obj?.results);
           setMontoTotal(res?.obj?.monto);
+          setTotalTransacciones(res?.obj?.total_trxs);
         })
         .catch((error) => {
           if (error?.cause === "custom") {
@@ -152,6 +154,13 @@ const ReporteTrx = () => {
           />
           <ButtonBar />
         </Form>
+        <Accordion
+          titulo={
+            <GridRow
+              cols={["", "No. Transacciones", totalTransacciones, "", ""]}
+            />
+          }
+        />
         <Accordion
           titulo={
             <GridRow
