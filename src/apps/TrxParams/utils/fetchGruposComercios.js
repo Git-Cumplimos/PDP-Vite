@@ -38,16 +38,15 @@ export const postGruposComercios = async (bodyObj) => {
     throw err;
   }
 };
-
-export const putComisionesPagar = async (argsObj, bodyObj) => {
-  if (!argsObj || !bodyObj) {
-    return "Sin datos de url ni body";
+export const putGruposComercios = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlComisiones}/comision/modificar`,
+      `${urlComisiones}/servicio-grupo-comercios/actualizar-grupo-comercios?pk_tbl_grupo_comercios`,
       "PUT",
-      argsObj,
+      {},
       bodyObj
     );
     if (!res?.status) {

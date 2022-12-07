@@ -14,6 +14,7 @@ import { notify, notifyError } from "../../../utils/notify";
 import {
   fetchGruposComercios,
   postGruposComercios,
+  putGruposComercios,
 } from "../utils/fetchGruposComercios";
 
 const GruposComercios = () => {
@@ -28,6 +29,7 @@ const GruposComercios = () => {
     pk_tbl_grupo_comercios: "",
     nombre_grupo_comercios: "",
     comercios: [],
+    comerciosOriginal: [],
     id_comercio: "",
     comercios_agregar: [],
     comercios_eliminar: [],
@@ -43,6 +45,7 @@ const GruposComercios = () => {
       pk_tbl_grupo_comercios: "",
       nombre_grupo_comercios: "",
       comercios: [],
+      comerciosOriginal: [],
       id_comercio: "",
       comercios_agregar: [],
       comercios_eliminar: [],
@@ -55,6 +58,7 @@ const GruposComercios = () => {
       pk_tbl_grupo_comercios: "",
       nombre_grupo_comercios: "",
       comercios: [],
+      comerciosOriginal: [],
       id_comercio: "",
       comercios_agregar: [],
       comercios_eliminar: [],
@@ -82,6 +86,7 @@ const GruposComercios = () => {
         ...old,
         pk_tbl_grupo_comercios: gruposComercios[i]?.["pk_tbl_grupo_comercios"],
         nombre_grupo_comercios: gruposComercios[i]?.["nombre_grupo_comercios"],
+        comerciosOriginal: gruposComercios[i]?.["comercios"],
         comercios: gruposComercios[i]?.["comercios"],
       }));
     },
@@ -92,21 +97,30 @@ const GruposComercios = () => {
       ev.preventDefault();
       setIsUploading(true);
       if (selectedGruposComercios?.pk_tbl_grupo_comercios !== "") {
-        //   putModificarTipoNivelComercio(
-        //     selectedTipoNivelComercio?.pkTipoNivel,
-        //     {
-        //       descripcion: selectedTipoNivelComercio?.descripcion,
-        //     }
-        //   )
-        //     .then((res) => {
-        //       if (res?.status) {
-        //         notify(res?.msg);
-        //         handleClose();
-        //       } else {
-        //         notifyError(res?.msg);
-        //       }
-        //     })
-        //     .catch((err) => console.error(err));
+        putGruposComercios({
+          pk_tbl_grupo_comercios:
+            selectedGruposComercios?.pk_tbl_grupo_comercios,
+          nombre_grupo_comercios:
+            selectedGruposComercios?.nombre_grupo_comercios,
+          comercios_agregar: selectedGruposComercios?.comercios_agregar,
+          comercios_eliminar: selectedGruposComercios?.comercios_eliminar,
+        })
+          .then((res) => {
+            if (res?.status) {
+              notify(res?.msg);
+              handleClose();
+            } else {
+              notifyError(res?.msg);
+              handleClose();
+            }
+            setIsUploading(false);
+          })
+          .catch((err) => {
+            notifyError(err);
+            handleClose();
+            setIsUploading(false);
+            console.error(err);
+          });
       } else {
         postGruposComercios({
           nombre_grupo_comercios:
@@ -144,7 +158,13 @@ const GruposComercios = () => {
       );
     if (datosBusqueda.nombre_grupo_comercios)
       obj["nombre_grupo_comercios"] = datosBusqueda.nombre_grupo_comercios;
-    fetchGruposComercios({ ...obj, page, limit })
+    fetchGruposComercios({
+      ...obj,
+      page,
+      limit,
+      sortBy: "pk_tbl_grupo_comercios",
+      sortDir: "DESC",
+    })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
         setGruposComercios(autoArr?.results ?? []);
@@ -154,23 +174,46 @@ const GruposComercios = () => {
   const onSelectComercioDelete = useCallback(
     (e, i) => {
       e.preventDefault();
-      console.log(selectedGruposComercios.comercios[i]);
-      const fk_comercio = selectedGruposComercios.comercios[i].fk_comercio
+      const fk_comercio = selectedGruposComercios.comercios[i].fk_comercio;
+      const obj = { ...selectedGruposComercios };
       if (
-        !selectedGruposComercios?.comercios?.find(
-          (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
-        ) &&
-        !selectedGruposComercios?.comercios_agregar?.find(
-          (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
+        selectedGruposComercios?.comercios_agregar?.find(
+          (a) => a?.fk_comercio === fk_comercio
+        )
+      ) {
+        const b = obj["comercios_agregar"].filter(
+          (a) => a?.fk_comercio !== fk_comercio
+        );
+        obj["comercios_agregar"] = b;
+      }
+      if (
+        selectedGruposComercios?.comerciosOriginal?.find(
+          (a) => a?.fk_comercio === fk_comercio
         ) &&
         !selectedGruposComercios?.comercios_eliminar?.find(
-          (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
-        ) &&
-        selectedGruposComercios["id_comercio"] !== ""
-      ){}
-      // let temp = [...idComercios];
-      // temp?.splice(i, 1);
-      // setIdComercios(temp);
+          (a) => a?.fk_comercio === fk_comercio
+        )
+      ) {
+        obj["comercios_eliminar"] = [
+          ...obj["comercios_eliminar"],
+          {
+            fk_comercio: fk_comercio,
+            fk_tbl_grupo_comercios:
+              selectedGruposComercios["pk_tbl_grupo_comercios"],
+          },
+        ];
+      }
+
+      const c = obj["comercios"].filter((a) => a?.fk_comercio !== fk_comercio);
+      obj["comercios"] = c;
+      setSelectedGruposComercios((old) => {
+        return {
+          ...old,
+          comercios_eliminar: obj["comercios_eliminar"],
+          comercios_agregar: obj["comercios_agregar"],
+          comercios: obj["comercios"],
+        };
+      });
     },
     [selectedGruposComercios]
   );
@@ -184,20 +227,33 @@ const GruposComercios = () => {
         !selectedGruposComercios?.comercios_agregar?.find(
           (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
         ) &&
-        !selectedGruposComercios?.comercios_eliminar?.find(
-          (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
-        ) &&
         selectedGruposComercios["id_comercio"] !== ""
       ) {
         const obj = { ...selectedGruposComercios };
-        obj["comercios_agregar"] = [
-          ...obj["comercios_agregar"],
-          {
-            fk_comercio: selectedGruposComercios["id_comercio"],
-            fk_tbl_grupo_comercios:
-              selectedGruposComercios["pk_tbl_grupo_comercios"],
-          },
-        ];
+        if (
+          !selectedGruposComercios?.comerciosOriginal?.find(
+            (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
+          )
+        ) {
+          obj["comercios_agregar"] = [
+            ...obj["comercios_agregar"],
+            {
+              fk_comercio: selectedGruposComercios["id_comercio"],
+              fk_tbl_grupo_comercios:
+                selectedGruposComercios["pk_tbl_grupo_comercios"],
+            },
+          ];
+        }
+        if (
+          selectedGruposComercios?.comercios_eliminar?.find(
+            (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
+          )
+        ) {
+          const b = obj["comercios_eliminar"].filter(
+            (a) => a?.fk_comercio !== selectedGruposComercios["id_comercio"]
+          );
+          obj["comercios_eliminar"] = b;
+        }
         obj["comercios"] = [
           ...obj["comercios"],
           { fk_comercio: selectedGruposComercios["id_comercio"] },
@@ -206,8 +262,10 @@ const GruposComercios = () => {
         setSelectedGruposComercios((old) => {
           return {
             ...old,
+            comercios_eliminar: obj["comercios_eliminar"],
             comercios_agregar: obj["comercios_agregar"],
             comercios: obj["comercios"],
+            id_comercio: "",
           };
         });
       }
@@ -218,12 +276,12 @@ const GruposComercios = () => {
     <Fragment>
       <SimpleLoading show={isUploading} />
       <ButtonBar>
-        <Button type="submit" onClick={handleShowModal}>
+        <Button type='submit' onClick={handleShowModal}>
           Crear grupo de comercios
         </Button>
       </ButtonBar>
       <TableEnterprise
-        title="Grupos de comercios"
+        title='Grupos de comercios'
         maxPage={maxPages}
         headers={["Id", "Nombre grupo", "Cantidad comercios"]}
         data={tableGruposComercios}
@@ -232,12 +290,12 @@ const GruposComercios = () => {
         // onChange={onChange}
       >
         <Input
-          id="pk_tbl_grupo_comercios"
-          label="Id grupo comercios"
-          type="text"
-          name="pk_tbl_grupo_comercios"
-          minLength="1"
-          maxLength="10"
+          id='pk_tbl_grupo_comercios'
+          label='Id grupo comercios'
+          type='text'
+          name='pk_tbl_grupo_comercios'
+          minLength='1'
+          maxLength='10'
           // required
           value={datosBusqueda.pk_tbl_grupo_comercios}
           onInput={(e) => {
@@ -247,23 +305,21 @@ const GruposComercios = () => {
                 return { ...old, pk_tbl_grupo_comercios: num };
               });
             }
-          }}
-        ></Input>
+          }}></Input>
         <Input
-          id="nombre_grupo_comercios"
-          label="Nombre grupo comercios"
-          type="text"
-          name="nombre_grupo_comercios"
-          minLength="1"
-          maxLength="10"
+          id='nombre_grupo_comercios'
+          label='Nombre grupo comercios'
+          type='text'
+          name='nombre_grupo_comercios'
+          minLength='1'
+          maxLength='10'
           // required
           value={datosBusqueda.nombre_grupo_comercios}
           onInput={(e) => {
             setDatosBusqueda((old) => {
               return { ...old, nombre_grupo_comercios: e.target.value };
             });
-          }}
-        ></Input>
+          }}></Input>
       </TableEnterprise>
       {/* {Array.isArray(tableConfiguracionComercios) &&
       tableConfiguracionComercios.length > 0 ? (
@@ -277,18 +333,18 @@ const GruposComercios = () => {
       )} */}
 
       <Modal show={showModal} handleClose={handleClose}>
-        <h1 className="text-3xl text-center">
+        <h1 className='text-3xl text-center'>
           {selectedGruposComercios?.pk_tbl_grupo_comercios !== ""
             ? "Actualizar grupo comercios"
             : "Crear grupo comercios"}
         </h1>
         <Form onSubmit={onSubmit} grid>
           <Input
-            id="nombre_grupo_comercios"
-            name="nombre_grupo_comercios"
-            label="Nombre grupo de comercios"
-            type="text"
-            autoComplete="off"
+            id='nombre_grupo_comercios'
+            name='nombre_grupo_comercios'
+            label='Nombre grupo de comercios'
+            type='text'
+            autoComplete='off'
             value={selectedGruposComercios.nombre_grupo_comercios}
             onInput={(e) =>
               setSelectedGruposComercios((old) => {
@@ -299,11 +355,11 @@ const GruposComercios = () => {
           />
           {selectedGruposComercios?.pk_tbl_grupo_comercios !== "" && (
             <Input
-              id="id_comercio"
-              name="id_comercio"
+              id='id_comercio'
+              name='id_comercio'
               label={"Id comercio"}
-              type="number"
-              autoComplete="off"
+              type='number'
+              autoComplete='off'
               value={selectedGruposComercios?.id_comercio}
               onInput={(e) => {
                 if (!isNaN(e.target.value)) {
@@ -325,15 +381,14 @@ const GruposComercios = () => {
                     color: "white",
                     borderRadius: "5px",
                   }}
-                  onClick={addComercio}
-                >
+                  onClick={addComercio}>
                   Agregar
                 </button>
               }
             />
           )}
           {selectedGruposComercios?.comercios?.length > 0 && (
-            <Fieldset legend="Comercios asociados" className="lg:col-span-2">
+            <Fieldset legend='Comercios asociados'>
               <TagsAlongSide
                 data={selectedGruposComercios?.comercios.map(
                   (it) => it.fk_comercio
@@ -343,10 +398,10 @@ const GruposComercios = () => {
             </Fieldset>
           )}
           <ButtonBar>
-            <Button type="button" onClick={handleClose}>
+            <Button type='button' onClick={handleClose}>
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button type='submit'>
               {selectedGruposComercios?.pk_tbl_grupo_comercios !== ""
                 ? "Actualizar grupo comercios"
                 : "Crear grupo comercios"}

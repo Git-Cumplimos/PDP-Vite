@@ -19,13 +19,13 @@ export const fetchGruposConvenios = async (obj) => {
     throw err;
   }
 };
-export const postComisionesPagar = async (bodyObj) => {
+export const postGruposConvenios = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlComisiones}/comision/crear`,
+      `${urlComisiones}/servicio-grupo-convenios/crear-grupo-convenios`,
       "POST",
       {},
       bodyObj
@@ -38,16 +38,15 @@ export const postComisionesPagar = async (bodyObj) => {
     throw err;
   }
 };
-
-export const putComisionesPagar = async (argsObj, bodyObj) => {
-  if (!argsObj || !bodyObj) {
-    return "Sin datos de url ni body";
+export const putGruposConvenios = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlComisiones}/comision/modificar`,
+      `${urlComisiones}/servicio-grupo-convenios/actualizar-grupo-convenios?pk_tbl_grupo_convenios`,
       "PUT",
-      argsObj,
+      {},
       bodyObj
     );
     if (!res?.status) {
