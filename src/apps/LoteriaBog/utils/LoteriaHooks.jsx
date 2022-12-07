@@ -716,14 +716,16 @@ export const useProvideLoteria = () => {
 	);
 
 	const consultaInventarioReporte = useCallback(
-		async (num_sorteo) => {
+		async (num_sorteo,pageData) => {
 			try {
+        console.log(codigos_lot)
 				const data = {
+          ...pageData,
 					num_sorteo: num_sorteo,
 					num_loteria: codigos_lot,
 				};
 				// console.log("data inventario reporte", data);
-				const res = await fetchData(urls.consultaInventarioReporte, "POST", {}, data);
+				const res = await fetchData(urls.consultaInventarioReporte, "POST",{},data);
 				// console.log("respuesta inventario reporte", res);
 				return res;
 			} catch (err) {

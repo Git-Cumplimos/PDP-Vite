@@ -19,22 +19,24 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 			comentario: "",
 		},
 	];
-
+	const [pageData, setPageData] = useState({ page: 1, limit: 10 });
 	const [reporteInventario, setReporteInventario] = useState(initReporte);
 	const [numeroSorteo, setNumeroSorteo] = useState("");
 	const [showTabla, setShowTabla] = useState(false);
+	const [maxPages, setMaxPages] = useState(1)
 	const { consultaInventarioReporte } = useLoteria();
 	useEffect(() => {
-		loadDocument(numeroSorteo);
+		loadDocument(numeroSorteo, pageData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [numeroSorteo]);
+	}, [numeroSorteo, pageData]);
 
-	const loadDocument = async (numeroSorteo) => {
-		consultaInventarioReporte(numeroSorteo).then((res) => {
+	const loadDocument = async (numeroSorteo, pageData) => {
+		consultaInventarioReporte(numeroSorteo, pageData).then((res) => {
 			if (!res?.status) {
 				notifyError("error");
 			} else {
 				setReporteInventario(res?.Respuesta);
+				setMaxPages(res?.maxPage);
 				setShowTabla(true);
 				// console.log("reportese _ a", reporteInventario);
 			}
@@ -46,6 +48,7 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 			{showTabla ? (
 				<TableEnterprise
 					title="Reporte Inventario"
+					maxPage={maxPages}
 					headers={[
 						"Sorteo",
 						"Loteria",
@@ -97,6 +100,7 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 						value={numeroSorteo}
 						onInput={(e) => setNumeroSorteo(e.target.value)}
 					/>
+					onSetPageData={setPageData}
 				</TableEnterprise>
 			) : (
 				""

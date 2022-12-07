@@ -7,12 +7,21 @@ const CryptoJS = require('crypto-js');
 //  * @returns {*} A base64 string
 //  */
 
+// function encryptAES(data, key) {
+
+//     key = CryptoJS.enc.Hex.parse(key);
+//     const encrypted = CryptoJS.TripleDES.encrypt(data, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.NoPadding }).toString();
+//     console.log(encrypted)
+//     return encrypted;
+// }
+
 function encryptAES(data, key) {
 
     key = CryptoJS.enc.Hex.parse(key);
+    data = CryptoJS.enc.Hex.parse(data);
     const encrypted = CryptoJS.TripleDES.encrypt(data, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.NoPadding }).toString();
-    console.log(encrypted)
-    return encrypted;
+    console.log(Buffer.from(encrypted, 'base64').toString('hex'))
+    return Buffer.from(encrypted, 'base64').toString('hex');
 }
 
 function hexToBytes(hex) {
