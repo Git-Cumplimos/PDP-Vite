@@ -417,7 +417,7 @@ const Deposito = () => {
             label='Número de cuenta'
             type='text'
             autoComplete='off'
-            minLength={"10"}
+            minLength={"9"}
             maxLength={"16"}
             value={numCuenta}
             onInput={(e) => {
