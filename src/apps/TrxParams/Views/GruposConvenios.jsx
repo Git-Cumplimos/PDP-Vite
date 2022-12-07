@@ -83,13 +83,13 @@ const GruposConvenios = () => {
       setShowModal(true);
       setSelectedGruposConvenios((old) => ({
         ...old,
-        pk_tbl_grupo_convenios: tableGruposConvenios[i]?.["Id"],
-        nombre_grupo_convenios: tableGruposConvenios[i]?.["Nombre grupo"],
+        pk_tbl_grupo_convenios: gruposConvenios[i]?.["pk_tbl_grupo_convenios"],
+        nombre_grupo_convenios: gruposConvenios[i]?.["nombre_grupo_convenios"],
         conveniosOriginal: gruposConvenios[i]?.["convenios"],
         convenios: gruposConvenios[i]?.["convenios"],
       }));
     },
-    [tableGruposConvenios]
+    [gruposConvenios]
   );
   const onSubmit = useCallback(
     (ev) => {
