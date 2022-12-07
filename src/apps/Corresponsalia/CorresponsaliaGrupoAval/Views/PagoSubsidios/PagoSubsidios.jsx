@@ -6,10 +6,7 @@ import Form from "../../../../../components/Base/Form";
 import HideInput from "../../../../../components/Base/HideInput";
 import Input from "../../../../../components/Base/Input";
 import Modal from "../../../../../components/Base/Modal";
-import MoneyInput, {
-  formatMoney,
-} from "../../../../../components/Base/MoneyInput";
-import Select from "../../../../../components/Base/Select";
+import { formatMoney } from "../../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { useFetch } from "../../../../../hooks/useFetch";
 import { toPhoneNumber } from "../../../../../utils/functions";
@@ -17,6 +14,7 @@ import { notify, notifyError } from "../../../../../utils/notify";
 import InfInicial from "../../components/PagoTerceros-PagoSubsidio/InfInicial";
 import InfRecibo from "../../components/PagoTerceros-PagoSubsidio/InfRecibo";
 import InfResConsulta from "../../components/PagoTerceros-PagoSubsidio/InfResConsulta";
+import { pinBlock } from "../../utils/pinBlock";
 import {
   fetchCustomPost,
   ErrorCustom,
@@ -162,8 +160,7 @@ const PagoSubsidios = () => {
       valor_total_trx: value,
       numeroCelular: inputData.numeroCelular,
       documento: inputData.documento,
-      otp: inputData.otp,
-      // id_trx: idTrx,
+      otp: pinBlock(inputData.otp),
       location: {
         address: roleInfo.direccion,
         city: roleInfo.ciudad,
