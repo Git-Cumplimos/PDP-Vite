@@ -10,7 +10,6 @@ export const fetchCustomPost = async (url_, name_, data_) => {
     throw new ErrorCustom(error.message);
   }
 
-  console.log(Peticion);
   //para los errores customizados del backend
   try {
     if (
