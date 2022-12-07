@@ -1,28 +1,24 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import Button from "../../../components/Base/Button/Button";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
+import Fieldset from "../../../components/Base/Fieldset";
 import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
 import Modal from "../../../components/Base/Modal/Modal";
 import Select from "../../../components/Base/Select/Select";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
+import TagsAlongSide from "../../../components/Base/TagsAlongSide";
 import useQuery from "../../../hooks/useQuery";
 import { notify, notifyError } from "../../../utils/notify";
 import {
-  postConsultaTipoNivelComercio,
-  postCrearTipoNivelComercio,
-  putModificarTipoNivelComercio,
-} from "../utils/fetchComercios";
-import { fetchGruposComercios } from "../utils/fetchGruposComercios";
-import {
-  fetchParametrosAutorizadores,
-  postParametrosAutorizadores,
-  putParametrosAutorizadores,
-} from "../utils/fetchParametrosAutorizadores";
-import { fetchAutorizadores } from "../utils/fetchRevalAutorizadores";
+  fetchGruposComercios,
+  postGruposComercios,
+} from "../utils/fetchGruposComercios";
 
 const GruposComercios = () => {
   const [showModal, setShowModal] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
@@ -31,6 +27,10 @@ const GruposComercios = () => {
   const [selectedGruposComercios, setSelectedGruposComercios] = useState({
     pk_tbl_grupo_comercios: "",
     nombre_grupo_comercios: "",
+    comercios: [],
+    id_comercio: "",
+    comercios_agregar: [],
+    comercios_eliminar: [],
   });
   const [datosBusqueda, setDatosBusqueda] = useState({
     pk_tbl_grupo_comercios: "",
@@ -42,6 +42,10 @@ const GruposComercios = () => {
     setSelectedGruposComercios({
       pk_tbl_grupo_comercios: "",
       nombre_grupo_comercios: "",
+      comercios: [],
+      id_comercio: "",
+      comercios_agregar: [],
+      comercios_eliminar: [],
     });
     fetchTipoNivelComerciosFunc();
   }, []);
@@ -50,6 +54,10 @@ const GruposComercios = () => {
     setSelectedGruposComercios({
       pk_tbl_grupo_comercios: "",
       nombre_grupo_comercios: "",
+      comercios: [],
+      id_comercio: "",
+      comercios_agregar: [],
+      comercios_eliminar: [],
     });
   }, []);
 
@@ -70,52 +78,57 @@ const GruposComercios = () => {
   const onSelectTipoNivelComercios = useCallback(
     (e, i) => {
       setShowModal(true);
-      setSelectedGruposComercios({
-        pk_tbl_grupo_comercios: tableGruposComercios[i]?.["Id"],
-        nombre_grupo_comercios: tableGruposComercios[i]?.["Nombre grupo"],
-      });
+      setSelectedGruposComercios((old) => ({
+        ...old,
+        pk_tbl_grupo_comercios: gruposComercios[i]?.["pk_tbl_grupo_comercios"],
+        nombre_grupo_comercios: gruposComercios[i]?.["nombre_grupo_comercios"],
+        comercios: gruposComercios[i]?.["comercios"],
+      }));
     },
-    [tableGruposComercios]
+    [gruposComercios]
   );
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-
-      // if (selectedTipoNivelComercio?.descripcion === "") {
-      //   notifyError("Se debe escribir la descripción");
-      //   return;
-      // }
-      // if (selectedTipoNivelComercio?.pkTipoNivel !== "") {
-      //   putModificarTipoNivelComercio(
-      //     selectedTipoNivelComercio?.pkTipoNivel,
-
-      //     {
-      //       descripcion: selectedTipoNivelComercio?.descripcion,
-      //     }
-      //   )
-      //     .then((res) => {
-      //       if (res?.status) {
-      //         notify(res?.msg);
-      //         handleClose();
-      //       } else {
-      //         notifyError(res?.msg);
-      //       }
-      //     })
-      //     .catch((err) => console.error(err));
-      // } else {
-      //   postCrearTipoNivelComercio({
-      //     descripcion: selectedTipoNivelComercio?.descripcion,
-      //   })
-      //     .then((res) => {
-      //       if (res?.status) {
-      //         notify(res?.msg);
-      //         handleClose();
-      //       } else {
-      //         notifyError(res?.msg);
-      //       }
-      //     })
-      //     .catch((err) => console.error(err));
-      // }
+      setIsUploading(true);
+      if (selectedGruposComercios?.pk_tbl_grupo_comercios !== "") {
+        //   putModificarTipoNivelComercio(
+        //     selectedTipoNivelComercio?.pkTipoNivel,
+        //     {
+        //       descripcion: selectedTipoNivelComercio?.descripcion,
+        //     }
+        //   )
+        //     .then((res) => {
+        //       if (res?.status) {
+        //         notify(res?.msg);
+        //         handleClose();
+        //       } else {
+        //         notifyError(res?.msg);
+        //       }
+        //     })
+        //     .catch((err) => console.error(err));
+      } else {
+        postGruposComercios({
+          nombre_grupo_comercios:
+            selectedGruposComercios?.nombre_grupo_comercios,
+        })
+          .then((res) => {
+            if (res?.status) {
+              notify(res?.msg);
+              handleClose();
+            } else {
+              notifyError(res?.msg);
+              handleClose();
+            }
+            setIsUploading(false);
+          })
+          .catch((err) => {
+            notifyError(err);
+            handleClose();
+            setIsUploading(false);
+            console.error(err);
+          });
+      }
     },
     [handleClose, selectedGruposComercios]
   );
@@ -138,16 +151,79 @@ const GruposComercios = () => {
       })
       .catch((err) => console.error(err));
   }, [page, limit, datosBusqueda]);
+  const onSelectComercioDelete = useCallback(
+    (e, i) => {
+      e.preventDefault();
+      console.log(selectedGruposComercios.comercios[i]);
+      const fk_comercio = selectedGruposComercios.comercios[i].fk_comercio
+      if (
+        !selectedGruposComercios?.comercios?.find(
+          (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
+        ) &&
+        !selectedGruposComercios?.comercios_agregar?.find(
+          (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
+        ) &&
+        !selectedGruposComercios?.comercios_eliminar?.find(
+          (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
+        ) &&
+        selectedGruposComercios["id_comercio"] !== ""
+      ){}
+      // let temp = [...idComercios];
+      // temp?.splice(i, 1);
+      // setIdComercios(temp);
+    },
+    [selectedGruposComercios]
+  );
+  const addComercio = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      if (
+        !selectedGruposComercios?.comercios?.find(
+          (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
+        ) &&
+        !selectedGruposComercios?.comercios_agregar?.find(
+          (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
+        ) &&
+        !selectedGruposComercios?.comercios_eliminar?.find(
+          (a) => a?.fk_comercio === selectedGruposComercios["id_comercio"]
+        ) &&
+        selectedGruposComercios["id_comercio"] !== ""
+      ) {
+        const obj = { ...selectedGruposComercios };
+        obj["comercios_agregar"] = [
+          ...obj["comercios_agregar"],
+          {
+            fk_comercio: selectedGruposComercios["id_comercio"],
+            fk_tbl_grupo_comercios:
+              selectedGruposComercios["pk_tbl_grupo_comercios"],
+          },
+        ];
+        obj["comercios"] = [
+          ...obj["comercios"],
+          { fk_comercio: selectedGruposComercios["id_comercio"] },
+        ];
 
+        setSelectedGruposComercios((old) => {
+          return {
+            ...old,
+            comercios_agregar: obj["comercios_agregar"],
+            comercios: obj["comercios"],
+          };
+        });
+      }
+    },
+    [selectedGruposComercios]
+  );
   return (
     <Fragment>
+      <SimpleLoading show={isUploading} />
       <ButtonBar>
-        <Button type='submit' onClick={handleShowModal}>
+        <Button type="submit" onClick={handleShowModal}>
           Crear grupo de comercios
         </Button>
       </ButtonBar>
       <TableEnterprise
-        title='Grupos de comercios'
+        title="Grupos de comercios"
         maxPage={maxPages}
         headers={["Id", "Nombre grupo", "Cantidad comercios"]}
         data={tableGruposComercios}
@@ -156,12 +232,12 @@ const GruposComercios = () => {
         // onChange={onChange}
       >
         <Input
-          id='pk_tbl_grupo_comercios'
-          label='Id grupo comercios'
-          type='text'
-          name='pk_tbl_grupo_comercios'
-          minLength='1'
-          maxLength='10'
+          id="pk_tbl_grupo_comercios"
+          label="Id grupo comercios"
+          type="text"
+          name="pk_tbl_grupo_comercios"
+          minLength="1"
+          maxLength="10"
           // required
           value={datosBusqueda.pk_tbl_grupo_comercios}
           onInput={(e) => {
@@ -171,21 +247,23 @@ const GruposComercios = () => {
                 return { ...old, pk_tbl_grupo_comercios: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
         <Input
-          id='nombre_grupo_comercios'
-          label='Nombre grupo comercios'
-          type='text'
-          name='nombre_grupo_comercios'
-          minLength='1'
-          maxLength='10'
+          id="nombre_grupo_comercios"
+          label="Nombre grupo comercios"
+          type="text"
+          name="nombre_grupo_comercios"
+          minLength="1"
+          maxLength="10"
           // required
           value={datosBusqueda.nombre_grupo_comercios}
           onInput={(e) => {
             setDatosBusqueda((old) => {
               return { ...old, nombre_grupo_comercios: e.target.value };
             });
-          }}></Input>
+          }}
+        ></Input>
       </TableEnterprise>
       {/* {Array.isArray(tableConfiguracionComercios) &&
       tableConfiguracionComercios.length > 0 ? (
@@ -198,36 +276,84 @@ const GruposComercios = () => {
         ""
       )} */}
 
-      {/* <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal} handleClose={handleClose}>
+        <h1 className="text-3xl text-center">
+          {selectedGruposComercios?.pk_tbl_grupo_comercios !== ""
+            ? "Actualizar grupo comercios"
+            : "Crear grupo comercios"}
+        </h1>
         <Form onSubmit={onSubmit} grid>
           <Input
-            id='descripcion'
-            name='descripcion'
-            label='Descripción'
-            type='text'
-            autoComplete='off'
-            value={selectedTipoNivelComercio.descripcion}
+            id="nombre_grupo_comercios"
+            name="nombre_grupo_comercios"
+            label="Nombre grupo de comercios"
+            type="text"
+            autoComplete="off"
+            value={selectedGruposComercios.nombre_grupo_comercios}
             onInput={(e) =>
-              setSelectedTipoNivelComercio((old) => {
-                return { ...old, descripcion: e.target.value };
+              setSelectedGruposComercios((old) => {
+                return { ...old, nombre_grupo_comercios: e.target.value };
               })
             }
-            // defaultValue={selectedAuto?.["Id comercio"] ?? ""}
-            // disabled={selectedAuto?.["Id configuracion"]}
             required
           />
+          {selectedGruposComercios?.pk_tbl_grupo_comercios !== "" && (
+            <Input
+              id="id_comercio"
+              name="id_comercio"
+              label={"Id comercio"}
+              type="number"
+              autoComplete="off"
+              value={selectedGruposComercios?.id_comercio}
+              onInput={(e) => {
+                if (!isNaN(e.target.value)) {
+                  const num = e.target.value;
+                  setSelectedGruposComercios((old) => {
+                    return { ...old, id_comercio: parseInt(num) };
+                  });
+                }
+              }}
+              info={
+                <button
+                  style={{
+                    position: "absolute",
+                    top: "-33px",
+                    right: "-235px",
+                    fontSize: "15px",
+                    padding: "5px",
+                    backgroundColor: "#e26c22",
+                    color: "white",
+                    borderRadius: "5px",
+                  }}
+                  onClick={addComercio}
+                >
+                  Agregar
+                </button>
+              }
+            />
+          )}
+          {selectedGruposComercios?.comercios?.length > 0 && (
+            <Fieldset legend="Comercios asociados" className="lg:col-span-2">
+              <TagsAlongSide
+                data={selectedGruposComercios?.comercios.map(
+                  (it) => it.fk_comercio
+                )}
+                onSelect={onSelectComercioDelete}
+              />
+            </Fieldset>
+          )}
           <ButtonBar>
-            <Button type='button' onClick={handleClose}>
+            <Button type="button" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button type='submit'>
-              {selectedTipoNivelComercio?.pkTipoNivel !== ""
-                ? "Actualizar tipo nivel comercio"
-                : "Crear tipo nivel comercio"}
+            <Button type="submit">
+              {selectedGruposComercios?.pk_tbl_grupo_comercios !== ""
+                ? "Actualizar grupo comercios"
+                : "Crear grupo comercios"}
             </Button>
           </ButtonBar>
         </Form>
-      </Modal> */}
+      </Modal>
     </Fragment>
   );
 };

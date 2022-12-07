@@ -19,13 +19,13 @@ export const fetchGruposComercios = async (obj) => {
     throw err;
   }
 };
-export const postComisionesPagar = async (bodyObj) => {
+export const postGruposComercios = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlComisiones}/comision/crear`,
+      `${urlComisiones}/servicio-grupo-comercios/crear-grupo-comercios`,
       "POST",
       {},
       bodyObj
