@@ -366,7 +366,7 @@ console.log('state?.cod =>', state?.cod)
             state?.op == "cb"
               ? consultaDatosSNR?.valorPin
               : state.sell
-              ? state?.cod // Desde informacionPin state?.cod (internalCod)
+              ? state?.cod // Desde informacionPin
               : inputValor,
           jsonAdicional: {
             nombre_usuario: userInfo?.attributes?.name,
@@ -385,25 +385,12 @@ console.log('state?.cod =>', state?.cod)
     )
       .then((res) => {
         if (res?.status == true) {
-          if (
-            res?.obj?.response?.respuesta ==
-            ":Error en el numero telefonico, si crees que el numero esta correcto comunicalo al distribuidor"
-          ) {
-            notifyError(
-              "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
-            );
-            setShowLoading(false);
-            setShowModal(false);
-            showModalDatosEPM(false);
-            setInputCelular("");
-            setInputValor(0);
-          } else {
             notify("Venta exitosa");
             setShowLoading(false);
             VentaExitosa(res?.obj?.response, fecha, hora);
-          }
         } else {
-          notifyError(res?.msg);
+          notifyError(res?.obj?.response?.respuesta ==
+            ":Error en el numero telefonico, si crees que el numero esta correcto comunicalo al distribuidor" ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor" : res?.msg);
           setShowLoading(false);
           showModalDatosEPM(false);
           showModalDatosSNR(false);
