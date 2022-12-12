@@ -71,6 +71,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const [cantNum, setCantNum] = useState(0);
 
   const url = process.env.REACT_APP_URL_COLPENSIONES;
+  // const url = "http://127.0.0.1:2500/";
 
   const printDiv = useRef();
 
@@ -318,6 +319,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 true
               )
                 .then((respuesta) => {
+                  setProcesandoTrx(false);
                   console.log(respuesta);
                   if (
                     respuesta?.msg?.["respuesta_colpensiones"] ===
