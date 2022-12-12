@@ -14,6 +14,7 @@ import fetchData from "../../../utils/fetchData";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import InputX from "../../../components/Base/InputX/InputX";
 import { notifyError } from "../../../utils/notify";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
@@ -40,6 +41,8 @@ const Loteria = ({ route }) => {
     sellLoteriafisica,
     codigos_lot,
     setCodigos_lot,
+    loadConsulta,
+    setLoadConsulta,
   } = useLoteria();
 
   const [sorteoOrdi, setSorteoOrdi] = useState(null);
@@ -138,6 +141,7 @@ const Loteria = ({ route }) => {
 
   useEffect(() => {
     setSellResponse(null);
+    setDatosEscaneados("")
     setNumero("");
     setSerie("");
     setCustomer({ fracciones: "", phone: "", doc_id: "" });
@@ -209,8 +213,9 @@ const Loteria = ({ route }) => {
   ]);
   return (
     <>
-      <Form grid>
+        <SimpleLoading show={loadConsulta}></SimpleLoading>
         <Select
+          className = {"place-self-strech"}
           disabled={serie !== "" || numero !== ""}
           id="selectSorteo"
           label="Tipo de sorteo"
@@ -219,23 +224,31 @@ const Loteria = ({ route }) => {
           onChange={(e) => setSorteo(e.target.value)}
         />
         { sorteo !== "" ? 
-        <>
+        <Form grid>
+        {sorteo.split("-")[1] === "true" ? 
         <InputX
-          label="Escanee el código de barras"
-          type="search"
-          value={datosEscaneados}
-          onInput={(e) => {
-            const num = e.target.value || "";
-            setDatosEscaneados(validarEntradaScanner(num));
-            if (num?.length === 20) {              
-              setNumero(String(num.substr(-9, 4)));
-              setSerie(String(num.substr(-5, 3)));
-            }else{
-              setNumero("");
-              setSerie("");
-            }
-          }}
-        ></InputX>
+        label="Escanee el código de barras"
+        type="search"
+        value={datosEscaneados}
+        onInput={(e) => {
+          const num = e.target.value || "";
+          setDatosEscaneados(validarEntradaScanner(num));
+          if (num?.length === 20) {       
+            searchLoteriafisica(sorteo, String(num.substr(-9, 4)), String(num.substr(-5, 3)), 1)
+            .then((max) => {
+              if (max !== undefined) {
+                setMaxPages(Math.ceil(max / 10));
+              }
+            });       
+            setNumero(String(num.substr(-9, 4)));
+            setSerie(String(num.substr(-5, 3)));
+          }else{
+            setNumero("");
+            setSerie("");
+          }
+        }}
+      ></InputX>
+        : ""}
         <Input
           id="numTicket"
           label="Numero de billete"
@@ -306,7 +319,7 @@ const Loteria = ({ route }) => {
             timeOut: 500,
           }}
         />
-        <ButtonBar>
+        <ButtonBar className= {"lg:col-span-2"}>
           <Button
             type="button"
             disabled={page < 2}
@@ -338,9 +351,9 @@ const Loteria = ({ route }) => {
             Siguiente
           </Button>
         </ButtonBar>
-        </>
+        </Form>
         : ""}
-      </Form>
+      
       {Array.isArray(loterias) && loterias.length > 0 ? (
         <>
           <div className="flex flex-row justify-evenly w-full my-4">
@@ -364,6 +377,7 @@ const Loteria = ({ route }) => {
               }
             )}
             onSelectRow={(e, index) => {
+              console.log(loterias[index])
               setSelected(loterias[index]);
               setShowModal(true);
             }}

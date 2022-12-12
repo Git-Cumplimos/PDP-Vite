@@ -55,7 +55,7 @@ const ApuestasDeportivas = ({ subRoutes }) => {
     })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
-        setCasas(autoArr?.results ?? []);
+        setCasas(autoArr?.response ?? []);
       })
       .catch((err) => console.error(err));
   };
@@ -102,7 +102,7 @@ const ApuestasDeportivas = ({ subRoutes }) => {
         casaApuesta: datosTrans?.inputCasa,
       })
         .then((autoArr) => {
-          if ( autoArr.results.length > 0 && autoArr.results[0].descripcion.toLowerCase() == datosTrans?.inputCasa.toLowerCase()){
+          if ( autoArr.response.length > 0 && autoArr.response[0].descripcion.toLowerCase() == datosTrans?.inputCasa.toLowerCase()){
             notify("Ya existe la casa de apuestas "+ datosTrans?.inputCasa)
             setDatosTrans((old)=>{
               return {
@@ -116,15 +116,15 @@ const ApuestasDeportivas = ({ subRoutes }) => {
               idcomercio : roleInfo?.["id_comercio"],
               casaApuesta:  datosTrans?.inputCasa,
             })
-              .then((response) => {
-                if (response.length != 0){ 
+              .then((res) => {
+                if (res.response.length != 0){ 
                   postInsertCasaApuestas({
-                    op : response[0]?.op,
-                    isPack : response[0]?.isPack,
-                    descripcion : response[0]?.desc
+                    op : res.response[0]?.op,
+                    isPack : res.response[0]?.isPack,
+                    descripcion : res.response[0]?.desc
                   })
-                    .then((response)=> {
-                      notify("Se ha agregado la casa de apuestas "+datosTrans?.inputCasa)
+                    .then((resp)=> {
+                      notify("Se agrego la casa de apuestas "+datosTrans?.inputCasa)
                       fecthTablaCasasApuestasPaginadoFunc();
                       setShowModal(false);
                       setDatosTrans((old)=>{

@@ -115,8 +115,8 @@ const RecargarPaquetes = () => {
 
       datosRecargas:{
           celular: inputCelular,
-          operador:state?.operador_recargar,
-          valor: parseInt(state?.valor_paquete),
+          operador:state?.operador,
+          valor: parseInt(state?.codigo_paq),
           jsonAdicional:{
             "nombre_usuario": userInfo?.attributes?.name,
             "operador": state?.operador_recargar

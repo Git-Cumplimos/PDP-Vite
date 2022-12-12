@@ -87,7 +87,7 @@ const SendForm = ({
   const formPago = (value) => {
     setTipoPago(value);
   };
-
+  // console.log(selected?.Fracciones)
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">

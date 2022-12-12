@@ -384,13 +384,13 @@ const allUrlsPrivateApps = [
           component: DescargarArchivosS3,
           permission: [6],
         },
-        {
-          link: `/loteria/${name}/premios`,
-          label: <AppIcons Logo={"Premio"} name="Premios" />,
-          component: Premios,
-          extern: false,
-          permission: [3], ///////////////////////////////////////////////////////////////////
-        },
+        // {
+        //   link: `/loteria/${name}/premios`,
+        //   label: <AppIcons Logo={"Premio"} name="Premios" />,
+        //   component: Premios,
+        //   extern: false,
+        //   permission: [3], ///////////////////////////////////////////////////////////////////
+        // },
         {
           link: `/loteria/${name}/inventario`,
           label: <AppIcons Logo={"REPORTE"} name="Inventario Billetes" />,

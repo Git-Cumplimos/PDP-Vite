@@ -102,6 +102,8 @@ export const LoteriaContext = createContext({
 	setTiposOperaciones: null,
 	codigosOficina: null,
 	setCodigosOficina: null,
+  loadConsulta: null,
+	setLoadConsulta: null,
 });
 
 export const useLoteria = () => {
@@ -136,6 +138,7 @@ export const useProvideLoteria = () => {
 	const [tiposOperaciones, setTiposOperaciones] = useState(null);
 	const [codigosOficina, setCodigosOficina] = useState(null);
 	const [nit_loteria, setNit_loteria] = useState(null);
+  const [loadConsulta, setLoadConsulta] = useState(false)
 
 	useEffect(() => {
 		if (numero === "" && serie === "") {
@@ -247,6 +250,7 @@ export const useProvideLoteria = () => {
 		if (num === "" && ser === "") return;
 
 		try {
+      setLoadConsulta(true)
 			const { Resultado: res, Num_Datos } = await fetchData(
 				urls.ordinario,
 				"GET",
@@ -261,15 +265,19 @@ export const useProvideLoteria = () => {
 				{}
 			);
 			setLoterias(res);
+      setLoadConsulta(false)
 			return Num_Datos;
 		} catch (err) {
 			setLoterias([]);
 			console.error(err);
+      setLoadConsulta(false)
 		}
+    
 	}, []);
 
 	const searchLoteriafisica = useCallback(
 		async (sorteo, num, ser, page) => {
+      
 			let fisico = false;
 			const sort = sorteo.split("-");
 			if (sort[1] === "true") {
@@ -279,6 +287,7 @@ export const useProvideLoteria = () => {
 			if (num === "" && ser === "") return;
 
 			try {
+        setLoadConsulta(true)
 				const { Resultado: res, Num_Datos } = await fetchData(
 					urls.ordinariofisico,
 					"GET",
@@ -296,11 +305,14 @@ export const useProvideLoteria = () => {
 				);
 
 				setLoterias(res);
+        setLoadConsulta(false)
 				return Num_Datos;
 			} catch (err) {
 				setLoterias([]);
+        setLoadConsulta(false)
 				console.error(err);
 			}
+      
 		},
 		[roleInfo, codigosOficina]
 	);
@@ -704,14 +716,16 @@ export const useProvideLoteria = () => {
 	);
 
 	const consultaInventarioReporte = useCallback(
-		async (num_sorteo) => {
+		async (num_sorteo,pageData) => {
 			try {
+        console.log(codigos_lot)
 				const data = {
+          ...pageData,
 					num_sorteo: num_sorteo,
 					num_loteria: codigos_lot,
 				};
 				// console.log("data inventario reporte", data);
-				const res = await fetchData(urls.consultaInventarioReporte, "POST", {}, data);
+				const res = await fetchData(urls.consultaInventarioReporte, "POST",{},data);
 				// console.log("respuesta inventario reporte", res);
 				return res;
 			} catch (err) {
@@ -806,5 +820,7 @@ export const useProvideLoteria = () => {
 		setTiposOperaciones,
 		codigosOficina,
 		setCodigosOficina,
+    loadConsulta,
+		setLoadConsulta,
 	};
 };

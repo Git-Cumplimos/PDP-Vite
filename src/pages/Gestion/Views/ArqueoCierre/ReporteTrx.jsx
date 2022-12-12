@@ -44,12 +44,14 @@ const TreeView = ({ tree = {}, onClickLastChild = (info, ev) => {} }) =>
       key,
       info?.nombre ?? "",
       formatMoney.format(info?.monto) ?? "No data",
-      info?.status === true
-        ? "Transaccion exitosa"
-        : info?.status === false
-        ? "Transaccion fallida"
-        : "",
-      info?.date_trx ?? "",
+      "status" in info
+        ? info?.status === true
+          ? "Transaccion exitosa"
+          : info?.status === false
+          ? "Transaccion fallida"
+          : ""
+        : "No. txns",
+      info?.date_trx ?? info?.total_trxs ?? "",
     ];
 
     if (info?.nodes) {
@@ -85,6 +87,7 @@ const ReporteTrx = () => {
 
   const [trxTree, setTrxTree] = useState({});
   const [montoTotal, setMontoTotal] = useState(0.0);
+  const [totalTransacciones, setTotalTransacciones] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [summaryTrx, setSummaryTrx] = useState(null);
@@ -114,6 +117,7 @@ const ReporteTrx = () => {
         .then((res) => {
           setTrxTree(res?.obj?.results);
           setMontoTotal(res?.obj?.monto);
+          setTotalTransacciones(res?.obj?.total_trxs);
         })
         .catch((error) => {
           if (error?.cause === "custom") {
@@ -155,7 +159,14 @@ const ReporteTrx = () => {
         <Accordion
           titulo={
             <GridRow
-              cols={["", "Total", formatMoney.format(montoTotal), "", ""]}
+              cols={["", "Total Valor", "No. Transacciones", "", ""]}
+            />
+          }
+        />
+        <Accordion
+          titulo={
+            <GridRow
+              cols={["", formatMoney.format(montoTotal), totalTransacciones, "", ""]}
             />
           }
         />
