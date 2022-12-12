@@ -19,6 +19,7 @@ import {
 
 import { rutasPinesVus } from "../apps/PinesVus/routes";
 import { enumPermisosPinesVus } from "../apps/PinesVus/enumPermisosPinesVus";
+
 /**
  * * Providers
  */
@@ -31,12 +32,8 @@ import rutasAvalCB, {
 import rutasAgrarioCB, {
   listPermissionsAgrario,
 } from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/routes";
-import CreatePlanComision from "../apps/TrxParams/Views/Comisiones/CreatePlanComision";
-import MainPlanComisiones from "../apps/TrxParams/Views/Comisiones/MainPlanComisiones";
-import MainAsignaciones from "../apps/TrxParams/Views/Comisiones/MainAsignaciones";
-import Assigns from "../apps/TrxParams/Views/Comisiones/Assigns";
-import MainPlanComisionesCampana from "../apps/TrxParams/Views/Comisiones/MainPlanComisionesCampana";
-import CreatePlanComisionCampana from "../apps/TrxParams/Views/Comisiones/CreatePlanComisionCampana";
+import rutasConfiguraciones from "../apps/TrxParams/routes";
+
 
 /**
 
@@ -149,56 +146,6 @@ const IAMPolicies = lazy(() => import("../apps/IAM/Views/IAMPolicies"));
 const FormCommerce = lazy(() => import("../apps/UpdateCommerce/FormCommerce"));
 const CommerceInfo = lazy(() => import("../apps/UpdateCommerce/CommerceInfo"));
 
-/**
- * Trx params
- */
-const ParametrosAutorizadores = lazy(() =>
-  import("../apps/TrxParams/Views/ParametrosAutorizadores")
-);
-const TipoContratoComisiones = lazy(() =>
-  import("../apps/TrxParams/Views/TipoContratoComisiones")
-);
-const Comisiones = lazy(() => import("../apps/TrxParams/Views/Comisiones"));
-const Com2Pay = lazy(() =>
-  import("../apps/TrxParams/Views/Comisiones/Com2Pay")
-);
-const CreateComision = lazy(() =>
-  import("../apps/TrxParams/Views/Comisiones/CreateComision")
-);
-const Com2Collect = lazy(() =>
-  import("../apps/TrxParams/Views/Comisiones/Com2Collect")
-);
-const Convenios = lazy(() => import("../apps/TrxParams/Views/Convenios"));
-const ConvAuto = lazy(() => import("../apps/TrxParams/Views/ConvAuto"));
-const Autorizadores = lazy(() =>
-  import("../apps/TrxParams/Views/Autorizadores")
-);
-const CreateComisionCobrada = lazy(() =>
-  import("../apps/TrxParams/Views/Comisiones/CreateComisionCobrada")
-);
-const ConfiguracionComercios = lazy(() =>
-  import("../apps/TrxParams/Views/ConfiguracionComercios")
-);
-const CrearComercios = lazy(() =>
-  import("../apps/TrxParams/Views/Comercios/CrearComercios")
-);
-const ListarComercios = lazy(() =>
-  import("../apps/TrxParams/Views/Comercios/ListarComercios")
-);
-const TipoNivelComercio = lazy(() =>
-  import("../apps/TrxParams/Views/TipoNivelComercios")
-);
-const ListarMensajePublicitario = lazy(() =>
-  import(
-    "../apps/TrxParams/Views/MensajesPublicitarios/ListarMensajePublicitario"
-  )
-);
-const GruposComercios = lazy(() =>
-  import("../apps/TrxParams/Views/GruposComercios")
-);
-const GruposConvenios = lazy(() =>
-  import("../apps/TrxParams/Views/GruposConvenios")
-);
 
 /**
  * Domiciliacion PPS
@@ -251,15 +198,7 @@ const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
 const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
 const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 
-/**
- * Editar parametros tipos de transacciones
- */
-const ParamsOperations = lazy(() =>
-  import("../apps/ParamsOperations/ParamsOperations")
-);
-const TypesTrxs = lazy(() =>
-  import("../apps/ParamsOperations/Views/TypesTrxs")
-);
+
 
 /**
  * iFood Aportes Sociales
@@ -809,223 +748,6 @@ const allUrlsPrivateApps = [
     ],
   },
   {
-    link: "/params-operations",
-    label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />,
-    component: ParamsOperations,
-    permission: [18, 19, 20, 21, 31],
-    subRoutes: [
-      {
-        link: "/params-operations/parametros-autorizadores",
-        label: (
-          <AppIcons Logo={"RECAUDO"} name={"Parametros por autorizador"} />
-        ),
-        component: ParametrosAutorizadores,
-        permission: [51],
-      },
-      {
-        link: "/params-operations/types-trxs",
-        label: <AppIcons Logo={"RECAUDO"} name={"Tipos de transacciones"} />,
-        component: TypesTrxs,
-        permission: [31],
-      },
-      {
-        link: "/params-operations/comisiones",
-        label: <AppIcons Logo={"IMPUESTO"} name={"Tarifas / Comisiones"} />,
-        component: Comisiones,
-        permission: [18, 19],
-        subRoutes: [
-          {
-            link: "/params-operations/comisiones/pagadas",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar"} />,
-            component: Com2Pay,
-            permission: [18],
-            subRoutes: [
-              {
-                link: "/params-operations/comisiones/pagadas/personalizadas",
-                label: (
-                  <AppIcons
-                    Logo={"IMPUESTO"}
-                    name={"Comisiones a pagar por comercio"}
-                  />
-                ),
-                component: CreateComision,
-                permission: [18],
-              },
-            ],
-          },
-          {
-            link: "/params-operations/comisiones/cobradas",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a cobrar"} />,
-            component: Com2Collect,
-            permission: [19],
-            subRoutes: [
-              {
-                link: "/params-operations/comisiones/cobradas/crear",
-                label: (
-                  <AppIcons
-                    Logo={"IMPUESTO"}
-                    name={"Comisiones a cobrar por autorizador"}
-                  />
-                ),
-                component: CreateComisionCobrada,
-                permission: [19],
-              },
-            ],
-          },
-          {
-            link: "/params-operations/comisiones/asignaciones",
-            label: (
-              <AppIcons Logo={"IMPUESTO"} name={"Asignación de comisiones"} />
-            ),
-            component: MainAsignaciones,
-            permission: [18],
-            subRoutes: [
-              {
-                link: "/params-operations/comisiones/asignaciones/crear",
-                label: (
-                  <AppIcons
-                    Logo={"IMPUESTO"}
-                    name={"Comisiones a cobrar por autorizador"}
-                  />
-                ),
-                component: Assigns,
-                permission: [19],
-              },
-            ],
-          },
-          {
-            link: "/params-operations/comisiones/plan-comisiones",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Plan de comisiones"} />,
-            component: MainPlanComisiones,
-            permission: [18],
-            subRoutes: [
-              {
-                link: "/params-operations/comisiones/plan-comisiones/crear",
-                label: (
-                  <AppIcons Logo={"IMPUESTO"} name={"Crear plan de comisión"} />
-                ),
-                component: CreatePlanComision,
-                permission: [19],
-              },
-            ],
-          },
-          {
-            link: "/params-operations/comisiones/plan-comisiones-campana",
-            label: (
-              <AppIcons
-                Logo={"IMPUESTO"}
-                name={"Plan de comisiones campañas"}
-              />
-            ),
-            component: MainPlanComisionesCampana,
-            permission: [18],
-            // subRoutes: [
-            //   {
-            //     link: "/params-operations/comisiones/plan-comisiones/campana/crear",
-            //     label: (
-            //       <AppIcons
-            //         Logo={"IMPUESTO"}
-            //         name={"Crear plan de comisión campaña"}
-            //       />
-            //     ),
-            //     component: CreatePlanComisionCampana,
-            //     permission: [19],
-            //   },
-            // ],
-          },
-        ],
-      },
-      {
-        link: "/params-operations/convenios",
-        label: <AppIcons Logo={"RETIRO"} name={"Convenios"} />,
-        component: Convenios,
-        permission: [20],
-        subRoutes: [
-          {
-            link: "/params-operations/convenios/autorizadores",
-            label: (
-              <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
-            ),
-            component: ConvAuto,
-            permission: [20],
-          },
-        ],
-      },
-
-      {
-        link: "/params-operations/autorizadores",
-        label: (
-          <AppIcons
-            Logo={"PRODUCTOS_FINANCIEROS"}
-            name={"Proveedores / Autorizadores"}
-          />
-        ),
-        component: Autorizadores,
-        permission: [21],
-      },
-      {
-        link: "/params-operations/configuracion_comercios",
-        label: <AppIcons Logo={"RETIRO"} name={"Configuración comercios"} />,
-        component: ConfiguracionComercios,
-        permission: [21],
-      },
-      {
-        link: "/params-operations/tipo_contrato_comisiones",
-        label: <AppIcons Logo={"RETIRO"} name={"Contratos comisiones"} />,
-        component: TipoContratoComisiones,
-        permission: [20],
-        subRoutes: [
-          {
-            link: "/params-operations/convenios/autorizadores",
-            label: (
-              <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
-            ),
-            component: ConvAuto,
-            permission: [20],
-          },
-        ],
-      },
-      {
-        link: "/params-operations/tipo-nivel-comercios",
-        label: <AppIcons Logo={"RECAUDO"} name={"Tipo nivel comercios"} />,
-        component: TipoNivelComercio,
-        permission: [21],
-      },
-      {
-        link: "/params-operations/comercios",
-        label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
-        component: ListarComercios,
-        permission: [21],
-      },
-      {
-        link: "/params-operations/comercios/crear",
-        label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
-        component: CrearComercios,
-        permission: [21],
-        show: false,
-      },
-      {
-        link: "/params-operations/mensajes_publicitarios",
-        label: <AppIcons Logo={"RECAUDO"} name={"Mensajes publicitarios"} />,
-        component: ListarMensajePublicitario,
-        permission: [21],
-      },
-      {
-        link: "/params-operations/grupos-comercio",
-        label: <AppIcons Logo={"RECAUDO"} name={"Grupos de comercios"} />,
-        component: GruposComercios,
-        permission: [21],
-      },
-      {
-        link: "/params-operations/grupos-convenios",
-        label: <AppIcons Logo={"RECAUDO"} name={"Grupos de convenios"} />,
-        component: GruposConvenios,
-        permission: [21],
-      },
-    ],
-  },
-
-  {
     link: "/colpensiones",
     label: <AppIcons Logo={"RECAUDO"} name={"Colpensiones"} />,
     component: Domiciliacion,
@@ -1053,6 +775,7 @@ const allUrlsPrivateApps = [
           },
         ],
       },
+      rutasConfiguraciones,
       /*       {
         link: "/colpensiones/formulario",
         label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />,
