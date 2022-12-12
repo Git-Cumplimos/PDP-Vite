@@ -82,7 +82,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    navigate(`/domiciliacion`);
+    navigate(`/colpensiones`);
   }, []);
   const handleClose2 = useCallback(() => {
     setShowModal(false);
@@ -210,28 +210,28 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   "El aportante no existe."
                 ) {
                   notifyError("El aportante no existe.");
-                  navigate(`/domiciliacion`);
+                  navigate(`/colpensiones`);
                 }
                 if (
                   respuesta?.msg ===
                   "El Valor Aportado Debe ser Exacto ej: 5000"
                 ) {
                   notifyError("El valor a aportar debe ser múltiplo de 100");
-                  /* navigate(`/domiciliacion`); */
+                  /* navigate(`/colpensiones`); */
                   setDisabledBtn(false);
                 }
                 if (
                   respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo"
                 ) {
                   notifyError("Lo sentimos, falló el registro del cupo");
-                  navigate(`/domiciliacion`);
+                  navigate(`/colpensiones`);
                 }
                 if (
                   respuesta?.msg?.["respuesta_colpensiones"] ===
                   "Cotizante no existe."
                 ) {
                   notifyError("Cotizante no existe.");
-                  navigate(`/domiciliacion`);
+                  navigate(`/colpensiones`);
                 }
 
                 if (
@@ -241,7 +241,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   notifyError(
                     "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
                   );
-                  /* navigate(`/domiciliacion`); */
+                  /* navigate(`/colpensiones`); */
                   setDisabledBtn(false);
                 }
                 if (
@@ -249,7 +249,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   "Lo Sentimos, Falló el Servicio De Colpensiones"
                 ) {
                   notifyError("Lo sentimos, falló el servicio de colpensiones");
-                  navigate(`/domiciliacion`);
+                  navigate(`/colpensiones`);
                 }
                 if (
                   respuesta?.msg?.["respuesta_colpensiones"] ===
@@ -258,11 +258,11 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   notifyError(
                     "Lo sentimos, transacción recibida fuera del horario."
                   );
-                  navigate(`/domiciliacion`);
+                  navigate(`/colpensiones`);
                 }
                 /* if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
                   notifyError("Lo Sentimos, Falló el Registro Del Cupo");
-                  navigate(`/domiciliacion`);
+                  navigate(`/colpensiones`);
                 } */
                 if (
                   (respuesta?.msg ===
@@ -276,7 +276,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               .catch((err) => {
                 console.log(err);
                 notifyError("Error al pagar planilla voluntaria a demanda");
-                navigate(`/domiciliacion`);
+                navigate(`/colpensiones`);
               });
           } else {
             notifyError(
@@ -326,14 +326,14 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                     "El aportante no existe."
                   ) {
                     notifyError("El aportante no existe.");
-                    navigate(`/domiciliacion`);
+                    navigate(`/colpensiones`);
                   }
                   if (
                     respuesta?.msg ===
                     "El Valor Aportado Debe ser Exacto ej: 5000"
                   ) {
                     notifyError("El valor a aportar debe ser múltiplo de 100");
-                    /* navigate(`/domiciliacion`); */
+                    /* navigate(`/colpensiones`); */
                     setDisabledBtn(false);
                   }
                   if (
@@ -341,7 +341,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                     "Cotizante no existe."
                   ) {
                     notifyError("Cotizante no existe.");
-                    navigate(`/domiciliacion`);
+                    navigate(`/colpensiones`);
                   }
 
                   if (
@@ -351,7 +351,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                     notifyError(
                       "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
                     );
-                    /* navigate(`/domiciliacion`); */
+                    /* navigate(`/colpensiones`); */
                     setDisabledBtn(false);
                   }
                   if (
@@ -366,7 +366,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 .catch((err) => {
                   console.log(err);
                   notifyError("Error al pagar planilla voluntaria a demanda");
-                  navigate(`/domiciliacion`);
+                  navigate(`/colpensiones`);
                 });
             } else {
               notifyError(
@@ -390,7 +390,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
       }
     } else {
       notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
-      navigate(`/domiciliacion`);
+      navigate(`/colpensiones`);
     }
   };
   const onCelChange = (e) => {
