@@ -138,7 +138,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                     "Se ha creado el comercio domiciliado voluntario exitosamente"
                   );
                   setShowModal(false);
-                  navigate(`/domiciliacion`);
+                  navigate(`/colpensiones`);
                 }
               }
             })
@@ -369,7 +369,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
               }
               <Button
                 onClick={() => {
-                  navigate(`/domiciliacion`);
+                  navigate(`/colpensiones`);
                   setShowModal(false);
                 }}
               >
