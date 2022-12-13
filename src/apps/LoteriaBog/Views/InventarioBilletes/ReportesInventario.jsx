@@ -26,6 +26,7 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 	const [maxPages, setMaxPages] = useState(1)
 	const { consultaInventarioReporte } = useLoteria();
 	useEffect(() => {
+		console.log(pageData)
 		loadDocument(numeroSorteo, pageData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [numeroSorteo, pageData]);

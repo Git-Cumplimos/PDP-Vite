@@ -452,8 +452,8 @@ const Retiro = () => {
           label='Número OTP'
           type='text'
           name='otp'
-          minLength={'4'}
-          maxLength={'4'}
+          minLength={'6'}
+          maxLength={'6'}
           autoComplete='off'
           value={otp}
           onInput={(e, valor) => {
