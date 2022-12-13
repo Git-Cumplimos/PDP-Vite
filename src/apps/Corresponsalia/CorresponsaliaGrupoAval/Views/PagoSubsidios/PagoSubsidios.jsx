@@ -142,7 +142,7 @@ const PagoSubsidios = () => {
   }
 
   function RetirarSubsidio() {
-    let oficinaPropia_;
+    let oficinaPropia_=false;
     if (
       roleInfo.tipo_comercio === "OFICINAS PROPIAS" ||
       roleInfo.tipo_comercio === "KIOSCO"
