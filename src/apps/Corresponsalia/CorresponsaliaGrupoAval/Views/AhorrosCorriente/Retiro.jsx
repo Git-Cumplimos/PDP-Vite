@@ -67,7 +67,7 @@ const Retiro = () => {
   
   const otpEncrip = useMemo(() => {
     let x
-    if (otp.length === 4){
+    if (otp.length === 6){
       x = pinBlock(otp)
     }
     else{
@@ -226,7 +226,7 @@ const Retiro = () => {
 
   const onSubmitModal = useCallback((e) => {
     e.preventDefault();
-    if ( otp.length === 4) {
+    if ( otp.length === 6) {
     const { min, max } = limitesMontos;
     if (valor >= min && valor <= max) {
     const summary = {
