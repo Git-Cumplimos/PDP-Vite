@@ -1,21 +1,21 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Fieldset from "../../../components/Base/Fieldset";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Modal from "../../../components/Base/Modal/Modal";
-import Select from "../../../components/Base/Select/Select";
-import SimpleLoading from "../../../components/Base/SimpleLoading";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
-import TagsAlongSide from "../../../components/Base/TagsAlongSide";
-import useQuery from "../../../hooks/useQuery";
-import { notify, notifyError } from "../../../utils/notify";
+import Button from "../../../../components/Base/Button/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
+import Fieldset from "../../../../components/Base/Fieldset";
+import Form from "../../../../components/Base/Form/Form";
+import Input from "../../../../components/Base/Input/Input";
+import Modal from "../../../../components/Base/Modal/Modal";
+import Select from "../../../../components/Base/Select/Select";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
+import useQuery from "../../../../hooks/useQuery";
+import { notify, notifyError } from "../../../../utils/notify";
 import {
   fetchGruposComercios,
   postGruposComercios,
   putGruposComercios,
-} from "../utils/fetchGruposComercios";
+} from "../../utils/fetchGruposComercios";
 
 const GruposComercios = () => {
   const [showModal, setShowModal] = useState(false);

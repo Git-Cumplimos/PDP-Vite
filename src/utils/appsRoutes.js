@@ -34,7 +34,6 @@ import rutasAgrarioCB, {
 } from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/routes";
 import rutasConfiguraciones from "../apps/TrxParams/routes";
 
-
 /**
 
  * * Logos
@@ -146,7 +145,6 @@ const IAMPolicies = lazy(() => import("../apps/IAM/Views/IAMPolicies"));
 const FormCommerce = lazy(() => import("../apps/UpdateCommerce/FormCommerce"));
 const CommerceInfo = lazy(() => import("../apps/UpdateCommerce/CommerceInfo"));
 
-
 /**
  * Domiciliacion PPS
  */
@@ -197,8 +195,6 @@ const EnviarSMS = lazy(() => import("../apps/API-SMS/Views/EnviarSMS"));
 const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
 const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
 const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
-
-
 
 /**
  * iFood Aportes Sociales
@@ -726,6 +722,7 @@ const allUrlsPrivateApps = [
       },
     ],
   },
+  rutasConfiguraciones,
   rutasRecargas,
   {
     link: "/movii-pdp",
@@ -775,7 +772,7 @@ const allUrlsPrivateApps = [
           },
         ],
       },
-      rutasConfiguraciones,
+
       /*       {
         link: "/colpensiones/formulario",
         label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />,

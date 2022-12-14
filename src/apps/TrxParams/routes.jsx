@@ -1,84 +1,74 @@
 import { lazy } from "react";
 import { enumPermisosTrx } from "./enumPermisosTrx";
-
+import navComercios from "./Views/Comercios/navComercios";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 
-
 /**
  * Trx params
  */
- const CreatePlanComision = lazy(() => import("./Views/Comisiones/CreatePlanComision"))
- const MainPlanComisiones = lazy(() => import("./Views/Comisiones/MainPlanComisiones"))
- const MainAsignaciones = lazy(() => import("./Views/Comisiones/MainAsignaciones"))
- const Assigns = lazy(() => import("./Views/Comisiones/Assigns"))
- const MainPlanComisionesCampana = lazy(() => import("./Views/Comisiones/MainPlanComisionesCampana"))
- const CreatePlanComisionCampana = lazy(() => import("./Views/Comisiones/CreatePlanComisionCampana"))
+const CreatePlanComision = lazy(() =>
+  import("./Views/Comisiones/CreatePlanComision")
+);
+const MainPlanComisiones = lazy(() =>
+  import("./Views/Comisiones/MainPlanComisiones")
+);
+const MainAsignaciones = lazy(() =>
+  import("./Views/Comisiones/MainAsignaciones")
+);
+const Assigns = lazy(() => import("./Views/Comisiones/Assigns"));
+const MainPlanComisionesCampana = lazy(() =>
+  import("./Views/Comisiones/MainPlanComisionesCampana")
+);
+const CreatePlanComisionCampana = lazy(() =>
+  import("./Views/Comisiones/CreatePlanComisionCampana")
+);
 
- const ParametrosAutorizadores = lazy(() =>
- import("./Views/ParametrosAutorizadores")
+const ParametrosAutorizadores = lazy(() =>
+  import("./Views/ParametrosAutorizadores")
 );
 const TipoContratoComisiones = lazy(() =>
- import("./Views/TipoContratoComisiones")
+  import("./Views/TipoContratoComisiones")
 );
 const Comisiones = lazy(() => import("./Views/Comisiones"));
-const Com2Pay = lazy(() =>
- import("./Views/Comisiones/Com2Pay")
+const Com2Pay = lazy(() => import("./Views/Comisiones/Com2Pay"));
+const CreateComision = lazy(() => import("./Views/Comisiones/CreateComision"));
+const GruposPlanesComisiones = lazy(() =>
+  import("./Views/Comisiones/GruposPlanesComisiones")
 );
-const CreateComision = lazy(() =>
- import("./Views/Comisiones/CreateComision")
-);
-const Com2Collect = lazy(() =>
- import("./Views/Comisiones/Com2Collect")
-);
+const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
 const Convenios = lazy(() => import("./Views/Convenios"));
 const ConvAuto = lazy(() => import("./Views/ConvAuto"));
-const Autorizadores = lazy(() =>
- import("./Views/Autorizadores")
-);
+const Autorizadores = lazy(() => import("./Views/Autorizadores"));
 const CreateComisionCobrada = lazy(() =>
- import("./Views/Comisiones/CreateComisionCobrada")
+  import("./Views/Comisiones/CreateComisionCobrada")
 );
 const ConfiguracionComercios = lazy(() =>
- import("./Views/ConfiguracionComercios")
+  import("./Views/ConfiguracionComercios")
 );
-const CrearComercios = lazy(() =>
- import("./Views/Comercios/CrearComercios")
-);
-const ListarComercios = lazy(() =>
- import("./Views/Comercios/ListarComercios")
-);
-const TipoNivelComercio = lazy(() =>
- import("./Views/TipoNivelComercios")
-);
+const CrearComercios = lazy(() => import("./Views/Comercios/CrearComercios"));
+const ListarComercios = lazy(() => import("./Views/Comercios/ListarComercios"));
+const TipoNivelComercio = lazy(() => import("./Views/TipoNivelComercios"));
 const ListarMensajePublicitario = lazy(() =>
- import(
-   "./Views/MensajesPublicitarios/ListarMensajePublicitario"
- )
+  import("./Views/MensajesPublicitarios/ListarMensajePublicitario")
 );
-const GruposComercios = lazy(() =>
- import("./Views/GruposComercios")
-);
-const GruposConvenios = lazy(() =>
- import("./Views/GruposConvenios")
-);
+const GruposComercios = lazy(() => import("./Views/Comercios/GruposComercios"));
+const GruposConvenios = lazy(() => import("./Views/GruposConvenios"));
 /**
  * Editar parametros tipos de transacciones
  */
- const ParamsOperations = lazy(() =>
- import("../ParamsOperations/ParamsOperations")
+const ParamsOperations = lazy(() =>
+  import("../ParamsOperations/ParamsOperations")
 );
-const TypesTrxs = lazy(() =>
- import("../ParamsOperations/Views/TypesTrxs")
-);
+const TypesTrxs = lazy(() => import("../ParamsOperations/Views/TypesTrxs"));
 
 const listPermissions = Object.values(enumPermisosTrx);
 export const listPermissionsTrx = listPermissions.splice(
   listPermissions.length / 2
 );
 
-const rutasConfiguraciones =   {
+const rutasConfiguraciones = {
   link: "/params-operations",
   label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />,
   component: ParamsOperations,
@@ -86,9 +76,7 @@ const rutasConfiguraciones =   {
   subRoutes: [
     {
       link: "/params-operations/parametros-autorizadores",
-      label: (
-        <AppIcons Logo={"RECAUDO"} name={"Parametros por autorizador"} />
-      ),
+      label: <AppIcons Logo={"RECAUDO"} name={"Parametros por autorizador"} />,
       component: ParametrosAutorizadores,
       permission: [enumPermisosTrx.parametros_autorizadores],
     },
@@ -102,7 +90,10 @@ const rutasConfiguraciones =   {
       link: "/params-operations/comisiones",
       label: <AppIcons Logo={"IMPUESTO"} name={"Tarifas / Comisiones"} />,
       component: Comisiones,
-      permission: [enumPermisosTrx.planes_comision, enumPermisosTrx.asignacion_comision],
+      permission: [
+        enumPermisosTrx.planes_comision,
+        enumPermisosTrx.asignacion_comision,
+      ],
       subRoutes: [
         {
           link: "/params-operations/comisiones/pagadas",
@@ -153,10 +144,7 @@ const rutasConfiguraciones =   {
             {
               link: "/params-operations/comisiones/asignaciones/crear",
               label: (
-                <AppIcons
-                  Logo={"IMPUESTO"}
-                  name={"Asignación de comisiones"}
-                />
+                <AppIcons Logo={"IMPUESTO"} name={"Asignación de comisiones"} />
               ),
               component: Assigns,
               permission: [enumPermisosTrx.asignacion_comision],
@@ -182,10 +170,7 @@ const rutasConfiguraciones =   {
         {
           link: "/params-operations/comisiones/plan-comisiones-campana",
           label: (
-            <AppIcons
-              Logo={"IMPUESTO"}
-              name={"Plan de comisiones campañas"}
-            />
+            <AppIcons Logo={"IMPUESTO"} name={"Plan de comisiones campañas"} />
           ),
           component: MainPlanComisionesCampana,
           permission: [enumPermisosTrx.planes_comision],
@@ -202,6 +187,17 @@ const rutasConfiguraciones =   {
           //     permission: [19],
           //   },
           // ],
+        },
+        {
+          link: "/params-operations/grupos-planes-comisiones",
+          label: (
+            <AppIcons
+              Logo={"RECAUDO"}
+              name={"Grupos de planes de comisiones"}
+            />
+          ),
+          component: GruposPlanesComisiones,
+          permission: [enumPermisosTrx.planes_comision],
         },
       ],
     },
@@ -256,36 +252,46 @@ const rutasConfiguraciones =   {
       ],
     },
     {
-      link: "/params-operations/tipo-nivel-comercios",
-      label: <AppIcons Logo={"RECAUDO"} name={"Tipo nivel comercios"} />,
-      component: TipoNivelComercio,
-      permission: [enumPermisosTrx.tipo_nivel_comercio],
-    },
-    {
-      link: "/params-operations/comercios",
-      label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
-      component: ListarComercios,
+      link: "/params-operations/navcomercios",
+      label: <AppIcons Logo={"RETIRO"} name={"Comercios"} />,
+      component: navComercios,
       permission: [enumPermisosTrx.comercios],
+      subRoutes: [
+        {
+          link: "/params-operations/tipo-nivel-comercios",
+          label: <AppIcons Logo={"RECAUDO"} name={"Tipo nivel comercios"} />,
+          component: TipoNivelComercio,
+          permission: [enumPermisosTrx.tipo_nivel_comercio],
+        },
+        {
+          link: "/params-operations/comercios",
+          label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
+          component: ListarComercios,
+          permission: [enumPermisosTrx.comercios],
+        },
+        {
+          link: "/params-operations/comercios/crear",
+          label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
+          component: CrearComercios,
+          permission: [enumPermisosTrx.comercios],
+          show: false,
+        },
+        {
+          link: "/params-operations/grupos-comercio",
+          label: <AppIcons Logo={"RECAUDO"} name={"Grupos de comercios"} />,
+          component: GruposComercios,
+          permission: [enumPermisosTrx.grupos_comercios],
+        },
+      ],
     },
-    {
-      link: "/params-operations/comercios/crear",
-      label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
-      component: CrearComercios,
-      permission: [enumPermisosTrx.comercios],
-      show: false,
-    },
+
     {
       link: "/params-operations/mensajes_publicitarios",
       label: <AppIcons Logo={"RECAUDO"} name={"Mensajes publicitarios"} />,
       component: ListarMensajePublicitario,
       permission: [enumPermisosTrx.mensajes_publicitarios],
     },
-    {
-      link: "/params-operations/grupos-comercio",
-      label: <AppIcons Logo={"RECAUDO"} name={"Grupos de comercios"} />,
-      component: GruposComercios,
-      permission: [enumPermisosTrx.grupos_comercios],
-    },
+
     {
       link: "/params-operations/grupos-convenios",
       label: <AppIcons Logo={"RECAUDO"} name={"Grupos de convenios"} />,
@@ -293,6 +299,6 @@ const rutasConfiguraciones =   {
       permission: [enumPermisosTrx.grupos_convenios],
     },
   ],
-}
+};
 
-export default rutasConfiguraciones
+export default rutasConfiguraciones;
