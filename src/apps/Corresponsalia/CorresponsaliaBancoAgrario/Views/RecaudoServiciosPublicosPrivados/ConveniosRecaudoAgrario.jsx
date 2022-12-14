@@ -289,7 +289,7 @@ const ConveniosRecaudoAgrario = () => {
                             uuid: uniqueId,
                           })
                             .then((res) => {
-                              if (res?.msg !== "No ha terminado el reintento") {
+                              if (res?.msg !== "No ha terminado la operación") {
                                 if (res?.status) {
                                   setIsUploading(false);
                                   notify(res?.msg);

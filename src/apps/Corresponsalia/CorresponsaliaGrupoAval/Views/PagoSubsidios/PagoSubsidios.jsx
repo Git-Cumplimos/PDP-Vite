@@ -29,8 +29,8 @@ const dataInputInitial = {
   valor_total_trx: "",
 };
 const tipo_operacion = 99;
-const url_consulta_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/consulta-pago-subsidio`;
-const url_pago_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/pago-subsidio`;
+const url_consulta_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/consulta-pago-subsidios`;
+const url_pago_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/pago-subsidios`;
 
 const PagoSubsidios = () => {
   const [inputData, setInputData] = useState(dataInputInitial);
@@ -142,14 +142,14 @@ const PagoSubsidios = () => {
   }
 
   function RetirarSubsidio() {
-    let oficinaPropia_;
+    let oficinaPropia_ = false;
     if (
       roleInfo.tipo_comercio === "OFICINAS PROPIAS" ||
       roleInfo.tipo_comercio === "KIOSCO"
     ) {
       oficinaPropia_ = true;
     }
-    const dataSubsidio = {
+    let dataSubsidio = {
       comercio: {
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
@@ -167,6 +167,9 @@ const PagoSubsidios = () => {
         dane_code: roleInfo.codigo_dane,
       },
     };
+    if (idTrx == null) {
+      dataSubsidio["id_trx"] = idTrx;
+    }
 
     PeticionRetirarSubsidio(
       url_pago_subsidio,
