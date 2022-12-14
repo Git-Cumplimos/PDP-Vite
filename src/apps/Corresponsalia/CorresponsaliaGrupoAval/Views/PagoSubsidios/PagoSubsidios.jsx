@@ -142,14 +142,14 @@ const PagoSubsidios = () => {
   }
 
   function RetirarSubsidio() {
-    let oficinaPropia_=false;
+    let oficinaPropia_ = false;
     if (
       roleInfo.tipo_comercio === "OFICINAS PROPIAS" ||
       roleInfo.tipo_comercio === "KIOSCO"
     ) {
       oficinaPropia_ = true;
     }
-    const dataSubsidio = {
+    let dataSubsidio = {
       comercio: {
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
@@ -167,6 +167,9 @@ const PagoSubsidios = () => {
         dane_code: roleInfo.codigo_dane,
       },
     };
+    if (idTrx == null) {
+      dataSubsidio["id_trx"] = idTrx;
+    }
 
     PeticionRetirarSubsidio(
       url_pago_subsidio,
