@@ -20,6 +20,16 @@ const BuscarCedulaPpsADemanda = () => {
   const [message, setMessage] = useState("3");
   const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
 
+  const [datos, estableceDatos] = useState("");
+
+  const hijoAPadre = () => {
+    setBuscarCedula("");
+    setDatosConsulta("");
+    setEstado(false);
+  };
+  /* function hijoAPadre() {
+    setBuscarCedula("");
+  } */
   //------------------Constantes para Dar Estilos---------------------//
   const {
     contenedorForm,
@@ -106,7 +116,10 @@ const BuscarCedulaPpsADemanda = () => {
   return (
     <div>
       {(datosConsulta?.length >= 0) & estado ? (
-        <TipoPpsADemanda numCed={buscarCedula}></TipoPpsADemanda>
+        <TipoPpsADemanda
+          numCed={buscarCedula}
+          fun={hijoAPadre}
+        ></TipoPpsADemanda>
       ) : (
         ""
       )}
@@ -118,7 +131,7 @@ const BuscarCedulaPpsADemanda = () => {
           autoComplete="off"
           minLength={"5"}
           maxLength={"10"}
-          invalid={invalidCedula}
+          /* invalid={invalidCedula} */
           value={buscarCedula ?? ""}
           onChange={onCedChange}
           required

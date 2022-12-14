@@ -33,7 +33,7 @@ const {
   contenedorLabel,
 } = classes;
 
-const PpsVoluntarioDemanda = ({ ced }) => {
+const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
   const [limitesMontos] = useState({
     max: 149100,
     min: 5000,
@@ -516,7 +516,16 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               </Button>
               /*  ) : null */
             }
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setShowModal(false);
+                /*   hijoAPadre(); */
+                fun();
+                funBorrar();
+              }}
+            >
+              Cancelar
+            </Button>
           </ButtonBar>
         </Form>
       </Modal>
