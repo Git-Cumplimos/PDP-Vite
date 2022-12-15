@@ -79,6 +79,7 @@ export const pinBlock = (pinX) => {
   let pin = pinX;
   let pan = process.env.REACT_APP_PAN_AVAL; /////// Verificar en donde poner el PAN
   const L = pin.length;
+  
 
   pin = `0${L}${pin}ffffffffffffffff`;
   const pinHexa = pin.slice(0, 16);
