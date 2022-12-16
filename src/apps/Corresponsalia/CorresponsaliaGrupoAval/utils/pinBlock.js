@@ -16,16 +16,13 @@ const CryptoJS = require("crypto-js");
 // }
 
 function encryptAES(data, key) {
-  console.log("data", data);
-  console.log("key", key);
+
   key = CryptoJS.enc.Hex.parse(key);
-  console.log("key2", key.toString());
   data = CryptoJS.enc.Hex.parse(data);
   const encrypted = CryptoJS.TripleDES.encrypt(data, key, {
     mode: CryptoJS.mode.ECB,
     padding: CryptoJS.pad.NoPadding,
   }).toString();
-  console.log(Buffer.from(encrypted, "base64").toString("hex"));
   return Buffer.from(encrypted, "base64").toString("hex");
 }
 
