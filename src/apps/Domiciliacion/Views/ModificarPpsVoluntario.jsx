@@ -186,7 +186,7 @@ const ModificarPps = () => {
                 respuesta?.msg === "El usuario ha sido modificado exitosamente"
               ) {
                 notify("El usuario ha sido modificado exitosamente");
-                navigate(`/domiciliacion`);
+                navigate(`/colpensiones`);
               } else if (
                 respuesta?.msg === "El Valor Aportado Debe ser Exacto ej: 5000"
               ) {
@@ -194,7 +194,7 @@ const ModificarPps = () => {
                 /* navigate(`/domiciliacion`); */
               } else {
                 notifyError("El usuario no ha sido modificado exitosamente");
-                navigate(`/domiciliacion`);
+                navigate(`/colpensiones`);
               }
             })
             .catch((err) => {
@@ -280,20 +280,20 @@ const ModificarPps = () => {
           <div className={contenedorLogo}>
             <LogoPDP xsmall></LogoPDP>
           </div>
-          <Form onSubmit={(e) => ModificarGuardar(e)}>
-            <PaymentSummary
-              title="Editar Comercio Domiciliado"
-              subtitle={`Tipo De Domiciliación: ${datosConsulta[0]?.tipo_pps}`}
-              /* summaryTrx={{
+          <PaymentSummary
+            title="Editar Comercio Domiciliado"
+            subtitle={`Tipo De Domiciliación: ${datosConsulta[0]?.tipo_pps}`}
+            /* summaryTrx={{
                 "Numero De Identificación":
-                  datosConsulta[0]?.identificacion ?? "", */
-              /* "Tipo De Domiciliación": datosConsulta[0]?.tipo_pps ?? "", */
-              /*     "N° Pagos Punto Pago": datosConsulta[0]?.num_pago_pdp ?? "", */
-              /*    }} */
-            ></PaymentSummary>
-            <ul className={contenedorSubtitle}>
-              Numero De Identificación: {datosConsulta[0]?.identificacion ?? ""}
-            </ul>
+                datosConsulta[0]?.identificacion ?? "", */
+            /* "Tipo De Domiciliación": datosConsulta[0]?.tipo_pps ?? "", */
+            /*     "N° Pagos Punto Pago": datosConsulta[0]?.num_pago_pdp ?? "", */
+            /*    }} */
+          ></PaymentSummary>
+          <ul className={contenedorSubtitle}>
+            Numero De Identificación: {datosConsulta[0]?.identificacion ?? ""}
+          </ul>
+          <Form grid onSubmit={(e) => ModificarGuardar(e)}>
             <Fieldset legend="Modificar Domiciliación">
               {/*  <Input
                 label={"Valor Aportar"}
@@ -356,7 +356,11 @@ const ModificarPps = () => {
                   maxLength={"2"}
                   /* invalid={invalidCedula} */
                   value={numPagosPdp}
-                  onChange={(event) => setNumPagosPdp(event?.target?.value)}
+                  // onChange={(event) => setNumPagosPdp(event?.target?.value)}
+                  onInput={(e) => {
+                    const num = parseInt(e.target.value) || "";
+                    setNumPagosPdp(num);
+                  }}
                   required
                 />
                 <Select

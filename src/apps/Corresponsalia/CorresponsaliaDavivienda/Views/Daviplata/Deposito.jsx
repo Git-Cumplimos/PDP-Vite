@@ -30,6 +30,8 @@ const Deposito = () => {
   const navigate = useNavigate();
   // const [{ phone, userDoc, valor, nomDepositante, summary }, setQuery] =
   //   useQuery();
+
+  
   const [verificacionTel, setVerificacionTel] = useState("");
 
   const [phone, setPhone] = useState("");
@@ -43,6 +45,32 @@ const Deposito = () => {
     consultaGiroDaviplata
   );
   const [, fetchTypes] = useFetch();
+
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "Recibo de Depósito a Daviplata",
+    timeInfo: {
+      "Fecha de venta": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      /*id transaccion recarga*/
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+      /*id_dispositivo*/
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      /*ciudad*/
+      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+      ["Tipo de operación", "Depósito a DaviPlata"],
+      ["", ""],
+    ],
+    commerceName: roleInfo?.["nombre comercio"]
+      ? roleInfo?.["nombre comercio"]
+      : "No hay datos",
+    trxInfo: [],
+    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+  });
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -214,90 +242,23 @@ const Deposito = () => {
     navigate(-1);
   }, [navigate]);
 
-  // const onMakePaymentReintento = useCallback((response,body) => {
-  //   setIsUploading(true);
-  //   if (response?.obj?.reintento){
-  //     body.reintento = true
-  //     fetchCashIn(body)
-  //     .then((res) => {
-  //       if (!res?.status) {
-  //         notifyError(res?.msg);
-  //         setIsUploading(false);
-  //         handleClose()
-  //         // return;
-  //       } else {
-  //         setIsUploading(false);
-  //         notify("Transaccion satisfactoria");
-  //         const trx_id = res?.obj?.Data?.valTalon ?? 0;
-  //         const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
-  //         const total = parseInt(comision) + valor;
-  //         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
-  //         const tempTicket = {
-  //           title: "Recibo de Depósito a Daviplata",
-  //           timeInfo: {
-  //             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-  //               year: "2-digit",
-  //               month: "2-digit",
-  //               day: "2-digit",
-  //             }).format(new Date()),
-  //             Hora: Intl.DateTimeFormat("es-CO", {
-  //               hour: "2-digit",
-  //               minute: "2-digit",
-  //               second: "2-digit",
-  //             }).format(new Date()),
-  //           },
-  //           commerceInfo: [
-  //             ["Id Comercio", roleInfo?.id_comercio],
-  //             ["No. terminal", ter],
-  //             ["Municipio", roleInfo?.ciudad],
-  //             ["Dirección", roleInfo?.direccion],
-  //             ["Tipo de operación", "Depósito a DaviPlata"],
-  //             ["", ""],
-  //             ["No. de aprobación", trx_id],
-  //             ["", ""],
-  //           ],
-  //           commerceName: roleInfo?.["nombre comercio"]
-  //             ? roleInfo?.["nombre comercio"]
-  //             : "No hay datos",
-  //           trxInfo: [
-  //             ["Número DaviPlata", `****${String(phone)?.slice(-4) ?? ""}`],
-  //             ["", ""],
-  //             ["Valor", formatMoney.format(valor)],
-  //             ["", ""],
-  //             ["Costo transacción", formatMoney.format(comision)],
-  //             ["", ""],
-  //             ["Total", formatMoney.format(total)],
-  //             ["", ""],
-  //           ],
-  //           disclamer:
-  //             "Línea de atención personalizada: #688\nMensaje de texto: 85888",
-  //         };
 
-  //         setPaymentStatus(tempTicket);
-  //         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
-  //           .then((resTicket) => {
-  //             console.log(resTicket);
-  //           })
-  //           .catch((err) => {
-  //             setIsUploading(false);
-  //             console.error(err);
-  //             notifyError("Error guardando el ticket");
-  //           });
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       setIsUploading(false);
-  //       console.error(err);
-  //       notifyError("No se ha podido conectar al servidor");
-  //     });
-
-  //   }else{
-  //     setIsUploading(false);
-  //     handleClose()
-  //   }
-  // }, [valor]);
 
   const onMakePayment = useCallback(() => {
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
+    const objTicket = { ...objTicketActual };
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
     setIsUploading(true);
     const body = {
       idComercio: roleInfo?.id_comercio,
@@ -320,6 +281,7 @@ const Deposito = () => {
       id_transaccion: datosConsulta?.DataHeader?.idTransaccion,
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
+      ticket:objTicket
     };
     console.log(body)
     fetchCashIn(body)
@@ -338,57 +300,84 @@ const Deposito = () => {
             res?.obj?.respuestaDavivienda?.valComisionGiroDaviplata ?? 0;
           const total = parseInt(comision) + valor;
           const ter = res?.obj?.codigoTotal;
-          const tempTicket = {
-            title: "Recibo de Depósito a Daviplata",
-            timeInfo: {
-              "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-                year: "2-digit",
-                month: "2-digit",
-                day: "2-digit",
-              }).format(new Date()),
-              Hora: Intl.DateTimeFormat("es-CO", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              }).format(new Date()),
-            },
-            commerceInfo: [
-              ["Id Comercio", roleInfo?.id_comercio],
-              ["No. terminal", ter],
-              ["Municipio", roleInfo?.ciudad],
-              ["Dirección", roleInfo?.direccion],
-              ["Tipo de operación", "Depósito a DaviPlata"],
-              ["", ""],
-              ["No. de aprobación", trx_id],
-              ["", ""],
-            ],
-            commerceName: roleInfo?.["nombre comercio"]
-              ? roleInfo?.["nombre comercio"]
-              : "No hay datos",
-            trxInfo: [
-              ["Número DaviPlata", `****${String(phone)?.slice(-4) ?? ""}`],
-              ["", ""],
-              ["Valor", formatMoney.format(valor)],
-              ["", ""],
-              ["Costo transacción", formatMoney.format(comision)],
-              ["", ""],
-              ["Total", formatMoney.format(total)],
-              ["", ""],
-            ],
-            disclamer:
-              "Línea de atención personalizada: #688\nMensaje de texto: 85888",
-          };
+          objTicket["commerceInfo"][1] = [
+            "No. terminal",
+            ter,
+          ];
+          objTicket["commerceInfo"].push([
+            "No. de aprobación",
+            trx_id,
+          ]);
+          objTicket["commerceInfo"].push(["", ""]);
+          objTicket["trxInfo"].push(["Número DaviPlata", 
+          `****${String(phone)?.slice(-4) ?? ""}`]);
+          objTicket["trxInfo"].push(["", ""]);
+          objTicket["trxInfo"].push([
+            "Valor",
+            formatMoney.format(valor),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          objTicket["trxInfo"].push([
+            "Costo transacción",
+            formatMoney.format(comision),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          objTicket["trxInfo"].push([
+            "Total",
+            formatMoney.format(total),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          // const tempTicket = {
+          //   title: "Recibo de Depósito a Daviplata",
+          //   timeInfo: {
+          //     "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+          //       year: "2-digit",
+          //       month: "2-digit",
+          //       day: "2-digit",
+          //     }).format(new Date()),
+          //     Hora: Intl.DateTimeFormat("es-CO", {
+          //       hour: "2-digit",
+          //       minute: "2-digit",
+          //       second: "2-digit",
+          //     }).format(new Date()),
+          //   },
+          //   commerceInfo: [
+          //     ["Id Comercio", roleInfo?.id_comercio],
+          //     ["No. terminal", ter],
+          //     ["Municipio", roleInfo?.ciudad],
+          //     ["Dirección", roleInfo?.direccion],
+          //     ["Tipo de operación", "Depósito a DaviPlata"],
+          //     ["", ""],
+          //     ["No. de aprobación", trx_id],
+          //     ["", ""],
+          //   ],
+          //   commerceName: roleInfo?.["nombre comercio"]
+          //     ? roleInfo?.["nombre comercio"]
+          //     : "No hay datos",
+          //   trxInfo: [
+          //     ["Número DaviPlata", `****${String(phone)?.slice(-4) ?? ""}`],
+          //     ["", ""],
+          //     ["Valor", formatMoney.format(valor)],
+          //     ["", ""],
+          //     ["Costo transacción", formatMoney.format(comision)],
+          //     ["", ""],
+          //     ["Total", formatMoney.format(total)],
+          //     ["", ""],
+          //   ],
+          //   disclamer:
+          //     "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+          // };
 
-          setPaymentStatus(tempTicket);
-          infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
-            .then((resTicket) => {
-              console.log(resTicket);
-            })
-            .catch((err) => {
-              setIsUploading(false);
-              console.error(err);
-              notifyError("Error guardando el ticket");
-            });
+          setPaymentStatus(objTicket);
+          // infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
+          //   .then((resTicket) => {
+          //     console.log(resTicket);
+          //   })
+          //   .catch((err) => {
+          //     setIsUploading(false);
+          //     console.error(err);
+          //     notifyError("Error guardando el ticket");
+          //   });
         }
       })
       .catch((err) => {

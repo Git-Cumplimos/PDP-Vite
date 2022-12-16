@@ -15,6 +15,7 @@ import { toPhoneNumber } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
 import InfInicial from "../../components/PagoTerceros-PagoSubsidio/InfInicial";
 import InfRecibo from "../../components/PagoTerceros-PagoSubsidio/InfRecibo";
+import { pinBlock } from "../../utils/pinBlock";
 import {
   fetchCustomPost,
   ErrorCustom,
@@ -110,7 +111,10 @@ const PagoTerceros = () => {
 
   function PagoTerceros() {
     let oficinaPropia_ = false;
-    if (roleInfo.tipo_comercio === "OFICINAS PROPIAS" || roleInfo.tipo_comercio === "KIOSCO"){
+    if (
+      roleInfo.tipo_comercio === "OFICINAS PROPIAS" ||
+      roleInfo.tipo_comercio === "KIOSCO"
+    ) {
       oficinaPropia_ = true;
     }
     const dataTerceros = {
@@ -124,7 +128,7 @@ const PagoTerceros = () => {
       valor_total_trx: inputData.valor_total_trx,
       numeroCelular: inputData.numeroCelular,
       documento: inputData.documento,
-      otp: inputData.otp,
+      otp: pinBlock(inputData.otp),
       location: {
         address: roleInfo.direccion,
         city: roleInfo.ciudad,

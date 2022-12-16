@@ -130,7 +130,7 @@ const ConveniosRecaudoAval = () => {
                             })
                               .then((res) => {
                                 if (
-                                  res?.msg !== "No ha terminado el reintento"
+                                  res?.msg !== "No ha terminado la operación"
                                 ) {
                                   if (res?.status) {
                                     setIsUploading(false);
@@ -141,9 +141,9 @@ const ConveniosRecaudoAval = () => {
                                     resolve(true);
                                   }
                                 } else {
-                                  // notifyError(res?.msg ?? res?.message ?? "");
-                                  setIsUploading(false);
-                                  hideModal();
+                                  notifyError(res?.msg ?? res?.message ?? "");
+                                  // setIsUploading(false);
+                                  // hideModal();
                                   resolve(false);
                                 }
                               })

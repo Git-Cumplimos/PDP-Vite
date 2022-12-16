@@ -102,18 +102,18 @@ const FormularioVentaSoat = () => {
           setDatosPropietarioSoat((old) => {
             return {
               ...old,
-              marca: res?.obj?.marca,
-              linea: res?.obj?.linea,
-              modelo: res?.obj?.modelo,
-              numeroChasis: res?.obj?.no_chasis,
-              respuestaConsulta: res?.obj?.respuesta,
-              claseSoat: res?.obj?.clase_soat,
-              nombrePropietario: res?.obj?.nombre,
-              apellidoPropietario: res?.obj?.apellido,
-              sexoPropietarioSoat: res?.obj?.sexo,
-              ciudadPropietarioSoat: res?.obj?.ciudadtxt,
-              departamentoPropietarioSoat: res?.obj?.dptoNum,
-              valorSoat: res?.obj?.valor,
+              marca: res?.obj?.response?.marca,
+              linea: res?.obj?.response?.linea,
+              modelo: res?.obj?.response?.modelo,
+              numeroChasis: res?.obj?.response?.no_chasis,
+              respuestaConsulta: res?.obj?.response?.respuesta,
+              claseSoat: res?.obj?.response?.clase_soat,
+              nombrePropietario: res?.obj?.response?.nombre,
+              apellidoPropietario: res?.obj?.response?.apellido,
+              sexoPropietarioSoat: res?.obj?.response?.sexo,
+              ciudadPropietarioSoat: res?.obj?.response?.ciudadtxt,
+              departamentoPropietarioSoat: res?.obj?.response?.dptoNum,
+              valorSoat: res?.obj?.response?.valor,
             };
           });
           if (res?.estado == "05") {

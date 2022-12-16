@@ -67,7 +67,7 @@ const Retiro = () => {
   
   const otpEncrip = useMemo(() => {
     let x
-    if (otp.length === 4){
+    if (otp.length === 6){
       x = pinBlock(otp)
     }
     else{
@@ -226,7 +226,7 @@ const Retiro = () => {
 
   const onSubmitModal = useCallback((e) => {
     e.preventDefault();
-    if ( otp.length === 4) {
+    if ( otp.length === 6) {
     const { min, max } = limitesMontos;
     if (valor >= min && valor <= max) {
     const summary = {
@@ -452,8 +452,8 @@ const Retiro = () => {
           label='Número OTP'
           type='text'
           name='otp'
-          minLength={'4'}
-          maxLength={'4'}
+          minLength={'6'}
+          maxLength={'6'}
           autoComplete='off'
           value={otp}
           onInput={(e, valor) => {

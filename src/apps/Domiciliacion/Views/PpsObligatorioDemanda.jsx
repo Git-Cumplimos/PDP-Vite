@@ -179,7 +179,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
             .catch((err) => {
               console.log(err);
               notifyError("Error al pagar planilla obligatoria a demanda");
-              navigate(`/domiciliacion`);
+              navigate(`/colpensiones`);
             });
         } else {
           notifyError("El Valor Aportado Debe ser Exacto ej: 5000.");
@@ -193,7 +193,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
       }
     } else {
       notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
-      navigate(`/domiciliacion`);
+      navigate(`/colpensiones`);
     }
   };
   useEffect(() => {}, [datosComercio]);
@@ -261,7 +261,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    navigate(`/domiciliacion`);
+    navigate(`/colpensiones`);
   }, []);
 
   return (

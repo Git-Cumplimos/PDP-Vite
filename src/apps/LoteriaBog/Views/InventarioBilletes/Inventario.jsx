@@ -304,6 +304,8 @@ const Inventario = () => {
             <InputX
               label="Cantidad de billetes"
               type="tel"
+              minLength="1"
+              maxLength="5"
               value={cantidadBilletes}
               onInput={(e) => {
                 const cantidad = parseInt(e.target.value) || "";
@@ -341,6 +343,7 @@ const Inventario = () => {
                 <InputX
                   label="Escanee el código de barras"
                   type="search"
+                  maxLength="23"
                   value={datosEscaneados["escaneado1"]}
                   onInput={(e) => {
                     const num = e.target.value || "";
@@ -385,6 +388,7 @@ const Inventario = () => {
                 <InputX
                   label="Escanee el código de barras"
                   type="search"
+                  maxLength="23"
                   value={datosEscaneados["escaneado2"]}
                   onInput={(e) => {
                     const num2 = e.target.value || "";
@@ -428,6 +432,7 @@ const Inventario = () => {
                 <InputX
                   label="Escanee el código de barras"
                   type="search"
+                  maxLength="23"
                   value={datosEscaneados["escaneado3"]}
                   onInput={(e) => {
                     const num3 = e.target.value || "";

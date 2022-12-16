@@ -79,7 +79,7 @@ const RecargasPaquetes = ({ subRoutes }) => {
     })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
-        setOperadores(autoArr?.results ?? []);
+        setOperadores(autoArr?.response ?? []);
       })
       .catch((err) => console.error(err));
   };

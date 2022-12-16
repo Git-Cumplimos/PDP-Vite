@@ -40,7 +40,9 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
         {
           state: {
             valor_paquete: paquetes[i]["sell"],
+            codigo_paq: paquetes[i]["practiCode"],
             descripcion: paquetes[i]["productDesc"],
+            operador: state?.producto,
             operador_recargar: state?.operador_recargar,
           },
         }        
@@ -71,7 +73,7 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
     })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
-        setPaquetes(autoArr?.results ?? []);
+        setPaquetes(autoArr?.response ?? []);
       })
       .catch((err) => console.error(err));
   };
