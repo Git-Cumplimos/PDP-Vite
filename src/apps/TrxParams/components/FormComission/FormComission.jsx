@@ -57,8 +57,17 @@ const FormComission = ({ outerState, onSubmit, children }) => {
         last?.["Rango maximo"] === "" ||
         !last?.["Rango maximo"]
       ) {
-        notifyError("Se debe agregar rango maximo de la comision");
+        notifyError("Se debe agregar rango máximo de la comisión");
         return;
+      }
+      if (copy?.ranges.length > 1) {
+        const almostLast = copy?.ranges.at(-2);
+        console.log(almostLast, last);
+        if (last?.["Rango maximo"] <= last?.["Rango minimo"]) {
+          return notifyError(
+            "El valor del rango mínimo debe ser superior al valor máximo"
+          );
+        }
       }
       copy.ranges = [
         ...copy?.ranges,
@@ -92,9 +101,9 @@ const FormComission = ({ outerState, onSubmit, children }) => {
       {comissionData ? (
         <Form onSubmit={onSubmit} onChange={onChange} grid>
           <Select
-            id="comissionType"
-            name="comissionType"
-            label="Tipo de comision"
+            id='comissionType'
+            name='comissionType'
+            label='Tipo de pago de comisión'
             options={{
               "Transaccion Escalonada": "trxEsc",
               "Transaccion Acumulada": "trx",
@@ -110,8 +119,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
               <Fieldset
                 legend={`Rango ${ind + 1}`}
                 key={ind}
-                className="lg:col-span-2"
-              >
+                className='lg:col-span-2'>
                 {Object.entries(_comission).map(([key, val], idx) => {
                   if (key === "Rango minimo" || key === "Rango maximo") {
                     if (
@@ -136,7 +144,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                               setComissionData(copyData);
                             }
                           }}
-                          autoComplete="off"
+                          autoComplete='off'
                           required={
                             comissionData?.ranges.length === ind + 1 &&
                             key === "Rango maximo"
@@ -161,8 +169,8 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           key={`${key}_${ind}`}
                           name={`${key}|${ind}`}
                           label={key}
-                          type="text"
-                          autoComplete="off"
+                          type='text'
+                          autoComplete='off'
                           maxLength={"15"}
                           value={val}
                           onInput={(e, valor) => {
@@ -178,8 +186,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                             key === "Rango maximo"
                               ? false
                               : true
-                          }
-                        ></MoneyInput>
+                          }></MoneyInput>
                       );
                   } else if (key === "Comision porcentual") {
                     return (
@@ -221,7 +228,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                             setComissionData(copyData);
                           }
                         }}
-                        autoComplete="off"
+                        autoComplete='off'
                         required={
                           comissionData?.ranges.length === ind + 1 &&
                           key === "Rango maximo"
@@ -237,11 +244,11 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                         key={`${key}_${ind}`}
                         name={`${key}|${ind}`}
                         label={key}
-                        type="text"
-                        autoComplete="off"
+                        type='text'
+                        autoComplete='off'
                         maxLength={"15"}
                         value={val}
-                        max="10000"
+                        max='10000'
                         onInput={(e, valor) => {
                           if (!isNaN(valor)) {
                             const num = valor;
@@ -261,19 +268,17 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           key === "Rango maximo"
                             ? false
                             : true
-                        }
-                      ></MoneyInput>
+                        }></MoneyInput>
                     );
                   }
                 })}
-                <ButtonBar className="lg:col-span-2">
+                <ButtonBar className='lg:col-span-2'>
                   {comissionData?.ranges?.length > 1 && ind !== 0 && (
                     <Button
-                      type="button"
+                      type='button'
                       onClick={(e) => {
                         onClickDelete(e, ind);
-                      }}
-                    >
+                      }}>
                       Eliminar rango
                     </Button>
                   )}
@@ -281,10 +286,8 @@ const FormComission = ({ outerState, onSubmit, children }) => {
               </Fieldset>
             );
           })}
-          {JSON.stringify(comissionData)}
-
-          <ButtonBar className="lg:col-span-2">
-            <Button type="button" onClick={(e) => onClick(e)}>
+          <ButtonBar className='lg:col-span-2'>
+            <Button type='button' onClick={onClick}>
               Agregar rango
             </Button>
             {children}

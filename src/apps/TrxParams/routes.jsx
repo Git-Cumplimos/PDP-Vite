@@ -17,7 +17,7 @@ const MainPlanComisiones = lazy(() =>
 const MainAsignaciones = lazy(() =>
   import("./Views/Comisiones/MainAsignaciones")
 );
-const Assigns = lazy(() => import("./Views/Comisiones/Assigns"));
+const CreateAssigns = lazy(() => import("./Views/Comisiones/CreateAssigns"));
 const MainPlanComisionesCampana = lazy(() =>
   import("./Views/Comisiones/MainPlanComisionesCampana")
 );
@@ -146,7 +146,7 @@ const rutasConfiguraciones = {
               label: (
                 <AppIcons Logo={"IMPUESTO"} name={"Asignación de comisiones"} />
               ),
-              component: Assigns,
+              component: CreateAssigns,
               permission: [enumPermisosTrx.asignacion_comision],
             },
           ],

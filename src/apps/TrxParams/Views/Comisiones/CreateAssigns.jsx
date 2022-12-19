@@ -33,7 +33,7 @@ import Select from "../../../../components/Base/Select";
 //   ],
 // };
 
-const Assigns = () => {
+const CreateAssigns = () => {
   const navigate = useNavigate();
 
   const [
@@ -400,11 +400,11 @@ const Assigns = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl">Configuración:</h1>
+      <h1 className='text-3xl'>Configuración:</h1>
       <Select
-        id="tipo_transaccion"
-        name="tipo_transaccion"
-        label="Tipo de transacción"
+        id='tipo_transaccion'
+        name='tipo_transaccion'
+        label='Tipo de transacción'
         options={{ Cobrar: "cobrar", Pagar: "pagar" }}
         value={transactionType}
         onChange={() => {
@@ -414,15 +414,14 @@ const Assigns = () => {
         required
       />
       <FormComission outerState={[comissionData, setComissionData]}>
-        <Button type="submit" onClick={createComission}>
+        <Button type='submit' onClick={createComission}>
           Crear comision
         </Button>
       </FormComission>
       <Modal
         show={showModal}
         handleClose={handleClose}
-        className="flex align-middle"
-      >
+        className='flex align-middle'>
         {/* {selectedOpt === "convenio" && */}
         <Fragment>
           <TableEnterprise
@@ -442,8 +441,7 @@ const Assigns = () => {
             data={data}
             onSelectRow={onSelectConvenio}
             onSetPageData={setPageData}
-            onChange={onChange}
-          >
+            onChange={onChange}>
             {selectedOpt === "comision" && (
               <>
                 <Input
@@ -451,7 +449,7 @@ const Assigns = () => {
                   label={"Convenio"}
                   name={"convenio"}
                   type={"text"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={convenio}
                 />
                 <Input
@@ -459,16 +457,16 @@ const Assigns = () => {
                   label={"Tipo de operación"}
                   name={"tipoTrx"}
                   type={"text"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={tipoTrx}
                 />
                 <Input
                   id={"comercioComissions"}
                   label={"Id comercio"}
                   name={"comercio"}
-                  type="number"
+                  type='number'
                   step={"1"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={comercio}
                 />
                 <Input
@@ -476,7 +474,7 @@ const Assigns = () => {
                   label={"Autorizador"}
                   name={"autorizador"}
                   type={"text"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={autorizador}
                 />
               </>
@@ -488,4 +486,4 @@ const Assigns = () => {
   );
 };
 
-export default Assigns;
+export default CreateAssigns;

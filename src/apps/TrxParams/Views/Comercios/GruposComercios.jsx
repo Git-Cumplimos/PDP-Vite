@@ -11,6 +11,7 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
 import useQuery from "../../../../hooks/useQuery";
 import { notify, notifyError } from "../../../../utils/notify";
+import SearchGruposPlanesComisiones from "../../components/PlanesComisiones/SearchGruposPlanesComisionesPagar";
 import {
   fetchGruposComercios,
   postGruposComercios,
@@ -20,6 +21,7 @@ import {
 const GruposComercios = () => {
   const [showModal, setShowModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showModal2, setShowModal2] = useState(false);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
@@ -33,6 +35,8 @@ const GruposComercios = () => {
     id_comercio: "",
     comercios_agregar: [],
     comercios_eliminar: [],
+    fk_tbl_grupo_planes_comisiones: "",
+    nombre_grupo_plan: "",
   });
   const [datosBusqueda, setDatosBusqueda] = useState({
     pk_tbl_grupo_comercios: "",
@@ -49,6 +53,8 @@ const GruposComercios = () => {
       id_comercio: "",
       comercios_agregar: [],
       comercios_eliminar: [],
+      fk_tbl_grupo_planes_comisiones: "",
+      nombre_grupo_plan: "",
     });
     fetchTipoNivelComerciosFunc();
   }, []);
@@ -62,7 +68,15 @@ const GruposComercios = () => {
       id_comercio: "",
       comercios_agregar: [],
       comercios_eliminar: [],
+      fk_tbl_grupo_planes_comisiones: "",
+      nombre_grupo_plan: "",
     });
+  }, []);
+  const handleClose2 = useCallback(() => {
+    setShowModal2(false);
+  }, []);
+  const handleShowModal2 = useCallback(() => {
+    setShowModal2(true);
   }, []);
 
   const tableGruposComercios = useMemo(() => {
@@ -88,6 +102,9 @@ const GruposComercios = () => {
         nombre_grupo_comercios: gruposComercios[i]?.["nombre_grupo_comercios"],
         comerciosOriginal: gruposComercios[i]?.["comercios"],
         comercios: gruposComercios[i]?.["comercios"],
+        fk_tbl_grupo_planes_comisiones:
+          gruposComercios[i]?.["fk_tbl_grupo_planes_comisiones"],
+        nombre_grupo_plan: gruposComercios[i]?.["nombre_grupo_plan"],
       }));
     },
     [gruposComercios]
@@ -95,6 +112,9 @@ const GruposComercios = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
+      if (selectedGruposComercios?.fk_tbl_grupo_planes_comisiones === "") {
+        return notifyError("Seleccione el grupo de planes de comisiones");
+      }
       setIsUploading(true);
       if (selectedGruposComercios?.pk_tbl_grupo_comercios !== "") {
         putGruposComercios({
@@ -104,6 +124,8 @@ const GruposComercios = () => {
             selectedGruposComercios?.nombre_grupo_comercios,
           comercios_agregar: selectedGruposComercios?.comercios_agregar,
           comercios_eliminar: selectedGruposComercios?.comercios_eliminar,
+          fk_tbl_grupo_planes_comisiones:
+            selectedGruposComercios?.fk_tbl_grupo_planes_comisiones,
         })
           .then((res) => {
             if (res?.status) {
@@ -125,6 +147,8 @@ const GruposComercios = () => {
         postGruposComercios({
           nombre_grupo_comercios:
             selectedGruposComercios?.nombre_grupo_comercios,
+          fk_tbl_grupo_planes_comisiones:
+            selectedGruposComercios?.fk_tbl_grupo_planes_comisiones,
         })
           .then((res) => {
             if (res?.status) {
@@ -353,6 +377,19 @@ const GruposComercios = () => {
             }
             required
           />
+          {selectedGruposComercios?.fk_tbl_grupo_planes_comisiones !== "" && (
+            <Input
+              id='nombre_grupo_plan'
+              name='nombre_grupo_plan'
+              label='Nombre grupo plan de comisiones'
+              type='text'
+              autoComplete='off'
+              value={selectedGruposComercios.nombre_grupo_plan}
+              onInput={() => {}}
+              disabled
+              required
+            />
+          )}
           {selectedGruposComercios?.pk_tbl_grupo_comercios !== "" && (
             <Input
               id='id_comercio'
@@ -401,6 +438,11 @@ const GruposComercios = () => {
             <Button type='button' onClick={handleClose}>
               Cancelar
             </Button>
+            <Button type='button' onClick={handleShowModal2}>
+              {selectedGruposComercios?.fk_tbl_grupo_planes_comisiones !== ""
+                ? "Actualizar grupo de planes de comisiones"
+                : "Agregar grupo de planes de comisiones"}
+            </Button>
             <Button type='submit'>
               {selectedGruposComercios?.pk_tbl_grupo_comercios !== ""
                 ? "Actualizar grupo comercios"
@@ -408,6 +450,12 @@ const GruposComercios = () => {
             </Button>
           </ButtonBar>
         </Form>
+      </Modal>
+      <Modal show={showModal2} handleClose={handleClose2}>
+        <SearchGruposPlanesComisiones
+          setSelectedGruposComercios={setSelectedGruposComercios}
+          handleClose={handleClose2}
+        />
       </Modal>
     </Fragment>
   );

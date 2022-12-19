@@ -11,29 +11,36 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
 import useQuery from "../../../../hooks/useQuery";
 import { notify, notifyError } from "../../../../utils/notify";
+import SearchPlanesComisionesPagar from "../../components/PlanesComisiones/SearchPlanesComisionesPagar";
 import {
-  fetchGruposComercios,
-  postGruposComercios,
-  putGruposComercios,
-} from "../../utils/fetchGruposComercios";
-import { fetchGruposPlanesComisiones } from "../../utils/fetchGruposPlanesComisiones";
+  fetchGruposPlanesComisiones,
+  postGruposPlanesComisiones,
+  putGruposPlanesComisiones,
+} from "../../utils/fetchGruposPlanesComisiones";
 
 const GruposPlanesComisiones = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showModal2, setShowModal2] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
   });
-  const [gruposComercios, setGruposComercios] = useState([]);
+  const [pageDataPlanes, setPageDataPlanes] = useState({
+    page: 1,
+    limit: 10,
+  });
+  const [maxPagesPlanes, setMaxPagesPlanes] = useState(0);
+  const [gruposPlanes, setGruposPlanes] = useState([]);
   const [selectedGruposPlanes, setSelectedGruposPlanes] = useState({
     pk_tbl_grupo_planes_comisiones: "",
     nombre_grupo_plan: "",
     planes_comisiones: [],
     planesComisionesOriginal: [],
-    id_comercio: "",
-    comercios_agregar: [],
-    comercios_eliminar: [],
+    id_plan: "",
+    nombre_plan_comision: "",
+    planes_agregar: [],
+    planes_eliminar: [],
   });
   const [datosBusqueda, setDatosBusqueda] = useState({
     pk_tbl_grupo_planes_comisiones: "",
@@ -47,9 +54,10 @@ const GruposPlanesComisiones = () => {
       nombre_grupo_plan: "",
       planes_comisiones: [],
       planesComisionesOriginal: [],
-      id_comercio: "",
-      comercios_agregar: [],
-      comercios_eliminar: [],
+      id_plan: "",
+      nombre_plan_comision: "",
+      planes_agregar: [],
+      planes_eliminar: [],
     });
     fetchGruposPlanesComisionesFunc();
   }, []);
@@ -60,15 +68,22 @@ const GruposPlanesComisiones = () => {
       nombre_grupo_plan: "",
       planes_comisiones: [],
       planesComisionesOriginal: [],
-      id_comercio: "",
-      comercios_agregar: [],
-      comercios_eliminar: [],
+      id_plan: "",
+      nombre_plan_comision: "",
+      planes_agregar: [],
+      planes_eliminar: [],
     });
   }, []);
+  const handleClose2 = useCallback(() => {
+    setShowModal2(false);
+  }, []);
+  const handleShowModal2 = useCallback(() => {
+    setShowModal2(true);
+  }, []);
 
-  const tableGruposComercios = useMemo(() => {
+  const tableGruposPlanes = useMemo(() => {
     return [
-      ...gruposComercios.map(
+      ...gruposPlanes.map(
         ({
           nombre_grupo_plan,
           pk_tbl_grupo_planes_comisiones,
@@ -82,7 +97,15 @@ const GruposPlanesComisiones = () => {
         }
       ),
     ];
-  }, [gruposComercios]);
+  }, [gruposPlanes]);
+
+  const tablePlanes = useMemo(() => {
+    const dataTab = selectedGruposPlanes.planes_comisiones.slice(
+      pageDataPlanes.limit * (pageDataPlanes.page - 1),
+      pageDataPlanes.limit * pageDataPlanes.page
+    );
+    return [...dataTab];
+  }, [selectedGruposPlanes.planes_comisiones, pageDataPlanes]);
 
   const onSelectTipoNivelComercios = useCallback(
     (e, i) => {
@@ -90,25 +113,34 @@ const GruposPlanesComisiones = () => {
       setSelectedGruposPlanes((old) => ({
         ...old,
         pk_tbl_grupo_planes_comisiones:
-          gruposComercios[i]?.["pk_tbl_grupo_planes_comisiones"],
-        nombre_grupo_plan: gruposComercios[i]?.["nombre_grupo_plan"],
-        planesComisionesOriginal: gruposComercios[i]?.["planes_comisiones"],
-        planes_comisiones: gruposComercios[i]?.["planes_comisiones"],
+          gruposPlanes[i]?.["pk_tbl_grupo_planes_comisiones"],
+        nombre_grupo_plan: gruposPlanes[i]?.["nombre_grupo_plan"],
+        planesComisionesOriginal: gruposPlanes[i]?.["planes_comisiones"],
+        planes_comisiones: gruposPlanes[i]?.["planes_comisiones"],
       }));
+      setMaxPagesPlanes(
+        Math.ceil(
+          selectedGruposPlanes.planes_comisiones.length / pageDataPlanes.limit
+        )
+      );
     },
-    [gruposComercios]
+    [
+      gruposPlanes,
+      pageDataPlanes.limit,
+      selectedGruposPlanes.planes_comisiones.length,
+    ]
   );
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
       setIsUploading(true);
       if (selectedGruposPlanes?.pk_tbl_grupo_planes_comisiones !== "") {
-        putGruposComercios({
+        putGruposPlanesComisiones({
           pk_tbl_grupo_planes_comisiones:
             selectedGruposPlanes?.pk_tbl_grupo_planes_comisiones,
           nombre_grupo_plan: selectedGruposPlanes?.nombre_grupo_plan,
-          comercios_agregar: selectedGruposPlanes?.comercios_agregar,
-          comercios_eliminar: selectedGruposPlanes?.comercios_eliminar,
+          planes_agregar: selectedGruposPlanes?.planes_agregar,
+          planes_eliminar: selectedGruposPlanes?.planes_eliminar,
         })
           .then((res) => {
             if (res?.status) {
@@ -127,7 +159,7 @@ const GruposPlanesComisiones = () => {
             console.error(err);
           });
       } else {
-        postGruposComercios({
+        postGruposPlanesComisiones({
           nombre_grupo_plan: selectedGruposPlanes?.nombre_grupo_plan,
         })
           .then((res) => {
@@ -171,110 +203,55 @@ const GruposPlanesComisiones = () => {
     })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
-        setGruposComercios(autoArr?.results ?? []);
+        setGruposPlanes(autoArr?.results ?? []);
       })
       .catch((err) => console.error(err));
   }, [page, limit, datosBusqueda]);
-  const onSelectComercioDelete = useCallback(
+  const onSelectPlanDelete = useCallback(
     (e, i) => {
-      e.preventDefault();
-      const fk_comercio = selectedGruposPlanes.planes_comisiones[i].fk_comercio;
+      const fk_planes_comisiones =
+        selectedGruposPlanes.planes_comisiones[i].fk_planes_comisiones;
       const obj = { ...selectedGruposPlanes };
       if (
-        selectedGruposPlanes?.comercios_agregar?.find(
-          (a) => a?.fk_comercio === fk_comercio
+        selectedGruposPlanes?.planes_agregar?.find(
+          (a) => a?.fk_planes_comisiones === fk_planes_comisiones
         )
       ) {
-        const b = obj["comercios_agregar"].filter(
-          (a) => a?.fk_comercio !== fk_comercio
+        const b = obj["planes_agregar"].filter(
+          (a) => a?.fk_planes_comisiones !== fk_planes_comisiones
         );
-        obj["comercios_agregar"] = b;
+        obj["planes_agregar"] = b;
       }
       if (
         selectedGruposPlanes?.planesComisionesOriginal?.find(
-          (a) => a?.fk_comercio === fk_comercio
+          (a) => a?.fk_planes_comisiones === fk_planes_comisiones
         ) &&
-        !selectedGruposPlanes?.comercios_eliminar?.find(
-          (a) => a?.fk_comercio === fk_comercio
+        !selectedGruposPlanes?.planes_eliminar?.find(
+          (a) => a?.fk_planes_comisiones === fk_planes_comisiones
         )
       ) {
-        obj["comercios_eliminar"] = [
-          ...obj["comercios_eliminar"],
+        obj["planes_eliminar"] = [
+          ...obj["planes_eliminar"],
           {
-            fk_comercio: fk_comercio,
-            fk_tbl_grupo_comercios:
+            fk_planes_comisiones: fk_planes_comisiones,
+            fk_tbl_grupo_planes_comisiones:
               selectedGruposPlanes["pk_tbl_grupo_planes_comisiones"],
           },
         ];
       }
 
       const c = obj["planes_comisiones"].filter(
-        (a) => a?.fk_comercio !== fk_comercio
+        (a) => a?.fk_planes_comisiones !== fk_planes_comisiones
       );
       obj["planes_comisiones"] = c;
       setSelectedGruposPlanes((old) => {
         return {
           ...old,
-          comercios_eliminar: obj["comercios_eliminar"],
-          comercios_agregar: obj["comercios_agregar"],
+          planes_eliminar: obj["planes_eliminar"],
+          planes_agregar: obj["planes_agregar"],
           planes_comisiones: obj["planes_comisiones"],
         };
       });
-    },
-    [selectedGruposPlanes]
-  );
-  const addComercio = useCallback(
-    (ev) => {
-      ev.preventDefault();
-      if (
-        !selectedGruposPlanes?.planes_comisiones?.find(
-          (a) => a?.fk_comercio === selectedGruposPlanes["id_comercio"]
-        ) &&
-        !selectedGruposPlanes?.comercios_agregar?.find(
-          (a) => a?.fk_comercio === selectedGruposPlanes["id_comercio"]
-        ) &&
-        selectedGruposPlanes["id_comercio"] !== ""
-      ) {
-        const obj = { ...selectedGruposPlanes };
-        if (
-          !selectedGruposPlanes?.planesComisionesOriginal?.find(
-            (a) => a?.fk_comercio === selectedGruposPlanes["id_comercio"]
-          )
-        ) {
-          obj["comercios_agregar"] = [
-            ...obj["comercios_agregar"],
-            {
-              fk_comercio: selectedGruposPlanes["id_comercio"],
-              fk_tbl_grupo_comercios:
-                selectedGruposPlanes["pk_tbl_grupo_planes_comisiones"],
-            },
-          ];
-        }
-        if (
-          selectedGruposPlanes?.comercios_eliminar?.find(
-            (a) => a?.fk_comercio === selectedGruposPlanes["id_comercio"]
-          )
-        ) {
-          const b = obj["comercios_eliminar"].filter(
-            (a) => a?.fk_comercio !== selectedGruposPlanes["id_comercio"]
-          );
-          obj["comercios_eliminar"] = b;
-        }
-        obj["planes_comisiones"] = [
-          ...obj["planes_comisiones"],
-          { fk_comercio: selectedGruposPlanes["id_comercio"] },
-        ];
-
-        setSelectedGruposPlanes((old) => {
-          return {
-            ...old,
-            comercios_eliminar: obj["comercios_eliminar"],
-            comercios_agregar: obj["comercios_agregar"],
-            planes_comisiones: obj["planes_comisiones"],
-            id_comercio: "",
-          };
-        });
-      }
     },
     [selectedGruposPlanes]
   );
@@ -290,7 +267,7 @@ const GruposPlanesComisiones = () => {
         title='Grupos de planes de comisiones'
         maxPage={maxPages}
         headers={["Id", "Nombre grupo", "Cantidad planes"]}
-        data={tableGruposComercios}
+        data={tableGruposPlanes}
         onSelectRow={onSelectTipoNivelComercios}
         onSetPageData={setPageData}
         // onChange={onChange}
@@ -360,53 +337,25 @@ const GruposPlanesComisiones = () => {
             required
           />
           {selectedGruposPlanes?.pk_tbl_grupo_planes_comisiones !== "" && (
-            <Input
-              id='id_comercio'
-              name='id_comercio'
-              label={"Id grupo planes"}
-              type='number'
-              autoComplete='off'
-              value={selectedGruposPlanes?.id_comercio}
-              onInput={(e) => {
-                if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
-                  setSelectedGruposPlanes((old) => {
-                    return { ...old, id_comercio: parseInt(num) };
-                  });
-                }
-              }}
-              info={
-                <button
-                  style={{
-                    position: "absolute",
-                    top: "-33px",
-                    right: "-235px",
-                    fontSize: "15px",
-                    padding: "5px",
-                    backgroundColor: "#e26c22",
-                    color: "white",
-                    borderRadius: "5px",
-                  }}
-                  onClick={addComercio}>
-                  Agregar
-                </button>
-              }
-            />
-          )}
-          {selectedGruposPlanes?.planes_comisiones?.length > 0 && (
-            <Fieldset legend='Comercios asociados'>
-              <TagsAlongSide
-                data={selectedGruposPlanes?.planes_comisiones.map(
-                  (it) => it.fk_comercio
-                )}
-                onSelect={onSelectComercioDelete}
-              />
-            </Fieldset>
+            <TableEnterprise
+              title='Planes de comisiones'
+              maxPage={maxPagesPlanes}
+              headers={["Id", "Plan comision"]}
+              data={tablePlanes}
+              onSelectRow={onSelectPlanDelete}
+              onSetPageData={setPageDataPlanes}
+              // onChange={onChange}
+            ></TableEnterprise>
           )}
           <ButtonBar>
             <Button type='button' onClick={handleClose}>
               Cancelar
             </Button>
+            {selectedGruposPlanes?.pk_tbl_grupo_planes_comisiones !== "" && (
+              <Button type='button' onClick={handleShowModal2}>
+                Agregar plan de comisión
+              </Button>
+            )}
             <Button type='submit'>
               {selectedGruposPlanes?.pk_tbl_grupo_planes_comisiones !== ""
                 ? "Actualizar grupo de planes"
@@ -414,6 +363,13 @@ const GruposPlanesComisiones = () => {
             </Button>
           </ButtonBar>
         </Form>
+      </Modal>
+      <Modal show={showModal2} handleClose={handleClose2}>
+        <SearchPlanesComisionesPagar
+          selectedGruposPlanes={selectedGruposPlanes}
+          setSelectedGruposPlanes={setSelectedGruposPlanes}
+          handleClose={() => handleClose2()}
+        />
       </Modal>
     </Fragment>
   );

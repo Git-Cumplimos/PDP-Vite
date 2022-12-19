@@ -8,13 +8,16 @@ import Input from "../../../../components/Base/Input";
 import { fetchComisionesPagar } from "../../utils/fetchComisionesPagar";
 import { fetchComisionesCobrar } from "../../utils/fetchComisionesCobrar";
 import { getComisionesPlanes } from "../../utils/fetchComisionesPlanes";
-import { getAssingsCommissions, getComisionesPlanesCampanas } from "../../utils/fetchComisionesPlanesCampanas";
+import {
+  getAssingsCommissions,
+  getComisionesPlanesCampanas,
+} from "../../utils/fetchComisionesPlanesCampanas";
 import Select from "../../../../components/Base/Select";
 
 const SearchComissions = ({ comissionFace, onSelectItem }) => {
   const [
     {
-      tipoTrx = "",
+      tipoComision = "",
       comercio = "",
       convenio = "",
       autorizador = "",
@@ -30,12 +33,10 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
 
       pk_planes_comisiones = "",
 
-      nombre_asignacion_comision="",
-      fk_tipo_op="",
-      fk_comercio="",
-      fk_convenio="",
-      respuesta="",
-      tipo_comision=""
+      nombre_asignacion_comision = "",
+      fk_tipo_op = "",
+      fk_tbl_grupo_convenios = "",
+      tipo_comision = "",
     },
     setQuery,
   ] = useQuery();
@@ -84,7 +85,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     if (headers.includes("pk_planes_comisiones")) {
       newHeaders.push("Id Plan");
     }
-    
+
     // if (headers.includes("fecha_modificacion")) {
     //   newHeaders.push("Fecha de modificación");
     // }
@@ -101,12 +102,11 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
       newHeaders.push("Nombre Campaña");
     }
 
-
     if (headers.includes("nombre_asignacion_comision")) {
       newHeaders.push("Nombre asignación");
     }
     if (headers.includes("fk_tipo_op")) {
-      newHeaders.push("Tipo operacion");
+      newHeaders.push("Tipo operación");
     }
     if (headers.includes("tipo_comision")) {
       newHeaders.push("Tipo comisión");
@@ -114,19 +114,10 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     if (headers.includes("fk_planes_comisiones")) {
       newHeaders.push("Plan asociado");
     }
-    if (headers.includes("fk_comercio")) {
-      newHeaders.push("Id comercio");
-    }
-    if (headers.includes("fk_convenio")) {
-      newHeaders.push("Id convenio");
-    }
-    if (headers.includes("respuesta")) {
-      newHeaders.push("Respuesta trx");
-    }
     if (headers.includes("fecha_creacion")) {
       newHeaders.push("Fecha de Creación");
     }
-    
+
     return newHeaders;
   }, [comissions]);
 
@@ -194,10 +185,12 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           fecha_modificacion,
           nombre_plan_comision,
           pk_planes_comisiones,
+          tipo_comision,
         }) => {
           return {
             "Id Plan": pk_planes_comisiones,
-            // Comisiones: comisiones,
+            "Nombre Plan de Comisión": nombre_plan_comision ?? "",
+            "Tipo comision": tipo_comision ?? "",
             "Fecha de Creación":
               Intl.DateTimeFormat("es-CO", {
                 year: "numeric",
@@ -210,8 +203,6 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
                   new Date(fecha_creacion + "-5").getHours()
                 )
               ) ?? "",
-            // "Fecha de Modificación": fecha_modificacion ?? "",
-            "Nombre Plan de Comisión": nombre_plan_comision ?? "",
           };
         }
       );
@@ -265,7 +256,8 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           };
         }
       );
-    } if (comissionFace === "assigns") {
+    }
+    if (comissionFace === "assigns") {
       return comissions.map(
         ({
           nombre_asignacion_comision,
@@ -276,17 +268,17 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           tipo_comision,
           fk_planes_comisiones,
           pk_asignacion_comisiones,
-          fecha_creacion
+          fecha_creacion,
         }) => {
           return {
-          nombre_asignacion_comision,
-          fk_tipo_op,
-          tipo_comision,
-          fk_planes_comisiones,
-          fk_comercio,
-          fk_convenio,
-          respuesta,
-          "Fecha de Creación":
+            nombre_asignacion_comision,
+            fk_tipo_op,
+            tipo_comision,
+            fk_planes_comisiones,
+            fk_comercio,
+            fk_convenio,
+            respuesta,
+            "Fecha de Creación":
               Intl.DateTimeFormat("es-CO", {
                 year: "numeric",
                 month: "numeric",
@@ -301,7 +293,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
           };
         }
       );
-    }else {
+    } else {
       return comissions.map(
         ({
           id_comision_pagada,
@@ -344,7 +336,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
       const _id_plan_comision = comissions?.[indx]?.["pk_planes_comisiones"];
       const _id_plan_comision_campana =
         comissions?.[indx]?.["pk_planes_comisiones"];
-        const _id_plan_asignacion_comision =
+      const _id_plan_asignacion_comision =
         comissions?.[indx]?.["pk_asignacion_comisiones"];
       // const _id_tipo_trx = comissions?.[indx]?.["id_tipo_op"];
       // const _id_comercio = comissions?.[indx]?.["id_comercio"];
@@ -366,7 +358,10 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
         urlParams.append("id_plan_comision_campana", _id_plan_comision_campana);
       }
       if (comissionFace === "assigns") {
-        urlParams.append("id_plan_asignacion_comision", _id_plan_asignacion_comision);
+        urlParams.append(
+          "id_plan_asignacion_comision",
+          _id_plan_asignacion_comision
+        );
       }
 
       // if (_id_tipo_trx) {
@@ -407,13 +402,13 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
       fetchPlans();
     } else if (comissionFace === "campaigns") {
       fetchCampaignPlans();
-    }else if (comissionFace === "assigns") {
+    } else if (comissionFace === "assigns") {
       fetchAssingsCommission();
     }
   }, [
     convenio,
     comercio,
-    tipoTrx,
+    tipoComision,
     autorizador,
     page,
     limit,
@@ -425,17 +420,15 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     comissionFace,
     nombre_asignacion_comision,
     fk_tipo_op,
-    fk_comercio,
-    fk_convenio,
-    respuesta,
-    tipo_comision
+    fk_tbl_grupo_convenios,
+    tipo_comision,
   ]);
   const fecthComisionesPagarFunc = () => {
     let obj = { page, limit };
     if (id_comision) obj["id_comision"] = id_comision;
     if (convenio !== "") obj["nombre_convenio"] = convenio;
     if (nombre_comision !== "") obj["nombre_comision"] = nombre_comision;
-    if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
+    if (tipoComision !== "") obj["nombre_operacion"] = tipoComision;
     if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
     if (comercio !== "") obj["id_comercio"] = parseInt(comercio);
     fetchComisionesPagar(obj)
@@ -450,7 +443,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
     if (id_comision) obj["id_comision"] = id_comision;
     if (nombre_comision !== "") obj["nombre_comision"] = nombre_comision;
     if (convenio !== "") obj["nombre_convenio"] = convenio;
-    if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
+    if (tipoComision !== "") obj["nombre_operacion"] = tipoComision;
     if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
     fetchComisionesCobrar(obj)
       .then((res) => {
@@ -461,15 +454,10 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
   };
 
   const fetchPlans = () => {
-    console.log("fecthComisionescomisiones");
-
-    let obj = { page, limit };
+    let obj = { page, limit, sortDir: "DESC", sortBy: "pk_planes_comisiones" };
     if (pk_planes_comisiones !== "")
       obj["pk_planes_comisiones"] = pk_planes_comisiones;
-    if (comisiones !== "") obj["comisiones"] = comisiones;
-    if (fecha_creacion !== "") obj["fecha_creacion"] = fecha_creacion;
-    if (fecha_modificacion !== "")
-      obj["fecha_modificacion"] = fecha_modificacion;
+    if (tipoComision !== "") obj["tipo_comision"] = tipoComision;
     if (nombre_plan_comision !== "")
       obj["nombre_plan_comision"] = nombre_plan_comision;
 
@@ -500,16 +488,13 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
   };
   const fetchAssingsCommission = () => {
     let obj = { page, limit };
-    if (nombre_asignacion_comision !== "") obj["nombre_asignacion_comision"] = nombre_asignacion_comision;
+    if (nombre_asignacion_comision !== "")
+      obj["nombre_asignacion_comision"] = nombre_asignacion_comision;
     if (fk_tipo_op !== "") obj["fk_tipo_op"] = fk_tipo_op;
-    if (fk_comercio !== "") obj["fk_comercio"] = fk_comercio;
-    if (fk_convenio !== "") obj["fk_convenio"] = fk_convenio;
-    if (respuesta !== "")
-      obj["respuesta"] = respuesta;
-      if (tipo_comision !== "")
-      obj["tipo_comision"] = tipo_comision;
+    if (fk_tbl_grupo_convenios !== "")
+      obj["fk_tbl_grupo_convenios"] = fk_tbl_grupo_convenios;
 
-      getAssingsCommissions(obj)
+    getAssingsCommissions(obj)
       .then((res) => {
         console.log(res);
         setComissions(res?.results);
@@ -531,7 +516,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
             ? "Lista de Planes de Comisión"
             : comissionFace === "campaigns"
             ? "Lista de Campañas"
-            :comissionFace === "assigns"
+            : comissionFace === "assigns"
             ? "Asignaciones de comisiones"
             : ""
         }
@@ -540,8 +525,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
         headers={headersTable}
         data={dataTable}
         onSelectRow={onSelectItem ? passItem : onSelectRow}
-        onSetPageData={setPageData}
-      >
+        onSetPageData={setPageData}>
         {comissionFace === "pay" ? (
           <>
             <Input
@@ -549,7 +533,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre convenio"}
               name={"convenio"}
               type={"text"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={convenio}
             />
             <Input
@@ -557,24 +541,24 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre comision"}
               name={"nombre_comision"}
               type={"text"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={nombre_comision}
             />
             <Input
-              id={"tipoTrx"}
+              id={"tipoComision"}
               label={"Tipo de transacción"}
-              name={"tipoTrx"}
+              name={"tipoComision"}
               type={"text"}
-              autoComplete="off"
-              defaultValue={tipoTrx}
+              autoComplete='off'
+              defaultValue={tipoComision}
             />
             <Input
               id={"id_comision"}
               label={"Id comisión"}
               name={"id_comision"}
-              type="number"
+              type='number'
               step={"1"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={id_comision}
             />
           </>
@@ -586,7 +570,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre convenio"}
               name={"convenio"}
               type={"text"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={convenio}
             />
             <Input
@@ -594,24 +578,24 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre comision"}
               name={"nombre_comision"}
               type={"text"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={nombre_comision}
             />
             <Input
-              id={"tipoTrx"}
+              id={"tipoComision"}
               label={"Tipo de transacción"}
-              name={"tipoTrx"}
+              name={"tipoComision"}
               type={"text"}
-              autoComplete="off"
-              defaultValue={tipoTrx}
+              autoComplete='off'
+              defaultValue={tipoComision}
             />
             <Input
               id={"id_comision"}
               label={"Id comisión"}
               name={"id_comision"}
-              type="number"
+              type='number'
               step={"1"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={id_comision}
             />
           </>
@@ -623,24 +607,27 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre comisión"}
               name={"nombre_plan_comision"}
               type={"text"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={nombre_plan_comision}
             />
-            <Input
-              id={"tipoTrx"}
-              label={"Tipo de transacción"}
-              name={"tipoTrx"}
-              type={"text"}
-              autoComplete="off"
-              defaultValue={tipoTrx}
+            <Select
+              id='tipoComision'
+              name='tipoComision'
+              label='Tipo de comisión'
+              options={{
+                "": "",
+                Pagar: "PAGAR",
+                Cobrar: "COBRAR",
+              }}
+              defaultValue={tipoComision}
             />
             <Input
               id={"pk_planes_comisiones"}
               label={"Id plan"}
               name={"pk_planes_comisiones"}
-              type="number"
+              type='number'
               step={"1"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={pk_planes_comisiones}
             />
           </>
@@ -652,24 +639,24 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre comisión"}
               name={"nombre_comision"}
               type={"text"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={nombre_comision}
             />
             <Input
-              id={"tipoTrx"}
+              id={"tipoComision"}
               label={"Tipo de transacción"}
-              name={"tipoTrx"}
+              name={"tipoComision"}
               type={"text"}
-              autoComplete="off"
-              defaultValue={tipoTrx}
+              autoComplete='off'
+              defaultValue={tipoComision}
             />
             <Input
               id={"id_comision"}
               label={"Id comisión"}
               name={"id_comision"}
-              type="number"
+              type='number'
               // step={"1"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={comercio}
             />
           </>
@@ -681,70 +668,19 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre asignación"}
               name={"nombre_asignacion_comision"}
               type={"text"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={nombre_asignacion_comision}
-            />
-            <Input
-              id={"tipo_comision"}
-              label={"Tipo de comision"}
-              name={"tipo_comision"}
-              type={"text"}
-              autoComplete="off"
-              defaultValue={tipo_comision}
             />
             <Input
               id={"fk_tipo_op"}
               label={"Tipo de transacción"}
               name={"fk_tipo_op"}
               type={"number"}
-              autoComplete="off"
+              autoComplete='off'
               defaultValue={fk_tipo_op}
             />
-            <Input
-              id={"fk_comercio"}
-              label={"Id comercio"}
-              name={"fk_comercio"}
-              type="number"
-              // step={"1"}
-              autoComplete="off"
-              defaultValue={fk_comercio}
-            />
-            <Input
-              id={"fk_convenio"}
-              label={"Id convenio"}
-              name={"fk_convenio"}
-              type={"text"}
-              autoComplete="off"
-              defaultValue={fk_convenio}
-            />
-            <Input
-              id={"respuesta"}
-              label={"Respuesta de transacción"}
-              name={"respuesta"}
-              type={"text"}
-              autoComplete="off"
-              defaultValue={respuesta}
-            />
-            
           </>
-        ):null}
-        {/* <Select
-          id="tipoTrx"
-          name="tipoTrx"
-          label="Tipo de transacción"
-          options={{ Cobrar: "cobrar", Pagar: "pagar" }}
-          value={tipoTrx}
-          // defaultValue={comissionData?.type}
-          required
-        /> */}
-        {/* <Input
-          id={"fecha_inicio"}
-          label={"Fecha inicio"}
-          name={"fecha_inicio"}
-          type={"date"}
-          autoComplete="off"
-          defaultValue={fecha_inicio}
-        /> */}
+        ) : null}
       </TableEnterprise>
     </Fragment>
   );
