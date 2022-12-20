@@ -51,6 +51,7 @@ const TramitePines = () => {
   const [showModalReenvio, setShowModalReenvio] = useState(false)
   const [doc_cliente, setDoc_cliente] = useState("")
   const [cierreManual, setCierreManual] = useState(false)
+  const [infoComercioCreacion, setInfoComercioCreacion] = useState("")
 
   useEffect(() => {
     ///////////////
@@ -136,6 +137,7 @@ const TramitePines = () => {
           setValor_tramite(res?.obj?.results?.[0]?.valor_tramite);
           setName_tramite(res?.obj?.results?.[0]?.name_tramite);
           setId_pin(res?.obj?.results?.[0]?.id_pin)
+          setInfoComercioCreacion(res?.obj?.results?.[0]?.datos_comercio_creacion)
         }
       })
       .catch((err) => console.log("error", err));
@@ -248,6 +250,7 @@ const TramitePines = () => {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
+
                 setShowModal(true);
                 setActivarNavigate(false);
               }
@@ -343,6 +346,7 @@ const TramitePines = () => {
             id_pin = {id_pin}
             trx={id_trx}
             tipoPin={tipoPin}
+            infoComercioCreacion={infoComercioCreacion}
             setActivarNavigate={setActivarNavigate}
             closeModal={closeModal}
           ></CancelPin>

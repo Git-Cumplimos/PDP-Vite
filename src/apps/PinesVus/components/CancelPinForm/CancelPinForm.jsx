@@ -24,6 +24,7 @@ const CancelPin = ({
   id_pin,
   trx,
   tipoPin,
+  infoComercioCreacion,
   closeModal,
   setActivarNavigate,
 }) => {
@@ -124,11 +125,11 @@ const CancelPin = ({
   const onSubmitCancel = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion) //// Valor = valor + IVA
+    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion) //// Valor = valor + IVA
       .then((res) => {
         setActivarNavigate(false);
         setDisabledBtn(false);
-        if (res?.status == false) {
+        if (res?.status === false) {
           notifyError(res?.msg);
         } else {
           setActivarNavigate(true);
@@ -138,7 +139,7 @@ const CancelPin = ({
       })
       .catch((err) => console.log("error", err));
   };
-  console.log(tipCancelacion)
+  console.log(infoComercioCreacion)
 
   return (
     <>
