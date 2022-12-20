@@ -143,8 +143,8 @@ const SearchPlanesComisionesPagar = ({
         onSelectRow={addPlanes}
         onSetPageData={setPageData}>
         <Input
-          id='searchPkComercio'
-          name='searchPkComercio'
+          id='pk_planes_comisiones'
+          name='pk_planes_comisiones'
           label={"Id plan comisión"}
           type='number'
           autoComplete='off'

@@ -20,12 +20,12 @@ import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
 import Select from "../../../../components/Base/Select";
+import SearchPlanesComisiones from "../../components/PlanesComisiones/SearchPlanesComisiones";
+import Fieldset from "../../../../components/Base/Fieldset";
 
 const CreateAssigns = () => {
   const navigate = useNavigate();
 
-  const [headersTable, setHeadersTable] = useState([]);
-  const [transactionType, setTransactionType] = useState([]);
   const [idComercios, setIdComercios] = useState([]);
   const [newComision, setNewComision] = useState({
     fk_tipo_op: "",
@@ -272,6 +272,14 @@ const CreateAssigns = () => {
     },
     [idComercios]
   );
+  const handleShow = useCallback(
+    (data) => (ev) => {
+      ev.preventDefault();
+      setSelectedOpt(data);
+      setShowModal(true);
+    },
+    []
+  );
 
   return (
     <Fragment>
@@ -293,7 +301,7 @@ const CreateAssigns = () => {
             label={"Plan de comisión"}
             type='text'
             autoComplete='off'
-            value={newComision?.["nombre_plan"]}
+            value={newComision?.nombre_plan}
             onChange={() => {}}
             disabled
           />
@@ -322,23 +330,25 @@ const CreateAssigns = () => {
             disabled
           />
         )}
-        <ButtonBar className='lg:col-span-2'>
-          <Button type='button' onClick={handleClose}>
-            {newComision?.fk_planes_comisiones !== ""
-              ? "Actualizar plan de comisión"
-              : "Agregar plan de comisión"}
-          </Button>
-          <Button type='button' onClick={() => {}}>
-            {newComision?.fk_tipo_op !== ""
-              ? "Actualizar tipo de operación"
-              : "Agregar tipo de operación"}
-          </Button>
-          <Button type='button'>
-            {newComision?.fk_tbl_grupo_convenios !== ""
-              ? "Actualizar grupo convenios"
-              : "Agregar grupo convenios"}
-          </Button>
-        </ButtonBar>
+        <Fieldset legend='Datos de la comisión' className='lg:col-span-2'>
+          <ButtonBar className='lg:col-span-2'>
+            <Button type='button' onClick={handleShow("planComision")}>
+              {newComision?.fk_planes_comisiones !== ""
+                ? "Actualizar plan de comisión"
+                : "Agregar plan de comisión"}
+            </Button>
+            <Button type='button' onClick={handleShow("tipoOperacion")}>
+              {newComision?.fk_tipo_op !== ""
+                ? "Actualizar tipo de operación"
+                : "Agregar tipo de operación"}
+            </Button>
+            <Button type='button' onClick={handleShow("grupoConvenios")}>
+              {newComision?.fk_tbl_grupo_convenios !== ""
+                ? "Actualizar grupo convenios"
+                : "Agregar grupo convenios"}
+            </Button>
+          </ButtonBar>
+        </Fieldset>
         <ButtonBar className='lg:col-span-2'>
           <Button type='button' onClick={handleClose}>
             Cancelar
@@ -354,7 +364,17 @@ const CreateAssigns = () => {
       <Modal
         show={showModal}
         handleClose={handleClose}
-        className='flex align-middle'></Modal>
+        className='flex align-middle'>
+        {selectedOpt === "planComision" ? (
+          <SearchPlanesComisiones
+            handleClose={handleClose}
+            setNewComision={setNewComision}
+            newComision={newComision}
+          />
+        ) : (
+          <></>
+        )}
+      </Modal>
     </Fragment>
   );
 };

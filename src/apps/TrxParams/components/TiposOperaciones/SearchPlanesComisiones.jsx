@@ -6,14 +6,15 @@ import {
   getComisionesPlanesPagar,
 } from "../../utils/fetchComisionesPlanes";
 import Select from "../../../../components/Base/Select";
+import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
 
-const SearchPlanesComisiones = ({
+const SearchTiposOperaciones = ({
   newComision,
   setNewComision,
   handleClose,
 }) => {
-  const [planesComisiones, setPlanesComisiones] = useState([]);
-  const [dataPlanesComisiones, setDataPlanesComisiones] = useState({
+  const [tiposOperaciones, setTiposOperaciones] = useState([]);
+  const [dataTiposOperaciones, setDataTiposOperaciones] = useState({
     pk_planes_comisiones: "",
     nombre_plan_comision: "",
     tipo_comision: "",
@@ -25,7 +26,7 @@ const SearchPlanesComisiones = ({
   });
 
   const dataTable = useMemo(() => {
-    return planesComisiones.map(
+    return tiposOperaciones.map(
       ({
         comisiones,
         fecha_creacion,
@@ -41,40 +42,48 @@ const SearchPlanesComisiones = ({
         };
       }
     );
-  }, [planesComisiones]);
+  }, [tiposOperaciones]);
   const selectPlan = useCallback(
     (ev, i) => {
       ev.preventDefault();
       setNewComision((old) => ({
         ...old,
-        fk_planes_comisiones: planesComisiones[i].pk_planes_comisiones,
-        nombre_plan: planesComisiones[i].nombre_plan_comision,
+        fk_planes_comisiones: tiposOperaciones[i].pk_planes_comisiones,
+        nombre_plan: tiposOperaciones[i].nombre_plan_comision,
       }));
       handleClose();
     },
-    [planesComisiones]
+    [tiposOperaciones]
   );
   useEffect(() => {
-    fetchPlans();
-  }, [dataPlanesComisiones, page, limit]);
+    fetchTiposTransaccionFunc();
+  }, [dataTiposOperaciones, page, limit]);
   const onChangeFormat = useCallback((ev) => {
     let valor = ev.target.value;
     valor = valor.replace(/[\s\.]/g, "");
-    setDataPlanesComisiones((old) => {
+    setDataTiposOperaciones((old) => {
       return { ...old, [ev.target.name]: valor };
     });
   }, []);
   const fetchPlans = () => {
     let obj = { page, limit, sortDir: "DESC", sortBy: "pk_planes_comisiones" };
-    if (dataPlanesComisiones.pk_planes_comisiones !== "")
-      obj["pk_planes_comisiones"] = dataPlanesComisiones.pk_planes_comisiones;
-    if (dataPlanesComisiones.nombre_plan_comision !== "")
-      obj["nombre_plan_comision"] = dataPlanesComisiones.nombre_plan_comision;
-    if (dataPlanesComisiones.tipo_comision !== "")
-      obj["tipo_comision"] = dataPlanesComisiones.tipo_comision;
+    if (dataTiposOperaciones.pk_planes_comisiones !== "")
+      obj["pk_planes_comisiones"] = dataTiposOperaciones.pk_planes_comisiones;
+    if (dataTiposOperaciones.nombre_plan_comision !== "")
+      obj["nombre_plan_comision"] = dataTiposOperaciones.nombre_plan_comision;
+    if (dataTiposOperaciones.tipo_comision !== "")
+      obj["tipo_comision"] = dataTiposOperaciones.tipo_comision;
     getComisionesPlanes(obj)
       .then((res) => {
-        setPlanesComisiones(res?.results);
+        setTiposOperaciones(res?.results);
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => console.error(err));
+  };
+  const fetchTiposTransaccionFunc = () => {
+    fetchTrxTypesPages("", page)
+      .then((res) => {
+        setTiposOperaciones(res?.results);
         setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
@@ -94,7 +103,7 @@ const SearchPlanesComisiones = ({
           label={"Id plan comisión"}
           type='number'
           autoComplete='off'
-          value={dataPlanesComisiones.pk_planes_comisiones}
+          value={dataTiposOperaciones.pk_planes_comisiones}
           onChange={onChangeFormat}
         />
         <Input
@@ -103,7 +112,7 @@ const SearchPlanesComisiones = ({
           label={"Nombre plan comisión"}
           type='text'
           autoComplete='off'
-          value={dataPlanesComisiones.nombre_plan_comision}
+          value={dataTiposOperaciones.nombre_plan_comision}
           onChange={onChangeFormat}
         />
         <Select
@@ -115,7 +124,7 @@ const SearchPlanesComisiones = ({
             Pagar: "PAGAR",
             Cobrar: "COBRAR",
           }}
-          value={dataPlanesComisiones.tipo_comision}
+          value={dataTiposOperaciones.tipo_comision}
           onChange={onChangeFormat}
         />
       </TableEnterprise>
@@ -123,4 +132,4 @@ const SearchPlanesComisiones = ({
   );
 };
 
-export default SearchPlanesComisiones;
+export default SearchTiposOperaciones;
