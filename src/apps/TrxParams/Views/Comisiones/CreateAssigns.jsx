@@ -21,52 +21,22 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
 import Select from "../../../../components/Base/Select";
 
-// const initComissionData = {
-//   type: "trx",
-//   ranges: [
-//     {
-//       "Rango minimo": 0,
-//       "Rango maximo": 0,
-//       "Comision porcentual": 0,
-//       "Comision fija": 0,
-//     },
-//   ],
-// };
-
 const CreateAssigns = () => {
   const navigate = useNavigate();
-
-  const [
-    {
-      tipoTrx = "",
-      comercio = "",
-      convenio = "",
-      autorizador = "",
-      selectedOpt,
-    },
-    setQuery,
-  ] = useQuery();
 
   const [headersTable, setHeadersTable] = useState([]);
   const [transactionType, setTransactionType] = useState([]);
   const [idComercios, setIdComercios] = useState([]);
-  const [comissionData, setComissionData] = useState({
-    type: "trx",
-    ranges: [
-      {
-        "Rango minimo": 0,
-        "Rango maximo": 0,
-        "Comision porcentual": 0,
-        "Comision fija": 0,
-      },
-    ],
-  });
   const [newComision, setNewComision] = useState({
-    "Id comercio": "",
-    "Nombre comision": "",
-    "Fecha inicio": "",
-    "Fecha fin": "",
+    fk_tipo_op: "",
+    nombre_tipo_operacion: "",
+    fk_planes_comisiones: "",
+    nombre_plan: "",
+    nombre_asignacion_comision: "",
+    fk_tbl_grupo_convenios: "",
+    nombre_grupo_convenios: "",
   });
+  const [selectedOpt, setSelectedOpt] = useState("");
   const [data, setdata] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
   const [{ page, limit }, setPageData] = useState({
@@ -77,26 +47,10 @@ const CreateAssigns = () => {
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setQuery(
-      {
-        ["selectedOpt"]: "",
-        ["tipoTrx"]: "",
-        ["comercio"]: "",
-        ["autorizador"]: "",
-      },
-      { replace: true }
-    );
   }, []);
   const createComission = useCallback(
     (ev) => {
       ev.preventDefault();
-
-      let errRang = comissionData?.ranges?.length === 0;
-      setNewComision({
-        ...newComision,
-        "Tipo de transaccion": transactionType,
-      });
-
       if (
         !newComision["Convenio"] &&
         !newComision["Tipo de transaccion"] &&
@@ -115,11 +69,6 @@ const CreateAssigns = () => {
         notifyError("Se debe agregar el autorizador");
         return;
       }
-
-      if (errRang) {
-        notifyError("Se debe agregar al menos una comision");
-        return;
-      }
       if (newComision["Fecha fin"] !== "") {
         if (newComision["Fecha inicio"] !== "") {
           if (
@@ -133,20 +82,6 @@ const CreateAssigns = () => {
           notifyError("Debe existir una fecha inicial");
           return;
         }
-      }
-
-      comissionData?.ranges.reduce((prev, curr, indexR) => {
-        if (!(prev?.["Rango maximo"] + 1 === curr?.["Rango minimo"])) {
-          notifyError(`El rango maximo de un rango comision no puede 
-          ser mayor al rango minimo del siguiente 
-            rango de comision (Rango ${indexR} - Rango ${indexR + 1})`);
-          errRang = true;
-        }
-        return curr;
-      });
-
-      if (errRang) {
-        return;
       }
       let obj = {};
       if (newComision["Nombre comision"]) {
@@ -170,38 +105,8 @@ const CreateAssigns = () => {
       if (newComision["Fecha fin"] !== "") {
         obj["fecha_fin"] = newComision["Fecha fin"];
       }
-      postComisionesPagar({
-        ...obj,
-        comisiones: {
-          ...comissionData,
-          ranges: comissionData?.ranges.map(
-            ({
-              "Rango minimo": Minimo,
-              "Rango maximo": Maximo,
-              "Comision porcentual": Porcentaje,
-              "Comision fija": Fija,
-            }) => {
-              return {
-                Minimo,
-                Maximo: !Maximo ? -1 : Maximo,
-                Porcentaje: Porcentaje / 100,
-                Fija,
-              };
-            }
-          ),
-        },
-      })
-        .then((res) => {
-          if (res?.status) {
-            notify(res?.msg);
-            navigate(-1, { replace: true });
-          } else {
-            notifyError(res?.msg);
-          }
-        })
-        .catch((err) => console.error(err));
     },
-    [comissionData, newComision, idComercios, navigate]
+    [newComision, idComercios, navigate]
   );
   const onChangeNewComision = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -231,7 +136,7 @@ const CreateAssigns = () => {
     } else {
       setdata([]);
     }
-  }, [selectedOpt, page, tipoTrx, comercio, convenio, autorizador]);
+  }, [selectedOpt, page]);
   const fetchConveniosFunc = useCallback(() => {
     fetchConveniosUnique({ tags: "", page, limit })
       .then((res) => {
@@ -297,10 +202,10 @@ const CreateAssigns = () => {
   };
   const fecthComisionesPagarFunc = () => {
     let obj = { page };
-    if (convenio !== "") obj["nombre_convenio"] = convenio;
-    if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
-    if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
-    if (comercio !== "") obj["id_comercio"] = parseInt(comercio);
+    // if (convenio !== "") obj["nombre_convenio"] = convenio;
+    // if (tipoTrx !== "") obj["nombre_operacion"] = tipoTrx;
+    // if (autorizador !== "") obj["nombre_autorizador"] = autorizador;
+    // if (comercio !== "") obj["id_comercio"] = parseInt(comercio);
     fetchComisionesPagar(obj)
       .then((res) => {
         setdata(
@@ -335,45 +240,15 @@ const CreateAssigns = () => {
           "Id convenio": data[i]?.["Id convenio"],
           Convenio: data[i]?.["Nombre convenio"],
         }));
-      } else if (selectedOpt === "autorizador") {
-        setNewComision((old) => ({
-          ...old,
-          "Id autorizador": data[i]?.["Id autorizador"],
-          Autorizador: data[i]?.["Nombre autorizador"],
-        }));
-      } else if (selectedOpt === "Tipo de transaccion") {
-        setNewComision((old) => ({
-          ...old,
-          "Id tipo operacion": data[i]?.["Id tipo operacion"],
-          "Tipo de transaccion": data[i]?.["Nombre transaccion"],
-        }));
-      } else if (selectedOpt === "comision") {
-        fetchComisionesPagar({ id_comision_pagada: data[i]?.["Id comision"] })
-          .then((res) => {
-            setComissionData({
-              type: res?.results[0]?.comisiones?.type,
-              ranges: res?.results?.[0]?.comisiones?.ranges?.map(
-                ({ Fija, Maximo, Minimo, Porcentaje }) => {
-                  return {
-                    "Rango minimo": Minimo,
-                    "Rango maximo": Maximo === -1 ? "" : Maximo,
-                    "Comision porcentual": parseFloat(Porcentaje * 100),
-                    "Comision fija": parseFloat(Fija),
-                  };
-                }
-              ),
-            });
-          })
-          .catch((err) => console.error(err));
       }
       handleClose();
     },
     [data, selectedOpt, handleClose]
   );
-  const onChange = useCallback(
-    (ev) => setQuery({ [ev.target.name]: ev.target.value }, { replace: true }),
-    [setQuery]
-  );
+  // const onChange = useCallback(
+  //   (ev) => setQuery({ [ev.target.name]: ev.target.value }, { replace: true }),
+  //   [setQuery]
+  // );
   const addComercio = useCallback(
     (ev) => {
       ev.preventDefault();
@@ -400,88 +275,86 @@ const CreateAssigns = () => {
 
   return (
     <Fragment>
-      <h1 className='text-3xl'>Configuración:</h1>
-      <Select
-        id='tipo_transaccion'
-        name='tipo_transaccion'
-        label='Tipo de transacción'
-        options={{ Cobrar: "cobrar", Pagar: "pagar" }}
-        value={transactionType}
-        onChange={() => {
-          setTransactionType(transactionType === "cobrar" ? "cobrar" : "pagar");
-        }}
-        // defaultValue={comissionData?.type}
-        required
-      />
-      <FormComission outerState={[comissionData, setComissionData]}>
-        <Button type='submit' onClick={createComission}>
-          Crear comision
-        </Button>
-      </FormComission>
+      <h1 className='text-3xl'>Crear asignación comisión</h1>
+      <Form grid>
+        <Input
+          id='nombre_asignacion_comision'
+          name='nombre_asignacion_comision'
+          label={"Nombre asignación de comisión"}
+          type='text'
+          autoComplete='off'
+          value={newComision?.["nombre_asignacion_comision"]}
+          onChange={() => {}}
+        />
+        {newComision?.fk_planes_comisiones !== "" && (
+          <Input
+            id='nombre_plan'
+            name='nombre_plan'
+            label={"Plan de comisión"}
+            type='text'
+            autoComplete='off'
+            value={newComision?.["nombre_plan"]}
+            onChange={() => {}}
+            disabled
+          />
+        )}
+        {newComision?.fk_tipo_op !== "" && (
+          <Input
+            id='nombre_tipo_operacion'
+            name='nombre_tipo_operacion'
+            label={"Tipo de operación"}
+            type='text'
+            autoComplete='off'
+            value={newComision?.["nombre_tipo_operacion"]}
+            onChange={() => {}}
+            disabled
+          />
+        )}
+        {newComision?.fk_tbl_grupo_convenios !== "" && (
+          <Input
+            id='nombre_grupo_convenios'
+            name='nombre_grupo_convenios'
+            label={"Grupo convenios"}
+            type='text'
+            autoComplete='off'
+            value={newComision?.["nombre_grupo_convenios"]}
+            onChange={() => {}}
+            disabled
+          />
+        )}
+        <ButtonBar className='lg:col-span-2'>
+          <Button type='button' onClick={handleClose}>
+            {newComision?.fk_planes_comisiones !== ""
+              ? "Actualizar plan de comisión"
+              : "Agregar plan de comisión"}
+          </Button>
+          <Button type='button' onClick={() => {}}>
+            {newComision?.fk_tipo_op !== ""
+              ? "Actualizar tipo de operación"
+              : "Agregar tipo de operación"}
+          </Button>
+          <Button type='button'>
+            {newComision?.fk_tbl_grupo_convenios !== ""
+              ? "Actualizar grupo convenios"
+              : "Agregar grupo convenios"}
+          </Button>
+        </ButtonBar>
+        <ButtonBar className='lg:col-span-2'>
+          <Button type='button' onClick={handleClose}>
+            Cancelar
+          </Button>
+          <Button type='submit'>
+            {/* {selectedGruposComercios?.pk_tbl_grupo_comercios !== ""
+                ? "Actualizar grupo comercios"
+                : "Crear grupo comercios"} */}
+            Crear asignación de comisión
+          </Button>
+        </ButtonBar>
+      </Form>
       <Modal
         show={showModal}
         handleClose={handleClose}
-        className='flex align-middle'>
-        {/* {selectedOpt === "convenio" && */}
-        <Fragment>
-          <TableEnterprise
-            title={
-              selectedOpt === "convenio"
-                ? "Seleccionar convenio"
-                : selectedOpt === "autorizador"
-                ? "Seleccionar autorizador"
-                : selectedOpt === "Tipo de transaccion"
-                ? "Seleccionar tipo de transacción"
-                : selectedOpt === "comision"
-                ? "Seleccionar comisión"
-                : ""
-            }
-            maxPage={maxPages}
-            headers={headersTable}
-            data={data}
-            onSelectRow={onSelectConvenio}
-            onSetPageData={setPageData}
-            onChange={onChange}>
-            {selectedOpt === "comision" && (
-              <>
-                <Input
-                  id={"convenioComissions"}
-                  label={"Convenio"}
-                  name={"convenio"}
-                  type={"text"}
-                  autoComplete='off'
-                  defaultValue={convenio}
-                />
-                <Input
-                  id={"tipoTrx"}
-                  label={"Tipo de operación"}
-                  name={"tipoTrx"}
-                  type={"text"}
-                  autoComplete='off'
-                  defaultValue={tipoTrx}
-                />
-                <Input
-                  id={"comercioComissions"}
-                  label={"Id comercio"}
-                  name={"comercio"}
-                  type='number'
-                  step={"1"}
-                  autoComplete='off'
-                  defaultValue={comercio}
-                />
-                <Input
-                  id={"autorizadorComissions"}
-                  label={"Autorizador"}
-                  name={"autorizador"}
-                  type={"text"}
-                  autoComplete='off'
-                  defaultValue={autorizador}
-                />
-              </>
-            )}
-          </TableEnterprise>
-        </Fragment>
-      </Modal>
+        className='flex align-middle'></Modal>
     </Fragment>
   );
 };

@@ -37,14 +37,14 @@ const MainConfiguraciones = () => {
       {!id_plan_comision ? (
         <Fragment>
           <ButtonBar>
-            <Button onClick={() => navigate("crear")}>
+            <Button onClick={() => navigate("crear")} type='submit'>
               Crear plan de comisiones
             </Button>
             {/* <Button onClick={generateReport}>
               Generar reporte de comisiones
             </Button> */}
           </ButtonBar>
-          <SearchComissions comissionFace="plans" />
+          <SearchComissions comissionFace='plans' />
         </Fragment>
       ) : (
         <EditComission />
