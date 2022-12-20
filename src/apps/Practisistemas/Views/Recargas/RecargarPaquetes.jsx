@@ -184,7 +184,7 @@ const RecargarPaquetes = () => {
         } catch (error) {
           console.error(error);
         }
-        notify("Su transacción esta siendo procesada");
+        notify("Su transacción esta siendo procesada, no recargue la página");
       }
     });
   };
@@ -270,15 +270,15 @@ const RecargarPaquetes = () => {
             summaryTrx={{
               Celular: toPhoneNumber(inputCelular),
               Valor: formatMoney.format(state?.valor_paquete),
-              Descripción: state?.descripcion,
+              Descripción: <div className="absolute text-left">{state?.descripcion}</div>,
             }}
           >
             <>
               <ButtonBar>
+                <Button onClick={handleCloseCancelada}>Cancelar</Button>
                 <Button type={"submit"} onClick={fecthEnvioTransaccion}>
                   Aceptar
                 </Button>
-                <Button onClick={handleCloseCancelada}>Cancelar</Button>
               </ButtonBar>
             </> 
             <SimpleLoading show={respuesta}/>

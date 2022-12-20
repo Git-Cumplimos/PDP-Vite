@@ -338,7 +338,7 @@ const CompraPin = () => {
       ];
       newVoucher["trxInfo"][5] = ["", ""];
     }
-console.log('state?.cod =>', state?.cod)
+
     fetchData(
       `${url_compra_pines}/transacciones`,
       "POST",
@@ -458,6 +458,7 @@ console.log('state?.cod =>', state?.cod)
           } catch (error) {
             console.error(error);
           }
+          notify("Su transacción esta siendo procesada, no recargue la página");
         }
       });
   };
