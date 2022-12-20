@@ -60,7 +60,7 @@ const RecargasOperadores = () => {
     disclamer:
       "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
   });
-  console.log(roleInfo)
+  
   const onChangeMoney = useMoney({
     limits: [minValor,maxValor],
     equalError: false
@@ -178,7 +178,7 @@ const RecargasOperadores = () => {
                     setTypeInfo("RecargaExitosa");
                   }
                   else {
-                    notifyError(res?.obj?.response?.respuesta);
+                    notifyError(res?.obj?.response?.["respuesta"]);
                     setRespuesta(true);
                     handleClose();
                     resolve(true);
@@ -202,7 +202,7 @@ const RecargasOperadores = () => {
         } catch (error) {
           console.error(error);
         }        
-        notify("Su transacción esta siendo procesada");
+        notify("Su transacción esta siendo procesada, no recargue la página");
       }
     });
   };
@@ -302,10 +302,10 @@ const RecargasOperadores = () => {
           >  
             <>
               <ButtonBar>
+                <Button onClick={handleCloseCancelada}>Cancelar</Button>
                 <Button type={"submit"} onClick={fecthEnvioTransaccion}>
                   Aceptar
                 </Button>
-                <Button onClick={handleCloseCancelada}>Cancelar</Button>
               </ButtonBar>
             </>
             <SimpleLoading show={respuesta}/>
