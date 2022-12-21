@@ -245,10 +245,6 @@ const CreateAssigns = () => {
     },
     [data, selectedOpt, handleClose]
   );
-  // const onChange = useCallback(
-  //   (ev) => setQuery({ [ev.target.name]: ev.target.value }, { replace: true }),
-  //   [setQuery]
-  // );
   const addComercio = useCallback(
     (ev) => {
       ev.preventDefault();

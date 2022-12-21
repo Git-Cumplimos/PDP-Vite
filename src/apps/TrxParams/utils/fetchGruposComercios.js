@@ -20,6 +20,42 @@ export const fetchGruposComercios = async (obj) => {
     throw err;
   }
 };
+export const fetchComerciosNotInGruposComercios = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-grupo-comercios/consultar-comercios-not-in-grupo-comercios`,
+      "GET",
+      obj,
+      {}
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+export const fetchComerciosGruposComercios = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-grupo-comercios/consultar-comercios-grupo-comercios`,
+      "GET",
+      obj,
+      {}
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
 export const postGruposComercios = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";

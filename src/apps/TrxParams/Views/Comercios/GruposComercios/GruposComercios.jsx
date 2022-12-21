@@ -1,24 +1,26 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Fieldset from "../../../../components/Base/Fieldset";
-import Form from "../../../../components/Base/Form/Form";
-import Input from "../../../../components/Base/Input/Input";
-import Modal from "../../../../components/Base/Modal/Modal";
-import Select from "../../../../components/Base/Select/Select";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
-import useQuery from "../../../../hooks/useQuery";
-import { notify, notifyError } from "../../../../utils/notify";
-import SearchGruposPlanesComisiones from "../../components/PlanesComisiones/SearchGruposPlanesComisionesPagar";
+import Button from "../../../../../components/Base/Button/Button";
+import ButtonBar from "../../../../../components/Base/ButtonBar/ButtonBar";
+import Fieldset from "../../../../../components/Base/Fieldset";
+import Form from "../../../../../components/Base/Form/Form";
+import Input from "../../../../../components/Base/Input/Input";
+import Modal from "../../../../../components/Base/Modal/Modal";
+import Select from "../../../../../components/Base/Select/Select";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import TableEnterprise from "../../../../../components/Base/TableEnterprise";
+import TagsAlongSide from "../../../../../components/Base/TagsAlongSide";
+import useQuery from "../../../../../hooks/useQuery";
+import { notify, notifyError } from "../../../../../utils/notify";
+import { useNavigate } from "react-router-dom";
+import SearchGruposPlanesComisiones from "../../../components/PlanesComisiones/SearchGruposPlanesComisiones";
 import {
   fetchGruposComercios,
   postGruposComercios,
   putGruposComercios,
-} from "../../utils/fetchGruposComercios";
+} from "../../../utils/fetchGruposComercios";
 
 const GruposComercios = () => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
@@ -86,7 +88,7 @@ const GruposComercios = () => {
           return {
             Id: pk_tbl_grupo_comercios,
             "Nombre grupo": nombre_grupo_comercios,
-            "Cantidad comercios": comercios.length ?? 0,
+            "Cantidad comercios": comercios.length > 0 ? comercios[0].count : 0,
           };
         }
       ),
@@ -95,19 +97,11 @@ const GruposComercios = () => {
 
   const onSelectTipoNivelComercios = useCallback(
     (e, i) => {
-      setShowModal(true);
-      setSelectedGruposComercios((old) => ({
-        ...old,
-        pk_tbl_grupo_comercios: gruposComercios[i]?.["pk_tbl_grupo_comercios"],
-        nombre_grupo_comercios: gruposComercios[i]?.["nombre_grupo_comercios"],
-        comerciosOriginal: gruposComercios[i]?.["comercios"],
-        comercios: gruposComercios[i]?.["comercios"],
-        fk_tbl_grupo_planes_comisiones:
-          gruposComercios[i]?.["fk_tbl_grupo_planes_comisiones"],
-        nombre_grupo_plan: gruposComercios[i]?.["nombre_grupo_plan"],
-      }));
+      navigate(
+        `/params-operations/grupos-comercio/edit/${gruposComercios[i]?.["pk_tbl_grupo_comercios"]}`
+      );
     },
-    [gruposComercios]
+    [gruposComercios, navigate]
   );
   const onSubmit = useCallback(
     (ev) => {

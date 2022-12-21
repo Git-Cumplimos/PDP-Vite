@@ -53,7 +53,12 @@ const TipoNivelComercio = lazy(() => import("./Views/TipoNivelComercios"));
 const ListarMensajePublicitario = lazy(() =>
   import("./Views/MensajesPublicitarios/ListarMensajePublicitario")
 );
-const GruposComercios = lazy(() => import("./Views/Comercios/GruposComercios"));
+const GruposComercios = lazy(() =>
+  import("./Views/Comercios/GruposComercios/GruposComercios")
+);
+const EditGruposComercios = lazy(() =>
+  import("./Views/Comercios/GruposComercios/EditGruposComercios")
+);
 const GruposConvenios = lazy(() => import("./Views/GruposConvenios"));
 /**
  * Editar parametros tipos de transacciones
@@ -281,6 +286,13 @@ const rutasConfiguraciones = {
           label: <AppIcons Logo={"RECAUDO"} name={"Grupos de comercios"} />,
           component: GruposComercios,
           permission: [enumPermisosTrx.grupos_comercios],
+        },
+        {
+          link: "/params-operations/grupos-comercio/edit/:id",
+          label: <AppIcons Logo={"RECAUDO"} name={"Grupos de comercios"} />,
+          component: EditGruposComercios,
+          permission: [enumPermisosTrx.grupos_comercios],
+          show: false,
         },
       ],
     },

@@ -76,7 +76,7 @@ const SearchGruposPlanesComisiones = ({
   return (
     <>
       <TableEnterprise
-        title='Lista de Planes de Comisión'
+        title='Lista de grupos planes de comisión'
         maxPage={maxPages}
         headers={["Id", "Nombre grupo", "Cantidad planes"]}
         data={tableGruposPlanes}
