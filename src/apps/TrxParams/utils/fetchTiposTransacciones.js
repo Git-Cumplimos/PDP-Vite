@@ -23,3 +23,21 @@ export const fetchTrxTypesPages = async (Nombre_operacion, page) => {
     throw err;
   }
 };
+export const fetchTrxTypesPagesObj = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${url_types}/tipos-operaciones-pagination`,
+      "GET",
+      obj
+    );
+
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};

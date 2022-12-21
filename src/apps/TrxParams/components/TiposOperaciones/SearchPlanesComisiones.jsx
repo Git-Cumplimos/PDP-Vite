@@ -6,7 +6,10 @@ import {
   getComisionesPlanesPagar,
 } from "../../utils/fetchComisionesPlanes";
 import Select from "../../../../components/Base/Select";
-import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
+import {
+  fetchTrxTypesPages,
+  fetchTrxTypesPagesObj,
+} from "../../utils/fetchTiposTransacciones";
 
 const SearchTiposOperaciones = ({
   newComision,
@@ -26,22 +29,12 @@ const SearchTiposOperaciones = ({
   });
 
   const dataTable = useMemo(() => {
-    return tiposOperaciones.map(
-      ({
-        comisiones,
-        fecha_creacion,
-        fecha_modificacion,
-        nombre_plan_comision,
-        pk_planes_comisiones,
-        tipo_comision,
-      }) => {
-        return {
-          pk_planes_comisiones,
-          nombre_plan_comision,
-          tipo_comision,
-        };
-      }
-    );
+    return tiposOperaciones.map(({ id_tipo_operacion, Nombre }) => {
+      return {
+        id_tipo_operacion,
+        Nombre,
+      };
+    });
   }, [tiposOperaciones]);
   const selectPlan = useCallback(
     (ev, i) => {
@@ -80,8 +73,8 @@ const SearchTiposOperaciones = ({
       })
       .catch((err) => console.error(err));
   };
-  const fetchTiposTransaccionFunc = () => {
-    fetchTrxTypesPages("", page)
+  const fetchTiposTransaccionFunc = (obj) => {
+    fetchTrxTypesPagesObj(obj)
       .then((res) => {
         setTiposOperaciones(res?.results);
         setMaxPages(res?.maxPages);
