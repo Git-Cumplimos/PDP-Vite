@@ -118,10 +118,17 @@ const TramitePines = () => {
             res?.obj?.results?.map((row) => {
               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
+              const fecha_nacimiento = new Date(row?.fecha_nacimiento);
+              fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
               setFormatMon(row?.ValorPagar);
               return {
                 // Id: row?.id_pin,
                 Cedula: row?.doc_cliente,
+                Nombre: row?.nombre,
+                Apellidos: row?.apellidos,
+                "Fecha Nacimiento":  dateFormatter.format(fecha_nacimiento),
+                Celular: row?.celular, 
+                Email: row?.email,
                 Estado: row?.name_estado_pin,
                 // "Codigo Estado": row?.estado_pin,
                 Vencimiento: dateFormatter.format(fecha_vencimiento),
@@ -239,6 +246,11 @@ const TramitePines = () => {
             maxPage={maxPages}
             headers={[
               "Cédula",
+              "Nombre",
+              "Apellidos",
+              "Fecha Nacimiento",
+              "Celular", 
+              "Email",
               "Estado",
               "Vencimiento",
               "Trámite",
