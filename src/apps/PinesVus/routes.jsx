@@ -76,14 +76,6 @@ export const rutasPinesVus = {
               component: ParticipacionPines,
               permission: [enumPermisosPinesVus.operarPinesVus],
             },
-            {
-              link: "/PinesVus/Administrar/Participacion/VerPagoParticipacion",
-              label: (
-                <AppIcons Logo={"ReportePines"} name={"Ver pago participación"} />
-              ),
-              component: VerParticipacionPines,
-              permission: [enumPermisosPinesVus.operarPinesVus],
-            },
           ],
         },
         {
@@ -108,6 +100,14 @@ export const rutasPinesVus = {
               ),
               component: ReportePinesDescargar,
               permission: [enumPermisosPinesVus.administrarPinesVus],
+            },
+            {
+              link: "/PinesVus/Administrar/Participacion/VerPagoParticipacion",
+              label: (
+                <AppIcons Logo={"ReportePines"} name={"Ver pago participación"} />
+              ),
+              component: VerParticipacionPines,
+              permission: [enumPermisosPinesVus.operarPinesVus, enumPermisosPinesVus.administrarPinesVus],
             },
           ],
         },

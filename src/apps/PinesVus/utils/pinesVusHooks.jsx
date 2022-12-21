@@ -272,6 +272,7 @@ export const useProvidePinesVus = () => {
   const consultaPagoParticipacion = useCallback(
     async (
       id_comercio,
+      id_usuario,
       fecha_ini,
       fecha_fin,
       pageData
@@ -283,6 +284,9 @@ export const useProvidePinesVus = () => {
       }
       if ((id_comercio !== "") & !isNaN(id_comercio)) {
         query.id_comercio = id_comercio;
+      }
+      if ((id_usuario !== "") & !isNaN(id_usuario)) {
+        query.id_usuario = id_usuario;
       }
       try {
         const res = await fetchData(urls.consultaPagoParticipacion, "GET", query);
