@@ -81,7 +81,7 @@ const CompraPin = () => {
   // **************************************************************
 
   //------------------Funcion Para consultar a practisistemas validarPinEpm -------------------------------
-  const ConsultaPinesServicio = (e) => {
+  const ConsultaPinEPM = (e) => {
     e.preventDefault(e);
     if (state?.op == "cb") {
       fetchConsultaPinSNR({
@@ -244,7 +244,7 @@ const CompraPin = () => {
       }
     } else {
       if (inputMatricula || inputContador) {
-        ConsultaPinesServicio(e);
+        ConsultaPinEPM(e);
       } else {
         setShowModal(true);
         setTypeInfo("ResumenVentaPin");
@@ -289,8 +289,6 @@ const CompraPin = () => {
       ];
       newVoucher["trxInfo"][3] = ["", ""];
       newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
-      newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Círculo", inputCirculo];
       newVoucher["trxInfo"][5] = ["", ""];
       newVoucher["trxInfo"][6] = [
         "Valor del Pin",
@@ -338,7 +336,6 @@ const CompraPin = () => {
       ];
       newVoucher["trxInfo"][5] = ["", ""];
     }
-
     fetchData(
       `${url_compra_pines}/transacciones`,
       "POST",
@@ -385,12 +382,16 @@ const CompraPin = () => {
     )
       .then((res) => {
         if (res?.status == true) {
-            notify("Venta exitosa");
-            setShowLoading(false);
-            VentaExitosa(res?.obj?.response, fecha, hora);
+          notify("Venta exitosa");
+          setShowLoading(false);
+          VentaExitosa(res?.obj?.response, fecha, hora);
         } else {
-          notifyError(res?.obj?.response?.respuesta ==
-            ":Error en el numero telefonico, si crees que el numero esta correcto comunicalo al distribuidor" ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor" : res?.msg);
+          notifyError(
+            res?.obj?.response?.respuesta ==
+              ":Error en el numero telefonico, si crees que el numero esta correcto comunicalo al distribuidor"
+              ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
+              : res?.msg
+          );
           setShowLoading(false);
           showModalDatosEPM(false);
           showModalDatosSNR(false);
@@ -456,10 +457,13 @@ const CompraPin = () => {
               break;
             }
           } catch (error) {
+            console.error("Entró al catch del for");
+
             console.error(error);
           }
           notify("Su transacción esta siendo procesada, no recargue la página");
         }
+        validNavigate("/Pines/PinesContenido");
       });
   };
 
