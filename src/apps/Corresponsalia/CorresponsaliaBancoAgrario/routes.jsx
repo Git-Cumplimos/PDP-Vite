@@ -127,21 +127,27 @@ const rutasAgrarioCB = {
           component: ConveniosRecaudoAgrario,
           permission: [enumPermisosAgrario.agrario_cb_convenios_recaudo],
         },
+      ],
+    },
+    {
+      link: "/runt",
+      label: <AppIcons Logo={"IMPUESTO"} name={"Runt"} />,
+      component: ContenedorRunt,
+      permission: [55, 56, 57],
+      subRoutes: [
         {
-          link: "/runt",
-          label: <AppIcons Logo={"IMPUESTO"} name={"Runt"} />,
-          component: ContenedorRunt,
-          permission: [enumPermisosAgrario.agrario_cb_convenios_recaudo],
-          // permission: [55, 56, 57],
-          subRoutes: [
+          link: "/runt/pagar-runt",
+          label: <AppIcons Logo={"RETIRO"} name={"Pagar Runt"} />,
+          component: PagarRunt,
+          permission: [56, 57],
+          /*   subRoutes: [
             {
-              link: "/runt/pagar-runt",
-              label: <AppIcons Logo={"RETIRO"} name={"Pagar Runt"} />,
-              component: PagarRunt,
-              permission: [enumPermisosAgrario.agrario_cb_convenios_recaudo],
-              // permission: [56, 57],
+              link: "/recaudo-integrado/davivienda/cargar",
+              label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
+              component: cargarArchivos,
+              permission: [55],
             },
-          ],
+          ], */
         },
       ],
     },

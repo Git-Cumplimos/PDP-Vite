@@ -245,9 +245,9 @@ const cargarArchivos = lazy(() =>
 /**
  * RUNT Banco Agrario
  */
-const ContenedorRunt = lazy(() => import("../apps/Runt/ContenedorRunt"));
+/* const ContenedorRunt = lazy(() => import("../apps/Runt/ContenedorRunt"));
 const PagarRunt = lazy(() => import("../apps/Runt/Views/PagarRunt"));
-
+ */
 /**
  * Daviplata
  */
