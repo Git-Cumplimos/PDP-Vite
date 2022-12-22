@@ -300,11 +300,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           setIsUploading(false);
           notifyError(res?.msg);
           hideModal();
+          navigate(-1);
         }
       })
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        navigate(-1);
         console.error(err);
       });
   };
@@ -384,11 +386,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           setIsUploading(false);
           notifyError(res?.msg);
           hideModal();
+          navigate(-1);
         }
       })
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        navigate(-1);
         console.error(err);
       });
   };
