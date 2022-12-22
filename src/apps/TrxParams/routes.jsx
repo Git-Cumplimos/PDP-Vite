@@ -106,44 +106,44 @@ const rutasConfiguraciones = {
         enumPermisosTrx.asignacion_comision,
       ],
       subRoutes: [
-        {
-          link: "/params-operations/comisiones/pagadas",
-          label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar"} />,
-          component: Com2Pay,
-          permission: [enumPermisosTrx.planes_comision],
-          subRoutes: [
-            {
-              link: "/params-operations/comisiones/pagadas/personalizadas",
-              label: (
-                <AppIcons
-                  Logo={"IMPUESTO"}
-                  name={"Comisiones a pagar por comercio"}
-                />
-              ),
-              component: CreateComision,
-              permission: [enumPermisosTrx.planes_comision],
-            },
-          ],
-        },
-        {
-          link: "/params-operations/comisiones/cobradas",
-          label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a cobrar"} />,
-          component: Com2Collect,
-          permission: [enumPermisosTrx.asignacion_comision],
-          subRoutes: [
-            {
-              link: "/params-operations/comisiones/cobradas/crear",
-              label: (
-                <AppIcons
-                  Logo={"IMPUESTO"}
-                  name={"Comisiones a cobrar por autorizador"}
-                />
-              ),
-              component: CreateComisionCobrada,
-              permission: [enumPermisosTrx.asignacion_comision],
-            },
-          ],
-        },
+        // {
+        //   link: "/params-operations/comisiones/pagadas",
+        //   label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar"} />,
+        //   component: Com2Pay,
+        //   permission: [enumPermisosTrx.planes_comision],
+        //   subRoutes: [
+        //     {
+        //       link: "/params-operations/comisiones/pagadas/personalizadas",
+        //       label: (
+        //         <AppIcons
+        //           Logo={"IMPUESTO"}
+        //           name={"Comisiones a pagar por comercio"}
+        //         />
+        //       ),
+        //       component: CreateComision,
+        //       permission: [enumPermisosTrx.planes_comision],
+        //     },
+        //   ],
+        // },
+        // {
+        //   link: "/params-operations/comisiones/cobradas",
+        //   label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a cobrar"} />,
+        //   component: Com2Collect,
+        //   permission: [enumPermisosTrx.asignacion_comision],
+        //   subRoutes: [
+        //     {
+        //       link: "/params-operations/comisiones/cobradas/crear",
+        //       label: (
+        //         <AppIcons
+        //           Logo={"IMPUESTO"}
+        //           name={"Comisiones a cobrar por autorizador"}
+        //         />
+        //       ),
+        //       component: CreateComisionCobrada,
+        //       permission: [enumPermisosTrx.asignacion_comision],
+        //     },
+        //   ],
+        // },
         {
           link: "/params-operations/comisiones/asignaciones",
           label: (
@@ -159,6 +159,15 @@ const rutasConfiguraciones = {
               ),
               component: CreateAssigns,
               permission: [enumPermisosTrx.asignacion_comision],
+            },
+            {
+              link: "/params-operations/comisiones/asignaciones/edit/:id",
+              label: (
+                <AppIcons Logo={"RECAUDO"} name={"Asignación de comisiones"} />
+              ),
+              component: CreateAssigns,
+              permission: [enumPermisosTrx.asignacion_comision],
+              show: false,
             },
           ],
         },

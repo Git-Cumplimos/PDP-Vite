@@ -10,14 +10,6 @@ import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import TagsAlongSide from "../../../../../components/Base/TagsAlongSide";
 import { useNavigate, useParams } from "react-router-dom";
 import { notify, notifyError } from "../../../../../utils/notify";
-import SearchGruposPlanesComisiones from "../../../components/PlanesComisiones/SearchGruposPlanesComisiones";
-import {
-  fetchComerciosGruposComercios,
-  fetchGruposComercios,
-  postGruposComercios,
-  putGruposComercios,
-} from "../../../utils/fetchGruposComercios";
-import SearchComerciosNotInGruposComercios from "../../../components/GruposComercios/SearchComerciosNotInGruposComercios";
 import {
   fetchConveniosGrupoConvenios,
   fetchGruposConvenios,
