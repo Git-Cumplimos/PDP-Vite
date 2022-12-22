@@ -106,7 +106,6 @@ const EditGruposComercios = () => {
       sortDir: "DESC",
     })
       .then((autoArr) => {
-        console.log(autoArr);
         setMaxPages(autoArr?.maxPages);
         setSelectedGruposComercios((old) => ({
           ...old,
@@ -437,7 +436,7 @@ const EditGruposComercios = () => {
           label={"Nombre comercio"}
           type='text'
           autoComplete='off'
-          value={datosBusqueda.nombre_plan_comision}
+          value={datosBusqueda.nombre_comercio}
           onChange={onChangeFormat}
         />
       </TableEnterprise>

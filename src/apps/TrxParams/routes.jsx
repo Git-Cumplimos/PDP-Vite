@@ -1,6 +1,5 @@
 import { lazy } from "react";
 import { enumPermisosTrx } from "./enumPermisosTrx";
-import navComercios from "./Views/Comercios/navComercios";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
@@ -38,7 +37,7 @@ const GruposPlanesComisiones = lazy(() =>
   import("./Views/Comisiones/GruposPlanesComisiones")
 );
 const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
-const Convenios = lazy(() => import("./Views/Convenios"));
+const Convenios = lazy(() => import("./Views/Convenios/Convenios"));
 const ConvAuto = lazy(() => import("./Views/ConvAuto"));
 const Autorizadores = lazy(() => import("./Views/Autorizadores"));
 const CreateComisionCobrada = lazy(() =>
@@ -59,7 +58,14 @@ const GruposComercios = lazy(() =>
 const EditGruposComercios = lazy(() =>
   import("./Views/Comercios/GruposComercios/EditGruposComercios")
 );
-const GruposConvenios = lazy(() => import("./Views/GruposConvenios"));
+const GruposConvenios = lazy(() =>
+  import("./Views/Convenios/GruposConvenios/GruposConvenios")
+);
+const EditGruposConvenios = lazy(() =>
+  import("./Views/Convenios/GruposConvenios/EditGruposConvenios")
+);
+const navConvenios = lazy(() => import("./Views/Convenios/navConvenios"));
+const navComercios = lazy(() => import("./Views/Comercios/navComercios"));
 /**
  * Editar parametros tipos de transacciones
  */
@@ -207,18 +213,29 @@ const rutasConfiguraciones = {
       ],
     },
     {
-      link: "/params-operations/convenios",
+      link: "/params-operations/navconvenios",
       label: <AppIcons Logo={"RETIRO"} name={"Convenios"} />,
-      component: Convenios,
-      permission: [enumPermisosTrx.convenios],
+      component: navConvenios,
+      permission: [enumPermisosTrx.convenios, enumPermisosTrx.grupos_comercios],
       subRoutes: [
         {
-          link: "/params-operations/convenios/autorizadores",
-          label: (
-            <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
-          ),
-          component: ConvAuto,
+          link: "/params-operations/convenios",
+          label: <AppIcons Logo={"RECAUDO"} name={"Convenios"} />,
+          component: Convenios,
+          permission: [enumPermisosTrx.tipo_nivel_comercio],
+        },
+        {
+          link: "/params-operations/grupos-convenios",
+          label: <AppIcons Logo={"RECAUDO"} name={"Grupos de convenios"} />,
+          component: GruposConvenios,
           permission: [enumPermisosTrx.convenios],
+        },
+        {
+          link: "/params-operations/grupos-convenios/edit/:id",
+          label: <AppIcons Logo={"RECAUDO"} name={"Grupos de convenios"} />,
+          component: EditGruposConvenios,
+          permission: [enumPermisosTrx.grupos_comercios],
+          show: false,
         },
       ],
     },
@@ -302,13 +319,6 @@ const rutasConfiguraciones = {
       label: <AppIcons Logo={"RECAUDO"} name={"Mensajes publicitarios"} />,
       component: ListarMensajePublicitario,
       permission: [enumPermisosTrx.mensajes_publicitarios],
-    },
-
-    {
-      link: "/params-operations/grupos-convenios",
-      label: <AppIcons Logo={"RECAUDO"} name={"Grupos de convenios"} />,
-      component: GruposConvenios,
-      permission: [enumPermisosTrx.grupos_convenios],
     },
   ],
 };

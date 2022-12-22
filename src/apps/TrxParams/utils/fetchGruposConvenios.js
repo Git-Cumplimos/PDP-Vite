@@ -58,3 +58,39 @@ export const putGruposConvenios = async (bodyObj) => {
     throw err;
   }
 };
+export const fetchConveniosGrupoConvenios = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-grupo-convenios/consultar-convenios-grupo-convenios`,
+      "GET",
+      obj,
+      {}
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+export const fetchConveniosNotInGruposConvenios = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-grupo-convenios/consultar-convenios-not-in-grupo-convenios`,
+      "GET",
+      obj,
+      {}
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};

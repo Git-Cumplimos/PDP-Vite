@@ -1,22 +1,23 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import Button from "../../../components/Base/Button/Button";
-import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
-import Fieldset from "../../../components/Base/Fieldset";
-import Form from "../../../components/Base/Form/Form";
-import Input from "../../../components/Base/Input/Input";
-import Modal from "../../../components/Base/Modal/Modal";
-import Select from "../../../components/Base/Select/Select";
-import SimpleLoading from "../../../components/Base/SimpleLoading";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
-import TagsAlongSide from "../../../components/Base/TagsAlongSide";
-import { notify, notifyError } from "../../../utils/notify";
+import Button from "../../../../../components/Base/Button/Button";
+import ButtonBar from "../../../../../components/Base/ButtonBar/ButtonBar";
+import Fieldset from "../../../../../components/Base/Fieldset";
+import Form from "../../../../../components/Base/Form/Form";
+import Input from "../../../../../components/Base/Input/Input";
+import Modal from "../../../../../components/Base/Modal/Modal";
+import { useNavigate } from "react-router-dom";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import TableEnterprise from "../../../../../components/Base/TableEnterprise";
+import TagsAlongSide from "../../../../../components/Base/TagsAlongSide";
+import { notify, notifyError } from "../../../../../utils/notify";
 import {
   fetchGruposConvenios,
   postGruposConvenios,
   putGruposConvenios,
-} from "../utils/fetchGruposConvenios";
+} from "../../../utils/fetchGruposConvenios";
 
 const GruposConvenios = () => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [{ page, limit }, setPageData] = useState({
@@ -81,13 +82,9 @@ const GruposConvenios = () => {
   const onSelectGruposConvenios = useCallback(
     (e, i) => {
       setShowModal(true);
-      setSelectedGruposConvenios((old) => ({
-        ...old,
-        pk_tbl_grupo_convenios: gruposConvenios[i]?.["pk_tbl_grupo_convenios"],
-        nombre_grupo_convenios: gruposConvenios[i]?.["nombre_grupo_convenios"],
-        conveniosOriginal: gruposConvenios[i]?.["convenios"],
-        convenios: gruposConvenios[i]?.["convenios"],
-      }));
+      navigate(
+        `/params-operations/grupos-convenios/edit/${gruposConvenios[i]?.["pk_tbl_grupo_convenios"]}`
+      );
     },
     [gruposConvenios]
   );
