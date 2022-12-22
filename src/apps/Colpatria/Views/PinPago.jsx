@@ -71,7 +71,7 @@ const PinPago = () => {
     () => ({
       "Tipo de persona": ObjTiposPersonas[tipoPersona],
       "No. Identificación": userDocument,
-      "Fecha de expedicion identificacion": userDocumentDate,
+      "Fecha de expedición identificación": userDocumentDate,
       "No. De PIN": pinNumber,
       "Valor a Retirar": formatMoney.format(valPinPago),
     }),
@@ -130,13 +130,13 @@ const PinPago = () => {
               roleInfo,
               trx_id,
               codigo_autorizacion,
-              "Retiro de pin",
+              "Pin de giro",
               [
                 ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
                 ["", ""],
                 ["No. Identificación", userDocument],
                 ["", ""],
-                ["Fecha de expedicion identificacion", userDocumentDate],
+                ["Fecha de expedición identificación", userDocumentDate],
                 ["", ""],
                 ["No. De PIN", pinNumber],
                 ["", ""],
@@ -246,7 +246,7 @@ const PinPago = () => {
 
   return (
     <Fragment>
-      <h1 className='text-3xl mt-6'>Retiros con PIN</h1>
+      <h1 className="text-3xl mt-6">Pago de giro</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
@@ -281,11 +281,11 @@ const PinPago = () => {
           required
         />
         <Input
-          id='docClienteDate'
-          name='docClienteDate'
-          label='Fecha expedicion identificacion'
-          type='date'
-          autoComplete='off'
+          id="docClienteDate"
+          name="docClienteDate"
+          label="Fecha expedición identificación"
+          type="date"
+          autoComplete="off"
           value={userDocumentDate}
           onInput={(ev) => setUserDocumentDate(ev.target.value)}
           required
