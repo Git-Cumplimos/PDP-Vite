@@ -123,7 +123,8 @@ const TramitePines = () => {
               setFormatMon(row?.ValorPagar);
               return {
                 // Id: row?.id_pin,
-                Cedula: row?.doc_cliente,
+                Documento: row?.doc_cliente,
+                "Tipo Documento": row?.tipo_documento_descripcion,
                 Nombre: row?.nombre,
                 Apellidos: row?.apellidos,
                 "Fecha Nacimiento":  dateFormatter.format(fecha_nacimiento),
@@ -245,7 +246,8 @@ const TramitePines = () => {
             title="Información Pin"
             maxPage={maxPages}
             headers={[
-              "Cédula",
+              "Documento",
+              "Tipo Documento",
               "Nombre",
               "Apellidos",
               "Fecha Nacimiento",
