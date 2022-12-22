@@ -1,0 +1,245 @@
+.contendorPrincipalFormulario {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px;
+    padding: 40px;
+    gap: 20px;
+    background: #FFFFFF;
+    border: 1px solid rgba(54, 54, 54, 0.1);
+    border-radius: 10px;
+
+}
+
+.contenedorForm {
+    flex-direction: column;
+    gap: 15px;
+    display: flex;
+}
+
+.titulo {
+    font-family: 'Avenir';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 25px;
+    line-height: 30px;
+    letter-spacing: 0.5px;
+    color: #E06838;
+}
+
+.contenedorInput {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.nombreInput {
+    font-family: 'Avenir';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 14px;
+    line-height: 18px;
+    color: #2C2C2C;
+}
+
+.contenedorSecundarioInput {
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 15px;
+    gap: 20px;
+    border: 1px solid #E06838;
+    border-radius: 5px;
+}
+
+.styleInput {
+    border: 1px solid white;
+    font-family: 'Avenir';
+    font-style: normal;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 18px;
+    color: #2C2C2C;
+    width: 100%;
+}
+
+.contenedorArchivos {
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 15px;
+    gap: 20px;
+    border: 1px solid #E4E2DA;
+    border-radius: 5px;
+}
+
+
+
+.contenedorBtns {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 7px;
+}
+
+.contenedorLabel {
+    cursor: pointer;
+    border-radius: 9999px;
+    --tw-bg-opacity: 1;
+    background-color: white;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.contenedorLabelbasura {
+    cursor: pointer;
+    border-radius: 9999px;
+    --tw-bg-opacity: 0;
+    background-color: white;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.btnBasura {
+    background-color: white;
+    border: none;
+}
+
+.contenedorArchivosBasura {
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 15px;
+    gap: 20px;
+    border: 1px solid #E4E2DA;
+    border-radius: 5px;
+}
+
+.contenedorArchivosBasura:hover img {
+    /*     -webkit-transform: scale(1.1);
+    -moz-transform: scale(1.1);
+    -ms-transform: scale(1.1);
+    -o-transform: scale(1.1); */
+    transform: scale(1.1);
+    /*     background: url("/publicDir/basura25red.png"); */
+
+}
+
+
+.btnEnviar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    gap: 10px;
+    font-family: 'Avenir';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.01em;
+    color: #FFFFFF;
+    border: 0;
+    cursor: pointer;
+    background: linear-gradient(89.3deg, #E06838 -8.74%, #F0B844 134.85%);
+    border-radius: 30px;
+    order: 0;
+}
+
+.btnCancelar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+    gap: 10px;
+    font-family: 'Avenir';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.01em;
+    border: 0;
+    color: #E06838;
+    background: white;
+    border-radius: 30px;
+    order: 1;
+}
+
+
+@media (min-width: 768px) {
+    .contendorPrincipalFormulario {
+        margin: 50px 100px 50px 100px;
+
+    }
+
+    .contenedorForm {
+        display: grid;
+        column-gap: 50px;
+        grid-template-columns: auto auto;
+        width: 80%;
+    }
+
+    .titulo {
+        font-family: 'Avenir';
+        font-style: normal;
+        font-weight: 800;
+        font-size: 35px;
+        line-height: 36px;
+        text-align: center;
+        color: #E06838;
+    }
+
+    .nombreInput {
+        font-family: 'Avenir';
+        font-style: normal;
+        font-weight: 800;
+        font-size: 16px;
+        line-height: 20px;
+        color: #2C2C2C;
+    }
+
+    .contenedorSecundarioInput {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 12px 15px;
+        gap: 20px;
+        border: 1px solid #E06838;
+        border-radius: 5px;
+    }
+
+    .styleInput {
+        font-family: 'Avenir';
+        font-style: normal;
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 20px;
+        color: #2C2C2C;
+    }
+
+    .contenedorBtns {
+        justify-content: flex-end;
+    }
+
+    .btnCancelar {
+        display: none;
+    }
+
+}

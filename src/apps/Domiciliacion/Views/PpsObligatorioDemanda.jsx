@@ -112,14 +112,14 @@ const PpsObligatorioDemanda = ({ ced }) => {
                 };
               });
 
-              console.log("DATOS RECIBIDOS:", respuesta?.obj?.datos_recibidos);
-              console.log(
-                "idtrx:",
-                respuesta?.obj?.datos_recibidos
-                  ?.trazabilityFinanciialInstitutionCode
-              );
+              // console.log("DATOS RECIBIDOS:", respuesta?.obj?.datos_recibidos);
+              // console.log(
+              //   "idtrx:",
+              //   respuesta?.obj?.datos_recibidos
+              //     ?.trazabilityFinanciialInstitutionCode
+              // );
 
-              console.log("MENSJAE", datosComercio?.["idTrx"]);
+              // console.log("MENSJAE", datosComercio?.["idTrx"]);
               setDisabledBtn(false);
 
               if (
@@ -142,6 +142,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
                 respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "FAILED"
               ) {
                 notifyError(respuesta?.obj?.datos_recibidos?.["messageError"]);
+                navigate(`/colpensiones`);
               }
 
               // if (respuesta.obj["datos_recibidos"].ResponseCode == "SUCCESS") {
@@ -183,12 +184,14 @@ const PpsObligatorioDemanda = ({ ced }) => {
             });
         } else {
           notifyError("El Valor Aportado Debe ser Exacto ej: 5000.");
+          setProcesandoTrx(false);
           setDisabledBtn(false);
         }
       } else {
         notifyError(
           "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
         );
+        setProcesandoTrx(false);
         setDisabledBtn(false);
       }
     } else {
