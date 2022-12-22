@@ -82,7 +82,7 @@ export const postCheckReintentoRecargas = async (bodyObj) => {
       bodyObj,
       {},
       true,
-      35000
+      10000
     );
     if (!res?.status) {
       console.error(res?.msg);

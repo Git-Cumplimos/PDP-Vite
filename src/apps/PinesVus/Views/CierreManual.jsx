@@ -97,7 +97,7 @@ const CierreManual = () => {
     </ButtonBar>
     <Modal show={showModal} handleClose={() => closeModal()}>
       <div className="flex flex-col w-1/2 mx-auto">
-      <h1 className="text-3x2 mt-2 mx-auto">¿Desea cerrar el modulo de pines?</h1>
+      <h1 className="text-3x2 mt-2 mx-auto">¿Desea cerrar el módulo de pines?</h1>
       <ButtonBar>
         <Button
           type="submit"

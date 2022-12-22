@@ -67,6 +67,7 @@ const CrearPin = () => {
   const [idPin, setIdPin] = useState("")
   const [firma, setFirma] = useState("")
   const [pedirFirma, setPedirFirma] = useState(true)
+  const [descripcionTipDoc, setDescripcionTipDoc] = useState("")
 
   const [olimpia, setOlimpia] = useState("")
 
@@ -319,30 +320,7 @@ const CrearPin = () => {
 
   const onSubmitModal = (e) => {
     e.preventDefault();
-    // Control de edad _____________________________________________________
-    // let edad_correcta = false
-    // const year = Intl.DateTimeFormat("es-CO", {
-    //   year: "numeric",
-    //   month: "numeric",
-    //   day: "numeric",
-    // }).format(new Date())
-    // if (year.split("/")[2] - fechaNacimiento.split("-")[0] > 16){
-    //   edad_correcta = true  
-    // } 
-    // else if (year.split("/")[2] - fechaNacimiento.split("-")[0] === 16){
-    //   if (year.split("/")[1] - fechaNacimiento.split("-")[1] > 0){
-    //     edad_correcta = true
-    //   }
-    //   else if (year.split("/")[1] - fechaNacimiento.split("-")[1] === 0){
-    //     console.log(year.split("/")[0] - fechaNacimiento.split("-")[2])
-    //     console.log(year.split("/")[0] , fechaNacimiento.split("-")[2])
-    //     if (year.split("/")[0] - fechaNacimiento.split("-")[2] >= 0){
-    //       edad_correcta = true
-    //     }  
-    //   }
-    // }
-    // console.log(edad_correcta)
-    //-------------------------------------------------------------------------
+
     if (firma === "" && pedirFirma) {
       notifyError("Asegúrese de tener la firma del cliente en físico ")
     }
@@ -436,7 +414,7 @@ const CrearPin = () => {
       notifyError("Para evitar fallas no se permite realizar la transacción, hora cierre: " + horaCierre[0] + ":" + horaCierre[1])
       navigate("/Pines/PinesVus",{replace:true});
     }else{
-    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin,firma, motivoCompra)
+    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin,firma, motivoCompra, descripcionTipDoc)
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -609,6 +587,7 @@ const CrearPin = () => {
         value={tipoDocumento}
         onChange={(e) => {
           setTipoDocumento(e.target.value);
+          setDescripcionTipDoc(optionsDocumento.filter(tip => tip.value === e.target.value)[0]['label'])
           setDisabledBtnsContinuar(false)
           setShowFormulario(false)
           setTipoPin("")

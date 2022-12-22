@@ -51,6 +51,7 @@ const TramitePines = () => {
   const [showModalReenvio, setShowModalReenvio] = useState(false)
   const [doc_cliente, setDoc_cliente] = useState("")
   const [cierreManual, setCierreManual] = useState(false)
+  const [infoComercioCreacion, setInfoComercioCreacion] = useState("")
 
   useEffect(() => {
     ///////////////
@@ -117,10 +118,18 @@ const TramitePines = () => {
             res?.obj?.results?.map((row) => {
               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
+              const fecha_nacimiento = new Date(row?.fecha_nacimiento);
+              fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
               setFormatMon(row?.ValorPagar);
               return {
                 // Id: row?.id_pin,
-                Cedula: row?.doc_cliente,
+                Documento: row?.doc_cliente,
+                "Tipo Documento": row?.tipo_documento_descripcion,
+                Nombre: row?.nombre,
+                Apellidos: row?.apellidos,
+                "Fecha Nacimiento":  dateFormatter.format(fecha_nacimiento),
+                Celular: row?.celular, 
+                Email: row?.email,
                 Estado: row?.name_estado_pin,
                 // "Codigo Estado": row?.estado_pin,
                 Vencimiento: dateFormatter.format(fecha_vencimiento),
@@ -136,6 +145,7 @@ const TramitePines = () => {
           setValor_tramite(res?.obj?.results?.[0]?.valor_tramite);
           setName_tramite(res?.obj?.results?.[0]?.name_tramite);
           setId_pin(res?.obj?.results?.[0]?.id_pin)
+          setInfoComercioCreacion(res?.obj?.results?.[0]?.datos_comercio_creacion)
         }
       })
       .catch((err) => console.log("error", err));
@@ -236,7 +246,13 @@ const TramitePines = () => {
             title="Información Pin"
             maxPage={maxPages}
             headers={[
-              "Cédula",
+              "Documento",
+              "Tipo Documento",
+              "Nombre",
+              "Apellidos",
+              "Fecha Nacimiento",
+              "Celular", 
+              "Email",
               "Estado",
               "Vencimiento",
               "Trámite",
@@ -248,6 +264,7 @@ const TramitePines = () => {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
+
                 setShowModal(true);
                 setActivarNavigate(false);
               }
@@ -343,6 +360,7 @@ const TramitePines = () => {
             id_pin = {id_pin}
             trx={id_trx}
             tipoPin={tipoPin}
+            infoComercioCreacion={infoComercioCreacion}
             setActivarNavigate={setActivarNavigate}
             closeModal={closeModal}
           ></CancelPin>

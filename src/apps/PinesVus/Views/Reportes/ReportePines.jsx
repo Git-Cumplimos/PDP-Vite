@@ -41,7 +41,7 @@ const ReportePines = () => {
     if (
       (fechaInicial !== "") & (fechaFinal !== "") ||
       estadoPin !== "" ||
-      tipoPin != ""
+      tipoPin !== ""
     ) {
       console.log(estadoPin);
       consultaPinesVus(
