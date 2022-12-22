@@ -47,6 +47,14 @@ export const onChangeNumber = (ev) => {
 
   ev.target.value = ((ev.target.value ?? "").match(/\d/g) ?? []).join("");
 
+  if (ev.target.value.length < ev.target.minLength) {
+    ev.target.setCustomValidity(
+      `Aumenta la longitud del texto a ${ev.target.minLength} caracteres como minimo (actualmente, el texto tiene ${ev.target.value.length} caracteres)`
+    );
+  } else {
+    ev.target.setCustomValidity("");
+  }
+
   ev.target.focus();
   caret_pos += ev.target.value.length - len;
   ev.target.setSelectionRange(caret_pos, caret_pos);
@@ -67,6 +75,7 @@ export const toPhoneNumber = (num = "") => {
 
 /**
  * On change for just number inputs
+ * ! to fix pattern
  * @param {*} ev
  * @returns digits in text
  */
@@ -103,6 +112,19 @@ export const onChangeAccountNumber = (ev) => {
   const len = ev.target.value.length;
 
   const temp = ((ev.target.value ?? "").match(/\d/g) ?? []).join("");
+
+  if (temp.length < ev.target.minLength - Math.floor(ev.target.minLength / 5)) {
+    ev.target.setCustomValidity(
+      `Aumenta la longitud del texto a ${
+        ev.target.minLength - Math.floor(ev.target.minLength / 5)
+      } caracteres como minimo (actualmente, el texto tiene ${
+        temp.length
+      } caracteres)`
+    );
+  } else {
+    ev.target.setCustomValidity("");
+  }
+
   ev.target.value = toAccountNumber(temp);
 
   ev.target.focus();
@@ -138,7 +160,7 @@ export const onUpdateSW = (registration) => {
  * @param data a string
  * @returns {*} a utf8 hex string
  */
- export function encrypt3DES(data, k1, k2, k3) {
+export function encrypt3DES(data, k1, k2, k3) {
   const key3des = CryptoJS.enc.Hex.parse(`${k1}${k2}${k3}`);
   const hex_data = CryptoJS.enc.Hex.parse(data);
   const encrypted = CryptoJS.TripleDES.encrypt(hex_data, key3des, {

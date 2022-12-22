@@ -127,7 +127,7 @@ const rutasColpatria = {
     },
     {
       link: "/corresponsalia/colpatria/pago-de-giro",
-      label: <AppIcons Logo={"PagoPorGiro"} name={"Pin de giro"} />,
+      label: <AppIcons Logo={"PagoPorGiro"} name={"Pago de giro"} />,
       component: PinPago,
       permission: [PermissionsColpatria.pago_giro],
     },
