@@ -40,6 +40,10 @@ const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
 const Convenios = lazy(() => import("./Views/Convenios/Convenios"));
 const ConvAuto = lazy(() => import("./Views/ConvAuto"));
 const Autorizadores = lazy(() => import("./Views/Autorizadores"));
+const ReporteConfiguracionComisiones = lazy(() =>
+  import("./Views/Comisiones/ReporteConfiguracionComisiones")
+);
+
 const CreateComisionCobrada = lazy(() =>
   import("./Views/Comisiones/CreateComisionCobrada")
 );
@@ -144,6 +148,7 @@ const rutasConfiguraciones = {
         //     },
         //   ],
         // },
+
         {
           link: "/params-operations/comisiones/asignaciones",
           label: (
@@ -218,6 +223,18 @@ const rutasConfiguraciones = {
           ),
           component: GruposPlanesComisiones,
           permission: [enumPermisosTrx.planes_comision],
+        },
+        {
+          link: "/params-operations/comisiones/reporte-configuracion-comisiones",
+          label: (
+            <AppIcons
+              Logo={"IMPUESTO"}
+              name={"Reporte configuración de comisiones"}
+            />
+          ),
+          component: ReporteConfiguracionComisiones,
+          permission: [enumPermisosTrx.asignacion_comision],
+          subRoutes: [],
         },
       ],
     },
