@@ -106,14 +106,14 @@ const CierreManual = () => {
           }}
           disabled = {disabledBtns}
         >
-          Cerrar Modulo
+          Cerrar Módulo
         </Button>
         <Button
           onClick={() => {
             closeModal();
           }}
         >
-          Cerrar
+          Cancelar
         </Button>
       </ButtonBar>
       </div>
