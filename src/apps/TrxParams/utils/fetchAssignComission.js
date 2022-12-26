@@ -58,3 +58,22 @@ export const putAsignacionesComisiones = async (bodyObj) => {
     throw err;
   }
 };
+export const deleteAsignacionesComisiones = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-asignacion-comisiones/eliminar-asignacion-comision`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
