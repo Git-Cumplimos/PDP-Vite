@@ -152,7 +152,7 @@ const RecargasOperadores = () => {
         },
       },
     })
-      .then((res) => {
+      .then(async (res) => {
         if (res?.status === true) {
           notify("Recarga exitosa");
           infTicketFinal["commerceInfo"].push([
@@ -167,70 +167,76 @@ const RecargasOperadores = () => {
           setRespuesta(false);
           setTypeInfo("RecargaExitosa");
         } else {
-          notifyError(res?.msg);
-          setRespuesta(false);
-          handleClose();
+          if (res?.message === "Endpoint request timed out") {
+            notify("Su transacción esta siendo procesada");
+            for (let i = 0; i <= 8; i++) {
+              try {
+                const prom = await new Promise((resolve, reject) =>
+                  setTimeout(() => {
+                    postCheckReintentoRecargas({
+                      id_uuid_trx: id_uuid,
+                      idComercio: roleInfo?.id_comercio,
+                      idDispositivo: roleInfo?.id_dispositivo,
+                    })
+                      .then((res) => {
+                        if (res?.msg !== "No ha terminado el reintento") {
+                          if (
+                            res?.status === true ||
+                            res?.obj?.response?.estado == "00"
+                          ) {
+                            notify("Recarga exitosa");
+                            infTicketFinal["commerceInfo"].push([
+                              "Id Trx",
+                              res?.obj?.response?.["idtrans"],
+                            ]);
+                            infTicketFinal["commerceInfo"].push([
+                              "Id Aut",
+                              res?.obj?.response?.["codigoauth"],
+                            ]);
+                            setInfTicket(infTicketFinal);
+                            setRespuesta(false);
+                            setTypeInfo("RecargaExitosa");
+                          } else {
+                            notifyError(res?.obj?.response?.["respuesta"]);
+                            setRespuesta(true);
+                            handleClose();
+                            resolve(true);
+                          }
+                        } else {
+                          setRespuesta(true);
+                          resolve(false);
+                        }
+                      })
+                      .catch((err) => {
+                        setRespuesta(false);
+                        console.error(err);
+                      });
+                  }, 11000)
+                );
+                if (prom === true) {
+                  setRespuesta(false);
+                  handleClose();
+                  break;
+                }
+              } catch (error) {
+                console.error(error);
+              }
+              notify("Su transacción esta siendo procesada, no recargue la página");
+            }
+            validNavigate("/recargas-paquetes");
+          }
+          else {
+            notifyError(res?.msg);
+            setRespuesta(false);
+            handleClose();
+          }          
         }
       })
-      .catch(async (err) => {
-        notify("Su transacción esta siendo procesada");
-        setRespuesta(true);
+      .catch((err) => {
+        setRespuesta(false);
+        notifyError("No se ha podido conectar al servidor");
         console.error(err);
-        for (let i = 0; i <= 8; i++) {
-          try {
-            const prom = await new Promise((resolve, reject) =>
-              setTimeout(() => {
-                postCheckReintentoRecargas({
-                  id_uuid_trx: id_uuid,
-                  idComercio: roleInfo?.id_comercio,
-                  idDispositivo: roleInfo?.id_dispositivo,
-                })
-                  .then((res) => {
-                    if (res?.msg !== "No ha terminado el reintento") {
-                      if (
-                        res?.status === true ||
-                        res?.obj?.response?.estado == "00"
-                      ) {
-                        notify("Recarga exitosa");
-                        infTicketFinal["commerceInfo"].push([
-                          "Id Trx",
-                          res?.obj?.response?.["idtrans"],
-                        ]);
-                        infTicketFinal["commerceInfo"].push([
-                          "Id Aut",
-                          res?.obj?.response?.["codigoauth"],
-                        ]);
-                        setInfTicket(infTicketFinal);
-                        setRespuesta(false);
-                        setTypeInfo("RecargaExitosa");
-                      } else {
-                        notifyError(res?.obj?.response?.["respuesta"]);
-                        setRespuesta(true);
-                        handleClose();
-                        resolve(true);
-                      }
-                    } else {
-                      setRespuesta(true);
-                      resolve(false);
-                    }
-                  })
-                  .catch((err) => {
-                    setRespuesta(false);
-                    console.error(err);
-                  });
-              }, 11000)
-            );
-            if (prom === true) {
-              setRespuesta(false);
-              handleClose();
-              break;
-            }
-          } catch (error) {
-            console.error(error);
-          }
-          notify("Su transacción esta siendo procesada, no recargue la página");
-        }
-        validNavigate("/recargas-paquetes");
+        handleClose();      
       });
   };
 

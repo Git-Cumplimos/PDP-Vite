@@ -377,93 +377,101 @@ const CompraPin = () => {
         ticket: newVoucher,
       },
       {},
-      false,
-      29000
+      true,
+      60000
     )
-      .then((res) => {
+      .then(async (res) => {
         if (res?.status == true) {
           notify("Venta exitosa");
           setShowLoading(false);
           VentaExitosa(res?.obj?.response, fecha, hora);
         } else {
-          notifyError(
-            res?.obj?.response?.respuesta ==
-              ":Error en el numero telefonico, si crees que el numero esta correcto comunicalo al distribuidor"
-              ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
-              : res?.msg
-          );
-          setShowLoading(false);
-          showModalDatosEPM(false);
-          showModalDatosSNR(false);
-          setShowModal(false);
-          setInputCelular("");
-          setInputValor(0);
+          if (res?.message === "Endpoint request timed out") {
+            notify("Se está procesando la transacción");
+            setShowLoading(true);
+            const today = new Date();
+            const formatDate = Intl.DateTimeFormat("es-CO", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            }).format(today);
+
+            for (let i = 0; i <= 8; i++) {
+              try {
+                const promesa = await new Promise((resolve, reject) =>
+                  setTimeout(() => {
+                    postCheckReintentoPines({
+                      idComercio: roleInfo?.id_comercio,
+                      idUsuario: roleInfo?.id_usuario,
+                      idTerminal: roleInfo?.id_dispositivo,
+                      id_uuid_trx: uniqueId,
+                    })
+                      .then((res) => {
+                        if (res?.msg !== "No ha terminado el reintento") {
+                          if (
+                            res?.status === true ||
+                            res?.obj?.response?.estado == "00"
+                          ) {
+                            notify("Venta exitosa");
+                            VentaExitosa(res?.obj?.response, fecha, hora);
+                            setShowLoading(false);
+                          } else {
+                            notifyError(res?.obj?.response?.["respuesta"]);
+                            setShowLoading(true);
+                            setShowModal(false);
+                            showModalDatosEPM(false);
+                            showModalDatosSNR(false);
+                            setInputCelular("");
+                            setInputValor(0);
+                            resolve(true);
+                          }
+                        } else {
+                          setShowLoading(true);
+                          resolve(false);
+                        }
+                      })
+                      .catch((err) => {
+                        setShowLoading(false);
+                        console.error(err);
+                      });
+                  }, 11000)
+                );
+                if (promesa === true) {
+                  setShowLoading(false);
+                  handleClose();
+                  break;
+                }
+              } catch (error) {
+                console.error("Entró al catch del for");
+
+                console.error(error);
+              }
+              notify(
+                "Su transacción esta siendo procesada, no recargue la página"
+              );
+            }
+            notifyError("Error de TimeOut. Sin respuesta");
+            validNavigate("/Pines/PinesContenido");
+          } else {
+            notifyError(
+              res?.obj?.response?.respuesta ==
+                ":Error en el numero telefonico, si crees que el numero esta correcto comunicalo al distribuidor"
+                ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
+                : res?.msg
+            );
+            setShowLoading(false);
+            showModalDatosEPM(false);
+            showModalDatosSNR(false);
+            setShowModal(false);
+            setInputCelular("");
+            setInputValor(0);
+          }
         }
       })
       .catch(async (err) => {
-        notify("Se está procesando la transacción");
-        setShowLoading(true);
-        console.error(err);
-        const today = new Date();
-        const formatDate = Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        }).format(today);
-
-        for (let i = 0; i <= 8; i++) {
-          try {
-            const promesa = await new Promise((resolve, reject) =>
-              setTimeout(() => {
-                postCheckReintentoPines({
-                  idComercio: roleInfo?.id_comercio,
-                  idUsuario: roleInfo?.id_usuario,
-                  idTerminal: roleInfo?.id_dispositivo,
-                  id_uuid_trx: uniqueId,
-                })
-                  .then((res) => {
-                    if (res?.msg !== "No ha terminado el reintento") {
-                      if (
-                        res?.status === true ||
-                        res?.obj?.response?.estado == "00"
-                      ) {
-                        notify("Venta exitosa");
-                        VentaExitosa(res?.obj?.response, fecha, hora);
-                        setShowLoading(false);
-                      } else {
-                        notifyError(res?.obj?.response?.["respuesta"]);
-                        setShowLoading(true);
-                        setShowModal(false);
-                        showModalDatosEPM(false);
-                        showModalDatosSNR(false);
-                        setInputCelular("");
-                        setInputValor(0);
-                        resolve(true);
-                      }
-                    } else {
-                      setShowLoading(true);
-                      resolve(false);
-                    }
-                  })
-                  .catch((err) => {
-                    setShowLoading(false);
-                    console.error(err);
-                  });
-              }, 11000)
-            );
-            if (promesa === true) {
-              setShowLoading(false);
-              handleClose();
-              break;
-            }
-          } catch (error) {
-            console.error("Entró al catch del for");
-
-            console.error(error);
-          }
-          notify("Su transacción esta siendo procesada, no recargue la página");
-        }
-        validNavigate("/Pines/PinesContenido");
+        notifyError("No se ha podido conectar al servidor");
+        setShowLoading(false);
+        handleClose();
       });
   };
 
