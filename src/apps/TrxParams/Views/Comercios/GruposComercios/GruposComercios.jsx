@@ -16,6 +16,7 @@ import {
   postGruposComercios,
   putGruposComercios,
 } from "../../../utils/fetchGruposComercios";
+import Select from "../../../../../components/Base/Select";
 
 const GruposComercios = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const GruposComercios = () => {
   const [selectedGruposComercios, setSelectedGruposComercios] = useState({
     pk_tbl_grupo_comercios: "",
     nombre_grupo_comercios: "",
+    paga_comision:"",
     comercios: [],
     comerciosOriginal: [],
     id_comercio: "",
@@ -48,6 +50,7 @@ const GruposComercios = () => {
     setSelectedGruposComercios({
       pk_tbl_grupo_comercios: "",
       nombre_grupo_comercios: "",
+      paga_comision:"",
       comercios: [],
       comerciosOriginal: [],
       id_comercio: "",
@@ -63,6 +66,7 @@ const GruposComercios = () => {
     setSelectedGruposComercios({
       pk_tbl_grupo_comercios: "",
       nombre_grupo_comercios: "",
+      paga_comision:"",
       comercios: [],
       comerciosOriginal: [],
       id_comercio: "",
@@ -141,6 +145,7 @@ const GruposComercios = () => {
             selectedGruposComercios?.nombre_grupo_comercios,
           fk_tbl_grupo_planes_comisiones:
             selectedGruposComercios?.fk_tbl_grupo_planes_comisiones,
+            paga_comision:selectedGruposComercios?.paga_comision,
         })
           .then((res) => {
             if (res?.status) {
@@ -337,17 +342,6 @@ const GruposComercios = () => {
             });
           }}></Input>
       </TableEnterprise>
-      {/* {Array.isArray(tableConfiguracionComercios) &&
-      tableConfiguracionComercios.length > 0 ? (
-        <Table
-          headers={Object.keys(tableConfiguracionComercios[0])}
-          data={tableConfiguracionComercios}
-          onSelectRow={onSelectConfiguracionComercios}
-        />
-      ) : (
-        ""
-      )} */}
-
       <Modal show={showModal} handleClose={handleClose}>
         <h1 className='text-3xl text-center'>
           {selectedGruposComercios?.pk_tbl_grupo_comercios !== ""
@@ -369,6 +363,21 @@ const GruposComercios = () => {
             }
             required
           />
+          <Select
+              id='paga_comision'
+              name='paga_comision'
+              label='Paga comisión'
+              options={{
+                "Si": true,
+                "No": false,
+              }}
+              value={selectedGruposComercios.paga_comision}
+              onChange={(e) =>
+                setSelectedGruposComercios((old) => {
+                  return { ...old, paga_comision: e.target.value === "true" ? true : false };
+                })
+            }
+            />
           {selectedGruposComercios?.fk_tbl_grupo_planes_comisiones !== "" && (
             <Input
               id='nombre_grupo_plan'

@@ -18,6 +18,7 @@ import {
   putGruposComercios,
 } from "../../../utils/fetchGruposComercios";
 import SearchComerciosNotInGruposComercios from "../../../components/GruposComercios/SearchComerciosNotInGruposComercios";
+import Select from "../../../../../components/Base/Select";
 
 const EditGruposComercios = () => {
   const params = useParams();
@@ -33,6 +34,7 @@ const EditGruposComercios = () => {
   const [selectedGruposComercios, setSelectedGruposComercios] = useState({
     pk_tbl_grupo_comercios: "",
     nombre_grupo_comercios: "",
+    paga_comision:"",
     id_comercio: "",
     comercios_agregar: [],
     comercios_eliminar: [],
@@ -70,6 +72,7 @@ const EditGruposComercios = () => {
         comercios_eliminar: selectedGruposComercios?.comercios_eliminar,
         fk_tbl_grupo_planes_comisiones:
           selectedGruposComercios?.fk_tbl_grupo_planes_comisiones,
+          paga_comision:selectedGruposComercios?.paga_comision,
       })
         .then((res) => {
           if (res?.status) {
@@ -86,7 +89,7 @@ const EditGruposComercios = () => {
           console.error(err);
         });
     },
-    [selectedGruposComercios]
+    [selectedGruposComercios,navigate]
   );
 
   useEffect(() => {
@@ -116,6 +119,8 @@ const EditGruposComercios = () => {
           fk_tbl_grupo_planes_comisiones:
             autoArr?.results[0]?.["fk_tbl_grupo_planes_comisiones"],
           nombre_grupo_plan: autoArr?.results[0]?.["nombre_grupo_plan"],
+          paga_comision: autoArr?.results[0]?.["paga_comision"],
+          
         }));
       })
       .catch((err) => console.error(err));
@@ -316,6 +321,21 @@ const EditGruposComercios = () => {
           }
           required
         />
+        <Select
+              id='paga_comision'
+              name='paga_comision'
+              label='Paga comisión'
+              options={{
+                "Si": true,
+                "No": false,
+              }}
+              value={selectedGruposComercios.paga_comision}
+              onChange={(e) =>
+                setSelectedGruposComercios((old) => {
+                  return { ...old, paga_comision: e.target.value === "true" ? true : false };
+                })
+            }
+            />
         <Fieldset legend='Grupo de planes comisiones' className='lg:col-span-2'>
           <Input
             id='nombre_grupo_plan'
