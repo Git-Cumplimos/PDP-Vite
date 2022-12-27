@@ -245,7 +245,7 @@ const PinPago = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Pago de giro</h1>
+      <h1 className="text-3xl mt-6">Pin de Giro</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
