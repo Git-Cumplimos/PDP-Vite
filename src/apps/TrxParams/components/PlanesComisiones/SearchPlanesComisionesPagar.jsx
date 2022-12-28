@@ -2,6 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Input from "../../../../components/Base/Input";
 import { getComisionesPlanesPagar } from "../../utils/fetchComisionesPlanes";
+import { notifyError } from "../../../../utils/notify";
 
 const SearchPlanesComisionesPagar = ({
   selectedGruposPlanes,
@@ -40,68 +41,32 @@ const SearchPlanesComisionesPagar = ({
     (ev, i) => {
       ev.preventDefault();
       if (
-        !selectedGruposPlanes?.planes_comisiones?.find(
-          (a) =>
-            a?.fk_planes_comisiones === planesComisiones[i].pk_planes_comisiones
-        ) &&
         !selectedGruposPlanes?.planes_agregar?.find(
           (a) =>
             a?.fk_planes_comisiones === planesComisiones[i].pk_planes_comisiones
-        ) &&
-        planesComisiones[i].pk_planes_comisiones !== ""
+        )
       ) {
         const obj = { ...selectedGruposPlanes };
-        if (
-          !selectedGruposPlanes?.planesComisionesOriginal?.find(
-            (a) =>
-              a?.fk_planes_comisiones ===
-              planesComisiones[i].pk_planes_comisiones
-          )
-        ) {
-          obj["planes_agregar"] = [
-            ...obj["planes_agregar"],
-            {
-              fk_planes_comisiones: planesComisiones[i].pk_planes_comisiones,
-              fk_tbl_grupo_planes_comisiones:
-                selectedGruposPlanes["pk_tbl_grupo_planes_comisiones"],
-            },
-          ];
-        }
-        if (
-          selectedGruposPlanes?.planes_eliminar?.find(
-            (a) =>
-              a?.fk_planes_comisiones ===
-              planesComisiones[i].pk_planes_comisiones
-          )
-        ) {
-          const b = obj["planes_eliminar"].filter(
-            (a) =>
-              a?.fk_planes_comisiones !==
-              planesComisiones[i].pk_planes_comisiones
-          );
-          obj["planes_eliminar"] = b;
-        }
-        obj["planes_comisiones"] = [
-          ...obj["planes_comisiones"],
+        obj["planes_agregar"] = [
+          ...obj["planes_agregar"],
           {
             fk_planes_comisiones: planesComisiones[i].pk_planes_comisiones,
-            nombre_plan_comision: planesComisiones[i].nombre_plan_comision,
+            fk_tbl_grupo_planes_comisiones:
+              selectedGruposPlanes["pk_tbl_grupo_planes_comisiones"],
           },
         ];
-
         setSelectedGruposPlanes((old) => {
           return {
             ...old,
-            planes_eliminar: obj["planes_eliminar"],
             planes_agregar: obj["planes_agregar"],
-            planes_comisiones: obj["planes_comisiones"],
-            id_plan: "",
           };
         });
+      } else {
+        return notifyError("El plan ya se ha agregado anteriormente");
       }
       handleClose();
     },
-    [selectedGruposPlanes, setSelectedGruposPlanes, planesComisiones]
+    [selectedGruposPlanes, planesComisiones]
   );
   useEffect(() => {
     fetchPlans();
@@ -119,12 +84,9 @@ const SearchPlanesComisionesPagar = ({
       obj["pk_planes_comisiones"] = dataPlanesComisiones.pk_planes_comisiones;
     if (dataPlanesComisiones.nombre_plan_comision !== "")
       obj["nombre_plan_comision"] = dataPlanesComisiones.nombre_plan_comision;
-    if (selectedGruposPlanes?.planes_comisiones.length > 0) {
-      obj["planes_comisiones"] = selectedGruposPlanes?.planes_comisiones.map(
-        (value, i) => {
-          return [value.fk_planes_comisiones];
-        }
-      );
+    if (selectedGruposPlanes.pk_tbl_grupo_planes_comisiones) {
+      obj["fk_tbl_grupo_planes_comisiones"] =
+        selectedGruposPlanes.pk_tbl_grupo_planes_comisiones;
     }
     getComisionesPlanesPagar(obj)
       .then((res) => {

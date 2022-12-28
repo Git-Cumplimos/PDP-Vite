@@ -62,7 +62,6 @@ const SearchGruposPlanesComisiones = ({
   }, [page, limit, dataGruposPlanesComisiones]);
   const onClickRow = useCallback(
     (ev, i) => {
-      console.log(gruposPlanes[i]);
       setSelectedGruposComercios((old) => ({
         ...old,
         nombre_grupo_plan: gruposPlanes[i]?.nombre_grupo_plan,

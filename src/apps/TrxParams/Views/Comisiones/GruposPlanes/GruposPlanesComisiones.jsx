@@ -1,24 +1,23 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import Button from "../../../../components/Base/Button/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
-import Fieldset from "../../../../components/Base/Fieldset";
-import Form from "../../../../components/Base/Form/Form";
-import Input from "../../../../components/Base/Input/Input";
-import Modal from "../../../../components/Base/Modal/Modal";
-import Select from "../../../../components/Base/Select/Select";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
-import useQuery from "../../../../hooks/useQuery";
-import { notify, notifyError } from "../../../../utils/notify";
-import SearchPlanesComisionesPagar from "../../components/PlanesComisiones/SearchPlanesComisionesPagar";
+import Button from "../../../../../components/Base/Button/Button";
+import ButtonBar from "../../../../../components/Base/ButtonBar/ButtonBar";
+import Fieldset from "../../../../../components/Base/Fieldset";
+import Form from "../../../../../components/Base/Form/Form";
+import Input from "../../../../../components/Base/Input/Input";
+import Modal from "../../../../../components/Base/Modal/Modal";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import TableEnterprise from "../../../../../components/Base/TableEnterprise";
+import { useNavigate } from "react-router-dom";
+import { notify, notifyError } from "../../../../../utils/notify";
+import SearchPlanesComisionesPagar from "../../../components/PlanesComisiones/SearchPlanesComisionesPagar";
 import {
   fetchGruposPlanesComisiones,
   postGruposPlanesComisiones,
   putGruposPlanesComisiones,
-} from "../../utils/fetchGruposPlanesComisiones";
+} from "../../../utils/fetchGruposPlanesComisiones";
 
 const GruposPlanesComisiones = () => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -26,11 +25,6 @@ const GruposPlanesComisiones = () => {
     page: 1,
     limit: 10,
   });
-  const [pageDataPlanes, setPageDataPlanes] = useState({
-    page: 1,
-    limit: 10,
-  });
-  const [maxPagesPlanes, setMaxPagesPlanes] = useState(0);
   const [gruposPlanes, setGruposPlanes] = useState([]);
   const [selectedGruposPlanes, setSelectedGruposPlanes] = useState({
     pk_tbl_grupo_planes_comisiones: "",
@@ -74,12 +68,6 @@ const GruposPlanesComisiones = () => {
       planes_eliminar: [],
     });
   }, []);
-  const handleClose2 = useCallback(() => {
-    setShowModal2(false);
-  }, []);
-  const handleShowModal2 = useCallback(() => {
-    setShowModal2(true);
-  }, []);
 
   const tableGruposPlanes = useMemo(() => {
     return [
@@ -92,93 +80,45 @@ const GruposPlanesComisiones = () => {
           return {
             Id: pk_tbl_grupo_planes_comisiones,
             "Nombre grupo": nombre_grupo_plan,
-            "Cantidad comercios": planes_comisiones.length ?? 0,
+            "Cantidad comercios":
+              planes_comisiones.length > 0 ? planes_comisiones[0].count : 0,
           };
         }
       ),
     ];
   }, [gruposPlanes]);
 
-  const tablePlanes = useMemo(() => {
-    const dataTab = selectedGruposPlanes.planes_comisiones.slice(
-      pageDataPlanes.limit * (pageDataPlanes.page - 1),
-      pageDataPlanes.limit * pageDataPlanes.page
-    );
-    return [...dataTab];
-  }, [selectedGruposPlanes.planes_comisiones, pageDataPlanes]);
-
   const onSelectTipoNivelComercios = useCallback(
     (e, i) => {
-      setShowModal(true);
-      setSelectedGruposPlanes((old) => ({
-        ...old,
-        pk_tbl_grupo_planes_comisiones:
-          gruposPlanes[i]?.["pk_tbl_grupo_planes_comisiones"],
-        nombre_grupo_plan: gruposPlanes[i]?.["nombre_grupo_plan"],
-        planesComisionesOriginal: gruposPlanes[i]?.["planes_comisiones"],
-        planes_comisiones: gruposPlanes[i]?.["planes_comisiones"],
-      }));
-      setMaxPagesPlanes(
-        Math.ceil(
-          selectedGruposPlanes.planes_comisiones.length / pageDataPlanes.limit
-        )
+      navigate(
+        `/params-operations/grupos-planes-comisiones/edit/${gruposPlanes[i]?.["pk_tbl_grupo_planes_comisiones"]}`
       );
     },
-    [
-      gruposPlanes,
-      pageDataPlanes.limit,
-      selectedGruposPlanes.planes_comisiones.length,
-    ]
+    [gruposPlanes]
   );
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
       setIsUploading(true);
-      if (selectedGruposPlanes?.pk_tbl_grupo_planes_comisiones !== "") {
-        putGruposPlanesComisiones({
-          pk_tbl_grupo_planes_comisiones:
-            selectedGruposPlanes?.pk_tbl_grupo_planes_comisiones,
-          nombre_grupo_plan: selectedGruposPlanes?.nombre_grupo_plan,
-          planes_agregar: selectedGruposPlanes?.planes_agregar,
-          planes_eliminar: selectedGruposPlanes?.planes_eliminar,
-        })
-          .then((res) => {
-            if (res?.status) {
-              notify(res?.msg);
-              handleClose();
-            } else {
-              notifyError(res?.msg);
-              handleClose();
-            }
-            setIsUploading(false);
-          })
-          .catch((err) => {
-            notifyError(err);
+      postGruposPlanesComisiones({
+        nombre_grupo_plan: selectedGruposPlanes?.nombre_grupo_plan,
+      })
+        .then((res) => {
+          if (res?.status) {
+            notify(res?.msg);
             handleClose();
-            setIsUploading(false);
-            console.error(err);
-          });
-      } else {
-        postGruposPlanesComisiones({
-          nombre_grupo_plan: selectedGruposPlanes?.nombre_grupo_plan,
-        })
-          .then((res) => {
-            if (res?.status) {
-              notify(res?.msg);
-              handleClose();
-            } else {
-              notifyError(res?.msg);
-              handleClose();
-            }
-            setIsUploading(false);
-          })
-          .catch((err) => {
-            notifyError(err);
+          } else {
+            notifyError(res?.msg);
             handleClose();
-            setIsUploading(false);
-            console.error(err);
-          });
-      }
+          }
+          setIsUploading(false);
+        })
+        .catch((err) => {
+          notifyError(err);
+          handleClose();
+          setIsUploading(false);
+          console.error(err);
+        });
     },
     [handleClose, selectedGruposPlanes]
   );
@@ -304,16 +244,6 @@ const GruposPlanesComisiones = () => {
             });
           }}></Input>
       </TableEnterprise>
-      {/* {Array.isArray(tableConfiguracionComercios) &&
-      tableConfiguracionComercios.length > 0 ? (
-        <Table
-          headers={Object.keys(tableConfiguracionComercios[0])}
-          data={tableConfiguracionComercios}
-          onSelectRow={onSelectConfiguracionComercios}
-        />
-      ) : (
-        ""
-      )} */}
 
       <Modal show={showModal} handleClose={handleClose}>
         <h1 className='text-3xl text-center'>
@@ -336,26 +266,11 @@ const GruposPlanesComisiones = () => {
             }
             required
           />
-          {selectedGruposPlanes?.pk_tbl_grupo_planes_comisiones !== "" && (
-            <TableEnterprise
-              title='Planes de comisiones'
-              maxPage={maxPagesPlanes}
-              headers={["Id", "Plan comision"]}
-              data={tablePlanes}
-              onSelectRow={onSelectPlanDelete}
-              onSetPageData={setPageDataPlanes}
-              // onChange={onChange}
-            ></TableEnterprise>
-          )}
+
           <ButtonBar>
             <Button type='button' onClick={handleClose}>
               Cancelar
             </Button>
-            {selectedGruposPlanes?.pk_tbl_grupo_planes_comisiones !== "" && (
-              <Button type='button' onClick={handleShowModal2}>
-                Agregar plan de comisión
-              </Button>
-            )}
             <Button type='submit'>
               {selectedGruposPlanes?.pk_tbl_grupo_planes_comisiones !== ""
                 ? "Actualizar grupo de planes"
@@ -363,13 +278,6 @@ const GruposPlanesComisiones = () => {
             </Button>
           </ButtonBar>
         </Form>
-      </Modal>
-      <Modal show={showModal2} handleClose={handleClose2}>
-        <SearchPlanesComisionesPagar
-          selectedGruposPlanes={selectedGruposPlanes}
-          setSelectedGruposPlanes={setSelectedGruposPlanes}
-          handleClose={() => handleClose2()}
-        />
       </Modal>
     </Fragment>
   );

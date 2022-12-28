@@ -34,7 +34,7 @@ const Comisiones = lazy(() => import("./Views/Comisiones"));
 const Com2Pay = lazy(() => import("./Views/Comisiones/Com2Pay"));
 const CreateComision = lazy(() => import("./Views/Comisiones/CreateComision"));
 const GruposPlanesComisiones = lazy(() =>
-  import("./Views/Comisiones/GruposPlanesComisiones")
+  import("./Views/Comisiones/GruposPlanes/GruposPlanesComisiones")
 );
 const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
 const Convenios = lazy(() => import("./Views/Convenios/Convenios"));
@@ -67,6 +67,9 @@ const GruposConvenios = lazy(() =>
 );
 const EditGruposConvenios = lazy(() =>
   import("./Views/Convenios/GruposConvenios/EditGruposConvenios")
+);
+const EditGruposPlanesComisiones = lazy(() =>
+  import("./Views/Comisiones/GruposPlanes/EditGruposPlanesComisiones")
 );
 const navConvenios = lazy(() => import("./Views/Convenios/navConvenios"));
 const navComercios = lazy(() => import("./Views/Comercios/navComercios"));
@@ -223,6 +226,18 @@ const rutasConfiguraciones = {
           ),
           component: GruposPlanesComisiones,
           permission: [enumPermisosTrx.planes_comision],
+        },
+        {
+          link: "/params-operations/grupos-planes-comisiones/edit/:id",
+          label: (
+            <AppIcons
+              Logo={"RECAUDO"}
+              name={"Grupos de planes de comisiones"}
+            />
+          ),
+          component: EditGruposPlanesComisiones,
+          permission: [enumPermisosTrx.planes_comision],
+          show: false,
         },
         {
           link: "/params-operations/comisiones/reporte-configuracion-comisiones",

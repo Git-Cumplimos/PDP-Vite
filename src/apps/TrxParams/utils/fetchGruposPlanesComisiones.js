@@ -20,6 +20,24 @@ export const fetchGruposPlanesComisiones = async (obj) => {
     throw err;
   }
 };
+export const fetchPlanesGruposPlanesComisiones = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-grupo-planes/consultar-planes-grupo-planes`,
+      "GET",
+      obj,
+      {}
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
 export const postGruposPlanesComisiones = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
