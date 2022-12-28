@@ -176,6 +176,7 @@ const Com2Collect = lazy(() =>
   import("../apps/TrxParams/Views/Comisiones/Com2Collect")
 );
 const Convenios = lazy(() => import("../apps/TrxParams/Views/Convenios"));
+const ConveniosPDP = lazy(() => import("../apps/TrxParams/Views/ConveniosPDP"));
 const ConvAuto = lazy(() => import("../apps/TrxParams/Views/ConvAuto"));
 const Autorizadores = lazy(() =>
   import("../apps/TrxParams/Views/Autorizadores")
@@ -977,7 +978,7 @@ const allUrlsPrivateApps = [
       {
         link: "/params-operations/convenios",
         label: <AppIcons Logo={"RETIRO"} name={"Convenios"} />,
-        component: Convenios,
+        component: ConveniosPDP,
         permission: [20],
         subRoutes: [
           {

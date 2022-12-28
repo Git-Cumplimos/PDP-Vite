@@ -1,0 +1,395 @@
+import { Fragment, useEffect, useState, useCallback } from "react";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Input from "../../../../components/Base/Input";
+import { onChangeNumber } from "../../../../utils/functions";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
+
+import { crearConvenio, buscarConvenios, actualizarConvenio } from "./utils";
+import Select from "../../../../components/Base/Select";
+import { notifyError, notifyPending } from "../../../../utils/notify";
+import useDelayedCallback from "../../../../hooks/useDelayedCallback";
+import Modal from "../../../../components/Base/Modal";
+import Form from "../../../../components/Base/Form";
+import Fieldset from "../../../../components/Base/Fieldset";
+import TextArea from "../../../../components/Base/TextArea";
+
+const ConveniosPDP = () => {
+  const [conveniosPdp, setConveniosPdp] = useState([]);
+  const [maxPage, setMaxPage] = useState(0);
+  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [searchFilters, setSearchFilters] = useState({
+    pk_id_convenio: "",
+    nombre_convenio: "",
+    tags: "",
+    estado: "",
+  });
+
+  const [selectedConvenio, setSelectedConvenio] = useState(null);
+  const [isCreate, setIsCreate] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const handleClose = useCallback(() => {
+    if (!loading) {
+      setSelectedConvenio(null);
+      setIsCreate(null);
+    }
+  }, [loading]);
+
+  const lazySearch = useDelayedCallback(
+    useCallback(() => {
+      buscarConvenios({
+        ...pageData,
+        ...Object.fromEntries(
+          Object.entries(searchFilters)
+            .filter(([_, val]) => val)
+            .map(([key, val]) => [key, key === "tags" ? val.split(" ") : val])
+        ),
+      })
+        .then((res) => {
+          setConveniosPdp(res?.obj?.results ?? []);
+          setMaxPage(res?.obj?.max_pages ?? []);
+        })
+        .catch((err) => {
+          if (err?.cause === "custom") {
+            notifyError(err?.message);
+            return;
+          }
+          console.error(err?.message);
+        });
+    }, [pageData, searchFilters]),
+    300
+  );
+
+  useEffect(() => {
+    lazySearch();
+  }, [lazySearch]);
+
+  const submitConvenio = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      const objCopy = structuredClone(selectedConvenio);
+      objCopy.relaciones = Object.fromEntries(objCopy.relaciones);
+      if ("estado" in objCopy) {
+        objCopy.estado = objCopy.estado === "true";
+      }
+      notifyPending(
+        isCreate ? crearConvenio(objCopy) : actualizarConvenio({}, objCopy),
+        {
+          render: () => {
+            setLoading(true);
+            return `${isCreate ? "Creando" : "Actualizando"} convenio`;
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            setLoading(false);
+            lazySearch();
+            handleClose();
+            return res?.msg;
+          },
+        },
+        {
+          render: ({ data: err }) => {
+            setLoading(false);
+            if (err?.cause === "custom") {
+              return err?.message;
+            }
+            console.error(err?.message);
+            return `${isCreate ? "Creacion" : "Actualizacion"} fallida`;
+          },
+        }
+      );
+    },
+    [selectedConvenio, isCreate, lazySearch, handleClose]
+  );
+
+  return (
+    <Fragment>
+      <ButtonBar>
+        <Button
+          type="submit"
+          onClick={() => {
+            setSelectedConvenio({
+              nombre_convenio: "",
+              descripcion_convenio: "",
+              tags: [],
+              relaciones: [],
+            });
+            setIsCreate(true);
+          }}
+        >
+          Crear convenio
+        </Button>
+      </ButtonBar>
+      <TableEnterprise
+        title="Convenios de recaudo"
+        headers={["Código convenio", "Nombre convenio", "Estado"]}
+        data={conveniosPdp.map(
+          ({ pk_id_convenio, nombre_convenio, estado }) => ({
+            pk_id_convenio,
+            nombre_convenio,
+            estado: estado ? "Activo" : "Inactivo",
+          })
+        )}
+        maxPage={maxPage}
+        onSetPageData={setPageData}
+        onSelectRow={(e, i) => {
+          const copy = structuredClone(conveniosPdp[i]);
+          copy.relaciones = Object.entries(conveniosPdp[i]?.relaciones);
+          setSelectedConvenio(copy);
+          setIsCreate(false);
+        }}
+        onChange={(ev) =>
+          setSearchFilters((old) => ({
+            ...old,
+            [ev.target.name]: ev.target.value,
+          }))
+        }
+      >
+        <Input
+          id={"pk_id_convenio"}
+          label={"Código de convenio"}
+          name={"pk_id_convenio"}
+          type="tel"
+          autoComplete="off"
+          maxLength={"10"}
+          onChange={(ev) => (ev.target.value = onChangeNumber(ev))}
+          required
+        />
+        <Input
+          id={"nombre_convenio"}
+          label={"Nombre del convenio"}
+          name={"nombre_convenio"}
+          type="text"
+          autoComplete="off"
+          maxLength={"30"}
+          required
+        />
+        <Input
+          id={"tags"}
+          label={"Tags"}
+          name={"tags"}
+          type="text"
+          autoComplete="off"
+          maxLength={"30"}
+          required
+        />
+        <Select
+          id={"estado"}
+          label={"Estado"}
+          name={"estado"}
+          options={[
+            { value: "", label: "" },
+            { value: "true", label: "Activo" },
+            { value: "false", label: "Inactivo" },
+          ]}
+          required
+        />
+      </TableEnterprise>
+      <Modal
+        show={selectedConvenio && isCreate !== null}
+        handleClose={handleClose}
+      >
+        <Form onSubmit={submitConvenio} grid>
+          <h1 className="text-3xl text-center">
+            {isCreate ? "Crear" : "Actualizar"} convenio
+          </h1>
+          {!isCreate && (
+            <Input
+              id="pk_id_convenio"
+              label="Id convenio"
+              name="pk_id_convenio"
+              type="tel"
+              autoComplete="off"
+              minLength="1"
+              maxLength="30"
+              defaultValue={selectedConvenio?.pk_id_convenio}
+              disabled
+            />
+          )}
+          <Input
+            id="nombre_convenio"
+            name={"nombre_convenio"}
+            label="Nombre de convenio"
+            type="text"
+            autoComplete="off"
+            value={selectedConvenio?.nombre_convenio}
+            onChange={(ev) =>
+              setSelectedConvenio((old) => {
+                const copy = { ...old };
+                copy.nombre_convenio = ev.target.value;
+                return { ...copy };
+              })
+            }
+            required
+          />
+          <TextArea
+            id="descripcion_convenio"
+            label="Nombre de convenio"
+            name={"descripcion_convenio"}
+            autoComplete="off"
+            value={selectedConvenio?.descripcion_convenio}
+            onChange={(ev) =>
+              setSelectedConvenio((old) => {
+                const copy = { ...old };
+                copy.descripcion_convenio = ev.target.value;
+                return { ...copy };
+              })
+            }
+            required
+          />
+          {!isCreate && (
+            <Select
+              id={"estado"}
+              label={"Estado"}
+              name={"estado"}
+              options={[
+                { value: "", label: "" },
+                { value: "true", label: "Activo" },
+                { value: "false", label: "Inactivo" },
+              ]}
+              value={selectedConvenio?.estado}
+              onChange={(ev) =>
+                setSelectedConvenio((old) => {
+                  const copy = { ...old };
+                  copy.estado = ev.target.value;
+                  return { ...copy };
+                })
+              }
+              required
+            />
+          )}
+          <Fieldset legend={"Tags"}>
+            {selectedConvenio?.tags?.map((val, ind) => (
+              <div className="flex align-middle justify-center" key={ind}>
+                <Input
+                  id={`tagsConvenio_${ind}`}
+                  name="tags"
+                  type="text"
+                  autoComplete="off"
+                  value={val}
+                  onChange={(ev) =>
+                    setSelectedConvenio((old) => {
+                      const copy = { ...old };
+                      copy.tags[ind] = ev.target.value;
+                      return { ...copy };
+                    })
+                  }
+                  required
+                />
+                {selectedConvenio?.tags.length > 1 && (
+                  <ButtonBar className="w-52">
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        if (selectedConvenio?.tags.length < 2) {
+                          return;
+                        }
+                        const copy = { ...selectedConvenio };
+                        copy?.tags.splice(ind, 1);
+                        setSelectedConvenio({ ...copy });
+                      }}
+                    >
+                      Eliminar tag
+                    </Button>
+                  </ButtonBar>
+                )}
+              </div>
+            ))}
+            <ButtonBar>
+              <Button
+                type="button"
+                onClick={() => {
+                  const copy = { ...selectedConvenio };
+                  copy?.tags.push("");
+                  setSelectedConvenio({ ...copy });
+                }}
+              >
+                Añadir tag
+              </Button>
+            </ButtonBar>
+          </Fieldset>
+          <Fieldset legend={"Convenios Autorizador"}>
+            {selectedConvenio?.relaciones.map(([key, val], relIndex) => (
+              <div
+                className="flex flex-wrap align-middle justify-center"
+                key={relIndex}
+              >
+                <Select
+                  id={`relaciones_${relIndex}`}
+                  label="Autorizador"
+                  name="r_keys"
+                  options={[
+                    { value: "", label: "" },
+                    { value: 13, label: "Davivienda CB" },
+                    { value: 14, label: "Scotiabank Colpatria" },
+                    { value: 16, label: "Banco Agrario" },
+                    { value: 17, label: "Grupo Aval" },
+                  ]}
+                  value={key}
+                  onChange={(ev) =>
+                    setSelectedConvenio((old) => {
+                      const copy = { ...old };
+                      copy.relaciones[relIndex] = [ev.target.value, val];
+                      return { ...copy };
+                    })
+                  }
+                  required
+                />
+                <Input
+                  id={`relaciones_${relIndex}`}
+                  label="Id convenio"
+                  name="r_vals"
+                  type="text"
+                  autoComplete="off"
+                  value={val}
+                  onChange={(ev) =>
+                    setSelectedConvenio((old) => {
+                      const copy = { ...old };
+                      copy.relaciones[relIndex] = [key, ev.target.value];
+                      return { ...copy };
+                    })
+                  }
+                  required
+                />
+                <ButtonBar>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      const copy = { ...selectedConvenio };
+                      copy?.relaciones.splice(relIndex, 1);
+                      setSelectedConvenio({ ...copy });
+                    }}
+                  >
+                    Eliminar autorizador
+                  </Button>
+                </ButtonBar>
+              </div>
+            ))}
+            <ButtonBar>
+              <Button
+                type="button"
+                onClick={() => {
+                  const copy = { ...selectedConvenio };
+                  copy?.relaciones.push(["", ""]);
+                  setSelectedConvenio({ ...copy });
+                }}
+              >
+                Añadir autorizador
+              </Button>
+            </ButtonBar>
+          </Fieldset>
+          <ButtonBar>
+            <Button type="submit">
+              {isCreate ? "Crear" : "Actualizar"} convenio
+            </Button>
+          </ButtonBar>
+        </Form>
+      </Modal>
+    </Fragment>
+  );
+};
+
+export default ConveniosPDP;
