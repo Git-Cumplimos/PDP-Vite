@@ -944,7 +944,7 @@ const CrearPin = () => {
           <TicketsPines
             refPrint={null} 
             ticket={tickets} 
-            logo = 'LogoMiLicensia'
+            logo = 'LogoVus'
           />
           <TicketsPines
             refPrint={null} 

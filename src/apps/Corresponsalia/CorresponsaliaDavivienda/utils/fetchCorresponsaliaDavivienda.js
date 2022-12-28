@@ -1,5 +1,6 @@
 import { cifrarAES, decryptAES } from "../../../../utils/cryptoUtils";
 import fetchData from "../../../../utils/fetchData";
+import { hash } from "../../../../utils/hash";
 
 const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
 const urlParametrizacion = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}`;
@@ -119,6 +120,11 @@ export const postRealizarCashoutDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
+  const bodyHash = {...bodyObj}
+  delete bodyHash.ticket
+
+  const cod_hash = hash(bodyHash)
+  bodyObj.cod_hash = cod_hash
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
@@ -205,6 +211,11 @@ export const depositoCorresponsal = async (bodyObj) => {
       resolve("Sin datos body");
     });
   }
+  const bodyHash = {...bodyObj}
+  delete bodyHash.ticket
+
+  const cod_hash = hash(bodyHash)
+  bodyObj.cod_hash = cod_hash
 
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
@@ -251,6 +262,11 @@ export const retiroCorresponsal = async (bodyObj) => {
       resolve("Sin datos body");
     });
   }
+  const bodyHash = {...bodyObj}
+  delete bodyHash.ticket
+
+  const cod_hash = hash(bodyHash)
+  bodyObj.cod_hash = cod_hash
 
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {

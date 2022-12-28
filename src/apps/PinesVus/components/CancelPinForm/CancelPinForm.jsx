@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState, useEffect } from "react";
 import Button from "../../../../components/Base/Button";
-import Tickets from "../../../../components/Base/Tickets";
+import TicketsPines from "../TicketsPines";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useAuth } from "../../../../hooks/AuthHooks";
@@ -255,7 +255,11 @@ const CancelPin = ({
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center">
-          <Tickets refPrint={printDiv} ticket={tickets} />
+          <TicketsPines
+              refPrint={null}
+              ticket={tickets}
+              logo="LogoVus"
+          />
           <ButtonBar>
             <Button
               onClick={() => {
