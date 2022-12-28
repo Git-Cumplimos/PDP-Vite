@@ -38,6 +38,7 @@ const GruposPlanesComisiones = lazy(() =>
 );
 const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
 const Convenios = lazy(() => import("./Views/Convenios/Convenios"));
+const ConveniosPDP = lazy(() => import("./Views/ConveniosPDP"));
 const ConvAuto = lazy(() => import("./Views/ConvAuto"));
 const Autorizadores = lazy(() => import("./Views/Autorizadores"));
 const ReporteConfiguracionComisiones = lazy(() =>
@@ -252,6 +253,12 @@ const rutasConfiguraciones = {
           subRoutes: [],
         },
       ],
+    },
+    {
+      link: "/params-operations/convenios2",
+      label: <AppIcons Logo={"RETIRO"} name={"Convenios 2"} />,
+      component: ConveniosPDP,
+      permission: [20],
     },
     {
       link: "/params-operations/navconvenios",
