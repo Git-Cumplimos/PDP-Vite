@@ -218,16 +218,14 @@ const Participacion = () => {
           }) || []}
           onSelectRow={(e, index) => {            
               setSelected(table[index]);
-              if (!pagoParticipacion){
-                notifyError("Debe esperar la hora de cierre para hacer el pago de participación")
-              }else{
+              
               if (table[index].pagado === false){
                 setShowModal(true)
               }
               else{
                 notifyError("El pago a " + table[index].aliado + " ya se realizo")
               }  
-            }          
+                 
           }}
         >
           <Input

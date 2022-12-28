@@ -229,7 +229,26 @@ const PpsVoluntarioDemanda = lazy(() =>
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
 const RecaudoManual = lazy(() => import("../apps/Recaudo/Views/RecaudoManual"));
 const RecaudoCodigo = lazy(() => import("../apps/Recaudo/Views/RecaudoCodigo"));
+/**
+ * RecaudoIntegrado
+ */
+const RecaudoIntegrado = lazy(() =>
+  import("../apps/RecaudoIntegrado/RecaudoIntegrado")
+);
+const RecaudoDavivienda = lazy(() =>
+  import("../apps/RecaudoIntegrado/Views/Davivienda/RecaudoDavivienda")
+);
 
+const cargarArchivos = lazy(() =>
+  import("../apps/RecaudoIntegrado/Views/Davivienda/Views/CargarArchivos")
+);
+
+/**
+ * RUNT Banco Agrario
+ */
+/* const ContenedorRunt = lazy(() => import("../apps/Runt/ContenedorRunt"));
+const PagarRunt = lazy(() => import("../apps/Runt/Views/PagarRunt"));
+ */
 /**
  * Daviplata
  */
@@ -1110,6 +1129,53 @@ const allUrlsPrivateApps = [
       },
     ],
   },
+
+  {
+    link: "/recaudo-integrado",
+    label: <AppIcons Logo={"RECAUDO"} name={"Recaudo Integrado"} />,
+    component: RecaudoIntegrado,
+    permission: [55, 56, 57],
+    subRoutes: [
+      {
+        link: "/recaudo-integrado/davivienda",
+        label: <AppIcons Logo={"RETIRO"} name={"Davivienda"} />,
+        component: RecaudoDavivienda,
+        permission: [56, 57],
+        subRoutes: [
+          {
+            link: "/recaudo-integrado/davivienda/cargar",
+            label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
+            component: cargarArchivos,
+            permission: [55],
+          },
+        ],
+      },
+    ],
+  },
+
+  // {
+  //   link: "/runt",
+  //   label: <AppIcons Logo={"IMPUESTO"} name={"Runt"} />,
+  //   component: ContenedorRunt,
+  //   permission: [55, 56, 57],
+  //   subRoutes: [
+  //     {
+  //       link: "/runt/pagar-runt",
+  //       label: <AppIcons Logo={"RETIRO"} name={"Pagar Runt"} />,
+  //       component: PagarRunt,
+  //       permission: [56, 57],
+  //       /*   subRoutes: [
+  //         {
+  //           link: "/recaudo-integrado/davivienda/cargar",
+  //           label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
+  //           component: cargarArchivos,
+  //           permission: [55],
+  //         },
+  //       ], */
+  //     },
+  //   ],
+  // },
+
   {
     link: "/pagos-ifood",
     label: <AppIcons Logo={"RECAUDO"} name={"Aportes en Linea iFood"} />,
