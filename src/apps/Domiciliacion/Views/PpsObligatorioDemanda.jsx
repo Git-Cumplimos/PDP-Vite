@@ -101,11 +101,11 @@ const PpsObligatorioDemanda = ({ ced }) => {
             true
           )
             .then((respuesta) => {
-              console.log(
-                "RESPUESTA:",
-                respuesta?.obj?.datos_recibidos
-                  ?.trazabilityFinanciialInstitutionCode
-              );
+              // console.log(
+              //   "RESPUESTA:",
+              //   respuesta?.obj?.datos_recibidos
+              //     ?.trazabilityFinanciialInstitutionCode
+              // );
               setProcesandoTrx(false);
               setDatosComercio((old) => {
                 return {
