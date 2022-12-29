@@ -507,11 +507,6 @@ const CompraPin = () => {
           ? ["Contador", inputContador]
           : [],
 
-        state?.op == "em" ? ["", ""] : [],
-        state?.op == "em"
-          ? ["Numero Pin", result_?.jsonAdicional["Numero Pin"]]
-          : [],
-
         ["", ""],
         [
           "Valor del Pin",
