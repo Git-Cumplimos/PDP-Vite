@@ -27,12 +27,14 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 });
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
 const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
-/* const url = "http://127.0.0.1:5000"; */
+// const url = "http://127.0.0.1:5000";
 const PpsObligatorioDemanda = ({ ced }) => {
   const { quotaInfo, roleInfo, infoTicket } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
+  const [isPropia, setIsPropia] = useState(false);
+
   const [limitesMontos] = useState({
     max: 149100,
     min: 5000,
@@ -44,13 +46,21 @@ const PpsObligatorioDemanda = ({ ced }) => {
     numPlanilla: "",
     valorAportar: "",
   });
+  // useEffect(() => {
+  //   if (roleInfo["tipo_comercio"] === "OFICINAS PROPIAS") {
+  //     setIsPropia(true);
+  //   } else {
+  //     setIsPropia(false);
+  //   }
+  // }, [roleInfo, isPropia]);
 
   const [datosComercio, setDatosComercio] = useState({
     idComercio: roleInfo?.["id_comercio"],
     idusuario: roleInfo?.["id_usuario"],
     iddispositivo: roleInfo["id_dispositivo"],
     oficina_propia:
-      roleInfo?.tipocomercio === "OFICINAS PROPIAS" ? true : false,
+      roleInfo["tipo_comercio"] === "OFICINAS PROPIAS" ? true : false,
+
     cupoLogin: quotaInfo?.["quota"],
     tipoComercio: roleInfo?.["tipo_comercio"],
     nombreComercio: roleInfo?.["nombre comercio"],
@@ -68,6 +78,11 @@ const PpsObligatorioDemanda = ({ ced }) => {
 
   const enviar = (e) => {
     e.preventDefault();
+
+    // console.log("*********DATOS COMERCIO", datosComercio);
+    // console.log("*********role-info", roleInfo["tipo_comercio"]);
+    // console.log("*********isPropia", isPropia);
+
     setDisabledBtn(true);
     setProcesandoTrx(true);
     if (datosComercio?.["cupoLogin"] >= datosAportante?.["valorAportar"]) {
@@ -79,6 +94,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
           fetchData(
             `${url}/pps_obligatorio_demada_colpensiones`,
             // `http://127.0.0.1:5000/pps_obligatorio_demada_colpensiones`,
+            // `http://127.0.0.1:5000//simulacionColpensiones`,
             "POST",
             {},
             {
@@ -182,7 +198,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
               } */
             })
             .catch((err) => {
-              console.log(err);
+              // console.log(err);
               notifyError("Error al pagar planilla obligatoria a demanda");
               navigate(`/colpensiones`);
             });
@@ -203,7 +219,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
       navigate(`/colpensiones`);
     }
   };
-  useEffect(() => {}, [datosComercio]);
+  useEffect(() => {}, [datosComercio, isPropia]);
   const tickets = useMemo(() => {
     return {
       title: ["COLPENSIONES Recibo de pago"],
@@ -258,10 +274,10 @@ const PpsObligatorioDemanda = ({ ced }) => {
   useEffect(() => {
     infoTicket(datosComercio?.["idTrx"], 108, tickets)
       .then((resTicket) => {
-        console.log("RESTICKET:", resTicket);
+        // console.log("RESTICKET:", resTicket);
       })
       .catch((err) => {
-        console.error(err);
+        // console.error(err);
         notifyError("Error guardando el ticket");
       });
   }, [infoTicket, tickets]);
