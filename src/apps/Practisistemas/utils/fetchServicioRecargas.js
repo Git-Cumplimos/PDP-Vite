@@ -1,7 +1,8 @@
 import fetchData from "../../../utils/fetchData";
 
 // const urlRecargasCelular = `${process.env.REACT_APP_RECARGAS_CELULAR}`;
-const urlRecargasCelular = process.env.REACT_APP_PRACTISISTEMAS+'/recargasCelular';
+const urlRecargasCelular =
+  process.env.REACT_APP_PRACTISISTEMAS + "/recargasCelular";
 
 export const postConsultaOperadores = async (bodyObj) => {
   if (!bodyObj) {
@@ -59,7 +60,7 @@ export const postEnvioTrans = async (bodyObj) => {
       bodyObj,
       {},
       true,
-      8000
+      60000
     );
     if (!res?.status) {
       console.error(res?.msg);
