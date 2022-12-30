@@ -63,6 +63,9 @@ const AdminLayout = () => {
   const closeCash = useCallback(() => {
     navigate(`/gestion/arqueo/arqueo-cierre/reporte`);
   }, [navigate]);
+  const navigateCommission = useCallback(() => {
+    navigate(`/billetera-comisiones`);
+  }, [navigate]);
 
   const {
     svgs: { backIcon2 },
@@ -146,7 +149,7 @@ const AdminLayout = () => {
             </div>
           </div>
           <div className={usrData}>
-            <div className={comision}>
+            <div className={comision} onClick={navigateCommission}>
               Comisiones {comisionTotal || "$0.00"}
             </div>
           </div>

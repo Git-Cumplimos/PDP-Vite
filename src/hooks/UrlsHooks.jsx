@@ -12,6 +12,7 @@ import { privateUrls } from "../pages/routes";
 
 import PrivateRoute from "../components/Compound/PrivateRoute";
 import SubPage from "../components/Base/SubPage";
+import rutasBilleteraComisiones from "../pages/BilleteraComisiones/routes";
 
 const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
 const PublicLayout = lazy(() => import("../layouts/PublicLayout"));
@@ -122,6 +123,7 @@ export const UrlsContext = createContext({
   urlsGestion: [],
   urlsReportes: [],
   urlsInformacionGeneral: [],
+  urlsBilleteraComisiones: [],
 });
 
 export const useUrls = () => {
@@ -163,6 +165,14 @@ export const useProvideUrls = () => {
     }
   }, [userPermissions]);
 
+  const urlsBilleteraComisiones = useMemo(() => {
+    if (Array.isArray(userPermissions) && userPermissions.length > 0) {
+      return [...filterPermissions(rutasBilleteraComisiones, userPermissions)];
+    } else {
+      return [];
+    }
+  }, [userPermissions]);
+
   const allRoutes = useMemo(() => {
     return (
       <Routes>
@@ -172,6 +182,7 @@ export const useProvideUrls = () => {
           {toRoute(urlsGestion, true, SubPage)}
           {toRoute(urlsReportes, true, SubPage)}
           {toRoute(urlsInformacionGeneral, true, SubPage)}
+          {toRoute(urlsBilleteraComisiones, true, SubPage)}
         </Route>
         <Route path='/login' element={<LoginLayout />}>
           {toRoute(loginUrls, false)}
@@ -181,7 +192,13 @@ export const useProvideUrls = () => {
         </Route>
       </Routes>
     );
-  }, [urlsPrivateApps, urlsGestion, urlsReportes, urlsInformacionGeneral]);
+  }, [
+    urlsPrivateApps,
+    urlsGestion,
+    urlsReportes,
+    urlsInformacionGeneral,
+    urlsBilleteraComisiones,
+  ]);
 
   return {
     urlsPrivate: privateUrls,
@@ -191,5 +208,6 @@ export const useProvideUrls = () => {
     urlsGestion,
     urlsReportes,
     urlsInformacionGeneral,
+    urlsBilleteraComisiones,
   };
 };
