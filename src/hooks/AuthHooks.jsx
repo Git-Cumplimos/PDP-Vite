@@ -222,27 +222,8 @@ const reducerAuth = (userState, action) => {
         .then((quota) => {
           const tempRole = { quota: 0, comision: 0 };
           tempRole.quota = quota["cupo disponible"];
-          fetchData(
-            urlComisiones,
-            "POST",
-            {},
-            {
-              id_comercio: id_comercio,
-              id_terminal: id_dispositivo,
-            }
-          )
-            .then((comision) => {
-              if (!comision.status)
-                dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } });
-              let comisionTemp = comision.obj.results;
-              tempRole.comision = comisionTemp[0]["saldo"] ?? 0;
-              dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } });
-            })
-            .catch(() =>
-              dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } })
-            );
-          // tempRole.comision = quota["comisiones"];
-          // dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } });
+          tempRole.comision = quota["comisiones"];
+          dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } });
         })
         .catch(() =>
           dispatch?.({

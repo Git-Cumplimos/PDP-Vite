@@ -320,12 +320,12 @@ const rutasConfiguraciones = {
       component: navComercios,
       permission: [enumPermisosTrx.comercios],
       subRoutes: [
-        {
-          link: "/params-operations/tipo-nivel-comercios",
-          label: <AppIcons Logo={"RECAUDO"} name={"Tipo nivel comercios"} />,
-          component: TipoNivelComercio,
-          permission: [enumPermisosTrx.tipo_nivel_comercio],
-        },
+        // {
+        //   link: "/params-operations/tipo-nivel-comercios",
+        //   label: <AppIcons Logo={"RECAUDO"} name={"Tipo nivel comercios"} />,
+        //   component: TipoNivelComercio,
+        //   permission: [enumPermisosTrx.tipo_nivel_comercio],
+        // },
         {
           link: "/params-operations/comercios",
           label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
