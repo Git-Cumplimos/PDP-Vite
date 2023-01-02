@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -25,8 +25,15 @@ const MovimientoComisionesCupo = () => {
   const [datosTrans, setDatosTrans] = useState({
     valor: 0,
     seleccion: "",
+    saldoComision: 0,
   });
   const [isUploading, setIsUploading] = useState(false);
+  useEffect(() => {
+    setDatosTrans((old) => ({
+      ...old,
+      saldoComision: quotaInfo?.comision,
+    }));
+  }, [quotaInfo?.comision]);
 
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
   const onSubmit = (e) => {
@@ -94,10 +101,21 @@ const MovimientoComisionesCupo = () => {
         console.error(err);
       });
   };
+  if (parseInt(datosTrans.saldoComision) === 0) {
+    return (
+      <>
+        <SimpleLoading show={isUploading} />
+        <h1 className='text-3xl mb-10 text-center'>
+          No tiene saldo de comisiones suficiente para realizar la transferencia
+          a cupo
+        </h1>
+      </>
+    );
+  }
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl mb-10'>
+      <h1 className='text-3xl mb-10 text-center'>
         Movimiento billetera comisiones al cupo PDP
       </h1>
       <Form grid onSubmit={onSubmit} autoComplete='off'>
@@ -108,7 +126,7 @@ const MovimientoComisionesCupo = () => {
           type='text'
           autoComplete='off'
           maxLength={"15"}
-          value={formatMoney.format(quotaInfo?.comision ?? 0)}
+          value={formatMoney.format(datosTrans.saldoComision ?? 0)}
           onInput={(e, valor) => {}}
           disabled></MoneyInput>
         <Select
@@ -120,6 +138,7 @@ const MovimientoComisionesCupo = () => {
             Total: "Total",
             Parcial: "Parcial",
           }}
+          value={datosTrans.seleccion ?? ""}
           onChange={(e) => {
             setDatosTrans((old) => {
               return { ...old, seleccion: e.target.value };
@@ -162,7 +181,7 @@ const MovimientoComisionesCupo = () => {
           ) : (
             <h2 className='text-base'>
               {`Valor de transacción: ${formatMoney.format(
-                quotaInfo?.comision ?? 0
+                datosTrans.saldoComision ?? 0
               )} `}
             </h2>
           )}
