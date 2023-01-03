@@ -13,6 +13,7 @@ import { notifyError } from "../utils/notify";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
+const urlComisiones = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/servicio-wallet-comisiones/consulta-wallet-comercio`;
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
@@ -433,11 +434,7 @@ export const useProvideAuth = () => {
 
   const forgotPasswordSubmit = useCallback(async (email, code, confirmPass) => {
     try {
-      await Auth.forgotPasswordSubmit(
-        email,
-        code,
-        confirmPass
-      );
+      await Auth.forgotPasswordSubmit(email, code, confirmPass);
     } catch (error) {
       throw error;
     }

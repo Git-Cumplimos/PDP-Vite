@@ -128,3 +128,24 @@ export const putModificarComercio = async (pkComercio, bodyObj) => {
     throw err;
   }
 };
+export const postCambiarComercioGrupoComercio = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlComercios}/comercios/modificar-comercio-grupo-comercio`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};

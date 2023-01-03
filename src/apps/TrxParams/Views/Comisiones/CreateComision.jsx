@@ -243,7 +243,6 @@ const CreateComision = () => {
   const fetchPlanesComisiones = useCallback(() => {
     getComisionesPlanes()
       .then((res) => {
-        console.log(res);
         setdata(
           [...res?.results].map(
             ({ pk_planes_comisiones, nombre_plan_comision }) => {
@@ -428,18 +427,30 @@ const CreateComision = () => {
     [idComercios]
   );
 
+  const onSelectPlan = useCallback(
+    (e, i) => {
+      setNewComision((old) => ({
+        ...old,
+        "Id plan": data[i]?.["Id plan"],
+        Plan: data[i]?.["Nombre plan"],
+      }));
+      handleClose();
+    },
+    [data, handleClose]
+  );
+
   return (
     <Fragment>
-      <h1 className="text-3xl">Crear comisión a pagar:</h1>
+      <h1 className='text-3xl'>Crear comisión a pagar:</h1>
       {/* <SearchComissions comissionFace="pay" onSelectItem={onSelectItem} /> */}
       <Form onChange={onChangeNewComision} grid>
         {newComision?.["Convenio"] && (
           <Input
-            id="Convenio"
-            name="Convenio"
+            id='Convenio'
+            name='Convenio'
             label={"Convenio"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             // defaultValue={newComision?.["Convenio"]}
             value={newComision?.["Convenio"]}
             disabled
@@ -447,11 +458,11 @@ const CreateComision = () => {
         )}
         {newComision?.["Autorizador"] && (
           <Input
-            id="Autorizador"
-            name="Autorizador"
+            id='Autorizador'
+            name='Autorizador'
             label={"Autorizador"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             // defaultValue={newComision?.["Autorizador"]}
             value={newComision?.["Autorizador"]}
             disabled
@@ -459,31 +470,31 @@ const CreateComision = () => {
         )}
         {newComision?.["Tipo de transaccion"] && (
           <Input
-            id="Tipo de transaccion"
-            name="Tipo de transaccion"
+            id='Tipo de transaccion'
+            name='Tipo de transaccion'
             label={"Tipo de transaccion"}
-            type="text"
-            autoComplete="off"
+            type='text'
+            autoComplete='off'
             // defaultValue={newComision?.["Tipo de transaccion"]}
             value={newComision?.["Tipo de transaccion"]}
             disabled
           />
         )}
         <Input
-          id="Nombre comision"
-          name="Nombre comision"
+          id='Nombre comision'
+          name='Nombre comision'
           label={"Nombre comisión"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           value={newComision?.["Nombre comision"]}
           onChange={() => {}}
         />
         <Input
-          id="Id comercio"
-          name="Id comercio"
+          id='Id comercio'
+          name='Id comercio'
           label={"Id comercio"}
-          type="number"
-          autoComplete="off"
+          type='number'
+          autoComplete='off'
           value={newComision?.["Id comercio"]}
           onChange={() => {}}
           info={
@@ -498,36 +509,35 @@ const CreateComision = () => {
                 color: "white",
                 borderRadius: "5px",
               }}
-              onClick={addComercio}
-            >
+              onClick={addComercio}>
               Agregar
             </button>
           }
         />
         <Input
-          id="Fecha inicio"
-          name="Fecha inicio"
+          id='Fecha inicio'
+          name='Fecha inicio'
           label={"Fecha inicio"}
-          type="date"
-          autoComplete="off"
+          type='date'
+          autoComplete='off'
           value={newComision?.["Fecha inicio"]}
           onChange={() => {}}
         />
         <Input
-          id="Fecha fin"
-          name="Fecha fin"
+          id='Fecha fin'
+          name='Fecha fin'
           label={"Fecha fin"}
-          type="date"
-          autoComplete="off"
+          type='date'
+          autoComplete='off'
           value={newComision?.["Fecha fin"]}
           onChange={() => {}}
         />
         <Input
-          id="Respuesta"
-          name="Respuesta"
+          id='Respuesta'
+          name='Respuesta'
           label={"Respuesta"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           value={newComision?.["Respuesta"]}
           onChange={() => {}}
         />
@@ -538,29 +548,27 @@ const CreateComision = () => {
       )}
       <ButtonBar>
         <Button
-          type="button"
+          type='button'
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "convenio" }, { replace: true });
             setHeadersTable(["Id convenio", "Nombre convenio"]);
-          }}
-        >
+          }}>
           {newComision?.["Convenio"] ? "Editar convenio" : "Agregar convenio"}
         </Button>
         <Button
-          type="button"
+          type='button'
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "autorizador" }, { replace: true });
             setHeadersTable(["Id autorizador", "Nombre autorizador"]);
-          }}
-        >
+          }}>
           {newComision?.["Autorizador"]
             ? "Editar autorizador"
             : "Agregar autorizador"}
         </Button>
         <Button
-          type="button"
+          type='button'
           onClick={() => {
             setShowModal(true);
             setQuery(
@@ -568,14 +576,13 @@ const CreateComision = () => {
               { replace: true }
             );
             setHeadersTable(["Id tipo operacion", "Nombre transaccion"]);
-          }}
-        >
+          }}>
           {newComision?.["Tipo de transaccion"]
             ? "Editar tipo transacción"
             : "Agregar tipo transacción"}
         </Button>
         <Button
-          type="button"
+          type='button'
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "comision" }, { replace: true });
@@ -586,31 +593,28 @@ const CreateComision = () => {
               "Convenio",
               "Autorizador",
             ]);
-          }}
-        >
+          }}>
           Agregar comisión existente
         </Button>
         <Button
-          type="button"
+          type='button'
           onClick={() => {
             setShowModal(true);
             setQuery({ ["selectedOpt"]: "plan_comision" }, { replace: true });
             setHeadersTable(["Id plan", "Nombre plan"]);
-          }}
-        >
+          }}>
           Agregar planes de comisión
         </Button>
       </ButtonBar>
       <FormComission outerState={[comissionData, setComissionData]}>
-        <Button type="submit" onClick={createComission}>
+        <Button type='submit' onClick={createComission}>
           Crear comision
         </Button>
       </FormComission>
       <Modal
         show={showModal}
         handleClose={handleClose}
-        className="flex align-middle"
-      >
+        className='flex align-middle'>
         {/* {selectedOpt === "convenio" && */}
         <Fragment>
           <TableEnterprise
@@ -630,10 +634,11 @@ const CreateComision = () => {
             maxPage={maxPages}
             headers={headersTable}
             data={data}
-            onSelectRow={onSelectConvenio}
+            onSelectRow={
+              selectedOpt === "comision" ? onSelectConvenio : onSelectPlan
+            }
             onSetPageData={setPageData}
-            onChange={onChange}
-          >
+            onChange={onChange}>
             {selectedOpt === "comision" && (
               <>
                 <Input
@@ -641,7 +646,7 @@ const CreateComision = () => {
                   label={"Convenio"}
                   name={"convenio"}
                   type={"text"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={convenio}
                 />
                 <Input
@@ -649,16 +654,16 @@ const CreateComision = () => {
                   label={"Tipo de operación"}
                   name={"tipoTrx"}
                   type={"text"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={tipoTrx}
                 />
                 <Input
                   id={"comercioComissions"}
                   label={"Id comercio"}
                   name={"comercio"}
-                  type="number"
+                  type='number'
                   step={"1"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={comercio}
                 />
                 <Input
@@ -666,7 +671,7 @@ const CreateComision = () => {
                   label={"Autorizador"}
                   name={"autorizador"}
                   type={"text"}
-                  autoComplete="off"
+                  autoComplete='off'
                   defaultValue={autorizador}
                 />
               </>

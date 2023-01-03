@@ -1,22 +1,22 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import Button from "../../../components/Base/Button";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Fieldset from "../../../components/Base/Fieldset";
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import InputSuggestions from "../../../components/Base/InputSuggestions";
-import Modal from "../../../components/Base/Modal";
-import SimpleLoading from "../../../components/Base/SimpleLoading";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
-import useQuery from "../../../hooks/useQuery";
-import { notify, notifyError } from "../../../utils/notify";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Fieldset from "../../../../components/Base/Fieldset";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import InputSuggestions from "../../../../components/Base/InputSuggestions";
+import Modal from "../../../../components/Base/Modal";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import useQuery from "../../../../hooks/useQuery";
+import { notify, notifyError } from "../../../../utils/notify";
 import {
   fetchConveniosMany,
   fetchConveniosUnique,
   fetchTiposConvenios,
   postConvenios,
   putConvenios,
-} from "../utils/fetchRevalConvenios";
+} from "../../utils/fetchRevalConvenios";
 
 const Convenios = () => {
   const [{ searchConvenio = "", ean13Convenio = "" }, setQuery] = useQuery();
