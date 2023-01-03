@@ -197,9 +197,6 @@ const Transacciones = () => {
                   ? "Transaccion pendiente"  
                   : "Transaccion aprobada"
                 : "Transaccion rechazada"
-              
-                
-         
               : trxs[index]?.status_trx
                 ? "Transaccion aprobada"
                 : "Transaccion rechazada"
@@ -222,9 +219,6 @@ const Transacciones = () => {
                 ? "Transaccion pendiente"  
                 : "Transaccion aprobada"
               : "Transaccion rechazada"
-            
-              
-       
             : trxs[index]?.status_trx
               ? "Transaccion aprobada"
               : "Transaccion rechazada"
