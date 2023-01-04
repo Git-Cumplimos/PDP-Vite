@@ -5,10 +5,11 @@ const { buttonTag } = classes;
 
 const TagsAlongSide = ({ data = [], onSelect = () => {} }) => {
   return (
-    <div>
+    <div className="flex justify-center">
       {data.map((element, index) => (
         <button
           className={buttonTag}
+          type="button"
           key={index}
           onClick={onSelect ? (e) => onSelect(e, index) : null}>
           {element}

@@ -334,7 +334,7 @@ const CompraPin = () => {
         "Valor del Pin",
         formatMoney.format(state.sell ? state.sell : inputValor),
       ];
-      newVoucher["trxInfo"][5] = ["", ""];
+      newVoucher["trxInfo"][5] = ["",""];
     }
     fetchData(
       `${url_compra_pines}/transacciones`,
@@ -507,11 +507,6 @@ const CompraPin = () => {
           ? ["Contador", inputContador]
           : [],
 
-        state?.op == "em" ? ["", ""] : [],
-        state?.op == "em"
-          ? ["Numero Pin", result_?.jsonAdicional["Numero Pin"]]
-          : [],
-
         ["", ""],
         [
           "Valor del Pin",
@@ -523,6 +518,8 @@ const CompraPin = () => {
               : inputValor
           ),
         ],
+        ["", ""],
+        ["Pin", result_?.jsonAdicional?.info],
         ["", ""],
       ],
       disclamer:
@@ -596,6 +593,12 @@ const CompraPin = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
+
+  useEffect(() => {
+    if (!state?.op) {
+      validNavigate("/Pines/PinesContenido");
+    }
+  }, [state?.op]);
 
   return (
     <Fragment>

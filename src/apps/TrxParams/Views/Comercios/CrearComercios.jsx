@@ -13,11 +13,13 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 import {
+  postCambiarComercioGrupoComercio,
   postConsultaComercio,
   postConsultaTipoNivelComercio,
   postCrearComercio,
   putModificarComercio,
 } from "../../utils/fetchComercios";
+import { fetchGruposComercios } from "../../utils/fetchGruposComercios";
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const vectorCodigosInstitucionales = [
   ...process.env.REACT_APP_CODIGOS_INSTITUCIONALES_COMERCIOS.split("/").map(
@@ -55,6 +57,7 @@ const CrearComercios = () => {
     codigosInst: [],
   });
   const [tipoNivelComercio, setTipoNivelComercio] = useState([]);
+  const [grupoComercios, setGrupoComercios] = useState([]);
 
   const [docTypes, setDocTypes] = useState({ "": "" });
   const [docTypesContact, setDocTypesContact] = useState({ "": "" });
@@ -91,6 +94,7 @@ const CrearComercios = () => {
     tel_contacto1_comercio: "",
     tel_contacto2_comercio: "",
     telefono_fijo_comercio: "",
+    pk_tbl_grupo_comercios: "",
   });
   const tableComercios = useMemo(() => {
     return [
@@ -164,6 +168,7 @@ const CrearComercios = () => {
       fetchComerciosFunc();
     }
     fetchTipoNivelComerciosFunc();
+    fetchGrupoComerciosFunc();
     fetchData(`${url_types}/type-doc`, "GET", {}, {})
       .then((res) => {
         const temp = { "": "" };
@@ -193,11 +198,39 @@ const CrearComercios = () => {
       })
       .catch((err) => console.error(err));
   }, []);
+  const fetchGrupoComerciosFunc = useCallback(() => {
+    let obj = {};
+    fetchGruposComercios({
+      ...obj,
+      limit: 100,
+      sortBy: "pk_tbl_grupo_comercios",
+      sortDir: "DESC",
+    })
+      .then((autoArr) => {
+        const temp = { "": "" };
+        for (const {
+          pk_tbl_grupo_comercios,
+          nombre_grupo_comercios,
+        } of autoArr?.results ?? []) {
+          temp[`${nombre_grupo_comercios}`] = pk_tbl_grupo_comercios;
+        }
+        setGrupoComercios(temp);
+      })
+      .catch((err) => console.error(err));
+    // postConsultaTipoNivelComercio({ ...obj })
+    //   .then((autoArr) => {
+    //     const temp = { "": "" };
+    //     for (const { pk_tipo_nivel, descripcion } of autoArr?.results ?? []) {
+    //       temp[`${descripcion}`] = pk_tipo_nivel;
+    //     }
+    //     setTipoNivelComercio(temp);
+    //   })
+    //   .catch((err) => console.error(err));
+  }, []);
   const fetchComerciosFunc = useCallback(() => {
     let obj = { "co1.pk_comercio": state?.id };
     postConsultaComercio({ ...obj })
       .then((autoArr) => {
-        console.log(autoArr?.results[0]);
         setComercio(
           { ...autoArr?.results[0] } ?? {
             apellido_contacto1_comercio: "",
@@ -232,16 +265,56 @@ const CrearComercios = () => {
             tel_contacto1_comercio: "",
             tel_contacto2_comercio: "",
             telefono_fijo_comercio: "",
+            pk_tbl_grupo_comercios: "",
           }
         );
       })
       .catch((err) => console.error(err));
   }, [state]);
-  const onChangeFormat = useCallback((ev) => {
-    setComercio((old) => {
-      return { ...old, [ev.target.name]: ev.target.value };
-    });
-  }, []);
+  const onChangeFormat = useCallback(
+    (ev) => {
+      if (ev.target.name === "pk_tbl_grupo_comercios") {
+        if (state?.id) {
+          const dataOrg = { ...comercio };
+          if (ev.target.value === "")
+            return notifyError("Seleccione el grupo de comercios");
+          const obj = {
+            pk_comercio: dataOrg.pk_comercio,
+            fk_tbl_grupo_comercios: ev.target.value,
+          };
+          setIsUploading(true);
+          postCambiarComercioGrupoComercio({
+            ...obj,
+          })
+            .then((res) => {
+              setIsUploading(false);
+              if (res?.status) {
+                notify(res?.msg);
+              } else {
+                notifyError(res?.msg);
+              }
+            })
+            .catch((err) => {
+              setIsUploading(false);
+              notifyError("No se ha podido conectar al servidor");
+              console.error(err);
+            });
+          setComercio((old) => {
+            return { ...old, [ev.target.name]: ev.target.value };
+          });
+        } else {
+          setComercio((old) => {
+            return { ...old, [ev.target.name]: ev.target.value };
+          });
+        }
+      } else {
+        setComercio((old) => {
+          return { ...old, [ev.target.name]: ev.target.value };
+        });
+      }
+    },
+    [comercio, state?.id]
+  );
   const seleccionarCodigoIns = useCallback(() => {
     if (selectedCodigo.selectedCod === "") {
       return notifyError("Seleccione el código institucional a agregar");
@@ -264,18 +337,6 @@ const CrearComercios = () => {
     (ev) => {
       ev.preventDefault();
       setIsUploading(true);
-      // if (selectedParam?.nombre_autorizador === "") {
-      //   notifyError("Se debe agregar el autorizador");
-      //   return;
-      // }
-      // if (selectedParam?.nombre_parametro === "") {
-      //   notifyError("Se debe agregar el nombre del parametro");
-      //   return;
-      // }
-      // if (selectedParam?.valor_parametro === "") {
-      //   notifyError("Se debe agregar el valor del parametro");
-      //   return;
-      // }
       const dataOrg = { ...comercio };
       delete dataOrg["comercio_padre"];
       delete dataOrg["descripcion_tipo_nivel"];
@@ -399,7 +460,7 @@ const CrearComercios = () => {
                 });
               }
             }}></Input>
-          <Select
+          {/* <Select
             className='place-self-stretch'
             id='fk_tipo_nivel'
             name='fk_tipo_nivel'
@@ -408,6 +469,16 @@ const CrearComercios = () => {
             options={tipoNivelComercio ?? []}
             onChange={onChangeFormat}
             value={comercio?.fk_tipo_nivel}
+          /> */}
+          <Select
+            className='place-self-stretch'
+            id='pk_tbl_grupo_comercios'
+            name='pk_tbl_grupo_comercios'
+            label='Grupo comercio'
+            required={true}
+            options={grupoComercios ?? []}
+            onChange={onChangeFormat}
+            value={comercio?.pk_tbl_grupo_comercios}
           />
           <Input
             id='telefono_fijo_comercio'

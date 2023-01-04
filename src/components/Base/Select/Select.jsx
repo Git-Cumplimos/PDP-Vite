@@ -1,7 +1,9 @@
 import classes from "./Select.module.css";
+import classes2 from "../Form/Form.module.css";
 
 const Select = ({ label, options, self = false, info = "", ...select }) => {
   const { formItem } = classes;
+  const { div_input_form_item } = classes2;
   const { id: _id } = select;
 
   if (Array.isArray(options)) {
@@ -19,7 +21,7 @@ const Select = ({ label, options, self = false, info = "", ...select }) => {
         </select>
       </>
     ) : (
-      <div className={formItem}>
+      <div className={`${div_input_form_item} ${formItem}`}>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
         <div>
           <select id={_id} {...select}>
@@ -51,7 +53,7 @@ const Select = ({ label, options, self = false, info = "", ...select }) => {
       </select>
     </>
   ) : (
-    <div className={formItem}>
+    <div className={`${div_input_form_item} ${formItem}`}>
       {label && label !== "" && <label htmlFor={_id}>{label}</label>}
       <div>
         <select id={_id} {...select}>

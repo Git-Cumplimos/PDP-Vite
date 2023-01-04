@@ -8,7 +8,7 @@ const InformacionGeneral = lazy(() => import("./InformacionGeneral"));
 const Gestion = lazy(() => import("./Gestion"));
 
 const emptyComp = () => {
-  return <h1 className="text-3xl text-center my-4">En mantenimiento</h1>;
+  return <h1 className='text-3xl text-center my-4'>En mantenimiento</h1>;
 };
 
 export const privateUrls = [

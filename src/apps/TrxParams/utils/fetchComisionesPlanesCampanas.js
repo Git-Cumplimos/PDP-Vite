@@ -2,7 +2,8 @@ import fetchData from "../../../utils/fetchData";
 
 const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
 
-const urlComisiones = process.env.REACT_APP_URL_BACK_COMISIONES;
+const urlComisiones =
+  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 export const postComisionesPlanCampanas = async (bodyObj) => {
   if (!bodyObj) {
@@ -41,6 +42,24 @@ export const getComisionesPlanesCampanas = async () => {
     throw err;
   }
 };
+export const getAssingsCommissions = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-asignacion-comisiones/consultar-asignacion-comision`,
+      "GET",
+      obj,
+      {}
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
 
 export const getComisionesPlanesCampanaUnique = async ({
   id_plan_comision_campana,
@@ -66,13 +85,13 @@ export const putComisionesPlanesCampanas = async (obj) => {
   const { id_plan_comision_campana, ...bodyObj } = obj;
   try {
     const res = await fetchData(
-      `${urlComisiones}/servicio-planes-campanas-comisiones/actualizar-planes-campanas-comision?pk_planes_comisiones_campanas=${id_plan_comision_campana}`,
+      `${urlComisiones}/servicio-planes-campanas-comisiones/actualizar-planes-campanas-comision?pk_planes_comisiones_campanas`,
       "PUT",
       {},
       bodyObj
     );
     if (res?.status) {
-      return { ...res?.obj };
+      return { ...res };
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };

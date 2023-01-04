@@ -2,7 +2,8 @@ import fetchData from "../../../utils/fetchData";
 
 const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
 
-const urlComisiones = process.env.REACT_APP_URL_BACK_COMISIONES;
+const urlComisiones =
+  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 export const postComisionesPlan = async (bodyObj) => {
   if (!bodyObj) {
@@ -24,11 +25,31 @@ export const postComisionesPlan = async (bodyObj) => {
   }
 };
 
-export const getComisionesPlanes = async () => {
+export const getComisionesPlanes = async (obj) => {
   try {
     const res = await fetchData(
       `${urlComisiones}/servicio-planes-comisiones/consultar-planes-comision`,
       "GET",
+      obj,
+      {}
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const getComisionesPlanesPagar = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-planes-comisiones/consultar-planes-comision-pagar`,
+      "GET",
+      obj,
       {}
     );
     if (res?.status) {
@@ -70,7 +91,7 @@ export const putComisionesPlanes = async (obj) => {
       bodyObj
     );
     if (res?.status) {
-      return { ...res?.obj };
+      return { ...res };
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };

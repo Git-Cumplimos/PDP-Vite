@@ -15,7 +15,6 @@
   @apply mx-auto px-4 md:px-8 pb-4 md:pb-8;
 }
 
-
 header.headerPDP {
   @apply flex flex-col justify-center items-center px-2 md:px-4;
 }
@@ -35,7 +34,7 @@ header.headerPDP .usrData > .saldoCupo {
 
 header.headerPDP .usrData > .comision {
   max-width: 8.75rem;
-  @apply rounded-full px-6 bg-primary-light text-white mx-2 text-center;
+  @apply rounded-full px-6 bg-primary-light text-white mx-2 text-center cursor-pointer;
 }
 
 header.headerPDP .usrData > .cargar {
@@ -49,6 +48,6 @@ header.headerPDP .usrData > .cargar {
   @apply my-2 md:my-0;
 }
 
-.itemButtonCentered div{
+.itemButtonCentered div {
   max-width: 100%;
 }
