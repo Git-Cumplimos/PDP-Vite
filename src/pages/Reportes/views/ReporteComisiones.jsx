@@ -94,7 +94,11 @@ const ReporteComisiones = () => {
             setIsUploading(false);
           }
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          console.error(err);
+          notifyError("No se pudo conectar al servidor");
+          setIsUploading(false);
+        });
     },
     [report]
   );
