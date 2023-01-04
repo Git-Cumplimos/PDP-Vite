@@ -1176,12 +1176,12 @@ const allUrlsPrivateApps = [
   //   ],
   // },
 
-  {
-    link: "/pagos-ifood",
-    label: <AppIcons Logo={"RECAUDO"} name={"Aportes en Linea iFood"} />,
-    component: iFoodAportes,
-    permission: [1],
-  },
+  // {
+  //   link: "/pagos-ifood",
+  //   label: <AppIcons Logo={"RECAUDO"} name={"Aportes en Linea iFood"} />,
+  //   component: iFoodAportes,
+  //   permission: [1],
+  // },
   rutasSoat,
 ];
 
