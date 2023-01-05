@@ -22,6 +22,27 @@ export const postObtenerReporteComisionesAplicadas = async (bodyObj) => {
     throw err;
   }
 };
+export const postObtenerReporteComisionesAplicadasComercio = async (
+  bodyObj
+) => {
+  // if (!bodyObj) {
+  //   return "Sin datos body";
+  // }
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-reporte-aplicacion-comision/reporte-aplicacion-comision-comercio`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
 
 export const postObtenerReporteConteoComisionesAplicadas = async (bodyObj) => {
   if (!bodyObj) {
