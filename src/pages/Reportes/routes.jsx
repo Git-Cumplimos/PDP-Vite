@@ -6,6 +6,9 @@ const ReporteComisiones = lazy(() => import("./views/ReporteComisiones"));
 const ReporteConteoComisiones = lazy(() =>
   import("./views/ReporteConteoComisiones")
 );
+const ReporteComisionesComercios = lazy(() =>
+  import("./views/ReporteComisionesComercios")
+);
 
 export const rutasReportes = [
   {
@@ -25,5 +28,11 @@ export const rutasReportes = [
     label: <AppIcons Logo={"RECAUDO"} name='Reportes conteo comisiones' />,
     component: ReporteConteoComisiones,
     permission: [42],
+  },
+  {
+    link: "/reportes/comisiones-comercio",
+    label: <AppIcons Logo={"RECAUDO"} name='Reportes comisiones comercio' />,
+    component: ReporteComisionesComercios,
+    permission: [25001],
   },
 ];
