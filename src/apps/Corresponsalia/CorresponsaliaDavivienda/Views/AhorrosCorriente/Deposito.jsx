@@ -188,8 +188,7 @@ const Deposito = () => {
             } else {
               setDatosConsulta(res?.obj?.Data);
               let summary = {
-                // "Nombre titular": res?.obj?.Data?.valNombreTitular,
-                // "Apellido titular": res?.obj?.Data?.valApellidoTitular,
+                "Nombre titular": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
                 "Número cuenta": numCuenta,
                 "Valor depósito": valorFormat,
               };
@@ -250,6 +249,8 @@ const Deposito = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"].push(["Nombre titular", summary["Nombre titular"]]);
+    objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
     const body = {
       idComercio: roleInfo?.id_comercio,
@@ -390,7 +391,7 @@ const Deposito = () => {
     fetchDepositoCorresponsal,
     roleInfo,
     infoTicket,
-    ,
+    summary,
     datosConsulta,
   ]);
 
