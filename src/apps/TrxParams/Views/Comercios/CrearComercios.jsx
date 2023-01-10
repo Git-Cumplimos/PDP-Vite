@@ -77,7 +77,7 @@ const CrearComercios = () => {
     fecha_registro: "",
     fk_comercio_padre: "",
     fk_tipo_identificacion: "",
-    fk_tipo_nivel: "",
+    // fk_tipo_nivel: "",
     latitud_comercio: "",
     longitud_comercio: "",
     nombre_comercio: "",
@@ -248,7 +248,7 @@ const CrearComercios = () => {
             fecha_registro: "",
             fk_comercio_padre: "",
             fk_tipo_identificacion: "",
-            fk_tipo_nivel: "",
+            // fk_tipo_nivel: "",
             latitud_comercio: "",
             longitud_comercio: "",
             nombre_comercio: "",
@@ -342,6 +342,8 @@ const CrearComercios = () => {
       delete dataOrg["descripcion_tipo_nivel"];
       delete dataOrg["fecha_actualizacion"];
       delete dataOrg["fecha_registro"];
+      delete dataOrg["nombre_grupo_comercios"];
+      delete dataOrg["pk_tbl_grupo_comercios"];
       if (!dataOrg.fk_comercio_padre) delete dataOrg["fk_comercio_padre"];
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
       if (!dataOrg.credito_comercio) delete dataOrg["credito_comercio"];
