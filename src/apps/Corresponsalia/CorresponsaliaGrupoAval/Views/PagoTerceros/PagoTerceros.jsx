@@ -128,7 +128,10 @@ const PagoTerceros = () => {
       valor_total_trx: inputData.valor_total_trx,
       numeroCelular: inputData.numeroCelular,
       documento: inputData.documento,
-      otp: pinBlock(inputData.otp),
+      otp: pinBlock(
+        inputData.otp,
+        process.env.REACT_APP_PAN_AVAL_PAGO_TERCEROS
+      ),
       location: {
         address: roleInfo.direccion,
         city: roleInfo.ciudad,
