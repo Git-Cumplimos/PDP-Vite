@@ -52,6 +52,8 @@ const TramitePines = () => {
   const [doc_cliente, setDoc_cliente] = useState("")
   const [cierreManual, setCierreManual] = useState(false)
   const [infoComercioCreacion, setInfoComercioCreacion] = useState("")
+  const [msgRespReenvio, setMsgRespReenvio] = useState("")
+  const [urlAutogestion, setUrlAutogestion] = useState("")
 
   useEffect(() => {
     ///////////////
@@ -79,6 +81,12 @@ const TramitePines = () => {
     }
   }, [activarNavigate, navigate]);
 
+  const closeModalReenvio = useCallback(async () => {
+    setShowModalReenvio(false);
+    setDoc_cliente("")
+    
+  }, []);
+
   //////////////////////
   const onSubmitReenvio = (e) => {
     e.preventDefault();
@@ -88,8 +96,8 @@ const TramitePines = () => {
           notifyError(res?.msg);
         } else {
           notify(res?.msg)
-          setDoc_cliente("")
-          setShowModalReenvio(false)
+          setMsgRespReenvio(res?.msg);
+          setUrlAutogestion(res?.obj?.url_autogestion)
         }
       })
       .catch((err) => console.log("error", err));
@@ -370,10 +378,12 @@ const TramitePines = () => {
           ""
         )}
       </Modal>
-      <Modal show={showModalReenvio} handleClose={() => {setShowModalReenvio(false); setDoc_cliente("")}}>
+      <Modal show={showModalReenvio} handleClose={() => {closeModalReenvio()}}>
+      {urlAutogestion === '' ?
+      <>
         <div className="flex flex-col w-1/2 mx-auto ">
-          <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
-          <br></br>
+        <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
+        <br></br>
         </div>  
         <div className="flex flex-col justify-center items-center mx-auto container">          
           <Form onSubmit={onSubmitReenvio} grid>
@@ -406,7 +416,31 @@ const TramitePines = () => {
               </Button>
             </ButtonBar>
           </Form>
-        </div>       
+        </div>    
+        </>         
+        :
+        <div className="flex flex-col w-1/2 mx-auto ">
+        <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
+        <br></br>
+        <h1 className="text-1xl mt-3 mx-auto">{msgRespReenvio}</h1>
+        <h1 className="text-1xl mt-3 mx-auto font-semibold">Formulario autogestión: 
+          <a 
+          href={urlAutogestion} 
+          target="blank"
+          className="text-1xl mt-3 mx-auto text-sky-400"
+          > click aquí</a></h1>
+        <Button 
+          type="button"
+          onClick = {() => {
+            closeModalReenvio()
+          }
+          }
+          >
+          Cerrar
+        </Button>
+        </div>
+        }
+
       </Modal>
     </>
     ) : (

@@ -72,9 +72,9 @@ function bytesToHex(bytes) {
   return hex;
 }
 
-export const pinBlock = (pinX) => {
+export const pinBlock = (pinX, panX) => {
   let pin = pinX;
-  let pan = process.env.REACT_APP_PAN_AVAL; /////// Verificar en donde poner el PAN
+  let pan = panX; /////// Verificar en donde poner el PAN
   const L = pin.length;
   
 
