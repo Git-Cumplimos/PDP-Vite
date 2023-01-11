@@ -139,6 +139,7 @@ const PagoTerceros = () => {
       },
     };
 
+    // peticion al backend
     PeticionPagoTerceros(
       url_pago_terceros,
       "/grupo-aval/pago-terceros",
