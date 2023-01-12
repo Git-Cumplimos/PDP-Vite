@@ -196,7 +196,7 @@ const PagoSubsidios = () => {
         HandleCloseSecond();
       });
   }
-
+  //vaucher
   const PagoSubsidioExitoso = (result_) => {
     const voucher = {
       title: "Recibo de pago subsidio ",
