@@ -259,6 +259,8 @@ const Deposito = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"].push(["Nombre titular", summary["Nombre cliente"]]);
+    objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
     const body = {
       idComercio: roleInfo?.id_comercio,
@@ -392,7 +394,7 @@ const Deposito = () => {
     fetchCashIn,
     roleInfo,
     infoTicket,
-    ,
+    summary,
     datosConsulta,
   ]);
 
