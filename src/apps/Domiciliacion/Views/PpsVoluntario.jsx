@@ -14,11 +14,18 @@ import { useNavigate } from "react-router-dom";
 import MoneyInput from "../../../components/Base/MoneyInput";
 
 const PpsVoluntario = ({ datosConsulta }) => {
+  const [limitesMontos] = useState({
+    max: 149000,
+    min: 5000,
+  });
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [numDocumento, setNumDocumento] = useState(null);
 
   const [idComercio, setIdComercio] = useState(datosConsulta?.id_comercio);
   const [idusuario, setIdUsuario] = useState(datosConsulta?.id_usuario);
+  const [tipoComercio, setTipoComercio] = useState(
+    datosConsulta?.tipo_comercio
+  );
   const [iddispositivo, setIddispositivo] = useState(
     datosConsulta?.id_dispositivo
   );
@@ -32,7 +39,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
   const [showModal, setShowModal] = useState(true);
   const navigate = useNavigate();
 
-  const { contenedorImagen } = classes;
+  const { contenedorImagen, contenedorFormulario } = classes;
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, []);
@@ -87,6 +94,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
               id_comercio: idComercio,
               id_dispositivo: iddispositivo,
               id_usuario: idusuario,
+              tipo_comercio: tipoComercio,
               estado: "activo",
               // estado_pago: "",
               tipo_pps: "voluntario",
@@ -154,7 +162,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
       /*   notify("Valor Correcto"); */
     } else {
       notifyError(
-        "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+        "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
       );
     }
   };
@@ -185,31 +193,32 @@ const PpsVoluntario = ({ datosConsulta }) => {
           <div className={contenedorImagen}>
             <LogoPDP xsmall></LogoPDP>
           </div>
-          <Form onSubmit={(e) => enviar(e)}>
+          <Form grid onSubmit={(e) => enviar(e)}>
             <Fieldset
               legend="Formulario Aporte Voluntario"
               /* className="lg:col-span-3" */
             >
-              <Select
-                onChange={(event) =>
-                  setTipoIdentificacion(event?.target?.value)
-                }
-                id="comissionType"
-                label="Tipo de Identificación"
-                options={{
-                  "": "",
-                  "Cédula de Ciudadania": "1",
-                  "Cédula de Extranjeria": "2",
-                  "Tarjeta de Identidad": "4",
-                  "Registro Civil": "5",
-                  "Pasaporte ": "6",
-                  "Carnét Diplomático": "7",
-                  "Salvo conducto permanencia": "8",
-                  "Permiso especial permanencia": "9",
-                }}
-                required
-              ></Select>
-              {/*               <Input
+              <div className={contenedorFormulario}>
+                <Select
+                  onChange={(event) =>
+                    setTipoIdentificacion(event?.target?.value)
+                  }
+                  id="comissionType"
+                  label="Tipo de Identificación"
+                  options={{
+                    "": "",
+                    "Cédula de Ciudadania": "1",
+                    "Cédula de Extranjeria": "2",
+                    "Tarjeta de Identidad": "4",
+                    "Registro Civil": "5",
+                    "Pasaporte ": "6",
+                    "Carnét Diplomático": "7",
+                    "Salvo conducto permanencia": "8",
+                    "Permiso especial permanencia": "9",
+                  }}
+                  required
+                ></Select>
+                {/*               <Input
                 label={"N° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={numDocumento}
@@ -223,58 +232,58 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 required
               ></Input> */}
 
-              <Input
-                name="N° Identificación"
-                label="N° Identificación"
-                type="tel"
-                autoComplete="off"
-                minLength={"5"}
-                maxLength={"10"}
-                /* invalid={invalidCedula} */
-                value={numDocumento ?? ""}
-                onChange={onCedChange}
-                required
-              />
-              <Input
-                label={"Id Comercio"}
-                placeholder="Ingrese Id Comercio"
-                value={idComercio}
-                onChange={(e) => setIdComercio(e.target.value)}
-                type={"number"}
-                disabled
-              ></Input>
-              <Input
-                label={"Id Dispositivo"}
-                placeholder="Ingrese Id Dispositivo"
-                value={iddispositivo}
-                onChange={(e) => setIddispositivo(e.target.value)}
-                type={"number"}
-                disabled
-              ></Input>
-              <Input
-                id="celular"
-                name="celular"
-                label="Celular: "
-                type="tel"
-                autoComplete="off"
-                minLength="10"
-                maxLength="10"
-                value={numCelular ?? ""}
-                onInput={(e) => {
-                  const num = parseInt(e.target.value) || "";
-                  if (e.target.value.length === 1) {
-                    if (e.target.value != 3) {
-                      notifyError(
-                        "Número inválido, el N° de celular debe comenzar con el número 3. "
-                      );
+                <Input
+                  name="N° Identificación"
+                  label="N° Identificación"
+                  type="tel"
+                  autoComplete="off"
+                  minLength={"5"}
+                  maxLength={"10"}
+                  /* invalid={invalidCedula} */
+                  value={numDocumento ?? ""}
+                  onChange={onCedChange}
+                  required
+                />
+                <Input
+                  label={"Id Comercio"}
+                  placeholder="Ingrese Id Comercio"
+                  value={idComercio}
+                  onChange={(e) => setIdComercio(e.target.value)}
+                  type={"number"}
+                  disabled
+                ></Input>
+                <Input
+                  label={"Id Dispositivo"}
+                  placeholder="Ingrese Id Dispositivo"
+                  value={iddispositivo}
+                  onChange={(e) => setIddispositivo(e.target.value)}
+                  type={"number"}
+                  disabled
+                ></Input>
+                <Input
+                  id="celular"
+                  name="celular"
+                  label="Celular "
+                  type="tel"
+                  autoComplete="off"
+                  minLength="10"
+                  maxLength="10"
+                  value={numCelular ?? ""}
+                  onInput={(e) => {
+                    const num = parseInt(e.target.value) || "";
+                    if (e.target.value.length === 1) {
+                      if (e.target.value != 3) {
+                        notifyError(
+                          "Número inválido, el N° de celular debe comenzar con el número 3. "
+                        );
+                      }
                     }
-                  }
-                  setNumCelular(num);
-                }}
-                required
-              />
+                    setNumCelular(num);
+                  }}
+                  required
+                />
 
-              {/*               <Input
+                {/*               <Input
                 name="celular"
                 label="Celular"
                 type="tel"
@@ -286,17 +295,19 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 onChange={onCelChange}
                 required
               /> */}
-              <MoneyInput
-                label={"Valor Aportar"}
-                placeholder={"Ingrese Valor Aportar"}
-                value={valorAportar}
-                minLength="6"
-                maxLength="9"
-                onInput={(e) => {
-                  const num = e.target.value.replace(".", "") || "";
-                  setValorAportar(num.replace("$", ""));
-                }}
-                /*    onInput={(e, valor) =>
+                <MoneyInput
+                  label={"Valor Aportar"}
+                  placeholder={"Ingrese Valor Aportar"}
+                  value={valorAportar}
+                  min={limitesMontos?.min}
+                  max={limitesMontos?.max}
+                  minLength="6"
+                  maxLength="9"
+                  onInput={(e) => {
+                    const num = e.target.value.replace(".", "") || "";
+                    setValorAportar(num.replace("$", ""));
+                  }}
+                  /*    onInput={(e, valor) =>
                 setValorAportar((old) => {
                   return {
                     ...old,
@@ -304,21 +315,23 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   };
                 })
               } */
-                type={"text"}
-                required
-              ></MoneyInput>
-              <Select
-                onChange={(event) => setTipoDomiciliacion(event?.target?.value)}
-                id="comissionType"
-                label="Tipo de Domiciliación"
-                value={tipoDomiciliacion}
-                options={{
-                  Mensual: 1,
-                  Quincenal: 2,
-                  Semanal: 3,
-                }}
-              ></Select>
-              {/*               <Select
+                  type={"text"}
+                  required
+                ></MoneyInput>
+                <Select
+                  onChange={(event) =>
+                    setTipoDomiciliacion(event?.target?.value)
+                  }
+                  id="comissionType"
+                  label="Tipo de Domiciliación"
+                  value={tipoDomiciliacion}
+                  options={{
+                    Mensual: 1,
+                    Quincenal: 2,
+                    Semanal: 3,
+                  }}
+                ></Select>
+                {/*               <Select
                 onChange={(event) => setNumPagosPdp(event?.target?.value)}
                 id="comissionType"
                 label="N° Pagos Punto Pago"
@@ -330,18 +343,22 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   3: 3,
                 }}
               ></Select> */}
-              <Input
-                name="N° Pagos Punto Pago"
-                label="N° Pagos Punto Pago"
-                type="tel"
-                autoComplete="off"
-                minLength={"1"}
-                maxLength={"2"}
-                /* invalid={invalidCedula} */
-                value={numPagosPdp}
-                onChange={(event) => setNumPagosPdp(event?.target?.value)}
-                required
-              />
+                <Input
+                  name="N° Pagos Punto Pago"
+                  label="N° Pagos Punto Pago"
+                  type="tel"
+                  autoComplete="off"
+                  minLength="1"
+                  maxLength="2"
+                  /* invalid={invalidCedula} */
+                  value={numPagosPdp}
+                  onInput={(e) => {
+                    const num = parseInt(e.target.value) || "";
+                    setNumPagosPdp(num);
+                  }}
+                  required
+                />
+              </div>
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"} type="">
               {
@@ -350,7 +367,14 @@ const PpsVoluntario = ({ datosConsulta }) => {
                 </Button>
                 /*  ) : null */
               }
-                   <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+              <Button
+                onClick={() => {
+                  navigate(`/domiciliacion`);
+                  setShowModal(false);
+                }}
+              >
+                Cancelar
+              </Button>
             </ButtonBar>
           </Form>
         </Modal>

@@ -143,6 +143,8 @@ const BuscarComercioEmail = () => {
             value={emailComercio}
             onChange={(e) => setEmailComercio(e.target.value)}
             type={"email"}
+            minLength="6"
+            maxLength="70"
             required
           ></Input>
           <ButtonBar className={"lg:col-span-2"} type="">

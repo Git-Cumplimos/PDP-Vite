@@ -15,7 +15,6 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import Select from "../../../components/Base/Select";
-import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import useMoney from "../../../hooks/useMoney";
@@ -29,11 +28,13 @@ import {
   toAccountNumber,
 } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
+import TicketColpatria from "../components/TicketColpatria";
+import { buildTicket } from "../utils/functions";
 
 const accountTypes = {
   10: "Cuenta ahorros",
   20: "Cuenta corriente",
-  30: "Cuenta de credito",
+  30: "Cuenta de crédito",
 };
 
 const formatMoney = makeMoneyFormatter(2);
@@ -95,7 +96,9 @@ const Deposito = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINA PROPIA",
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valDeposito,
 
         // Datos trx colpatria
@@ -106,8 +109,7 @@ const Deposito = () => {
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
-            city: roleInfo?.ciudad.substring(0, 8),
-            state: roleInfo?.codigo_dane.substring(0, 2),
+            city: roleInfo?.ciudad.substring(0, 7),
           },
         },
       };
@@ -125,31 +127,12 @@ const Deposito = () => {
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
-            const tempTicket = {
-              title: "Recibo de deposito",
-              timeInfo: {
-                "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-                  year: "2-digit",
-                  month: "2-digit",
-                  day: "2-digit",
-                }).format(new Date()),
-                Hora: Intl.DateTimeFormat("es-CO", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                }).format(new Date()),
-              },
-              commerceInfo: [
-                ["Id Comercio", roleInfo?.id_comercio],
-                ["No. terminal", roleInfo?.id_dispositivo],
-                ["Municipio", roleInfo?.ciudad],
-                ["Dirección", roleInfo?.direccion],
-                ["Id Trx", trx_id],
-                ["codigo autorizacion", codigo_autorizacion],
-                // ["Id Transacción", res?.obj?.IdTransaccion],
-              ],
-              commerceName: "Colpatria",
-              trxInfo: [
+            const tempTicket = buildTicket(
+              roleInfo,
+              trx_id,
+              codigo_autorizacion,
+              "Deposito",
+              [
                 ["Tipo de cuenta", accountTypes?.[accountType] ?? "No type"],
                 ["", ""],
                 ["Numero de cuenta", toAccountNumber(accountNumber)],
@@ -158,9 +141,8 @@ const Deposito = () => {
                 ["", ""],
                 ["Valor de deposito", formatMoney.format(valDeposito)],
                 ["", ""],
-              ],
-              disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
-            };
+              ]
+            );
             setPaymentStatus(tempTicket);
             infoTicket(trx_id, id_type_trx, tempTicket)
               .then((resTicket) => {
@@ -175,14 +157,15 @@ const Deposito = () => {
           },
         },
         {
-          render({data: err}) {
+          render({ data: err }) {
             setLoadingDeposit(false);
+            navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
               return err?.message;
             }
             console.error(err?.message);
             return "Transaccion fallida";
-          }
+          },
         }
       );
     },
@@ -194,6 +177,7 @@ const Deposito = () => {
       valDeposito,
       roleInfo,
       infoTicket,
+      navigate,
     ]
   );
 
@@ -260,18 +244,17 @@ const Deposito = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Depositos Colpatria</h1>
+      <h1 className='text-3xl mt-6'>Depósitos Colpatria</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
           setShowModal(true);
         }}
-        grid
-      >
+        grid>
         <Select
-          id="accType"
-          name="accType"
-          label="Tipo de cuenta"
+          id='accType'
+          name='accType'
+          label='Tipo de cuenta'
           options={{
             "": "",
             ...Object.fromEntries(
@@ -283,22 +266,22 @@ const Deposito = () => {
           required
         />
         <Input
-          id="numCuenta"
-          name="numCuenta"
-          label="Número de cuenta"
-          type="tel"
-          autoComplete="off"
+          id='numCuenta'
+          name='numCuenta'
+          label='Número de cuenta'
+          type='tel'
+          autoComplete='off'
           minLength={"19"}
           maxLength={"19"}
           onInput={(ev) => setAccountNumber(onChangeAccountNumber(ev))}
           required
         />
         <Input
-          id="docCliente"
-          name="docCliente"
-          label="CC de quien deposita"
-          type="text"
-          autoComplete="off"
+          id='docCliente'
+          name='docCliente'
+          label='CC de quien deposita'
+          type='text'
+          autoComplete='off'
           minLength={"7"}
           maxLength={"13"}
           value={userDocument}
@@ -306,27 +289,26 @@ const Deposito = () => {
           required
         />
         <Input
-          id="valor"
-          name="valor"
-          label="Valor a depositar"
-          autoComplete="off"
-          type="tel"
+          id='valor'
+          name='valor'
+          label='Valor a depositar'
+          autoComplete='off'
+          type='tel'
           minLength={"5"}
           maxLength={"20"}
           onInput={(ev) => setValDeposito(onChangeMoney(ev))}
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar deposito</Button>
+          <Button type={"submit"}>Realizar depósito</Button>
         </ButtonBar>
       </Form>
       <Modal
         show={showModal}
-        handleClose={paymentStatus || loadingDeposit ? () => {} : handleClose}
-      >
+        handleClose={paymentStatus || loadingDeposit ? () => {} : handleClose}>
         {paymentStatus ? (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={paymentStatus} />
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={() => navigate("/colpatria")}>Cerrar</Button>
@@ -336,10 +318,9 @@ const Deposito = () => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type="submit"
+                type='submit'
                 onClick={onMakePayment}
-                disabled={loadingDeposit}
-              >
+                disabled={loadingDeposit}>
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingDeposit}>

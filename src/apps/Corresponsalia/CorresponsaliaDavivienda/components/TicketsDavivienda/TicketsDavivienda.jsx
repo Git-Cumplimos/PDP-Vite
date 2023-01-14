@@ -1,5 +1,7 @@
 import classes from "./TicketsDavivienda.module.css";
 import LogoPDP from "../../../../../components/Base/LogoPDP/LogoPDP";
+import { useCallback, useEffect, useState } from "react";
+import { consultarMensajePublicitarioDavivienda } from "../../utils/fetchCorresponsaliaDavivienda";
 // import LogoPDP from "../../../LogoPDP/LogoPDP";
 
 const TicketsDavivienda = ({
@@ -31,7 +33,18 @@ const TicketsDavivienda = ({
   const { divPrint } = classes;
   const { title, timeInfo, commerceInfo, commerceName, trxInfo, disclamer } =
     ticket;
+  const [mensajePubli, setMensajePubli] = useState(false);
+  useEffect(() => {
+    fetchMensajePublicitario();
+  }, []);
 
+  const fetchMensajePublicitario = useCallback((e) => {
+    consultarMensajePublicitarioDavivienda()
+      .then((autoArr) => {
+        setMensajePubli(autoArr?.results[0].mensaje ?? "");
+      })
+      .catch((err) => console.error(err));
+  }, []);
   return (
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
@@ -83,7 +96,14 @@ const TicketsDavivienda = ({
                         <h1 className='font-semibold'>
                           {key ? `${key}:` : ""}
                         </h1>
-                        <h1>{val}</h1>
+                        {typeof val === "string" &&
+                        val?.includes("<strong>") ? (
+                          <h1 className='font-bold'>
+                            {val?.replace("<strong>", "")}
+                          </h1>
+                        ) : (
+                          <h1>{val}</h1>
+                        )}
                       </div>
                     );
                   })}
@@ -164,12 +184,8 @@ const TicketsDavivienda = ({
             <h1 className='text-center my-1 text-xs font-normal whitespace-pre-wrap'>
               {disclamer}
             </h1>
-            <h1 className='text-center my-1 text-xs font-normal'>
-              {"En este Punto DaviPlata Corresponsal"}
-              <br />
-              {"Bancario Davivienda usted podrá meter"}
-              <br />
-              {"y sacar plata de su DaviPlata"}
+            <h1 className='text-center my-1 text-xs font-normal whitespace-pre-wrap'>
+              {`${mensajePubli}`}
             </h1>
           </div>
         </div>
@@ -193,7 +209,7 @@ const TicketsDavivienda = ({
               Punto De Pago
             </h1>
             <h1 className='text-center my-1 text-xs font-normal'>
-              Punto Daviplata - Corresponsal Bancario Davivienda
+              Punto DaviPlata - Corresponsal Bancario Davivienda
             </h1>
           </div>
         </div>

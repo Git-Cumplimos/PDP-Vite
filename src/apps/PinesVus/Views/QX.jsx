@@ -44,7 +44,7 @@ const QX = () => {
   const consultaPines = useCallback(async (fecha_ini,fecha_fin,tipo,documento, pageData) => {
     if (
       (fecha_ini !== "") & (fecha_fin !== "") ||
-      tipo != ""
+      tipo !== ""
     ) {
       consultaPinesVus(
         "",

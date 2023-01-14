@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import classes from "./InputSuggestions.module.css";
+
+const { formItem, suggestion, liSelected, liUnSelected } = classes;
 
 const InputSuggestions = ({
   label,
@@ -9,7 +11,6 @@ const InputSuggestions = ({
   onSelectSuggestion,
   ...input
 }) => {
-  const { formItem, suggestion } = classes;
   const { id: _id, type } = input;
 
   const [timer, setTimer] = useState(null);
@@ -43,6 +44,41 @@ const InputSuggestions = ({
       };
     }
   }
+
+  const itemsRef = useRef([]);
+  const [indexSelected, setIndexSelected] = useState(-1);
+  const onKeySuggestion = useCallback(
+    (ev) => {
+      if (!Array.isArray(suggestions) || !(suggestions.length > 0)) {
+        return;
+      }
+      if (ev.keyCode === 0x28) {
+        ev.preventDefault();
+        setIndexSelected((old) => {
+          if (old === suggestions.length - 1) {
+            return old;
+          }
+          return old + 1;
+        });
+      } else if (ev.keyCode === 0x26) {
+        ev.preventDefault();
+        setIndexSelected((old) => {
+          if (old === -1) {
+            return old;
+          }
+          return old - 1;
+        });
+      } else if (ev.keyCode === 0x0d) {
+        ev.preventDefault();
+        if (indexSelected !== -1) {
+          ev.target.blur();
+          itemsRef.current[indexSelected].click();
+        }
+      }
+    },
+    [suggestions, indexSelected]
+  );
+
   return (
     <div className={`${formItem}`}>
       {label && label !== "" && (
@@ -51,21 +87,28 @@ const InputSuggestions = ({
         </label>
       )}
       <div className={suggestion}>
-        <input {...input} />
+        <input {...input} onKeyDown={onKeySuggestion} />
         {Array.isArray(suggestions) && suggestions.length > 0 ? (
           <ul>
-            {suggestions.map((el, idx) => {
-              return (
-                <li
-                  key={idx}
-                  onClick={() => {
-                    onSelectSuggestion?.(idx, el);
-                  }}
-                >
-                  {el}
-                </li>
-              );
-            })}
+            {suggestions.map((el, idx) => (
+              <li
+                key={idx}
+                ref={(el) => (itemsRef.current[idx] = el)}
+                className={`${
+                  indexSelected === idx ? liSelected : liUnSelected
+                }`}
+                onClick={(ev) => {
+                  onSelectSuggestion?.(idx, el);
+                  Array.from(ev.currentTarget.childNodes.entries()).forEach(
+                    ([, el]) => {
+                      el.click();
+                    }
+                  );
+                }}
+              >
+                {el}
+              </li>
+            ))}
           </ul>
         ) : (
           ""

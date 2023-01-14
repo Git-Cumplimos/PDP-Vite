@@ -23,6 +23,8 @@ import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
+import { decryptAES } from "../../../../../utils/cryptoUtils";
 
 const Deposito = () => {
   const navigate = useNavigate();
@@ -45,20 +47,20 @@ const Deposito = () => {
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("01");
   const [isUploading, setIsUploading] = useState(false);
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max:1000000,
-    min: 10000,
+    max: enumParametrosDavivienda.maxCashInDaviplata,
+    min: enumParametrosDavivienda.minCashInDaviplata,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false,
   });
 
   const options = [
-    { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
     { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
@@ -105,7 +107,7 @@ const Deposito = () => {
     setNomDepositante("");
     setSummary([]);
     setValor("");
-    setTipoDocumento("");
+    setTipoDocumento("01");
     setUserDoc("");
   }, []);
 
@@ -115,7 +117,7 @@ const Deposito = () => {
       setIsUploading(true);
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
+      if (valor >= min && valor <= max) {
         // const formData = new FormData(e.target);
         // const phone = formData.get("numCliente");
         // const userDoc = formData.get("docCliente");
@@ -127,7 +129,7 @@ const Deposito = () => {
             idComercio: roleInfo?.id_comercio,
             idUsuario: roleInfo?.id_usuario,
             idDispositivo: roleInfo?.id_dispositivo,
-            Tipo: roleInfo?.tipo_comercio,
+            // Tipo: roleInfo?.tipo_comercio,
             numIdentificacionDepositante: userDoc,
             numDaviplata: phone,
             valGiro: valor,
@@ -138,7 +140,15 @@ const Deposito = () => {
               setIsUploading(false);
               if (!res?.status) {
                 setIsUploading(false);
+                setPhone("");
+                setVerificacionTel("");
+                setNomDepositante("");
+                setSummary([]);
+                setValor("");
+                setTipoDocumento("01");
+                setUserDoc("");
                 notifyError(res?.msg);
+                handleClose();
                 return;
               } else {
                 setIsUploading(false);
@@ -149,7 +159,7 @@ const Deposito = () => {
                   "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
                   "Número celular": phone,
                   "Documento depositante": userDoc,
-                  "Nombre depositante": nomDepositante,
+                  // "Nombre depositante": nomDepositante,
                   "Valor depósito": formatMoney.format(valor),
                   "Valor comisión": formatMoney.format(
                     res?.obj?.Data?.valComisionGiroDaviplata
@@ -159,13 +169,13 @@ const Deposito = () => {
                 setSummary(summary);
                 setShowModal(true);
               }
-
               //notify("Transaccion satisfactoria");
             })
             .catch((err) => {
               setIsUploading(false);
               console.error(err);
-              notifyError("Error interno en la transaccion");
+              notifyError("No se ha podido conectar al servidor");
+              handleClose();
             });
         } else {
           setIsUploading(false);
@@ -174,9 +184,11 @@ const Deposito = () => {
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del deposito debe estar entre ${formatMoney.format(
-            min
-          )} y ${formatMoney.format(max)}`
+          `El valor del depósito debe estar entre ${formatMoney
+            .format(min)
+            .replace(/(\$\s)/g, "$")} y ${formatMoney
+            .format(max)
+            .replace(/(\$\s)/g, "$")}`
         );
       }
     },
@@ -202,13 +214,101 @@ const Deposito = () => {
     navigate(-1);
   }, [navigate]);
 
+  // const onMakePaymentReintento = useCallback((response,body) => {
+  //   setIsUploading(true);
+  //   if (response?.obj?.reintento){
+  //     body.reintento = true
+  //     fetchCashIn(body)
+  //     .then((res) => {
+  //       if (!res?.status) {
+  //         notifyError(res?.msg);
+  //         setIsUploading(false);
+  //         handleClose()
+  //         // return;
+  //       } else {
+  //         setIsUploading(false);
+  //         notify("Transaccion satisfactoria");
+  //         const trx_id = res?.obj?.Data?.valTalon ?? 0;
+  //         const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
+  //         const total = parseInt(comision) + valor;
+  //         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+  //         const tempTicket = {
+  //           title: "Recibo de Depósito a Daviplata",
+  //           timeInfo: {
+  //             "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+  //               year: "2-digit",
+  //               month: "2-digit",
+  //               day: "2-digit",
+  //             }).format(new Date()),
+  //             Hora: Intl.DateTimeFormat("es-CO", {
+  //               hour: "2-digit",
+  //               minute: "2-digit",
+  //               second: "2-digit",
+  //             }).format(new Date()),
+  //           },
+  //           commerceInfo: [
+  //             ["Id Comercio", roleInfo?.id_comercio],
+  //             ["No. terminal", ter],
+  //             ["Municipio", roleInfo?.ciudad],
+  //             ["Dirección", roleInfo?.direccion],
+  //             ["Tipo de operación", "Depósito a DaviPlata"],
+  //             ["", ""],
+  //             ["No. de aprobación", trx_id],
+  //             ["", ""],
+  //           ],
+  //           commerceName: roleInfo?.["nombre comercio"]
+  //             ? roleInfo?.["nombre comercio"]
+  //             : "No hay datos",
+  //           trxInfo: [
+  //             ["Número DaviPlata", `****${String(phone)?.slice(-4) ?? ""}`],
+  //             ["", ""],
+  //             ["Valor", formatMoney.format(valor)],
+  //             ["", ""],
+  //             ["Costo transacción", formatMoney.format(comision)],
+  //             ["", ""],
+  //             ["Total", formatMoney.format(total)],
+  //             ["", ""],
+  //           ],
+  //           disclamer:
+  //             "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+  //         };
+
+  //         setPaymentStatus(tempTicket);
+  //         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
+  //           .then((resTicket) => {
+  //             console.log(resTicket);
+  //           })
+  //           .catch((err) => {
+  //             setIsUploading(false);
+  //             console.error(err);
+  //             notifyError("Error guardando el ticket");
+  //           });
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       setIsUploading(false);
+  //       console.error(err);
+  //       notifyError("No se ha podido conectar al servidor");
+  //     });
+
+  //   }else{
+  //     setIsUploading(false);
+  //     handleClose()
+  //   }
+  // }, [valor]);
+
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
     const body = {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
-      Tipo: roleInfo?.tipo_comercio,
+      // Tipo: roleInfo?.tipo_comercio,
+      oficinaPropia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       numIdentificacionDepositante: userDoc,
       nomDepositante: nomDepositante,
       numDaviplata: phone,
@@ -221,20 +321,23 @@ const Deposito = () => {
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
     };
-
+    console.log(body)
     fetchCashIn(body)
       .then((res) => {
         setIsUploading(false);
         if (!res?.status) {
-          setIsUploading(false);
           notifyError(res?.msg);
-          return;
+          setIsUploading(false);
+          handleClose();
+          // onMakePaymentReintento(res,body)
+          // return;
         } else {
           notify("Transaccion satisfactoria");
-          const trx_id = res?.obj?.Data?.valTalon ?? 0;
-          const comision = res?.obj?.Data?.valComisionGiroDaviplata ?? 0;
+          const trx_id = res?.obj?.respuestaDavivienda?.valTalon ?? 0;
+          const comision =
+            res?.obj?.respuestaDavivienda?.valComisionGiroDaviplata ?? 0;
           const total = parseInt(comision) + valor;
-          const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
+          const ter = res?.obj?.respuestaDavivienda?.total;
           const tempTicket = {
             title: "Recibo de Depósito a Daviplata",
             timeInfo: {
@@ -291,7 +394,7 @@ const Deposito = () => {
       .catch((err) => {
         setIsUploading(false);
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
   }, [
     phone,
@@ -321,7 +424,10 @@ const Deposito = () => {
             maxLength={"10"}
             value={phone}
             onInput={(e) => {
-              if ((phone?.length === 0) & (e.target.value !== "3")) {
+              if (
+                (String(e.target.value).length > 0) &
+                (String(e.target.value).slice(0, 1) !== "3")
+              ) {
                 notifyError("El número de celular debe iniciar por 3");
                 setPhone("");
               } else {
@@ -341,18 +447,29 @@ const Deposito = () => {
             maxLength={"10"}
             value={verificacionTel}
             onInput={(e) => {
-              if ((verificacionTel?.length === 0) & (e.target.value !== "3")) {
-                notifyError("El número de celular debe iniciar por 3");
-                setVerificacionTel("");
+              if (
+                (String(e.target.value).length > 2) &
+                (String(verificacionTel).length < 1)
+              ) {
+                notifyError("Debe digitar el número celular y no pegarlo");
               } else {
-                const num = parseInt(e.target.value) || "";
-                setVerificacionTel(num);
+                if (
+                  (String(e.target.value).length > 0) &
+                  (String(e.target.value).slice(0, 1) !== "3")
+                ) {
+                  notifyError("El número de celular debe iniciar por 3");
+                  setVerificacionTel("");
+                } else {
+                  const num = parseInt(e.target.value) || "";
+                  setVerificacionTel(num);
+                }
               }
             }}
             required
           />
           <Select
-            id='tipoCuenta'
+            className='place-self-stretch'
+            id='tipoDocumento'
             label='Tipo de documento'
             options={options}
             value={tipoDocumento}
@@ -368,16 +485,17 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"5"}
-            maxLength={"16"}
+            maxLength={"11"}
             value={userDoc}
             onInput={(e) => {
-              if (!isNaN(e.target.value)) {
-                setUserDoc(e.target.value);
+              const num = e.target.value.replace(/[\s\.]/g, "");
+              if (!isNaN(num)) {
+                setUserDoc(num);
               }
             }}
             required
           />
-          <Input
+          {/* <Input
             id='nomDepositante'
             name='nomDepositante'
             label='Nombre depositante'
@@ -392,7 +510,7 @@ const Deposito = () => {
               }
             }}
             required
-          />
+          /> */}
           {/* <MoneyInput
             id='valor'
             name='valor'
@@ -428,7 +546,7 @@ const Deposito = () => {
         <Modal
           show={showModal}
           handleClose={
-            paymentStatus ? () => {} : loadingCashIn ? () => {} : handleClose
+            paymentStatus ? goToRecaudo : loadingCashIn ? () => {} : handleClose
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>

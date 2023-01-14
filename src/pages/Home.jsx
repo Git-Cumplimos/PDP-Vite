@@ -10,7 +10,7 @@ import { useImgs } from "../hooks/ImgsHooks";
 
 const Home = () => {
   const { urlsPrivateApps } = useUrls();
-  const { imgs } = useImgs();
+  const { banners } = useImgs();
 
   // const [emails, setEmails] = useState([
   //   "directora.mercadeo@puntodepago.com.co",
@@ -18,12 +18,8 @@ const Home = () => {
   // ]);
 
   const imgsCarousel = useMemo(() => {
-    const { COLPENSIONES, BANNER2 } = imgs;
-    return [
-      { name: "Colpensiones", url: COLPENSIONES },
-      { name: "Punto de pago", url: BANNER2 },
-    ];
-  }, [imgs]);
+    return Object.entries(banners).map(([name, url]) => ({ name, url }));
+  }, [banners]);
   return (
     <>
       <Carousel

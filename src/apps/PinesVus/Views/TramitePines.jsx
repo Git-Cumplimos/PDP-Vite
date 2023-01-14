@@ -5,7 +5,7 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import { usePinesVus } from "../utils/pinesVusHooks";
-import { notifyError } from "../../../utils/notify";
+import { notifyError, notify } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import UsarPinForm from "../components/UsarPinForm/UsarPinForm";
@@ -21,7 +21,7 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
 
 const TramitePines = () => {
   const navigate = useNavigate();
-  const { consultaPinesVus, activarNavigate, setActivarNavigate } =
+  const { consultaPinesVus, reenvioHash, activarNavigate, setActivarNavigate } =
     usePinesVus();
 
   const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -48,6 +48,8 @@ const TramitePines = () => {
   const [valor_tramite, setValor_tramite] = useState("");
   const [name_tramite, setName_tramite] = useState("");
   const [id_pin, setId_pin] = useState("")
+  const [showModalReenvio, setShowModalReenvio] = useState(false)
+  const [doc_cliente, setDoc_cliente] = useState("")
 
 
   const closeModal = useCallback(async () => {
@@ -62,6 +64,22 @@ const TramitePines = () => {
       navigate("/PinesVus");
     }
   }, [activarNavigate, navigate]);
+
+  //////////////////////
+  const onSubmitReenvio = (e) => {
+    e.preventDefault();
+    reenvioHash(doc_cliente,"enviarFormulario")
+      .then((res) => {
+        if (!res?.status) {
+          notifyError(res?.msg);
+        } else {
+          notify(res?.msg)
+          setDoc_cliente("")
+          setShowModalReenvio(false)
+        }
+      })
+      .catch((err) => console.log("error", err));
+  };
 
   //////////////////////
   const onSubmit = (e) => {
@@ -114,41 +132,6 @@ const TramitePines = () => {
     setModalUsar(true);
   };
 
-  // const hora = useMemo(() => {    
-  //   return Intl.DateTimeFormat("es-CO", {
-  //     hour: "numeric",
-  //     minute: "numeric",
-  //     hour12: false,
-  //   }).format(new Date())
-  // }, [parametroBusqueda, table]);
-
-  // const horaCierre = useMemo(() => { 
-  //   const dia = (new Date()).getDay()  
-  //   if (dia === enumParametrosPines.diaFinSemana) {
-  //     return enumParametrosPines.horaCierreFinSemana.split(":") 
-  //   }
-  //   else{
-  //     return enumParametrosPines.horaCierre.split(":")
-  //   }
-     
-  // }, []);
-
-  // useEffect(() => {
-  //   const horaActual = hora.split(":")
-  //   const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
-  //   const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
-  //   if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
-  //     notifyError("Módulo cerrado a partir de las " + horaCierre)
-  //     navigate("/PinesVus",{replace:true});
-  //   }
-  //   else if ((deltaHora ===1 & deltaMinutos<-50)){
-  //     notifyError("El módulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
-  //   }
-  //   else if ((deltaHora ===0 & deltaMinutos<10)){
-  //     notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
-  //   }
-
-  // }, [hora,parametroBusqueda, table, horaCierre,navigate])
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -176,8 +159,17 @@ const TramitePines = () => {
                 <Button type="submit" disabled={disabledBtn}>
                   Consultar Pin
                 </Button>
+                <Button 
+                  type="button" 
+                  onClick = { () => {
+                    setShowModalReenvio(true)
+                  }}
+                  >
+                  Reenviar Código
+                </Button>
               </ButtonBar>
             </Form>
+            
           </>
         </div>
       ) : (
@@ -303,6 +295,44 @@ const TramitePines = () => {
         ) : (
           ""
         )}
+      </Modal>
+      <Modal show={showModalReenvio} handleClose={() => {setShowModalReenvio(false); setDoc_cliente("")}}>
+        <div className="flex flex-col w-1/2 mx-auto ">
+          <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
+          <br></br>
+        </div>  
+        <div className="flex flex-col justify-center items-center mx-auto container">          
+          <Form onSubmit={onSubmitReenvio} grid>
+            <Input
+              id="docCliente"
+              label="Número documento"
+              type="text"
+              minLength="5"
+              maxLength="12"
+              autoComplete="off"
+              value={doc_cliente}
+              required
+              onInput={(e) => {
+                setDoc_cliente(e.target.value);
+              }}
+            />
+            <ButtonBar className="col-auto md:col-span-2">
+              <Button type="submit" disabled={disabledBtn}>
+                Reenviar código
+              </Button>
+              <Button 
+                type="button"
+                onClick = {() => {
+                  setShowModalReenvio(false)
+                  setDoc_cliente("")
+                }
+                }
+                >
+                Cancelar
+              </Button>
+            </ButtonBar>
+          </Form>
+        </div>       
       </Modal>
     </>
     ) : (

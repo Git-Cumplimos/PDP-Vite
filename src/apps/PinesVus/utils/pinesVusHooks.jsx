@@ -14,6 +14,8 @@ const urls = {
   descargaArchivosS3: `${process.env.REACT_APP_URL_PinesVus}/descargaArchivosS3`,
   cupoQX: `${process.env.REACT_APP_URL_PinesVus}/cupoQX`,
   ingresarIdQX: `${process.env.REACT_APP_URL_PinesVus}/ingresarIdQX`,
+  consultaEpsArl: `${process.env.REACT_APP_URL_PinesVus}/consultaEpsArl`,
+  reenvioHash: `${process.env.REACT_APP_URL_PinesVus}/reenviarCodigoHash`,
 };
 
 export const pinesVusContext = createContext({
@@ -29,6 +31,8 @@ export const pinesVusContext = createContext({
   consultaCupoQX: () => {},
   modificarCupoQX: () => {},
   ingresarIdQX: () => {},
+  consultaEpsArl: () => {},
+  reenvioHash: () => {},
   activarNavigate: null,
   setActivarNavigate: null,
 });
@@ -41,16 +45,21 @@ export const useProvidePinesVus = () => {
   const { roleInfo } = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
 
-  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite) => {
+  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion) => {
+    let tipo_comercio = user?.tipo_comercio
+    if (user?.tipo_comercio === "KIOSCO"){
+      tipo_comercio = "OFICINAS PROPIAS"
+    }
     const body = {
       valor_tramite : valor_tramite,
       Usuario: user?.id_usuario,
       Dispositivo: user?.id_dispositivo,
       Comercio: user?.id_comercio,
-      Tipo: user?.tipo_comercio,
+      Tipo: tipo_comercio,
       NombreComercio: roleInfo?.["nombre comercio"],
       valor: parseFloat(valor),
       motivo: motivo,
+      tipCancelacion: tipCancelacion,
       id_trx: trx,
     };
     const query = {
@@ -64,7 +73,11 @@ export const useProvidePinesVus = () => {
     }
   }, []);
   
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma, motivoCompra) => {
+    let tipo_comercio = user?.Tipo
+    if (user?.Tipo === "KIOSCO"){
+      tipo_comercio = "OFICINAS PROPIAS"
+    }
     const body = {
       tipo_tramite: tramite,
       infoTramite: infoTramite,
@@ -73,13 +86,16 @@ export const useProvidePinesVus = () => {
       Usuario: user?.Usuario,
       Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,
-      Tipo: user?.Tipo,
+      Tipo: tipo_comercio,
       NombreComercio: roleInfo?.["nombre comercio"],
+      DireccionComercio: roleInfo?.direccion,
       infoCliente: infoCliente,
       olimpia: olimpia,
-      categoria: categoria
+      categoria: categoria,
+      firma: firma,
+      motivoCompra: motivoCompra
     };
-    if (idPin != ""){
+    if (idPin !== ""){
       body.Pin = idPin
     }
     try {
@@ -92,11 +108,15 @@ export const useProvidePinesVus = () => {
 
   const usarPinVus = useCallback(
     async (valor, trx, num_tramite, user, id_pin) => {
+      let tipo_comercio = user?.tipo_comercio
+      if (user?.tipo_comercio === "KIOSCO"){
+        tipo_comercio = "OFICINAS PROPIAS"
+      }
       const body = {
         Usuario: user?.id_usuario,
         Dispositivo: user?.id_dispositivo,
         Comercio: user?.id_comercio,
-        Tipo: user?.tipo_comercio,
+        Tipo: tipo_comercio,
         NombreComercio: roleInfo?.["nombre comercio"],
         valor: parseFloat(valor),
         id_trx: trx,
@@ -213,6 +233,10 @@ export const useProvidePinesVus = () => {
     fecha_participacion
     // voucher
     ) => {
+    let tipo_comercio = roleInfo.tipo_comercio
+    if (roleInfo?.tipo_comercio === "KIOSCO"){
+      tipo_comercio = "OFICINAS PROPIAS"
+    }
     const body = {
       participante: participante, 
       // banco: banco, 
@@ -225,7 +249,7 @@ export const useProvidePinesVus = () => {
       Usuario: roleInfo?.id_usuario,
       Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
-      Tipo: roleInfo?.tipo_comercio,
+      Tipo: tipo_comercio,
     };
     try {
       const res = await fetchData(urls.registroPagoParticipacion, "POST", {}, body);
@@ -317,6 +341,34 @@ export const useProvidePinesVus = () => {
     []
   );
 
+  const consultaEpsArl = useCallback(
+    async () => {
+      try {
+        const res = await fetchData(urls.consultaEpsArl, "GET", {});
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
+
+  const reenvioHash = useCallback(
+    async (
+      doc_cliente,
+      reenviarFormulario
+    ) => {
+      const query = { doc_cliente : doc_cliente, reenviarFormulario : reenviarFormulario };
+      try {
+        const res = await fetchData(urls.reenvioHash, "GET", query);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
+
   return {
     cancelPinVus,
     crearPinVus,
@@ -334,5 +386,7 @@ export const useProvidePinesVus = () => {
     ingresarIdQX,
     activarNavigate,
     setActivarNavigate,
+    consultaEpsArl,
+    reenvioHash
   };
 };

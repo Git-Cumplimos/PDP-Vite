@@ -27,10 +27,10 @@ const PagoGiro = () => {
   // });
   const [peticion, setPeticion] = useState(0);
   const [datosTrans, setDatosTrans] = useState({
-    tipoIdentificacion: "",
+    tipoIdentificacion: "01",
     numeroIdentificacion: "",
     codigoFamilia: "",
-    nombreTipoIdentificacion: "",
+    nombreTipoIdentificacion: "Cédula de ciudadanía",
   });
   const [isUploading, setIsUploading] = useState(false);
   const [datosConsulta, setDatosConsulta] = useState({});
@@ -105,10 +105,10 @@ const PagoGiro = () => {
     }
     setShowModal(false);
     setDatosTrans({
-      tipoIdentificacion: "",
+      tipoIdentificacion: "01",
       numeroIdentificacion: "",
       codigoFamilia: "",
-      nombreTipoIdentificacion: "",
+      nombreTipoIdentificacion: "Cédula de ciudadanía",
     });
     setDatosConsultaIdTrx({
       idTrx: "",
@@ -149,11 +149,17 @@ const PagoGiro = () => {
   });
   const peticionConsulta = () => {
     const hoy = new Date();
-    const fecha =
-      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
     /*hora actual */
-    const hora =
-      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+    const hora = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
@@ -174,7 +180,10 @@ const PagoGiro = () => {
       nombreComercio: roleInfo?.["nombre comercio"],
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       ticket: objTicket,
     })
       .then((res) => {
@@ -182,14 +191,13 @@ const PagoGiro = () => {
           setIsUploading(false);
           notify(res?.msg);
           // hideModal();
-          console.log(res);
           objTicket["commerceInfo"][1] = [
             "No. terminal",
             res?.obj?.codigoTotal,
           ];
           objTicket["commerceInfo"][6] = [
             "No. de aprobación",
-            "Transacción Cancelada por el usuario",
+            "<strong>Transacción Rechazada por el cliente",
           ];
           objTicket["trxInfo"].push(["Valor", formatMoney.format(0)]);
           objTicket["trxInfo"].push(["", ""]);
@@ -209,7 +217,6 @@ const PagoGiro = () => {
             valor: res?.valorTransaccion,
           }));
           setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
-          console.log("Recibe,", res?.valorTransaccion);
           setPeticion(2);
         } else {
           setIsUploading(false);
@@ -225,11 +232,17 @@ const PagoGiro = () => {
   };
   const peticionPagoPorGiro = () => {
     const hoy = new Date();
-    const fecha =
-      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
     /*hora actual */
-    const hora =
-      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
@@ -246,7 +259,10 @@ const PagoGiro = () => {
       nombreComercio: roleInfo?.["nombre comercio"],
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       ticket: objTicket,
       direccion: roleInfo?.direccion,
       idTrx: datosConsultaIdTrx.idTrx,
@@ -312,22 +328,23 @@ const PagoGiro = () => {
           type='text'
           name='numeroIdentificacion'
           minLength='5'
-          maxLength='16'
+          maxLength='10'
           required
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+            let valor = e.target.value;
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, numeroIdentificacion: num };
               });
             }
           }}></Input>
-          <HideInput
+        <HideInput
           id='codigoFamilia'
           label='Código de familia'
-          type='text'
+          type='number'
           name='codigoFamilia'
           minLength='1'
           maxLength='8'
@@ -335,8 +352,8 @@ const PagoGiro = () => {
           required
           value={datosTrans.codigoFamilia ?? ""}
           onInput={(e, valor) => {
-            if (!isNaN(valor)) {
-              const num = valor;
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, codigoFamilia: num };
               });
@@ -365,7 +382,6 @@ const PagoGiro = () => {
           name='tipoIdentificacion'
           label='Tipo de identificación'
           options={{
-            "": "",
             "Cédula de ciudadanía": "01",
             "Tarjeta de identidad": "04",
             "Cédula extranjería": "02",
@@ -396,7 +412,10 @@ const PagoGiro = () => {
               </h1>
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
-              <h2>{`Código de familia: ${datosTrans.codigoFamilia.replace(/\w/g,"*")}`}</h2>
+              <h2>{`Código de familia: ${datosTrans.codigoFamilia.replace(
+                /\w/g,
+                "*"
+              )}`}</h2>
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>
                 <Button type='submit' onClick={peticionConsulta}>
@@ -412,7 +431,13 @@ const PagoGiro = () => {
               </h1>
               <h2>{`Nombre de convenio: ${datosConsulta.nombreConvenio}`}</h2>
               <h2>{`Código de convenio: ${datosConsulta.codigoConvenio}`}</h2>
-              <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
+              <h2>{`Nombre beneficiario: ${
+                datosConsulta.nombreBeneficiario.replace(/[0]/g, "") ?? ""
+              }`}</h2>
+              <h2>{`Código de Familia: ${datosTrans.codigoFamilia.replace(
+                /\w/g,
+                "*"
+              )}`}</h2>
               <h2>{`Número de identificacion: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
               <h2>{`Valor transacción: ${formatMoney.format(
                 datosConsultaIdTrx.valor
@@ -430,7 +455,10 @@ const PagoGiro = () => {
               <h1 className='text-2xl font-semibold'>
                 ¿Está seguro de realizar la transacción del giro?
               </h1>
-              <h2>{`Código de Familia: ${datosConsulta.codigoDeFamilia}`}</h2>
+              <h2>{`Código de Familia: ${datosTrans.codigoFamilia.replace(
+                /\w/g,
+                "*"
+              )}`}</h2>
               <h2>{`Número de identificación: ${datosConsulta.numeroIdentificacionBeneficiario}`}</h2>
               <h2>{`Valor transacción: ${formatMoney.format(
                 datosConsultaIdTrx.valor

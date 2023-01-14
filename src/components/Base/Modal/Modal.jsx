@@ -6,7 +6,6 @@ const Modal = ({
   show,
   full = false,
   bigger = false,
-  allowClose = false,
   children,
 }) => {
   const { modal, modalContent, close } = classes;
@@ -16,7 +15,7 @@ const Modal = ({
   const refModal = useRef();
 
   window.onclick = function (event) {
-    if (event.target === refModal.current && allowClose) {
+    if (event.target === refModal.current && handleClose) {
       handleClose?.();
     }
   };
@@ -30,9 +29,12 @@ const Modal = ({
   return show ? (
     <div ref={refModal} className={`${modal} flex`}>
       <section className={`container ${limit} ${modalContent} ${hasPadding}`}>
-        {allowClose?
-        <span className={`bi bi-x ${close}`} onClick={() => (allowClose)?handleClose?.():false} />
-        :<></>}
+        {handleClose && (
+          <span
+            className={`bi bi-x ${close}`}
+            onClick={() => handleClose?.()}
+          />
+        )}
         <br />
         {children}
       </section>

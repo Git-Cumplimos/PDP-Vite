@@ -1,4 +1,5 @@
 import { Auth } from "@aws-amplify/auth";
+import https from "https";
 
 const fetchData = async (
   url = "",
@@ -39,7 +40,9 @@ const fetchData = async (
     url += `?${queries}`;
   }
 
-  const fetchOptions = { method: method };
+  const fetchOptions = {
+    method: method,
+  };
   const _headers = {};
   if (authenticate) {
     _headers.Authorization = `Bearer ${session?.idToken?.jwtToken}`;
@@ -58,13 +61,11 @@ const fetchData = async (
   }
 
   async function fetchWithTimeout(resource, options, timeout) {
-  
-    
     const abortController = new AbortController();
     const id = setTimeout(() => abortController.abort(), timeout);
     const response = await fetch(resource, {
       ...options,
-      signal: abortController.signal  
+      signal: abortController.signal,
     });
     clearTimeout(id);
     return response;

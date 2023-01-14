@@ -1,37 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
+import useMoney from "../../../hooks/useMoney";
+import { makeMoneyFormatter, moneyValidator } from "../../../utils/functions";
 import Input from "../Input";
 
-const moneyValidator = (value) => {
-  const floatMoney = value.replace(/[($\s).,\s]+/g, "");
-  // .replace(/,+/g, ".");
-  const val = parseInt(floatMoney);
-  return isNaN(val) ? "" : val;
-};
+export const formatMoney = makeMoneyFormatter(2);
 
-export const formatMoney = Intl.NumberFormat("es-CO", {
-  style: "currency",
-  currency: "COP",
-  maximumFractionDigits: 2,
-  minimumFractionDigits: 0,
-});
-
-// const clampValue = (val, min, max) => {
-//   return val === "" ? val : Math.min(Math.max(val, min), max);
-// };
-
-const MoneyInput = ({ ...input }) => {
-  const [invalid, setInvalid] = useState("");
-
-  const onInput = useMemo(() => {
-    const inpFcn = input?.onInput;
-    const chgFcn = input?.onChange;
-    const newCallback = (e, value) => {
-      inpFcn?.(e, value);
-      chgFcn?.(e, value);
-    };
-    return newCallback;
-  }, [input?.onChange, input?.onInput]);
-
+const MoneyInput = ({ decimalDigits = 0, equalError = true, ...input }) => {
   const inputLimits = useMemo(() => {
     const minVal = parseInt(input?.min) || 0;
     const maxVal = parseInt(input?.max) || 10000000;
@@ -41,73 +15,44 @@ const MoneyInput = ({ ...input }) => {
     return [minVal, maxVal];
   }, [input?.min, input?.max]);
 
-  const newValue = useMemo(() => {
-    const moneyValue = moneyValidator(`${input?.value ?? ""}`);
-    return moneyValue === "" ? "$ " : formatMoney.format(moneyValue);
-  }, [input?.value]);
+  const onChangeMoney = useMoney({
+    limits: inputLimits,
+    decimalDigits,
+    equalError,
+  });
 
-  const newDefaultValue = useMemo(() => {
-    const moneyValue = moneyValidator(`${input?.defaultValue ?? ""}`);
-    return moneyValue === "" ? "$ " : formatMoney.format(moneyValue);
-  }, [input?.defaultValue]);
-
-  useEffect(() => {
-    delete input.type;
-  }, [input.type]);
-
-  return "value" in input ? (
-    <Input
-      {...input}
-      value={newValue}
-      type={"tel"}
-      onInput={(e) => {
-        let caret_pos = e.target.selectionStart;
-        const len = e.target.value.length;
-        const moneyValue = moneyValidator(e.target.value);
-        const [min, max] = inputLimits;
-        if (moneyValue < min) {
-          setInvalid(`El valor debe ser mayor a ${formatMoney.format(min)}`);
-        } else if (moneyValue > max) {
-          setInvalid(`El valor debe ser menor a ${formatMoney.format(max)}`);
-        } else {
-          setInvalid(e.target.validationMessage);
-        }
-        e.target.value =
-          moneyValue === "" ? "$ " : formatMoney.format(moneyValue);
-        e.target.focus();
-        caret_pos += e.target.value.length - len;
-        e.target.setSelectionRange(caret_pos, caret_pos);
-        onInput?.(e, moneyValue);
-      }}
-      invalid={invalid}
-    />
-  ) : (
-    <Input
-      {...input}
-      type={"tel"}
-      onInput={(e) => {
-        let caret_pos = e.target.selectionStart;
-        const len = e.target.value.length;
-        const moneyValue = moneyValidator(e.target.value);
-        const [min, max] = inputLimits;
-        if (moneyValue < min) {
-          setInvalid(`El valor debe ser mayor a ${formatMoney.format(min)}`);
-        } else if (moneyValue > max) {
-          setInvalid(`El valor debe ser menor a ${formatMoney.format(max)}`);
-        } else {
-          setInvalid(e.target.validationMessage);
-        }
-        e.target.value =
-          moneyValue === "" ? "$ " : formatMoney.format(moneyValue);
-        e.target.focus();
-        caret_pos += e.target.value.length - len;
-        e.target.setSelectionRange(caret_pos, caret_pos);
-        onInput?.(e, moneyValue);
-      }}
-      invalid={invalid}
-      defaultValue={newDefaultValue}
-    />
+  const localFormatMoney = useMemo(
+    () => makeMoneyFormatter(decimalDigits),
+    [decimalDigits]
   );
+
+  const onInput = useCallback(
+    (e) => {
+      const inpFcn = input?.onInput;
+      const chgFcn = input?.onChange;
+      const value = onChangeMoney(e);
+      inpFcn?.(e, value);
+      chgFcn?.(e, value);
+    },
+    [input?.onChange, input?.onInput, onChangeMoney]
+  );
+
+  const dynamicProps = useMemo(() => {
+    const _props = new Map([
+      ["type", "tel"]
+    ]);
+    if (input?.value !== undefined) {
+      const moneyValue = moneyValidator(`${input?.value ?? ""}`);
+      _props.set("value", moneyValue === "" ? "$ " : localFormatMoney.format(moneyValue));
+    }
+    if (input?.defaultValue !== undefined) {
+      const moneyValue = moneyValidator(`${input?.value ?? ""}`);
+      _props.set("value", moneyValue === "" ? "$ " : localFormatMoney.format(moneyValue));
+    }
+    return Object.fromEntries(_props)
+  }, [input?.value, input?.defaultValue, localFormatMoney])
+
+  return <Input {...input} {...dynamicProps} onInput={onInput} />;
 };
 
 export default MoneyInput;

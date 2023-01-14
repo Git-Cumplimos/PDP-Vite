@@ -18,13 +18,26 @@ import Tickets from "../../../components/Base/Tickets";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import useQuery from "../../../hooks/useQuery";
 import classes from "./PpsVoluntarioDemanda.module.css";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
   maximumFractionDigits: 0,
 });
-const { contenedorImagen } = classes;
+const {
+  contenedorImagen,
+  contenedorForm,
+  contenedorCampos,
+  contenedorPrincipal,
+  contenedorSecundario,
+  contenedorLabel,
+} = classes;
+
 const PpsVoluntarioDemanda = ({ ced }) => {
+  const [limitesMontos] = useState({
+    max: 149100,
+    min: 5000,
+  });
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [numDocumento, setNumDocumento] = useState(ced);
   const [numCelular, setNumCelular] = useState(null);
@@ -39,7 +52,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
 
   const [{ numCuenta, userDoc, valor, nomDepositante, summary }, setQuery] =
     useQuery();
-  console.log(quotaInfo);
+  console.log(roleInfo);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
   const [idComercio, setIdComercio] = useState(roleInfo?.["id_comercio"]);
   const [idusuario, setIdUsuario] = useState(roleInfo?.["id_usuario"]);
@@ -49,6 +62,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const [tipoComercio, setTipoComercio] = useState(roleInfo["tipo_comercio"]);
   const [esPropio, setEsPropio] = useState(false);
   const [voucher, setVoucher] = useState(false);
+  const [procesandoTrx, setProcesandoTrx] = useState(false);
 
   const [disabledBtn, setDisabledBtn] = useState(false);
 
@@ -90,7 +104,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: " COLPENSIONES Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -104,22 +118,35 @@ const PpsVoluntarioDemanda = ({ ced }) => {
           hour12: false,
         }).format(new Date()),
       },
-      commerceName: tipoComercio,
-      commerceInfo: Object.entries({
-        "Id Comercio": roleInfo?.id_comercio,
-        "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
-        "Id Trx": datosRespuesta?.[0]?.["inserted_id"] /* "22" */,
-      }),
+      /*  commerceName: tipoComercio, */
+      commerceInfo: [
+        ["Id Comercio", roleInfo?.id_comercio],
+        ["No. terminal", roleInfo?.id_dispositivo],
+        ["Municipio", roleInfo?.ciudad],
+        ["", ""],
+        ["Dirección", roleInfo?.direccion],
+        ["", ""],
+      ],
+
       trxInfo: [
-        ["Proceso", "Aporte Voluntario A Demanda"],
-        ["Valor", formatMoney.format(valorAportar)],
+        ["PISO DE PROTECCION SOCIAL - APORTE VOLUNTARIO"],
+        ["", ""],
+        [
+          "Número de documento",
+          /* "33" */ datosRespuesta?.[1]?.["Identificacion"],
+        ],
+        ["", ""],
+        ["Número de autorización ", datosRespuesta?.[0]?.["inserted_id"]],
+        /* ["Proceso", "Aporte Voluntario A Demanda"], */
+        ["", ""],
         ["N° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
+        ["", ""],
+        ["Valor", formatMoney.format(valorAportar)],
+        ["", ""],
       ],
 
       disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
     };
   }, [
     roleInfo,
@@ -131,7 +158,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   useEffect(() => {
     infoTicket(datosRespuesta?.[0]?.["inserted_id"], 57, tickets)
       .then((resTicket) => {
-        console.log(resTicket);
+        // console.log(resTicket);
       })
       .catch((err) => {
         console.error(err);
@@ -142,14 +169,15 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   const enviar = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
+    setProcesandoTrx(true);
     /*  setShowModal(false); */
     if (cupoLogin >= valorAportar) {
       if (tipoComercio === "OFICINAS PROPIAS") {
-        console.log("entre");
+        // console.log("entre");
         setEsPropio(true);
 
         if (String(numCelular).charAt(0) === "3") {
-          console.log("es 3");
+          // console.log("es 3");
 
           if (valorAportar >= 5000 && valorAportar <= 149000) {
             fetchData(
@@ -174,6 +202,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               true
             )
               .then((respuesta) => {
+                setProcesandoTrx(false);
                 console.log(respuesta);
                 if (
                   respuesta?.msg?.["respuesta_colpensiones"] ===
@@ -209,7 +238,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
                 ) {
                   notifyError(
-                    "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                    "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
                   );
                   /* navigate(`/domiciliacion`); */
                   setDisabledBtn(false);
@@ -219,6 +248,15 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                   "Lo Sentimos, Falló el Servicio De Colpensiones"
                 ) {
                   notifyError("Lo sentimos, falló el servicio de colpensiones");
+                  navigate(`/domiciliacion`);
+                }
+                if (
+                  respuesta?.msg?.["respuesta_colpensiones"] ===
+                  "Transacci\u00f3n recibida fuera del horario."
+                ) {
+                  notifyError(
+                    "Lo sentimos, transacción recibida fuera del horario."
+                  );
                   navigate(`/domiciliacion`);
                 }
                 /* if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
@@ -241,12 +279,12 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               });
           } else {
             notifyError(
-              "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+              "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
             );
             setDisabledBtn(false);
           }
         } else {
-          console.log("no es 3");
+          // console.log("no es 3");
           notifyError(
             "Numero invalido, el N° de celular debe comenzar con el número 3."
           );
@@ -309,7 +347,7 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                     "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
                   ) {
                     notifyError(
-                      "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                      "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
                     );
                     /* navigate(`/domiciliacion`); */
                     setDisabledBtn(false);
@@ -330,8 +368,9 @@ const PpsVoluntarioDemanda = ({ ced }) => {
                 });
             } else {
               notifyError(
-                "El valor aportado ingresado esta fuera del rango de 5000 y 149000."
+                "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
               );
+              console.log("valor fuera de rango");
               setDisabledBtn(false);
             }
           } else {
@@ -367,70 +406,76 @@ const PpsVoluntarioDemanda = ({ ced }) => {
   };
   return (
     <div>
+      <SimpleLoading show={procesandoTrx}></SimpleLoading>
       <Modal show={showModal} handleClose={handleClose}>
         <div className={contenedorImagen}>
           <LogoPDP xsmall></LogoPDP>
         </div>
-        <Form onSubmit={(e) => enviar(e)}>
+        <Form grid onSubmit={(e) => enviar(e)}>
           <Fieldset
-            legend="Formulario Aporte Voluntario"
+            legend="Piso de Protección Social Voluntario"
             /* className="lg:col-span-3" */
           >
-            <Select
-              onChange={(event) => setTipoIdentificacion(event?.target?.value)}
-              id="comissionType"
-              label="Tipo Identificación"
-              required
-              options={{
-                "": "",
-                "Cédula de Ciudadania": "1",
-                "Cédula de Extranjeria": "2",
-                "Tarjeta de Identidad": "4",
-                "Registro Civil": "5",
-                "Pasaporte ": "6",
-                "Carnét Diplomático": "7",
-                "Salvo conducto permanencia": "8",
-                "Permiso especial permanencia": "9",
-              }}
-            ></Select>
-
-            <Input
-              label={"N° Documento"}
-              placeholder={"Ingrese su Numero Documento"}
-              value={numDocumento}
-              minLength="6"
-              maxLength="11"
-              onInput={(e) => {
-                const num = e.target.value || "";
-                setNumDocumento(num.toString());
-              }}
-              type={"text"}
-              required
-              disabled
-            ></Input>
-            <Input
-              id="celular"
-              name="celular"
-              label="Celular: "
-              type="tel"
-              autoComplete="off"
-              minLength="10"
-              maxLength="10"
-              value={numCelular ?? ""}
-              onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                if (e.target.value.length === 1) {
-                  if (e.target.value != 3) {
-                    notifyError(
-                      "Número inválido, el N° de celular debe comenzar con el número 3."
-                    );
-                  }
+            <div className={contenedorForm}>
+              <Select
+                onChange={(event) =>
+                  setTipoIdentificacion(event?.target?.value)
                 }
-                setNumCelular(num);
-              }}
-              required
-            />
-            {/*             <Input
+                id="comissionType"
+                label="Tipo Identificación: "
+                required
+                options={{
+                  "": "",
+                  "Cédula de Ciudadania": "1",
+                  "Cédula de Extranjeria": "2",
+                  "Tarjeta de Identidad": "4",
+                  "Registro Civil": "5",
+                  "Pasaporte ": "6",
+                  "Carnét Diplomático": "7",
+                  "Salvo conducto permanencia": "8",
+                  "Permiso especial permanencia": "9",
+                }}
+              ></Select>
+
+              <Input
+                label={"N° Documento: "}
+                placeholder={"Ingrese su Numero Documento"}
+                value={numDocumento}
+                minLength="6"
+                maxLength="11"
+                onInput={(e) => {
+                  const num = e.target.value || "";
+                  setNumDocumento(num.toString());
+                }}
+                type={"text"}
+                required
+                disabled
+              ></Input>
+
+              <Input
+                id="celular"
+                name="celular"
+                label="N° Celular: "
+                type="tel"
+                autoComplete="off"
+                minLength="10"
+                maxLength="10"
+                value={numCelular ?? ""}
+                onInput={(e) => {
+                  const num = parseInt(e.target.value) || "";
+                  if (e.target.value.length === 1) {
+                    if (e.target.value != 3) {
+                      notifyError(
+                        "Número inválido, el N° de celular debe comenzar con el número 3."
+                      );
+                    }
+                  }
+                  setNumCelular(num);
+                }}
+                required
+              />
+
+              {/*             <Input
               name="celular"
               label="Celular"
               type="tel"
@@ -442,19 +487,22 @@ const PpsVoluntarioDemanda = ({ ced }) => {
               onChange={onCelChange}
               required
             /> */}
-            <MoneyInput
-              label={"Valor Aportar"}
-              placeholder={"Ingrese Valor Aportar"}
-              value={valorAportar}
-              minLength="6"
-              maxLength="9"
-              onInput={(e) => {
-                const num = e.target.value.replace(".", "") || "";
-                setValorAportar(num.replace("$", ""));
-              }}
-              type={"text"}
-              required
-            ></MoneyInput>
+              <MoneyInput
+                label={"Valor Aportar: "}
+                placeholder={"Ingrese Valor Aportar"}
+                value={valorAportar}
+                min={limitesMontos?.min}
+                max={limitesMontos?.max}
+                minLength="6"
+                maxLength="9"
+                onInput={(e) => {
+                  const num = e.target.value.replace(".", "") || "";
+                  setValorAportar(num.replace("$", ""));
+                }}
+                type={"text"}
+                required
+              ></MoneyInput>
+            </div>
           </Fieldset>
           <ButtonBar className={"lg:col-span-2"} type="">
             {

@@ -12,6 +12,10 @@ import TableEnterprise from "../components/Base/TableEnterprise";
 import { formatMoney } from "../components/Base/MoneyInput";
 import PaymentSummary from "../components/Compound/PaymentSummary";
 import TicketsDavivienda from "../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
+import TicketsPines from "../apps/PinesVus/components/TicketsPines";
+import TicketsAval from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
+import TicketColpatria from "../apps/Colpatria/components/TicketColpatria";
+import TicketsAgrario from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -25,25 +29,23 @@ const Transacciones = () => {
   const { roleInfo, userPermissions } = useAuth();
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
-  const [montoAcumulado, setMontoAcumulado] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
   const [summaryTrx, setSummaryTrx] = useState(null);
 
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
-
+  // 27034
   const [maxPages, setMaxPages] = useState(1);
+  const [idTrxIpt, setIdTrxIpt] = useState("");
   const [idComercio, setIdComercio] = useState(-1);
   const [usuario, setUsuario] = useState(-1);
-  const [tipoComercio, setTipoComercio] = useState(null);
   const [tipoOp, setTipoOp] = useState("");
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
 
   const transacciones = useCallback(() => {
     const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
-    const urlAcumulado = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-acumulado`;
     const queries = { ...pageData };
     if (!(idComercio === -1 || idComercio === "")) {
       queries.id_comercio = parseInt(idComercio);
@@ -53,6 +55,9 @@ const Transacciones = () => {
     }
     if (tipoOp) {
       queries.id_tipo_transaccion = tipoOp;
+    }
+    if (idTrxIpt) {
+      queries.id_trx = idTrxIpt;
     }
     if (fechaInicial && fechaFinal) {
       const fecha_ini = new Date(fechaInicial);
@@ -71,31 +76,23 @@ const Transacciones = () => {
         day: "numeric",
       }).format(fecha_fin);
     }
-    fetchData(url, "GET", queries)
-      .then((res) => {
-        if (res?.status) {
-          setMaxPages(res?.obj?.maxpages);
-          setTrxs(res?.obj?.trxs);
-        } else {
-          throw new Error(res?.msg);
-        }
-      })
-      .catch(() => {});
-
-    if (tipoComercio !== null) {
-      const acumQueries = { ...queries, oficina_propia: tipoComercio };
-      delete acumQueries.limit;
-      delete acumQueries.page;
-      fetchData(urlAcumulado, "GET", acumQueries)
+    console.log(userPermissions
+      .map(({ id_permission }) => id_permission)
+      .includes(5), queries.id_comercio)
+    if (userPermissions
+      .map(({ id_permission }) => id_permission)
+      .includes(5) || usuario !== -1){
+      fetchData(url, "GET", queries)
         .then((res) => {
           if (res?.status) {
-            setMontoAcumulado(res?.obj);
+            setMaxPages(res?.obj?.maxpages);
+            setTrxs(res?.obj?.trxs);
           } else {
             throw new Error(res?.msg);
           }
         })
         .catch(() => {});
-    }
+      }
   }, [
     pageData,
     idComercio,
@@ -103,7 +100,7 @@ const Transacciones = () => {
     fechaInicial,
     tipoOp,
     usuario,
-    tipoComercio,
+    idTrxIpt,
   ]);
 
   const closeModal = useCallback(async () => {
@@ -127,26 +124,30 @@ const Transacciones = () => {
     tempArr.forEach((types_trx) =>
       types_trx.forEach((val) => allTypes.push(val))
     );
-    setTiposOp([...allTypes]);
+    setTiposOp([
+      ...allTypes
+        .sort((a, b) => a.Nombre.localeCompare(b.Nombre))
+        .filter(
+          (value, index, self) =>
+            index ===
+            self.findIndex(
+              (t) => t.id_tipo_operacion === value.id_tipo_operacion
+            )
+        ),
+    ]);
 
     setIdComercio(roleInfo?.id_comercio || -1);
     setUsuario(roleInfo?.id_usuario || -1);
-    setTipoComercio(
-      "tipo_comercio" in roleInfo
-        ? roleInfo.tipo_comercio === "OFICINAS PROPIAS"
-        : null
-    );
   }, [userPermissions, roleInfo]);
 
   useEffect(() => {
     transacciones();
   }, [transacciones]);
-
   return (
-    <div className='w-full flex flex-col justify-center items-center my-8'>
-      <h1 className='text-3xl'>Transacciones</h1>
+    <div className="w-full flex flex-col justify-center items-center my-8">
+      <h1 className="text-3xl">Transacciones</h1>
       <TableEnterprise
-        title='Transacciones'
+        title="Transacciones"
         headers={[
           "Id transaccion",
           "Operación",
@@ -183,68 +184,61 @@ const Transacciones = () => {
           const fecha = new Date(trxs[index]?.created);
           fecha.setHours(fecha.getHours() + 5);
           setSummaryTrx({
-            "Tipo transaccion": trxs[index]?.["Tipo transaccion"],
+            "Tipo transacción": trxs[index]?.["Tipo transaccion"],
             Fecha: dateFormatter.format(fecha),
             "Mensaje de respuesta trx": trxs[index]?.message_trx,
             Monto: formatMoney.format(trxs[index]?.monto),
-            "Estado de la trasaccion": trxs[index]?.status_trx
+            "Estado de la transacción": trxs[index]?.status_trx
               ? "Transaccion aprobada"
               : "Transaccion rechazada",
           });
           setShowModal(true);
         }}
-        onSetPageData={setPageData}>
+        onSetPageData={setPageData}
+      >
         <Input
-          id='dateInit'
-          label='Fecha inicial'
-          type='date'
+          id="dateInit"
+          label="Fecha inicial"
+          type="date"
           value={fechaInicial}
           onInput={(e) => setFechaInicial(e.target.value)}
         />
         <Input
-          id='dateEnd'
-          label='Fecha final'
-          type='date'
+          id="dateEnd"
+          label="Fecha final"
+          type="date"
           value={fechaFinal}
           onInput={(e) => setFechaFinal(e.target.value)}
         />
         <Select
-          className='place-self-stretch'
-          id='searchBySorteo'
-          label='Tipo de busqueda'
-          options={
-            Object.fromEntries([
-              ["", ""],
-              ...tiposOp.map(({ Nombre, id_tipo_operacion }) => {
-                return [Nombre, id_tipo_operacion];
-              }),
-            ]) || { "": "" }
-          }
+          className="place-self-stretch"
+          id="searchBySorteo"
+          label="Tipo de busqueda"
+          options={[
+            { value: "", label: "" },
+            ...tiposOp.map(({ Nombre, id_tipo_operacion }) => {
+              return { label: Nombre, value: id_tipo_operacion };
+            }),
+          ]}
           value={tipoOp}
           required={true}
           onChange={(e) => setTipoOp(parseInt(e.target.value) ?? "")}
         />
+        <Input
+          id="id_trx"
+          label="Id de transaccion"
+          type="numeric"
+          value={idTrxIpt}
+          onChange={(e) => setIdTrxIpt(e.target.value)}
+        />
         {userPermissions
           .map(({ id_permission }) => id_permission)
-          .includes(58) &&
-          tipoComercio !== null && (
-            <Fragment>
-              <Input
-                label="Monto acumulado"
-                type="tel"
-                value={formatMoney.format(montoAcumulado ?? 0)}
-                readOnly
-              />
-            </Fragment>
-          )}
-        {userPermissions
-          .map(({ id_permission }) => id_permission)
-          .includes(5) ? (
+          .includes(91) ? (
           <>
             <Input
-              id='id_comercio'
-              label='Id comercio'
-              type='numeric'
+              id="id_comercio"
+              label="Id comercio"
+              type="numeric"
               value={idComercio}
               onChange={(e) => {
                 setIdComercio(e.target.value);
@@ -255,9 +249,9 @@ const Transacciones = () => {
               }}
             />
             <Input
-              id='id_usuario'
-              label='Id usuario'
-              type='numeric'
+              id="id_usuario"
+              label="Id usuario"
+              type="numeric"
               value={usuario}
               onChange={(e) => {
                 setUsuario(e.target.value);
@@ -273,39 +267,92 @@ const Transacciones = () => {
         )}
       </TableEnterprise>
       <Modal show={showModal} handleClose={closeModal}>
-        {selected?.ticket && selected?.id_autorizador === 13 ? (
-          <div className='flex flex-col justify-center items-center'>
-            <TicketsDavivienda
-              refPrint={printDiv}
-              type='Reimpresión'
-              ticket={selected?.ticket}
-              stateTrx={selected?.status_trx}
-            />
-            <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => closeModal()}>Cerrar</Button>
-            </ButtonBar>
-          </div>
-        ) : selected?.ticket ? (
-          <div className='flex flex-col justify-center items-center'>
-            <Tickets
-              refPrint={printDiv}
-              type='Reimpresión'
-              ticket={selected?.ticket}
-              stateTrx={selected?.status_trx}
-            />
+        {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (
+          <div className="flex flex-col justify-center items-center">
+            {selected?.id_autorizador === 13 ? (
+              <TicketsDavivienda
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 14 ? (
+              <TicketColpatria
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 17 ? (
+              <TicketsAval
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 14 ? (
+              <TicketColpatria
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 16 ? (
+              <TicketsAgrario
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_tipo_transaccion === 43 ? (
+              <div ref={printDiv}>
+                {selected?.ticket?.ticket2 ? (
+                  <>
+                    <TicketsPines
+                      refPrint={null}
+                      ticket={selected?.ticket?.ticket1}
+                      type="Reimpresión"
+                      stateTrx={selected?.status_trx}
+                      logo="LogoMiLicensia"
+                    />
+                    <TicketsPines
+                      refPrint={null}
+                      ticket={selected?.ticket?.ticket2}
+                      type="Reimpresión"
+                      stateTrx={selected?.status_trx}
+                      logo="LogoVus"
+                    />
+                  </>
+                ) : (
+                  <Tickets
+                    refPrint={null}
+                    ticket={selected?.ticket}
+                    type="Reimpresión"
+                    stateTrx={selected?.status_trx}
+                  />
+                )}
+              </div>
+            ) : (
+              <Tickets
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            )}
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={() => closeModal()}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
-          <div className='flex flex-col justify-center items-center mx-auto container'>
+          <div className="flex flex-col justify-center items-center mx-auto container">
             <PaymentSummary
-              title='Resumen transaccion'
-              subtitle=''
-              summaryTrx={summaryTrx}>
-              <h1 className='text-3xl mt-6 text-aling'>
+              title="Resumen transacción"
+              subtitle=""
+              summaryTrx={summaryTrx}
+            >
+              <h1 className="text-3xl mt-6 text-aling">
                 No hay ticket registrado
               </h1>
               <ButtonBar>

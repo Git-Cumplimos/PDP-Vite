@@ -11,7 +11,7 @@ import { useReactToPrint } from "react-to-print";
 import { postRealizarCashout } from "../utils/fetchMoviiRed";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
-import { enumParametrosAutorizador } from "../utils/enumParametrosAutorizador";
+import { enumParametrosAutorizador } from "../../../utils/enumParametrosAutorizador";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -23,7 +23,7 @@ const MoviiPDPCashOut = () => {
   const { roleInfo } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: 100000,
+    superior: 20000000,
     inferior: 100,
   });
   const [peticion, setPeticion] = useState(false);
@@ -151,7 +151,10 @@ const MoviiPDPCashOut = () => {
       subscriberNum: datosTrans.numeroTelefono,
       otp: datosTrans.otp,
       oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
     })
       .then((res) => {
         if (res?.status) {

@@ -51,6 +51,7 @@ const BuscarCedulaPpsADemanda = () => {
     setDatosConsulta(0);
     setBuscarCedula("");
   }, []);
+
   const BuscarCedula = (e) => {
     setShowModal(true);
     e.preventDefault();
@@ -106,91 +107,31 @@ const BuscarCedulaPpsADemanda = () => {
     <div>
       {(datosConsulta?.length >= 0) & estado ? (
         <TipoPpsADemanda numCed={buscarCedula}></TipoPpsADemanda>
-      ) : Array.isArray(datosConsulta) && datosConsulta?.length > 0 ? (
-        <Modal show={showModal} handleClose={handleClose}>
-          <div className={contenedorImagen}>
-            <LogoPDP></LogoPDP>
-          </div>
-          <div className={contenedorForm}>
-            <div className={contenedorDatos}>
-              <div className={contenedorTitulos}>
-                <h2 className={tituloDatos}>{`Tipo Pps: `}</h2>
-                <h2 className={tituloDatos}>{`Célular: `}</h2>
-                <h2 className={tituloDatos}>{`Estado: `}</h2>
-              </div>
-              <div className={contenedorValoresTitulos}>
-                <h2
-                  className={tituloDatos}
-                >{`${datosConsulta[0]["tipo_pps"]}`}</h2>
-                <h2
-                  className={tituloDatos}
-                >{`${datosConsulta[0]["celular"]}`}</h2>
-                <h2
-                  className={tituloDatos}
-                >{`${datosConsulta[0]["estado"]}`}</h2>
-              </div>
-              <div className={contenedorTitulos}>
-                <h2 className={tituloDatos}>{`Id Usuario: `}</h2>
-                <h2 className={tituloDatos}>{`Id Comercio: `}</h2>
-                <h2 className={tituloDatos}>{`Id Dispositivo: `}</h2>
-              </div>
-              <div className={contenedorTitulos}>
-                <h2
-                  className={tituloDatos}
-                >{`${datosConsulta[0]["id_usuario"]}`}</h2>
-                <h2
-                  className={tituloDatos}
-                >{`${datosConsulta[0]["id_comercio"]}`}</h2>
-                <h2
-                  className={tituloDatos}
-                >{` ${datosConsulta[0]["id_dispositivo"]}`}</h2>
-              </div>
-            </div>
-            <span className={tituloNotificacion}>
-              No se puede realizar el aporte, el número de documento se
-              encuentra domiciliado.
-            </span>
-          </div>
-        </Modal>
       ) : (
-        <div>
-          <Form grid onSubmit={(e) => BuscarCedula(e)}>
-            {/*             <Input
-              label={"N° Identificación"}
-              placeholder={"Ingrese N° Identificación"}
-              value={buscarCedula}
-              minLength="6"
-              maxLength="10"
-              onInput={(e) => {
-                const num = e.target.value || "";
-                setBuscarCedula(num);
-              }}
-              type={"text"}
-              required
-            ></Input> */}
-
-            <Input
-              name="N° Identificación"
-              label="N° Identificación"
-              type="tel"
-              autoComplete="off"
-              minLength={"5"}
-              maxLength={"10"}
-              invalid={invalidCedula}
-              value={buscarCedula ?? ""}
-              onChange={onCedChange}
-              required
-            />
-            <ButtonBar className={"lg:col-span-2"} type="">
-              {
-                <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>
-                  Buscar Cliente
-                </Button>
-              }
-            </ButtonBar>
-          </Form>
-        </div>
+        ""
       )}
+      <Form grid onSubmit={(e) => BuscarCedula(e)}>
+        <Input
+          name="N° Identificación"
+          label="N° Identificación"
+          type="tel"
+          autoComplete="off"
+          minLength={"5"}
+          maxLength={"10"}
+          invalid={invalidCedula}
+          value={buscarCedula ?? ""}
+          onChange={onCedChange}
+          required
+        />
+
+        <ButtonBar className={"lg:col-span-2"} type="">
+          {
+            <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>
+              Buscar Cliente
+            </Button>
+          }
+        </ButtonBar>
+      </Form>
     </div>
   );
 };

@@ -5,23 +5,26 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Fieldset from "../../../components/Base/Fieldset";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
+import Modal from "../../../components/Base/Modal";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import TextArea from "../../../components/Base/TextArea";
+import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
 import { getConsultaCupoComercio, putAjusteCupo } from "../utils/fetchCupo";
 
 const AjusteCupoComer = ({ subRoutes }) => {
+  const navegateValid = useNavigate();
   const [cupoComer, setCupoComer] = useState(null);
   const [idComercio, setIdComercio] = useState(null);
-  const [valor, setValor] = useState(null);
-  const [razonAjuste, setRazonAjuste] = useState(null);
+  const [valor, setValor] = useState("");
+  const [razonAjuste, setRazonAjuste] = useState("");
   const [inputId, setinputId] = useState(false);
-  const navegateValid = useNavigate();
+  const [submitName, setSubmitName] = useState("");
 
   const limitesMontos = {
     max: 9999999999,
-    min: -9999999999,
+    min: 0,
   };
 
   const { roleInfo } = useAuth();
@@ -56,9 +59,8 @@ const AjusteCupoComer = ({ subRoutes }) => {
 
   const onSubmitAjuste = useCallback(
     (e) => {
-      e.preventDefault();
       if (valor !== null && valor !== "") {
-        if (e.nativeEvent.submitter.name === "Débito") {
+        if (submitName === "Débito") {
           const args = { pk_id_comercio: idComercio };
 
           const body = {
@@ -75,15 +77,15 @@ const AjusteCupoComer = ({ subRoutes }) => {
               consultaCupoComercios(idComercio);
               if (res?.status) {
                 notify(res?.msg);
+                navegateValid(`/cupo`);
                 // navigate(-1, { replace: true });
               } else {
                 notifyError(res?.msg);
               }
             })
             .catch((err) => console.error(err));
-          navegateValid(`/cupo`);
         }
-        if (e.nativeEvent.submitter.name === "Crédito") {
+        if (submitName === "Crédito") {
           const args = { pk_id_comercio: idComercio };
           const afectacion = "-" + valor;
           const body = {
@@ -99,6 +101,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
             .then((res) => {
               consultaCupoComercios(idComercio);
               if (res?.status) {
+                navegateValid(`/cupo`);
                 notify(res?.msg);
                 // navigate(-1, { replace: true });
               } else {
@@ -106,9 +109,8 @@ const AjusteCupoComer = ({ subRoutes }) => {
               }
             })
             .catch((err) => console.error(err));
-          navegateValid(`/cupo`);
         }
-        if (e.nativeEvent.submitter.name === "contigencia") {
+        if (submitName === "contigencia") {
           const args = { pk_id_comercio: idComercio };
           const afectacion = "-" + valor;
           const body = {
@@ -123,6 +125,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
             .then((res) => {
               consultaCupoComercios(idComercio);
               if (res?.status) {
+                navegateValid(`/cupo`);
                 notify(res?.msg);
                 // navigate(-1, { replace: true });
               } else {
@@ -130,13 +133,19 @@ const AjusteCupoComer = ({ subRoutes }) => {
               }
             })
             .catch((err) => console.error(err));
-          navegateValid(`/cupo`);
         }
       } else {
         notifyError("El campo monto no puede estar vacío");
       }
     },
-    [idComercio, valor, razonAjuste, roleInfo.id_usuario, navegateValid]
+    [
+      idComercio,
+      valor,
+      razonAjuste,
+      roleInfo?.id_usuario,
+      submitName,
+      navegateValid,
+    ]
   );
   const onSubmitBusqueda = useCallback(
     (e) => {
@@ -177,7 +186,13 @@ const AjusteCupoComer = ({ subRoutes }) => {
       </Form>
       {cupoComer?.results.length === 1 ? (
         <Fragment>
-          <Form onSubmit={onSubmitAjuste} grid>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setSubmitName(e.nativeEvent.submitter.name);
+            }}
+            grid
+          >
             <Fieldset legend={"Datos Cupo"} className={"lg:col-span-2"}>
               <MoneyInput
                 id="cupo_limite"
@@ -232,9 +247,9 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 label="Razón de ajuste"
                 autoComplete="off"
                 maxLength={"100"}
-                onInput={(e) => {
-                  setRazonAjuste(e.target.value);
-                }}
+                value={razonAjuste}
+                onInput={(e) => setRazonAjuste(e.target.value.trimLeft())}
+                info={`Maximo 100 caracteres: (${razonAjuste.length}/100)`}
               />
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"}>
@@ -249,6 +264,21 @@ const AjusteCupoComer = ({ subRoutes }) => {
               </Button>
             </ButtonBar>
           </Form>
+          <Modal show={submitName} handleClose={() => setSubmitName("")}>
+            <PaymentSummary
+              title="Esta seguro de realizar el ajuste de cupo del comercio?"
+              subtitle=""
+            >
+              <ButtonBar className={"lg:col-span-2"}>
+                <Button type={"submit"} onClick={onSubmitAjuste}>
+                  Aceptar
+                </Button>
+                <Button type={"button"} onClick={() => setSubmitName("")}>
+                  Cancelar
+                </Button>
+              </ButtonBar>
+            </PaymentSummary>
+          </Modal>
         </Fragment>
       ) : (
         ""

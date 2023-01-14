@@ -11,7 +11,11 @@ import {
   retiroCorresponsal,
   consultaCostoCB,
 } from "../../utils/fetchCorresponsaliaDavivienda";
-import { notify, notifyError } from "../../../../../utils/notify";
+import {
+  notify,
+  notifyError,
+  notifyPending,
+} from "../../../../../utils/notify";
 import Tickets from "../../components/TicketsDavivienda";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import MoneyInput, {
@@ -21,11 +25,25 @@ import { useFetch } from "../../../../../hooks/useFetch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import HideInput from "../../../../../components/Base/HideInput";
+import { makeMoneyFormatter } from "../../../../../utils/functions";
+import useMoney from "../../../../../hooks/useMoney";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
 
 const Retiro = () => {
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
+
+  const [limitesMontos, setLimitesMontos] = useState({
+    max: enumParametrosDavivienda.maxRetiroCuentas,
+    min: enumParametrosDavivienda.minRetiroCuentas,
+  });
+
+  const onChangeMoney = useMoney({
+    limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false,
+  });
 
   const [loadingRetiroCorresponsal, fetchRetiroCorresponsal] =
     useFetch(retiroCorresponsal);
@@ -37,24 +55,18 @@ const Retiro = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("01");
   const [isUploading, setIsUploading] = useState(false);
-  const [userDoc, setUserDoc] = useState("")
-  const [valor, setValor] = useState("")
-  const [otp, setOtp] = useState("")
-  const [summary, setSummary] = useState([])
-
-  const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
-  });
+  const [userDoc, setUserDoc] = useState("");
+  const [valor, setValor] = useState("");
+  const [otp, setOtp] = useState("");
+  const [summary, setSummary] = useState([]);
 
   const optionsDocumento = [
-    { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
     { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
-    { value: "13", label: "Regitro Civil" },
+    { value: "13", label: "Registro Civil" },
   ];
 
   const printDiv = useRef();
@@ -93,78 +105,105 @@ const Retiro = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
+    setTipoCuenta("");
+    setTipoDocumento("01");
+    setValor("");
+    setUserDoc("");
+    setOtp("");
+    setSummary([]);
   }, []);
 
   const onSubmitRetiro = useCallback(
     (e) => {
       e.preventDefault();
       setIsUploading(true);
-
-      const { min, max } = limitesMontos;
-
-      if (valor >= min && valor < max) {
-        const formData = new FormData(e.target);
-        const userDoc = formData.get("docCliente");
-        const valorFormat = formData.get("valor");
-        const otp = formData.get("OTP");
-
-        const body = {
-          idComercio: roleInfo?.id_comercio,
-          idUsuario: roleInfo?.id_usuario,
-          idDispositivo: roleInfo?.id_dispositivo,
-          Tipo: roleInfo?.tipo_comercio,
-          numTipoTransaccion: 2130, /// retiro
-          numTipoDocumento: tipoDocumento, /// Cedula
-          numNumeroDocumento: userDoc,
-          numValorTransaccion: valor,
-          //nomDepositante: nomDepositante,
-          // valToken: "valToken", /// De donde viene
-        };
-        fetchConsultaCostoCB(body)
-          .then((res) => {
-            setIsUploading(false);
-            if (!res?.status) {
-              notifyError(res?.msg);
-              return;
-            } else {
-              setDatosConsulta(res?.obj?.Data);
-              const summary = {
-                "Nombre cliente": res?.obj?.Data?.valNumbreDaviplata,
-                // "Numero celular": numCuenta,
-                "C.C. del depositante": userDoc,
-                "Codigo OTP": otp,
-                "Valor de retiro": valorFormat,
-                "Valor cobro": formatMoney.format(
-                  res?.obj?.Data?.numValorCobro
-                ),
-              };
-              setSummary(summary)
-              setShowModal(true);
-            }
-
-            //notify("Transaccion satisfactoria");
-          })
-          .catch((err) => {
-            setIsUploading(false);
-            console.error(err);
-            notifyError("Error interno en la transaccion");
-          });
-      } else {
+      if (otp.length < 6) {
         setIsUploading(false);
-        notifyError(
-          `El valor del retiro debe estar entre ${formatMoney.format(
-            min
-          )} y ${formatMoney.format(max)}`
-        );
+        notifyError("El número OTP debe ser de 6 dígitos");
+      } else {
+        if (valor % 10000 === 0) {
+          const { min, max } = limitesMontos;
+
+          if (valor >= min && valor <= max) {
+            const formData = new FormData(e.target);
+            const userDoc = formData.get("docCliente");
+            const valorFormat = formData.get("valor");
+            const otp = formData.get("OTP");
+
+            const body = {
+              idComercio: roleInfo?.id_comercio,
+              idUsuario: roleInfo?.id_usuario,
+              idDispositivo: roleInfo?.id_dispositivo,
+              // Tipo: roleInfo?.tipo_comercio,
+              numTipoTransaccion: 2130, /// retiro
+              numTipoDocumento: tipoDocumento, /// Cedula
+              numNumeroDocumento: userDoc,
+              numValorTransaccion: valor,
+              //nomDepositante: nomDepositante,
+              // valToken: "valToken", /// De donde viene
+            };
+            fetchConsultaCostoCB(body)
+              .then((res) => {
+                setIsUploading(false);
+                if (!res?.status) {
+                  notifyError(res?.msg);
+                  setTipoCuenta("");
+                  setTipoDocumento("01");
+                  setValor("");
+                  setUserDoc("");
+                  setOtp("");
+                  return;
+                } else {
+                  notifyError(
+                    "Recuerde verificar si posee el efectivo suficiente para continuar con el retiro"
+                  );
+                  setDatosConsulta(res?.obj?.Data);
+                  const summary = {
+                    "Nombre cliente":
+                      res?.obj?.Data?.valNombreTitular +
+                      " " +
+                      res?.obj?.Data?.valApellidoTitular,
+                    // "Numero celular": numCuenta,
+                    "Documento del cliente": userDoc,
+                    //"Codigo OTP": otp,
+                    "Valor de retiro": valorFormat,
+                    "Valor cobro": formatMoney.format(
+                      res?.obj?.Data?.numValorCobro
+                    ),
+                  };
+                  setSummary(summary);
+                  setShowModal(true);
+                }
+
+                //notify("Transaccion satisfactoria");
+              })
+              .catch((err) => {
+                setIsUploading(false);
+                console.error(err);
+                notifyError("No se ha podido conectar al servidor");
+              });
+          } else {
+            setIsUploading(false);
+            notifyError(
+              `El valor del retiro debe estar entre ${formatMoney
+                .format(min)
+                .replace(/(\$\s)/g, "$")} y ${formatMoney
+                .format(max)
+                .replace(/(\$\s)/g, "$")}`
+            );
+          }
+        } else {
+          setIsUploading(false);
+          notifyError("El valor a retirar debe ser múltiplo de $10.000");
+        }
       }
     },
-    [valor, limitesMontos]
+    [valor, limitesMontos, otp]
   );
-
 
   const onMoneyChange = useCallback(
     (e, valor) => {
-      setValor(valor)
+      setValor(valor);
     },
     [valor]
   );
@@ -179,25 +218,32 @@ const Retiro = () => {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
-      Tipo: roleInfo?.tipo_comercio,
+      // Tipo: roleInfo?.tipo_comercio,
+      oficinaPropia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       numTipoDocumento: tipoDocumento,
       numNumeroDocumento: userDoc,
       numValorRetiro: valor,
       numOtp: otp,
-      valToken: "valToken",
+      // valToken: "valToken",
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
     };
-
+    
     fetchRetiroCorresponsal(body)
       .then((res) => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
+          handleClose();
           return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const trx_id2 = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
@@ -221,36 +267,41 @@ const Retiro = () => {
             ["Dirección", roleInfo?.direccion],
             ["Tipo de operación", "Retiro De Cuentas"],
             ["", ""],
-            ["No. de aprobación", trx_id],
+            ["No. de aprobación Banco", trx_id],
+            ["", ""],
+            ["No. de aprobación Aliado", trx_id2],
             ["", ""],
           ],
           commerceName: roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "No hay datos",
+            ? roleInfo?.["nombre comercio"]
+            : "No hay datos",
           trxInfo: [
             [
-              "Tipo",
-              res?.obj?.Data?.numTipoCuenta === "01" ? "Ahorros" : "Corriente",
+              "Tipo de cuenta",
+              res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
-            ["",""],
+            ["", ""],
             [
               "Nro. Cuenta",
-              `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
+              `****${
+                String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""
+              }`,
             ],
-            ["",""],
+            ["", ""],
             ["Valor", formatMoney.format(valor)],
-            ["",""],
+            ["", ""],
             [
               "Costo transacción",
               formatMoney.format(res?.obj?.Data?.numValorCobro),
             ],
-            ["",""],
+            ["", ""],
             ["Total", formatMoney.format(valor)],
-            ["",""],
+            ["", ""],
 
             //["Usuario de venta", "Nombre propietario del punto"],
           ],
-          disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+          disclamer:
+            "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
         };
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
@@ -265,7 +316,7 @@ const Retiro = () => {
       .catch((err) => {
         setIsUploading(false);
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
   }, [
     valor,
@@ -273,7 +324,6 @@ const Retiro = () => {
     fetchRetiroCorresponsal,
     roleInfo,
     infoTicket,
-    ,
     datosConsulta,
     tipoDocumento,
   ]);
@@ -297,45 +347,48 @@ const Retiro = () => {
           <Input
             id='docCliente'
             name='docCliente'
-            label='Documento Cliente'
+            label='Documento cliente'
             type='text'
             autoComplete='off'
-            minLength={"7"}
-            maxLength={"16"}
+            minLength={"5"}
+            maxLength={"11"}
             value={userDoc}
             onInput={(e) => {
-              if (!isNaN(e.target.value)){
-                setUserDoc(e.target.value)
+              const num = e.target.value.replace(/[\s\.]/g, "");
+              if (!isNaN(num)) {
+                setUserDoc(num);
               }
             }}
             required
           />
-          <Input
-            id='OTP'
-            name='OTP'
-            label='Codigo OTP'
+          <HideInput
+            id='otp'
+            label='Número OTP'
             type='text'
-            autoComplete='off'
+            name='otp'
             minLength={"6"}
             maxLength={"6"}
-            value={otp}
-            onInput={(e) => {
-              if (!isNaN(e.target.value)){
-                setOtp(e.target.value)
-              }
-              }}
+            autoComplete='off'
             required
-          />
-          <MoneyInput
+            value={otp}
+            onInput={(e, valor) => {
+              let num = valor.replace(/[\s\.]/g, "");
+              if (!isNaN(valor)) {
+                setOtp(num);
+              }
+            }}></HideInput>
+          <Input
             id='valor'
             name='valor'
             label='Valor a retirar'
             autoComplete='off'
-            min={limitesMontos?.min}
-            max={limitesMontos?.max}
+            type='text'
             minLength={"1"}
             maxLength={"15"}
-            onInput={onMoneyChange}
+            min={limitesMontos?.min}
+            max={limitesMontos?.max}
+            value={makeMoneyFormatter(0).format(valor)}
+            onInput={(ev) => setValor(onChangeMoney(ev))}
             required
           />
           <ButtonBar className={"lg:col-span-2"}>
@@ -348,7 +401,7 @@ const Retiro = () => {
           show={showModal}
           handleClose={
             paymentStatus
-              ? () => {}
+              ? goToRecaudo
               : loadingRetiroCorresponsal
               ? () => {}
               : handleClose

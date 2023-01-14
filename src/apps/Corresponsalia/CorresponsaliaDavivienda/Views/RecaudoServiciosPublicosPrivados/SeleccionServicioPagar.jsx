@@ -28,12 +28,12 @@ const SeleccionServicioPagar = () => {
           pk_tbl_transaccional_convenios_davivienda_cb,
           nom_convenio_cnb,
           cod_convenio_cnb,
-          cod_iac_cnb,
+          // cod_iac_cnb,
         }) => {
           return {
             "Id convenio": cod_convenio_cnb,
-            Convenio: nom_convenio_cnb,
-            "Id IAC": cod_iac_cnb,
+            Convenio: nom_convenio_cnb.replace(/^\s+|\s+$/g, "") ?? "",
+            // "Id IAC": cod_iac_cnb,
           };
         }
       ),
@@ -74,13 +74,13 @@ const SeleccionServicioPagar = () => {
   };
   return (
     <>
-      <h1 className='text-3xl text-center'>
-        Recaudo servicios publicos y privados
+      <h1 className='text-3xl text-center mt-5'>
+        Recaudo servicios públicos y privados
       </h1>
       <TableEnterprise
         title='Tabla convenios Davivienda corresponsal bancario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "Id IAC"]}
+        headers={["Código convenio", "Convenio"]}
         data={tableConvenios}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
@@ -89,9 +89,11 @@ const SeleccionServicioPagar = () => {
         <Input
           id='searchConvenio'
           name='searchConvenio'
-          label={"Buscar convenio"}
+          label={"Nombre convenio"}
           type='text'
           autoComplete='off'
+          minLength='1'
+          maxLength='30'
           onInput={(e) => {
             setDatosTrans((old) => {
               return { ...old, convenio: e.target.value };
@@ -100,7 +102,7 @@ const SeleccionServicioPagar = () => {
         />
         <Input
           id='idConvenio'
-          label='Id convenio'
+          label='Código convenio'
           type='text'
           name='idConvenio'
           minLength='1'
@@ -115,7 +117,7 @@ const SeleccionServicioPagar = () => {
               });
             }
           }}></Input>
-        <Input
+        {/* <Input
           id='idIAC'
           label='Id IAC'
           type='text'
@@ -131,7 +133,7 @@ const SeleccionServicioPagar = () => {
                 return { ...old, idIAC: num };
               });
             }
-          }}></Input>
+          }}></Input> */}
       </TableEnterprise>
     </>
   );

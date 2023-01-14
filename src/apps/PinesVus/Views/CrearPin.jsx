@@ -8,13 +8,17 @@ import { usePinesVus } from "../utils/pinesVusHooks";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notifyError } from "../../../utils/notify";
-import Tickets from "../../../components/Base/Tickets";
+import TicketsPines from "../components/TicketsPines/TicketsPines"
+import Tickets from "../../../components/Base/Tickets"
 import { useReactToPrint } from "react-to-print";
 import Select from "../../../components/Base/Select";
 import { useNavigate } from "react-router-dom";
 import Fieldset from "../../../components/Base/Fieldset";
 import LocationFormPinVus from "../components/LocationForm/LocationFormPinesVus"
 import { enumParametrosPines } from "../utils/enumParametrosPines";
+import InputSuggestions from "../../../components/Base/InputSuggestions";
+import FirmaTratamientoDatos from "../components/FirmaTratamientoDatos/FirmaTratamientoDatos";
+import TextArea from "../../../components/Base/TextArea";
 
 const dateFormatter = Intl.DateTimeFormat("az", {
   year: "numeric",
@@ -37,14 +41,16 @@ const CrearPin = () => {
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const { crearPinVus, con_estado_tipoPin, consultaTramite, consultaClientes } = usePinesVus();
+  const { crearPinVus, con_estado_tipoPin, consultaTramite, consultaClientes, consultaEpsArl } = usePinesVus();
   const { infoTicket } = useAuth();
 
   const { roleInfo } = useAuth();
   const [showFormulario, setShowFormulario] = useState(false)
   const [documento, setDocumento] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showModalFirma, setShowModalFirma] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
+  const [disabledBtnsContinuar, setDisabledBtnsContinuar] = useState(false);
   const [respPin, setRespPin] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
   const [tipoPin, setTipoPin] = useState("");
@@ -59,8 +65,12 @@ const CrearPin = () => {
   const [eps, setEps] = useState("")
   const [arl, setArl] = useState("")
   const [idPin, setIdPin] = useState("")
+  const [firma, setFirma] = useState("")
+  const [pedirFirma, setPedirFirma] = useState(true)
 
   const [olimpia, setOlimpia] = useState("")
+
+  const [motivoCompra, setMotivoCompra] = useState("")
 
   const homeLocation = {
     municipio: useState(""),
@@ -85,10 +95,9 @@ const CrearPin = () => {
     { value: "", label: "" },
     { value: "F", label: "Femenino" },
     { value: "M", label: "Masculino" },
-    { Value: "O", label: "Otro"},
+    { value: "O", label: "Otro" }, 
   ];
   const [genero, setGenero] = useState("")
-
 
 
   const optionsVehiculo = [
@@ -174,34 +183,91 @@ const CrearPin = () => {
   ];
 
   const [categoria, setCategoria] = useState("")
-  // const myDate = new Date();  
-  // const year = myDate.getFullYear();
-  // for(var i = 1900; i < year+1; i++){
-    
-  // }
+  const [foundEps, setFoundEps] = useState([])
+  const [foundArl, setFoundArl] = useState([])
+  const [optionsEps, setOptionsEps] = useState([])
+  const [optionsArl, setOptionsArl] = useState([])
+
+  const searchEps = useCallback((e) => {
+    const query = (e.target.value);
+    if (query.length > 1) {
+    const datos = [];
+    const resp = optionsEps.map((eps) => {
+      if (eps.includes(query)){
+      datos.push(
+        <div onClick={ (e) => {
+          setEps(eps)
+        }}
+          >
+          <h1>{eps}</h1>
+          </div>
+        )
+      }
+      return datos
+    })  
+      setFoundEps(resp[0]) 
+    } else {
+      setFoundEps([]);
+    }
+  }, [optionsEps]);
+
+  const searchArl = useCallback((e) => {
+    const query = (e.target.value);
+    if (query.length > 1) {
+    const datos = [];
+    const resp = optionsArl.map((arl) => {
+      if (arl.includes(query)){
+      datos.push(
+        <div onClick={ (e) => {
+          setArl(arl)
+        }}
+          >
+          <h1>{arl}</h1>
+          </div>
+        )
+      }
+      return datos
+    })  
+      setFoundArl(resp[0]) 
+    } else {
+      setFoundArl([]);
+    }
+  }, [optionsArl]);
 
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
-      .then((res) => {
-        setDisabledBtns(false);
-        if (!res?.status) {
-          notifyError(res?.msg);
-        } else {
-          setOptionsTipoPines(res?.obj?.results);
-        }
-      })
-      .catch(() => setDisabledBtns(false));
-    
-      consultaTramite()
-      .then((res) => {
-        setDisabledBtns(false);
-        if (!res?.status) {
-          notifyError(res?.msg);
-        } else {
-          setOptionsTramites(res?.obj?.results);
-        }
-      })
-      .catch(() => setDisabledBtns(false));
+    .then((res) => {
+      setDisabledBtns(false);
+      if (!res?.status) {
+        notifyError(res?.msg);
+      } else {
+        setOptionsTipoPines(res?.obj?.results);
+      }
+    })
+    .catch(() => setDisabledBtns(false));
+  
+    consultaTramite()
+    .then((res) => {
+      setDisabledBtns(false);
+      if (!res?.status) {
+        notifyError(res?.msg);
+      } else {
+        setOptionsTramites(res?.obj?.results);
+      }
+    })
+    .catch(() => setDisabledBtns(false));
+
+    consultaEpsArl()
+    .then((res) => {
+      setDisabledBtns(false);
+      if (!res?.status) {
+        notifyError(res?.msg);
+      } else {
+        setOptionsEps(res?.obj?.eps);
+        setOptionsArl(res?.obj?.arl);
+      }
+    })
+    .catch(() => setDisabledBtns(false));
   }, []);
 
   const pinData = useMemo(() => {
@@ -241,23 +307,45 @@ const CrearPin = () => {
 
   const onSubmitModal = (e) => {
     e.preventDefault();
-    if(!isNaN(infoCliente?.municipio)){
-    e.preventDefault();
-    setShowModal(true)
+    // Control de edad _____________________________________________________
+    // let edad_correcta = false
+    // const year = Intl.DateTimeFormat("es-CO", {
+    //   year: "numeric",
+    //   month: "numeric",
+    //   day: "numeric",
+    // }).format(new Date())
+    // if (year.split("/")[2] - fechaNacimiento.split("-")[0] > 16){
+    //   edad_correcta = true  
+    // } 
+    // else if (year.split("/")[2] - fechaNacimiento.split("-")[0] === 16){
+    //   if (year.split("/")[1] - fechaNacimiento.split("-")[1] > 0){
+    //     edad_correcta = true
+    //   }
+    //   else if (year.split("/")[1] - fechaNacimiento.split("-")[1] === 0){
+    //     console.log(year.split("/")[0] - fechaNacimiento.split("-")[2])
+    //     console.log(year.split("/")[0] , fechaNacimiento.split("-")[2])
+    //     if (year.split("/")[0] - fechaNacimiento.split("-")[2] >= 0){
+    //       edad_correcta = true
+    //     }  
+    //   }
+    // }
+    // console.log(edad_correcta)
+    //-------------------------------------------------------------------------
+    if (firma === "" && pedirFirma) {
+      notifyError("Asegúrese de tener la firma del cliente en físico ")
     }
-    else{
-      notifyError("Agregue municipio y departamento de residencia")
-    }
+    setShowModal(true) 
   };
 
   const onSubmitCliente = (e) => {
     e.preventDefault();
-    setDisabledBtns(true);
+    setDisabledBtnsContinuar(true);
     setShowFormulario(false)
     consultaClientes(documento,olimpia,idPin).then((resp) => {
       if (!resp?.status){
         notifyError(resp?.msg)
       }else{
+      setPedirFirma(!resp?.obj?.firma)
       setShowFormulario(true)    
       if (resp?.obj?.results?.length > 0) {
         const fecha_nacimiento = new Date(resp?.obj?.results?.[0]?.fecha_nacimiento);
@@ -303,15 +391,21 @@ const CrearPin = () => {
         setComprarVehiculo("")
         setVehiculoCompra("")
         if (resp?.obj?.results?.[0]?.home_location !== null){ 
-        homeLocation?.municipio?.[1]("")
-        homeLocation?.departamento?.[1]("")
+        /// Se inicializa en Bogota
+        homeLocation?.municipio?.[1]("Bogotá D.C.")
+        homeLocation?.departamento?.[1]("Bogotá D.C.")
         homeLocation?.direccion?.[1]("")
         homeLocation?.barrio?.[1]("")
         homeLocation?.localidad?.[1]("")
-        homeLocation?.foundMunicipios?.[1]("")
+        homeLocation?.foundMunicipios?.[1]([{
+          c_digo_dane_del_departamento: "11",
+          c_digo_dane_del_municipio: "11.001",
+          departamento: "Bogotá D.C.",
+          municipio: "Bogotá D.C.",
+          region: "Región Centro Oriente"}
+        ])
       }
     }}
-    setDisabledBtns(false);
     });
   };
 
@@ -330,7 +424,7 @@ const CrearPin = () => {
       notifyError("Para evitar fallas no se permite realizar la transacción, hora cierre: " + horaCierre[0] + ":" + horaCierre[1])
       navigate("/PinesVus",{replace:true});
     }else{
-    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin)
+    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin,firma, motivoCompra)
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -356,13 +450,17 @@ const CrearPin = () => {
     }
     setShowModal(false);
     setDisabledBtns(false);
-    
+    setFirma("")
     
   }, [respPin]);
 
+  const closeModalFirma = useCallback(async () => {    
+    setShowModalFirma(false);      
+  }, []);
+
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago: " + tramiteData?.descripcion,
+      title: "Recibo de pago: Servicio voluntario de impresión premium",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -388,11 +486,46 @@ const CrearPin = () => {
         ["Proceso", "Creación de Pin"],
         // ["Código", respPin?.cod_hash_pin],
         ["Vence", respPin?.fecha_vencimiento],
-        ["Valor Trámite", formatMoney.format(tramiteData?.valor)],
-        ["IVA Trámite",formatMoney.format(tramiteData?.iva)],
         ["Valor Pin", formatMoney.format(respPin?.valor)],
         ["IVA Pin",formatMoney.format(respPin?.valor_iva)],
-        ["Total", formatMoney.format(respPin?.valor_total)],
+        ["Total", formatMoney.format(respPin?.valor + respPin?.valor_iva)],
+      ],
+      disclamer:
+        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    };
+  }, [roleInfo, respPin, pinData, tramiteData]);
+
+  const tickets2 = useMemo(() => {
+    return {
+      title: "Recibo de pago: " + tramiteData?.descripcion,
+      timeInfo: {
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: false,
+        }).format(new Date()),
+      },
+      commerceInfo: Object.entries({
+        "Id Comercio": roleInfo?.id_comercio,
+        "No. terminal": roleInfo?.id_dispositivo,
+        Municipio: roleInfo?.ciudad,
+        Dirección: roleInfo?.direccion,
+        "Id Trx": respPin?.transacciones_id_trx?.creacion,
+      }),
+      commerceName: "Tramite generación de licencia",
+      trxInfo: [
+        ["Proceso", "Creación de Pin"],
+        // ["Código", respPin?.cod_hash_pin],
+        ["Vence", respPin?.fecha_vencimiento],
+        ["Valor Trámite", formatMoney.format(tramiteData?.valor)],
+        ["IVA Trámite",formatMoney.format(tramiteData?.iva)],
+        ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)],
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -403,9 +536,12 @@ const CrearPin = () => {
     infoTicket(
       respPin?.transacciones_id_trx?.creacion,
       respPin?.tipo_trx,
-      tickets
+      {
+      ticket1 : tickets,
+      ticket2 : tickets2
+      },
     );
-  }, [infoTicket, respPin, tickets]);
+  }, [infoTicket, respPin, tickets, tickets2]);
   
   const hora = useMemo(() => {    
     return Intl.DateTimeFormat("es-CO", {
@@ -443,8 +579,7 @@ const CrearPin = () => {
     }
 
   }, [venderVehiculo,tipoPin, hora, horaCierre, navigate])
-  console.log(pinData)
-  console.log(homeLocation)
+  
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -458,6 +593,11 @@ const CrearPin = () => {
         value={tipoDocumento}
         onChange={(e) => {
           setTipoDocumento(e.target.value);
+          setDisabledBtnsContinuar(false)
+          setShowFormulario(false)
+          setTipoPin("")
+          setTramite("")
+          setCategoria("")
         }}
         required
       />  
@@ -473,6 +613,11 @@ const CrearPin = () => {
         onInput={(e) => {
           const num = parseInt(e.target.value) || "";
           setDocumento(num);
+          setDisabledBtnsContinuar(false)
+          setShowFormulario(false)
+          setTipoPin("")
+          setTramite("")
+          setCategoria("")
         }}
       />
       <Select
@@ -487,6 +632,11 @@ const CrearPin = () => {
         value={olimpia}
         onChange={(e) => {
           setOlimpia(e.target.value);
+          setDisabledBtnsContinuar(false)
+          setShowFormulario(false)
+          setTipoPin("")
+          setTramite("")
+          setCategoria("")
         }}
       />
       {olimpia === "true" ? 
@@ -508,7 +658,7 @@ const CrearPin = () => {
       </>
       :"" }
       <ButtonBar className="lg:col-span-2">
-      <Button type="submit" disabled={disabledBtns}>
+      <Button type="submit" disabled={disabledBtnsContinuar}>
         Continuar
       </Button>
       </ButtonBar>
@@ -516,7 +666,7 @@ const CrearPin = () => {
       {showFormulario? 
       <Form onSubmit={onSubmitModal} grid>
       <Fieldset legend="Datos cliente" className="lg:col-span-2">
-        <Input
+        {/* <Input
           id="nombre"
           label="Nombre"
           type="text"
@@ -560,7 +710,7 @@ const CrearPin = () => {
           onChange={(e) => {
             setGenero(e.target.value);
           }}
-        />
+        /> */}
         <Input
           id="celular"
           label="Celular"
@@ -571,7 +721,6 @@ const CrearPin = () => {
           autoComplete="off"
           value={celular}
           onInput={(e) => {
-            console.log(e.target.value?.length)
             if (celular?.length === 0 & e.target.value!=="3"){
               notifyError("El número de celular debe iniciar por 3")
               setCelular("");
@@ -596,35 +745,56 @@ const CrearPin = () => {
             setEmail(text);
           }}
         />
-        <Input
-          id="eps"
-          label="Eps"
-          type="text"
+        <TextArea
+          id="motivo"
+          label="Motivo compra"
+          type="input"
           minLength="1"
-          maxLength="30"
-          required
+          maxLength="160"
           autoComplete="off"
-          value={eps}
+          value={motivoCompra}
+          required
           onInput={(e) => {
-            setEps(e.target.value);
+            setMotivoCompra(e.target.value);
           }}
         />
-        <Input
-          id="arl"
-          label="Arl"
-          type="text"
-          minLength="1"
-          maxLength="30"
-          required
-          autoComplete="off"
-          value={arl}
-          onInput={(e) => {
-            setArl(e.target.value);
-          }}
+        {/* <InputSuggestions
+        id={"searchEps"}
+        label={"Eps"}
+        name={"nameEps"}
+        type={"search"}
+        value={eps}
+        autoComplete="off"
+        suggestions={foundEps || []}
+        onInput={(e) => {
+          const text = e.target.value.toUpperCase()
+          setEps(text);
+        }}
+        onLazyInput={{
+          callback: searchEps,
+          timeOut: 500,
+        }}
         />
-        <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/>
+        <InputSuggestions
+        id={"searchArl"}
+        label={"Arl"}
+        name={"nameArl"}
+        type={"search"}
+        value={arl}
+        autoComplete="off"
+        suggestions={foundArl || []}
+        onInput={(e) => {
+          const text = e.target.value.toUpperCase()
+          setArl(text);
+        }}
+        onLazyInput={{
+          callback: searchArl,
+          timeOut: 500,
+        }}
+        />
+        <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/> */}
       </Fieldset>
-      <Fieldset legend="Datos Vehículo" className="lg:col-span-2">
+      {/* <Fieldset legend="Datos Vehículo" className="lg:col-span-2">
         <Select
           id="tieneVehiculo"
           label="¿Tiene Vehículo?"
@@ -704,7 +874,7 @@ const CrearPin = () => {
           />
             : "" }
         </Fieldset>
-      </Fieldset>     
+      </Fieldset>      */}
       <Fieldset legend="Datos Trámite" className="lg:col-span-2">
         <Select
           className="place-self-stretch"
@@ -758,6 +928,14 @@ const CrearPin = () => {
         <Button type="submit" disabled={disabledBtns}>
           Crear pin
         </Button>
+        <Button type="button"
+        onClick={() => {
+          setShowModalFirma(true)
+        }}
+        disabled={!pedirFirma}
+        >
+          Firma
+        </Button>
       </ButtonBar>
       </Form>
       :
@@ -766,8 +944,19 @@ const CrearPin = () => {
 
       <Modal show={showModal} handleClose={() => closeModal()}>
         {respPin !== ""? 
-        <div className="flex flex-col justify-center items-center">
-          <Tickets refPrint={printDiv} ticket={tickets} />
+        <div className="flex flex-col justify-center items-center" >
+          <div ref={printDiv}>
+          <TicketsPines
+            refPrint={null} 
+            ticket={tickets} 
+            logo = 'LogoMiLicensia'
+          />
+          <TicketsPines
+            refPrint={null} 
+            ticket={tickets2}
+            logo = 'LogoVus'
+          />
+          </div>
           <ButtonBar>
             <Button
               onClick={() => {
@@ -856,11 +1045,16 @@ const CrearPin = () => {
               </Form>
             </div>
           </div>
-        </div>
-        
-        
-        }
-        
+        </div>     
+        }   
+      </Modal>
+      <Modal show={showModalFirma} handleClose={() => closeModalFirma()}>
+        <FirmaTratamientoDatos
+        closeModal={closeModalFirma}
+        setFirma = {setFirma}
+        firma = {firma}
+        >
+        </FirmaTratamientoDatos>
       </Modal>
     </>) : (
       <h1 className="text-3xl mt-6">El usuario no tiene comercio asociado</h1>

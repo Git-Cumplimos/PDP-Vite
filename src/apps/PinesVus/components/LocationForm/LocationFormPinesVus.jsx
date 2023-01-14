@@ -42,12 +42,13 @@ const LocationFormPinesVus = ({
 
   const searchMunicipio = useCallback((e) => {
     const query = (e.target.value);
+    setDepartamento("")
     if (query.length > 1) {
       fetchData(
         url,
         "GET",
         {
-          $where: `municipio LIKE '%${query}%'`,
+          $where: `(UPPER(municipio)) LIKE UPPER('%${query}%')`,
           $limit: 5,
         },
         {},
@@ -90,7 +91,6 @@ const LocationFormPinesVus = ({
       );
     });
   }, [foundMuni]);
-  console.log(foundMuni)
   return (
     <Fieldset
       legend={`Ubicación${place !== "" ? ` ${place}` : ""}`}
@@ -200,7 +200,6 @@ const LocationFormPinesVus = ({
               return { departamento, municipio };
             })}
             onSelectRow={(e, i) => {
-              console.log(foundMuni[i])
               setDepartamento(foundMuni[i].departamento);
               setMunicipio(foundMuni[i].municipio);
               setFoundMuni([foundMuni[i]]);

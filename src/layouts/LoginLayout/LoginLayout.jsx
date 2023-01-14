@@ -1,5 +1,4 @@
 import classes from "./LoginLayout.module.css";
-import SocialBar from "../../components/Compound/SocialBar";
 import LogoPDP from "../../components/Base/LogoPDP";
 import RightArrow from "../../components/Base/RightArrow";
 import { useImgs } from "../../hooks/ImgsHooks";
@@ -33,9 +32,6 @@ const LoginLayout = ({ children }) => {
 
   return (
     <div className={loginLayout}>
-      <div className={`${wave} top-4`}>
-        <SocialBar />
-      </div>
       <div className={`${wave} top-52`}>
         <PublicNav />
       </div>

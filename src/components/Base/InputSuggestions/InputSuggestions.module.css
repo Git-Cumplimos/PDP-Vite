@@ -25,12 +25,20 @@
   @apply block;
 }
 
-.formItem > .suggestion > ul > li {
+/* .formItem > .suggestion > ul > li {
+  @apply rounded-md text-black bg-transparent;
+} */
+
+.liUnSelected {
   @apply rounded-md text-black bg-transparent;
 }
 
+.liSelected {
+  @apply rounded-md bg-gray-600 text-gray-50;
+}
+
 .formItem > .suggestion > ul > li:hover {
-  @apply bg-gray-600 text-gray-50;
+  @apply liSelected;
 }
 
 .formItem > .suggestion > input {

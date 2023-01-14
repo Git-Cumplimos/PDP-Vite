@@ -23,17 +23,19 @@ import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
 
 const Deposito = () => {
   const navigate = useNavigate();
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
-    min: 5000,
+    max: enumParametrosDavivienda.maxDepositoCuentas,
+    min: enumParametrosDavivienda.minDepositoCuentas,
   });
 
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false
   });
 
   const { roleInfo, infoTicket } = useAuth();
@@ -48,7 +50,7 @@ const Deposito = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("01");
   const [isUploading, setIsUploading] = useState(false);
   const [numCuenta, setNumCuenta] = useState("")
   const [userDoc, setUserDoc] = useState("")
@@ -58,16 +60,15 @@ const Deposito = () => {
 
   const options = [
     { value: "", label: "" },
-    { value: "02", label: "Corriente" },
     { value: "01", label: "Ahorros" },
+    { value: "02", label: "Corriente" },    
   ];
 
   const optionsDocumento = [
-    { value: "", label: "" },
     { value: "01", label: "Cédula Ciudadanía" },
     { value: "02", label: "Cédula Extranjería" },
     { value: "04", label: "Tarjeta Identidad" },
-    { value: "13", label: "Regitro Civil" },
+    { value: "13", label: "Registro Civil" },
   ];
 
   
@@ -109,11 +110,12 @@ const Deposito = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
     setTipoCuenta("")
-    setTipoDocumento("")
+    setTipoDocumento("01")
     setNomDepositante("")
     setNumCuenta("")
     setValor("")
     setUserDoc("")
+    setSummary([])
 
   }, []);
 
@@ -124,7 +126,7 @@ const Deposito = () => {
 
       const { min, max } = limitesMontos;
 
-      if (valor >= min && valor < max) {
+      if (valor >= min && valor <= max) {
         const formData = new FormData(e.target);
         const numCuenta = formData.get("numCuenta");
         const userDoc = formData.get("docCliente");
@@ -135,7 +137,7 @@ const Deposito = () => {
           idComercio: roleInfo?.id_comercio,
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
-          Tipo: roleInfo?.tipo_comercio,
+          // Tipo: roleInfo?.tipo_comercio,
           numTipoTransaccion: 5706, /// Deposito
           numTipoDocumento: tipoDocumento, /// Cedula
           numNumeroDocumento: userDoc,
@@ -150,18 +152,29 @@ const Deposito = () => {
             setIsUploading(false);
             if (!res?.status) {
               notifyError(res?.msg);
+              setTipoCuenta("")
+              setTipoDocumento("01")
+              setNomDepositante("")
+              setNumCuenta("")
+              setValor("")
+              setUserDoc("")
               return;
             } else {
               setDatosConsulta(res?.obj?.Data);
-              const summary = {
-                "Nombre titular": res?.obj?.Data?.valNombreTitular,
-                "Apellido titular": res?.obj?.Data?.valApellidoTitular,
+              let summary = {
+                // "Nombre titular": res?.obj?.Data?.valNombreTitular,
+                // "Apellido titular": res?.obj?.Data?.valApellidoTitular,
                 "Número cuenta": numCuenta,
                 "Valor depósito": valorFormat,
-                "Valor cobro": formatMoney.format(
-                  res?.obj?.Data?.numValorCobro
-                ),
               };
+              console.log(process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA)
+              if (process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true'){
+                summary["Valor cobro"]= formatMoney.format(
+                  res?.obj?.Data?.numValorCobro
+                )
+              }
+                
+                
               setSummary(summary)
               setShowModal(true);
             }
@@ -171,14 +184,14 @@ const Deposito = () => {
           .catch((err) => {
             setIsUploading(false);
             console.error(err);
-            notifyError("Error interno en la transaccion");
+            notifyError("No se ha podido conectar al servidor");
           });
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del deposito debe estar entre ${formatMoney.format(
+          `El valor del depósito debe estar entre ${(formatMoney.format(
             min
-          )} y ${formatMoney.format(max)}`
+          )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
         );
       }
     },
@@ -202,7 +215,12 @@ const Deposito = () => {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
-      Tipo: roleInfo?.tipo_comercio,
+      // Tipo: roleInfo?.tipo_comercio,
+      oficinaPropia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       numTipoCuenta: tipoCuenta,
       numNumeroCuenta: numCuenta,
       numIdDepositante: userDoc,
@@ -219,10 +237,12 @@ const Deposito = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
+          handleClose();
           return;
         }
         notify("Transaccion satisfactoria");
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
+        const trx_id2 = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
         const tempTicket = {
@@ -246,7 +266,9 @@ const Deposito = () => {
             ["Dirección", roleInfo?.direccion],
             ["Tipo de operación", "Depósito A Cuentas"],
             ["", ""],
-            ["No. de aprobación", trx_id],
+            ["No. de aprobación Banco", trx_id],
+            ["", ""],
+            ["No. de aprobación Aliado", trx_id2],
             ["", ""],
           ],
           commerceName: roleInfo?.["nombre comercio"]
@@ -254,28 +276,27 @@ const Deposito = () => {
           : "No hay datos",
           trxInfo: [
             [
-              "Tipo",
-              res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
+            "Tipo de cuenta",
+            res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
             ],
             ["",""],
             [
-              "Nro. Cuenta",
-              `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
+            "Nro. Cuenta",
+            `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
             ],
             ["",""],
-            ["Valor", formatMoney.format(valor)],
-            ["", ""],
-            ["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)],
-            ["", ""],
-            ["Total", formatMoney.format(valor)],
-            ["", ""],
-            ["Identificación depositante", userDoc],
-            ["", ""],
-            ["Nombre depositante", nomDepositante],
+            ["Valor", formatMoney.format(valor)],            
             ["", ""],
           ],
-          disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+          disclamer: "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
         };
+        if (process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true'){
+          tempTicket['trxInfo'].push(["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)]);
+          tempTicket['trxInfo'].push(["", ""]);
+        }
+
+        tempTicket['trxInfo'].push(["Total", formatMoney.format(valor)]);
+        tempTicket['trxInfo'].push(["", ""]);
         setPaymentStatus(tempTicket);
         infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
           .then((resTicket) => {
@@ -289,7 +310,7 @@ const Deposito = () => {
       .catch((err) => {
         setIsUploading(false);
         console.error(err);
-        notifyError("Error interno en la transaccion");
+        notifyError("No se ha podido conectar al servidor");
       });
   }, [
     numCuenta,
@@ -330,9 +351,10 @@ const Deposito = () => {
             maxLength={"16"}
             value={numCuenta}
             onInput={(e) => {
-              if (!isNaN(e.target.value)){
-                setNumCuenta(e.target.value)
-              }
+              const num = e.target.value.replace(/[\s\.]/g, "");
+              if (! isNaN(num)){
+              setNumCuenta(num)  
+              }     
             }}
             required
           />
@@ -353,16 +375,17 @@ const Deposito = () => {
             type='text'
             autoComplete='off'
             minLength={"5"}
-            maxLength={"16"}
+            maxLength={"11"}
             value={userDoc}
             onInput={(e) => {
-              if (!isNaN(e.target.value)){
-                setUserDoc(e.target.value)
+              const num = e.target.value.replace(/[\s\.]/g, "");
+              if (! isNaN(num)){
+              setUserDoc(num)  
               }
             }}
             required
           />
-          <Input
+          {/* <Input
             id='nomDepositante'
             name='nomDepositante'
             label='Nombre depositante'
@@ -377,7 +400,7 @@ const Deposito = () => {
             }
             }
             required
-          />
+          /> */}
           {/* <MoneyInput
             id='valor'
             name='valor'
@@ -414,11 +437,13 @@ const Deposito = () => {
           show={showModal}
           handleClose={
             paymentStatus
-              ? () => {}
+              ? goToRecaudo
               : loadingDepositoCorresponsal
               ? () => {}
               : handleClose
-          }>
+          }
+
+          >
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
               <ButtonBar>

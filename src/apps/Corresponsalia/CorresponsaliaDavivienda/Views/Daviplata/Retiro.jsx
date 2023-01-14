@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
@@ -12,13 +13,16 @@ import MoneyInput, {
 } from "../../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
-import { enumParametrosAutorizador } from "../../utils/enumParametrosAutorizador";
+import { enumParametrosAutorizador } from "../../../../../utils/enumParametrosAutorizador";
 import { fetchParametrosAutorizadores } from "../../../../TrxParams/utils/fetchParametrosAutorizadores";
 import TicketsDavivienda from "../../components/TicketsDavivienda";
 import HideInput from "../../../../../components/Base/HideInput";
+import { useNavigate } from "react-router-dom";
+import { cifrarAES } from "../../../../../utils/cryptoUtils";
 
 const Retiro = () => {
   const { roleInfo } = useAuth();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
     superior: 720000,
@@ -155,11 +159,17 @@ const Retiro = () => {
 
   const peticionCashOut = () => {
     const hoy = new Date();
-    const fecha =
-      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
     /*hora actual */
-    const hora =
-      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
@@ -176,9 +186,16 @@ const Retiro = () => {
       ticket: objTicket,
       numCelular: datosTrans.numeroTelefono,
       municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "No hay datos",
-      otp: datosTrans.otp,
+      otp: cifrarAES(
+        `${process.env.REACT_APP_LLAVE_AES_CASHOUT_DAV}`,
+        `${process.env.REACT_APP_IV_AES_CASHOUT_DAV}`,
+        datosTrans.otp
+      ),
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       direccion: roleInfo?.direccion ? roleInfo?.direccion : "",
     })
       .then((res) => {
@@ -223,6 +240,7 @@ const Retiro = () => {
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        hideModal();
         console.error(err);
       });
   };
@@ -242,8 +260,9 @@ const Retiro = () => {
           autoComplete='off'
           value={datosTrans.numeroTelefono}
           onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+            let valor = e.target.value;
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(num)) {
               if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
                 return notifyError("El número DaviPlata debe comenzar por 3");
               }
@@ -283,8 +302,8 @@ const Retiro = () => {
           required
           value={datosTrans.otp ?? ""}
           onInput={(e, valor) => {
+            let num = valor.replace(/[\s\.]/g, "");
             if (!isNaN(valor)) {
-              const num = valor;
               setDatosTrans((old) => {
                 return { ...old, otp: num };
               });
@@ -343,6 +362,7 @@ const Retiro = () => {
                     type='submit'
                     onClick={() => {
                       hideModal();
+                      navigate(-1);
                     }}>
                     Aceptar
                   </Button>

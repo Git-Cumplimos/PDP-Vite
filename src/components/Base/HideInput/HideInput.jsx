@@ -17,7 +17,7 @@ const HideInput = ({ ...input }) => {
   }, [input?.onChange, input?.onInput]);
 
   const newValue = useMemo(() => {
-    return input?.value ? input?.value.replace(/\w/g, "*") : "";
+    return input?.value ? input?.value.replace(/\W*\w/g, "*") : "";
   }, [input?.value]);
 
   useEffect(() => {
@@ -27,6 +27,11 @@ const HideInput = ({ ...input }) => {
   const handleOldValue = (value) => {
     const len = value.length;
     const oldLen = oldValueData.length;
+
+    if (oldLen - len > 1) {
+      setOldValueData(value);
+      return value;
+    }
     const lastIndexTargetValue = value[value.length - 1];
     let stringData = oldValueData;
     if (len > oldLen) {
@@ -47,7 +52,7 @@ const HideInput = ({ ...input }) => {
         const len = e.target.value.length;
         const targetValue = e.target.value;
         const stringOnlyData = handleOldValue(targetValue);
-        e.target.value = e.target.value.replace(/\w/g, "*");
+        e.target.value = e.target.value.replace(/\W*\w/g, "*");
         e.target.focus();
         caret_pos += e.target.value.length - len;
         e.target.setSelectionRange(caret_pos, caret_pos);

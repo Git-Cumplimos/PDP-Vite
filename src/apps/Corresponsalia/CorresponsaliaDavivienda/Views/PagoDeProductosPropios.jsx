@@ -18,32 +18,34 @@ import {
   postPagoProductosPropiosDavivienda,
 } from "../utils/fetchProductosPropios";
 import { fetchParametrosAutorizadores } from "../../../TrxParams/utils/fetchParametrosAutorizadores";
-import { enumParametrosAutorizador } from "../utils/enumParametrosAutorizador";
+import { enumParametrosAutorizador } from "../../../../utils/enumParametrosAutorizador";
 import Fieldset from "../../../../components/Base/Fieldset";
+import { useNavigate } from "react-router-dom";
 
 const PagoDeProductosPropios = () => {
   const { roleInfo } = useAuth();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: 720000,
+    superior: 9900001,
     inferior: 1,
   });
   const [peticion, setPeticion] = useState(0);
   const [datosTrans, setDatosTrans] = useState({
-    tipoIdentificacion: "",
+    tipoIdentificacion: "01",
     numeroIdentificacion: "",
     tipoProducto: "",
     nombreProducto: "",
     numeroProducto: "",
     codigoFamilia: "",
-    nombreTipoIdentificacion: "",
+    nombreTipoIdentificacion: "Cédula de ciudadanía",
     binTarjetaCredito: "",
     ultimosTarjetaCredito: "",
     idTrx: "",
   });
   const [tipoAbono, setTipoAbono] = useState({
-    tipoAbonoId: "",
-    tipoAbonoNombre: "",
+    tipoAbonoId: "0001",
+    tipoAbonoNombre: "Valor mínimo",
     valorAbono: "",
   });
   const [isUploading, setIsUploading] = useState(false);
@@ -122,18 +124,22 @@ const PagoDeProductosPropios = () => {
   const hideModal = () => {
     setShowModal(false);
     setDatosTrans({
-      tipoIdentificacion: "",
+      tipoIdentificacion: "01",
       numeroIdentificacion: "",
       tipoProducto: "",
       nombreProducto: "",
       numeroProducto: "",
       codigoFamilia: "",
-      nombreTipoIdentificacion: "",
+      nombreTipoIdentificacion: "Cédula de ciudadanía",
       binTarjetaCredito: "",
       ultimosTarjetaCredito: "",
       idTrx: "",
     });
-    setTipoAbono({ tipoAbonoId: "", tipoAbonoNombre: "", valorAbono: "" });
+    setTipoAbono({
+      tipoAbonoId: "0001",
+      tipoAbonoNombre: "Valor mínimo",
+      valorAbono: "",
+    });
     setObjTicketActual((old) => {
       return {
         ...old,
@@ -181,14 +187,16 @@ const PagoDeProductosPropios = () => {
       nombreComercio: roleInfo?.["nombre comercio"],
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
     })
       .then((res) => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
           // hideModal();
-          console.log(res);
           setDatosTrans((old) => ({
             ...old,
             idTrx: res?.obj?.idTrx,
@@ -204,45 +212,63 @@ const PagoDeProductosPropios = () => {
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        hideModal();
         console.error(err);
       });
   };
-  const peticionIntermedia = () => {
+  const peticionIntermedia = (e) => {
+    e.preventDefault();
     if (tipoAbono.tipoAbonoId === "")
       return notifyError("Ingrese un tipo de abono");
-    if (
-      (tipoAbono.tipoAbonoId === "0003" ||
-        tipoAbono.tipoAbonoId === "0004" ||
-        tipoAbono.tipoAbonoId === "0005" ||
-        tipoAbono.tipoAbonoId === "0006") &&
-      tipoAbono.valorAbono === ""
-    )
-      return notifyError("Ingrese el valor del abono");
-    if (tipoAbono.valorAbono > datosConsulta.valPagoTotal)
-      return notifyError("El valor del abono debe ser menor al valor total");
-    if (tipoAbono.valorAbono > limiteRecarga.superior) {
+    let valorPagar = 0;
+    if (tipoAbono.tipoAbonoId === "0001") {
+      valorPagar = datosConsulta?.valPagoMinimo;
+    } else if (tipoAbono.tipoAbonoId === "0002") {
+      valorPagar = datosConsulta?.valPagoTotal;
+    } else {
+      valorPagar = tipoAbono.valorAbono;
+    }
+    // if (
+    //   tipoAbono.tipoAbonoId === "0003" ||
+    //   tipoAbono.tipoAbonoId === "0004" ||
+    //   tipoAbono.tipoAbonoId === "0005" ||
+    //   tipoAbono.tipoAbonoId === "0006"
+    // ) {
+    if (valorPagar === 0) return notifyError("Ingrese el valor del abono");
+    if (valorPagar > limiteRecarga.superior) {
       return notifyError(
-        `El valor del abono debe ser menor a ${formatMoney(
+        `El valor de la transacción debe ser menor a ${formatMoney.format(
           limiteRecarga.superior
         )}`
       );
     }
-    // if (tipoAbono.valorAbono < limiteRecarga.inferior) {
-    //   return notifyError(
-    //     `El valor del abono debe ser mayor a ${formatMoney(
-    //       limiteRecarga.inferior
-    //     )}`
-    //   );
+    if (valorPagar < limiteRecarga.inferior) {
+      return notifyError(
+        `El valor de la transacción debe ser mayor a ${formatMoney.format(
+          limiteRecarga.inferior
+        )}`
+      );
+    }
+    if (valorPagar > datosConsulta.valPagoTotal)
+      return notifyError(
+        "El valor de la transacción debe ser menor al valor total"
+      );
     // }
     setPeticion(3);
   };
   const peticionPagoPropios = () => {
     const hoy = new Date();
-    const fecha =
-      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
     /*hora actual */
-    const hora =
-      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
     let numeroProducto =
       datosTrans.tipoProducto === "01"
         ? datosTrans.binTarjetaCredito
@@ -250,7 +276,11 @@ const PagoDeProductosPropios = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push(["Tipo de producto", datosTrans.nombreProducto]);
+    // objTicket["trxInfo"].push(["Tipo de producto", datosTrans.nombreProducto]);
+    objTicket["trxInfo"].push([
+      "Tipo de producto",
+      "Crédito o Tarjeta crédito",
+    ]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
       "Número de producto",
@@ -265,7 +295,6 @@ const PagoDeProductosPropios = () => {
     } else {
       valorPagar = tipoAbono.valorAbono;
     }
-    console.log(valorPagar);
     setIsUploading(true);
     postPagoProductosPropiosDavivienda({
       tipoIdentificacion: datosTrans.tipoIdentificacion,
@@ -283,7 +312,10 @@ const PagoDeProductosPropios = () => {
       ticket: objTicket,
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       direccion: roleInfo?.direccion,
       idTrx: datosTrans?.idTrx,
     })
@@ -331,6 +363,7 @@ const PagoDeProductosPropios = () => {
       })
       .catch((err) => {
         setIsUploading(false);
+        hideModal();
         notifyError("No se ha podido conectar al servidor");
         console.error(err);
       });
@@ -338,18 +371,18 @@ const PagoDeProductosPropios = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl mb-10'>Pago de productos de crédito</h1>
+      <h1 className='text-3xl mb-10 mt-5'>Pago de productos propios</h1>
       <Form grid onSubmit={onSubmit}>
         <Select
           id='tipoIdentificacion'
           name='tipoIdentificacion'
           label='Tipo de identificación'
           options={{
-            "": "",
             "Cédula de ciudadanía": "01",
-            "Cedula extranjeria": "02",
+            "Cédula de extranjería": "02",
             NIT: "03",
-            "NIT Persona natural": "04",
+            "Tarjeta de identidad": "04",
+            "NIT Persona natural": "12",
           }}
           value={datosTrans?.tipoIdentificacion}
           onChange={(e) =>
@@ -369,13 +402,15 @@ const PagoDeProductosPropios = () => {
           label='Número de identificación'
           type='text'
           name='numeroIdentificacion'
-          minLength='5'
-          maxLength='10'
+          minLength='3'
+          maxLength={datosTrans.tipoIdentificacion === "04" ? 11 : 10}
           required
+          autoComplete='off'
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+            let valor = e.target.value;
+            let num = valor.replace(/[\s\.]/g, "");
+            if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, numeroIdentificacion: num };
               });
@@ -416,10 +451,12 @@ const PagoDeProductosPropios = () => {
               minLength='16'
               maxLength='16'
               required
+              autoComplete='off'
               value={datosTrans.numeroProducto}
               onInput={(e) => {
-                if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
+                let valor = e.target.value;
+                let num = valor.replace(/[\s\.]/g, "");
+                if (!isNaN(num)) {
                   setDatosTrans((old) => {
                     return { ...old, numeroProducto: num };
                   });
@@ -437,10 +474,12 @@ const PagoDeProductosPropios = () => {
               minLength='6'
               maxLength='6'
               required
+              autoComplete='off'
               value={datosTrans.binTarjetaCredito}
               onInput={(e) => {
-                if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
+                let valor = e.target.value;
+                let num = valor.replace(/[\s\.]/g, "");
+                if (!isNaN(num)) {
                   setDatosTrans((old) => {
                     return { ...old, binTarjetaCredito: num };
                   });
@@ -448,16 +487,18 @@ const PagoDeProductosPropios = () => {
               }}></Input>
             <Input
               id='ultimosTarjetaCredito'
-              label='Ultimos cuatro dígitos tarjeta de crédito'
+              label='Últimos cuatro dígitos tarjeta de crédito'
               type='text'
               name='ultimosTarjetaCredito'
               minLength='4'
               maxLength='4'
               required
+              autoComplete='off'
               value={datosTrans.ultimosTarjetaCredito}
               onInput={(e) => {
+                let valor = e.target.value;
+                let num = valor.replace(/[\s\.]/g, "");
                 if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
                   setDatosTrans((old) => {
                     return { ...old, ultimosTarjetaCredito: num };
                   });
@@ -474,7 +515,7 @@ const PagoDeProductosPropios = () => {
           {peticion === 1 && (
             <>
               <h1 className='text-2xl font-semibold'>
-                ¿Esta seguro de realizar la consulta del producto?
+                ¿Está seguro de realizar la consulta del producto?
               </h1>
               <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
               <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
@@ -489,39 +530,49 @@ const PagoDeProductosPropios = () => {
             </>
           )}
           {peticion === 2 && (
-            <>
+            <Form grid onSubmit={peticionIntermedia}>
               <h1 className='text-2xl font-semibold'>
                 Respuesta de consulta Davivienda
               </h1>
-              {console.log(datosConsulta.valPagoMinimo)}
-              <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
-              <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
+              <h2>{`Nombre del titular: ${
+                datosConsulta.valNombreTitular ?? ""
+              } ${datosConsulta.valApellidoTitular ?? ""}`}</h2>
+              <h2>{`Número de producto: ${
+                datosConsulta.numProducto ?? ""
+              }`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
-              <h2>{`Valor de pago minimo: ${formatMoney.format(
+              <h2>{`Valor de la comisión: ${formatMoney.format(
+                datosConsulta.valCobro
+              )}`}</h2>
+              <h2>{`Valor de pago mínimo: ${formatMoney.format(
                 datosConsulta.valPagoMinimo
               )}`}</h2>
               <h2>{`Valor de pago total: ${formatMoney.format(
                 datosConsulta.valPagoTotal
               )}`}</h2>
               {datosConsulta.valPagoTotal &&
-              parseInt(datosConsulta.valPagoTotal) !== 0 &&
-              datosConsulta.valPagoMinimo &&
-              parseInt(datosConsulta.valPagoMinimo) !== 0 ? (
+              parseInt(datosConsulta.valPagoTotal) !== 0 ? (
+                // &&
+                // datosConsulta.valPagoMinimo &&
+                // parseInt(datosConsulta.valPagoMinimo) !== 0
                 <Select
                   id='tipoAbono'
                   name='tipoAbono'
                   label='Indique el tipo de abono'
                   options={{
-                    "": "",
                     "Valor mínimo": "0001",
                     "Valor total": "0002",
-                    ...(datosConsulta.valIndAbonoExtraordinario === "S" && {
-                      "Disminución de cuota": "0003",
-                      "Adelanto de cuota": "0004",
-                      "Abono a capital": "0005",
-                      "Indicador extraordinario": "0006",
-                      Otro: "0006",
-                    }),
+                    ...(datosConsulta.valIndAbonoExtraordinario === "S"
+                      ? {
+                          "Disminución de cuota": "0003",
+                          "Adelanto de cuota": "0004",
+                          "Abono a capital": "0005",
+                          // "Indicador extraordinario": "0006",
+                          // Otro: "0006",
+                        }
+                      : {
+                          "Pago valor diferente": "0006",
+                        }),
                   }}
                   value={tipoAbono?.tipoAbonoId}
                   onChange={(e) =>
@@ -546,44 +597,60 @@ const PagoDeProductosPropios = () => {
                 tipoAbono.tipoAbonoId === "0006") && (
                 <MoneyInput
                   id='valorAbono'
-                  label='Valor abono'
+                  label='Valor a pagar'
                   type='text'
                   autoComplete='off'
+                  required
+                  min={limiteRecarga.inferior}
+                  max={limiteRecarga.superior}
                   value={tipoAbono.valorAbono}
-                  onInput={(e, valor) =>
-                    setTipoAbono((old) => {
-                      return {
-                        ...old,
-                        valorAbono: valor,
-                      };
-                    })
-                  }
+                  onInput={(e, valor) => {
+                    if (valor.toString().length < 11) {
+                      setTipoAbono((old) => {
+                        return {
+                          ...old,
+                          valorAbono: valor,
+                        };
+                      });
+                    }
+                  }}
                 />
               )}
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>
                 {datosConsulta.valPagoTotal &&
-                parseInt(datosConsulta.valPagoTotal) !== 0 &&
-                datosConsulta.valPagoMinimo &&
-                parseInt(datosConsulta.valPagoMinimo) !== 0 ? (
-                  <Button type='submit' onClick={peticionIntermedia}>
+                parseInt(datosConsulta.valPagoTotal) !== 0 ? (
+                  // &&
+                  // datosConsulta.valPagoMinimo &&
+                  // parseInt(datosConsulta.valPagoMinimo) !== 0
+                  <Button
+                    type='submit'
+                    // onClick={peticionIntermedia}
+                  >
                     Aceptar
                   </Button>
                 ) : (
                   <></>
                 )}
               </ButtonBar>
-            </>
+            </Form>
           )}
           {peticion === 3 && (
             <>
               <h1 className='text-2xl font-semibold'>
-                ¿Esta seguro de realizar el pago del producto de crédito?
+                ¿Está seguro de realizar el pago del producto de crédito?
               </h1>
-              <h2>{`Número de documento: ${datosTrans.numeroIdentificacion}`}</h2>
-              <h2>{`Tipo de documento: ${datosTrans.nombreTipoIdentificacion}`}</h2>
+              <h2>{`Nombre del titular: ${
+                datosConsulta.valNombreTitular ?? ""
+              } ${datosConsulta.valApellidoTitular ?? ""}`}</h2>
+              <h2>{`Número de producto: ${
+                datosConsulta.numProducto ?? ""
+              }`}</h2>
               <h2>{`Producto: ${datosTrans.nombreProducto}`}</h2>
-              <h2>{`Número producto: ${tipoAbono.tipoAbonoNombre}`}</h2>
+              <h2>{`Tipo de abono: ${tipoAbono.tipoAbonoNombre}`}</h2>
+              <h2>{`Valor de la comisión: ${formatMoney.format(
+                datosConsulta.valCobro
+              )}`}</h2>
               <h2>{`Valor a pagar: ${formatMoney.format(
                 tipoAbono.tipoAbonoId === "0001"
                   ? datosConsulta.valPagoMinimo
@@ -609,6 +676,7 @@ const PagoDeProductosPropios = () => {
                     type='submit'
                     onClick={() => {
                       hideModal();
+                      navigate(-1);
                     }}>
                     Aceptar
                   </Button>

@@ -7,7 +7,7 @@ import BarIcon from "../../components/Base/BarIcon";
 import UserInfo from "../../components/Compound/UserInfo";
 import RightArrow from "../../components/Base/RightArrow";
 import { useAuth } from "../../hooks/AuthHooks";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import HNavbar from "../../components/Base/HNavbar";
 import Modal from "../../components/Base/Modal";
 import Button from "../../components/Base/Button";
@@ -16,14 +16,15 @@ import { useWindowSize } from "../../hooks/WindowSizeHooks";
 import { Outlet } from "react-router-dom";
 import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
 import { searchCierre } from "../../pages/Gestion/utils/fetchCaja";
+import { notifyError } from "../../utils/notify";
+import ButtonBar from "../../components/Base/ButtonBar";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
   maximumFractionDigits: 0,
 });
-// image/png
-// max-age=86400,must-revalidate
+
 const AdminLayout = () => {
   const {
     adminLayout,
@@ -33,17 +34,15 @@ const AdminLayout = () => {
     saldoCupo,
     comision,
     cargar,
-    itemButtonCentered
   } = classes;
 
-  const { quotaInfo, roleInfo, signOut } = useAuth();
+  const { quotaInfo, roleInfo, signOut, userPermissions, userInfo } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useLocation();
 
   const { urlsPrivate: urls } = useUrls();
 
   const [showModal, setShowModal] = useState(false);
-  const [infoCaja, setInfoCaja] = useState(false);
   const [cajaState, setCajaState] = useState("");
 
   const saldoDisponible = useMemo(() => {
@@ -54,12 +53,16 @@ const AdminLayout = () => {
     return formatMoney.format(quotaInfo?.comision ?? 0);
   }, [quotaInfo?.comision]);
 
+  const nombreComercio = useMemo(
+    () => roleInfo?.["nombre comercio"],
+    [roleInfo]
+  );
+
   const [clientWidth] = useWindowSize();
 
-  const closeCash = async () => {
-    navigate(`/gestion/panel_transacciones`);
-    setInfoCaja(false);
-  };
+  const closeCash = useCallback(() => {
+    navigate(`/gestion/arqueo/arqueo-cierre/reporte`);
+  }, [navigate]);
 
   const {
     svgs: { backIcon2 },
@@ -78,32 +81,54 @@ const AdminLayout = () => {
   }, [backIcon2, clientWidth]);
 
   useEffect(() => {
-    if (roleInfo?.tipo_comercio === "OFICINAS PROPIAS") {
-      if (roleInfo !== undefined) {
-        const query = {
-          id_usuario: roleInfo?.id_usuario,
-          id_comercio: roleInfo?.id_comercio,
-          id_terminal: roleInfo?.id_dispositivo,
-        };
-
-        if (location.pathname === "/") {
-          searchCierre(query)
-            .then((res) => {
-              if (res?.status) {
-                if (res?.obj !== 3 && res?.obj !== 2) {
-                  setInfoCaja(true);
-                  setCajaState(res?.obj);
-                } else {
-                }
-              }
-            })
-            .catch((err) => {
-              throw err;
-            });
-        }
-      }
+    const conditions = [
+      roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO",
+      roleInfo?.id_usuario !== undefined,
+      roleInfo?.id_comercio !== undefined,
+      roleInfo?.id_dispositivo !== undefined,
+      roleInfo?.direccion !== undefined,
+      nombreComercio !== undefined,
+      userPermissions?.map(({ id_permission }) => id_permission).includes(6101),
+      false,
+    ];
+    if (conditions.every((val) => val)) {
+      searchCierre({
+        id_usuario: roleInfo?.id_usuario,
+        id_comercio: roleInfo?.id_comercio,
+        id_terminal: roleInfo?.id_dispositivo,
+        nombre_comercio: nombreComercio,
+        nombre_usuario: userInfo?.attributes?.name,
+        direccion_comercio: roleInfo?.direccion,
+      })
+        .then((res) => {
+          setCajaState(res?.obj);
+          // if (res?.obj !== 3 && res?.obj !== 2) {
+          // }
+        })
+        .catch((error) => {
+          if (error?.cause === "custom") {
+            notifyError(error?.message);
+          }
+          console.error(error?.message);
+          // notifyError("Busqueda fallida");
+        });
     }
-  }, [roleInfo, location]);
+  }, [
+    pathname,
+    roleInfo,
+    nombreComercio,
+    userPermissions,
+    userInfo?.attributes?.name,
+  ]);
+
+  const infoCaja = useMemo(() => {
+    return (
+      (cajaState === 1 &&
+        !pathname.startsWith("/gestion/arqueo/arqueo-cierre")) ||
+      cajaState === 4
+    );
+  }, [cajaState, pathname]);
 
   return (
     <div className={adminLayout}>
@@ -132,43 +157,41 @@ const AdminLayout = () => {
           </div>
         </Modal>
       </header>
-      <main className="container">
+      <main className='container'>
         <Suspense fallback={<ContentBox />}>{!infoCaja && <Outlet />}</Suspense>
-        <Modal show={infoCaja }>
+        <Modal show={infoCaja}>
           {cajaState === 1 ? (
-            <div className="items-center text-center">
+            <div className='items-center text-center'>
               <h1>
                 Señor usuario, la caja presenta cierre tardío, no se pueden
                 realizar transacciones hasta que la cierre.
-                <div className={itemButtonCentered}>
+                <ButtonBar>
                   <Button
-                    className="btn mx-auto d-block"
-                    type="button"
-                    onClick={() => closeCash()}
-                  >
+                    className='btn mx-auto d-block'
+                    type='submit'
+                    onClick={() => closeCash()}>
                     Cerrar caja
                   </Button>
-                </div>
+                </ButtonBar>
               </h1>
             </div>
           ) : cajaState === 4 ? (
-            <h1 className="text-center">
+            <h1 className='text-center'>
               Señor usuario, la caja ha sido cerrada, no se pueden realizar mas
               transacciones
-              <div className="ml-32">
+              <ButtonBar>
                 <Button
-                  type="submit"
+                  type='submit'
                   onClick={() => {
+                    navigate("/", { replace: true });
                     signOut();
-                    navigate("/login", { replace: true });
-                  }}
-                >
+                  }}>
                   Cerrar sesión
                 </Button>
-              </div>
+              </ButtonBar>
             </h1>
           ) : (
-            <></>
+            ""
           )}
         </Modal>
       </main>

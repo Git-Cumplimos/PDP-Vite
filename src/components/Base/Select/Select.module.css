@@ -11,6 +11,14 @@
   @apply text-xl;
 }
 
-.formItem > select {
-  @apply px-4 py-2 rounded-md bg-secondary-light text-black;
+.formItem > div {
+  @apply relative place-self-stretch;
+}
+
+.formItem > div > select {
+  @apply px-4 py-2 rounded-md bg-secondary-light text-black w-full;
+}
+
+.formItem > div > select + p {
+  @apply text-xs absolute text-left;
 }
