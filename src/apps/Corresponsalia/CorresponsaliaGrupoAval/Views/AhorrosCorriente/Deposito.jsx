@@ -37,7 +37,7 @@ const Deposito = () => {
     equalError: false
   });
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo } = useAuth();
 
   const [loadingDepositoCorresponsalGrupoAval, fetchDepositoCorresponsalGrupoAval] =
     useFetch(depositoCorresponsalGrupoAval);
@@ -406,7 +406,6 @@ const Deposito = () => {
     userDoc,
     fetchDepositoCorresponsalGrupoAval,
     roleInfo,
-    infoTicket,
     ,
     datosConsulta,
     DataBanco,

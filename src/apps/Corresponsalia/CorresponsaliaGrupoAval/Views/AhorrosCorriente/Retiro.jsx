@@ -37,7 +37,7 @@ import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 const Retiro = () => {
   const navigate = useNavigate();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo} = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosGrupoAval.maxRetiroCuentas,
@@ -404,14 +404,6 @@ const Retiro = () => {
             disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
           };
           setPaymentStatus(tempTicket);
-          infoTicket(trx_id, res?.obj?.tipo_trx, tempTicket) ////////////////////////////////////
-            .then((resTicket) => {
-              console.log(resTicket);
-            })
-            .catch((err) => {
-              console.error(err);
-              notifyError("Error guardando el ticket");
-            });
         }
       })
       .catch((err) => {
@@ -424,7 +416,6 @@ const Retiro = () => {
     userDoc,
     fetchRetiroCorresponsalGrupoAval,
     roleInfo,
-    infoTicket,
     ,
     datosConsulta,
     tipoDocumento,
