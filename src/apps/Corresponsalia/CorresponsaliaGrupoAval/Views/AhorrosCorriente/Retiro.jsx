@@ -37,7 +37,7 @@ import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 const Retiro = () => {
   const navigate = useNavigate();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo} = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosGrupoAval.maxRetiroCuentas,
@@ -69,6 +69,26 @@ const Retiro = () => {
   const [summary, setSummary] = useState([]);
   const [banco, setBanco] = useState("");
   const [showBTNConsulta, setShowBTNConsulta] = useState(true);
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "Recibo de Pago",
+    timeInfo: {
+      "Fecha de pago": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      ["No. Terminal", roleInfo?.id_dispositivo],
+      ["Teléfono", roleInfo?.telefono],
+      // ["Id trx", trx_id],
+      // ["Id Aut", id_auth],
+      ["Comercio", roleInfo?.["nombre comercio"]],
+      ["",""],
+      ["Dirección", roleInfo?.direccion],
+      ["",""],            
+    ],
+    commerceName: "Retiro",
+    trxInfo: [],
+    disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
+  })
 
   const otpEncrip = useMemo(() => {
     let x;
@@ -261,6 +281,40 @@ const Retiro = () => {
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
+    const objTicket = { ...objTicketActual };
+    objTicket["timeInfo"]["Fecha de pago"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"].push([
+      "Número celular",
+      phone
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Entidad financiera",
+      DataBanco?.nombre
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Tipo de cuenta",
+      tipoCuenta === "01" ? "Ahorros" : "Corriente",
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Valor",
+      formatMoney.format(valor ?? "0"),
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
     const body = {
       comercio: {
         id_comercio: roleInfo?.id_comercio,
@@ -287,6 +341,7 @@ const Retiro = () => {
           direccion: roleInfo?.direccion,
         },
       },
+      ticket: objTicket,
     };
 
     fetchRetiroCorresponsalGrupoAval(body)
@@ -349,14 +404,6 @@ const Retiro = () => {
             disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
           };
           setPaymentStatus(tempTicket);
-          infoTicket(trx_id, res?.obj?.tipo_trx, tempTicket) ////////////////////////////////////
-            .then((resTicket) => {
-              console.log(resTicket);
-            })
-            .catch((err) => {
-              console.error(err);
-              notifyError("Error guardando el ticket");
-            });
         }
       })
       .catch((err) => {
@@ -369,7 +416,6 @@ const Retiro = () => {
     userDoc,
     fetchRetiroCorresponsalGrupoAval,
     roleInfo,
-    infoTicket,
     ,
     datosConsulta,
     tipoDocumento,

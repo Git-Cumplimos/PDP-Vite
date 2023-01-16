@@ -81,7 +81,7 @@ const Deposito = () => {
       ? roleInfo?.["nombre comercio"]
       : "No hay datos",
     trxInfo: [],
-    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
+    disclamer: "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
   });
 
   const options = [

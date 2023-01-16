@@ -397,6 +397,7 @@ const Deposito = () => {
     summary,
     datosConsulta,
   ]);
+
   return (
     <>
       <SimpleLoading show={isUploading} />
