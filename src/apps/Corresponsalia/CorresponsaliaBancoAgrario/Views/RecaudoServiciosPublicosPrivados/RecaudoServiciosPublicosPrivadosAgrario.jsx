@@ -117,7 +117,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();
-    let valorTransaccion = parseInt(datosTrans?.valorVar) ?? 0;
+    let valorTransaccion = parseInt(datosTrans?.valor) ?? 0;
     const fecha = Intl.DateTimeFormat("es-CO", {
       year: "numeric",
       month: "2-digit",

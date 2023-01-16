@@ -151,7 +151,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   }, []);
   const onSubmit = (e) => {
     e.preventDefault();
-    if (datosTrans?.codBarras.slice(0, 3) === "]C1") {
+    if (datosTrans?.codBarras.includes("415")) {
       setIsUploading(true);
       fetchTablaConveniosEspecificoFunc(datosTrans?.codBarras);
     } else {
