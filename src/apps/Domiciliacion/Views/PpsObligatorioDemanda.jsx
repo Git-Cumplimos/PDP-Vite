@@ -75,7 +75,56 @@ const PpsObligatorioDemanda = ({ ced }) => {
     content: () => printDiv.current,
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
+  const tickets = useMemo(() => {
+    return {
+      title: ["COLPENSIONES Recibo de pago"],
+      // title: [["Recibo De Pago"]],
+      // "COLPENSIONES Recibo de pago"],
+      timeInfo: {
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: false,
+        }).format(new Date()),
+      },
+      // commerceName: datosComercio?.["tipoComercio"],
+      commerceInfo: [
+        ["Id Comercio", roleInfo?.id_comercio],
+        ["No. terminal", roleInfo?.id_dispositivo],
+        ["Municipio", roleInfo?.ciudad],
+        ["", ""],
+        ["Dirección", roleInfo?.direccion],
+        ["", ""],
+      ],
 
+      trxInfo: [
+        ["PISO DE PROTECCION SOCIAL - APORTE OBLIGATORIO"],
+        ["", ""],
+        ["Número de documento", datosAportante?.["numDocumento"]],
+        ["", ""],
+        ["Número de autorización: ", datosComercio?.["idTrx"]],
+        ["", ""],
+        ["N° Planilla", datosAportante?.["numPlanilla"]],
+        ["", ""],
+        ["Valor", formatMoney.format(datosAportante?.["valorAportar"])],
+        ["", ""],
+      ],
+
+      disclamer:
+        "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
+    };
+  }, [
+    roleInfo,
+    datosAportante?.["valorAportar"],
+    datosComercio?.["idTrx"],
+    datosComercio?.["tipoComercio"] /* respPinCancel, roleInfo, valor */,
+  ]);
   const enviar = (e) => {
     e.preventDefault();
 
@@ -103,6 +152,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
                 id_terminal: datosComercio?.["iddispositivo"],
                 id_usuario: datosComercio?.["idusuario"],
               },
+              ticket: tickets,
               oficina_propia: datosComercio?.["oficina_propia"],
               valor_total_trx: datosAportante?.["valorAportar"],
               nombre_comercio: datosComercio?.["nombreComercio"],
@@ -117,11 +167,12 @@ const PpsObligatorioDemanda = ({ ced }) => {
             true
           )
             .then((respuesta) => {
-              // console.log(
-              //   "RESPUESTA:",
-              //   respuesta?.obj?.datos_recibidos
-              //     ?.trazabilityFinanciialInstitutionCode
-              // );
+              console.log(
+                "RESPUESTA:",
+                respuesta?.obj?.datos_recibidos
+                  ?.trazabilityFinancialInstitutionCode
+              );
+              console.log("RESPUESTA", respuesta);
               setProcesandoTrx(false);
               setDatosComercio((old) => {
                 return {
@@ -131,7 +182,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
                       ?.trazabilityFinancialInstitutionCode,
                 };
               });
-
+              console.log("++++++idtrx", datosComercio?.idTrx);
               // console.log("DATOS RECIBIDOS:", respuesta?.obj?.datos_recibidos);
               // console.log(
               //   "idtrx:",
@@ -220,67 +271,17 @@ const PpsObligatorioDemanda = ({ ced }) => {
     }
   };
   useEffect(() => {}, [datosComercio, isPropia]);
-  const tickets = useMemo(() => {
-    return {
-      title: ["COLPENSIONES Recibo de pago"],
-      // title: [["Recibo De Pago"]],
-      // "COLPENSIONES Recibo de pago"],
-      timeInfo: {
-        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }).format(new Date()),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        }).format(new Date()),
-      },
-      // commerceName: datosComercio?.["tipoComercio"],
-      commerceInfo: [
-        ["Id Comercio", roleInfo?.id_comercio],
-        ["No. terminal", roleInfo?.id_dispositivo],
-        ["Municipio", roleInfo?.ciudad],
-        ["", ""],
-        ["Dirección", roleInfo?.direccion],
-        ["", ""],
-      ],
 
-      trxInfo: [
-        ["PISO DE PROTECCION SOCIAL - APORTE OBLIGATORIO"],
-        ["", ""],
-        ["Número de documento", datosAportante?.["numDocumento"]],
-        ["", ""],
-        ["Número de autorización: ", datosComercio?.["idTrx"]],
-        ["", ""],
-        ["N° Planilla", datosAportante?.["numPlanilla"]],
-        ["", ""],
-        ["Valor", formatMoney.format(datosAportante?.["valorAportar"])],
-        ["", ""],
-      ],
-
-      disclamer:
-        "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
-    };
-  }, [
-    roleInfo,
-    datosAportante?.["valorAportar"],
-    datosComercio?.["idTrx"],
-    datosComercio?.["tipoComercio"] /* respPinCancel, roleInfo, valor */,
-  ]);
-
-  useEffect(() => {
-    infoTicket(datosComercio?.["idTrx"], 108, tickets)
-      .then((resTicket) => {
-        // console.log("RESTICKET:", resTicket);
-      })
-      .catch((err) => {
-        // console.error(err);
-        notifyError("Error guardando el ticket");
-      });
-  }, [infoTicket, tickets]);
+  // useEffect(() => {
+  //   infoTicket(datosComercio?.["idTrx"], 108, tickets)
+  //     .then((resTicket) => {
+  //       // console.log("RESTICKET:", resTicket);
+  //     })
+  //     .catch((err) => {
+  //       // console.error(err);
+  //       notifyError("Error guardando el ticket");
+  //     });
+  // }, [infoTicket, tickets]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
