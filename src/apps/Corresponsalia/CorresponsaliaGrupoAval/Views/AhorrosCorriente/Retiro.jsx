@@ -495,7 +495,7 @@ const Retiro = () => {
             label="Número OTP"
             type="text"
             name="otp"
-            minLength={"6"}
+            minLength={"3"}
             maxLength={"6"}
             autoComplete="off"
             value={otp}
