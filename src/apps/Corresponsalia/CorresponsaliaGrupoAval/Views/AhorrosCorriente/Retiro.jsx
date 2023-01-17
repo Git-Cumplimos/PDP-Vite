@@ -249,7 +249,7 @@ const Retiro = () => {
   const onSubmitModal = useCallback(
     (e) => {
       e.preventDefault();
-      if (otp.length === 6) {
+      if (otp.length <= 6 && otp.length>=3) {
         const { min, max } = limitesMontos;
         if (valor >= min && valor <= max) {
           const summary = {
