@@ -84,6 +84,7 @@ const TramitePines = () => {
   const closeModalReenvio = useCallback(async () => {
     setShowModalReenvio(false);
     setDoc_cliente("")
+    setUrlAutogestion("")
     
   }, []);
 
