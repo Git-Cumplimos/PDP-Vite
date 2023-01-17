@@ -144,7 +144,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   }, []);
   const onSubmit = (e) => {
     e.preventDefault();
-    if (datosTrans?.codBarras.slice(0, 3) === "]C1") {
+    if (datosTrans?.codBarras.includes("415")) {
       setIsUploading(true);
       fetchTablaConveniosEspecificoFunc(datosTrans?.codBarras);
     } else {
@@ -237,57 +237,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   const onSubmitConfirm = (e) => {
     e.preventDefault();
     setIsUploading(true);
-    // postConsultaConveniosAval({
-    //   oficina_propia:
-    //     roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-    //     roleInfo?.tipo_comercio === "KIOSCO"
-    //       ? true
-    //       : false,
-    //   valor_total_trx: datosTransaccion.valorSinModificar ?? 0,
-    //   nombre_comercio: roleInfo?.["nombre comercio"],
-    //   comercio: {
-    //     id_comercio: roleInfo?.id_comercio,
-    //     id_usuario: roleInfo?.id_usuario,
-    //     id_terminal: roleInfo?.id_dispositivo,
-    //   },
-    //   recaudoAval: {
-    //     numeroConvenio: datosEnvio?.datosConvenio?.nura,
-    //     valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
-    //     codigoBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
-    //     location: {
-    //       address: roleInfo?.["direccion"],
-    //       dane_code: roleInfo?.codigo_dane,
-    //       city: roleInfo?.["ciudad"],
-    //     },
-    //   },
-    // })
-    //   .then((res) => {
-    //     if (res?.status) {
-    //       setIsUploading(false);
-    //       notify(res?.msg);
-    //       setDatosConsulta(res?.obj);
-    //       let valorTrxCons = res?.obj?.valorTrx ?? 0;
-    //       setDatosTransaccion((old) => {
-    //         return {
-    //           ...old,
-    //           showValor2: formatMoney.format(valorTrxCons) ?? "",
-    //           valor: valorTrxCons ?? "",
-    //           valorSinModificar2: valorTrxCons ?? "",
-    //         };
-    //       });
-    //       setPeticion(2);
-    //       habilitarModal();
-    //     } else {
-    //       setIsUploading(false);
-    //       notifyError(res?.msg);
-    //       hideModal();
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     setIsUploading(false);
-    //     notifyError("No se ha podido conectar al servidor");
-    //     console.error(err);
-    //   });
   };
   const onSubmitPago = (e) => {
     e.preventDefault();

@@ -18,13 +18,14 @@
 }
 
 .titulo {
-    font-family: 'Avenir';
+    /* font-family: 'Avenir'; */
     font-style: normal;
-    font-weight: 800;
-    font-size: 25px;
+    font-weight: 400;
+    font-size: 20px;
     line-height: 30px;
     letter-spacing: 0.5px;
     color: #E06838;
+    margin-bottom: 30px;
 }
 
 .contenedorInput {
@@ -34,9 +35,9 @@
 }
 
 .nombreInput {
-    font-family: 'Avenir';
+    /*     font-family: 'Avenir'; */
     font-style: normal;
-    font-weight: 800;
+    font-weight: 200;
     font-size: 14px;
     line-height: 18px;
     color: #2C2C2C;
@@ -73,13 +74,17 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 12px 15px;
+    padding: 17px 15px;
     gap: 20px;
     border: 1px solid #E4E2DA;
     border-radius: 5px;
+    background: white;
 }
 
+.fileInput {
+    background: white;
 
+}
 
 .contenedorBtns {
     display: flex;
@@ -90,20 +95,37 @@
     gap: 7px;
 }
 
+.divsuperior {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 32px;
+    background: white;
+}
+
+.divinferior {
+    position: relative;
+    width: 100%;
+    height: 16px;
+    background: white;
+}
+
 .contenedorLabel {
     cursor: pointer;
     border-radius: 9999px;
     --tw-bg-opacity: 1;
-    background-color: white;
+    background: white;
     display: flex;
     justify-content: flex-end;
     width: 100%;
+    height: 16px;
 }
 
 .contenedorLabelbasura {
     cursor: pointer;
     border-radius: 9999px;
-    --tw-bg-opacity: 0;
+    --tw-bg-opacity: 1;
     background-color: white;
     display: flex;
     justify-content: flex-end;
@@ -124,8 +146,10 @@
     align-items: center;
     padding: 12px 15px;
     gap: 20px;
+    color: #E06838;
     border: 1px solid #E4E2DA;
     border-radius: 5px;
+    font-size: small;
 }
 
 .contenedorArchivosBasura:hover img {
@@ -146,16 +170,20 @@
     align-items: center;
     padding: 10px 20px;
     gap: 10px;
-    font-family: 'Avenir';
+    /* font-family: 'Avenir'; */
     font-style: normal;
-    font-weight: 800;
+    font-weight: 200;
     font-size: 16px;
     line-height: 20px;
     letter-spacing: -0.01em;
     color: #FFFFFF;
     border: 0;
     cursor: pointer;
-    background: linear-gradient(89.3deg, #E06838 -8.74%, #F0B844 134.85%);
+    /* background: linear-gradient(89.3deg, #E06838 -8.74%, #F0B844 134.85%); */
+    --tw-bg-opacity: 1;
+    background-color: rgba(226, 106, 34, var(--tw-bg-opacity));
+    --tw-text-opacity: 1;
+    color: rgba(255, 255, 255, var(--tw-text-opacity));
     border-radius: 30px;
     order: 0;
 }
@@ -188,26 +216,30 @@
     }
 
     .contenedorForm {
-        display: grid;
-        column-gap: 50px;
-        grid-template-columns: auto auto;
-        width: 80%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /*    display: grid; */
+        /*   column-gap: 50px; */
+        /* grid-template-columns: auto auto; */
+        width: 450px;
     }
 
     .titulo {
-        font-family: 'Avenir';
+        /*     font-family: 'Avenir'; */
         font-style: normal;
-        font-weight: 800;
-        font-size: 35px;
-        line-height: 36px;
+        font-weight: 400;
+        font-size: 25px;
+        /* line-height: 36px; */
         text-align: center;
         color: #E06838;
+        margin-bottom: 50px;
     }
 
     .nombreInput {
-        font-family: 'Avenir';
+        /*         font-family: 'Avenir'; */
         font-style: normal;
-        font-weight: 800;
+        font-weight: 200;
         font-size: 16px;
         line-height: 20px;
         color: #2C2C2C;
@@ -226,7 +258,7 @@
     }
 
     .styleInput {
-        font-family: 'Avenir';
+        /*     font-family: 'Avenir'; */
         font-style: normal;
         font-weight: 300;
         font-size: 14px;
@@ -235,8 +267,9 @@
     }
 
     .contenedorBtns {
-        justify-content: flex-end;
+        justify-content: flex-start;
     }
+
 
     .btnCancelar {
         display: none;

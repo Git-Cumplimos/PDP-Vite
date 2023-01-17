@@ -343,7 +343,6 @@ const CrearComercios = () => {
       delete dataOrg["fecha_actualizacion"];
       delete dataOrg["fecha_registro"];
       delete dataOrg["nombre_grupo_comercios"];
-      delete dataOrg["pk_tbl_grupo_comercios"];
       if (!dataOrg.fk_comercio_padre) delete dataOrg["fk_comercio_padre"];
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
       if (!dataOrg.credito_comercio) delete dataOrg["credito_comercio"];
@@ -354,6 +353,7 @@ const CrearComercios = () => {
         //   }
         // });
         delete dataOrg["pk_comercio"];
+        delete dataOrg["pk_tbl_grupo_comercios"];
         putModificarComercio(state?.id, {
           ...dataOrg,
         })
@@ -372,6 +372,13 @@ const CrearComercios = () => {
             console.error(err);
           });
       } else {
+        if (dataOrg.pk_tbl_grupo_comercios) {
+          dataOrg.fk_tbl_grupo_comercios = dataOrg.pk_tbl_grupo_comercios;
+          delete dataOrg["pk_tbl_grupo_comercios"];
+        } else {
+          setIsUploading(false);
+          return notifyError("Escoja el grupo del comercio");
+        }
         postCrearComercio({
           ...dataOrg,
         })
@@ -391,7 +398,7 @@ const CrearComercios = () => {
           });
       }
     },
-    [comercio, handleClose, state, navigate]
+    [comercio, state, navigate]
   );
 
   return (

@@ -1,11 +1,4 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../../components/Base/Button";
@@ -17,11 +10,11 @@ import MoneyInput, {
   formatMoney,
 } from "../../../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
-import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { checkLuhn } from "../../../../../utils/validationUtils";
+import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario";
 import { enumParametrosBancoAgrario } from "../../utils/enumParametrosBancoAgrario";
 import {
   postConsultaTablaConveniosEspecifico,
@@ -117,7 +110,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();
-    let valorTransaccion = parseInt(datosTrans?.valorVar) ?? 0;
+    let valorTransaccion = parseInt(datosTrans?.valor) ?? 0;
     const fecha = Intl.DateTimeFormat("es-CO", {
       year: "numeric",
       month: "2-digit",
@@ -132,7 +125,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push(["Convenio", convenio.convenio]);
+    objTicket["trxInfo"].push(["Convenio", convenio.nombre_convenio]);
     objTicket["trxInfo"].push(["", ""]);
     // objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
     // objTicket["trxInfo"].push(["", ""]);
@@ -201,7 +194,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
           objTicket["commerceInfo"].push(["", ""]);
 
           setObjTicketActual(objTicket);
-          setShowModal((old) => ({ ...old, estadoPeticion: 4 }));
+          setShowModal((old) => ({ ...old, estadoPeticion: 1 }));
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
@@ -435,7 +428,9 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                   </Button>
                 </ButtonBar>
               </h2>
-              <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
+              <TicketsAgrario
+                ticket={objTicketActual}
+                refPrint={printDiv}></TicketsAgrario>
             </>
           ) : (
             <></>
