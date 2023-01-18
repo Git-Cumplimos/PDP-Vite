@@ -57,7 +57,7 @@ const Borrado_billetes = ({ route }) => {
   const sorteos = useCallback(async (sorteosLOT) => {
     try {
       const res = await fetchData(url_sorteos, "GET", {
-        codigos_loteria: sorteosLOT,
+        idloteria: sorteosLOT,
       });
       console.log(res);
       return res;
@@ -202,8 +202,7 @@ const Borrado_billetes = ({ route }) => {
                   type="button"
                   onClick={() => {
                     closeModal(false);
-                  }}
-                >
+                  }}>
                   Cancelar
                 </Button>
               </ButtonBar>

@@ -12,7 +12,9 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 
 const SendFormFisico = ({
   selected,
-  canFrac,
+  numbillete,
+  sorteo,
+  serie,
   customer: {
     doc_id,
     primer_nombre,
@@ -27,21 +29,26 @@ const SendFormFisico = ({
   closeModal,
   handleSubmit,
 }) => {
+  console.log("ESTO ES SELECTED****", selected);
+  console.log("numbillete****", numbillete);
   const details = {
-    "Billete:": selected ? selected["Ganadorboleto"] : "",
-    "Serie:": selected ? selected["serie:"] : "",
-    "Valor ganado:": selected
-      ? formatMoney.format(selected["valor bruto"])
-      : "",
-    "Retención 17%:": selected
-      ? formatMoney.format(selected["valor 17percent"])
-      : "",
-    "Retención 20%:": selected
-      ? formatMoney.format(selected["valor 20percent"])
-      : "",
-    "Valor a pagar:": selected
-      ? formatMoney.format(selected["valor ganado"])
-      : "",
+    // "sorteo:": sorteo,
+    // "Número:": numbillete,
+    // "serie:": serie,
+    // "Billete:": selected ? selected["Ganadorboleto"] : "",
+    // "Serie:": selected ? selected["serie:"] : "",
+    // "Valor ganado:": selected
+    //   ? formatMoney.format(selected["valor bruto"])
+    //   : "",
+    // "Retención 17%:": selected
+    //   ? formatMoney.format(selected["valor 17percent"])
+    //   : "",
+    // "Retención 20%:": selected
+    //   ? formatMoney.format(selected["valor 20percent"])
+    //   : "",
+    // "Valor a pagar:": selected
+    //   ? formatMoney.format(selected["valor ganado"])
+    //   : "",
   };
   // const [frac1, setFrac1] = useState(false);
   // const [frac2, setFrac2] = useState(false);
@@ -67,8 +74,7 @@ const SendFormFisico = ({
           return (
             <div
               className="flex flex-row justify-between text-lg font-medium"
-              key={key}
-            >
+              key={key}>
               <h1>{key}</h1>
               <h1>{val}</h1>
             </div>
@@ -260,8 +266,7 @@ const SendFormFisico = ({
                   telefono: "",
                   fracciones: "",
                 });
-              }}
-            >
+              }}>
               Cancelar
             </Button>
           </ButtonBar>

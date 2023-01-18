@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useLoteria } from "../utils/LoteriaHooks";
-
+// import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import Input from "../../../components/Base/Input";
@@ -13,6 +13,8 @@ import PagarFormFisico from "../components/SendForm/PagarFormFisico";
 import PagoResp from "../components/SellResp/PagoResp";
 
 import SubPage from "../../../components/Base/SubPage/SubPage";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
@@ -23,14 +25,25 @@ const Premios = ({ route }) => {
   const {
     infoLoto: { pagoresponse, setPagoresponse },
   } = useLoteria();
-
+  const [respuesta, setRespuesta] = useState(false);
   const [sorteo, setSorteo] = useState("");
   const [billete, setBillete] = useState("");
   const [serie, setSerie] = useState("");
+  const [total, setTotal] = useState("");
+  const [valNetoFraccion, setValNetoFraccion] = useState("");
   const [phone, setPhone] = useState("");
   const [hash, setHash] = useState("");
 
-  const [respagar, setRespagar] = useState("");
+  const [respagar, setRespagar] = useState([]);
+  // const [respagar, setRespagar] = useState([
+  //   {
+  //     "Premio Mayor1": ["Hola", "Premio Mayor2"],
+  //     "sorteo ": ["Estas", "todo"],
+  //     "numero ": ["Que hay", "Sacan"],
+  //     "serie ": ["De tu vida", "maleta"],
+  //     "neto ": ["que tal todo", "espacio"],
+  //   },
+  // ]);
   const [tipopago, setTipopago] = useState("");
   const [fracciones_fisi, setFracciones_fisi] = useState("");
 
@@ -38,6 +51,8 @@ const Premios = ({ route }) => {
   const [isSelf, setIsSelf] = useState(false);
   ///////////////////////////////////////////////////////
   const [showModal, setShowModal] = useState(false);
+  const [showTable, setShowTable] = useState(true);
+  // const [showTable, setShowTable] = useState(true);
   const [customer, setCustomer] = useState({
     doc_id: "",
     primer_nombre: "",
@@ -50,7 +65,7 @@ const Premios = ({ route }) => {
   });
 
   const closeModal = useCallback(() => {
-    setShowModal(false);
+    // setShowModal(false);
     setWinner("");
     setPhone("");
     setHash("");
@@ -100,19 +115,86 @@ const Premios = ({ route }) => {
   };
 
   const onSubmit = (e) => {
+    setShowTable(false);
     setDisabledBtns(true);
-
+    setRespuesta(true);
     e.preventDefault();
     isWinner(sorteo, billete, serie)
       .then((res) => {
+        console.log("RESPUESTA fecth**************", res);
+        setRespuesta(false);
         fracbill.length = 0;
-        console.log(res, "res");
+        console.log("res********", res);
+        console.log("HOLA", res?.msg);
+
+        // setValNetoFraccion(res?.obj?.ganador);
+        // setTotal(res?.obj?.total);
         setDisabledBtns(false);
 
         if ("msg" in res) {
-          notifyError(res.msg);
-          setWinner(false);
-          setIsSelf(false);
+          if (res?.obj?.ganador && res?.obj?.gana.length > 1) {
+            console.log("Se metio en el primer if");
+            notify(res?.obj?.gana[0]);
+            notify(res?.obj?.gana[1]);
+            console.log("respagar##################", respagar);
+            // setShowModal(true);
+            setWinner(true);
+            setIsSelf(true);
+            // setRespagar([
+            //   {
+            //     "Premio Mayor1": [
+            //       {
+            //         "Premio Mayor1": res?.obj?.gana[0],
+            //         "Premio Mayor2": res?.obj?.gana[1],
+            //       },
+            //     ],
+            //     "sorteo ": [{ "sorteo ": sorteo, "sorteo ": sorteo }],
+            //     "numero ": [{ numero: billete, numero: billete }],
+            //     "serie ": [{ "serie ": serie, "serie ": serie }],
+            //     "neto ": [{ "neto ": 15000, "neto ": 10000 }],
+            //   },
+            // ]);
+            res = [
+              {
+                "Premio Mayor1": "Premio Mayor",
+                "neto ": 15000,
+              },
+              {
+                "Premio Mayor2": "Secos",
+                "neto ": 25000,
+              },
+            ];
+            for (let i = 0; i < res.length; i++) {
+              res[i].sorteo = sorteo;
+              res[i].billete = billete;
+              res[i].serie = serie;
+            }
+            setRespagar(res);
+            console.log("ESTO ES RESPAGAR", respagar);
+            setShowTable(true);
+          } else if (res?.obj?.ganador) {
+            console.log("Se metio en el segundo if");
+            // setShowModal(true);
+            notify(res?.obj?.gana[0]);
+            setWinner(true);
+            setIsSelf(true);
+            res = [
+              {
+                "Premio Mayor1": "Premio Mayor2",
+                "sorteo ": sorteo,
+                "numero ": billete,
+                "serie ": serie,
+                "neto ": 15000,
+              },
+            ];
+            setRespagar(res);
+            console.log("ESTO ES RESPAGAR", respagar);
+          } else if (res?.obj?.ganador == false && "msg" in res) {
+            console.log("Se metio en el tercer if");
+            notifyError(res?.obj?.gana);
+            setWinner(false);
+            setIsSelf(false);
+          }
         }
         if (res[0]["Estado"] === false) {
           notifyError("No ganador");
@@ -148,7 +230,7 @@ const Premios = ({ route }) => {
 
     makePayment(sorteo, billete, serie, phone, hash)
       .then((res) => {
-        setShowModal(true);
+        // setShowModal(true);
         setDisabledBtns(false);
         setRespagar(res);
 
@@ -167,14 +249,13 @@ const Premios = ({ route }) => {
 
       .catch(() => setDisabledBtns(false));
   };
-
   const onPay2 = (e) => {
     setDisabledBtns(true);
     e.preventDefault();
 
     makePayment2(sorteo, billete, serie, selecFrac)
       .then((res) => {
-        setShowModal(true);
+        // setShowModal(true);
         setDisabledBtns(false);
         setRespagar(res);
         console.log(res);
@@ -272,7 +353,22 @@ const Premios = ({ route }) => {
             Consultar
           </Button>
         </ButtonBar>
+        <SimpleLoading show={respuesta} />
       </Form>
+      {showTable ? (
+        <TableEnterprise
+          title="Premios a pagar"
+          headers={[
+            "Acierto",
+            "Sorteo",
+            "Numero",
+            "Serie",
+            "Premio Neto x Fraccion",
+          ]}
+          data={respagar}></TableEnterprise>
+      ) : (
+        ""
+      )}
       {winner ? (
         <>
           {tipopago === 2 ? (
@@ -352,8 +448,7 @@ const Premios = ({ route }) => {
           <Modal
             show={showModal}
             num_tele={phone}
-            handleClose={() => closeModal()}
-          >
+            handleClose={() => closeModal()}>
             {pagoresponse === null || "msg" in pagoresponse ? (
               <>
                 {tipopago === 2 ? (
@@ -384,6 +479,9 @@ const Premios = ({ route }) => {
                   <PagarFormFisico
                     selected={respagar}
                     canFrac={fracciones_fisi}
+                    numbillete={billete}
+                    sorteo={sorteo}
+                    serie={serie}
                     customer={customer}
                     setCustomer={setCustomer}
                     closeModal={closeModal}
@@ -415,6 +513,22 @@ const Premios = ({ route }) => {
                 setCustomer={setCustomer}
               />
             )}
+
+            {/* {showTable ? (
+              <TableEnterprise
+                title="Premios a pagar"
+                headers={[
+                  "Acierto",
+                  "Sorteo",
+                  "Numero",
+                  "Serie",
+                  "Premio Neto x Billete",
+                  "Premio Neto x Fraccion",
+                ]}
+                data={respagar}></TableEnterprise>
+            ) : (
+              ""
+            )} */}
           </Modal>
         </>
       ) : (
