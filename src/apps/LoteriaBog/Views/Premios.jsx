@@ -123,6 +123,7 @@ const Premios = ({ route }) => {
         setRespuesta(false);
         fracbill.length = 0;
         setDisabledBtns(false);
+        var totalPagar = res?.obj?.total;
         if ("msg" in res) {
           if (res?.obj?.ganador) {
             var gana = res?.obj?.gana;
@@ -131,12 +132,12 @@ const Premios = ({ route }) => {
             for (let i = 0; i < gana.length; i++) {
               res.push([gana[i], sorteo, billete, serie, ValNetoFraccion[i]]);
             }
+            res.push(["TOTAL A PAGAR:", "", "", "", totalPagar]);
             setWinner(true);
             setIsSelf(true);
             setRespagar(res);
             setShowTable(true);
           } else if (res?.obj?.ganador == false && "msg" in res) {
-            console.log("Se metio en el tercer if");
             notifyError(res?.obj?.gana);
             setWinner(false);
             setIsSelf(false);
@@ -204,7 +205,6 @@ const Premios = ({ route }) => {
         // setShowModal(true);
         setDisabledBtns(false);
         setRespagar(res);
-        console.log(res);
 
         if ("msg" in res) {
           notifyError(res.msg);
@@ -305,7 +305,7 @@ const Premios = ({ route }) => {
         <TableEnterprise
           title="Premios a pagar"
           headers={[
-            "Acierto",
+            "Descripción Premio",
             "Sorteo",
             "Numero",
             "Serie",
