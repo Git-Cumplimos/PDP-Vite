@@ -51,8 +51,7 @@ const Premios = ({ route }) => {
   const [isSelf, setIsSelf] = useState(false);
   ///////////////////////////////////////////////////////
   const [showModal, setShowModal] = useState(false);
-  const [showTable, setShowTable] = useState(true);
-  // const [showTable, setShowTable] = useState(true);
+  const [showTable, setShowTable] = useState(false);
   const [customer, setCustomer] = useState({
     doc_id: "",
     primer_nombre: "",
@@ -121,74 +120,21 @@ const Premios = ({ route }) => {
     e.preventDefault();
     isWinner(sorteo, billete, serie)
       .then((res) => {
-        console.log("RESPUESTA fecth**************", res);
         setRespuesta(false);
         fracbill.length = 0;
-        console.log("res********", res);
-        console.log("HOLA", res?.msg);
-
-        // setValNetoFraccion(res?.obj?.ganador);
-        // setTotal(res?.obj?.total);
         setDisabledBtns(false);
-
         if ("msg" in res) {
-          if (res?.obj?.ganador && res?.obj?.gana.length > 1) {
-            console.log("Se metio en el primer if");
-            notify(res?.obj?.gana[0]);
-            notify(res?.obj?.gana[1]);
-            console.log("respagar##################", respagar);
-            // setShowModal(true);
-            setWinner(true);
-            setIsSelf(true);
-            // setRespagar([
-            //   {
-            //     "Premio Mayor1": [
-            //       {
-            //         "Premio Mayor1": res?.obj?.gana[0],
-            //         "Premio Mayor2": res?.obj?.gana[1],
-            //       },
-            //     ],
-            //     "sorteo ": [{ "sorteo ": sorteo, "sorteo ": sorteo }],
-            //     "numero ": [{ numero: billete, numero: billete }],
-            //     "serie ": [{ "serie ": serie, "serie ": serie }],
-            //     "neto ": [{ "neto ": 15000, "neto ": 10000 }],
-            //   },
-            // ]);
-            res = [
-              {
-                "Premio Mayor1": "Premio Mayor",
-                "neto ": 15000,
-              },
-              {
-                "Premio Mayor2": "Secos",
-                "neto ": 25000,
-              },
-            ];
-            for (let i = 0; i < res.length; i++) {
-              res[i].sorteo = sorteo;
-              res[i].billete = billete;
-              res[i].serie = serie;
+          if (res?.obj?.ganador) {
+            var gana = res?.obj?.gana;
+            var ValNetoFraccion = res?.obj?.ValNetoFraccion;
+            res = [];
+            for (let i = 0; i < gana.length; i++) {
+              res.push([gana[i], sorteo, billete, serie, ValNetoFraccion[i]]);
             }
-            setRespagar(res);
-            console.log("ESTO ES RESPAGAR", respagar);
-            setShowTable(true);
-          } else if (res?.obj?.ganador) {
-            console.log("Se metio en el segundo if");
-            // setShowModal(true);
-            notify(res?.obj?.gana[0]);
             setWinner(true);
             setIsSelf(true);
-            res = [
-              {
-                "Premio Mayor1": "Premio Mayor2",
-                "sorteo ": sorteo,
-                "numero ": billete,
-                "serie ": serie,
-                "neto ": 15000,
-              },
-            ];
             setRespagar(res);
-            console.log("ESTO ES RESPAGAR", respagar);
+            setShowTable(true);
           } else if (res?.obj?.ganador == false && "msg" in res) {
             console.log("Se metio en el tercer if");
             notifyError(res?.obj?.gana);
