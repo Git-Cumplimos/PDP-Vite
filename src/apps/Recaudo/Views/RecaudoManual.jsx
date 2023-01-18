@@ -3,7 +3,9 @@ import useQuery from "../../../hooks/useQuery";
 import fetchData from "../../../utils/fetchData";
 import FlujoRecaudo from "../components/FlujoRecaudo/FlujoRecaudo";
 
-const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
+// const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
+const urlConvenios =
+  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 const RecaudoManual = () => {
   const [{ id_convenio }] = useQuery();
@@ -36,29 +38,29 @@ const RecaudoManual = () => {
     ];
   }, [dataConvenio]);
 
-  useEffect(
-    () => {
-      
-      fetchData(`${urlConvenios}/convenio_unique`, "GET", {
-        id_convenio,
+  useEffect(() => {
+    fetchData(`${urlConvenios}/convenios-pdp/unique`, "GET", {
+      pk_id_convenio: id_convenio,
+    })
+      .then((res) => {
+        if (res?.status) {
+          setDataConvenio(res?.obj);
+        } else {
+          setDataConvenio(null);
+          console.error(res?.msg);
+        }
       })
-        .then((res) => {
-          if (res?.status) {
-            setDataConvenio(res?.obj?.results?.[0]);
-          } else {
-            setDataConvenio(null);
-            console.error(res?.msg);
-          }
-        })
-        .catch(() => {});
-    },
-    [id_convenio]
-  );
+      .catch(() => {});
+  }, [id_convenio]);
+
+  console.log(dataConvenio);
 
   return (
     <Fragment>
       {dataConvenio && "nombre_convenio" in dataConvenio ? (
-        <h1 className="text-3xl mt-6">Recaudo {dataConvenio?.nombre_convenio}</h1>
+        <h1 className="text-3xl mt-6">
+          Recaudo {dataConvenio?.nombre_convenio}
+        </h1>
       ) : (
         ""
       )}

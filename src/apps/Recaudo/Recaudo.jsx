@@ -7,7 +7,11 @@ import ButtonLink from "../../components/Base/ButtonLink/ButtonLink";
 import InputSuggestions from "../../components/Base/InputSuggestions";
 import fetchData from "../../utils/fetchData";
 
-const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
+// const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
+const urlConvenios =
+  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+
+const urlBroker = "http://localhost:8000/api";
 
 const initialItems = [
   {
@@ -34,23 +38,59 @@ const Recaudo = () => {
 
   const [foundConv, setFoundConv] = useState([]);
 
-  const mapSuggestions = useMemo(() => {
-    return foundConv.map(({ id_convenio, nombre_convenio }) => {
-      return (
-        <Link to={`/recaudo/manual?id_convenio=${id_convenio}`}>
+  const mapSuggestions = useMemo(
+    () =>
+      foundConv.map(({ pk_id_convenio, nombre_convenio }) => (
+        <div
+          onClick={() => {
+            fetchData(
+              `${urlBroker}/recaudo/consulta-autorizadores`,
+              "POST",
+              {},
+              {
+                comercio: {
+                  id_comercio: 59,
+                  id_usuario: 8202,
+                  id_terminal: 133,
+                  nombre_comercio: "PDP COTA",
+                },
+                ubicacion: {
+                  address: "CL 12 # 4 - 29",
+                  dane_code: "25214",
+                  city: "Cota",
+                  country: "CO",
+                },
+                info_transaccion: {
+                  convenio: pk_id_convenio,
+                  valor_transaccion: 20000,
+                },
+              }
+            )
+              .then((res) => {
+                if (res?.status) {
+                  console.log(res?.obj);
+                } else {
+                  console.error(res?.msg);
+                }
+              })
+              .catch(() => {});
+          }}
+        >
           <div className="grid grid-cols-1 place-items-center px-4 py-2">
             <h1 className="text-lg">{nombre_convenio}</h1>
           </div>
-        </Link>
-      );
-    });
-  }, [foundConv]);
+        </div>
+        // <Link to={`/recaudo/manual?id_convenio=${pk_id_convenio}`}>
+        // </Link>
+      )),
+    [foundConv]
+  );
 
   const searchConvenios = useCallback((e) => {
     const _nameConvenio = e.target.value;
     if (_nameConvenio.length > 2) {
       // setFoundConv(initialFounds);
-      fetchData(`${urlConvenios}/convenio_many`, "GET", {
+      fetchData(`${urlConvenios}/convenios-pdp/administrar`, "GET", {
         tags: _nameConvenio,
         limit: 5,
       })
@@ -82,9 +122,9 @@ const Recaudo = () => {
 
   return (
     <Fragment>
-      <ButtonBar>
+      {/* <ButtonBar>
         <ButtonLink to="/recaudo/codigo">Leer codigo de barras</ButtonLink>
-      </ButtonBar>
+      </ButtonBar> */}
       {/* <HNavbar links={mostUsed} isIcon /> */}
       <InputSuggestions
         id={"searchConv"}
