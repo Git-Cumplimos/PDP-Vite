@@ -61,9 +61,8 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     commerceName: "Recaudo de facturas",
     trxInfo: [],
     disclamer:
-      "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación, verifique la información. Este es el unico recibo oficial de pago. Requerimientos 018000 514652.",
+      "En caso de reclamo o inquietud favor comunicarse en Bogota al Tel 594-8500 o gratis en el resto del pais al 01800-915000 o la pagina web http://www.bancoagrario.gov.co",
   });
-  const [datosConsulta, setDatosConsulta] = useState({});
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
   useEffect(() => {
@@ -246,7 +245,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         trxInfo: [],
       };
     });
-    setDatosConsulta({});
   }, []);
   const onChangeFormat = useCallback(
     (ev) => {
@@ -397,7 +395,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                 )}
               {convenio?.nombre_ref3 !== "" &&
                 !convenio?.nombre_ref3?.match(/-/g) && (
-                  <h2>{`Referencia 1: ${datosTrans.ref3}`}</h2>
+                  <h2>{`Referencia 3: ${datosTrans.ref3}`}</h2>
                 )}
               <h2 className='text-base'>
                 {`Valor a pagar: ${formatMoney.format(
@@ -428,9 +426,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                   </Button>
                 </ButtonBar>
               </h2>
-              <TicketsAgrario
-                ticket={objTicketActual}
-                refPrint={printDiv}></TicketsAgrario>
+              <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
             </>
           ) : (
             <></>
