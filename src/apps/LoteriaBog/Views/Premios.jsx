@@ -15,6 +15,7 @@ import PagoResp from "../components/SellResp/PagoResp";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
+import Fieldset from "../../../components/Base/Fieldset";
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
@@ -49,9 +50,15 @@ const Premios = ({ route }) => {
 
   const [winner, setWinner] = useState(false);
   const [isSelf, setIsSelf] = useState(false);
+
   ///////////////////////////////////////////////////////
   const [showModal, setShowModal] = useState(false);
   const [showTable, setShowTable] = useState(false);
+  const [checkBilleteVirtual, setCheckBilleteVirtual] = useState(false);
+  const [checkBilleteFisico, setCheckBilleteFisico] = useState(false);
+  const [checkDisableVirtual, setCheckDisableVirtual] = useState(false);
+  const [checkDisableFisico, setCheckDisableFisico] = useState(false);
+
   const [customer, setCustomer] = useState({
     doc_id: "",
     primer_nombre: "",
@@ -302,16 +309,56 @@ const Premios = ({ route }) => {
         <SimpleLoading show={respuesta} />
       </Form>
       {showTable ? (
-        <TableEnterprise
-          title="Premios a pagar"
-          headers={[
-            "Descripción Premio",
-            "Sorteo",
-            "Numero",
-            "Serie",
-            "Premio Neto x Fraccion",
-          ]}
-          data={respagar}></TableEnterprise>
+        <>
+          <TableEnterprise
+            title="Premios a pagar"
+            headers={[
+              "Descripción Premio",
+              "Sorteo",
+              "Numero",
+              "Serie",
+              "Premio Neto x Fraccion",
+            ]}
+            data={respagar}></TableEnterprise>
+          <Fieldset legend={"Seleccione un tipo de billete"}>
+            <Form>
+              <Input
+                type="checkbox"
+                label="Billete Físico"
+                required
+                value={checkBilleteFisico}
+                disabled={checkDisableFisico}
+                onChange={() => {
+                  setCheckBilleteFisico(!checkBilleteFisico);
+                  if (checkBilleteFisico == true) {
+                    setCheckDisableVirtual(false);
+                  } else {
+                    setCheckDisableVirtual(true);
+                  }
+                }}></Input>
+
+              <Input
+                label="Billete Virtual"
+                type="checkbox"
+                required
+                disabled={checkDisableVirtual}
+                value={checkBilleteVirtual}
+                onChange={() => {
+                  setCheckBilleteVirtual(!checkBilleteVirtual);
+                  if (checkBilleteVirtual == true) {
+                    setCheckDisableFisico(false);
+                  } else {
+                    setCheckDisableFisico(true);
+                  }
+                }}></Input>
+              {checkBilleteVirtual == true || checkBilleteFisico == true ? (
+                <Button type="submit">Pagar</Button>
+              ) : (
+                ""
+              )}
+            </Form>
+          </Fieldset>
+        </>
       ) : (
         ""
       )}
