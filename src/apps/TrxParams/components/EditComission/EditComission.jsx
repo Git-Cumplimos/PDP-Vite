@@ -9,25 +9,14 @@ import Button from "../../../../components/Base/Button";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import {
-  fetchComisionesPagar,
-  putComisionesPagar,
-} from "../../utils/fetchComisionesPagar";
-import {
-  fetchComisionesCobrar,
-  putComisionesCobrada,
-} from "../../utils/fetchComisionesCobrar";
-import {
-  getComisionesPlanes,
   getComisionesPlanesUnique,
   putComisionesPlanes,
 } from "../../utils/fetchComisionesPlanes";
 import {
-  getComisionesPlanesCampanas,
   getComisionesPlanesCampanaUnique,
   postComisionesPlanCampanas,
   putComisionesPlanesCampanas,
 } from "../../utils/fetchComisionesPlanesCampanas";
-import ActiveSelect from "../../../../components/Base/ActiveSelect";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Select from "../../../../components/Base/Select";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
@@ -48,8 +37,15 @@ const EditComission = () => {
   const [editedComission, setEditedComission] = useState({
     nombre_plan_comision: "",
     tipo_comision: "",
-    type: "",
-    ranges: [],
+    type: "trx",
+    ranges: [
+      {
+        "Rango minimo": 0,
+        "Rango maximo": 0,
+        "Comision porcentual": 0,
+        "Comision fija": 0,
+      },
+    ],
     nombre_plan_comision_campana: "",
     fecha_final: "",
     fecha_inicio: "",

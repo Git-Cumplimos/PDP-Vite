@@ -174,7 +174,13 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           id={`${key}_${ind}`}
                           key={`${key}_${ind}`}
                           name={`${key}|${ind}`}
-                          label={key}
+                          label={
+                            key === "Rango minimo"
+                              ? "Rango mínimo"
+                              : key === "Rango maximo"
+                              ? "Rango máximo"
+                              : key
+                          }
                           type='text'
                           autoComplete='off'
                           maxLength={"15"}
