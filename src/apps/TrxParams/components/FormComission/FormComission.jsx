@@ -61,8 +61,6 @@ const FormComission = ({ outerState, onSubmit, children }) => {
         return;
       }
       if (copy?.ranges.length > 1) {
-        const almostLast = copy?.ranges.at(-2);
-        console.log(almostLast, last);
         if (last?.["Rango maximo"] <= last?.["Rango minimo"]) {
           return notifyError(
             "El valor del rango mínimo debe ser superior al valor máximo"
