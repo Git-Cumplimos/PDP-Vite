@@ -86,8 +86,7 @@ const Participacion = () => {
                 Valor: formatMoney.format(row?.valor),
                 Devolución: formatMoney.format(row?.val_devolucion_cancelacion),
                 "Fecha participación": dateFormatter.format(fecha_participacion),
-                "Fecha pago": dateFormatter.format(fecha_registro),
-                
+                "Fecha pago": row?.fecha_registro !== null ? dateFormatter.format(fecha_registro) : "",               
                 // "voucher": row?.voucher
               };
             }));            

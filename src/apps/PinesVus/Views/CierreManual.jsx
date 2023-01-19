@@ -39,7 +39,7 @@ const CierreManual = () => {
     const deltaHora = parseInt(horaCierre[0])-parseInt(hora[0])
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(hora[1])
     if (deltaHora<0 || (deltaHora===0 & deltaMinutos<5) ){
-      notifyError("El modulo ya ha sido cerrado desde las " + horaCierre[0] + ":" + horaCierre[1])
+      notifyError("El módulo ya ha sido cerrado desde las " + horaCierre[0] + ":" + horaCierre[1])
       navigate("/PinesVus/Administrar",{replace:true});
     }
     else{
@@ -92,7 +92,7 @@ const CierreManual = () => {
         setShowModal(true)
       }}
       >
-        Cerrar Modulo
+        Cerrar Módulo
       </Button>
     </ButtonBar>
     <Modal show={showModal} handleClose={() => closeModal()}>

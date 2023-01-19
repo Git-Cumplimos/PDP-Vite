@@ -213,7 +213,9 @@ const Transacciones = () => {
             Fecha: dateFormatter.format(fecha),
             "Mensaje de respuesta trx": trxs[index]?.message_trx,
             Monto: formatMoney.format(trxs[index]?.monto),
-            "Estado de la transacción": trxs[index]?.tipo_afectacion !== "NA"
+            "Estado de la transacción": trxs[index]?.tipo_afectacion !== "NA" &&
+            !(trxs[index]?.id_tipo_transaccion === 66 ||
+            trxs[index]?.id_tipo_transaccion === 67)
             ? trxs[index]?.status_trx
               ? trxs[index]?.ticket == null
                 ? "Transaccion pendiente"  
