@@ -209,7 +209,6 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                         onInput={(e) => {
                           let valor = e.target.value;
                           let num = valor.replace(/[\s-]/g, "");
-                          console.log(num.slice(-1));
                           // num = num.replace(/^0[0-9]/, "");
                           if (!isNaN(num)) {
                             let copyData = { ...comissionData };
