@@ -222,7 +222,7 @@ const Convenios = () => {
           { id_convenio: selectedConvenio?.["Id convenio"] },
           {
             ...obj,
-            id_convenio: selectedConvenio?.["Id convenio"],
+            // id_convenio: selectedConvenio?.["Id convenio"],
             nombre_convenio: selectedConvenio?.["Nombre de convenio"],
             tags: selectedConvenio?.Tags.join(","),
             referencias: [
