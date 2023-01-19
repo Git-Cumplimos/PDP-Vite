@@ -35,7 +35,7 @@ const CreatePlanComision = () => {
       ev.preventDefault();
 
       let errRang = comissionData?.ranges?.length === 0;
-      if (newComision === "") {
+      if (newComision.nombre_plan_comision === "") {
         return notifyError("Ingrese el nombre del plan de comisión");
       }
       comissionData?.ranges.reduce((prev, curr, indexR) => {
