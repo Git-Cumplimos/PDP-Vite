@@ -14,6 +14,7 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
+import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario";
 import {
   postConsultaCodigoBarrasConveniosEspecifico,
   postRecaudoConveniosAgrario,
@@ -50,7 +51,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     commerceName: "Recaudo de facturas",
     trxInfo: [],
     disclamer:
-      "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación, verifique la información. Este es el unico recibo oficial de pago. Requerimientos 018000 514652.",
+      "En caso de reclamo o inquietud favor comunicarse en Bogota al Tel 594-8500 o gratis en el resto del pais al 01800-915000 o la pagina web http://www.bancoagrario.gov.co",
   });
   const [datosTrans, setDatosTrans] = useState({
     codBarras: "",
@@ -64,6 +65,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   const [datosTransaccion, setDatosTransaccion] = useState({
     ref1: "",
     ref2: "",
+    ref3: "",
     valor: "",
     showValor: "",
     showValor2: "",
@@ -71,13 +73,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     valorSinModificar2: "",
     data: "",
   });
-  const [datosConsulta, setDatosConsulta] = useState({});
   const [isUploading, setIsUploading] = useState(false);
 
   const onChangeFormat = useCallback(
     (ev) => {
       const valor = ev.target.value;
-      console.log(valor);
       if (valor.length > datosTrans.codBarras.length) {
         setDatosTrans((old) => {
           return { ...old, [ev.target.name]: valor };
@@ -99,8 +99,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
           let dateStatus = false;
           if (
             datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 &&
-            datosEnvio?.datosConvenio[0]?.val_fecha_lim_cnb === "1"
+            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0
           ) {
             const dateVenc = new Date(
               datosEnvio?.datosCodigoBarras?.fechaCaducidad[0]
@@ -124,6 +123,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
               ...old,
               ref1: autoArr?.obj.datosCodigoBarras.codigosReferencia[0] ?? "",
               ref2: autoArr?.obj.datosCodigoBarras.codigosReferencia[1] ?? "",
+              ref3: autoArr?.obj.datosCodigoBarras.codigosReferencia[3] ?? "",
               showValor: formatMoney.format(valorTrx) ?? "",
               valor: valorTrx ?? "",
               valorSinModificar: valorTrx ?? "",
@@ -151,42 +151,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       notifyError("El código de barras no tiene el formato correcto");
     }
   };
-  const habilitarModal = () => {
-    setShowModal(true);
-  };
-
-  const hideModal = () => {
-    setPeticion(0);
-    setShowModal(false);
-    setObjTicketActual((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          /*id transaccion recarga*/
-          /*comercio*/
-          [
-            "Comercio",
-            roleInfo?.["nombre comercio"]
-              ? roleInfo?.["nombre comercio"]
-              : "Sin datos",
-          ],
-          /*id_dispositivo*/
-          [
-            "No. Terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
-          /*direccion*/
-          [
-            "Dirección",
-            roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
-          ],
-          /*telefono*/
-          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
-        ],
-        trxInfo: [],
-      };
-    });
-  };
   const hideModalReset = () => {
     setDatosEnvio({
       datosCodigoBarras: {},
@@ -198,6 +162,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     setDatosTransaccion({
       ref1: "",
       ref2: "",
+      ref3: "",
       valor: "",
       showValor: "",
       valorSinModificar: "",
@@ -236,12 +201,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
-    setIsUploading(true);
+    setPeticion(1);
+    setShowModal(true);
   };
   const onSubmitPago = (e) => {
     e.preventDefault();
     setIsUploading(true);
-    const valorTransaccion = parseInt(datosTransaccion.valor) ?? 0;
+    const valorTransaccion = parseInt(datosTransaccion.valorSinModificar) ?? 0;
     const fecha = Intl.DateTimeFormat("es-CO", {
       year: "numeric",
       month: "2-digit",
@@ -254,14 +220,46 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       second: "2-digit",
     }).format(new Date());
     const objTicket = { ...objTicketActual };
+    let objRecaudo = {
+      nombreConvenio: datosEnvio?.datosConvenio?.nombre_convenio,
+      codigoConvenio: datosEnvio?.datosConvenio?.codigo,
+      referencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0],
+    };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["trxInfo"].push([
       "Convenio",
-      datosEnvio?.datosConvenio?.convenio,
+      datosEnvio?.datosConvenio?.nombre_convenio,
     ]);
     objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Referencia de pago", datosTrans?.ref1 ?? ""]);
+    objTicket["trxInfo"].push([
+      "Referencia de pago 1",
+      datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
+    ]);
+    if (
+      datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
+      !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g)
+    ) {
+      objTicket["trxInfo"].push([
+        "Referencia de pago 2",
+        datosTrans?.ref2 ?? "",
+      ]);
+      objTicket["trxInfo"].push(["", ""]);
+      objRecaudo["referencia2"] =
+        datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "";
+    }
+    if (
+      datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
+      !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g)
+    ) {
+      objTicket["trxInfo"].push([
+        "Referencia de pago 3",
+        datosTrans?.ref3 ?? "",
+      ]);
+      objTicket["trxInfo"].push(["", ""]);
+      objRecaudo["referencia3"] =
+        datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? "";
+    }
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
       "Valor",
@@ -283,12 +281,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
       },
-      recaudoAval: {
-        pila: datosConsulta?.["pila"] ?? "",
-        54: datosConsulta?.tipoRecaudo?.["54"] ?? "",
-        62: datosConsulta?.tipoRecaudo?.["62"] ?? "",
-        103: datosConsulta?.tipoRecaudo?.["103"] ?? "",
-        104: datosConsulta?.tipoRecaudo?.["104"] ?? "",
+      recaudoAgrario: {
+        ...objRecaudo,
         location: {
           address: roleInfo?.["direccion"],
           dane_code: roleInfo?.codigo_dane,
@@ -307,17 +301,18 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
           ]);
           objTicket["commerceInfo"].push(["", ""]);
           setObjTicketActual(objTicket);
-          setPeticion(4);
+          setPeticion(2);
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
-          hideModal();
+          hideModalReset();
         }
       })
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
         console.error(err);
+        hideModalReset();
       });
   };
   const onChangeMoney = useMoney({
@@ -403,39 +398,73 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       ) : (
         <>
           <h1 className='text-3xl text-center  mb-10'>{`Convenio: ${
-            datosEnvio?.datosConvenio?.convenio ?? ""
+            datosEnvio?.datosConvenio?.nombre_convenio ?? ""
           }`}</h1>
           <Form grid onSubmit={onSubmitConfirm}>
-            <Input
-              id='ref1'
-              label='Referencia 1'
-              type='text'
-              name='ref1'
-              minLength='32'
-              maxLength='32'
-              disabled={true}
-              value={datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""}
-              onInput={(e) => {
-                // setDatosTransaccion((old) => {
-                //   return { ...old, ref1: e.target.value };
-                // });
-              }}></Input>
+            {datosEnvio?.datosConvenio?.nombre_ref1 !== "" &&
+              !datosEnvio?.datosConvenio?.nombre_ref1?.match(/-/g) && (
+                <Input
+                  id='ref1'
+                  label={datosEnvio?.datosConvenio?.nombre_ref1}
+                  type='text'
+                  name='ref1'
+                  minLength={datosEnvio?.datosConvenio?.longitud_min_ref1}
+                  maxLength={datosEnvio?.datosConvenio?.longitud_max_ref1}
+                  required
+                  disabled={true}
+                  value={
+                    datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                  }
+                  autoComplete='off'
+                  onInput={onChangeFormat}
+                />
+              )}
+            {datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
+              !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g) && (
+                <Input
+                  id='ref2'
+                  label={datosEnvio?.datosConvenio?.nombre_ref2}
+                  type='text'
+                  name='ref2'
+                  minLength={datosEnvio?.datosConvenio?.longitud_min_ref2}
+                  maxLength={datosEnvio?.datosConvenio?.longitud_max_ref2}
+                  required
+                  disabled={true}
+                  value={
+                    datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
+                  }
+                  autoComplete='off'
+                  onInput={onChangeFormat}></Input>
+              )}
+            {datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
+              !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g) && (
+                <Input
+                  id='ref3'
+                  label={datosEnvio?.datosConvenio?.nombre_ref3}
+                  type='text'
+                  name='ref3'
+                  minLength={datosEnvio?.datosConvenio?.longitud_min_ref3}
+                  maxLength={datosEnvio?.datosConvenio?.longitud_max_ref3}
+                  required
+                  disabled={true}
+                  value={
+                    datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? ""
+                  }
+                  autoComplete='off'
+                  onInput={onChangeFormat}></Input>
+              )}
             {datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
             datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 ? (
               <Input
-                id='ref2'
+                id='fechaCaducidad'
                 label='Fecha de caducidad'
                 type='text'
-                name='ref2'
-                minLength='32'
+                name='fechaCaducidad'
+                minLength='0'
                 maxLength='32'
                 disabled={true}
                 value={datosEnvio.datosCodigoBarras.fechaCaducidad[0] ?? ""}
-                onInput={(e) => {
-                  // setDatosTransaccion((old) => {
-                  //   return { ...old, ref2: e.target.value };
-                  // });
-                }}></Input>
+                onInput={(e) => {}}></Input>
             ) : (
               <></>
             )}
@@ -452,79 +481,51 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                 onInput={(e, valor) => {
                   if (!isNaN(valor)) {
                     const num = valor;
-                    // setDatosTransaccion((old) => {
-                    //   return { ...old, valor: num };
-                    // });
                   }
                 }}
                 required></MoneyInputDec>
             )}
             <ButtonBar className='lg:col-span-2'>
-              <Button
-                type='button'
-                onClick={() => {
-                  setDatosEnvio({
-                    datosCodigoBarras: {},
-                    datosConvenio: {},
-                    estadoConsulta: false,
-                    estadoFecha: false,
-                  });
-                  setDatosTrans({ codBarras: "" });
-                  setDatosTransaccion({
-                    ref1: "",
-                    ref2: "",
-                    valor: "",
-                    showValor: "",
-                    valorSinModificar: "",
-                    data: "",
-                  });
-                }}>
+              <Button type='button' onClick={hideModalReset}>
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
-                <Button type='submit'>Realizar consulta</Button>
+                <Button type='submit'>Realizar pago</Button>
               )}
             </ButtonBar>
           </Form>
-          <Modal show={showModal} handleClose={hideModal}>
+          <Modal show={showModal} handleClose={hideModalReset}>
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-              {peticion === 2 && (
+              {peticion === 1 && (
                 <>
                   <h1 className='text-2xl text-center mb-5 font-semibold'>
-                    Resultado consulta
+                    ¿Está seguro de realizar el recaudo?
                   </h1>
-                  <h2>{`Nombre convenio: ${datosEnvio?.datosConvenio?.convenio}`}</h2>
-                  <h2>{`Número convenio: ${datosEnvio?.datosConvenio?.nura}`}</h2>
-                  <h2>{`Referencia 1: ${
-                    datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
-                  }`}</h2>
+                  <h2>{`Nombre convenio: ${datosEnvio?.datosConvenio?.nombre_convenio}`}</h2>
+                  <h2>{`Número convenio: ${datosEnvio?.datosConvenio?.codigo}`}</h2>
+                  {datosEnvio?.datosConvenio?.nombre_ref1 !== "" &&
+                    !datosEnvio?.datosConvenio?.nombre_ref1?.match(/-/g) && (
+                      <h2>{`Referencia 1: ${
+                        datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                      }`}</h2>
+                    )}
+                  {datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
+                    !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g) && (
+                      <h2>{`Referencia 2: ${
+                        datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
+                      }`}</h2>
+                    )}
+                  {datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
+                    !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g) && (
+                      <h2>{`Referencia 3: ${
+                        datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? ""
+                      }`}</h2>
+                    )}
                   <h2 className='text-base'>
-                    {`Valor consultado: ${formatMoney.format(
-                      datosTransaccion.valorSinModificar2
+                    {`Valor a pagar: ${formatMoney.format(
+                      datosTransaccion.valorSinModificar
                     )} `}
                   </h2>
-                  {datosEnvio?.datosConvenio?.parciales === "0" && (
-                    <Form grid onSubmit={onSubmitPago}>
-                      <Input
-                        id='valor'
-                        name='valor'
-                        label='Valor a pagar'
-                        autoComplete='off'
-                        type='tel'
-                        minLength={"5"}
-                        maxLength={"20"}
-                        defaultValue={datosTransaccion.showValor2 ?? ""}
-                        onInput={(ev) =>
-                          setDatosTransaccion((old) => ({
-                            ...old,
-                            valor: onChangeMoney(ev),
-                            showValor2: onChangeMoney(ev),
-                          }))
-                        }
-                        required
-                      />
-                    </Form>
-                  )}
                   <ButtonBar>
                     <Button onClick={hideModalReset}>Cancelar</Button>
                     <Button type='submit' onClick={onSubmitPago}>
@@ -533,7 +534,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   </ButtonBar>
                 </>
               )}
-              {peticion === 4 && (
+              {peticion === 2 && (
                 <>
                   <h2>
                     <ButtonBar>
@@ -548,9 +549,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                       </Button>
                     </ButtonBar>
                   </h2>
-                  <Tickets
+                  <TicketsAgrario
                     ticket={objTicketActual}
-                    refPrint={printDiv}></Tickets>
+                    refPrint={printDiv}
+                  />
                 </>
               )}
             </div>

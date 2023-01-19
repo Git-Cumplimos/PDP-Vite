@@ -71,7 +71,7 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlBancoAgrario}/grupo_aval_cb_recaudo/codigo_barras`,
+      `${urlBancoAgrario}/banco-agrario/banco_agrario_cb_recaudo/codigo_barras`,
       "POST",
       {},
       bodyObj,

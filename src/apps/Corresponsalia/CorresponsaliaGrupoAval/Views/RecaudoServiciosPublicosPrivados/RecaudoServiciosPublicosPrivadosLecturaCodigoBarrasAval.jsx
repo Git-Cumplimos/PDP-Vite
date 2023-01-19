@@ -106,8 +106,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           let dateStatus = false;
           if (
             datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 &&
-            datosEnvio?.datosConvenio[0]?.val_fecha_lim_cnb === "1"
+            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0
           ) {
             const dateVenc = new Date(
               datosEnvio?.datosCodigoBarras?.fechaCaducidad[0]
