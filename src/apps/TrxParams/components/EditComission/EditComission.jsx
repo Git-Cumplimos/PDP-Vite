@@ -45,7 +45,15 @@ const EditComission = () => {
     setQuery,
   ] = useQuery();
 
-  const [editedComission, setEditedComission] = useState(null);
+  const [editedComission, setEditedComission] = useState({
+    nombre_plan_comision: "",
+    tipo_comision: "",
+    type: "",
+    ranges: [],
+    nombre_plan_comision_campana: "",
+    fecha_final: "",
+    fecha_inicio: "",
+  });
   const [campaignStatus, setCampaignStatus] = useState(null);
   const [comissions, setComissions] = useState({
     nombre_comision: "",
@@ -55,8 +63,8 @@ const EditComission = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-      setIsUploading(true);
       if (id_plan_comision) {
+        setIsUploading(true);
         putComisionesPlanes({
           pk_planes_comisiones: id_plan_comision,
           nombre_plan_comision: editedComission?.nombre_plan_comision,
@@ -95,32 +103,55 @@ const EditComission = () => {
             console.error(err);
           });
       } else if (id_plan_comision_campana) {
+        if (editedComission.nombre_plan_comision_campana === "") {
+          return notifyError("Agregue el nombre de la campaña");
+        }
+        if (editedComission["fecha_final"] !== "") {
+          if (editedComission["fecha_inicio"] !== "") {
+            if (
+              new Date(editedComission["fecha_final"]) <=
+              new Date(editedComission["fecha_inicio"])
+            ) {
+              notifyError("La fecha final debe ser mayor a la inicial");
+              return;
+            }
+          } else {
+            notifyError("Debe existir una fecha inicial");
+            return;
+          }
+        } else {
+          return notifyError("Debe existir una fecha final");
+        }
+        setIsUploading(true);
         if (campaignStatus) {
-          console.log("edit campaign");
           putComisionesPlanesCampanas({
             id_plan_comision_campana: id_plan_comision_campana,
             nombre_plan_comision_campana:
               editedComission?.["nombre_plan_comision_campana"],
             fecha_inicio: editedComission?.["fecha_inicio"],
             fecha_final: editedComission?.["fecha_final"],
-            pk_planes_comisiones_campanas: id_plan_comision_campana,
+            pk_planes_comisiones_campanas:
+              comissions?.pk_planes_comisiones_campanas,
             comisiones_campanas: {
-              // ...editedComission,
-              type: comissions?.comisiones?.type,
-              ranges: comissions?.comisiones?.ranges?.map(
-                ({ Fija, Maximo, Minimo, Porcentaje }) => {
+              type: editedComission?.type,
+              ranges: editedComission?.ranges?.map(
+                ({
+                  "Rango minimo": Minimo,
+                  "Rango maximo": Maximo,
+                  "Comision porcentual": Porcentaje,
+                  "Comision fija": Fija,
+                }) => {
                   return {
-                    Minimo: Minimo,
-                    Maximo: Maximo === -1 ? "" : Maximo,
-                    Porcentaje: parseFloat(Porcentaje * 100),
-                    Fija: parseFloat(Fija),
+                    Minimo,
+                    Maximo: !Maximo ? -1 : Maximo,
+                    Porcentaje: Porcentaje / 100,
+                    Fija,
                   };
                 }
               ),
             },
           })
             .then((res) => {
-              console.log(res);
               if (res?.status) {
                 notify(res?.msg);
                 navigate(-1, { replace: true });
@@ -142,6 +173,7 @@ const EditComission = () => {
             fecha_final: editedComission?.["fecha_final"],
             fk_planes_comisiones: id_plan_comision_campana,
             comisiones_campanas: {
+              type: editedComission?.["type"],
               ranges: editedComission?.ranges.map(
                 ({
                   "Rango minimo": Minimo,
@@ -160,7 +192,6 @@ const EditComission = () => {
             },
           })
             .then((res) => {
-              console.log(res);
               if (res?.status) {
                 notify(res?.msg);
                 navigate(-1, { replace: true });
@@ -179,10 +210,11 @@ const EditComission = () => {
     },
     [
       editedComission,
+      comissions,
       navigate,
       id_plan_comision,
       id_plan_comision_campana,
-      comissions,
+      campaignStatus,
     ]
   );
 
@@ -203,15 +235,12 @@ const EditComission = () => {
     }
   }, []);
 
-  const onClickDelete = () => {
-    console.log("delete", id_plan_comision);
-  };
-
   const fetchPlanesComisiones = () => {
     getComisionesPlanesUnique({ id_plan_comision })
       .then((res) => {
         setComissions(res?.results?.[0]);
-        setEditedComission({
+        setEditedComission((old) => ({
+          ...old,
           nombre_plan_comision: res?.results[0]?.nombre_plan_comision,
           tipo_comision: res?.results[0]?.tipo_comision,
           type: res?.results[0]?.comisiones?.type,
@@ -225,7 +254,7 @@ const EditComission = () => {
               };
             }
           ),
-        });
+        }));
       })
       .catch((err) => console.error(err));
   };
@@ -234,18 +263,27 @@ const EditComission = () => {
     getComisionesPlanesCampanaUnique({ id_plan_comision_campana })
       .then((res) => {
         setComissions(res?.results?.[0]);
-        setEditedComission({
+        setEditedComission((old) => ({
+          ...old,
           nombre_plan_comision: res?.results?.[0]?.nombre_plan_comision,
           nombre_plan_comision_campana:
-            res?.results?.[0]?.nombre_plan_comision_campana,
-          fecha_inicio: res?.results?.[0]?.fecha_inicio,
-          fecha_final: res?.results?.[0]?.fecha_final,
-          type: res?.results[0]?.comisiones?.type
-            ? res?.results[0]?.comisiones?.type
+            res?.results?.[0]?.nombre_plan_comision_campana ?? "",
+          fecha_inicio: res?.results?.[0]?.fecha_inicio
+            ? new Date(res?.results?.[0]?.fecha_inicio)
+                .toISOString()
+                .substring(0, 16)
+            : "",
+          fecha_final: res?.results?.[0]?.fecha_final
+            ? new Date(res?.results?.[0]?.fecha_final)
+                .toISOString()
+                .substring(0, 16)
+            : "",
+          type: res?.results[0]?.comisiones_campanas?.type
+            ? res?.results[0]?.comisiones_campanas?.type
             : "",
           ranges:
-            res?.results?.[0]?.comisiones?.ranges?.length > 0
-              ? res?.results?.[0]?.comisiones?.ranges?.map(
+            res?.results?.[0]?.comisiones_campanas?.ranges?.length > 0
+              ? res?.results?.[0]?.comisiones_campanas?.ranges?.map(
                   ({ Fija, Maximo, Minimo, Porcentaje }) => {
                     return {
                       "Rango minimo": Minimo,
@@ -255,13 +293,18 @@ const EditComission = () => {
                     };
                   }
                 )
-              : [],
-        });
-        if (res?.results?.[0]?.comisiones?.ranges?.length > 0) {
-          console.log("edition");
+              : [
+                  {
+                    "Rango minimo": 0,
+                    "Rango maximo": 0,
+                    "Comision porcentual": 0,
+                    "Comision fija": 0,
+                  },
+                ],
+        }));
+        if (res?.results?.[0]?.comisiones_campanas?.ranges?.length > 0) {
           setCampaignStatus(true);
         } else {
-          console.log("creation");
           setCampaignStatus(false);
         }
       })
@@ -286,151 +329,6 @@ const EditComission = () => {
           : ""}
       </h1>
       <Form grid>
-        {id_comision_pagada && (
-          <Fragment>
-            {comissions?.["nombre_convenio"] && (
-              <Input
-                id='Nombre convenio'
-                name='Nombre convenio'
-                type={"text"}
-                autoComplete='off'
-                label={"Nombre convenio"}
-                value={comissions?.["nombre_convenio"]}
-                readOnly
-                disabled
-              />
-            )}
-            {comissions?.["nombre_operacion"] && (
-              <Input
-                id='Nombre operacion'
-                name='Nombre operacion'
-                type={"text"}
-                label={"Nombre transaccion"}
-                autoComplete='off'
-                value={comissions?.["nombre_operacion"]}
-                readOnly
-                disabled
-              />
-            )}
-            {comissions?.["id_comercio"] && (
-              <Input
-                id='Id comercio'
-                name='Id comercio'
-                type={"number"}
-                label={"Id comercio"}
-                autoComplete='off'
-                value={comissions?.["id_comercio"]}
-                readOnly
-                disabled
-              />
-            )}
-            {comissions?.["fecha_inicio"] && (
-              <Input
-                id='Fecha inicio'
-                name='Fecha inicio'
-                type={"text"}
-                label={"Fecha inicio"}
-                autoComplete='off'
-                value={Intl.DateTimeFormat("es-CO", {
-                  year: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                }).format(
-                  new Date(comissions?.["fecha_inicio"]).setHours(
-                    new Date(comissions?.["fecha_inicio"] + "-5").getHours()
-                  )
-                )}
-                readOnly
-                disabled
-              />
-            )}
-            {comissions?.["fecha_fin"] && (
-              <Input
-                id='Fecha_fin'
-                name='Fecha_fin'
-                type={"text"}
-                label={"Fecha_fin"}
-                autoComplete='off'
-                value={Intl.DateTimeFormat("es-CO", {
-                  year: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                }).format(
-                  new Date(comissions?.["fecha_fin"]).setHours(
-                    new Date(comissions?.["fecha_fin"] + "-5").getHours()
-                  )
-                )}
-                readOnly
-                disabled
-              />
-            )}
-            <ActiveSelect
-              label='Estado comisión'
-              value={comissions?.["estado"] ?? false}
-              onChange={(e) => {
-                setComissions((old) => ({
-                  ...old,
-                  estado: e,
-                }));
-              }}
-            />
-          </Fragment>
-        )}
-        {id_comision_cobrada && (
-          <Fragment>
-            {comissions?.["nombre_autorizador"] && (
-              <Input
-                id='Autorizador'
-                name='Autorizador'
-                type={"text"}
-                label={"Autorizador"}
-                autoComplete='off'
-                value={comissions?.["nombre_autorizador"]}
-                readOnly
-                disabled
-              />
-            )}
-            {comissions?.["nombre_convenio"] && (
-              <Input
-                id='Nombre convenio'
-                name='Nombre convenio'
-                type={"text"}
-                autoComplete='off'
-                label={"Nombre convenio"}
-                value={comissions?.["nombre_convenio"]}
-                readOnly
-                disabled
-              />
-            )}
-
-            {comissions?.["nombre_operacion"] && (
-              <Input
-                id='Nombre operacion'
-                name='Nombre operacion'
-                type={"text"}
-                label={"Nombre transaccion"}
-                autoComplete='off'
-                value={comissions?.["nombre_operacion"]}
-                readOnly
-                disabled
-              />
-            )}
-            <ActiveSelect
-              label='Estado comisión'
-              value={comissions?.["estado"] ?? false}
-              onChange={(e) => {
-                setComissions((old) => ({
-                  ...old,
-                  estado: e,
-                }));
-              }}
-            />
-          </Fragment>
-        )}
         {id_plan_comision && (
           <>
             <Input
@@ -515,6 +413,7 @@ const EditComission = () => {
               type={"text"}
               autoComplete='off'
               value={id_plan_comision_campana}
+              onChange={() => {}}
               readOnly
               disabled
             />
@@ -524,7 +423,8 @@ const EditComission = () => {
               label={"Nombre plan de comisión"}
               type={"text"}
               autoComplete='off'
-              value={editedComission?.nombre_plan_comision}
+              value={editedComission?.nombre_plan_comision ?? ""}
+              onChange={() => {}}
               readOnly
               disabled
             />
@@ -534,7 +434,15 @@ const EditComission = () => {
               label={"Nombre campaña"}
               type={"text"}
               autoComplete='off'
-              value={editedComission?.nombre_plan_comision_campana}
+              value={editedComission?.nombre_plan_comision_campana ?? ""}
+              onInput={(e) =>
+                setEditedComission((old) => {
+                  return {
+                    ...old,
+                    nombre_plan_comision_campana: e.target.value,
+                  };
+                })
+              }
             />
             <Input
               id='fecha_inicio'
@@ -543,16 +451,17 @@ const EditComission = () => {
               type={"datetime-local"}
               autoComplete='off'
               onChange={onChangeDates}
-              min='2022-01-01T00:00'
-              max='2025-01-01T00:00'
-              value={
-                // to ISO string
-                dateIsValid(editedComission?.["fecha_inicio"])
-                  ? new Date(editedComission?.["fecha_inicio"])
-                      .toISOString()
-                      .split(".")[0]
-                  : ""
-              }
+              min={new Date().toISOString().slice(0, -8)}
+              max='2031-01-01T00:00'
+              value={editedComission?.["fecha_inicio"] ?? ""}
+              // value={
+              //   // to ISO string
+              //   dateIsValid(editedComission?.["fecha_inicio"])
+              //     ? new Date(editedComission?.["fecha_inicio"])
+              //         .toISOString()
+              //         .split(".")[0]
+              //     : ""
+              // }
             />
             <Input
               id='fecha_final'
@@ -561,16 +470,17 @@ const EditComission = () => {
               type={"datetime-local"}
               autoComplete='off'
               onChange={onChangeDates}
-              min='2022-01-01T00:00'
-              max='2025-01-01T00:00'
-              value={
-                // to ISO string
-                dateIsValid(editedComission?.["fecha_final"])
-                  ? new Date(editedComission?.["fecha_final"])
-                      .toISOString()
-                      .split(".")[0]
-                  : ""
-              }
+              min={new Date().toISOString().slice(0, -8)}
+              max='2031-01-01T00:00'
+              value={editedComission?.["fecha_final"] ?? ""}
+              // value={
+              //   // to ISO string
+              //   dateIsValid(editedComission?.["fecha_final"])
+              //     ? new Date(editedComission?.["fecha_final"])
+              //         .toISOString()
+              //         .split(".")[0]
+              //     : ""
+              // }
             />
           </>
         )}
@@ -587,7 +497,7 @@ const EditComission = () => {
               ? "Actualizar plan de comisión"
               : id_plan_comision_campana && !campaignStatus
               ? "Crear campaña"
-              : id_plan_comision_campana && !campaignStatus
+              : id_plan_comision_campana && campaignStatus
               ? "Actualizar campaña"
               : ""}
           </Button>
