@@ -191,7 +191,9 @@ const Transacciones = () => {
               Tipo_operacion,
               money,
               created,
-              status_trx: trxs[index]?.tipo_afectacion !== "NA"
+              status_trx: trxs[index]?.tipo_afectacion !== "NA" &&
+              !(trxs[index]?.id_tipo_transaccion === 66 ||
+              trxs[index]?.id_tipo_transaccion === 67)
               ? trxs[index]?.status_trx
                 ? trxs[index]?.ticket == null
                   ? "Transaccion pendiente"  
