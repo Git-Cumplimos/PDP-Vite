@@ -34,7 +34,7 @@ const EditGruposComercios = () => {
   const [selectedGruposComercios, setSelectedGruposComercios] = useState({
     pk_tbl_grupo_comercios: "",
     nombre_grupo_comercios: "",
-    paga_comision:"",
+    paga_comision: "",
     id_comercio: "",
     comercios_agregar: [],
     comercios_eliminar: [],
@@ -72,7 +72,7 @@ const EditGruposComercios = () => {
         comercios_eliminar: selectedGruposComercios?.comercios_eliminar,
         fk_tbl_grupo_planes_comisiones:
           selectedGruposComercios?.fk_tbl_grupo_planes_comisiones,
-          paga_comision:selectedGruposComercios?.paga_comision,
+        paga_comision: selectedGruposComercios?.paga_comision,
       })
         .then((res) => {
           if (res?.status) {
@@ -89,7 +89,7 @@ const EditGruposComercios = () => {
           console.error(err);
         });
     },
-    [selectedGruposComercios,navigate]
+    [selectedGruposComercios, navigate]
   );
 
   useEffect(() => {
@@ -109,7 +109,7 @@ const EditGruposComercios = () => {
       sortDir: "DESC",
     })
       .then((autoArr) => {
-        setMaxPages(autoArr?.maxPages);
+        // setMaxPages(autoArr?.maxPages);
         setSelectedGruposComercios((old) => ({
           ...old,
           pk_tbl_grupo_comercios:
@@ -120,7 +120,6 @@ const EditGruposComercios = () => {
             autoArr?.results[0]?.["fk_tbl_grupo_planes_comisiones"],
           nombre_grupo_plan: autoArr?.results[0]?.["nombre_grupo_plan"],
           paga_comision: autoArr?.results[0]?.["paga_comision"],
-          
         }));
       })
       .catch((err) => console.error(err));
@@ -140,6 +139,7 @@ const EditGruposComercios = () => {
       sortDir: "DESC",
     })
       .then((autoArr) => {
+        // console.log(autoArr);
         setMaxPages(autoArr?.maxPages);
         setComercios(autoArr?.results ?? []);
       })
@@ -322,20 +322,23 @@ const EditGruposComercios = () => {
           required
         />
         <Select
-              id='paga_comision'
-              name='paga_comision'
-              label='Paga comisión'
-              options={{
-                "Si": true,
-                "No": false,
-              }}
-              value={selectedGruposComercios.paga_comision}
-              onChange={(e) =>
-                setSelectedGruposComercios((old) => {
-                  return { ...old, paga_comision: e.target.value === "true" ? true : false };
-                })
-            }
-            />
+          id='paga_comision'
+          name='paga_comision'
+          label='Paga comisión'
+          options={{
+            Si: true,
+            No: false,
+          }}
+          value={selectedGruposComercios.paga_comision}
+          onChange={(e) =>
+            setSelectedGruposComercios((old) => {
+              return {
+                ...old,
+                paga_comision: e.target.value === "true" ? true : false,
+              };
+            })
+          }
+        />
         <Fieldset legend='Grupo de planes comisiones' className='lg:col-span-2'>
           <Input
             id='nombre_grupo_plan'

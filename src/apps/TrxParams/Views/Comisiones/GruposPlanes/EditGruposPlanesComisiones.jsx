@@ -107,7 +107,7 @@ const EditGruposPlanesComisiones = () => {
       sortDir: "DESC",
     })
       .then((autoArr) => {
-        setMaxPages(autoArr?.maxPages);
+        // setMaxPages(autoArr?.maxPages);
         setSelectedGruposPlanes((old) => ({
           ...old,
           pk_tbl_grupo_planes_comisiones:
