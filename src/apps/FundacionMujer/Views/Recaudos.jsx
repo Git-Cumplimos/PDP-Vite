@@ -301,14 +301,14 @@ const Recaudo = () => {
     const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
     console.log(deltaHora, deltaMinutos)
     if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
-      notifyError("Modulo cerrado a partir de las " + enumParametrosFundacion.horaCierre)
+      notifyError("Módulo cerrado a partir de las " + enumParametrosFundacion.horaCierre)
       navigate("/PinesVus");
     }
     else if ((deltaHora ===1 & deltaMinutos<-50)){
-      notifyError("El modulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
+      notifyError("El módulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
     }
     else if ((deltaHora ===0 & deltaMinutos<10)){
-      notifyError("El modulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
+      notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
     }}
 
   }, [hora,dia])

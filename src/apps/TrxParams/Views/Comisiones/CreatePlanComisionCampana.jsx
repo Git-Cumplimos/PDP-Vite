@@ -14,11 +14,7 @@ import {
   postComisionesPlan,
 } from "../../utils/fetchComisionesPlanes";
 import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
-import Modal from "../../../../components/Base/Modal";
-import ButtonBar from "../../../../components/Base/ButtonBar";
 import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
 import Select from "../../../../components/Base/Select";
 
 // const initComissionData = {
@@ -70,74 +66,11 @@ const CreatePlanComisionCampana = () => {
     page: 1,
     limit: 10,
   });
-
-  const [showModal, setShowModal] = useState(false);
-  const handleClose = useCallback(() => {
-    setShowModal(false);
-    setQuery(
-      {
-        ["selectedOpt"]: "",
-        ["tipoTrx"]: "",
-        ["comercio"]: "",
-        ["autorizador"]: "",
-      },
-      { replace: true }
-    );
-  }, []);
   const createComission = useCallback(
     (ev) => {
       ev.preventDefault();
 
       let errRang = comissionData?.ranges?.length === 0;
-
-      // if (
-      //   !newComision["Convenio"] &&
-      //   !newComision["Tipo de transaccion"] &&
-      //   !newComision["Id comercio"]
-      // ) {
-      //   notifyError(
-      //     "Se debe agregar al menos un convenio o un tipo de transaccion o un id de comercio"
-      //   );
-      //   return;
-      // }
-      // if (newComision["Nombre comision"] === "") {
-      //   notifyError("Se debe agregar el nombre de la comision");
-      //   return;
-      // }
-      // if (!newComision["Autorizador"]) {
-      //   notifyError("Se debe agregar el autorizador");
-      //   return;
-      // }
-
-      // if (errRang) {
-      //   notifyError("Se debe agregar al menos una comision");
-      //   return;
-      // }
-      // if (newComision["Fecha fin"] !== "") {
-      //   if (newComision["Fecha inicio"] !== "") {
-      //     if (
-      //       new Date(newComision["Fecha fin"]) <=
-      //       new Date(newComision["Fecha inicio"])
-      //     ) {
-      //       notifyError("La fecha final debe ser mayor a la inicial");
-      //       return;
-      //     }
-      //   } else {
-      //     notifyError("Debe existir una fecha inicial");
-      //     return;
-      //   }
-      // }
-
-      // comissionData?.ranges.reduce((prev, curr, indexR) => {
-      //   if (!(prev?.["Rango maximo"] + 1 === curr?.["Rango minimo"])) {
-      //     notifyError(`El rango maximo de un rango comision no puede
-      //     ser mayor al rango minimo del siguiente
-      //       rango de comision (Rango ${indexR} - Rango ${indexR + 1})`);
-      //     errRang = true;
-      //   }
-      //   return curr;
-      // });
-
       if (errRang) {
         return;
       }
@@ -151,7 +84,6 @@ const CreatePlanComisionCampana = () => {
       // if (comissionData) {
       //   obj["comisiones"] = comissionData;
       // }
-      console.log("obj", obj);
       postComisionesPlan({
         ...obj,
         comisiones: {
@@ -174,7 +106,6 @@ const CreatePlanComisionCampana = () => {
         },
       })
         .then((res) => {
-          console.log("res", res);
           notify("Se creo la comision correctamente");
           // navigate("/comisiones/planes");
         })
@@ -315,29 +246,28 @@ const CreatePlanComisionCampana = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl">Crear plan de comisión:</h1>
+      <h1 className='text-3xl'>Crear plan de comisión:</h1>
       <Form onChange={onChangeNewComision} grid>
         <Select
-          name="Tipo de comision"
-          label="Tipo de comision"
+          name='Tipo de comision'
+          label='Tipo de comision'
           options={{ NA: "", Cobrar: "COBRAR", Pagar: "PAGAR" }}
           value={newComision?.["Tipo de comision"]}
           onChange={() => {}}
           // defaultValue={""}
         />
         <Input
-          id="Nombre plan de comision"
-          name="Nombre plan de comision"
+          id='Nombre plan de comision'
+          name='Nombre plan de comision'
           label={"Nombre plan de comisión"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           value={newComision?.["Nombre plan de comision"]}
           onChange={() => {}}
         />
       </Form>
-      {JSON.stringify(newComision)}
       <FormComission outerState={[comissionData, setComissionData]}>
-        <Button type="submit" onClick={createComission}>
+        <Button type='submit' onClick={createComission}>
           Crear comision
         </Button>
       </FormComission>

@@ -470,17 +470,12 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
   };
 
   const fetchCampaignPlans = () => {
-    let obj = { page, limit };
-    if (comisiones !== "") obj["comisiones"] = comisiones;
-    if (fecha_creacion !== "") obj["fecha_creacion"] = fecha_creacion;
-    if (fecha_inicio !== "") obj["fecha_inicio"] = fecha_inicio;
-    if (fecha_final !== "") obj["fecha_final"] = fecha_final;
+    let obj = { page, limit, sortDir: "DESC", sortBy: "pk_planes_comisiones" };
     if (nombre_plan_comision !== "")
       obj["nombre_plan_comision"] = nombre_plan_comision;
 
     getComisionesPlanesCampanas(obj)
       .then((res) => {
-        console.log(res);
         setComissions(res?.results);
         setMaxPages(res?.maxPages);
       })
@@ -496,7 +491,6 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
 
     getAssingsCommissions(obj)
       .then((res) => {
-        console.log(res);
         setComissions(res?.results);
         setMaxPages(res?.maxPages);
       })
@@ -635,29 +629,12 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
         {comissionFace === "campaigns" ? (
           <>
             <Input
-              id={"nombre_comision"}
-              label={"Nombre comisión"}
-              name={"nombre_comision"}
+              id={"nombre_plan_comision"}
+              label={"Nombre plan comisión"}
+              name={"nombre_plan_comision"}
               type={"text"}
               autoComplete='off'
-              defaultValue={nombre_comision}
-            />
-            <Input
-              id={"tipoComision"}
-              label={"Tipo de transacción"}
-              name={"tipoComision"}
-              type={"text"}
-              autoComplete='off'
-              defaultValue={tipoComision}
-            />
-            <Input
-              id={"id_comision"}
-              label={"Id comisión"}
-              name={"id_comision"}
-              type='number'
-              // step={"1"}
-              autoComplete='off'
-              defaultValue={comercio}
+              defaultValue={nombre_plan_comision}
             />
           </>
         ) : null}

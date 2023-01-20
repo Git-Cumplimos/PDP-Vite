@@ -97,7 +97,7 @@ const EditGruposConvenios = () => {
       sortDir: "DESC",
     })
       .then((autoArr) => {
-        setMaxPages(autoArr?.maxPages);
+        // setMaxPages(autoArr?.maxPages);
         setSelectedGruposConvenios((old) => ({
           ...old,
           pk_tbl_grupo_convenios:

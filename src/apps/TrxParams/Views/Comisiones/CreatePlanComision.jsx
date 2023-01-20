@@ -8,17 +8,7 @@ import { notify, notifyError } from "../../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { fetchConveniosUnique } from "../../utils/fetchRevalConvenios";
-import {
-  getComisionesPlanes,
-  postComisionesPlan,
-} from "../../utils/fetchComisionesPlanes";
-import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
-import Modal from "../../../../components/Base/Modal";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
+import { postComisionesPlan } from "../../utils/fetchComisionesPlanes";
 import Select from "../../../../components/Base/Select";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
@@ -45,7 +35,9 @@ const CreatePlanComision = () => {
       ev.preventDefault();
 
       let errRang = comissionData?.ranges?.length === 0;
-
+      if (newComision.nombre_plan_comision === "") {
+        return notifyError("Ingrese el nombre del plan de comisión");
+      }
       comissionData?.ranges.reduce((prev, curr, indexR) => {
         if (
           !(parseInt(prev?.["Rango maximo"]) + 1 === curr?.["Rango minimo"])
