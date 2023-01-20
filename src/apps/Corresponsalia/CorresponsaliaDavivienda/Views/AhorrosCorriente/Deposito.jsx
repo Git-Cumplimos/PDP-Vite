@@ -247,6 +247,7 @@ const Deposito = () => {
       second: "2-digit",
     }).format(new Date());
     const objTicket = { ...objTicketActual };
+    objTicket["trxInfo"] = []
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["trxInfo"].push(["Nombre titular", summary["Nombre titular"]]);

@@ -79,7 +79,7 @@ const Deposito = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: enumParametrosDavivienda.maxCashInDaviplata,
+    max: 4000000,
     min: enumParametrosDavivienda.minCashInDaviplata,
   });
 
@@ -259,6 +259,7 @@ const Deposito = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"] = []
     objTicket["trxInfo"].push(["Nombre titular", summary["Nombre cliente"]]);
     objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
