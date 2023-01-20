@@ -79,7 +79,7 @@ const Deposito = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 4000000,
+    max: enumParametrosDavivienda.maxCashInDaviplata,
     min: enumParametrosDavivienda.minCashInDaviplata,
   });
 
