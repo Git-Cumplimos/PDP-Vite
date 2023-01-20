@@ -192,12 +192,29 @@ const RecaudoDavivienda = lazy(() =>
 const cargarArchivos = lazy(() =>
   import("../apps/RecaudoIntegrado/Views/Davivienda/Views/CargarArchivos")
 );
+const HistoricoContingenciaDavivienda = lazy(() =>
+  import(
+    "../apps/RecaudoIntegrado/Views/Davivienda/Views/HistoricoContingencia"
+  )
+);
+const TransaccionesDavivienda = lazy(() =>
+  import("../apps/RecaudoIntegrado/Views/Davivienda/Views/Transacciones")
+);
+
 const RecaudoBancolombia = lazy(() =>
   import("../apps/RecaudoIntegrado/Views/Bancolombia/RecaudoBancolombia")
 );
 
 const cargarArchivosBancolombia = lazy(() =>
   import("../apps/RecaudoIntegrado/Views/Bancolombia/Views/CargarArchivos")
+);
+const HistoricoContingenciaBancolombia = lazy(() =>
+  import(
+    "../apps/RecaudoIntegrado/Views/Bancolombia/Views/HistoricoContingencia"
+  )
+);
+const TransaccionesBancolombia = lazy(() =>
+  import("../apps/RecaudoIntegrado/Views/Bancolombia/Views/Transacciones")
 );
 
 /**
@@ -892,6 +909,20 @@ const allUrlsPrivateApps = [
             component: cargarArchivos,
             permission: [55],
           },
+          {
+            link: "/recaudo-integrado/davivienda/historicocontingencia",
+            label: (
+              <AppIcons Logo={"IMPUESTO"} name={"Histórico de contingencia"} />
+            ),
+            component: HistoricoContingenciaDavivienda,
+            permission: [55],
+          },
+          {
+            link: "/recaudo-integrado/davivienda/transacciones",
+            label: <AppIcons Logo={"IMPUESTO"} name={"Transacciones"} />,
+            component: TransaccionesDavivienda,
+            permission: [55],
+          },
         ],
       },
       //--------------------
@@ -905,6 +936,20 @@ const allUrlsPrivateApps = [
             link: "/recaudo-integrado/bancolombia/cargar",
             label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
             component: cargarArchivosBancolombia,
+            permission: [55],
+          },
+          {
+            link: "/recaudo-integrado/bancolombia/historicocontingencia",
+            label: (
+              <AppIcons Logo={"IMPUESTO"} name={"Histórico de contingencia"} />
+            ),
+            component: HistoricoContingenciaBancolombia,
+            permission: [55],
+          },
+          {
+            link: "/recaudo-integrado/bancolombia/transacciones",
+            label: <AppIcons Logo={"IMPUESTO"} name={"Transacciones"} />,
+            component: TransaccionesBancolombia,
             permission: [55],
           },
         ],
