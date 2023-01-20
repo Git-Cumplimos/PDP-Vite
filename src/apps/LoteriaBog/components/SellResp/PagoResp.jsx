@@ -162,7 +162,6 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
   useEffect(() => {
     infoTicket(pagoresponse["id_trx"], 13, ticket);
   }, [infoTicket, pagoresponse, ticket]);
-  console.log(pagoresponse);
   //////////////////////////////////////////
   return "msg" in pagoresponse ? (
     <div className="flex flex-col justify-center items-center">
@@ -170,8 +169,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
       <Button
         onClick={(e) => {
           setPagoresponse(null);
-        }}
-      >
+        }}>
         Volver
       </Button>
     </div>
@@ -186,8 +184,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
             closeModal();
             setPagoresponse(null);
             //setCustomer({ fracciones: "", phone: "", doc_id: "" });
-          }}
-        >
+          }}>
           Cerrar
         </Button>
       </ButtonBar>

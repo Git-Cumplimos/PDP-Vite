@@ -37,6 +37,7 @@ const urls = {
   //pagosReportes:`${process.env.REACT_APP_URL_LOTERIAS}/reportes_pago_premios`,
 
   consultaPago: `${process.env.REACT_APP_URL_LOTERIAS}/consultaPremio`,
+  pagoPremioLoterias: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremio`,
   premiohash: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioVirtual`,
   premiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioFisico`,
   pagopremio: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioVirtual`,
@@ -147,7 +148,7 @@ export const useProvideLoteria = () => {
     const query = { nit_loteria: nit };
     try {
       const res = await fetchData(urls.idloteria, "GET", query);
-      console.log("idloteria", res);
+      // console.log("idloteria", res);
       return res;
     } catch (err) {
       console.error(err);
@@ -176,7 +177,7 @@ export const useProvideLoteria = () => {
           "GET",
           query
         );
-        console.log(res);
+        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -196,7 +197,7 @@ export const useProvideLoteria = () => {
           // setDisabledBtns(true);
         } else {
           setCodigos_lot(res?.obj);
-          console.log(res?.obj);
+          // console.log(res?.obj);
         }
       });
       //Consulta id de las operaciones por lotería
@@ -214,14 +215,14 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         consulta_codigos_oficina(nit).then((res) => {
           if (res?.msg) {
-            console.log(res?.msg);
+            // console.log(res?.msg);
             setCodigosOficina({
               cod_oficina_lot: "PPVIR",
               cod_sucursal_lot: "00",
             });
           } else {
             setCodigosOficina(res);
-            console.log(res);
+            // console.log(res);
           }
         });
       }
@@ -230,13 +231,13 @@ export const useProvideLoteria = () => {
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
-    console.log(codigos_lot?.length);
+    // console.log(codigos_lot?.length);
     if (codigos_lot?.length === 2) {
       cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
     } else {
       cod = `${codigos_lot?.[0]?.cod_loteria}`;
     }
-    console.log("Esto es el cod_loteria*******", cod);
+    // console.log("Esto es el cod_loteria*******", cod);
     return cod;
   }, [codigos_lot]);
 
@@ -246,7 +247,7 @@ export const useProvideLoteria = () => {
     if (sort[1] === "true") {
       fisico = true;
     }
-    console.log(sorteo);
+    // console.log(sorteo);
     if (num === "" && ser === "") return;
 
     try {
@@ -273,9 +274,9 @@ export const useProvideLoteria = () => {
 
   const searchLoteriafisica = useCallback(
     async (sorteo, num, ser, page) => {
-      console.log(roleInfo);
+      // console.log(roleInfo);
       let fisico = false;
-      console.log(sorteo);
+      // console.log(sorteo);
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
         fisico = true;
@@ -321,7 +322,7 @@ export const useProvideLoteria = () => {
       if (roleInfo.tipo_comercio === "KIOSCO") {
         tipo_comercio = "OFICINAS PROPIAS";
       }
-      console.log(roleInfo);
+      // console.log(roleInfo);
       const req = {
         num_sorteo: sort[0],
         num_billete: `${selected.Num_billete}`,
@@ -367,7 +368,7 @@ export const useProvideLoteria = () => {
       if (roleInfo.tipo_comercio === "KIOSCO") {
         tipo_comercio = "OFICINAS PROPIAS";
       }
-      console.log(selecFrac);
+      // console.log(selecFrac);
       const req = {
         num_sorteo: sort[0],
         num_billete: `${selected.Num_billete}`,
@@ -440,7 +441,7 @@ export const useProvideLoteria = () => {
   const con_distribuidor_venta = useCallback(async () => {
     try {
       const info = await fetchData(urls.con_distribuidor_venta, "GET", {});
-      console.log(info);
+      // console.log(info);
       return info;
     } catch (err) {
       console.error(err);
@@ -473,16 +474,59 @@ export const useProvideLoteria = () => {
   );
 
   const makePayment = useCallback(
-    async (sorteo, billete, serie, phone, hash) => {
+    async (
+      sorteo,
+      billete,
+      serie,
+      checkBilleteFisico,
+      checkBilleteVirtual,
+      selectFraccion,
+      nombre,
+      documento,
+      direccion,
+      celular,
+      phone,
+      hash
+    ) => {
       try {
-        const res = await fetchData(urls.premiohash, "GET", {
-          num_sorteo: sorteo,
-          bill_consultado: billete,
-          serie_consultada: serie,
-          celular: phone,
-          hash,
-        });
-
+        console.log("ESTO ES BILLETE", billete);
+        console.log("ESTO ES SERIE", serie);
+        console.log("ESTO ES checkBilleteFisico", checkBilleteFisico);
+        const res = await fetchData(
+          urls.pagoPremioLoterias,
+          "POST",
+          {},
+          {
+            datosBill: {
+              num_sorteo: "2670",
+              bill_consultado: "6697",
+              serie_consultada: "000",
+              fisico: false,
+              virtual: true,
+              valorbruto: 6024,
+              valorneto: 5000,
+              fraccion: 3,
+              hash: "2139b9a2f2",
+              nombre: "John",
+              identificacion: "101111100",
+              direccion: "cra 1 #2-3",
+              celular: 3022222222,
+            },
+            comercio: {
+              id_comercio: 13719,
+              id_terminal: 2392,
+              id_usuario: 2159,
+            },
+            idLoteria: "02",
+            tipo_ganancia: 2,
+            oficina_propia: false,
+            cod_distribuidor: "PPAGO",
+            cod_dane_ciudad: 555,
+          },
+          {},
+          true,
+          60000
+        );
         return res;
       } catch (err) {
         console.error(err);
@@ -493,7 +537,7 @@ export const useProvideLoteria = () => {
 
   const makePayment2 = useCallback(
     async (sorteo, billete, serie, fracciones_fisi) => {
-      console.log(fracciones_fisi);
+      // console.log(fracciones_fisi);
       try {
         const res = await fetchData(urls.premiofisico, "GET", {
           num_sorteo: sorteo,
@@ -651,7 +695,7 @@ export const useProvideLoteria = () => {
           tip_sorteo: tip_sorteo,
           nit_loteria: nit_loteria,
         });
-        console.log(res);
+        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -691,7 +735,7 @@ export const useProvideLoteria = () => {
           tip_sorteo: info.tipo_sorteo,
           nit_loteria: nit_loteria,
         });
-        console.log(res);
+        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -706,7 +750,7 @@ export const useProvideLoteria = () => {
         fecha_ini: fecha_ini,
         fecha_fin: fecha_fin,
       });
-      console.log(res);
+      // console.log(res);
       return res;
     } catch (err) {
       console.error(err);

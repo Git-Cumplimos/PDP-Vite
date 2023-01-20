@@ -29,8 +29,6 @@ const SendFormFisico = ({
   closeModal,
   handleSubmit,
 }) => {
-  console.log("ESTO ES SELECTED****", selected);
-  console.log("numbillete****", numbillete);
   const details = {
     // "sorteo:": sorteo,
     // "Número:": numbillete,
