@@ -493,48 +493,91 @@ export const useProvideLoteria = () => {
       comercio,
       terminal,
       usuario,
-      phone,
-      hash
+      idLoteria,
+      tipopago,
+      hash,
+      phone
     ) => {
-      try {
-        const res = await fetchData(
-          urls.pagoPremioLoterias,
-          "POST",
-          {},
-          {
-            datosBill: {
-              num_sorteo: sorteo,
-              bill_consultado: billete,
-              serie_consultada: serie,
-              fisico: false,
-              virtual: true,
-              valorbruto: valorbruto,
-              valorneto: totalPagar,
-              fraccion: selectFraccion,
-              hash: "2139b9a2f2",
-              nombre: nombre,
-              identificacion: documento,
-              direccion: direccion,
-              celular: celular,
+      if (tipopago == 2) {
+        try {
+          console.log("Acá esta llegando tipo pago########", tipopago);
+          const res = await fetchData(
+            urls.pagoPremioLoterias,
+            "POST",
+            {},
+            {
+              datosBill: {
+                num_sorteo: sorteo,
+                bill_consultado: billete,
+                serie_consultada: serie,
+                fisico: checkBilleteFisico,
+                virtual: checkBilleteVirtual,
+                valorbruto: valorbruto,
+                valorneto: totalPagar,
+                fraccion: selectFraccion,
+                hash: hash,
+                nombre: nombre,
+                identificacion: documento,
+                direccion: direccion,
+                celular: celular,
+              },
+              comercio: {
+                id_comercio: comercio,
+                id_terminal: terminal,
+                id_usuario: usuario,
+              },
+              idLoteria: idLoteria,
+              tipo_ganancia: tipopago,
+              oficina_propia: false,
+              cod_distribuidor: "PPAGO",
+              cod_dane_ciudad: 555,
             },
-            comercio: {
-              id_comercio: comercio,
-              id_terminal: terminal,
-              id_usuario: usuario,
+            {},
+            true,
+            60000
+          );
+          return res;
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        try {
+          console.log("Acá esta llegando tipo pago########", tipopago);
+          const res = await fetchData(
+            urls.pagoPremioLoterias,
+            "POST",
+            {},
+            {
+              datosBill: {
+                num_sorteo: sorteo,
+                bill_consultado: billete,
+                serie_consultada: serie,
+                fisico: checkBilleteFisico,
+                virtual: checkBilleteVirtual,
+                valorbruto: valorbruto,
+                valorneto: totalPagar,
+                fraccion: selectFraccion,
+                hash: hash,
+              },
+              comercio: {
+                id_comercio: comercio,
+                id_terminal: terminal,
+                id_usuario: usuario,
+              },
+              idLoteria: idLoteria,
+              tipo_ganancia: tipopago,
+              oficina_propia: false,
+              cod_distribuidor: "PPAGO",
+              cod_dane_ciudad: 555,
             },
-            idLoteria: "02",
-            tipo_ganancia: 2,
-            oficina_propia: false,
-            cod_distribuidor: "PPAGO",
-            cod_dane_ciudad: 555,
-          },
-          {},
-          true,
-          60000
-        );
-        return res;
-      } catch (err) {
-        console.error(err);
+            {},
+            true,
+            60000
+          );
+          return res;
+        } catch (err) {
+          console.error(err);
+        }
       }
     },
     []

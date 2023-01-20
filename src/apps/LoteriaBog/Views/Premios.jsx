@@ -36,10 +36,12 @@ const Premios = ({ route }) => {
   const [totalPagar, setTotalPagar] = useState("");
   const [valorbruto, setValorbruto] = useState("");
   const [serie, setSerie] = useState("");
+  const [idLoteria, seIdLoteria] = useState("");
   const [total, setTotal] = useState("");
   const [valNetoFraccion, setValNetoFraccion] = useState("");
   const [phone, setPhone] = useState("");
   const [hash, setHash] = useState("");
+  const [maxPago, setMaxPago] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
   console.log("ESTO ES EL ROLEINFO", roleInfo);
@@ -53,7 +55,7 @@ const Premios = ({ route }) => {
     statusPagoPremio: false,
   });
   const [datosComercio, setDatosComercio] = useState({
-    comercio: "0",
+    comercio: "",
     terminal: "",
     usuario: "",
   });
@@ -168,6 +170,11 @@ const Premios = ({ route }) => {
     e.preventDefault();
     isWinner(sorteo, billete, serie)
       .then((res) => {
+        var salvarRes = res;
+        setMaxPago(res?.obj?.max_pago);
+        seIdLoteria(res?.obj?.idloteria);
+        setTotalPagar(res?.obj?.total);
+        setTipopago(salvarRes?.obj?.tipo_ganancia);
         setDatosComercio((old) => {
           return {
             ...old,
@@ -176,20 +183,17 @@ const Premios = ({ route }) => {
             terminal: roleInfo?.id_dispositivo,
           };
         });
-        var salvarRes = res;
+
         setRespuesta(false);
+        setValorbruto(res?.obj?.valorbruto);
         fracbill.length = 0;
         setDisabledBtns(false);
-        setTotalPagar(res?.obj?.total);
-        setValorbruto(res?.obj?.valorbruto);
         console.log("ESTO ES RES***", res);
-
         if ("msg" in res) {
           if (res?.obj?.max_pago == true) {
             notifyError(
               "El valor del premio, supera el valor asignado para el comercio"
             );
-          } else if (res?.obj?.ganador) {
             var gana = res?.obj?.gana;
             var ValNetoFraccion = res?.obj?.ValNetoFraccion;
             res = [];
@@ -209,11 +213,33 @@ const Premios = ({ route }) => {
               "",
               formatMoney.format(totalPagar),
             ]);
-            setWinner(true);
+            setRespagar(res);
+            setShowTable(true);
+          } else if (res?.obj?.ganador) {
+            gana = res?.obj?.gana;
+            ValNetoFraccion = res?.obj?.ValNetoFraccion;
+            res = [];
+            for (let i = 0; i < gana.length; i++) {
+              res.push([
+                gana[i],
+                sorteo,
+                billete,
+                serie,
+                formatMoney.format(ValNetoFraccion[i]),
+              ]);
+            }
+            res.push([
+              "TOTAL A PAGAR:",
+              "",
+              "",
+              "",
+              formatMoney.format(totalPagar),
+            ]);
             // setIsSelf(true);
             console.log("RES??? CRISTINA", res);
             setRespagar(res);
             setShowTable(true);
+            setWinner(true);
           } else if (res?.obj?.ganador == false && "msg" in res) {
             notifyError(res?.obj?.gana);
             setWinner(false);
@@ -221,7 +247,7 @@ const Premios = ({ route }) => {
           }
         }
         console.log("Esto es tipo de ganancia", salvarRes?.obj?.tipo_ganancia);
-        setTipopago(2);
+        // setTipopago(2);
         if (salvarRes?.obj?.tipo_ganancia == 2) {
           setWinner(true);
           setTipopago(salvarRes?.obj?.tipo_ganancia);
@@ -259,6 +285,8 @@ const Premios = ({ route }) => {
     e.preventDefault();
     setRespuesta(true);
     // setDisabledBtns(true);
+    if (checkBilleteFisico) {
+    }
     makePayment(
       sorteo,
       billete,
@@ -275,8 +303,10 @@ const Premios = ({ route }) => {
       datosComercio.comercio,
       datosComercio.terminal,
       datosComercio.usuario,
-      phone,
-      hash
+      idLoteria,
+      tipopago,
+      hash,
+      phone
     )
       .then((res) => {
         setRespuesta(false);
@@ -413,6 +443,14 @@ const Premios = ({ route }) => {
     //   setIsSelf(true);
     // }
   }, [setIsSelf]);
+  useEffect(() => {
+    // if (isSelf) {
+    //   setIsSelf(true);
+    // } else {
+    //   setIsSelf(true);
+    // }
+    // setTotalPagar();
+  }, [setTotalPagar]);
   const optionsDocumento = [
     { value: "0", label: "Seleccione la fracción" },
     { value: "1", label: "Fracción # 1" },
@@ -514,7 +552,7 @@ const Premios = ({ route }) => {
             ]}
             data={respagar}></TableEnterprise>
 
-          {tipopago === 2 ? (
+          {tipopago === 2 && !maxPago ? (
             <Form onSubmit={onPay1} grid>
               <Fieldset
                 className="lg:col-span-2"
@@ -641,7 +679,7 @@ const Premios = ({ route }) => {
                     autoComplete="off"
                     required
                     value={hash}
-                    onInput={(e) => {
+                    onChange={(e) => {
                       setHash(e.target.value);
                     }}
                   />
@@ -663,110 +701,117 @@ const Premios = ({ route }) => {
             </Form>
           ) : (
             <>
-              <Form onSubmit={onPay2} grid>
-                {/************Selección tipo de documento******************* */}
-                <Fieldset
-                  className="lg:col-span-2"
-                  legend={"Seleccione un tipo de billete fielset 2"}>
-                  <Select
-                    id="selectFraccion"
-                    label="Fracción"
-                    options={optionsDocumento}
-                    value={datosCliente?.selectFraccion}
-                    onChange={(e) => {
-                      setDatosCliente((old) => {
-                        return { ...old, selectFraccion: e.target.value };
-                      });
-                    }}
-                    required
-                  />
-                  <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
-                    <Input
-                      type="checkbox"
-                      label="Billete Físico"
-                      required
-                      value={checkBilleteFisico}
-                      disabled={checkDisableFisico}
-                      onChange={() => {
-                        setCheckBilleteFisico(!checkBilleteFisico);
-                        if (checkBilleteFisico == true) {
-                          setCheckDisableVirtual(false);
-                          setIsSelf(!isSelf);
-                        } else {
-                          setCheckDisableVirtual(true);
-                        }
-                      }}></Input>
+              {!maxPago ? (
+                <>
+                  <Form onSubmit={onPay1} grid>
+                    {/************Selección tipo de documento******************* */}
+                    <Fieldset
+                      className="lg:col-span-2"
+                      legend={"Seleccione un tipo de billete fielset 2"}>
+                      <Select
+                        id="selectFraccion"
+                        label="Fracción"
+                        options={optionsDocumento}
+                        value={datosCliente?.selectFraccion}
+                        onChange={(e) => {
+                          setDatosCliente((old) => {
+                            return { ...old, selectFraccion: e.target.value };
+                          });
+                        }}
+                        required
+                      />
+                      <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
+                        <Input
+                          type="checkbox"
+                          label="Billete Físico"
+                          required
+                          value={checkBilleteFisico}
+                          disabled={checkDisableFisico}
+                          onChange={() => {
+                            setCheckBilleteFisico(!checkBilleteFisico);
+                            if (checkBilleteFisico == true) {
+                              setCheckDisableVirtual(false);
+                              setIsSelf(!isSelf);
+                            } else {
+                              setCheckDisableVirtual(true);
+                            }
+                          }}></Input>
 
-                    <Input
-                      label="Billete Virtual"
-                      type="checkbox"
-                      required
-                      disabled={checkDisableVirtual}
-                      value={checkBilleteVirtual}
-                      onChange={() => {
-                        setCheckBilleteVirtual(!checkBilleteVirtual);
-                        if (checkBilleteVirtual == true) {
-                          setCheckDisableFisico(false);
-                          setIsSelf(true);
-                        } else {
-                          setCheckDisableFisico(true);
-                        }
-                      }}></Input>
-                  </div>
-                  {checkBilleteVirtual == true ? (
-                    <Input
-                      id="codHash"
-                      label="Codigo de seguridad"
-                      type="text"
-                      autoComplete="off"
-                      required
-                      value={hash}
-                      onInput={(e) => {
-                        setHash(e.target.value);
-                      }}
-                    />
-                  ) : (
-                    ""
-                  )}
-                  {checkBilleteVirtual == true || checkBilleteFisico == true ? (
-                    <>
+                        <Input
+                          label="Billete Virtual"
+                          type="checkbox"
+                          required
+                          disabled={checkDisableVirtual}
+                          value={checkBilleteVirtual}
+                          onChange={() => {
+                            setCheckBilleteVirtual(!checkBilleteVirtual);
+                            if (checkBilleteVirtual == true) {
+                              setCheckDisableFisico(false);
+                              setIsSelf(true);
+                            } else {
+                              setCheckDisableFisico(true);
+                            }
+                          }}></Input>
+                      </div>
+                      {checkBilleteVirtual == true ? (
+                        <Input
+                          id="codHash"
+                          label="Codigo de seguridad"
+                          type="text"
+                          autoComplete="off"
+                          required
+                          value={hash}
+                          onChange={(e) => {
+                            setHash(e.target.value);
+                          }}
+                        />
+                      ) : (
+                        ""
+                      )}
+                      {checkBilleteVirtual == true ||
+                      checkBilleteFisico == true ? (
+                        <>
+                          <ButtonBar className="col-auto md:col-span-2">
+                            <Button type="submit" disabled={disabledBtns}>
+                              Pagar
+                            </Button>
+                          </ButtonBar>
+                        </>
+                      ) : (
+                        ""
+                      )}
+                    </Fieldset>
+                  </Form>
+                  <Form onSubmit={onPay2} grid>
+                    {/* <h2>Este numero no fue vendido por Punto de pago, solicite el billete</h2> */}
+
+                    {fracbill.map((frac, index) => {
+                      return (
+                        <Input
+                          id={frac}
+                          label={`Fracción ${frac}:`}
+                          type="checkbox"
+                          value={frac}
+                          checked={checkedState[index]}
+                          onChange={() => handleOnChange(index)}
+                        />
+                      );
+                    })}
+
+                    {selecFrac.length >= 1 ? (
                       <ButtonBar className="col-auto md:col-span-2">
                         <Button type="submit" disabled={disabledBtns}>
                           Pagar
                         </Button>
                       </ButtonBar>
-                    </>
-                  ) : (
-                    ""
-                  )}
-                </Fieldset>
-              </Form>
-              <Form onSubmit={onPay2} grid>
-                {/* <h2>Este numero no fue vendido por Punto de pago, solicite el billete</h2> */}
-
-                {fracbill.map((frac, index) => {
-                  return (
-                    <Input
-                      id={frac}
-                      label={`Fracción ${frac}:`}
-                      type="checkbox"
-                      value={frac}
-                      checked={checkedState[index]}
-                      onChange={() => handleOnChange(index)}
-                    />
-                  );
-                })}
-
-                {selecFrac.length >= 1 ? (
-                  <ButtonBar className="col-auto md:col-span-2">
-                    <Button type="submit" disabled={disabledBtns}>
-                      Pagar
-                    </Button>
-                  </ButtonBar>
-                ) : (
-                  ""
-                )}
-              </Form>
+                    ) : (
+                      ""
+                    )}
+                  </Form>
+                </>
+              ) : (
+                ""
+              )}
             </>
           )}
           {/* <Form onSubmit={onPay2} grid>
