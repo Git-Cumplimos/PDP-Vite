@@ -33,6 +33,8 @@ const Premios = ({ route }) => {
   const navigate = useNavigate();
   const [sorteo, setSorteo] = useState("");
   const [billete, setBillete] = useState("");
+  const [totalPagar, setTotalPagar] = useState("");
+  const [valorbruto, setValorbruto] = useState("");
   const [serie, setSerie] = useState("");
   const [total, setTotal] = useState("");
   const [valNetoFraccion, setValNetoFraccion] = useState("");
@@ -40,6 +42,7 @@ const Premios = ({ route }) => {
   const [hash, setHash] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
+  console.log("ESTO ES EL ROLEINFO", roleInfo);
   const [datosCliente, setDatosCliente] = useState({
     selectFraccion: "0",
     nombre: "",
@@ -48,6 +51,11 @@ const Premios = ({ route }) => {
     celular: "",
     idTransaccion: "",
     statusPagoPremio: false,
+  });
+  const [datosComercio, setDatosComercio] = useState({
+    comercio: "0",
+    terminal: "",
+    usuario: "",
   });
   const handleClose = useCallback(() => {
     setShowAllmodals((old) => {
@@ -160,15 +168,28 @@ const Premios = ({ route }) => {
     e.preventDefault();
     isWinner(sorteo, billete, serie)
       .then((res) => {
+        setDatosComercio((old) => {
+          return {
+            ...old,
+            comercio: roleInfo?.id_comercio,
+            usuario: roleInfo?.id_usuario,
+            terminal: roleInfo?.id_dispositivo,
+          };
+        });
         var salvarRes = res;
         setRespuesta(false);
         fracbill.length = 0;
         setDisabledBtns(false);
-        var totalPagar = res?.obj?.total;
+        setTotalPagar(res?.obj?.total);
+        setValorbruto(res?.obj?.valorbruto);
         console.log("ESTO ES RES***", res);
 
         if ("msg" in res) {
-          if (res?.obj?.ganador) {
+          if (res?.obj?.max_pago == true) {
+            notifyError(
+              "El valor del premio, supera el valor asignado para el comercio"
+            );
+          } else if (res?.obj?.ganador) {
             var gana = res?.obj?.gana;
             var ValNetoFraccion = res?.obj?.ValNetoFraccion;
             res = [];
@@ -200,6 +221,7 @@ const Premios = ({ route }) => {
           }
         }
         console.log("Esto es tipo de ganancia", salvarRes?.obj?.tipo_ganancia);
+        setTipopago(2);
         if (salvarRes?.obj?.tipo_ganancia == 2) {
           setWinner(true);
           setTipopago(salvarRes?.obj?.tipo_ganancia);
@@ -241,27 +263,40 @@ const Premios = ({ route }) => {
       sorteo,
       billete,
       serie,
-      phone,
-      hash,
       checkBilleteFisico,
       checkBilleteVirtual,
       datosCliente?.selectFraccion,
       datosCliente?.nombre,
       datosCliente?.documento,
       datosCliente?.direccion,
-      datosCliente?.celular
+      datosCliente?.celular,
+      totalPagar,
+      valorbruto,
+      datosComercio.comercio,
+      datosComercio.terminal,
+      datosComercio.usuario,
+      phone,
+      hash
     )
       .then((res) => {
         setRespuesta(false);
+
         console.log("ESTO ES EL RES DEL PAGO***", res);
         setDatosCliente((old) => {
-          return { ...old, statusPagoPremio: res?.status };
+          return {
+            ...old,
+            statusPagoPremio: res?.status,
+            idTransaccion: res?.obj?.id_trx,
+          };
         });
         console.log("ESTO ES EL RES DEL STATUS***", res?.status);
         console.log(
           "ESTO ES datosCliente?.statusPagoPremio ????????***",
           datosCliente?.statusPagoPremio
         );
+        if (res?.status == false) {
+          notifyError(res?.obj?.msg);
+        }
         // setShowModal(true);
         // setDisabledBtns(false);
         // setRespagar(res);
@@ -279,6 +314,7 @@ const Premios = ({ route }) => {
       })
       .catch(() => setDisabledBtns(false));
   };
+
   const tickets = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -298,7 +334,7 @@ const Premios = ({ route }) => {
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Id Trx ", 222],
+        ["Id Trx ", datosCliente.idTransaccion],
         ["Id Aut ", 333],
         ["Municipio", roleInfo?.ciudad],
         ["", ""],
@@ -311,7 +347,7 @@ const Premios = ({ route }) => {
         ["", "DATOS DEL CLIENTE"],
         ["Nombre", datosCliente?.nombre],
         ["Celular", datosCliente?.celular],
-        ["Valor", formatMoney.format("Hola")],
+        ["Valor", formatMoney.format(totalPagar)],
       ],
 
       disclamer:
@@ -477,9 +513,12 @@ const Premios = ({ route }) => {
               "Premio Neto x Fraccion",
             ]}
             data={respagar}></TableEnterprise>
-          <Fieldset legend={"Seleccione un tipo de billete"}>
-            {tipopago == 2 ? (
-              <Form onSubmit={onPay1} grid>
+
+          {tipopago === 2 ? (
+            <Form onSubmit={onPay1} grid>
+              <Fieldset
+                className="lg:col-span-2"
+                legend={"Seleccione un tipo de billete"}>
                 <Input
                   id="nombre"
                   label="Nombre"
@@ -561,7 +600,7 @@ const Premios = ({ route }) => {
                   }}
                   required
                 />
-                <div>
+                <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
                   <Input
                     type="checkbox"
                     label="Billete Físico"
@@ -593,39 +632,42 @@ const Premios = ({ route }) => {
                         setCheckDisableFisico(true);
                       }
                     }}></Input>
-                  {checkBilleteVirtual == true ? (
-                    <Input
-                      id="codHash"
-                      label="Codigo de seguridad"
-                      type="text"
-                      autoComplete="off"
-                      required
-                      value={hash}
-                      onInput={(e) => {
-                        setHash(e.target.value);
-                      }}
-                    />
-                  ) : (
-                    ""
-                  )}
-                  {checkBilleteVirtual == true || checkBilleteFisico == true ? (
-                    <>
-                      <ButtonBar className="col-auto md:col-span-2">
-                        <Button type="submit" disabled={disabledBtns}>
-                          Pagar
-                        </Button>
-                      </ButtonBar>
-                    </>
-                  ) : (
-                    ""
-                  )}
                 </div>
-              </Form>
-            ) : (
-              <>
-                <Form onSubmit={onPay2} grid>
-                  {/************Selección tipo de documento******************* */}
-
+                {checkBilleteVirtual == true ? (
+                  <Input
+                    id="codHash"
+                    label="Codigo de seguridad"
+                    type="text"
+                    autoComplete="off"
+                    required
+                    value={hash}
+                    onInput={(e) => {
+                      setHash(e.target.value);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
+                {checkBilleteVirtual == true || checkBilleteFisico == true ? (
+                  <>
+                    <ButtonBar className="col-auto md:col-span-2">
+                      <Button type="submit" disabled={disabledBtns}>
+                        Pagar
+                      </Button>
+                    </ButtonBar>
+                  </>
+                ) : (
+                  ""
+                )}
+              </Fieldset>
+            </Form>
+          ) : (
+            <>
+              <Form onSubmit={onPay2} grid>
+                {/************Selección tipo de documento******************* */}
+                <Fieldset
+                  className="lg:col-span-2"
+                  legend={"Seleccione un tipo de billete fielset 2"}>
                   <Select
                     id="selectFraccion"
                     label="Fracción"
@@ -638,37 +680,39 @@ const Premios = ({ route }) => {
                     }}
                     required
                   />
-                  <Input
-                    type="checkbox"
-                    label="Billete Físico"
-                    required
-                    value={checkBilleteFisico}
-                    disabled={checkDisableFisico}
-                    onChange={() => {
-                      setCheckBilleteFisico(!checkBilleteFisico);
-                      if (checkBilleteFisico == true) {
-                        setCheckDisableVirtual(false);
-                        setIsSelf(!isSelf);
-                      } else {
-                        setCheckDisableVirtual(true);
-                      }
-                    }}></Input>
+                  <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
+                    <Input
+                      type="checkbox"
+                      label="Billete Físico"
+                      required
+                      value={checkBilleteFisico}
+                      disabled={checkDisableFisico}
+                      onChange={() => {
+                        setCheckBilleteFisico(!checkBilleteFisico);
+                        if (checkBilleteFisico == true) {
+                          setCheckDisableVirtual(false);
+                          setIsSelf(!isSelf);
+                        } else {
+                          setCheckDisableVirtual(true);
+                        }
+                      }}></Input>
 
-                  <Input
-                    label="Billete Virtual"
-                    type="checkbox"
-                    required
-                    disabled={checkDisableVirtual}
-                    value={checkBilleteVirtual}
-                    onChange={() => {
-                      setCheckBilleteVirtual(!checkBilleteVirtual);
-                      if (checkBilleteVirtual == true) {
-                        setCheckDisableFisico(false);
-                        setIsSelf(true);
-                      } else {
-                        setCheckDisableFisico(true);
-                      }
-                    }}></Input>
+                    <Input
+                      label="Billete Virtual"
+                      type="checkbox"
+                      required
+                      disabled={checkDisableVirtual}
+                      value={checkBilleteVirtual}
+                      onChange={() => {
+                        setCheckBilleteVirtual(!checkBilleteVirtual);
+                        if (checkBilleteVirtual == true) {
+                          setCheckDisableFisico(false);
+                          setIsSelf(true);
+                        } else {
+                          setCheckDisableFisico(true);
+                        }
+                      }}></Input>
+                  </div>
                   {checkBilleteVirtual == true ? (
                     <Input
                       id="codHash"
@@ -695,36 +739,40 @@ const Premios = ({ route }) => {
                   ) : (
                     ""
                   )}
-                </Form>
-                <Form onSubmit={onPay2} grid>
-                  {/* <h2>Este numero no fue vendido por Punto de pago, solicite el billete</h2> */}
+                </Fieldset>
+              </Form>
+              <Form onSubmit={onPay2} grid>
+                {/* <h2>Este numero no fue vendido por Punto de pago, solicite el billete</h2> */}
 
-                  {fracbill.map((frac, index) => {
-                    return (
-                      <Input
-                        id={frac}
-                        label={`Fracción ${frac}:`}
-                        type="checkbox"
-                        value={frac}
-                        checked={checkedState[index]}
-                        onChange={() => handleOnChange(index)}
-                      />
-                    );
-                  })}
+                {fracbill.map((frac, index) => {
+                  return (
+                    <Input
+                      id={frac}
+                      label={`Fracción ${frac}:`}
+                      type="checkbox"
+                      value={frac}
+                      checked={checkedState[index]}
+                      onChange={() => handleOnChange(index)}
+                    />
+                  );
+                })}
 
-                  {selecFrac.length >= 1 ? (
-                    <ButtonBar className="col-auto md:col-span-2">
-                      <Button type="submit" disabled={disabledBtns}>
-                        Pagar
-                      </Button>
-                    </ButtonBar>
-                  ) : (
-                    ""
-                  )}
-                </Form>
-              </>
-            )}
-            <Form onSubmit={onPay2} grid>
+                {selecFrac.length >= 1 ? (
+                  <ButtonBar className="col-auto md:col-span-2">
+                    <Button type="submit" disabled={disabledBtns}>
+                      Pagar
+                    </Button>
+                  </ButtonBar>
+                ) : (
+                  ""
+                )}
+              </Form>
+            </>
+          )}
+          {/* <Form onSubmit={onPay2} grid>
+            <Fieldset
+              className="lg:col-span-2"
+              legend={"Seleccione un tipo de billete fielset 2"}>
               {fracbill.map((frac, index) => {
                 return (
                   <Input
@@ -746,8 +794,8 @@ const Premios = ({ route }) => {
               ) : (
                 ""
               )}
-            </Form>
-          </Fieldset>
+            </Fieldset>
+          </Form> */}
         </>
       ) : (
         ""

@@ -449,6 +449,9 @@ export const useProvideLoteria = () => {
   }, []);
   const isWinner = useCallback(
     async (sorteo, billete, serie) => {
+      console.log("sorteo en loteriahook???????", sorteo);
+      console.log("billete en loteriahook???????", billete);
+      console.log("serie en loteriahook???????", serie);
       let loteria = sorteosLOT.split(",");
       try {
         const res = await fetchData(
@@ -485,37 +488,39 @@ export const useProvideLoteria = () => {
       documento,
       direccion,
       celular,
+      totalPagar,
+      valorbruto,
+      comercio,
+      terminal,
+      usuario,
       phone,
       hash
     ) => {
       try {
-        console.log("ESTO ES BILLETE", billete);
-        console.log("ESTO ES SERIE", serie);
-        console.log("ESTO ES checkBilleteFisico", checkBilleteFisico);
         const res = await fetchData(
           urls.pagoPremioLoterias,
           "POST",
           {},
           {
             datosBill: {
-              num_sorteo: "2670",
-              bill_consultado: "6697",
-              serie_consultada: "000",
+              num_sorteo: sorteo,
+              bill_consultado: billete,
+              serie_consultada: serie,
               fisico: false,
               virtual: true,
-              valorbruto: 6024,
-              valorneto: 5000,
-              fraccion: 3,
+              valorbruto: valorbruto,
+              valorneto: totalPagar,
+              fraccion: selectFraccion,
               hash: "2139b9a2f2",
-              nombre: "John",
-              identificacion: "101111100",
-              direccion: "cra 1 #2-3",
-              celular: 3022222222,
+              nombre: nombre,
+              identificacion: documento,
+              direccion: direccion,
+              celular: celular,
             },
             comercio: {
-              id_comercio: 13719,
-              id_terminal: 2392,
-              id_usuario: 2159,
+              id_comercio: comercio,
+              id_terminal: terminal,
+              id_usuario: usuario,
             },
             idLoteria: "02",
             tipo_ganancia: 2,
