@@ -197,7 +197,9 @@ const RecargasOperadores = () => {
                             setRespuesta(false);
                             setTypeInfo("RecargaExitosa");
                           } else {
-                            notifyError(res?.obj?.response?.["respuesta"]);
+                            notifyError(
+                              "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                            );
                             setRespuesta(true);
                             handleClose();
                             resolve(true);
@@ -221,22 +223,24 @@ const RecargasOperadores = () => {
               } catch (error) {
                 console.error(error);
               }
-              notify("Su transacción esta siendo procesada, no recargue la página");
+              notify(
+                "Su transacción esta siendo procesada, no recargue la página"
+              );
             }
             validNavigate("/recargas-paquetes");
           }
           else {
-            notifyError(res?.msg);
+            notifyError("Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])");
             setRespuesta(false);
             handleClose();
-          }          
+          }
         }
       })
       .catch((err) => {
         setRespuesta(false);
-        notifyError("No se ha podido conectar al servidor");
+        notifyError("Error respuesta PDP: Falla en la conexión [CODIGO]");
         console.error(err);
-        handleClose();      
+        handleClose();
       });
   };
 

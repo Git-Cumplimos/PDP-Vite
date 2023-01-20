@@ -4,7 +4,6 @@ import React, {
   useEffect,
   useRef,
   useState,
-  useMemo,
 } from "react";
 import useMoney from "../../../../hooks/useMoney";
 import { useReactToPrint } from "react-to-print";
@@ -28,7 +27,7 @@ import {
   fetchConsultaPinEPM,
   fetchConsultaPinSNR,
 } from "../../utils/fetchBackPines";
-import { useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import { v4 } from "uuid";
 
@@ -92,6 +91,7 @@ const CompraPin = () => {
         },
       })
         .then((res) => {
+          console.log("Esto es res", res);
           if (res?.obj?.respuesta == "Consulta con error") {
             if (res?.obj?.data?.nombre == "Usuario no existe") {
               notifyError("Usuario no existe");
@@ -122,6 +122,7 @@ const CompraPin = () => {
           }
         })
         .catch((err) => {
+          console.log("Esto es esl cath err linea 126", err);
           notifyError("Transaccón declinada", err);
         });
     } else if (state?.op == "em") {
@@ -133,6 +134,7 @@ const CompraPin = () => {
         },
       })
         .then((res) => {
+          console.log("Este es el res lina 138", res);
           if (res?.obj?.respuesta == "Consulta con error") {
             if (res?.obj?.data?.nombre == "Usuario no existe") {
               notifyError("Usuario no existe");
@@ -156,6 +158,7 @@ const CompraPin = () => {
           }
         })
         .catch((err) => {
+          console.log("Esto es esl cath err linea 162", err);
           notifyError("Transaccón declinada", err);
         });
     }
@@ -407,6 +410,7 @@ const CompraPin = () => {
                       id_uuid_trx: uniqueId,
                     })
                       .then((res) => {
+                        console.log("Esto es es res linea 414", res);
                         if (res?.msg !== "No ha terminado el reintento") {
                           if (
                             res?.status === true ||
@@ -416,7 +420,7 @@ const CompraPin = () => {
                             VentaExitosa(res?.obj?.response, fecha, hora);
                             setShowLoading(false);
                           } else {
-                            notifyError(res?.obj?.response?.["respuesta"]);
+                            notifyError("Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])");
                             setShowLoading(true);
                             setShowModal(false);
                             showModalDatosEPM(false);
@@ -442,22 +446,19 @@ const CompraPin = () => {
                   break;
                 }
               } catch (error) {
-                console.error("Entró al catch del for");
-
                 console.error(error);
               }
               notify(
                 "Su transacción esta siendo procesada, no recargue la página"
               );
             }
-            notifyError("Error de TimeOut. Sin respuesta");
             validNavigate("/Pines/PinesContenido");
           } else {
             notifyError(
               res?.obj?.response?.respuesta ==
                 ":Error en el numero telefonico, si crees que el numero esta correcto comunicalo al distribuidor"
                 ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
-                : res?.msg
+                : "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
             );
             setShowLoading(false);
             showModalDatosEPM(false);
@@ -469,7 +470,7 @@ const CompraPin = () => {
         }
       })
       .catch(async (err) => {
-        notifyError("No se ha podido conectar al servidor");
+        notifyError("Error respuesta PDP: Falla en la conexión [CODIGO]");
         setShowLoading(false);
         handleClose();
       });
@@ -534,7 +535,9 @@ const CompraPin = () => {
       })
       .catch((err) => {
         console.error(err);
-        notifyError("Error guardando el ticket");
+        console.log("Error guardando el ticket");
+        notifyError("Error respuesta PDP: Error guardando el ticket [CODIGO]");
+        // notifyError("Error guardando el ticket");
       });
   };
 
