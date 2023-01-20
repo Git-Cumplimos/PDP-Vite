@@ -55,20 +55,21 @@ const CargarArchivos = () => {
       if (archivos1[0]) {
         /*   console.log("primer fetch", data); */
         const formData = new FormData();
-        formData.set("id_proceso", "davivienda");
-        /*        fetch(`${urlBackend}/uploadfile?id_proceso=davivienda`, {
-          method: "GET",
-          mode: "cors",
-        })
-          .then((response) => response.json()) */
+        formData.set("id_proceso", "bancolombia");
+
         fetchData(
-          `${urlBackend}/uploadfile?id_proceso=davivienda`,
+          `${urlBackend}/uploadfile?id_proceso=bancolombia`,
           "GET",
           {},
           {},
           {},
           true
         )
+          /* fetch(`${urlBackend}/uploadfile?id_proceso=bancolombia`, {
+          method: "GET",
+          mode: "cors",
+        })
+          .then((response) => response.json()) */
           .then((data2) => {
             // console.log(data2);
             if (!data2?.status) {

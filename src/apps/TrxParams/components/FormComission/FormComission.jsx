@@ -61,8 +61,6 @@ const FormComission = ({ outerState, onSubmit, children }) => {
         return;
       }
       if (copy?.ranges.length > 1) {
-        const almostLast = copy?.ranges.at(-2);
-        console.log(almostLast, last);
         if (last?.["Rango maximo"] <= last?.["Rango minimo"]) {
           return notifyError(
             "El valor del rango mínimo debe ser superior al valor máximo"
@@ -105,8 +103,8 @@ const FormComission = ({ outerState, onSubmit, children }) => {
             name='comissionType'
             label='Tipo de pago de comisión'
             options={{
-              "Transaccion Escalonada": "trxEsc",
-              "Transaccion Acumulada": "trx",
+              "Transacción Escalonada": "trxEsc",
+              "Transacción Acumulada": "trx",
               Monto: "monto",
             }}
             value={comissionData?.type}
@@ -130,17 +128,25 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                         <Input
                           key={`${key}_${ind}`}
                           id={`${key}_${ind}`}
-                          label={key}
+                          label={
+                            key === "Rango minimo"
+                              ? "Rango mínimo"
+                              : key === "Rango maximo"
+                              ? "Rango máximo"
+                              : key
+                          }
                           name={`${key}|${ind}`}
                           type={"text"}
                           value={val}
                           onInput={(e) => {
                             let valor = e.target.value;
-                            let num = valor.replace(/[\s.]/g, "");
-                            num = num.replace(/^0[0-9]/, "");
+                            let num = valor.replace(/[\s.-]/g, "");
+                            // num = num.replace(/^0[0-9]/, "");
                             if (!isNaN(num)) {
                               let copyData = { ...comissionData };
-                              copyData.ranges[ind][key] = num;
+                              copyData.ranges[ind][key] = !isNaN(parseInt(num))
+                                ? parseInt(num)
+                                : 0;
                               setComissionData(copyData);
                             }
                           }}
@@ -168,7 +174,13 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           id={`${key}_${ind}`}
                           key={`${key}_${ind}`}
                           name={`${key}|${ind}`}
-                          label={key}
+                          label={
+                            key === "Rango minimo"
+                              ? "Rango mínimo"
+                              : key === "Rango maximo"
+                              ? "Rango máximo"
+                              : key
+                          }
                           type='text'
                           autoComplete='off'
                           maxLength={"15"}
@@ -193,18 +205,23 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                       <Input
                         key={`${key}_${ind}`}
                         id={`${key}_${ind}`}
-                        label={key}
+                        label={"Comisión porcentual"}
                         name={`${key}|${ind}`}
                         type={"text"}
                         value={val}
                         // onChange={() => {}}
                         onInput={(e) => {
                           let valor = e.target.value;
-                          let num = valor.replace(/[\s]/g, "");
-                          num = num.replace(/^0[0-9]/, "");
+                          let num = valor.replace(/[\s-]/g, "");
+                          // num = num.replace(/^0[0-9]/, "");
                           if (!isNaN(num)) {
                             let copyData = { ...comissionData };
-                            copyData.ranges[ind][key] = num;
+                            copyData.ranges[ind][key] =
+                              num.slice(-1) === "."
+                                ? num
+                                : !isNaN(parseFloat(num))
+                                ? parseFloat(num)
+                                : 0;
                             setComissionData(copyData);
                           }
                           if (num > 10) {
@@ -243,7 +260,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                         id={`${key}_${ind}`}
                         key={`${key}_${ind}`}
                         name={`${key}|${ind}`}
-                        label={key}
+                        label={"Comisión fija"}
                         type='text'
                         autoComplete='off'
                         maxLength={"15"}

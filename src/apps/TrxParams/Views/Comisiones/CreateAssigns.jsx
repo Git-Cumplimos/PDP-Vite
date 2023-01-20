@@ -100,7 +100,7 @@ const CreateAssigns = () => {
   const deleteAssignComission = useCallback(
     (ev) => {
       ev.preventDefault();
-      const obj = {}
+      const obj = {};
       setIsUploading(true);
       if (newComision?.pk_asignacion_comisiones !== "") {
         obj["pk_asignacion_comisiones"] = newComision.pk_asignacion_comisiones;
@@ -119,7 +119,10 @@ const CreateAssigns = () => {
             setIsUploading(false);
             console.error(err);
           });
-      }},[navigate,newComision]) 
+      }
+    },
+    [navigate, newComision]
+  );
 
   useEffect(() => {
     fetchAssignsFunc();
@@ -132,7 +135,6 @@ const CreateAssigns = () => {
       })
         .then((res) => {
           setIsUploading(false);
-          console.log(res);
           const dataRes = res?.results;
           if (dataRes.length > 0) {
             setNewComision((old) => ({
@@ -263,11 +265,11 @@ const CreateAssigns = () => {
             }}>
             Cancelar
           </Button>
-            {newComision?.pk_asignacion_comisiones !== "" &&
-          <Button type='button' onClick={handleShow("eliminarAsignacion")}>
+          {newComision?.pk_asignacion_comisiones !== "" && (
+            <Button type='button' onClick={handleShow("eliminarAsignacion")}>
               Eliminar asignación de comisión
-          </Button>
-}
+            </Button>
+          )}
           <Button type='submit'>
             {newComision?.pk_asignacion_comisiones !== ""
               ? "Actualizar asignación comisión"
@@ -297,24 +299,23 @@ const CreateAssigns = () => {
             setNewComision={setNewComision}
             newComision={newComision}
           />
-        ) : selectedOpt === "eliminarAsignacion" ?(
+        ) : selectedOpt === "eliminarAsignacion" ? (
           <>
-              <h1 className='text-2xl text-center mb-5 font-semibold'>
-                ¿Está seguro de eliminar la asignación?
-              </h1>
-              <ButtonBar className='lg:col-span-2'>
-          <Button
-            type='button'
-            onClick={handleClose}>
-            Cancelar
-          </Button>
-          <Button type='submit' onClick={deleteAssignComission}>
-              Eliminar asignación de comisión
-          </Button>
-        </ButtonBar>
+            <h1 className='text-2xl text-center mb-5 font-semibold'>
+              ¿Está seguro de eliminar la asignación?
+            </h1>
+            <ButtonBar className='lg:col-span-2'>
+              <Button type='button' onClick={handleClose}>
+                Cancelar
+              </Button>
+              <Button type='submit' onClick={deleteAssignComission}>
+                Eliminar asignación de comisión
+              </Button>
+            </ButtonBar>
           </>
-        ):
-        <></>}
+        ) : (
+          <></>
+        )}
       </Modal>
     </Fragment>
   );

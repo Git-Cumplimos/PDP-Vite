@@ -44,7 +44,7 @@ const MainPlanDeComisiones = () => {
               Generar reporte de comisiones
             </Button>
           </ButtonBar> */}
-          <SearchComissions comissionFace="campaigns" />
+          <SearchComissions comissionFace='campaigns' />
         </Fragment>
       ) : (
         <EditComission />

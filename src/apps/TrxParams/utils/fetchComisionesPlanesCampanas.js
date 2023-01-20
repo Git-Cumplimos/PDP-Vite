@@ -25,11 +25,12 @@ export const postComisionesPlanCampanas = async (bodyObj) => {
   }
 };
 
-export const getComisionesPlanesCampanas = async () => {
+export const getComisionesPlanesCampanas = async (obj) => {
   try {
     const res = await fetchData(
       `${urlComisiones}/servicio-planes-campanas-comisiones/consultar-planes-campanas-comision`,
       "GET",
+      obj,
       {}
     );
     if (res?.status) {
