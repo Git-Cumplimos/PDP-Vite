@@ -17,14 +17,16 @@ const Transacciones = () => {
   const [tipoOperacion, setTipoOperacion] = useState("");
   const [tipoProceso, setTipoProceso] = useState();
 
+  const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
   useEffect(() => {
     fetchData(
-      "http://127.0.0.1:5000/servicio-contingencia-empresarial-pdp/searchtrx?nombre_banco=bancolombia",
+      `${urlBackend}/searchtrx?nombre_banco=bancolombia`,
+
       "GET",
       {},
       {},
       {},
-      false
+      true
     )
       .then((res) => {
         setCantidadPaginas(res?.obj?.maxPages);
@@ -44,11 +46,19 @@ const Transacciones = () => {
     if (fechaInicial && fechaFinal) {
       fetchData(
         //    `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}`,
-        `http://127.0.0.1:5000/servicio-contingencia-empresarial-pdp/searchtrx?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&nombre_banco=bancolombia`,
-        "GET"
+        `${urlBackend}/searchtrx?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&nombre_banco=bancolombia`,
+
+        "GET",
+        {},
+        {},
+        {},
+        true
       )
         /* .then((response) => response.json()) */
         .then((respuesta) => {
+          if (respuesta?.obj?.results["results"].length == 0) {
+            notifyError("No se encontraron resultados");
+          }
           setDatosFiltradosFecha(respuesta?.obj?.results["results"]);
           console.log("respuesta", datosFiltradosFecha);
         })
@@ -62,16 +72,18 @@ const Transacciones = () => {
   useEffect(() => {
     if (tipoOperacion) {
       fetchData(
-        /*  `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}` */
-        /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`, */
-        `http://127.0.0.1:5000/servicio-contingencia-empresarial-pdp/searchtrx?nombre_banco=bancolombia&id_tipo_transaccion=${tipoOperacion}`,
+        `${urlBackend}/searchtrx?nombre_banco=bancolombia&id_tipo_transaccion=${tipoOperacion}`,
         "GET",
         {},
         {},
-        false
+        {},
+        true
       )
         /* .then((response) => response.json()) */
         .then((respuesta) => {
+          if (respuesta?.obj?.results["results"].length == 0) {
+            notifyError("No se encontraron resultados");
+          }
           setDatosFiltradosTipoOperacion(respuesta?.obj?.results["results"]);
           console.log("DATOS TIPPOS DE OPERACION", datosFiltradosTipoOperacion);
         })

@@ -4,6 +4,8 @@ import fetchData from "../../../../../utils/fetchData";
 import Input from "../../../../../components/Base/Input";
 import Select from "../../../../../components/Base/Select";
 import { notifyError } from "../../../../../utils/notify";
+import XLSX from "xlsx";
+
 const HistoricoContingencia = () => {
   const [datosTablaContingencia, setDatosTablaContingencia] = useState([]);
   const [datosFiltradosFecha, setDatosFiltradosFecha] = useState([]);
@@ -13,14 +15,16 @@ const HistoricoContingencia = () => {
   const [estadoProceso, setEstadoProceso] = useState("");
   const [numeroProceso, setNumeroProceso] = useState("");
 
+  const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
+
   useEffect(() => {
     fetchData(
-      "http://127.0.0.1:5000/servicio-contingencia-empresarial-pdp/search?identificador_banco=bancolombia",
+      `${urlBackend}/search?identificador_banco=bancolombia`,
       "GET",
       {},
       {},
       {},
-      false
+      true
     )
       .then((res) => {
         setCantidadPaginas(res?.obj?.maxPages);
@@ -28,6 +32,9 @@ const HistoricoContingencia = () => {
           "datos contingencia bancolombia",
           res?.obj?.results["results"]
         );
+        if (res?.obj?.results["results"].length == 0) {
+          notifyError("No se encontraron registros");
+        }
         setDatosTablaContingencia(res?.obj?.results["results"]);
       })
       .catch((err) => {
@@ -40,11 +47,18 @@ const HistoricoContingencia = () => {
     if (fechaInicial && fechaFinal) {
       fetchData(
         //    `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}`,
-        `http://127.0.0.1:5000/servicio-contingencia-empresarial-pdp/search?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&identificador_banco=bancolombia`,
-        "GET"
+        `${urlBackend}/search?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&identificador_banco=bancolombia`,
+        "GET",
+        {},
+        {},
+        {},
+        true
       )
         /* .then((response) => response.json()) */
         .then((respuesta) => {
+          if (respuesta?.obj?.results["results"].length == 0) {
+            notifyError("No se encontraron registros");
+          }
           setDatosFiltradosFecha(respuesta?.obj?.results["results"]);
           console.log("respuesta", datosFiltradosFecha);
         })
@@ -62,17 +76,94 @@ const HistoricoContingencia = () => {
           title="Histórico de contingencia"
           maxPage={cantidadPaginas}
           headers={[
+            "Banco",
             "Cantidad de registros del archivo",
             "Cantidad de registros procesados exitosamente",
+            "Cantidad de registros fallidos",
+
             "Fecha y hora de la ejecución",
+            "nombre del archivo",
           ]}
           data={
-            datosFiltradosFecha?.map((inf) => ({
+            datosTablaContingencia?.map((inf) => ({
+              identificador_banco: inf.identificador_banco,
               cantidad_registros: inf.cantidad_registros,
               cantidad_trx_exitos: inf.cantidad_trx_exitosas,
+              cantidad_trx_fallidas: inf.cantidad_trx_fallidas,
               fecha_carga_archivo: inf.fecha_carga_archivo,
+              nombre_archivo: inf.nombre_archivo,
             })) ?? []
           }
+          onSelectRow={(e, i) => {
+            console.log("esta es la tabla i", datosTablaContingencia[i]);
+
+            // Crear objeto de hoja de cálculo
+            const wb = XLSX.utils.book_new();
+
+            // Agregar encabezados
+            const ws = XLSX.utils.json_to_sheet(
+              [
+                {
+                  "Nombre Banco": "",
+                  "Fecha de carga": "",
+                  "Total de registros": "",
+                  "Registros procesados": "",
+                  "Registros fallidos": "",
+                  "Respuesta Trx": "",
+                  "Respuesta Trx fallidos": "",
+                },
+              ],
+              {
+                header: [
+                  "Nombre Banco",
+                  "Fecha de carga",
+                  "Total de registros",
+                  "Registros procesados",
+                  "Registros fallidos",
+                  "Respuesta Trx",
+                  "Respuesta Trx fallidos",
+                ],
+              }
+            );
+
+            // Agregar información de la transacción seleccionada
+            const data = [
+              {
+                "Nombre Banco": datosTablaContingencia[i].identificador_banco,
+                "Fecha de carga": datosTablaContingencia[i].fecha_carga_archivo,
+                "Total de registros      ":
+                  datosTablaContingencia[i].cantidad_registros,
+                "Registros procesados     ":
+                  datosTablaContingencia[i].cantidad_trx_exitosas,
+                "Registros fallidos     ":
+                  datosTablaContingencia[i].cantidad_trx_fallidas,
+
+                "Respuesta Trx exitosas   ": JSON.stringify(
+                  datosTablaContingencia[i].respuuestas_trx
+                ),
+
+                "Respuesta Trx fallidos   ": JSON.stringify(
+                  datosTablaContingencia[i].respuestas_trx_fallidas
+                ),
+              },
+            ];
+            XLSX.utils.sheet_add_json(ws, data, { skipHeader: false });
+            ws["!cols"] = [
+              { wch: 20 },
+              { wch: 20 },
+              { wch: 20 },
+              { wch: 20 },
+              { wch: 20 },
+              { wch: 100 },
+              { wch: 100 },
+            ];
+
+            // Agregar hoja de cálculo al archivo
+            XLSX.utils.book_append_sheet(wb, ws, "Control Transacciones");
+
+            // Crear archivo de Excel
+            XLSX.writeFile(wb, "Control_Transacciones.xlsx");
+          }}
         >
           <Input
             id="dateInit"
@@ -98,17 +189,94 @@ const HistoricoContingencia = () => {
           title="Histórico de contingencia"
           maxPage={cantidadPaginas}
           headers={[
+            "Banco",
             "Cantidad de registros del archivo",
             "Cantidad de registros procesados exitosamente",
+            "Cantidad de registros fallidos",
+
             "Fecha y hora de la ejecución",
+            "nombre del archivo",
           ]}
           data={
             datosTablaContingencia?.map((inf) => ({
+              identificador_banco: inf.identificador_banco,
               cantidad_registros: inf.cantidad_registros,
               cantidad_trx_exitos: inf.cantidad_trx_exitosas,
+              cantidad_trx_fallidas: inf.cantidad_trx_fallidas,
               fecha_carga_archivo: inf.fecha_carga_archivo,
+              nombre_archivo: inf.nombre_archivo,
             })) ?? []
           }
+          onSelectRow={(e, i) => {
+            console.log("esta es la tabla i", datosTablaContingencia[i]);
+
+            // Crear objeto de hoja de cálculo
+            const wb = XLSX.utils.book_new();
+
+            // Agregar encabezados
+            const ws = XLSX.utils.json_to_sheet(
+              [
+                {
+                  "Nombre Banco": "",
+                  "Fecha de carga": "",
+                  "Total de registros": "",
+                  "Registros procesados": "",
+                  "Registros fallidos": "",
+                  "Respuesta Trx": "",
+                  "Respuesta Trx fallidos": "",
+                },
+              ],
+              {
+                header: [
+                  "Nombre Banco",
+                  "Fecha de carga",
+                  "Total de registros",
+                  "Registros procesados",
+                  "Registros fallidos",
+                  "Respuesta Trx",
+                  "Respuesta Trx fallidos",
+                ],
+              }
+            );
+
+            // Agregar información de la transacción seleccionada
+            const data = [
+              {
+                "Nombre Banco": datosTablaContingencia[i].identificador_banco,
+                "Fecha de carga": datosTablaContingencia[i].fecha_carga_archivo,
+                "Total de registros      ":
+                  datosTablaContingencia[i].cantidad_registros,
+                "Registros procesados     ":
+                  datosTablaContingencia[i].cantidad_trx_exitosas,
+                "Registros fallidos     ":
+                  datosTablaContingencia[i].cantidad_trx_fallidas,
+
+                "Respuesta Trx exitosas   ": JSON.stringify(
+                  datosTablaContingencia[i].respuuestas_trx
+                ),
+
+                "Respuesta Trx fallidos   ": JSON.stringify(
+                  datosTablaContingencia[i].respuestas_trx_fallidas
+                ),
+              },
+            ];
+            XLSX.utils.sheet_add_json(ws, data, { skipHeader: false });
+            ws["!cols"] = [
+              { wch: 20 },
+              { wch: 20 },
+              { wch: 20 },
+              { wch: 20 },
+              { wch: 20 },
+              { wch: 100 },
+              { wch: 100 },
+            ];
+
+            // Agregar hoja de cálculo al archivo
+            XLSX.utils.book_append_sheet(wb, ws, "Control Transacciones");
+
+            // Crear archivo de Excel
+            XLSX.writeFile(wb, "Control_Transacciones.xlsx");
+          }}
         >
           <Input
             id="dateInit"

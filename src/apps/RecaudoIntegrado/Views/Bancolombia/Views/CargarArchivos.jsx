@@ -5,8 +5,10 @@ import fetchData from "../../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../../utils/notify";
 import classes from "./CargarArchivos.module.css";
 const CargarArchivos = () => {
-  const urlBackend =
-    "https://48hfhzfcfe.execute-api.us-east-2.amazonaws.com/v1/cert/recaudo-empresarial/servicio-contingencia-empresarial-pdp";
+  /*   const urlBackend =
+    "https://48hfhzfcfe.execute-api.us-east-2.amazonaws.com/v1/cert/recaudo-empresarial/servicio-contingencia-empresarial-pdp"; */
+
+  const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
   const {
     contendorPrincipalFormulario,
@@ -101,7 +103,7 @@ const CargarArchivos = () => {
                 })
                   .then((resrut) => {
                     // resrut?.status;
-                    notify("Formulario enviado con éxito.");
+                    notify("Archivo enviado con éxito.");
                     setDisabledBtn(false);
                     setArchivos1([]);
                     setNombreCamara("");

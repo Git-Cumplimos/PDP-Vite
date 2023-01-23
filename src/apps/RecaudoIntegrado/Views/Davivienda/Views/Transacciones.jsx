@@ -15,15 +15,15 @@ const Transacciones = () => {
   const [fechaFinal, setFechaFinal] = useState("");
   const [tipoOperacion, setTipoOperacion] = useState("");
   const [numeroProceso, setNumeroProceso] = useState("");
-
+  const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
   useEffect(() => {
     fetchData(
-      "http://127.0.0.1:5000/servicio-contingencia-empresarial-pdp/searchtrx?nombre_banco=davivienda",
+      `${urlBackend}/searchtrx?nombre_banco=davivienda`,
       "GET",
       {},
       {},
       {},
-      false
+      true
     )
       .then((res) => {
         setCantidadPaginas(res?.obj?.maxPages);
@@ -31,6 +31,9 @@ const Transacciones = () => {
           "datos contingencia davivienda",
           res?.obj?.results["results"]
         );
+        if (res?.obj?.results["results"].length == 0) {
+          notifyError("No se encontraron registros");
+        }
         setDatosTablaTrx(res?.obj?.results["results"]);
       })
       .catch((err) => {
@@ -43,13 +46,22 @@ const Transacciones = () => {
     if (fechaInicial && fechaFinal) {
       fetchData(
         //    `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}`,
-        `http://127.0.0.1:5000/servicio-contingencia-empresarial-pdp/searchtrx?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&nombre_banco=davivienda`,
-        "GET"
+
+        `${urlBackend}/searchtrx?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&nombre_banco=davivienda`,
+
+        "GET",
+        {},
+        {},
+        {},
+        true
       )
         /* .then((response) => response.json()) */
         .then((respuesta) => {
           setDatosFiltradosFecha(respuesta?.obj?.results["results"]);
           console.log("respuesta", datosFiltradosFecha);
+          if (respuesta?.obj?.results["results"].length == 0) {
+            notifyError("No se encontraron registros");
+          }
         })
         .catch((err) => {
           console.log(err);
@@ -61,16 +73,18 @@ const Transacciones = () => {
   useEffect(() => {
     if (tipoOperacion) {
       fetchData(
-        /*  `http://127.0.0.1:5000/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&validation_state=${estadoProceso}` */
-        /* `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?validation_state=En Proceso de Validación`, */
-        `http://127.0.0.1:5000/servicio-contingencia-empresarial-pdp/searchtrx?nombre_banco=davivienda&id_tipo_transaccion=${tipoOperacion}`,
+        `${urlBackend}/searchtrx?nombre_banco=davivienda&id_tipo_transaccion=${tipoOperacion}`,
+
         "GET",
         {},
         {},
-        false
+        true
       )
         /* .then((response) => response.json()) */
         .then((respuesta) => {
+          if (respuesta?.obj?.results["results"].length == 0) {
+            notifyError("No se encontraron registros");
+          }
           setDatosFiltradosTipoOperacion(respuesta?.obj?.results["results"]);
           console.log("DATOS TIPPOS DE OPERACION", datosFiltradosTipoOperacion);
         })
