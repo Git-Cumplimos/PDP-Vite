@@ -69,6 +69,7 @@ const DescargarArchivos = () => {
     con_distribuidor_venta().then((res) => {
       const copy2 = [...opcionesdisponibles];
       if (copy2.length === 1) {
+        console.log(res?.info);
         for (var i = 0; i < res?.info?.length; i++) {
           copy2.push({
             value: `${res.info[i]}`,
@@ -83,12 +84,14 @@ const DescargarArchivos = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     getReportesVentas(sorteo, e.target.value).then((res) => {
+      console.log(res);
       if ("msg" in res) {
         notifyError(res.msg);
         setDownloadRef(res.msg);
       } else {
         setDownloadRef(res.archivo);
         setDisabled_Btn(false);
+        console.log(res);
       }
     });
   };
@@ -96,12 +99,14 @@ const DescargarArchivos = () => {
   const onSubmitVir = (e) => {
     if (e.target.value.split("-")[1] === "false") {
       getReportesVentas(e.target.value, distribuidor).then((res) => {
+        console.log(res);
         if ("msg" in res) {
           notifyError(res.msg);
           setDownloadRef(res.msg);
         } else {
           setDownloadRef(res.archivo);
           setDisabled_Btn(false);
+          console.log(res);
         }
       });
     }

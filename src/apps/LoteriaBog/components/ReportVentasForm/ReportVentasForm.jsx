@@ -61,11 +61,13 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
+    console.log(codigos_lot?.length);
     if (codigos_lot?.length === 2) {
       cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
     } else {
       cod = `${codigos_lot?.[0]?.cod_loteria}`;
     }
+    console.log(cod);
     return cod;
   }, [codigos_lot]);
 
@@ -81,7 +83,7 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
         setSorteoExtra(null);
         setSorteofisico(null);
         setSorteofisicoextraordinario(null);
-        // console.log(res);
+        console.log(res);
         const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
           return tip_sorteo === 1 && !fisico;
         });
@@ -127,8 +129,9 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
   const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
     { value: "", label: "" },
   ]);
-
+  console.log(sorteo);
   useEffect(() => {
+    console.log(sorteoOrdi);
     const copy = [{ value: "", label: "" }];
     if (sorteoOrdi !== null) {
       copy.push({
@@ -279,7 +282,7 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
                     notifyError(res.msg);
                     setDisabledBtns(true);
                   } else {
-                    // console.log(res);
+                    console.log(res);
                     setResp_report(res.data);
                     setTotal(res.total);
                     setDisabledBtns(false);
@@ -302,7 +305,7 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
                     notifyError(res.msg);
                     setDisabledBtns(true);
                   } else {
-                    // console.log(res);
+                    console.log(res);
                     setResp_report(res.data);
                     setTotal(res.total);
                     setDisabledBtns(false);
@@ -326,7 +329,7 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
                       notifyError(res.msg);
                       setDisabledBtns(true);
                     } else {
-                      // console.log(res);
+                      console.log(res);
                       setResp_report(res.data);
                       setTotal(res.total);
                       setDisabledBtns(false);
