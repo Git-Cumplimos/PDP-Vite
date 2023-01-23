@@ -134,7 +134,7 @@ const RecargarPaquetes = () => {
         },
       },
     })
-      .then(async(res) => {
+      .then(async (res) => {
         if (res?.status === true) {
           notify("Compra de paquete exitosa");
           infTicketFinal["commerceInfo"].push([
@@ -179,7 +179,10 @@ const RecargarPaquetes = () => {
                             setRespuesta(false);
                             setTypeInfo("RecargaExitosa");
                           } else {
-                            notifyError(res?.obj?.response?.respuesta);
+                            notifyError(
+                              "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                            );
+                            // notifyError(res?.obj?.response?.respuesta);
                             setRespuesta(true);
                             handleClose();
                             resolve(true);
@@ -203,20 +206,24 @@ const RecargarPaquetes = () => {
               } catch (error) {
                 console.error(error);
               }
-              notify("Su transacción esta siendo procesada, no recargue la página");
+              notify(
+                "Su transacción esta siendo procesada, no recargue la página"
+              );
             }
             validNavigate("/recargas-paquetes");
-          }
-          else {
-            notifyError(res?.msg);
+          } else {
+            notifyError(
+              "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+            );
             setRespuesta(false);
             handleClose();
-          }          
+          }
         }
       })
       .catch(async (err) => {
         setRespuesta(false);
-        notifyError("No se ha podido conectar al servidor");
+        notifyError("Error respuesta PDP: Falla en la conexión [CODIGO]");
+        // notifyError("No se ha podido conectar al servidor");
         console.error(err);
         handleClose();
       });
