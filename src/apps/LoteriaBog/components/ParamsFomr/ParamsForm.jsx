@@ -19,7 +19,7 @@ const url_cambioParams = `${process.env.REACT_APP_URL_LOTERIAS}/cambio_params`;
 
 const ParamsForm = ({ closeModal, params, setParams }) => {
   const cambio_params = useCallback(async (uvt, max_pago) => {
-    const query = { params: `{"uvt":${uvt},"max_pago":${max_pago}}` };
+    const query = { params: `{"uvt":${uvt},"tipo":"4","max_pago":${max_pago}}` };
     console.log(query);
     try {
       const res = await fetchData(url_cambioParams, "GET", query);
