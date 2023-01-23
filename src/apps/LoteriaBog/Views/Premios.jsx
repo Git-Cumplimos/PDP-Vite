@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useLoteria } from "../utils/LoteriaHooks";
-// import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import Input from "../../../components/Base/Input";
@@ -12,7 +11,6 @@ import PagarForm from "../components/SendForm/PagarForm";
 import PagarFormFisico from "../components/SendForm/PagarFormFisico";
 import PagoResp from "../components/SellResp/PagoResp";
 import { useAuth } from "../../../hooks/AuthHooks";
-import SubPage from "../../../components/Base/SubPage/SubPage";
 import { useNavigate } from "react-router-dom";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
@@ -30,6 +28,7 @@ const Premios = ({ route }) => {
     infoLoto: { pagoresponse, setPagoresponse },
   } = useLoteria();
   const [respuesta, setRespuesta] = useState(false);
+  const [estadoTransaccion, setEstadoTransaccion] = useState(false);
   const navigate = useNavigate();
   const [sorteo, setSorteo] = useState("");
   const [billete, setBillete] = useState("");
@@ -37,15 +36,12 @@ const Premios = ({ route }) => {
   const [valorbruto, setValorbruto] = useState("");
   const [serie, setSerie] = useState("");
   const [idLoteria, seIdLoteria] = useState("");
-  const [total, setTotal] = useState("");
-  const [valNetoFraccion, setValNetoFraccion] = useState("");
   const [phone, setPhone] = useState("");
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
-  console.log("ESTO ES EL ROLEINFO", roleInfo);
   const [datosCliente, setDatosCliente] = useState({
     selectFraccion: 0,
     nombre: "",
@@ -164,8 +160,6 @@ const Premios = ({ route }) => {
     });
   };
   const onSubmit = (e) => {
-    console.log("ESTO ES checkBilleteFisico onSubmit", checkBilleteFisico);
-    console.log("ESTO ES checkBilleteVirtual onSubmit", checkBilleteVirtual);
     setDatosCliente((old) => {
       return {
         ...old,
@@ -184,10 +178,10 @@ const Premios = ({ route }) => {
       // checkDisableVirtual: false,
       // checkBilleteFisico: false,
     };
-    const handleCheckboxChange = (event) => {
-      this.setState({ isChecked: event.target.checkDisableVirtual });
-      this.setState({ isChecked: event.target.checkBilleteFisico });
-    };
+    // const handleCheckboxChange = (event) => {
+    //   this.setState({ isChecked: event.target.checkDisableVirtual });
+    //   this.setState({ isChecked: event.target.checkBilleteFisico });
+    // };
     // setCheckDisableVirtual(false);
     // setCheckBilleteFisico(false);
     setShowTable(false);
@@ -201,14 +195,6 @@ const Premios = ({ route }) => {
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
         setTipopago(salvarRes?.obj?.tipo_ganancia);
-        console.log(
-          "ESTO ES checkBilleteFisico onSubmit despues",
-          checkBilleteFisico
-        );
-        console.log(
-          "ESTO ES checkBilleteVirtual onSubmit despues",
-          checkBilleteVirtual
-        );
         setDatosComercio((old) => {
           return {
             ...old,
@@ -222,7 +208,6 @@ const Premios = ({ route }) => {
         setValorbruto(res?.obj?.valorbruto);
         fracbill.length = 0;
         setDisabledBtns(false);
-        console.log("ESTO ES RES***", res);
         if ("msg" in res) {
           if (res?.obj?.max_pago == true) {
             notifyError(
@@ -273,7 +258,6 @@ const Premios = ({ route }) => {
               formatMoney.format(totalPagarLoteria),
             ]);
             // setIsSelf(true);
-            console.log("RES??? CRISTINA", res);
             setRespagar(res);
             setShowTable(true);
             setWinner(true);
@@ -283,12 +267,9 @@ const Premios = ({ route }) => {
             setIsSelf(false);
           }
         }
-        console.log("Esto es tipo de ganancia", salvarRes?.obj?.tipo_ganancia);
-        // setTipopago(2);
         if (salvarRes?.obj?.tipo_ganancia == 2) {
           setWinner(true);
           setTipopago(salvarRes?.obj?.tipo_ganancia);
-          console.log("Entro al if y este es Tipopago", tipopago);
         }
         if (res[0]["Estado"] === false) {
           notifyError("No ganador");
@@ -325,79 +306,96 @@ const Premios = ({ route }) => {
   ];
   const onPay1 = (e) => {
     e.preventDefault();
-    setRespuesta(true);
-    // setDisabledBtns(true);
-    console.log("ESTO ES EL SELECFRACCION", seleccionarFraccion);
-    if (
-      seleccionarFraccion === 0 ||
-      seleccionarFraccion === "0" ||
-      seleccionarFraccion === undefined
-    ) {
-      setRespuesta(false);
-      notifyError("Seleccione una fracción");
+    if (String(datosCliente?.celular).charAt(0) === "3") {
+      setRespuesta(true);
+      if (
+        seleccionarFraccion === 0 ||
+        seleccionarFraccion === "0" ||
+        seleccionarFraccion === undefined
+      ) {
+        setRespuesta(false);
+        notifyError("Seleccione una fracción");
+      } else {
+        makePayment(
+          sorteo,
+          billete,
+          serie,
+          checkBilleteFisico,
+          checkBilleteVirtual,
+          seleccionarFraccion,
+          datosCliente?.nombre,
+          datosCliente?.documento,
+          datosCliente?.direccion,
+          datosCliente?.celular,
+          totalPagar,
+          valorbruto,
+          datosComercio.comercio,
+          datosComercio.terminal,
+          datosComercio.usuario,
+          idLoteria,
+          tipopago,
+          hash,
+          phone
+        )
+          .then((res) => {
+            setRespuesta(false);
+            setDatosCliente((old) => {
+              return {
+                ...old,
+                statusPagoPremio: res?.status,
+                idTransaccion: res?.obj?.id_trx,
+              };
+            });
+            setEstadoTransaccion(res?.status);
+            if (res?.status === false) {
+              var recargarPag = res?.status;
+              // this.setState({ recargarPag: false });
+              notifyError(res?.obj?.msg);
+              navigate(`/loteria/loteria-de-bogota`);
+            }
+          })
+          .catch(() => setDisabledBtns(false));
+      }
     } else {
-      makePayment(
-        sorteo,
-        billete,
-        serie,
-        checkBilleteFisico,
-        checkBilleteVirtual,
-        seleccionarFraccion,
-        datosCliente?.nombre,
-        datosCliente?.documento,
-        datosCliente?.direccion,
-        datosCliente?.celular,
-        totalPagar,
-        valorbruto,
-        datosComercio.comercio,
-        datosComercio.terminal,
-        datosComercio.usuario,
-        idLoteria,
-        tipopago,
-        hash,
-        phone
-      )
-        .then((res) => {
-          setRespuesta(false);
-
-          console.log("ESTO ES EL RES DEL PAGO***", res);
-          setDatosCliente((old) => {
-            return {
-              ...old,
-              statusPagoPremio: res?.status,
-              idTransaccion: res?.obj?.id_trx,
-            };
-          });
-          console.log("ESTO ES EL RES DEL STATUS***", res?.status);
-          console.log(
-            "ESTO ES datosCliente?.statusPagoPremio ????????***",
-            datosCliente?.statusPagoPremio
-          );
-          if (datosCliente?.statusPagoPremio === false) {
-            var recargarPag = res?.status;
-            // this.setState({ recargarPag: false });
-
-            notifyError(res?.obj?.msg);
-            navigate(`/loteria/loteria-de-bogota`);
-          }
-          // setShowModal(true);
-          // setDisabledBtns(false);
-          // setRespagar(res);
-          // if ("msg" in res) {
-          //   notifyError(res.msg);
-          // } else {
-          //   if (res?.Tipo === 0) {
-          //     notifyError(
-          //       "El valor a pagar supera la capacidad de la oficina " +
-          //         formatMoney.format(res["valor ganado"])
-          //     );
-          //   } else {
-          //   }
-          // }
-        })
-        .catch(() => setDisabledBtns(false));
+      notifyError(
+        "Numero invalido, el N° de celular debe comenzar con el número 3."
+      );
     }
   };
+
+  const tickets2 = useMemo(() => {
+    return {
+      title: "Recibo de pago",
+      timeInfo: {
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: false,
+        }).format(new Date()),
+      },
+      commerceInfo: [
+        ["Id Comercio", roleInfo?.id_comercio],
+        ["No. terminal", roleInfo?.id_dispositivo],
+        ["Id Trx ", datosCliente.idTransaccion],
+        ["Id Aut ", 333],
+        ["Municipio", roleInfo?.ciudad],
+        ["", ""],
+        ["Dirección", roleInfo?.direccion],
+        ["", ""],
+      ],
+      commerceName: "LOTERIA DE BOGOTÁ D.C",
+      trxInfo: [["", ""]],
+
+      disclamer:
+        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    };
+  }, [estadoTransaccion]);
 
   const tickets = useMemo(() => {
     return {
@@ -437,7 +435,8 @@ const Premios = ({ route }) => {
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [datosCliente?.statusPagoPremio]);
+  }, [estadoTransaccion]);
+
   const onPay2 = (e) => {
     setDisabledBtns(true);
     e.preventDefault();
@@ -486,24 +485,15 @@ const Premios = ({ route }) => {
       }
     }
   };
-  useEffect(() => {
-    if (pagoresponse != null && "msg" in pagoresponse) {
-      notifyError(pagoresponse.msg);
-    }
-  }, [pagoresponse]);
-  useEffect(() => {
-    // if (isSelf) {
-    //   setIsSelf(true);
-    // } else {
-    //   setIsSelf(true);
-    // }
-  }, [totalPagar]);
-
+  // useEffect(() => {
+  //   if (pagoresponse != null && "msg" in pagoresponse) {
+  //     notifyError(pagoresponse.msg);
+  //   }
+  // }, [pagoresponse]);
+  // useEffect(() => {}, [totalPagar]);
+  //------------------Funcion para validar el número del celular------------------------------
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-    setDatosCliente((old) => {
-      return { ...old, celular: valueInput };
-    });
 
     if (valueInput[0] != 3) {
       if (valueInput.length == 1 && datosCliente?.celular == "") {
@@ -513,15 +503,43 @@ const Premios = ({ route }) => {
         return;
       }
     }
+    setDatosCliente((old) => {
+      return { ...old, celular: valueInput };
+    });
   };
+  //-------------------------------------------------------------------------------
+
+  // const onCelChange = (e) => {
+  //   const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+  //   setDatosCliente((old) => {
+  //     return { ...old, celular: valueInput };
+  //   });
+
+  //   if (valueInput[0] != 3) {
+  //     if (valueInput.length == 1 && datosCliente?.celular == "") {
+  //       notifyError(
+  //         "Número inválido, el No. de celular debe comenzar con el número 3"
+  //       );
+  //       return;
+  //     }
+  //   }
+  // };
   useEffect(() => {
-    infoTicket(datosCliente?.statusPagoPremio, 114, tickets)
+    infoTicket(estadoTransaccion, 114, tickets)
       .then((resTicket) => {})
       .catch((err) => {
         console.error(err);
         notifyError("Error guardando el ticket");
       });
-  }, [infoTicket, datosCliente?.statusPagoPremio, tickets]);
+  }, [infoTicket, estadoTransaccion, tickets]);
+  useEffect(() => {
+    infoTicket(estadoTransaccion, 114, tickets2)
+      .then((resTicket) => {})
+      .catch((err) => {
+        console.error(err);
+        notifyError("Error guardando el ticket");
+      });
+  }, [infoTicket, estadoTransaccion, tickets2]);
   const cancelar = () => {
     notifyError("Se cancelo el pago del premio");
     navigate(`/loteria/loteria-de-bogota`);
@@ -630,12 +648,13 @@ const Premios = ({ route }) => {
               "Premio Neto x Fraccion",
             ]}
             data={respagar}></TableEnterprise>
-          {console.log("========= ESTO ES RES PAGAR==========", respagar)}
           {tipopago === 2 && !maxPago ? (
             <Form onSubmit={onPay1} grid>
               <Fieldset
                 className="lg:col-span-2"
-                legend={"Seleccione un tipo de billete"}>
+                legend={
+                  "El valor del premio, supera la ganancia ocasional, por favor diligencie los campos del usuario."
+                }>
                 <Input
                   id="nombre"
                   label="Nombre"
@@ -679,7 +698,6 @@ const Premios = ({ route }) => {
                   maxLength={"10"}
                   autoComplete="off"
                   required
-                  // onChange={onCelChange}
                   value={datosCliente?.celular}
                   onInput={(e) => {
                     setDatosCliente((old) => {
@@ -691,7 +709,6 @@ const Premios = ({ route }) => {
                   }}
                   onChange={onCelChange}
                 />
-
                 <Input
                   id="direccion"
                   label="Dirección"
@@ -724,19 +741,10 @@ const Premios = ({ route }) => {
                   id="selectFraccion"
                   label="Fracción"
                   options={optionsDocumento}
-                  // value={datosCliente?.selectFraccion}
                   value={seleccionarFraccion}
                   required
                   onChange={(e) => {
-                    var valorFraccion = e.target.value;
-                    console.log(
-                      "ESTO ES EL VALUE DE LA FRACCION??????????",
-                      valorFraccion
-                    );
                     setSeleccionarFraccion(e.target.value);
-                    // setDatosCliente((old) => {
-                    //   return { ...old, selectFraccion: e.target.value };
-                    // });
                   }}
                 />
                 {checkBilleteVirtual == true ? (
@@ -755,18 +763,16 @@ const Premios = ({ route }) => {
                   ""
                 )}
                 {checkBilleteVirtual == true || checkBilleteFisico == true ? (
-                  <div className="flex justify-center items-center mx-96">
-                    <div>
-                      <ButtonBar className="col-auto md:col-span-2">
-                        <Button type="submit" disabled={disabledBtns}>
-                          Pagar
-                        </Button>
-                      </ButtonBar>
-                      <ButtonBar>
-                        <Button onClick={() => cancelar()}>Cancelar</Button>
-                      </ButtonBar>
-                    </div>
-                  </div>
+                  <>
+                    <ButtonBar
+                      className="flex flex-row justify-center items-center
+                          mx-auto container gap-10 text-lg lg:col-span-2">
+                      <Button onClick={() => cancelar()}>Cancelar</Button>
+                      <Button type="submit" disabled={disabledBtns}>
+                        Pagar
+                      </Button>
+                    </ButtonBar>
+                  </>
                 ) : (
                   ""
                 )}
@@ -777,33 +783,20 @@ const Premios = ({ route }) => {
               {!maxPago ? (
                 <>
                   <Form onSubmit={onPay1} grid>
-                    {/************Selección tipo de documento******************* */}
                     <Fieldset
                       className="lg:col-span-2 flex justify-center items-center"
-                      legend={"Por favor llene los campos 2"}>
+                      legend={
+                        "Por favor, seleccione la fracción del billete a pagar"
+                      }>
                       <Select
                         id="selectFraccion"
                         label="Fracción"
                         options={optionsDocumento}
-                        // value={datosCliente?.selectFraccion}
                         value={seleccionarFraccion}
                         required
                         onChange={(e) => {
-                          var valorFraccion = e.target.value;
-                          console.log(
-                            "ESTO ES EL VALUE DE LA FRACCION??????????",
-                            e.target.value
-                          );
                           setSeleccionarFraccion(e.target.value);
-                          // setDatosCliente((old) => {
-                          //   return { ...old, selectFraccion: e.target.value };
-                          // });
                         }}
-                        // onChange={(e) => {
-                        //   setDatosCliente((old) => {
-                        //     return { ...old, selectFraccion: e.target.value };
-                        //   });
-                        // }}
                       />
                       {checkBilleteVirtual === true ? (
                         <Input
@@ -822,28 +815,22 @@ const Premios = ({ route }) => {
                       )}
                       {checkBilleteFisico === true ||
                       checkBilleteVirtual === true ? (
-                        <div className="flex justify-center items-center mx-96">
-                          <div>
-                            <ButtonBar className="col-auto md:col-span-2">
-                              <Button type="submit" disabled={disabledBtns}>
-                                Pagar
-                              </Button>
-                            </ButtonBar>
-                            <ButtonBar>
-                              <Button onClick={() => cancelar()}>
-                                Cancelar
-                              </Button>
-                            </ButtonBar>
-                          </div>
-                        </div>
+                        <>
+                          <ButtonBar
+                            className="flex flex-row justify-center items-center
+                          mx-auto container gap-10 text-lg lg:col-span-2">
+                            <Button onClick={() => cancelar()}>Cancelar</Button>
+                            <Button type="submit" disabled={disabledBtns}>
+                              Pagar
+                            </Button>
+                          </ButtonBar>
+                        </>
                       ) : (
                         ""
                       )}
                     </Fieldset>
                   </Form>
                   <Form onSubmit={onPay2} grid>
-                    {/* <h2>Este numero no fue vendido por Punto de pago, solicite el billete</h2> */}
-
                     {fracbill.map((frac, index) => {
                       return (
                         <Input
@@ -1069,9 +1056,9 @@ const Premios = ({ route }) => {
       ) : (
         ""
       )}
-      {datosCliente?.statusPagoPremio ? (
+      {estadoTransaccion && tipopago === 2 ? (
         /**************** Compra Soat Exitosa Voucher **********************/
-        <Modal show={datosCliente?.statusPagoPremio} handleClose={handleClose}>
+        <Modal show={estadoTransaccion} handleClose={handleClose}>
           {/* <Modal show={showAllmodals.showModalVoucher} handleClose={handleClose}> */}
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
@@ -1081,12 +1068,23 @@ const Premios = ({ route }) => {
             </ButtonBar>
           </div>
         </Modal>
+      ) : /*************** Compra Soat Exitosa Voucher **********************/
+      tipopago === 1 ? (
+        <Modal show={estadoTransaccion} handleClose={handleClose}>
+          {/* <Modal show={showAllmodals.showModalVoucher} handleClose={handleClose}> */}
+          <div className="flex flex-col justify-center items-center">
+            <Tickets refPrint={printDiv} ticket={tickets2}></Tickets>
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button onClick={handleClose}>Cerrar</Button>
+            </ButtonBar>
+          </div>
+        </Modal>
       ) : (
-        /*************** Compra Soat Exitosa Voucher **********************/
         <Modal show={showAllmodals.showModalError} handleClose={handleClose}>
           <Fieldset legend="Datos Erroneos ">
             <div>
-              <label className="font-medium">{`${datosCliente?.statusPagoPremio}`}</label>
+              <label className="font-medium">{`${estadoTransaccion}`}</label>
             </div>
           </Fieldset>
         </Modal>
