@@ -40,13 +40,14 @@ const Premios = ({ route }) => {
   const [total, setTotal] = useState("");
   const [valNetoFraccion, setValNetoFraccion] = useState("");
   const [phone, setPhone] = useState("");
+  const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
   console.log("ESTO ES EL ROLEINFO", roleInfo);
   const [datosCliente, setDatosCliente] = useState({
-    selectFraccion: "0",
+    selectFraccion: 0,
     nombre: "",
     documento: "",
     direccion: "",
@@ -162,19 +163,52 @@ const Premios = ({ route }) => {
       progress: undefined,
     });
   };
-
   const onSubmit = (e) => {
+    console.log("ESTO ES checkBilleteFisico onSubmit", checkBilleteFisico);
+    console.log("ESTO ES checkBilleteVirtual onSubmit", checkBilleteVirtual);
+    setDatosCliente((old) => {
+      return {
+        ...old,
+        selectFraccion: "0",
+        nombre: "",
+        documento: "",
+        direccion: "",
+        celular: "",
+        idTransaccion: "",
+        statusPagoPremio: false,
+      };
+    });
+    // this.setState({ setCheckDisableVirtual: false });
+    // this.setState({ setCheckBilleteFisico: false });
+    var state = {
+      // checkDisableVirtual: false,
+      // checkBilleteFisico: false,
+    };
+    const handleCheckboxChange = (event) => {
+      this.setState({ isChecked: event.target.checkDisableVirtual });
+      this.setState({ isChecked: event.target.checkBilleteFisico });
+    };
+    // setCheckDisableVirtual(false);
+    // setCheckBilleteFisico(false);
     setShowTable(false);
     setDisabledBtns(true);
     setRespuesta(true);
     e.preventDefault();
-    isWinner(sorteo, billete, serie)
+    isWinner(sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual)
       .then((res) => {
         var salvarRes = res;
         setMaxPago(res?.obj?.max_pago);
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
         setTipopago(salvarRes?.obj?.tipo_ganancia);
+        console.log(
+          "ESTO ES checkBilleteFisico onSubmit despues",
+          checkBilleteFisico
+        );
+        console.log(
+          "ESTO ES checkBilleteVirtual onSubmit despues",
+          checkBilleteVirtual
+        );
         setDatosComercio((old) => {
           return {
             ...old,
@@ -196,6 +230,7 @@ const Premios = ({ route }) => {
             );
             var gana = res?.obj?.gana;
             var ValNetoFraccion = res?.obj?.ValNetoFraccion;
+            var totalPagarLoteria = res?.obj?.total;
             res = [];
             for (let i = 0; i < gana.length; i++) {
               res.push([
@@ -211,13 +246,15 @@ const Premios = ({ route }) => {
               "",
               "",
               "",
-              formatMoney.format(totalPagar),
+              formatMoney.format(totalPagarLoteria),
             ]);
             setRespagar(res);
             setShowTable(true);
           } else if (res?.obj?.ganador) {
             gana = res?.obj?.gana;
             ValNetoFraccion = res?.obj?.ValNetoFraccion;
+            totalPagarLoteria = res?.obj?.total;
+
             res = [];
             for (let i = 0; i < gana.length; i++) {
               res.push([
@@ -233,7 +270,7 @@ const Premios = ({ route }) => {
               "",
               "",
               "",
-              formatMoney.format(totalPagar),
+              formatMoney.format(totalPagarLoteria),
             ]);
             // setIsSelf(true);
             console.log("RES??? CRISTINA", res);
@@ -280,69 +317,86 @@ const Premios = ({ route }) => {
       })
       .catch(() => setDisabledBtns(false));
   };
-
+  const optionsDocumento = [
+    { value: 0, label: "Seleccione la fracción" },
+    { value: 1, label: "Fracción # 1" },
+    { value: 2, label: "Fracción # 2" },
+    { value: 3, label: "Fracción # 3" },
+  ];
   const onPay1 = (e) => {
     e.preventDefault();
     setRespuesta(true);
     // setDisabledBtns(true);
-    if (checkBilleteFisico) {
-    }
-    makePayment(
-      sorteo,
-      billete,
-      serie,
-      checkBilleteFisico,
-      checkBilleteVirtual,
-      datosCliente?.selectFraccion,
-      datosCliente?.nombre,
-      datosCliente?.documento,
-      datosCliente?.direccion,
-      datosCliente?.celular,
-      totalPagar,
-      valorbruto,
-      datosComercio.comercio,
-      datosComercio.terminal,
-      datosComercio.usuario,
-      idLoteria,
-      tipopago,
-      hash,
-      phone
-    )
-      .then((res) => {
-        setRespuesta(false);
+    console.log("ESTO ES EL SELECFRACCION", seleccionarFraccion);
+    if (
+      seleccionarFraccion === 0 ||
+      seleccionarFraccion === "0" ||
+      seleccionarFraccion === undefined
+    ) {
+      setRespuesta(false);
+      notifyError("Seleccione una fracción");
+    } else {
+      makePayment(
+        sorteo,
+        billete,
+        serie,
+        checkBilleteFisico,
+        checkBilleteVirtual,
+        seleccionarFraccion,
+        datosCliente?.nombre,
+        datosCliente?.documento,
+        datosCliente?.direccion,
+        datosCliente?.celular,
+        totalPagar,
+        valorbruto,
+        datosComercio.comercio,
+        datosComercio.terminal,
+        datosComercio.usuario,
+        idLoteria,
+        tipopago,
+        hash,
+        phone
+      )
+        .then((res) => {
+          setRespuesta(false);
 
-        console.log("ESTO ES EL RES DEL PAGO***", res);
-        setDatosCliente((old) => {
-          return {
-            ...old,
-            statusPagoPremio: res?.status,
-            idTransaccion: res?.obj?.id_trx,
-          };
-        });
-        console.log("ESTO ES EL RES DEL STATUS***", res?.status);
-        console.log(
-          "ESTO ES datosCliente?.statusPagoPremio ????????***",
-          datosCliente?.statusPagoPremio
-        );
-        if (res?.status == false) {
-          notifyError(res?.obj?.msg);
-        }
-        // setShowModal(true);
-        // setDisabledBtns(false);
-        // setRespagar(res);
-        // if ("msg" in res) {
-        //   notifyError(res.msg);
-        // } else {
-        //   if (res?.Tipo === 0) {
-        //     notifyError(
-        //       "El valor a pagar supera la capacidad de la oficina " +
-        //         formatMoney.format(res["valor ganado"])
-        //     );
-        //   } else {
-        //   }
-        // }
-      })
-      .catch(() => setDisabledBtns(false));
+          console.log("ESTO ES EL RES DEL PAGO***", res);
+          setDatosCliente((old) => {
+            return {
+              ...old,
+              statusPagoPremio: res?.status,
+              idTransaccion: res?.obj?.id_trx,
+            };
+          });
+          console.log("ESTO ES EL RES DEL STATUS***", res?.status);
+          console.log(
+            "ESTO ES datosCliente?.statusPagoPremio ????????***",
+            datosCliente?.statusPagoPremio
+          );
+          if (datosCliente?.statusPagoPremio === false) {
+            var recargarPag = res?.status;
+            // this.setState({ recargarPag: false });
+
+            notifyError(res?.obj?.msg);
+            navigate(`/loteria/loteria-de-bogota`);
+          }
+          // setShowModal(true);
+          // setDisabledBtns(false);
+          // setRespagar(res);
+          // if ("msg" in res) {
+          //   notifyError(res.msg);
+          // } else {
+          //   if (res?.Tipo === 0) {
+          //     notifyError(
+          //       "El valor a pagar supera la capacidad de la oficina " +
+          //         formatMoney.format(res["valor ganado"])
+          //     );
+          //   } else {
+          //   }
+          // }
+        })
+        .catch(() => setDisabledBtns(false));
+    }
   };
 
   const tickets = useMemo(() => {
@@ -418,6 +472,7 @@ const Premios = ({ route }) => {
   };
 
   const handleOnChange = (position) => {
+    setFracbill(5);
     selecFrac.length = 0;
     const updatedCheckedState = checkedState.map((item, frac) =>
       frac === position ? !item : item
@@ -442,30 +497,16 @@ const Premios = ({ route }) => {
     // } else {
     //   setIsSelf(true);
     // }
-  }, [setIsSelf]);
-  useEffect(() => {
-    // if (isSelf) {
-    //   setIsSelf(true);
-    // } else {
-    //   setIsSelf(true);
-    // }
-    // setTotalPagar();
-  }, [setTotalPagar]);
-  const optionsDocumento = [
-    { value: "0", label: "Seleccione la fracción" },
-    { value: "1", label: "Fracción # 1" },
-    { value: "2", label: "Fracción # 2" },
-    { value: "3", label: "Fracción # 3" },
-  ];
-  const consultarSoat = (e) => {};
+  }, [totalPagar]);
+
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
     setDatosCliente((old) => {
-      return { ...old, numCelular: valueInput };
+      return { ...old, celular: valueInput };
     });
 
     if (valueInput[0] != 3) {
-      if (valueInput.length == 1 && datosCliente?.numCelular == "") {
+      if (valueInput.length == 1 && datosCliente?.celular == "") {
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
@@ -481,6 +522,10 @@ const Premios = ({ route }) => {
         notifyError("Error guardando el ticket");
       });
   }, [infoTicket, datosCliente?.statusPagoPremio, tickets]);
+  const cancelar = () => {
+    notifyError("Se cancelo el pago del premio");
+    navigate(`/loteria/loteria-de-bogota`);
+  };
   return (
     <>
       <Form onSubmit={onSubmit} grid>
@@ -532,6 +577,40 @@ const Premios = ({ route }) => {
             }
           }}
         />
+        <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
+          <Input
+            type="checkbox"
+            label="Billete Físico"
+            required
+            value={checkBilleteFisico}
+            disabled={checkDisableFisico}
+            onChange={() => {
+              setCheckBilleteFisico(!checkBilleteFisico);
+              if (checkBilleteFisico == true) {
+                setCheckDisableVirtual(false);
+                setIsSelf(!isSelf);
+              } else {
+                setCheckDisableVirtual(true);
+              }
+            }}></Input>
+
+          <Input
+            label="Billete Virtual"
+            type="checkbox"
+            required
+            disabled={checkDisableVirtual}
+            value={checkBilleteVirtual}
+            onChange={() => {
+              setCheckBilleteVirtual(!checkBilleteVirtual);
+              if (checkBilleteVirtual == true) {
+                setCheckDisableFisico(false);
+                setIsSelf(true);
+              } else {
+                setCheckDisableFisico(true);
+              }
+            }}></Input>
+        </div>
+
         <ButtonBar className="lg:col-span-2">
           <Button type="submit" disabled={disabledBtns}>
             Consultar
@@ -539,7 +618,7 @@ const Premios = ({ route }) => {
         </ButtonBar>
         <SimpleLoading show={respuesta} />
       </Form>
-      {showTable ? (
+      {showTable && totalPagar && respagar ? (
         <>
           <TableEnterprise
             title="Premios a pagar"
@@ -551,7 +630,7 @@ const Premios = ({ route }) => {
               "Premio Neto x Fraccion",
             ]}
             data={respagar}></TableEnterprise>
-
+          {console.log("========= ESTO ES RES PAGAR==========", respagar)}
           {tipopago === 2 && !maxPago ? (
             <Form onSubmit={onPay1} grid>
               <Fieldset
@@ -577,6 +656,8 @@ const Premios = ({ route }) => {
                   id="cedula"
                   label="Cédula"
                   type="text"
+                  minLength={"12"}
+                  maxLength={"12"}
                   autoComplete="off"
                   required
                   value={datosCliente?.documento}
@@ -608,6 +689,7 @@ const Premios = ({ route }) => {
                       };
                     });
                   }}
+                  onChange={onCelChange}
                 />
 
                 <Input
@@ -626,51 +708,37 @@ const Premios = ({ route }) => {
                     });
                   }}
                 />
+                {/* {fracbill.map((frac, index) => {
+                  return (
+                    <Input
+                      id={frac}
+                      label={`Fracción ${frac}:`}
+                      type="checkbox"
+                      value={frac}
+                      checked={checkedState[index]}
+                      onChange={() => handleOnChange(index)}
+                    />
+                  );
+                })} */}
                 <Select
                   id="selectFraccion"
                   label="Fracción"
                   options={optionsDocumento}
-                  value={datosCliente?.selectFraccion}
-                  onChange={(e) => {
-                    setDatosCliente((old) => {
-                      return { ...old, selectFraccion: e.target.value };
-                    });
-                  }}
+                  // value={datosCliente?.selectFraccion}
+                  value={seleccionarFraccion}
                   required
+                  onChange={(e) => {
+                    var valorFraccion = e.target.value;
+                    console.log(
+                      "ESTO ES EL VALUE DE LA FRACCION??????????",
+                      valorFraccion
+                    );
+                    setSeleccionarFraccion(e.target.value);
+                    // setDatosCliente((old) => {
+                    //   return { ...old, selectFraccion: e.target.value };
+                    // });
+                  }}
                 />
-                <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
-                  <Input
-                    type="checkbox"
-                    label="Billete Físico"
-                    required
-                    value={checkBilleteFisico}
-                    disabled={checkDisableFisico}
-                    onChange={() => {
-                      setCheckBilleteFisico(!checkBilleteFisico);
-                      if (checkBilleteFisico == true) {
-                        setCheckDisableVirtual(false);
-                        setIsSelf(!isSelf);
-                      } else {
-                        setCheckDisableVirtual(true);
-                      }
-                    }}></Input>
-
-                  <Input
-                    label="Billete Virtual"
-                    type="checkbox"
-                    required
-                    disabled={checkDisableVirtual}
-                    value={checkBilleteVirtual}
-                    onChange={() => {
-                      setCheckBilleteVirtual(!checkBilleteVirtual);
-                      if (checkBilleteVirtual == true) {
-                        setCheckDisableFisico(false);
-                        setIsSelf(true);
-                      } else {
-                        setCheckDisableFisico(true);
-                      }
-                    }}></Input>
-                </div>
                 {checkBilleteVirtual == true ? (
                   <Input
                     id="codHash"
@@ -687,13 +755,18 @@ const Premios = ({ route }) => {
                   ""
                 )}
                 {checkBilleteVirtual == true || checkBilleteFisico == true ? (
-                  <>
-                    <ButtonBar className="col-auto md:col-span-2">
-                      <Button type="submit" disabled={disabledBtns}>
-                        Pagar
-                      </Button>
-                    </ButtonBar>
-                  </>
+                  <div className="flex justify-center items-center mx-96">
+                    <div>
+                      <ButtonBar className="col-auto md:col-span-2">
+                        <Button type="submit" disabled={disabledBtns}>
+                          Pagar
+                        </Button>
+                      </ButtonBar>
+                      <ButtonBar>
+                        <Button onClick={() => cancelar()}>Cancelar</Button>
+                      </ButtonBar>
+                    </div>
+                  </div>
                 ) : (
                   ""
                 )}
@@ -706,54 +779,33 @@ const Premios = ({ route }) => {
                   <Form onSubmit={onPay1} grid>
                     {/************Selección tipo de documento******************* */}
                     <Fieldset
-                      className="lg:col-span-2"
-                      legend={"Seleccione un tipo de billete fielset 2"}>
+                      className="lg:col-span-2 flex justify-center items-center"
+                      legend={"Por favor llene los campos 2"}>
                       <Select
                         id="selectFraccion"
                         label="Fracción"
                         options={optionsDocumento}
-                        value={datosCliente?.selectFraccion}
-                        onChange={(e) => {
-                          setDatosCliente((old) => {
-                            return { ...old, selectFraccion: e.target.value };
-                          });
-                        }}
+                        // value={datosCliente?.selectFraccion}
+                        value={seleccionarFraccion}
                         required
+                        onChange={(e) => {
+                          var valorFraccion = e.target.value;
+                          console.log(
+                            "ESTO ES EL VALUE DE LA FRACCION??????????",
+                            e.target.value
+                          );
+                          setSeleccionarFraccion(e.target.value);
+                          // setDatosCliente((old) => {
+                          //   return { ...old, selectFraccion: e.target.value };
+                          // });
+                        }}
+                        // onChange={(e) => {
+                        //   setDatosCliente((old) => {
+                        //     return { ...old, selectFraccion: e.target.value };
+                        //   });
+                        // }}
                       />
-                      <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
-                        <Input
-                          type="checkbox"
-                          label="Billete Físico"
-                          required
-                          value={checkBilleteFisico}
-                          disabled={checkDisableFisico}
-                          onChange={() => {
-                            setCheckBilleteFisico(!checkBilleteFisico);
-                            if (checkBilleteFisico == true) {
-                              setCheckDisableVirtual(false);
-                              setIsSelf(!isSelf);
-                            } else {
-                              setCheckDisableVirtual(true);
-                            }
-                          }}></Input>
-
-                        <Input
-                          label="Billete Virtual"
-                          type="checkbox"
-                          required
-                          disabled={checkDisableVirtual}
-                          value={checkBilleteVirtual}
-                          onChange={() => {
-                            setCheckBilleteVirtual(!checkBilleteVirtual);
-                            if (checkBilleteVirtual == true) {
-                              setCheckDisableFisico(false);
-                              setIsSelf(true);
-                            } else {
-                              setCheckDisableFisico(true);
-                            }
-                          }}></Input>
-                      </div>
-                      {checkBilleteVirtual == true ? (
+                      {checkBilleteVirtual === true ? (
                         <Input
                           id="codHash"
                           label="Codigo de seguridad"
@@ -768,15 +820,22 @@ const Premios = ({ route }) => {
                       ) : (
                         ""
                       )}
-                      {checkBilleteVirtual == true ||
-                      checkBilleteFisico == true ? (
-                        <>
-                          <ButtonBar className="col-auto md:col-span-2">
-                            <Button type="submit" disabled={disabledBtns}>
-                              Pagar
-                            </Button>
-                          </ButtonBar>
-                        </>
+                      {checkBilleteFisico === true ||
+                      checkBilleteVirtual === true ? (
+                        <div className="flex justify-center items-center mx-96">
+                          <div>
+                            <ButtonBar className="col-auto md:col-span-2">
+                              <Button type="submit" disabled={disabledBtns}>
+                                Pagar
+                              </Button>
+                            </ButtonBar>
+                            <ButtonBar>
+                              <Button onClick={() => cancelar()}>
+                                Cancelar
+                              </Button>
+                            </ButtonBar>
+                          </div>
+                        </div>
                       ) : (
                         ""
                       )}

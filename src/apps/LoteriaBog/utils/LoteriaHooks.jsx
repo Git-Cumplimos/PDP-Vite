@@ -448,7 +448,7 @@ export const useProvideLoteria = () => {
     }
   }, []);
   const isWinner = useCallback(
-    async (sorteo, billete, serie) => {
+    async (sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual) => {
       console.log("sorteo en loteriahook???????", sorteo);
       console.log("billete en loteriahook???????", billete);
       console.log("serie en loteriahook???????", serie);
@@ -463,6 +463,8 @@ export const useProvideLoteria = () => {
             bill_consultado: billete,
             serie_consultada: serie,
             idloteria: loteria,
+            fisico: checkBilleteFisico,
+            virtual: checkBilleteVirtual,
           },
           {},
           true,
