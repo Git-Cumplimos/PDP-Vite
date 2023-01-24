@@ -173,7 +173,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
     setProcesandoTrx(true);
     /*  setShowModal(false); */
     if (cupoLogin >= valorAportar) {
-      if (tipoComercio === "OFICINAS PROPIAS") {
+      if (tipoComercio === "OFICINAS PROPIAS" || tipoComercio === "KIOSCO") {
         // console.log("entre");
         setEsPropio(true);
 
