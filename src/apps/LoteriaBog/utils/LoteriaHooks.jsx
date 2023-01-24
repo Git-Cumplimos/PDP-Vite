@@ -36,6 +36,7 @@ const urls = {
 	premiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioFisico`,
 	pagopremio: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioVirtual`,
 	pagopremiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioFisico`,
+	pagoPremioLoterias: `${process.env.REACT_APP_URL_LOTERIAS}/premios`,
 
 	ConsultaCrearSort: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_sorteos`,
 	CambiarSort: `${process.env.REACT_APP_URL_LOTERIAS}/sorteo`,
