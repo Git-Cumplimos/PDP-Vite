@@ -177,8 +177,10 @@ const PpsVoluntarioDemanda = lazy(() =>
  * Recaudo
  */
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
+const RecaudoTrxRecaudo = lazy(() => import("../apps/Recaudo/Views/TrxRecaudo"));
 const RecaudoManual = lazy(() => import("../apps/Recaudo/Views/RecaudoManual"));
 const RecaudoCodigo = lazy(() => import("../apps/Recaudo/Views/RecaudoCodigo"));
+
 /**
  * RecaudoIntegrado
  */
@@ -223,6 +225,7 @@ const TransaccionesBancolombia = lazy(() =>
 /* const ContenedorRunt = lazy(() => import("../apps/Runt/ContenedorRunt"));
 const PagarRunt = lazy(() => import("../apps/Runt/Views/PagarRunt"));
  */
+
 /**
  * Daviplata
  */
@@ -550,6 +553,13 @@ const allUrlsPrivateApps = [
     component: Recaudo,
     permission: [22, 23],
     subRoutes: [
+      {
+        link: "/recaudo/trx",
+        label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
+        component: RecaudoTrxRecaudo,
+        permission: [22],
+        show: false,
+      },
       {
         link: "/recaudo/manual",
         label: <AppIcons Logo={"RECAUDO"} name={"Recaudo manual"} />,

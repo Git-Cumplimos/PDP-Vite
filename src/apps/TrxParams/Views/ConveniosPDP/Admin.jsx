@@ -51,7 +51,7 @@ const AdminConveniosPDP = () => {
         ...Object.fromEntries(
           Object.entries(searchFilters)
             .filter(([_, val]) => val)
-            .map(([key, val]) => [key, key === "tags" ? val.split(" ") : val])
+            .map(([key, val]) => [key, key === "tags" ? val.split(",") : val])
         ),
       })
         .then((res) => {
