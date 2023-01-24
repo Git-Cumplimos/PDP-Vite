@@ -16,6 +16,7 @@ import { notifyPending, notifyError } from "../../../utils/notify";
 
 import {
   consultarConvenio,
+  consultarConvenioBarras,
   consultarRecaudo,
   transaccionConvenio,
 } from "./utils";
@@ -27,11 +28,12 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import { makeMoneyFormatter } from "../../../utils/functions";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { useNavigate } from "react-router-dom";
+import ButtonLink from "../../../components/Base/ButtonLink";
 
 const formatMoney = makeMoneyFormatter(0);
 
 const TrxRecaudo = () => {
-  const [{ id_convenio }] = useQuery();
+  const [{ id_convenio, codigo }] = useQuery();
 
   const navigate = useNavigate();
 
@@ -47,7 +49,9 @@ const TrxRecaudo = () => {
   const [userInputData, setUserInputData] = useState({
     referencias: [],
     valorTrx: "0",
+    valorTrxOriginal: null,
   });
+  const [isCodigoBarras, setIsCodigoBarras] = useState(null);
 
   const printDiv = useRef();
 
@@ -86,38 +90,69 @@ const TrxRecaudo = () => {
 
   const searchConvenios = useDelayedCallback(
     useCallback(() => {
-      setSearchingConvData(true);
-      consultarConvenio({
-        comercio: {
-          id_comercio: roleInfo?.id_comercio,
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
-          nombre_comercio: roleInfo?.["nombre comercio"],
-        },
-        ubicacion: {
-          address: roleInfo?.direccion,
-          dane_code: roleInfo?.codigo_dane,
-          city: roleInfo?.ciudad.substring(0, 7),
-        },
-        info_transaccion: {
-          convenio: id_convenio,
-          valor_transaccion: 20000,
-        },
-      })
-        .then((res) => {
-          if (res?.status) {
-            setDataConvenio(res?.obj);
-            setUserInputData((old) => ({
-              ...old,
-              referencias: new Array(res?.obj?.referencias?.length).fill(""),
-            }));
-          } else {
-            console.error(res?.msg);
-          }
-        })
-        .catch(() => {})
-        .finally(() => setSearchingConvData(false));
-    }, [id_convenio, roleInfo]),
+      if (id_convenio || codigo) {
+        setSearchingConvData(true);
+        const bodyData = {
+          comercio: {
+            id_comercio: roleInfo?.id_comercio,
+            id_usuario: roleInfo?.id_usuario,
+            id_terminal: roleInfo?.id_dispositivo,
+            nombre_comercio: roleInfo?.["nombre comercio"],
+          },
+          ubicacion: {
+            address: roleInfo?.direccion,
+            dane_code: roleInfo?.codigo_dane,
+            city: roleInfo?.ciudad.substring(0, 7),
+          },
+          info_transaccion: {},
+        };
+        let peticionConsultaConvenio;
+        if (id_convenio) {
+          bodyData.info_transaccion.convenio = id_convenio;
+          bodyData.info_transaccion.valor_transaccion = 20000;
+          peticionConsultaConvenio = consultarConvenio(bodyData);
+          setIsCodigoBarras(false);
+        } else if (codigo) {
+          bodyData.info_transaccion.codigo_barras = codigo;
+          peticionConsultaConvenio = consultarConvenioBarras(bodyData);
+          setIsCodigoBarras(true);
+        }
+        peticionConsultaConvenio
+          .then((res) => {
+            if (res?.status) {
+              setDataConvenio(res?.obj);
+              setUserInputData((old) => {
+                if (id_convenio) {
+                  return {
+                    ...old,
+                    referencias: new Array(res?.obj?.referencias?.length).fill(
+                      ""
+                    ),
+                  };
+                }
+                if (codigo) {
+                  return {
+                    ...old,
+                    referencias:
+                      res?.obj?.datos_adicionales?.data_codigo_barras
+                        ?.codigosReferencia ??
+                      new Array(res?.obj?.referencias?.length).fill(""),
+                    valorTrx:
+                      res?.obj?.datos_adicionales?.data_codigo_barras?.pago,
+                    valorTrxOriginal:
+                      res?.obj?.datos_adicionales?.data_codigo_barras?.pago,
+                  };
+                }
+                return { ...old };
+              });
+            } else {
+              console.error(res?.msg);
+            }
+          })
+          .catch(() => {})
+          .finally(() => setSearchingConvData(false));
+      }
+    }, [id_convenio, codigo, roleInfo]),
     300
   );
 
@@ -132,7 +167,16 @@ const TrxRecaudo = () => {
 
   const handleClose = useCallback((ev) => {
     setShowModal(false);
-  }, []);
+    if (isCodigoBarras) {
+      navigate("/recaudo/codigo");
+      return;
+    }
+    setUserInputData((old) => ({
+      ...old,
+      referencias: old.referencias.fill(""),
+      valorTrx: "0",
+    }))
+  }, [isCodigoBarras, navigate]);
 
   const submitTrx = useCallback(
     (ev) => {
@@ -286,23 +330,35 @@ const TrxRecaudo = () => {
           )
         )}
         {!isConsulta && (
-          <MoneyInput
-            id="valor"
-            name="valor"
-            label="Valor a pagar"
-            autoComplete="off"
-            minLength={"5"}
-            maxLength={"15"}
-            value={userInputData?.valorTrx}
-            onInput={(_, val) =>
-              setUserInputData((old) => ({
-                ...old,
-                valorTrx: val,
-              }))
-            }
-            readOnly={!modificarValor}
-            required
-          />
+          <Fragment>
+            {userInputData?.valorTrxOriginal && modificarValor && (
+              <MoneyInput
+                id="valor_original"
+                name="valor_original"
+                label="Valor a pagar original"
+                value={userInputData?.valorTrxOriginal}
+                readOnly
+                disabled
+              />
+            )}
+            <MoneyInput
+              id="valor"
+              name="valor"
+              label="Valor a pagar"
+              autoComplete="off"
+              minLength={"5"}
+              maxLength={"15"}
+              value={userInputData?.valorTrx}
+              onInput={(_, val) =>
+                setUserInputData((old) => ({
+                  ...old,
+                  valorTrx: val,
+                }))
+              }
+              readOnly={!modificarValor}
+              required
+            />
+          </Fragment>
         )}
         <ButtonBar
           className={
@@ -311,6 +367,11 @@ const TrxRecaudo = () => {
               : ""
           }
         >
+          {isCodigoBarras && (
+            <ButtonLink type="button" to="/recaudo/codigo">
+              Volver a ingresar código de barras
+            </ButtonLink>
+          )}
           <Button type="submit">
             {isConsulta ? "Realizar consulta" : "Realizar pago"}
           </Button>

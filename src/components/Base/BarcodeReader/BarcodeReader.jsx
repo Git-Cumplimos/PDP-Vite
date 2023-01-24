@@ -22,7 +22,7 @@ const BarcodeReader = ({
           onSearchCodigo(ev.target.value);
           return;
         }
-        if (ev.keyCode === 8 && ev.shiftKey === false) {
+        if ((ev.keyCode === 8 || ev.keyCode === 46) && ev.shiftKey === false) {
           ev.preventDefault();
           return;
         }

@@ -26,6 +26,9 @@ const buildPostFunction = (url) => {
 export const consultarConvenio = buildPostFunction(
   `${urlBroker}/recaudo/consulta-convenio`
 );
+export const consultarConvenioBarras = buildPostFunction(
+  `${urlBroker}/recaudo/consulta-convenio-codigo-barras`
+);
 export const consultarRecaudo = buildPostFunction(
   `${urlBroker}/recaudo/consulta-recaudo`
 );
