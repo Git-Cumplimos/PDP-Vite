@@ -12,6 +12,9 @@ import SendForm from "../components/SendForm/SendForm";
 import { useLoteria } from "../utils/LoteriaHooks";
 import fetchData from "../../../utils/fetchData";
 import SubPage from "../../../components/Base/SubPage/SubPage";
+import InputX from "../../../components/Base/InputX/InputX";
+import { notifyError } from "../../../utils/notify";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
@@ -38,6 +41,8 @@ const Loteria = ({ route }) => {
     sellLoteriafisica,
     codigos_lot,
     setCodigos_lot,
+    loadConsulta,
+    setLoadConsulta,
   } = useLoteria();
 
   const [sorteoOrdi, setSorteoOrdi] = useState(null);
@@ -46,15 +51,27 @@ const Loteria = ({ route }) => {
   const [sorteoOrdifisico, setSorteofisico] = useState(null);
   const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
 
+  const [datosEscaneados, setDatosEscaneados] = useState("");
+
+  const validarEntradaScanner = useCallback(
+    (validarNum) => {
+      if (validarNum[0] === "]") {
+        // console.log(validarNum.replace("]C1", ""));
+        return validarNum.replace("]C1", "");
+      } else {
+        return validarNum;
+      }
+    },
+    [datosEscaneados]
+  );
+
   const sorteosLOT = useMemo(() => {
     var cod = "";
-    console.log(codigos_lot?.length);
     if (codigos_lot?.length === 2) {
       cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
     } else {
       cod = `${codigos_lot?.[0]?.cod_loteria}`;
     }
-    console.log(cod);
     return cod;
   }, [codigos_lot]);
 
@@ -69,7 +86,6 @@ const Loteria = ({ route }) => {
         setSorteoExtra(null);
         setSorteofisico(null);
         setSorteofisicoextraordinario(null);
-        console.log(res);
         const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
           return tip_sorteo === 1 && !fisico;
         });
@@ -125,6 +141,7 @@ const Loteria = ({ route }) => {
 
   useEffect(() => {
     setSellResponse(null);
+    setDatosEscaneados("")
     setNumero("");
     setSerie("");
     setCustomer({ fracciones: "", phone: "", doc_id: "" });
@@ -132,7 +149,6 @@ const Loteria = ({ route }) => {
     setPage(1);
     setMaxPages(1);
 
-    console.log(sorteoOrdi);
     const copy = [{ value: "", label: "" }];
     if (sorteoOrdi !== null) {
       copy.push({
@@ -197,8 +213,9 @@ const Loteria = ({ route }) => {
   ]);
   return (
     <>
-      <Form grid>
+        <SimpleLoading show={loadConsulta}></SimpleLoading>
         <Select
+          className = {"place-self-strech"}
           disabled={serie !== "" || numero !== ""}
           id="selectSorteo"
           label="Tipo de sorteo"
@@ -206,6 +223,32 @@ const Loteria = ({ route }) => {
           value={sorteo}
           onChange={(e) => setSorteo(e.target.value)}
         />
+        { sorteo !== "" ? 
+        <Form grid>
+        {sorteo.split("-")[1] === "true" ? 
+        <InputX
+        label="Escanee el código de barras"
+        type="search"
+        value={datosEscaneados}
+        onInput={(e) => {
+          const num = e.target.value || "";
+          setDatosEscaneados(validarEntradaScanner(num));
+          if (num?.length === 20) {       
+            searchLoteriafisica(sorteo, String(num.substr(-9, 4)), String(num.substr(-5, 3)), 1)
+            .then((max) => {
+              if (max !== undefined) {
+                setMaxPages(Math.ceil(max / 10));
+              }
+            });       
+            setNumero(String(num.substr(-9, 4)));
+            setSerie(String(num.substr(-5, 3)));
+          }else{
+            setNumero("");
+            setSerie("");
+          }
+        }}
+      ></InputX>
+        : ""}
         <Input
           id="numTicket"
           label="Numero de billete"
@@ -215,6 +258,7 @@ const Loteria = ({ route }) => {
           autoComplete="off"
           value={numero}
           onInput={(e) => {
+            setDatosEscaneados("");
             if (!isNaN(e.target.value)) {
               const num = e.target.value;
               setNumero(num);
@@ -249,6 +293,7 @@ const Loteria = ({ route }) => {
           autoComplete="off"
           value={serie}
           onInput={(e) => {
+            setDatosEscaneados("");
             if (!isNaN(e.target.value)) {
               const num = e.target.value;
               setSerie(num);
@@ -274,7 +319,7 @@ const Loteria = ({ route }) => {
             timeOut: 500,
           }}
         />
-        <ButtonBar>
+        <ButtonBar className= {"lg:col-span-2"}>
           <Button
             type="button"
             disabled={page < 2}
@@ -306,7 +351,9 @@ const Loteria = ({ route }) => {
             Siguiente
           </Button>
         </ButtonBar>
-      </Form>
+        </Form>
+        : ""}
+      
       {Array.isArray(loterias) && loterias.length > 0 ? (
         <>
           <div className="flex flex-row justify-evenly w-full my-4">
@@ -315,7 +362,7 @@ const Loteria = ({ route }) => {
           </div>
           <Table
             headers={[
-              "Numero",
+              "Número",
               "Serie",
               "Fracciones disponibles",
               // "Valor por fraccion",
@@ -330,7 +377,7 @@ const Loteria = ({ route }) => {
               }
             )}
             onSelectRow={(e, index) => {
-              console.log(loterias[index].Fracciones);
+              console.log(loterias[index])
               setSelected(loterias[index]);
               setShowModal(true);
             }}

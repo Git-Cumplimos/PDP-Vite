@@ -169,7 +169,8 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
       <Button
         onClick={(e) => {
           setPagoresponse(null);
-        }}>
+        }}
+      >
         Volver
       </Button>
     </div>
@@ -184,7 +185,8 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
             closeModal();
             setPagoresponse(null);
             //setCustomer({ fracciones: "", phone: "", doc_id: "" });
-          }}>
+          }}
+        >
           Cerrar
         </Button>
       </ButtonBar>

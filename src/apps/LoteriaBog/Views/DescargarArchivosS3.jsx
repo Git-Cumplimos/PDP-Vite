@@ -54,8 +54,6 @@ const DescargarArchivosS3 = ({ route }) => {
     setShowModal2(false);
   }, []);
 
-  console.log(resp_con_sort);
-  console.log(typeof resp_con_sort);
   return (
     <>
       <div>
