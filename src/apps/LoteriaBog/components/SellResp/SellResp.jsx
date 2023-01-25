@@ -52,7 +52,6 @@ const SellResp = ({
     content: () => printDiv.current,
     pageStyle: pageStyle,
   });
-  console.log(sellResponse);
   const voucherInfo = useMemo(() => {
     const vinfo = {};
     if (!("msg" in sellResponse)) {
@@ -134,7 +133,6 @@ const SellResp = ({
     sellResponse,
     voucherInfo,
   ]);
-  console.log(sellResponse?.tipoPago);
   useEffect(() => {
     infoTicket(sellResponse?.["id_trx"], sellResponse?.tipoPago, ticket);
   }, [infoTicket, sellResponse, ticket]);

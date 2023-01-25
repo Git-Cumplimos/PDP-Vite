@@ -8,7 +8,12 @@ import MoneyInput from "../../../../components/Base/MoneyInput";
 import Select from "../../../../components/Base/Select";
 import { notifyError } from "../../../../utils/notify";
 
-const FormComission = ({ outerState, onSubmit, children }) => {
+const FormComission = ({
+  outerState,
+  onSubmit,
+  children,
+  disabledState = false,
+}) => {
   const [comissionData, setComissionData] = outerState;
 
   const onChange = useCallback(
@@ -110,6 +115,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
             value={comissionData?.type}
             onChange={() => {}}
             // defaultValue={comissionData?.type}
+            disabled={disabledState}
             required
           />
           {comissionData?.ranges.map((_comission, ind) => {
@@ -158,13 +164,13 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                               : true
                           }
                           disabled={
-                            key === "Rango minimo"
+                            (key === "Rango minimo"
                               ? true
                               : key === "Rango maximo"
                               ? comissionData?.ranges.length === ind + 1
                                 ? false
                                 : true
-                              : true
+                              : true) || disabledState
                           }
                         />
                       );
@@ -198,7 +204,8 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                             key === "Rango maximo"
                               ? false
                               : true
-                          }></MoneyInput>
+                          }
+                          disabled={disabledState}></MoneyInput>
                       );
                   } else if (key === "Comision porcentual") {
                     return (
@@ -252,6 +259,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                             ? false
                             : true
                         }
+                        disabled={disabledState}
                       />
                     );
                   } else if (key === "Comision fija") {
@@ -285,28 +293,33 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           key === "Rango maximo"
                             ? false
                             : true
-                        }></MoneyInput>
+                        }
+                        disabled={disabledState}></MoneyInput>
                     );
                   }
                 })}
                 <ButtonBar className='lg:col-span-2'>
-                  {comissionData?.ranges?.length > 1 && ind !== 0 && (
-                    <Button
-                      type='button'
-                      onClick={(e) => {
-                        onClickDelete(e, ind);
-                      }}>
-                      Eliminar rango
-                    </Button>
-                  )}
+                  {!disabledState &&
+                    comissionData?.ranges?.length > 1 &&
+                    ind !== 0 && (
+                      <Button
+                        type='button'
+                        onClick={(e) => {
+                          onClickDelete(e, ind);
+                        }}>
+                        Eliminar rango
+                      </Button>
+                    )}
                 </ButtonBar>
               </Fieldset>
             );
           })}
           <ButtonBar className='lg:col-span-2'>
-            <Button type='button' onClick={onClick}>
-              Agregar rango
-            </Button>
+            {!disabledState && (
+              <Button type='button' onClick={onClick}>
+                Agregar rango
+              </Button>
+            )}
             {children}
           </ButtonBar>
         </Form>
