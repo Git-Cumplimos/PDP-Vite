@@ -39,8 +39,8 @@ const GruposPlanesComisiones = lazy(() =>
 const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
 const Convenios = lazy(() => import("./Views/Convenios/Convenios"));
 const ConveniosPDP = lazy(() => import("./Views/ConveniosPDP"));
-const AdminConveniosPDP = lazy(() => import("../apps/TrxParams/Views/ConveniosPDP/Admin"));
-const ConveniosAutorizadoresRecaudo = lazy(() => import("../apps/TrxParams/Views/ConveniosPDP/AutorizadoresRecaudo"));
+const AdminConveniosPDP = lazy(() => import("./Views/ConveniosPDP/Admin"));
+const ConveniosAutorizadoresRecaudo = lazy(() => import("./Views/ConveniosPDP/AutorizadoresRecaudo"));
 const ConvAuto = lazy(() => import("./Views/ConvAuto"));
 const Autorizadores = lazy(() => import("./Views/Autorizadores"));
 const ReporteConfiguracionComisiones = lazy(() =>
