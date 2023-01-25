@@ -30,7 +30,7 @@ import MoneyInput from "../../../components/Base/MoneyInput";
 import { useNavigate } from "react-router-dom";
 import ButtonLink from "../../../components/Base/ButtonLink";
 
-const formatMoney = makeMoneyFormatter(0);
+const formatMoney = makeMoneyFormatter(2);
 
 const TrxRecaudo = () => {
   const [{ id_convenio, codigo }] = useQuery();
@@ -165,18 +165,21 @@ const TrxRecaudo = () => {
     setShowModal(true);
   }, []);
 
-  const handleClose = useCallback((ev) => {
-    setShowModal(false);
-    if (isCodigoBarras) {
-      navigate("/recaudo/codigo");
-      return;
-    }
-    setUserInputData((old) => ({
-      ...old,
-      referencias: old.referencias.fill(""),
-      valorTrx: "0",
-    }))
-  }, [isCodigoBarras, navigate]);
+  const handleClose = useCallback(
+    (ev) => {
+      setShowModal(false);
+      if (isCodigoBarras) {
+        navigate("/recaudo/codigo");
+        return;
+      }
+      setUserInputData((old) => ({
+        ...old,
+        referencias: old.referencias.fill(""),
+        valorTrx: "0",
+      }));
+    },
+    [isCodigoBarras, navigate]
+  );
 
   const submitTrx = useCallback(
     (ev) => {
