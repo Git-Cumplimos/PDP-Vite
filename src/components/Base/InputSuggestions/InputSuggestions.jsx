@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import classes from "./InputSuggestions.module.css";
 
 const { formItem, suggestion, liSelected, liUnSelected } = classes;
@@ -9,10 +9,12 @@ const InputSuggestions = ({
   onLazyInput,
   suggestions,
   onSelectSuggestion,
+  onClearSearch,
   ...input
 }) => {
   const { id: _id, type } = input;
-
+  
+  const inputRef = useRef(null);
   const [timer, setTimer] = useState(null);
 
   if (type === "email") {
@@ -79,6 +81,14 @@ const InputSuggestions = ({
     [suggestions, indexSelected]
   );
 
+  useEffect(() => {
+    const inpRef = inputRef.current;
+    inpRef.addEventListener("search", onClearSearch)
+    return () => {
+      inpRef.removeEventListener("search", onClearSearch)
+    }
+  }, [onClearSearch])
+
   return (
     <div className={`${formItem}`}>
       {label && label !== "" && (
@@ -87,7 +97,7 @@ const InputSuggestions = ({
         </label>
       )}
       <div className={suggestion}>
-        <input {...input} onKeyDown={onKeySuggestion} />
+        <input {...input} ref={inputRef} onKeyDown={onKeySuggestion} />
         {Array.isArray(suggestions) && suggestions.length > 0 ? (
           <ul>
             {suggestions.map((el, idx) => (
