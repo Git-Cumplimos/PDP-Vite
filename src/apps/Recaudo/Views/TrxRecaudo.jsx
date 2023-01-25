@@ -219,7 +219,7 @@ const TrxRecaudo = () => {
         {
           render: () => {
             setLoading(true);
-            return `${isConsulta ? "Creando" : "Actualizando"} convenio`;
+            return "Procesando transaccion";
           },
         },
         {
@@ -271,7 +271,7 @@ const TrxRecaudo = () => {
               return err?.message;
             }
             console.error(err?.message);
-            return `${isConsulta ? "Creacion" : "Actualizacion"} fallida`;
+            return `${isConsulta ? "Consulta" : "Transaccion"} fallida`;
           },
         }
       );
