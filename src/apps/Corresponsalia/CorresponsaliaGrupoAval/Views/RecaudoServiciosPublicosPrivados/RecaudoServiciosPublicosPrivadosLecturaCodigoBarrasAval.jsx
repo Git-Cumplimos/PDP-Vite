@@ -601,7 +601,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                     </Form>
                   )}
                   <ButtonBar>
-                    <Button onClick={hideModalReset}>Cancelar</Button>
+                    <Button
+                      onClick={() => {
+                        notifyError("Transacción cancelada por el usuario");
+                        hideModalReset();
+                      }}>
+                      Cancelar
+                    </Button>
                     <Button type='submit' onClick={onSubmitPago}>
                       Realizar pago
                     </Button>
