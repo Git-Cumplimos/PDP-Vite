@@ -50,6 +50,7 @@ const Premios = ({ route }) => {
     celular: "",
     idTransaccion: "",
     statusPagoPremio: false,
+    tipo_operacion: "",
   });
   const [datosComercio, setDatosComercio] = useState({
     comercio: "",
@@ -401,6 +402,7 @@ const Premios = ({ route }) => {
                 ...old,
                 statusPagoPremio: res?.status,
                 idTransaccion: res?.obj?.id_trx,
+                tipo_operacion: res?.obj?.tipo_operacion,
               };
             });
             setEstadoTransaccion(res?.status);
@@ -578,22 +580,23 @@ const Premios = ({ route }) => {
   //     }
   //   }
   // };
+
   useEffect(() => {
-    infoTicket(estadoTransaccion, 114, tickets)
+    const ticket = tipopago === 1 ? tickets : tickets2;
+    infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
       .then((resTicket) => {})
       .catch((err) => {
         console.error(err);
         notifyError("Error guardando el ticket");
       });
-  }, [infoTicket, estadoTransaccion, tickets]);
-  useEffect(() => {
-    infoTicket(estadoTransaccion, 114, tickets2)
-      .then((resTicket) => {})
-      .catch((err) => {
-        console.error(err);
-        notifyError("Error guardando el ticket");
-      });
-  }, [infoTicket, estadoTransaccion, tickets2]);
+  }, [
+    infoTicket,
+    datosCliente,
+    estadoTransaccion,
+    tickets2,
+    tickets,
+    tipopago,
+  ]);
   const cancelar = () => {
     notifyError("Se cancelo el pago del premio");
     navigate(`/loteria/loteria-de-bogota`);
