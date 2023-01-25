@@ -9,12 +9,14 @@ import {
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
+import { notifyError } from "../../../utils/notify";
 //import Loteria from "../Views/Loteria";
 
 ////// NITS de loterias _______________________
 const nitsLoterias = {
   "loteria-de-bogota": "899.999.270-1",
   "loteria-del-tolima": "809.008.775-0",
+  "loteria-de-cundinamarca": "86.003.723-4",
 };
 //////////////////////////////////////////////
 
@@ -50,6 +52,9 @@ const urls = {
   idloteria: `${process.env.REACT_APP_URL_LOTERIAS}/codigos_loteria`,
   consulta_operaciones: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_operaciones`,
   consulta_codigos_oficina: `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`,
+  consultaInventario: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_numeros_inventario`,
+  consultaInventarioReporte: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_inventario`,
+  registrarInventario: `${process.env.REACT_APP_URL_LOTERIAS}/registrar_inventario`,
 };
 export const LoteriaContext = createContext({
   infoLoto: {
@@ -97,12 +102,17 @@ export const LoteriaContext = createContext({
   con_sort_ventas: () => {},
   cargueVentasExtra_S3: () => {},
   reportVentas: () => {},
+  consultaInventario: () => {},
+  consultaInventarioReporte: () => {},
+  registrarInventario: () => {},
   setCodigos_lot: null,
   codigos_lot: null,
   tiposOperaciones: null,
   setTiposOperaciones: null,
   codigosOficina: null,
   setCodigosOficina: null,
+  loadConsulta: null,
+  setLoadConsulta: null,
 });
 
 export const useLoteria = () => {
@@ -137,6 +147,7 @@ export const useProvideLoteria = () => {
   const [tiposOperaciones, setTiposOperaciones] = useState(null);
   const [codigosOficina, setCodigosOficina] = useState(null);
   const [nit_loteria, setNit_loteria] = useState(null);
+  const [loadConsulta, setLoadConsulta] = useState(false);
 
   useEffect(() => {
     if (numero === "" && serie === "") {
@@ -149,6 +160,7 @@ export const useProvideLoteria = () => {
     const query = { nit_loteria: nit };
     try {
       const res = await fetchData(urls.idloteria, "GET", query);
+
       return res;
     } catch (err) {
       console.error(err);
@@ -192,29 +204,42 @@ export const useProvideLoteria = () => {
       setNit_loteria(nit);
       idloteria(nit).then((res) => {
         if (!res?.status) {
+          // console.log(res?.msg);
+          // setDisabledBtns(true);
         } else {
           setCodigos_lot(res?.obj);
+          // console.log(res?.obj);
         }
       });
+      //Consulta id de las operaciones por lotería
       consulta_operaciones(nit).then((res) => {
         if (!res?.status) {
+          // console.log(res?.msg);
+          // setDisabledBtns(true);
         } else {
           setTiposOperaciones(res?.obj);
+          // console.log(res?.obj);
         }
       });
 
       //Consulta codigos de oficina y sucursal por lotería
       if (roleInfo?.id_comercio !== undefined) {
-        consulta_codigos_oficina(nit).then((res) => {
-          if (res?.msg) {
-            setCodigosOficina({
-              cod_oficina_lot: "PPVIR",
-              cod_sucursal_lot: "00",
-            });
-          } else {
-            setCodigosOficina(res);
-          }
-        });
+        try {
+          consulta_codigos_oficina(nit).then((res) => {
+            // console.log("repueta", res);
+            if ("msg" in res) {
+              setCodigosOficina({
+                cod_oficina_lot: "PPVIR",
+                cod_sucursal_lot: "00",
+              });
+            } else {
+              setCodigosOficina(res);
+            }
+          });
+        } catch (err) {
+          notifyError("Error");
+          console.error(err);
+        }
       }
     }
   }, [pathname, roleInfo]);
@@ -238,6 +263,7 @@ export const useProvideLoteria = () => {
     if (num === "" && ser === "") return;
 
     try {
+      setLoadConsulta(true);
       const { Resultado: res, Num_Datos } = await fetchData(
         urls.ordinario,
         "GET",
@@ -252,10 +278,12 @@ export const useProvideLoteria = () => {
         {}
       );
       setLoterias(res);
+      setLoadConsulta(false);
       return Num_Datos;
     } catch (err) {
       setLoterias([]);
       console.error(err);
+      setLoadConsulta(false);
     }
   }, []);
 
@@ -270,6 +298,7 @@ export const useProvideLoteria = () => {
       if (num === "" && ser === "") return;
 
       try {
+        setLoadConsulta(true);
         const { Resultado: res, Num_Datos } = await fetchData(
           urls.ordinariofisico,
           "GET",
@@ -287,9 +316,11 @@ export const useProvideLoteria = () => {
         );
 
         setLoterias(res);
+        setLoadConsulta(false);
         return Num_Datos;
       } catch (err) {
         setLoterias([]);
+        setLoadConsulta(false);
         console.error(err);
       }
     },
@@ -399,6 +430,7 @@ export const useProvideLoteria = () => {
       }
       try {
         const res = await fetchData(urls.moda, "GET", query, {});
+        // console.log(res);
         setModa(res);
       } catch (err) {
         setModa(null);
@@ -428,6 +460,7 @@ export const useProvideLoteria = () => {
       console.error(err);
     }
   }, []);
+
   const isWinner = useCallback(
     async (sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual) => {
       let loteria = sorteosLOT.split(",");
@@ -566,8 +599,8 @@ export const useProvideLoteria = () => {
       try {
         const res = await fetchData(urls.premiofisico, "GET", {
           num_sorteo: sorteo,
-          bill_consultado: billete,
-          serie_consultada: serie,
+          bill_ganador: billete,
+          serie_ganadora: serie,
           fracciones_fisi: fracciones_fisi,
         });
         return res;
@@ -594,8 +627,8 @@ export const useProvideLoteria = () => {
           " " +
           customer.segundo_apellido,
         num_sorteo: sorteo,
-        bill_consultado: billete,
-        serie_consultada: serie,
+        bill_ganador: billete,
+        serie_ganadora: serie,
         cod_seguridad: hash,
         direccion: customer.direccion,
         cod_dane_ciudad: roleInfo.codigo_dane,
@@ -641,8 +674,8 @@ export const useProvideLoteria = () => {
           " " +
           customer2.segundo_apellido,
         num_sorteo: sorteo,
-        bill_consultado: billete,
-        serie_consultada: serie,
+        bill_ganador: billete,
+        serie_ganadora: serie,
         direccion: customer2.direccion,
         cod_dane_ciudad: roleInfo.codigo_dane,
         celular: customer2.telefono,
@@ -720,6 +753,7 @@ export const useProvideLoteria = () => {
           tip_sorteo: tip_sorteo,
           nit_loteria: nit_loteria,
         });
+        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -739,7 +773,7 @@ export const useProvideLoteria = () => {
         query.fecha_fin = fecha_fin;
         query.numero = page;
       }
-      query.idloteria = sorteosLOT;
+      query.codigos_loteria = sorteosLOT;
       try {
         const res = await fetchData(urls.con_SortVentas_S3, "GET", query, {});
         return res;
@@ -759,6 +793,7 @@ export const useProvideLoteria = () => {
           tip_sorteo: info.tipo_sorteo,
           nit_loteria: nit_loteria,
         });
+        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -773,11 +808,94 @@ export const useProvideLoteria = () => {
         fecha_ini: fecha_ini,
         fecha_fin: fecha_fin,
       });
+      // console.log(res);
       return res;
     } catch (err) {
       console.error(err);
     }
   }, []);
+
+  const consultaInventario = useCallback(
+    async (numSorteo, numLoteria) => {
+      try {
+        const res = await fetchData(
+          urls.consultaInventario,
+          "POST",
+          {},
+          {
+            num_sorteo: numSorteo,
+            num_loteria: numLoteria,
+            cod_distribuidor: codigosOficina?.cod_oficina_lot,
+            cod_sucursal: codigosOficina?.cod_sucursal_lot,
+          }
+        );
+        // console.log(res);
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [codigosOficina]
+  );
+
+  const consultaInventarioReporte = useCallback(
+    async (num_sorteo, pageData) => {
+      try {
+        console.log(codigos_lot);
+        const data = {
+          ...pageData,
+          num_sorteo: num_sorteo,
+          num_loteria: codigos_lot,
+        };
+        // console.log("data inventario reporte", data);
+        const res = await fetchData(
+          urls.consultaInventarioReporte,
+          "POST",
+          {},
+          data
+        );
+        // console.log("respuesta inventario reporte", res);
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [codigos_lot]
+  );
+
+  const registrarInventario = useCallback(
+    async (
+      numSorteo,
+      numLoteria,
+      comentario,
+      numero_total,
+      numero_completo,
+      inconcistencia
+    ) => {
+      try {
+        const res = await fetchData(
+          urls.registrarInventario,
+          "POST",
+          {},
+          {
+            num_sorteo: numSorteo,
+            num_loteria: numLoteria,
+            cod_distribuidor: codigosOficina?.cod_oficina_lot,
+            cod_sucursal: codigosOficina?.cod_sucursal_lot,
+            comentario: comentario,
+            numero_total: numero_total,
+            numero_completo: numero_completo,
+            inconcistencia: inconcistencia,
+          }
+        );
+        // console.log(res);
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [codigosOficina]
+  );
 
   return {
     infoLoto: {
@@ -828,11 +946,16 @@ export const useProvideLoteria = () => {
     con_SortVentas_S3,
     descargaVentas_S3,
     reportVentas,
+    consultaInventario,
+    consultaInventarioReporte,
+    registrarInventario,
     codigos_lot,
     setCodigos_lot,
     tiposOperaciones,
     setTiposOperaciones,
     codigosOficina,
     setCodigosOficina,
+    loadConsulta,
+    setLoadConsulta,
   };
 };

@@ -27,7 +27,7 @@ const SendForm = ({
   handleSubmit,
 }) => {
   const details = {
-    "Billetesg:": selected ? selected["Ganadorboleto"] : "",
+    "Billete:": selected ? selected["Ganadorboleto"] : "",
     "Serie:": selected ? selected["serie:"] : "",
     "Valor ganado:": selected
       ? formatMoney.format(selected["valor bruto"])
@@ -59,7 +59,8 @@ const SendForm = ({
           return (
             <div
               className="flex flex-row justify-between text-lg font-medium"
-              key={key}>
+              key={key}
+            >
               <h1>{key}</h1>
               <h1>{val}</h1>
             </div>
@@ -216,7 +217,8 @@ const SendForm = ({
                   direccion: "",
                   telefono: "",
                 });
-              }}>
+              }}
+            >
               Cancelar
             </Button>
           </ButtonBar>

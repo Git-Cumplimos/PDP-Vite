@@ -22,7 +22,7 @@ const CargaArchivos = ({ route }) => {
   const options = [
     { value: "", label: "" },
     { value: "PlanDePremios", label: "Plan de premios" },
-    { value: "Asignacion", label: "Asignacion" },
+    { value: "Asignacion", label: "Asignación" },
     { value: "Resultados", label: "Resultados" },
     { value: "Liquidacion", label: "Liquidacion de premios" },
   ];
@@ -54,7 +54,7 @@ const CargaArchivos = ({ route }) => {
 
   const optionsFisiVir = [
     { value: "", label: "" },
-    { value: "Fisico/", label: `${archivo} Fisicos` },
+    { value: "Fisico/", label: `${archivo} físicos` },
     { value: "Virtual/", label: `${archivo} Virtuales` },
   ];
 
@@ -69,44 +69,8 @@ const CargaArchivos = ({ route }) => {
     params: { Bucket: S3_BUCKET },
     region: REGION,
   });
-  console.log(`${tipoSorteo}${archivo}/${fisiVirtual}`);
-  // const saveFile = () => {
-  //   setDisabledBtns(true);
-  //   const f = new Date();
-  //   const params = {
-  //     Body: file,
-  //     Bucket: S3_BUCKET,
-  //     Key: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
-  //       f.getMonth() + 1
-  //     }${f.getFullYear()}${fileName}`,
-  //   };
-  //   bucket
-  //     .putObject(params)
-  //     .on("httpUploadProgress", (evt) => {
-  //       setProgress(Math.round((evt.loaded / evt.total) * 100));
-  //       setTimeout(() => {
-  //         closeModal();
-  //         EstadoArchivos().then((res) => {
-  //           if (typeof res != Object) {
-  //             if ("Motivo" in res?.[0]) {
-  //               if (res[0]["Estado"] === 1) {
-  //                 notify(res[0]["Motivo"]);
-  //               } else {
-  //                 notifyError(res[0]["Motivo"]);
-  //               }
-  //             } else {
-  //               notifyError("Consulte con soporte");
-  //             }
-  //           }
-  //         });
-  //       }, 3000);
-  //     })
-  //     .send((err) => {
-  //       if (err)
-  //         notifyError("Error con servicio de almacenamiento en la nube", err);
-  //       console.log(err);
-  //     });
-  // };
+  // console.log(`${tipoSorteo}${archivo}/${fisiVirtual}`);
+
   //------------------Funcion Para Subir El Formulario---------------------//
   const saveFile = useCallback(
     (e) => {
@@ -134,7 +98,7 @@ const CargaArchivos = ({ route }) => {
               }
 
               formData2.set("file", file);
-              console.log(formData2, `${respuesta?.obj?.url}`);
+              // console.log(formData2, `${respuesta?.obj?.url}`);
               fetch(`${respuesta?.obj?.url}`, {
                 method: "POST",
                 body: formData2,
@@ -155,7 +119,7 @@ const CargaArchivos = ({ route }) => {
                         }
                       }
                     });
-                  }, 3000);
+                  }, 5000);
                 } else {
                   notifyError("No fue posible conectar con el Bucket");
                 }
@@ -198,7 +162,6 @@ const CargaArchivos = ({ route }) => {
   if (progress === 100) {
   }
   const onChange = (files) => {
-    console.log(file);
     if (Array.isArray(Array.from(files))) {
       files = Array.from(files);
       if (files.length === 1) {
@@ -235,7 +198,6 @@ const CargaArchivos = ({ route }) => {
     setFileName("");
   }, []);
 
-  console.log(file && progress === 0);
   return (
     <>
       <div>
@@ -271,7 +233,7 @@ const CargaArchivos = ({ route }) => {
         {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
           <Select
             id="FisiVir"
-            label={`${archivo} fisicos/Virtuales`}
+            label={`${archivo} físicos/Virtuales`}
             options={optionsFisiVir}
             disabled={progress !== 0 && progress !== 100}
             value={fisiVirtual}

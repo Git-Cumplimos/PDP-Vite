@@ -52,7 +52,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
 
   const [{ numCuenta, userDoc, valor, nomDepositante, summary }, setQuery] =
     useQuery();
-  console.log(roleInfo);
+  // console.log(roleInfo);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
   const [idComercio, setIdComercio] = useState(roleInfo?.["id_comercio"]);
   const [idusuario, setIdUsuario] = useState(roleInfo?.["id_usuario"]);
@@ -173,7 +173,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
     setProcesandoTrx(true);
     /*  setShowModal(false); */
     if (cupoLogin >= valorAportar) {
-      if (tipoComercio === "OFICINAS PROPIAS") {
+      if (tipoComercio === "OFICINAS PROPIAS" || tipoComercio === "KIOSCO") {
         // console.log("entre");
         setEsPropio(true);
 
@@ -205,6 +205,12 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               .then((respuesta) => {
                 setProcesandoTrx(false);
                 console.log(respuesta);
+
+                // OJOOOOOO
+                if (respuesta?.msg?.["respuesta_colpensiones"]) {
+                  notifyError(respuesta?.msg?.["respuesta_colpensiones"]);
+                  navigate(`/colpensiones`);
+                }
                 if (
                   respuesta?.msg?.["respuesta_colpensiones"] ===
                   "El aportante no existe."
@@ -293,7 +299,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
         }
       } else {
         if (cantNum == 10) {
-          console.log("Comercio");
+          console.log("*Comercio");
           setEsPropio(true);
           if (String(numCelular).charAt(0) === "3") {
             if (valorAportar >= 5000 && valorAportar <= 149000) {
@@ -320,7 +326,12 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               )
                 .then((respuesta) => {
                   setProcesandoTrx(false);
-                  console.log(respuesta);
+                  console.log("********", respuesta);
+                  // OJOOOOOO
+                  if (respuesta?.msg?.["respuesta_colpensiones"]) {
+                    notifyError(respuesta?.msg?.["respuesta_colpensiones"]);
+                    navigate(`/colpensiones`);
+                  }
                   if (
                     respuesta?.msg?.["respuesta_colpensiones"] ===
                     "El aportante no existe."
