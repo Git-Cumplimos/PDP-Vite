@@ -306,7 +306,63 @@ const Premios = ({ route }) => {
   ];
   const onPay1 = (e) => {
     e.preventDefault();
-    if (String(datosCliente?.celular).charAt(0) === "3") {
+    if (tipopago === 2) {
+      if (String(datosCliente?.celular).charAt(0) === "3") {
+        setRespuesta(true);
+        if (
+          seleccionarFraccion === 0 ||
+          seleccionarFraccion === "0" ||
+          seleccionarFraccion === undefined
+        ) {
+          setRespuesta(false);
+          notifyError("Seleccione una fracción");
+        } else {
+          makePayment(
+            sorteo,
+            billete,
+            serie,
+            checkBilleteFisico,
+            checkBilleteVirtual,
+            seleccionarFraccion,
+            datosCliente?.nombre,
+            datosCliente?.documento,
+            datosCliente?.direccion,
+            datosCliente?.celular,
+            totalPagar,
+            valorbruto,
+            datosComercio.comercio,
+            datosComercio.terminal,
+            datosComercio.usuario,
+            idLoteria,
+            tipopago,
+            hash,
+            phone
+          )
+            .then((res) => {
+              setRespuesta(false);
+              setDatosCliente((old) => {
+                return {
+                  ...old,
+                  statusPagoPremio: res?.status,
+                  idTransaccion: res?.obj?.id_trx,
+                };
+              });
+              setEstadoTransaccion(res?.status);
+              if (res?.status === false) {
+                var recargarPag = res?.status;
+                // this.setState({ recargarPag: false });
+                notifyError(res?.obj?.msg);
+                navigate(`/loteria/loteria-de-bogota`);
+              }
+            })
+            .catch(() => setDisabledBtns(false));
+        }
+      } else {
+        notifyError(
+          "Numero invalido, el N° de celular debe comenzar con el número 3."
+        );
+      }
+    } else {
       setRespuesta(true);
       if (
         seleccionarFraccion === 0 ||
@@ -356,10 +412,6 @@ const Premios = ({ route }) => {
           })
           .catch(() => setDisabledBtns(false));
       }
-    } else {
-      notifyError(
-        "Numero invalido, el N° de celular debe comenzar con el número 3."
-      );
     }
   };
 
