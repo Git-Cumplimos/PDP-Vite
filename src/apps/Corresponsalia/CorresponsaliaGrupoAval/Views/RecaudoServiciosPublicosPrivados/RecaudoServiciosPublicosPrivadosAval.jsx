@@ -386,14 +386,26 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
                     required
                   /> */}
                   <ButtonBar>
-                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button
+                      onClick={() => {
+                        notifyError("Transacción cancelada por el usuario");
+                        handleClose();
+                      }}>
+                      Cancelar
+                    </Button>
                     <Button type='submit'>Realizar pago</Button>
                   </ButtonBar>
                 </Form>
               ) : (
                 <>
                   <ButtonBar>
-                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button
+                      onClick={() => {
+                        notifyError("Transacción cancelada por el usuario");
+                        handleClose();
+                      }}>
+                      Cancelar
+                    </Button>
                     <Button
                       type='submit'
                       onClick={(e) => {
@@ -421,7 +433,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               </h2>
               <>
                 <ButtonBar>
-                  <Button onClick={handleClose}>Cancelar</Button>
+                  <Button
+                    onClick={() => {
+                      notifyError("Transacción cancelada por el usuario");
+                      handleClose();
+                    }}>
+                    Cancelar
+                  </Button>
                   <Button type='submit' onClick={onSubmitValidacion}>
                     Realizar pago
                   </Button>
