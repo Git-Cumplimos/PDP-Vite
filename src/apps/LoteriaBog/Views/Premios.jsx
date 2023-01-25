@@ -50,6 +50,7 @@ const Premios = ({ route }) => {
     celular: "",
     idTransaccion: "",
     statusPagoPremio: false,
+    tipo_operacion: "",
   });
   const [datosComercio, setDatosComercio] = useState({
     comercio: "",
@@ -160,6 +161,7 @@ const Premios = ({ route }) => {
     });
   };
   const onSubmit = (e) => {
+    setSeleccionarFraccion(0);
     setDatosCliente((old) => {
       return {
         ...old,
@@ -400,6 +402,7 @@ const Premios = ({ route }) => {
                 ...old,
                 statusPagoPremio: res?.status,
                 idTransaccion: res?.obj?.id_trx,
+                tipo_operacion: res?.obj?.tipo_operacion,
               };
             });
             setEstadoTransaccion(res?.status);
@@ -435,14 +438,16 @@ const Premios = ({ route }) => {
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", datosCliente.idTransaccion],
-        ["Id Aut ", 333],
         ["Municipio", roleInfo?.ciudad],
         ["", ""],
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
       commerceName: "LOTERIA DE BOGOTÁ D.C",
-      trxInfo: [["", ""]],
+      trxInfo: [
+        ["", ""],
+        ["Valor", formatMoney.format(totalPagar)],
+      ],
 
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -469,7 +474,6 @@ const Premios = ({ route }) => {
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", datosCliente.idTransaccion],
-        ["Id Aut ", 333],
         ["Municipio", roleInfo?.ciudad],
         ["", ""],
         ["Dirección", roleInfo?.direccion],
@@ -576,22 +580,23 @@ const Premios = ({ route }) => {
   //     }
   //   }
   // };
+
   useEffect(() => {
-    infoTicket(estadoTransaccion, 114, tickets)
+    const ticket = tipopago === 1 ? tickets : tickets2;
+    infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
       .then((resTicket) => {})
       .catch((err) => {
         console.error(err);
         notifyError("Error guardando el ticket");
       });
-  }, [infoTicket, estadoTransaccion, tickets]);
-  useEffect(() => {
-    infoTicket(estadoTransaccion, 114, tickets2)
-      .then((resTicket) => {})
-      .catch((err) => {
-        console.error(err);
-        notifyError("Error guardando el ticket");
-      });
-  }, [infoTicket, estadoTransaccion, tickets2]);
+  }, [
+    infoTicket,
+    datosCliente,
+    estadoTransaccion,
+    tickets2,
+    tickets,
+    tipopago,
+  ]);
   const cancelar = () => {
     notifyError("Se cancelo el pago del premio");
     navigate(`/loteria/loteria-de-bogota`);
