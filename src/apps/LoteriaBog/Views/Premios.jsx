@@ -66,7 +66,7 @@ const Premios = ({ route }) => {
         showModalconfirmacionVentaSoat: false,
       };
     });
-    navigate(`/loteria/loteria-de-bogota`);
+    navigate(`../loteria`);
   }, []);
   const [respagar, setRespagar] = useState([]);
   // const [respagar, setRespagar] = useState([
@@ -354,7 +354,7 @@ const Premios = ({ route }) => {
                 var recargarPag = res?.status;
                 // this.setState({ recargarPag: false });
                 notifyError(res?.obj?.msg);
-                navigate(`/loteria/loteria-de-bogota`);
+                navigate(`../loteria`);
               }
             })
             .catch(() => setDisabledBtns(false));
@@ -410,7 +410,7 @@ const Premios = ({ route }) => {
               var recargarPag = res?.status;
               // this.setState({ recargarPag: false });
               notifyError(res?.obj?.msg);
-              navigate(`/loteria/loteria-de-bogota`);
+              navigate(`../loteria`);
             }
           })
           .catch(() => setDisabledBtns(false));
@@ -599,7 +599,7 @@ const Premios = ({ route }) => {
   ]);
   const cancelar = () => {
     notifyError("Se cancelo el pago del premio");
-    navigate(`/loteria/loteria-de-bogota`);
+    navigate(`../loteria`);
   };
   return (
     <>
