@@ -11,8 +11,6 @@ const HistoricoContingencia = () => {
   const [cantidadPaginas, setCantidadPaginas] = useState(0);
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
-  const [estadoProceso, setEstadoProceso] = useState("");
-  const [numeroProceso, setNumeroProceso] = useState("");
 
   const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
   useEffect(() => {
@@ -26,10 +24,10 @@ const HistoricoContingencia = () => {
     )
       .then((res) => {
         setCantidadPaginas(res?.obj?.maxPages);
-        console.log(
-          "datos contingencia davivienda",
-          res?.obj?.results["results"]
-        );
+        // console.log(
+        //   "datos contingencia davivienda",
+        //   res?.obj?.results["results"]
+        // );
         if (res?.obj?.results["results"].length == 0) {
           notifyError("No se encontraron registros");
         }
@@ -52,7 +50,7 @@ const HistoricoContingencia = () => {
         /* .then((response) => response.json()) */
         .then((respuesta) => {
           setDatosFiltradosFecha(respuesta?.obj?.results["results"]);
-          console.log("respuesta", datosFiltradosFecha);
+          // console.log("respuesta", datosFiltradosFecha);
           if (respuesta?.obj?.results["results"].length == 0) {
             notifyError("No se encontraron registros");
           }
@@ -63,7 +61,7 @@ const HistoricoContingencia = () => {
         });
     }
   }, [fechaInicial, fechaFinal]);
-  const datos = [32, 32];
+
   return (
     <div>
       {datosFiltradosFecha?.length > 0 ? (
@@ -90,7 +88,7 @@ const HistoricoContingencia = () => {
             })) ?? []
           }
           onSelectRow={(e, i) => {
-            console.log("esta es la tabla i", datosTablaContingencia[i]);
+            // console.log("esta es la tabla i", datosTablaContingencia[i]);
 
             // Crear objeto de hoja de cálculo
             const wb = XLSX.utils.book_new();
@@ -203,7 +201,7 @@ const HistoricoContingencia = () => {
             })) ?? []
           }
           onSelectRow={(e, i) => {
-            console.log("esta es la tabla i", datosTablaContingencia[i]);
+            // console.log("esta es la tabla i", datosTablaContingencia[i]);
 
             // Crear objeto de hoja de cálculo
             const wb = XLSX.utils.book_new();

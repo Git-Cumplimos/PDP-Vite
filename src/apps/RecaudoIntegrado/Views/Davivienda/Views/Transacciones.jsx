@@ -14,7 +14,6 @@ const Transacciones = () => {
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
   const [tipoOperacion, setTipoOperacion] = useState("");
-  const [numeroProceso, setNumeroProceso] = useState("");
   const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
   useEffect(() => {
     fetchData(
@@ -27,10 +26,10 @@ const Transacciones = () => {
     )
       .then((res) => {
         setCantidadPaginas(res?.obj?.maxPages);
-        console.log(
-          "datos contingencia davivienda",
-          res?.obj?.results["results"]
-        );
+        // console.log(
+        //   "datos contingencia davivienda",
+        //   res?.obj?.results["results"]
+        // );
         if (res?.obj?.results["results"].length == 0) {
           notifyError("No se encontraron registros");
         }
@@ -58,7 +57,7 @@ const Transacciones = () => {
         /* .then((response) => response.json()) */
         .then((respuesta) => {
           setDatosFiltradosFecha(respuesta?.obj?.results["results"]);
-          console.log("respuesta", datosFiltradosFecha);
+          // console.log("respuesta", datosFiltradosFecha);
           if (respuesta?.obj?.results["results"].length == 0) {
             notifyError("No se encontraron registros");
           }
@@ -86,7 +85,7 @@ const Transacciones = () => {
             notifyError("No se encontraron registros");
           }
           setDatosFiltradosTipoOperacion(respuesta?.obj?.results["results"]);
-          console.log("DATOS TIPPOS DE OPERACION", datosFiltradosTipoOperacion);
+          // console.log("DATOS TIPPOS DE OPERACION", datosFiltradosTipoOperacion);
         })
         .catch((err) => {
           console.log(err);

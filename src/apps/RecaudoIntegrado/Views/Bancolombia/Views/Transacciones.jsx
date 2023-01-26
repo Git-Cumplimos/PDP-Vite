@@ -10,12 +10,11 @@ const Transacciones = () => {
   const [datosFiltradosFecha, setDatosFiltradosFecha] = useState([]);
   const [datosFiltradosTipoOperacion, setDatosFiltradosTipoOperacion] =
     useState([]);
-  const [datosTipoProceso, setDatosTipoProceso] = useState([]);
   const [cantidadPaginas, setCantidadPaginas] = useState(0);
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
   const [tipoOperacion, setTipoOperacion] = useState("");
-  const [tipoProceso, setTipoProceso] = useState();
+
 
   const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
   useEffect(() => {
@@ -30,10 +29,10 @@ const Transacciones = () => {
     )
       .then((res) => {
         setCantidadPaginas(res?.obj?.maxPages);
-        console.log(
-          "datos contingencia bancolombia",
-          res?.obj?.results["results"]
-        );
+        // console.log(
+        //   "datos contingencia bancolombia",
+        //   res?.obj?.results["results"]
+        // );
         setDatosTablaTrx(res?.obj?.results["results"]);
       })
       .catch((err) => {
@@ -60,7 +59,7 @@ const Transacciones = () => {
             notifyError("No se encontraron resultados");
           }
           setDatosFiltradosFecha(respuesta?.obj?.results["results"]);
-          console.log("respuesta", datosFiltradosFecha);
+          // console.log("respuesta", datosFiltradosFecha);
         })
         .catch((err) => {
           console.log(err);
@@ -85,7 +84,7 @@ const Transacciones = () => {
             notifyError("No se encontraron resultados");
           }
           setDatosFiltradosTipoOperacion(respuesta?.obj?.results["results"]);
-          console.log("DATOS TIPPOS DE OPERACION", datosFiltradosTipoOperacion);
+          // console.log("DATOS TIPPOS DE OPERACION", datosFiltradosTipoOperacion);
         })
         .catch((err) => {
           console.log(err);
