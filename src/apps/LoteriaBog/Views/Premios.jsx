@@ -22,6 +22,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
+
 const Premios = ({ route }) => {
   const { label } = route;
   const {
@@ -42,6 +43,7 @@ const Premios = ({ route }) => {
   const [maxPago, setMaxPago] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
+  console.log("ESTO ES ROLEINFO", roleInfo);
   const [datosCliente, setDatosCliente] = useState({
     selectFraccion: 0,
     nombre: "",
@@ -56,6 +58,7 @@ const Premios = ({ route }) => {
     comercio: "",
     terminal: "",
     usuario: "",
+    codigo_dane: "",
   });
   const handleClose = useCallback(() => {
     setShowAllmodals((old) => {
@@ -203,6 +206,7 @@ const Premios = ({ route }) => {
             comercio: roleInfo?.id_comercio,
             usuario: roleInfo?.id_usuario,
             terminal: roleInfo?.id_dispositivo,
+            codigo_dane: roleInfo?.codigo_dane,
           };
         });
 
@@ -335,6 +339,7 @@ const Premios = ({ route }) => {
             datosComercio.comercio,
             datosComercio.terminal,
             datosComercio.usuario,
+            datosComercio.codigo_dane,
             idLoteria,
             tipopago,
             hash,

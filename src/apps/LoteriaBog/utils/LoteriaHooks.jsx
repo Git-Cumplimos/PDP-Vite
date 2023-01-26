@@ -506,12 +506,17 @@ export const useProvideLoteria = () => {
       comercio,
       terminal,
       usuario,
+      codigo_dane,
       idLoteria,
       tipopago,
       hash,
       phone
     ) => {
       if (tipopago == 2) {
+        // let tipo_comercio = roleInfo.tipo_comercio;
+        // if (roleInfo.tipo_comercio === "KIOSCO") {
+        //   tipo_comercio = "OFICINAS PROPIAS";
+        // }
         try {
           const res = await fetchData(
             urls.pagoPremioLoterias,
@@ -540,9 +545,10 @@ export const useProvideLoteria = () => {
               },
               idLoteria: idLoteria,
               tipo_ganancia: tipopago,
-              oficina_propia: false,
-              cod_distribuidor: "PPAGO",
-              cod_dane_ciudad: 555,
+              oficina_propia:
+                roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+              cod_distribuidor: codigosOficina?.cod_oficina_lot,
+              cod_dane_ciudad: codigo_dane,
             },
             {},
             true,
