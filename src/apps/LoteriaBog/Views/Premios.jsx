@@ -38,11 +38,13 @@ const Premios = ({ route }) => {
   const [serie, setSerie] = useState("");
   const [idLoteria, seIdLoteria] = useState("");
   const [phone, setPhone] = useState("");
+  const [cod_distribuidor, setCod_distribuidor] = useState("");
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
+  console.log("ESTO ES ROLEINFO", roleInfo.cod_oficina_lot);
   const [datosCliente, setDatosCliente] = useState({
     selectFraccion: 0,
     nombre: "",
@@ -195,6 +197,7 @@ const Premios = ({ route }) => {
     isWinner(sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual)
       .then((res) => {
         var salvarRes = res;
+        setCod_distribuidor(roleInfo.cod_oficina_lot);
         setMaxPago(res?.obj?.max_pago);
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
@@ -395,6 +398,7 @@ const Premios = ({ route }) => {
           datosComercio.terminal,
           datosComercio.usuario,
           datosComercio.codigo_dane,
+          cod_distribuidor,
           idLoteria,
           tipopago,
           hash,
