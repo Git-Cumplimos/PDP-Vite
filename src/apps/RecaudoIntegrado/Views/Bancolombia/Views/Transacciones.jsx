@@ -30,10 +30,10 @@ const Transacciones = () => {
     )
       .then((res) => {
         setCantidadPaginas(res?.obj?.maxPages);
-        console.log(
-          "datos contingencia bancolombia",
-          res?.obj?.results["results"]
-        );
+        // console.log(
+        //   "datos contingencia bancolombia",
+        //   res?.obj?.results["results"]
+        // );
         setDatosTablaTrx(res?.obj?.results["results"]);
       })
       .catch((err) => {
@@ -60,7 +60,7 @@ const Transacciones = () => {
             notifyError("No se encontraron resultados");
           }
           setDatosFiltradosFecha(respuesta?.obj?.results["results"]);
-          console.log("respuesta", datosFiltradosFecha);
+          // console.log("respuesta", datosFiltradosFecha);
         })
         .catch((err) => {
           console.log(err);
@@ -85,7 +85,7 @@ const Transacciones = () => {
             notifyError("No se encontraron resultados");
           }
           setDatosFiltradosTipoOperacion(respuesta?.obj?.results["results"]);
-          console.log("DATOS TIPPOS DE OPERACION", datosFiltradosTipoOperacion);
+          // console.log("DATOS TIPPOS DE OPERACION", datosFiltradosTipoOperacion);
         })
         .catch((err) => {
           console.log(err);
