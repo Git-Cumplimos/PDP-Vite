@@ -59,7 +59,10 @@ const PpsObligatorioDemanda = ({ ced }) => {
     idusuario: roleInfo?.["id_usuario"],
     iddispositivo: roleInfo["id_dispositivo"],
     oficina_propia:
-      roleInfo["tipo_comercio"] === "OFICINAS PROPIAS" ? true : false,
+      roleInfo["tipo_comercio"] === "OFICINAS PROPIAS" ||
+      roleInfo["tipo_comercio"] === "KIOSCO"
+        ? true
+        : false,
 
     cupoLogin: quotaInfo?.["quota"],
     tipoComercio: roleInfo?.["tipo_comercio"],
@@ -125,6 +128,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
     datosComercio?.["idTrx"],
     datosComercio?.["tipoComercio"] /* respPinCancel, roleInfo, valor */,
   ]);
+  console.log(roleInfo);
   const enviar = (e) => {
     e.preventDefault();
 
