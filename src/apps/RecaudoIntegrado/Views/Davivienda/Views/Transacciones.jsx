@@ -14,7 +14,6 @@ const Transacciones = () => {
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
   const [tipoOperacion, setTipoOperacion] = useState("");
-  const [numeroProceso, setNumeroProceso] = useState("");
   const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
   useEffect(() => {
     fetchData(
