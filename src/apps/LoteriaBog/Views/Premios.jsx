@@ -311,7 +311,6 @@ const Premios = ({ route }) => {
   ];
   const onPay1 = (e) => {
     e.preventDefault();
-    console.log("Tipo Pago=====", tipopago);
     if (tipopago === 2) {
       if (String(datosCliente?.celular).charAt(0) === "3") {
         setRespuesta(true);
@@ -323,7 +322,6 @@ const Premios = ({ route }) => {
           setRespuesta(false);
           notifyError("Seleccione una fracción");
         } else {
-          console.log("Tipo Pago desde el llamado en Premios=====", tipopago);
           makePayment(
             sorteo,
             billete,
@@ -380,10 +378,6 @@ const Premios = ({ route }) => {
         setRespuesta(false);
         notifyError("Seleccione una fracción");
       } else {
-        console.log(
-          "Tipo Pago desde el llamado en Premios en el segundo else =====",
-          tipopago
-        );
         makePayment(
           sorteo,
           billete,

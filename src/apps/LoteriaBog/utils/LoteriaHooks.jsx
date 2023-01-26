@@ -512,14 +512,12 @@ export const useProvideLoteria = () => {
       hash,
       phone
     ) => {
-      console.log("Tipo Pago desde el hook=====", tipopago);
       if (tipopago == 2) {
         // let tipo_comercio = roleInfo.tipo_comercio;
         // if (roleInfo.tipo_comercio === "KIOSCO") {
         //   tipo_comercio = "OFICINAS PROPIAS";
         // }
         try {
-          console.log("Tipo Pago desde el hook=====", tipopago);
           const res = await fetchData(
             urls.pagoPremioLoterias,
             "POST",
@@ -849,7 +847,6 @@ export const useProvideLoteria = () => {
   const consultaInventarioReporte = useCallback(
     async (num_sorteo, pageData) => {
       try {
-        console.log(codigos_lot);
         const data = {
           ...pageData,
           num_sorteo: num_sorteo,
