@@ -204,21 +204,15 @@ export const useProvideLoteria = () => {
       setNit_loteria(nit);
       idloteria(nit).then((res) => {
         if (!res?.status) {
-          // console.log(res?.msg);
-          // setDisabledBtns(true);
         } else {
           setCodigos_lot(res?.obj);
-          // console.log(res?.obj);
         }
       });
       //Consulta id de las operaciones por lotería
       consulta_operaciones(nit).then((res) => {
         if (!res?.status) {
-          // console.log(res?.msg);
-          // setDisabledBtns(true);
         } else {
           setTiposOperaciones(res?.obj);
-          // console.log(res?.obj);
         }
       });
 
@@ -226,7 +220,6 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         try {
           consulta_codigos_oficina(nit).then((res) => {
-            // console.log("repueta", res);
             if ("msg" in res) {
               setCodigosOficina({
                 cod_oficina_lot: "PPVIR",
@@ -430,7 +423,6 @@ export const useProvideLoteria = () => {
       }
       try {
         const res = await fetchData(urls.moda, "GET", query, {});
-        // console.log(res);
         setModa(res);
       } catch (err) {
         setModa(null);
@@ -507,16 +499,13 @@ export const useProvideLoteria = () => {
       terminal,
       usuario,
       codigo_dane,
+      cod_distribuidor,
       idLoteria,
       tipopago,
       hash,
       phone
     ) => {
       if (tipopago == 2) {
-        // let tipo_comercio = roleInfo.tipo_comercio;
-        // if (roleInfo.tipo_comercio === "KIOSCO") {
-        //   tipo_comercio = "OFICINAS PROPIAS";
-        // }
         try {
           const res = await fetchData(
             urls.pagoPremioLoterias,
@@ -547,7 +536,7 @@ export const useProvideLoteria = () => {
               tipo_ganancia: tipopago,
               oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
-              cod_distribuidor: codigosOficina?.cod_oficina_lot,
+              cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
             },
             {},
@@ -583,9 +572,10 @@ export const useProvideLoteria = () => {
               },
               idLoteria: idLoteria,
               tipo_ganancia: tipopago,
-              oficina_propia: false,
-              cod_distribuidor: "PPAGO",
-              cod_dane_ciudad: 555,
+              oficina_propia:
+                roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+              cod_distribuidor: cod_distribuidor,
+              cod_dane_ciudad: codigo_dane,
             },
             {},
             true,
@@ -759,7 +749,6 @@ export const useProvideLoteria = () => {
           tip_sorteo: tip_sorteo,
           nit_loteria: nit_loteria,
         });
-        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -799,7 +788,6 @@ export const useProvideLoteria = () => {
           tip_sorteo: info.tipo_sorteo,
           nit_loteria: nit_loteria,
         });
-        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -814,7 +802,6 @@ export const useProvideLoteria = () => {
         fecha_ini: fecha_ini,
         fecha_fin: fecha_fin,
       });
-      // console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -835,7 +822,6 @@ export const useProvideLoteria = () => {
             cod_sucursal: codigosOficina?.cod_sucursal_lot,
           }
         );
-        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -852,14 +838,12 @@ export const useProvideLoteria = () => {
           num_sorteo: num_sorteo,
           num_loteria: codigos_lot,
         };
-        // console.log("data inventario reporte", data);
         const res = await fetchData(
           urls.consultaInventarioReporte,
           "POST",
           {},
           data
         );
-        // console.log("respuesta inventario reporte", res);
         return res;
       } catch (err) {
         console.error(err);
@@ -893,7 +877,6 @@ export const useProvideLoteria = () => {
             inconcistencia: inconcistencia,
           }
         );
-        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
