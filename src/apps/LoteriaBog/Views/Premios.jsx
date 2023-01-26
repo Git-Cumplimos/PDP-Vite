@@ -43,7 +43,6 @@ const Premios = ({ route }) => {
   const [maxPago, setMaxPago] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
-  console.log("ESTO ES ROLEINFO", roleInfo);
   const [datosCliente, setDatosCliente] = useState({
     selectFraccion: 0,
     nombre: "",
@@ -69,7 +68,7 @@ const Premios = ({ route }) => {
         showModalconfirmacionVentaSoat: false,
       };
     });
-    navigate(`../loteria`);
+    navigate(-1);
   }, []);
   const [respagar, setRespagar] = useState([]);
   // const [respagar, setRespagar] = useState([
@@ -312,6 +311,7 @@ const Premios = ({ route }) => {
   ];
   const onPay1 = (e) => {
     e.preventDefault();
+    console.log("Tipo Pago=====", tipopago);
     if (tipopago === 2) {
       if (String(datosCliente?.celular).charAt(0) === "3") {
         setRespuesta(true);
@@ -323,6 +323,7 @@ const Premios = ({ route }) => {
           setRespuesta(false);
           notifyError("Seleccione una fracción");
         } else {
+          console.log("Tipo Pago desde el llamado en Premios=====", tipopago);
           makePayment(
             sorteo,
             billete,
@@ -359,7 +360,7 @@ const Premios = ({ route }) => {
                 var recargarPag = res?.status;
                 // this.setState({ recargarPag: false });
                 notifyError(res?.obj?.msg);
-                navigate(`../loteria`);
+                navigate(-1);
               }
             })
             .catch(() => setDisabledBtns(false));
@@ -379,6 +380,10 @@ const Premios = ({ route }) => {
         setRespuesta(false);
         notifyError("Seleccione una fracción");
       } else {
+        console.log(
+          "Tipo Pago desde el llamado en Premios en el segundo else =====",
+          tipopago
+        );
         makePayment(
           sorteo,
           billete,
@@ -395,6 +400,7 @@ const Premios = ({ route }) => {
           datosComercio.comercio,
           datosComercio.terminal,
           datosComercio.usuario,
+          datosComercio.codigo_dane,
           idLoteria,
           tipopago,
           hash,
@@ -415,7 +421,7 @@ const Premios = ({ route }) => {
               var recargarPag = res?.status;
               // this.setState({ recargarPag: false });
               notifyError(res?.obj?.msg);
-              navigate(`../loteria`);
+              navigate(-1);
             }
           })
           .catch(() => setDisabledBtns(false));
@@ -604,7 +610,7 @@ const Premios = ({ route }) => {
   ]);
   const cancelar = () => {
     notifyError("Se cancelo el pago del premio");
-    navigate(`../loteria`);
+    navigate(-1);
   };
   return (
     <>
