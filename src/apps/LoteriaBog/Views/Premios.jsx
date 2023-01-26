@@ -22,6 +22,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
+
 const Premios = ({ route }) => {
   const { label } = route;
   const {
@@ -42,6 +43,7 @@ const Premios = ({ route }) => {
   const [maxPago, setMaxPago] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
+  console.log("ESTO ES ROLEINFO", roleInfo);
   const [datosCliente, setDatosCliente] = useState({
     selectFraccion: 0,
     nombre: "",
@@ -50,11 +52,13 @@ const Premios = ({ route }) => {
     celular: "",
     idTransaccion: "",
     statusPagoPremio: false,
+    tipo_operacion: "",
   });
   const [datosComercio, setDatosComercio] = useState({
     comercio: "",
     terminal: "",
     usuario: "",
+    codigo_dane: "",
   });
   const handleClose = useCallback(() => {
     setShowAllmodals((old) => {
@@ -65,7 +69,7 @@ const Premios = ({ route }) => {
         showModalconfirmacionVentaSoat: false,
       };
     });
-    navigate(`/loteria/loteria-de-bogota`);
+    navigate(`../loteria`);
   }, []);
   const [respagar, setRespagar] = useState([]);
   // const [respagar, setRespagar] = useState([
@@ -202,6 +206,7 @@ const Premios = ({ route }) => {
             comercio: roleInfo?.id_comercio,
             usuario: roleInfo?.id_usuario,
             terminal: roleInfo?.id_dispositivo,
+            codigo_dane: roleInfo?.codigo_dane,
           };
         });
 
@@ -334,6 +339,7 @@ const Premios = ({ route }) => {
             datosComercio.comercio,
             datosComercio.terminal,
             datosComercio.usuario,
+            datosComercio.codigo_dane,
             idLoteria,
             tipopago,
             hash,
@@ -353,7 +359,7 @@ const Premios = ({ route }) => {
                 var recargarPag = res?.status;
                 // this.setState({ recargarPag: false });
                 notifyError(res?.obj?.msg);
-                navigate(`/loteria/loteria-de-bogota`);
+                navigate(`../loteria`);
               }
             })
             .catch(() => setDisabledBtns(false));
@@ -401,6 +407,7 @@ const Premios = ({ route }) => {
                 ...old,
                 statusPagoPremio: res?.status,
                 idTransaccion: res?.obj?.id_trx,
+                tipo_operacion: res?.obj?.tipo_operacion,
               };
             });
             setEstadoTransaccion(res?.status);
@@ -408,7 +415,7 @@ const Premios = ({ route }) => {
               var recargarPag = res?.status;
               // this.setState({ recargarPag: false });
               notifyError(res?.obj?.msg);
-              navigate(`/loteria/loteria-de-bogota`);
+              navigate(`../loteria`);
             }
           })
           .catch(() => setDisabledBtns(false));
@@ -578,25 +585,26 @@ const Premios = ({ route }) => {
   //     }
   //   }
   // };
+
   useEffect(() => {
-    infoTicket(estadoTransaccion, 114, tickets)
+    const ticket = tipopago === 1 ? tickets : tickets2;
+    infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
       .then((resTicket) => {})
       .catch((err) => {
         console.error(err);
         notifyError("Error guardando el ticket");
       });
-  }, [infoTicket, estadoTransaccion, tickets]);
-  useEffect(() => {
-    infoTicket(estadoTransaccion, 114, tickets2)
-      .then((resTicket) => {})
-      .catch((err) => {
-        console.error(err);
-        notifyError("Error guardando el ticket");
-      });
-  }, [infoTicket, estadoTransaccion, tickets2]);
+  }, [
+    infoTicket,
+    datosCliente,
+    estadoTransaccion,
+    tickets2,
+    tickets,
+    tipopago,
+  ]);
   const cancelar = () => {
     notifyError("Se cancelo el pago del premio");
-    navigate(`/loteria/loteria-de-bogota`);
+    navigate(`../loteria`);
   };
   return (
     <>

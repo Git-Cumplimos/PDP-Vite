@@ -38,6 +38,9 @@ const GruposPlanesComisiones = lazy(() =>
 );
 const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
 const Convenios = lazy(() => import("./Views/Convenios/Convenios"));
+const ConveniosPDP = lazy(() => import("./Views/ConveniosPDP"));
+const AdminConveniosPDP = lazy(() => import("./Views/ConveniosPDP/Admin"));
+const ConveniosAutorizadoresRecaudo = lazy(() => import("./Views/ConveniosPDP/AutorizadoresRecaudo"));
 const ConvAuto = lazy(() => import("./Views/ConvAuto"));
 const Autorizadores = lazy(() => import("./Views/Autorizadores"));
 const ReporteConfiguracionComisiones = lazy(() =>
@@ -250,6 +253,30 @@ const rutasConfiguraciones = {
           component: ReporteConfiguracionComisiones,
           permission: [enumPermisosTrx.asignacion_comision],
           subRoutes: [],
+        },
+      ],
+    },
+    {
+      link: "/params-operations/convenios-recaudo",
+      label: <AppIcons Logo={"RETIRO"} name={"Convenios de recaudo"} />,
+      component: ConveniosPDP,
+      permission: [20],
+      subRoutes: [
+        {
+          link: "/params-operations/convenios-recaudo/administrar",
+          label: (
+            <AppIcons Logo={"RETIRO"} name={"Administrar convenios"} />
+          ),
+          component: AdminConveniosPDP,
+          permission: [20],
+        },
+        {
+          link: "/params-operations/convenios-recaudo/autorizadores-recaudo",
+          label: (
+            <AppIcons Logo={"RETIRO"} name={"Autorizadores de recaudo"} />
+          ),
+          component: ConveniosAutorizadoresRecaudo,
+          permission: [20],
         },
       ],
     },

@@ -24,7 +24,6 @@ const CargaArchivos = ({ route }) => {
     { value: "PlanDePremios", label: "Plan de premios" },
     { value: "Asignacion", label: "Asignación" },
     { value: "Resultados", label: "Resultados" },
-    { value: "Liquidacion", label: "Liquidacion de premios" },
   ];
 
   const optionsTipoSorteo = useMemo(() => {
