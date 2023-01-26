@@ -10,12 +10,11 @@ const Transacciones = () => {
   const [datosFiltradosFecha, setDatosFiltradosFecha] = useState([]);
   const [datosFiltradosTipoOperacion, setDatosFiltradosTipoOperacion] =
     useState([]);
-  const [datosTipoProceso, setDatosTipoProceso] = useState([]);
   const [cantidadPaginas, setCantidadPaginas] = useState(0);
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
   const [tipoOperacion, setTipoOperacion] = useState("");
-  const [tipoProceso, setTipoProceso] = useState();
+
 
   const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
   useEffect(() => {
