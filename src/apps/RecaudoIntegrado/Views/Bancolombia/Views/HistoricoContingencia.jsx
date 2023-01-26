@@ -2,7 +2,6 @@ import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import React, { useCallback, useEffect, useState } from "react";
 import fetchData from "../../../../../utils/fetchData";
 import Input from "../../../../../components/Base/Input";
-import Select from "../../../../../components/Base/Select";
 import { notifyError } from "../../../../../utils/notify";
 import XLSX from "xlsx";
 
@@ -12,8 +11,7 @@ const HistoricoContingencia = () => {
   const [cantidadPaginas, setCantidadPaginas] = useState(0);
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
-  const [estadoProceso, setEstadoProceso] = useState("");
-  const [numeroProceso, setNumeroProceso] = useState("");
+
 
   const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
 
