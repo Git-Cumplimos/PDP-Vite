@@ -11,8 +11,6 @@ const HistoricoContingencia = () => {
   const [cantidadPaginas, setCantidadPaginas] = useState(0);
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
-  const [estadoProceso, setEstadoProceso] = useState("");
-  const [numeroProceso, setNumeroProceso] = useState("");
 
   const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
   useEffect(() => {
@@ -63,7 +61,7 @@ const HistoricoContingencia = () => {
         });
     }
   }, [fechaInicial, fechaFinal]);
-  const datos = [32, 32];
+
   return (
     <div>
       {datosFiltradosFecha?.length > 0 ? (
