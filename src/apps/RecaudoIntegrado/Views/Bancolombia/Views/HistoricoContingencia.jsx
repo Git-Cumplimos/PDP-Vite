@@ -28,10 +28,10 @@ const HistoricoContingencia = () => {
     )
       .then((res) => {
         setCantidadPaginas(res?.obj?.maxPages);
-        console.log(
-          "datos contingencia bancolombia",
-          res?.obj?.results["results"]
-        );
+        // console.log(
+        //   "datos contingencia bancolombia",
+        //   res?.obj?.results["results"]
+        // );
         if (res?.obj?.results["results"].length == 0) {
           notifyError("No se encontraron registros");
         }
@@ -60,7 +60,7 @@ const HistoricoContingencia = () => {
             notifyError("No se encontraron registros");
           }
           setDatosFiltradosFecha(respuesta?.obj?.results["results"]);
-          console.log("respuesta", datosFiltradosFecha);
+          // console.log("respuesta", datosFiltradosFecha);
         })
         .catch((err) => {
           console.log(err);
@@ -95,7 +95,7 @@ const HistoricoContingencia = () => {
             })) ?? []
           }
           onSelectRow={(e, i) => {
-            console.log("esta es la tabla i", datosTablaContingencia[i]);
+            // console.log("esta es la tabla i", datosTablaContingencia[i]);
 
             // Crear objeto de hoja de cálculo
             const wb = XLSX.utils.book_new();
@@ -208,7 +208,7 @@ const HistoricoContingencia = () => {
             })) ?? []
           }
           onSelectRow={(e, i) => {
-            console.log("esta es la tabla i", datosTablaContingencia[i]);
+            // console.log("esta es la tabla i", datosTablaContingencia[i]);
 
             // Crear objeto de hoja de cálculo
             const wb = XLSX.utils.book_new();
