@@ -5,8 +5,7 @@ import fetchData from "../../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../../utils/notify";
 import classes from "./CargarArchivos.module.css";
 const CargarArchivos = () => {
-  /*   const urlBackend =
-    "https://48hfhzfcfe.execute-api.us-east-2.amazonaws.com/v1/cert/recaudo-empresarial/servicio-contingencia-empresarial-pdp"; */
+
 
   const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
@@ -16,17 +15,11 @@ const CargarArchivos = () => {
     titulo,
     contenedorInput,
     nombreInput,
-    contenedorSecundarioInput,
-    styleInput,
     contenedorArchivos,
     contenedorBtns,
-    file,
     nombreArchivo,
     fileInput,
     contenedorLabel,
-    btnCancelar,
-    btnEnviar,
-    contenedorLabelbasura,
     btnBasura,
     divsuperior,
     divinferior,
@@ -34,8 +27,6 @@ const CargarArchivos = () => {
   } = classes;
 
   const [archivos1, setArchivos1] = useState([]);
-  const [archivos2, setArchivos2] = useState([]);
-  const [nombreRut, setNombreRut] = useState("");
   const [nombreCamara, setNombreCamara] = useState("");
   const [disabledBtn, setDisabledBtn] = useState(false);
 
@@ -144,15 +135,7 @@ const CargarArchivos = () => {
     setNombreCamara("");
   };
 
-  const Cancelar = (e) => {
-    // e.preventDefault();
-    // setArchivos1([]);
-    // () => onFileChange();
-    // () => onFileChange2();
-    // setArchivos2([]);
-    // setNombreCamara("");
-    // setNombreRut("");
-  };
+
 
   return (
     <div className={contendorPrincipalFormulario}>
