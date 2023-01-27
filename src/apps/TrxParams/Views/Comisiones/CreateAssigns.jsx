@@ -53,8 +53,8 @@ const CreateAssigns = () => {
         nombre_asignacion_comision: newComision.nombre_asignacion_comision,
       };
       if (newComision.fk_tbl_grupo_convenios !== "") {
+        obj["fk_tbl_grupo_convenios"] = newComision.fk_tbl_grupo_convenios;
       }
-      obj["fk_tbl_grupo_convenios"] = newComision.fk_tbl_grupo_convenios;
 
       setIsUploading(true);
       if (newComision?.pk_asignacion_comisiones !== "") {
