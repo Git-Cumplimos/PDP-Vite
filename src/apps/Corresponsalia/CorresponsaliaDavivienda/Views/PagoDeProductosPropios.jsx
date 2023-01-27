@@ -23,7 +23,7 @@ import Fieldset from "../../../../components/Base/Fieldset";
 import { useNavigate } from "react-router-dom";
 
 const PagoDeProductosPropios = () => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
@@ -184,6 +184,7 @@ const PagoDeProductosPropios = () => {
       idUsuario: roleInfo?.id_usuario,
       idTerminal: roleInfo?.id_dispositivo,
       issuerIdDane: roleInfo?.codigo_dane,
+      nombre_usuario: pdpUser?.uname ?? "",
       nombreComercio: roleInfo?.["nombre comercio"],
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
@@ -304,6 +305,7 @@ const PagoDeProductosPropios = () => {
       tipoAbono: tipoAbono.tipoAbonoId,
       valAbono: valorPagar,
 
+      nombre_usuario: pdpUser?.uname ?? "",
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idTerminal: roleInfo?.id_dispositivo,

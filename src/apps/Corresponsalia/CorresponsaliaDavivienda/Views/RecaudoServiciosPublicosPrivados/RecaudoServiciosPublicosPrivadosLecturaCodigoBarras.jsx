@@ -24,7 +24,7 @@ import {
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
@@ -354,6 +354,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valCodigoDeBarras: valorTransaccion,
         // valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
 
+        nombre_usuario: pdpUser?.uname ?? "",
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
         idTerminal: roleInfo?.id_dispositivo,
@@ -530,6 +531,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         numValor: datosTransaccion.valor ?? 0,
         numValorTotalDebito: datosTransaccion.valor ?? 0,
 
+        nombre_usuario: pdpUser?.uname ?? "",
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
         idTerminal: roleInfo?.id_dispositivo,
