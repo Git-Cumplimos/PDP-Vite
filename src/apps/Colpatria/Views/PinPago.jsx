@@ -36,7 +36,7 @@ const ObjTiposPersonas = {
 const PinPago = () => {
   const navigate = useNavigate();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser, infoTicket } = useAuth();
 
   const [tipoPersona, setTipoPersona] = useState("");
   const [userDocument, setUserDocument] = useState("");
@@ -98,6 +98,7 @@ const PinPago = () => {
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valPinPago,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
@@ -178,6 +179,7 @@ const PinPago = () => {
       userAddress,
       valPinPago,
       roleInfo,
+      pdpUser?.uname,
       infoTicket,
       navigate,
     ]
