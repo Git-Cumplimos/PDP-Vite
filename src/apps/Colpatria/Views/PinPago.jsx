@@ -26,7 +26,6 @@ import TicketColpatria from "../components/TicketColpatria";
 import { buildTicket, encryptPin } from "../utils/functions";
 import Select from "../../../components/Base/Select";
 
-
 const formatMoney = makeMoneyFormatter(2);
 
 const ObjTiposPersonas = {
@@ -162,7 +161,7 @@ const PinPago = () => {
             setLoadingPinPago(false);
             navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
-              return err?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
             }
             console.error(err?.message);
             return "Transacción fallida";

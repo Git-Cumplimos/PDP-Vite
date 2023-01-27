@@ -156,15 +156,15 @@ const Deposito = () => {
           },
         },
         {
-          render({data: err}) {
+          render({ data: err }) {
             setLoadingDeposit(false);
             navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
-              return err?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
             }
             console.error(err?.message);
             return "Transaccion fallida";
-          }
+          },
         }
       );
     },

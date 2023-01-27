@@ -155,7 +155,7 @@ const VentaPines = () => {
             setLoadingInquiry(false);
             navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
-              return error?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
             console.error(error?.message);
             return "Consulta fallida";
@@ -256,7 +256,7 @@ const VentaPines = () => {
             setLoadingSell(false);
             navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
-              return error?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
             console.error(error?.message);
             return "Transacción fallida";
