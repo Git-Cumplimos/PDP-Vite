@@ -246,7 +246,7 @@ const ConveniosRecaudoAval = () => {
             }
           }}></Input>
         <ButtonBar>
-          <Button type='submit' onClick={() => setShowModal(true)}>
+          <Button type='button' onClick={() => setShowModal(true)}>
             Subir convenios
           </Button>
         </ButtonBar>
