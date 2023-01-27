@@ -279,31 +279,32 @@ const Premios = ({ route }) => {
         if (salvarRes?.obj?.tipo_ganancia == 2) {
           setWinner(true);
           setTipopago(salvarRes?.obj?.tipo_ganancia);
+          r;
         }
         if (res[0]["Estado"] === false) {
           notifyError("No ganador");
           setWinner(false);
           setIsSelf(false);
         }
-        if (res[0]["Estado"] === true) {
-          if (res[0]["Tipo"] === 2) {
-            notify("Ganador con billete virtual");
-            setTipopago(res[0]["Tipo"]);
-            setWinner(true);
-            setIsSelf(true);
-          } else {
-            notify("Ganador con billete físico");
-            for (var i = 0; i < res[0].cantidad_frac_billete; i++) {
-              fracbill.push(i + 1);
-            }
-            setTipopago(res[0]["Tipo"]);
-            setCheckedState(
-              new Array(res[0].cantidad_frac_billete).fill(false)
-            );
-            setWinner(true);
-            setIsSelf(false);
-          }
-        }
+        // if (res[0]["Estado"] === true) {
+        //   if (res[0]["Tipo"] === 2) {
+        //     notify("Ganador con billete virtual");
+        //     setTipopago(res[0]["Tipo"]);
+        //     setWinner(true);
+        //     setIsSelf(true);
+        //   } else {
+        //     notify("Ganador con billete físico");
+        //     for (var i = 0; i < res[0].cantidad_frac_billete; i++) {
+        //       fracbill.push(i + 1);
+        //     }
+        //     setTipopago(res[0]["Tipo"]);
+        //     setCheckedState(
+        //       new Array(res[0].cantidad_frac_billete).fill(false)
+        //     );
+        //     setWinner(true);
+        //     setIsSelf(false);
+        //   }
+        // }
       })
       .catch(() => setDisabledBtns(false));
   };
@@ -343,6 +344,7 @@ const Premios = ({ route }) => {
             datosComercio.terminal,
             datosComercio.usuario,
             datosComercio.codigo_dane,
+            cod_distribuidor,
             idLoteria,
             tipopago,
             hash,
