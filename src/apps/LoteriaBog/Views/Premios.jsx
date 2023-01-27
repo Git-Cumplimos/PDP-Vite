@@ -44,7 +44,6 @@ const Premios = ({ route }) => {
   const [maxPago, setMaxPago] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
-  console.log("ESTO ES ROLEINFO", roleInfo.cod_oficina_lot);
   const [datosCliente, setDatosCliente] = useState({
     selectFraccion: 0,
     nombre: "",
@@ -60,6 +59,7 @@ const Premios = ({ route }) => {
     terminal: "",
     usuario: "",
     codigo_dane: "",
+    nom_loteria: "",
   });
   const handleClose = useCallback(() => {
     setShowAllmodals((old) => {
@@ -209,6 +209,7 @@ const Premios = ({ route }) => {
             usuario: roleInfo?.id_usuario,
             terminal: roleInfo?.id_dispositivo,
             codigo_dane: roleInfo?.codigo_dane,
+            nom_loteria: res?.obj?.nom_loteria,
           };
         });
 
@@ -452,7 +453,7 @@ const Premios = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: "LOTERIA DE BOGOTÁ D.C",
+      commerceName: datosComercio.nom_loteria,
       trxInfo: [
         ["", ""],
         ["Valor", formatMoney.format(totalPagar)],
@@ -488,7 +489,7 @@ const Premios = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: "LOTERIA DE BOGOTÁ D.C",
+      commerceName: datosComercio.nom_loteria,
       trxInfo: [
         ["", ""],
         ["", "DATOS DEL CLIENTE"],
