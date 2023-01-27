@@ -357,6 +357,7 @@ const Premios = ({ route }) => {
                   ...old,
                   statusPagoPremio: res?.status,
                   idTransaccion: res?.obj?.id_trx,
+                  tipo_operacion: res?.obj?.tipo_operacion,
                 };
               });
               setEstadoTransaccion(res?.status);
