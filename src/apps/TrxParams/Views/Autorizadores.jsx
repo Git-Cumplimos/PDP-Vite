@@ -97,9 +97,30 @@ const Autorizadores = () => {
   const onSelectAutorizador = useCallback(
     (e, i) => {
       setShowModal(true);
-      setSelectedAuto(tableAutorizadores[i]);
+      const dataAut = [
+        ...autorizadores.map(
+          ({
+            id_autorizador,
+            nombre_autorizador,
+            nit,
+            descripcion,
+            id_tipo_contrato,
+            nombre_contrato,
+          }) => {
+            return {
+              "Id autorizador": id_autorizador,
+              Autorizador: nombre_autorizador,
+              Nit: nit,
+              Descripcion: descripcion,
+              Contrato: nombre_contrato,
+              "Id contrato": id_tipo_contrato,
+            };
+          }
+        ),
+      ];
+      setSelectedAuto(dataAut[i]);
     },
-    [tableAutorizadores]
+    [autorizadores]
   );
 
   const onChange = useCallback(
@@ -167,7 +188,6 @@ const Autorizadores = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-      console.log(selectedAuto?.["Id contrato"]);
       if (!selectedAuto?.["Id contrato"]) {
         notifyError("Se debe agregar el contrato");
         return;

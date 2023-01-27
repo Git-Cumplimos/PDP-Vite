@@ -26,7 +26,7 @@ const SearchGruposConvenios = ({
         return {
           Id: pk_tbl_grupo_convenios,
           "Nombre grupo": nombre_grupo_convenios,
-          "Cantidad convenios": convenios.length,
+          "Cantidad convenios": convenios.length > 0 ? convenios[0].count : 0,
         };
       }
     );

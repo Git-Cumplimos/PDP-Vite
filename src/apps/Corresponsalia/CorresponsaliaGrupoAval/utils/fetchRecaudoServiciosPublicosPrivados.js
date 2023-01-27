@@ -23,6 +23,27 @@ export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
     throw err;
   }
 };
+export const postConsultaTablaConveniosPaginadoTotal = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlAval}/grupo_aval_cb_recaudo/consulta_tabla_convenios_paginado_total`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res?.obj;
+  } catch (err) {
+    throw err;
+  }
+};
 export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
