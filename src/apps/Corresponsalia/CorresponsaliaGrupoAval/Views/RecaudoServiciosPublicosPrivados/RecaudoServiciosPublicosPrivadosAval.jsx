@@ -22,7 +22,7 @@ import {
 
 const RecaudoServiciosPublicosPrivadosAval = () => {
   const { state } = useLocation();
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
 
   const [{ showModal, estadoPeticion }, setShowModal] = useState({
@@ -107,6 +107,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           : false,
       valor_total_trx: datosTrans.valor !== "" ? datosTrans.valor : 0,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
@@ -183,6 +184,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           : false,
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,

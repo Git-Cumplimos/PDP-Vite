@@ -21,7 +21,7 @@ import {
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
@@ -263,6 +263,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           : false,
       valor_total_trx: datosTransaccion.valorSinModificar ?? 0,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
@@ -351,6 +352,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           : false,
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,
