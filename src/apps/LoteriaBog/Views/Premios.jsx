@@ -326,6 +326,7 @@ const Premios = ({ route }) => {
           setRespuesta(false);
           notifyError("Seleccione una fracción");
         } else {
+          console.log("");
           makePayment(
             sorteo,
             billete,
