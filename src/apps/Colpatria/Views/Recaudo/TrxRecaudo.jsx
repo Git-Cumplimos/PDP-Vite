@@ -46,7 +46,7 @@ const TrxRecaudo = () => {
 
   const { id_convenio_pin } = useParams();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser, infoTicket } = useAuth();
 
   const [searchingConvData, setSearchingConvData] = useState(false);
   const [datosConvenio, setDatosConvenio] = useState(null);
@@ -129,6 +129,7 @@ const TrxRecaudo = () => {
         },
         oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valTrxRecaudo,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
@@ -177,6 +178,7 @@ const TrxRecaudo = () => {
       userAddress,
       valTrxRecaudo,
       roleInfo,
+      pdpUser?.uname,
       navigate,
     ]
   );
@@ -195,6 +197,7 @@ const TrxRecaudo = () => {
         },
         oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valTrxRecaudo,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
@@ -273,6 +276,7 @@ const TrxRecaudo = () => {
       valTrxRecaudo,
       inquiryStatus,
       roleInfo,
+      pdpUser?.uname,
       infoTicket,
       navigate,
     ]

@@ -42,7 +42,7 @@ const formatMoney = makeMoneyFormatter(2);
 const Deposito = () => {
   const navigate = useNavigate();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser, infoTicket } = useAuth();
 
   const [userDocument, setUserDocument] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
@@ -98,6 +98,7 @@ const Deposito = () => {
         },
         oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valDeposito,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
@@ -174,6 +175,7 @@ const Deposito = () => {
       userAddress,
       valDeposito,
       roleInfo,
+      pdpUser?.uname,
       infoTicket,
       navigate,
     ]
@@ -270,7 +272,7 @@ const Deposito = () => {
           label="Número de cuenta"
           type="tel"
           autoComplete="off"
-          minLength={"19"}
+          minLength={"1"}
           maxLength={"19"}
           onInput={(ev) => setAccountNumber(onChangeAccountNumber(ev))}
           required
