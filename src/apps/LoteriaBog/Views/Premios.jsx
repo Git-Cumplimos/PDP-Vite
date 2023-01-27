@@ -279,7 +279,6 @@ const Premios = ({ route }) => {
         if (salvarRes?.obj?.tipo_ganancia == 2) {
           setWinner(true);
           setTipopago(salvarRes?.obj?.tipo_ganancia);
-          r;
         }
         if (res[0]["Estado"] === false) {
           notifyError("No ganador");
