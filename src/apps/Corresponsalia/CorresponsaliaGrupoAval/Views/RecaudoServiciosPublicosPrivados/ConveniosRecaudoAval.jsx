@@ -12,6 +12,7 @@ import { notify, notifyError } from "../../../../../utils/notify";
 import {
   postCheckEstadoConveniosAval,
   postConsultaTablaConveniosPaginado,
+  postConsultaTablaConveniosPaginadoTotal,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 import { v4 as uuidv4 } from "uuid";
 
@@ -55,7 +56,7 @@ const ConveniosRecaudoAval = () => {
   }, [datosTrans, page, limit]);
 
   const fecthTablaConveniosPaginadoFunc = () => {
-    postConsultaTablaConveniosPaginado({
+    postConsultaTablaConveniosPaginadoTotal({
       convenio: datosTrans.convenio,
       nura: datosTrans.idConvenio,
       ean: datosTrans.ean,
