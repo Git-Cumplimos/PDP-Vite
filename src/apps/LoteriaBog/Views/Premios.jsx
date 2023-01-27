@@ -594,7 +594,7 @@ const Premios = ({ route }) => {
   // };
 
   useEffect(() => {
-    const ticket = tipopago === 1 ? tickets : tickets2;
+    const ticket = tipopago === 1 ? tickets2 : tickets;
     infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
       .then((resTicket) => {})
       .catch((err) => {
