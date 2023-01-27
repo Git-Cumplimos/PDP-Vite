@@ -37,7 +37,7 @@ const VentaPines = () => {
 
   const { id_convenio_pin } = useParams();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser, infoTicket } = useAuth();
 
   const [searchingConvData, setSearchingConvData] = useState(false);
   const [datosConvenio, setDatosConvenio] = useState(null);
@@ -122,6 +122,7 @@ const VentaPines = () => {
           roleInfo?.tipo_comercio === "KIOSCO" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valVentaPines,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
@@ -171,6 +172,7 @@ const VentaPines = () => {
       userAddress,
       valVentaPines,
       roleInfo,
+      pdpUser?.uname,
       navigate,
     ]
   );
@@ -191,6 +193,7 @@ const VentaPines = () => {
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valVentaPines,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
@@ -273,6 +276,7 @@ const VentaPines = () => {
       valVentaPines,
       inquiryStatus,
       roleInfo,
+      pdpUser?.uname,
       infoTicket,
       navigate,
     ]
