@@ -17,11 +17,9 @@ import {
   rutasSoat,
 } from "../apps/Practisistemas/routes";
 
-
-import {
-  rutasPinesVus
-} from "../apps/PinesVus/routes";
+import { rutasPinesVus } from "../apps/PinesVus/routes";
 import { enumPermisosPinesVus } from "../apps/PinesVus/enumPermisosPinesVus";
+
 /**
  * * Providers
  */
@@ -34,6 +32,7 @@ import rutasAvalCB, {
 import rutasAgrarioCB, {
   listPermissionsAgrario,
 } from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/routes";
+import rutasConfiguraciones from "../apps/TrxParams/routes";
 
 /**
 
@@ -58,7 +57,7 @@ const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
 
 /** Loteria Bogota */
 const venta = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
-const Descargas = lazy(() => import("../apps/LoteriaBog/Views/Descargas"));
+const Sorteos = lazy(() => import("../apps/LoteriaBog/Views/Sorteos"));
 const DescargarArchivosS3 = lazy(() =>
   import("../apps/LoteriaBog/Views/DescargarArchivosS3")
 );
@@ -72,9 +71,16 @@ const CargaArchivos = lazy(() =>
   import("../apps/LoteriaBog/Views/CargaArchivos")
 );
 const ArqueoBilletes = lazy(() =>
-  import("../apps/LoteriaBog/Views/ArqueoBilletes")
+  import("../apps/LoteriaBog/Views/InventarioBilletes/ArqueoBilletes")
 );
 const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
+const Inventario = lazy(() => import("../apps/LoteriaBog/Views/Inventario"));
+const CrearInventario = lazy(() =>
+  import("../apps/LoteriaBog/Views/InventarioBilletes/Inventario")
+);
+const ReportInventario = lazy(() =>
+  import("../apps/LoteriaBog/Views/InventarioBilletes/ReportesInventario")
+);
 
 /**
  * ColCard
@@ -147,54 +153,13 @@ const FormCommerce = lazy(() => import("../apps/UpdateCommerce/FormCommerce"));
 const CommerceInfo = lazy(() => import("../apps/UpdateCommerce/CommerceInfo"));
 
 /**
- * Trx params
- */
-const ParametrosAutorizadores = lazy(() =>
-  import("../apps/TrxParams/Views/ParametrosAutorizadores")
-);
-const TipoContratoComisiones = lazy(() =>
-  import("../apps/TrxParams/Views/TipoContratoComisiones")
-);
-const Comisiones = lazy(() => import("../apps/TrxParams/Views/Comisiones"));
-const Com2Pay = lazy(() =>
-  import("../apps/TrxParams/Views/Comisiones/Com2Pay")
-);
-const CreateComision = lazy(() =>
-  import("../apps/TrxParams/Views/Comisiones/CreateComision")
-);
-const Com2Collect = lazy(() =>
-  import("../apps/TrxParams/Views/Comisiones/Com2Collect")
-);
-const Convenios = lazy(() => import("../apps/TrxParams/Views/Convenios"));
-const ConvAuto = lazy(() => import("../apps/TrxParams/Views/ConvAuto"));
-const Autorizadores = lazy(() =>
-  import("../apps/TrxParams/Views/Autorizadores")
-);
-const CreateComisionCobrada = lazy(() =>
-  import("../apps/TrxParams/Views/Comisiones/CreateComisionCobrada")
-);
-const ConfiguracionComercios = lazy(() =>
-  import("../apps/TrxParams/Views/ConfiguracionComercios")
-);
-const CrearComercios = lazy(() =>
-  import("../apps/TrxParams/Views/Comercios/CrearComercios")
-);
-const ListarComercios = lazy(() =>
-  import("../apps/TrxParams/Views/Comercios/ListarComercios")
-);
-const TipoNivelComercio = lazy(() =>
-  import("../apps/TrxParams/Views/TipoNivelComercios")
-);
-const ListarMensajePublicitario = lazy(() =>
-  import(
-    "../apps/TrxParams/Views/MensajesPublicitarios/ListarMensajePublicitario"
-  )
-);
-
-/**
  * Domiciliacion PPS
  */
 const Domiciliacion = lazy(() => import("../apps/Domiciliacion/Domiciliacion"));
+
+const moduloDomiciliacion = lazy(() =>
+  import("../apps/Domiciliacion/Views/ModuloDomiciliacion")
+);
 const comprobarEmail = lazy(() =>
   import("../apps/Domiciliacion/Views/BuscarComercioEmail")
 );
@@ -212,8 +177,56 @@ const PpsVoluntarioDemanda = lazy(() =>
  * Recaudo
  */
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
+const RecaudoTrxRecaudo = lazy(() =>
+  import("../apps/Recaudo/Views/TrxRecaudo")
+);
 const RecaudoManual = lazy(() => import("../apps/Recaudo/Views/RecaudoManual"));
 const RecaudoCodigo = lazy(() => import("../apps/Recaudo/Views/RecaudoCodigo"));
+
+/**
+ * RecaudoIntegrado
+ */
+const RecaudoIntegrado = lazy(() =>
+  import("../apps/RecaudoIntegrado/RecaudoIntegrado")
+);
+const RecaudoDavivienda = lazy(() =>
+  import("../apps/RecaudoIntegrado/Views/Davivienda/RecaudoDavivienda")
+);
+
+const cargarArchivos = lazy(() =>
+  import("../apps/RecaudoIntegrado/Views/Davivienda/Views/CargarArchivos")
+);
+const HistoricoContingenciaDavivienda = lazy(() =>
+  import(
+    "../apps/RecaudoIntegrado/Views/Davivienda/Views/HistoricoContingencia"
+  )
+);
+const TransaccionesDavivienda = lazy(() =>
+  import("../apps/RecaudoIntegrado/Views/Davivienda/Views/Transacciones")
+);
+
+const RecaudoBancolombia = lazy(() =>
+  import("../apps/RecaudoIntegrado/Views/Bancolombia/RecaudoBancolombia")
+);
+
+const cargarArchivosBancolombia = lazy(() =>
+  import("../apps/RecaudoIntegrado/Views/Bancolombia/Views/CargarArchivos")
+);
+const HistoricoContingenciaBancolombia = lazy(() =>
+  import(
+    "../apps/RecaudoIntegrado/Views/Bancolombia/Views/HistoricoContingencia"
+  )
+);
+const TransaccionesBancolombia = lazy(() =>
+  import("../apps/RecaudoIntegrado/Views/Bancolombia/Views/Transacciones")
+);
+
+/**
+ * RUNT Banco Agrario
+ */
+/* const ContenedorRunt = lazy(() => import("../apps/Runt/ContenedorRunt"));
+const PagarRunt = lazy(() => import("../apps/Runt/Views/PagarRunt"));
+ */
 
 /**
  * Daviplata
@@ -237,16 +250,6 @@ const EnviarSMS = lazy(() => import("../apps/API-SMS/Views/EnviarSMS"));
 const CrearSMS = lazy(() => import("../apps/API-SMS/Views/CrearSMS"));
 const reporteSMS = lazy(() => import("../apps/API-SMS/Views/ReporteSMS"));
 const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
-
-/**
- * Editar parametros tipos de transacciones
- */
-const ParamsOperations = lazy(() =>
-  import("../apps/ParamsOperations/ParamsOperations")
-);
-const TypesTrxs = lazy(() =>
-  import("../apps/ParamsOperations/Views/TypesTrxs")
-);
 
 /**
  * iFood Aportes Sociales
@@ -308,7 +311,7 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={"Loteria"} name="Loteria" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
-    permission: [3, 4, 5, 6, 44, 45, 46, 47],
+    permission: [3, 4, 5, 6, 44, 45, 46, 47, 95],
     subRoutes: [
       {
         link: "loteria-de-bogota",
@@ -322,6 +325,12 @@ const allUrlsPrivateApps = [
         logo: "LoteriaTolima",
         permission: [44, 45, 46, 47],
       },
+      {
+        link: "loteria-de-cundinamarca",
+        label: "Lotería de Cundinamarca",
+        logo: "LoteriaTolima",
+        permission: [95, 45, 46, 47],
+      },
     ].map(({ link: name, label, logo, permission }) => ({
       link: `/loteria/${name}`,
       label: <AppIcons Logo={logo} name={label} />,
@@ -332,7 +341,7 @@ const allUrlsPrivateApps = [
           link: `/loteria/${name}/ventas`,
           label: <AppIcons Logo={"Ventas"} name="Ventas" />,
           component: venta,
-          permission: [3],
+          permission: [3, 44, 95],
         },
         {
           link: `/loteria/${name}/cargar`,
@@ -343,7 +352,7 @@ const allUrlsPrivateApps = [
         {
           link: `/loteria/${name}/sorteos`,
           label: <AppIcons Logo={"SORTEO01"} name="Sorteos" />,
-          component: Descargas,
+          component: Sorteos,
           permission: [5, 6],
           subRoutes: [
             {
@@ -371,14 +380,46 @@ const allUrlsPrivateApps = [
           label: <AppIcons Logo={"Premio"} name="Premios" />,
           component: Premios,
           extern: false,
-          permission: [3], ///////////////////////////////////////////////////////////////////
+          permission: [3, 44, 95], ///////////////////////////////////////////////////////////////////
         },
         {
-          link: `/loteria/${name}/arqueo`,
-          label: <AppIcons Logo={"ArqueoBilletes"} name="Arqueo Billetes" />,
-          component: ArqueoBilletes,
+          link: `/loteria/${name}/inventario`,
+          label: <AppIcons Logo={"REPORTE"} name="Inventario Billetes" />,
+          component: Inventario,
           extern: false,
-          permission: [3, 6], ///////////////////////////////////////////////////////////////////
+          permission: [3, 6, 44, 95], ///////////////////////////////////////////////////////////////////
+          subRoutes: [
+            {
+              link: `/loteria/${name}/arqueo`,
+              label: (
+                <AppIcons Logo={"ArqueoBilletes"} name="Arqueo Billetes" />
+              ),
+              component: ArqueoBilletes,
+              extern: false,
+              permission: [3, 6, 44, 95], ///////////////////////////////////////////////////////////////////
+            },
+            {
+              link: `/loteria/${name}/inventario/crear`,
+              label: (
+                <AppIcons Logo={"REPORTE"} name="Crear Inventario Billetes" />
+              ),
+              component: CrearInventario,
+              extern: false,
+              permission: [3, 44, 95], ///////////////////////////////////////////////////////////////////
+            },
+            {
+              link: `/loteria/${name}/inventario/reportes`,
+              label: (
+                <AppIcons
+                  Logo={"REPORTE"}
+                  name="Reportes Inventario Billetes"
+                />
+              ),
+              component: ReportInventario,
+              extern: false,
+              permission: [3, 6, 44, 95], ///////////////////////////////////////////////////////////////////
+            },
+          ],
         },
       ],
     })),
@@ -462,14 +503,12 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={"CrearPines"} name="Pines" />,
     component: PinesVus,
     permission: [
-      enumPermisosPinesVus.administrarPinesVus, 
-      enumPermisosPinesVus.operarPinesVus, 
-      enumPermisosPractisistemas.practisistemasPines],
-    provider: ProvidepinesVus,
-    subRoutes: [
-      rutasPines,
-      rutasPinesVus
+      enumPermisosPinesVus.administrarPinesVus,
+      enumPermisosPinesVus.operarPinesVus,
+      enumPermisosPractisistemas.practisistemasPines,
     ],
+    provider: ProvidepinesVus,
+    subRoutes: [rutasPines, rutasPinesVus],
   },
 
   {
@@ -516,6 +555,13 @@ const allUrlsPrivateApps = [
     component: Recaudo,
     permission: [22, 23],
     subRoutes: [
+      {
+        link: "/recaudo/trx",
+        label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
+        component: RecaudoTrxRecaudo,
+        permission: [22],
+        show: false,
+      },
       {
         link: "/recaudo/manual",
         label: <AppIcons Logo={"RECAUDO"} name={"Recaudo manual"} />,
@@ -739,7 +785,7 @@ const allUrlsPrivateApps = [
                 link: "/movistar/operador-pdp/cargar-paquetes",
                 label: (
                   <AppIcons
-                    Logo={"CARGAR"}
+                    Logo={"SORTEO01"}
                     name="Cargue de paquetes de movistar"
                   />
                 ),
@@ -748,21 +794,23 @@ const allUrlsPrivateApps = [
               },
               {
                 link: "/movistar/operador-pdp/concilacion",
-                label: <AppIcons Logo={"Reporte"} name="Conciliaciones" />,
+                label: <AppIcons Logo={"SORTEO01"} name="Conciliación" />,
                 component: ConcilacionMovistar,
                 permission: [66],
                 subRoutes: [
                   {
                     link: "/movistar/operador-pdp/concilacion/descarga",
                     label: (
-                      <AppIcons Logo={"DESCARGAR"} name="Decargar archivos" />
+                      <AppIcons Logo={"SORTEO01"} name="Decargar archivos" />
                     ),
                     component: ConcilacionMovistarDescarga,
                     permission: [66],
                   },
                   {
                     link: "/movistar/operador-pdp/concilacion/carga",
-                    label: <AppIcons Logo={"CARGAR"} name="Cargar archivos" />,
+                    label: (
+                      <AppIcons Logo={"SORTEO01"} name="Cargar archivos" />
+                    ),
                     component: ConciliacionMovistarCarga,
                     permission: [66],
                   },
@@ -774,6 +822,7 @@ const allUrlsPrivateApps = [
       },
     ],
   },
+  rutasConfiguraciones,
   rutasRecargas,
   {
     link: "/movii-pdp",
@@ -796,169 +845,48 @@ const allUrlsPrivateApps = [
     ],
   },
   {
-    link: "/params-operations",
-    label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />,
-    component: ParamsOperations,
-    permission: [18, 19, 20, 21, 31],
-    subRoutes: [
-      {
-        link: "/params-operations/parametros-autorizadores",
-        label: (
-          <AppIcons Logo={"RECAUDO"} name={"Parametros por autorizador"} />
-        ),
-        component: ParametrosAutorizadores,
-        permission: [51],
-      },
-      {
-        link: "/params-operations/types-trxs",
-        label: <AppIcons Logo={"RECAUDO"} name={"Tipos de transacciones"} />,
-        component: TypesTrxs,
-        permission: [31],
-      },
-      {
-        link: "/params-operations/comisiones",
-        label: <AppIcons Logo={"IMPUESTO"} name={"Tarifas / Comisiones"} />,
-        component: Comisiones,
-        permission: [18, 19],
-        subRoutes: [
-          {
-            link: "/params-operations/comisiones/pagadas",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a pagar"} />,
-            component: Com2Pay,
-            permission: [18],
-            subRoutes: [
-              {
-                link: "/params-operations/comisiones/pagadas/personalizadas",
-                label: (
-                  <AppIcons
-                    Logo={"IMPUESTO"}
-                    name={"Comisiones a pagar por comercio"}
-                  />
-                ),
-                component: CreateComision,
-                permission: [18],
-              },
-            ],
-          },
-          {
-            link: "/params-operations/comisiones/cobradas",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Comisiones a cobrar"} />,
-            component: Com2Collect,
-            permission: [19],
-            subRoutes: [
-              {
-                link: "/params-operations/comisiones/cobradas/crear",
-                label: (
-                  <AppIcons
-                    Logo={"IMPUESTO"}
-                    name={"Comisiones a cobrar por autorizador"}
-                  />
-                ),
-                component: CreateComisionCobrada,
-                permission: [19],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        link: "/params-operations/convenios",
-        label: <AppIcons Logo={"RETIRO"} name={"Convenios"} />,
-        component: Convenios,
-        permission: [20],
-        subRoutes: [
-          {
-            link: "/params-operations/convenios/autorizadores",
-            label: (
-              <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
-            ),
-            component: ConvAuto,
-            permission: [20],
-          },
-        ],
-      },
-
-      {
-        link: "/params-operations/autorizadores",
-        label: (
-          <AppIcons
-            Logo={"PRODUCTOS_FINANCIEROS"}
-            name={"Proveedores / Autorizadores"}
-          />
-        ),
-        component: Autorizadores,
-        permission: [21],
-      },
-      {
-        link: "/params-operations/configuracion_comercios",
-        label: <AppIcons Logo={"RETIRO"} name={"Configuración comercios"} />,
-        component: ConfiguracionComercios,
-        permission: [21],
-      },
-      {
-        link: "/params-operations/tipo_contrato_comisiones",
-        label: <AppIcons Logo={"RETIRO"} name={"Contratos comisiones"} />,
-        component: TipoContratoComisiones,
-        permission: [20],
-        subRoutes: [
-          {
-            link: "/params-operations/convenios/autorizadores",
-            label: (
-              <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
-            ),
-            component: ConvAuto,
-            permission: [20],
-          },
-        ],
-      },
-      {
-        link: "/params-operations/tipo-nivel-comercios",
-        label: <AppIcons Logo={"RECAUDO"} name={"Tipo nivel comercios"} />,
-        component: TipoNivelComercio,
-        permission: [21],
-      },
-      {
-        link: "/params-operations/comercios",
-        label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
-        component: ListarComercios,
-        permission: [21],
-      },
-      {
-        link: "/params-operations/comercios/crear",
-        label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
-        component: CrearComercios,
-        permission: [21],
-        show: false,
-      },
-      {
-        link: "/params-operations/mensajes_publicitarios",
-        label: <AppIcons Logo={"RECAUDO"} name={"Mensajes publicitarios"} />,
-        component: ListarMensajePublicitario,
-        permission: [21],
-      },
-    ],
-  },
-
-  {
-    link: "/domiciliacion",
-    label: <AppIcons Logo={"RECAUDO"} name={"Domiciliación"} />,
+    link: "/colpensiones",
+    label: <AppIcons Logo={"RECAUDO"} name={"Colpensiones"} />,
     component: Domiciliacion,
     permission: [55, 56, 57],
     subRoutes: [
       {
-        link: "/domiciliacion/formulario",
+        link: "/colpensiones/domiciliacion",
+        label: <AppIcons Logo={"RETIRO"} name={"Domiciliación"} />,
+        component: moduloDomiciliacion,
+        permission: [56, 57],
+        subRoutes: [
+          {
+            link: "/colpensiones/formulario",
+            label: (
+              <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />
+            ),
+            component: comprobarEmail,
+            permission: [55],
+          },
+          {
+            link: "/colpensiones/modificar",
+            label: <AppIcons Logo={"ACTUALIZACION"} name={"Modificar"} />,
+            component: ModificarPps,
+            permission: [56],
+          },
+        ],
+      },
+
+      /*       {
+        link: "/colpensiones/formulario",
         label: <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />,
         component: comprobarEmail,
         permission: [55],
-      },
-      {
-        link: "/domiciliacion/modificar",
+      }, */
+      /*    {
+        link: "/colpensiones/modificar",
         label: <AppIcons Logo={"ACTUALIZACION"} name={"Modificar"} />,
         component: ModificarPps,
         permission: [56],
-      },
+      }, */
       {
-        link: "/domiciliacion/voluntariodemanda",
+        link: "/colpensiones/voluntariodemanda",
         label: (
           <AppIcons Logo={"ACTUALIZACION"} name={"Voluntario a Demanda"} />
         ),
@@ -967,19 +895,109 @@ const allUrlsPrivateApps = [
         show: false,
       },
       {
-        link: "/domiciliacion/ppspordemanda",
-        label: <AppIcons Logo={"ACTUALIZACION"} name={"Pps A Demanda"} />,
+        link: "/colpensiones/ppspordemanda",
+        label: <AppIcons Logo={"ACTUALIZACION"} name={"PPS Demanda"} />,
         component: BuscarCedulaPpsADemanda,
         permission: [57],
       },
     ],
   },
+
   {
-    link: "/pagos-ifood",
-    label: <AppIcons Logo={"RECAUDO"} name={"Aportes en Linea iFood"} />,
-    component: iFoodAportes,
-    permission: [1],
+    link: "/recaudo-integrado",
+    label: <AppIcons Logo={"RECAUDO"} name={"Recaudo Integrado"} />,
+    component: RecaudoIntegrado,
+    permission: [55, 56, 57],
+    subRoutes: [
+      {
+        link: "/recaudo-integrado/davivienda",
+        label: <AppIcons Logo={"RETIRO"} name={"Davivienda"} />,
+        component: RecaudoDavivienda,
+        permission: [56, 57],
+        subRoutes: [
+          {
+            link: "/recaudo-integrado/davivienda/cargar",
+            label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
+            component: cargarArchivos,
+            permission: [55],
+          },
+          {
+            link: "/recaudo-integrado/davivienda/historicocontingencia",
+            label: (
+              <AppIcons Logo={"IMPUESTO"} name={"Histórico de contingencia"} />
+            ),
+            component: HistoricoContingenciaDavivienda,
+            permission: [55],
+          },
+          {
+            link: "/recaudo-integrado/davivienda/transacciones",
+            label: <AppIcons Logo={"IMPUESTO"} name={"Transacciones"} />,
+            component: TransaccionesDavivienda,
+            permission: [55],
+          },
+        ],
+      },
+      //--------------------
+      {
+        link: "/recaudo-integrado/bancolombia",
+        label: <AppIcons Logo={"RETIRO"} name={"Bancolombia"} />,
+        component: RecaudoBancolombia,
+        permission: [56, 57],
+        subRoutes: [
+          {
+            link: "/recaudo-integrado/bancolombia/cargar",
+            label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
+            component: cargarArchivosBancolombia,
+            permission: [55],
+          },
+          {
+            link: "/recaudo-integrado/bancolombia/historicocontingencia",
+            label: (
+              <AppIcons Logo={"IMPUESTO"} name={"Histórico de contingencia"} />
+            ),
+            component: HistoricoContingenciaBancolombia,
+            permission: [55],
+          },
+          {
+            link: "/recaudo-integrado/bancolombia/transacciones",
+            label: <AppIcons Logo={"IMPUESTO"} name={"Transacciones"} />,
+            component: TransaccionesBancolombia,
+            permission: [55],
+          },
+        ],
+      },
+    ],
   },
+
+  // {
+  //   link: "/runt",
+  //   label: <AppIcons Logo={"IMPUESTO"} name={"Runt"} />,
+  //   component: ContenedorRunt,
+  //   permission: [55, 56, 57],
+  //   subRoutes: [
+  //     {
+  //       link: "/runt/pagar-runt",
+  //       label: <AppIcons Logo={"RETIRO"} name={"Pagar Runt"} />,
+  //       component: PagarRunt,
+  //       permission: [56, 57],
+  //       /*   subRoutes: [
+  //         {
+  //           link: "/recaudo-integrado/davivienda/cargar",
+  //           label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
+  //           component: cargarArchivos,
+  //           permission: [55],
+  //         },
+  //       ], */
+  //     },
+  //   ],
+  // },
+
+  // {
+  //   link: "/pagos-ifood",
+  //   label: <AppIcons Logo={"RECAUDO"} name={"Aportes en Linea iFood"} />,
+  //   component: iFoodAportes,
+  //   permission: [1],
+  // },
   rutasSoat,
 ];
 
