@@ -3,6 +3,9 @@ import { lazy } from "react";
 /**
  * Rutas
  */
+import rutasBancolombiaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialBancolombia/routes";
+import rutasDaviviendaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialDavivienda/routes";
+
 import rutasColpatria, {
   listPermissionsColpatria,
 } from "../apps/Colpatria/routes";
@@ -177,7 +180,9 @@ const PpsVoluntarioDemanda = lazy(() =>
  * Recaudo
  */
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
-const RecaudoTrxRecaudo = lazy(() => import("../apps/Recaudo/Views/TrxRecaudo"));
+const RecaudoTrxRecaudo = lazy(() =>
+  import("../apps/Recaudo/Views/TrxRecaudo")
+);
 const RecaudoManual = lazy(() => import("../apps/Recaudo/Views/RecaudoManual"));
 const RecaudoCodigo = lazy(() => import("../apps/Recaudo/Views/RecaudoCodigo"));
 
@@ -238,6 +243,12 @@ const Deposito = lazy(() => import("../apps/Daviplata/Views/Deposito"));
  */
 const Corresponsalia = lazy(() =>
   import("../apps/Corresponsalia/Corresponsalia")
+);
+/**
+ * RecaudoEmpresarial
+ */
+const RecaudoEmpresarial = lazy(() =>
+  import("../apps/RecaudoIntegrado/RecaudoEmpresarial")
 );
 
 /**
@@ -658,6 +669,22 @@ const allUrlsPrivateApps = [
       ...listPermissionsAgrario,
     ],
     subRoutes: [rutasDaviviendaCB, rutasAvalCB, rutasAgrarioCB, rutasColpatria],
+  },
+  {
+    link: "/recaudoEmpresarial",
+    label: <AppIcons Logo={"Corresponsalia"} name="Recaudo Empresarial" />,
+    component: RecaudoEmpresarial,
+    permission: [
+      54,
+      ...listPermissionsColpatria,
+      ...listPermissionsDavivienda,
+      ...listPermissionsAval,
+      ...listPermissionsAgrario,
+    ],
+    subRoutes: [
+      rutasBancolombiaRecaudoEmpresarial,
+      rutasDaviviendaRecaudoEmpresarial,
+    ],
   },
 
   {
