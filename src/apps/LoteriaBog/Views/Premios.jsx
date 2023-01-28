@@ -22,6 +22,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
+
 const Premios = ({ route }) => {
   const { label } = route;
   const {
@@ -37,6 +38,7 @@ const Premios = ({ route }) => {
   const [serie, setSerie] = useState("");
   const [idLoteria, seIdLoteria] = useState("");
   const [phone, setPhone] = useState("");
+  const [cod_distribuidor, setCod_distribuidor] = useState("");
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
@@ -56,6 +58,8 @@ const Premios = ({ route }) => {
     comercio: "",
     terminal: "",
     usuario: "",
+    codigo_dane: "",
+    nom_loteria: "",
   });
   const handleClose = useCallback(() => {
     setShowAllmodals((old) => {
@@ -66,7 +70,7 @@ const Premios = ({ route }) => {
         showModalconfirmacionVentaSoat: false,
       };
     });
-    navigate(`/loteria/loteria-de-bogota`);
+    navigate(-1);
   }, []);
   const [respagar, setRespagar] = useState([]);
   // const [respagar, setRespagar] = useState([
@@ -193,6 +197,7 @@ const Premios = ({ route }) => {
     isWinner(sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual)
       .then((res) => {
         var salvarRes = res;
+        setCod_distribuidor(roleInfo.cod_oficina_lot);
         setMaxPago(res?.obj?.max_pago);
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
@@ -203,6 +208,8 @@ const Premios = ({ route }) => {
             comercio: roleInfo?.id_comercio,
             usuario: roleInfo?.id_usuario,
             terminal: roleInfo?.id_dispositivo,
+            codigo_dane: roleInfo?.codigo_dane,
+            nom_loteria: res?.obj?.nom_loteria,
           };
         });
 
@@ -278,25 +285,25 @@ const Premios = ({ route }) => {
           setWinner(false);
           setIsSelf(false);
         }
-        if (res[0]["Estado"] === true) {
-          if (res[0]["Tipo"] === 2) {
-            notify("Ganador con billete virtual");
-            setTipopago(res[0]["Tipo"]);
-            setWinner(true);
-            setIsSelf(true);
-          } else {
-            notify("Ganador con billete físico");
-            for (var i = 0; i < res[0].cantidad_frac_billete; i++) {
-              fracbill.push(i + 1);
-            }
-            setTipopago(res[0]["Tipo"]);
-            setCheckedState(
-              new Array(res[0].cantidad_frac_billete).fill(false)
-            );
-            setWinner(true);
-            setIsSelf(false);
-          }
-        }
+        // if (res[0]["Estado"] === true) {
+        //   if (res[0]["Tipo"] === 2) {
+        //     notify("Ganador con billete virtual");
+        //     setTipopago(res[0]["Tipo"]);
+        //     setWinner(true);
+        //     setIsSelf(true);
+        //   } else {
+        //     notify("Ganador con billete físico");
+        //     for (var i = 0; i < res[0].cantidad_frac_billete; i++) {
+        //       fracbill.push(i + 1);
+        //     }
+        //     setTipopago(res[0]["Tipo"]);
+        //     setCheckedState(
+        //       new Array(res[0].cantidad_frac_billete).fill(false)
+        //     );
+        //     setWinner(true);
+        //     setIsSelf(false);
+        //   }
+        // }
       })
       .catch(() => setDisabledBtns(false));
   };
@@ -335,6 +342,8 @@ const Premios = ({ route }) => {
             datosComercio.comercio,
             datosComercio.terminal,
             datosComercio.usuario,
+            datosComercio.codigo_dane,
+            cod_distribuidor,
             idLoteria,
             tipopago,
             hash,
@@ -347,6 +356,7 @@ const Premios = ({ route }) => {
                   ...old,
                   statusPagoPremio: res?.status,
                   idTransaccion: res?.obj?.id_trx,
+                  tipo_operacion: res?.obj?.tipo_operacion,
                 };
               });
               setEstadoTransaccion(res?.status);
@@ -354,7 +364,7 @@ const Premios = ({ route }) => {
                 var recargarPag = res?.status;
                 // this.setState({ recargarPag: false });
                 notifyError(res?.obj?.msg);
-                navigate(`/loteria/loteria-de-bogota`);
+                navigate(-1);
               }
             })
             .catch(() => setDisabledBtns(false));
@@ -390,6 +400,8 @@ const Premios = ({ route }) => {
           datosComercio.comercio,
           datosComercio.terminal,
           datosComercio.usuario,
+          datosComercio.codigo_dane,
+          cod_distribuidor,
           idLoteria,
           tipopago,
           hash,
@@ -410,7 +422,7 @@ const Premios = ({ route }) => {
               var recargarPag = res?.status;
               // this.setState({ recargarPag: false });
               notifyError(res?.obj?.msg);
-              navigate(`/loteria/loteria-de-bogota`);
+              navigate(-1);
             }
           })
           .catch(() => setDisabledBtns(false));
@@ -443,7 +455,7 @@ const Premios = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: "LOTERIA DE BOGOTÁ D.C",
+      commerceName: datosComercio.nom_loteria,
       trxInfo: [
         ["", ""],
         ["Valor", formatMoney.format(totalPagar)],
@@ -479,7 +491,7 @@ const Premios = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: "LOTERIA DE BOGOTÁ D.C",
+      commerceName: datosComercio.nom_loteria,
       trxInfo: [
         ["", ""],
         ["", "DATOS DEL CLIENTE"],
@@ -582,7 +594,7 @@ const Premios = ({ route }) => {
   // };
 
   useEffect(() => {
-    const ticket = tipopago === 1 ? tickets : tickets2;
+    const ticket = tipopago === 1 ? tickets2 : tickets;
     infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
       .then((resTicket) => {})
       .catch((err) => {
@@ -599,7 +611,7 @@ const Premios = ({ route }) => {
   ]);
   const cancelar = () => {
     notifyError("Se cancelo el pago del premio");
-    navigate(`/loteria/loteria-de-bogota`);
+    navigate(-1);
   };
   return (
     <>
@@ -706,7 +718,7 @@ const Premios = ({ route }) => {
             ]}
             data={respagar}></TableEnterprise>
           {tipopago === 2 && !maxPago ? (
-            <Form onSubmit={onPay1} grid>
+            <Form grid>
               <Fieldset
                 className="lg:col-span-2"
                 legend={
@@ -825,7 +837,7 @@ const Premios = ({ route }) => {
                       className="flex flex-row justify-center items-center
                           mx-auto container gap-10 text-lg lg:col-span-2">
                       <Button onClick={() => cancelar()}>Cancelar</Button>
-                      <Button type="submit" disabled={disabledBtns}>
+                      <Button type={"submit"} onClick={onPay1}>
                         Pagar
                       </Button>
                     </ButtonBar>
@@ -839,7 +851,7 @@ const Premios = ({ route }) => {
             <>
               {!maxPago ? (
                 <>
-                  <Form onSubmit={onPay1} grid>
+                  <Form grid>
                     <Fieldset
                       className="lg:col-span-2 flex justify-center items-center"
                       legend={
@@ -877,7 +889,7 @@ const Premios = ({ route }) => {
                             className="flex flex-row justify-center items-center
                           mx-auto container gap-10 text-lg lg:col-span-2">
                             <Button onClick={() => cancelar()}>Cancelar</Button>
-                            <Button type="submit" disabled={disabledBtns}>
+                            <Button type={"submit"} onClick={onPay1}>
                               Pagar
                             </Button>
                           </ButtonBar>
