@@ -718,7 +718,7 @@ const Premios = ({ route }) => {
             ]}
             data={respagar}></TableEnterprise>
           {tipopago === 2 && !maxPago ? (
-            <Form onSubmit={onPay1} grid>
+            <Form grid>
               <Fieldset
                 className="lg:col-span-2"
                 legend={
@@ -837,7 +837,7 @@ const Premios = ({ route }) => {
                       className="flex flex-row justify-center items-center
                           mx-auto container gap-10 text-lg lg:col-span-2">
                       <Button onClick={() => cancelar()}>Cancelar</Button>
-                      <Button type="submit" disabled={disabledBtns}>
+                      <Button type={"submit"} onClick={onPay1}>
                         Pagar
                       </Button>
                     </ButtonBar>
@@ -851,7 +851,7 @@ const Premios = ({ route }) => {
             <>
               {!maxPago ? (
                 <>
-                  <Form onSubmit={onPay1} grid>
+                  <Form grid>
                     <Fieldset
                       className="lg:col-span-2 flex justify-center items-center"
                       legend={
@@ -889,7 +889,7 @@ const Premios = ({ route }) => {
                             className="flex flex-row justify-center items-center
                           mx-auto container gap-10 text-lg lg:col-span-2">
                             <Button onClick={() => cancelar()}>Cancelar</Button>
-                            <Button type="submit" disabled={disabledBtns}>
+                            <Button type={"submit"} onClick={onPay1}>
                               Pagar
                             </Button>
                           </ButtonBar>
