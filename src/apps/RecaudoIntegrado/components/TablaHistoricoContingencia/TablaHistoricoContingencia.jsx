@@ -8,6 +8,7 @@ import {
   BuscarPorFecha,
 } from "../../utils/fetchHistoricoContingencia";
 const TablaHistoricoContingencia = ({ banco }) => {
+  console.log("banco******", banco);
   const [datosTablaContingencia, setDatosTablaContingencia] = useState([]);
   const [datosFiltradosFecha, setDatosFiltradosFecha] = useState([]);
   const [cantidadPaginas, setCantidadPaginas] = useState(0);
@@ -22,30 +23,36 @@ const TablaHistoricoContingencia = ({ banco }) => {
   }, [fechaInicial, fechaFinal]);
 
   const ActualizarTablaPorBanco = () => {
-    BuscarPorBanco({})
+    BuscarPorBanco(banco)
       .then((res) => {
-        // console.log(res?.["results"].length);
-        if (res?.["results"].length == 0) {
+        console.log("------------", res);
+        if (res?.results?.length == 0) {
           notifyError("No se encontraron registros");
         } else {
           setCantidadPaginas(res?.maxPages);
-          setDatosTablaContingencia(res?.["results"]);
+          setDatosTablaContingencia(res?.results);
         }
       })
-      .catch((err) => notifyError("Error al cargar Datos "));
+      .catch((err) => {
+        // console.log("ERROR", err);
+        notifyError("Error al cargar Datos ");
+      });
   };
   const ActualizarTablaPorFecha = () => {
-    BuscarPorFecha(fechaInicial, fechaFinal)
+    BuscarPorFecha(fechaInicial, fechaFinal, banco)
       .then((res) => {
-        console.log("Fechjas", res);
-        if (res?.["results"].length == 0) {
+        // console.log("RESPUESTA FECHAS", res?.results);
+        if (res?.results?.length == 0) {
           notifyError("No se encontraron registros");
         } else {
           setCantidadPaginas(res?.maxPages);
-          setDatosFiltradosFecha(res?.["results"]);
+          setDatosFiltradosFecha(res?.results);
         }
       })
-      .catch((err) => notifyError("Error al cargar Datos "));
+      .catch((err) => {
+        // console.log("ERROR", err);
+        notifyError("Error al cargar datos por fecha ");
+      });
   };
   return (
     <div>
@@ -63,7 +70,7 @@ const TablaHistoricoContingencia = ({ banco }) => {
             "nombre del archivo",
           ]}
           data={
-            datosTablaContingencia?.map((inf) => ({
+            datosFiltradosFecha?.map((inf) => ({
               identificador_banco: inf.identificador_banco,
               cantidad_registros: inf.cantidad_registros,
               cantidad_trx_exitos: inf.cantidad_trx_exitosas,
