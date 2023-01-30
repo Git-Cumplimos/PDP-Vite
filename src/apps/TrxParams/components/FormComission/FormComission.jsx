@@ -221,35 +221,42 @@ const FormComission = ({
                           let valor = e.target.value;
                           let num = valor.replace(/[\s-]/g, "");
                           // num = num.replace(/^0[0-9]/, "");
-                          if (!isNaN(num)) {
-                            let copyData = { ...comissionData };
-                            copyData.ranges[ind][key] =
-                              num.slice(-1) === "."
-                                ? num
-                                : !isNaN(parseFloat(num))
-                                ? parseFloat(num)
-                                : 0;
-                            setComissionData(copyData);
-                          }
                           if (num > 10) {
                             notifyError(
                               "Está introduciendo un valor porcentual inusualmente alto",
                               false
                             );
                           }
+
                           if (num > 100) {
                             e.target.value = 100;
                             // replace the value with 100
                             let copyData = { ...comissionData };
                             copyData.ranges[ind][key] = 100;
-                            setComissionData(copyData);
+                            return setComissionData(copyData);
                           }
                           if (num < 0) {
                             e.target.value = 0;
                             // replace the value with 0
                             let copyData = { ...comissionData };
                             copyData.ranges[ind][key] = 0;
-                            setComissionData(copyData);
+                            return setComissionData(copyData);
+                          }
+                          if (!isNaN(num)) {
+                            let copyData = { ...comissionData };
+                            if (copyData.ranges[ind]["Comision fija"] > 0) {
+                              notifyError(
+                                "Se esta introduciendo una comisión porcentual teniendo configurado una comisión fija",
+                                false
+                              );
+                            }
+                            copyData.ranges[ind][key] =
+                              num.slice(-1) === "."
+                                ? num
+                                : !isNaN(parseFloat(num))
+                                ? parseFloat(num)
+                                : 0;
+                            return setComissionData(copyData);
                           }
                         }}
                         autoComplete='off'
@@ -278,6 +285,14 @@ const FormComission = ({
                           if (!isNaN(valor)) {
                             const num = valor;
                             let copyData = { ...comissionData };
+                            if (
+                              copyData.ranges[ind]["Comision porcentual"] > 0
+                            ) {
+                              notifyError(
+                                "Se esta introduciendo una comisión fija teniendo configurado una comisión porcentual",
+                                false
+                              );
+                            }
                             copyData.ranges[ind][key] = num;
                             setComissionData(copyData);
                           }
