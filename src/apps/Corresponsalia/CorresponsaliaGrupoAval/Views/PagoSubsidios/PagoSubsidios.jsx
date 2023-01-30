@@ -199,18 +199,20 @@ const PagoSubsidios = () => {
   //vaucher
   const PagoSubsidioExitoso = (result_) => {
     const voucher = {
-      title: "Recibo de pago subsidio ",
+      title: "Recibo de pago",
       timeInfo: {
         "Fecha de venta": result_.fecha,
         Hora: result_.hora,
       },
       commerceInfo: [
-        ["Id Comercio", roleInfo.id_comercio],
         ["No. terminal", roleInfo.id_dispositivo],
-        ["Municipio", roleInfo.ciudad],
-        ["Dirección", roleInfo.direccion],
+        ["Teléfono", 4567890],
         ["Id Trx", result_.id_trx],
-        ["Id Transacción", result_.id_trx],
+        ["Id Aut", 987654],
+        ["Comercio", roleInfo["nombre comercio"]],
+        ["", ""],
+        ["Dirección", roleInfo.direccion],
+        ["", ""],
       ],
       commerceName: "PAGO DE SUBSIDIO",
       trxInfo: [
@@ -222,7 +224,7 @@ const PagoSubsidios = () => {
         ["", ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
+        "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación, verifique la información. Este es el único recibo oficial de pago. Requerimientos 018000 514652.",
     };
 
     notify("Pago de subsidio exitoso");
