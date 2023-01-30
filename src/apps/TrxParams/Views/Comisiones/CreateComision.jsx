@@ -13,6 +13,7 @@ import {
   fetchComisionesPagar,
   postComisionesPagar,
 } from "../../utils/fetchComisionesPagar";
+import { getComisionesPlanes } from "../../utils/fetchComisionesPlanes";
 import { fetchAutorizadores } from "../../utils/fetchRevalAutorizadores";
 import Modal from "../../../../components/Base/Modal";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -20,17 +21,17 @@ import { fetchTrxTypesPages } from "../../utils/fetchTiposTransacciones";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import TagsAlongSide from "../../../../components/Base/TagsAlongSide";
 
-const initComissionData = {
-  type: "",
-  ranges: [
-    {
-      "Rango minimo": 0,
-      "Rango maximo": "",
-      "Comision porcentual": 0,
-      "Comision fija": 0,
-    },
-  ],
-};
+// const initComissionData = {
+//   type: "trx",
+//   ranges: [
+//     {
+//       "Rango minimo": 0,
+//       "Rango maximo": 0,
+//       "Comision porcentual": 0,
+//       "Comision fija": 0,
+//     },
+//   ],
+// };
 
 const CreateComision = () => {
   const navigate = useNavigate();
@@ -48,13 +49,24 @@ const CreateComision = () => {
 
   const [headersTable, setHeadersTable] = useState([]);
   const [idComercios, setIdComercios] = useState([]);
-  const [comissionData, setComissionData] = useState(initComissionData);
+  const [comissionData, setComissionData] = useState({
+    type: "trx",
+    ranges: [
+      {
+        "Rango minimo": 0,
+        "Rango maximo": 0,
+        "Comision porcentual": 0,
+        "Comision fija": 0,
+      },
+    ],
+  });
   const [newComision, setNewComision] = useState({
     "Id comercio": "",
     "Nombre comision": "",
     "Fecha inicio": "",
     "Fecha fin": "",
   });
+  const [planesComisiones, setPlanesComisiones] = useState([]);
   const [data, setdata] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
   const [{ page, limit }, setPageData] = useState({
@@ -120,7 +132,9 @@ const CreateComision = () => {
       }
 
       comissionData?.ranges.reduce((prev, curr, indexR) => {
-        if (!(prev?.["Rango maximo"] + 1 === curr?.["Rango minimo"])) {
+        if (
+          !(parseInt(prev?.["Rango maximo"]) + 1 === curr?.["Rango minimo"])
+        ) {
           notifyError(`El rango maximo de un rango comision no puede 
           ser mayor al rango minimo del siguiente 
             rango de comision (Rango ${indexR} - Rango ${indexR + 1})`);
@@ -153,6 +167,9 @@ const CreateComision = () => {
       }
       if (newComision["Fecha fin"] !== "") {
         obj["fecha_fin"] = newComision["Fecha fin"];
+      }
+      if (newComision["Respuesta"] !== "") {
+        obj["respuesta"] = newComision["Respuesta"];
       }
       postComisionesPagar({
         ...obj,
@@ -190,13 +207,17 @@ const CreateComision = () => {
   const onChangeNewComision = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
     const newData = [];
-    ["Id comercio", "Fecha inicio", "Fecha fin", "Nombre comision"].forEach(
-      (col) => {
-        let data = null;
-        data = formData.get(col);
-        newData.push([col, data]);
-      }
-    );
+    [
+      "Id comercio",
+      "Fecha inicio",
+      "Fecha fin",
+      "Nombre comision",
+      "Respuesta",
+    ].forEach((col) => {
+      let data = null;
+      data = formData.get(col);
+      newData.push([col, data]);
+    });
     setNewComision((old) => ({
       ...old,
       ...Object.fromEntries(newData),
@@ -212,10 +233,34 @@ const CreateComision = () => {
       fetchTiposTransaccionFunc();
     } else if (selectedOpt === "comision") {
       fecthComisionesPagarFunc();
+    } else if (selectedOpt === "plan_comision") {
+      fetchPlanesComisiones();
     } else {
       setdata([]);
     }
   }, [selectedOpt, page, tipoTrx, comercio, convenio, autorizador]);
+
+  const fetchPlanesComisiones = useCallback(() => {
+    getComisionesPlanes()
+      .then((res) => {
+        setdata(
+          [...res?.results].map(
+            ({ pk_planes_comisiones, nombre_plan_comision }) => {
+              return {
+                "Id plan": pk_planes_comisiones,
+                "Nombre plan": nombre_plan_comision,
+              };
+            }
+          )
+        );
+        setMaxPages(res?.maxPages);
+      })
+      .catch((err) => {
+        notifyError("No se ha podido conectar al servidor");
+        console.error(err);
+      });
+  }, []);
+
   const fetchConveniosFunc = useCallback(() => {
     fetchConveniosUnique({ tags: "", page, limit })
       .then((res) => {
@@ -382,6 +427,18 @@ const CreateComision = () => {
     [idComercios]
   );
 
+  const onSelectPlan = useCallback(
+    (e, i) => {
+      setNewComision((old) => ({
+        ...old,
+        "Id plan": data[i]?.["Id plan"],
+        Plan: data[i]?.["Nombre plan"],
+      }));
+      handleClose();
+    },
+    [data, handleClose]
+  );
+
   return (
     <Fragment>
       <h1 className='text-3xl'>Crear comisión a pagar:</h1>
@@ -475,6 +532,15 @@ const CreateComision = () => {
           value={newComision?.["Fecha fin"]}
           onChange={() => {}}
         />
+        <Input
+          id='Respuesta'
+          name='Respuesta'
+          label={"Respuesta"}
+          type='text'
+          autoComplete='off'
+          value={newComision?.["Respuesta"]}
+          onChange={() => {}}
+        />
       </Form>
 
       {idComercios?.length > 0 && (
@@ -530,6 +596,15 @@ const CreateComision = () => {
           }}>
           Agregar comisión existente
         </Button>
+        <Button
+          type='button'
+          onClick={() => {
+            setShowModal(true);
+            setQuery({ ["selectedOpt"]: "plan_comision" }, { replace: true });
+            setHeadersTable(["Id plan", "Nombre plan"]);
+          }}>
+          Agregar planes de comisión
+        </Button>
       </ButtonBar>
       <FormComission outerState={[comissionData, setComissionData]}>
         <Button type='submit' onClick={createComission}>
@@ -552,12 +627,16 @@ const CreateComision = () => {
                 ? "Seleccionar tipo de transacción"
                 : selectedOpt === "comision"
                 ? "Seleccionar comisión"
+                : selectedOpt === "plan_comision"
+                ? "Seleccionar plan de comisión"
                 : ""
             }
             maxPage={maxPages}
             headers={headersTable}
             data={data}
-            onSelectRow={onSelectConvenio}
+            onSelectRow={
+              selectedOpt === "comision" ? onSelectConvenio : onSelectPlan
+            }
             onSetPageData={setPageData}
             onChange={onChange}>
             {selectedOpt === "comision" && (

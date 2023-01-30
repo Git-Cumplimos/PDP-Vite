@@ -6,10 +6,7 @@ import Form from "../../../../../components/Base/Form";
 import HideInput from "../../../../../components/Base/HideInput";
 import Input from "../../../../../components/Base/Input";
 import Modal from "../../../../../components/Base/Modal";
-import MoneyInput, {
-  formatMoney,
-} from "../../../../../components/Base/MoneyInput";
-import Select from "../../../../../components/Base/Select";
+import { formatMoney } from "../../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { useFetch } from "../../../../../hooks/useFetch";
 import { toPhoneNumber } from "../../../../../utils/functions";
@@ -17,6 +14,7 @@ import { notify, notifyError } from "../../../../../utils/notify";
 import InfInicial from "../../components/PagoTerceros-PagoSubsidio/InfInicial";
 import InfRecibo from "../../components/PagoTerceros-PagoSubsidio/InfRecibo";
 import InfResConsulta from "../../components/PagoTerceros-PagoSubsidio/InfResConsulta";
+import { pinBlock } from "../../utils/pinBlock";
 import {
   fetchCustomPost,
   ErrorCustom,
@@ -31,8 +29,8 @@ const dataInputInitial = {
   valor_total_trx: "",
 };
 const tipo_operacion = 99;
-const url_consulta_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/consulta-pago-subsidio`;
-const url_pago_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/pago-subsidio`;
+const url_consulta_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/consulta-pago-subsidios`;
+const url_pago_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/pago-subsidios`;
 
 const PagoSubsidios = () => {
   const [inputData, setInputData] = useState(dataInputInitial);
@@ -144,29 +142,37 @@ const PagoSubsidios = () => {
   }
 
   function RetirarSubsidio() {
-    let oficinaPropia;
-    if (roleInfo.tipo_comercio != "OFICINASPROPIAS") {
-      oficinaPropia = false;
+    let oficinaPropia_ = false;
+    if (
+      roleInfo.tipo_comercio === "OFICINAS PROPIAS" ||
+      roleInfo.tipo_comercio === "KIOSCO"
+    ) {
+      oficinaPropia_ = true;
     }
-    const dataSubsidio = {
+    let dataSubsidio = {
       comercio: {
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
       },
       nombre_comercio: roleInfo["nombre comercio"],
-      oficina_propia: oficinaPropia,
+      oficina_propia: oficinaPropia_,
       valor_total_trx: value,
       numeroCelular: inputData.numeroCelular,
       documento: inputData.documento,
-      otp: inputData.otp,
-      // id_trx: idTrx,
+      otp: pinBlock(
+        inputData.otp,
+        process.env.REACT_APP_PAN_AVAL_PAGO_TERCEROS
+      ),
       location: {
         address: roleInfo.direccion,
         city: roleInfo.ciudad,
         dane_code: roleInfo.codigo_dane,
       },
     };
+    if (idTrx == null) {
+      dataSubsidio["id_trx"] = idTrx;
+    }
 
     PeticionRetirarSubsidio(
       url_pago_subsidio,
@@ -190,7 +196,7 @@ const PagoSubsidios = () => {
         HandleCloseSecond();
       });
   }
-
+  //vaucher
   const PagoSubsidioExitoso = (result_) => {
     const voucher = {
       title: "Recibo de pago subsidio ",

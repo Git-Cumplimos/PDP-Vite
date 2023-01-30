@@ -16,6 +16,8 @@ const urls = {
   ingresarIdQX: `${process.env.REACT_APP_URL_PinesVus}/ingresarIdQX`,
   consultaEpsArl: `${process.env.REACT_APP_URL_PinesVus}/consultaEpsArl`,
   reenvioHash: `${process.env.REACT_APP_URL_PinesVus}/reenviarCodigoHash`,
+  cierreManual: `${process.env.REACT_APP_URL_PinesVus}/cierreManual`,
+  consultaEstadoCierre: `${process.env.REACT_APP_URL_PinesVus}/consultaCierreManual`,
 };
 
 export const pinesVusContext = createContext({
@@ -33,6 +35,8 @@ export const pinesVusContext = createContext({
   ingresarIdQX: () => {},
   consultaEpsArl: () => {},
   reenvioHash: () => {},
+  cierreManual: () => {},
+  consultaEstadoCierre: () => {},
   activarNavigate: null,
   setActivarNavigate: null,
 });
@@ -45,7 +49,7 @@ export const useProvidePinesVus = () => {
   const { roleInfo } = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
 
-  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion) => {
+  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion) => {
     let tipo_comercio = user?.tipo_comercio
     if (user?.tipo_comercio === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
@@ -61,6 +65,7 @@ export const useProvidePinesVus = () => {
       motivo: motivo,
       tipCancelacion: tipCancelacion,
       id_trx: trx,
+      comercio_creacion: infoComercioCreacion
     };
     const query = {
       id_pin: id_pin,
@@ -73,7 +78,7 @@ export const useProvidePinesVus = () => {
     }
   }, []);
   
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma, motivoCompra) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma, motivoCompra, descripcionTipDocumento) => {
     let tipo_comercio = user?.Tipo
     if (user?.Tipo === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
@@ -93,7 +98,8 @@ export const useProvidePinesVus = () => {
       olimpia: olimpia,
       categoria: categoria,
       firma: firma,
-      motivoCompra: motivoCompra
+      motivoCompra: motivoCompra,
+      descripcionTipDocumento:descripcionTipDocumento,
     };
     if (idPin !== ""){
       body.Pin = idPin
@@ -213,7 +219,10 @@ export const useProvidePinesVus = () => {
   }, []);
 
   const consultaParticipacion = useCallback(async (fecha_ini) => {
-    const query = { id_comercio: roleInfo.id_comercio};
+    const query = { 
+      id_comercio: roleInfo.id_comercio,
+      id_usuario: roleInfo.id_usuario
+    };
     query.fecha_participacion = fecha_ini
     try {
       const res = await fetchData(urls.consultaParticipacion, "GET", query);
@@ -225,6 +234,7 @@ export const useProvidePinesVus = () => {
 
   const registroPagoParticipacion = useCallback(async (
     participante, 
+    id_pago,
     // banco, 
     // num_cuenta, 
     // num_aprobacion,
@@ -239,6 +249,7 @@ export const useProvidePinesVus = () => {
     }
     const body = {
       participante: participante, 
+      id_pago: id_pago,
       // banco: banco, 
       // num_cuenta: num_cuenta, 
       // num_aprobacion: num_aprobacion,
@@ -262,6 +273,7 @@ export const useProvidePinesVus = () => {
   const consultaPagoParticipacion = useCallback(
     async (
       id_comercio,
+      id_usuario,
       fecha_ini,
       fecha_fin,
       pageData
@@ -273,6 +285,9 @@ export const useProvidePinesVus = () => {
       }
       if ((id_comercio !== "") & !isNaN(id_comercio)) {
         query.id_comercio = id_comercio;
+      }
+      if ((id_usuario !== "") & !isNaN(id_usuario)) {
+        query.id_usuario = id_usuario;
       }
       try {
         const res = await fetchData(urls.consultaPagoParticipacion, "GET", query);
@@ -369,6 +384,38 @@ export const useProvidePinesVus = () => {
     []
   );
 
+  const cierreManual = useCallback(
+    async () => {
+      const body = { 
+        pk_id_comercio : roleInfo?.id_comercio,
+        id_usuario : roleInfo?.id_usuario
+      };
+      try {
+        const res = await fetchData(urls.cierreManual, "POST", {}, body);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
+
+  const consultaCierreManual = useCallback(
+    async () => {
+      const body = { 
+        pk_id_comercio : roleInfo?.id_comercio,
+        id_usuario : roleInfo?.id_usuario 
+      };
+      try {
+        const res = await fetchData(urls.consultaEstadoCierre, "POST",{}, body);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    []
+  );
+
   return {
     cancelPinVus,
     crearPinVus,
@@ -387,6 +434,8 @@ export const useProvidePinesVus = () => {
     activarNavigate,
     setActivarNavigate,
     consultaEpsArl,
-    reenvioHash
+    reenvioHash,
+    cierreManual,
+    consultaCierreManual
   };
 };

@@ -26,13 +26,15 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
-// const url = process.env.REACT_APP_URL_COLPENSIONES;
-const url = "http://127.0.0.1:5000";
+const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
+// const url = "http://127.0.0.1:5000";
 const PpsObligatorioDemanda = ({ ced }) => {
   const { quotaInfo, roleInfo, infoTicket } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
+  const [isPropia, setIsPropia] = useState(false);
+
   const [limitesMontos] = useState({
     max: 149100,
     min: 5000,
@@ -44,13 +46,24 @@ const PpsObligatorioDemanda = ({ ced }) => {
     numPlanilla: "",
     valorAportar: "",
   });
+  // useEffect(() => {
+  //   if (roleInfo["tipo_comercio"] === "OFICINAS PROPIAS") {
+  //     setIsPropia(true);
+  //   } else {
+  //     setIsPropia(false);
+  //   }
+  // }, [roleInfo, isPropia]);
 
   const [datosComercio, setDatosComercio] = useState({
     idComercio: roleInfo?.["id_comercio"],
     idusuario: roleInfo?.["id_usuario"],
     iddispositivo: roleInfo["id_dispositivo"],
     oficina_propia:
-      roleInfo?.tipocomercio === "OFICINAS PROPIAS" ? true : false,
+      roleInfo["tipo_comercio"] === "OFICINAS PROPIAS" ||
+      roleInfo["tipo_comercio"] === "KIOSCO"
+        ? true
+        : false,
+
     cupoLogin: quotaInfo?.["quota"],
     tipoComercio: roleInfo?.["tipo_comercio"],
     nombreComercio: roleInfo?.["nombre comercio"],
@@ -65,138 +78,6 @@ const PpsObligatorioDemanda = ({ ced }) => {
     content: () => printDiv.current,
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
-
-  const enviar = (e) => {
-    e.preventDefault();
-    setDisabledBtn(true);
-    setProcesandoTrx(true);
-    if (datosComercio?.["cupoLogin"] >= datosAportante?.["valorAportar"]) {
-      if (
-        datosAportante?.["valorAportar"] >= 5000 &&
-        datosAportante?.["valorAportar"] <= 149000
-      ) {
-        if (datosAportante?.["valorAportar"] % 100 == 0) {
-          fetchData(
-            `${url}/pps_obligatorio_demada_colpensiones`,
-            // `http://127.0.0.1:5000/pps_obligatorio_demada_colpensiones`,
-            "POST",
-            {},
-            {
-              comercio: {
-                id_comercio: datosComercio?.["idComercio"],
-                id_terminal: datosComercio?.["iddispositivo"],
-                id_usuario: datosComercio?.["idusuario"],
-              },
-              oficina_propia: datosComercio?.["oficina_propia"],
-              valor_total_trx: datosAportante?.["valorAportar"],
-              nombre_comercio: datosComercio?.["nombreComercio"],
-              obligatorioDemanda: {
-                Identificacion: datosAportante?.["numDocumento"],
-                PlanillaCode: datosAportante?.["numPlanilla"],
-                trazabilityOperatorCode: datosAportante?.["numPlanilla"],
-                ValueAmount: datosAportante?.["valorAportar"],
-              },
-            },
-            {},
-            true
-          )
-            .then((respuesta) => {
-              // console.log("RESPUESTA:", respuesta);
-              setProcesandoTrx(false);
-              setDatosComercio((old) => {
-                return {
-                  ...old,
-                  idTrx:
-                    respuesta?.obj?.datos_recibidos
-                      ?.trazabilityFinanciialInstitutionCode,
-                };
-              });
-
-              console.log("DATOS RECIBIDOS:", respuesta?.obj?.datos_recibidos);
-              console.log(
-                "idtrx:",
-                respuesta?.obj?.datos_recibidos
-                  ?.trazabilityFinanciialInstitutionCode
-              );
-
-              console.log("MENSJAE", datosComercio?.["idTrx"]);
-              setDisabledBtn(false);
-
-              if (
-                respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "SUCCESS"
-              ) {
-                notify(
-                  "Transaccion Colpensiones PPS obligatorio demanda Exitosa."
-                );
-                setShowModalVoucher(true);
-              }
-
-              //si la respuesta de colpensiones viene vacia entra a este if
-              if (
-                Object.entries(respuesta?.obj?.datos_recibidos).length === 0
-              ) {
-                notifyError(respuesta?.msg);
-              }
-
-              if (
-                respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "FAILED"
-              ) {
-                notifyError(respuesta?.obj?.datos_recibidos?.["messageError"]);
-              }
-
-              // if (respuesta.obj["datos_recibidos"].ResponseCode == "SUCCESS") {
-              //   notify("Pago Exitoso.");
-              //   setShowModalVoucher(true);
-              // }
-              // if (respuesta.obj["datos_recibidos"].ResponseCode == "FAILED") {
-              //   notifyError(respuesta.obj["datos_recibidos"].messageError);
-              // }
-              // if (respuesta?.obj?.ResponseCode == "FAILED") {
-              //   notifyError(respuesta?.obj?.messageError);
-              // }
-              // if (
-              //   respuesta?.msg[0] ==
-              //   "Lo Sentimos, Error pago, la planilla no se puede pagar"
-              // ) {
-              //   notifyError(respuesta?.msg[0]);
-              // }
-              // if (
-              //   respuesta.obj["datos_recibidos"] ==
-              //   "Error pago, la planilla no se puede pagar"
-              // ) {
-              //   notifyError(respuesta.obj["datos_recibidos"]);
-              // }
-
-              /* if (respuesta?.msg?.respuesta_colpensiones) {
-                notifyError(respuesta?.msg?.respuesta_colpensiones);
-                setDisabledBtn(false);
-              }
-              if (respuesta?.msg) {
-                notifyError(respuesta?.msg);
-                setDisabledBtn(false);
-              } */
-            })
-            .catch((err) => {
-              console.log(err);
-              notifyError("Error al pagar planilla obligatoria a demanda");
-              navigate(`/domiciliacion`);
-            });
-        } else {
-          notifyError("El Valor Aportado Debe ser Exacto ej: 5000.");
-          setDisabledBtn(false);
-        }
-      } else {
-        notifyError(
-          "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
-        );
-        setDisabledBtn(false);
-      }
-    } else {
-      notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
-      navigate(`/domiciliacion`);
-    }
-  };
-  useEffect(() => {}, [datosComercio]);
   const tickets = useMemo(() => {
     return {
       title: ["COLPENSIONES Recibo de pago"],
@@ -247,21 +128,168 @@ const PpsObligatorioDemanda = ({ ced }) => {
     datosComercio?.["idTrx"],
     datosComercio?.["tipoComercio"] /* respPinCancel, roleInfo, valor */,
   ]);
+  console.log(roleInfo);
+  const enviar = (e) => {
+    e.preventDefault();
 
-  useEffect(() => {
-    infoTicket(datosComercio?.["idTrx"], 108, tickets)
-      .then((resTicket) => {
-        console.log("RESTICKET:", resTicket);
-      })
-      .catch((err) => {
-        console.error(err);
-        notifyError("Error guardando el ticket");
-      });
-  }, [infoTicket, tickets]);
+    // console.log("*********DATOS COMERCIO", datosComercio);
+    // console.log("*********role-info", roleInfo["tipo_comercio"]);
+    // console.log("*********isPropia", isPropia);
+
+    setDisabledBtn(true);
+    setProcesandoTrx(true);
+    if (datosComercio?.["cupoLogin"] >= datosAportante?.["valorAportar"]) {
+      if (
+        datosAportante?.["valorAportar"] >= 5000 &&
+        datosAportante?.["valorAportar"] <= 149000
+      ) {
+        if (datosAportante?.["valorAportar"] % 100 == 0) {
+          fetchData(
+            `${url}/pps_obligatorio_demada_colpensiones`,
+            // `http://127.0.0.1:5000/pps_obligatorio_demada_colpensiones`,
+            // `http://127.0.0.1:5000//simulacionColpensiones`,
+            "POST",
+            {},
+            {
+              comercio: {
+                id_comercio: datosComercio?.["idComercio"],
+                id_terminal: datosComercio?.["iddispositivo"],
+                id_usuario: datosComercio?.["idusuario"],
+              },
+              ticket: tickets,
+              oficina_propia: datosComercio?.["oficina_propia"],
+              valor_total_trx: datosAportante?.["valorAportar"],
+              nombre_comercio: datosComercio?.["nombreComercio"],
+              obligatorioDemanda: {
+                Identificacion: datosAportante?.["numDocumento"],
+                PlanillaCode: datosAportante?.["numPlanilla"],
+                trazabilityOperatorCode: datosAportante?.["numPlanilla"],
+                ValueAmount: datosAportante?.["valorAportar"],
+              },
+            },
+            {},
+            true
+          )
+            .then((respuesta) => {
+              console.log(
+                "RESPUESTA:",
+                respuesta?.obj?.datos_recibidos
+                  ?.trazabilityFinancialInstitutionCode
+              );
+              console.log("RESPUESTA", respuesta);
+              setProcesandoTrx(false);
+              setDatosComercio((old) => {
+                return {
+                  ...old,
+                  idTrx:
+                    respuesta?.obj?.datos_recibidos
+                      ?.trazabilityFinancialInstitutionCode,
+                };
+              });
+              console.log("++++++idtrx", datosComercio?.idTrx);
+              // console.log("DATOS RECIBIDOS:", respuesta?.obj?.datos_recibidos);
+              // console.log(
+              //   "idtrx:",
+              //   respuesta?.obj?.datos_recibidos
+              //     ?.trazabilityFinanciialInstitutionCode
+              // );
+
+              // console.log("MENSJAE", datosComercio?.["idTrx"]);
+              setDisabledBtn(false);
+
+              if (
+                respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "SUCCESS"
+              ) {
+                notify(
+                  "Transaccion Colpensiones PPS obligatorio demanda Exitosa."
+                );
+                setShowModalVoucher(true);
+              }
+
+              //si la respuesta de colpensiones viene vacia entra a este if
+              if (
+                Object.entries(respuesta?.obj?.datos_recibidos).length === 0
+              ) {
+                notifyError(respuesta?.msg);
+              }
+
+              if (
+                respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "FAILED"
+              ) {
+                notifyError(respuesta?.obj?.datos_recibidos?.["messageError"]);
+                navigate(`/colpensiones`);
+              }
+
+              // if (respuesta.obj["datos_recibidos"].ResponseCode == "SUCCESS") {
+              //   notify("Pago Exitoso.");
+              //   setShowModalVoucher(true);
+              // }
+              // if (respuesta.obj["datos_recibidos"].ResponseCode == "FAILED") {
+              //   notifyError(respuesta.obj["datos_recibidos"].messageError);
+              // }
+              // if (respuesta?.obj?.ResponseCode == "FAILED") {
+              //   notifyError(respuesta?.obj?.messageError);
+              // }
+              // if (
+              //   respuesta?.msg[0] ==
+              //   "Lo Sentimos, Error pago, la planilla no se puede pagar"
+              // ) {
+              //   notifyError(respuesta?.msg[0]);
+              // }
+              // if (
+              //   respuesta.obj["datos_recibidos"] ==
+              //   "Error pago, la planilla no se puede pagar"
+              // ) {
+              //   notifyError(respuesta.obj["datos_recibidos"]);
+              // }
+
+              /* if (respuesta?.msg?.respuesta_colpensiones) {
+                notifyError(respuesta?.msg?.respuesta_colpensiones);
+                setDisabledBtn(false);
+              }
+              if (respuesta?.msg) {
+                notifyError(respuesta?.msg);
+                setDisabledBtn(false);
+              } */
+            })
+            .catch((err) => {
+              // console.log(err);
+              notifyError("Error al pagar planilla obligatoria a demanda");
+              navigate(`/colpensiones`);
+            });
+        } else {
+          notifyError("El Valor Aportado Debe ser Exacto ej: 5000.");
+          setProcesandoTrx(false);
+          setDisabledBtn(false);
+        }
+      } else {
+        notifyError(
+          "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
+        );
+        setProcesandoTrx(false);
+        setDisabledBtn(false);
+      }
+    } else {
+      notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
+      navigate(`/colpensiones`);
+    }
+  };
+  useEffect(() => {}, [datosComercio, isPropia]);
+
+  // useEffect(() => {
+  //   infoTicket(datosComercio?.["idTrx"], 108, tickets)
+  //     .then((resTicket) => {
+  //       // console.log("RESTICKET:", resTicket);
+  //     })
+  //     .catch((err) => {
+  //       // console.error(err);
+  //       notifyError("Error guardando el ticket");
+  //     });
+  // }, [infoTicket, tickets]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    navigate(`/domiciliacion`);
+    navigate(`/colpensiones`);
   }, []);
 
   return (

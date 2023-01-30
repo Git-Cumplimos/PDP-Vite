@@ -15,6 +15,7 @@ import { toPhoneNumber } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
 import InfInicial from "../../components/PagoTerceros-PagoSubsidio/InfInicial";
 import InfRecibo from "../../components/PagoTerceros-PagoSubsidio/InfRecibo";
+import { pinBlock } from "../../utils/pinBlock";
 import {
   fetchCustomPost,
   ErrorCustom,
@@ -53,13 +54,15 @@ const PagoTerceros = () => {
       valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
     }
     if (e.target.name === "numeroCelular") {
-      const valueInputCel = ((e.target.value ?? "").match(/\d/g) ?? []).join(
-        ""
-      );
+      let valueInputCel = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+
       if (valueInputCel[0] != 3) {
-        notifyError(
-          "Número inválido, el No. de celular debe comenzar con el número 3"
-        );
+        if (valueInputCel != "") {
+          notifyError(
+            "Número inválido, el No. de celular debe comenzar con el número 3"
+          );
+          valueInput = "";
+        }
       } else {
         valueInput = valueInputCel;
       }
@@ -108,7 +111,10 @@ const PagoTerceros = () => {
 
   function PagoTerceros() {
     let oficinaPropia_ = false;
-    if (roleInfo.tipo_comercio === "OFICINASPROPIAS") {
+    if (
+      roleInfo.tipo_comercio === "OFICINAS PROPIAS" ||
+      roleInfo.tipo_comercio === "KIOSCO"
+    ) {
       oficinaPropia_ = true;
     }
     const dataTerceros = {
@@ -122,7 +128,10 @@ const PagoTerceros = () => {
       valor_total_trx: inputData.valor_total_trx,
       numeroCelular: inputData.numeroCelular,
       documento: inputData.documento,
-      otp: inputData.otp,
+      otp: pinBlock(
+        inputData.otp,
+        process.env.REACT_APP_PAN_AVAL_PAGO_TERCEROS
+      ),
       location: {
         address: roleInfo.direccion,
         city: roleInfo.ciudad,
@@ -130,6 +139,7 @@ const PagoTerceros = () => {
       },
     };
 
+    // peticion al backend
     PeticionPagoTerceros(
       url_pago_terceros,
       "/grupo-aval/pago-terceros",

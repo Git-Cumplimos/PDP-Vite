@@ -63,6 +63,9 @@ const AdminLayout = () => {
   const closeCash = useCallback(() => {
     navigate(`/gestion/arqueo/arqueo-cierre/reporte`);
   }, [navigate]);
+  const navigateCommission = useCallback(() => {
+    navigate(`/billetera-comisiones`);
+  }, [navigate]);
 
   const {
     svgs: { backIcon2 },
@@ -144,18 +147,14 @@ const AdminLayout = () => {
             <div className={saldoCupo}>
               Saldo cupo {saldoDisponible || "$0.00"}
             </div>
-            <div className={comision}>Comisión {comisionTotal || "$0.00"}</div>
-            <button className={cargar} onClick={() => setShowModal(true)}>
-              Carga tu billetera
-            </button>
+          </div>
+          <div className={usrData}>
+            <div className={comision} onClick={navigateCommission}>
+              Comisiones {comisionTotal || "$0.00"}
+            </div>
           </div>
         </div>
         <HNavbar links={urls} isText />
-        <Modal show={showModal} handleClose={() => setShowModal(false)}>
-          <div>
-            <h1>Carga tu billetera</h1>
-          </div>
-        </Modal>
       </header>
       <main className='container'>
         <Suspense fallback={<ContentBox />}>{!infoCaja && <Outlet />}</Suspense>

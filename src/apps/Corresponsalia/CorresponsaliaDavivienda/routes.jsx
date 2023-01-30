@@ -1,6 +1,5 @@
 import { lazy } from "react";
 import { enumPermisosDavivienda } from "./enumPermisosDavivienda";
-
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../../components/Base/AppIcons"));
 
@@ -31,6 +30,11 @@ const RecaudoServiciosPublicosPrivados = lazy(() =>
 );
 const RecaudoServiciosPublicosPrivadosMenu = lazy(() =>
   import("./Views/RecaudoServiciosPublicosPrivadosMenu")
+);
+const RecaudoServiciosPublicosPrivadosOperaciones = lazy(() =>
+  import(
+    "./Views/RecaudoServiciosPublicosPrivados/RecaudoServiciosPublicosPrivadosOperaciones"
+  )
 );
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = lazy(() =>
@@ -125,7 +129,10 @@ const rutasDaviviendaCB = {
         />
       ),
       component: PagoDeProductosPropios,
-      permission: [enumPermisosDavivienda.davivienda_cb_pago_productos_propios],
+      permission: [
+        enumPermisosDavivienda.davivienda_cb_pago_productos_propios,
+        enumPermisosDavivienda.davivienda_cb_recaudo_operaciones,
+      ],
     },
     {
       link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados",
@@ -145,6 +152,19 @@ const rutasDaviviendaCB = {
           permission: [enumPermisosDavivienda.davivienda_cb_recaudo],
         },
         {
+          link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccionOperaciones",
+          label: (
+            <AppIcons
+              Logo={"RecaudoManual"}
+              name='Recaudo manual operaciones'
+            />
+          ),
+          component: SeleccionServicioPagar,
+          permission: [
+            enumPermisosDavivienda.davivienda_cb_recaudo_operaciones,
+          ],
+        },
+        {
           link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/codbarras",
           label: (
             <AppIcons
@@ -160,6 +180,15 @@ const rutasDaviviendaCB = {
           label: <AppIcons Logo={"RecaudoManual"} name='Recaudo manual' />,
           component: RecaudoServiciosPublicosPrivados,
           permission: [enumPermisosDavivienda.davivienda_cb_recaudo],
+          show: false,
+        },
+        {
+          link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manualOperaciones",
+          label: <AppIcons Logo={"RecaudoManual"} name='Recaudo manual' />,
+          component: RecaudoServiciosPublicosPrivadosOperaciones,
+          permission: [
+            enumPermisosDavivienda.davivienda_cb_recaudo_operaciones,
+          ],
           show: false,
         },
       ],

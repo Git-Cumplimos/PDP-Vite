@@ -17,8 +17,8 @@ import {
   msgCustomBackend,
 } from "../utils/fetchPaquetesMovistar";
 
-const url_carga_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/carga-paquetes/cargar-archivo`;
-const url_prescrita_archivo = `${process.env.REACT_APP_URL_MOVISTAR}/movistar/carga-paquetes/url-post-archivo`;
+const url_carga_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-carga-paquetes/cargar-archivo-paquetes`;
+const url_prescrita_archivo = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-carga-paquetes/url-post-archivo-paquetes`;
 
 const CargaPaquetesMovistar = () => {
   const [showModal, setShowModal] = useState(false);
@@ -26,7 +26,7 @@ const CargaPaquetesMovistar = () => {
   const [file, setFile] = useState(null);
   const [nameFile, setNameFile] = useState("");
   const [errorUser, setErrorUser] = useState("");
-  const [flagValidateFile, setFlagValidateFile] = useState(false);
+  const [, setFlagValidateFile] = useState(false);
   const validNavigate = useNavigate();
   const [loadingValidarArchivoPaquete, PeticionValidarArchivoPaquete] =
     useFetch(fetchCustom);

@@ -1,11 +1,4 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../../components/Base/Button";
@@ -17,15 +10,15 @@ import MoneyInput, {
   formatMoney,
 } from "../../../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
-import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { notify, notifyError } from "../../../../../utils/notify";
+import { checkLuhn } from "../../../../../utils/validationUtils";
+import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario";
+import { enumParametrosBancoAgrario } from "../../utils/enumParametrosBancoAgrario";
 import {
-  postConsultaConveniosAval,
   postConsultaTablaConveniosEspecifico,
-  postRecaudoConveniosAval,
-  postRecaudoConveniosDavivienda,
+  postRecaudoConveniosAgrario,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const RecaudoServiciosPublicosPrivadosAgrario = () => {
@@ -42,8 +35,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     ref2: "",
     ref3: "",
     valor: "",
-    valorConst: "",
-    valorVar: "",
   });
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de Pago",
@@ -70,9 +61,8 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     commerceName: "Recaudo de facturas",
     trxInfo: [],
     disclamer:
-      "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación, verifique la información. Este es el unico recibo oficial de pago. Requerimientos 018000 514652.",
+      "En caso de reclamo o inquietud favor comunicarse en Bogota al Tel 594-8500 o gratis en el resto del pais al 01800-915000 o la pagina web http://www.bancoagrario.gov.co",
   });
-  const [datosConsulta, setDatosConsulta] = useState({});
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
   useEffect(() => {
@@ -102,18 +92,24 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     e.preventDefault();
     //Valdicacion de luhm
     if (convenio?.algoritmo_ref1?.match(/(Q 108)/g)) {
+      if (!checkLuhn(datosTrans?.ref1))
+        return notifyError("Validación de la referencia 1 erronea");
     }
     if (convenio?.algoritmo_ref2?.match(/(Q 108)/g)) {
+      if (!checkLuhn(datosTrans?.ref1))
+        return notifyError("Validación de la referencia 2 erronea");
     }
-    if (convenio?.algoritmo_ref2?.match(/(Q 108)/g)) {
+    if (convenio?.algoritmo_ref3?.match(/(Q 108)/g)) {
+      if (!checkLuhn(datosTrans?.ref1))
+        return notifyError("Validación de la referencia 3 erronea");
     }
 
-    setIsUploading(true);
-    // setShowModal((old) => ({ ...old, showModal: true }));
+    // setIsUploading(true);
+    setShowModal((old) => ({ ...old, showModal: true }));
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();
-    let valorTransaccion = parseInt(datosTrans?.valorVar) ?? 0;
+    let valorTransaccion = parseInt(datosTrans?.valor) ?? 0;
     const fecha = Intl.DateTimeFormat("es-CO", {
       year: "numeric",
       month: "2-digit",
@@ -128,19 +124,41 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push(["Convenio", convenio.convenio]);
+    objTicket["trxInfo"].push(["Convenio", convenio.nombre_convenio]);
     objTicket["trxInfo"].push(["", ""]);
     // objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
     // objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Referencia de pago", datosTrans?.ref1 ?? ""]);
+    objTicket["trxInfo"].push(["Referencia de pago 1", datosTrans?.ref1 ?? ""]);
     objTicket["trxInfo"].push(["", ""]);
+    let objRecaudo = {
+      nombreConvenio: convenio?.nombre_convenio,
+      codigoConvenio: convenio?.codigo,
+      referencia1: datosTrans?.ref1,
+    };
+    if (convenio?.nombre_ref2 !== "" && !convenio?.nombre_ref2?.match(/-/g)) {
+      objTicket["trxInfo"].push([
+        "Referencia de pago 2",
+        datosTrans?.ref2 ?? "",
+      ]);
+      objTicket["trxInfo"].push(["", ""]);
+      objRecaudo["referencia2"] = datosTrans?.ref2;
+    }
+    if (convenio?.nombre_ref3 !== "" && !convenio?.nombre_ref3?.match(/-/g)) {
+      objTicket["trxInfo"].push([
+        "Referencia de pago 3",
+        datosTrans?.ref3 ?? "",
+      ]);
+      objTicket["trxInfo"].push(["", ""]);
+      objRecaudo["referencia3"] = datosTrans?.ref3;
+    }
     objTicket["trxInfo"].push([
       "Valor",
       formatMoney.format(valorTransaccion ?? "0"),
     ]);
     objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
-    postRecaudoConveniosAval({
+
+    postRecaudoConveniosAgrario({
       oficina_propia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
         roleInfo?.tipo_comercio === "KIOSCO"
@@ -154,12 +172,8 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
       },
-      recaudoAval: {
-        pila: datosConsulta?.["pila"] ?? "",
-        54: datosConsulta?.tipoRecaudo?.["54"] ?? "",
-        62: datosConsulta?.tipoRecaudo?.["62"] ?? "",
-        103: datosConsulta?.tipoRecaudo?.["103"] ?? "",
-        104: datosConsulta?.tipoRecaudo?.["104"] ?? "",
+      recaudoAgrario: {
+        ...objRecaudo,
         location: {
           address: roleInfo?.["direccion"],
           dane_code: roleInfo?.codigo_dane,
@@ -179,7 +193,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
           objTicket["commerceInfo"].push(["", ""]);
 
           setObjTicketActual(objTicket);
-          setShowModal((old) => ({ ...old, estadoPeticion: 4 }));
+          setShowModal((old) => ({ ...old, estadoPeticion: 1 }));
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
@@ -231,7 +245,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         trxInfo: [],
       };
     });
-    setDatosConsulta({});
   }, []);
   const onChangeFormat = useCallback(
     (ev) => {
@@ -273,7 +286,10 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 20000000],
+    limits: [
+      enumParametrosBancoAgrario.minRecaudo,
+      enumParametrosBancoAgrario.maxRecaudo,
+    ],
     decimalDigits: 2,
   });
   return (
@@ -367,12 +383,23 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               <h1 className='text-2xl text-center mb-5 font-semibold'>
                 ¿Está seguro de realizar el recaudo?
               </h1>
-              <h2>{`Nombre convenio: ${convenio?.convenio}`}</h2>
-              <h2>{`Número convenio: ${convenio?.nura}`}</h2>
-              <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
+              <h2>{`Nombre convenio: ${convenio?.nombre_convenio}`}</h2>
+              <h2>{`Número convenio: ${convenio?.codigo}`}</h2>
+              {convenio?.nombre_ref1 !== "" &&
+                !convenio?.nombre_ref1?.match(/-/g) && (
+                  <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
+                )}
+              {convenio?.nombre_ref2 !== "" &&
+                !convenio?.nombre_ref2?.match(/-/g) && (
+                  <h2>{`Referencia 2: ${datosTrans.ref2}`}</h2>
+                )}
+              {convenio?.nombre_ref3 !== "" &&
+                !convenio?.nombre_ref3?.match(/-/g) && (
+                  <h2>{`Referencia 3: ${datosTrans.ref3}`}</h2>
+                )}
               <h2 className='text-base'>
                 {`Valor a pagar: ${formatMoney.format(
-                  datosTrans.valorConst ?? "0"
+                  datosTrans.valor ?? "0"
                 )} `}
               </h2>
               <>
@@ -384,7 +411,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                 </ButtonBar>
               </>
             </>
-          ) : estadoPeticion === 4 ? (
+          ) : estadoPeticion === 1 ? (
             <>
               <h2>
                 <ButtonBar>
@@ -399,7 +426,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                   </Button>
                 </ButtonBar>
               </h2>
-              <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
+              <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
             </>
           ) : (
             <></>

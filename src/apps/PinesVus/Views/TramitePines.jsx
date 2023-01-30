@@ -21,7 +21,7 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
 
 const TramitePines = () => {
   const navigate = useNavigate();
-  const { consultaPinesVus, reenvioHash, activarNavigate, setActivarNavigate } =
+  const { consultaPinesVus, reenvioHash, activarNavigate, setActivarNavigate, consultaCierreManual } =
     usePinesVus();
 
   const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -50,7 +50,23 @@ const TramitePines = () => {
   const [id_pin, setId_pin] = useState("")
   const [showModalReenvio, setShowModalReenvio] = useState(false)
   const [doc_cliente, setDoc_cliente] = useState("")
+  const [cierreManual, setCierreManual] = useState(false)
+  const [infoComercioCreacion, setInfoComercioCreacion] = useState("")
+  const [msgRespReenvio, setMsgRespReenvio] = useState("")
+  const [urlAutogestion, setUrlAutogestion] = useState("")
 
+  useEffect(() => {
+    ///////////////
+    consultaCierreManual()
+    .then((res) => {
+      if (!res?.status) {
+        setCierreManual(false)
+      } else {
+        setCierreManual(true)
+      }
+    })
+    .catch(() => console.log("Falla en consulta estado cierre manual"));
+  }, []);
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
@@ -65,6 +81,13 @@ const TramitePines = () => {
     }
   }, [activarNavigate, navigate]);
 
+  const closeModalReenvio = useCallback(async () => {
+    setShowModalReenvio(false);
+    setDoc_cliente("")
+    setUrlAutogestion("")
+    
+  }, []);
+
   //////////////////////
   const onSubmitReenvio = (e) => {
     e.preventDefault();
@@ -74,8 +97,8 @@ const TramitePines = () => {
           notifyError(res?.msg);
         } else {
           notify(res?.msg)
-          setDoc_cliente("")
-          setShowModalReenvio(false)
+          setMsgRespReenvio(res?.msg);
+          setUrlAutogestion(res?.obj?.url_autogestion)
         }
       })
       .catch((err) => console.log("error", err));
@@ -104,10 +127,19 @@ const TramitePines = () => {
             res?.obj?.results?.map((row) => {
               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
+              const fecha_nacimiento = new Date(row?.fecha_nacimiento);
+              fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
               setFormatMon(row?.ValorPagar);
               return {
                 // Id: row?.id_pin,
-                Cedula: row?.doc_cliente,
+                Documento: row?.doc_cliente,
+                "Tipo Documento": row?.tipo_documento_descripcion,
+                Nombre: row?.nombre,
+                Apellidos: row?.apellidos,
+                "Fecha Nacimiento":  dateFormatter.format(fecha_nacimiento),
+                Celular: row?.celular, 
+                Email: row?.email,
+                Dirección: row?.direccion,
                 Estado: row?.name_estado_pin,
                 // "Codigo Estado": row?.estado_pin,
                 Vencimiento: dateFormatter.format(fecha_vencimiento),
@@ -123,6 +155,7 @@ const TramitePines = () => {
           setValor_tramite(res?.obj?.results?.[0]?.valor_tramite);
           setName_tramite(res?.obj?.results?.[0]?.name_tramite);
           setId_pin(res?.obj?.results?.[0]?.id_pin)
+          setInfoComercioCreacion(res?.obj?.results?.[0]?.datos_comercio_creacion)
         }
       })
       .catch((err) => console.log("error", err));
@@ -131,6 +164,47 @@ const TramitePines = () => {
   const onSubmitUsar = (e) => {
     setModalUsar(true);
   };
+
+  const hora = useMemo(() => {    
+    return Intl.DateTimeFormat("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).format(new Date())
+  }, [parametroBusqueda]);
+
+  const horaCierre = useMemo(() => { 
+    const dia = (new Date()).getDay()  
+    if (dia === enumParametrosPines.diaFinSemana) {
+      return enumParametrosPines.horaCierreFinSemana.split(":")
+    }
+    else{
+      return enumParametrosPines.horaCierre.split(":")
+    }
+     
+  }, [hora]);
+
+  useEffect(() => {
+    
+    const horaActual = hora.split(":")
+    const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
+    const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
+    if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
+      notifyError("Módulo cerrado a partir de las " + horaCierre[0] + ":" + horaCierre[1])
+      navigate("/Pines/PinesVus",{replace:true});
+    }
+    else if (cierreManual){
+      notifyError("Módulo cerrado de manera manual")
+      navigate("/Pines/PinesVus",{replace:true});
+    }
+    else if ((deltaHora ===1 & deltaMinutos<-50)){
+      notifyError("El módulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
+    }
+    else if ((deltaHora ===0 & deltaMinutos<10)){
+      notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
+    }
+
+  }, [parametroBusqueda, hora, horaCierre, navigate, cierreManual])
 
   return (
     <>
@@ -182,7 +256,14 @@ const TramitePines = () => {
             title="Información Pin"
             maxPage={maxPages}
             headers={[
-              "Cédula",
+              "Documento",
+              "Tipo Documento",
+              "Nombre",
+              "Apellidos",
+              "Fecha Nacimiento",
+              "Celular", 
+              "Email",
+              "Dirección",
               "Estado",
               "Vencimiento",
               "Trámite",
@@ -194,6 +275,7 @@ const TramitePines = () => {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
+
                 setShowModal(true);
                 setActivarNavigate(false);
               }
@@ -289,6 +371,7 @@ const TramitePines = () => {
             id_pin = {id_pin}
             trx={id_trx}
             tipoPin={tipoPin}
+            infoComercioCreacion={infoComercioCreacion}
             setActivarNavigate={setActivarNavigate}
             closeModal={closeModal}
           ></CancelPin>
@@ -296,10 +379,12 @@ const TramitePines = () => {
           ""
         )}
       </Modal>
-      <Modal show={showModalReenvio} handleClose={() => {setShowModalReenvio(false); setDoc_cliente("")}}>
+      <Modal show={showModalReenvio} handleClose={() => {closeModalReenvio()}}>
+      {urlAutogestion === '' ?
+      <>
         <div className="flex flex-col w-1/2 mx-auto ">
-          <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
-          <br></br>
+        <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
+        <br></br>
         </div>  
         <div className="flex flex-col justify-center items-center mx-auto container">          
           <Form onSubmit={onSubmitReenvio} grid>
@@ -332,7 +417,31 @@ const TramitePines = () => {
               </Button>
             </ButtonBar>
           </Form>
-        </div>       
+        </div>    
+        </>         
+        :
+        <div className="flex flex-col w-1/2 mx-auto ">
+        <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
+        <br></br>
+        <h1 className="text-1xl mt-3 mx-auto">{msgRespReenvio}</h1>
+        <h1 className="text-1xl mt-3 mx-auto font-semibold">Formulario autogestión: 
+          <a 
+          href={urlAutogestion} 
+          target="blank"
+          className="text-1xl mt-3 mx-auto text-sky-400"
+          > click aquí</a></h1>
+        <Button 
+          type="button"
+          onClick = {() => {
+            closeModalReenvio()
+          }
+          }
+          >
+          Cerrar
+        </Button>
+        </div>
+        }
+
       </Modal>
     </>
     ) : (

@@ -135,6 +135,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           }));
         } else {
           setIsUploading(false);
+          handleClose();
           notifyError(res?.msg);
         }
       })
@@ -227,14 +228,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   };
   const handleClose = useCallback(() => {
     setShowModal((old) => ({ ShowModal: false, estadoPeticion: 0 }));
-    setDatosTrans((old) => ({
-      ...old,
+    setDatosTrans({
       ref1: "",
       ref2: "",
       valor: "",
       valorConst: "",
       valorVar: "",
-    }));
+    });
     setObjTicketActual((old) => {
       return {
         ...old,
@@ -270,7 +270,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       };
     });
     setDatosConsulta({});
-  }, []);
+  }, [roleInfo]);
   const onChangeMoneyLocal = (ev, valor) => {
     if (!isNaN(valor)) {
       const num = valor;
@@ -386,14 +386,26 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
                     required
                   /> */}
                   <ButtonBar>
-                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button
+                      onClick={() => {
+                        notifyError("Transacción cancelada por el usuario");
+                        handleClose();
+                      }}>
+                      Cancelar
+                    </Button>
                     <Button type='submit'>Realizar pago</Button>
                   </ButtonBar>
                 </Form>
               ) : (
                 <>
                   <ButtonBar>
-                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button
+                      onClick={() => {
+                        notifyError("Transacción cancelada por el usuario");
+                        handleClose();
+                      }}>
+                      Cancelar
+                    </Button>
                     <Button
                       type='submit'
                       onClick={(e) => {
@@ -421,7 +433,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               </h2>
               <>
                 <ButtonBar>
-                  <Button onClick={handleClose}>Cancelar</Button>
+                  <Button
+                    onClick={() => {
+                      notifyError("Transacción cancelada por el usuario");
+                      handleClose();
+                    }}>
+                    Cancelar
+                  </Button>
                   <Button type='submit' onClick={onSubmitValidacion}>
                     Realizar pago
                   </Button>

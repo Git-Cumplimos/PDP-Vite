@@ -92,10 +92,11 @@ const svgs = {
 };
 
 const banners = {
-  SOI: `${urlAssets}/assets/img/SOI-BANNERPAGINA.jpg`,
-  FUNDACION_DE_LA_MUJER: `${urlAssets}/assets/img/FUNDACIONBANNERPAG.jpg`,
-  COLPENSIONES: `${urlAssets}/assets/img/COLPENSIONES-BANNER.jpg`,
-  SERVICIOS: `${urlAssets}/assets/img/BANNER SERVICIOS.jpg`,
+  // SOI: `${urlAssets}/assets/img/SOI-BANNERPAGINA.jpg`,
+  // FUNDACION_DE_LA_MUJER: `${urlAssets}/assets/img/FUNDACIONBANNERPAG.jpg`,
+  // COLPENSIONES: `${urlAssets}/assets/img/COLPENSIONES-BANNER.jpg`,
+  // SERVICIOS: `${urlAssets}/assets/img/BANNER SERVICIOS.jpg`,
+  Corresponsal: `${urlAssets}/assets/svg/CORRESPONSAL_example.svg`,
 }
 
 export { images, svgs, banners };

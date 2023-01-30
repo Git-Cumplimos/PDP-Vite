@@ -106,8 +106,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           let dateStatus = false;
           if (
             datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 &&
-            datosEnvio?.datosConvenio[0]?.val_fecha_lim_cnb === "1"
+            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0
           ) {
             const dateVenc = new Date(
               datosEnvio?.datosCodigoBarras?.fechaCaducidad[0]
@@ -151,7 +150,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   }, []);
   const onSubmit = (e) => {
     e.preventDefault();
-    if (datosTrans?.codBarras.slice(0, 3) === "]C1") {
+    if (datosTrans?.codBarras.includes("415")) {
       setIsUploading(true);
       fetchTablaConveniosEspecificoFunc(datosTrans?.codBarras);
     } else {
@@ -300,11 +299,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           setIsUploading(false);
           notifyError(res?.msg);
           hideModal();
+          navigate(-1);
         }
       })
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        navigate(-1);
         console.error(err);
       });
   };
@@ -384,11 +385,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           setIsUploading(false);
           notifyError(res?.msg);
           hideModal();
+          navigate(-1);
         }
       })
       .catch((err) => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
+        navigate(-1);
         console.error(err);
       });
   };
@@ -598,7 +601,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                     </Form>
                   )}
                   <ButtonBar>
-                    <Button onClick={hideModalReset}>Cancelar</Button>
+                    <Button
+                      onClick={() => {
+                        notifyError("Transacción cancelada por el usuario");
+                        hideModalReset();
+                      }}>
+                      Cancelar
+                    </Button>
                     <Button type='submit' onClick={onSubmitPago}>
                       Realizar pago
                     </Button>

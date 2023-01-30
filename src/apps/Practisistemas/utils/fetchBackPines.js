@@ -90,3 +90,46 @@ export const postRevisarTransaccion = async (bodyObj) => {
     throw err;
   }
 };
+
+export const fetchConsultaPinEPM = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlPines}/consultaPinEPM`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+export const fetchConsultaPinSNR = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlPines}/consultaPinSNR`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};

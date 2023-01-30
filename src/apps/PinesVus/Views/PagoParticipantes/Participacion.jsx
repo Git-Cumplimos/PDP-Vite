@@ -89,18 +89,18 @@ const Participacion = () => {
     setFile("")
     setFileName("")
   }, []);
-
   const onSubmit = (e) => { 
     e.preventDefault();
     setDisabledBtns(true)
     // const f = new Date()
     registroPagoParticipacion(
-      selected.aliado, 
+      selected.aliado,
+      selected.id,
       //banco, 
       //numCuenta, 
       //numAprobacion, 
       //numTransaccion,
-      selected.valor,
+      selected.total_pago,
       fecha_ini,
       // `vouchersPagoParticipacion/voucherPago_${selected.aliado}_${f.getDate()}${
       //   f.getMonth() + 1
@@ -200,28 +200,32 @@ const Participacion = () => {
           headers={[
             "Aliado",
             "Valor",
+            "Devolución",
+            "# Devoluciones",
+            "Total",
             "Pagado"
           ]}
           data={table.map((row) => {
             return {
               Aliado: row?.aliado,
               Valor: formatMoney.format(row?.valor),
+              Devolución: formatMoney.format(row?.devolucion),
+              "# Devoluciones": (row?.pines_cancelados),
+              Total: formatMoney.format(row?.total_pago),
               Pagado: row?.pagado ? "Si": "No",
               
             };
           }) || []}
           onSelectRow={(e, index) => {            
               setSelected(table[index]);
-              if (!pagoParticipacion){
-                notifyError("Debe esperar la hora de cierre para hacer el pago de participación")
-              }else{
+              
               if (table[index].pagado === false){
                 setShowModal(true)
               }
               else{
                 notifyError("El pago a " + table[index].aliado + " ya se realizo")
               }  
-            }          
+                 
           }}
         >
           <Input
@@ -267,7 +271,7 @@ const Participacion = () => {
                 label="Valor pago"
                 type="text"
                 autoComplete="off"
-                value={formatMoney.format(selected.valor)}
+                value={formatMoney.format(selected.total_pago)}
                 required
                 />
                 {/* <Input

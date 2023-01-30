@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Input from "../../../../../components/Base/Input";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import { notify, notifyError } from "../../../../../utils/notify";
@@ -7,8 +7,8 @@ import { postConsultaTablaConveniosPaginado } from "../../utils/fetchRecaudoServ
 
 const SeleccionServicioPagar = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   // const [{ searchConvenio = "" }, setQuery] = useQuery();
-
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
@@ -42,16 +42,30 @@ const SeleccionServicioPagar = () => {
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      navigate(
-        "../corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
-        {
-          state: {
-            id: convenios[i]["pk_tbl_transaccional_convenios_davivienda_cb"],
-          },
-        }
-      );
+      if (
+        pathname ===
+        "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccionOperaciones"
+      ) {
+        navigate(
+          "../corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manualOperaciones",
+          {
+            state: {
+              id: convenios[i]["pk_tbl_transaccional_convenios_davivienda_cb"],
+            },
+          }
+        );
+      } else {
+        navigate(
+          "../corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
+          {
+            state: {
+              id: convenios[i]["pk_tbl_transaccional_convenios_davivienda_cb"],
+            },
+          }
+        );
+      }
     },
-    [navigate, convenios]
+    [navigate, convenios, pathname]
   );
 
   useEffect(() => {

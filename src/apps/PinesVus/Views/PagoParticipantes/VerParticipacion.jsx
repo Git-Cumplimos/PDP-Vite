@@ -36,6 +36,9 @@ const Participacion = () => {
   const [fechaFinal, setFechaFinal] = useState("");
   const [showModal, setShowModal] = useState(false)
   const [urlVoucher, setUrlVoucher] = useState("")
+  const [comercio, setComercio] = useState("")
+  const [usuario, setUsuario] = useState("")
+
 
   const closeModal = useCallback(() => {
     setShowModal(false);
@@ -43,12 +46,22 @@ const Participacion = () => {
     setSelected("")
   }, []);
 
-
-  const transacciones = useCallback(() => {
+  console.log('ciudad' in roleInfo)
+  const transacciones = useCallback( async(comercio,usuario) => {
     if (
       (fechaInicial !== "") & (fechaFinal !== "")){
+      let idComercio = ''
+      let idUsuario = ''
+      if('id_comercio' in roleInfo){
+        idComercio = roleInfo.id_comercio
+        idUsuario = roleInfo.id_usuario
+      }else{
+        idComercio = comercio
+        idUsuario = usuario
+      }
       consultaPagoParticipacion(
-        roleInfo.id_comercio,
+        idComercio,
+        idUsuario,
         fechaInicial,
         fechaFinal,
         pageData
@@ -64,15 +77,16 @@ const Participacion = () => {
               fecha_participacion.setHours(fecha_participacion.getHours() + 5);
               setFormatMon(row?.ValorPagar);
               return {
-                Participante: row?.participante,
+                Comercio: row?.id_comercio,
+                Usuario: row?.id_usuario,
                 // Banco: row?.banco,
                 // "No cuenta": row?.num_cuenta,
                 // "No transaccion": row?.num_transaccion,
                 // "No aprobacion": row?.num_aprobacion,
-                "Fecha participación": dateFormatter.format(fecha_participacion),
-                "Fecha pago": dateFormatter.format(fecha_registro),
-                "Comercio": row?.id_comercio,
                 Valor: formatMoney.format(row?.valor),
+                Devolución: formatMoney.format(row?.val_devolucion_cancelacion),
+                "Fecha participación": dateFormatter.format(fecha_participacion),
+                "Fecha pago": row?.fecha_registro !== null ? dateFormatter.format(fecha_registro) : "",               
                 // "voucher": row?.voucher
               };
             }));            
@@ -110,11 +124,13 @@ const Participacion = () => {
           title="Pagos participacion"
           maxPage={maxPages}
           headers={[
-            "Participante",
+            "Comercio",
+            "Usuario",
+            "Valor",
+            "Devolución",
             "Fecha participación",
             "Fecha pago",
-            "Comercio",
-            "Valor",
+            
           ]}
           data={table || []}
           onSelectRow={(e, index) => {
@@ -138,6 +154,42 @@ const Participacion = () => {
             value={fechaFinal}
             onInput={(e) => setFechaFinal(e.target.value)}
           />
+          {!('id_comercio' in roleInfo) ? (
+          <>
+            <Input
+              id="id_comercio"
+              label="Id comercio"
+              type="numeric"
+              value={comercio}
+              onChange={(e) => {
+                setComercio(e.target.value);
+              }}
+              onLazyInput={{
+                callback: (e) => {
+                  transacciones(e.target.value,usuario)
+                },
+                timeOut: 500,
+              }}
+            />
+            <Input
+              id="id_usuario"
+              label="Id usuario"
+              type="numeric"
+              value={usuario}
+              onChange={(e) => {
+                setUsuario(e.target.value);
+              }}
+              onLazyInput={{
+                callback: (e) => {
+                  transacciones(comercio,e.target.value)
+                },
+                timeOut: 500,
+              }}
+            />
+          </>
+        ) : (
+          ""
+        )}
         </TableEnterprise>
         <Modal show={showModal} handleClose={() => closeModal()}>
           <img src={urlVoucher} alt="Imagen no encontrada"/>

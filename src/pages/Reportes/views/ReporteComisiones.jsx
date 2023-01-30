@@ -1,128 +1,42 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
-import { fetchAutorizadores } from "../../../apps/TrxParams/utils/fetchRevalAutorizadores";
-import { fetchConveniosMany } from "../../../apps/TrxParams/utils/fetchRevalConvenios";
+import { Fragment, useCallback, useState } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
+import Fieldset from "../../../components/Base/Fieldset";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
-import useQuery from "../../../hooks/useQuery";
 import { notify, notifyError } from "../../../utils/notify";
+import SearchAutorizador from "../components/SearchAutorizador";
+import SearchTipoOperacion from "../components/SearchTipoOperacion";
 import { postObtenerReporteComisionesAplicadas } from "../utils/fetchReportesComisiones";
 
 const ReporteComisiones = () => {
-  const [{ selectedOpt, convenio = "", autorizador = "" }, setQuery] =
-    useQuery();
-  const [maxPages, setMaxPages] = useState(0);
-  const [{ page, limit }, setPageData] = useState({
-    page: 1,
-    limit: 10,
-  });
   const [showModal, setShowModal] = useState(false);
+  const [selectedOpt, setSelectedOpt] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [headersTable, setHeadersTable] = useState([]);
-  const [data, setdata] = useState([]);
   const [report, setReport] = useState({
-    "Id comercio": "",
-    "Fecha inicio": "",
-    "Fecha fin": new Date().toISOString().substring(0, 10),
+    id_comercio: "",
+    id_tipo_transaccion: "",
+    nombre_operacion: "Vacio",
+    id_autorizador: "",
+    nombre_autorizador: "Vacio",
+    id_trx: "",
+    date_ini: "",
+    date_end: "",
     // .replace("/", "-"),
   });
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setQuery(
-      {
-        ["selectedOpt"]: "",
-        ["convenio"]: "",
-        ["autorizador"]: "",
-      },
-      { replace: true }
-    );
+    setSelectedOpt("");
   }, []);
-  useEffect(() => {
-    if (selectedOpt === "convenio") {
-      fetchConveniosFunc();
-    } else if (selectedOpt === "autorizador") {
-      fetchAutorizadoresFunc();
-    } else {
-      setdata([]);
-    }
-  }, [selectedOpt, page, limit, convenio, autorizador]);
-  const fetchConveniosFunc = () => {
-    fetchConveniosMany({ tags: convenio, page, limit })
-      .then((res) => {
-        setdata(
-          [...res?.results].map(({ id_convenio, nombre_convenio }) => {
-            return {
-              "Id convenio": id_convenio,
-              "Nombre convenio": nombre_convenio,
-            };
-          })
-        );
-        setMaxPages(res?.maxPages);
-      })
-      .catch((err) => console.error(err));
-  };
-  const fetchAutorizadoresFunc = () => {
-    fetchAutorizadores({ page, limit })
-      .then((res) => {
-        setdata(
-          [...res?.results].map(({ id_autorizador, nombre_autorizador }) => {
-            return {
-              "Id autorizador": id_autorizador,
-              "Nombre autorizador": nombre_autorizador,
-            };
-          })
-        );
-        setMaxPages(res?.maxPages);
-      })
-      .catch((err) => console.error(err));
-  };
-  const onChangeReport = useCallback((ev) => {
-    const formData = new FormData(ev.target.form);
-    const newData = [];
-    ["Id comercio", "Fecha inicio", "Fecha fin"].forEach((col) => {
-      let data = null;
-      data = formData.get(col);
-      newData.push([col, data]);
-    });
-    setReport((old) => ({
-      ...old,
-      ...Object.fromEntries(newData),
-    }));
-  }, []);
-  const onSelect = useCallback(
-    (e, i) => {
-      setShowModal(true);
-      if (selectedOpt === "convenio") {
-        setReport((old) => ({
-          ...old,
-          "Id convenio": data[i]?.["Id convenio"],
-          Convenio: data[i]?.["Nombre convenio"],
-        }));
-      } else if (selectedOpt === "autorizador") {
-        setReport((old) => ({
-          ...old,
-          "Id autorizador": data[i]?.["Id autorizador"],
-          Autorizador: data[i]?.["Nombre autorizador"],
-        }));
-      }
-      handleClose();
-    },
-    [data, selectedOpt, handleClose]
-  );
-  const onChange = useCallback(
-    (ev) => setQuery({ [ev.target.name]: ev.target.value }, { replace: true }),
-    [setQuery]
-  );
+
   const removeReport = useCallback(
     (name) => (ev) => {
       ev.preventDefault();
       setReport((old) => {
-        return { ...old, [name]: "" };
+        return { ...old, [name]: "Vacio" };
       });
     },
     []
@@ -130,16 +44,14 @@ const ReporteComisiones = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-      if (new Date(report["Fecha fin"]) > new Date()) {
+      if (new Date(report["date_end"]) > new Date()) {
         notifyError("La fecha final no puede ser mayor al dia de hoy");
         return;
       }
 
-      if (report["Fecha fin"] !== "") {
-        if (report["Fecha inicio"] !== "") {
-          if (
-            new Date(report["Fecha fin"]) <= new Date(report["Fecha inicio"])
-          ) {
+      if (report["date_end"] !== "") {
+        if (report["date_ini"] !== "") {
+          if (new Date(report["date_end"]) <= new Date(report["date_ini"])) {
             notifyError("La fecha final debe ser mayor a la inicial");
             return;
           }
@@ -149,20 +61,26 @@ const ReporteComisiones = () => {
         }
       }
       let obj = {};
-      if (report["Id comercio"] !== "") {
-        obj["id_comercio"] = report["Id comercio"];
+      if (report["id_comercio"] !== "") {
+        obj["id_comercio"] = report["id_comercio"];
       }
-      if (report["Autorizador"] !== "" && report["Autorizador"]) {
-        obj["id_autorizador"] = report["Id autorizador"];
+      if (report["nombre_autorizador"] !== "Vacio" && report["Autorizador"]) {
+        obj["id_autorizador"] = report["id_autorizador"];
       }
-      if (report["Convenio"] !== "" && report["Convenio"]) {
-        obj["id_convenio"] = report["Id convenio"];
+      if (
+        report["nombre_operacion"] !== "Vacio" &&
+        report["nombre_operacion"]
+      ) {
+        obj["id_tipo_transaccion"] = report["id_tipo_transaccion"];
       }
-      if (report["Fecha inicio"] !== "") {
-        obj["date_ini"] = report["Fecha inicio"];
+      if (report["date_ini"] !== "") {
+        obj["date_ini"] = report["date_ini"];
       }
-      if (report["Fecha fin"] !== "") {
-        obj["date_end"] = report["Fecha fin"];
+      if (report["date_end"] !== "") {
+        obj["date_end"] = report["date_end"];
+      }
+      if (report["id_trx"] !== "") {
+        obj["id_trx"] = report["id_trx"];
       }
       setIsUploading(true);
       postObtenerReporteComisionesAplicadas(obj)
@@ -176,7 +94,11 @@ const ReporteComisiones = () => {
             setIsUploading(false);
           }
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          console.error(err);
+          notifyError("No se pudo conectar al servidor");
+          setIsUploading(false);
+        });
     },
     [report]
   );
@@ -185,32 +107,100 @@ const ReporteComisiones = () => {
       <SimpleLoading show={isUploading} />
       <h1 className='text-3xl'>Reporte historico comisiones:</h1>
       {/* <SearchComissions comissionFace="pay" onSelectItem={onSelectItem} /> */}
-      <Form onChange={onChangeReport} grid>
-        {report?.["Convenio"] && (
+      <Form grid>
+        <Input
+          id='id_comercio'
+          name='id_comercio'
+          label={"Id comercio"}
+          type='number'
+          autoComplete='off'
+          value={report?.["id_comercio"]}
+          onChange={(e) => {
+            setReport((old) => {
+              return { ...old, id_comercio: e.target.value };
+            });
+          }}
+        />
+        <Input
+          id='id_trx'
+          name='id_trx'
+          label={"Id transacción"}
+          type='number'
+          autoComplete='off'
+          value={report?.["id_trx"]}
+          onChange={(e) => {
+            setReport((old) => {
+              return { ...old, id_trx: e.target.value };
+            });
+          }}
+        />
+        <Input
+          id='date_ini'
+          name='date_ini'
+          label={"Fecha inicio"}
+          type='datetime-local'
+          autoComplete='off'
+          value={report?.["date_ini"]}
+          onChange={(e) => {
+            setReport((old) => {
+              return { ...old, date_ini: e.target.value };
+            });
+          }}
+        />
+        <Input
+          id='date_end'
+          name='date_end'
+          label={"Fecha fin"}
+          type='datetime-local'
+          autoComplete='off'
+          value={report?.["date_end"]}
+          onChange={(e) => {
+            setReport((old) => {
+              return { ...old, date_end: e.target.value };
+            });
+          }}
+        />
+        <Fieldset legend={"Tipo operación"} className='lg:col-span-2'>
           <Input
-            id='Convenio'
-            name='Convenio'
-            label={"Convenio"}
+            id='nombre_operacion'
+            name='nombre_operacion'
+            label={"Operación"}
             type='text'
             autoComplete='off'
             // defaultValue={newComision?.["Convenio"]}
-            value={report?.["Convenio"]}
+            value={report?.["nombre_operacion"]}
             disabled
             info={
-              <button
-                className='bi bi-x'
-                style={{
-                  position: "absolute",
-                  top: "-35px",
-                  right: "-235px",
-                  fontSize: "30px",
-                  backgroundColor: "#f4f4f5",
-                }}
-                onClick={removeReport("Convenio")}></button>
+              report?.["nombre_operacion"] !== "Vacio" ? (
+                <button
+                  className='bi bi-x'
+                  style={{
+                    position: "absolute",
+                    top: "-35px",
+                    right: "-235px",
+                    fontSize: "30px",
+                    backgroundColor: "#f4f4f5",
+                  }}
+                  onClick={removeReport("nombre_operacion")}></button>
+              ) : (
+                <></>
+              )
             }
           />
-        )}
-        {report?.["Autorizador"] && (
+          <ButtonBar>
+            <Button
+              type='button'
+              onClick={() => {
+                setShowModal(true);
+                setSelectedOpt("operacion");
+              }}>
+              {report?.["nombre_operacion"] !== "Vacio"
+                ? "Editar operación"
+                : "Agregar operación"}
+            </Button>
+          </ButtonBar>
+        </Fieldset>
+        <Fieldset legend={"Autorizador"} className='lg:col-span-2'>
           <Input
             id='Autorizador'
             name='Autorizador'
@@ -218,117 +208,60 @@ const ReporteComisiones = () => {
             type='text'
             autoComplete='off'
             // defaultValue={newComision?.["Autorizador"]}
-            value={report?.["Autorizador"]}
+            value={report?.["nombre_autorizador"]}
             info={
-              <button
-                className='bi bi-x'
-                style={{
-                  position: "absolute",
-                  top: "-35px",
-                  right: "-235px",
-                  fontSize: "30px",
-                  backgroundColor: "#f4f4f5",
-                }}
-                onClick={removeReport("Autorizador")}></button>
+              report?.["nombre_autorizador"] !== "Vacio" ? (
+                <button
+                  className='bi bi-x'
+                  style={{
+                    position: "absolute",
+                    top: "-35px",
+                    right: "-235px",
+                    fontSize: "30px",
+                    backgroundColor: "#f4f4f5",
+                  }}
+                  onClick={removeReport("nombre_autorizador")}></button>
+              ) : (
+                <></>
+              )
             }
             disabled
           />
-        )}
-        <Input
-          id='Id comercio'
-          name='Id comercio'
-          label={"Id comercio"}
-          type='number'
-          autoComplete='off'
-          value={report?.["Id comercio"]}
-          onChange={() => {}}
-        />
-        <Input
-          id='Fecha inicio'
-          name='Fecha inicio'
-          label={"Fecha inicio"}
-          type='date'
-          autoComplete='off'
-          value={report?.["Fecha inicio"]}
-          onChange={() => {}}
-        />
-        <Input
-          id='Fecha fin'
-          name='Fecha fin'
-          label={"Fecha fin"}
-          type='date'
-          autoComplete='off'
-          value={report?.["Fecha fin"]}
-          onChange={() => {}}
-        />
+          <ButtonBar>
+            <Button
+              type='button'
+              onClick={() => {
+                setShowModal(true);
+                setSelectedOpt("autorizador");
+              }}>
+              {report?.["nombre_autorizador"] !== "Vacio"
+                ? "Editar autorizador"
+                : "Agregar autorizador"}
+            </Button>
+          </ButtonBar>
+        </Fieldset>
       </Form>
       <ButtonBar>
-        <Button
-          type='button'
-          onClick={() => {
-            setShowModal(true);
-            setQuery({ ["selectedOpt"]: "convenio" }, { replace: true });
-            setHeadersTable(["Id convenio", "Nombre convenio"]);
-          }}>
-          {report?.["Convenio"] ? "Editar convenio" : "Agregar convenio"}
-        </Button>
-        <Button
-          type='button'
-          onClick={() => {
-            setShowModal(true);
-            setQuery({ ["selectedOpt"]: "autorizador" }, { replace: true });
-            setHeadersTable(["Id autorizador", "Nombre autorizador"]);
-          }}>
-          {report?.["Autorizador"]
-            ? "Editar autorizador"
-            : "Agregar autorizador"}
-        </Button>
         <Button type='submit' onClick={onSubmit}>
           Generar reporte
         </Button>
       </ButtonBar>
-      <Modal
-        show={showModal}
-        handleClose={handleClose}
-        className='flex align-middle'>
-        {/* {selectedOpt === "convenio" && */}
-        <Fragment>
-          <TableEnterprise
-            title={
-              selectedOpt === "convenio"
-                ? "Seleccionar convenio"
-                : selectedOpt === "autorizador"
-                ? "Seleccionar autorizador"
-                : ""
-            }
-            maxPage={maxPages}
-            headers={headersTable}
-            data={data}
-            onSelectRow={onSelect}
-            onSetPageData={setPageData}
-            onChange={onChange}>
-            {selectedOpt === "convenio" && (
-              <Input
-                id={"convenioComissions"}
-                label={"Convenio"}
-                name={"convenio"}
-                type={"text"}
-                autoComplete='off'
-                defaultValue={convenio}
-              />
-            )}
-            {selectedOpt === "autorizador" && (
-              <Input
-                id={"autorizadorComissions"}
-                label={"Autorizador"}
-                name={"autorizador"}
-                type={"text"}
-                autoComplete='off'
-                defaultValue={autorizador}
-              />
-            )}
-          </TableEnterprise>
-        </Fragment>
+      <Modal show={showModal} handleClose={handleClose}>
+        {selectedOpt === "operacion" ? (
+          <SearchTipoOperacion
+            handleClose={handleClose}
+            setReport={setReport}
+            report={report}
+          />
+        ) : selectedOpt === "autorizador" ? (
+          <SearchAutorizador
+            handleClose={handleClose}
+            setReport={setReport}
+            report={report}
+          />
+        ) : (
+          <></>
+        )}
       </Modal>
     </>
   );

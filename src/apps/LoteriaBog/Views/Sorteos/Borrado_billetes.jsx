@@ -8,6 +8,7 @@ import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useLoteria } from "../../utils/LoteriaHooks";
+import { useNavigate } from "react-router-dom";
 
 const url_BorrarBilletes = `${process.env.REACT_APP_URL_LOTERIAS}/eliminar_asignacion`;
 const url_sorteos = `${process.env.REACT_APP_URL_LOTERIAS}/num_sorteo`;
@@ -20,9 +21,11 @@ const Borrado_billetes = ({ route }) => {
   const [num_sorteo, setNum_sorteo] = useState("");
   const { codigos_lot, setCodigos_lot } = useLoteria();
 
+  const navigate = useNavigate();
+  
+
   const sorteosLOT = useMemo(() => {
     var cod = "";
-    console.log(codigos_lot?.length);
     if (codigos_lot?.length === 2) {
       cod = `${codigos_lot?.[0]?.cod_loteria},${codigos_lot?.[1]?.cod_loteria}`;
     } else {
@@ -39,10 +42,8 @@ const Borrado_billetes = ({ route }) => {
         cod_sucursal: cod_sucursal,
         sorteo: num_sorteo,
       };
-      console.log(query);
       try {
         const res = await fetchData(url_BorrarBilletes, "GET", query);
-        console.log(res);
         closeModal();
         return res;
       } catch (err) {
@@ -59,7 +60,6 @@ const Borrado_billetes = ({ route }) => {
       const res = await fetchData(url_sorteos, "GET", {
         idloteria: sorteosLOT,
       });
-      console.log(res);
       return res;
     } catch (err) {
       closeModal();
@@ -123,7 +123,6 @@ const Borrado_billetes = ({ route }) => {
             value={num_sorteo}
             required
             onChange={(e) => {
-              console.log(e.target.value);
               setNum_sorteo(e.target.value);
             }}
           />
@@ -132,7 +131,7 @@ const Borrado_billetes = ({ route }) => {
             label="Distribuidor"
             type="text"
             minLength="5"
-            maxLength="5"
+            maxLength="6"
             required
             autoComplete="false"
             value={cod_distribuidor}

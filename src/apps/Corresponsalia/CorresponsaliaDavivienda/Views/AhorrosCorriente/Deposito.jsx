@@ -58,6 +58,32 @@ const Deposito = () => {
   const [nomDepositante, setNomDepositante] = useState("")
   const [summary, setSummary] = useState([])
 
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "Depósito A Cuentas Davivienda",
+    timeInfo: {
+      "Fecha de venta": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      /*id transaccion recarga*/
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+      /*id_dispositivo*/
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      /*ciudad*/
+      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+      ["Tipo de operación", "Depósito A Cuentas"],
+      ["", ""],
+    ],
+    commerceName: roleInfo?.["nombre comercio"]
+      ? roleInfo?.["nombre comercio"]
+      : "No hay datos",
+    trxInfo: [],
+    disclamer: "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
+  });
+
   const options = [
     { value: "", label: "" },
     { value: "01", label: "Ahorros" },
@@ -162,8 +188,7 @@ const Deposito = () => {
             } else {
               setDatosConsulta(res?.obj?.Data);
               let summary = {
-                // "Nombre titular": res?.obj?.Data?.valNombreTitular,
-                // "Apellido titular": res?.obj?.Data?.valApellidoTitular,
+                "Nombre titular": res?.obj?.Data?.valNombreTitular +" "+res?.obj?.Data?.valApellidoTitular,
                 "Número cuenta": numCuenta,
                 "Valor depósito": valorFormat,
               };
@@ -210,6 +235,23 @@ const Deposito = () => {
   }, [navigate]);
 
   const onMakePayment = useCallback(() => {
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
+    const objTicket = { ...objTicketActual };
+    objTicket["trxInfo"] = []
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"].push(["Nombre titular", summary["Nombre titular"]]);
+    objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
     const body = {
       idComercio: roleInfo?.id_comercio,
@@ -230,6 +272,8 @@ const Deposito = () => {
       cod_dane: roleInfo?.codigo_dane,
       nomdepositante: nomDepositante,
       tip_id_depositante: tipoDocumento,
+      ticket: objTicket,
+      mostrar_costo: process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true' ? true : false,
     };
 
     fetchDepositoCorresponsal(body)
@@ -244,68 +288,96 @@ const Deposito = () => {
         const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const trx_id2 = res?.obj?.DataHeader?.idTransaccion ?? 0;
         const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
-
-        const tempTicket = {
-          title: "Depósito A Cuentas Davivienda",
-          timeInfo: {
-            "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-            }).format(new Date()),
-            Hora: Intl.DateTimeFormat("es-CO", {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            }).format(new Date()),
-          },
-          commerceInfo: [
-            ["Id Comercio", roleInfo?.id_comercio],
-            ["No. terminal", ter],
-            ["Municipio", roleInfo?.ciudad],
-            ["Dirección", roleInfo?.direccion],
-            ["Tipo de operación", "Depósito A Cuentas"],
-            ["", ""],
-            ["No. de aprobación Banco", trx_id],
-            ["", ""],
-            ["No. de aprobación Aliado", trx_id2],
-            ["", ""],
-          ],
-          commerceName: roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "No hay datos",
-          trxInfo: [
-            [
-            "Tipo de cuenta",
-            res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
-            ],
-            ["",""],
-            [
+        objTicket["commerceInfo"][1] = [
+          "No. terminal",
+          ter,
+        ];
+        objTicket["commerceInfo"].push([
+          "No. de aprobación Banco",
+          trx_id,
+        ]);
+        objTicket["commerceInfo"].push(["", ""]);
+        objTicket["commerceInfo"].push([
+          "No. de aprobación Aliado",
+          trx_id2,
+        ]);
+        objTicket["commerceInfo"].push(["", ""]);
+        objTicket["trxInfo"].push([
+          "Tipo de cuenta",
+          res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
+        ]);
+        objTicket["trxInfo"].push(["", ""]);
+        objTicket["trxInfo"].push([
             "Nro. Cuenta",
             `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
-            ],
-            ["",""],
-            ["Valor", formatMoney.format(valor)],            
-            ["", ""],
-          ],
-          disclamer: "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
-        };
+        ]);
+        objTicket["trxInfo"].push(["", ""]);
+        objTicket["trxInfo"].push([
+          "Valor",
+          formatMoney.format(valor),
+        ]);
+        objTicket["trxInfo"].push(["", ""]);
+        // const tempTicket = {
+        //   title: "Depósito A Cuentas Davivienda",
+        //   timeInfo: {
+        //     "Fecha de venta": Intl.DateTimeFormat("es-CO", {
+        //       year: "2-digit",
+        //       month: "2-digit",
+        //       day: "2-digit",
+        //     }).format(new Date()),
+        //     Hora: Intl.DateTimeFormat("es-CO", {
+        //       hour: "2-digit",
+        //       minute: "2-digit",
+        //       second: "2-digit",
+        //     }).format(new Date()),
+        //   },
+        //   commerceInfo: [
+        //     ["Id Comercio", roleInfo?.id_comercio],
+        //     ["No. terminal", ter],
+        //     ["Municipio", roleInfo?.ciudad],
+        //     ["Dirección", roleInfo?.direccion],
+        //     ["Tipo de operación", "Depósito A Cuentas"],
+        //     ["", ""],
+        //     ["No. de aprobación Banco", trx_id],
+        //     ["", ""],
+        //     ["No. de aprobación Aliado", trx_id2],
+        //     ["", ""],
+        //   ],
+        //   commerceName: roleInfo?.["nombre comercio"]
+        //   ? roleInfo?.["nombre comercio"]
+        //   : "No hay datos",
+        //   trxInfo: [
+        //     [
+        //     "Tipo de cuenta",
+        //     res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
+        //     ],
+        //     ["",""],
+        //     [
+        //     "Nro. Cuenta",
+        //     `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
+        //     ],
+        //     ["",""],
+        //     ["Valor", formatMoney.format(valor)],            
+        //     ["", ""],
+        //   ],
+        //   disclamer: "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
+        // };
         if (process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true'){
-          tempTicket['trxInfo'].push(["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)]);
-          tempTicket['trxInfo'].push(["", ""]);
+          objTicket['trxInfo'].push(["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)]);
+          objTicket['trxInfo'].push(["", ""]);
         }
 
-        tempTicket['trxInfo'].push(["Total", formatMoney.format(valor)]);
-        tempTicket['trxInfo'].push(["", ""]);
-        setPaymentStatus(tempTicket);
-        infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
-          .then((resTicket) => {
-            console.log(resTicket);
-          })
-          .catch((err) => {
-            console.error(err);
-            notifyError("Error guardando el ticket");
-          });
+        objTicket['trxInfo'].push(["Total", formatMoney.format(valor)]);
+        objTicket['trxInfo'].push(["", ""]);
+        setPaymentStatus(objTicket);
+        // infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
+        //   .then((resTicket) => {
+        //     console.log(resTicket);
+        //   })
+        //   .catch((err) => {
+        //     console.error(err);
+        //     notifyError("Error guardando el ticket");
+        //   });
       })
       .catch((err) => {
         setIsUploading(false);
@@ -320,7 +392,7 @@ const Deposito = () => {
     fetchDepositoCorresponsal,
     roleInfo,
     infoTicket,
-    ,
+    summary,
     datosConsulta,
   ]);
 

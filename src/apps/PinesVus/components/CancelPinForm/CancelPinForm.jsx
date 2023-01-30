@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState, useEffect } from "react";
 import Button from "../../../../components/Base/Button";
-import Tickets from "../../../../components/Base/Tickets";
+import TicketsPines from "../TicketsPines";
 import { useReactToPrint } from "react-to-print";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useAuth } from "../../../../hooks/AuthHooks";
@@ -24,6 +24,7 @@ const CancelPin = ({
   id_pin,
   trx,
   tipoPin,
+  infoComercioCreacion,
   closeModal,
   setActivarNavigate,
 }) => {
@@ -124,11 +125,11 @@ const CancelPin = ({
   const onSubmitCancel = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion) //// Valor = valor + IVA
+    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion) //// Valor = valor + IVA
       .then((res) => {
         setActivarNavigate(false);
         setDisabledBtn(false);
-        if (res?.status == false) {
+        if (res?.status === false) {
           notifyError(res?.msg);
         } else {
           setActivarNavigate(true);
@@ -138,7 +139,7 @@ const CancelPin = ({
       })
       .catch((err) => console.log("error", err));
   };
-  console.log(tipCancelacion)
+  console.log(infoComercioCreacion)
 
   return (
     <>
@@ -254,7 +255,11 @@ const CancelPin = ({
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center">
-          <Tickets refPrint={printDiv} ticket={tickets} />
+          <TicketsPines
+              refPrint={null}
+              ticket={tickets}
+              logo="LogoVus"
+          />
           <ButtonBar>
             <Button
               onClick={() => {
