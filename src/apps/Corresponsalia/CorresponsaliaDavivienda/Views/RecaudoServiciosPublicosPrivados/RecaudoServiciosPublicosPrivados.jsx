@@ -480,7 +480,7 @@ const RecaudoServiciosPublicosPrivados = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 9900000],
+    limits: [0, 9900001],
     decimalDigits: 2,
   });
   return (
