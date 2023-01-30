@@ -192,6 +192,8 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         id_terminal: roleInfo?.id_dispositivo,
       },
       recaudoAval: {
+        numeroConvenio: convenio.nura,
+        valReferencia1: datosTrans.ref1,
         pila: datosConsulta?.["pila"] ?? "",
         54: datosConsulta?.tipoRecaudo?.["54"] ?? "",
         62: datosConsulta?.tipoRecaudo?.["62"] ?? "",
