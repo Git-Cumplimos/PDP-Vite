@@ -255,6 +255,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   const onSubmitConfirm = (e) => {
     e.preventDefault();
     setIsUploading(true);
+    let codBarrasIndex = datosTrans.codBarras.indexOf("415");
+    let codBarras = datosTrans.codBarras.slice(codBarrasIndex);
     postConsultaConveniosAval({
       oficina_propia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -272,7 +274,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
       recaudoAval: {
         numeroConvenio: datosEnvio?.datosConvenio?.nura,
         valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
-        codigoBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
+        codigoBarras: codBarras.replace(/[\x1D]/g, ""),
         location: {
           address: roleInfo?.["direccion"],
           dane_code: roleInfo?.codigo_dane,
