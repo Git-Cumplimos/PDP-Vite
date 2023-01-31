@@ -1,4 +1,4 @@
-// import SignaturePad from "react-signature-canvas";
+// import SignaturePad from 'react-signature-canvas';
 import "./FirmaTratamientoDatos.css";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Button from "../../../../components/Base/Button";

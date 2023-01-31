@@ -518,7 +518,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         });
     } else {
       setIsUploading(true);
-      let dataCodBarras = datosTrans.codBarras.slice(3).replace(/[\x1D]/g, "");
+      let codBarrasIndex = datosTrans.codBarras.indexOf("415");
+      let codBarras = datosTrans.codBarras
+        .slice(codBarrasIndex)
+        .replace(/[\x1D]/g, "");
       postConsultaConveniosDavivienda({
         tipoTransaccion: "1",
         numNumeroConvenioIAC: datosEnvio?.datosConvenio?.cod_iac_cnb,
@@ -574,7 +577,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 9900000],
+    limits: [0, 9900001],
     decimalDigits: 2,
   });
   const printDiv = useRef();
