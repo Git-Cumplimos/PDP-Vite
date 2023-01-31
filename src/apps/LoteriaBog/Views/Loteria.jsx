@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo} from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
@@ -16,6 +16,7 @@ import SubPage from "../../../components/Base/SubPage/SubPage";
 import InputX from "../../../components/Base/InputX/InputX";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useLocation } from "react-router-dom";
+import { notifyError } from "../../../utils/notify";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
@@ -86,7 +87,7 @@ const Loteria = ({ route }) => {
 
   useEffect(() => {
     const nit = nitsLoterias?.[pathname.split("/")?.[2]];
-    console.log("NIT",nit)
+    console.log("NIT", nit)
     if (nit !== "" && nit !== undefined) {
       setNit_loteria(nit);
       idloteria(nit).then((res) => {
@@ -105,7 +106,7 @@ const Loteria = ({ route }) => {
     };
     fetchData(urlLoto, "GET", query, {})
       .then((res) => {
-        console.log("RES*****",res)
+        console.log("RES*****", res)
         ////sorteo virtual
         setSorteoOrdi(null);
         setSorteoExtra(null);
@@ -213,6 +214,7 @@ const Loteria = ({ route }) => {
   ]);
 
   const closeModal = useCallback(() => {
+    navigate(-1);
     setShowModal(false);
     setSellResponse(null);
     setCustomer({ fracciones: "", phone: "", doc_id: "" });
@@ -235,149 +237,152 @@ const Loteria = ({ route }) => {
   ]);
   return (
     <>
-    <h1 className="text-3xl mt-6">Venta {nom_loteria} </h1>
-        <SimpleLoading show={loadConsulta}></SimpleLoading>
-        <Select
-          className = {"place-self-strech"}
-          disabled={serie !== "" || numero !== ""}
-          id="selectSorteo"
-          label="Tipo de sorteo"
-          options={opcionesdisponibles}
-          value={sorteo}
-          onChange={(e) => setSorteo(e.target.value)}
-        />
-        { sorteo !== "" ? 
+      <h1 className="text-3xl mt-6">Venta {nom_loteria} </h1>
+      <SimpleLoading show={loadConsulta}></SimpleLoading>
+      <Select
+        className={"place-self-strech"}
+        disabled={serie !== "" || numero !== ""}
+        id="selectSorteo"
+        label="Tipo de sorteo"
+        options={opcionesdisponibles}
+        value={sorteo}
+        onChange={(e) => setSorteo(e.target.value)}
+      />
+      {sorteo !== "" ?
         <Form grid>
-        {sorteo.split("-")[1] === "true" ? 
-        <InputX
-        label="Escanee el código de barras"
-        type="search"
-        value={datosEscaneados}
-        onInput={(e) => {
-          const num = e.target.value || "";
-          setDatosEscaneados(validarEntradaScanner(num));
-          if (num?.length === 20) {       
-            searchLoteriafisica(sorteo, String(num.substr(-9, 4)), String(num.substr(-5, 3)), 1)
-            .then((max) => {
-              if (max !== undefined) {
-                setMaxPages(Math.ceil(max / 10));
+          {sorteo.split("-")[1] === "true" ?
+            <InputX
+              label="Escanee el código de barras"
+              type="search"
+              value={datosEscaneados}
+              onInput={(e) => {
+                const num = e.target.value || "";
+                setDatosEscaneados(validarEntradaScanner(num));
+                if (num?.length === 20) {
+                  searchLoteriafisica(sorteo, String(num.substr(-9, 4)), String(num.substr(-5, 3)), 1)
+                    .then((max) => {
+                      if (max !== undefined) {
+                        setMaxPages(Math.ceil(max / 10));
+                      }
+                    });
+                  setNumero(String(num.substr(-9, 4)));
+                  setSerie(String(num.substr(-5, 3)));
+                } else {
+                  setNumero("");
+                  setSerie("");
+                }
+              }}
+            ></InputX>
+            : ""}
+          <Input
+            id="numTicket"
+            label="Numero de billete"
+            type="search"
+            minLength="1"
+            maxLength="4"
+            autoComplete="off"
+            value={numero}
+            onInput={(e) => {
+              setDatosEscaneados("");
+              if (!isNaN(e.target.value)) {
+                const num = e.target.value;
+                setNumero(num);
               }
-            });       
-            setNumero(String(num.substr(-9, 4)));
-            setSerie(String(num.substr(-5, 3)));
-          }else{
-            setNumero("");
-            setSerie("");
-          }
-        }}
-      ></InputX>
-        : ""}
-        <Input
-          id="numTicket"
-          label="Numero de billete"
-          type="search"
-          minLength="1"
-          maxLength="4"
-          autoComplete="off"
-          value={numero}
-          onInput={(e) => {
-            setDatosEscaneados("");
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
-              setNumero(num);
-            }
-          }}
-          onLazyInput={{
-            callback: (e) => {
-              const num = !isNaN(e.target.value) ? e.target.value : "";
-              setPage(1);
+            }}
+            onLazyInput={{
+              callback: (e) => {
+                const num = !isNaN(e.target.value) ? e.target.value : "";
+                setPage(1);
 
-              sorteo.split("-")[1] === "true"
-                ? searchLoteriafisica(sorteo, num, serie, 1).then((max) => {
+                sorteo.split("-")[1] === "true"
+                  ? searchLoteriafisica(sorteo, num, serie, 1).then((max) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
                   })
-                : searchLoteria(sorteo, num, serie, 1).then((max) => {
+                  : searchLoteria(sorteo, num, serie, 1).then((max) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
+                    if (max === 0) {
+                      notifyError("No hay fracciones para vender")
+                    }
                   });
-            },
-            timeOut: 500,
-          }}
-        />
-        <Input
-          id="numSerie"
-          label="Numero de serie"
-          type="search"
-          minLength="1"
-          maxLength="3"
-          autoComplete="off"
-          value={serie}
-          onInput={(e) => {
-            setDatosEscaneados("");
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
-              setSerie(num);
-            }
-          }}
-          onLazyInput={{
-            callback: (e) => {
-              const num = !isNaN(e.target.value) ? e.target.value : "";
-              setPage(1);
+              },
+              timeOut: 500,
+            }}
+          />
+          <Input
+            id="numSerie"
+            label="Numero de serie"
+            type="search"
+            minLength="1"
+            maxLength="3"
+            autoComplete="off"
+            value={serie}
+            onInput={(e) => {
+              setDatosEscaneados("");
+              if (!isNaN(e.target.value)) {
+                const num = e.target.value;
+                setSerie(num);
+              }
+            }}
+            onLazyInput={{
+              callback: (e) => {
+                const num = !isNaN(e.target.value) ? e.target.value : "";
+                setPage(1);
 
-              sorteo.split("-")[1] === "true"
-                ? searchLoteriafisica(sorteo, numero, num, 1).then((max) => {
+                sorteo.split("-")[1] === "true"
+                  ? searchLoteriafisica(sorteo, numero, num, 1).then((max) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
                   })
-                : searchLoteria(sorteo, numero, num, 1).then((max) => {
+                  : searchLoteria(sorteo, numero, num, 1).then((max) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
                   });
-            },
-            timeOut: 500,
-          }}
-        />
-        {maxPages > 1 ? 
-        <ButtonBar className= {"lg:col-span-2"}>
-          <Button
-            type="button"
-            disabled={page < 2}
-            onClick={() => {
-              if (page > 1) {
-                setPage(page - 1);
-
-                sorteo.split("-")[1] === "true"
-                  ? searchLoteriafisica(sorteo, numero, serie, page - 1)
-                  : searchLoteria(sorteo, numero, serie, page - 1);
-              }
+              },
+              timeOut: 500,
             }}
-          >
-            Anterior
-          </Button>
-          <Button
-            type="button"
-            disabled={page >= maxPages || loterias.length === 0}
-            onClick={() => {
-              if (page < maxPages) {
-                setPage(page + 1);
+          />
+          {maxPages > 1 ?
+            <ButtonBar className={"lg:col-span-2"}>
+              <Button
+                type="button"
+                disabled={page < 2}
+                onClick={() => {
+                  if (page > 1) {
+                    setPage(page - 1);
 
-                sorteo.split("-")[1] === "true"
-                  ? searchLoteriafisica(sorteo, numero, serie, page + 1)
-                  : searchLoteria(sorteo, numero, serie, page + 1);
-              }
-            }}
-          >
-            Siguiente
-          </Button>
-        </ButtonBar>: ""}
+                    sorteo.split("-")[1] === "true"
+                      ? searchLoteriafisica(sorteo, numero, serie, page - 1)
+                      : searchLoteria(sorteo, numero, serie, page - 1);
+                  }
+                }}
+              >
+                Anterior
+              </Button>
+              <Button
+                type="button"
+                disabled={page >= maxPages || loterias.length === 0}
+                onClick={() => {
+                  if (page < maxPages) {
+                    setPage(page + 1);
+
+                    sorteo.split("-")[1] === "true"
+                      ? searchLoteriafisica(sorteo, numero, serie, page + 1)
+                      : searchLoteria(sorteo, numero, serie, page + 1);
+                  }
+                }}
+              >
+                Siguiente
+              </Button>
+            </ButtonBar> : ""}
         </Form>
         : ""}
-      
+
       {Array.isArray(loterias) && loterias.length > 0 ? (
         <>
           <div className="flex flex-row justify-evenly w-full my-4">
@@ -390,7 +395,7 @@ const Loteria = ({ route }) => {
               "Serie",
               "Fracciones disponibles",
             ]}
-            maxPage = {maxPages}
+            maxPage={maxPages}
             data={loterias.map(
               ({ Fracciones_disponibles, Num_billete, serie: Serie_lot }) => {
                 return {

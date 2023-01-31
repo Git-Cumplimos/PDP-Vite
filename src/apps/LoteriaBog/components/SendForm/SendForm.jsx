@@ -1,11 +1,11 @@
-import React, {useCallback,} from "react";
+import React, { useCallback, } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { useState, useEffect, useMemo } from "react";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { notify,notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -36,7 +36,7 @@ const SendForm = ({
   };
 
   const { tiposOperaciones } = useLoteria();
-  const operacion = useMemo(() => {    
+  const operacion = useMemo(() => {
     return tiposOperaciones;
   }, [tiposOperaciones]);
 
@@ -76,13 +76,19 @@ const SendForm = ({
     }
   };
 
-  const handleCloseCancelar = useCallback (()=> {
+  const handleCloseCancelar = useCallback(() => {
     notify("Venta de lotería cancelada");
   })
 
   const formPago = (value) => {
     setTipoPago(value);
   };
+  useEffect(() => {
+    const cus = { fracciones, phone, doc_id };
+    cus.fracciones = "1";
+    setCustomer({ ...cus });
+  }, [fracciones])
+
 
   return (
     <>
@@ -143,11 +149,11 @@ const SendForm = ({
               min="1"
               value={fracciones}
               required
-              onInput={(e) => {
-                const cus = { fracciones, phone, doc_id };
-                cus.fracciones = e.target.value;
-                setCustomer({ ...cus });
-              }}
+            // onInput={(e) => {
+            //   const cus = { fracciones, phone, doc_id };
+            //   cus.fracciones = e.target.value;
+            //   setCustomer({ ...cus });
+            // }}
             />
           )}
           <Input
