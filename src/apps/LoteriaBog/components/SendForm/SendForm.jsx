@@ -1,10 +1,11 @@
+import React, {useCallback,} from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { useState, useEffect, useMemo } from "react";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { notifyError } from "../../../../utils/notify";
+import { notify,notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -64,10 +65,6 @@ const SendForm = ({
       }
     }
   };
-  // useEffect(() => {
-  //     setSelecFrac([])
-  //     setTipoPago()
-  // });
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -79,15 +76,14 @@ const SendForm = ({
     }
   };
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {};
-  // }
+  const handleCloseCancelar = useCallback (()=> {
+    notify("Venta de lotería cancelada");
+  })
 
   const formPago = (value) => {
     setTipoPago(value);
   };
-  // console.log(selected?.Fracciones)
+
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">
@@ -201,6 +197,7 @@ const SendForm = ({
             <Button
               type="button"
               onClick={() => {
+                handleCloseCancelar();
                 closeModal();
                 setCustomer({ fracciones: "", phone: "", doc_id: "" });
                 setCheckedState(

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo} from "react";
 
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
@@ -10,16 +10,23 @@ import Table from "../../../components/Base/Table";
 import SellResp from "../components/SellResp/SellResp";
 import SendForm from "../components/SendForm/SendForm";
 import { useLoteria } from "../utils/LoteriaHooks";
+import { useNavigate } from "react-router-dom";
 import fetchData from "../../../utils/fetchData";
 import SubPage from "../../../components/Base/SubPage/SubPage";
 import InputX from "../../../components/Base/InputX/InputX";
-import { notifyError } from "../../../utils/notify";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
+import { useLocation } from "react-router-dom";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
 const Loteria = ({ route }) => {
+  const nitsLoterias = {
+    "loteria-de-bogota": "899.999.270-1",
+    "loteria-del-tolima": "809.008.775-0",
+    "loteria-de-cundinamarca": "86.003.723-4",
+  };
   const { label } = route;
+  const { pathname } = useLocation();
   const {
     infoLoto: {
       numero,
@@ -43,15 +50,17 @@ const Loteria = ({ route }) => {
     setCodigos_lot,
     loadConsulta,
     setLoadConsulta,
-  } = useLoteria();
 
+  } = useLoteria();
+  const { idloteria } = useLoteria();
   const [sorteoOrdi, setSorteoOrdi] = useState(null);
   const [sorteoExtra, setSorteoExtra] = useState(null);
-
   const [sorteoOrdifisico, setSorteofisico] = useState(null);
   const [sorteoExtrafisico, setSorteofisicoextraordinario] = useState(null);
-
   const [datosEscaneados, setDatosEscaneados] = useState("");
+  const [nit_loteria, setNit_loteria] = useState(null);
+  const [nom_loteria, setNom_loteria] = useState(null);
+  const navigate = useNavigate();
 
   const validarEntradaScanner = useCallback(
     (validarNum) => {
@@ -76,11 +85,27 @@ const Loteria = ({ route }) => {
   }, [codigos_lot]);
 
   useEffect(() => {
+    const nit = nitsLoterias?.[pathname.split("/")?.[2]];
+    console.log("NIT",nit)
+    if (nit !== "" && nit !== undefined) {
+      setNit_loteria(nit);
+      idloteria(nit).then((res) => {
+        if (res?.status) {
+          setNom_loteria(res['obj'][0]['nombre'])
+        } else {
+          navigate(-1);
+        }
+      });
+    }
+  }, [pathname]);
+
+  useEffect(() => {
     const query = {
       num_loteria: sorteosLOT,
     };
     fetchData(urlLoto, "GET", query, {})
       .then((res) => {
+        console.log("RES*****",res)
         ////sorteo virtual
         setSorteoOrdi(null);
         setSorteoExtra(null);
@@ -102,9 +127,7 @@ const Loteria = ({ route }) => {
         } else {
           /* notifyError("No se encontraron sorteos extraordinarios"); */
         }
-
         ////////////////////////////////////////////////////////////////////////////////////////////////
-
         ///sorteo fisico
         const sortOrdfisico = res.filter(({ tip_sorteo, fisico }) => {
           return tip_sorteo === 1 && fisico;
@@ -134,7 +157,6 @@ const Loteria = ({ route }) => {
   const [sorteo, setSorteo] = useState("");
   const [selecFrac, setSelecFrac] = useState([]);
   const [tipoPago, setTipoPago] = useState(null);
-
   const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
     { value: "", label: "" },
   ]);
@@ -153,13 +175,13 @@ const Loteria = ({ route }) => {
     if (sorteoOrdi !== null) {
       copy.push({
         value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
-        label: `Sorteo ordinario - ${sorteoOrdi.num_sorteo}`,
+        label: `Sorteo ordinario virtual- ${sorteoOrdi.num_sorteo}`,
       });
     }
     if (sorteoExtra !== null) {
       copy.push({
         value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}-${sorteoExtra.num_loteria}`,
-        label: `Sorteo extraordinario - ${sorteoExtra.num_sorteo}`,
+        label: `Sorteo extraordinario virtual- ${sorteoExtra.num_sorteo}`,
       });
     }
     if (sorteoOrdifisico !== null) {
@@ -213,6 +235,7 @@ const Loteria = ({ route }) => {
   ]);
   return (
     <>
+    <h1 className="text-3xl mt-6">Venta {nom_loteria} </h1>
         <SimpleLoading show={loadConsulta}></SimpleLoading>
         <Select
           className = {"place-self-strech"}
@@ -319,6 +342,7 @@ const Loteria = ({ route }) => {
             timeOut: 500,
           }}
         />
+        {maxPages > 1 ? 
         <ButtonBar className= {"lg:col-span-2"}>
           <Button
             type="button"
@@ -350,7 +374,7 @@ const Loteria = ({ route }) => {
           >
             Siguiente
           </Button>
-        </ButtonBar>
+        </ButtonBar>: ""}
         </Form>
         : ""}
       
@@ -365,8 +389,8 @@ const Loteria = ({ route }) => {
               "Número",
               "Serie",
               "Fracciones disponibles",
-              // "Valor por fraccion",
             ]}
+            maxPage = {maxPages}
             data={loterias.map(
               ({ Fracciones_disponibles, Num_billete, serie: Serie_lot }) => {
                 return {
@@ -377,7 +401,6 @@ const Loteria = ({ route }) => {
               }
             )}
             onSelectRow={(e, index) => {
-              console.log(loterias[index])
               setSelected(loterias[index]);
               setShowModal(true);
             }}

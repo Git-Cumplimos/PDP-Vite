@@ -101,12 +101,25 @@ const Borrado_billetes = ({ route }) => {
       if (res.status === false) {
       } else {
         setOptionsDisponibles(res?.num_sorteos);
+        setNum_sorteo(res?.num_sorteos[0]['sorteo']);
       }
     });
   }, [sorteosLOT]);
 
+  const handleCloseCancelar = useCallback (()=> {
+    notify("Eliminación de billeteria Cancelada por el usuario");
+    sorteos(sorteosLOT).then((res) => {
+      if (res.status === false) {
+      } else {
+        setOptionsDisponibles(res?.num_sorteos);
+        setNum_sorteo(res?.num_sorteos[0]['sorteo']);
+      }
+    });
+  })
+
   return (
     <>
+    <h1 className="text-3xl mt-6">Eliminar billetera</h1>
       <div>
         <Form formDir="col" onSubmit={onSubmit} grid>
           <Select
@@ -114,7 +127,6 @@ const Borrado_billetes = ({ route }) => {
             label="Sorteo"
             options={
               Object.fromEntries([
-                ["", ""],
                 ...optionsDisponibles.map(({ sorteo }) => {
                   return [sorteo];
                 }),
@@ -161,7 +173,7 @@ const Borrado_billetes = ({ route }) => {
         <Modal show={showModal} handleClose={closeModal}>
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
             <h1 className="text-2xl font-semibold">
-              ¿Esta seguro de eliminar los billetes asignados?
+              ¿Está seguro de eliminar los billetes asignados?
             </h1>
             <Form onSubmit={borrar} grid>
               <Input
@@ -201,8 +213,8 @@ const Borrado_billetes = ({ route }) => {
                   type="button"
                   onClick={() => {
                     closeModal(false);
-                  }}
-                >
+                    handleCloseCancelar();
+                  }}>
                   Cancelar
                 </Button>
               </ButtonBar>

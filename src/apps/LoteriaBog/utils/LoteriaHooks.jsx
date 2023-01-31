@@ -160,13 +160,11 @@ export const useProvideLoteria = () => {
     const query = { nit_loteria: nit };
     try {
       const res = await fetchData(urls.idloteria, "GET", query);
-
       return res;
     } catch (err) {
       console.error(err);
     }
   }, []);
-
   //// Conaulta operaciones asociadas a la lotería
   const consulta_operaciones = useCallback(async (nit) => {
     const query = { nit_loteria: nit };
@@ -921,6 +919,7 @@ export const useProvideLoteria = () => {
     // getReportesVentas,
     // getReportesPagos,
     isWinner,
+    idloteria,
     makePayment,
     makePayment2,
     pagopremio,

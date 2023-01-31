@@ -2,7 +2,7 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import Input from "../../../../components/Base/Input";
 import { notify, notifyError } from "../../../../utils/notify";
@@ -36,13 +36,16 @@ const SortForm = ({
     });
     setChangesorteo(sorteo);
   };
+  const handleCloseCancelar = useCallback (()=> {
+    notify("Apertura de Sorteo cancelada por el usuario");
+  })
 
   return (
     <>
       <div className="flex flex-col justify-center items-center mx-auto container">
         <Form onSubmit={onSubmit} grid>
           <div className="flex flex-row justify-between text-lg font-medium grid">
-            Verifique que el número de sorteo al igual que su fecha de juego!!!
+            Verifique el número de sorteo al igual que su fecha de juego
           </div>
           <Input
             id="numsorteo"
@@ -79,6 +82,7 @@ const SortForm = ({
               type="button"
               onClick={() => {
                 closeModal();
+                handleCloseCancelar();
               }}
             >
               Cancelar
