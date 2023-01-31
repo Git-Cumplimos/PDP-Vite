@@ -133,7 +133,7 @@ const CargaArchivos = ({ route }) => {
         })
         .catch((err) => {
           notifyError("Error al cargar Datos");
-        }); /* notify("Se ha comenzado la carga"); */
+        });
     },
     [file, fileName, archivo, tipoSorteo, fisiVirtual]
   );
