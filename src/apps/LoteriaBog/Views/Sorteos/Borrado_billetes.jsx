@@ -58,7 +58,7 @@ const Borrado_billetes = ({ route }) => {
   const sorteos = useCallback(async (sorteosLOT) => {
     try {
       const res = await fetchData(url_sorteos, "GET", {
-        idloteria: sorteosLOT,
+        codigos_loteria: sorteosLOT,
       });
       return res;
     } catch (err) {
@@ -105,8 +105,13 @@ const Borrado_billetes = ({ route }) => {
     });
   }, [sorteosLOT]);
 
+  const handleCloseCancelar = useCallback (()=> {
+    notify("Eliminación de billeteria Cancelada por el usuario");
+  })
+
   return (
     <>
+    <h1 className="text-3xl mt-6">Eliminar billetera</h1>
       <div>
         <Form formDir="col" onSubmit={onSubmit} grid>
           <Select
@@ -161,7 +166,7 @@ const Borrado_billetes = ({ route }) => {
         <Modal show={showModal} handleClose={closeModal}>
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
             <h1 className="text-2xl font-semibold">
-              ¿Esta seguro de eliminar los billetes asignados?
+              ¿Está seguro de eliminar los billetes asignados?
             </h1>
             <Form onSubmit={borrar} grid>
               <Input
@@ -201,6 +206,7 @@ const Borrado_billetes = ({ route }) => {
                   type="button"
                   onClick={() => {
                     closeModal(false);
+                    handleCloseCancelar();
                   }}>
                   Cancelar
                 </Button>
