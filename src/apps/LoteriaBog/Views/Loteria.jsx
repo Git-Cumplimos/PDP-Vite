@@ -175,13 +175,13 @@ const Loteria = ({ route }) => {
     if (sorteoOrdi !== null) {
       copy.push({
         value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
-        label: `Sorteo ordinario - ${sorteoOrdi.num_sorteo}`,
+        label: `Sorteo ordinario virtual- ${sorteoOrdi.num_sorteo}`,
       });
     }
     if (sorteoExtra !== null) {
       copy.push({
         value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}-${sorteoExtra.num_loteria}`,
-        label: `Sorteo extraordinario - ${sorteoExtra.num_sorteo}`,
+        label: `Sorteo extraordinario virtual- ${sorteoExtra.num_sorteo}`,
       });
     }
     if (sorteoOrdifisico !== null) {

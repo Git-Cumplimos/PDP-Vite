@@ -101,12 +101,20 @@ const Borrado_billetes = ({ route }) => {
       if (res.status === false) {
       } else {
         setOptionsDisponibles(res?.num_sorteos);
+        setNum_sorteo(res?.num_sorteos[0]['sorteo']);
       }
     });
   }, [sorteosLOT]);
 
   const handleCloseCancelar = useCallback (()=> {
     notify("Eliminación de billeteria Cancelada por el usuario");
+    sorteos(sorteosLOT).then((res) => {
+      if (res.status === false) {
+      } else {
+        setOptionsDisponibles(res?.num_sorteos);
+        setNum_sorteo(res?.num_sorteos[0]['sorteo']);
+      }
+    });
   })
 
   return (
@@ -119,7 +127,6 @@ const Borrado_billetes = ({ route }) => {
             label="Sorteo"
             options={
               Object.fromEntries([
-                ["", ""],
                 ...optionsDisponibles.map(({ sorteo }) => {
                   return [sorteo];
                 }),
