@@ -313,7 +313,7 @@ const Deposito = () => {
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/colpatria")}>Cerrar</Button>
+              <Button onClick={() => navigate("/corresponsalia/colpatria")}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
