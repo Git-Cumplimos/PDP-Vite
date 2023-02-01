@@ -358,7 +358,6 @@ export const useProvideLoteria = () => {
         setSellResponse(res);
         setLoadConsulta(false);
       } catch (err) {
-        console.log("hubo un error fisica")
         setLoadConsulta(false);
         setSellResponse(null);
         navigate(-1);
@@ -414,7 +413,6 @@ export const useProvideLoteria = () => {
         setLoadConsulta(false);
         setSellResponse(null);
         console.error(err);
-        console.log("hubo un error fisica")
         navigate(-1);
         notifyError("Error al hacer la consulta")
       }
