@@ -77,9 +77,8 @@ const CargaArchivos = ({ route }) => {
       const f = new Date();
       const query = {
         contentType: "application/text",
-        filename: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
-          f.getMonth() + 1
-        }${f.getFullYear()}${fileName}`,
+        filename: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${f.getMonth() + 1
+          }${f.getFullYear()}${fileName}`,
       };
       fetchData(url_cargueS3, "GET", query)
         .then((respuesta) => {
@@ -109,6 +108,12 @@ const CargaArchivos = ({ route }) => {
                         if ("Motivo" in res?.[0]) {
                           closeModal();
                           if (res[0]["Estado"] === 1) {
+                            setProgress(0);
+                            setFile("");
+                            setFileName("");
+                            setArchivo("");
+                            setTipoSorteo("");
+                            setFisiVirtual("");
                             notify(res[0]["Motivo"]);
                           } else {
                             notifyError(res[0]["Motivo"]);
@@ -128,7 +133,7 @@ const CargaArchivos = ({ route }) => {
         })
         .catch((err) => {
           notifyError("Error al cargar Datos");
-        }); /* notify("Se ha comenzado la carga"); */
+        });
     },
     [file, fileName, archivo, tipoSorteo, fisiVirtual]
   );
@@ -195,12 +200,16 @@ const CargaArchivos = ({ route }) => {
     setProgress(0);
     setFile("");
     setFileName("");
+    setArchivo("");
+    setTipoSorteo("");
+    setFisiVirtual("");
   }, []);
-
   return (
     <>
+      <h1 class="text-3xl">Carga de archivos</h1>
       <div>
         <Select
+          class="mb-3"
           id="archivos"
           label="Archivo a subir"
           options={options}
@@ -214,9 +223,10 @@ const CargaArchivos = ({ route }) => {
           }}
         />
         {archivo === "PlanDePremios" ||
-        archivo === "Asignacion" ||
-        archivo === "Resultados" ? (
+          archivo === "Asignacion" ||
+          archivo === "Resultados" ? (
           <Select
+            class="mb-3"
             id="tip_sorteo"
             label={`Tipo de sorteo para ${archivo}`}
             options={optionsTipoSorteo}
@@ -229,8 +239,9 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
+        {(archivo !== "PlanDePremios" && archivo !== "Resultados") && tipoSorteo !== "" ? (
           <Select
+            class="mb-3"
             id="FisiVir"
             label={`${archivo} físicos/Virtuales`}
             options={optionsFisiVir}
@@ -243,16 +254,15 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {(archivo === "PlanDePremios" && tipoSorteo !== "") ||
-        fisiVirtual !== "" ? (
+        {((archivo === "PlanDePremios" || archivo === "Resultados") && tipoSorteo !== "") ||
+          fisiVirtual !== "" ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <InputX
               id={`archivo_${archivo}`}
-              label={`Elegir archivo: ${
-                options.find(({ value }) => {
-                  return value === archivo;
-                }).label
-              }`}
+              label={`Elegir archivo: ${options.find(({ value }) => {
+                return value === archivo;
+              }).label
+                }`}
               type="file"
               disabled={progress !== 0}
               accept=".txt,.csv"
@@ -276,8 +286,8 @@ const CargaArchivos = ({ route }) => {
               {progress === 0
                 ? "Listo para subir"
                 : progress === 100
-                ? "Subido"
-                : "Subiendo"}
+                  ? "Subido"
+                  : "Subiendo"}
             </h1>
             <ProgressBar value={progress} max="100"></ProgressBar>
           </>

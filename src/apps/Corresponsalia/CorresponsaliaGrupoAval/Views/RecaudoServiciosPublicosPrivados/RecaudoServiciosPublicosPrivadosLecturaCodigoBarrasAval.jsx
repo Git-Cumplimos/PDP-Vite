@@ -21,7 +21,7 @@ import {
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
@@ -255,6 +255,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   const onSubmitConfirm = (e) => {
     e.preventDefault();
     setIsUploading(true);
+    let codBarrasIndex = datosTrans.codBarras.indexOf("415");
+    let codBarras = datosTrans.codBarras.slice(codBarrasIndex);
     postConsultaConveniosAval({
       oficina_propia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -263,6 +265,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           : false,
       valor_total_trx: datosTransaccion.valorSinModificar ?? 0,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
@@ -271,7 +274,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
       recaudoAval: {
         numeroConvenio: datosEnvio?.datosConvenio?.nura,
         valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
-        codigoBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
+        codigoBarras: codBarras.replace(/[\x1D]/g, ""),
         location: {
           address: roleInfo?.["direccion"],
           dane_code: roleInfo?.codigo_dane,
@@ -351,6 +354,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           : false,
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,

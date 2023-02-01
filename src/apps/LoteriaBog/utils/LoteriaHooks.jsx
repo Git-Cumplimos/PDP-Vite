@@ -74,10 +74,10 @@ export const LoteriaContext = createContext({
     pagoresponse: null,
     setPagoresponse: null,
   },
-  searchLoteria: () => {},
-  searchLoteriafisica: () => {},
-  sellLoteria: () => {},
-  sellLoteriafisica: () => {},
+  searchLoteria: () => { },
+  searchLoteriafisica: () => { },
+  sellLoteria: () => { },
+  sellLoteriafisica: () => { },
   reportes: {
     moda: null,
     sorteo: null,
@@ -87,24 +87,24 @@ export const LoteriaContext = createContext({
     fechaFinal: null,
     setFechaFinal: null,
   },
-  searchModa: () => {},
-  con_distribuidor_venta: () => {},
+  searchModa: () => { },
+  con_distribuidor_venta: () => { },
   // getReportesVentas: () => {},
   // getReportesPagos: () => {},
-  isWinner: () => {},
-  makePayment: () => {},
-  makePayment2: () => {},
-  pagopremio: () => {},
-  pagopremiofisico: () => {},
-  ConsultaCrearSort: () => {},
-  CambiarSort: () => {},
-  EstadoArchivos: () => {},
-  con_sort_ventas: () => {},
-  cargueVentasExtra_S3: () => {},
-  reportVentas: () => {},
-  consultaInventario: () => {},
-  consultaInventarioReporte: () => {},
-  registrarInventario: () => {},
+  isWinner: () => { },
+  makePayment: () => { },
+  makePayment2: () => { },
+  pagopremio: () => { },
+  pagopremiofisico: () => { },
+  ConsultaCrearSort: () => { },
+  CambiarSort: () => { },
+  EstadoArchivos: () => { },
+  con_sort_ventas: () => { },
+  cargueVentasExtra_S3: () => { },
+  reportVentas: () => { },
+  consultaInventario: () => { },
+  consultaInventarioReporte: () => { },
+  registrarInventario: () => { },
   setCodigos_lot: null,
   codigos_lot: null,
   tiposOperaciones: null,
@@ -160,13 +160,11 @@ export const useProvideLoteria = () => {
     const query = { nit_loteria: nit };
     try {
       const res = await fetchData(urls.idloteria, "GET", query);
-
       return res;
     } catch (err) {
       console.error(err);
     }
   }, []);
-
   //// Conaulta operaciones asociadas a la lotería
   const consulta_operaciones = useCallback(async (nit) => {
     const query = { nit_loteria: nit };
@@ -503,7 +501,6 @@ export const useProvideLoteria = () => {
       idLoteria,
       tipopago,
       hash,
-      phone
     ) => {
       if (tipopago == 2) {
         try {
@@ -922,6 +919,7 @@ export const useProvideLoteria = () => {
     // getReportesVentas,
     // getReportesPagos,
     isWinner,
+    idloteria,
     makePayment,
     makePayment2,
     pagopremio,
