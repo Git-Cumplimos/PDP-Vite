@@ -204,7 +204,6 @@ const CargaArchivos = ({ route }) => {
     setTipoSorteo("");
     setFisiVirtual("");
   }, []);
-
   return (
     <>
       <h1 class="text-3xl">Carga de archivos</h1>
@@ -240,7 +239,7 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
+        {(archivo !== "PlanDePremios" && archivo !== "Resultados") && tipoSorteo !== "" ? (
           <Select
             class="mb-3"
             id="FisiVir"
@@ -255,7 +254,7 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {(archivo === "PlanDePremios" && tipoSorteo !== "") ||
+        {((archivo === "PlanDePremios" || archivo === "Resultados") && tipoSorteo !== "") ||
           fisiVirtual !== "" ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <InputX
