@@ -299,16 +299,13 @@ const Loteria = ({ route }) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
-                    if (max === 0) {
-                      notifyError("No se encontraron billetes asociados a la busqueda")
-                    }
                   })
                   : searchLoteria(sorteo, num, serie, 1).then((max) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
                     if (max === 0) {
-                      notifyError("No se encontraron billetes asociados a la busqueda")
+                      notifyError("No hay fracciones para vender")
                     }
                   });
               },
@@ -340,16 +337,10 @@ const Loteria = ({ route }) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
-                    if (max === 0) {
-                      notifyError("No se encontraron billetes asociados a la busqueda")
-                    }
                   })
                   : searchLoteria(sorteo, numero, num, 1).then((max) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
-                    }
-                    if (max === 0) {
-                      notifyError("No se encontraron billetes asociados a la busqueda")
                     }
                   });
               },

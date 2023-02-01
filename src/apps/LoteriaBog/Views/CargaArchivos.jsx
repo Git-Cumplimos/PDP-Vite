@@ -133,7 +133,7 @@ const CargaArchivos = ({ route }) => {
         })
         .catch((err) => {
           notifyError("Error al cargar Datos");
-        });
+        }); /* notify("Se ha comenzado la carga"); */
     },
     [file, fileName, archivo, tipoSorteo, fisiVirtual]
   );
@@ -203,7 +203,9 @@ const CargaArchivos = ({ route }) => {
     setArchivo("");
     setTipoSorteo("");
     setFisiVirtual("");
+    notifyError("Carga de archivos cancelada por el usuario")
   }, []);
+
   return (
     <>
       <h1 class="text-3xl">Carga de archivos</h1>
@@ -239,7 +241,7 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {(archivo !== "PlanDePremios" && archivo !== "Resultados") && tipoSorteo !== "" ? (
+        {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
           <Select
             class="mb-3"
             id="FisiVir"
@@ -254,7 +256,7 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {((archivo === "PlanDePremios" || archivo === "Resultados") && tipoSorteo !== "") ||
+        {(archivo === "PlanDePremios" && tipoSorteo !== "") ||
           fisiVirtual !== "" ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <InputX
