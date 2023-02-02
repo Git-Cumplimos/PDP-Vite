@@ -225,7 +225,7 @@ const TablaHistoricoContingencia = ({ banco }) => {
               setFechaFinal(e.target.value);
             }}
           />
-          <button onClick={handleClick}>Descargar Excel</button>
+          
         </TableEnterprise>
       )}
     </div>
