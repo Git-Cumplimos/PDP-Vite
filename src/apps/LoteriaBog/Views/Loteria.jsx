@@ -87,7 +87,6 @@ const Loteria = ({ route }) => {
 
   useEffect(() => {
     const nit = nitsLoterias?.[pathname.split("/")?.[2]];
-    console.log("NIT", nit)
     if (nit !== "" && nit !== undefined) {
       setNit_loteria(nit);
       idloteria(nit).then((res) => {
@@ -106,8 +105,6 @@ const Loteria = ({ route }) => {
     };
     fetchData(urlLoto, "GET", query, {})
       .then((res) => {
-        console.log("RES*****", res)
-        ////sorteo virtual
         setSorteoOrdi(null);
         setSorteoExtra(null);
         setSorteofisico(null);
