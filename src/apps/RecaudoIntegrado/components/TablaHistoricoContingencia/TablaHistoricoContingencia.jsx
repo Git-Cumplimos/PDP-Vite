@@ -89,25 +89,7 @@ const TablaHistoricoContingencia = ({ banco }) => {
     setTablaSeleccionada(false);
   }
 
-  const handleClick = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:5000/servicio-contingencia-empresarial-pdp/generarexcel"
-      );
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "Control_Transacciones.xlsx");
-      document.body.appendChild(link);
-      link.click();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+
   return (
     <div>
       {datosFiltradosFecha?.length > 0 ? (
