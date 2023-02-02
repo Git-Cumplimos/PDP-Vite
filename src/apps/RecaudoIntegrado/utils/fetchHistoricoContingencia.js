@@ -59,17 +59,28 @@ export const DescargarExcel = async (data) => {
 
   try {
     const res = await fetchData(
-      "http://127.0.0.1:5000/servicio-contingencia-empresarial-pdp/generarexcel",
+      "http://recaudoempresarial-cert.us-east-2.elasticbeanstalk.com/servicio-contingencia-empresarial-pdp/generarexcel",
       "POST",
       {},
       {
-        nombre_banco: data?.nombre_banco,
-        fecha_carga: data?.fecha_carga,
-        total_registros: "data?.total_registros",
-        registros_procesados: "registros_procesados",
-        registros_fallidos: "registros_fallidos",
-        respuesta_trx_exitosas: 4,
-        respuesta_trx_fallidas: 2,
+        nombre_banco: data?.nombre_banco.toString(),
+        fecha_carga: data?.fecha_carga.toString(),
+
+        total_registros: data?.total_registros
+          ? data.total_registros.toString()
+          : "0",
+        registros_procesados: data?.registros_procesados
+          ? data.registros_procesados.toString()
+          : "0",
+        registros_fallidos: data?.registros_fallidos
+          ? data.registros_fallidos.toString()
+          : "0",
+        respuesta_trx_exitosas: data?.respuesta_trx_exitosas
+          ? data.respuesta_trx_exitosas.toString()
+          : "0",
+        respuesta_trx_fallidas: data?.respuesta_trx_fallidas
+          ? data.respuesta_trx_fallidas.toString()
+          : "0",
       },
       {},
       true

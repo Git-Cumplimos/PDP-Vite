@@ -135,74 +135,26 @@ const TablaHistoricoContingencia = ({ banco }) => {
           }
           onSelectRow={(e, i) => {
             console.log("esta es la tabla i", datosFiltradosFecha[i]);
+            setDatosTrx((old) => {
+              return {
+                ...old,
+                nombre_banco: datosTablaContingencia[i].identificador_banco,
+                fecha_carga: datosTablaContingencia[i].fecha_carga_archivo,
+                total_registros: datosTablaContingencia[i].cantidad_registros,
+                registros_procesados:
+                  datosTablaContingencia[i].cantidad_trx_exitosas,
+                registros_fallidos:
+                  datosTablaContingencia[i].cantidad_trx_fallidas,
+                respuesta_trx_exitosas: JSON.stringify(
+                  datosTablaContingencia[i].respuuestas_trx
+                ),
+                respuesta_trx_fallidas: JSON.stringify(
+                  datosTablaContingencia[i].respuestas_trx_fallidas
+                ),
+              };
+            });
+            setTablaSeleccionada(true);
 
-            // Crear objeto de hoja de cálculo
-            //   const wb = XLSX.utils.book_new();
-
-            //   // Agregar encabezados
-            //   const ws = XLSX.utils.json_to_sheet(
-            //     [
-            //       {
-            //         "Nombre Banco": "",
-            //         "Fecha de carga": "",
-            //         "Total de registros": "",
-            //         "Registros procesados": "",
-            //         "Registros fallidos": "",
-            //         "Respuesta Trx": "",
-            //         "Respuesta Trx fallidos": "",
-            //       },
-            //     ],
-            //     {
-            //       header: [
-            //         "Nombre Banco",
-            //         "Fecha de carga",
-            //         "Total de registros",
-            //         "Registros procesados",
-            //         "Registros fallidos",
-            //         "Respuesta Trx",
-            //         "Respuesta Trx fallidos",
-            //       ],
-            //     }
-            //   );
-
-            //   // Agregar información de la transacción seleccionada
-            //   const data = [
-            //     {
-            //       "Nombre Banco": datosFiltradosFecha[i].identificador_banco,
-            //       "Fecha de carga": datosFiltradosFecha[i].fecha_carga_archivo,
-            //       "Total de registros      ":
-            //         datosFiltradosFecha[i].cantidad_registros,
-            //       "Registros procesados     ":
-            //         datosFiltradosFecha[i].cantidad_trx_exitosas,
-            //       "Registros fallidos     ":
-            //         datosFiltradosFecha[i].cantidad_trx_fallidas,
-
-            //       "Respuesta Trx exitosas   ": JSON.stringify(
-            //         datosFiltradosFecha[i].respuuestas_trx
-            //       ),
-
-            //       "Respuesta Trx fallidos   ": JSON.stringify(
-            //         datosFiltradosFecha[i].respuestas_trx_fallidas
-            //       ),
-            //     },
-            //   ];
-            //   XLSX.utils.sheet_add_json(ws, data, { skipHeader: false });
-            //   ws["!cols"] = [
-            //     { wch: 20 },
-            //     { wch: 20 },
-            //     { wch: 20 },
-            //     { wch: 20 },
-            //     { wch: 20 },
-            //     { wch: 100 },
-            //     { wch: 100 },
-            //   ];
-
-            //   // Agregar hoja de cálculo al archivo
-            //   XLSX.utils.book_append_sheet(wb, ws, "Control Transacciones");
-
-            //   // Crear archivo de Excel
-            //   XLSX.writeFile(wb, "Control_Transacciones.xlsx");
-            //
           }}
         >
           <Input
@@ -248,7 +200,7 @@ const TablaHistoricoContingencia = ({ banco }) => {
             })) ?? []
           }
           onSelectRow={(e, i) => {
-            console.log("esta es la tabla i", datosTablaContingencia[i]);
+            // console.log("esta es la tabla i", datosTablaContingencia[i]);
 
             setDatosTrx((old) => {
               return {
@@ -270,72 +222,7 @@ const TablaHistoricoContingencia = ({ banco }) => {
             });
             setTablaSeleccionada(true);
 
-            // // Crear objeto de hoja de cálculo
-            // const wb = XLSX.utils.book_new();
-
-            // // Agregar encabezados
-            // const ws = XLSX.utils.json_to_sheet(
-            //   [
-            //     {
-            //       "Nombre Banco": "",
-            //       "Fecha de carga": "",
-            //       "Total de registros": "",
-            //       "Registros procesados": "",
-            //       "Registros fallidos": "",
-            //       "Respuesta Trx": "",
-            //       "Respuesta Trx fallidos": "",
-            //     },
-            //   ],
-            //   {
-            //     header: [
-            //       "Nombre Banco",
-            //       "Fecha de carga",
-            //       "Total de registros",
-            //       "Registros procesados",
-            //       "Registros fallidos",
-            //       "Respuesta Trx",
-            //       "Respuesta Trx fallidos",
-            //     ],
-            //   }
-            // );
-
-            // // Agregar información de la transacción seleccionada
-            // const data = [
-            //   {
-            //     "Nombre Banco": datosTablaContingencia[i].identificador_banco,
-            //     "Fecha de carga": datosTablaContingencia[i].fecha_carga_archivo,
-            //     "Total de registros      ":
-            //       datosTablaContingencia[i].cantidad_registros,
-            //     "Registros procesados     ":
-            //       datosTablaContingencia[i].cantidad_trx_exitosas,
-            //     "Registros fallidos     ":
-            //       datosTablaContingencia[i].cantidad_trx_fallidas,
-
-            //     "Respuesta Trx exitosas   ": JSON.stringify(
-            //       datosTablaContingencia[i].respuuestas_trx
-            //     ),
-
-            //     "Respuesta Trx fallidos   ": JSON.stringify(
-            //       datosTablaContingencia[i].respuestas_trx_fallidas
-            //     ),
-            //   },
-            // ];
-            // XLSX.utils.sheet_add_json(ws, data, { skipHeader: false });
-            // ws["!cols"] = [
-            //   { wch: 20 },
-            //   { wch: 20 },
-            //   { wch: 20 },
-            //   { wch: 20 },
-            //   { wch: 20 },
-            //   { wch: 100 },
-            //   { wch: 100 },
-            // ];
-
-            // // Agregar hoja de cálculo al archivo
-            // XLSX.utils.book_append_sheet(wb, ws, "Control Transacciones");
-
-            // // Crear archivo de Excel
-            // XLSX.writeFile(wb, "Control_Transacciones.xlsx");
+            
           }}
         >
           <Input
