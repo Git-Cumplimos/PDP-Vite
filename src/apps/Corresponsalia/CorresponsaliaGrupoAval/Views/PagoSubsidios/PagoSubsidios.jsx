@@ -339,6 +339,8 @@ const PagoSubsidios = () => {
             HandleClose={() =>
               HandleCloseSecondCancelada("Consulta pago subsidios")
             }
+            title="¿Está seguro de realizar consulta?"
+            subtitle="Resumen de la consulta"
           ></InfInicial>
         )}
 
