@@ -180,7 +180,9 @@ const RecargarPaquetes = () => {
                             setTypeInfo("RecargaExitosa");
                           } else {
                             notifyError(
-                              "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                              typeof res?.msg == typeof {}
+                                ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                                : res?.msg
                             );
                             // notifyError(res?.obj?.response?.respuesta);
                             setRespuesta(true);
@@ -213,7 +215,9 @@ const RecargarPaquetes = () => {
             validNavigate("/recargas-paquetes");
           } else {
             notifyError(
-              "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+              typeof res?.msg == typeof {}
+                ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                : res?.msg
             );
             setRespuesta(false);
             handleClose();

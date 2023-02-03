@@ -420,7 +420,10 @@ const CompraPin = () => {
                             VentaExitosa(res?.obj?.response, fecha, hora);
                             setShowLoading(false);
                           } else {
-                            notifyError("Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])");
+                            notifyError(
+                              typeof res?.msg == typeof {}
+                                ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                                : res?.msg);
                             setShowLoading(true);
                             setShowModal(false);
                             showModalDatosEPM(false);
@@ -458,7 +461,9 @@ const CompraPin = () => {
               res?.obj?.response?.respuesta ==
                 ":Error en el numero telefonico, si crees que el numero esta correcto comunicalo al distribuidor"
                 ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
-                : "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                : typeof res?.msg == typeof {}
+                  ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                  : res?.msg
             );
             setShowLoading(false);
             showModalDatosEPM(false);
@@ -520,7 +525,11 @@ const CompraPin = () => {
           ),
         ],
         ["", ""],
-        ["Pin", result_?.jsonAdicional?.info],
+        state?.op == "em"
+        ? ["Pin", result_?.jsonAdicional?.["Numero Pin"]]
+        : state?.op == "hv" || state?.op == "cb"
+          ? ["", ""]
+          : ["Pin", result_?.jsonAdicional?.info],
         ["", ""],
       ],
       disclamer:
