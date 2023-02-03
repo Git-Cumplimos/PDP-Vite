@@ -56,11 +56,13 @@ const DescargarArchivosS3 = ({ route }) => {
 
   return (
     <>
+      <h1 class="text-3xl">Descarga de archivos  </h1>
+
       <div>
         <Form grid>
           <Input
             id="num_sorteo"
-            label="Numero de sorteo"
+            label="Número de sorteo"
             type="search"
             minLength="1"
             maxLength="4"
@@ -78,12 +80,14 @@ const DescargarArchivosS3 = ({ route }) => {
                 if (e.target.value !== "") {
                   con_SortVentas_S3(e.target.value, null, null, page).then(
                     (res) => {
+                      console.log("Esta es la respuesta ", res)
                       if (!("msg" in res)) {
                         setResp_con_sort(res.info);
                         setMaxPages(res.num_datos);
                       } else {
                         notifyError(res.msg);
                         setResp_con_sort("");
+                        console.log("Esto es el mensaje", res.msg)
                       }
                     }
                   );
@@ -95,8 +99,6 @@ const DescargarArchivosS3 = ({ route }) => {
           {sorteo === "" ? (
             <>
               <div className="flex flex-row justify-center w-full">
-                {/* <hr className="border-black flex-auto" /> */}Ó
-                {/* <hr className="border-black flex-auto" /> */}
               </div>
 
               <Input
@@ -128,6 +130,8 @@ const DescargarArchivosS3 = ({ route }) => {
                   timeOut: 500,
                 }}
               />
+              <div className="flex flex-row justify-center w-full">
+              </div>
               <Input
                 id="dateEnd"
                 label="Fecha final"
@@ -145,11 +149,13 @@ const DescargarArchivosS3 = ({ route }) => {
                         e.target.value,
                         page
                       ).then((res) => {
-                        if (!("msg" in res)) {
-                          setResp_con_sort(res.info);
-                          setMaxPages(res.num_datos);
-                        } else {
-                          notifyError(res.msg);
+                        if (res !== undefined) {
+                          if (!("msg" in res)) {
+                            setResp_con_sort(res.info);
+                            setMaxPages(res.num_datos);
+                          } else {
+                            notifyError(res.msg);
+                          }
                         }
                       });
                     }

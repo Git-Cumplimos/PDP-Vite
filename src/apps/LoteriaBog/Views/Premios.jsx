@@ -575,16 +575,21 @@ const Premios = ({ route }) => {
                     });
                   }}
                 />
-                <Select
-                  id="selectFraccion"
-                  label="Fracción"
-                  options={optionsDocumento}
-                  value={seleccionarFraccion}
-                  required
-                  onChange={(e) => {
-                    setSeleccionarFraccion(e.target.value);
-                  }}
-                />
+                {checkBilleteVirtual == false ? (
+                  <Select
+                    id="selectFraccion"
+                    label="Fracción"
+                    options={optionsDocumento}
+                    value={seleccionarFraccion}
+                    required
+                    onChange={(e) => {
+                      setSeleccionarFraccion(e.target.value);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
+
                 {checkBilleteVirtual == true ? (
                   <Input
                     id="codHash"
@@ -626,16 +631,20 @@ const Premios = ({ route }) => {
                       legend={
                         "Por favor, seleccione la fracción del billete a pagar"
                       }>
-                      <Select
-                        id="selectFraccion"
-                        label="Fracción"
-                        options={optionsDocumento}
-                        value={seleccionarFraccion}
-                        required
-                        onChange={(e) => {
-                          setSeleccionarFraccion(e.target.value);
-                        }}
-                      />
+                      {checkBilleteVirtual === false ? (
+                        <Select
+                          id="selectFraccion"
+                          label="Fracción"
+                          options={optionsDocumento}
+                          value={seleccionarFraccion}
+                          required
+                          onChange={(e) => {
+                            setSeleccionarFraccion(e.target.value);
+                          }}
+                        />
+                      ) : (
+                        ""
+                      )}
                       {checkBilleteVirtual === true ? (
                         <Input
                           id="codHash"
