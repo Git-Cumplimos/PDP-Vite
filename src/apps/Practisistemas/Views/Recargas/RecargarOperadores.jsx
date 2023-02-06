@@ -53,15 +53,16 @@ const RecargasOperadores = () => {
       ["No. terminal", roleInfo.id_dispositivo],
       ["Comercio", roleInfo["nombre comercio"]],
       ["", ""],
-      ["Municipio", roleInfo.ciudad],
-      ["", ""],
       ["Dirección", roleInfo.direccion],
       ["", ""],
     ],
-    commerceName: "RECARGA " + state?.operador_recargar,
-    trxInfo: [],
+    commerceName: "RECARGA",
+    trxInfo: [
+      ["Operador",state?.operador_recargar],
+      ["", ""],
+    ],
     disclamer:
-      "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
+      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
   });
 
   const onChangeMoney = useMoney({
@@ -108,10 +109,10 @@ const RecargasOperadores = () => {
     const fecha = Intl.DateTimeFormat("es-CO", {
       year: "numeric",
       month: "2-digit",
-      day: "numeric",
+      day: "2-digit",
     }).format(new Date());
     /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
+    const hora = Intl.DateTimeFormat(undefined, {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
@@ -155,14 +156,8 @@ const RecargasOperadores = () => {
       .then(async (res) => {
         if (res?.status === true) {
           notify("Recarga exitosa");
-          infTicketFinal["commerceInfo"].push([
-            "Id Transacción",
-            res?.obj?.response?.["idtrans"],
-          ]);
-          infTicketFinal["commerceInfo"].push([
-            "Id Aut",
-            res?.obj?.response?.["codigoauth"],
-          ]);
+          infTicketFinal["commerceInfo"].splice(2,0,["Id Trx",res?.obj?.response?.["idtrans"],]);
+          infTicketFinal["commerceInfo"].splice(3,0,["Id Aut",res?.obj?.response?.["codigoauth"],]);
           setInfTicket(infTicketFinal);
           setRespuesta(false);
           setTypeInfo("RecargaExitosa");
@@ -185,14 +180,8 @@ const RecargasOperadores = () => {
                             res?.obj?.response?.estado == "00"
                           ) {
                             notify("Recarga exitosa");
-                            infTicketFinal["commerceInfo"].push([
-                              "Id Trx",
-                              res?.obj?.response?.["idtrans"],
-                            ]);
-                            infTicketFinal["commerceInfo"].push([
-                              "Id Aut",
-                              res?.obj?.response?.["codigoauth"],
-                            ]);
+                            infTicketFinal["commerceInfo"].splice(2,0,["Id Trx",res?.obj?.response?.["idtrans"],]);
+                            infTicketFinal["commerceInfo"].splice(3,0,["Id Aut",res?.obj?.response?.["codigoauth"],]);
                             setInfTicket(infTicketFinal);
                             setRespuesta(false);
                             setTypeInfo("RecargaExitosa");
@@ -244,7 +233,7 @@ const RecargasOperadores = () => {
       })
       .catch((err) => {
         setRespuesta(false);
-        notifyError("Error respuesta PDP: Falla en la conexión [CODIGO]");
+        notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
         console.error(err);
         handleClose();
       });
@@ -263,12 +252,10 @@ const RecargasOperadores = () => {
           ["No. terminal", roleInfo.id_dispositivo],
           ["Comercio", roleInfo["nombre comercio"]],
           ["", ""],
-          ["Municipio", roleInfo.ciudad],
-          ["", ""],
           ["Dirección", roleInfo.direccion],
           ["", ""],
         ],
-        commerceName: "RECARGA " + state?.operador_recargar,
+        commerceName: "RECARGA",
         trxInfo: [],
       };
     });
