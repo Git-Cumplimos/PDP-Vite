@@ -157,7 +157,7 @@ const Deposito = () => {
             idComercio: roleInfo?.id_comercio,
             idUsuario: roleInfo?.id_usuario,
             idDispositivo: roleInfo?.id_dispositivo,
-            nombre_comercio: roleInfo?.["nombre comercio"],
+            nombre_usuario: roleInfo?.["nombre comercio"],
             // Tipo: roleInfo?.tipo_comercio,
             numIdentificacionDepositante: userDoc,
             numDaviplata: phone,
@@ -268,7 +268,7 @@ const Deposito = () => {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
-      nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: roleInfo?.["nombre comercio"],
       // Tipo: roleInfo?.tipo_comercio,
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
