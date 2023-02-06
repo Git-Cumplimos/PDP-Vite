@@ -1,10 +1,4 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, {Fragment,useCallback,useEffect,useRef,useState,} from "react";
 import useMoney from "../../../../hooks/useMoney";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../components/Base/Button";
@@ -22,11 +16,7 @@ import { notify, notifyError } from "../../../../utils/notify";
 import { toPhoneNumber } from "../../../../utils/functions";
 import classes from "./FormularioVentaPines.module.css";
 import fetchData from "../../../../utils/fetchData";
-import {
-  postCheckReintentoPines,
-  fetchConsultaPinEPM,
-  fetchConsultaPinSNR,
-} from "../../utils/fetchBackPines";
+import {postCheckReintentoPines,fetchConsultaPinEPM,fetchConsultaPinSNR,} from "../../utils/fetchBackPines";
 import { useNavigate, useLocation } from "react-router-dom";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import { v4 } from "uuid";
@@ -35,14 +25,12 @@ const minValor = 1000;
 const maxValor = 100000;
 const minValorEPM = `${process.env.MIN_VALOR_EPM}`;
 const maxValorEPM = `${process.env.MAX_VALOR_EPM}`;
-const tipo_operacion = 113;
 const url_compra_pines = `${process.env.REACT_APP_PRACTISISTEMAS}/pines`;
+const tipo_operacion = 113;
 
 const CompraPin = () => {
   const { contenedorbtn, contenedorTitulos } = classes;
-  const printDiv = useRef();
   const { roleInfo, userInfo, infoTicket } = useAuth();
-  const validNavigate = useNavigate();
   const [inputCelular, setInputCelular] = useState("");
   const [inputContador, setInputContador] = useState("");
   const [inputPlaca, setInputPlaca] = useState("");
@@ -52,8 +40,9 @@ const CompraPin = () => {
   const [showModal, setShowModal] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
   const [showLoading, setShowLoading] = useState(false);
-  const [numeroPinEPM, setNumeroPinEPM] = useState("");
+  const validNavigate = useNavigate();
   const { state } = useLocation();
+  const printDiv = useRef();
   //******************* Datos del propietario DatosEPM (Variables) ***************
   const [consultaDatosEPM, setConsultaDatosEPM] = useState({
     nombreClienteEpm: "",
@@ -78,7 +67,6 @@ const CompraPin = () => {
   //******************* MODAL SNR**********************************
   const [modalDatosSNR, showModalDatosSNR] = useState(false);
   // **************************************************************
-
   //------------------Funcion Para consultar a practisistemas validarPinEpm -------------------------------
   const ConsultaPinEPM = (e) => {
     e.preventDefault(e);
@@ -91,7 +79,6 @@ const CompraPin = () => {
         },
       })
         .then((res) => {
-          console.log("Esto es res", res);
           if (res?.obj?.respuesta == "Consulta con error") {
             if (res?.obj?.data?.nombre == "Usuario no existe") {
               notifyError("Usuario no existe");
@@ -122,7 +109,6 @@ const CompraPin = () => {
           }
         })
         .catch((err) => {
-          console.log("Esto es esl cath err linea 126", err);
           notifyError("Transaccón declinada", err);
         });
     } else if (state?.op == "em") {
@@ -134,7 +120,6 @@ const CompraPin = () => {
         },
       })
         .then((res) => {
-          console.log("Este es el res lina 138", res);
           if (res?.obj?.respuesta == "Consulta con error") {
             if (res?.obj?.data?.nombre == "Usuario no existe") {
               notifyError("Usuario no existe");
@@ -158,7 +143,6 @@ const CompraPin = () => {
           }
         })
         .catch((err) => {
-          console.log("Esto es esl cath err linea 162", err);
           notifyError("Transaccón declinada", err);
         });
     }
@@ -171,17 +155,17 @@ const CompraPin = () => {
       Hora: "",
     },
     commerceInfo: [
+      ["Id Comercio", roleInfo.id_comercio],
       ["No. terminal", roleInfo.id_dispositivo],
-      ["Teléfono", roleInfo.telefono],
       ["Comercio", roleInfo["nombre comercio"]],
       ["", ""],
       ["Dirección", roleInfo.direccion],
       ["", ""],
     ],
-    commerceName: "Venta de Pines de Servicio y Contenido",
+    commerceName: "VENTA PINES DE CONTENIDO",
     trxInfo: [],
     disclamer:
-      "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
+    "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
   });
 
   const onChangeMoney = useMoney({
@@ -265,17 +249,17 @@ const CompraPin = () => {
     setShowLoading(true);
 
     const uniqueId = v4();
-    const dateActual = new Date();
-    const date = dateActual.getDate();
-    const mounth = dateActual.getMonth() + 1;
-    const year = dateActual.getFullYear();
-    const fecha = date + "/" + mounth + "/" + year;
-
-    const hour = dateActual.getHours();
-    const minutes = dateActual.getMinutes();
-    const seconds = dateActual.getSeconds();
-    const hora = hour + ":" + minutes + ":" + seconds;
-
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
     const newVoucher = { ...infTicket };
 
     newVoucher["timeInfo"]["Fecha de venta"] = fecha;
@@ -286,57 +270,33 @@ const CompraPin = () => {
 
     if (state?.op == "cb") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = [
-        "Número celular",
-        toPhoneNumber(inputCelular),
-      ];
+      newVoucher["trxInfo"][2] = ["Número celular",toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
       newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = [
-        "Valor del Pin",
-        formatMoney.format(consultaDatosSNR?.valorPin),
-      ];
+      newVoucher["trxInfo"][6] = ["Valor del Pin",formatMoney.format(consultaDatosSNR?.valorPin),];
       newVoucher["trxInfo"][7] = ["", ""];
     } else if (state?.op == "em") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = [
-        "Número celular",
-        toPhoneNumber(inputCelular),
-      ];
+      newVoucher["trxInfo"][2] = ["Número celular",toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
       newVoucher["trxInfo"][4] = ["Contador", inputContador];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = [
-        "Valor del Pin",
-        formatMoney.format(inputValor),
-      ];
+      newVoucher["trxInfo"][6] = ["Valor del Pin",formatMoney.format(inputValor),];
       newVoucher["trxInfo"][7] = ["", ""];
     } else if (state?.op == "hv") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = [
-        "Número celular",
-        toPhoneNumber(inputCelular),
-      ];
+      newVoucher["trxInfo"][2] = ["Número celular",toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
       newVoucher["trxInfo"][4] = ["Placa", inputPlaca];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = [
-        "Valor del Pin",
-        formatMoney.format(inputValor),
-      ];
+      newVoucher["trxInfo"][6] = ["Valor del Pin",formatMoney.format(inputValor),];
       newVoucher["trxInfo"][7] = ["", ""];
     } else {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = [
-        "Número celular",
-        toPhoneNumber(inputCelular),
-      ];
+      newVoucher["trxInfo"][2] = ["Número celular",toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = [
-        "Valor del Pin",
-        formatMoney.format(state.sell ? state.sell : inputValor),
-      ];
+      newVoucher["trxInfo"][4] = ["Valor del Pin",formatMoney.format(state.sell ? state.sell : inputValor),];
       newVoucher["trxInfo"][5] = ["",""];
     }
     fetchData(
@@ -459,7 +419,7 @@ const CompraPin = () => {
           } else {
             notifyError(
               res?.obj?.response?.respuesta ==
-                ":Error en el numero telefonico, si crees que el numero esta correcto comunicalo al distribuidor"
+                ":Error en el numero telefónico, si crees que el número esta correcto comunícalo al distribuidor"
                 ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
                 : typeof res?.msg == typeof {}
                   ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
@@ -475,7 +435,7 @@ const CompraPin = () => {
         }
       })
       .catch(async (err) => {
-        notifyError("Error respuesta PDP: Falla en la conexión [CODIGO]");
+        notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
         setShowLoading(false);
         handleClose();
       });
@@ -489,22 +449,39 @@ const CompraPin = () => {
         Hora: hora,
       },
       commerceInfo: [
+        ["Id Comercio", roleInfo.id_comercio],
         ["No. terminal", roleInfo.id_dispositivo],
-        ["Teléfono", roleInfo.telefono],
         ["Id trx", result_.idtrans],
         ["Id Aut", result_.codigoauth],
         ["Comercio", roleInfo["nombre comercio"]],
         ["", ""],
         ["Dirección", roleInfo.direccion],
-        ["", ""],
+        ["", ""],       
       ],
-      commerceName: "Venta de Pines de Servicio y Contenido",
+      commerceName: 
+      state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+        ? "VENTA PINES DE SERVICIO"
+        : "VENTA PINES DE CONTENIDO",
       trxInfo: [
-        ["Nombre del Pin", state.desc],
+        ["Convenio", state.desc],
+        ["", ""],       
+        state?.op == "em"
+          ? ["No. PIN",result_?.jsonAdicional?.["Numero Pin"]]
+          : state?.op !== "hv" || state?.op !== "cb"
+            ? ["", ""]
+            : ["No. PIN",result_?.jsonAdicional?.info],
         ["", ""],
-        ["Número celular", toPhoneNumber(inputCelular)],
-        [("", "")],
-
+        ["No. Celular", toPhoneNumber(inputCelular)],
+        ["", ""],
+        ["Valor",
+          formatMoney.format(
+            state.sell
+              ? state.sell
+              : consultaDatosSNR.valorPin
+              ? consultaDatosSNR.valorPin
+              : inputValor
+          ),],
+        ["", ""],
         state?.op == "cb"
           ? ["Matrícula", inputMatricula]
           : state?.op == "hv"
@@ -512,41 +489,21 @@ const CompraPin = () => {
           : state?.op == "em"
           ? ["Contador", inputContador]
           : [],
-
-        ["", ""],
-        [
-          "Valor del Pin",
-          formatMoney.format(
-            state.sell
-              ? state.sell
-              : consultaDatosSNR.valorPin
-              ? consultaDatosSNR.valorPin
-              : inputValor
-          ),
-        ],
-        ["", ""],
-        state?.op == "em"
-        ? ["Pin", result_?.jsonAdicional?.["Numero Pin"]]
-        : state?.op == "hv" || state?.op == "cb"
-          ? ["", ""]
-          : ["Pin", result_?.jsonAdicional?.info],
         ["", ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
+        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
     };
     setTypeInfo("VentaExitosa");
     setInfTicket(voucher);
 
     infoTicket(result_.idtrans, tipo_operacion, voucher)
       .then((resTicket) => {
-        console.error(resTicket);
+        console.log(resTicket);
       })
       .catch((err) => {
         console.error(err);
-        console.log("Error guardando el ticket");
-        notifyError("Error respuesta PDP: Error guardando el ticket [CODIGO]");
-        // notifyError("Error guardando el ticket");
+        notifyError("Error respuesta PDP: Fallo en la inserción en tabla de transacciones [0040001]");
       });
   };
 
@@ -572,17 +529,17 @@ const CompraPin = () => {
         Hora: "",
       },
       commerceInfo: [
+        ["Id Comercio", roleInfo.id_comercio],
         ["No. terminal", roleInfo.id_dispositivo],
-        ["Teléfono", roleInfo.telefono],
         ["Comercio", roleInfo["nombre comercio"]],
         ["", ""],
         ["Dirección", roleInfo.direccion],
         ["", ""],
       ],
-      commerceName: "Venta de Pines de Servicio y Contenido",
+      commerceName: "VENTA PINES DE CONTENIDO",
       trxInfo: [],
       disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
+      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
     });
     validNavigate("/Pines/PinesContenido");
   }, []);
