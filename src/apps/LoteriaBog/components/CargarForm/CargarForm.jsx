@@ -1,16 +1,15 @@
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
-import { notifyError } from "../../../../utils/notify";
 import { useState, useEffect } from "react";
 //import { useAuth } from "../../../../hooks/AuthHooks";
 
 const CargarForm = ({
-  selected,
   file,
   disabledBtns,
   closeModal,
   handleSubmit,
+  fisiVirtual,
 }) => {
   const onSubmit = (e) => {
     e.preventDefault();
@@ -22,9 +21,9 @@ const CargarForm = ({
     <>
       <div className="flex flex-col justify-center items-center mx-auto container">
         <Form onSubmit={onSubmit} grid>
-          <div className="flex flex-row justify-between text-lg font-medium">
+          <div className="flex flex-row text-center justify-between text-lg font-medium">
             <h1>
-              ¿Seguro que desea subir el archivo "{file}" como "{selected}"?
+              ¿Está seguro de subir el archivo "{file}" para la asignación {fisiVirtual === "Fisico/" ? `Física` : ("Virtual")}?
             </h1>
           </div>
 
@@ -36,8 +35,6 @@ const CargarForm = ({
               type="button"
               onClick={() => {
                 closeModal();
-                notifyError("Carga de archivos cancelada por el usuario")
-
               }}
             >
               Cancelar

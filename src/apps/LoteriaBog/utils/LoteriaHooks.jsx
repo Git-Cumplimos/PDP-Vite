@@ -11,7 +11,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import { notifyError } from "../../../utils/notify";
 //import Loteria from "../Views/Loteria";
-
+import { useNavigate } from "react-router-dom";
 ////// NITS de loterias _______________________
 const nitsLoterias = {
   "loteria-de-bogota": "899.999.270-1",
@@ -123,7 +123,7 @@ export const useProvideLoteria = () => {
   // Datos consulta y compra
   const { roleInfo } = useAuth();
   const { pathname } = useLocation();
-
+  const navigate = useNavigate();
   const [numero, setNumero] = useState("");
   const [serie, setSerie] = useState("");
   const [loterias, setLoterias] = useState(null);
@@ -218,7 +218,9 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         try {
           consulta_codigos_oficina(nit).then((res) => {
+            console.log("Hizo la consulta acá es donde se totea", res)
             if ("msg" in res) {
+              console.log("Se metio en el if donde se totea", res)
               setCodigosOficina({
                 cod_oficina_lot: "PPVIR",
                 cod_sucursal_lot: "00",
@@ -353,10 +355,15 @@ export const useProvideLoteria = () => {
       };
 
       try {
+        setLoadConsulta(true);
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
         setSellResponse(res);
+        setLoadConsulta(false);
       } catch (err) {
+        setLoadConsulta(false);
         setSellResponse(null);
+        navigate(-1);
+        notifyError("Error al hacer la consulta")
         console.error(err);
       }
     },
@@ -400,11 +407,16 @@ export const useProvideLoteria = () => {
       };
 
       try {
+        setLoadConsulta(true);
         const res = await fetchData(urls.ventaOrdinariofisica, "POST", {}, req);
         setSellResponse(res);
+        setLoadConsulta(false);
       } catch (err) {
+        setLoadConsulta(false);
         setSellResponse(null);
         console.error(err);
+        navigate(-1);
+        notifyError("Error al hacer la consulta")
       }
     },
     [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica]

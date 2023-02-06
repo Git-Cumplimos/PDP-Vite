@@ -87,7 +87,6 @@ const Loteria = ({ route }) => {
 
   useEffect(() => {
     const nit = nitsLoterias?.[pathname.split("/")?.[2]];
-    console.log("NIT", nit)
     if (nit !== "" && nit !== undefined) {
       setNit_loteria(nit);
       idloteria(nit).then((res) => {
@@ -106,8 +105,6 @@ const Loteria = ({ route }) => {
     };
     fetchData(urlLoto, "GET", query, {})
       .then((res) => {
-        console.log("RES*****", res)
-        ////sorteo virtual
         setSorteoOrdi(null);
         setSorteoExtra(null);
         setSorteofisico(null);
@@ -299,16 +296,13 @@ const Loteria = ({ route }) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
-                    if (max === 0) {
-                      notifyError("No se encontraron billetes asociados a la busqueda")
-                    }
                   })
                   : searchLoteria(sorteo, num, serie, 1).then((max) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
                     if (max === 0) {
-                      notifyError("No se encontraron billetes asociados a la busqueda")
+                      notifyError("No hay fracciones para vender")
                     }
                   });
               },
@@ -340,16 +334,10 @@ const Loteria = ({ route }) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
-                    if (max === 0) {
-                      notifyError("No se encontraron billetes asociados a la busqueda")
-                    }
                   })
                   : searchLoteria(sorteo, numero, num, 1).then((max) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
-                    }
-                    if (max === 0) {
-                      notifyError("No se encontraron billetes asociados a la busqueda")
                     }
                   });
               },
