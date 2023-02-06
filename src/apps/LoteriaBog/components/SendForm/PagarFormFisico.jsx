@@ -52,7 +52,7 @@ const SendFormFisico = ({
   // const [frac2, setFrac2] = useState(false);
   // const [frac3, setFrac3] = useState(false);
 
-  // console.log(frac1,frac2,frac3)
+
 
   const [disabledBtns, setDisabledBtns] = useState(false);
 

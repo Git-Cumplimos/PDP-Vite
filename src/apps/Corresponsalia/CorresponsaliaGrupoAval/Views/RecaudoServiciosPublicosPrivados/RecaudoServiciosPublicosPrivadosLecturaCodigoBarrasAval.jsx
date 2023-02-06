@@ -260,7 +260,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
     postConsultaConveniosAval({
       oficina_propia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-        roleInfo?.tipo_comercio === "KIOSCO"
+          roleInfo?.tipo_comercio === "KIOSCO"
           ? true
           : false,
       valor_total_trx: datosTransaccion.valorSinModificar ?? 0,
@@ -349,7 +349,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
     postRecaudoConveniosAval({
       oficina_propia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-        roleInfo?.tipo_comercio === "KIOSCO"
+          roleInfo?.tipo_comercio === "KIOSCO"
           ? true
           : false,
       valor_total_trx: valorTransaccion,
@@ -481,9 +481,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         </>
       ) : (
         <>
-          <h1 className='text-3xl text-center  mb-10'>{`Convenio: ${
-            datosEnvio?.datosConvenio?.convenio ?? ""
-          }`}</h1>
+          <h1 className='text-3xl text-center  mb-10'>{`Convenio: ${datosEnvio?.datosConvenio?.convenio ?? ""
+            }`}</h1>
           <Form grid onSubmit={onSubmitConfirm}>
             <Input
               id='ref1'
@@ -500,7 +499,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                 // });
               }}></Input>
             {datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 ? (
+              datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 ? (
               <Input
                 id='ref2'
                 label='Fecha de caducidad'
@@ -574,9 +573,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                   </h1>
                   <h2>{`Nombre convenio: ${datosEnvio?.datosConvenio?.convenio}`}</h2>
                   <h2>{`Número convenio: ${datosEnvio?.datosConvenio?.nura}`}</h2>
-                  <h2>{`Referencia 1: ${
-                    datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
-                  }`}</h2>
+                  <h2>{`Referencia 1: ${datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                    }`}</h2>
                   <h2 className='text-base'>
                     {`Valor consultado: ${formatMoney.format(
                       datosTransaccion.valorSinModificar2

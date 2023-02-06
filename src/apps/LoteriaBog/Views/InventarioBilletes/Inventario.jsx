@@ -142,7 +142,6 @@ const Inventario = () => {
         ], //numero_completo
         "true" //inconcistencia-bool
       ).then((resp) => {
-        console.log("resOK", resp);
         if (resp?.response === "Registro exitoso") {
           notify("Inventario agregado exitosamente.");
           navigate(`/loteria`);
@@ -173,7 +172,6 @@ const Inventario = () => {
         ], //numero_completo
         "false" //inconcistencia-bool
       ).then((res) => {
-        console.log("Resfalse", res);
         if (res?.response === "Registro exitoso") {
           notify("Inconsistencia agregada exitosamente.");
           setHabilitarBtnAgregarInconsistencia(true);
@@ -196,17 +194,14 @@ const Inventario = () => {
 
   /* const validarEntradaScanner = (validarNum) => {
     if (validarNum[0] === "]") {
-      console.log(validarNum.replace("]", ""));
       setDatosEscaneados((old) => {
         return { ...old, escaneado1: validarNum.replace("]", " ") };
       });
-      console.log(datosEscaneados["escaneado1"]);
     }
   }; */
   const validarEntradaScanner = useCallback(
     (validarNum) => {
       if (validarNum[0] === "]") {
-        // console.log(validarNum.replace("]C1", ""));
         return validarNum.replace("]C1", "");
       } else {
         return validarNum;
@@ -355,11 +350,6 @@ const Inventario = () => {
                       return { ...old, escaneado1Validados: false };
                     });
                     if (num?.length === 20) {
-                      /* console.log(num.substr(-9, 4)); */
-                      /*  console.log(
-                        String(num.substr(-5, 3)),
-                        String(datosAzar[0].split("-")[1])
-                      ); */
                       if (
                         (String(num.substr(-9, 4)) !==
                           String(datosAzar[0].split("-")[0])) &
@@ -403,7 +393,6 @@ const Inventario = () => {
                       return { ...old, escaneado2Validados: false };
                     });
                     if (num2?.length === 20) {
-                      /* console.log(e.target.value.substr(-9, 4)); */
                       if (
                         (String(num2.substr(-9, 4)) !==
                           String(datosAzar[1].split("-")[0])) &
@@ -447,7 +436,6 @@ const Inventario = () => {
                       return { ...old, escaneado3Validados: false };
                     });
                     if (num3?.length === 20) {
-                      /* console.log(num3.substr(-9, 4)); */
                       if (
                         (String(num3.substr(-9, 4)) !==
                           String(datosAzar[2].split("-")[0])) &

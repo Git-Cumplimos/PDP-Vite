@@ -62,11 +62,10 @@ const Loteria = ({ route }) => {
   const [nit_loteria, setNit_loteria] = useState(null);
   const [nom_loteria, setNom_loteria] = useState(null);
   const navigate = useNavigate();
-
+  const [isInputDisabled, setIsInputDisabled] = useState(false);
   const validarEntradaScanner = useCallback(
     (validarNum) => {
       if (validarNum[0] === "]") {
-        // console.log(validarNum.replace("]C1", ""));
         return validarNum.replace("]C1", "");
       } else {
         return validarNum;
@@ -173,26 +172,26 @@ const Loteria = ({ route }) => {
     if (sorteoOrdi !== null) {
       copy.push({
         value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
-        label: `Sorteo ordinario virtual- ${sorteoOrdi.num_sorteo}`,
+        label: `Sorteo Ordinario Virtual- ${sorteoOrdi.num_sorteo}`,
       });
     }
     if (sorteoExtra !== null) {
       copy.push({
         value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}-${sorteoExtra.num_loteria}`,
-        label: `Sorteo extraordinario virtual- ${sorteoExtra.num_sorteo}`,
+        label: `Sorteo Extraordinario Virtual- ${sorteoExtra.num_sorteo}`,
       });
     }
     if (sorteoOrdifisico !== null) {
       copy.push({
         value: `${sorteoOrdifisico.num_sorteo}-${sorteoOrdifisico.fisico}-${sorteoOrdifisico.num_loteria}`,
-        label: `Sorteo ordinario  fisico- ${sorteoOrdifisico.num_sorteo}`,
+        label: `Sorteo ordinario  Físico- ${sorteoOrdifisico.num_sorteo}`,
       });
     }
 
     if (sorteoExtrafisico !== null) {
       copy.push({
         value: `${sorteoExtrafisico.num_sorteo}-${sorteoExtrafisico.fisico}-${sorteoExtrafisico.num_loteria}`,
-        label: `Sorteo extraordinario fisico - ${sorteoExtrafisico.num_sorteo}`,
+        label: `Sorteo Extraordinario Físico - ${sorteoExtrafisico.num_sorteo}`,
       });
     }
     SetOpcionesDisponibles([...copy]);
@@ -267,13 +266,15 @@ const Loteria = ({ route }) => {
                 } else {
                   setNumero("");
                   setSerie("");
+                  setIsInputDisabled(true);
                 }
               }}
+              disabled={isInputDisabled}
             ></InputX>
             : ""}
           <Input
             id="numTicket"
-            label="Numero de billete"
+            label="Número de billete"
             type="search"
             minLength="1"
             maxLength="4"
@@ -296,6 +297,10 @@ const Loteria = ({ route }) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
+                    if (max === 0) {
+                      notifyError("No se encontraron billetes asociados a la búsqueda")
+
+                    }
                   })
                   : searchLoteria(sorteo, num, serie, 1).then((max) => {
                     if (max !== undefined) {
@@ -311,7 +316,7 @@ const Loteria = ({ route }) => {
           />
           <Input
             id="numSerie"
-            label="Numero de serie"
+            label="Número de serie"
             type="search"
             minLength="1"
             maxLength="3"

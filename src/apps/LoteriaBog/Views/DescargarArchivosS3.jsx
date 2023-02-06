@@ -80,14 +80,12 @@ const DescargarArchivosS3 = ({ route }) => {
                 if (e.target.value !== "") {
                   con_SortVentas_S3(e.target.value, null, null, page).then(
                     (res) => {
-                      console.log("Esta es la respuesta ", res)
                       if (!("msg" in res)) {
                         setResp_con_sort(res.info);
                         setMaxPages(res.num_datos);
                       } else {
                         notifyError(res.msg);
                         setResp_con_sort("");
-                        console.log("Esto es el mensaje", res.msg)
                       }
                     }
                   );
@@ -153,9 +151,9 @@ const DescargarArchivosS3 = ({ route }) => {
                           if (!("msg" in res)) {
                             setResp_con_sort(res.info);
                             setMaxPages(res.num_datos);
-                          } else {
-                            notifyError(res.msg);
                           }
+                        } else {
+                          notifyError(res.msg);
                         }
                       });
                     }
@@ -211,8 +209,8 @@ const DescargarArchivosS3 = ({ route }) => {
         {Array.isArray(resp_con_sort) && resp_con_sort.length > 0 ? (
           <>
             <div className="flex flex-row justify-evenly w-full my-4">
-              <h1>Pagina: {page}</h1>
-              <h1>Ultima pagina: {maxPages}</h1>
+              <h1>Página: {page}</h1>
+              <h1>Ultima Página: {maxPages}</h1>
             </div>
             <Table
               headers={["Sorteo", "Fecha de juego"]}

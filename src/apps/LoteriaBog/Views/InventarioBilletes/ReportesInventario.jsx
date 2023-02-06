@@ -26,7 +26,6 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 	const [maxPages, setMaxPages] = useState(1)
 	const { consultaInventarioReporte } = useLoteria();
 	useEffect(() => {
-		console.log(pageData)
 		loadDocument(numeroSorteo, pageData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [numeroSorteo, pageData]);
@@ -39,7 +38,6 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 				setReporteInventario(res?.Respuesta);
 				setMaxPages(res?.maxPage);
 				setShowTabla(true);
-				// console.log("reportese _ a", reporteInventario);
 			}
 		});
 	};
@@ -92,7 +90,6 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 							}
 						)
 					}
-					// onSelectRow={console.log("a")}
 				>
 					<Input
 						id="numSorteo"
