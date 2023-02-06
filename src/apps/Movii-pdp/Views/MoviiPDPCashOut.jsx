@@ -20,7 +20,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const MoviiPDPCashOut = () => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
     superior: 20000000,
@@ -147,6 +147,7 @@ const MoviiPDPCashOut = () => {
       amount: datosTrans?.valorCashOut,
       issuer_id_dane: roleInfo?.codigo_dane,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
       Ticket: objTicket,
       subscriberNum: datosTrans.numeroTelefono,
       otp: datosTrans.otp,
@@ -168,7 +169,8 @@ const MoviiPDPCashOut = () => {
           objTicket["trxInfo"].push(["", ""]);
           objTicket["trxInfo"].push([
             "Id transacción",
-            res?.obj?.respuesta_movii?.correlationId,
+            res?.obj?.respuesta_movii?.transactionId,
+            // res?.obj?.respuesta_movii?.correlationId,
           ]);
           objTicket["trxInfo"].push(["", ""]);
 
@@ -199,10 +201,14 @@ const MoviiPDPCashOut = () => {
           minLength='10'
           maxLength='10'
           required
+          autoComplete='off'
           value={datosTrans.numeroTelefono}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               const num = e.target.value;
+              if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
+                return notifyError("El número Movii debe comenzar por 3");
+              }
               setDatosTrans((old) => {
                 return { ...old, numeroTelefono: num };
               });
@@ -216,6 +222,7 @@ const MoviiPDPCashOut = () => {
           minLength='2'
           maxLength='6'
           required
+          autoComplete='off'
           value={datosTrans.otp}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -253,7 +260,7 @@ const MoviiPDPCashOut = () => {
             datosTrans.valorCashOut > limiteRecarga.inferior ? (
               <>
                 <h1 className='text-2xl font-semibold'>
-                  ¿Esta seguro de realizar el cash out?
+                  ¿Está seguro de realizar el cash out?
                 </h1>
                 <h2 className='text-base'>
                   {`Valor de transacción: ${formatMoney.format(

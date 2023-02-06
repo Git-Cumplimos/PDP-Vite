@@ -30,7 +30,7 @@ import {
 
 const RecaudoServiciosPublicosPrivadosOperaciones = () => {
   const { state } = useLocation();
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [{ showModal, estadoPeticion }, setShowModal] = useState({
     showModal: false,
@@ -219,6 +219,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
         nomConvenio: convenio.nom_convenio_cnb,
         ticket: objTicket,
 
+        nombre_usuario: pdpUser?.uname ?? "",
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
         idTerminal: roleInfo?.id_dispositivo,
@@ -377,6 +378,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
           setIsUploading(false);
           notifyError("No se ha podido conectar al servidor");
           console.error(err);
+          handleClose();
         });
     } else {
       setIsUploading(true);
@@ -387,6 +389,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
         valReferencia2: datosTransValidacion?.ref2 ?? "",
         numValorTotalDebito: datosTransValidacion.valor ?? 0,
 
+        nombre_usuario: pdpUser?.uname ?? "",
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
         idTerminal: roleInfo?.id_dispositivo,

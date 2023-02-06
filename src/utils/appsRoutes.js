@@ -177,8 +177,12 @@ const PpsVoluntarioDemanda = lazy(() =>
  * Recaudo
  */
 const Recaudo = lazy(() => import("../apps/Recaudo/Recaudo"));
+const RecaudoTrxRecaudo = lazy(() =>
+  import("../apps/Recaudo/Views/TrxRecaudo")
+);
 const RecaudoManual = lazy(() => import("../apps/Recaudo/Views/RecaudoManual"));
 const RecaudoCodigo = lazy(() => import("../apps/Recaudo/Views/RecaudoCodigo"));
+
 /**
  * RecaudoIntegrado
  */
@@ -223,6 +227,7 @@ const TransaccionesBancolombia = lazy(() =>
 /* const ContenedorRunt = lazy(() => import("../apps/Runt/ContenedorRunt"));
 const PagarRunt = lazy(() => import("../apps/Runt/Views/PagarRunt"));
  */
+
 /**
  * Daviplata
  */
@@ -306,7 +311,7 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={"Loteria"} name="Loteria" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
-    permission: [3, 4, 5, 6, 44, 45, 46, 47],
+    permission: [3, 4, 5, 6, 44, 45, 46, 47, 95],
     subRoutes: [
       {
         link: "loteria-de-bogota",
@@ -324,7 +329,7 @@ const allUrlsPrivateApps = [
         link: "loteria-de-cundinamarca",
         label: "Lotería de Cundinamarca",
         logo: "LoteriaTolima",
-        permission: [44, 45, 46, 47],
+        permission: [95, 45, 46, 47],
       },
     ].map(({ link: name, label, logo, permission }) => ({
       link: `/loteria/${name}`,
@@ -336,7 +341,7 @@ const allUrlsPrivateApps = [
           link: `/loteria/${name}/ventas`,
           label: <AppIcons Logo={"Ventas"} name="Ventas" />,
           component: venta,
-          permission: [3],
+          permission: [3, 44, 95],
         },
         {
           link: `/loteria/${name}/cargar`,
@@ -375,14 +380,14 @@ const allUrlsPrivateApps = [
           label: <AppIcons Logo={"Premio"} name="Premios" />,
           component: Premios,
           extern: false,
-          permission: [3], ///////////////////////////////////////////////////////////////////
+          permission: [3, 44, 95], ///////////////////////////////////////////////////////////////////
         },
         {
           link: `/loteria/${name}/inventario`,
           label: <AppIcons Logo={"REPORTE"} name="Inventario Billetes" />,
           component: Inventario,
           extern: false,
-          permission: [3, 6], ///////////////////////////////////////////////////////////////////
+          permission: [3, 6, 44, 95], ///////////////////////////////////////////////////////////////////
           subRoutes: [
             {
               link: `/loteria/${name}/arqueo`,
@@ -391,7 +396,7 @@ const allUrlsPrivateApps = [
               ),
               component: ArqueoBilletes,
               extern: false,
-              permission: [3, 6], ///////////////////////////////////////////////////////////////////
+              permission: [3, 6, 44, 95], ///////////////////////////////////////////////////////////////////
             },
             {
               link: `/loteria/${name}/inventario/crear`,
@@ -400,7 +405,7 @@ const allUrlsPrivateApps = [
               ),
               component: CrearInventario,
               extern: false,
-              permission: [3], ///////////////////////////////////////////////////////////////////
+              permission: [3, 44, 95], ///////////////////////////////////////////////////////////////////
             },
             {
               link: `/loteria/${name}/inventario/reportes`,
@@ -412,7 +417,7 @@ const allUrlsPrivateApps = [
               ),
               component: ReportInventario,
               extern: false,
-              permission: [3, 6], ///////////////////////////////////////////////////////////////////
+              permission: [3, 6, 44, 95], ///////////////////////////////////////////////////////////////////
             },
           ],
         },
@@ -550,6 +555,13 @@ const allUrlsPrivateApps = [
     component: Recaudo,
     permission: [22, 23],
     subRoutes: [
+      {
+        link: "/recaudo/trx",
+        label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
+        component: RecaudoTrxRecaudo,
+        permission: [22],
+        show: false,
+      },
       {
         link: "/recaudo/manual",
         label: <AppIcons Logo={"RECAUDO"} name={"Recaudo manual"} />,

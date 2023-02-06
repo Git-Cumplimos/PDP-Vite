@@ -24,7 +24,6 @@ const CargaArchivos = ({ route }) => {
     { value: "PlanDePremios", label: "Plan de premios" },
     { value: "Asignacion", label: "Asignación" },
     { value: "Resultados", label: "Resultados" },
-    { value: "Liquidacion", label: "Liquidacion de premios" },
   ];
 
   const optionsTipoSorteo = useMemo(() => {
@@ -54,7 +53,7 @@ const CargaArchivos = ({ route }) => {
 
   const optionsFisiVir = [
     { value: "", label: "" },
-    { value: "Fisico/", label: `${archivo} físicos` },
+    { value: "Fisico/", label: `${archivo} Físicos` },
     { value: "Virtual/", label: `${archivo} Virtuales` },
   ];
 
@@ -64,12 +63,10 @@ const CargaArchivos = ({ route }) => {
 
   const S3_BUCKET = process.env.REACT_APP_BUCKET;
   const REGION = process.env.REACT_APP_REGION;
-  //console.log(S3_BUCKET)
   const bucket = new AWS.S3({
     params: { Bucket: S3_BUCKET },
     region: REGION,
   });
-  // console.log(`${tipoSorteo}${archivo}/${fisiVirtual}`);
 
   //------------------Funcion Para Subir El Formulario---------------------//
   const saveFile = useCallback(
@@ -78,16 +75,14 @@ const CargaArchivos = ({ route }) => {
       const f = new Date();
       const query = {
         contentType: "application/text",
-        filename: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
-          f.getMonth() + 1
-        }${f.getFullYear()}${fileName}`,
+        filename: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${f.getMonth() + 1
+          }${f.getFullYear()}${fileName}`,
       };
       fetchData(url_cargueS3, "GET", query)
         .then((respuesta) => {
           if (!respuesta?.status) {
-            notifyError(respuesta?.msg);
+            notifyError(respuesta?.msg === "Motivo: Archivo con errores: UniqueViolation" ? ("Este archivo ya fue cargado previamente") : respuesta?.msg);
           } else {
-            // setEstadoForm(true);
             const formData2 = new FormData();
             if (file) {
               for (const property in respuesta?.obj?.fields) {
@@ -98,7 +93,6 @@ const CargaArchivos = ({ route }) => {
               }
 
               formData2.set("file", file);
-              // console.log(formData2, `${respuesta?.obj?.url}`);
               fetch(`${respuesta?.obj?.url}`, {
                 method: "POST",
                 body: formData2,
@@ -110,6 +104,12 @@ const CargaArchivos = ({ route }) => {
                         if ("Motivo" in res?.[0]) {
                           closeModal();
                           if (res[0]["Estado"] === 1) {
+                            setProgress(0);
+                            setFile("");
+                            setFileName("");
+                            setArchivo("");
+                            setTipoSorteo("");
+                            setFisiVirtual("");
                             notify(res[0]["Motivo"]);
                           } else {
                             notifyError(res[0]["Motivo"]);
@@ -166,7 +166,6 @@ const CargaArchivos = ({ route }) => {
       files = Array.from(files);
       if (files.length === 1) {
         const m_file = files[0];
-        // console.log(m_file);
         setFile(m_file);
         setFileName(m_file.name);
       } else {
@@ -196,12 +195,18 @@ const CargaArchivos = ({ route }) => {
     setProgress(0);
     setFile("");
     setFileName("");
+    setArchivo("");
+    setTipoSorteo("");
+    setFisiVirtual("");
+    notifyError("Carga de archivos cancelada por el usuario")
   }, []);
 
   return (
     <>
+      <h1 class="text-3xl">Carga de archivos</h1>
       <div>
         <Select
+          class="mb-3"
           id="archivos"
           label="Archivo a subir"
           options={options}
@@ -215,11 +220,12 @@ const CargaArchivos = ({ route }) => {
           }}
         />
         {archivo === "PlanDePremios" ||
-        archivo === "Asignacion" ||
-        archivo === "Resultados" ? (
+          archivo === "Asignacion" ||
+          archivo === "Resultados" ? (
           <Select
+            class="mb-3"
             id="tip_sorteo"
-            label={`Tipo de sorteo para ${archivo}`}
+            label={(archivo === "Asignacion") ? (`Tipo de sorteo para asignación`) : (`Tipo de sorteo para ${archivo}`)}
             options={optionsTipoSorteo}
             disabled={progress !== 0 && progress !== 100}
             value={tipoSorteo}
@@ -231,9 +237,11 @@ const CargaArchivos = ({ route }) => {
           ""
         )}
         {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
+
           <Select
+            class="mb-3"
             id="FisiVir"
-            label={`${archivo} físicos/Virtuales`}
+            label={(archivo === "Asignacion") ? (`Asignación Físicos/Virtuales`) : (`${archivo} Físicos/Virtuales`)}
             options={optionsFisiVir}
             disabled={progress !== 0 && progress !== 100}
             value={fisiVirtual}
@@ -245,15 +253,14 @@ const CargaArchivos = ({ route }) => {
           ""
         )}
         {(archivo === "PlanDePremios" && tipoSorteo !== "") ||
-        fisiVirtual !== "" ? (
+          fisiVirtual !== "" ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <InputX
               id={`archivo_${archivo}`}
-              label={`Elegir archivo: ${
-                options.find(({ value }) => {
-                  return value === archivo;
-                }).label
-              }`}
+              label={`Elegir archivo: ${options.find(({ value }) => {
+                return value === archivo;
+              }).label
+                }`}
               type="file"
               disabled={progress !== 0}
               accept=".txt,.csv"
@@ -277,8 +284,8 @@ const CargaArchivos = ({ route }) => {
               {progress === 0
                 ? "Listo para subir"
                 : progress === 100
-                ? "Subido"
-                : "Subiendo"}
+                  ? "Subido"
+                  : "Subiendo"}
             </h1>
             <ProgressBar value={progress} max="100"></ProgressBar>
           </>
@@ -294,6 +301,7 @@ const CargaArchivos = ({ route }) => {
             handleSubmit={() => {
               saveFile();
             }}
+            fisiVirtual={fisiVirtual}
           />
         </Modal>
       </div>

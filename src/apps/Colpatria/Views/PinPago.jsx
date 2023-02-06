@@ -36,7 +36,7 @@ const ObjTiposPersonas = {
 const PinPago = () => {
   const navigate = useNavigate();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser, infoTicket } = useAuth();
 
   const [tipoPersona, setTipoPersona] = useState("");
   const [userDocument, setUserDocument] = useState("");
@@ -98,6 +98,7 @@ const PinPago = () => {
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valPinPago,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
@@ -162,7 +163,7 @@ const PinPago = () => {
             setLoadingPinPago(false);
             navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
-              return err?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
             }
             console.error(err?.message);
             return "Transacción fallida";
@@ -178,6 +179,7 @@ const PinPago = () => {
       userAddress,
       valPinPago,
       roleInfo,
+      pdpUser?.uname,
       infoTicket,
       navigate,
     ]

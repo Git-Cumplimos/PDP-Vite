@@ -46,7 +46,7 @@ const TrxRecaudo = () => {
 
   const { id_convenio_pin } = useParams();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser, infoTicket } = useAuth();
 
   const [searchingConvData, setSearchingConvData] = useState(false);
   const [datosConvenio, setDatosConvenio] = useState(null);
@@ -132,6 +132,7 @@ const TrxRecaudo = () => {
           roleInfo?.tipo_comercio === "KIOSCO" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valTrxRecaudo,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
@@ -166,7 +167,7 @@ const TrxRecaudo = () => {
             setLoadingInquiry(false);
             navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
-              return error?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
             console.error(error?.message);
             return "Consulta fallida";
@@ -180,6 +181,7 @@ const TrxRecaudo = () => {
       userAddress,
       valTrxRecaudo,
       roleInfo,
+      pdpUser?.uname,
       navigate,
     ]
   );
@@ -200,6 +202,7 @@ const TrxRecaudo = () => {
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valTrxRecaudo,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
@@ -263,7 +266,7 @@ const TrxRecaudo = () => {
             setLoadingSell(false);
             navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
-              return error?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
             console.error(error?.message);
             return "Transacción fallida";
@@ -278,6 +281,7 @@ const TrxRecaudo = () => {
       valTrxRecaudo,
       inquiryStatus,
       roleInfo,
+      pdpUser?.uname,
       infoTicket,
       navigate,
     ]

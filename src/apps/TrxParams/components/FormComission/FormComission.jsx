@@ -8,7 +8,12 @@ import MoneyInput from "../../../../components/Base/MoneyInput";
 import Select from "../../../../components/Base/Select";
 import { notifyError } from "../../../../utils/notify";
 
-const FormComission = ({ outerState, onSubmit, children }) => {
+const FormComission = ({
+  outerState,
+  onSubmit,
+  children,
+  disabledState = false,
+}) => {
   const [comissionData, setComissionData] = outerState;
 
   const onChange = useCallback(
@@ -110,6 +115,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
             value={comissionData?.type}
             onChange={() => {}}
             // defaultValue={comissionData?.type}
+            disabled={disabledState}
             required
           />
           {comissionData?.ranges.map((_comission, ind) => {
@@ -158,13 +164,13 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                               : true
                           }
                           disabled={
-                            key === "Rango minimo"
+                            (key === "Rango minimo"
                               ? true
                               : key === "Rango maximo"
                               ? comissionData?.ranges.length === ind + 1
                                 ? false
                                 : true
-                              : true
+                              : true) || disabledState
                           }
                         />
                       );
@@ -198,7 +204,8 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                             key === "Rango maximo"
                               ? false
                               : true
-                          }></MoneyInput>
+                          }
+                          disabled={disabledState}></MoneyInput>
                       );
                   } else if (key === "Comision porcentual") {
                     return (
@@ -214,35 +221,42 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           let valor = e.target.value;
                           let num = valor.replace(/[\s-]/g, "");
                           // num = num.replace(/^0[0-9]/, "");
-                          if (!isNaN(num)) {
-                            let copyData = { ...comissionData };
-                            copyData.ranges[ind][key] =
-                              num.slice(-1) === "."
-                                ? num
-                                : !isNaN(parseFloat(num))
-                                ? parseFloat(num)
-                                : 0;
-                            setComissionData(copyData);
-                          }
                           if (num > 10) {
                             notifyError(
                               "Está introduciendo un valor porcentual inusualmente alto",
                               false
                             );
                           }
+
                           if (num > 100) {
                             e.target.value = 100;
                             // replace the value with 100
                             let copyData = { ...comissionData };
                             copyData.ranges[ind][key] = 100;
-                            setComissionData(copyData);
+                            return setComissionData(copyData);
                           }
                           if (num < 0) {
                             e.target.value = 0;
                             // replace the value with 0
                             let copyData = { ...comissionData };
                             copyData.ranges[ind][key] = 0;
-                            setComissionData(copyData);
+                            return setComissionData(copyData);
+                          }
+                          if (!isNaN(num)) {
+                            let copyData = { ...comissionData };
+                            if (copyData.ranges[ind]["Comision fija"] > 0) {
+                              notifyError(
+                                "Se esta introduciendo una comisión porcentual teniendo configurado una comisión fija",
+                                false
+                              );
+                            }
+                            copyData.ranges[ind][key] =
+                              num.slice(-1) === "."
+                                ? num
+                                : !isNaN(parseFloat(num))
+                                ? parseFloat(num)
+                                : 0;
+                            return setComissionData(copyData);
                           }
                         }}
                         autoComplete='off'
@@ -252,6 +266,7 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                             ? false
                             : true
                         }
+                        disabled={disabledState}
                       />
                     );
                   } else if (key === "Comision fija") {
@@ -270,6 +285,14 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           if (!isNaN(valor)) {
                             const num = valor;
                             let copyData = { ...comissionData };
+                            if (
+                              copyData.ranges[ind]["Comision porcentual"] > 0
+                            ) {
+                              notifyError(
+                                "Se esta introduciendo una comisión fija teniendo configurado una comisión porcentual",
+                                false
+                              );
+                            }
                             copyData.ranges[ind][key] = num;
                             setComissionData(copyData);
                           }
@@ -285,28 +308,33 @@ const FormComission = ({ outerState, onSubmit, children }) => {
                           key === "Rango maximo"
                             ? false
                             : true
-                        }></MoneyInput>
+                        }
+                        disabled={disabledState}></MoneyInput>
                     );
                   }
                 })}
                 <ButtonBar className='lg:col-span-2'>
-                  {comissionData?.ranges?.length > 1 && ind !== 0 && (
-                    <Button
-                      type='button'
-                      onClick={(e) => {
-                        onClickDelete(e, ind);
-                      }}>
-                      Eliminar rango
-                    </Button>
-                  )}
+                  {!disabledState &&
+                    comissionData?.ranges?.length > 1 &&
+                    ind !== 0 && (
+                      <Button
+                        type='button'
+                        onClick={(e) => {
+                          onClickDelete(e, ind);
+                        }}>
+                        Eliminar rango
+                      </Button>
+                    )}
                 </ButtonBar>
               </Fieldset>
             );
           })}
           <ButtonBar className='lg:col-span-2'>
-            <Button type='button' onClick={onClick}>
-              Agregar rango
-            </Button>
+            {!disabledState && (
+              <Button type='button' onClick={onClick}>
+                Agregar rango
+              </Button>
+            )}
             {children}
           </ButtonBar>
         </Form>

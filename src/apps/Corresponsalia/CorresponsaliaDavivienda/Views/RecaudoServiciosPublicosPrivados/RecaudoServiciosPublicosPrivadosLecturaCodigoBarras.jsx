@@ -24,7 +24,7 @@ import {
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
@@ -354,6 +354,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valCodigoDeBarras: valorTransaccion,
         // valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
 
+        nombre_usuario: pdpUser?.uname ?? "",
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
         idTerminal: roleInfo?.id_dispositivo,
@@ -517,7 +518,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         });
     } else {
       setIsUploading(true);
-      let dataCodBarras = datosTrans.codBarras.slice(3).replace(/[\x1D]/g, "");
+      let codBarrasIndex = datosTrans.codBarras.indexOf("415");
+      let codBarras = datosTrans.codBarras
+        .slice(codBarrasIndex)
+        .replace(/[\x1D]/g, "");
       postConsultaConveniosDavivienda({
         tipoTransaccion: "1",
         numNumeroConvenioIAC: datosEnvio?.datosConvenio?.cod_iac_cnb,
@@ -530,6 +534,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         numValor: datosTransaccion.valor ?? 0,
         numValorTotalDebito: datosTransaccion.valor ?? 0,
 
+        nombre_usuario: pdpUser?.uname ?? "",
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
         idTerminal: roleInfo?.id_dispositivo,
@@ -572,7 +577,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 9900000],
+    limits: [0, 9900001],
     decimalDigits: 2,
   });
   const printDiv = useRef();

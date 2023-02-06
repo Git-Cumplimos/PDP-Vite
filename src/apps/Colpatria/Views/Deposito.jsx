@@ -42,7 +42,7 @@ const formatMoney = makeMoneyFormatter(2);
 const Deposito = () => {
   const navigate = useNavigate();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser, infoTicket } = useAuth();
 
   const [userDocument, setUserDocument] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
@@ -100,6 +100,7 @@ const Deposito = () => {
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valDeposito,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
@@ -161,7 +162,7 @@ const Deposito = () => {
             setLoadingDeposit(false);
             navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
-              return err?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
             }
             console.error(err?.message);
             return "Transaccion fallida";
@@ -176,6 +177,7 @@ const Deposito = () => {
       userAddress,
       valDeposito,
       roleInfo,
+      pdpUser?.uname,
       infoTicket,
       navigate,
     ]
@@ -266,24 +268,24 @@ const Deposito = () => {
           required
         />
         <Input
-          id='numCuenta'
-          name='numCuenta'
-          label='Número de cuenta'
-          type='tel'
-          autoComplete='off'
-          minLength={"19"}
+          id="numCuenta"
+          name="numCuenta"
+          label="Número de cuenta"
+          type="tel"
+          autoComplete="off"
+          minLength={"1"}
           maxLength={"19"}
           onInput={(ev) => setAccountNumber(onChangeAccountNumber(ev))}
           required
         />
         <Input
-          id='docCliente'
-          name='docCliente'
-          label='CC de quien deposita'
-          type='text'
-          autoComplete='off'
-          minLength={"7"}
-          maxLength={"13"}
+          id="docCliente"
+          name="docCliente"
+          label="No. Documento del Depositante"
+          type="text"
+          autoComplete="off"
+          minLength={"5"}
+          maxLength={"12"}
           value={userDocument}
           onInput={(ev) => setUserDocument(onChangeNumber(ev))}
           required
@@ -295,7 +297,7 @@ const Deposito = () => {
           autoComplete='off'
           type='tel'
           minLength={"5"}
-          maxLength={"20"}
+          maxLength={"13"}
           onInput={(ev) => setValDeposito(onChangeMoney(ev))}
           required
         />
@@ -311,7 +313,7 @@ const Deposito = () => {
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/colpatria")}>Cerrar</Button>
+              <Button onClick={() => navigate("/corresponsalia/colpatria")}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (

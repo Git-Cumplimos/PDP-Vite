@@ -50,11 +50,19 @@ const EditComission = () => {
     fecha_final: "",
     fecha_inicio: "",
   });
+  const [disabledState, setDisabledState] = useState(false);
   const [campaignStatus, setCampaignStatus] = useState(null);
   const [comissions, setComissions] = useState({
     nombre_comision: "",
   });
   const [isUploading, setIsUploading] = useState(false);
+  useEffect(() => {
+    if (id_plan_comision || (id_plan_comision_campana && campaignStatus)) {
+      const date = new Date();
+      // setDisabledState(!(date.getDate() <= 5));
+      setDisabledState(false);
+    }
+  }, [id_plan_comision, id_plan_comision_campana, campaignStatus]);
 
   const onSubmit = useCallback(
     (ev) => {
@@ -484,7 +492,8 @@ const EditComission = () => {
       <h1 className='text-3xl'>Comisión</h1>
       <FormComission
         outerState={[editedComission, setEditedComission]}
-        onSubmit={onSubmit}>
+        onSubmit={onSubmit}
+        disabledState={disabledState}>
         <ButtonBar className='lg:col-span-2'>
           <Button type='submit'>
             {id_comision_cobrada && "Actualizar comisión"}
