@@ -282,7 +282,7 @@ const Deposito = () => {
           id="docCliente"
           name="docCliente"
           label="No. Documento del Depositante"
-          type="text"
+          type="tel"
           autoComplete="off"
           minLength={"5"}
           maxLength={"12"}
@@ -313,7 +313,9 @@ const Deposito = () => {
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/corresponsalia/colpatria")}>Cerrar</Button>
+              <Button onClick={() => navigate("/corresponsalia/colpatria")}>
+                Cerrar
+              </Button>
             </ButtonBar>
           </div>
         ) : (
