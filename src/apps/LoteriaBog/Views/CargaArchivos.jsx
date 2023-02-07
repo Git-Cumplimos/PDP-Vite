@@ -236,7 +236,7 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
+        {/* {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
 
           <Select
             class="mb-3"
@@ -251,9 +251,8 @@ const CargaArchivos = ({ route }) => {
           />
         ) : (
           ""
-        )}
-        {(archivo === "PlanDePremios" && tipoSorteo !== "") ||
-          fisiVirtual !== "" ? (
+        )} */}
+        {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <InputX
               id={`archivo_${archivo}`}
