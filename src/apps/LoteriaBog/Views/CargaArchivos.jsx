@@ -236,7 +236,7 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {/* {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
+        {archivo !== "PlanDePremios" && archivo !== "Resultados" && tipoSorteo !== "" ? (
 
           <Select
             class="mb-3"
@@ -251,9 +251,11 @@ const CargaArchivos = ({ route }) => {
           />
         ) : (
           ""
-        )} */}
-        {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
+        )}
+        {(archivo === "PlanDePremios" && tipoSorteo !== "") ||
+          fisiVirtual !== "" || (archivo === "Resultados" && tipoSorteo !== "") ? (
           <Form formDir="col" onSubmit={onSubmit}>
+            {console.log("Esto es tipoSOrteo", tipoSorteo)}
             <InputX
               id={`archivo_${archivo}`}
               label={`Elegir archivo: ${options.find(({ value }) => {
