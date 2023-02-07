@@ -13,6 +13,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import fetchData from "../../../../utils/fetchData";
 import Select from "../../../../components/Base/Select";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -505,11 +506,7 @@ const ArqueoBilletes = ({ route }) => {
                     Siguiente
                   </Button>
                 </ButtonBar>
-                <div className="flex flex-row justify-evenly w-full my-4">
-                  <h1>Pagina: {page}</h1>
-                  <h1>Ultima pagina: {maxPages}</h1>
-                </div>
-                <Table
+                <TableEnterprise
                   headers={[
                     "Sorteo",
                     "Comercio",
@@ -541,11 +538,9 @@ const ArqueoBilletes = ({ route }) => {
                       };
                     }
                   )}
-                  onSelectRow={(e, index) => {
-                    // setSelected(datosArqueo[index]);
-                    // setShowModal(true);
-                  }}
-                />
+                >
+
+                </TableEnterprise>
               </>
             ) : (
               ""
