@@ -56,11 +56,13 @@ const DescargarArchivosS3 = ({ route }) => {
 
   return (
     <>
+      <h1 class="text-3xl">Descarga de archivos  </h1>
+
       <div>
         <Form grid>
           <Input
             id="num_sorteo"
-            label="Numero de sorteo"
+            label="Número de sorteo"
             type="search"
             minLength="1"
             maxLength="4"
@@ -95,8 +97,6 @@ const DescargarArchivosS3 = ({ route }) => {
           {sorteo === "" ? (
             <>
               <div className="flex flex-row justify-center w-full">
-                {/* <hr className="border-black flex-auto" /> */}Ó
-                {/* <hr className="border-black flex-auto" /> */}
               </div>
 
               <Input
@@ -128,6 +128,8 @@ const DescargarArchivosS3 = ({ route }) => {
                   timeOut: 500,
                 }}
               />
+              <div className="flex flex-row justify-center w-full">
+              </div>
               <Input
                 id="dateEnd"
                 label="Fecha final"
@@ -145,9 +147,11 @@ const DescargarArchivosS3 = ({ route }) => {
                         e.target.value,
                         page
                       ).then((res) => {
-                        if (!("msg" in res)) {
-                          setResp_con_sort(res.info);
-                          setMaxPages(res.num_datos);
+                        if (res !== undefined) {
+                          if (!("msg" in res)) {
+                            setResp_con_sort(res.info);
+                            setMaxPages(res.num_datos);
+                          }
                         } else {
                           notifyError(res.msg);
                         }
@@ -205,8 +209,8 @@ const DescargarArchivosS3 = ({ route }) => {
         {Array.isArray(resp_con_sort) && resp_con_sort.length > 0 ? (
           <>
             <div className="flex flex-row justify-evenly w-full my-4">
-              <h1>Pagina: {page}</h1>
-              <h1>Ultima pagina: {maxPages}</h1>
+              <h1>Página: {page}</h1>
+              <h1>Ultima Página: {maxPages}</h1>
             </div>
             <Table
               headers={["Sorteo", "Fecha de juego"]}

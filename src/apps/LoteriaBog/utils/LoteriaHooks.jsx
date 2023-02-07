@@ -218,15 +218,16 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         try {
           consulta_codigos_oficina(nit).then((res) => {
-            console.log("Hizo la consulta acá es donde se totea", res)
-            if ("msg" in res) {
-              console.log("Se metio en el if donde se totea", res)
-              setCodigosOficina({
-                cod_oficina_lot: "PPVIR",
-                cod_sucursal_lot: "00",
-              });
-            } else {
-              setCodigosOficina(res);
+            if (res !== undefined) {
+
+              if ("msg" in res && res?.cod_sucursal_lot && res?.cod_oficina_lot) {
+                setCodigosOficina({
+                  cod_oficina_lot: "PPVIR",
+                  cod_sucursal_lot: "00",
+                });
+              } else {
+                setCodigosOficina(res);
+              }
             }
           });
         } catch (err) {
