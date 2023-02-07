@@ -157,8 +157,7 @@ const ConfiguracionComercios = () => {
   }, [searchAuto, page, limit, openTipoContrato]);
   const fecthConfiguracionComerciosFunc = () => {
     let obj = {};
-    if (parseInt(searchAuto))
-      obj["id_configuracion_comercios"] = parseInt(searchAuto);
+    if (parseInt(searchAuto)) obj["id_comercio"] = parseInt(searchAuto);
     fetchConfiguracionComercios({ ...obj, page, limit })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);

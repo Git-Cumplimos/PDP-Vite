@@ -279,13 +279,13 @@ const Deposito = () => {
           required
         />
         <Input
-          id='docCliente'
-          name='docCliente'
-          label='CC de quien deposita'
-          type='text'
-          autoComplete='off'
-          minLength={"7"}
-          maxLength={"13"}
+          id="docCliente"
+          name="docCliente"
+          label="No. Documento del Depositante"
+          type="text"
+          autoComplete="off"
+          minLength={"5"}
+          maxLength={"12"}
           value={userDocument}
           onInput={(ev) => setUserDocument(onChangeNumber(ev))}
           required
@@ -297,7 +297,7 @@ const Deposito = () => {
           autoComplete='off'
           type='tel'
           minLength={"5"}
-          maxLength={"20"}
+          maxLength={"13"}
           onInput={(ev) => setValDeposito(onChangeMoney(ev))}
           required
         />
