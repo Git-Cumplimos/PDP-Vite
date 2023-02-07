@@ -218,9 +218,10 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         try {
           consulta_codigos_oficina(nit).then((res) => {
-            if (res !== undefined) {
-
-              if ("msg" in res && res?.cod_sucursal_lot && res?.cod_oficina_lot) {
+            console.log("res------>",res)
+            if (res != undefined) {
+              if ("msg" in res) {
+                console.log("Entra acá")
                 setCodigosOficina({
                   cod_oficina_lot: "PPVIR",
                   cod_sucursal_lot: "00",
@@ -230,13 +231,14 @@ export const useProvideLoteria = () => {
               }
             }
           });
+          console.log("codigosOficina",codigosOficina)
         } catch (err) {
           notifyError("Error");
           console.error(err);
         }
       }
     }
-  }, [pathname, roleInfo, codigosOficina]);
+  }, [pathname, roleInfo]);
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -358,6 +360,7 @@ export const useProvideLoteria = () => {
       try {
         setLoadConsulta(true);
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
+        console.log("RES--->",res)
         setSellResponse(res);
         setLoadConsulta(false);
       } catch (err) {
@@ -368,7 +371,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones, codigosOficina]
+    [selected, customer, roleInfo, tiposOperaciones,codigosOficina]
   );
 
   const sellLoteriafisica = useCallback(
@@ -420,7 +423,7 @@ export const useProvideLoteria = () => {
         notifyError("Error al hacer la consulta")
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica,codigosOficina]
+    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica, codigosOficina]
   );
 
   const searchModa = useCallback(
@@ -514,6 +517,7 @@ export const useProvideLoteria = () => {
       idLoteria,
       tipopago,
       hash,
+      nombre_usuario
     ) => {
       if (tipopago == 2) {
         try {
@@ -548,6 +552,7 @@ export const useProvideLoteria = () => {
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
+              nombre_usuario,
             },
             {},
             true,

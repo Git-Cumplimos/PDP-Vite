@@ -34,7 +34,7 @@ const Premios = ({ route }) => {
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
-  const { roleInfo, infoTicket } = useAuth();
+  const { pdpUser, roleInfo, infoTicket } = useAuth();
   const [respagar, setRespagar] = useState([]);
   const [tipopago, setTipopago] = useState("");
   const [isSelf, setIsSelf] = useState(false);
@@ -242,6 +242,7 @@ const Premios = ({ route }) => {
             idLoteria,
             tipopago,
             hash,
+            pdpUser?.uname
           )
             .then((res) => {
               setRespuesta(false);
@@ -382,7 +383,6 @@ const Premios = ({ route }) => {
       return { ...old, celular: valueInput };
     });
   };
-
   useEffect(() => {
     const ticket = tickets;
     infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
