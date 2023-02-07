@@ -4,6 +4,7 @@ import Form from "../../../../components/Base/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { useState } from "react";
 import Table from "../../../../components/Base/Table";
+import { notifyError } from "../../../../utils/notify";
 
 const DescargaForm = ({ closeModal, selected }) => {
   const { descargaVentas_S3 } = useLoteria();
@@ -26,12 +27,11 @@ const DescargaForm = ({ closeModal, selected }) => {
     <>
       <div className="flex flex-col justify-center items-center mx-auto container">
         <Form onSubmit={onSubmit} grid>
-          <div className="flex flex-row justify-between text-lg font-medium">
-            <h1>
-              Desea descargar los archivos de ventas del sorteo{" "}
-              {selected?.num_sorteo}
+          <div className="flex flex-row text-lg font-medium text-center items-center justify-center">
+            <h1 className="text-center">
+              ¿Desea descargar los archivos de ventas del sorteo{" "}
+              {selected?.num_sorteo}?
             </h1>
-            <h1>Fecha de juego: {selected?.fecha_juego}</h1>
           </div>
 
           {Array.isArray(urls) && urls.length > 0 ? (
@@ -65,6 +65,7 @@ const DescargaForm = ({ closeModal, selected }) => {
               onClick={() => {
                 closeModal();
                 setUrls(false);
+                notifyError("Se canceló la descarga de los archivos")
               }}
             >
               Cancelar
