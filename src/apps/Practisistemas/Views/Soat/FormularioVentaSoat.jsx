@@ -358,7 +358,7 @@ const FormularioVentaSoat = () => {
               handleClose();
               break;
             }
-          } catch (error) {}
+          } catch (error) { }
         }
       });
   };
@@ -387,7 +387,7 @@ const FormularioVentaSoat = () => {
   }, []);
   //-----------------------Botón Cancelar--------------------------------------------------------
   const cancelar = () => {
-    notifyError("Se cancelo la venta del SOAT");
+    notifyError("Se canceló la venta del SOAT");
     setShowAllmodals((old) => {
       return {
         ...old,
@@ -428,7 +428,7 @@ const FormularioVentaSoat = () => {
   // #########UseEffect para guardar el ticket en la base de datos de PDP#############################
   useEffect(() => {
     infoTicket(datosPropietarioSoat?.idTransaccion, 114, tickets)
-      .then((resTicket) => {})
+      .then((resTicket) => { })
       .catch((err) => {
         console.error(err);
         notifyError("Error guardando el ticket");
@@ -537,7 +537,7 @@ const FormularioVentaSoat = () => {
         </ButtonBar>
       </Form>
       {datosPropietarioSoat?.respuestaConsulta == "Consulta Correcta" &&
-      datosPropietarioSoat?.nombrePropietario ? (
+        datosPropietarioSoat?.nombrePropietario ? (
         <Modal
           show={showAllmodals.showModalDatosPropietario}
           handleClose={handleClose}>
