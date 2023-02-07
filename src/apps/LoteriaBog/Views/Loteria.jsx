@@ -17,6 +17,7 @@ import InputX from "../../../components/Base/InputX/InputX";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useLocation } from "react-router-dom";
 import { notifyError } from "../../../utils/notify";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
@@ -184,7 +185,7 @@ const Loteria = ({ route }) => {
     if (sorteoOrdifisico !== null) {
       copy.push({
         value: `${sorteoOrdifisico.num_sorteo}-${sorteoOrdifisico.fisico}-${sorteoOrdifisico.num_loteria}`,
-        label: `Sorteo ordinario  Físico- ${sorteoOrdifisico.num_sorteo}`,
+        label: `Sorteo Ordinario  Físico- ${sorteoOrdifisico.num_sorteo}`,
       });
     }
 
@@ -272,7 +273,7 @@ const Loteria = ({ route }) => {
               disabled={isInputDisabled}
             ></InputX>
             : ""}
-          <Input
+          <InputX
             id="numTicket"
             label="Número de billete"
             type="search"
@@ -314,7 +315,7 @@ const Loteria = ({ route }) => {
               timeOut: 500,
             }}
           />
-          <Input
+          <InputX
             id="numSerie"
             label="Número de serie"
             type="search"
@@ -343,6 +344,9 @@ const Loteria = ({ route }) => {
                   : searchLoteria(sorteo, numero, num, 1).then((max) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
+                    }
+                    if (max === 0) {
+                      notifyError("No se encontraron billetes para esta búsqueda")
                     }
                   });
               },
@@ -387,11 +391,7 @@ const Loteria = ({ route }) => {
 
       {Array.isArray(loterias) && loterias.length > 0 ? (
         <>
-          <div className="flex flex-row justify-evenly w-full my-4">
-            <h1>Pagina: {page}</h1>
-            <h1>Ultima pagina: {maxPages}</h1>
-          </div>
-          <Table
+          <TableEnterprise
             headers={[
               "Número",
               "Serie",
@@ -411,7 +411,9 @@ const Loteria = ({ route }) => {
               setSelected(loterias[index]);
               setShowModal(true);
             }}
-          />
+          >
+
+          </TableEnterprise>
         </>
       ) : (
         ""

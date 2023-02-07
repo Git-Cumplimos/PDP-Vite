@@ -198,7 +198,6 @@ const CargaArchivos = ({ route }) => {
     setArchivo("");
     setTipoSorteo("");
     setFisiVirtual("");
-    notifyError("Carga de archivos cancelada por el usuario")
   }, []);
 
   return (

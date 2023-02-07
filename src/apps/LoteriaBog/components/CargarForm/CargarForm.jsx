@@ -2,6 +2,7 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import { useState, useEffect } from "react";
+import { notifyError } from "../../../../utils/notify";
 //import { useAuth } from "../../../../hooks/AuthHooks";
 
 const CargarForm = ({
@@ -34,6 +35,7 @@ const CargarForm = ({
             <Button
               type="button"
               onClick={() => {
+                notifyError("Carga de archivos cancelada por el usuario")
                 closeModal();
               }}
             >
