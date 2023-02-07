@@ -97,16 +97,27 @@ const SellResp = ({
     return {
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de venta": voucherInfo?.["Fecha de venta"],
-        Hora: voucherInfo?.["Hora"],
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }).format(new Date()),
       },
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo.id_comercio,
         "No. terminal": roleInfo.id_dispositivo,
-        Municipio: roleInfo.ciudad,
-        Dirección: roleInfo.direccion,
-        "Id Trx": sellResponse?.["id_trx"],
-        "Id Transacción": sellResponse?.id_Transaccion,
+        "Id Trx": sellResponse?.id_Transaccion,
+        "Id Aut ": sellResponse?.["id_trx"],
+        "Comercio": roleInfo?.["nombre comercio"],
+        "": "",
+        "Dirección": roleInfo.direccion,
+        "": "",
       }),
       commerceName: sellResponse?.nom_loteria,
       trxInfo: Object.entries({

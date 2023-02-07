@@ -132,13 +132,13 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
     if (sorteoOrdi !== null) {
       copy.push({
         value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
-        label: `Sorteo Ordinario - ${sorteoOrdi.num_sorteo}`,
+        label: `Sorteo Ordinario Virtual - ${sorteoOrdi.num_sorteo}`,
       });
     }
     if (sorteoExtra !== null) {
       copy.push({
         value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}-${sorteoExtra.num_loteria}`,
-        label: `Sorteo extraordinario - ${sorteoExtra.num_sorteo}`,
+        label: `Sorteo Extraordinario - ${sorteoExtra.num_sorteo}`,
       });
     }
     if (sorteoOrdifisico !== null) {
@@ -366,6 +366,7 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
                 setResp_report(null);
                 setTotal(null);
                 setDisabledBtns(true);
+                notifyError("Se canceló la generación de reporte de ventas")
               }}
             >
               Cancelar

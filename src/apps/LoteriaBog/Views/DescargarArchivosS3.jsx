@@ -11,6 +11,7 @@ import SubPage from "../../../components/Base/SubPage/SubPage";
 import ReportVentasForm from "../components/ReportVentasForm/ReportVentasForm";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const DescargarArchivosS3 = ({ route }) => {
   const { label } = route;
@@ -165,7 +166,7 @@ const DescargarArchivosS3 = ({ route }) => {
           ) : (
             ""
           )}
-          <ButtonBar className="col-span-1 md:col-span-2">
+          {/* <ButtonBar className="col-span-1 md:col-span-2">
             <Button
               type="button"
               disabled={page < 2}
@@ -204,11 +205,11 @@ const DescargarArchivosS3 = ({ route }) => {
             >
               Siguiente
             </Button>
-          </ButtonBar>
+          </ButtonBar> */}
         </Form>
         {Array.isArray(resp_con_sort) && resp_con_sort.length > 0 ? (
           <>
-            <div className="flex flex-row justify-evenly w-full my-4">
+            {/* <div className="flex flex-row justify-evenly w-full my-4">
               <h1>Página: {page}</h1>
               <h1>Ultima Página: {maxPages}</h1>
             </div>
@@ -224,7 +225,55 @@ const DescargarArchivosS3 = ({ route }) => {
                 setSelected(resp_con_sort[index]);
                 setShowModal(true);
               }}
-            />
+            /> */}
+            <TableEnterprise title='Tabla Número de sorteo'
+              maxPage={maxPages}
+              headers={["Sorteo", "Fecha de Juego"]}
+              data={resp_con_sort.map(({ num_sorteo, fecha_juego }) => {
+                return {
+                  num_sorteo,
+                  fecha_juego,
+                };
+              })}
+            // onSelectRow={onSelectAutorizador}
+            // onSetPageData={setPageData}
+            >
+              <Input
+                id='searchConvenio'
+                name='searchConvenio'
+                label={"Número de sorteo"}
+                minLength='1'
+                maxLength='30'
+                type='text'
+                autoComplete='off'
+                onInput={(e) => {
+                  if (!isNaN(e.target.value)) {
+                    setFecha_ini("");
+                    setFecha_fin("");
+                    setSorteo(e.target.value);
+                  }
+                }}
+                onLazyInput={{
+                  callback: (e) => {
+                    if (e.target.value !== "") {
+                      con_SortVentas_S3(e.target.value, null, null, page).then(
+                        (res) => {
+                          if (!("msg" in res)) {
+                            setResp_con_sort(res.info);
+                            setMaxPages(res.num_datos);
+                          } else {
+                            notifyError(res.msg);
+                            setResp_con_sort("");
+                          }
+                        }
+                      );
+                    }
+                  },
+                  timeOut: 500,
+                }}
+              />
+            </TableEnterprise>
+
           </>
         ) : (
           ""
