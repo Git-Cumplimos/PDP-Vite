@@ -17,6 +17,7 @@ import InputX from "../../../components/Base/InputX/InputX";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useLocation } from "react-router-dom";
 import { notifyError } from "../../../utils/notify";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
@@ -387,11 +388,7 @@ const Loteria = ({ route }) => {
 
       {Array.isArray(loterias) && loterias.length > 0 ? (
         <>
-          <div className="flex flex-row justify-evenly w-full my-4">
-            <h1>Pagina: {page}</h1>
-            <h1>Ultima pagina: {maxPages}</h1>
-          </div>
-          <Table
+          <TableEnterprise
             headers={[
               "Número",
               "Serie",
@@ -411,7 +408,9 @@ const Loteria = ({ route }) => {
               setSelected(loterias[index]);
               setShowModal(true);
             }}
-          />
+          >
+
+          </TableEnterprise>
         </>
       ) : (
         ""
