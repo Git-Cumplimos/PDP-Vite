@@ -345,6 +345,9 @@ const Loteria = ({ route }) => {
                     if (max !== undefined) {
                       setMaxPages(Math.ceil(max / 10));
                     }
+                    if (max === 0) {
+                      notifyError("No se encontraron billetes para esta búsqueda")
+                    }
                   });
               },
               timeOut: 500,
