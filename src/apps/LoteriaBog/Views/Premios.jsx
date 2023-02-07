@@ -399,7 +399,7 @@ const Premios = ({ route }) => {
     tipopago,
   ]);
   const cancelar = () => {
-    notifyError("Se cancelo el pago del premio");
+    notifyError("Se canceló el pago del premio");
     navigate(-1);
   };
   return (
