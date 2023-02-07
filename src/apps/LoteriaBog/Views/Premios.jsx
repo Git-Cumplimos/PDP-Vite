@@ -383,8 +383,6 @@ const Premios = ({ route }) => {
       return { ...old, celular: valueInput };
     });
   };
-  console.log("ESTO ES ROLEINFO", roleInfo)
-  console.log("ESTO ES pdpUser", pdpUser?.uname)
   useEffect(() => {
     const ticket = tickets;
     infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
