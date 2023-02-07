@@ -218,9 +218,10 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         try {
           consulta_codigos_oficina(nit).then((res) => {
-            if (res !== undefined) {
-
-              if ("msg" in res && res?.cod_sucursal_lot && res?.cod_oficina_lot) {
+            console.log("res------>",res)
+            if (res != undefined) {
+              if ("msg" in res) {
+                console.log("Entra acá")
                 setCodigosOficina({
                   cod_oficina_lot: "PPVIR",
                   cod_sucursal_lot: "00",
@@ -230,6 +231,7 @@ export const useProvideLoteria = () => {
               }
             }
           });
+          console.log("codigosOficina",codigosOficina)
         } catch (err) {
           notifyError("Error");
           console.error(err);
@@ -358,6 +360,7 @@ export const useProvideLoteria = () => {
       try {
         setLoadConsulta(true);
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
+        console.log("RES--->",res)
         setSellResponse(res);
         setLoadConsulta(false);
       } catch (err) {
