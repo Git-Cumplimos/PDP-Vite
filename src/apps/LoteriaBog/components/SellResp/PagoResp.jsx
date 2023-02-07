@@ -133,10 +133,12 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo.id_comercio,
         "No. terminal": roleInfo.id_dispositivo,
-        Municipio: roleInfo.ciudad,
-        Dirección: roleInfo.direccion,
-        "Id Trx": pagoresponse["id_trx"],
-        "Id Transacción": pagoresponse.id_Transaccion,
+        "Id Trx": pagoresponse.id_Transaccion,
+        "Id Aut": pagoresponse["id_trx"],
+        "Comercio": roleInfo?.["nombre comercio"],
+        "": "",
+        "Dirección": roleInfo.direccion,
+        "": "",
       }),
       commerceName: pagoresponse.nom_loteria,
       trxInfo: Object.entries({

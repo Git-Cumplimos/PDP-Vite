@@ -103,10 +103,12 @@ const SellResp = ({
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo.id_comercio,
         "No. terminal": roleInfo.id_dispositivo,
-        Municipio: roleInfo.ciudad,
-        Dirección: roleInfo.direccion,
-        "Id Trx": sellResponse?.["id_trx"],
-        "Id Transacción": sellResponse?.id_Transaccion,
+        "Id Trx": sellResponse?.id_Transaccion,
+        "Id Aut ": sellResponse?.["id_trx"],
+        "Comercio": roleInfo?.["nombre comercio"],
+        "": "",
+        "Dirección": roleInfo.direccion,
+        "": "",
       }),
       commerceName: sellResponse?.nom_loteria,
       trxInfo: Object.entries({
