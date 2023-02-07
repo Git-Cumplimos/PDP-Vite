@@ -368,7 +368,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina]
   );
 
   const sellLoteriafisica = useCallback(
@@ -420,7 +420,7 @@ export const useProvideLoteria = () => {
         notifyError("Error al hacer la consulta")
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica]
+    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica,codigosOficina]
   );
 
   const searchModa = useCallback(
