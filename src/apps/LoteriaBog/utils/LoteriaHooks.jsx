@@ -420,7 +420,7 @@ export const useProvideLoteria = () => {
         notifyError("Error al hacer la consulta")
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica,codigosOficina]
+    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica, codigosOficina]
   );
 
   const searchModa = useCallback(
@@ -514,6 +514,7 @@ export const useProvideLoteria = () => {
       idLoteria,
       tipopago,
       hash,
+      nombre_usuario
     ) => {
       if (tipopago == 2) {
         try {
@@ -548,6 +549,7 @@ export const useProvideLoteria = () => {
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
+              nombre_usuario,
             },
             {},
             true,
