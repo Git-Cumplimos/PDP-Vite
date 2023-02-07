@@ -185,7 +185,7 @@ const Loteria = ({ route }) => {
     if (sorteoOrdifisico !== null) {
       copy.push({
         value: `${sorteoOrdifisico.num_sorteo}-${sorteoOrdifisico.fisico}-${sorteoOrdifisico.num_loteria}`,
-        label: `Sorteo ordinario  Físico- ${sorteoOrdifisico.num_sorteo}`,
+        label: `Sorteo Ordinario  Físico- ${sorteoOrdifisico.num_sorteo}`,
       });
     }
 
@@ -273,7 +273,7 @@ const Loteria = ({ route }) => {
               disabled={isInputDisabled}
             ></InputX>
             : ""}
-          <Input
+          <InputX
             id="numTicket"
             label="Número de billete"
             type="search"
@@ -315,7 +315,7 @@ const Loteria = ({ route }) => {
               timeOut: 500,
             }}
           />
-          <Input
+          <InputX
             id="numSerie"
             label="Número de serie"
             type="search"
