@@ -19,15 +19,16 @@ export const fetchCustomPost = async (url_, name_, data_) => {
     ) {
       const error_msg = Peticion?.obj?.error_msg;
       const error_msg_key = Object.keys(error_msg);
-      const error_msg_vector = [];
-      error_msg_key.map((nombre_error) => {
-        const error_msg_ind = error_msg[nombre_error];
-        if (error_msg_ind?.blocker === true) {
-          error_msg_vector.push(`${error_msg_ind?.description}`);
-        }
-      });
+      const msg = Peticion?.msg;
+      // const error_msg_vector = [];
+      // error_msg_key.map((nombre_error) => {
+      //   const error_msg_ind = error_msg[nombre_error];
+      //   if (error_msg_ind?.blocker === true) {
+      //     error_msg_vector.push(`${error_msg_ind?.description}`);
+      //   }
+      // });
 
-      throw new ErrorCustomBackend(error_msg_vector, error_msg_key);
+      throw new ErrorCustomBackend(msg, error_msg_key);
     }
 
     // cuando status es false pero no hay errores
