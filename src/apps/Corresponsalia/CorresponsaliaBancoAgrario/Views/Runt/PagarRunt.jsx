@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useState, useMemo } from "react";
-import Button from "../../../../components/Base/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import Fieldset from "../../../../components/Base/Fieldset";
-import Form from "../../../../components/Base/Form";
-import InputX from "../../../../components/Base/InputX/InputX";
-import LogoPDP from "../../../../components/Base/LogoPDP";
-import Modal from "../../../../components/Base/Modal";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
-import { notify } from "../../../../utils/notify";
+import { useState, useRef, useCallback, useEffect } from "react";
+import Button from "../../../../../components/Base/Button";
+import ButtonBar from "../../../../../components/Base/ButtonBar";
+import Fieldset from "../../../../../components/Base/Fieldset";
+import Form from "../../../../../components/Base/Form";
+import InputX from "../../../../../components/Base/InputX/InputX";
+import LogoPDP from "../../../../../components/Base/LogoPDP";
+import Modal from "../../../../../components/Base/Modal";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import { notify } from "../../../../../utils/notify";
 
-import { validarEntradaScanner } from "../utils/functionsRunt";
+import { validarEntradaScanner } from "../../utils/functionsRunt";
 
 import classes from "./PagarRunt.module.css";
 
@@ -22,16 +22,20 @@ const PagarRunt = () => {
     mensaje,
   } = classes;
   const [datosEscaneados, setDatosEscaneados] = useState("");
+  const [codigoBarras, setCodigoBarras] = useState("");
   const [desHabilitarBtnConsultar, setDesHabilitarBtnConsulta] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [aprobarRef, setAprobarRef] = useState(false);
   const [procesandoTrx, setProcesandoTrx] = useState(false);
+  const [dataTrx, setDataTrx] = useState({ ref1: "" });
   /* const validarReferenciaPago = (e) => {
     e.preventDefault();
     setShowModal(true);
   };
  */
+  const isAlt = useRef("");
+  const isAltCR = useRef({ data: "", state: false });
 
   const consultarRunt = (e) => {
     e.preventDefault();
@@ -53,6 +57,67 @@ const PagarRunt = () => {
       notify("Pago Runt Exitoso");
     }, 2500);
   };
+
+  const onChangeFormat = useCallback(
+    (ev) => {
+      const valor = ev.target.value;
+      if (valor.length > codigoBarras.length) {
+        setCodigoBarras((old) => {
+          return { ...old, [ev.target.name]: valor };
+        });
+      }
+    },
+    [codigoBarras]
+  );
+
+  // useEffect(() => {
+  //   console.log(codigoBarras);
+  // }, [codigoBarras]);
+
+  const callOnKeyDown = (ev) => {
+    console.log("down", isAltCR.current);
+
+    if (ev.keyCode === 13 && ev.shiftKey === false) {
+      // ev.preventDefault();
+      console.log("cc");
+      // onSubmit(ev);
+      return;
+    }
+    if (ev.altKey) {
+      if (isAltCR.current.state) {
+        isAltCR.current = {
+          ...isAltCR.current,
+          data: isAltCR.current.data + ev.key,
+        };
+      }
+      if (ev.keyCode !== 18) {
+        isAlt.current += ev.key;
+      } else {
+        isAltCR.current = { ...isAltCR.current, state: true };
+      }
+    }
+  };
+
+  const callOnKeyUp = (ev) => {
+    if (ev.altKey === false && isAlt.current !== "") {
+      let value = String.fromCharCode(parseInt(isAlt.current));
+      isAlt.current = "";
+      if (value === "\u001d") {
+        setCodigoBarras((old) => old + "\u001d");
+      }
+    }
+    if (ev.keyCode === 18) {
+      if (isAltCR.current.data === "013") {
+        // onSubmit(ev);
+      }
+      isAltCR.current = {
+        ...isAltCR.current,
+        state: false,
+        data: "",
+      };
+    }
+  };
+
   return (
     <div>
       <Fieldset legend="RUNT" className="lg:col-span-2">
@@ -136,26 +201,19 @@ const PagarRunt = () => {
         ) : (
           ""
         )}
-        <Form grid /* onSubmit={(e) => validarReferenciaPago(e)} */>
+        <Form grid onSubmit={(e) => e.preventDefault()}>
           <InputX
+            id="codBarras"
             label="Escanee el código de barras"
-            type="search"
-            value={datosEscaneados}
-            minLength="17"
-            maxLength="20"
-            onInput={(e) => {
-              const num = e.target.value || "";
-              const num2 = validarEntradaScanner(num);
-              setDatosEscaneados(num2);
-              if (num2?.length === 17) {
-                console.log(datosEscaneados);
-                setDesHabilitarBtnConsulta(false);
-              } else {
-                /* setNumero(""); */
-                console.log("Datos escaneados Errados", datosEscaneados);
-                setDesHabilitarBtnConsulta(true);
-              }
-            }}
+            type="text"
+            name="codBarras"
+            required
+            value={codigoBarras}
+            autoFocus
+            autoComplete="off"
+            onInput={onChangeFormat}
+            onKeyDown={callOnKeyDown}
+            onKeyUp={callOnKeyUp}
           ></InputX>
           <ButtonBar className={"lg:col-span-2"}>
             {desHabilitarBtnConsultar ? (
