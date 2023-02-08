@@ -25,7 +25,8 @@ const url_consulta_recarga = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-rec
 const RecargasMovistar = () => {
   //Variables
   const printDiv = useRef();
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, infoTicket, pdpUser } = useAuth();
+
   const statePermissionTrx = usePermissionTrx(
     "No se podra realizar recargas a movistar porque el usuario no es un comercio, ni oficina propia o kiosko."
   );
@@ -88,6 +89,9 @@ const RecargasMovistar = () => {
       direccion: roleInfo.direccion,
       ciudad: roleInfo.ciudad,
       codigo_dane: roleInfo.codigo_dane,
+      nombre_comercio: roleInfo["nombre comercio"],
+      nombre_usuario: pdpUser["uname"],
+      bool_ticket: true,
     };
 
     peticionRecarga(data, {})
@@ -103,13 +107,7 @@ const RecargasMovistar = () => {
         if (error instanceof ErrorCustom) {
           switch (error.name) {
             case "ErrorCustomBackend":
-              msg = `${msg}: ${error.message}`;
-              const error_msg_key = Object.keys(error.error_msg);
-              const find = error_msg_key.find(
-                (keyInd) => keyInd === "ErrorTrxRefuse"
-              );
-              msg = find !== undefined ? error.message : msg;
-              notifyError(msg);
+              notifyError(error.message);
               break;
             default:
               if (error.notificacion == null) {
