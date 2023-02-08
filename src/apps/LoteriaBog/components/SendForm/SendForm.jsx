@@ -77,7 +77,7 @@ const SendForm = ({
   };
 
   const handleCloseCancelar = useCallback(() => {
-    notify("Venta de lotería cancelada");
+    notifyError("Venta de lotería cancelada");
   })
 
   const formPago = (value) => {

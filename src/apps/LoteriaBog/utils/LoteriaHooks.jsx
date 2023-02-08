@@ -513,7 +513,8 @@ export const useProvideLoteria = () => {
       idLoteria,
       tipopago,
       hash,
-      nombre_usuario
+      nombre_usuario,
+      tickets,
     ) => {
       if (tipopago == 2) {
         try {
@@ -549,6 +550,7 @@ export const useProvideLoteria = () => {
               nombre_usuario: nombre_usuario,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
+              ticket: tickets,
             },
             {},
             true,
@@ -588,6 +590,7 @@ export const useProvideLoteria = () => {
               nombre_usuario: nombre_usuario,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
+              ticket: tickets,
             },
             {},
             true,

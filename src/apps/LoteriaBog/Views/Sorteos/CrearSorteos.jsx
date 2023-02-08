@@ -64,7 +64,7 @@ const CrearSorteos = ({ route }) => {
   const onSubmit4 = (e) => {
     setTip_sorteo(1);
     setShowModal2(true);
-    setDisable_botoOrdinario(true);
+    // setDisable_botoOrdinario(true);
   };
 
   const closeModal = useCallback(() => {
