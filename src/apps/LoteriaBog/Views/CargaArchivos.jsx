@@ -53,8 +53,8 @@ const CargaArchivos = ({ route }) => {
 
   const optionsFisiVir = [
     { value: "", label: "" },
-    { value: "Fisico/", label: `${archivo} Físicos` },
-    { value: "Virtual/", label: `${archivo} Virtuales` },
+    { value: "Fisico/", label: `${archivo === "Asignacion" ? ("Asignación") : ("")} Físicos` },
+    { value: "Virtual/", label: `${archivo === "Asignacion" ? ("Asignación") : ("")} Virtuales` },
   ];
 
   const [showModal, setShowModal] = useState(false);

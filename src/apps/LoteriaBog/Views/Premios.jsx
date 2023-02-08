@@ -316,6 +316,9 @@ const Premios = ({ route }) => {
               notifyError(res?.obj?.msg);
               navigate(-1);
             }
+            if (res?.status === false) {
+              notifyError(res?.msg)
+            }
           })
           .catch(() => setDisabledBtns(false));
       }
