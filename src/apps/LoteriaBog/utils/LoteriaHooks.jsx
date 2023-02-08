@@ -546,9 +546,9 @@ export const useProvideLoteria = () => {
               tipo_ganancia: tipopago,
               oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+              nombre_usuario: nombre_usuario,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
-              nombre_usuario,
             },
             {},
             true,
@@ -585,6 +585,7 @@ export const useProvideLoteria = () => {
               tipo_ganancia: tipopago,
               oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+              nombre_usuario: nombre_usuario,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
             },

@@ -298,6 +298,7 @@ const Premios = ({ route }) => {
           idLoteria,
           tipopago,
           hash,
+          pdpUser?.uname
         )
           .then((res) => {
             setRespuesta(false);
