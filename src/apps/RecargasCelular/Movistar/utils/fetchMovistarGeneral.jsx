@@ -199,6 +199,6 @@ export class ErrorCustomBackendUser extends ErrorCustom {
 
 export class msgCustomBackend extends ErrorCustom {
   constructor(message, error_msg) {
-    super(message, "msgCustomBackend", error_msg, "notify");
+    super(message, "msgCustomBackend", error_msg, null);
   }
 }

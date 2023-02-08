@@ -25,7 +25,7 @@ const url_consulta_recarga = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-rec
 const RecargasMovistar = () => {
   //Variables
   const printDiv = useRef();
-  const { roleInfo, infoTicket, pdpUser } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   const statePermissionTrx = usePermissionTrx(
     "No se podra realizar recargas a movistar porque el usuario no es un comercio, ni oficina propia o kiosko."
@@ -97,8 +97,12 @@ const RecargasMovistar = () => {
     peticionRecarga(data, {})
       .then((response) => {
         if (response?.status === true) {
+          if (response?.obj?.result?.ticket) {
+            const voucher = response.obj.result.ticket;
+            setInfTicket(JSON.parse(voucher));
+          }
           notify("Recarga exitosa");
-          RecargaExitosa(response?.obj?.result);
+          setTypeInfo("RecargaExitosa");
         }
       })
       .catch((error) => {
@@ -108,6 +112,9 @@ const RecargasMovistar = () => {
           switch (error.name) {
             case "ErrorCustomBackend":
               notifyError(error.message);
+              break;
+            case "msgCustomBackend":
+              notify(error.message);
               break;
             default:
               if (error.notificacion == null) {
@@ -162,48 +169,6 @@ const RecargasMovistar = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-
-  const RecargaExitosa = (result_) => {
-    const voucher = {
-      title: "Recibo de pago",
-      timeInfo: {
-        "Fecha de venta": result_.fecha_final_ptopago,
-        Hora: result_.hora_final_ptopago,
-      },
-      commerceInfo: [
-        ["Id Transacción", result_.id_trx],
-        ["No. terminal", roleInfo.id_dispositivo],
-        ["Id Movistar", result_.id_movistar],
-        ["Id Comercio", roleInfo.id_comercio],
-        ["Comercio", roleInfo["nombre comercio"]],
-        ["", ""],
-        ["Municipio", roleInfo.ciudad],
-        ["", ""],
-        ["Dirección", roleInfo.direccion],
-        ["", ""],
-      ],
-      commerceName: "RECARGAS MOVISTAR",
-      trxInfo: [
-        ["Número celular", toPhoneNumber(inputCelular)],
-        ["", ""],
-        ["Valor recarga", formatMoney.format(inputValor)],
-        ["", ""],
-      ],
-      disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
-    };
-
-    setTypeInfo("RecargaExitosa");
-    setInfTicket(voucher);
-    infoTicket(result_.id_trx, result_.id_tipo_transaccion, voucher)
-      .then((resTicket) => {
-        console.log(resTicket);
-      })
-      .catch((err) => {
-        console.error(err);
-        notifyError("Error guardando el ticket");
-      });
-  };
 
   return (
     <Fragment>
