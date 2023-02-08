@@ -82,7 +82,7 @@ const CargaArchivos = ({ route }) => {
         .then((respuesta) => {
           console.log("Por aca****", respuesta?.msg)
           if (!respuesta?.status) {
-            notifyError(respuesta?.msg === "Motivo: Archivo con errores: UniqueViolation" ? "Este archivo ya fue cargado previamente" : respuesta?.msg);
+            notifyError(respuesta?.msg == "Motivo: Archivo con errores: UniqueViolation" ? "Este archivo ya fue cargado previamente" : respuesta?.msg);
             console.log("Si entro =?=?=?=?=?=?", respuesta?.msg)
           } else {
             const formData2 = new FormData();
