@@ -22,7 +22,7 @@ const Borrado_billetes = ({ route }) => {
   const { codigos_lot, setCodigos_lot } = useLoteria();
 
   const navigate = useNavigate();
-  
+
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -106,8 +106,8 @@ const Borrado_billetes = ({ route }) => {
     });
   }, [sorteosLOT]);
 
-  const handleCloseCancelar = useCallback (()=> {
-    notify("Eliminación de billeteria Cancelada por el usuario");
+  const handleCloseCancelar = useCallback(() => {
+    notifyError("Eliminación de billeteria cancelada por el usuario");
     sorteos(sorteosLOT).then((res) => {
       if (res.status === false) {
       } else {
@@ -119,7 +119,7 @@ const Borrado_billetes = ({ route }) => {
 
   return (
     <>
-    <h1 className="text-3xl mt-6">Eliminar billetera</h1>
+      <h1 className="text-3xl mt-6">Eliminar billetera</h1>
       <div>
         <Form formDir="col" onSubmit={onSubmit} grid>
           <Select
