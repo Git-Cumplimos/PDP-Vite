@@ -11,8 +11,7 @@ const CorresponsaliaBancoAgrario = lazy(() =>
   import("./CorresponsaliaBancoAgrario")
 );
 
-const ContenedorRunt = lazy(() => import("./ContenedorRunt"));
-const PagarRunt = lazy(() => import("./Views/PagarRunt"));
+const PagarRunt = lazy(() => import("./Views/Runt/PagarRunt"));
 
 const TrxCuentasBancoAgrario = lazy(() =>
   import("./CorresponsaliaBancoAgrario")
@@ -129,44 +128,14 @@ const rutasAgrarioCB = {
         },
       ],
     },
+
     {
-      link: "/runt",
-      label: <AppIcons Logo={"IMPUESTO"} name={"Runt"} />,
-      component: ContenedorRunt,
-      permission: [55, 56, 57],
-      subRoutes: [
-        {
-          link: "/runt/pagar-runt",
-          label: <AppIcons Logo={"RETIRO"} name={"Pagar Runt"} />,
-          component: PagarRunt,
-          permission: [56, 57],
-          /*   subRoutes: [
-            {
-              link: "/recaudo-integrado/davivienda/cargar",
-              label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
-              component: cargarArchivos,
-              permission: [55],
-            },
-          ], */
-        },
-      ],
+      link: "/runt/pagar-runt",
+      label: <AppIcons Logo={"RETIRO"} name={"Pagar Runt"} />,
+      component: PagarRunt,
+      permission: [56, 57],
+      subRoutes: [],
     },
-    // {
-    //   link: "/corresponsalia/corresponsalia-banco-agrario/retiro",
-    //   label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
-    //   component: RetiroBancoAgrario,
-    //   permission: [72],
-    //   subRoutes: [
-    //     {
-    //       link: "/corresponsalia/corresponsalia-banco-agrario/retiro/retiro-efectivo",
-    //       label: (
-    //         <AppIcons Logo={"MARKETPLACE"} name="Retiro en efectivo" />
-    //       ),
-    //       component: RetiroEfectivoBancoAgrario,
-    //       permission: [73],
-    //     },
-    //   ],
-    // },
   ],
 };
 export default rutasAgrarioCB;

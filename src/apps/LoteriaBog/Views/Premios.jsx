@@ -298,7 +298,8 @@ const Premios = ({ route }) => {
           idLoteria,
           tipopago,
           hash,
-          pdpUser?.uname
+          pdpUser?.uname,
+          tickets,
         )
           .then((res) => {
             setRespuesta(false);
@@ -314,6 +315,9 @@ const Premios = ({ route }) => {
             if (res?.status === false) {
               notifyError(res?.obj?.msg);
               navigate(-1);
+            }
+            if (res?.status === false) {
+              notifyError(res?.msg)
             }
           })
           .catch(() => setDisabledBtns(false));
@@ -384,21 +388,21 @@ const Premios = ({ route }) => {
       return { ...old, celular: valueInput };
     });
   };
-  useEffect(() => {
-    const ticket = tickets;
-    infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
-      .then((resTicket) => { })
-      .catch((err) => {
-        console.error(err);
-        notifyError("Error guardando el ticket");
-      });
-  }, [
-    infoTicket,
-    datosCliente,
-    estadoTransaccion,
-    tickets,
-    tipopago,
-  ]);
+  // useEffect(() => {
+  //   const ticket = tickets;
+  //   infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
+  //     .then((resTicket) => { })
+  //     .catch((err) => {
+  //       console.error(err);
+  //       notifyError("Error guardando el ticket");
+  //     });
+  // }, [
+  //   infoTicket,
+  //   datosCliente,
+  //   estadoTransaccion,
+  //   tickets,
+  //   tipopago,
+  // ]);
   const cancelar = () => {
     notifyError("Se canceló el pago del premio");
     navigate(-1);
