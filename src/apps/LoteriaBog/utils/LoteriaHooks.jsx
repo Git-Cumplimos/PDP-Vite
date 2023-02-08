@@ -363,8 +363,8 @@ export const useProvideLoteria = () => {
         setLoadConsulta(false);
         setSellResponse(null);
         navigate(-1);
-        notifyError("Error al hacer la consulta")
-        console.error(err);
+        notifyError("Error al hacer la venta")
+        console.error("Este es el error-->",err);
       }
     },
     [selected, customer, roleInfo, tiposOperaciones, codigosOficina]
@@ -395,6 +395,7 @@ export const useProvideLoteria = () => {
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
+        nombre_usuario: pdpUser?.uname,
         fisico: fisico,
         frac_fisico_venta: selecFrac,
         frac_fisico_disponibles: selected?.Fracciones,
@@ -414,9 +415,9 @@ export const useProvideLoteria = () => {
       } catch (err) {
         setLoadConsulta(false);
         setSellResponse(null);
-        console.error(err);
+        console.error("Este es el error-->",err);
         navigate(-1);
-        notifyError("Error al hacer la consulta")
+        notifyError("Error al hacer la venta")
       }
     },
     [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica, codigosOficina]
