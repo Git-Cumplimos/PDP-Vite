@@ -357,7 +357,6 @@ export const useProvideLoteria = () => {
       try {
         setLoadConsulta(true);
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
-        console.log("RES--->", res)
         setSellResponse(res);
         setLoadConsulta(false);
       } catch (err) {

@@ -248,7 +248,7 @@ const Loteria = ({ route }) => {
       {sorteo !== "" ?
         <Form grid>
           {sorteo.split("-")[1] === "true" ?
-            <InputX
+            <Input
               label="Escanee el código de barras"
               type="search"
               value={datosEscaneados}
@@ -271,9 +271,9 @@ const Loteria = ({ route }) => {
                 }
               }}
               disabled={isInputDisabled}
-            ></InputX>
+            ></Input>
             : ""}
-          <InputX
+          <Input
             id="numTicket"
             label="Número de billete"
             type="search"
@@ -315,7 +315,7 @@ const Loteria = ({ route }) => {
               timeOut: 500,
             }}
           />
-          <InputX
+          <Input
             id="numSerie"
             label="Número de serie"
             type="search"
