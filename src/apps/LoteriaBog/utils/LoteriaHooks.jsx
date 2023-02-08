@@ -549,7 +549,6 @@ export const useProvideLoteria = () => {
               nombre_usuario: nombre_usuario,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
-              nombre_usuario,
             },
             {},
             true,
