@@ -81,6 +81,9 @@ export const useFetchMovistar = (
           direccion: data_.direccion,
           ciudad: data_.ciudad,
           codigo_dane: data_.codigo_dane,
+          nombre_comercio: data_.nombre_comercio,
+          nombre_usuario: data_.nombre_usuario,
+          bool_ticket: data_.bool_ticket,
         };
 
         Object.keys(data_additional_).map(
@@ -112,6 +115,9 @@ export const useFetchMovistar = (
             id_usuario: data_.id_usuario,
             id_trx: id_trx,
             id_movistar: id_movistar,
+            nombre_comercio: data_.nombre_comercio,
+            nombre_usuario: data_.nombre_usuario,
+            bool_ticket: data_.bool_ticket,
           };
 
           Object.keys(data_additional_).map(
