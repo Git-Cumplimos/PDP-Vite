@@ -18,7 +18,7 @@ export const fetchCustom = (url_, metodo_, name_) => {
       }
     } catch (error) {
       throw new ErrorCustomFetch(
-        "error con el código del fetch debido a los datos de entrada",
+        "Error respuesta Front-end PDP: (fallo validando los datos de entrada del fetch)",
         error.message
       );
     }
@@ -33,11 +33,9 @@ export const fetchCustom = (url_, metodo_, name_) => {
       } else if (metodo_ === "POST") {
         Peticion = await fetchData(urlCompleto, "POST", {}, data_, true);
       }
-      console.log("hh", Peticion);
     } catch (error) {
-      console.log(error);
       throw new ErrorCustomFetch(
-        `Falla en el sistema: no conecta con el servicio ${name_}`,
+        `Error respuesta Front-end PDP: (No conecta con el servicio ${name_})`,
         error.message
       );
     }
@@ -46,7 +44,7 @@ export const fetchCustom = (url_, metodo_, name_) => {
     try {
       if (typeof Peticion !== "object") {
         throw new ErrorCustomFetch(
-          `Falla en el sistema: servicio no encontrado ${name_}`,
+          `Error respuesta Front-end PDP: (Servicio no encontrado ${name_})`,
           "404 not found"
         );
       }
@@ -54,8 +52,6 @@ export const fetchCustom = (url_, metodo_, name_) => {
       throw error;
     }
 
-    console.log(Peticion?.hasOwnProperty("status") === false);
-    console.log(typeof {});
     //evaluar respuesta de api gateway
     try {
       if (
@@ -66,12 +62,12 @@ export const fetchCustom = (url_, metodo_, name_) => {
         if (Peticion?.hasOwnProperty("message") === true) {
           if (Peticion.message === "Endpoint request timed out") {
             throw new ErrorCustomTimeout(
-              `Falla en el sistema: timeout con el servicio ${name_}`,
+              `Error respuesta Front-end PDP: (Timeout con el servicio ${name_})`,
               "timeout"
             );
           } else {
             throw new ErrorCustomFetch(
-              `Falla en el sistema: error no controlado de la respuesta del servicio ${name_}`,
+              `Error respuesta Front-end PDP: (Error no controlado de la respuesta del servicio ${name_})`,
               Peticion.message
             );
           }
@@ -84,7 +80,7 @@ export const fetchCustom = (url_, metodo_, name_) => {
         throw error;
       } else {
         throw new ErrorCustomFetch(
-          `Falla en el sistema: no conecta con el servicio ${name_}`,
+          `Error respuesta Front-end PDP: (No conecta con el servicio ${name_})`,
           `no conecta con el servicio ${name_}`
         );
       }
@@ -107,7 +103,7 @@ export const EvaluateResponse = (res) => {
     }
   } catch (error) {
     throw new ErrorCustomFetch(
-      `Falla en el sistema: error con el código del fetch al evaluar el status`,
+      `Error respuesta Front-end PDP: (Error con el fetch al evaluar el status)`,
       error.message
     );
   }
@@ -132,7 +128,7 @@ export const EvaluateResponse = (res) => {
       throw error;
     } else {
       throw new ErrorCustomFetch(
-        `Falla en el sistema: error con el código del fetch al evaluar los errores`,
+        `Error respuesta Front-end PDP: (Error con el código del fetch al evaluar los errores)`,
         error.message
       );
     }
@@ -156,7 +152,7 @@ const MetodoError1 = (error_msg_) => {
       throw new ErrorCustomBackend(error.message, error.error_msg);
     } else {
       throw new ErrorCustomFetch(
-        `Falla en el sistema: error con el código del fetch al evaluar los mensajes`,
+        `Error respuesta Front-end PDP: (Error con el código del fetch al evaluar los mensajes)`,
         error.message
       );
     }
