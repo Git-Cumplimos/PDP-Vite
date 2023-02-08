@@ -119,7 +119,7 @@ const Borrado_billetes = ({ route }) => {
 
   return (
     <>
-      <h1 className="text-3xl mt-6">Eliminar billetera</h1>
+      <h1 className="text-3xl mt-6">Eliminar billeteria</h1>
       <div>
         <Form formDir="col" onSubmit={onSubmit} grid>
           <Select
