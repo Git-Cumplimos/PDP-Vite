@@ -121,7 +121,7 @@ export const useLoteria = () => {
 
 export const useProvideLoteria = () => {
   // Datos consulta y compra
-  const { roleInfo } = useAuth();
+  const { pdpUser, roleInfo } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [numero, setNumero] = useState("");
@@ -347,7 +347,7 @@ export const useProvideLoteria = () => {
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
-
+        nombre_usuario: pdpUser?.uname,
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
@@ -357,7 +357,6 @@ export const useProvideLoteria = () => {
       try {
         setLoadConsulta(true);
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
-        console.log("RES--->", res)
         setSellResponse(res);
         setLoadConsulta(false);
       } catch (err) {
@@ -368,7 +367,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones,codigosOficina]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina]
   );
 
   const sellLoteriafisica = useCallback(
@@ -547,9 +546,9 @@ export const useProvideLoteria = () => {
               tipo_ganancia: tipopago,
               oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+              nombre_usuario: nombre_usuario,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
-              nombre_usuario,
             },
             {},
             true,
@@ -586,6 +585,7 @@ export const useProvideLoteria = () => {
               tipo_ganancia: tipopago,
               oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+              nombre_usuario: nombre_usuario,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
             },
