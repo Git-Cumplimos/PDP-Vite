@@ -194,7 +194,7 @@ const PagoSubsidios = () => {
       .catch((error) => {
         if (error instanceof ErrorCustom) {
         } else if (error instanceof ErrorCustomBackend) {
-          notifyError(`Pago de subsidio no exitoso: ${error.message}`);
+          notifyError(`${error.message}`);
         } else if (error instanceof msgCustomBackend) {
           notify(`${error.message}`);
         } else {
