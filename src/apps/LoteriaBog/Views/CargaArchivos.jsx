@@ -198,7 +198,6 @@ const CargaArchivos = ({ route }) => {
     setArchivo("");
     setTipoSorteo("");
     setFisiVirtual("");
-    notifyError("Carga de archivos cancelada por el usuario")
   }, []);
 
   return (
@@ -236,7 +235,7 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
+        {archivo !== "PlanDePremios" && archivo !== "Resultados" && tipoSorteo !== "" ? (
 
           <Select
             class="mb-3"
@@ -253,7 +252,7 @@ const CargaArchivos = ({ route }) => {
           ""
         )}
         {(archivo === "PlanDePremios" && tipoSorteo !== "") ||
-          fisiVirtual !== "" ? (
+          fisiVirtual !== "" || (archivo === "Resultados" && tipoSorteo !== "") ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <InputX
               id={`archivo_${archivo}`}

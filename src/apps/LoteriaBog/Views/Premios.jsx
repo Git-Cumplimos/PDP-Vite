@@ -34,7 +34,7 @@ const Premios = ({ route }) => {
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
-  const { roleInfo, infoTicket } = useAuth();
+  const { pdpUser, roleInfo, infoTicket } = useAuth();
   const [respagar, setRespagar] = useState([]);
   const [tipopago, setTipopago] = useState("");
   const [isSelf, setIsSelf] = useState(false);
@@ -242,6 +242,7 @@ const Premios = ({ route }) => {
             idLoteria,
             tipopago,
             hash,
+            pdpUser?.uname
           )
             .then((res) => {
               setRespuesta(false);
@@ -324,14 +325,14 @@ const Premios = ({ route }) => {
       title: "Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
         }).format(new Date()),
         Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
           hour12: false,
         }).format(new Date()),
       },
@@ -339,23 +340,31 @@ const Premios = ({ route }) => {
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", datosCliente.idTransaccion],
-        ["Municipio", roleInfo?.ciudad],
+        ["Id Aut ", "Falta"],
+        ["Comercio", roleInfo?.["nombre comercio"]],
         ["", ""],
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
       commerceName: datosComercio.nom_loteria,
       trxInfo: [
+        ["Sorteo", sorteo],
+        ["Billete", billete],
+        ["Serie", serie],
+        ["Fracciones", seleccionarFraccion],
+        [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
+        ["", ""],
+        ["Valor", formatMoney.format(totalPagar)],
+        ["", ""],
+        ["Forma de Pago", "Efectivo"],
         ["", ""],
         [tipopago === 2 ? "Nombre" : "", tipopago === 2 ? datosCliente?.nombre : ""],
         [tipopago === 2 ? "Celular" : "", tipopago === 2 ? datosCliente?.celular : ""],
-        ["Valor", formatMoney.format(totalPagar)],
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [estadoTransaccion]);
-
   const handlePrint = useReactToPrint({
     content: () => printDiv?.current,
   });
@@ -374,7 +383,6 @@ const Premios = ({ route }) => {
       return { ...old, celular: valueInput };
     });
   };
-
   useEffect(() => {
     const ticket = tickets;
     infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
@@ -391,7 +399,7 @@ const Premios = ({ route }) => {
     tipopago,
   ]);
   const cancelar = () => {
-    notifyError("Se cancelo el pago del premio");
+    notifyError("Se canceló el pago del premio");
     navigate(-1);
   };
   return (
@@ -575,16 +583,21 @@ const Premios = ({ route }) => {
                     });
                   }}
                 />
-                <Select
-                  id="selectFraccion"
-                  label="Fracción"
-                  options={optionsDocumento}
-                  value={seleccionarFraccion}
-                  required
-                  onChange={(e) => {
-                    setSeleccionarFraccion(e.target.value);
-                  }}
-                />
+                {checkBilleteVirtual == false ? (
+                  <Select
+                    id="selectFraccion"
+                    label="Fracción"
+                    options={optionsDocumento}
+                    value={seleccionarFraccion}
+                    required
+                    onChange={(e) => {
+                      setSeleccionarFraccion(e.target.value);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
+
                 {checkBilleteVirtual == true ? (
                   <Input
                     id="codHash"
@@ -626,16 +639,20 @@ const Premios = ({ route }) => {
                       legend={
                         "Por favor, seleccione la fracción del billete a pagar"
                       }>
-                      <Select
-                        id="selectFraccion"
-                        label="Fracción"
-                        options={optionsDocumento}
-                        value={seleccionarFraccion}
-                        required
-                        onChange={(e) => {
-                          setSeleccionarFraccion(e.target.value);
-                        }}
-                      />
+                      {checkBilleteVirtual === false ? (
+                        <Select
+                          id="selectFraccion"
+                          label="Fracción"
+                          options={optionsDocumento}
+                          value={seleccionarFraccion}
+                          required
+                          onChange={(e) => {
+                            setSeleccionarFraccion(e.target.value);
+                          }}
+                        />
+                      ) : (
+                        ""
+                      )}
                       {checkBilleteVirtual === true ? (
                         <Input
                           id="codHash"

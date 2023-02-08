@@ -97,31 +97,44 @@ const SellResp = ({
     return {
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de venta": voucherInfo?.["Fecha de venta"],
-        Hora: voucherInfo?.["Hora"],
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }).format(new Date()),
       },
-      commerceInfo: Object.entries({
-        "Id Comercio": roleInfo.id_comercio,
-        "No. terminal": roleInfo.id_dispositivo,
-        Municipio: roleInfo.ciudad,
-        Dirección: roleInfo.direccion,
-        "Id Trx": sellResponse?.["id_trx"],
-        "Id Transacción": sellResponse?.id_Transaccion,
-      }),
+      commerceInfo: [
+        ["Id Comercio", roleInfo?.id_comercio],
+        ["No. terminal", roleInfo?.id_dispositivo],
+        ["Id Trx ", sellResponse?.["id_trx"]],
+        ["Id Aut ", sellResponse?.id_Transaccion],
+        ["Comercio", roleInfo?.["nombre comercio"]],
+        ["", ""],
+        ["Dirección", roleInfo?.direccion],
+        ["", ""],
+      ],
       commerceName: sellResponse?.nom_loteria,
-      trxInfo: Object.entries({
-        Sorteo: sellResponse?.sorteo,
-        Billete: sellResponse?.num_billete,
-        Serie: sellResponse?.serie,
-        Fracciones: sellResponse?.fracciones,
-        "Valor pago": formatMoney.format(sellResponse?.valor_pago),
-        "Tipo de Billete": sellResponse?.fisico === true ? "Fisico" : "Virtual",
-        "Forma de pago":
-          parseInt(sellResponse?.tipoPago) ===
-            parseInt(operacion?.Venta_Fisica) || sellResponse?.fisico == false
-            ? "Efectivo"
-            : "Bono",
-      }),
+      trxInfo: [
+        ["Sorteo", sellResponse?.sorteo],
+        ["Billete", sellResponse?.num_billete],
+        ["Serie", sellResponse?.serie],
+        ["Fracciones", sellResponse?.fracciones],
+        ["Tipo de Billete", sellResponse?.fisico === true ? "Fisico" : "Virtual"],
+        ["", ""],
+        ["Valor", formatMoney.format(sellResponse?.valor_pago)],
+        ["", ""],
+        ["Forma de Pago", parseInt(sellResponse?.tipoPago) ===
+          parseInt(operacion?.Venta_Fisica) || sellResponse?.fisico == false
+          ? "Efectivo"
+          : "Bono",],
+        ["", ""],
+      ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };

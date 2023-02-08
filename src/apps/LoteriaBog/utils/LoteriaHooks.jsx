@@ -121,7 +121,7 @@ export const useLoteria = () => {
 
 export const useProvideLoteria = () => {
   // Datos consulta y compra
-  const { roleInfo } = useAuth();
+  const { pdpUser, roleInfo } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [numero, setNumero] = useState("");
@@ -218,15 +218,15 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         try {
           consulta_codigos_oficina(nit).then((res) => {
-            console.log("Hizo la consulta acá es donde se totea", res)
-            if ("msg" in res) {
-              console.log("Se metio en el if donde se totea", res)
-              setCodigosOficina({
-                cod_oficina_lot: "PPVIR",
-                cod_sucursal_lot: "00",
-              });
-            } else {
-              setCodigosOficina(res);
+            if (res != undefined) {
+              if ("msg" in res) {
+                setCodigosOficina({
+                  cod_oficina_lot: "PPVIR",
+                  cod_sucursal_lot: "00",
+                });
+              } else {
+                setCodigosOficina(res);
+              }
             }
           });
         } catch (err) {
@@ -347,7 +347,7 @@ export const useProvideLoteria = () => {
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
-
+        nombre_usuario: pdpUser?.uname,
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
@@ -367,7 +367,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina]
   );
 
   const sellLoteriafisica = useCallback(
@@ -419,7 +419,7 @@ export const useProvideLoteria = () => {
         notifyError("Error al hacer la consulta")
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica]
+    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica, codigosOficina]
   );
 
   const searchModa = useCallback(
@@ -513,6 +513,7 @@ export const useProvideLoteria = () => {
       idLoteria,
       tipopago,
       hash,
+      nombre_usuario
     ) => {
       if (tipopago == 2) {
         try {
@@ -547,6 +548,7 @@ export const useProvideLoteria = () => {
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
+              nombre_usuario,
             },
             {},
             true,
