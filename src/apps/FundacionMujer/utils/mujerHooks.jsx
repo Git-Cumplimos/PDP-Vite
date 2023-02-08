@@ -43,7 +43,7 @@ export const useMujer = () => {
 
 export const useProvideFDLM = () => {
   // Datos consulta y compra
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const [RespuestaPagoRecaudo, setRespuestaPagoRecaudo] = useState(null);
   const [respuestamujer, setRespuestamujer] = useState();
   const [arreglo, setArreglo] = useState(null);
@@ -100,6 +100,7 @@ export const useProvideFDLM = () => {
     const body = {
       Tipo: values?.Tipo,
       Usuario: parseInt(values?.Usuario),
+      nombre_usuario: pdpUser?.uname ?? "",
       Dispositivo: values?.Dispositivo,
       Comercio: values?.Comercio,
       Credito: parseInt(values?.Credito),
@@ -110,6 +111,7 @@ export const useProvideFDLM = () => {
       cedula: values?.cedula,
       cliente: values?.cliente,
       nombre_comercio: values?.nombre_comercio,
+      ticket: values?.ticket
     };
     try {
       const res = await fetchData(urls.ingresorecibo, "POST", {}, body);
@@ -117,7 +119,7 @@ export const useProvideFDLM = () => {
     } catch (err) {
       throw err;
     }
-  }, []);
+  }, [pdpUser]);
 
   const valorcuota = useCallback(async (numero, user) => {
     const body = {

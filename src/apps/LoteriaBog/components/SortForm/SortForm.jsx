@@ -36,8 +36,8 @@ const SortForm = ({
     });
     setChangesorteo(sorteo);
   };
-  const handleCloseCancelar = useCallback (()=> {
-    notify("Apertura de Sorteo cancelada por el usuario");
+  const handleCloseCancelar = useCallback(() => {
+    notifyError("Apertura de sorteo cancelada por el usuario");
   })
 
   return (
