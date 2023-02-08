@@ -31,7 +31,7 @@ const CloseForm = ({ closeModal, tip_sorteo }) => {
   }, [tip_sorteo]);
 
   const handleCloseCancelar = useCallback(() => {
-    notify("Cierre de Sorteo " + tipo_sorteo + " Cancelado por el usuario");
+    notifyError("Cierre de sorteo " + tipo_sorteo + " cancelado por el usuario");
   })
 
   return (
