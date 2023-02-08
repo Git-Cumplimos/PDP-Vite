@@ -81,7 +81,7 @@ const CargaArchivos = ({ route }) => {
       fetchData(url_cargueS3, "GET", query)
         .then((respuesta) => {
           if (!respuesta?.status) {
-            notifyError(respuesta?.msg === "Motivo: Archivo con errores: UniqueViolation" ? ("Este archivo ya fue cargado previamente") : respuesta?.msg);
+            notifyError(respuesta?.msg === "Motivo: Archivo con errores: UniqueViolation" ? "Este archivo ya fue cargado previamente" : respuesta?.msg);
           } else {
             const formData2 = new FormData();
             if (file) {
