@@ -121,7 +121,7 @@ export const useLoteria = () => {
 
 export const useProvideLoteria = () => {
   // Datos consulta y compra
-  const { roleInfo } = useAuth();
+  const { pdpUser, roleInfo } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [numero, setNumero] = useState("");
@@ -347,7 +347,7 @@ export const useProvideLoteria = () => {
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
-
+        nombre_usuario: pdpUser?.uname,
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
@@ -367,7 +367,7 @@ export const useProvideLoteria = () => {
         console.error(err);
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones,codigosOficina]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina]
   );
 
   const sellLoteriafisica = useCallback(
