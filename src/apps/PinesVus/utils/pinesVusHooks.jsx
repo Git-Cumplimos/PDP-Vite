@@ -46,9 +46,9 @@ export const usePinesVus = () => {
 
 export const useProvidePinesVus = () => {
   // Datos consulta y compra
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser} = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
-
+  console.log("PDP USER",pdpUser)
   const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion) => {
     let tipo_comercio = user?.tipo_comercio
     if (user?.tipo_comercio === "KIOSCO"){
@@ -59,6 +59,7 @@ export const useProvidePinesVus = () => {
       Usuario: user?.id_usuario,
       Dispositivo: user?.id_dispositivo,
       Comercio: user?.id_comercio,
+      nombre_usuario: pdpUser?.uname ?? "",
       Tipo: tipo_comercio,
       NombreComercio: roleInfo?.["nombre comercio"],
       valor: parseFloat(valor),
@@ -76,7 +77,7 @@ export const useProvidePinesVus = () => {
     } catch (err) {
       throw err;
     }
-  }, []);
+  }, [roleInfo, pdpUser]);
   
   const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma, motivoCompra, descripcionTipDocumento) => {
     let tipo_comercio = user?.Tipo
@@ -91,6 +92,7 @@ export const useProvidePinesVus = () => {
       Usuario: user?.Usuario,
       Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,
+      nombre_usuario: pdpUser?.uname ?? "",
       Tipo: tipo_comercio,
       NombreComercio: roleInfo?.["nombre comercio"],
       DireccionComercio: roleInfo?.direccion,
@@ -110,7 +112,7 @@ export const useProvidePinesVus = () => {
     } catch (err) {
       throw err;
     }
-  }, []);
+  }, [roleInfo, pdpUser]);
 
   const usarPinVus = useCallback(
     async (valor, trx, num_tramite, user, id_pin) => {
@@ -123,6 +125,7 @@ export const useProvidePinesVus = () => {
         Dispositivo: user?.id_dispositivo,
         Comercio: user?.id_comercio,
         Tipo: tipo_comercio,
+        nombre_usuario: pdpUser?.uname ?? "",
         NombreComercio: roleInfo?.["nombre comercio"],
         valor: parseFloat(valor),
         id_trx: trx,
@@ -141,7 +144,7 @@ export const useProvidePinesVus = () => {
         throw err;
       }
     },
-    []
+    [roleInfo, pdpUser]
   );
 
   const consultaPinesVus = useCallback(
@@ -260,6 +263,7 @@ export const useProvidePinesVus = () => {
       Usuario: roleInfo?.id_usuario,
       Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
+      nombre_usuario: pdpUser?.uname ?? "",
       Tipo: tipo_comercio,
     };
     try {
@@ -268,7 +272,7 @@ export const useProvidePinesVus = () => {
     } catch (err) {
       throw err;
     }
-  }, []);
+  }, [roleInfo, pdpUser]);
 
   const consultaPagoParticipacion = useCallback(
     async (
