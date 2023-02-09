@@ -345,6 +345,7 @@ export const useProvideLoteria = () => {
         can_fracciones: parseInt(selected.Fracciones_disponibles),
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
+        comercio: roleInfo?.["nombre comercio"],
         direccion: roleInfo.direccion,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
@@ -369,7 +370,7 @@ export const useProvideLoteria = () => {
         console.error("Este es el error-->",err);
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones, codigosOficina]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina,sellResponse]
   );
 
   const sellLoteriafisica = useCallback(
@@ -395,6 +396,7 @@ export const useProvideLoteria = () => {
         cod_sucursal: codigosOficina?.cod_sucursal_lot,
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
+        comercio: roleInfo?.["nombre comercio"],
         direccion: roleInfo.direccion,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
@@ -424,7 +426,7 @@ export const useProvideLoteria = () => {
         notifyError("Error al hacer la venta")
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica, codigosOficina]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina, sellResponse]
   );
 
   const searchModa = useCallback(
