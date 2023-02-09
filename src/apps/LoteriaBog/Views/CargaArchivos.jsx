@@ -85,6 +85,7 @@ const CargaArchivos = ({ route }) => {
             notifyError(respuesta?.msg == "Motivo: Archivo con errores: UniqueViolation" ? "Este archivo ya fue cargado previamente" : respuesta?.msg);
             console.log("Si entro =?=?=?=?=?=?", respuesta?.msg)
           } else {
+            console.log("FILE****",file)
             const formData2 = new FormData();
             if (file) {
               for (const property in respuesta?.obj?.fields) {
@@ -99,6 +100,7 @@ const CargaArchivos = ({ route }) => {
                 method: "POST",
                 body: formData2,
               }).then((res) => {
+                console.log("RES***",res)
                 if (res?.ok) {
                   setTimeout(() => {
                     EstadoArchivos().then((res) => {
@@ -114,7 +116,7 @@ const CargaArchivos = ({ route }) => {
                             setFisiVirtual("");
                             notify(res[0]["Motivo"]);
                           } else {
-                            notifyError(res[0]["Motivo"]);
+                            notifyError("Error respuesta PDP: (No se pudo cargar el archivo ("+archivo+") [0010006]) "+res[0]["Motivo"]);
                           }
                         } else {
                           notifyError("Consulte con soporte");
@@ -123,15 +125,15 @@ const CargaArchivos = ({ route }) => {
                     });
                   }, 5000);
                 } else {
-                  notifyError("No fue posible conectar con el Bucket");
+                  notifyError("Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])");
                 }
               });
             }
           }
         })
         .catch((err) => {
-          notifyError("Error al cargar Datos");
-        }); /* notify("Se ha comenzado la carga"); */
+          notifyError("Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])");
+        });
     },
     [file, fileName, archivo, tipoSorteo, fisiVirtual]
   );
