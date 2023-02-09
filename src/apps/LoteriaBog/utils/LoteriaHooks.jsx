@@ -321,7 +321,7 @@ export const useProvideLoteria = () => {
   );
 
   const sellLoteria = useCallback(
-    async (sorteo, selecFrac, tipoPago) => {
+    async (sorteo, ticket, sorteo3) => {
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -345,6 +345,7 @@ export const useProvideLoteria = () => {
         can_fracciones: parseInt(selected.Fracciones_disponibles),
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
+        direccion: roleInfo.direccion,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
         nombre_usuario: pdpUser?.uname,
@@ -352,6 +353,7 @@ export const useProvideLoteria = () => {
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
         tipoPago: tiposOperaciones?.Venta_Virtual, /// Venta - Virtual
+        ticket: ticket,
       };
 
       try {
@@ -371,7 +373,7 @@ export const useProvideLoteria = () => {
   );
 
   const sellLoteriafisica = useCallback(
-    async (sorteo, selecFrac, tipoPago) => {
+    async (sorteo, selecFrac, tipoPago, ticket) => {
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -393,8 +395,10 @@ export const useProvideLoteria = () => {
         cod_sucursal: codigosOficina?.cod_sucursal_lot,
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
+        direccion: roleInfo.direccion,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
+        nombre_usuario: pdpUser?.uname,
         fisico: fisico,
         frac_fisico_venta: selecFrac,
         frac_fisico_disponibles: selected?.Fracciones,
@@ -404,6 +408,7 @@ export const useProvideLoteria = () => {
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
         tipoPago: tipoPago !== null ? tipoPago : tiposOperaciones?.Venta_Fisica, /// Venta lotería de Bogotá - Intercambio/Fisica
+        ticket: ticket,
       };
 
       try {

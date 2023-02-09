@@ -146,9 +146,9 @@ const SellResp = ({
     sellResponse,
     voucherInfo,
   ]);
-  useEffect(() => {
-    infoTicket(sellResponse?.["id_trx"], sellResponse?.tipoPago, ticket);
-  }, [infoTicket, sellResponse, ticket]);
+  // useEffect(() => {
+  //   infoTicket(sellResponse?.["id_trx"], sellResponse?.tipoPago, ticket);
+  // }, [infoTicket, sellResponse, ticket]);
 
   return "msg" in sellResponse ? (
     <div className="flex flex-col justify-center items-center">
