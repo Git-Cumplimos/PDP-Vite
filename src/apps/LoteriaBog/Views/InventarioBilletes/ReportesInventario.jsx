@@ -19,6 +19,13 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 			comentario: "",
 		},
 	];
+	const dateFormatter = Intl.DateTimeFormat("es-CO", {
+		year: "numeric",
+		month: "numeric",
+		day: "numeric",
+		hour: "numeric",
+		minute: "numeric",
+	});
 	const [pageData, setPageData] = useState({ page: 1, limit: 10 });
 	const [reporteInventario, setReporteInventario] = useState(initReporte);
 	const [numeroSorteo, setNumeroSorteo] = useState("");
@@ -43,39 +50,30 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 	};
 
 	return (
-		<div>
-			{showTabla ? (
-				<TableEnterprise
-					title="Reporte Inventario"
-					maxPage={maxPages}
-					headers={[
-						"Sorteo",
-						"Loteria",
-						"cod_distribuidor",
-						"cod_sucursal",
-						"Fecha Inicio",
-						"Inventario",
-						"Total Asignado",
-						"Total Inventariado",
-						// "inconcistencia",
-						"Comentario",
-					]}
-					data={
-						reporteInventario &&
-						reporteInventario?.map(
-							({
-								num_sorteo,
-								num_loteria,
-								cod_distribuidor,
-								cod_sucursal,
-								fecha_creacion,
-								inventario,
-								total_asignaciones,
-								total_inventario,
-								// inconcistencia,
-								comentario,
-							}) => {
-								return {
+		<>
+
+			<h1 class="text-3xl">Reporte Inventario</h1>
+			<div>
+				{showTabla ? (
+					<TableEnterprise
+						title="Reporte Inventario"
+						maxPage={maxPages}
+						headers={[
+							"Sorteo",
+							"Loteria",
+							"cod_distribuidor",
+							"cod_sucursal",
+							"Fecha Inicio",
+							"Inventario",
+							"Total Asignado",
+							"Total Inventariado",
+							// "inconcistencia",
+							"Comentario",
+						]}
+						data={
+							reporteInventario &&
+							reporteInventario?.map(
+								({
 									num_sorteo,
 									num_loteria,
 									cod_distribuidor,
@@ -86,24 +84,40 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 									total_inventario,
 									// inconcistencia,
 									comentario,
-								};
-							}
-						)
-					}
-				>
-					<Input
-						id="numSorteo"
-						label="Numero de sorte: "
-						type="text"
-						value={numeroSorteo}
-						onInput={(e) => setNumeroSorteo(e.target.value)}
-					/>
-					onSetPageData={setPageData}
-				</TableEnterprise>
-			) : (
-				""
-			)}
-		</div>
+								}) => {
+									const tempDate = new Date(fecha_creacion);
+									tempDate.setHours(tempDate.getHours() + 5);
+									fecha_creacion = dateFormatter.format(tempDate);
+									return {
+										num_sorteo,
+										num_loteria,
+										cod_distribuidor,
+										cod_sucursal,
+										fecha_creacion,
+										inventario,
+										total_asignaciones,
+										total_inventario,
+										// inconcistencia,
+										comentario,
+									};
+								}
+							)
+						}
+					>
+						<Input
+							id="numSorteo"
+							label="Numero de sorte: "
+							type="text"
+							value={numeroSorteo}
+							onInput={(e) => setNumeroSorteo(e.target.value)}
+						/>
+						{/* onSetPageData={setPageData} */}
+					</TableEnterprise>
+				) : (
+					""
+				)}
+			</div>
+		</>
 	);
 };
 

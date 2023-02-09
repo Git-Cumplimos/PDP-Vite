@@ -444,7 +444,29 @@ const Loteria = ({ route }) => {
 
       {Array.isArray(loterias) && loterias.length > 0 ? (
         <>
-          <TableEnterprise
+          <Table
+            headers={[
+              "Numero",
+              "Serie",
+              "Fracciones disponibles",
+              // "Valor por fraccion",
+            ]}
+            data={loterias.map(
+              ({ Fracciones_disponibles, Num_billete, serie: Serie_lot }) => {
+                return {
+                  Num_billete,
+                  Serie_lot,
+                  Fracciones_disponibles,
+                };
+              }
+            )}
+            onSelectRow={(e, index) => {
+              console.log(loterias[index].Fracciones);
+              setSelected(loterias[index]);
+              setShowModal(true);
+            }}
+          />
+          {/* <TableEnterprise
             headers={[
               "Número",
               "Serie",
@@ -466,7 +488,7 @@ const Loteria = ({ route }) => {
             }}
           >
 
-          </TableEnterprise>
+          </TableEnterprise> */}
         </>
       ) : (
         ""
