@@ -143,7 +143,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
         "Id Comercio": roleInfo.id_comercio,
         "No. terminal": roleInfo.id_dispositivo,
         "Id Trx": pagoresponse.id_Transaccion,
-        "Id Aut": pagoresponse["id_trx"],
+        "Id Aut": pagoresponse.id_Transaccion,
         "Comercio": roleInfo?.["nombre comercio"],
         "": "",
         "Dirección": roleInfo.direccion,

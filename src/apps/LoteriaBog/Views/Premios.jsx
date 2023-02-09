@@ -227,7 +227,7 @@ const Premios = ({ route }) => {
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", datosCliente.idTransaccion],
-        ["Id Aut ", ""],
+        ["Id Aut ", datosCliente.idTransaccion],
         ["Comercio", roleInfo?.["nombre comercio"]],
         ["", ""],
         ["Dirección", roleInfo?.direccion],

@@ -112,7 +112,7 @@ const SellResp = ({
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Id Trx ", sellResponse?.["id_trx"]],
+        ["Id Trx ", sellResponse?.id_Transaccion],
         ["Id Aut ", sellResponse?.id_Transaccion],
         ["Comercio", roleInfo?.["nombre comercio"]],
         ["", ""],
@@ -138,7 +138,7 @@ const SellResp = ({
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [roleInfo,sellResponse,voucherInfo]);
+  }, [roleInfo, sellResponse, voucherInfo]);
 
   return "msg" in sellResponse ? (
     <div className="flex flex-col justify-center items-center">
