@@ -233,17 +233,10 @@ const Loteria = ({ route }) => {
     sorteo.split("-")[1] === "true"
       ? searchLoteriafisica(sorteo, numero, serie, page)
       : searchLoteria(sorteo, numero, serie, page);
-  }, [
-    numero,
-    page,
-    searchLoteria,
-    searchLoteriafisica,
-    serie,
-    setCustomer,
-    setSelected,
-    setSellResponse,
-    sorteo,
-  ]);
+    }, 
+    [numero,page,searchLoteria,searchLoteriafisica,serie,setCustomer,setSelected,setSellResponse,sorteo]
+  );
+
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -283,17 +276,14 @@ const Loteria = ({ route }) => {
         ["Forma de Pago", parseInt(sellResponse?.tipoPago) ===
           parseInt(operacion?.Venta_Fisica) || sellResponse?.fisico === false
           ? "Efectivo"
-          : "Bono",],
+          : "Bono"],
         ["", ""],
       ],
       disclamer:
         "Para quejas o reclamos comuniquese, al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [
-    roleInfo,
-    operacion,
-    sellResponse,
-  ]);
+  }, [sellResponse]
+  );
 
   return (
     <>

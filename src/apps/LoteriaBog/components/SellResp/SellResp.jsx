@@ -112,7 +112,7 @@ const SellResp = ({
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Id Trx ", sellResponse?.["id_trx"]],
+        ["Id Trx ", sellResponse?.id_Transaccion],
         ["Id Aut ", sellResponse?.id_Transaccion],
         ["Comercio", roleInfo?.["nombre comercio"]],
         ["", ""],
@@ -132,23 +132,13 @@ const SellResp = ({
         ["Forma de Pago", parseInt(sellResponse?.tipoPago) ===
           parseInt(operacion?.Venta_Fisica) || sellResponse?.fisico == false
           ? "Efectivo"
-          : "Bono",],
+          : "Bono"],
         ["", ""],
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [
-    roleInfo.ciudad,
-    roleInfo.direccion,
-    roleInfo.id_comercio,
-    roleInfo.id_dispositivo,
-    sellResponse,
-    voucherInfo,
-  ]);
-  // useEffect(() => {
-  //   infoTicket(sellResponse?.["id_trx"], sellResponse?.tipoPago, ticket);
-  // }, [infoTicket, sellResponse, ticket]);
+  }, [roleInfo,sellResponse,voucherInfo]);
 
   return "msg" in sellResponse ? (
     <div className="flex flex-col justify-center items-center">
