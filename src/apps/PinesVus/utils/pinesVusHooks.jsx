@@ -79,7 +79,7 @@ export const useProvidePinesVus = () => {
     }
   }, [roleInfo, pdpUser]);
   
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma, motivoCompra, descripcionTipDocumento) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma, motivoCompra, descripcionTipDocumento, ticket1, ticket2) => {
     let tipo_comercio = user?.Tipo
     if (user?.Tipo === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
@@ -102,6 +102,8 @@ export const useProvidePinesVus = () => {
       firma: firma,
       motivoCompra: motivoCompra,
       descripcionTipDocumento:descripcionTipDocumento,
+      ticket_pin:ticket1,
+      ticket_tramite:ticket2
     };
     if (idPin !== ""){
       body.Pin = idPin

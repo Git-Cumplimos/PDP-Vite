@@ -236,6 +236,37 @@ const CrearPin = () => {
     }
   }, [optionsArl]);
 
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "",
+    timeInfo: {
+      "Fecha de venta": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+      /*id_dispositivo*/
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      /*ciudad*/
+      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+
+      ["Id Trx", ""],
+    ],
+    commerceName: "",
+    trxInfo: [
+      ["Proceso", "Creacion de Pin"],
+      ["Vence", ""],
+      ["", ""],
+      ["",""],
+      ["", ""],
+    ],
+    disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+  });
+
+
+
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
     .then((res) => {
@@ -414,7 +445,40 @@ const CrearPin = () => {
       notifyError("Para evitar fallas no se permite realizar la transacción, hora cierre: " + horaCierre[0] + ":" + horaCierre[1])
       navigate("/Pines/PinesVus",{replace:true});
     }else{
-    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin,firma, motivoCompra, descripcionTipDoc)
+
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
+
+    const objTicket = { ...objTicketActual };
+    objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["commerceName"] = "PIN PARA GENERACIÓN DE LICENCIA"
+    objTicket["trxInfo"][0] = ["Proceso", "Creación de Pin"]
+    // objTicket["trxInfo"][2] = ["Valor Pin", formatMoney.format(respPin?.valor)]
+    // objTicket["trxInfo"][3] = ["IVA Pin",formatMoney.format(respPin?.valor_iva)]
+    // objTicket["trxInfo"][4] = ["Total", formatMoney.format(respPin?.valor + respPin?.valor_iva)] 
+
+    const objTicket2 = { ...objTicketActual };
+    objTicket2["title"] = "Recibo de pago: " + tramiteData?.descripcion
+    objTicket2["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket2["timeInfo"]["Hora"] = hora;
+    objTicket["commerceName"] = "TRAMITE GENERACIÓN DE LICENCIA"
+    objTicket2["trxInfo"][0] = ["Proceso", "Creación de Pin"]
+    objTicket2["trxInfo"][2] = ["Valor Trámite", formatMoney.format(tramiteData?.valor)]
+    objTicket2["trxInfo"][3] = ["IVA Trámite",formatMoney.format(tramiteData?.iva)]
+    objTicket2["trxInfo"][4] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)] 
+
+    crearPinVus(documento, tipoPin, tramite,user, tramiteData, infoCliente, olimpia, categoria, idPin,firma, motivoCompra, descripcionTipDoc, objTicket,objTicket2 )
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -522,16 +586,16 @@ const CrearPin = () => {
     };
   }, [roleInfo, respPin, pinData, tramiteData]);
 
-  useEffect(() => {
-    infoTicket(
-      respPin?.transacciones_id_trx?.creacion,
-      respPin?.tipo_trx,
-      {
-      ticket1 : tickets,
-      ticket2 : tickets2
-      },
-    );
-  }, [infoTicket, respPin, tickets, tickets2]);
+  // useEffect(() => {
+  //   infoTicket(
+  //     respPin?.transacciones_id_trx?.creacion,
+  //     respPin?.tipo_trx,
+  //     {
+  //     ticket1 : tickets,
+  //     ticket2 : tickets2
+  //     },
+  //   );
+  // }, [infoTicket, respPin, tickets, tickets2]);
   
   const hora = useMemo(() => {    
     return Intl.DateTimeFormat("es-CO", {
