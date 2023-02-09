@@ -365,8 +365,8 @@ export const useProvideLoteria = () => {
         setLoadConsulta(false);
         setSellResponse(null);
         navigate(-1);
-        notifyError("Error al hacer la consulta")
-        console.error(err);
+        notifyError("Error al hacer la venta")
+        console.error("Este es el error-->",err);
       }
     },
     [selected, customer, roleInfo, tiposOperaciones, codigosOficina]
@@ -419,9 +419,9 @@ export const useProvideLoteria = () => {
       } catch (err) {
         setLoadConsulta(false);
         setSellResponse(null);
-        console.error(err);
+        console.error("Este es el error-->",err);
         navigate(-1);
-        notifyError("Error al hacer la consulta")
+        notifyError("Error al hacer la venta")
       }
     },
     [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica, codigosOficina]
