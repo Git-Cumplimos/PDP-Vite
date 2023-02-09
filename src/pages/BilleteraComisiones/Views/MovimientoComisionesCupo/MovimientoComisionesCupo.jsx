@@ -17,7 +17,7 @@ import { notify, notifyError } from "../../../../utils/notify";
 import { postTransferenciaComisiones } from "../../utils/fetchTransferenciaCom";
 
 const MovimientoComisionesCupo = () => {
-  const { quotaInfo, roleInfo } = useAuth();
+  const { quotaInfo, roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [estadoPeticion, setEstadoPeticion] = useState(0);
@@ -156,6 +156,7 @@ const MovimientoComisionesCupo = () => {
       id_comercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 0,
       id_usuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 0,
       id_terminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+      nombre_usuario: pdpUser?.uname ?? "",
       nombre_comercio: roleInfo?.["nombre comercio"]
         ? roleInfo?.["nombre comercio"]
         : "No hay datos",
