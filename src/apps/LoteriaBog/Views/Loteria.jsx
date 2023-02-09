@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
-
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -18,15 +17,28 @@ import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useLocation } from "react-router-dom";
 import { notifyError } from "../../../utils/notify";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
 const Loteria = ({ route }) => {
+  const { roleInfo } = useAuth
   const nitsLoterias = {
     "loteria-de-bogota": "899.999.270-1",
     "loteria-del-tolima": "809.008.775-0",
     "loteria-de-cundinamarca": "86.003.723-4",
   };
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
+  const { tiposOperaciones } = useLoteria();
+
+  const operacion = useMemo(() => {
+    return tiposOperaciones;
+  }, [tiposOperaciones]);
+
   const { label } = route;
   const { pathname } = useLocation();
   const {
@@ -232,6 +244,57 @@ const Loteria = ({ route }) => {
     setSellResponse,
     sorteo,
   ]);
+  const ticket = useMemo(() => {
+    return {
+      title: "Recibo de pago",
+      timeInfo: {
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }).format(new Date()),
+      },
+      commerceInfo: [
+        ["Id Comercio", roleInfo?.id_comercio],
+        ["No. terminal", roleInfo?.id_dispositivo],
+        ["Id Trx ", sellResponse?.["id_trx"]],
+        ["Id Aut ", sellResponse?.id_Transaccion],
+        ["Comercio", roleInfo?.["nombre comercio"]],
+        ["", ""],
+        ["Dirección", roleInfo?.direccion],
+        ["", ""],
+      ],
+      commerceName: sellResponse?.nom_loteria,
+      trxInfo: [
+        ["Sorteo", sellResponse?.sorteo],
+        ["Billete", sellResponse?.num_billete],
+        ["Serie", sellResponse?.serie],
+        ["Fracciones", sellResponse?.fracciones],
+        ["Tipo de Billete", sellResponse?.fisico === true ? "Fisico" : "Virtual"],
+        ["", ""],
+        ["Valor", formatMoney.format(sellResponse?.valor_pago)],
+        ["", ""],
+        ["Forma de Pago", parseInt(sellResponse?.tipoPago) ===
+          parseInt(operacion?.Venta_Fisica) || sellResponse?.fisico === false
+          ? "Efectivo"
+          : "Bono",],
+        ["", ""],
+      ],
+      disclamer:
+        "Para quejas o reclamos comuniquese, al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    };
+  }, [
+    roleInfo,
+    operacion,
+    sellResponse,
+  ]);
+
   return (
     <>
       <h1 className="text-3xl mt-6">Venta {nom_loteria} </h1>
@@ -391,7 +454,29 @@ const Loteria = ({ route }) => {
 
       {Array.isArray(loterias) && loterias.length > 0 ? (
         <>
-          <TableEnterprise
+          <Table
+            headers={[
+              "Numero",
+              "Serie",
+              "Fracciones disponibles",
+              // "Valor por fraccion",
+            ]}
+            data={loterias.map(
+              ({ Fracciones_disponibles, Num_billete, serie: Serie_lot }) => {
+                return {
+                  Num_billete,
+                  Serie_lot,
+                  Fracciones_disponibles,
+                };
+              }
+            )}
+            onSelectRow={(e, index) => {
+              console.log(loterias[index].Fracciones);
+              setSelected(loterias[index]);
+              setShowModal(true);
+            }}
+          />
+          {/* <TableEnterprise
             headers={[
               "Número",
               "Serie",
@@ -413,7 +498,7 @@ const Loteria = ({ route }) => {
             }}
           >
 
-          </TableEnterprise>
+          </TableEnterprise> */}
         </>
       ) : (
         ""
@@ -433,8 +518,8 @@ const Loteria = ({ route }) => {
             closeModal={closeModal}
             handleSubmit={(event) => {
               sorteo.split("-")[1] === "true"
-                ? sellLoteriafisica(sorteo, selecFrac, tipoPago)
-                : sellLoteria(sorteo);
+                ? sellLoteriafisica(sorteo, selecFrac, tipoPago, ticket)
+                : sellLoteria(sorteo, ticket);
             }}
           />
         ) : (

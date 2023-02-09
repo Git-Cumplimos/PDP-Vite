@@ -65,7 +65,7 @@ const SubPaquetesMovistar = () => {
   const [infTicket, setInfTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
-  const { roleInfo, infoTicket: guardarTicket } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigateValid = useNavigate();
   const [, PeticionGetPaquetes] = useFetch(fetchGetPaquetes);
   const [loadingPeticionCompraPaquetes, PeticionCompraPaquetes] =
@@ -122,6 +122,9 @@ const SubPaquetesMovistar = () => {
             case "ErrorCustomBackend":
               notifyError(`${msg}: ${error.message}`);
               break;
+            case "msgCustomBackend":
+              notify(error.message);
+              break;
             default:
               if (error.notificacion == null) {
                 notifyError(`${msg}: ${error.message}`);
@@ -165,7 +168,7 @@ const SubPaquetesMovistar = () => {
 
   const ComprarPaquete = () => {
     const tipo__comerio = roleInfo.tipo_comercio.toLowerCase();
-  
+
     const data = {
       celular: inputData.celular,
       valor: dataPackage.valordelaoferta,
@@ -179,6 +182,9 @@ const SubPaquetesMovistar = () => {
       direccion: roleInfo.direccion,
       ciudad: roleInfo.ciudad,
       codigo_dane: roleInfo.codigo_dane,
+      nombre_comercio: roleInfo["nombre comercio"],
+      nombre_usuario: pdpUser["uname"],
+      bool_ticket: true,
     };
 
     const data_additional = {
@@ -188,8 +194,12 @@ const SubPaquetesMovistar = () => {
     PeticionCompraPaquetes(data, data_additional)
       .then((response) => {
         if (response?.status === true) {
+          if (response?.obj?.result?.ticket) {
+            const voucher = response.obj.result.ticket;
+            setInfTicket(JSON.parse(voucher));
+          }
           notify("Compra de paquetes exitosa");
-          CompraPaquetesExitosa(response?.obj?.result);
+          setTypeInfo("InfRecibo");
         }
       })
       .catch((error) => {
@@ -198,13 +208,10 @@ const SubPaquetesMovistar = () => {
         if (error instanceof ErrorCustom) {
           switch (error.name) {
             case "ErrorCustomBackend":
-              msg = `${msg}: ${error.message}`;
-              const error_msg_key = Object.keys(error.error_msg);
-              const find = error_msg_key.find(
-                (keyInd) => keyInd === "ErrorTrxRefuse"
-              );
-              msg = find != undefined ? error.message : msg;
-              notifyError(msg);
+              notifyError(error.message);
+              break;
+            case "msgCustomBackend":
+              notify(error.message);
               break;
             default:
               if (error.notificacion == null) {
@@ -217,53 +224,6 @@ const SubPaquetesMovistar = () => {
         }
       });
   };
-
-  function CompraPaquetesExitosa(result_) {
-    const voucher = {
-      title: "Recibo de pago",
-      timeInfo: {
-        "Fecha de venta": result_.fecha_final_ptopago,
-        Hora: result_.hora_final_ptopago,
-      },
-      commerceInfo: [
-        ["Id Transacción", result_.id_trx],
-        ["No. terminal", roleInfo.id_dispositivo],
-        ["Id Movistar", result_.id_movistar],
-        ["Id Comercio", roleInfo.id_comercio],
-        ["Comercio", roleInfo["nombre comercio"]],
-        ["", ""],
-        ["Municipio", roleInfo.ciudad],
-        ["", ""],
-        ["Dirección", roleInfo.direccion],
-        ["", ""],
-      ],
-      commerceName: "PAQUETES MOVISTAR",
-      trxInfo: [
-        ["Tipo paquete", tipodeoferta],
-        ["", ""],
-        ["Número celular", toPhoneNumber(inputData.celular)],
-        ["", ""],
-        ["Valor paquete", formatMoney.format(dataPackage.valordelaoferta)],
-        ["", ""],
-        ["Código paquete", dataPackage.codigodelaoferta],
-        ["", ""],
-        ["Descripción", dataPackage.descripcioncorta],
-        ["", ""],
-      ],
-      disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
-    };
-
-    setInfTicket(voucher);
-    setTypeInfo("InfRecibo");
-    guardarTicket(result_.id_trx, result_.id_tipo_transaccion, voucher)
-      .then((resTicket) => {
-        console.log("Ticket guardado exitosamente");
-      })
-      .catch((err) => {
-        console.error("Error guardando el ticket");
-      });
-  }
 
   const printDiv = useRef();
   const handlePrint = useReactToPrint({

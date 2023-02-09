@@ -210,9 +210,9 @@ const DescargarArchivosS3 = ({ route }) => {
         {Array.isArray(resp_con_sort) && resp_con_sort.length > 0 ? (
           <>
             {/* <div className="flex flex-row justify-evenly w-full my-4">
-              <h1>Página: {page}</h1>
-              <h1>Ultima Página: {maxPages}</h1>
-            </div>
+              <h1>Pagina: {page}</h1>
+              <h1>Ultima pagina: {maxPages}</h1>
+            </div> */}
             <Table
               headers={["Sorteo", "Fecha de juego"]}
               data={resp_con_sort.map(({ num_sorteo, fecha_juego }) => {
@@ -225,8 +225,8 @@ const DescargarArchivosS3 = ({ route }) => {
                 setSelected(resp_con_sort[index]);
                 setShowModal(true);
               }}
-            /> */}
-            <TableEnterprise title='Tabla Número de sorteo'
+            />
+            {/* <TableEnterprise title='Tabla Número de sorteo'
               maxPage={maxPages}
               headers={["Sorteo", "Fecha de Juego"]}
               data={resp_con_sort.map(({ num_sorteo, fecha_juego }) => {
@@ -235,6 +235,10 @@ const DescargarArchivosS3 = ({ route }) => {
                   fecha_juego,
                 };
               })}
+              onSelectRow={(_e, index) => {
+                setSelected(resp_con_sort[index]);
+                setShowModal(true);
+              }}
             // onSelectRow={onSelectAutorizador}
             // onSetPageData={setPageData}
             >
@@ -272,7 +276,7 @@ const DescargarArchivosS3 = ({ route }) => {
                   timeOut: 500,
                 }}
               />
-            </TableEnterprise>
+            </TableEnterprise> */}
 
           </>
         ) : (

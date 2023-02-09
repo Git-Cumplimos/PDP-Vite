@@ -506,7 +506,45 @@ const ArqueoBilletes = ({ route }) => {
                     Siguiente
                   </Button>
                 </ButtonBar>
-                <TableEnterprise
+                <Table
+                  headers={[
+                    "Sorteo",
+                    "Comercio",
+                    "Fecha arqueo",
+                    "Fracciones Base de datos",
+                    "Fracciones contadas",
+                  ]}
+                  data={datosArqueo.map(
+                    ({
+                      sorteo,
+                      id_comercio,
+                      fecha,
+                      frac_disponibles,
+                      frac_arqueo,
+                    }) => {
+                      const tempDate = new Date(fecha);
+                      tempDate.setHours(tempDate.getHours() + 5);
+                      fecha = Intl.DateTimeFormat("es-CO", {
+                        year: "numeric",
+                        month: "numeric",
+                        day: "numeric",
+                      }).format(tempDate);
+                      return {
+                        sorteo,
+                        id_comercio,
+                        fecha,
+                        frac_disponibles,
+                        frac_arqueo,
+                      };
+                    }
+                  )}
+                  onSelectRow={(e, index) => {
+                    console.log(datosArqueo[index].sorteo);
+                    // setSelected(datosArqueo[index]);
+                    // setShowModal(true);
+                  }}
+                />
+                {/* <TableEnterprise
                   headers={[
                     "Sorteo",
                     "Comercio",
@@ -540,7 +578,7 @@ const ArqueoBilletes = ({ route }) => {
                   )}
                 >
 
-                </TableEnterprise>
+                </TableEnterprise> */}
               </>
             ) : (
               ""

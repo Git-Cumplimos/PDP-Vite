@@ -53,8 +53,8 @@ const CargaArchivos = ({ route }) => {
 
   const optionsFisiVir = [
     { value: "", label: "" },
-    { value: "Fisico/", label: `${archivo} Físicos` },
-    { value: "Virtual/", label: `${archivo} Virtuales` },
+    { value: "Fisico/", label: `${archivo === "Asignacion" ? ("Asignación") : ("")} Físicos` },
+    { value: "Virtual/", label: `${archivo === "Asignacion" ? ("Asignación") : ("")} Virtuales` },
   ];
 
   const [showModal, setShowModal] = useState(false);
@@ -80,8 +80,10 @@ const CargaArchivos = ({ route }) => {
       };
       fetchData(url_cargueS3, "GET", query)
         .then((respuesta) => {
+          console.log("Por aca****", respuesta)
           if (!respuesta?.status) {
-            notifyError(respuesta?.msg === "Motivo: Archivo con errores: UniqueViolation" ? ("Este archivo ya fue cargado previamente") : respuesta?.msg);
+            notifyError(respuesta?.msg == "Motivo: Archivo con errores: UniqueViolation" ? "Este archivo ya fue cargado previamente" : respuesta?.msg);
+            console.log("Si entro =?=?=?=?=?=?", respuesta?.msg)
           } else {
             const formData2 = new FormData();
             if (file) {
