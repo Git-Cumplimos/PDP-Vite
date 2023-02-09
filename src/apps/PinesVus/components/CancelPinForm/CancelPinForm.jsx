@@ -44,6 +44,37 @@ const CancelPin = ({
     { value: 2, label: "Cancelar solo comisión premium" },
   ];
 
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "",
+    timeInfo: {
+      "Fecha de venta": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+      /*id_dispositivo*/
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      /*ciudad*/
+      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+
+      ["Id Trx", ""],
+    ],
+    commerceName: "",
+    trxInfo: [
+      ["Proceso", "Cancelación de Pin"],
+      ["",""],
+      ["", ""],
+      ["", ""],
+      ["",""],
+      ["", ""],
+      ["", ""],
+    ],
+    disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+  });
+
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
       .then((res) => {
@@ -98,6 +129,7 @@ const CancelPin = ({
       trxInfo: tipCancelacion === "1" ? 
       [
         ["Proceso", "Cancelación de Pin"],
+        ["",""],
         ["Valor Trámite", formatMoney.format(valor_tramite)],
         ["IVA Trámite",formatMoney.format(0)],
         ["Valor Pin", formatMoney.format(valor)],
@@ -107,6 +139,7 @@ const CancelPin = ({
       : 
       [
         ["Proceso", "Cancelación de Pin"],
+        ["",""],
         ["Valor Pin", formatMoney.format(valor)],
         ["IVA Pin", formatMoney.format(valor*0.19)],
         ["Total", formatMoney.format(valor*1.19)], // Valor + IVA
@@ -118,14 +151,43 @@ const CancelPin = ({
     };
   }, [respPinCancel, roleInfo, valor]);
 
-  useEffect(() => {
-    infoTicket(respPinCancel?.id_trx, respPinCancel?.tipo_trx, tickets);
-  }, [infoTicket, respPinCancel, tickets]);
+  // useEffect(() => {
+  //   infoTicket(respPinCancel?.id_trx, respPinCancel?.tipo_trx, tickets);
+  // }, [infoTicket, respPinCancel, tickets]);
 
   const onSubmitCancel = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion) //// Valor = valor + IVA
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
+
+    const objTicket = { ...objTicketActual };
+    objTicket["title"] = "Recibo de pago: " + name_tramite
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["commerceName"] = textTipoPin
+
+    objTicket["trxInfo"][2] = ["Valor Trámite", formatMoney.format(valor_tramite)]
+    objTicket["trxInfo"][3] = ["IVA Trámite",formatMoney.format(0)]
+    objTicket["trxInfo"][4] = ["Valor Pin", formatMoney.format(valor)]
+    objTicket["trxInfo"][5] = ["IVA Pin", formatMoney.format(valor*0.19)]
+    objTicket["trxInfo"][6] = ["Total", formatMoney.format(valor*1.19 + valor_tramite)]
+
+    if (tipCancelacion === '2') {
+      objTicket["trxInfo"][6] = ["Total", formatMoney.format(valor*1.19)]     
+      objTicket["trxInfo"].splice(2,2)
+    }
+
+    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion, objTicket) //// Valor = valor + IVA
       .then((res) => {
         setActivarNavigate(false);
         setDisabledBtn(false);

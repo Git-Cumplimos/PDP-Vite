@@ -49,7 +49,7 @@ export const useProvidePinesVus = () => {
   const { roleInfo, pdpUser} = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
   console.log("PDP USER",pdpUser)
-  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion) => {
+  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion,ticket) => {
     let tipo_comercio = user?.tipo_comercio
     if (user?.tipo_comercio === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
@@ -66,7 +66,8 @@ export const useProvidePinesVus = () => {
       motivo: motivo,
       tipCancelacion: tipCancelacion,
       id_trx: trx,
-      comercio_creacion: infoComercioCreacion
+      comercio_creacion: infoComercioCreacion,
+      ticket: ticket
     };
     const query = {
       id_pin: id_pin,
@@ -79,7 +80,7 @@ export const useProvidePinesVus = () => {
     }
   }, [roleInfo, pdpUser]);
   
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma, motivoCompra, descripcionTipDocumento) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma, motivoCompra, descripcionTipDocumento, ticket1, ticket2) => {
     let tipo_comercio = user?.Tipo
     if (user?.Tipo === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
@@ -102,6 +103,8 @@ export const useProvidePinesVus = () => {
       firma: firma,
       motivoCompra: motivoCompra,
       descripcionTipDocumento:descripcionTipDocumento,
+      ticket_pin:ticket1,
+      ticket_tramite:ticket2
     };
     if (idPin !== ""){
       body.Pin = idPin
@@ -115,7 +118,7 @@ export const useProvidePinesVus = () => {
   }, [roleInfo, pdpUser]);
 
   const usarPinVus = useCallback(
-    async (valor, trx, num_tramite, user, id_pin) => {
+    async (valor, trx, num_tramite, user, id_pin, ticket) => {
       let tipo_comercio = user?.tipo_comercio
       if (user?.tipo_comercio === "KIOSCO"){
         tipo_comercio = "OFICINAS PROPIAS"
@@ -129,6 +132,7 @@ export const useProvidePinesVus = () => {
         NombreComercio: roleInfo?.["nombre comercio"],
         valor: parseFloat(valor),
         id_trx: trx,
+        ticket: ticket
       };
       if (num_tramite !== "") {
         body.num_tramite = String(num_tramite);
