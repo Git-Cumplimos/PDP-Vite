@@ -321,7 +321,9 @@ export const useProvideLoteria = () => {
   );
 
   const sellLoteria = useCallback(
-    async (sorteo, selecFrac, tipoPago) => {
+    async (sorteo, ticket, sorteo3) => {
+      console.log("ESTE ES EL TICKET ?=?=?=? sellLoteria", ticket)
+      console.log("ESTE ES EL TICKET ?=?=?=? sorteo", sorteo3)
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -352,6 +354,7 @@ export const useProvideLoteria = () => {
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
         tipoPago: tiposOperaciones?.Venta_Virtual, /// Venta - Virtual
+        ticket: ticket,
       };
 
       try {
@@ -371,7 +374,8 @@ export const useProvideLoteria = () => {
   );
 
   const sellLoteriafisica = useCallback(
-    async (sorteo, selecFrac, tipoPago) => {
+    async (sorteo, selecFrac, tipoPago, ticket) => {
+      console.log("ESTE ES EL TICKET ?=?=?=? sellLoteriafisica", ticket)
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -405,6 +409,7 @@ export const useProvideLoteria = () => {
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
         tipoPago: tipoPago !== null ? tipoPago : tiposOperaciones?.Venta_Fisica, /// Venta lotería de Bogotá - Intercambio/Fisica
+        ticket: ticket,
       };
 
       try {
