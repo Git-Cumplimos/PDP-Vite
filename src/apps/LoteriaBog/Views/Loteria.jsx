@@ -233,8 +233,8 @@ const Loteria = ({ route }) => {
     sorteo.split("-")[1] === "true"
       ? searchLoteriafisica(sorteo, numero, serie, page)
       : searchLoteria(sorteo, numero, serie, page);
-    }, 
-    [numero,page,searchLoteria,searchLoteriafisica,serie,setCustomer,setSelected,setSellResponse,sorteo]
+  },
+    [numero, page, searchLoteria, searchLoteriafisica, serie, setCustomer, setSelected, setSellResponse, sorteo]
   );
 
   const ticket = useMemo(() => {

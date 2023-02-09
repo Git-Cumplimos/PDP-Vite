@@ -138,7 +138,7 @@ const SellResp = ({
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [roleInfo,sellResponse,voucherInfo]);
+  }, [roleInfo, sellResponse, voucherInfo]);
 
   return "msg" in sellResponse ? (
     <div className="flex flex-col justify-center items-center">
