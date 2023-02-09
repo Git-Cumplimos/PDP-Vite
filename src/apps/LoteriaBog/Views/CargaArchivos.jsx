@@ -85,6 +85,7 @@ const CargaArchivos = ({ route }) => {
             notifyError(respuesta?.msg == "Motivo: Archivo con errores: UniqueViolation" ? "Este archivo ya fue cargado previamente" : respuesta?.msg);
             console.log("Si entro =?=?=?=?=?=?", respuesta?.msg)
           } else {
+            console.log("FILE****",file)
             const formData2 = new FormData();
             if (file) {
               for (const property in respuesta?.obj?.fields) {
@@ -99,6 +100,7 @@ const CargaArchivos = ({ route }) => {
                 method: "POST",
                 body: formData2,
               }).then((res) => {
+                console.log("RES***",res)
                 if (res?.ok) {
                   setTimeout(() => {
                     EstadoArchivos().then((res) => {
@@ -123,14 +125,14 @@ const CargaArchivos = ({ route }) => {
                     });
                   }, 5000);
                 } else {
-                  notifyError("No fue posible conectar con el Bucket");
+                  notifyError("Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])");
                 }
               });
             }
           }
         })
         .catch((err) => {
-          notifyError("Error al cargar Datos");
+          notifyError("Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])");
         });
     },
     [file, fileName, archivo, tipoSorteo, fisiVirtual]
