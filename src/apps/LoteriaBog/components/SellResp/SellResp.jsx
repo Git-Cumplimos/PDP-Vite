@@ -112,7 +112,7 @@ const SellResp = ({
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Id Trx ", sellResponse?.["id_trx"]],
+        ["Id Trx ", sellResponse?.id_Transaccion],
         ["Id Aut ", sellResponse?.id_Transaccion],
         ["Comercio", roleInfo?.["nombre comercio"]],
         ["", ""],
