@@ -244,7 +244,6 @@ const Loteria = ({ route }) => {
     setSellResponse,
     sorteo,
   ]);
-
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -291,7 +290,7 @@ const Loteria = ({ route }) => {
         "Para quejas o reclamos comuniquese, al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [
-    roleInfo, formatMoney,
+    roleInfo,
     operacion,
     sellResponse,
   ]);
@@ -498,7 +497,7 @@ const Loteria = ({ route }) => {
             handleSubmit={(event) => {
               sorteo.split("-")[1] === "true"
                 ? sellLoteriafisica(sorteo, selecFrac, tipoPago, ticket)
-                : sellLoteria(sorteo, ticket, sellResponse?.sorteo);
+                : sellLoteria(sorteo, ticket);
             }}
           />
         ) : (
