@@ -235,6 +235,10 @@ const DescargarArchivosS3 = ({ route }) => {
                   fecha_juego,
                 };
               })}
+              onSelectRow={(_e, index) => {
+                setSelected(resp_con_sort[index]);
+                setShowModal(true);
+              }}
             // onSelectRow={onSelectAutorizador}
             // onSetPageData={setPageData}
             >

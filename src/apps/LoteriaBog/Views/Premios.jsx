@@ -207,7 +207,59 @@ const Premios = ({ route }) => {
       })
       .catch(() => setDisabledBtns(false));
   };
-
+  const tickets = useMemo(() => {
+    return {
+      title: "Recibo de pago",
+      timeInfo: {
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }).format(new Date()),
+      },
+      commerceInfo: [
+        ["Id Comercio", roleInfo?.id_comercio],
+        ["No. terminal", roleInfo?.id_dispositivo],
+        ["Id Trx ", datosCliente.idTransaccion],
+        ["Id Aut ", ""],
+        ["Comercio", roleInfo?.["nombre comercio"]],
+        ["", ""],
+        ["Dirección", roleInfo?.direccion],
+        ["", ""],
+      ],
+      commerceName: datosComercio.nom_loteria,
+      trxInfo: [
+        ["Sorteo", sorteo],
+        ["Billete", billete],
+        ["Serie", serie],
+        ["Fracciones", seleccionarFraccion],
+        [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
+        ["", ""],
+        ["Valor", formatMoney.format(totalPagar)],
+        ["", ""],
+        ["Forma de Pago", "Efectivo"],
+        ["", ""],
+        [tipopago === 2 ? "Nombre" : "", tipopago === 2 ? datosCliente?.nombre : ""],
+        [tipopago === 2 ? "Celular" : "", tipopago === 2 ? datosCliente?.celular : ""],
+      ],
+      disclamer:
+        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    };
+  }, [estadoTransaccion, sorteo,
+    billete,
+    serie,
+    checkBilleteFisico,
+    checkBilleteVirtual,
+    seleccionarFraccion,
+    datosCliente,
+    totalPagar,
+    valorbruto]);
   const onPay1 = (e) => {
     e.preventDefault();
     if (tipopago === 2) {
@@ -242,7 +294,8 @@ const Premios = ({ route }) => {
             idLoteria,
             tipopago,
             hash,
-            pdpUser?.uname
+            pdpUser?.uname,
+            tickets,
           )
             .then((res) => {
               setRespuesta(false);
@@ -254,6 +307,7 @@ const Premios = ({ route }) => {
                   tipo_operacion: res?.obj?.tipo_operacion,
                 };
               });
+              tickets["commerceInfo"].splice(2, 0, ["Id Trx", datosCliente?.idTransaccion,]);
               setEstadoTransaccion(res?.status);
               if (res?.status === false) {
                 notifyError(res?.obj?.msg);
@@ -325,51 +379,7 @@ const Premios = ({ route }) => {
     }
   };
 
-  const tickets = useMemo(() => {
-    return {
-      title: "Recibo de pago",
-      timeInfo: {
-        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "2-digit",
-          month: "2-digit",
-          day: "2-digit",
-        }).format(new Date()),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-        }).format(new Date()),
-      },
-      commerceInfo: [
-        ["Id Comercio", roleInfo?.id_comercio],
-        ["No. terminal", roleInfo?.id_dispositivo],
-        ["Id Trx ", datosCliente.idTransaccion],
-        ["Id Aut ", ""],
-        ["Comercio", roleInfo?.["nombre comercio"]],
-        ["", ""],
-        ["Dirección", roleInfo?.direccion],
-        ["", ""],
-      ],
-      commerceName: datosComercio.nom_loteria,
-      trxInfo: [
-        ["Sorteo", sorteo],
-        ["Billete", billete],
-        ["Serie", serie],
-        ["Fracciones", seleccionarFraccion],
-        [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
-        ["", ""],
-        ["Valor", formatMoney.format(totalPagar)],
-        ["", ""],
-        ["Forma de Pago", "Efectivo"],
-        ["", ""],
-        [tipopago === 2 ? "Nombre" : "", tipopago === 2 ? datosCliente?.nombre : ""],
-        [tipopago === 2 ? "Celular" : "", tipopago === 2 ? datosCliente?.celular : ""],
-      ],
-      disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-    };
-  }, [estadoTransaccion]);
+
   const handlePrint = useReactToPrint({
     content: () => printDiv?.current,
   });
