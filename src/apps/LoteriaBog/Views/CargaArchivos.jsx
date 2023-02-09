@@ -114,7 +114,7 @@ const CargaArchivos = ({ route }) => {
                             setFisiVirtual("");
                             notify(res[0]["Motivo"]);
                           } else {
-                            notifyError(res[0]["Motivo"]);
+                            notifyError("Error respuesta PDP: (No se pudo cargar el archivo ("+archivo+") [0010006]) "+res[0]["Motivo"]);
                           }
                         } else {
                           notifyError("Consulte con soporte");
@@ -131,7 +131,7 @@ const CargaArchivos = ({ route }) => {
         })
         .catch((err) => {
           notifyError("Error al cargar Datos");
-        }); /* notify("Se ha comenzado la carga"); */
+        });
     },
     [file, fileName, archivo, tipoSorteo, fisiVirtual]
   );
