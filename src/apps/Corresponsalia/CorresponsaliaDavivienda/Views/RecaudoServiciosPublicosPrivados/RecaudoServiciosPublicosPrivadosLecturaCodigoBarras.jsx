@@ -441,7 +441,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                         direccion: roleInfo?.direccion,
                       })
                         .then((res) => {
-                          if (res?.msg !== "No ha terminado el reintento") {
+                          if (
+                            res?.msg !==
+                            "Error respuesta PDP: (No ha terminado la operación)"
+                          ) {
                             if (res?.status) {
                               setIsUploading(false);
                               notify(res?.msg);
