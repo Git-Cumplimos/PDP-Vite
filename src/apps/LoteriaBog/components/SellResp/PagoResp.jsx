@@ -160,7 +160,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
         "valor 20%": formatMoney.format(pagoresponse["valor 20percent"]),
         Total: formatMoney.format(pagoresponse["valor ganado"]),
       }),
-      disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+      disclamer: "Para quejas o reclamos comuníquese al *num PDP*",
     };
   }, [
     roleInfo.ciudad,

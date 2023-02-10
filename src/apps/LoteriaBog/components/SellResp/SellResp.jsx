@@ -125,7 +125,7 @@ const SellResp = ({
         ["Billete", sellResponse?.num_billete],
         ["Serie", sellResponse?.serie],
         ["Fracciones", sellResponse?.fracciones],
-        ["Tipo de Billete", sellResponse?.fisico === true ? "Fisico" : "Virtual"],
+        ["Tipo de Billete", sellResponse?.fisico === true ? "Físico" : "Virtual"],
         ["", ""],
         ["Valor", formatMoney.format(sellResponse?.valor_pago)],
         ["", ""],
@@ -136,7 +136,7 @@ const SellResp = ({
         ["", ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [roleInfo, sellResponse, voucherInfo]);
 

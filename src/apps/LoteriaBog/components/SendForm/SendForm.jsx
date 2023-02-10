@@ -19,7 +19,7 @@ const SendForm = ({
   setSelecFrac,
   selected,
   setSelected,
-  customer: { fracciones, phone, doc_id },
+  customer: { fracciones, phone, doc_id, email },
   setCustomer,
   closeModal,
   handleSubmit,
@@ -34,7 +34,6 @@ const SendForm = ({
     Serie: selected ? selected.serie : "",
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
   };
-
   const { tiposOperaciones } = useLoteria();
   const operacion = useMemo(() => {
     return tiposOperaciones;
@@ -84,11 +83,10 @@ const SendForm = ({
     setTipoPago(value);
   };
   useEffect(() => {
-    const cus = { fracciones, phone, doc_id };
+    const cus = { fracciones, phone, doc_id, email };
     cus.fracciones = "1";
     setCustomer({ ...cus });
   }, [fracciones])
-
 
   return (
     <>
@@ -157,6 +155,22 @@ const SendForm = ({
             />
           )}
           <Input
+            id="num_id"
+            label="Documento de identidad"
+            type="text"
+            value={doc_id}
+            minLength="5"
+            maxLength="12"
+            required={true}
+            onInput={(e) => {
+              if (!isNaN(e.target.value)) {
+                const cus = { fracciones, phone, doc_id, email };
+                cus.doc_id = e.target.value;
+                setCustomer({ ...cus });
+              }
+            }}
+          />
+          <Input
             id="numCel"
             label="Celular"
             type="tel"
@@ -170,32 +184,33 @@ const SendForm = ({
                 (String(e.target.value).slice(0, 1) !== "3")
               ) {
                 notifyError("El número de celular debe iniciar por 3");
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.phone = "";
                 setCustomer({ ...cus });
               } else {
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.phone = e.target.value;
                 setCustomer({ ...cus });
               }
             }}
           />
+
           <Input
-            id="num_id"
-            label="Documento de identidad"
+            id="email"
+            label="Email"
             type="text"
-            value={doc_id}
+            value={email}
             minLength="5"
-            maxLength="12"
+            maxLength="30"
             required={true}
-            onInput={(e) => {
-              if (!isNaN(e.target.value)) {
-                const cus = { fracciones, phone, doc_id };
-                cus.doc_id = e.target.value;
-                setCustomer({ ...cus });
-              }
+            onChange={(e) => {
+              const cus = { fracciones, phone, doc_id, email };
+              cus.email = e.target.value;
+              setCustomer({ ...cus });
             }}
           />
+
+
           <ButtonBar>
             <Button type="submit" disabled={disabledBtns}>
               Aceptar
@@ -205,7 +220,7 @@ const SendForm = ({
               onClick={() => {
                 handleCloseCancelar();
                 closeModal();
-                setCustomer({ fracciones: "", phone: "", doc_id: "" });
+                setCustomer({ fracciones: "", phone: "", doc_id: "", email: "" });
                 setCheckedState(
                   new Array(selected?.Fracciones?.length).fill(false)
                 );

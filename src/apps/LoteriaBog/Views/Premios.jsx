@@ -249,7 +249,7 @@ const Premios = ({ route }) => {
         [tipopago === 2 ? "Celular" : "", tipopago === 2 ? datosCliente?.celular : ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [estadoTransaccion, sorteo,
     billete,

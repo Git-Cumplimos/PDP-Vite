@@ -8,11 +8,11 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
+const Voucher = ({ setPrintDiv, refPrint, ...info }) => {
   const { divPrint } = classes;
 
   return (
-    
+
     <div className={divPrint} ref={refPrint}>
       <div className="flex flex-row justify-center items-center w-full">
         <LogoPDP xsmall />
@@ -96,7 +96,7 @@ const Voucher = ({ setPrintDiv, refPrint, ...info}) => {
         ***ORIGINAL***
       </h1>
       <h1 className="text-center my-3 text-xs font-normal">
-        Para quejas o reclamos comuniquese al *num PDP*
+        Para quejas o reclamos comuníquese al *num PDP*
       </h1>
     </div>
   );

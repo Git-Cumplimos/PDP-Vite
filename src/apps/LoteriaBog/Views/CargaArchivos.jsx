@@ -80,10 +80,8 @@ const CargaArchivos = ({ route }) => {
       };
       fetchData(url_cargueS3, "GET", query)
         .then((respuesta) => {
-          console.log("Por aca****", respuesta)
           if (!respuesta?.status) {
-            notifyError(respuesta?.msg == "Motivo: Archivo con errores: UniqueViolation" ? "Este archivo ya fue cargado previamente" : respuesta?.msg);
-            console.log("Si entro =?=?=?=?=?=?", respuesta?.msg)
+            notifyError(respuesta?.msg == "Motivo: Archivo con errores: UniqueViolation" ? "Error respuesta PDP: (No se pudo cargar el archivo (" + archivo + ") [0010006]) Este archivo ya fue cargado previamente" : "Error respuesta PDP: (No se pudo cargar el archivo (" + archivo + ") [0010006]) " + respuesta?.msg);
           } else {
             const formData2 = new FormData();
             if (file) {
@@ -93,7 +91,6 @@ const CargaArchivos = ({ route }) => {
                   `${respuesta?.obj?.fields[property]}`
                 );
               }
-
               formData2.set("file", file);
               fetch(`${respuesta?.obj?.url}`, {
                 method: "POST",
@@ -114,7 +111,7 @@ const CargaArchivos = ({ route }) => {
                             setFisiVirtual("");
                             notify(res[0]["Motivo"]);
                           } else {
-                            notifyError(res[0]["Motivo"]);
+                            notifyError("Error respuesta PDP: (No se pudo cargar el archivo (" + archivo + ") [0010006]) " + res[0]["Motivo"]);
                           }
                         } else {
                           notifyError("Consulte con soporte");
@@ -123,15 +120,15 @@ const CargaArchivos = ({ route }) => {
                     });
                   }, 5000);
                 } else {
-                  notifyError("No fue posible conectar con el Bucket");
+                  notifyError("Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])");
                 }
               });
             }
           }
         })
         .catch((err) => {
-          notifyError("Error al cargar Datos");
-        }); /* notify("Se ha comenzado la carga"); */
+          notifyError("Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])");
+        });
     },
     [file, fileName, archivo, tipoSorteo, fisiVirtual]
   );
