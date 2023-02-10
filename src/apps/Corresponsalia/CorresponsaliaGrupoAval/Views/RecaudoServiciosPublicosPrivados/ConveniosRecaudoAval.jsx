@@ -131,7 +131,8 @@ const ConveniosRecaudoAval = () => {
                             })
                               .then((res) => {
                                 if (
-                                  res?.msg !== "No ha terminado la operación"
+                                  res?.msg !==
+                                  "Error respuesta PDP: (No ha terminado la operación)"
                                 ) {
                                   if (res?.status) {
                                     setIsUploading(false);
