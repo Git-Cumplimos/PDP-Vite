@@ -38,10 +38,10 @@ const PagoTerceros = () => {
   const [infTicket, setInfTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
-  const navigateValid = useNavigate();
-  const { roleInfo, pdpUser } = useAuth();
   const [loadingPeticionPagoTerceros, PeticionPagoTerceros] =
     useFetch(fetchCustomPost);
+  const navigateValid = useNavigate();
+  const { roleInfo, pdpUser } = useAuth();
 
   function onChangeInput(e) {
     let valueInput = "";
@@ -167,6 +167,7 @@ const PagoTerceros = () => {
       });
   }
 
+  //********************Funciones para cerrar el Modal**************************
   const HandleCloseInicial = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);

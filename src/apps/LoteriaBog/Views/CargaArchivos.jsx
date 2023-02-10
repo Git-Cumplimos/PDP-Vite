@@ -83,6 +83,7 @@ const CargaArchivos = ({ route }) => {
           if (!respuesta?.status) {
             notifyError(respuesta?.msg == "Motivo: Archivo con errores: UniqueViolation" ? "Error respuesta PDP: (No se pudo cargar el archivo (" + archivo + ") [0010006]) Este archivo ya fue cargado previamente" : "Error respuesta PDP: (No se pudo cargar el archivo (" + archivo + ") [0010006]) " + respuesta?.msg);
           } else {
+            console.log("FILE****", file)
             const formData2 = new FormData();
             if (file) {
               for (const property in respuesta?.obj?.fields) {
@@ -96,6 +97,7 @@ const CargaArchivos = ({ route }) => {
                 method: "POST",
                 body: formData2,
               }).then((res) => {
+                console.log("RES***", res)
                 if (res?.ok) {
                   setTimeout(() => {
                     EstadoArchivos().then((res) => {
