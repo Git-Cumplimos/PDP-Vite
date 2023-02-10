@@ -9,7 +9,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
-import { notifyError } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 //import Loteria from "../Views/Loteria";
 import { useNavigate } from "react-router-dom";
 ////// NITS de loterias _______________________
@@ -363,6 +363,10 @@ export const useProvideLoteria = () => {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
         setSellResponse(res);
         setLoadConsulta(false);
+        if (res?.mensaje_hash) {
+          notify(res?.mensaje_hash)
+        }
+
       } catch (err) {
         setLoadConsulta(false);
         setSellResponse(null);
