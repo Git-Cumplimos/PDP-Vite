@@ -286,7 +286,9 @@ const DescargarArchivosS3 = ({ route }) => {
           <Button type="submit">Reporte ventas</Button>
         </Form>
         <Modal show={showModal} handleClose={closeModal}>
-          <DescargaForm closeModal={closeModal} selected={selected} />
+          <DescargaForm
+            showModal
+            closeModal={closeModal} selected={selected} />
         </Modal>
         <Modal show={showModal2} handleClose={closeModal2}>
           <ReportVentasForm closeModal={closeModal2} Oficina="" />

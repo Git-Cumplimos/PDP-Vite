@@ -25,7 +25,7 @@ const CargarForm = ({
         <Form onSubmit={onSubmit} grid>
           <div className="flex flex-row text-center justify-between text-lg font-medium">
             <h1>
-              ¿Está seguro de subir el archivo "{file}" para {selected === "PlanDePremios" ? "Plan De Premios" : selected} {fisiVirtual === "" ? "" : fisiVirtual === "Fisico/" ? `Física` : ("Virtual")}?
+              ¿Está seguro de subir el archivo "{file}" para {selected === "PlanDePremios" ? "Plan De Premios" : selected === "Asignacion" ? "Asignación" : selected} {fisiVirtual === "" ? "" : fisiVirtual === "Fisico/" ? `Física` : ("Virtual")}?
 
 
               {/* {fisiVirtual === "" ? `${file} para ${selected}` 
