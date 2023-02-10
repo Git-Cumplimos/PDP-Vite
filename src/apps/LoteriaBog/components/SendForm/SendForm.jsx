@@ -139,37 +139,39 @@ const SendForm = ({
               </div>
             </>
           ) : (
-            <Input
-              id="cantFrac"
-              label="Fracciones a comprar"
-              type="number"
-              max={selected ? `${selected.Fracciones_disponibles}` : "3"}
-              min="1"
-              value={fracciones}
-              required
-            // onInput={(e) => {
-            //   const cus = { fracciones, phone, doc_id };
-            //   cus.fracciones = e.target.value;
-            //   setCustomer({ ...cus });
-            // }}
-            />
+            <>
+
+              <Input
+                id="cantFrac"
+                label="Fracciones a comprar"
+                type="number"
+                max={selected ? `${selected.Fracciones_disponibles}` : "3"}
+                min="1"
+                value={fracciones}
+                required
+              // onInput={(e) => {
+              //   const cus = { fracciones, phone, doc_id };
+              //   cus.fracciones = e.target.value;
+              //   setCustomer({ ...cus });
+              // }}
+              />
+              <Input
+                id="email"
+                label="Email"
+                type="text"
+                value={email}
+                minLength="5"
+                maxLength="30"
+                required={true}
+                onChange={(e) => {
+                  const cus = { fracciones, phone, doc_id, email };
+                  cus.email = e.target.value;
+                  setCustomer({ ...cus });
+                }}
+              />
+            </>
           )}
-          <Input
-            id="num_id"
-            label="Documento de identidad"
-            type="text"
-            value={doc_id}
-            minLength="5"
-            maxLength="12"
-            required={true}
-            onInput={(e) => {
-              if (!isNaN(e.target.value)) {
-                const cus = { fracciones, phone, doc_id, email };
-                cus.doc_id = e.target.value;
-                setCustomer({ ...cus });
-              }
-            }}
-          />
+
           <Input
             id="numCel"
             label="Celular"
@@ -196,20 +198,21 @@ const SendForm = ({
           />
 
           <Input
-            id="email"
-            label="Email"
+            id="num_id"
+            label="Documento de identidad"
             type="text"
-            value={email}
+            value={doc_id}
             minLength="5"
-            maxLength="30"
+            maxLength="12"
             required={true}
-            onChange={(e) => {
-              const cus = { fracciones, phone, doc_id, email };
-              cus.email = e.target.value;
-              setCustomer({ ...cus });
+            onInput={(e) => {
+              if (!isNaN(e.target.value)) {
+                const cus = { fracciones, phone, doc_id, email };
+                cus.doc_id = e.target.value;
+                setCustomer({ ...cus });
+              }
             }}
           />
-
 
           <ButtonBar>
             <Button type="submit" disabled={disabledBtns}>
