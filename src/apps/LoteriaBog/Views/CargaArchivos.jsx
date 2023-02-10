@@ -81,7 +81,7 @@ const CargaArchivos = ({ route }) => {
       fetchData(url_cargueS3, "GET", query)
         .then((respuesta) => {
           if (!respuesta?.status) {
-            notifyError(respuesta?.msg == "Motivo: Archivo con errores: UniqueViolation" ? "Error respuesta PDP: (No se pudo cargar el archivo ("+archivo+") [0010006]) Este archivo ya fue cargado previamente" : "Error respuesta PDP: (No se pudo cargar el archivo ("+archivo+") [0010006]) "+respuesta?.msg);
+            notifyError(respuesta?.msg == "Motivo: Archivo con errores: UniqueViolation" ? "Error respuesta PDP: (No se pudo cargar el archivo (" + archivo + ") [0010006]) Este archivo ya fue cargado previamente" : "Error respuesta PDP: (No se pudo cargar el archivo (" + archivo + ") [0010006]) " + respuesta?.msg);
           } else {
             const formData2 = new FormData();
             if (file) {
@@ -111,7 +111,7 @@ const CargaArchivos = ({ route }) => {
                             setFisiVirtual("");
                             notify(res[0]["Motivo"]);
                           } else {
-                            notifyError("Error respuesta PDP: (No se pudo cargar el archivo ("+archivo+") [0010006]) "+res[0]["Motivo"]);
+                            notifyError("Error respuesta PDP: (No se pudo cargar el archivo (" + archivo + ") [0010006]) " + res[0]["Motivo"]);
                           }
                         } else {
                           notifyError("Consulte con soporte");

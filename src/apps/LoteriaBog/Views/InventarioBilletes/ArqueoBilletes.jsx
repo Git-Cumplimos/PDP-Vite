@@ -539,7 +539,6 @@ const ArqueoBilletes = ({ route }) => {
                     }
                   )}
                   onSelectRow={(e, index) => {
-                    console.log(datosArqueo[index].sorteo);
                     // setSelected(datosArqueo[index]);
                     // setShowModal(true);
                   }}

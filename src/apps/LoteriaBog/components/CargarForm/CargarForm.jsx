@@ -6,6 +6,8 @@ import { notifyError } from "../../../../utils/notify";
 //import { useAuth } from "../../../../hooks/AuthHooks";
 
 const CargarForm = ({
+
+  selected,
   file,
   disabledBtns,
   closeModal,
@@ -14,7 +16,6 @@ const CargarForm = ({
 }) => {
   const onSubmit = (e) => {
     e.preventDefault();
-
     handleSubmit();
   };
 
@@ -24,7 +25,11 @@ const CargarForm = ({
         <Form onSubmit={onSubmit} grid>
           <div className="flex flex-row text-center justify-between text-lg font-medium">
             <h1>
-              ¿Está seguro de subir el archivo "{file}" para la asignación {fisiVirtual === "Fisico/" ? `Física` : ("Virtual")}?
+              ¿Está seguro de subir el archivo "{file}" para {selected === "PlanDePremios" ? "Plan De Premios" : selected} {fisiVirtual === "" ? "" : fisiVirtual === "Fisico/" ? `Física` : ("Virtual")}?
+
+
+              {/* {fisiVirtual === "" ? `${file} para ${selected}` 
+                : `${file} para ${selected}` {fisiVirtual === "Fisico/" ? `Física` : ("Virtual")}} */}
             </h1>
           </div>
 
