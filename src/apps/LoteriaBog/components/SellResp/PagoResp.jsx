@@ -154,7 +154,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
         Sorteo: pagoresponse["Numero sorteo"],
         Billete: pagoresponse.num_billete,
         Serie: pagoresponse.serie,
-        Fracciones: pagoresponse.fracciones,
+        Fracción: pagoresponse.fracciones,
         Premio: formatMoney.format(pagoresponse["valor bruto"]),
         "valor 17%": formatMoney.format(pagoresponse["valor 17percent"]),
         "valor 20%": formatMoney.format(pagoresponse["valor 20percent"]),

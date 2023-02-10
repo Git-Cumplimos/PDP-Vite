@@ -238,7 +238,7 @@ const Premios = ({ route }) => {
         ["Sorteo", sorteo],
         ["Billete", billete],
         ["Serie", serie],
-        ["Fracciones", seleccionarFraccion],
+        ["Fracción", seleccionarFraccion],
         [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
         ["", ""],
         ["Valor", formatMoney.format(totalPagar)],
