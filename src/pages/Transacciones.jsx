@@ -345,7 +345,9 @@ const Transacciones = () => {
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.id_tipo_transaccion === 43 ? (
+            ) : selected?.id_tipo_transaccion === 43 ||
+                selected?.id_tipo_transaccion === 44 ||
+                selected?.id_tipo_transaccion === 45 ? (
               <div ref={printDiv}>
                 {selected?.ticket?.ticket2 ? (
                   <>
@@ -354,7 +356,7 @@ const Transacciones = () => {
                       ticket={selected?.ticket?.ticket1}
                       type="Reimpresión"
                       stateTrx={selected?.status_trx}
-                      logo="LogoMiLicensia"
+                      logo="LogoVus"
                     />
                     <TicketsPines
                       refPrint={null}
@@ -365,11 +367,12 @@ const Transacciones = () => {
                     />
                   </>
                 ) : (
-                  <Tickets
+                  <TicketsPines
                     refPrint={null}
                     ticket={selected?.ticket}
                     type="Reimpresión"
                     stateTrx={selected?.status_trx}
+                    logo="LogoVus"
                   />
                 )}
               </div>

@@ -39,7 +39,7 @@ const Deposito = () => {
   const [valor, setValor] = useState("");
   const [nomDepositante, setNomDepositante] = useState("");
   const [summary, setSummary] = useState([]);
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, infoTicket, pdpUser } = useAuth();
   const [loadingCashIn, fetchCashIn] = useFetch(pagoGiroDaviplata);
   const [loadingConsultaCashIn, fetchConsultaCashIn] = useFetch(
     consultaGiroDaviplata
@@ -157,6 +157,7 @@ const Deposito = () => {
             idComercio: roleInfo?.id_comercio,
             idUsuario: roleInfo?.id_usuario,
             idDispositivo: roleInfo?.id_dispositivo,
+            nombre_usuario: pdpUser?.uname ?? "",
             // Tipo: roleInfo?.tipo_comercio,
             numIdentificacionDepositante: userDoc,
             numDaviplata: phone,
@@ -228,6 +229,7 @@ const Deposito = () => {
       nomDepositante,
       valor,
       limitesMontos,
+      pdpUser
     ]
   );
 
@@ -267,6 +269,7 @@ const Deposito = () => {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
+      nombre_usuario: pdpUser?.uname ?? "",
       // Tipo: roleInfo?.tipo_comercio,
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -397,6 +400,7 @@ const Deposito = () => {
     infoTicket,
     summary,
     datosConsulta,
+    pdpUser
   ]);
 
   return (

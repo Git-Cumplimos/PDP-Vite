@@ -19,7 +19,7 @@ const SendForm = ({
   setSelecFrac,
   selected,
   setSelected,
-  customer: { fracciones, phone, doc_id },
+  customer: { fracciones, phone, doc_id, email },
   setCustomer,
   closeModal,
   handleSubmit,
@@ -34,7 +34,6 @@ const SendForm = ({
     Serie: selected ? selected.serie : "",
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
   };
-
   const { tiposOperaciones } = useLoteria();
   const operacion = useMemo(() => {
     return tiposOperaciones;
@@ -77,18 +76,17 @@ const SendForm = ({
   };
 
   const handleCloseCancelar = useCallback(() => {
-    notify("Venta de lotería cancelada");
+    notifyError("Venta de lotería cancelada");
   })
 
   const formPago = (value) => {
     setTipoPago(value);
   };
   useEffect(() => {
-    const cus = { fracciones, phone, doc_id };
+    const cus = { fracciones, phone, doc_id, email };
     cus.fracciones = "1";
     setCustomer({ ...cus });
   }, [fracciones])
-
 
   return (
     <>
@@ -141,21 +139,39 @@ const SendForm = ({
               </div>
             </>
           ) : (
-            <Input
-              id="cantFrac"
-              label="Fracciones a comprar"
-              type="number"
-              max={selected ? `${selected.Fracciones_disponibles}` : "3"}
-              min="1"
-              value={fracciones}
-              required
-            // onInput={(e) => {
-            //   const cus = { fracciones, phone, doc_id };
-            //   cus.fracciones = e.target.value;
-            //   setCustomer({ ...cus });
-            // }}
-            />
+            <>
+
+              <Input
+                id="cantFrac"
+                label="Fracciones a comprar"
+                type="number"
+                max={selected ? `${selected.Fracciones_disponibles}` : "3"}
+                min="1"
+                value={fracciones}
+                required
+              // onInput={(e) => {
+              //   const cus = { fracciones, phone, doc_id };
+              //   cus.fracciones = e.target.value;
+              //   setCustomer({ ...cus });
+              // }}
+              />
+              <Input
+                id="email"
+                label="Email"
+                type="text"
+                value={email}
+                minLength="5"
+                maxLength="30"
+                required={true}
+                onChange={(e) => {
+                  const cus = { fracciones, phone, doc_id, email };
+                  cus.email = e.target.value;
+                  setCustomer({ ...cus });
+                }}
+              />
+            </>
           )}
+
           <Input
             id="numCel"
             label="Celular"
@@ -170,16 +186,17 @@ const SendForm = ({
                 (String(e.target.value).slice(0, 1) !== "3")
               ) {
                 notifyError("El número de celular debe iniciar por 3");
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.phone = "";
                 setCustomer({ ...cus });
               } else {
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.phone = e.target.value;
                 setCustomer({ ...cus });
               }
             }}
           />
+
           <Input
             id="num_id"
             label="Documento de identidad"
@@ -190,12 +207,13 @@ const SendForm = ({
             required={true}
             onInput={(e) => {
               if (!isNaN(e.target.value)) {
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.doc_id = e.target.value;
                 setCustomer({ ...cus });
               }
             }}
           />
+
           <ButtonBar>
             <Button type="submit" disabled={disabledBtns}>
               Aceptar
@@ -205,7 +223,7 @@ const SendForm = ({
               onClick={() => {
                 handleCloseCancelar();
                 closeModal();
-                setCustomer({ fracciones: "", phone: "", doc_id: "" });
+                setCustomer({ fracciones: "", phone: "", doc_id: "", email: "" });
                 setCheckedState(
                   new Array(selected?.Fracciones?.length).fill(false)
                 );

@@ -160,6 +160,7 @@ const Retiro = () => {
               idComercio: roleInfo?.id_comercio,
               idUsuario: roleInfo?.id_usuario,
               idDispositivo: roleInfo?.id_dispositivo,
+              nombre_usuario: roleInfo?.["nombre comercio"],
               // Tipo: roleInfo?.tipo_comercio,
               numTipoTransaccion: 2130, /// retiro
               numTipoDocumento: tipoDocumento, /// Cedula
@@ -258,6 +259,7 @@ const Retiro = () => {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
+      nombre_usuario: roleInfo?.["nombre comercio"],
       // Tipo: roleInfo?.tipo_comercio,
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||

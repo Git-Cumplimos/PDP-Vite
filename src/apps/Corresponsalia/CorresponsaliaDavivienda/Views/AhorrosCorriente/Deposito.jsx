@@ -38,7 +38,7 @@ const Deposito = () => {
     equalError: false
   });
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, infoTicket, pdpUser} = useAuth();
 
   const [loadingDepositoCorresponsal, fetchDepositoCorresponsal] =
     useFetch(depositoCorresponsal);
@@ -163,6 +163,7 @@ const Deposito = () => {
           idComercio: roleInfo?.id_comercio,
           idUsuario: roleInfo?.id_usuario,
           idDispositivo: roleInfo?.id_dispositivo,
+          nombre_usuario: pdpUser?.uname ?? "",
           // Tipo: roleInfo?.tipo_comercio,
           numTipoTransaccion: 5706, /// Deposito
           numTipoDocumento: tipoDocumento, /// Cedula
@@ -220,7 +221,7 @@ const Deposito = () => {
         );
       }
     },
-    [valor, limitesMontos, tipoCuenta]
+    [valor, limitesMontos, tipoCuenta,pdpUser]
   );
 
   const onMoneyChange = useCallback(
@@ -257,6 +258,7 @@ const Deposito = () => {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
+      nombre_usuario: pdpUser?.uname ?? "",
       // Tipo: roleInfo?.tipo_comercio,
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -317,51 +319,6 @@ const Deposito = () => {
           formatMoney.format(valor),
         ]);
         objTicket["trxInfo"].push(["", ""]);
-        // const tempTicket = {
-        //   title: "Depósito A Cuentas Davivienda",
-        //   timeInfo: {
-        //     "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-        //       year: "2-digit",
-        //       month: "2-digit",
-        //       day: "2-digit",
-        //     }).format(new Date()),
-        //     Hora: Intl.DateTimeFormat("es-CO", {
-        //       hour: "2-digit",
-        //       minute: "2-digit",
-        //       second: "2-digit",
-        //     }).format(new Date()),
-        //   },
-        //   commerceInfo: [
-        //     ["Id Comercio", roleInfo?.id_comercio],
-        //     ["No. terminal", ter],
-        //     ["Municipio", roleInfo?.ciudad],
-        //     ["Dirección", roleInfo?.direccion],
-        //     ["Tipo de operación", "Depósito A Cuentas"],
-        //     ["", ""],
-        //     ["No. de aprobación Banco", trx_id],
-        //     ["", ""],
-        //     ["No. de aprobación Aliado", trx_id2],
-        //     ["", ""],
-        //   ],
-        //   commerceName: roleInfo?.["nombre comercio"]
-        //   ? roleInfo?.["nombre comercio"]
-        //   : "No hay datos",
-        //   trxInfo: [
-        //     [
-        //     "Tipo de cuenta",
-        //     res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
-        //     ],
-        //     ["",""],
-        //     [
-        //     "Nro. Cuenta",
-        //     `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
-        //     ],
-        //     ["",""],
-        //     ["Valor", formatMoney.format(valor)],            
-        //     ["", ""],
-        //   ],
-        //   disclamer: "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
-        // };
         if (process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true'){
           objTicket['trxInfo'].push(["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)]);
           objTicket['trxInfo'].push(["", ""]);
@@ -370,14 +327,6 @@ const Deposito = () => {
         objTicket['trxInfo'].push(["Total", formatMoney.format(valor)]);
         objTicket['trxInfo'].push(["", ""]);
         setPaymentStatus(objTicket);
-        // infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
-        //   .then((resTicket) => {
-        //     console.log(resTicket);
-        //   })
-        //   .catch((err) => {
-        //     console.error(err);
-        //     notifyError("Error guardando el ticket");
-        //   });
       })
       .catch((err) => {
         setIsUploading(false);
@@ -394,6 +343,7 @@ const Deposito = () => {
     infoTicket,
     summary,
     datosConsulta,
+    pdpUser
   ]);
 
   return (

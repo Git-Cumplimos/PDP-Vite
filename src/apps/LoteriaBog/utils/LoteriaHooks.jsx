@@ -9,7 +9,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
-import { notifyError } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 //import Loteria from "../Views/Loteria";
 import { useNavigate } from "react-router-dom";
 ////// NITS de loterias _______________________
@@ -121,7 +121,7 @@ export const useLoteria = () => {
 
 export const useProvideLoteria = () => {
   // Datos consulta y compra
-  const { roleInfo } = useAuth();
+  const { pdpUser, roleInfo } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [numero, setNumero] = useState("");
@@ -218,15 +218,15 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         try {
           consulta_codigos_oficina(nit).then((res) => {
-            console.log("Hizo la consulta acá es donde se totea", res)
-            if ("msg" in res) {
-              console.log("Se metio en el if donde se totea", res)
-              setCodigosOficina({
-                cod_oficina_lot: "PPVIR",
-                cod_sucursal_lot: "00",
-              });
-            } else {
-              setCodigosOficina(res);
+            if (res != undefined) {
+              if ("msg" in res) {
+                setCodigosOficina({
+                  cod_oficina_lot: "PPVIR",
+                  cod_sucursal_lot: "00",
+                });
+              } else {
+                setCodigosOficina(res);
+              }
             }
           });
         } catch (err) {
@@ -321,7 +321,7 @@ export const useProvideLoteria = () => {
   );
 
   const sellLoteria = useCallback(
-    async (sorteo, selecFrac, tipoPago) => {
+    async (sorteo, ticket) => {
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -345,13 +345,17 @@ export const useProvideLoteria = () => {
         can_fracciones: parseInt(selected.Fracciones_disponibles),
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
+        comercio: roleInfo?.["nombre comercio"],
+        direccion: roleInfo.direccion,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
-
+        nombre_usuario: pdpUser?.uname,
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
         tipoPago: tiposOperaciones?.Venta_Virtual, /// Venta - Virtual
+        ticket: ticket,
+        email: customer.email,
       };
 
       try {
@@ -359,19 +363,23 @@ export const useProvideLoteria = () => {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
         setSellResponse(res);
         setLoadConsulta(false);
+        if (res?.mensaje_hash) {
+          notify(res?.mensaje_hash)
+        }
+
       } catch (err) {
         setLoadConsulta(false);
         setSellResponse(null);
         navigate(-1);
-        notifyError("Error al hacer la consulta")
-        console.error(err);
+        notifyError("Error al hacer la venta")
+        console.error("Este es el error-->", err);
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina, sellResponse]
   );
 
   const sellLoteriafisica = useCallback(
-    async (sorteo, selecFrac, tipoPago) => {
+    async (sorteo, selecFrac, tipoPago, ticket) => {
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -393,8 +401,11 @@ export const useProvideLoteria = () => {
         cod_sucursal: codigosOficina?.cod_sucursal_lot,
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
+        comercio: roleInfo?.["nombre comercio"],
+        direccion: roleInfo.direccion,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
+        nombre_usuario: pdpUser?.uname,
         fisico: fisico,
         frac_fisico_venta: selecFrac,
         frac_fisico_disponibles: selected?.Fracciones,
@@ -404,6 +415,7 @@ export const useProvideLoteria = () => {
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
         tipoPago: tipoPago !== null ? tipoPago : tiposOperaciones?.Venta_Fisica, /// Venta lotería de Bogotá - Intercambio/Fisica
+        ticket: ticket,
       };
 
       try {
@@ -414,12 +426,12 @@ export const useProvideLoteria = () => {
       } catch (err) {
         setLoadConsulta(false);
         setSellResponse(null);
-        console.error(err);
+        console.error("Este es el error-->", err);
         navigate(-1);
-        notifyError("Error al hacer la consulta")
+        notifyError("Error al hacer la venta")
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina, sellResponse]
   );
 
   const searchModa = useCallback(
@@ -513,6 +525,8 @@ export const useProvideLoteria = () => {
       idLoteria,
       tipopago,
       hash,
+      nombre_usuario,
+      tickets,
     ) => {
       if (tipopago == 2) {
         try {
@@ -545,8 +559,10 @@ export const useProvideLoteria = () => {
               tipo_ganancia: tipopago,
               oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+              nombre_usuario: nombre_usuario,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
+              ticket: tickets,
             },
             {},
             true,
@@ -583,8 +599,10 @@ export const useProvideLoteria = () => {
               tipo_ganancia: tipopago,
               oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+              nombre_usuario: nombre_usuario,
               cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
+              ticket: tickets,
             },
             {},
             true,
