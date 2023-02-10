@@ -69,7 +69,7 @@ export const makePinDePago = async (bodyDep) => {
 
   try {
     const res = await fetchData(
-      `${urlColpatriaTrx}/pago-de-giro`,
+      `${urlColpatriaTrx}/pin-de-pago`,
       "POST",
       {},
       bodyDep
