@@ -22,7 +22,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
 const Loteria = ({ route }) => {
-  const { roleInfo } = useAuth
+  const { roleInfo } = useAuth();
   const nitsLoterias = {
     "loteria-de-bogota": "899.999.270-1",
     "loteria-del-tolima": "809.008.775-0",
@@ -180,7 +180,6 @@ const Loteria = ({ route }) => {
     setLoterias("");
     setPage(1);
     setMaxPages(1);
-
     const copy = [{ value: "", label: "" }];
     if (sorteoOrdi !== null) {
       copy.push({
@@ -236,7 +235,6 @@ const Loteria = ({ route }) => {
   },
     [numero, page, searchLoteria, searchLoteriafisica, serie, setCustomer, setSelected, setSellResponse, sorteo]
   );
-
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -256,8 +254,8 @@ const Loteria = ({ route }) => {
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Id Trx ", sellResponse?.["id_trx"]],
-        ["Id Aut ", sellResponse?.id_Transaccion],
+        ["Id Trx ", ""],
+        ["Id Aut ", ""],
         ["Comercio", roleInfo?.["nombre comercio"]],
         ["", ""],
         ["Dirección", roleInfo?.direccion],
@@ -265,24 +263,21 @@ const Loteria = ({ route }) => {
       ],
       commerceName: sellResponse?.nom_loteria,
       trxInfo: [
-        ["Sorteo", sellResponse?.sorteo],
-        ["Billete", sellResponse?.num_billete],
-        ["Serie", sellResponse?.serie],
-        ["Fracciones", sellResponse?.fracciones],
-        ["Tipo de Billete", sellResponse?.fisico === true ? "Fisico" : "Virtual"],
+        ["Sorteo", sorteo],
+        ["Billete", numero],
+        ["Serie", serie],
+        ["Fracciones", ""],
+        ["Tipo de Billete", ""],
         ["", ""],
-        ["Valor", formatMoney.format(sellResponse?.valor_pago)],
+        ["Valor", ""],
         ["", ""],
-        ["Forma de Pago", parseInt(sellResponse?.tipoPago) ===
-          parseInt(operacion?.Venta_Fisica) || sellResponse?.fisico === false
-          ? "Efectivo"
-          : "Bono"],
+        ["Forma de Pago", ""],
         ["", ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuniquese, al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese, al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [sellResponse]
+  }, [roleInfo, sellResponse]
   );
 
   return (
@@ -353,7 +348,6 @@ const Loteria = ({ route }) => {
                     }
                     if (max === 0) {
                       notifyError("No se encontraron billetes asociados a la búsqueda")
-
                     }
                   })
                   : searchLoteria(sorteo, num, serie, 1).then((max) => {
@@ -383,6 +377,7 @@ const Loteria = ({ route }) => {
                 setSerie(num);
               }
             }}
+
             onLazyInput={{
               callback: (e) => {
                 const num = !isNaN(e.target.value) ? e.target.value : "";
@@ -400,6 +395,9 @@ const Loteria = ({ route }) => {
                     }
                     if (max === 0) {
                       notifyError("No se encontraron billetes para esta búsqueda")
+                    }
+                    if (setLoterias === []) {
+                      notifyError("No se ha realizado la asignación Billeteria Virtual / Billeteria Física ")
                     }
                   });
               },
@@ -461,7 +459,6 @@ const Loteria = ({ route }) => {
               }
             )}
             onSelectRow={(e, index) => {
-              console.log(loterias[index].Fracciones);
               setSelected(loterias[index]);
               setShowModal(true);
             }}

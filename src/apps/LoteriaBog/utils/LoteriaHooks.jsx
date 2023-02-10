@@ -367,10 +367,10 @@ export const useProvideLoteria = () => {
         setSellResponse(null);
         navigate(-1);
         notifyError("Error al hacer la venta")
-        console.error("Este es el error-->",err);
+        console.error("Este es el error-->", err);
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones, codigosOficina,sellResponse]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina, sellResponse]
   );
 
   const sellLoteriafisica = useCallback(
@@ -421,7 +421,7 @@ export const useProvideLoteria = () => {
       } catch (err) {
         setLoadConsulta(false);
         setSellResponse(null);
-        console.error("Este es el error-->",err);
+        console.error("Este es el error-->", err);
         navigate(-1);
         notifyError("Error al hacer la venta")
       }
