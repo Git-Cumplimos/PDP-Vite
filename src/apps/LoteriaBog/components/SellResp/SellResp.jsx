@@ -124,7 +124,7 @@ const SellResp = ({
         ["Sorteo", sellResponse?.sorteo],
         ["Billete", sellResponse?.num_billete],
         ["Serie", sellResponse?.serie],
-        ["Fracciones", sellResponse?.fracciones],
+        ["Fracción", sellResponse?.fracciones],
         ["Tipo de Billete", sellResponse?.fisico === true ? "Físico" : "Virtual"],
         ["", ""],
         ["Valor", formatMoney.format(sellResponse?.valor_pago)],
