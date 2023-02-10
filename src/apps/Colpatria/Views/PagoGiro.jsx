@@ -129,7 +129,7 @@ const PagoGiro = () => {
               roleInfo,
               trx_id,
               codigo_autorizacion,
-              "Pin de giro",
+              "Pago de giro",
               [
                 ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
                 ["", ""],
