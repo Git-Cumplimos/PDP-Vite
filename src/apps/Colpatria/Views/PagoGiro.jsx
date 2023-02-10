@@ -17,7 +17,7 @@ import Modal from "../../../components/Base/Modal";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import useMoney from "../../../hooks/useMoney";
-import { makePinPago } from "../utils/fetchFunctions";
+import { makePagoGiro } from "../utils/fetchFunctions";
 
 import { notifyPending, notifyError } from "../../../utils/notify";
 import { makeMoneyFormatter, onChangeNumber } from "../../../utils/functions";
@@ -33,7 +33,7 @@ const ObjTiposPersonas = {
   f: "Persona juridica",
 };
 
-const PinPago = () => {
+const PagoGiro = () => {
   const navigate = useNavigate();
 
   const { roleInfo, pdpUser, infoTicket } = useAuth();
@@ -112,7 +112,7 @@ const PinPago = () => {
         },
       };
       notifyPending(
-        makePinPago(data),
+        makePagoGiro(data),
         {
           render() {
             setLoadingPinPago(true);
@@ -246,7 +246,7 @@ const PinPago = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Pin de Giro</h1>
+      <h1 className="text-3xl mt-6">Pago de Giro</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
@@ -349,4 +349,4 @@ const PinPago = () => {
   );
 };
 
-export default PinPago;
+export default PagoGiro;
