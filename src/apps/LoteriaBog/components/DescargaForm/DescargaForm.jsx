@@ -38,51 +38,49 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
   }
   return (
     <>
-      <div className="flex flex-col justify-center items-center mx-auto container">
-        <Form onSubmit={onSubmit} grid>
-          {Array.isArray(urls) && urls.length > 0 ? (
-            <>
-              <div className="flex flex-row text-lg font-medium text-center items-center justify-center">
-                <h1 className="text-center">
-                  ¿Desea descargar los archivos de ventas del sorteo{" "}
-                  {selected?.num_sorteo}?
-                </h1>
-              </div>
-              {/* <div className="flex flex-row justify-evenly w-full my-4">
+      {Array.isArray(urls) && urls.length > 0 ? (
+        <div className="flex flex-col justify-center items-center mx-auto container">
+          <Form onSubmit={onSubmit} grid>
+            <div className="flex flex-row text-lg font-medium text-center items-center justify-center">
+              <h1 className="text-center">
+                ¿Desea descargar los archivos de ventas del sorteo{" "}
+                {selected?.num_sorteo}?
+              </h1>
+            </div>
+            {/* <div className="flex flex-row justify-evenly w-full my-4">
             <h1>Pagina: {page}</h1>
             <h1>Ultima pagina: {maxPages}</h1>
           </div> */}
-              <Table
-                headers={["Link de descarga"]}
-                data={urls.map(({ archivo, url }) => {
-                  return {
-                    archivo,
-                  };
-                })}
-                onSelectRow={(_e, index) => {
-                  window.open(urls[index].url, "_blank");
+            <Table
+              headers={["Link de descarga"]}
+              data={urls.map(({ archivo, url }) => {
+                return {
+                  archivo,
+                };
+              })}
+              onSelectRow={(_e, index) => {
+                window.open(urls[index].url, "_blank");
+              }}
+            />
+            <ButtonBar>
+              <Button
+                type="button"
+                onClick={() => {
+                  closeModal();
+                  setUrls(false);
+                  notifyError("Se canceló la descarga de los archivos")
                 }}
-              />
-              <ButtonBar>
-                <Button
-                  type="button"
-                  onClick={() => {
-                    closeModal();
-                    setUrls(false);
-                    notifyError("Se canceló la descarga de los archivos")
-                  }}
-                >
-                  Cancelar
-                </Button>
-              </ButtonBar>
-            </>
-          ) : (
-            ""
-          )}
-
-
-        </Form>
-      </div>
+              >
+                Cancelar
+              </Button>
+            </ButtonBar>
+          </Form>
+        </div>
+      ) : (
+        <div className="flex flex-col justify-center items-center mx-auto container"><h1>
+          No existen archivos para descargar
+        </h1></div>
+      )}
     </>
   );
 };
