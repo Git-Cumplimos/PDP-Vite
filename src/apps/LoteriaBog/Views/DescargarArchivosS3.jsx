@@ -15,7 +15,6 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const DescargarArchivosS3 = ({ route }) => {
   const { label } = route;
-  const [timer, setTimer] = useState(null);
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
