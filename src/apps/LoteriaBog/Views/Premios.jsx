@@ -235,18 +235,18 @@ const Premios = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: datosComercio.nom_loteria,
+      commerceName: ["PAGO PREMIO ", datosComercio.nom_loteria],
       trxInfo: [
         ["Sorteo", sorteo],
         ["Billete", billete],
         ["Serie", serie],
         ["Fracción", seleccionarFraccion],
-        [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
-        ["", ""],
-        ["Valor", formatMoney.format(totalPagar)],
-        ["", ""],
-        ["Forma de Pago", "Efectivo"],
-        ["", ""],
+        // [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
+        // ["", ""],
+        ["Valor a pagar", formatMoney.format(totalPagar)],
+        // ["", ""],
+        // ["Forma de Pago", "Efectivo"],
+        // ["", ""],
         [tipopago === 2 ? "Nombre" : "", tipopago === 2 ? datosCliente?.nombre : ""],
         [tipopago === 2 ? "Celular" : "", tipopago === 2 ? datosCliente?.celular : ""],
       ],
@@ -273,7 +273,10 @@ const Premios = ({ route }) => {
           seleccionarFraccion === undefined
         ) {
           setRespuesta(false);
-          notifyError("Seleccione una fracción");
+          if (checkBilleteVirtual === false) {
+            notifyError("Seleccione una fracción")
+          }
+
         } else {
           makePayment(
             sorteo,
@@ -618,7 +621,7 @@ const Premios = ({ route }) => {
                 {checkBilleteVirtual == true ? (
                   <Input
                     id="codHash"
-                    label="Codigo de seguridad"
+                    label="Código de seguridad"
                     type="text"
                     autoComplete="off"
                     required
@@ -653,9 +656,7 @@ const Premios = ({ route }) => {
                   <Form grid>
                     <Fieldset
                       className="lg:col-span-2 flex justify-center items-center"
-                      legend={
-                        "Por favor, seleccione la fracción del billete a pagar"
-                      }>
+                      legend={checkBilleteVirtual === true ? ("Por favor, Ingresar el Código Hash.") : ("Por favor, seleccione la fracción del billete a pagar")}>
                       {checkBilleteVirtual === false ? (
                         <Select
                           id="selectFraccion"
@@ -673,7 +674,7 @@ const Premios = ({ route }) => {
                       {checkBilleteVirtual === true ? (
                         <Input
                           id="codHash"
-                          label="Codigo de seguridad"
+                          label="Código de seguridad"
                           type="text"
                           autoComplete="off"
                           required
