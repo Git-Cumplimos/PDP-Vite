@@ -15,7 +15,7 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const DescargarArchivosS3 = ({ route }) => {
   const { label } = route;
-
+  const [timer, setTimer] = useState(null);
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
@@ -114,11 +114,13 @@ const DescargarArchivosS3 = ({ route }) => {
                 label="Fecha inicial"
                 type="date"
                 value={fecha_ini}
-                onInput={handleChange}
+                onChange={handleChange}
                 // onInput={(e) => {
                 //   setFecha_ini(e.target.value);
                 // }}
+                // onLazyInput={handleChange}
                 onLazyInput={{
+
                   callback: (e) => {
                     if (fecha_fin !== "") {
                       con_SortVentas_S3(
@@ -152,7 +154,7 @@ const DescargarArchivosS3 = ({ route }) => {
                 // }}
                 onLazyInput={{
                   callback: (e) => {
-                    if (fecha_ini !== "") {
+                    if (fecha_ini !== "" && fecha_fin !== "") {
                       con_SortVentas_S3(
                         sorteo,
                         fecha_ini,
