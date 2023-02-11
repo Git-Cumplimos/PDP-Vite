@@ -61,7 +61,7 @@ const DescargarArchivosS3 = ({ route }) => {
   };
   const handleChange2 = (e) => {
     if (e.target.value) {
-      setFecha_ini(e.target.value);
+      setFecha_fin(e.target.value);
     }
   };
   return (
@@ -146,7 +146,7 @@ const DescargarArchivosS3 = ({ route }) => {
                 label="Fecha final"
                 type="date"
                 value={fecha_fin}
-                onInput={handleChange}
+                onInput={handleChange2}
                 // onInput={(e) => {
                 //   setFecha_fin(e.target.value);
                 // }}
