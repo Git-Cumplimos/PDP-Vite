@@ -54,7 +54,16 @@ const DescargarArchivosS3 = ({ route }) => {
   const closeModal2 = useCallback(async () => {
     setShowModal2(false);
   }, []);
-
+  const handleChange = (e) => {
+    if (e.target.value) {
+      setFecha_ini(e.target.value);
+    }
+  };
+  const handleChange2 = (e) => {
+    if (e.target.value) {
+      setFecha_ini(e.target.value);
+    }
+  };
   return (
     <>
       <h1 class="text-3xl">Descarga de archivos  </h1>
@@ -105,9 +114,10 @@ const DescargarArchivosS3 = ({ route }) => {
                 label="Fecha inicial"
                 type="date"
                 value={fecha_ini}
-                onInput={(e) => {
-                  setFecha_ini(e.target.value);
-                }}
+                onInput={handleChange}
+                // onInput={(e) => {
+                //   setFecha_ini(e.target.value);
+                // }}
                 onLazyInput={{
                   callback: (e) => {
                     if (fecha_fin !== "") {
@@ -136,9 +146,10 @@ const DescargarArchivosS3 = ({ route }) => {
                 label="Fecha final"
                 type="date"
                 value={fecha_fin}
-                onInput={(e) => {
-                  setFecha_fin(e.target.value);
-                }}
+                onInput={handleChange}
+                // onInput={(e) => {
+                //   setFecha_fin(e.target.value);
+                // }}
                 onLazyInput={{
                   callback: (e) => {
                     if (fecha_ini !== "") {

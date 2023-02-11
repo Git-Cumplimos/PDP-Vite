@@ -140,7 +140,9 @@ const Premios = ({ route }) => {
             nom_loteria: res?.obj?.nom_loteria,
           };
         });
-
+        if (res === undefined) {
+          notifyError("No existen resultados, para el sorteo indicado")
+        }
         if ("msg" in res) {
           if (res?.obj?.max_pago == true) {
             notifyError(
