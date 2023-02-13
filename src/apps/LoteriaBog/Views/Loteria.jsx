@@ -261,7 +261,7 @@ const Loteria = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: sellResponse?.nom_loteria,
+      commerceName: sellResponse?.obj?.nom_loteria,
       trxInfo: [
         ["Sorteo", sorteo],
         ["Billete", numero],
