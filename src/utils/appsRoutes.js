@@ -33,6 +33,9 @@ import rutasAgrarioCB, {
   listPermissionsAgrario,
 } from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/routes";
 import rutasConfiguraciones from "../apps/TrxParams/routes";
+import rutasRecaudoMultiple, {
+  listPermissionsRecaudoMultiple,
+} from "../apps/Corresponsalia/RecaudoMultiple/routes";
 
 /**
 
@@ -658,8 +661,15 @@ const allUrlsPrivateApps = [
       ...listPermissionsDavivienda,
       ...listPermissionsAval,
       ...listPermissionsAgrario,
+      ...listPermissionsRecaudoMultiple,
     ],
-    subRoutes: [rutasDaviviendaCB, rutasAvalCB, rutasAgrarioCB, rutasColpatria],
+    subRoutes: [
+      rutasDaviviendaCB,
+      rutasAvalCB,
+      rutasAgrarioCB,
+      rutasColpatria,
+      rutasRecaudoMultiple,
+    ],
   },
 
   {
