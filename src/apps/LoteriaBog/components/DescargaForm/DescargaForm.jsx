@@ -14,7 +14,7 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
   const onSubmit = (e) => {
     e.preventDefault();
     descargaVentas_S3(selected).then((res) => {
-      if (res != undefined) {
+      if (res !== undefined) {
         if (!("msg" in res)) {
           // Si no llega el mensaje el setea res
           setUrls(res);
@@ -26,7 +26,7 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
   };
   if (showModal) {
     descargaVentas_S3(selected).then((res) => {
-      if (res != undefined) {
+      if (res !== undefined) {
         if (!("msg" in res)) {
           // Si no llega el mensaje el setea res
           setUrls(res);
@@ -35,6 +35,9 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
         }
       }
     });
+  }
+  const cerrarModal = () => {
+    closeModal()
   }
   return (
     <>
@@ -77,8 +80,9 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
           </Form>
         </div>
       ) : (
-        ""
+        cerrarModal()
       )}
+      {urls?.length == 0 ? notifyError("No existen archivos para descargar") : ""}
     </>
   );
 };
