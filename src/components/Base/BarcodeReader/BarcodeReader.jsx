@@ -45,7 +45,8 @@ const BarcodeReader = ({
           let value = String.fromCharCode(parseInt(isAlt.current));
           isAlt.current = "";
           if (value === "\u001d") {
-            ev.target.value = ev.target.value.slice(0, -1) + "\u001d";
+            ev.target.value = ev.target.value + "\u001d";
+            //ev.target.value = ev.target.value.slice(0, -1) + "\u001d";
           }
         }
         if (ev.keyCode === 18) {
