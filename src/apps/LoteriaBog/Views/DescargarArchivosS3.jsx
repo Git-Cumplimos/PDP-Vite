@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import { useLoteria } from "../utils/LoteriaHooks";
@@ -18,8 +18,8 @@ const DescargarArchivosS3 = ({ route }) => {
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
-  const [fecha_ini, setFecha_ini] = useState("");
-  const [fecha_fin, setFecha_fin] = useState("");
+  const [fecha_ini, setFecha_ini] = useState(new Date().toLocaleDateString());
+  const [fecha_fin, setFecha_fin] = useState(new Date().toLocaleDateString());
   const [resp_con_sort, setResp_con_sort] = useState(null);
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -50,6 +50,13 @@ const DescargarArchivosS3 = ({ route }) => {
     setShowModal(false);
   }, []);
 
+  // const closeModal = () => {
+  //   setShowModal(false)
+  //   console.log("ENTRO===")
+  // }
+  // const closeModal = useCallback(() => {
+  //   setShowModal(false);
+  // }, []);
   const closeModal2 = useCallback(async () => {
     setShowModal2(false);
   }, []);
@@ -63,6 +70,9 @@ const DescargarArchivosS3 = ({ route }) => {
       setFecha_fin(e.target.value);
     }
   };
+  useEffect(() => {
+
+  }, [fecha_fin, fecha_ini])
   return (
     <>
       <h1 class="text-3xl">Descarga de archivos  </h1>
@@ -89,12 +99,15 @@ const DescargarArchivosS3 = ({ route }) => {
                 if (e.target.value !== "") {
                   con_SortVentas_S3(e.target.value, null, null, page).then(
                     (res) => {
-                      if (!("msg" in res)) {
-                        setResp_con_sort(res.info);
-                        setMaxPages(res.num_datos);
-                      } else {
-                        notifyError(res.msg);
-                        setResp_con_sort("");
+                      if (res !== undefined) {
+
+                        if (!("msg" in res)) {
+                          setResp_con_sort(res.info);
+                          setMaxPages(res.num_datos);
+                        } else {
+                          notifyError(res.msg);
+                          setResp_con_sort("");
+                        }
                       }
                     }
                   );
@@ -128,11 +141,14 @@ const DescargarArchivosS3 = ({ route }) => {
                         fecha_fin,
                         page
                       ).then((res) => {
-                        if (!("msg" in res)) {
-                          setResp_con_sort(res.info);
-                          setMaxPages(res.num_datos);
-                        } else {
-                          notifyError(res.msg);
+                        if (res !== undefined) {
+
+                          if (!("msg" in res)) {
+                            setResp_con_sort(res.info);
+                            setMaxPages(res.num_datos);
+                          } else {
+                            notifyError(res.msg);
+                          }
                         }
                       });
                     }

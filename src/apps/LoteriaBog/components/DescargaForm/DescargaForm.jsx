@@ -4,7 +4,7 @@ import Form from "../../../../components/Base/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { useState } from "react";
 import Table from "../../../../components/Base/Table";
-import { notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const DescargaForm = ({ closeModal, selected, showModal }) => {
   const { descargaVentas_S3 } = useLoteria();
@@ -38,7 +38,7 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
   }
   return (
     <>
-      {Array.isArray(urls) && urls.length > 0 ? (
+      {Array?.isArray(urls) && urls?.length > 0 ? (
         <div className="flex flex-col justify-center items-center mx-auto container">
           <Form onSubmit={onSubmit} grid>
             <div className="flex flex-row text-lg font-medium text-center items-center justify-center">
@@ -53,13 +53,13 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
           </div> */}
             <Table
               headers={["Link de descarga"]}
-              data={urls.map(({ archivo, url }) => {
+              data={urls?.map(({ archivo, url }) => {
                 return {
                   archivo,
                 };
               })}
               onSelectRow={(_e, index) => {
-                window.open(urls[index].url, "_blank");
+                window.open(urls[index]?.url, "_blank");
               }}
             />
             <ButtonBar>
@@ -77,9 +77,7 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
           </Form>
         </div>
       ) : (
-        <div className="flex flex-col justify-center items-center mx-auto container"><h1>
-          No existen archivos para descargar
-        </h1></div>
+        ""
       )}
     </>
   );

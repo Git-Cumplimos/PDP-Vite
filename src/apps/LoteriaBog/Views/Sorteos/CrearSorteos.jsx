@@ -53,18 +53,19 @@ const CrearSorteos = ({ route }) => {
       setResp_con(res);
     });
     setDay(new Date().getDay());
-  }, [sorteosLOT]);
+  }, [sorteosLOT, disable_botoOrdinario, disabledBtns]);
 
   const onSubmit3 = (e) => {
     setTip_sorteo(2);
     setShowModal2(true);
+    setDisabledBtns(true);
     setDisable_botoExtra(true);
   };
 
   const onSubmit4 = (e) => {
     setTip_sorteo(1);
     setShowModal2(true);
-    setDisabledBtns(false)
+    setDisabledBtns(true)
     setDisable_botoOrdinario(true);
   };
 
