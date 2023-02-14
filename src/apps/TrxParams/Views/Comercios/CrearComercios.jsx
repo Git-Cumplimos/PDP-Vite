@@ -21,6 +21,7 @@ import {
 } from "../../utils/fetchComercios";
 import { fetchGruposComercios } from "../../utils/fetchGruposComercios";
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
 const vectorCodigosInstitucionales = [
   ...process.env.REACT_APP_CODIGOS_INSTITUCIONALES_COMERCIOS.split("/").map(
     (e, i) => {
@@ -94,7 +95,7 @@ const CrearComercios = () => {
     tel_contacto1_comercio: "",
     tel_contacto2_comercio: "",
     telefono_fijo_comercio: "",
-    pk_tbl_grupo_comercios: "",
+    pk_tbl_grupo_comercios: init_grupo_comercio,
   });
   const tableComercios = useMemo(() => {
     return [
@@ -265,7 +266,7 @@ const CrearComercios = () => {
             tel_contacto1_comercio: "",
             tel_contacto2_comercio: "",
             telefono_fijo_comercio: "",
-            pk_tbl_grupo_comercios: "",
+            pk_tbl_grupo_comercios: init_grupo_comercio,
           }
         );
       })
