@@ -133,7 +133,7 @@ const rutasAgrarioCB = {
       link: "/runt/pagar-runt",
       label: <AppIcons Logo={"RETIRO"} name={"Pagar Runt"} />,
       component: PagarRunt,
-      permission: [56, 57],
+      permission: [...listPermissionsAgrario],
       subRoutes: [],
     },
   ],
