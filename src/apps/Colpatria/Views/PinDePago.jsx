@@ -17,7 +17,7 @@ import Modal from "../../../components/Base/Modal";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import useMoney from "../../../hooks/useMoney";
-import { makePinPago } from "../utils/fetchFunctions";
+import { makePinDePago } from "../utils/fetchFunctions";
 
 import { notifyPending, notifyError } from "../../../utils/notify";
 import { makeMoneyFormatter, onChangeNumber } from "../../../utils/functions";
@@ -33,10 +33,10 @@ const ObjTiposPersonas = {
   f: "Persona juridica",
 };
 
-const PinPago = () => {
+const PinDePago = () => {
   const navigate = useNavigate();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser, infoTicket } = useAuth();
 
   const [tipoPersona, setTipoPersona] = useState("");
   const [userDocument, setUserDocument] = useState("");
@@ -94,10 +94,9 @@ const PinPago = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO",
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
         valor_total_trx: valPinPago,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
@@ -113,7 +112,7 @@ const PinPago = () => {
         },
       };
       notifyPending(
-        makePinPago(data),
+        makePinDePago(data),
         {
           render() {
             setLoadingPinPago(true);
@@ -130,7 +129,7 @@ const PinPago = () => {
               roleInfo,
               trx_id,
               codigo_autorizacion,
-              "Pin de giro",
+              "Pin de pago",
               [
                 ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
                 ["", ""],
@@ -162,7 +161,7 @@ const PinPago = () => {
             setLoadingPinPago(false);
             navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
-              return err?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
             }
             console.error(err?.message);
             return "Transacción fallida";
@@ -178,6 +177,7 @@ const PinPago = () => {
       userAddress,
       valPinPago,
       roleInfo,
+      pdpUser?.uname,
       infoTicket,
       navigate,
     ]
@@ -246,17 +246,18 @@ const PinPago = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Pin de Giro</h1>
+      <h1 className="text-3xl mt-6">Pin de Pago</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
           setShowModal(true);
         }}
-        grid>
+        grid
+      >
         <Select
-          id='accType'
-          name='accType'
-          label='Seleccionar'
+          id="accType"
+          name="accType"
+          label="Seleccionar"
           options={[
             { label: "", value: "" },
             ...Object.entries(ObjTiposPersonas).map(([value, label]) => ({
@@ -269,11 +270,11 @@ const PinPago = () => {
           required
         />
         <Input
-          id='docCliente'
-          name='docCliente'
-          label='No. Identificación'
-          type='tel'
-          autoComplete='off'
+          id="docCliente"
+          name="docCliente"
+          label="No. Identificación"
+          type="tel"
+          autoComplete="off"
           minLength={"5"}
           maxLength={"12"}
           value={userDocument}
@@ -291,21 +292,21 @@ const PinPago = () => {
           required
         />
         <Input
-          id='numPin'
-          name='numPin'
-          label='No. De PIN'
-          type='text'
-          autoComplete='off'
+          id="numPin"
+          name="numPin"
+          label="No. De PIN"
+          type="text"
+          autoComplete="off"
           maxLength={"12"}
           onInput={(ev) => setAccountNumber(ev.target.value)}
           required
         />
         <Input
-          id='valor'
-          name='valor'
-          label='Valor a Retirar'
-          autoComplete='off'
-          type='tel'
+          id="valor"
+          name="valor"
+          label="Valor a Retirar"
+          autoComplete="off"
+          type="tel"
           minLength={"5"}
           maxLength={"11"}
           onInput={(ev) => setValPinPago(onChangeMoney(ev))}
@@ -317,9 +318,10 @@ const PinPago = () => {
       </Form>
       <Modal
         show={showModal}
-        handleClose={loadingPinPago ? () => {} : handleClose}>
+        handleClose={loadingPinPago ? () => {} : handleClose}
+      >
         {paymentStatus ? (
-          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -330,9 +332,10 @@ const PinPago = () => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type='submit'
+                type="submit"
                 onClick={onMakePayment}
-                disabled={loadingPinPago}>
+                disabled={loadingPinPago}
+              >
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingPinPago}>
@@ -346,4 +349,4 @@ const PinPago = () => {
   );
 };
 
-export default PinPago;
+export default PinDePago;

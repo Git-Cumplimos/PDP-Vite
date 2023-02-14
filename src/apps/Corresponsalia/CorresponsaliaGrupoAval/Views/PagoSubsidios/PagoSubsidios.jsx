@@ -28,7 +28,7 @@ const dataInputInitial = {
   otp: "",
   valor_total_trx: "",
 };
-const tipo_operacion = 99;
+
 const url_consulta_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/consulta-pago-subsidios`;
 const url_pago_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/pago-subsidios`;
 
@@ -44,7 +44,7 @@ const PagoSubsidios = () => {
     useFetch(fetchCustomPost);
   const [loadingPeticionRetirarSubsidio, PeticionRetirarSubsidio] =
     useFetch(fetchCustomPost);
-  const { roleInfo, infoTicket: guardarTicket } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   function onChangeInput(e) {
     let valueInput = "";
@@ -156,6 +156,7 @@ const PagoSubsidios = () => {
         id_terminal: roleInfo.id_dispositivo,
       },
       nombre_comercio: roleInfo["nombre comercio"],
+      nombre_usuario: pdpUser["uname"],
       oficina_propia: oficinaPropia_,
       valor_total_trx: value,
       numeroCelular: inputData.numeroCelular,
@@ -169,6 +170,7 @@ const PagoSubsidios = () => {
         city: roleInfo.ciudad,
         dane_code: roleInfo.codigo_dane,
       },
+      bool_ticket: true,
     };
     if (idTrx == null) {
       dataSubsidio["id_trx"] = idTrx;
@@ -181,13 +183,18 @@ const PagoSubsidios = () => {
     )
       .then((response) => {
         if (response?.status === true) {
-          PagoSubsidioExitoso(response?.obj?.result);
+          if (response?.obj?.result?.ticket) {
+            const voucher = response.obj.result.ticket;
+            setInfTicket(JSON.parse(voucher));
+          }
+          notify("Pago de subsidio exitoso");
+          setTypeInfo("InfRecibo");
         }
       })
       .catch((error) => {
         if (error instanceof ErrorCustom) {
         } else if (error instanceof ErrorCustomBackend) {
-          notifyError(`Pago de subsidio no exitoso: ${error.message}`);
+          notifyError(`${error.message}`);
         } else if (error instanceof msgCustomBackend) {
           notify(`${error.message}`);
         } else {
@@ -196,46 +203,6 @@ const PagoSubsidios = () => {
         HandleCloseSecond();
       });
   }
-  //vaucher
-  const PagoSubsidioExitoso = (result_) => {
-    const voucher = {
-      title: "Recibo de pago subsidio ",
-      timeInfo: {
-        "Fecha de venta": result_.fecha,
-        Hora: result_.hora,
-      },
-      commerceInfo: [
-        ["Id Comercio", roleInfo.id_comercio],
-        ["No. terminal", roleInfo.id_dispositivo],
-        ["Municipio", roleInfo.ciudad],
-        ["Dirección", roleInfo.direccion],
-        ["Id Trx", result_.id_trx],
-        ["Id Transacción", result_.id_trx],
-      ],
-      commerceName: "PAGO DE SUBSIDIO",
-      trxInfo: [
-        ["Documento", inputData.documento],
-        ["", ""],
-        ["Celular", inputData.numeroCelular],
-        ["", ""],
-        ["Valor", formatMoney.format(value)],
-        ["", ""],
-      ],
-      disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
-    };
-
-    notify("Pago de subsidio exitoso");
-    setInfTicket(voucher);
-    setTypeInfo("InfRecibo");
-    guardarTicket(result_.id_trx, tipo_operacion, voucher)
-      .then((resTicket) => {
-        console.log("Ticket guardado exitosamente");
-      })
-      .catch((err) => {
-        console.error("Error guardando el ticket");
-      });
-  };
 
   const HandleCloseSecond = useCallback(() => {
     setTypeInfo("Ninguno");
@@ -325,7 +292,9 @@ const PagoSubsidios = () => {
           <Button type={"submit"}>Continuar</Button>
         </ButtonBar>
       </Form>
+
       <Modal show={showModal} handleClose={handleCloseModal}>
+        {/******************************Resumen de consulta*******************************************************/}
         {typeInfo === "Inicial" && (
           <InfInicial
             summaryInitial={{
@@ -337,9 +306,13 @@ const PagoSubsidios = () => {
             HandleClose={() =>
               HandleCloseSecondCancelada("Consulta pago subsidios")
             }
+            title="¿Está seguro de realizar consulta?"
+            subtitle="Resumen de la consulta"
           ></InfInicial>
         )}
+        {/******************************Resumen de consulta*******************************************************/}
 
+        {/******************************resConsulta*******************************************************/}
         {typeInfo === "resConsulta" && (
           <InfResConsulta
             value={value}
@@ -352,13 +325,16 @@ const PagoSubsidios = () => {
             HandleClose2={HandleCloseSecond}
           ></InfResConsulta>
         )}
+        {/******************************resConsulta*******************************************************/}
 
+        {/************************************ Recibo *******************************************************/}
         {typeInfo === "InfRecibo" && (
           <InfRecibo
             infTicket={infTicket}
             HandleClose={HandleCloseResRecibo}
           ></InfRecibo>
         )}
+        {/************************************ Recibo *******************************************************/}
       </Modal>
     </Fragment>
   );

@@ -19,6 +19,13 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 			comentario: "",
 		},
 	];
+	const dateFormatter = Intl.DateTimeFormat("es-CO", {
+		year: "numeric",
+		month: "numeric",
+		day: "numeric",
+		hour: "numeric",
+		minute: "numeric",
+	});
 	const [pageData, setPageData] = useState({ page: 1, limit: 10 });
 	const [reporteInventario, setReporteInventario] = useState(initReporte);
 	const [numeroSorteo, setNumeroSorteo] = useState("");
@@ -26,7 +33,6 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 	const [maxPages, setMaxPages] = useState(1)
 	const { consultaInventarioReporte } = useLoteria();
 	useEffect(() => {
-		console.log(pageData)
 		loadDocument(numeroSorteo, pageData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [numeroSorteo, pageData]);
@@ -39,45 +45,35 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 				setReporteInventario(res?.Respuesta);
 				setMaxPages(res?.maxPage);
 				setShowTabla(true);
-				// console.log("reportese _ a", reporteInventario);
 			}
 		});
 	};
 
 	return (
-		<div>
-			{showTabla ? (
-				<TableEnterprise
-					title="Reporte Inventario"
-					maxPage={maxPages}
-					headers={[
-						"Sorteo",
-						"Loteria",
-						"cod_distribuidor",
-						"cod_sucursal",
-						"Fecha Inicio",
-						"Inventario",
-						"Total Asignado",
-						"Total Inventariado",
-						// "inconcistencia",
-						"Comentario",
-					]}
-					data={
-						reporteInventario &&
-						reporteInventario?.map(
-							({
-								num_sorteo,
-								num_loteria,
-								cod_distribuidor,
-								cod_sucursal,
-								fecha_creacion,
-								inventario,
-								total_asignaciones,
-								total_inventario,
-								// inconcistencia,
-								comentario,
-							}) => {
-								return {
+		<>
+
+			<h1 class="text-3xl">Reporte Inventario</h1>
+			<div>
+				{showTabla ? (
+					<TableEnterprise
+						title="Reporte Inventario"
+						maxPage={maxPages}
+						headers={[
+							"Sorteo",
+							"Loteria",
+							"cod_distribuidor",
+							"cod_sucursal",
+							"Fecha Inicio",
+							"Inventario",
+							"Total Asignado",
+							"Total Inventariado",
+							// "inconcistencia",
+							"Comentario",
+						]}
+						data={
+							reporteInventario &&
+							reporteInventario?.map(
+								({
 									num_sorteo,
 									num_loteria,
 									cod_distribuidor,
@@ -88,25 +84,40 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 									total_inventario,
 									// inconcistencia,
 									comentario,
-								};
-							}
-						)
-					}
-					// onSelectRow={console.log("a")}
-				>
-					<Input
-						id="numSorteo"
-						label="Numero de sorte: "
-						type="text"
-						value={numeroSorteo}
-						onInput={(e) => setNumeroSorteo(e.target.value)}
-					/>
-					onSetPageData={setPageData}
-				</TableEnterprise>
-			) : (
-				""
-			)}
-		</div>
+								}) => {
+									const tempDate = new Date(fecha_creacion);
+									tempDate.setHours(tempDate.getHours() + 5);
+									fecha_creacion = dateFormatter.format(tempDate);
+									return {
+										num_sorteo,
+										num_loteria,
+										cod_distribuidor,
+										cod_sucursal,
+										fecha_creacion,
+										inventario,
+										total_asignaciones,
+										total_inventario,
+										// inconcistencia,
+										comentario,
+									};
+								}
+							)
+						}
+					>
+						<Input
+							id="numSorteo"
+							label="Numero de sorte: "
+							type="text"
+							value={numeroSorteo}
+							onInput={(e) => setNumeroSorteo(e.target.value)}
+						/>
+						{/* onSetPageData={setPageData} */}
+					</TableEnterprise>
+				) : (
+					""
+				)}
+			</div>
+		</>
 	);
 };
 

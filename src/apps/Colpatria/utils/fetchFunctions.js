@@ -21,7 +21,7 @@ export const makeDeposit = async (bodyDep) => {
     if (!res?.status) {
       if (res?.msg) {
         throw new Error(
-          res?.obj?.error_user_msg ? res?.obj?.error_user_msg : res?.msg,
+          res?.obj?.error_user_msg ?? res?.msg ?? "",
           { cause: "custom" }
         );
       }
@@ -34,7 +34,7 @@ export const makeDeposit = async (bodyDep) => {
   }
 };
 
-export const makePinPago = async (bodyDep) => {
+export const makePagoGiro = async (bodyDep) => {
   if (!bodyDep) {
     throw new Error("sin datos de pin de pago", { cause: "custom" });
   }
@@ -49,7 +49,35 @@ export const makePinPago = async (bodyDep) => {
     if (!res?.status) {
       if (res?.msg) {
         throw new Error(
-          res?.obj?.error_user_msg ? res?.obj?.error_user_msg : res?.msg,
+          res?.obj?.error_user_msg ?? res?.msg ?? "",
+          { cause: "custom" }
+        );
+      }
+
+      throw new Error(res, { cause: "custom" });
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const makePinDePago = async (bodyDep) => {
+  if (!bodyDep) {
+    throw new Error("sin datos de pin de pago", { cause: "custom" });
+  }
+
+  try {
+    const res = await fetchData(
+      `${urlColpatriaTrx}/pin-de-pago`,
+      "POST",
+      {},
+      bodyDep
+    );
+    if (!res?.status) {
+      if (res?.msg) {
+        throw new Error(
+          res?.obj?.error_user_msg ?? res?.msg ?? "",
           { cause: "custom" }
         );
       }
@@ -77,7 +105,7 @@ export const makeSellPin = async (bodyDep) => {
     if (!res?.status) {
       if (res?.msg) {
         throw new Error(
-          res?.obj?.error_user_msg ? res?.obj?.error_user_msg : res?.msg,
+          res?.obj?.error_user_msg ?? res?.msg ?? "",
           { cause: "custom" }
         );
       }
@@ -105,7 +133,7 @@ export const makeInquiryPin = async (bodyDep) => {
     if (!res?.status) {
       if (res?.msg) {
         throw new Error(
-          res?.obj?.error_user_msg ? res?.obj?.error_user_msg : res?.msg,
+          res?.obj?.error_user_msg ?? res?.msg ?? "",
           { cause: "custom" }
         );
       }
@@ -133,7 +161,7 @@ export const makeSellRecaudo = async (bodyDep) => {
     if (!res?.status) {
       if (res?.msg) {
         throw new Error(
-          res?.obj?.error_user_msg ? res?.obj?.error_user_msg : res?.msg,
+          res?.obj?.error_user_msg ?? res?.msg ?? "",
           { cause: "custom" }
         );
       }
@@ -161,7 +189,7 @@ export const makeInquiryRecaudo = async (bodyDep) => {
     if (!res?.status) {
       if (res?.msg) {
         throw new Error(
-          res?.obj?.error_user_msg ? res?.obj?.error_user_msg : res?.msg,
+          res?.obj?.error_user_msg ?? res?.msg ?? "",
           { cause: "custom" }
         );
       }

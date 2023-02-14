@@ -1,10 +1,11 @@
+import React, { useCallback, } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { useState, useEffect, useMemo } from "react";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -18,7 +19,7 @@ const SendForm = ({
   setSelecFrac,
   selected,
   setSelected,
-  customer: { fracciones, phone, doc_id },
+  customer: { fracciones, phone, doc_id, email },
   setCustomer,
   closeModal,
   handleSubmit,
@@ -33,9 +34,8 @@ const SendForm = ({
     Serie: selected ? selected.serie : "",
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
   };
-
   const { tiposOperaciones } = useLoteria();
-  const operacion = useMemo(() => {    
+  const operacion = useMemo(() => {
     return tiposOperaciones;
   }, [tiposOperaciones]);
 
@@ -64,10 +64,6 @@ const SendForm = ({
       }
     }
   };
-  // useEffect(() => {
-  //     setSelecFrac([])
-  //     setTipoPago()
-  // });
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -79,15 +75,19 @@ const SendForm = ({
     }
   };
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {};
-  // }
+  const handleCloseCancelar = useCallback(() => {
+    notifyError("Venta de lotería cancelada");
+  })
 
   const formPago = (value) => {
     setTipoPago(value);
   };
-  // console.log(selected?.Fracciones)
+  useEffect(() => {
+    const cus = { fracciones, phone, doc_id, email };
+    cus.fracciones = "1";
+    setCustomer({ ...cus });
+  }, [fracciones])
+
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">
@@ -139,21 +139,39 @@ const SendForm = ({
               </div>
             </>
           ) : (
-            <Input
-              id="cantFrac"
-              label="Fracciones a comprar"
-              type="number"
-              max={selected ? `${selected.Fracciones_disponibles}` : "3"}
-              min="1"
-              value={fracciones}
-              required
-              onInput={(e) => {
-                const cus = { fracciones, phone, doc_id };
-                cus.fracciones = e.target.value;
-                setCustomer({ ...cus });
-              }}
-            />
+            <>
+
+              <Input
+                id="cantFrac"
+                label="Fracciones a comprar"
+                type="number"
+                max={selected ? `${selected.Fracciones_disponibles}` : "3"}
+                min="1"
+                value={fracciones}
+                required={true}
+              // onInput={(e) => {
+              //   const cus = { fracciones, phone, doc_id };
+              //   cus.fracciones = e.target.value;
+              //   setCustomer({ ...cus });
+              // }}
+              />
+              <Input
+                id="email"
+                label="Email"
+                type="email"
+                value={email}
+                minLength="5"
+                maxLength="30"
+                required={true}
+                onChange={(e) => {
+                  const cus = { fracciones, phone, doc_id, email };
+                  cus.email = e.target.value;
+                  setCustomer({ ...cus });
+                }}
+              />
+            </>
           )}
+
           <Input
             id="numCel"
             label="Celular"
@@ -168,16 +186,17 @@ const SendForm = ({
                 (String(e.target.value).slice(0, 1) !== "3")
               ) {
                 notifyError("El número de celular debe iniciar por 3");
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.phone = "";
                 setCustomer({ ...cus });
               } else {
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.phone = e.target.value;
                 setCustomer({ ...cus });
               }
             }}
           />
+
           <Input
             id="num_id"
             label="Documento de identidad"
@@ -188,12 +207,13 @@ const SendForm = ({
             required={true}
             onInput={(e) => {
               if (!isNaN(e.target.value)) {
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.doc_id = e.target.value;
                 setCustomer({ ...cus });
               }
             }}
           />
+
           <ButtonBar>
             <Button type="submit" disabled={disabledBtns}>
               Aceptar
@@ -201,8 +221,9 @@ const SendForm = ({
             <Button
               type="button"
               onClick={() => {
+                handleCloseCancelar();
                 closeModal();
-                setCustomer({ fracciones: "", phone: "", doc_id: "" });
+                setCustomer({ fracciones: "", phone: "", doc_id: "", email: "" });
                 setCheckedState(
                   new Array(selected?.Fracciones?.length).fill(false)
                 );

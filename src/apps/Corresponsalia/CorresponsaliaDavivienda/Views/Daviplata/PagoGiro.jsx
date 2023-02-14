@@ -19,7 +19,7 @@ import {
 import HideInput from "../../../../../components/Base/HideInput";
 
 const PagoGiro = () => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
   // const [limiteRecarga, setLimiteRecarga] = useState({
   //   superior: 100000,
@@ -173,6 +173,7 @@ const PagoGiro = () => {
       tipoIdentificacion: datosTrans.tipoIdentificacion,
       numeroIdentificacion: datosTrans.numeroIdentificacion,
       codigoFamilia: datosTrans.codigoFamilia,
+      nombre_usuario: pdpUser?.uname ?? "",
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idTerminal: roleInfo?.id_dispositivo,
@@ -228,6 +229,7 @@ const PagoGiro = () => {
         setIsUploading(false);
         notifyError("No se ha podido conectar al servidor");
         console.error(err);
+        hideModal();
       });
   };
   const peticionPagoPorGiro = () => {
@@ -256,6 +258,7 @@ const PagoGiro = () => {
       idUsuario: roleInfo?.id_usuario,
       idTerminal: roleInfo?.id_dispositivo,
       issuerIdDane: roleInfo?.codigo_dane,
+      nombre_usuario: pdpUser?.uname ?? "",
       nombreComercio: roleInfo?.["nombre comercio"],
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:

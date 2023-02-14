@@ -9,9 +9,9 @@ import {
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
-import { notifyError } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 //import Loteria from "../Views/Loteria";
-
+import { useNavigate } from "react-router-dom";
 ////// NITS de loterias _______________________
 const nitsLoterias = {
   "loteria-de-bogota": "899.999.270-1",
@@ -74,10 +74,10 @@ export const LoteriaContext = createContext({
     pagoresponse: null,
     setPagoresponse: null,
   },
-  searchLoteria: () => {},
-  searchLoteriafisica: () => {},
-  sellLoteria: () => {},
-  sellLoteriafisica: () => {},
+  searchLoteria: () => { },
+  searchLoteriafisica: () => { },
+  sellLoteria: () => { },
+  sellLoteriafisica: () => { },
   reportes: {
     moda: null,
     sorteo: null,
@@ -87,24 +87,24 @@ export const LoteriaContext = createContext({
     fechaFinal: null,
     setFechaFinal: null,
   },
-  searchModa: () => {},
-  con_distribuidor_venta: () => {},
+  searchModa: () => { },
+  con_distribuidor_venta: () => { },
   // getReportesVentas: () => {},
   // getReportesPagos: () => {},
-  isWinner: () => {},
-  makePayment: () => {},
-  makePayment2: () => {},
-  pagopremio: () => {},
-  pagopremiofisico: () => {},
-  ConsultaCrearSort: () => {},
-  CambiarSort: () => {},
-  EstadoArchivos: () => {},
-  con_sort_ventas: () => {},
-  cargueVentasExtra_S3: () => {},
-  reportVentas: () => {},
-  consultaInventario: () => {},
-  consultaInventarioReporte: () => {},
-  registrarInventario: () => {},
+  isWinner: () => { },
+  makePayment: () => { },
+  makePayment2: () => { },
+  pagopremio: () => { },
+  pagopremiofisico: () => { },
+  ConsultaCrearSort: () => { },
+  CambiarSort: () => { },
+  EstadoArchivos: () => { },
+  con_sort_ventas: () => { },
+  cargueVentasExtra_S3: () => { },
+  reportVentas: () => { },
+  consultaInventario: () => { },
+  consultaInventarioReporte: () => { },
+  registrarInventario: () => { },
   setCodigos_lot: null,
   codigos_lot: null,
   tiposOperaciones: null,
@@ -121,9 +121,9 @@ export const useLoteria = () => {
 
 export const useProvideLoteria = () => {
   // Datos consulta y compra
-  const { roleInfo } = useAuth();
+  const { pdpUser, roleInfo } = useAuth();
   const { pathname } = useLocation();
-
+  const navigate = useNavigate();
   const [numero, setNumero] = useState("");
   const [serie, setSerie] = useState("");
   const [loterias, setLoterias] = useState(null);
@@ -160,13 +160,11 @@ export const useProvideLoteria = () => {
     const query = { nit_loteria: nit };
     try {
       const res = await fetchData(urls.idloteria, "GET", query);
-
       return res;
     } catch (err) {
       console.error(err);
     }
   }, []);
-
   //// Conaulta operaciones asociadas a la lotería
   const consulta_operaciones = useCallback(async (nit) => {
     const query = { nit_loteria: nit };
@@ -204,21 +202,15 @@ export const useProvideLoteria = () => {
       setNit_loteria(nit);
       idloteria(nit).then((res) => {
         if (!res?.status) {
-          // console.log(res?.msg);
-          // setDisabledBtns(true);
         } else {
           setCodigos_lot(res?.obj);
-          // console.log(res?.obj);
         }
       });
       //Consulta id de las operaciones por lotería
       consulta_operaciones(nit).then((res) => {
         if (!res?.status) {
-          // console.log(res?.msg);
-          // setDisabledBtns(true);
         } else {
           setTiposOperaciones(res?.obj);
-          // console.log(res?.obj);
         }
       });
 
@@ -226,14 +218,15 @@ export const useProvideLoteria = () => {
       if (roleInfo?.id_comercio !== undefined) {
         try {
           consulta_codigos_oficina(nit).then((res) => {
-            // console.log("repueta", res);
-            if ("msg" in res) {
-              setCodigosOficina({
-                cod_oficina_lot: "PPVIR",
-                cod_sucursal_lot: "00",
-              });
-            } else {
-              setCodigosOficina(res);
+            if (res != undefined) {
+              if ("msg" in res) {
+                setCodigosOficina({
+                  cod_oficina_lot: "PPVIR",
+                  cod_sucursal_lot: "00",
+                });
+              } else {
+                setCodigosOficina(res);
+              }
             }
           });
         } catch (err) {
@@ -328,7 +321,7 @@ export const useProvideLoteria = () => {
   );
 
   const sellLoteria = useCallback(
-    async (sorteo, selecFrac, tipoPago) => {
+    async (sorteo, ticket) => {
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -352,28 +345,41 @@ export const useProvideLoteria = () => {
         can_fracciones: parseInt(selected.Fracciones_disponibles),
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
+        comercio: roleInfo?.["nombre comercio"],
+        direccion: roleInfo.direccion,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
-
+        nombre_usuario: pdpUser?.uname,
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
         tipoPago: tiposOperaciones?.Venta_Virtual, /// Venta - Virtual
+        ticket: ticket,
+        email: customer.email,
       };
 
       try {
+        setLoadConsulta(true);
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
         setSellResponse(res);
+        setLoadConsulta(false);
+        if (res?.obj?.mensaje_hash) {
+          notifyError(res?.obj?.mensaje_hash)
+        }
+
       } catch (err) {
+        setLoadConsulta(false);
         setSellResponse(null);
-        console.error(err);
+        navigate(-1);
+        notifyError("Error al hacer la venta")
+        console.error("Este es el error-->", err);
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina, sellResponse]
   );
 
   const sellLoteriafisica = useCallback(
-    async (sorteo, selecFrac, tipoPago) => {
+    async (sorteo, selecFrac, tipoPago, ticket) => {
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -395,8 +401,11 @@ export const useProvideLoteria = () => {
         cod_sucursal: codigosOficina?.cod_sucursal_lot,
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
+        comercio: roleInfo?.["nombre comercio"],
+        direccion: roleInfo.direccion,
         id_usuario: roleInfo.id_usuario,
         id_terminal: roleInfo.id_dispositivo,
+        nombre_usuario: pdpUser?.uname,
         fisico: fisico,
         frac_fisico_venta: selecFrac,
         frac_fisico_disponibles: selected?.Fracciones,
@@ -406,17 +415,23 @@ export const useProvideLoteria = () => {
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
         tipoPago: tipoPago !== null ? tipoPago : tiposOperaciones?.Venta_Fisica, /// Venta lotería de Bogotá - Intercambio/Fisica
+        ticket: ticket,
       };
 
       try {
+        setLoadConsulta(true);
         const res = await fetchData(urls.ventaOrdinariofisica, "POST", {}, req);
         setSellResponse(res);
+        setLoadConsulta(false);
       } catch (err) {
+        setLoadConsulta(false);
         setSellResponse(null);
-        console.error(err);
+        console.error("Este es el error-->", err);
+        navigate(-1);
+        notifyError("Error al hacer la venta")
       }
     },
-    [selected, customer, roleInfo, tiposOperaciones?.Venta_Fisica]
+    [selected, customer, roleInfo, tiposOperaciones, codigosOficina, sellResponse]
   );
 
   const searchModa = useCallback(
@@ -430,7 +445,6 @@ export const useProvideLoteria = () => {
       }
       try {
         const res = await fetchData(urls.moda, "GET", query, {});
-        // console.log(res);
         setModa(res);
       } catch (err) {
         setModa(null);
@@ -507,16 +521,14 @@ export const useProvideLoteria = () => {
       terminal,
       usuario,
       codigo_dane,
+      cod_distribuidor,
       idLoteria,
       tipopago,
       hash,
-      phone
+      nombre_usuario,
+      tickets,
     ) => {
       if (tipopago == 2) {
-        // let tipo_comercio = roleInfo.tipo_comercio;
-        // if (roleInfo.tipo_comercio === "KIOSCO") {
-        //   tipo_comercio = "OFICINAS PROPIAS";
-        // }
         try {
           const res = await fetchData(
             urls.pagoPremioLoterias,
@@ -547,8 +559,10 @@ export const useProvideLoteria = () => {
               tipo_ganancia: tipopago,
               oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
-              cod_distribuidor: codigosOficina?.cod_oficina_lot,
+              nombre_usuario: nombre_usuario,
+              cod_distribuidor: cod_distribuidor,
               cod_dane_ciudad: codigo_dane,
+              ticket: tickets,
             },
             {},
             true,
@@ -583,9 +597,12 @@ export const useProvideLoteria = () => {
               },
               idLoteria: idLoteria,
               tipo_ganancia: tipopago,
-              oficina_propia: false,
-              cod_distribuidor: "PPAGO",
-              cod_dane_ciudad: 555,
+              oficina_propia:
+                roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+              nombre_usuario: nombre_usuario,
+              cod_distribuidor: cod_distribuidor,
+              cod_dane_ciudad: codigo_dane,
+              ticket: tickets,
             },
             {},
             true,
@@ -759,7 +776,6 @@ export const useProvideLoteria = () => {
           tip_sorteo: tip_sorteo,
           nit_loteria: nit_loteria,
         });
-        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -799,7 +815,6 @@ export const useProvideLoteria = () => {
           tip_sorteo: info.tipo_sorteo,
           nit_loteria: nit_loteria,
         });
-        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -814,7 +829,6 @@ export const useProvideLoteria = () => {
         fecha_ini: fecha_ini,
         fecha_fin: fecha_fin,
       });
-      // console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -835,7 +849,6 @@ export const useProvideLoteria = () => {
             cod_sucursal: codigosOficina?.cod_sucursal_lot,
           }
         );
-        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -847,20 +860,17 @@ export const useProvideLoteria = () => {
   const consultaInventarioReporte = useCallback(
     async (num_sorteo, pageData) => {
       try {
-        console.log(codigos_lot);
         const data = {
           ...pageData,
           num_sorteo: num_sorteo,
           num_loteria: codigos_lot,
         };
-        // console.log("data inventario reporte", data);
         const res = await fetchData(
           urls.consultaInventarioReporte,
           "POST",
           {},
           data
         );
-        // console.log("respuesta inventario reporte", res);
         return res;
       } catch (err) {
         console.error(err);
@@ -894,7 +904,6 @@ export const useProvideLoteria = () => {
             inconcistencia: inconcistencia,
           }
         );
-        // console.log(res);
         return res;
       } catch (err) {
         console.error(err);
@@ -940,6 +949,7 @@ export const useProvideLoteria = () => {
     // getReportesVentas,
     // getReportesPagos,
     isWinner,
+    idloteria,
     makePayment,
     makePayment2,
     pagopremio,

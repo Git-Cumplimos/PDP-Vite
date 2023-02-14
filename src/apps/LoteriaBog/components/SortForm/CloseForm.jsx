@@ -2,7 +2,7 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { notify, notifyError } from "../../../../utils/notify";
 
 const CloseForm = ({ closeModal, tip_sorteo }) => {
@@ -30,6 +30,10 @@ const CloseForm = ({ closeModal, tip_sorteo }) => {
     }
   }, [tip_sorteo]);
 
+  const handleCloseCancelar = useCallback(() => {
+    notifyError("Cierre de sorteo " + tipo_sorteo + " cancelado por el usuario");
+  })
+
   return (
     <>
       <div className="flex flex-col justify-center items-center mx-auto container">
@@ -46,6 +50,7 @@ const CloseForm = ({ closeModal, tip_sorteo }) => {
               type="button"
               onClick={() => {
                 closeModal();
+                handleCloseCancelar();
               }}
             >
               Cancelar

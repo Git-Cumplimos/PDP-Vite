@@ -13,6 +13,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import fetchData from "../../../../utils/fetchData";
 import Select from "../../../../components/Base/Select";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -206,28 +207,28 @@ const ArqueoBilletes = ({ route }) => {
 
   const reportVentas = useCallback(
     async (fecha_ini, fecha_fin, sorteo) => {
-      if(sorteo !== ""){
-      try {
-        const query = {
-          fecha_ini: fecha_ini.substr(0, 10),
-          fecha_fin: fecha_fin.substr(0, 10),
-          num_loteria: sorteosLOT,
-        };
-        if ("cod_oficina_lot" in codigosOficina) {
-          query.cod_distribuidor = codigosOficina?.cod_oficina_lot;
-          query.cod_sucursal = codigosOficina?.cod_sucursal_lot;
-        }
-        if (sorteo !== null) {
-          query.sorteo = sorteo;
-        }
+      if (sorteo !== "") {
+        try {
+          const query = {
+            fecha_ini: fecha_ini.substr(0, 10),
+            fecha_fin: fecha_fin.substr(0, 10),
+            num_loteria: sorteosLOT,
+          };
+          if ("cod_oficina_lot" in codigosOficina) {
+            query.cod_distribuidor = codigosOficina?.cod_oficina_lot;
+            query.cod_sucursal = codigosOficina?.cod_sucursal_lot;
+          }
+          if (sorteo !== null) {
+            query.sorteo = sorteo;
+          }
 
-        // query.arqueo = "Si";
-        const res = await fetchData(url_reportVentas, "GET", query);
+          // query.arqueo = "Si";
+          const res = await fetchData(url_reportVentas, "GET", query);
 
-        return res;
-      } catch (err) {
-        console.error(err);
-      }
+          return res;
+        } catch (err) {
+          console.error(err);
+        }
       }
     },
     [sorteosLOT, codigosOficina]
@@ -266,29 +267,29 @@ const ArqueoBilletes = ({ route }) => {
 
   const consultaArqueoBilletes = useCallback(
     async (page, fecha_ini, fecha_fin, sorteo, Comercio) => {
-      if(sorteo !== ""){
-      try {
-        const query = {
-          numero: page,
-          sorteo: sorteo,
-        };
+      if (sorteo !== "") {
+        try {
+          const query = {
+            numero: page,
+            sorteo: sorteo,
+          };
 
-        if (fecha_ini !== "" && fecha_fin !== "") {
-          query.fecha_ini = fecha_ini.substr(0, 10);
-          query.fecha_fin = fecha_fin.substr(0, 10);
+          if (fecha_ini !== "" && fecha_fin !== "") {
+            query.fecha_ini = fecha_ini.substr(0, 10);
+            query.fecha_fin = fecha_fin.substr(0, 10);
+          }
+
+          if (!(Comercio === -1 || Comercio === "")) {
+            query.id_comercio = parseInt(Comercio);
+          }
+
+          const res = await fetchData(url_Arqueobilletes, "GET", query);
+
+          return res;
+        } catch (err) {
+          console.error(err);
         }
-
-        if (!(Comercio === -1 || Comercio === "")) {
-          query.id_comercio = parseInt(Comercio);
-        }
-
-        const res = await fetchData(url_Arqueobilletes, "GET", query);
-
-        return res;
-      } catch (err) {
-        console.error(err);
       }
-    }
     },
     []
   );
@@ -300,7 +301,6 @@ const ArqueoBilletes = ({ route }) => {
   //         notifyError(res.msg);
   //         // setDisabledBtns(true);
   //       } else {
-  //         console.log(res);
   //         // setResp_report(res.data);
   //         setTotal(res.total);
   //         // setDisabledBtns(false);
@@ -316,7 +316,6 @@ const ArqueoBilletes = ({ route }) => {
   //         notifyError(res.msg);
   //         // setDisabledBtns(true);
   //       } else {
-  //         console.log(res);
   //         // setResp_report(res.data);
   //         setId_arqueo(res?.obj?.data?.[0].id_arqueo);
   //         // setDisabledBtns(false);
@@ -362,9 +361,9 @@ const ArqueoBilletes = ({ route }) => {
                       notifyError(res.msg);
                       // setDisabledBtns(true);
                     }
-                    else if (!res?.obj?.data){
+                    else if (!res?.obj?.data) {
                       notifyError("No hay arqueos registrados")
-                    }                    
+                    }
                     else {
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
@@ -397,9 +396,9 @@ const ArqueoBilletes = ({ route }) => {
                       notifyError(res.msg);
                       // setDisabledBtns(true);
                     }
-                    else if (!res?.obj?.length){
+                    else if (!res?.obj?.length) {
                       notifyError("No hay arqueos registrados")
-                    } 
+                    }
                     else {
                       // setResp_report(res.data);
                       setDatosArqueo(res?.obj?.data);
@@ -433,8 +432,8 @@ const ArqueoBilletes = ({ route }) => {
                     if (!res.status) {
                       notifyError(res.msg);
                       // setDisabledBtns(true);
-                    } 
-                    else if (!res?.obj?.length){
+                    }
+                    else if (!res?.obj?.length) {
                       notifyError("No hay arqueos registrados")
                     }
                     else {
@@ -507,10 +506,6 @@ const ArqueoBilletes = ({ route }) => {
                     Siguiente
                   </Button>
                 </ButtonBar>
-                <div className="flex flex-row justify-evenly w-full my-4">
-                  <h1>Pagina: {page}</h1>
-                  <h1>Ultima pagina: {maxPages}</h1>
-                </div>
                 <Table
                   headers={[
                     "Sorteo",
@@ -544,11 +539,45 @@ const ArqueoBilletes = ({ route }) => {
                     }
                   )}
                   onSelectRow={(e, index) => {
-                    // console.log(datosArqueo[index].sorteo);
                     // setSelected(datosArqueo[index]);
                     // setShowModal(true);
                   }}
                 />
+                {/* <TableEnterprise
+                  headers={[
+                    "Sorteo",
+                    "Comercio",
+                    "Fecha arqueo",
+                    "Fracciones Base de datos",
+                    "Fracciones contadas",
+                  ]}
+                  data={datosArqueo.map(
+                    ({
+                      sorteo,
+                      id_comercio,
+                      fecha,
+                      frac_disponibles,
+                      frac_arqueo,
+                    }) => {
+                      const tempDate = new Date(fecha);
+                      tempDate.setHours(tempDate.getHours() + 5);
+                      fecha = Intl.DateTimeFormat("es-CO", {
+                        year: "numeric",
+                        month: "numeric",
+                        day: "numeric",
+                      }).format(tempDate);
+                      return {
+                        sorteo,
+                        id_comercio,
+                        fecha,
+                        frac_disponibles,
+                        frac_arqueo,
+                      };
+                    }
+                  )}
+                >
+
+                </TableEnterprise> */}
               </>
             ) : (
               ""
@@ -566,38 +595,38 @@ const ArqueoBilletes = ({ route }) => {
                 setSorteo(e.target.value);
                 setShowArqueo(false);
                 setFracDisp(null);
-                if(e.target.value !== ""){
-                reportVentas(fecha_ini, fecha_fin, e.target.value).then(
-                  (res) => {
-                    setShowInput(false)
-                    if ("msg" in res) {
-                      notifyError("El comercio no ha realizado ventas, no es necesario realizar arqueo");
+                if (e.target.value !== "") {
+                  reportVentas(fecha_ini, fecha_fin, e.target.value).then(
+                    (res) => {
                       setShowInput(false)
-                      // setDisabledBtns(true);
+                      if ("msg" in res) {
+                        notifyError("El comercio no ha realizado ventas, no es necesario realizar arqueo");
+                        setShowInput(false)
+                        // setDisabledBtns(true);
+                      } else {
+                        // setResp_report(res.data);
+                        setTotal(res.total);
+                        setShowInput(true)
+                        // setDisabledBtns(false);
+                      }
+                    }
+                  );
+
+                  consultaArqueoBilletes(
+                    1,
+                    fecha_ini,
+                    fecha_fin,
+                    e.target.value,
+                    idComercio
+                  ).then((res) => {
+                    if (!res.status) {
+                      notifyError(res.msg);
                     } else {
                       // setResp_report(res.data);
-                      setTotal(res.total);
-                      setShowInput(true)
-                      // setDisabledBtns(false);
+                      setId_arqueo(res?.obj?.data?.[0].id_arqueo);
                     }
-                  }
-                );
-                                
-                consultaArqueoBilletes(
-                  1,
-                  fecha_ini,
-                  fecha_fin,
-                  e.target.value,
-                  idComercio
-                ).then((res) => {
-                  if (!res.status) {
-                    notifyError(res.msg);
-                  } else {
-                    // setResp_report(res.data);
-                    setId_arqueo(res?.obj?.data?.[0].id_arqueo);
-                  }
-                });
-              }
+                  });
+                }
               }}
             />
             {sorteo !== "" && showInput ? (

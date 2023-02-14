@@ -10,7 +10,8 @@ const Deposito = lazy(() => import("./Views/Deposito"));
 
 const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
 const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
-const PinPago = lazy(() => import("./Views/PinPago"));
+const PagoGiro = lazy(() => import("./Views/PagoGiro"));
+const PinDePago = lazy(() => import("./Views/PinDePago"));
 
 const ConsultaManual = lazy(() => import("./Views/Recaudo/ConsultaManual"));
 const ConsultaBarras = lazy(() => import("./Views/Recaudo/ConsultaBarras"));
@@ -127,9 +128,15 @@ const rutasColpatria = {
     },
     {
       link: "/corresponsalia/colpatria/pago-de-giro",
-      label: <AppIcons Logo={"PagoPorGiro"} name={"Pin de Giro"} />,
-      component: PinPago,
+      label: <AppIcons Logo={"PagoPorGiro"} name={"Pago de Giro"} />,
+      component: PagoGiro,
       permission: [PermissionsColpatria.pago_giro],
+    },
+    {
+      link: "/corresponsalia/colpatria/pin-de-pago",
+      label: <AppIcons Logo={"PagoPorGiro"} name={"Pin de Pago"} />,
+      component: PinDePago,
+      permission: [PermissionsColpatria.pin_pago],
     },
     rutasGestionColpatria,
   ],

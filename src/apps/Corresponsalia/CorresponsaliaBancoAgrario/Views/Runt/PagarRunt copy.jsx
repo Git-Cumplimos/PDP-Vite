@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useState, useMemo } from "react";
-import Button from "../../../../components/Base/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import Fieldset from "../../../../components/Base/Fieldset";
-import Form from "../../../../components/Base/Form";
-import InputX from "../../../../components/Base/InputX/InputX";
-import LogoPDP from "../../../../components/Base/LogoPDP";
-import Modal from "../../../../components/Base/Modal";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
-import { notify } from "../../../../utils/notify";
+import { useState, useRef } from "react";
+import Button from "../../../../../components/Base/Button";
+import ButtonBar from "../../../../../components/Base/ButtonBar";
+import Fieldset from "../../../../../components/Base/Fieldset";
+import Form from "../../../../../components/Base/Form";
+import InputX from "../../../../../components/Base/InputX/InputX";
+import LogoPDP from "../../../../../components/Base/LogoPDP";
+import Modal from "../../../../../components/Base/Modal";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import { notify } from "../../../../../utils/notify";
 
-import { validarEntradaScanner } from "../utils/functionsRunt";
+// import { validarEntradaScanner } from "../../utils/functionsRunt";
 
 import classes from "./PagarRunt.module.css";
 
@@ -27,11 +27,14 @@ const PagarRunt = () => {
   const [showModal2, setShowModal2] = useState(false);
   const [aprobarRef, setAprobarRef] = useState(false);
   const [procesandoTrx, setProcesandoTrx] = useState(false);
+  const [dataTrx, setDataTrx] = useState({ ref1: "" });
   /* const validarReferenciaPago = (e) => {
     e.preventDefault();
     setShowModal(true);
   };
  */
+  const isAlt = useRef("");
+  const isAltCR = useRef({ data: "", state: false });
 
   const consultarRunt = (e) => {
     e.preventDefault();
@@ -53,6 +56,28 @@ const PagarRunt = () => {
       notify("Pago Runt Exitoso");
     }, 2500);
   };
+
+  const callOnKeyDown = (ev) => {
+    // if (ev.keyCode === 13 && ev.shiftKey === false) {
+    //   // ev.preventDefault();
+    //   onSubmit(ev);
+    //   return;
+    // }
+    // if (ev.altKey) {
+    //   if (isAltCR.current.state) {
+    //     isAltCR.current = {
+    //       ...isAltCR.current,
+    //       data: isAltCR.current.data + ev.key,
+    //     };
+    //   }
+    //   if (ev.keyCode !== 18) {
+    //     isAlt.current += ev.key;
+    //   } else {
+    //     isAltCR.current = { ...isAltCR.current, state: true };
+    //   }
+    // }
+  };
+
   return (
     <div>
       <Fieldset legend="RUNT" className="lg:col-span-2">
@@ -145,7 +170,8 @@ const PagarRunt = () => {
             maxLength="20"
             onInput={(e) => {
               const num = e.target.value || "";
-              const num2 = validarEntradaScanner(num);
+              // const num2 = validarEntradaScanner(num);
+              const num2 = "jj";
               setDatosEscaneados(num2);
               if (num2?.length === 17) {
                 console.log(datosEscaneados);
