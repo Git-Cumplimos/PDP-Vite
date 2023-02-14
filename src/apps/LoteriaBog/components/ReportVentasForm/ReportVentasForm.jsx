@@ -296,7 +296,6 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
               setFecha_fin(e.target.value);
               if (fecha_ini !== "") {
                 reportVentas(fecha_ini, e.target.value, sorteo).then((res) => {
-                  console.log("RESSSSS*",res)
                   if (res != undefined){
                     if ("msg" in res) {
                       notifyError(res.msg);
