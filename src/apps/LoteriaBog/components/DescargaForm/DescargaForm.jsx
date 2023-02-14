@@ -94,7 +94,7 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
         cerrarModal(),
         notifyError("No existen archivos para descargar")
       )}
-      {urls?.length == 0 ? notifyError("No existen archivos para descargar") : "entro"}
+      {urls?.length == 0 ? notifyError("No existen archivos para descargar diferente") : "entro"}
     </>
   );
 };
