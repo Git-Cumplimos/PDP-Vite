@@ -269,6 +269,7 @@ const Premios = ({ route }) => {
         setRespuesta(true);
         if (checkBilleteVirtual === true && hash === "") {
           notifyError("Por favor, ingrese el código hash")
+          setRespuesta(false);
         } else if (
           seleccionarFraccion === 0 ||
           seleccionarFraccion === "0" ||
@@ -345,6 +346,7 @@ const Premios = ({ route }) => {
       setRespuesta(true);
       if (checkBilleteVirtual === true && hash === "") {
         notifyError("Por favor, ingrese el código hash")
+        setRespuesta(false);
       } else if (
         seleccionarFraccion === 0 ||
         seleccionarFraccion === "0" ||
