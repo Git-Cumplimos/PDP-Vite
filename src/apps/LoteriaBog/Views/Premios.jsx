@@ -267,7 +267,9 @@ const Premios = ({ route }) => {
     if (tipopago === 2) {
       if (String(datosCliente?.celular).charAt(0) === "3") {
         setRespuesta(true);
-        if (
+        if (checkBilleteVirtual === true && hash === "") {
+          notifyError("Por favor, ingrese el código hash")
+        } else if (
           seleccionarFraccion === 0 ||
           seleccionarFraccion === "0" ||
           seleccionarFraccion === undefined
@@ -276,8 +278,21 @@ const Premios = ({ route }) => {
           if (checkBilleteVirtual === false) {
             notifyError("Seleccione una fracción")
           }
+        }
+        // if (
+        //   seleccionarFraccion === 0 ||
+        //   seleccionarFraccion === "0" ||
+        //   seleccionarFraccion === undefined
+        // ) {
+        //   setRespuesta(false);
+        //   if (checkBilleteVirtual === false) {
+        //     notifyError("Seleccione una fracción")
+        //   } else if (checkBilleteVirtual === true) {
+        //     notifyError("Por favor, ingrese el código hash")
+        //   }
 
-        } else {
+        // }
+        else {
           makePayment(
             sorteo,
             billete,
@@ -328,13 +343,17 @@ const Premios = ({ route }) => {
       }
     } else {
       setRespuesta(true);
-      if (
+      if (checkBilleteVirtual === true && hash === "") {
+        notifyError("Por favor, ingrese el código hash")
+      } else if (
         seleccionarFraccion === 0 ||
         seleccionarFraccion === "0" ||
         seleccionarFraccion === undefined
       ) {
         setRespuesta(false);
-        notifyError("Seleccione una fracción");
+        if (checkBilleteVirtual === false) {
+          notifyError("Seleccione una fracción")
+        }
       } else {
         makePayment(
           sorteo,
