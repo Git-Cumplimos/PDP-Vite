@@ -90,9 +90,9 @@ const BuscarComercioEmail = () => {
             <div className={contenedorImagen}>
               <LogoPDP xsmall></LogoPDP>
             </div>
-            <div class={contenedorForm}>
-              <div class={contenedorDatos}>
-                <div class={contenedorTitulos}>
+            <div className={contenedorForm}>
+              <div className={contenedorDatos}>
+                <div className={contenedorTitulos}>
                   <h2 className={tituloDatos}>{`Nombre Comercio: `}</h2>
                   <h2 className={tituloDatos}>{`Tipo de Comercio: `}</h2>
                   <h2 className={tituloDatos}>{`Id Comercio: `}</h2>
