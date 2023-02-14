@@ -269,6 +269,7 @@ const Premios = ({ route }) => {
         setRespuesta(true);
         if (checkBilleteVirtual === true && hash === "") {
           notifyError("Por favor, ingrese el código hash")
+          setRespuesta(false);
         } else if (
           seleccionarFraccion === 0 ||
           seleccionarFraccion === "0" ||
@@ -342,19 +343,20 @@ const Premios = ({ route }) => {
         );
       }
     } else {
-      setRespuesta(true);
       if (checkBilleteVirtual === true && hash === "") {
         notifyError("Por favor, ingrese el código hash")
-      } else if (
+        setRespuesta(false);
+      } else if ((checkBilleteFisico) && (
         seleccionarFraccion === 0 ||
         seleccionarFraccion === "0" ||
-        seleccionarFraccion === undefined
+        seleccionarFraccion === undefined)
       ) {
-        setRespuesta(false);
         if (checkBilleteVirtual === false) {
+          setRespuesta(false);
           notifyError("Seleccione una fracción")
         }
       } else {
+        setRespuesta(true);
         makePayment(
           sorteo,
           billete,
@@ -393,9 +395,6 @@ const Premios = ({ route }) => {
             if (res?.status === false) {
               notifyError(res?.obj?.msg);
               navigate(-1);
-            }
-            if (res?.status === false) {
-              notifyError(res?.msg)
             }
           })
           .catch(() => setDisabledBtns(false));

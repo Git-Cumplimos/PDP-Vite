@@ -13,12 +13,16 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
+    console.log("Entro al onSubmit")
     descargaVentas_S3(selected).then((res) => {
       if (res !== undefined) {
+        console.log("Entro al if de onSubmit y esto es res", res)
         if (!("msg" in res)) {
+          console.log("Entro al segundo if de onSubmit y esto es res", res)
           // Si no llega el mensaje el setea res
           setUrls(res);
         } else {
+          console.log("Entro al else del segundo if de onSubmit y esto es res", res)
           //notifyError(res.msg)
         }
       }
@@ -26,8 +30,11 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
   };
   if (showModal) {
     descargaVentas_S3(selected).then((res) => {
+      console.log("ESTO ES res", res)
       if (res !== undefined) {
+        console.log("Entro al if y esto es res", res)
         if (!("msg" in res)) {
+          console.log("Entro al segundo if y esto es res", res)
           // Si no llega el mensaje el setea res
           setUrls(res);
         } else {
@@ -37,12 +44,15 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
     });
   }
   const cerrarModal = () => {
+    console.log("Entro a cerrar el modal y ESTO ES urls", urls)
     closeModal()
   }
+  console.log("ESTO ES urls", urls)
   return (
     <>
       {Array?.isArray(urls) && urls?.length > 0 ? (
         <div className="flex flex-col justify-center items-center mx-auto container">
+          {console.log("Entro a donde deberia entrar", urls)}
           <Form onSubmit={onSubmit} grid>
             <div className="flex flex-row text-lg font-medium text-center items-center justify-center">
               <h1 className="text-center">
@@ -80,9 +90,10 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
           </Form>
         </div>
       ) : (
-        cerrarModal()
+        cerrarModal(),
+        notifyError("No existen archivos para descargar")
       )}
-      {urls?.length == 0 ? notifyError("No existen archivos para descargar") : ""}
+      {urls?.length == 0 ? notifyError("No existen archivos para descargar diferente") : "entro"}
     </>
   );
 };

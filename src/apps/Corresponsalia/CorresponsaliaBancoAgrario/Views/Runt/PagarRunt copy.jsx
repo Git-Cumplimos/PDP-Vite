@@ -9,7 +9,7 @@ import Modal from "../../../../../components/Base/Modal";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import { notify } from "../../../../../utils/notify";
 
-import { validarEntradaScanner } from "../../utils/functionsRunt";
+// import { validarEntradaScanner } from "../../utils/functionsRunt";
 
 import classes from "./PagarRunt.module.css";
 
@@ -170,7 +170,8 @@ const PagarRunt = () => {
             maxLength="20"
             onInput={(e) => {
               const num = e.target.value || "";
-              const num2 = validarEntradaScanner(num);
+              // const num2 = validarEntradaScanner(num);
+              const num2 = "jj";
               setDatosEscaneados(num2);
               if (num2?.length === 17) {
                 console.log(datosEscaneados);
