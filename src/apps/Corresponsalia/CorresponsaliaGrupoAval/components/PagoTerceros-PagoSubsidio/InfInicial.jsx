@@ -8,7 +8,7 @@ const InfInicial = ({
   loadingPeticion,
   Peticion,
   HandleClose,
-  title = "¿Está seguro de realizar transacción?",
+  title = "¿Está seguro de realizar la transacción?",
   subtitle = "Resumen de la transacción",
 }) => {
   return (

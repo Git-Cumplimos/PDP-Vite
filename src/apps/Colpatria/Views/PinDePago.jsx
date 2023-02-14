@@ -14,43 +14,38 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
-import Select from "../../../components/Base/Select";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import useMoney from "../../../hooks/useMoney";
-import { makeDeposit } from "../utils/fetchFunctions";
+import { makePinDePago } from "../utils/fetchFunctions";
 
 import { notifyPending, notifyError } from "../../../utils/notify";
-import {
-  makeMoneyFormatter,
-  onChangeAccountNumber,
-  onChangeNumber,
-  toAccountNumber,
-} from "../../../utils/functions";
+import { makeMoneyFormatter, onChangeNumber } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 import TicketColpatria from "../components/TicketColpatria";
-import { buildTicket } from "../utils/functions";
-
-const accountTypes = {
-  10: "Cuenta ahorros",
-  20: "Cuenta corriente",
-  30: "Cuenta de crédito",
-};
+import { buildTicket, encryptPin } from "../utils/functions";
+import Select from "../../../components/Base/Select";
 
 const formatMoney = makeMoneyFormatter(2);
 
-const Deposito = () => {
+const ObjTiposPersonas = {
+  t: "Persona natural",
+  f: "Persona juridica",
+};
+
+const PinDePago = () => {
   const navigate = useNavigate();
 
   const { roleInfo, pdpUser, infoTicket } = useAuth();
 
+  const [tipoPersona, setTipoPersona] = useState("");
   const [userDocument, setUserDocument] = useState("");
+  const [userDocumentDate, setUserDocumentDate] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
-  const [accountNumber, setAccountNumber] = useState("");
-  const [accountType, setAccountType] = useState("");
-  const [valDeposito, setValDeposito] = useState(0);
+  const [pinNumber, setAccountNumber] = useState("");
+  const [valPinPago, setValPinPago] = useState(0);
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
@@ -64,7 +59,7 @@ const Deposito = () => {
     limits: [limitesMontos.min, limitesMontos.max],
   });
 
-  const [loadingDeposit, setLoadingDeposit] = useState(false);
+  const [loadingPinPago, setLoadingPinPago] = useState(false);
 
   const printDiv = useRef();
 
@@ -74,19 +69,22 @@ const Deposito = () => {
 
   const summary = useMemo(
     () => ({
-      "Tipo de cuenta": accountTypes?.[accountType] ?? "No type",
-      "Numero de cuenta": toAccountNumber(accountNumber),
-      "C.C. del depositante": userDocument,
-      "Valor de deposito": formatMoney.format(valDeposito),
-      // "Valor de la comision": formatMoney.format(valorComision),
-      // "Valor total": formatMoney.format(valor + valorComision),
+      "Tipo de persona": ObjTiposPersonas[tipoPersona],
+      "No. Identificación": userDocument,
+      "Fecha de expedición identificación": userDocumentDate,
+      "No. De PIN": pinNumber,
+      "Valor a Retirar": formatMoney.format(valPinPago),
     }),
-    [accountNumber, accountType, userDocument, valDeposito]
+    [pinNumber, userDocument, valPinPago, tipoPersona, userDocumentDate]
   );
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-  }, []);
+    if (!paymentStatus) {
+      notifyError("Transacción cancelada por el usuario");
+    }
+    navigate("/corresponsalia/colpatria");
+  }, [navigate, paymentStatus]);
 
   const onMakePayment = useCallback(
     (ev) => {
@@ -96,17 +94,16 @@ const Deposito = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO",
-        valor_total_trx: valDeposito,
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+        valor_total_trx: valPinPago,
         nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
           user_document: userDocument,
-          account_number: accountNumber,
-          processing_code: accountType,
+          numero_pin: encryptPin(pinNumber),
+          fecha_expedicion: userDocumentDate,
+          is_persona_natural: tipoPersona === "t",
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -115,16 +112,16 @@ const Deposito = () => {
         },
       };
       notifyPending(
-        makeDeposit(data),
+        makePinDePago(data),
         {
           render() {
-            setLoadingDeposit(true);
-            return "Procesando transaccion";
+            setLoadingPinPago(true);
+            return "Procesando transacción";
           },
         },
         {
           render({ data: res }) {
-            setLoadingDeposit(false);
+            setLoadingPinPago(false);
             const trx_id = res?.obj?.id_trx ?? 0;
             const id_type_trx = res?.obj?.id_type_trx ?? 0;
             const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
@@ -132,15 +129,17 @@ const Deposito = () => {
               roleInfo,
               trx_id,
               codigo_autorizacion,
-              "Deposito",
+              "Pin de pago",
               [
-                ["Tipo de cuenta", accountTypes?.[accountType] ?? "No type"],
+                ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
                 ["", ""],
-                ["Numero de cuenta", toAccountNumber(accountNumber)],
+                ["No. Identificación", userDocument],
                 ["", ""],
-                ["C.C. del depositante", userDocument],
+                ["Fecha de expedición identificación", userDocumentDate],
                 ["", ""],
-                ["Valor de deposito", formatMoney.format(valDeposito)],
+                ["No. De PIN", pinNumber],
+                ["", ""],
+                ["Valor a Retirar", formatMoney.format(valPinPago)],
                 ["", ""],
               ]
             );
@@ -154,28 +153,29 @@ const Deposito = () => {
                 notifyError("Error guardando el ticket");
               });
 
-            return "Transaccion satisfactoria";
+            return "Transacción satisfactoria";
           },
         },
         {
           render({ data: err }) {
-            setLoadingDeposit(false);
+            setLoadingPinPago(false);
             navigate("/corresponsalia/colpatria");
             if (err?.cause === "custom") {
               return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
             }
             console.error(err?.message);
-            return "Transaccion fallida";
+            return "Transacción fallida";
           },
         }
       );
     },
     [
-      accountNumber,
-      accountType,
+      tipoPersona,
+      pinNumber,
       userDocument,
+      userDocumentDate,
       userAddress,
-      valDeposito,
+      valPinPago,
       roleInfo,
       pdpUser?.uname,
       infoTicket,
@@ -187,7 +187,7 @@ const Deposito = () => {
     fetchData(
       `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`,
       "GET",
-      { tipo_op: 70 }
+      { tipo_op: 106 }
     )
       .then((res) => {
         if (!res?.status) {
@@ -246,42 +246,33 @@ const Deposito = () => {
 
   return (
     <Fragment>
-      <h1 className='text-3xl mt-6'>Depósitos Colpatria</h1>
+      <h1 className="text-3xl mt-6">Pin de Pago</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
           setShowModal(true);
         }}
-        grid>
+        grid
+      >
         <Select
-          id='accType'
-          name='accType'
-          label='Tipo de cuenta'
-          options={{
-            "": "",
-            ...Object.fromEntries(
-              Object.entries(accountTypes).map(([key, val]) => [val, key])
-            ),
-          }}
-          value={accountType}
-          onChange={(ev) => setAccountType(ev.target.value)}
-          required
-        />
-        <Input
-          id="numCuenta"
-          name="numCuenta"
-          label="Número de cuenta"
-          type="tel"
-          autoComplete="off"
-          minLength={"1"}
-          maxLength={"19"}
-          onInput={(ev) => setAccountNumber(onChangeAccountNumber(ev))}
+          id="accType"
+          name="accType"
+          label="Seleccionar"
+          options={[
+            { label: "", value: "" },
+            ...Object.entries(ObjTiposPersonas).map(([value, label]) => ({
+              value,
+              label,
+            })),
+          ]}
+          value={tipoPersona}
+          onChange={(ev) => setTipoPersona(ev.target.value)}
           required
         />
         <Input
           id="docCliente"
           name="docCliente"
-          label="No. Documento del Depositante"
+          label="No. Identificación"
           type="tel"
           autoComplete="off"
           minLength={"5"}
@@ -291,43 +282,63 @@ const Deposito = () => {
           required
         />
         <Input
-          id='valor'
-          name='valor'
-          label='Valor a depositar'
-          autoComplete='off'
-          type='tel'
+          id="docClienteDate"
+          name="docClienteDate"
+          label="Fecha expedición identificación"
+          type="date"
+          autoComplete="off"
+          value={userDocumentDate}
+          onInput={(ev) => setUserDocumentDate(ev.target.value)}
+          required
+        />
+        <Input
+          id="numPin"
+          name="numPin"
+          label="No. De PIN"
+          type="text"
+          autoComplete="off"
+          maxLength={"12"}
+          onInput={(ev) => setAccountNumber(ev.target.value)}
+          required
+        />
+        <Input
+          id="valor"
+          name="valor"
+          label="Valor a Retirar"
+          autoComplete="off"
+          type="tel"
           minLength={"5"}
-          maxLength={"13"}
-          onInput={(ev) => setValDeposito(onChangeMoney(ev))}
+          maxLength={"11"}
+          onInput={(ev) => setValPinPago(onChangeMoney(ev))}
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar depósito</Button>
+          <Button type={"submit"}>Realizar retiro</Button>
         </ButtonBar>
       </Form>
       <Modal
         show={showModal}
-        handleClose={paymentStatus || loadingDeposit ? () => {} : handleClose}>
+        handleClose={loadingPinPago ? () => {} : handleClose}
+      >
         {paymentStatus ? (
-          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => navigate("/corresponsalia/colpatria")}>
-                Cerrar
-              </Button>
+              <Button onClick={handleClose}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type='submit'
+                type="submit"
                 onClick={onMakePayment}
-                disabled={loadingDeposit}>
+                disabled={loadingPinPago}
+              >
                 Aceptar
               </Button>
-              <Button onClick={handleClose} disabled={loadingDeposit}>
+              <Button onClick={handleClose} disabled={loadingPinPago}>
                 Cancelar
               </Button>
             </ButtonBar>
@@ -338,4 +349,4 @@ const Deposito = () => {
   );
 };
 
-export default Deposito;
+export default PinDePago;
