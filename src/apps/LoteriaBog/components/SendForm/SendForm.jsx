@@ -148,7 +148,7 @@ const SendForm = ({
                 max={selected ? `${selected.Fracciones_disponibles}` : "3"}
                 min="1"
                 value={fracciones}
-                required
+                required={true}
               // onInput={(e) => {
               //   const cus = { fracciones, phone, doc_id };
               //   cus.fracciones = e.target.value;
