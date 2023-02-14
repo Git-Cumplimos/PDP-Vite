@@ -44,8 +44,7 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
     });
   }
   const cerrarModal = () => {
-    console.log("Entro a cerrar el modal")
-    console.log("ESTO ES urls", urls)
+    console.log("Entro a cerrar el modal y ESTO ES urls", urls)
     closeModal()
   }
   console.log("ESTO ES urls", urls)
