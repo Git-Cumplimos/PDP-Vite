@@ -37,6 +37,9 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
           console.log("Entro al segundo if y esto es res", res)
           // Si no llega el mensaje el setea res
           setUrls(res);
+          if (res === []) {
+            notifyError("No existen archivos para descargar")
+          }
         } else {
           //notifyError(res.msg)
         }
@@ -46,11 +49,13 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
   const cerrarModal = () => {
     console.log("Entro a cerrar el modal y ESTO ES urls", urls)
     closeModal()
+
   }
   console.log("ESTO ES urls", urls)
   return (
     <>
-      {Array?.isArray(urls) && urls?.length > 0 ? (
+      {/* {Array?.isArray(urls) && urls?.length > 0 ? ( */}
+      {urls?.length > 0 ? (
         <div className="flex flex-col justify-center items-center mx-auto container">
           {console.log("Entro a donde deberia entrar", urls)}
           <Form onSubmit={onSubmit} grid>
@@ -90,8 +95,8 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
           </Form>
         </div>
       ) : (
-        cerrarModal(),
-        notifyError("No existen archivos para descargar")
+        cerrarModal()
+
       )}
       {urls?.length == 0 ? notifyError("No existen archivos para descargar diferente") : "entro"}
     </>
