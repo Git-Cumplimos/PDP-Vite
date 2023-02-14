@@ -1,14 +1,14 @@
 import fetchData from "../../../../utils/fetchData";
 
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlRecaudoMultiple = `${process.env.REACT_APP_RECAUDO_MULTIPLE}`;
 
-export const postConsultaTotalDavivienda = async (bodyObj) => {
+export const postConsultaRecaudoMultiple = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlComercios}/comercios/consultar_id_total_davivienda`,
+      `${urlRecaudoMultiple}/lectura-archivo-recaudo-multiple`,
       "POST",
       {},
       bodyObj,
