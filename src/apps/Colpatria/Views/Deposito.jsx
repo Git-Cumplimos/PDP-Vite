@@ -34,7 +34,6 @@ import { buildTicket } from "../utils/functions";
 const accountTypes = {
   10: "Cuenta ahorros",
   20: "Cuenta corriente",
-  30: "Cuenta de crédito",
 };
 
 const formatMoney = makeMoneyFormatter(2);
