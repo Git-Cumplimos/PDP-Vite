@@ -45,13 +45,15 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
   }
   const cerrarModal = () => {
     console.log("Entro a cerrar el modal")
-
+    console.log("ESTO ES urls", urls)
     closeModal()
   }
+  console.log("ESTO ES urls", urls)
   return (
     <>
       {Array?.isArray(urls) && urls?.length > 0 ? (
         <div className="flex flex-col justify-center items-center mx-auto container">
+          {console.log("Entro a donde deberia entrar", urls)}
           <Form onSubmit={onSubmit} grid>
             <div className="flex flex-row text-lg font-medium text-center items-center justify-center">
               <h1 className="text-center">
