@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import { useLoteria } from "../utils/LoteriaHooks";
@@ -15,12 +15,11 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const DescargarArchivosS3 = ({ route }) => {
   const { label } = route;
-
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
-  const [fecha_ini, setFecha_ini] = useState("");
-  const [fecha_fin, setFecha_fin] = useState("");
+  const [fecha_ini, setFecha_ini] = useState(new Date().toLocaleDateString());
+  const [fecha_fin, setFecha_fin] = useState(new Date().toLocaleDateString());
   const [resp_con_sort, setResp_con_sort] = useState(null);
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -51,10 +50,29 @@ const DescargarArchivosS3 = ({ route }) => {
     setShowModal(false);
   }, []);
 
+  // const closeModal = () => {
+  //   setShowModal(false)
+  //   console.log("ENTRO===")
+  // }
+  // const closeModal = useCallback(() => {
+  //   setShowModal(false);
+  // }, []);
   const closeModal2 = useCallback(async () => {
     setShowModal2(false);
   }, []);
+  const handleChange = (e) => {
+    if (e.target.value) {
+      setFecha_ini(e.target.value);
+    }
+  };
+  const handleChange2 = (e) => {
+    if (e.target.value) {
+      setFecha_fin(e.target.value);
+    }
+  };
+  useEffect(() => {
 
+  }, [fecha_fin, fecha_ini])
   return (
     <>
       <h1 class="text-3xl">Descarga de archivos  </h1>
@@ -81,12 +99,15 @@ const DescargarArchivosS3 = ({ route }) => {
                 if (e.target.value !== "") {
                   con_SortVentas_S3(e.target.value, null, null, page).then(
                     (res) => {
-                      if (!("msg" in res)) {
-                        setResp_con_sort(res.info);
-                        setMaxPages(res.num_datos);
-                      } else {
-                        notifyError(res.msg);
-                        setResp_con_sort("");
+                      if (res !== undefined) {
+
+                        if (!("msg" in res)) {
+                          setResp_con_sort(res.info);
+                          setMaxPages(res.num_datos);
+                        } else {
+                          notifyError(res.msg);
+                          setResp_con_sort("");
+                        }
                       }
                     }
                   );
@@ -105,10 +126,13 @@ const DescargarArchivosS3 = ({ route }) => {
                 label="Fecha inicial"
                 type="date"
                 value={fecha_ini}
-                onInput={(e) => {
-                  setFecha_ini(e.target.value);
-                }}
+                onChange={handleChange}
+                // onInput={(e) => {
+                //   setFecha_ini(e.target.value);
+                // }}
+                // onLazyInput={handleChange}
                 onLazyInput={{
+
                   callback: (e) => {
                     if (fecha_fin !== "") {
                       con_SortVentas_S3(
@@ -117,11 +141,14 @@ const DescargarArchivosS3 = ({ route }) => {
                         fecha_fin,
                         page
                       ).then((res) => {
-                        if (!("msg" in res)) {
-                          setResp_con_sort(res.info);
-                          setMaxPages(res.num_datos);
-                        } else {
-                          notifyError(res.msg);
+                        if (res !== undefined) {
+
+                          if (!("msg" in res)) {
+                            setResp_con_sort(res.info);
+                            setMaxPages(res.num_datos);
+                          } else {
+                            notifyError(res.msg);
+                          }
                         }
                       });
                     }
@@ -136,12 +163,13 @@ const DescargarArchivosS3 = ({ route }) => {
                 label="Fecha final"
                 type="date"
                 value={fecha_fin}
-                onInput={(e) => {
-                  setFecha_fin(e.target.value);
-                }}
+                onInput={handleChange2}
+                // onInput={(e) => {
+                //   setFecha_fin(e.target.value);
+                // }}
                 onLazyInput={{
                   callback: (e) => {
-                    if (fecha_ini !== "") {
+                    if (fecha_ini !== "" && fecha_fin !== "") {
                       con_SortVentas_S3(
                         sorteo,
                         fecha_ini,

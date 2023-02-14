@@ -140,7 +140,9 @@ const Premios = ({ route }) => {
             nom_loteria: res?.obj?.nom_loteria,
           };
         });
-
+        if (res === undefined) {
+          notifyError("No existen resultados, para el sorteo indicado")
+        }
         if ("msg" in res) {
           if (res?.obj?.max_pago == true) {
             notifyError(
@@ -233,18 +235,18 @@ const Premios = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: datosComercio.nom_loteria,
+      commerceName: ["PAGO PREMIO ", datosComercio.nom_loteria],
       trxInfo: [
         ["Sorteo", sorteo],
         ["Billete", billete],
         ["Serie", serie],
         ["Fracción", seleccionarFraccion],
-        [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
-        ["", ""],
-        ["Valor", formatMoney.format(totalPagar)],
-        ["", ""],
-        ["Forma de Pago", "Efectivo"],
-        ["", ""],
+        // [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
+        // ["", ""],
+        ["Valor a pagar", formatMoney.format(totalPagar)],
+        // ["", ""],
+        // ["Forma de Pago", "Efectivo"],
+        // ["", ""],
         [tipopago === 2 ? "Nombre" : "", tipopago === 2 ? datosCliente?.nombre : ""],
         [tipopago === 2 ? "Celular" : "", tipopago === 2 ? datosCliente?.celular : ""],
       ],
@@ -265,14 +267,33 @@ const Premios = ({ route }) => {
     if (tipopago === 2) {
       if (String(datosCliente?.celular).charAt(0) === "3") {
         setRespuesta(true);
-        if (
+        if (checkBilleteVirtual === true && hash === "") {
+          notifyError("Por favor, ingrese el código hash")
+          setRespuesta(false);
+        } else if (
           seleccionarFraccion === 0 ||
           seleccionarFraccion === "0" ||
           seleccionarFraccion === undefined
         ) {
           setRespuesta(false);
-          notifyError("Seleccione una fracción");
-        } else {
+          if (checkBilleteVirtual === false) {
+            notifyError("Seleccione una fracción")
+          }
+        }
+        // if (
+        //   seleccionarFraccion === 0 ||
+        //   seleccionarFraccion === "0" ||
+        //   seleccionarFraccion === undefined
+        // ) {
+        //   setRespuesta(false);
+        //   if (checkBilleteVirtual === false) {
+        //     notifyError("Seleccione una fracción")
+        //   } else if (checkBilleteVirtual === true) {
+        //     notifyError("Por favor, ingrese el código hash")
+        //   }
+
+        // }
+        else {
           makePayment(
             sorteo,
             billete,
@@ -323,13 +344,18 @@ const Premios = ({ route }) => {
       }
     } else {
       setRespuesta(true);
-      if (
+      if (checkBilleteVirtual === true && hash === "") {
+        notifyError("Por favor, ingrese el código hash")
+        setRespuesta(false);
+      } else if (
         seleccionarFraccion === 0 ||
         seleccionarFraccion === "0" ||
         seleccionarFraccion === undefined
       ) {
         setRespuesta(false);
-        notifyError("Seleccione una fracción");
+        if (checkBilleteVirtual === false) {
+          notifyError("Seleccione una fracción")
+        }
       } else {
         makePayment(
           sorteo,
@@ -616,7 +642,7 @@ const Premios = ({ route }) => {
                 {checkBilleteVirtual == true ? (
                   <Input
                     id="codHash"
-                    label="Codigo de seguridad"
+                    label="Código de seguridad"
                     type="text"
                     autoComplete="off"
                     required
@@ -651,9 +677,7 @@ const Premios = ({ route }) => {
                   <Form grid>
                     <Fieldset
                       className="lg:col-span-2 flex justify-center items-center"
-                      legend={
-                        "Por favor, seleccione la fracción del billete a pagar"
-                      }>
+                      legend={checkBilleteVirtual === true ? ("Por favor, Ingresar el Código Hash.") : ("Por favor, seleccione la fracción del billete a pagar")}>
                       {checkBilleteVirtual === false ? (
                         <Select
                           id="selectFraccion"
@@ -671,7 +695,7 @@ const Premios = ({ route }) => {
                       {checkBilleteVirtual === true ? (
                         <Input
                           id="codHash"
-                          label="Codigo de seguridad"
+                          label="Código de seguridad"
                           type="text"
                           autoComplete="off"
                           required

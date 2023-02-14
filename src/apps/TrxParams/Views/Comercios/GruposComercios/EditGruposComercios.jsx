@@ -203,7 +203,7 @@ const EditGruposComercios = () => {
         ) {
           const obj = { ...selectedGruposComercios };
           const objBusqueda = {};
-          objBusqueda["fk_tbl_grupo_comercios"] = parseInt(params.id);
+          // objBusqueda["fk_tbl_grupo_comercios"] = parseInt(params.id);
           objBusqueda["fk_comercio"] = parseInt(
             selectedGruposComercios["id_comercio"]
           );

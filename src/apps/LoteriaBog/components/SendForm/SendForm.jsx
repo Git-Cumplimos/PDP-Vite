@@ -158,7 +158,7 @@ const SendForm = ({
               <Input
                 id="email"
                 label="Email"
-                type="text"
+                type="email"
                 value={email}
                 minLength="5"
                 maxLength="30"
