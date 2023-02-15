@@ -7,7 +7,7 @@ import PpsVoluntario from "./PpsVoluntario";
 const PpsDomiciliacion = ({ datosDomiciliacion }) => {
   const [tipoPps, setTipoPps] = useState("");
   const [emailVerificado, setEmailVerificado] = useState(true);
-  console.log(datosDomiciliacion);
+  // console.log(datosDomiciliacion);
   return (
     <Fragment>
       {emailVerificado === true ? (
@@ -19,7 +19,7 @@ const PpsDomiciliacion = ({ datosDomiciliacion }) => {
             options={{
               "": "",
               "Pps Voluntario": "Pps Voluntario",
-              "Pps Obligatorio": "Pps Obligatorio",
+              // "Pps Obligatorio": "Pps Obligatorio",
             }}
             info={"Seleccione un elemento de la lista"}
           ></Select>
