@@ -258,10 +258,13 @@ const DescargarArchivosS3 = ({ route }) => {
                 descargaVentas_S3(resp_con_sort[index]).then((res) => {
                   console.log("ESTO ES RES de bajo de table", res)
                   if (res !== undefined) {
+                    console.log("entro al if primero", res)
                     if (!("msg" in res) && res !== []) {
+                      console.log("entro al ifs segundo ", res)
                       setUrls(res);
                       setShowModal(true);
                     } else {
+                      console.log("entro al else", res)
                       notifyError("No existen archivos")
                     }
                   } else {
