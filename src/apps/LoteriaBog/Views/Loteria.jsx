@@ -515,6 +515,8 @@ const Loteria = ({ route }) => {
             setSellResponse={setSellResponse}
             closeModal={closeModal}
             setCustomer={setCustomer}
+            selecFrac={selecFrac}
+            setSelecFrac={setSelecFrac}
           />
         )}
       </Modal>
