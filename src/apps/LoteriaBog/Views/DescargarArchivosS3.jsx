@@ -182,9 +182,9 @@ const DescargarArchivosS3 = ({ route }) => {
                           if (!("msg" in res)) {
                             setResp_con_sort(res.info);
                             setMaxPages(res.num_datos);
+                          } else {
+                            notifyError(res.msg)
                           }
-                        } else {
-                          notifyError(res.msg);
                         }
                       });
                     }
@@ -317,7 +317,7 @@ const DescargarArchivosS3 = ({ route }) => {
         </Form>
         <Modal show={showModal} handleClose={closeModal}>
           <DescargaForm
-            showModal
+            setShowModal={setShowModal}
             closeModal={closeModal} selected={selected} />
         </Modal>
         <Modal show={showModal2} handleClose={closeModal2}>
