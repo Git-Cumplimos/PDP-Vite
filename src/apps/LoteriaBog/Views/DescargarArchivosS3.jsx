@@ -18,8 +18,8 @@ const DescargarArchivosS3 = ({ route }) => {
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
-  const [fecha_ini, setFecha_ini] = useState(new Date().toLocaleDateString().slice(0, 10));
-  const [fecha_fin, setFecha_fin] = useState(new Date().toLocaleDateString().slice(0, 10));
+  const [fecha_ini, setFecha_ini] = useState("");
+  const [fecha_fin, setFecha_fin] = useState("");
   // const [fecha_ini, setFecha_ini] = useState(new Date().toLocaleDateString());
   // const [fecha_fin, setFecha_fin] = useState(new Date().toLocaleDateString());
   const [resp_con_sort, setResp_con_sort] = useState(null);
@@ -172,7 +172,7 @@ const DescargarArchivosS3 = ({ route }) => {
                 // }}
                 onLazyInput={{
                   callback: (e) => {
-                    if (fecha_ini !== "" && fecha_fin !== "") {
+                    if (fecha_ini !== "") {
                       con_SortVentas_S3(
                         sorteo,
                         fecha_ini,
@@ -180,7 +180,7 @@ const DescargarArchivosS3 = ({ route }) => {
                         page
                       ).then((res) => {
                         if (res !== undefined) {
-                          if (!("msg" in res)) {
+                          if (!("msg" in res) && res !== []) {
                             setResp_con_sort(res.info);
                             setMaxPages(res.num_datos);
                           } else {

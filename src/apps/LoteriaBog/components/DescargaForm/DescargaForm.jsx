@@ -31,15 +31,17 @@ const DescargaForm = ({ closeModal, urls, setUrls }) => {
                   window.open(urls[index].url, "_blank");
                 }}
               />
-              <Button
-                type="button"
-                onClick={() => {
-                  closeModal();
-                  setUrls(false);
-                }}
-              >
-                Cancelar
-              </Button>
+              <ButtonBar>p
+                <Button
+                  type="button"
+                  onClick={() => {
+                    closeModal();
+                    setUrls(false);
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </ButtonBar>
             </>
           ) : (
             ""
