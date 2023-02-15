@@ -2,7 +2,7 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Table from "../../../../components/Base/Table";
 import { notify, notifyError } from "../../../../utils/notify";
 
@@ -56,7 +56,10 @@ const DescargaForm = ({ setShowModal, closeModal, selected, showModal }) => {
     closeModal();
     setUrls(false);
   }, []);
-  console.log("ESTO ES urls", urls)
+  useEffect(() => {
+    onSubmit()
+  }, [selected]);
+  console.log("ESTO ES urls", urls, selected)
   return (
     <>
       {Array?.isArray(urls) && urls?.length > 0 ? (
