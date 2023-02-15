@@ -55,7 +55,6 @@ const DescargarArchivosS3 = ({ route }) => {
 
   // const closeModal = () => {
   //   setShowModal(false)
-  //   console.log("ENTRO===")
   // }
   // const closeModal = useCallback(() => {
   //   setShowModal(false);
@@ -179,9 +178,9 @@ const DescargarArchivosS3 = ({ route }) => {
                         e.target.value,
                         page
                       ).then((res) => {
-                        console.log("ESTO ES RES en decha final", res)
                         if (res !== undefined) {
-                          if (!("msg" in res) && res !== []) {
+                          // if (!("msg" in res) && res !== []) {
+                          if (!("msg" in res) && res?.length !== 0) {
                             setResp_con_sort(res.info);
                             setMaxPages(res.num_datos);
                           } else {
@@ -256,15 +255,12 @@ const DescargarArchivosS3 = ({ route }) => {
               onSelectRow={(_e, index) => {
                 setSelected(resp_con_sort[index]);
                 descargaVentas_S3(resp_con_sort[index]).then((res) => {
-                  console.log("ESTO ES RES de bajo de table", res)
                   if (res !== undefined) {
-                    console.log("entro al if primero", res)
-                    if (!("msg" in res) && res !== []) {
-                      console.log("entro al ifs segundo ", res)
+                    // if (!("msg" in res) && res !== []) {
+                    if (!("msg" in res) && res?.length !== 0) {
                       setUrls(res);
                       setShowModal(true);
                     } else {
-                      console.log("entro al else", res)
                       notifyError("No existen archivos")
                     }
                   } else {

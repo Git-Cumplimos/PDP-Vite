@@ -147,8 +147,6 @@ const SellResp = ({
         "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [roleInfo, sellResponse, voucherInfo]);
-  console.log("setSelecFrac sellResp", setSelecFrac)
-  console.log("selecFrac sellResp", selecFrac)
   return !sellResponse?.status ? (
     <div className="flex flex-col justify-center items-center">
       <h1>Error: {sellResponse.msg}</h1>

@@ -12,9 +12,10 @@ const DescargaForm = ({ closeModal, urls, setUrls }) => {
 
   return (
     <>
-      <div className="flex flex-col justify-center items-center mx-auto container">
-        <Form grid>
-          {Array.isArray(urls) && urls.length > 0 ? (
+
+      {Array.isArray(urls) && urls.length > 0 ? (
+        <div className="flex flex-col justify-center items-center mx-auto container">
+          <Form grid>
             <>
               {/* <div className="flex flex-row justify-evenly w-full my-4">
             <h1>Pagina: {page}</h1>
@@ -44,11 +45,12 @@ const DescargaForm = ({ closeModal, urls, setUrls }) => {
                 </Button>
               </ButtonBar>
             </>
-          ) : (
-            ""
-          )}
-        </Form>
-      </div>
+          </Form>
+        </div>
+      ) : (
+        null
+      )}
+
     </>
   );
 };
