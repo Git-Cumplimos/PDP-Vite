@@ -4,8 +4,7 @@ import Form from "../../../../components/Base/Form";
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { useState } from "react";
 import Table from "../../../../components/Base/Table";
-import { notifyError } from "../../../../utils/notify";
-
+import { notify, notifyError } from "../../../../utils/notify";
 const DescargaForm = ({ closeModal, selected }) => {
   const { descargaVentas_S3 } = useLoteria();
   const [disabledBtns] = useState(false);
@@ -37,9 +36,33 @@ const DescargaForm = ({ closeModal, selected }) => {
           console.log("Entro al else del segundo if de onSubmit y esto es res", res)
           //notifyError(res.msg)
         }
+      } else if (res === []) {
+        closeModal()
+        console.log("Entro al if de onSubmit y esto es urls", urls)
+        notifyError("No existen archivos para descargar")
       }
     });
   };
+  // if (showModal) {
+  //   descargaVentas_S3(selected).then((res) => {
+  //     console.log("ESTO ES res", res)
+  //     if (res !== undefined) {
+  //       console.log("Entro al if y esto es res", res)
+  //       if (!("msg" in res)) {
+  //         console.log("Entro al segundo if y esto es res", res)
+  //         // Si no llega el mensaje el setea res
+  //         setUrls(res);
+  //         if (res === []) {
+
+  //           notifyError("No existen archivos para descargar")
+  //           console.log("ENTRO AL IF QUE ESTA SOLO", res)
+  //         }
+  //       } else {
+  //         //notifyError(res.msg)
+  //       }
+  //     }
+  //   });
+  // }
   return (
     <>
 
@@ -60,9 +83,7 @@ const DescargaForm = ({ closeModal, selected }) => {
               />
             </>
           ) : (
-            closeModal(),
-            console.log("Entro al if de onSubmit y esto es urls", urls),
-            notifyError("No existen archivos para descargar")
+            ""
           )}
 
           <ButtonBar>
