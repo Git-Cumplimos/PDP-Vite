@@ -23,6 +23,8 @@ import {
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
+const valor_maximo_recaudo = 9900000;
+
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
@@ -289,6 +291,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valorTransaccion = datosTransaccion.valor ?? 0;
       } else {
         valorTransaccion = datosTransaccion.valor ?? 0;
+      }
+      if (valorTransaccion > valor_maximo_recaudo) {
+        return notifyError(
+          `El valor de transacción es superior al valor maximo permitido ${formatMoney.format(
+            valor_maximo_recaudo
+          )}`
+        );
       }
       const hoy = new Date();
       const fecha = Intl.DateTimeFormat("es-CO", {
