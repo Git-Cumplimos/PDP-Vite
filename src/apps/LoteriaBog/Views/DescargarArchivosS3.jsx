@@ -115,7 +115,7 @@ const DescargarArchivosS3 = ({ route }) => {
                   );
                 }
               },
-              timeOut: 500,
+              timeOut: 1000,
             }}
           />
           {sorteo === "" ? (
@@ -155,7 +155,7 @@ const DescargarArchivosS3 = ({ route }) => {
                       });
                     }
                   },
-                  timeOut: 500,
+                  timeOut: 1000,
                 }}
               />
               <div className="flex flex-row justify-center w-full">
@@ -190,7 +190,7 @@ const DescargarArchivosS3 = ({ route }) => {
                       });
                     }
                   },
-                  timeOut: 500,
+                  timeOut: 1000,
                 }}
               />
             </>
