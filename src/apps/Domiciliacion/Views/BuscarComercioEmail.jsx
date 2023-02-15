@@ -18,6 +18,7 @@ const BuscarComercioEmail = () => {
   const [continuarDomiciliacion, setContinuarDomiciliacion] = useState(false);
   const [emailVerificado, setEmailVerificado] = useState(true);
   const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
+  // const url = "http://127.0.0.1:2500/";
 
   //------------------Constantes para Dar Estilos---------------------//
   const {
@@ -26,7 +27,7 @@ const BuscarComercioEmail = () => {
     contenedorTitulos,
     tituloDatos,
     contenedorValoresTitulos,
-    contendorBoton,
+
     contenedorImagen,
   } = classes;
 
@@ -66,7 +67,9 @@ const BuscarComercioEmail = () => {
         })
         .catch((err) => {
           console.log(err);
-          notifyError("Error al consultar email");
+          notifyError(
+            "Error respuesta PDP: (Falló al consumir el servicio [0010002])"
+          );
         });
     } else {
       notifyError("Ingrese un correo para la consulta");
