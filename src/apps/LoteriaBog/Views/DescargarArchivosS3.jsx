@@ -25,7 +25,8 @@ const DescargarArchivosS3 = ({ route }) => {
   const [resp_con_sort, setResp_con_sort] = useState(null);
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
+  const { descargaVentas_S3 } = useLoteria();
+  const [urls, setUrls] = useState(false);
   const { con_SortVentas_S3 } = useLoteria();
   const [showModal2, setShowModal2] = useState(false);
 
@@ -253,7 +254,19 @@ const DescargarArchivosS3 = ({ route }) => {
               })}
               onSelectRow={(_e, index) => {
                 setSelected(resp_con_sort[index]);
-                setShowModal(true);
+                descargaVentas_S3(resp_con_sort[index]).then((res) => {
+                  if (res !== undefined) {
+                    if (!("msg" in res)) {
+                      setUrls(res);
+                      setShowModal(true);
+                    } else {
+                      notifyError("No existen archivos")
+                    }
+                  } else {
+                    notifyError("No existen archivos")
+
+                  }
+                });
               }}
             />
             {/* <TableEnterprise title='Tabla Número de sorteo'
@@ -318,7 +331,7 @@ const DescargarArchivosS3 = ({ route }) => {
         <Modal show={showModal} handleClose={closeModal}>
           <DescargaForm
             setShowModal={setShowModal}
-            closeModal={closeModal} selected={selected} />
+            closeModal={closeModal} urls={urls} setUrls={setUrls} />
         </Modal>
         <Modal show={showModal2} handleClose={closeModal2}>
           <ReportVentasForm closeModal={closeModal2} Oficina="" />
