@@ -18,8 +18,10 @@ const DescargarArchivosS3 = ({ route }) => {
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
-  const [fecha_ini, setFecha_ini] = useState(new Date().toLocaleDateString());
-  const [fecha_fin, setFecha_fin] = useState(new Date().toLocaleDateString());
+  const [fecha_ini, setFecha_ini] = useState(new Date().toLocaleDateString().slice(0, 10));
+  const [fecha_fin, setFecha_fin] = useState(new Date().toLocaleDateString().slice(0, 10));
+  // const [fecha_ini, setFecha_ini] = useState(new Date().toLocaleDateString());
+  // const [fecha_fin, setFecha_fin] = useState(new Date().toLocaleDateString());
   const [resp_con_sort, setResp_con_sort] = useState(null);
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);

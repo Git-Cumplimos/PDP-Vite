@@ -28,24 +28,26 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
       }
     });
   };
-  if (showModal) {
-    descargaVentas_S3(selected).then((res) => {
-      console.log("ESTO ES res", res)
-      if (res !== undefined) {
-        console.log("Entro al if y esto es res", res)
-        if (!("msg" in res)) {
-          console.log("Entro al segundo if y esto es res", res)
-          // Si no llega el mensaje el setea res
-          setUrls(res);
-          if (res === []) {
-            notifyError("No existen archivos para descargar")
-          }
-        } else {
-          //notifyError(res.msg)
-        }
-      }
-    });
-  }
+  // if (showModal) {
+  //   descargaVentas_S3(selected).then((res) => {
+  //     console.log("ESTO ES res", res)
+  //     if (res !== undefined) {
+  //       console.log("Entro al if y esto es res", res)
+  //       if (!("msg" in res)) {
+  //         console.log("Entro al segundo if y esto es res", res)
+  //         // Si no llega el mensaje el setea res
+  //         setUrls(res);
+  //         if (res === []) {
+
+  //           notifyError("No existen archivos para descargar")
+  //           console.log("ENTRO AL IF QUE ESTA SOLO", res)
+  //         }
+  //       } else {
+  //         //notifyError(res.msg)
+  //       }
+  //     }
+  //   });
+  // }
   const cerrarModal = () => {
     console.log("Entro a cerrar el modal y ESTO ES urls", urls)
     closeModal()
@@ -54,6 +56,24 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
   console.log("ESTO ES urls", urls)
   return (
     <>
+      {showModal ? descargaVentas_S3(selected).then((res) => {
+        console.log("ESTO ES res", res)
+        if (res !== undefined) {
+          console.log("Entro al if y esto es res", res)
+          if (!("msg" in res)) {
+            console.log("Entro al segundo if y esto es res", res)
+            // Si no llega el mensaje el setea res
+            setUrls(res);
+            if (res === []) {
+
+              notifyError("No existen archivos para descargar")
+              console.log("ENTRO AL IF QUE ESTA SOLO", res)
+            }
+          } else {
+            //notifyError(res.msg)
+          }
+        }
+      }) : ("")}
       {/* {Array?.isArray(urls) && urls?.length > 0 ? ( */}
       {urls?.length > 0 ? (
         <div className="flex flex-col justify-center items-center mx-auto container">
@@ -96,7 +116,6 @@ const DescargaForm = ({ closeModal, selected, showModal }) => {
         </div>
       ) : (
         cerrarModal()
-
       )}
       {urls?.length == 0 ? notifyError("No existen archivos para descargar diferente") : "entro"}
     </>
