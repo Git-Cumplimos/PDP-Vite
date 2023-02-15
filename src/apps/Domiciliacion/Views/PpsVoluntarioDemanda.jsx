@@ -421,6 +421,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               "Numero invalido, el N° de celular debe comenzar con el número 3."
             );
             setDisabledBtn(false);
+            setProcesandoTrx(false);
           }
         } else {
           notifyError("Ingrese un número de célular valido");

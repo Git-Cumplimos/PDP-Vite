@@ -73,7 +73,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
     e.preventDefault();
     setProcesandoTrx(true);
     if (valorAportar >= 5000 && valorAportar <= 149000) {
-      console.log("r2", datosBusqueda?.length);
+      // console.log("r2", datosBusqueda?.length);
       //if para saber si ya esta domiciliado
       // if (datosBusqueda?.length <= 0) {
       if (String(numCelular).charAt(0) === "3") {
