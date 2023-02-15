@@ -256,7 +256,7 @@ const DescargarArchivosS3 = ({ route }) => {
               onSelectRow={(_e, index) => {
                 setSelected(resp_con_sort[index]);
                 descargaVentas_S3(resp_con_sort[index]).then((res) => {
-                  console.log("ESTO ES RES debajo de table", res)
+                  console.log("ESTO ES RES de bajo de table", res)
                   if (res !== undefined) {
                     if (!("msg" in res) && res !== []) {
                       setUrls(res);
