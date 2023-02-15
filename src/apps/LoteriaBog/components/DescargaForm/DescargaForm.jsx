@@ -31,7 +31,7 @@ const DescargaForm = ({ closeModal, urls, setUrls }) => {
                   window.open(urls[index].url, "_blank");
                 }}
               />
-              <ButtonBar>p
+              <ButtonBar>
                 <Button
                   type="button"
                   onClick={() => {
