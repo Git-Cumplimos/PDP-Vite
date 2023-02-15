@@ -21,6 +21,10 @@ const DescargaForm = ({ setShowModal, closeModal, selected, showModal }) => {
           console.log("Entro al segundo if de onSubmit y esto es res", res)
           // Si no llega el mensaje el setea res
           setUrls(res);
+          setShowModal(true)
+          if (res?.length > 0) {
+            notifyError("Si exiten datos para descargar")
+          }
         } else {
           console.log("Entro al else del segundo if de onSubmit y esto es res", res)
           //notifyError(res.msg)
