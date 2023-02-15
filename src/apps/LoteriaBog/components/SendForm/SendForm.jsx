@@ -87,7 +87,6 @@ const SendForm = ({
     cus.fracciones = "1";
     setCustomer({ ...cus });
   }, [fracciones])
-
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">

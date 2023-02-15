@@ -19,6 +19,8 @@ const SellResp = ({
   setSellResponse,
   closeModal,
   setCustomer,
+  selecFrac,
+  setSelecFrac
 }) => {
   const pageStyle = `
   @page {
@@ -50,12 +52,12 @@ const SellResp = ({
   const { infoTicket } = useAuth();
 
   useEffect(() => {
-    if (!sellResponse?.status){
+    if (!sellResponse?.status) {
       closeModal()
       notifyError(sellResponse?.msg || "Error respuesta PDP: (Fallo al consumir el servicio (loterías) [0010002])")
     }
   }, [sellResponse])
-  
+
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
     pageStyle: pageStyle,
@@ -135,7 +137,7 @@ const SellResp = ({
         ["", ""],
         ["Valor", formatMoney.format(sellResponse?.obj?.valor_pago)],
         ["", ""],
-        ["Forma de Pago", parseInt(sellResponse?.obj?.tipoPago) ===
+        ["Forma de Pagof", parseInt(sellResponse?.obj?.tipoPago) ===
           parseInt(operacion?.Venta_Fisica) || sellResponse?.obj?.fisico == false
           ? "Efectivo"
           : "Bono"],
@@ -145,7 +147,6 @@ const SellResp = ({
         "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [roleInfo, sellResponse, voucherInfo]);
-
   return !sellResponse?.status ? (
     <div className="flex flex-col justify-center items-center">
       <h1>Error: {sellResponse.msg}</h1>
