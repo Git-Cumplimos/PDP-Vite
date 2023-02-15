@@ -256,7 +256,7 @@ const DescargarArchivosS3 = ({ route }) => {
                 setSelected(resp_con_sort[index]);
                 descargaVentas_S3(resp_con_sort[index]).then((res) => {
                   if (res !== undefined) {
-                    if (!("msg" in res)) {
+                    if (!("msg" in res) && res !== []) {
                       setUrls(res);
                       setShowModal(true);
                     } else {
