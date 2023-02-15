@@ -30,7 +30,8 @@ const SearchGruposPlanesComisiones = ({
           return {
             Id: pk_tbl_grupo_planes_comisiones,
             "Nombre grupo": nombre_grupo_plan,
-            "Cantidad comercios": planes_comisiones.length ?? 0,
+            "Cantidad comercios":
+              planes_comisiones.length > 0 ? planes_comisiones[0].count : 0,
           };
         }
       ),
