@@ -37,6 +37,7 @@ const DescargaForm = ({ closeModal, urls, setUrls }) => {
                   onClick={() => {
                     closeModal();
                     setUrls(false);
+                    notifyError("Se canceló la descarga de archivos")
                   }}
                 >
                   Cancelar

@@ -179,6 +179,7 @@ const DescargarArchivosS3 = ({ route }) => {
                         e.target.value,
                         page
                       ).then((res) => {
+                        console.log("ESTO ES RES en decha final", res)
                         if (res !== undefined) {
                           if (!("msg" in res) && res !== []) {
                             setResp_con_sort(res.info);
@@ -255,6 +256,7 @@ const DescargarArchivosS3 = ({ route }) => {
               onSelectRow={(_e, index) => {
                 setSelected(resp_con_sort[index]);
                 descargaVentas_S3(resp_con_sort[index]).then((res) => {
+                  console.log("ESTO ES RES debajo de table", res)
                   if (res !== undefined) {
                     if (!("msg" in res) && res !== []) {
                       setUrls(res);
@@ -263,7 +265,7 @@ const DescargarArchivosS3 = ({ route }) => {
                       notifyError("No existen archivos")
                     }
                   } else {
-                    notifyError("No existen archivos")
+                    notifyError("No existen archivos parar descargar")
 
                   }
                 });
