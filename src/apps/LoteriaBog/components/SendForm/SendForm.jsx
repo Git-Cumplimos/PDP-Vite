@@ -160,7 +160,7 @@ const SendForm = ({
                 type="email"
                 value={email}
                 minLength="5"
-                maxLength="30"
+                maxLength="70"
                 required={true}
                 onChange={(e) => {
                   const cus = { fracciones, phone, doc_id, email };
