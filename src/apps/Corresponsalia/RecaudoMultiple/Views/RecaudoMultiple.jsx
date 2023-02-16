@@ -7,7 +7,7 @@ import MostrarRecaudosPagar from "../components/MostrarRecaudosPagar";
 
 const RecaudoMultiple = () => {
   const navigate = useNavigate();
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [estadoTrx, setEstadoTrx] = useState(0);
   const [fileName, setFileName] = useState("");
@@ -26,6 +26,7 @@ const RecaudoMultiple = () => {
           setEstadoTrx={setEstadoTrx}
           roleInfo={roleInfo}
           setFileName={setFileName}
+          pdpUser={pdpUser}
         />
       ) : estadoTrx === 1 ? (
         <MostrarRecaudosPagar
@@ -33,6 +34,7 @@ const RecaudoMultiple = () => {
           setEstadoTrx={setEstadoTrx}
           roleInfo={roleInfo}
           fileName={fileName}
+          pdpUser={pdpUser}
         />
       ) : (
         <></>

@@ -14,6 +14,7 @@ const MostrarRecaudosPagar = ({
   setIsUploading,
   setEstadoTrx,
   roleInfo,
+  pdpUser,
 }) => {
   const [recaudosMultiples, setRecaudosMultiples] = useState([]);
   const [maxPages, setMaxPages] = useState(1);
@@ -44,6 +45,12 @@ const MostrarRecaudosPagar = ({
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
         nombre_comercio: roleInfo?.["nombre comercio"],
+        nombre_usuario: pdpUser?.uname ?? "",
+        is_oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
       },
       ubicacion: {
         address: roleInfo?.direccion,
