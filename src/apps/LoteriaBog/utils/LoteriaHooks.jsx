@@ -364,7 +364,7 @@ export const useProvideLoteria = () => {
         setSellResponse(res);
         setLoadConsulta(false);
         if (res?.obj?.mensaje_hash) {
-          notifyError(res?.obj?.mensaje_hash)
+          notify(res?.obj?.mensaje_hash)
         }
 
       } catch (err) {
