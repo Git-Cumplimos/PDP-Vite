@@ -5,9 +5,9 @@ import { useLoteria } from "../../utils/LoteriaHooks";
 import { useState, useEffect, useCallback } from "react";
 import { notify, notifyError } from "../../../../utils/notify";
 
-const CloseForm = ({ closeModal, tip_sorteo }) => {
+const CloseForm = ({ closeModal, tip_sorteo, sorteo, disable_botoOrdinario, disabledBtns, disable_botoExtra }) => {
   const { cargueVentasExtra_S3 } = useLoteria();
-  const [disabledBtns, setDisabledBtns] = useState(false);
+  const [disabledBtns1, setDisabledBtns] = useState(false);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -28,22 +28,24 @@ const CloseForm = ({ closeModal, tip_sorteo }) => {
     } else {
       setTipo_sorteo("extraordinario");
     }
-  }, [tip_sorteo]);
+  }, [tip_sorteo, sorteo]);
 
   const handleCloseCancelar = useCallback(() => {
     notifyError("Cierre de sorteo " + tipo_sorteo + " cancelado por el usuario");
+    disable_botoOrdinario(false)
+    disable_botoExtra(false)
+    disabledBtns(false)
   })
-
   return (
     <>
       <div className="flex flex-col justify-center items-center mx-auto container">
         <Form onSubmit={onSubmit} grid>
           <div className="flex flex-row justify-center text-lg font-medium">
-            <h1>¿Cerrar sorteo {tipo_sorteo}?</h1>
+            <h1>¿Está seguro de cerrar el sorteo {tipo_sorteo} {sorteo}  ?</h1>
           </div>
 
           <ButtonBar>
-            <Button type="submit" disabled={disabledBtns}>
+            <Button type="submit" disabled={disabledBtns1}>
               Aceptar
             </Button>
             <Button
