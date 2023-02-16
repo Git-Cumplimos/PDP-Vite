@@ -132,7 +132,7 @@ const SellResp = ({
         ["Sorteo", sellResponse?.obj?.sorteo],
         ["Billete", sellResponse?.obj?.num_billete],
         ["Serie", sellResponse?.obj?.serie],
-        ["Fracción", sellResponse?.obj?.fracciones],
+        ["Fracción", sellResponse?.obj?.fisico === true? JSON.stringify(selecFrac).replace(/,/g," - ").replace(/[[]/,"").replace(/]/,"") : sellResponse?.obj?.fracciones],
         ["Tipo de Billete", sellResponse?.obj?.fisico === true ? "Físico" : "Virtual"],
         ["", ""],
         ["Valor", formatMoney.format(sellResponse?.obj?.valor_pago)],
