@@ -287,7 +287,7 @@ const EditComission = () => {
             : "",
           type: res?.results[0]?.comisiones_campanas?.type
             ? res?.results[0]?.comisiones_campanas?.type
-            : "",
+            : "trxEsc",
           ranges:
             res?.results?.[0]?.comisiones_campanas?.ranges?.length > 0
               ? res?.results?.[0]?.comisiones_campanas?.ranges?.map(
