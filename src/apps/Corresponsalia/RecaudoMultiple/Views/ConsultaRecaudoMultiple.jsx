@@ -5,7 +5,7 @@ import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoadi
 import CargueArchivoRecaudoMultiple from "../components/CargueArchivoRecaudoMultiple";
 import MostrarRecaudosPagar from "../components/MostrarRecaudosPagar";
 
-const RecaudoMultiple = () => {
+const ConsultaRecaudoMultiple = () => {
   const navigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
@@ -45,4 +45,4 @@ const RecaudoMultiple = () => {
   );
 };
 
-export default RecaudoMultiple;
+export default ConsultaRecaudoMultiple;

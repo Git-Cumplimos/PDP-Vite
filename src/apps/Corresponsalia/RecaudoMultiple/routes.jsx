@@ -8,6 +8,10 @@ const AppIcons = lazy(() => import("../../../components/Base/AppIcons"));
  * Corresponsalia Grupo Aval
  */
 const RecaudoMultiple = lazy(() => import("./Views/RecaudoMultiple"));
+const ConsultaRecaudoMultiple = lazy(() =>
+  import("./Views/ConsultaRecaudoMultiple")
+);
+const RecaudoMultipleNav = lazy(() => import("./RecaudoMultipleNav"));
 
 const listPermissions = Object.values(enumPermisosRecaudoMultiple);
 export const listPermissionsRecaudoMultiple = listPermissions.splice(
@@ -17,8 +21,23 @@ export const listPermissionsRecaudoMultiple = listPermissions.splice(
 const rutasRecaudoMultiple = {
   link: "/corresponsalia/recaudo-multiple",
   label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo multiple' />,
-  component: RecaudoMultiple,
+  component: RecaudoMultipleNav,
   permission: listPermissionsRecaudoMultiple,
-  subRoutes: [],
+  subRoutes: [
+    {
+      link: "/corresponsalia/recaudo-multiple/transaccion",
+      label: <AppIcons Logo={"MARKETPLACE"} name='Cargar recaudo multiple' />,
+      component: RecaudoMultiple,
+      permission: [enumPermisosRecaudoMultiple.recaudo_multiple],
+    },
+    {
+      link: "/corresponsalia/recaudo-multiple/consulta",
+      label: (
+        <AppIcons Logo={"MARKETPLACE"} name='Consultar recaudo multiple' />
+      ),
+      component: ConsultaRecaudoMultiple,
+      permission: [enumPermisosRecaudoMultiple.recaudo_multiple],
+    },
+  ],
 };
 export default rutasRecaudoMultiple;
