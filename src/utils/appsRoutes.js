@@ -3,7 +3,6 @@ import { lazy } from "react";
 /**
  * Rutas
  */
-import rutasRecaudoDirecto from "../apps/RecaudoDirecto/routes";
 import rutasColpatria, {
   listPermissionsColpatria,
 } from "../apps/Colpatria/routes";
@@ -1000,7 +999,6 @@ const allUrlsPrivateApps = [
   //   permission: [1],
   // },
   rutasSoat,
-  rutasRecaudoDirecto
 ];
 
 export { allUrlsPrivateApps };
