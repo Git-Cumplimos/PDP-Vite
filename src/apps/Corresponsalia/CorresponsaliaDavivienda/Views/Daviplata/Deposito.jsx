@@ -31,7 +31,6 @@ const Deposito = () => {
   // const [{ phone, userDoc, valor, nomDepositante, summary }, setQuery] =
   //   useQuery();
 
-  
   const [verificacionTel, setVerificacionTel] = useState("");
 
   const [phone, setPhone] = useState("");
@@ -229,7 +228,7 @@ const Deposito = () => {
       nomDepositante,
       valor,
       limitesMontos,
-      pdpUser
+      pdpUser,
     ]
   );
 
@@ -243,8 +242,6 @@ const Deposito = () => {
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
-
-
 
   const onMakePayment = useCallback(() => {
     const fecha = Intl.DateTimeFormat("es-CO", {
@@ -261,7 +258,7 @@ const Deposito = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"] = []
+    objTicket["trxInfo"] = [];
     objTicket["trxInfo"].push(["Nombre titular", summary["Nombre cliente"]]);
     objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
@@ -287,9 +284,8 @@ const Deposito = () => {
       id_transaccion: datosConsulta?.DataHeader?.idTransaccion,
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
-      ticket:objTicket
+      ticket: objTicket,
     };
-    console.log(body)
     fetchCashIn(body)
       .then((res) => {
         setIsUploading(false);
@@ -306,32 +302,22 @@ const Deposito = () => {
             res?.obj?.respuestaDavivienda?.valComisionGiroDaviplata ?? 0;
           const total = parseInt(comision) + valor;
           const ter = res?.obj?.codigoTotal;
-          objTicket["commerceInfo"][1] = [
-            "No. terminal",
-            ter,
-          ];
-          objTicket["commerceInfo"].push([
-            "No. de aprobación",
-            trx_id,
-          ]);
+          objTicket["commerceInfo"][1] = ["No. terminal", ter];
+          objTicket["commerceInfo"].push(["No. de aprobación", trx_id]);
           objTicket["commerceInfo"].push(["", ""]);
-          objTicket["trxInfo"].push(["Número DaviPlata", 
-          `****${String(phone)?.slice(-4) ?? ""}`]);
-          objTicket["trxInfo"].push(["", ""]);
           objTicket["trxInfo"].push([
-            "Valor",
-            formatMoney.format(valor),
+            "Número DaviPlata",
+            `****${String(phone)?.slice(-4) ?? ""}`,
           ]);
+          objTicket["trxInfo"].push(["", ""]);
+          objTicket["trxInfo"].push(["Valor", formatMoney.format(valor)]);
           objTicket["trxInfo"].push(["", ""]);
           objTicket["trxInfo"].push([
             "Costo transacción",
             formatMoney.format(comision),
           ]);
           objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Total",
-            formatMoney.format(total),
-          ]);
+          objTicket["trxInfo"].push(["Total", formatMoney.format(total)]);
           objTicket["trxInfo"].push(["", ""]);
           // const tempTicket = {
           //   title: "Recibo de Depósito a Daviplata",
@@ -400,7 +386,7 @@ const Deposito = () => {
     infoTicket,
     summary,
     datosConsulta,
-    pdpUser
+    pdpUser,
   ]);
 
   return (
