@@ -18,14 +18,15 @@ const DescargarArchivosS3 = ({ route }) => {
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
-  const [fecha_ini, setFecha_ini] = useState(new Date().toLocaleDateString().slice(0, 10));
-  const [fecha_fin, setFecha_fin] = useState(new Date().toLocaleDateString().slice(0, 10));
+  const [fecha_ini, setFecha_ini] = useState("");
+  const [fecha_fin, setFecha_fin] = useState("");
   // const [fecha_ini, setFecha_ini] = useState(new Date().toLocaleDateString());
   // const [fecha_fin, setFecha_fin] = useState(new Date().toLocaleDateString());
   const [resp_con_sort, setResp_con_sort] = useState(null);
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
+  const { descargaVentas_S3 } = useLoteria();
+  const [urls, setUrls] = useState(false);
   const { con_SortVentas_S3 } = useLoteria();
   const [showModal2, setShowModal2] = useState(false);
 
@@ -54,7 +55,6 @@ const DescargarArchivosS3 = ({ route }) => {
 
   // const closeModal = () => {
   //   setShowModal(false)
-  //   console.log("ENTRO===")
   // }
   // const closeModal = useCallback(() => {
   //   setShowModal(false);
@@ -115,7 +115,7 @@ const DescargarArchivosS3 = ({ route }) => {
                   );
                 }
               },
-              timeOut: 500,
+              timeOut: 1000,
             }}
           />
           {sorteo === "" ? (
@@ -155,7 +155,7 @@ const DescargarArchivosS3 = ({ route }) => {
                       });
                     }
                   },
-                  timeOut: 500,
+                  timeOut: 1000,
                 }}
               />
               <div className="flex flex-row justify-center w-full">
@@ -171,7 +171,7 @@ const DescargarArchivosS3 = ({ route }) => {
                 // }}
                 onLazyInput={{
                   callback: (e) => {
-                    if (fecha_ini !== "" && fecha_fin !== "") {
+                    if (fecha_ini !== "") {
                       con_SortVentas_S3(
                         sorteo,
                         fecha_ini,
@@ -179,17 +179,18 @@ const DescargarArchivosS3 = ({ route }) => {
                         page
                       ).then((res) => {
                         if (res !== undefined) {
-                          if (!("msg" in res)) {
+                          // if (!("msg" in res) && res !== []) {
+                          if (!("msg" in res) && res?.length !== 0) {
                             setResp_con_sort(res.info);
                             setMaxPages(res.num_datos);
+                          } else {
+                            notifyError(res.msg)
                           }
-                        } else {
-                          notifyError(res.msg);
                         }
                       });
                     }
                   },
-                  timeOut: 500,
+                  timeOut: 1000,
                 }}
               />
             </>
@@ -253,7 +254,20 @@ const DescargarArchivosS3 = ({ route }) => {
               })}
               onSelectRow={(_e, index) => {
                 setSelected(resp_con_sort[index]);
-                setShowModal(true);
+                descargaVentas_S3(resp_con_sort[index]).then((res) => {
+                  if (res !== undefined) {
+                    // if (!("msg" in res) && res !== []) {
+                    if (!("msg" in res) && res?.length !== 0) {
+                      setUrls(res);
+                      setShowModal(true);
+                    } else {
+                      notifyError("No existen archivos")
+                    }
+                  } else {
+                    notifyError("No existen archivos parar descargar")
+
+                  }
+                });
               }}
             />
             {/* <TableEnterprise title='Tabla Número de sorteo'
@@ -317,8 +331,8 @@ const DescargarArchivosS3 = ({ route }) => {
         </Form>
         <Modal show={showModal} handleClose={closeModal}>
           <DescargaForm
-            showModal
-            closeModal={closeModal} selected={selected} />
+            setShowModal={setShowModal}
+            closeModal={closeModal} urls={urls} setUrls={setUrls} />
         </Modal>
         <Modal show={showModal2} handleClose={closeModal2}>
           <ReportVentasForm closeModal={closeModal2} Oficina="" />

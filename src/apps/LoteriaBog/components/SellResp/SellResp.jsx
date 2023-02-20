@@ -132,12 +132,12 @@ const SellResp = ({
         ["Sorteo", sellResponse?.obj?.sorteo],
         ["Billete", sellResponse?.obj?.num_billete],
         ["Serie", sellResponse?.obj?.serie],
-        ["Fracción", sellResponse?.obj?.fracciones],
+        ["Fracción", sellResponse?.obj?.fisico === true? JSON.stringify(selecFrac).replace(/,/g," - ").replace(/[[]/,"").replace(/]/,"") : sellResponse?.obj?.fracciones],
         ["Tipo de Billete", sellResponse?.obj?.fisico === true ? "Físico" : "Virtual"],
         ["", ""],
         ["Valor", formatMoney.format(sellResponse?.obj?.valor_pago)],
         ["", ""],
-        ["Forma de Pagof", parseInt(sellResponse?.obj?.tipoPago) ===
+        ["Forma de Pago", parseInt(sellResponse?.obj?.tipoPago) ===
           parseInt(operacion?.Venta_Fisica) || sellResponse?.obj?.fisico == false
           ? "Efectivo"
           : "Bono"],
@@ -147,8 +147,6 @@ const SellResp = ({
         "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [roleInfo, sellResponse, voucherInfo]);
-  console.log("setSelecFrac sellResp", setSelecFrac)
-  console.log("selecFrac sellResp", selecFrac)
   return !sellResponse?.status ? (
     <div className="flex flex-col justify-center items-center">
       <h1>Error: {sellResponse.msg}</h1>
