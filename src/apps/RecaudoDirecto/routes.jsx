@@ -13,7 +13,7 @@ export const listPermissionsRecaudoDirecto = listPermissions.splice(listPermissi
 
 const rutasRecaudoDirecto = {
   link: "/recaudo-diecto",
-  label: <AppIcons Logo={"CorresponsalBancario"} name={"Recaudo/Retiro Directo"} />,
+  label: <AppIcons Logo={"CorresponsalBancario"} name={"Recaudo/Retiro Directos"} />,
   component: RecaudoEntryPoint,
   permission: listPermissionsRecaudoDirecto,
   subRoutes: [],
