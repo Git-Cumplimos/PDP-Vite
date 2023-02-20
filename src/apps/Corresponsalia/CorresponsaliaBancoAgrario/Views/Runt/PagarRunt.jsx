@@ -1,4 +1,4 @@
-import { useState, useCallback, Fragment } from "react";
+import { useState, useCallback, Fragment, useRef } from "react";
 import Input from "../../../../../components/Base/Input";
 import BarcodeReader from "../../../../../components/Base/BarcodeReader";
 import Button from "../../../../../components/Base/Button";
@@ -15,6 +15,9 @@ import { useFetch } from "../../../../../hooks/useFetch";
 
 import { fetchCustom, ErrorCustom } from "../../utils/fetchRunt";
 import { ComponentsModalSummaryTrx } from "../Runt/components/components_modal";
+import Tickets from "../../../../../components/Base/Tickets";
+import { useReactToPrint } from "react-to-print";
+import { useNavigate } from "react-router-dom";
 
 //Constantes
 const url_get_barcode = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
@@ -28,7 +31,11 @@ const PagarRunt = () => {
   const [numeroRunt, setNumeroRunt] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [resConsultRunt, setResConsultRunt] = useState({});
+  const [infTicket, setInfTicket] = useState(null);
+  const printDiv = useRef();
+  const validNavigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
+
   const [loadingPeticionBarcode, peticionBarcode] = useFetch(
     fetchCustom(url_get_barcode, "POST", "Leer código de barras")
   );
@@ -71,18 +78,23 @@ const PagarRunt = () => {
         id_usuario: roleInfo.id_usuario,
       },
       nombre_usuario: pdpUser["uname"],
-      oficina_propia: false,
       numero_runt: numeroRunt,
+      id_trx: resConsultRunt.id_trx,
       valor_mt: resConsultRunt.valor_mt,
       valor_runt: resConsultRunt.valor_runt,
       valor_total_trx: resConsultRunt.valor_total_trx,
+      nombre_comercio: roleInfo["nombre comercio"],
+      ciudad: roleInfo.ciudad,
+      direccion: roleInfo.direccion,
     };
     peticionPayRunt({}, data)
       .then((response) => {
         if (response?.status === true) {
-          setPaso("LecturaRunt");
-          setShowModal(false);
+          const voucher = response.obj.result.ticket;
+          setInfTicket(JSON.parse(voucher));
+          setPaso("TransaccionExitosa");
         }
+        notify("Pago del runt exitoso");
       })
       .catch((error) => {
         CallErrorPeticion(error);
@@ -133,14 +145,12 @@ const PagarRunt = () => {
     setShowModal(false);
   }
 
-  //********************Funciones para cerrar el Modal**************************
-  const HandleCloseResLecturaRunt = useCallback(() => {
-    setPaso("LecturaRunt");
-    notify("Transacción cancelada");
-    setNumeroRunt(null);
-  }, []);
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
 
-  const HandleCloseResumenTrx = useCallback(() => {
+  //********************Funciones para cerrar el Modal**************************
+  const HandleCloseTrx = useCallback(() => {
     setPaso("LecturaRunt");
     setShowModal(false);
     notify("Transacción cancelada");
@@ -148,17 +158,31 @@ const PagarRunt = () => {
     setResConsultRunt(null);
   }, []);
 
+  const HandleCloseTrxExitosa = useCallback(() => {
+    setPaso("LecturaRunt");
+    setShowModal(false);
+    setNumeroRunt(null);
+    setResConsultRunt(null);
+    setInfTicket(null);
+    validNavigate("/corresponsalia/corresponsalia-banco-agrario");
+  }, [validNavigate]);
+
   const HandleCloseModal = useCallback(() => {
-    if (paso === "RespuestaLecturaRunt" && !loadingPeticionBarcode) {
-      HandleCloseResLecturaRunt();
-    } else if (paso === "LecturaRunt" && !loadingPeticionConsultRunt) {
-      HandleCloseResumenTrx();
+    if (paso === "LecturaRunt" && !loadingPeticionBarcode) {
+      HandleCloseTrx();
+    } else if (paso === "RespuestaLecturaRunt" && !loadingPeticionConsultRunt) {
+      HandleCloseTrx();
+    } else if (paso === "ResumenTrx" && !loadingPeticionPayRunt) {
+      HandleCloseTrx();
+    } else if (paso === "TransaccionExitosa") {
+      HandleCloseTrxExitosa();
     }
   }, [
     paso,
-    HandleCloseResLecturaRunt,
-    HandleCloseResumenTrx,
+    HandleCloseTrx,
+    HandleCloseTrxExitosa,
     loadingPeticionBarcode,
+    loadingPeticionPayRunt,
     loadingPeticionConsultRunt,
   ]);
 
@@ -188,12 +212,16 @@ const PagarRunt = () => {
               disabled
             />
             <ButtonBar className="lg:col-span-2">
-              <Button type={"submit"} onClick={onSubmitConsultRunt}>
+              <Button
+                type={"submit"}
+                onClick={onSubmitConsultRunt}
+                disabled={loadingPeticionConsultRunt}
+              >
                 Tramitar runt
               </Button>
               <Button
                 type={"reset"}
-                onClick={HandleCloseResLecturaRunt}
+                onClick={HandleCloseTrx}
                 disabled={loadingPeticionConsultRunt}
               >
                 Cancelar
@@ -209,12 +237,24 @@ const PagarRunt = () => {
         {paso === "ResumenTrx" && (
           <ComponentsModalSummaryTrx
             summary={resConsultRunt}
-            loadingPeticion={loadingPeticionConsultRunt}
+            loadingPeticion={loadingPeticionPayRunt}
             peticion={onSubmitPayRunt}
-            handleClose={HandleCloseResumenTrx}
+            handleClose={HandleCloseTrx}
           ></ComponentsModalSummaryTrx>
         )}
         {/******************************Resumen de trx*******************************************************/}
+
+        {/**************** TransaccionExitosa **********************/}
+        {infTicket && paso === "TransaccionExitosa" && (
+          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+            <Tickets refPrint={printDiv} ticket={infTicket} />
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button onClick={HandleCloseTrxExitosa}>Cerrar</Button>
+            </ButtonBar>
+          </div>
+        )}
+        {/*************** Recarga Exitosa **********************/}
       </Modal>
     </Fragment>
   );
