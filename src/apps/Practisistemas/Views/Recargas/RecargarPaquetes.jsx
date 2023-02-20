@@ -52,6 +52,8 @@ const RecargarPaquetes = () => {
     ],
     commerceName: "RECARGA",
     trxInfo: [
+      ["Operador",state?.operadorPaquete],
+      ["", ""],
       ["Tipo paquete",state?.operador_recargar],
       ["", ""],
     ],

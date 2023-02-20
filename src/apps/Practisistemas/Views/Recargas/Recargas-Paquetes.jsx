@@ -58,6 +58,7 @@ const RecargasPaquetes = ({ subRoutes }) => {
             state: {
               operador_recargar: operadores[i]["desc"],
               producto: operadores[i]["op"],
+              operadorPaquete: operadores[i]["operadorPacks"],
             },
           }        
         )        
@@ -78,6 +79,7 @@ const RecargasPaquetes = ({ subRoutes }) => {
       operador: datosTrans.operador,
     })
       .then((autoArr) => {
+        console.log("autoArr",autoArr)
         setMaxPages(autoArr?.maxPages);
         setOperadores(autoArr?.response ?? []);
       })
