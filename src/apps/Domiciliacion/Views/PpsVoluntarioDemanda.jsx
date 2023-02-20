@@ -40,8 +40,6 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
   const [showModalVoucher, setShowModalVoucher] = useState(false);
   const { quotaInfo, roleInfo, infoTicket } = useAuth();
 
-  const [invalidCelular, setInvalidCelular] = useState("");
-
   // console.log(roleInfo);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
   const [idComercio, setIdComercio] = useState(roleInfo?.["id_comercio"]);

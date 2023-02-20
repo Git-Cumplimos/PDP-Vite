@@ -137,7 +137,7 @@ const SellResp = ({
         ["", ""],
         ["Valor", formatMoney.format(sellResponse?.obj?.valor_pago)],
         ["", ""],
-        ["Forma de Pagof", parseInt(sellResponse?.obj?.tipoPago) ===
+        ["Forma de Pago", parseInt(sellResponse?.obj?.tipoPago) ===
           parseInt(operacion?.Venta_Fisica) || sellResponse?.obj?.fisico == false
           ? "Efectivo"
           : "Bono"],
