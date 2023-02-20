@@ -184,7 +184,7 @@ const PagarRunt = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Pago de runt</h1>
+      <h1 className="text-3xl mt-6">Pago de RUNT</h1>
       <Form>
         {/******************************Lectura runt*******************************************************/}
         {paso === "LecturaRunt" && (
@@ -201,7 +201,7 @@ const PagarRunt = () => {
         {paso === "RespuestaLecturaRunt" && (
           <Fragment>
             <Input
-              label="Número de runt"
+              label="Número de RUNT"
               type="text"
               autoComplete="off"
               value={numeroRunt}
@@ -213,7 +213,7 @@ const PagarRunt = () => {
                 onClick={onSubmitConsultRunt}
                 disabled={loadingPeticionConsultRunt}
               >
-                Tramitar runt
+                Tramitar <RUNT></RUNT>
               </Button>
               <Button
                 type={"reset"}
