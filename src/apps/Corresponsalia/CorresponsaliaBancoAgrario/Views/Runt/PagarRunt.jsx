@@ -213,7 +213,7 @@ const PagarRunt = () => {
                 onClick={onSubmitConsultRunt}
                 disabled={loadingPeticionConsultRunt}
               >
-                Tramitar <RUNT></RUNT>
+                Tramitar RUNT
               </Button>
               <Button
                 type={"reset"}
