@@ -34,6 +34,7 @@ const ModificarPps = () => {
   const [estadoUsuarioNoEncontrado, setEstadoUsuarioNoEncontrado] =
     useState(false);
   const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
+  // const url = "http://127.0.0.1:2500/";
   // const url =  "http://127.0.0.1:7000";
   const [estado, setEstado] = useState(false);
   const [valueAmount, setValueAmount] = useState("");
@@ -42,7 +43,7 @@ const ModificarPps = () => {
   const [numPagosPdp, setNumPagosPdp] = useState("");
   const [estadoComercio, setEstadoComercio] = useState("");
   const [estadoComercioString, setEstadoComercioString] = useState("");
-  const { contenedorLogo, contenedorSubtitle, tituloNotificacion } = classes;
+  const { contenedorLogo, contenedorSubtitle } = classes;
   const navigate = useNavigate();
   //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
   useEffect(() => {
@@ -55,7 +56,7 @@ const ModificarPps = () => {
       numero = numero / 10;
     }
     setCantNum(contador);
-    console.log(cantNum);
+    // console.log(cantNum);
   }
 
   useEffect(() => {
@@ -69,7 +70,7 @@ const ModificarPps = () => {
       numero = numero / 10;
     }
     setCantNumCel(contadorCel);
-    console.log(cantNumCel);
+    // console.log(cantNumCel);
   }
   useEffect(() => {
     cantidadNumeroVal(valueAmount);
@@ -82,25 +83,12 @@ const ModificarPps = () => {
       numero = numero / 10;
     }
     setCantNumVal(contadorVal);
-    console.log(cantNumVal);
+    // console.log(cantNumVal);
   }
 
   const handleClose = useCallback(() => {
     setShowModal(false);
     setDatosConsulta(0);
-    setBuscarCedula("");
-  }, []);
-  const handleCloseUsuarioNoEncontrado = useCallback(() => {
-    setShowModalUsuarioNoEncontrado(false);
-    /*  setDatosConsulta(""); */
-    setBuscarCedula("");
-  }, []);
-
-  const UsuarioNoEncontradoNotify = useCallback(() => {
-    if (setShowModalUsuarioNoEncontrado) {
-      notifyError("Usuario no encontrado");
-    }
-    /*  setDatosConsulta(""); */
     setBuscarCedula("");
   }, []);
 
@@ -146,8 +134,11 @@ const ModificarPps = () => {
           }
         })
         .catch((err) => {
-          console.log(err);
+          // console.log(err);
           notifyError("Error al consultar cédula");
+          notifyError(
+            "Error respuesta PDP: (Falló al consumir el servicio [0010002])"
+          );
         });
     } else {
       notifyError("Ingrese un número valido para la consulta");
@@ -194,12 +185,16 @@ const ModificarPps = () => {
                 /* navigate(`/domiciliacion`); */
               } else {
                 notifyError("El usuario no ha sido modificado exitosamente");
+                notifyError(respuesta?.msg);
                 navigate(`/colpensiones`);
               }
             })
             .catch((err) => {
               console.log(err);
               notifyError("Error al modificar");
+              notifyError(
+                "Error respuesta PDP: (Falló al consumir el servicio [0010002])"
+              );
             });
         } else {
           console.log("no es 3");

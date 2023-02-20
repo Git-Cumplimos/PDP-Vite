@@ -87,7 +87,6 @@ const SendForm = ({
     cus.fracciones = "1";
     setCustomer({ ...cus });
   }, [fracciones])
-
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">
@@ -148,7 +147,7 @@ const SendForm = ({
                 max={selected ? `${selected.Fracciones_disponibles}` : "3"}
                 min="1"
                 value={fracciones}
-                required
+                required={true}
               // onInput={(e) => {
               //   const cus = { fracciones, phone, doc_id };
               //   cus.fracciones = e.target.value;
@@ -158,10 +157,10 @@ const SendForm = ({
               <Input
                 id="email"
                 label="Email"
-                type="text"
+                type="email"
                 value={email}
                 minLength="5"
-                maxLength="30"
+                maxLength="70"
                 required={true}
                 onChange={(e) => {
                   const cus = { fracciones, phone, doc_id, email };

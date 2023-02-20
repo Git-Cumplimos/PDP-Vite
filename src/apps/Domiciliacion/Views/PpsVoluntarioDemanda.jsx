@@ -7,11 +7,11 @@ import LogoPDP from "../../../components/Base/LogoPDP";
 import Modal from "../../../components/Base/Modal";
 import Select from "../../../components/Base/Select";
 import fetchData from "../../../utils/fetchData";
-import { notify, notifyError } from "../../../utils/notify";
+import { notifyError } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
-import Voucher from "../../LoteriaBog/components/Voucher/Voucher";
+
 import { useReactToPrint } from "react-to-print";
 import Form from "../../../components/Base/Form";
 import Tickets from "../../../components/Base/Tickets";
@@ -24,14 +24,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
-const {
-  contenedorImagen,
-  contenedorForm,
-  contenedorCampos,
-  contenedorPrincipal,
-  contenedorSecundario,
-  contenedorLabel,
-} = classes;
+const { contenedorImagen, contenedorForm } = classes;
 
 const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
   const [limitesMontos] = useState({
@@ -47,11 +40,6 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
   const [showModalVoucher, setShowModalVoucher] = useState(false);
   const { quotaInfo, roleInfo, infoTicket } = useAuth();
 
-  const [invalidCelular, setInvalidCelular] = useState("");
-  const [inputCelular, setInputCelular] = useState(null);
-
-  const [{ numCuenta, userDoc, valor, nomDepositante, summary }, setQuery] =
-    useQuery();
   // console.log(roleInfo);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
   const [idComercio, setIdComercio] = useState(roleInfo?.["id_comercio"]);
@@ -61,7 +49,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
   );
   const [tipoComercio, setTipoComercio] = useState(roleInfo["tipo_comercio"]);
   const [esPropio, setEsPropio] = useState(false);
-  const [voucher, setVoucher] = useState(false);
+
   const [procesandoTrx, setProcesandoTrx] = useState(false);
 
   const [disabledBtn, setDisabledBtn] = useState(false);
@@ -84,9 +72,9 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
     setShowModal(false);
     navigate(`/colpensiones`);
   }, []);
-  const handleClose2 = useCallback(() => {
-    setShowModal(false);
-  }, []);
+  // const handleClose2 = useCallback(() => {
+  //   setShowModal(false);
+  // }, []);
 
   //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
   useEffect(() => {
@@ -149,12 +137,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
       disclamer:
         "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
     };
-  }, [
-    roleInfo,
-    valorAportar,
-    datosRespuesta,
-    tipoComercio /* respPinCancel, roleInfo, valor */,
-  ]);
+  }, [roleInfo, valorAportar, datosRespuesta, tipoComercio]);
 
   useEffect(() => {
     infoTicket(datosRespuesta?.[0]?.["inserted_id"], 57, tickets)
@@ -174,7 +157,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
     /*  setShowModal(false); */
     if (cupoLogin >= valorAportar) {
       if (tipoComercio === "OFICINAS PROPIAS" || tipoComercio === "KIOSCO") {
-        // console.log("entre");
+        console.log("OFICINAS PROPIAS");
         setEsPropio(true);
 
         if (String(numCelular).charAt(0) === "3") {
@@ -205,7 +188,24 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               .then((respuesta) => {
                 setProcesandoTrx(false);
                 console.log(respuesta);
-
+                if (respuesta?.msg) {
+                  if (
+                    respuesta?.msg ===
+                    "El valor aportado debe ser exacto ej: 5000, debe ser múltiplo de 100"
+                  ) {
+                    notifyError(respuesta?.msg);
+                    setDisabledBtn(false);
+                  } else if (
+                    respuesta?.msg ===
+                    "La transaccion ha sido creada exitosamente"
+                  ) {
+                    setShowModalVoucher(true);
+                    setDatosRespuesta(respuesta?.obj);
+                  } else {
+                    notifyError(respuesta?.msg);
+                    navigate(`/colpensiones`);
+                  }
+                }
                 // OJOOOOOO
                 if (respuesta?.msg?.["respuesta_colpensiones"]) {
                   notifyError(respuesta?.msg?.["respuesta_colpensiones"]);
@@ -218,20 +218,20 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                   notifyError("El aportante no existe.");
                   navigate(`/colpensiones`);
                 }
-                if (
-                  respuesta?.msg ===
-                  "El Valor Aportado Debe ser Exacto ej: 5000"
-                ) {
-                  notifyError("El valor a aportar debe ser múltiplo de 100");
-                  /* navigate(`/colpensiones`); */
-                  setDisabledBtn(false);
-                }
-                if (
-                  respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo"
-                ) {
-                  notifyError("Lo sentimos, falló el registro del cupo");
-                  navigate(`/colpensiones`);
-                }
+                // if (
+                //   respuesta?.msg ===
+                //   "El Valor Aportado Debe ser Exacto ej: 5000"
+                // ) {
+                //   notifyError("El valor a aportar debe ser múltiplo de 100");
+                //   /* navigate(`/colpensiones`); */
+                //   setDisabledBtn(false);
+                // }
+                // if (
+                //   respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo"
+                // ) {
+                //   notifyError("Lo sentimos, falló el registro del cupo");
+                //   navigate(`/colpensiones`);
+                // }
                 if (
                   respuesta?.msg?.["respuesta_colpensiones"] ===
                   "Cotizante no existe."
@@ -281,7 +281,10 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               })
               .catch((err) => {
                 console.log(err);
-                notifyError("Error al pagar planilla voluntaria a demanda");
+                // notifyError("Error al pagar planilla voluntaria a demanda");
+                notifyError(
+                  "Error respuesta PDP: (Falló al consumir el servicio [0010002])"
+                );
                 navigate(`/colpensiones`);
               });
           } else {
@@ -295,6 +298,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
           notifyError(
             "Numero invalido, el N° de celular debe comenzar con el número 3."
           );
+          setProcesandoTrx(false);
           setDisabledBtn(false);
         }
       } else {
@@ -327,44 +331,65 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                 .then((respuesta) => {
                   setProcesandoTrx(false);
                   console.log("********", respuesta);
+                  if (respuesta?.msg) {
+                    if (
+                      respuesta?.msg ===
+                      "El valor aportado debe ser exacto ej: 5000, debe ser múltiplo de 100"
+                    ) {
+                      notifyError(respuesta?.msg);
+                      /* navigate(`/colpensiones`); */
+                      setDisabledBtn(false);
+                    } else if (
+                      respuesta?.msg ===
+                      "La transaccion ha sido creada exitosamente"
+                    ) {
+                      setShowModalVoucher(true);
+                      setDatosRespuesta(respuesta?.obj);
+                    } else {
+                      console.log("mensajeeeee");
+                      notifyError(respuesta?.msg);
+                      navigate(`/colpensiones`);
+                    }
+                  }
+
                   // OJOOOOOO
                   if (respuesta?.msg?.["respuesta_colpensiones"]) {
                     notifyError(respuesta?.msg?.["respuesta_colpensiones"]);
                     navigate(`/colpensiones`);
                   }
-                  if (
-                    respuesta?.msg?.["respuesta_colpensiones"] ===
-                    "El aportante no existe."
-                  ) {
-                    notifyError("El aportante no existe.");
-                    navigate(`/colpensiones`);
-                  }
-                  if (
-                    respuesta?.msg ===
-                    "El Valor Aportado Debe ser Exacto ej: 5000"
-                  ) {
-                    notifyError("El valor a aportar debe ser múltiplo de 100");
-                    /* navigate(`/colpensiones`); */
-                    setDisabledBtn(false);
-                  }
-                  if (
-                    respuesta?.msg?.["respuesta_colpensiones"] ===
-                    "Cotizante no existe."
-                  ) {
-                    notifyError("Cotizante no existe.");
-                    navigate(`/colpensiones`);
-                  }
+                  // if (
+                  //   respuesta?.msg?.["respuesta_colpensiones"] ===
+                  //   "El aportante no existe."
+                  // ) {
+                  //   notifyError("El aportante no existe.");
+                  //   navigate(`/colpensiones`);
+                  // }
+                  // if (
+                  //   respuesta?.msg ===
+                  //   "El Valor Aportado Debe ser Exacto ej: 5000"
+                  // ) {
+                  //   notifyError("El valor a aportar debe ser múltiplo de 100");
+                  //   /* navigate(`/colpensiones`); */
+                  //   setDisabledBtn(false);
+                  // }
+                  // if (
+                  //   respuesta?.msg?.["respuesta_colpensiones"] ===
+                  //   "Cotizante no existe."
+                  // ) {
+                  //   notifyError("Cotizante no existe.");
+                  //   navigate(`/colpensiones`);
+                  // }
 
-                  if (
-                    respuesta?.msg ===
-                    "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
-                  ) {
-                    notifyError(
-                      "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
-                    );
-                    /* navigate(`/colpensiones`); */
-                    setDisabledBtn(false);
-                  }
+                  // if (
+                  //   respuesta?.msg ===
+                  //   "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
+                  // ) {
+                  //   notifyError(
+                  //     "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
+                  //   );
+                  //   /* navigate(`/colpensiones`); */
+                  //   setDisabledBtn(false);
+                  // }
                   if (
                     (respuesta?.msg ===
                       "La transaccion ha sido creada exitosamente") &
@@ -376,7 +401,9 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                 })
                 .catch((err) => {
                   console.log(err);
-                  notifyError("Error al pagar planilla voluntaria a demanda");
+                  notifyError(
+                    "Error respuesta PDP: (Falló al consumir el servicio [0010002])"
+                  );
                   navigate(`/colpensiones`);
                 });
             } else {
@@ -392,6 +419,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               "Numero invalido, el N° de celular debe comenzar con el número 3."
             );
             setDisabledBtn(false);
+            setProcesandoTrx(false);
           }
         } else {
           notifyError("Ingrese un número de célular valido");
@@ -404,19 +432,19 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
       navigate(`/colpensiones`);
     }
   };
-  const onCelChange = (e) => {
-    const formData = new FormData(e.target.form);
-    const phone = ((formData.get("celular") ?? "").match(/\d/g) ?? []).join("");
-    setNumCelular(phone);
+  // const onCelChange = (e) => {
+  //   const formData = new FormData(e.target.form);
+  //   const phone = ((formData.get("celular") ?? "").match(/\d/g) ?? []).join("");
+  //   setNumCelular(phone);
 
-    if (e.target.value.length == 1) {
-      if (e.target.value[0] == 3) {
-        setInvalidCelular("");
-      } else {
-        setInvalidCelular("numero invalido");
-      }
-    }
-  };
+  //   if (e.target.value.length == 1) {
+  //     if (e.target.value[0] == 3) {
+  //       setInvalidCelular("");
+  //     } else {
+  //       setInvalidCelular("numero invalido");
+  //     }
+  //   }
+  // };
   return (
     <div>
       <SimpleLoading show={procesandoTrx}></SimpleLoading>

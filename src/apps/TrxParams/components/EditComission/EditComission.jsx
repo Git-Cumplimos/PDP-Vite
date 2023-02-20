@@ -59,8 +59,8 @@ const EditComission = () => {
   useEffect(() => {
     if (id_plan_comision || (id_plan_comision_campana && campaignStatus)) {
       const date = new Date();
-      setDisabledState(!(date.getDate() <= 5));
-      // setDisabledState(false);
+      // setDisabledState(!(date.getDate() <= 5));
+      setDisabledState(false);
     }
   }, [id_plan_comision, id_plan_comision_campana, campaignStatus]);
 
@@ -287,7 +287,7 @@ const EditComission = () => {
             : "",
           type: res?.results[0]?.comisiones_campanas?.type
             ? res?.results[0]?.comisiones_campanas?.type
-            : "",
+            : "trxEsc",
           ranges:
             res?.results?.[0]?.comisiones_campanas?.ranges?.length > 0
               ? res?.results?.[0]?.comisiones_campanas?.ranges?.map(

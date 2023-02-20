@@ -296,14 +296,17 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
               setFecha_fin(e.target.value);
               if (fecha_ini !== "") {
                 reportVentas(fecha_ini, e.target.value, sorteo).then((res) => {
-                  if ("msg" in res) {
-                    notifyError(res.msg);
-                    setDisabledBtns(true);
-                  } else {
-                    setResp_report(res.data);
-                    setTotal(res.total);
-                    setDisabledBtns(false);
+                  if (res != undefined){
+                    if ("msg" in res) {
+                      notifyError(res.msg);
+                      setDisabledBtns(true);
+                    } else {
+                      setResp_report(res.data);
+                      setTotal(res.total);
+                      setDisabledBtns(false);
+                    }
                   }
+                  
                 });
               }
             }}

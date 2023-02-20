@@ -7,6 +7,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { useEffect } from "react";
 import Tickets from "../../../../components/Base/Tickets";
 import { useLoteria } from "../../utils/LoteriaHooks";
+import { notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -18,6 +19,8 @@ const SellResp = ({
   setSellResponse,
   closeModal,
   setCustomer,
+  selecFrac,
+  setSelecFrac
 }) => {
   const pageStyle = `
   @page {
@@ -48,37 +51,44 @@ const SellResp = ({
   const { roleInfo } = useAuth();
   const { infoTicket } = useAuth();
 
+  useEffect(() => {
+    if (!sellResponse?.status) {
+      closeModal()
+      notifyError(sellResponse?.msg || "Error respuesta PDP: (Fallo al consumir el servicio (loterías) [0010002])")
+    }
+  }, [sellResponse])
+
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
     pageStyle: pageStyle,
   });
   const voucherInfo = useMemo(() => {
     const vinfo = {};
-    if (!("msg" in sellResponse)) {
-      sellResponse.fecha_venta = sellResponse.fecha_venta.replace(/-/g, "/");
+    if (sellResponse?.status) {
+      sellResponse.obj.fecha_venta = sellResponse?.obj?.fecha_venta.replace(/-/g, "/");
 
       vinfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
         year: "numeric",
         month: "numeric",
         day: "numeric",
-      }).format(new Date(sellResponse.fecha_venta));
+      }).format(new Date(sellResponse?.obj?.fecha_venta));
       vinfo["Hora"] = Intl.DateTimeFormat("es-CO", {
         hour: "numeric",
         minute: "numeric",
         second: "numeric",
         hour12: false,
-      }).format(new Date(sellResponse.fecha_venta));
+      }).format(new Date(sellResponse?.obj?.fecha_venta));
 
-      vinfo["Nombre de loteria"] = sellResponse.nom_loteria;
+      vinfo["Nombre de loteria"] = sellResponse?.obj?.nom_loteria;
       vinfo.Comercio = roleInfo.id_comercio;
       vinfo["Dirección"] = roleInfo.direccion;
-      vinfo.Fracciones = sellResponse.fracciones;
-      vinfo["Id Transacción"] = sellResponse.id_Transaccion;
-      vinfo["Numero de billete"] = sellResponse.num_billete;
+      vinfo.Fracciones = sellResponse?.obj?.fracciones;
+      vinfo["Id Transacción"] = sellResponse?.obj?.id_Transaccion;
+      vinfo["Numero de billete"] = sellResponse?.obj?.num_billete;
       vinfo.ciudad = roleInfo.ciudad;
-      vinfo.Serie = sellResponse.serie;
-      vinfo["Valor pagado"] = sellResponse.valor_pago;
-      vinfo.id_trx = sellResponse["id_trx"];
+      vinfo.Serie = sellResponse?.obj?.serie;
+      vinfo["Valor pagado"] = sellResponse?.obj?.valor_pago;
+      vinfo.id_trx = sellResponse?.obj?.["id_trx"];
       vinfo["No.terminal"] = roleInfo.id_dispositivo;
 
       return vinfo;
@@ -91,8 +101,6 @@ const SellResp = ({
     sellResponse,
   ]);
 
-  if (!("msg" in sellResponse)) {
-  }
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -112,25 +120,25 @@ const SellResp = ({
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Id Trx ", sellResponse?.id_Transaccion],
-        ["Id Aut ", sellResponse?.id_Transaccion],
+        ["Id Trx ", sellResponse?.obj?.id_trx],
+        ["Id Aut ", sellResponse?.obj?.id_trx],
         ["Comercio", roleInfo?.["nombre comercio"]],
         ["", ""],
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: sellResponse?.nom_loteria,
+      commerceName: sellResponse?.obj?.nom_loteria,
       trxInfo: [
-        ["Sorteo", sellResponse?.sorteo],
-        ["Billete", sellResponse?.num_billete],
-        ["Serie", sellResponse?.serie],
-        ["Fracciones", sellResponse?.fracciones],
-        ["Tipo de Billete", sellResponse?.fisico === true ? "Físico" : "Virtual"],
+        ["Sorteo", sellResponse?.obj?.sorteo],
+        ["Billete", sellResponse?.obj?.num_billete],
+        ["Serie", sellResponse?.obj?.serie],
+        ["Fracción", sellResponse?.obj?.fisico === true? JSON.stringify(selecFrac).replace(/,/g," - ").replace(/[[]/,"").replace(/]/,"") : sellResponse?.obj?.fracciones],
+        ["Tipo de Billete", sellResponse?.obj?.fisico === true ? "Físico" : "Virtual"],
         ["", ""],
-        ["Valor", formatMoney.format(sellResponse?.valor_pago)],
+        ["Valor", formatMoney.format(sellResponse?.obj?.valor_pago)],
         ["", ""],
-        ["Forma de Pago", parseInt(sellResponse?.tipoPago) ===
-          parseInt(operacion?.Venta_Fisica) || sellResponse?.fisico == false
+        ["Forma de Pago", parseInt(sellResponse?.obj?.tipoPago) ===
+          parseInt(operacion?.Venta_Fisica) || sellResponse?.obj?.fisico == false
           ? "Efectivo"
           : "Bono"],
         ["", ""],
@@ -139,8 +147,7 @@ const SellResp = ({
         "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
   }, [roleInfo, sellResponse, voucherInfo]);
-
-  return "msg" in sellResponse ? (
+  return !sellResponse?.status ? (
     <div className="flex flex-col justify-center items-center">
       <h1>Error: {sellResponse.msg}</h1>
       <Button

@@ -44,6 +44,7 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
             descripcion: paquetes[i]["productDesc"],
             operador: state?.producto,
             operador_recargar: state?.operador_recargar,
+            operadorPaquete: state?.operadorPaquete,
           },
         }        
       )

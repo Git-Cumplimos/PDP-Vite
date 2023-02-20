@@ -140,7 +140,9 @@ const Premios = ({ route }) => {
             nom_loteria: res?.obj?.nom_loteria,
           };
         });
-
+        if (res === undefined) {
+          notifyError("No existen resultados, para el sorteo indicado")
+        }
         if ("msg" in res) {
           if (res?.obj?.max_pago == true) {
             notifyError(
@@ -233,18 +235,18 @@ const Premios = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: datosComercio.nom_loteria,
+      commerceName: ["PAGO PREMIO ", datosComercio.nom_loteria],
       trxInfo: [
         ["Sorteo", sorteo],
         ["Billete", billete],
         ["Serie", serie],
-        ["Fracciones", seleccionarFraccion],
-        [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
-        ["", ""],
-        ["Valor", formatMoney.format(totalPagar)],
-        ["", ""],
-        ["Forma de Pago", "Efectivo"],
-        ["", ""],
+        ["Fracción", seleccionarFraccion],
+        // [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
+        // ["", ""],
+        ["Valor a pagar", formatMoney.format(totalPagar)],
+        // ["", ""],
+        // ["Forma de Pago", "Efectivo"],
+        // ["", ""],
         [tipopago === 2 ? "Nombre" : "", tipopago === 2 ? datosCliente?.nombre : ""],
         [tipopago === 2 ? "Celular" : "", tipopago === 2 ? datosCliente?.celular : ""],
       ],
@@ -265,14 +267,33 @@ const Premios = ({ route }) => {
     if (tipopago === 2) {
       if (String(datosCliente?.celular).charAt(0) === "3") {
         setRespuesta(true);
-        if (
+        if (checkBilleteVirtual === true && hash === "") {
+          // notifyError("Por favor, ingrese el código hash")
+          setRespuesta(false);
+        } else if (
           seleccionarFraccion === 0 ||
           seleccionarFraccion === "0" ||
           seleccionarFraccion === undefined
         ) {
           setRespuesta(false);
-          notifyError("Seleccione una fracción");
-        } else {
+          if (checkBilleteVirtual === false) {
+            notifyError("Seleccione una fracción")
+          }
+        }
+        // if (
+        //   seleccionarFraccion === 0 ||
+        //   seleccionarFraccion === "0" ||
+        //   seleccionarFraccion === undefined
+        // ) {
+        //   setRespuesta(false);
+        //   if (checkBilleteVirtual === false) {
+        //     notifyError("Seleccione una fracción")
+        //   } else if (checkBilleteVirtual === true) {
+        //     notifyError("Por favor, ingrese el código hash")
+        //   }
+
+        // }
+        else {
           makePayment(
             sorteo,
             billete,
@@ -322,15 +343,20 @@ const Premios = ({ route }) => {
         );
       }
     } else {
-      setRespuesta(true);
-      if (
+      if (checkBilleteVirtual === true && hash === "") {
+        // notifyError("Por favor, ingrese el código hash")
+        setRespuesta(false);
+      } else if ((checkBilleteFisico) && (
         seleccionarFraccion === 0 ||
         seleccionarFraccion === "0" ||
-        seleccionarFraccion === undefined
+        seleccionarFraccion === undefined)
       ) {
-        setRespuesta(false);
-        notifyError("Seleccione una fracción");
+        if (checkBilleteVirtual === false) {
+          setRespuesta(false);
+          notifyError("Seleccione una fracción")
+        }
       } else {
+        setRespuesta(true);
         makePayment(
           sorteo,
           billete,
@@ -369,9 +395,6 @@ const Premios = ({ route }) => {
             if (res?.status === false) {
               notifyError(res?.obj?.msg);
               navigate(-1);
-            }
-            if (res?.status === false) {
-              notifyError(res?.msg)
             }
           })
           .catch(() => setDisabledBtns(false));
@@ -426,7 +449,7 @@ const Premios = ({ route }) => {
           type="text"
           minLength="1"
           maxLength="4"
-          required
+          required={true}
           autoComplete="off"
           value={sorteo}
           onInput={(e) => {
@@ -442,7 +465,7 @@ const Premios = ({ route }) => {
           type="text"
           minLength="4" /*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="4"
-          required
+          required={true}
           autoComplete="off"
           value={billete}
           onInput={(e) => {
@@ -458,7 +481,7 @@ const Premios = ({ route }) => {
           type="text"
           minLength="3" /*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="3"
-          required
+          required={true}
           autoComplete="off"
           value={serie}
           onInput={(e) => {
@@ -472,7 +495,7 @@ const Premios = ({ route }) => {
           <Input
             type="checkbox"
             label="Billete Físico"
-            required
+            required={true}
             value={checkBilleteFisico}
             disabled={checkDisableFisico}
             onChange={() => {
@@ -488,7 +511,7 @@ const Premios = ({ route }) => {
           <Input
             label="Billete Virtual"
             type="checkbox"
-            required
+            required={true}
             disabled={checkDisableVirtual}
             value={checkBilleteVirtual}
             onChange={() => {
@@ -522,7 +545,7 @@ const Premios = ({ route }) => {
             ]}
             data={respagar}></TableEnterprise>
           {tipopago === 2 && !maxPago ? (
-            <Form grid>
+            <Form onSubmit={onPay1} grid>
               <Fieldset
                 className="lg:col-span-2"
                 legend={
@@ -542,7 +565,7 @@ const Premios = ({ route }) => {
                       };
                     });
                   }}
-                  required
+                  required={true}
                 />
                 <Input
                   id="cedula"
@@ -551,7 +574,7 @@ const Premios = ({ route }) => {
                   minLength={"10"}
                   maxLength={"10"}
                   autoComplete="off"
-                  required
+                  required={true}
                   value={datosCliente?.documento}
                   onInput={(e) => {
                     setDatosCliente((old) => {
@@ -570,7 +593,7 @@ const Premios = ({ route }) => {
                   minLength={"10"}
                   maxLength={"10"}
                   autoComplete="off"
-                  required
+                  required={true}
                   value={datosCliente?.celular}
                   onInput={(e) => {
                     setDatosCliente((old) => {
@@ -587,7 +610,7 @@ const Premios = ({ route }) => {
                   label="Dirección"
                   type="text"
                   autoComplete="off"
-                  required
+                  required={true}
                   value={datosCliente?.direccion}
                   onInput={(e) => {
                     setDatosCliente((old) => {
@@ -604,7 +627,7 @@ const Premios = ({ route }) => {
                     label="Fracción"
                     options={optionsDocumento}
                     value={seleccionarFraccion}
-                    required
+                    required={true}
                     onChange={(e) => {
                       setSeleccionarFraccion(e.target.value);
                     }}
@@ -616,14 +639,14 @@ const Premios = ({ route }) => {
                 {checkBilleteVirtual == true ? (
                   <Input
                     id="codHash"
-                    label="Codigo de seguridad"
+                    label="Código de seguridad"
                     type="text"
                     autoComplete="off"
-                    required
                     value={hash}
                     onChange={(e) => {
                       setHash(e.target.value);
                     }}
+                    required={true}
                   />
                 ) : (
                   ""
@@ -633,8 +656,8 @@ const Premios = ({ route }) => {
                     <ButtonBar
                       className="flex flex-row justify-center items-center
                           mx-auto container gap-10 text-lg lg:col-span-2">
-                      <Button onClick={() => cancelar()}>Cancelar</Button>
-                      <Button type={"submit"} onClick={onPay1}>
+                      <Button type={"button"} onClick={() => cancelar()}>Cancelar</Button>
+                      <Button type={"submit"} >
                         Pagar
                       </Button>
                     </ButtonBar>
@@ -648,19 +671,17 @@ const Premios = ({ route }) => {
             <>
               {!maxPago ? (
                 <>
-                  <Form grid>
+                  <Form onSubmit={onPay1} grid>
                     <Fieldset
                       className="lg:col-span-2 flex justify-center items-center"
-                      legend={
-                        "Por favor, seleccione la fracción del billete a pagar"
-                      }>
+                      legend={checkBilleteVirtual === true ? ("Por favor, Ingresar el Código Hash.") : ("Por favor, seleccione la fracción del billete a pagar")}>
                       {checkBilleteVirtual === false ? (
                         <Select
                           id="selectFraccion"
                           label="Fracción"
                           options={optionsDocumento}
                           value={seleccionarFraccion}
-                          required
+                          required={true}
                           onChange={(e) => {
                             setSeleccionarFraccion(e.target.value);
                           }}
@@ -670,15 +691,15 @@ const Premios = ({ route }) => {
                       )}
                       {checkBilleteVirtual === true ? (
                         <Input
-                          id="codHash"
-                          label="Codigo de seguridad"
+                          id="codHash1"
+                          label="Código de seguridad"
                           type="text"
                           autoComplete="off"
-                          required
                           value={hash}
                           onChange={(e) => {
                             setHash(e.target.value);
                           }}
+                          required={true}
                         />
                       ) : (
                         ""
@@ -690,7 +711,7 @@ const Premios = ({ route }) => {
                             className="flex flex-row justify-center items-center
                           mx-auto container gap-10 text-lg lg:col-span-2">
                             <Button onClick={() => cancelar()}>Cancelar</Button>
-                            <Button type={"submit"} onClick={onPay1}>
+                            <Button type={"submit"} >
                               Pagar
                             </Button>
                           </ButtonBar>

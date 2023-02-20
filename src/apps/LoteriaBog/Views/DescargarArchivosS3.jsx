@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import { useLoteria } from "../utils/LoteriaHooks";
@@ -15,16 +15,18 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 const DescargarArchivosS3 = ({ route }) => {
   const { label } = route;
-
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(1);
   const [sorteo, setSorteo] = useState("");
   const [fecha_ini, setFecha_ini] = useState("");
   const [fecha_fin, setFecha_fin] = useState("");
+  // const [fecha_ini, setFecha_ini] = useState(new Date().toLocaleDateString());
+  // const [fecha_fin, setFecha_fin] = useState(new Date().toLocaleDateString());
   const [resp_con_sort, setResp_con_sort] = useState(null);
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
+  const { descargaVentas_S3 } = useLoteria();
+  const [urls, setUrls] = useState(false);
   const { con_SortVentas_S3 } = useLoteria();
   const [showModal2, setShowModal2] = useState(false);
 
@@ -51,10 +53,28 @@ const DescargarArchivosS3 = ({ route }) => {
     setShowModal(false);
   }, []);
 
+  // const closeModal = () => {
+  //   setShowModal(false)
+  // }
+  // const closeModal = useCallback(() => {
+  //   setShowModal(false);
+  // }, []);
   const closeModal2 = useCallback(async () => {
     setShowModal2(false);
   }, []);
+  const handleChange = (e) => {
+    if (e.target.value) {
+      setFecha_ini(e.target.value);
+    }
+  };
+  const handleChange2 = (e) => {
+    if (e.target.value) {
+      setFecha_fin(e.target.value);
+    }
+  };
+  useEffect(() => {
 
+  }, [fecha_fin, fecha_ini])
   return (
     <>
       <h1 class="text-3xl">Descarga de archivos  </h1>
@@ -81,18 +101,21 @@ const DescargarArchivosS3 = ({ route }) => {
                 if (e.target.value !== "") {
                   con_SortVentas_S3(e.target.value, null, null, page).then(
                     (res) => {
-                      if (!("msg" in res)) {
-                        setResp_con_sort(res.info);
-                        setMaxPages(res.num_datos);
-                      } else {
-                        notifyError(res.msg);
-                        setResp_con_sort("");
+                      if (res !== undefined) {
+
+                        if (!("msg" in res)) {
+                          setResp_con_sort(res.info);
+                          setMaxPages(res.num_datos);
+                        } else {
+                          notifyError(res.msg);
+                          setResp_con_sort("");
+                        }
                       }
                     }
                   );
                 }
               },
-              timeOut: 500,
+              timeOut: 1000,
             }}
           />
           {sorteo === "" ? (
@@ -105,10 +128,13 @@ const DescargarArchivosS3 = ({ route }) => {
                 label="Fecha inicial"
                 type="date"
                 value={fecha_ini}
-                onInput={(e) => {
-                  setFecha_ini(e.target.value);
-                }}
+                onChange={handleChange}
+                // onInput={(e) => {
+                //   setFecha_ini(e.target.value);
+                // }}
+                // onLazyInput={handleChange}
                 onLazyInput={{
+
                   callback: (e) => {
                     if (fecha_fin !== "") {
                       con_SortVentas_S3(
@@ -117,16 +143,19 @@ const DescargarArchivosS3 = ({ route }) => {
                         fecha_fin,
                         page
                       ).then((res) => {
-                        if (!("msg" in res)) {
-                          setResp_con_sort(res.info);
-                          setMaxPages(res.num_datos);
-                        } else {
-                          notifyError(res.msg);
+                        if (res !== undefined) {
+
+                          if (!("msg" in res)) {
+                            setResp_con_sort(res.info);
+                            setMaxPages(res.num_datos);
+                          } else {
+                            notifyError(res.msg);
+                          }
                         }
                       });
                     }
                   },
-                  timeOut: 500,
+                  timeOut: 1000,
                 }}
               />
               <div className="flex flex-row justify-center w-full">
@@ -136,9 +165,10 @@ const DescargarArchivosS3 = ({ route }) => {
                 label="Fecha final"
                 type="date"
                 value={fecha_fin}
-                onInput={(e) => {
-                  setFecha_fin(e.target.value);
-                }}
+                onInput={handleChange2}
+                // onInput={(e) => {
+                //   setFecha_fin(e.target.value);
+                // }}
                 onLazyInput={{
                   callback: (e) => {
                     if (fecha_ini !== "") {
@@ -149,17 +179,18 @@ const DescargarArchivosS3 = ({ route }) => {
                         page
                       ).then((res) => {
                         if (res !== undefined) {
-                          if (!("msg" in res)) {
+                          // if (!("msg" in res) && res !== []) {
+                          if (!("msg" in res) && res?.length !== 0) {
                             setResp_con_sort(res.info);
                             setMaxPages(res.num_datos);
+                          } else {
+                            notifyError(res.msg)
                           }
-                        } else {
-                          notifyError(res.msg);
                         }
                       });
                     }
                   },
-                  timeOut: 500,
+                  timeOut: 1000,
                 }}
               />
             </>
@@ -223,7 +254,20 @@ const DescargarArchivosS3 = ({ route }) => {
               })}
               onSelectRow={(_e, index) => {
                 setSelected(resp_con_sort[index]);
-                setShowModal(true);
+                descargaVentas_S3(resp_con_sort[index]).then((res) => {
+                  if (res !== undefined) {
+                    // if (!("msg" in res) && res !== []) {
+                    if (!("msg" in res) && res?.length !== 0) {
+                      setUrls(res);
+                      setShowModal(true);
+                    } else {
+                      notifyError("No existen archivos")
+                    }
+                  } else {
+                    notifyError("No existen archivos parar descargar")
+
+                  }
+                });
               }}
             />
             {/* <TableEnterprise title='Tabla Número de sorteo'
@@ -286,7 +330,9 @@ const DescargarArchivosS3 = ({ route }) => {
           <Button type="submit">Reporte ventas</Button>
         </Form>
         <Modal show={showModal} handleClose={closeModal}>
-          <DescargaForm closeModal={closeModal} selected={selected} />
+          <DescargaForm
+            setShowModal={setShowModal}
+            closeModal={closeModal} urls={urls} setUrls={setUrls} />
         </Modal>
         <Modal show={showModal2} handleClose={closeModal2}>
           <ReportVentasForm closeModal={closeModal2} Oficina="" />

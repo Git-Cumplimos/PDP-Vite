@@ -363,8 +363,8 @@ export const useProvideLoteria = () => {
         const res = await fetchData(urls.ventaOrdinario, "POST", {}, req);
         setSellResponse(res);
         setLoadConsulta(false);
-        if (res?.mensaje_hash) {
-          notify(res?.mensaje_hash)
+        if (res?.obj?.mensaje_hash) {
+          notify(res?.obj?.mensaje_hash)
         }
 
       } catch (err) {

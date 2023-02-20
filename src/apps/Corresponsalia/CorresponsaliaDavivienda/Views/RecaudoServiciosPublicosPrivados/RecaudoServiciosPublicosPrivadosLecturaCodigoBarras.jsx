@@ -23,6 +23,8 @@ import {
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
+const valor_maximo_recaudo = 9900000;
+
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
@@ -290,6 +292,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       } else {
         valorTransaccion = datosTransaccion.valor ?? 0;
       }
+      if (valorTransaccion > valor_maximo_recaudo) {
+        return notifyError(
+          `El valor de transacción es superior al valor maximo permitido ${formatMoney.format(
+            valor_maximo_recaudo
+          )}`
+        );
+      }
       const hoy = new Date();
       const fecha = Intl.DateTimeFormat("es-CO", {
         year: "2-digit",
@@ -441,7 +450,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                         direccion: roleInfo?.direccion,
                       })
                         .then((res) => {
-                          if (res?.msg !== "No ha terminado el reintento") {
+                          if (
+                            res?.msg !==
+                            "Error respuesta PDP: (No ha terminado la operación)"
+                          ) {
                             if (res?.status) {
                               setIsUploading(false);
                               notify(res?.msg);

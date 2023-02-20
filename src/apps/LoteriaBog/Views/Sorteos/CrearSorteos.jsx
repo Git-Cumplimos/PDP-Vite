@@ -53,18 +53,20 @@ const CrearSorteos = ({ route }) => {
       setResp_con(res);
     });
     setDay(new Date().getDay());
-  }, [sorteosLOT]);
+  }, [sorteosLOT, disable_botoOrdinario, disabledBtns, disable_botoExtra, ConsultaCrearSort]);
 
   const onSubmit3 = (e) => {
     setTip_sorteo(2);
     setShowModal2(true);
+    setDisabledBtns(false);
     setDisable_botoExtra(true);
   };
 
   const onSubmit4 = (e) => {
     setTip_sorteo(1);
     setShowModal2(true);
-    // setDisable_botoOrdinario(true);
+    setDisabledBtns(false);
+    setDisable_botoOrdinario(true);
   };
 
   const closeModal = useCallback(() => {
@@ -204,6 +206,11 @@ const CrearSorteos = ({ route }) => {
           <CloseForm
             closeModal={closeModal2}
             tip_sorteo={tip_sorteo}
+            sorteo={sorteo}
+            disable_botoExtra={setDisable_botoExtra}
+            disabledBtns={setDisabledBtns}
+            disable_botoOrdinario={setDisable_botoOrdinario}
+
           ></CloseForm>
         </Modal>
         <Modal show={showparams} handleClose={() => closeparams()}>
