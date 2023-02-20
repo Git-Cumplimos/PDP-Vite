@@ -124,6 +124,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
 
   /////////////////////////////####//////////////////////
   const ticket = useMemo(() => {
+      
     return {
       title: "Recibo de pago",
       timeInfo: {

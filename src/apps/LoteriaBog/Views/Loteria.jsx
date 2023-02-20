@@ -266,7 +266,7 @@ const Loteria = ({ route }) => {
         ["Sorteo", sorteo],
         ["Billete", numero],
         ["Serie", serie],
-        ["Fracciones", ""],
+        ["Fracción", ""],
         ["Tipo de Billete", ""],
         ["", ""],
         ["Valor", ""],
@@ -279,7 +279,7 @@ const Loteria = ({ route }) => {
     };
   }, [roleInfo, sellResponse]
   );
-
+  
   return (
     <>
       <h1 className="text-3xl mt-6">Venta {nom_loteria} </h1>
@@ -515,6 +515,8 @@ const Loteria = ({ route }) => {
             setSellResponse={setSellResponse}
             closeModal={closeModal}
             setCustomer={setCustomer}
+            selecFrac={selecFrac}
+            setSelecFrac={setSelecFrac}
           />
         )}
       </Modal>
