@@ -37,7 +37,7 @@ import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 const Retiro = () => {
   const navigate = useNavigate();
 
-  const { roleInfo} = useAuth();
+  const { roleInfo, pdpUser} = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosGrupoAval.maxRetiroCuentas,
@@ -76,10 +76,10 @@ const Retiro = () => {
       Hora: "",
     },
     commerceInfo: [
+      ["Id comercio", roleInfo?.id_comercio],
       ["No. Terminal", roleInfo?.id_dispositivo],
-      ["Teléfono", roleInfo?.telefono],
-      // ["Id trx", trx_id],
-      // ["Id Aut", id_auth],
+      ["Id trx", ""],
+      ["Id Aut", ""],
       ["Comercio", roleInfo?.["nombre comercio"]],
       ["",""],
       ["Dirección", roleInfo?.direccion],
@@ -295,6 +295,7 @@ const Retiro = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"] = []
     objTicket["trxInfo"].push([
       "Número celular",
       phone
@@ -341,6 +342,7 @@ const Retiro = () => {
           direccion: roleInfo?.direccion,
         },
       },
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
     };
 
@@ -358,52 +360,14 @@ const Retiro = () => {
           // const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
           // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
-          const tempTicket = {
-            title: "Recibo de Pago",
-            timeInfo: {
-              "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-                year: "2-digit",
-                month: "2-digit",
-                day: "2-digit",
-              }).format(new Date()),
-              Hora: Intl.DateTimeFormat("es-CO", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              }).format(new Date()),
-            },
-            commerceInfo: [
-              ["No. Terminal", roleInfo?.id_dispositivo],
-              ["Teléfono", roleInfo?.telefono],
-              ["Id trx", trx_id],
-              ["Id Aut", id_auth],
-              ["Comercio", roleInfo?.["nombre comercio"]],
-              ["", ""],
-              ["Dirección", roleInfo?.direccion],
-              ["", ""],
-            ],
-            commerceName: "Retiro",
-            trxInfo: [
-              ["Número celular", phone],
-              ["", ""],
-
-              ["Entidad financiera", DataBanco?.nombre],
-              ["", ""],
-              ["Tipo de cuenta", tipoCuenta === "01" ? "Ahorros" : "Corriente"],
-              ["", ""],
-              // [
-              //   "Nro. Cuenta",
-              //   `****${String(numCuenta)?.slice(-4) ?? ""}`,
-              // ],
-              // ["",""],
-              ["Valor", formatMoney.format(valor)],
-              ["", ""],
-              ["Costo transacción", formatMoney.format(res?.obj?.costoTrx)],
-              ["", ""],
-            ],
-            disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
-          };
-          setPaymentStatus(tempTicket);
+          objTicket["commerceInfo"][2] = ["Id trx", trx_id]
+          objTicket["commerceInfo"][3] = ["Id trx", id_auth]
+          objTicket["trxInfo"].push([
+            "Costo transacción", 
+            formatMoney.format(res?.obj?.costoTrx)
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          setPaymentStatus(objTicket);
         }
       })
       .catch((err) => {

@@ -7,8 +7,6 @@ on:
   # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
     branches: [ "certificacion" ]
-  pull_request:
-    branches: [ "certificacion" ]
 
   # Allows you to run this workflow manually from the Actions tab
   # workflow_dispatch:
@@ -37,6 +35,10 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14.20.0
       
       - uses: aws-actions/configure-aws-credentials@v1
         with:

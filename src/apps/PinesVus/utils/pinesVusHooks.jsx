@@ -48,7 +48,6 @@ export const useProvidePinesVus = () => {
   // Datos consulta y compra
   const { roleInfo, pdpUser} = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
-  console.log("PDP USER",pdpUser)
   const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion,ticket) => {
     let tipo_comercio = user?.tipo_comercio
     if (user?.tipo_comercio === "KIOSCO"){
