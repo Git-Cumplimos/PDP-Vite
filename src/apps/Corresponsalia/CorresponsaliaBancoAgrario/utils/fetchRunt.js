@@ -72,6 +72,11 @@ export const fetchCustom = (url_, metodo_, name_) => {
             );
           }
         }
+      } else {
+        throw new ErrorCustomFetch(
+          `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+          Peticion
+        );
       }
     } catch (error) {
       if (error instanceof ErrorCustomTimeout) {

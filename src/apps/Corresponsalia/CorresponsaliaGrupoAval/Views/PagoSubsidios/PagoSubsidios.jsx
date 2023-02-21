@@ -18,10 +18,9 @@ import { pinBlock } from "../../utils/pinBlock";
 import {
   fetchCustomPost,
   ErrorCustom,
-  ErrorCustomBackend,
-  msgCustomBackend,
 } from "../../utils/fetchPagoSubsidios_PagoTerceros";
 
+// ************ constantes *******************
 const dataInputInitial = {
   documento: "",
   numeroCelular: "",
@@ -31,7 +30,9 @@ const dataInputInitial = {
 
 const url_consulta_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/consulta-pago-subsidios`;
 const url_pago_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/pago-subsidios`;
+// ********************************************
 
+// >>>>>>>>>>>>>>>>>>> componente <<<<<<<<<<<<<<<<<<<<<
 const PagoSubsidios = () => {
   const [inputData, setInputData] = useState(dataInputInitial);
   const [value, setValue] = useState(0);
@@ -46,6 +47,7 @@ const PagoSubsidios = () => {
     useFetch(fetchCustomPost);
   const { roleInfo, pdpUser } = useAuth();
 
+  // ***************************** on Change **********************************
   function onChangeInput(e) {
     let valueInput = "";
     if (e.target.name === "otp") {
@@ -74,7 +76,7 @@ const PagoSubsidios = () => {
 
   function onChangeInputSecond(e, value) {
     let valueInput = "";
-    if (e.target.name == "otp") {
+    if (e.target.name === "otp") {
       valueInput = ((value ?? "").match(/\d/g) ?? []).join("");
     }
     setInputData((anterior) => ({
@@ -104,6 +106,7 @@ const PagoSubsidios = () => {
     setTypeInfo("Inicial");
   }
 
+  // ************************************* onSubmit *****************************************
   function ConsultarSubsidio() {
     const dataConsult = {
       documento: inputData.documento,
@@ -117,7 +120,7 @@ const PagoSubsidios = () => {
 
     PeticionConsultaSubsidio(
       url_consulta_subsidio,
-      "/grupo-aval/consulta-pago-subsidio",
+      "Consulta de subsidios",
       dataConsult
     )
       .then((response) => {
@@ -129,12 +132,7 @@ const PagoSubsidios = () => {
         }
       })
       .catch((error) => {
-        if (error instanceof ErrorCustom) {
-        } else if (error instanceof ErrorCustomBackend) {
-          notifyError(`Consulta de subsidio no exitosa: ${error.message}`);
-        } else if (error instanceof msgCustomBackend) {
-          notify(`${error.message}`);
-        } else {
+        if (!error instanceof ErrorCustom) {
           notifyError("Consulta de subsidio no exitosa");
         }
         HandleCloseSecond();
@@ -176,11 +174,7 @@ const PagoSubsidios = () => {
       dataSubsidio["id_trx"] = idTrx;
     }
 
-    PeticionRetirarSubsidio(
-      url_pago_subsidio,
-      "/grupo-aval/pago-subsidio",
-      dataSubsidio
-    )
+    PeticionRetirarSubsidio(url_pago_subsidio, "Pago Subsidio", dataSubsidio)
       .then((response) => {
         if (response?.status === true) {
           if (response?.obj?.result?.ticket) {
@@ -192,18 +186,14 @@ const PagoSubsidios = () => {
         }
       })
       .catch((error) => {
-        if (error instanceof ErrorCustom) {
-        } else if (error instanceof ErrorCustomBackend) {
-          notifyError(`${error.message}`);
-        } else if (error instanceof msgCustomBackend) {
-          notify(`${error.message}`);
-        } else {
+        if (!error instanceof ErrorCustom) {
           notifyError("Pago de subsidio no exitoso");
         }
         HandleCloseSecond();
       });
   }
 
+  // ********************** Funciones para cerrar el modal ******************************
   const HandleCloseSecond = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);
