@@ -1,5 +1,6 @@
 import { lazy } from "react";
 import PermissionsRecaudoDirecto from "./permissions";
+// import RetiroDirecto from ;
 
 const ConvenioRecaudo = lazy(() => import("./Views/Admin/ConvenioRecaudo"));
 const ConvenioRetiro = lazy(() => import("./Views/Admin/ConvenioRetiro"));
@@ -14,6 +15,7 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 const RecaudoEntryPoint = lazy(() => import("./RecaudoEntryPoint"));
 const AdminRecaudoDirecto = lazy(() => import("./Views/Admin"));
 const RecaudoDirecto = lazy(() => import("./Views/Recaudo"));
+const RetiroDirecto = lazy(() => import("./Views/Retiro/RetiroDirecto"));
 
 const listPermissions = Object.values(PermissionsRecaudoDirecto);
 
@@ -27,14 +29,14 @@ export const rutasRecaudo = {
   subRoutes: [
     {
       link: "/recaudo-directo/recaudo/manual",
-      label: <AppIcons Logo={"RecaudoManual"} name={"Recaudo Manual"}/>,
-      component:RecaudoManual,
+      label: <AppIcons Logo={"RecaudoManual"} name={"Recaudo Manual"} />,
+      component: RecaudoManual,
       permission: [PermissionsRecaudoDirecto.recaudo],
     },
     {
       link: "/recaudo-directo/recaudo/barras",
-      label: <AppIcons Logo={"RecaudoCodigoDeBarras"} name={"Recaudo con Codigo de Barras"}/>,
-      component:RecaudoBarras,
+      label: <AppIcons Logo={"RecaudoCodigoDeBarras"} name={"Recaudo con Codigo de Barras"} />,
+      component: RecaudoBarras,
       permission: [PermissionsRecaudoDirecto.recaudo],
     },
     {
@@ -54,16 +56,16 @@ export const rutasGestionRecaudoDirecto = {
   permission: [PermissionsRecaudoDirecto.recaudo],
   subRoutes: [
     {
-    link: "/recaudo-directo/gestion/recaudo",
-    label: <AppIcons Logo={"Reporte"} name={"Convenios de Recaudos"} />,
-    component: ConvenioRecaudo,
-    permission: [PermissionsRecaudoDirecto.recaudo],
-  },{
-    link: "/recaudo-directo/gestion/retiro",
-    label: <AppIcons Logo={"Reporte"} name={"Convenios de Retiros"} />,
-    component: ConvenioRetiro,
-    permission: [PermissionsRecaudoDirecto.recaudo],
-  },]
+      link: "/recaudo-directo/gestion/recaudo",
+      label: <AppIcons Logo={"Reporte"} name={"Convenios de Recaudos"} />,
+      component: ConvenioRecaudo,
+      permission: [PermissionsRecaudoDirecto.recaudo],
+    }, {
+      link: "/recaudo-directo/gestion/retiro",
+      label: <AppIcons Logo={"Reporte"} name={"Convenios de Retiros"} />,
+      component: ConvenioRetiro,
+      permission: [PermissionsRecaudoDirecto.recaudo],
+    },]
 }
 
 const rutasRecaudoDirecto = {
@@ -73,6 +75,12 @@ const rutasRecaudoDirecto = {
   permission: listPermissionsRecaudoDirecto,
   subRoutes: [
     rutasRecaudo,
+    {
+      link: "/recaudo-directo/retiro",
+      label: <AppIcons Logo={"Retiro"} name={"Retiro Directo"} />,
+      component: RetiroDirecto,
+      permission: [PermissionsRecaudoDirecto.recaudo],
+    },
     rutasGestionRecaudoDirecto,
   ],
 };
