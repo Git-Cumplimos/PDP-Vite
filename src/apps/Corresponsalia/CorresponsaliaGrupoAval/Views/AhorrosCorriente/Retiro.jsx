@@ -517,7 +517,7 @@ const Retiro = () => {
                 >
                   Realizar retiro
                 </Button>
-                {showBTNConsulta ? (
+                {/* {showBTNConsulta ? (
                   <Button
                     type="submit"
                     onClick={consultaCosto}
@@ -527,7 +527,7 @@ const Retiro = () => {
                   </Button>
                 ) : (
                   ""
-                )}
+                )} */}
                 <Button
                   onClick={(e) => {
                     handleClose();

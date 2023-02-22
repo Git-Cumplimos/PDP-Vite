@@ -492,7 +492,7 @@ const Deposito = () => {
                   disabled={loadingDepositoCorresponsalGrupoAval}>
                   Realizar depósito
                 </Button>
-                {showBTNConsulta ? 
+                {/* {showBTNConsulta ? 
                 <Button
                 type='submit'
                 onClick={consultarCosto}
@@ -501,7 +501,7 @@ const Deposito = () => {
                 </Button>                
                 :
                 ""
-                }
+                } */}
                 
                 <Button
                   onClick={(e) => {
