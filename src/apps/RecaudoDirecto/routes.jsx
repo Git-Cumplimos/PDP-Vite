@@ -1,8 +1,11 @@
 import { lazy } from "react";
 import PermissionsRecaudoDirecto from "./permissions";
-// import RecaudoDirecto from "./Views/RecaudoDirecto";
+
 const ConvenioRecaudo = lazy(() => import("./Views/Admin/ConvenioRecaudo"));
 const ConvenioRetiro = lazy(() => import("./Views/Admin/ConvenioRetiro"));
+const RecaudoManual = lazy(() => import("./Views/Recaudo/RecaudoManual"));
+const RecaudoBarras = lazy(() => import("./Views/Recaudo/RecaudoBarras"));
+const RecaudoConjunto = lazy(() => import("./Views/Recaudo/RecaudoConjunto"));
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
@@ -10,10 +13,39 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 /** Rutas */
 const RecaudoEntryPoint = lazy(() => import("./RecaudoEntryPoint"));
 const AdminRecaudoDirecto = lazy(() => import("./Views/Admin"));
+const RecaudoDirecto = lazy(() => import("./Views/Recaudo"));
 
 const listPermissions = Object.values(PermissionsRecaudoDirecto);
 
 export const listPermissionsRecaudoDirecto = listPermissions.splice(listPermissions.length / 2)
+
+export const rutasRecaudo = {
+  link: "/recaudo-directo/recaudo",
+  label: <AppIcons Logo={"Recaudo"} name={"Recaudo Directo"} />,
+  component: RecaudoDirecto,
+  permission: listPermissionsRecaudoDirecto,
+  subRoutes: [
+    {
+      link: "/recaudo-directo/recaudo/manual",
+      label: <AppIcons Logo={"RecaudoManual"} name={"Recaudo Manual"}/>,
+      component:RecaudoManual,
+      permission: [PermissionsRecaudoDirecto.recaudo],
+    },
+    {
+      link: "/recaudo-directo/recaudo/barras",
+      label: <AppIcons Logo={"RecaudoCodigoDeBarras"} name={"Recaudo con Codigo de Barras"}/>,
+      component:RecaudoBarras,
+      permission: [PermissionsRecaudoDirecto.recaudo],
+    },
+    {
+      link: "/recaudo-directo/recaudo/:pk_id_convenio",
+      label: <AppIcons Logo={"Recaudo"} name={"Consultas de recaudo"} />,
+      component: RecaudoConjunto,
+      permission: [PermissionsRecaudoDirecto.recaudo],
+      show: false,
+    },
+  ],
+}
 
 export const rutasGestionRecaudoDirecto = {
   link: "/recaudo-directo/gestion",
@@ -40,6 +72,7 @@ const rutasRecaudoDirecto = {
   component: RecaudoEntryPoint,
   permission: listPermissionsRecaudoDirecto,
   subRoutes: [
+    rutasRecaudo,
     rutasGestionRecaudoDirecto,
   ],
 };
