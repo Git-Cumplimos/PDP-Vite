@@ -226,7 +226,7 @@ const PagoTerceros = () => {
           label="Número de OTP"
           type="text"
           minLength="4"
-          maxLength="6"
+          maxLength="8"
           autoComplete="off"
           value={inputData.otp}
           onInput={onChangeInputSecond}

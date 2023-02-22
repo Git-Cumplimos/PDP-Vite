@@ -18,7 +18,7 @@ export const fetchCustom = (url_, metodo_, name_) => {
       }
     } catch (error) {
       throw new ErrorCustomFetch(
-        "Error respuesta Front-end PDP: (fallo validando los datos de entrada del fetch)",
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message
       );
     }
@@ -35,7 +35,7 @@ export const fetchCustom = (url_, metodo_, name_) => {
       }
     } catch (error) {
       throw new ErrorCustomFetch(
-        `Error respuesta Front-end PDP: (No conecta con el servicio ${name_})`,
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message
       );
     }
@@ -44,20 +44,16 @@ export const fetchCustom = (url_, metodo_, name_) => {
     try {
       if (typeof Peticion !== "object") {
         throw new ErrorCustomFetch(
-          `Error respuesta Front-end PDP: (Servicio no encontrado ${name_})`,
-          "404 not found"
+          `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+          Peticion
         );
       }
     } catch (error) {
       throw error;
     }
-
     //evaluar respuesta de api gateway
     try {
-      if (
-        Peticion?.hasOwnProperty("status") === false &&
-        Peticion?.hasOwnProperty("status") === false
-      ) {
+      if (Peticion?.hasOwnProperty("status") === false) {
         //No es una respuesta directamente del servicio sino del api gateway
         if (Peticion?.hasOwnProperty("message") === true) {
           if (Peticion.message === "Endpoint request timed out") {
@@ -72,11 +68,6 @@ export const fetchCustom = (url_, metodo_, name_) => {
             );
           }
         }
-      } else {
-        throw new ErrorCustomFetch(
-          `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
-          Peticion
-        );
       }
     } catch (error) {
       if (error instanceof ErrorCustomTimeout) {
@@ -90,7 +81,6 @@ export const fetchCustom = (url_, metodo_, name_) => {
         );
       }
     }
-
     //evaluar la respuesta que llega del backend
     try {
       return EvaluateResponse(Peticion, name_);

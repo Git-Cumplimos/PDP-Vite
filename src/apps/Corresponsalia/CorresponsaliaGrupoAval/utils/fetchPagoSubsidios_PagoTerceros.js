@@ -12,12 +12,21 @@ export const fetchCustomPost = async (url_, name_, data_) => {
     );
   }
 
+  //Evaluar si la respuesta es json
+  try {
+    if (typeof Peticion !== "object") {
+      throw new ErrorCustomFetch(
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+        Peticion
+      );
+    }
+  } catch (error) {
+    throw error;
+  }
+
   //evaluar respuesta de api gateway
   try {
-    if (
-      Peticion?.hasOwnProperty("status") === false &&
-      Peticion?.hasOwnProperty("status") === false
-    ) {
+    if (Peticion?.hasOwnProperty("status") === false) {
       //No es una respuesta directamente del servicio sino del api gateway
       if (Peticion?.hasOwnProperty("message") === true) {
         if (Peticion.message === "Endpoint request timed out") {
@@ -31,11 +40,6 @@ export const fetchCustomPost = async (url_, name_, data_) => {
             Peticion.message
           );
         }
-      } else {
-        throw new ErrorCustomFetch(
-          `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
-          Peticion
-        );
       }
     }
   } catch (error) {

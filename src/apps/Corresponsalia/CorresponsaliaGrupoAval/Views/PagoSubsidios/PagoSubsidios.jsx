@@ -111,6 +111,7 @@ const PagoSubsidios = () => {
     const dataConsult = {
       documento: inputData.documento,
       otp: inputData.otp,
+      nombre_usuario: pdpUser["uname"],
       comercio: {
         id_comercio: roleInfo.id_comercio,
         id_usuario: roleInfo.id_usuario,
@@ -271,8 +272,8 @@ const PagoSubsidios = () => {
           name="otp"
           label="Número de OTP"
           type="text"
-          minLength="1"
-          maxLength="12"
+          minLength="4"
+          maxLength="8"
           autoComplete="off"
           value={inputData.otp}
           onInput={onChangeInputSecond}
