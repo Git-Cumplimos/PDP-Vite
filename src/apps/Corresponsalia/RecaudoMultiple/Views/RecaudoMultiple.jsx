@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 import CargueArchivoRecaudoMultiple from "../components/CargueArchivoRecaudoMultiple";
 import MostrarRecaudosPagar from "../components/MostrarRecaudosPagar";
+import ConsultarRecaudosMultiples from "../components/ConsultarRecaudosMultiples";
 
 const RecaudoMultiple = () => {
   const navigate = useNavigate();
@@ -38,6 +39,20 @@ const RecaudoMultiple = () => {
           pdpUser={pdpUser}
           setUuid={setUuid}
         />
+      ) : estadoTrx === 2 ? (
+        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+          <h1 className='text-2xl text-center mb-5'>
+            {`El código del proceso es:`}
+          </h1>
+          <h1 className='text-2xl text-center mb-5 font-semibold'>
+            {`${uuid}`}
+          </h1>
+          <ConsultarRecaudosMultiples
+            uuid={uuid}
+            roleInfo={roleInfo}
+            pdpUser={pdpUser}
+          />
+        </div>
       ) : (
         <></>
       )}

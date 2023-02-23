@@ -105,26 +105,12 @@ const MostrarRecaudosPagar = ({
   };
   const onSubmit = () => {
     setIsUploading(true);
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de pago"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
     const uniqueId = v4();
     let obj = {
       uuid: uniqueId,
       filename: fileName,
       cantidad_transacciones: recaudosMultiples.cantidad_transacciones,
-      ticket: objTicket,
+      ticket: objTicketActual,
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
@@ -153,6 +139,7 @@ const MostrarRecaudosPagar = ({
         setIsUploading(false);
         notify(res?.msg);
         setEstadoTrx(2);
+        setUuid(uniqueId);
       })
       .catch((err) => {
         notifyError("Error de conexion con el servicio");
