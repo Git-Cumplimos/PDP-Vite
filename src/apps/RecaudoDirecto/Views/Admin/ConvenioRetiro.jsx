@@ -14,15 +14,31 @@ const datos = {
   "name": "State",
   "value": [
     { activo: true, codigo_ean_iac: '0000000000000', pk_id_convenio: 2041, nombre_convenio: 'pruebas', fecha_creacion: '2022-07-10' },
-    { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2037, nombre_convenio: 'pruebas2', fecha_creacion: '2023-05-06' },
+    { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2037, nombre_convenio: 'prueba2', fecha_creacion: '2023-05-06' },
+    { activo: true, codigo_ean_iac: '2300000000000', pk_id_convenio: 2046, nombre_convenio: 'prueba3', fecha_creacion: '2022-07-10' },
+    { activo: true, codigo_ean_iac: '7458945645614', pk_id_convenio: 2035, nombre_convenio: 'prueba4', fecha_creacion: '2023-05-06' },
+    { activo: true, codigo_ean_iac: '0000000000000', pk_id_convenio: 2042, nombre_convenio: 'prueba5', fecha_creacion: '2022-07-10' },
+    { activo: true, codigo_ean_iac: '8878945645614', pk_id_convenio: 2022, nombre_convenio: 'prueba6', fecha_creacion: '2023-05-06' },
+    { activo: true, codigo_ean_iac: '9978945645614', pk_id_convenio: 2021, nombre_convenio: 'prueba7', fecha_creacion: '2023-05-06' },
+    { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2024, nombre_convenio: 'prueba8', fecha_creacion: '2023-05-06' },
+    { activo: true, codigo_ean_iac: '6878945645614', pk_id_convenio: 2025, nombre_convenio: 'prueba9', fecha_creacion: '2023-05-06' },
+    { activo: true, codigo_ean_iac: '9798945645614', pk_id_convenio: 2026, nombre_convenio: 'prueba10', fecha_creacion: '2023-05-06' },
+    { activo: true, codigo_ean_iac: '0078945645614', pk_id_convenio: 2027, nombre_convenio: 'prueba11', fecha_creacion: '2023-05-06' },
   ],
 }
 const tiposValores = [{ label: "verdadero", value: "TRUE" }, { label: "falso", value: "FALSE" }]
 
 const RetiroDirecto = () => {
+  const [listaConveniosRetiro, setListaConveniosRetiro] = useState([]);
   const [showModal, setShowModal] = useState(false)
   const [selected, setSelected] = useState(null);
-  // const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [maxPages, setMaxPages] = useState(0);
+  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [searchFilters, setSearchFilters] = useState({
+    pk_id_convenio: "",
+    codigo_ean_iac: "",
+    nombre_convenio: "",
+  });
 
   // const [listRecaudos,setListRecaudos] = useState('')
 
@@ -34,6 +50,27 @@ const RetiroDirecto = () => {
 
   // useEffect(()=>{getRecaudos()},[])
 
+  const getConvRetiro = useCallback(() => {
+    let datosFiltrados = datos['value'].filter((item, index) => {
+      if (index < pageData.limit) return item
+    })
+    let datosBusqueda;
+    // console.log(Object.values(searchFilters).some(val => val !== ""))
+    if (Object.values(searchFilters).some(val => val !== "")) {
+      datosBusqueda = datosFiltrados.filter((item) => {
+        if (searchFilters.pk_id_convenio !== "" &&
+          Object.values(item)[2].toString().includes(searchFilters.pk_id_convenio)) return item
+        else if (searchFilters.codigo_ean_iac !== "" &&
+          Object.values(item)[1].includes(searchFilters.codigo_ean_iac)) return item
+        else if (searchFilters.nombre_convenio !== "" &&
+          Object.values(item)[3].toString().includes(searchFilters.nombre_convenio.toString())) return item
+      })
+    }
+
+    console.log(datosBusqueda)
+    setListaConveniosRetiro(datosBusqueda ?? datosFiltrados)
+  }, [pageData, searchFilters])
+
   const crearConvenioRetiro = useCallback((e) => {
     e.preventDefault();
     console.log(e)
@@ -42,6 +79,7 @@ const RetiroDirecto = () => {
     setShowModal(false);
     setSelected(false)
   }, []);
+  useEffect(() => { getConvRetiro() }, [getConvRetiro])
 
   return (
     <Fragment>
@@ -59,7 +97,7 @@ const RetiroDirecto = () => {
           "Estado",
           "Fecha creacion",
         ]}
-        data={datos['value'].map(
+        data={listaConveniosRetiro.map(
           ({
             pk_id_convenio,
             codigo_ean_iac,
@@ -74,17 +112,23 @@ const RetiroDirecto = () => {
             fecha_creacion,
           })
         )}
-        // maxPage={0}
-        // onSetPageData={10 }
+        maxPage={2}
+        onSetPageData={setPageData}
         onSelectRow={(e, i) => {
           setShowModal(true);
           setSelected(datos['value'][i]);
         }}
+        onChange={(ev) =>
+          setSearchFilters((old) => ({
+            ...old,
+            [ev.target.name]: ev.target.value,
+          }))
+        }
       >
         <Input
           id={"pk_codigo_convenio"}
           label={"Código de convenio"}
-          name={"pk_codigo_convenio"}
+          name={"pk_id_convenio"}
           type="tel"
           autoComplete="off"
           maxLength={"4"}
