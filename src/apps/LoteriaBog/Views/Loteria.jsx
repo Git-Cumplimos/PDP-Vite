@@ -280,7 +280,6 @@ const Loteria = ({ route }) => {
     };
   }, [roleInfo, sellResponse]
   );
-  
   return (
     <>
       <h1 className="text-3xl mt-6">Venta {nom_loteria} </h1>
