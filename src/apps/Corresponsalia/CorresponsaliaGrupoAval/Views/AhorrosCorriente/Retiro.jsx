@@ -37,7 +37,7 @@ import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 const Retiro = () => {
   const navigate = useNavigate();
 
-  const { roleInfo} = useAuth();
+  const { roleInfo, pdpUser} = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosGrupoAval.maxRetiroCuentas,
@@ -342,6 +342,7 @@ const Retiro = () => {
           direccion: roleInfo?.direccion,
         },
       },
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
     };
 
@@ -516,7 +517,7 @@ const Retiro = () => {
                 >
                   Realizar retiro
                 </Button>
-                {showBTNConsulta ? (
+                {/* {showBTNConsulta ? (
                   <Button
                     type="submit"
                     onClick={consultaCosto}
@@ -526,7 +527,7 @@ const Retiro = () => {
                   </Button>
                 ) : (
                   ""
-                )}
+                )} */}
                 <Button
                   onClick={(e) => {
                     handleClose();

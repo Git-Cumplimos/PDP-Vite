@@ -29,7 +29,7 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
-  console.log("REQUEST--->", bodyObj)
+  console.log("REQUEST--->", bodyObj);
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
@@ -59,7 +59,6 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
       );
       res.obj = JSON.parse(obj);
     }
-    console.log("RESPONSE--->", res)
     return res?.obj;
   } catch (err) {
     throw err;
@@ -107,7 +106,7 @@ export const postConsultaConveniosDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
-  console.log("REQUEST--->", bodyObj)
+  console.log("REQUEST--->", bodyObj);
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
@@ -138,7 +137,6 @@ export const postConsultaConveniosDavivienda = async (bodyObj) => {
       );
       res.obj = JSON.parse(obj);
     }
-    console.log("RESPONSE--->", res)
     return res;
   } catch (err) {
     throw err;
@@ -196,12 +194,11 @@ export const postRecaudoConveniosDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
-  console.log("REQUEST--->", bodyObj)
-  const bodyHash = {...bodyObj}
-  delete bodyHash.ticket
+  const bodyHash = { ...bodyObj };
+  delete bodyHash.ticket;
 
-  const cod_hash = hash(bodyHash)
-  bodyObj.cod_hash = cod_hash
+  const cod_hash = hash(bodyHash);
+  bodyObj.cod_hash = cod_hash;
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
@@ -232,7 +229,6 @@ export const postRecaudoConveniosDavivienda = async (bodyObj) => {
       );
       res.obj = JSON.parse(obj);
     }
-    console.log("RESPONSE--->", res)
     return res;
   } catch (err) {
     throw err;
