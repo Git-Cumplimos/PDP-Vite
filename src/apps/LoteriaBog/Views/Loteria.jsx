@@ -235,6 +235,7 @@ const Loteria = ({ route }) => {
   },
     [numero, page, searchLoteria, searchLoteriafisica, serie, setCustomer, setSelected, setSellResponse, sorteo]
   );
+  
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -506,7 +507,7 @@ const Loteria = ({ route }) => {
             handleSubmit={(event) => {
               sorteo.split("-")[1] === "true"
                 ? sellLoteriafisica(sorteo, selecFrac, tipoPago, ticket)
-                : sellLoteria(sorteo, ticket);
+                : sellLoteria(sorteo, ticket, tipoPago);
             }}
           />
         ) : (
