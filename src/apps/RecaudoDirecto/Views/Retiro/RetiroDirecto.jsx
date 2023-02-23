@@ -1,4 +1,5 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
+import { useNavigate, Navigate, useParams, useSearchParams } from "react-router-dom";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -26,9 +27,10 @@ const retirosDirectos = [
 ]
 
 const RetiroDirecto = () => {
+  const navigate = useNavigate()
 
   const [showModal, setShowModal] = useState(false)
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState('');
   const [id_convenio, setId_Convenio] = useState(null);
   const [otp, setOtp] = useState('');
   const [tipoDocumento, setTipoDocumento] = useState(null);
@@ -71,6 +73,9 @@ const RetiroDirecto = () => {
     setShowModal(false);
     setSelected(false)
   }, []);
+  useEffect(() => {
+  if (selected !== '') navigate(`/recaudo-directo/consultar-retiro/retirar/${selected.pk_id_convenio}/${selected.nombre_convenio}`)
+  }, [selected]);
 
   return (
     <Fragment>
@@ -144,7 +149,7 @@ const RetiroDirecto = () => {
           required
         />
       </TableEnterprise>
-      <Modal show={showModal} handleClose={handleClose}>
+      {/* <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar retiro </h2>
         <Form onSubmit={consultarRetiroDirecto} grid >
           <Input
@@ -225,7 +230,7 @@ const RetiroDirecto = () => {
             </Button>
           </ButtonBar>
         </Form>
-      </Modal>
+      </Modal> */}
 
     </Fragment>
   )

@@ -18,6 +18,7 @@ const RecaudoEntryPoint = lazy(() => import("./RecaudoEntryPoint"));
 const AdminRecaudoDirecto = lazy(() => import("./Views/Admin"));
 const RecaudoDirecto = lazy(() => import("./Views/Recaudo"));
 const RetiroDirecto = lazy(() => import("./Views/Retiro/RetiroDirecto"));
+const FormularioRetiro = lazy(() => import("./Views/Retiro/FormularioRetiro"));
 
 const listPermissions = Object.values(PermissionsRecaudoDirecto);
 
@@ -47,6 +48,22 @@ export const rutasRecaudo = {
       component: RecaudoConjunto,
       permission: [PermissionsRecaudoDirecto.recaudo],
       show: false,
+    },
+  ],
+}
+
+export const rutasRetiro = {
+  link: "/recaudo-directo/consultar-retiro",
+  label: <AppIcons Logo={"Retiro"} name={"Retiro Directo"} />,
+  component: RetiroDirecto,
+  permission: [PermissionsRecaudoDirecto.recaudo],
+  subRoutes: [
+    {
+      link: "/recaudo-directo/consultar-retiro/retirar/:pk_id_convenio/:nombre_convenio",
+      label: <AppIcons Logo={"Retiro"} name={"Realizar retiro"} />,
+      component: FormularioRetiro,
+      permission: [PermissionsRecaudoDirecto.recaudo],
+      show:false,
     },
   ],
 }
@@ -87,12 +104,7 @@ const rutasRecaudoDirecto = {
   permission: listPermissionsRecaudoDirecto,
   subRoutes: [
     rutasRecaudo,
-    {
-      link: "/recaudo-directo/retiro",
-      label: <AppIcons Logo={"Retiro"} name={"Retiro Directo"} />,
-      component: RetiroDirecto,
-      permission: [PermissionsRecaudoDirecto.recaudo],
-    },
+    rutasRetiro,
     rutasGestionRecaudoDirecto,
   ],
 };
