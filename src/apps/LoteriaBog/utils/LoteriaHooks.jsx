@@ -177,7 +177,7 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-  //// Conaulta id disribuidor y de sucursal asociadas a la lotería
+  //// Consulta id disribuidor y de sucursal asociadas a la lotería
   const consulta_codigos_oficina = useCallback(
     async (nit) => {
       const query = { nit_loteria: nit, id_comercio: roleInfo?.id_comercio };
@@ -321,7 +321,7 @@ export const useProvideLoteria = () => {
   );
 
   const sellLoteria = useCallback(
-    async (sorteo, ticket) => {
+    async (sorteo, ticket, tipoPago) => {
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -353,7 +353,7 @@ export const useProvideLoteria = () => {
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
-        tipoPago: tiposOperaciones?.Venta_Virtual, /// Venta - Virtual
+        tipoPago: tipoPago !== null ? tipoPago : tiposOperaciones?.Venta_Virtual, /// Venta - Virtual
         ticket: ticket,
         email: customer.email,
       };

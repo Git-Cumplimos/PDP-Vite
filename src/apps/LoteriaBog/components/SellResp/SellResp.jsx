@@ -7,7 +7,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { useEffect } from "react";
 import Tickets from "../../../../components/Base/Tickets";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -55,6 +55,9 @@ const SellResp = ({
     if (!sellResponse?.status) {
       closeModal()
       notifyError(sellResponse?.msg || "Error respuesta PDP: (Fallo al consumir el servicio (loterías) [0010002])")
+    }
+    else {
+      notify("Venta de lotería exitosa")
     }
   }, [sellResponse])
 
@@ -138,7 +141,7 @@ const SellResp = ({
         ["Valor", formatMoney.format(sellResponse?.obj?.valor_pago)],
         ["", ""],
         ["Forma de Pago", parseInt(sellResponse?.obj?.tipoPago) ===
-          parseInt(operacion?.Venta_Fisica) || sellResponse?.obj?.fisico == false
+          parseInt(operacion?.Venta_Fisica)
           ? "Efectivo"
           : "Bono"],
         ["", ""],
@@ -146,7 +149,8 @@ const SellResp = ({
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
     };
-  }, [roleInfo, sellResponse, voucherInfo]);
+  }, [roleInfo, sellResponse,operacion,selecFrac]);
+ 
   return !sellResponse?.status ? (
     <div className="flex flex-col justify-center items-center">
       <h1>Error: {sellResponse.msg}</h1>
