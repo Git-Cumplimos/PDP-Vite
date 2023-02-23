@@ -5,44 +5,39 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { consultarRecaudo } from "../../../Recaudo/Views/utils";
+import { searchConveniosRecaudoList } from "../../utils/fetchFunctions"
 
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
 
-  const convenios = {
-    "name": "State",
-    "value": [
-      { activo: true, codigo_ean_iac: '0000000000000', id_convenio: 2041, nombre_convenio: 'pruebas', fecha_creacion: '2022-07-10' },
-      { activo: true, codigo_ean_iac: '8978945645614', id_convenio: 2037, nombre_convenio: 'pruebas2', fecha_creacion: '2023-05-06' },
-    ],
-  }
   const recaudoDirectos = [
-    { pk_id_convenio: 2041, referencia: 650122, nombre_cliente: "Kevin Guevara", valor: "25000" },
-    { pk_id_convenio: 2037, referencia: 660122, nombre_cliente: "Maria Reyes", valor: "35000" },
+    { pk_id_convenio: 1, referencia: 650122, nombre_cliente: "Kevin Guevara", valor: "25000" },
+    { pk_id_convenio: 2, referencia: 660122, nombre_cliente: "Maria Reyes", valor: "35000" },
   ]
   const { pk_id_convenio } = useParams()
   const [showModal, setShowModal] = useState(false)
-  const [data, setData] = useState('')
   const [dataRecaudo, setDataRecaudo] = useState('')
   const [cargando, setCargando] = useState(false)
   const [referencia, setReferencia] = useState('')
+  const [convenioRetiro, setConvenioRetiro] = useState(null);
 
 
-  const getData = useCallback(() => {
+  const getData = useCallback(async() => {
     try {
-      let rest = convenios['value'].filter((conv) => conv.id_convenio == pk_id_convenio)
+      let rest =await searchConveniosRecaudoList({convenio_id:pk_id_convenio})
+        .then((rest)=>{ return rest })
       if (rest.length < 1) throw "no hay datos"
-      return rest
+      setConvenioRetiro(rest)
+      setCargando(true)
     } catch (e) {
-      return e
+      alert("error")
+      navigate("/recaudo-directo/recaudo")
     }
   }, [pk_id_convenio])
 
-  const getDataMemo = useMemo(() => { return getData() }, [pk_id_convenio])
-
   const consultarRecaudoD = (e) => {
+    // Datos Estaticos
     e.preventDefault()
     const buscarRecaudo = recaudoDirectos.filter((data) => {
       return parseInt(data.pk_id_convenio) === parseInt(e.target.id_convenio.value) && parseInt(data.referencia) === parseInt(referencia)
@@ -58,13 +53,8 @@ const RecaudoConjunto = () => {
     setShowModal(false);
   }, []);
 
-  useEffect(() => {
-    getDataMemo == "no hay datos" ? navigate(
-      "/recaudo-directo/recaudo"
-    ) : setData(getDataMemo)
-    setCargando(true)
-  }, [pk_id_convenio])
-
+  useEffect(() => {getData()}, [pk_id_convenio])
+    
   return (
     <>
       {cargando ? (
@@ -76,13 +66,13 @@ const RecaudoConjunto = () => {
               name={"id_convenio"}
               type='text'
               autoComplete='off'
-              defaultValue={data[0].id_convenio}
+              defaultValue={convenioRetiro?.pk_id_convenio_directo}
               disabled
             />
             <Input
               label='Código EAN o IAC'
               type='text'
-              defaultValue={data[0].codigo_ean_iac}
+              defaultValue={convenioRetiro?.ean13}
               autoComplete='off'
 
               disabled
@@ -90,7 +80,7 @@ const RecaudoConjunto = () => {
             <Input
               label='Nombre de convenio'
               type='text'
-              defaultValue={data[0].nombre_convenio}
+              defaultValue={convenioRetiro?.nombre_convenio}
               autoComplete='off'
               disabled
             />

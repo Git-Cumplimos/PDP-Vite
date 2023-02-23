@@ -7,25 +7,25 @@ import ToggleInput from "../../../../components/Base/ToggleInput";
 import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-// import getRecaudosList from "../utils/fetchFunctions"
+import { getRetirosList } from "../../utils/fetchFunctions"
 
 
-const datos = {
-  "name": "State",
-  "value": [
-    { activo: true, codigo_ean_iac: '0000000000000', pk_id_convenio: 2041, nombre_convenio: 'pruebas', fecha_creacion: '2022-07-10' },
-    { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2037, nombre_convenio: 'prueba2', fecha_creacion: '2023-05-06' },
-    { activo: true, codigo_ean_iac: '2300000000000', pk_id_convenio: 2046, nombre_convenio: 'prueba3', fecha_creacion: '2022-07-10' },
-    { activo: true, codigo_ean_iac: '7458945645614', pk_id_convenio: 2035, nombre_convenio: 'prueba4', fecha_creacion: '2023-05-06' },
-    { activo: true, codigo_ean_iac: '0000000000000', pk_id_convenio: 2042, nombre_convenio: 'prueba5', fecha_creacion: '2022-07-10' },
-    { activo: true, codigo_ean_iac: '8878945645614', pk_id_convenio: 2022, nombre_convenio: 'prueba6', fecha_creacion: '2023-05-06' },
-    { activo: true, codigo_ean_iac: '9978945645614', pk_id_convenio: 2021, nombre_convenio: 'prueba7', fecha_creacion: '2023-05-06' },
-    { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2024, nombre_convenio: 'prueba8', fecha_creacion: '2023-05-06' },
-    { activo: true, codigo_ean_iac: '6878945645614', pk_id_convenio: 2025, nombre_convenio: 'prueba9', fecha_creacion: '2023-05-06' },
-    { activo: true, codigo_ean_iac: '9798945645614', pk_id_convenio: 2026, nombre_convenio: 'prueba10', fecha_creacion: '2023-05-06' },
-    { activo: true, codigo_ean_iac: '0078945645614', pk_id_convenio: 2027, nombre_convenio: 'prueba11', fecha_creacion: '2023-05-06' },
-  ],
-}
+// const datos = {
+//   "name": "State",
+//   "value": [
+//     { activo: true, codigo_ean_iac: '0000000000000', pk_id_convenio: 2041, nombre_convenio: 'pruebas', fecha_creacion: '2022-07-10' },
+//     { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2037, nombre_convenio: 'prueba2', fecha_creacion: '2023-05-06' },
+//     { activo: true, codigo_ean_iac: '2300000000000', pk_id_convenio: 2046, nombre_convenio: 'prueba3', fecha_creacion: '2022-07-10' },
+//     { activo: true, codigo_ean_iac: '7458945645614', pk_id_convenio: 2035, nombre_convenio: 'prueba4', fecha_creacion: '2023-05-06' },
+//     { activo: true, codigo_ean_iac: '0000000000000', pk_id_convenio: 2042, nombre_convenio: 'prueba5', fecha_creacion: '2022-07-10' },
+//     { activo: true, codigo_ean_iac: '8878945645614', pk_id_convenio: 2022, nombre_convenio: 'prueba6', fecha_creacion: '2023-05-06' },
+//     { activo: true, codigo_ean_iac: '9978945645614', pk_id_convenio: 2021, nombre_convenio: 'prueba7', fecha_creacion: '2023-05-06' },
+//     { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2024, nombre_convenio: 'prueba8', fecha_creacion: '2023-05-06' },
+//     { activo: true, codigo_ean_iac: '6878945645614', pk_id_convenio: 2025, nombre_convenio: 'prueba9', fecha_creacion: '2023-05-06' },
+//     { activo: true, codigo_ean_iac: '9798945645614', pk_id_convenio: 2026, nombre_convenio: 'prueba10', fecha_creacion: '2023-05-06' },
+//     { activo: true, codigo_ean_iac: '0078945645614', pk_id_convenio: 2027, nombre_convenio: 'prueba11', fecha_creacion: '2023-05-06' },
+//   ],
+// }
 const tiposValores = [{ label: "verdadero", value: "TRUE" }, { label: "falso", value: "FALSE" }]
 
 const RetiroDirecto = () => {
@@ -35,35 +35,42 @@ const RetiroDirecto = () => {
   const [maxPages, setMaxPages] = useState(0);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [searchFilters, setSearchFilters] = useState({
-    pk_id_convenio: "",
-    codigo_ean_iac: "",
+    pk_id_convenio_directo: "",
+    ean13: "",
     nombre_convenio: "",
   });
 
   // const [listRecaudos,setListRecaudos] = useState('')
 
   // const getRecaudos = useCallback(() => {
-  //     getRecaudosList()
+  //     getRetirosList()
   //     .then((res)=>{res.json()})
   //     .then((data)=>{setListRecaudos(data)})
   // },[/*pages*/])
 
   // useEffect(()=>{getRecaudos()},[])
 
-  const getConvRetiro = useCallback(() => {
-    let datosFiltrados = datos['value'].filter((item, index) => {
+  const getConvRetiro = useCallback(async() => {
+    let datos = await getRetirosList()
+      .then((data) => { return data })
+    // setCargando(true)
+
+
+    let datosFiltrados = datos.filter((item, index) => {
       if (index < pageData.limit) return item
     })
     let datosBusqueda;
     // console.log(Object.values(searchFilters).some(val => val !== ""))
     if (Object.values(searchFilters).some(val => val !== "")) {
       datosBusqueda = datosFiltrados.filter((item) => {
-        if (searchFilters.pk_id_convenio !== "" &&
-          Object.values(item)[2].toString().includes(searchFilters.pk_id_convenio)) return item
-        else if (searchFilters.codigo_ean_iac !== "" &&
-          Object.values(item)[1].includes(searchFilters.codigo_ean_iac)) return item
+        console.log(searchFilters.pk_id_convenio_directo)
+
+        if (searchFilters.pk_id_convenio_directo !== "" &&
+          Object.values(item)[0].toString().includes(searchFilters.pk_id_convenio_directo)) return item
+        else if (searchFilters.ean13 !== "" &&
+          Object.values(item)[3].includes(searchFilters.ean13)) return item
         else if (searchFilters.nombre_convenio !== "" &&
-          Object.values(item)[3].toString().includes(searchFilters.nombre_convenio.toString())) return item
+          Object.values(item)[1].toString().includes(searchFilters.nombre_convenio.toString())) return item
       })
     }
 
@@ -99,24 +106,24 @@ const RetiroDirecto = () => {
         ]}
         data={listaConveniosRetiro.map(
           ({
-            pk_id_convenio,
-            codigo_ean_iac,
+            pk_id_convenio_directo,
+            ean13,
             nombre_convenio,
             activo,
             fecha_creacion,
           }) => ({
-            pk_id_convenio,
-            codigo_ean_iac,
+            pk_id_convenio_directo,
+            ean13,
             nombre_convenio,
             activo: activo ? "Activo" : "No activo",
-            fecha_creacion,
+            fecha_creacion: !fecha_creacion && "No indicada",
           })
         )}
         maxPage={2}
         onSetPageData={setPageData}
         onSelectRow={(e, i) => {
           setShowModal(true);
-          setSelected(datos['value'][i]);
+          setSelected(listaConveniosRetiro[i]);
         }}
         onChange={(ev) =>
           setSearchFilters((old) => ({
@@ -128,7 +135,7 @@ const RetiroDirecto = () => {
         <Input
           id={"pk_codigo_convenio"}
           label={"Código de convenio"}
-          name={"pk_id_convenio"}
+          name={"pk_id_convenio_directo"}
           type="tel"
           autoComplete="off"
           maxLength={"4"}
@@ -142,7 +149,7 @@ const RetiroDirecto = () => {
         <Input
           id={"codigo_ean_iac_search"}
           label={"Código EAN o IAC"}
-          name={"codigo_ean_iac"}
+          name={"ean13"}
           type="tel"
           autoComplete="off"
           maxLength={"13"}

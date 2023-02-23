@@ -7,8 +7,7 @@ import ToggleInput from "../../../../components/Base/ToggleInput";
 import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-
-// import getRecaudosList from "../utils/fetchFunctions"
+import { getRecaudosList } from "../../utils/fetchFunctions"
 
 
 const datos = {
@@ -24,15 +23,16 @@ const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
   const [selected, setSelected] = useState(null);
   const [busqueda, setBusqueda] = useState('');
-  // const [listRecaudos,setListRecaudos] = useState('')
+  const [listRecaudos, setListRecaudos] = useState('')
+  const [cargando, setCargando] = useState(false)
 
-  // const getRecaudos = useCallback(() => {
-  //     getRecaudosList()
-  //     .then((res)=>{res.json()})
-  //     .then((data)=>{setListRecaudos(data)})
-  // },[/*pages*/])
+  const getRecaudos = useCallback(async() => {
+    await getRecaudosList()
+      .then((data) => { setListRecaudos(data) })
+    setCargando(true)
+  }, [])
 
-  // useEffect(()=>{getRecaudos()},[])
+  useEffect(() => { getRecaudos() }, [getRecaudos])
 
   const crearConvenioRecaudo = useCallback((e) => {
     e.preventDefault();
@@ -43,91 +43,95 @@ const RecaudoDirecto = () => {
     setSelected(false)
   }, []);
 
+
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Convenios de Recaudos Directos</h1>
+      <h1 className="text-3xl mt-6">Convenios de Recaudos Directo</h1>
       <ButtonBar>
         <Button type={"submit"} onClick={() => setShowModal(true)} >
           Crear Convenio</Button>
       </ButtonBar>
-      <TableEnterprise
-        title="Convenios de Recaudos"
-        headers={[
-          "Código convenio",
-          "Código EAN o IAC",
-          "Nombre convenio",
-          "Permite vencidos",
-          "Estado",
-          "Fecha creacion",
-        ]}
-        data={datos['value'].map(
-          ({
-            pk_id_convenio,
-            codigo_ean_iac,
-            nombre_convenio,
-            permite_vencidos,
-            activo,
-            fecha_creacion,
-          }) => ({
-            pk_id_convenio,
-            codigo_ean_iac,
-            nombre_convenio,
-            permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
-            activo: activo ? "Activo" : "No activo",
-            fecha_creacion,
-          })
-        )}
-        onSelectRow={(e, i) => {
-          setShowModal(true);
-          setSelected(datos['value'][i]);
-        }}
-        onChange={(ev) => {
-          setBusqueda(ev)
-        }
-          // setSearchFilters((old) => ({
-          //   ...old,
-          //   [ev.target.name]: ev.target.value,
-          // }))
-        }
-      >
-        <Input
-          id={"pk_codigo_convenio"}
-          label={"Código de convenio"}
-          name={"pk_codigo_convenio"}
-          type="tel"
-          autoComplete="off"
-          maxLength={"4"}
-          onChange={(ev) => {
-            // ev.target.value = onChangeNumber(ev);
+      {cargando ? (<>
+        <TableEnterprise
+          title="Convenios de Recaudos"
+          headers={[
+            "Código convenio",
+            "Código EAN o IAC",
+            "Nombre convenio",
+            "Permite vencidos",
+            "Estado",
+            "Fecha creacion",
+          ]}
+          // data={datos['value'].map(
+          data={listRecaudos.map(
+            ({
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+              permite_vencidos,
+              activo,
+              fecha_creacion,
+            }) => ({
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+              permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
+              activo: activo ? "Activo" : "No activo",
+              fecha_creacion,
+            })
+          )}
+          onSelectRow={(e, i) => {
+            setShowModal(true);
+            setSelected(listRecaudos[i]);
           }}
-          // defaultValue={selected?.pk_codigo_convenio ?? ""}
-          // readOnly={selected}
-          required
-        />
-         <Input
-          id={"codigo_ean_iac_search"}
-          label={"Código EAN o IAC"}
-          name={"codigo_ean_iac"}
-          type="tel"
-          autoComplete="off"
-          maxLength={"13"}
           onChange={(ev) => {
-            // ev.target.value = onChangeNumber(ev);
-          }}
-          // defaultValue={selected?.codigo_ean_iac ?? ""}
-          required
-        />
-        <Input
-          id={"nombre_convenio"}
-          label={"Nombre del convenio"}
-          name={"nombre_convenio"}
-          type="text"
-          autoComplete="off"
-          maxLength={"30"}
-          // defaultValue={selected?.nombre_convenio ?? ""}
-          required
-        />
-      </TableEnterprise>
+            setBusqueda(ev)
+          }
+            // setSearchFilters((old) => ({
+            //   ...old,
+            //   [ev.target.name]: ev.target.value,
+            // }))
+          }
+        >
+          <Input
+            id={"pk_codigo_convenio"}
+            label={"Código de convenio"}
+            name={"pk_codigo_convenio"}
+            type="tel"
+            autoComplete="off"
+            maxLength={"4"}
+            onChange={(ev) => {
+              // ev.target.value = onChangeNumber(ev);
+            }}
+            // defaultValue={selected?.pk_codigo_convenio ?? ""}
+            // readOnly={selected}
+            required
+          />
+          <Input
+            id={"codigo_ean_iac_search"}
+            label={"Código EAN o IAC"}
+            name={"codigo_ean_iac"}
+            type="tel"
+            autoComplete="off"
+            maxLength={"13"}
+            onChange={(ev) => {
+              // ev.target.value = onChangeNumber(ev);
+            }}
+            // defaultValue={selected?.codigo_ean_iac ?? ""}
+            required
+          />
+          <Input
+            id={"nombre_convenio"}
+            label={"Nombre del convenio"}
+            name={"nombre_convenio"}
+            type="text"
+            autoComplete="off"
+            maxLength={"30"}
+            // defaultValue={selected?.nombre_convenio ?? ""}
+            required
+          />
+        </TableEnterprise>
+      </>) : (<>cargando...</>)}
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
         <Form onSubmit={crearConvenioRecaudo} grid >
@@ -136,13 +140,15 @@ const RecaudoDirecto = () => {
             label={"Codigo nit"}
             name={"Codigo_nit"}
             autoComplete="off"
-            defaultValue={selected?.pk_id_convenio ?? ""}
+            defaultValue={selected?.pk_id_convenio_directo ?? ""}
+            disabled={selected ? true : false}
             required />
           <Input
             id={"codigo_ean_iac"}
             label={"Código EAN o IAC"}
             name={"codigo_ean_iac"}
-            defaultValue={selected?.codigo_ean_iac ?? ""}
+            defaultValue={selected?.ean13 ?? ""}
+            disabled={selected ? true : false}
             autoComplete="off"
           />
           <Input
