@@ -28,7 +28,7 @@ import { makeMoneyFormatter } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
 import ScreenBlocker from "../../components/ScreenBlocker";
 import TicketColpatria from "../../components/TicketColpatria";
-import { buildTicket, decryptPin } from "../../utils/functions";
+import { decryptPin } from "../../utils/functions";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -37,7 +37,7 @@ const VentaPines = () => {
 
   const { id_convenio_pin } = useParams();
 
-  const { roleInfo, pdpUser, infoTicket } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   const [searchingConvData, setSearchingConvData] = useState(false);
   const [datosConvenio, setDatosConvenio] = useState(null);
@@ -126,6 +126,7 @@ const VentaPines = () => {
 
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio_pdp: datosConvenio?.fk_id_convenio,
           codigo_convenio: datosConvenio?.pk_codigo_convenio,
           codigo_pin: datosConvenio?.codigo_pin,
           ...userReferences,
@@ -194,10 +195,25 @@ const VentaPines = () => {
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valVentaPines,
         nombre_usuario: pdpUser?.uname ?? "",
+        nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+        ticket_init: [
+          ["Convenio", datosConvenio?.nombre_convenio],
+          ["No. Pin", "pin_desencriptado"],
+          ...Object.entries(userReferences).map(([, val], index) => [
+            datosConvenio[`referencia_${index + 1}`],
+            val,
+          ]),
+          ["Valor", formatMoney.format(valVentaPines)],
+        ].reduce((list, elem, i) => {
+          list.push(elem);
+          if ((i + 1) % 1 === 0) list.push(["", ""]);
+          return list;
+        }, []),
 
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio_pdp: datosConvenio?.fk_id_convenio,
           codigo_convenio: datosConvenio?.pk_codigo_convenio,
           codigo_pin: datosConvenio?.codigo_pin,
           ...userReferences,
@@ -220,39 +236,11 @@ const VentaPines = () => {
         {
           render: ({ data: res }) => {
             setLoadingSell(false);
-            const trx_id = res?.obj?.id_trx ?? 0;
-            const id_type_trx = res?.obj?.id_type_trx ?? 0;
-            const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
+            const tempTicket = res?.obj?.ticket ?? {};
             const pin_encriptado = res?.obj?.pin_encriptado ?? "";
             const pin_desencriptado = decryptPin(pin_encriptado);
-            const tempTicket = buildTicket(
-              roleInfo,
-              trx_id,
-              codigo_autorizacion,
-              "Recaudo Pin",
-              [
-                ["Convenio", datosConvenio?.nombre_convenio],
-                ["No. Pin", pin_desencriptado],
-                ...Object.entries(userReferences).map(([, val], index) => [
-                  datosConvenio[`referencia_${index + 1}`],
-                  val,
-                ]),
-                ["Valor", formatMoney.format(valVentaPines)],
-              ].reduce((list, elem, i) => {
-                list.push(elem);
-                if ((i + 1) % 1 === 0) list.push(["", ""]);
-                return list;
-              }, [])
-            );
+            tempTicket.trxInfo[2][1] = pin_desencriptado;
             setPaymentStatus(tempTicket);
-            infoTicket(trx_id, id_type_trx, tempTicket)
-              .then((resTicket) => {
-                console.log(resTicket);
-              })
-              .catch((err) => {
-                console.error(err);
-                notifyError("Error guardando el ticket");
-              });
             return "Transacción satisfactoria";
           },
         },
@@ -277,7 +265,6 @@ const VentaPines = () => {
       inquiryStatus,
       roleInfo,
       pdpUser?.uname,
-      infoTicket,
       navigate,
     ]
   );
