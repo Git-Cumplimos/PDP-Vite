@@ -67,9 +67,16 @@ const SendForm = ({
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if ((selecFrac.length == 0) & (fracciones == 0)) {
+    if (sorteo.split("-")[1] === "true" & selecFrac.length == "0") {
       notifyError("Seleccione la(s) fraccion(es) a vender");
-    } else {
+    }
+    else if(tipoPago == null) {
+      notifyError("Seleccione método de pago");
+    }
+    else if(tipoPago == operacion?.Venta_Intercambio & selecFrac.length > 1) {
+      notifyError("El método de pago por bono aplica para una única fracción");
+    }
+     else {
       setDisabledBtns(true);
       handleSubmit();
     }
@@ -82,11 +89,13 @@ const SendForm = ({
   const formPago = (value) => {
     setTipoPago(value);
   };
+
   useEffect(() => {
     const cus = { fracciones, phone, doc_id, email };
     cus.fracciones = "1";
     setCustomer({ ...cus });
   }, [fracciones])
+
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">
@@ -118,24 +127,6 @@ const SendForm = ({
                   />
                 );
               })}
-              <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
-                Efectivo
-                <input
-                  id="Efectivo"
-                  value={operacion?.Venta_Fisica}
-                  name="pago"
-                  type="radio"
-                  onChange={(e) => formPago(e.target.value)}
-                />
-                Bono
-                <input
-                  id="Bono"
-                  value={operacion?.Venta_Intercambio}
-                  name="pago"
-                  type="radio"
-                  onChange={(e) => formPago(e.target.value)}
-                />
-              </div>
             </>
           ) : (
             <>
@@ -170,7 +161,6 @@ const SendForm = ({
               />
             </>
           )}
-
           <Input
             id="numCel"
             label="Celular"
@@ -195,7 +185,6 @@ const SendForm = ({
               }
             }}
           />
-
           <Input
             id="num_id"
             label="Documento de identidad"
@@ -212,7 +201,24 @@ const SendForm = ({
               }
             }}
           />
-
+          <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
+            Efectivo
+            <input
+              id="Efectivo"
+              value={operacion?.Venta_Fisica}
+              name="pago"
+              type="radio"
+              onChange={(e) => formPago(e.target.value)}
+            />
+            Bono
+            <input
+              id="Bono"
+              value={operacion?.Venta_Intercambio}
+              name="pago"
+              type="radio"
+              onChange={(e) => formPago(e.target.value)}
+            />
+          </div>
           <ButtonBar>
             <Button type="submit" disabled={disabledBtns}>
               Aceptar
