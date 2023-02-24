@@ -37,7 +37,7 @@ const Deposito = () => {
     equalError: false
   });
 
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   const [loadingDepositoCorresponsalGrupoAval, fetchDepositoCorresponsalGrupoAval] =
     useFetch(depositoCorresponsalGrupoAval);
@@ -64,10 +64,10 @@ const Deposito = () => {
       Hora: "",
     },
     commerceInfo: [
+      ["Id comercio", roleInfo?.id_comercio],
       ["No. Terminal", roleInfo?.id_dispositivo],
-      ["Teléfono", roleInfo?.telefono],
-      // ["Id trx", trx_id],
-      // ["Id Aut", id_auth],
+      ["Id trx", ""],
+      ["Id Aut", ""],
       ["Comercio", roleInfo?.["nombre comercio"]],
       ["",""],
       ["Dirección", roleInfo?.direccion],
@@ -75,7 +75,7 @@ const Deposito = () => {
     ],
     commerceName: "Depósito",
     trxInfo: [],
-    disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
+    disclamer: "Corresponsal bancario para Banco Occidente. La\n\rimpresión de este tiquete implica su aceptación. Verifique la\n\rinformación. Este es el único recibo oficial de pago.\n\rRequerimientos 01 8000 514652",
   })
   const optionsBanco = [
     { value: "", label: "" },
@@ -249,9 +249,6 @@ const Deposito = () => {
     navigate(-1);
   }, [navigate]);
 
-
-  console.log(roleInfo)
-
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
     const fecha = Intl.DateTimeFormat("es-CO", {
@@ -268,6 +265,7 @@ const Deposito = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"] = []
     objTicket["trxInfo"].push([
       "Número celular",
       phone
@@ -319,6 +317,7 @@ const Deposito = () => {
 
         }
       },
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
     };
 
@@ -335,62 +334,16 @@ const Deposito = () => {
         const trx_id = parseInt(res?.obj?.respuesta_grupo_aval["11"]) ?? 0;
         const numCuenta = (res?.obj?.respuesta_grupo_aval["102"]) ?? 0;
         const id_auth = parseInt(res?.obj?.respuesta_grupo_aval["38"]) ?? 0;
-        // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
-        const tempTicket = {
-          title: "Recibo de Pago",
-          timeInfo: {
-            "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-            }).format(new Date()),
-            Hora: Intl.DateTimeFormat("es-CO", {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            }).format(new Date()),
-          },
-          commerceInfo: [
-            ["No. Terminal", roleInfo?.id_dispositivo],
-            ["Teléfono", roleInfo?.telefono],
-            ["Id trx", trx_id],
-            ["Id Aut", id_auth],
-            ["Comercio", roleInfo?.["nombre comercio"]],
-            ["",""],
-            ["Dirección", roleInfo?.direccion],
-            ["",""],            
-          ],
-          commerceName: "Depósito",
-          trxInfo: [
-            [
-              "Número celular",
-              phone,
-            ],
-            ["",""],
-            [
-              "Entidad financiera",
-              DataBanco?.nombre,
-            ],
-            ["",""],
-            [
-              "Tipo de cuenta",
-              tipoCuenta === "01" ? "Ahorros" : "Corriente",
-            ],
-            ["",""],
-            [
-              "Nro. Cuenta",
-              `****${String(numCuenta)?.slice(-4) ?? ""}`,
-            ],
-            ["",""],
-            ["Valor", formatMoney.format(valor)],
-            ["", ""],
-            ["Costo transacción", formatMoney.format(res?.obj?.costoTrx)],
-            ["", ""],
-          ],
-          disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
-        };
-        setPaymentStatus(tempTicket);
+        objTicket["commerceInfo"][2] = ["Id trx", trx_id]
+        objTicket["commerceInfo"][3] = ["Id trx", id_auth]
+        objTicket["trxInfo"].push([
+          "Costo transacción", 
+          formatMoney.format(res?.obj?.costoTrx)
+        ]);
+        objTicket["trxInfo"].push(["", ""]);
+
+        setPaymentStatus(objTicket);
       }
       })
       .catch((err) => {
@@ -539,7 +492,7 @@ const Deposito = () => {
                   disabled={loadingDepositoCorresponsalGrupoAval}>
                   Realizar depósito
                 </Button>
-                {showBTNConsulta ? 
+                {/* {showBTNConsulta ? 
                 <Button
                 type='submit'
                 onClick={consultarCosto}
@@ -548,7 +501,7 @@ const Deposito = () => {
                 </Button>                
                 :
                 ""
-                }
+                } */}
                 
                 <Button
                   onClick={(e) => {

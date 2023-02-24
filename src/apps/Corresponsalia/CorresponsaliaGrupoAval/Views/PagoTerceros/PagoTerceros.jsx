@@ -19,10 +19,9 @@ import { pinBlock } from "../../utils/pinBlock";
 import {
   fetchCustomPost,
   ErrorCustom,
-  ErrorCustomBackend,
-  msgCustomBackend,
 } from "../../utils/fetchPagoSubsidios_PagoTerceros";
 
+// ************ constantes *******************
 const minValor = 1000;
 const maxValor = 300001;
 const dataInputInitial = {
@@ -32,7 +31,9 @@ const dataInputInitial = {
   valor_total_trx: "",
 };
 const url_pago_terceros = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_terceros/pago-terceros`;
+// ********************************************
 
+// >>>>>>>>>>>>>>>>>>> componente <<<<<<<<<<<<<<<<<<<<<
 const PagoTerceros = () => {
   const [inputData, setInputData] = useState(dataInputInitial);
   const [infTicket, setInfTicket] = useState(null);
@@ -43,6 +44,7 @@ const PagoTerceros = () => {
   const navigateValid = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
 
+  // ***************************** on Change **********************************
   function onChangeInput(e) {
     let valueInput = "";
     if (e.target.name === "valor_total_trx" || e.target.name === "otp") {
@@ -85,6 +87,7 @@ const PagoTerceros = () => {
     }));
   }
 
+  // ************************************* onSubmit *****************************************
   function onSubmitCheck(e) {
     e.preventDefault();
 
@@ -139,11 +142,7 @@ const PagoTerceros = () => {
     };
 
     // peticion al backend
-    PeticionPagoTerceros(
-      url_pago_terceros,
-      "/grupo-aval/pago-terceros",
-      dataTerceros
-    )
+    PeticionPagoTerceros(url_pago_terceros, "Pago Terceros", dataTerceros)
       .then((response) => {
         if (response?.status === true) {
           if (response?.obj?.result?.ticket) {
@@ -155,12 +154,7 @@ const PagoTerceros = () => {
         }
       })
       .catch((error) => {
-        if (error instanceof ErrorCustom) {
-        } else if (error instanceof ErrorCustomBackend) {
-          notifyError(`${error.message}`);
-        } else if (error instanceof msgCustomBackend) {
-          notify(`${error.message}`);
-        } else {
+        if (!error instanceof ErrorCustom) {
           notifyError("Pago de terceros no exitoso");
         }
         HandleCloseSecond();
@@ -232,7 +226,7 @@ const PagoTerceros = () => {
           label="Número de OTP"
           type="text"
           minLength="4"
-          maxLength="12"
+          maxLength="8"
           autoComplete="off"
           value={inputData.otp}
           onInput={onChangeInputSecond}
