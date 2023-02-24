@@ -26,10 +26,10 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
-const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
-// const url = "http://127.0.0.1:5000";
+// const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
+const url = "http://127.0.0.1:5000";
 const PpsObligatorioDemanda = ({ ced }) => {
-  const { quotaInfo, roleInfo, infoTicket } = useAuth();
+  const { quotaInfo, roleInfo, infoTicket, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
@@ -58,6 +58,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
     idComercio: roleInfo?.["id_comercio"],
     idusuario: roleInfo?.["id_usuario"],
     iddispositivo: roleInfo["id_dispositivo"],
+    u_name: pdpUser?.uname,
     oficina_propia:
       roleInfo["tipo_comercio"] === "OFICINAS PROPIAS" ||
       roleInfo["tipo_comercio"] === "KIOSCO"
@@ -128,7 +129,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
     datosComercio?.["idTrx"],
     datosComercio?.["tipoComercio"] /* respPinCancel, roleInfo, valor */,
   ]);
-  console.log(roleInfo);
+  // console.log(roleInfo);
   const enviar = (e) => {
     e.preventDefault();
 
@@ -145,8 +146,8 @@ const PpsObligatorioDemanda = ({ ced }) => {
       ) {
         if (datosAportante?.["valorAportar"] % 100 == 0) {
           fetchData(
-            `${url}/pps_obligatorio_demada_colpensiones`,
-            // `http://127.0.0.1:5000/pps_obligatorio_demada_colpensiones`,
+            // `${url}/pps_obligatorio_demada_colpensiones`,
+            `http://127.0.0.1:5000/pps_obligatorio_demada_colpensiones`,
             // `http://127.0.0.1:5000//simulacionColpensiones`,
             "POST",
             {},
@@ -277,7 +278,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
   useEffect(() => {}, [datosComercio, isPropia]);
 
   // useEffect(() => {
-  //   infoTicket(datosComercio?.["idTrx"], 108, tickets)
+  //   ,pdpUser(datosComercio?.["idTrx"], 108, tickets)
   //     .then((resTicket) => {
   //       // console.log("RESTICKET:", resTicket);
   //     })
@@ -285,7 +286,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
   //       // console.error(err);
   //       notifyError("Error guardando el ticket");
   //     });
-  // }, [infoTicket, tickets]);
+  // }, [,pdpUser, tickets]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
