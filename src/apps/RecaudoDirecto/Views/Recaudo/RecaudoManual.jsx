@@ -25,12 +25,14 @@ const RecaudoManual = () => {
 
   const [listRecaudos, setListRecaudos] = useState('')
   const [cargando, setCargando] = useState(false)
+  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [maxPages, setMaxPages] = useState(0);
 
-  const getRecaudos = useCallback(async() => {
-    await getRecaudosList()
-      .then((data) => { setListRecaudos(data) })
+  const getRecaudos = useCallback(async () => {
+    await getRecaudosList({ limit: pageData.limit, offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit })
+      .then((data) => { setListRecaudos(data.results); setMaxPages(data.maxPages) })
     setCargando(true)
-  }, [])
+  }, [pageData])
 
   useEffect(() => { getRecaudos() }, [getRecaudos])
 
@@ -38,67 +40,69 @@ const RecaudoManual = () => {
     <Fragment>
       <h1 className="text-3xl mt-6">Consulta recaudos manual</h1>
       {cargando ? (
-      <TableEnterprise
-        title="Convenios de recaudo"
-        headers={[
-          "Código convenio",
-          "Código EAN o IAC",
-          "Nombre convenio",
-        ]}
-        // data={datos['value'].map(
-        data={listRecaudos.map(
-          ({
-            pk_id_convenio_directo,
-            ean13,
-            nombre_convenio,
-          }) => ({
-            pk_id_convenio_directo,
-            ean13,
-            nombre_convenio,
-          })
-        )}
-        onSelectRow={(e, i) => {
-          navigate(`/recaudo-directo/recaudo/${listRecaudos[i].pk_id_convenio_directo}`)
-        }}
-      >
-        <Input
-          id={"pk_codigo_convenio"}
-          label={"Código de convenio"}
-          name={"pk_codigo_convenio_directo"}
-          type="tel"
-          autoComplete="off"
-          maxLength={"4"}
-          onChange={(ev) => {
-            // ev.target.value = onChangeNumber(ev);
+        <TableEnterprise
+          title="Convenios de recaudo"
+          headers={[
+            "Código convenio",
+            "Código EAN o IAC",
+            "Nombre convenio",
+          ]}
+          // data={datos['value'].map(
+          data={listRecaudos.map(
+            ({
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+            }) => ({
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+            })
+          )}
+          onSelectRow={(e, i) => {
+            navigate(`/recaudo-directo/recaudo/${listRecaudos[i].pk_id_convenio_directo}`)
           }}
-          // defaultValue={selected?.pk_codigo_convenio ?? ""}
-          // readOnly={selected}
-          required
-        />
-        <Input
-          id={"codigo_ean_iac_search"}
-          label={"Código EAN o IAC"}
-          name={"ean13"}
-          type="tel"
-          autoComplete="off"
-          maxLength={"13"}
-          onChange={(ev) => {
-            // ev.target.value = onChangeNumber(ev);
-          }}
-          // defaultValue={selected?.codigo_ean_iac ?? ""}
-          required
-        />
-        <Input
-          id={"nombre_convenio"}
-          label={"Nombre del convenio"}
-          name={"nombre_convenio"}
-          type="text"
-          autoComplete="off"
-          maxLength={"30"}
-          // defaultValue={selected?.nombre_convenio ?? ""}
-          required
-        />
-      </TableEnterprise>
+          maxPage={maxPages}
+          onSetPageData={setPageData}
+        >
+          <Input
+            id={"pk_codigo_convenio"}
+            label={"Código de convenio"}
+            name={"pk_codigo_convenio_directo"}
+            type="tel"
+            autoComplete="off"
+            maxLength={"4"}
+            onChange={(ev) => {
+              // ev.target.value = onChangeNumber(ev);
+            }}
+            // defaultValue={selected?.pk_codigo_convenio ?? ""}
+            // readOnly={selected}
+            required
+          />
+          <Input
+            id={"codigo_ean_iac_search"}
+            label={"Código EAN o IAC"}
+            name={"ean13"}
+            type="tel"
+            autoComplete="off"
+            maxLength={"13"}
+            onChange={(ev) => {
+              // ev.target.value = onChangeNumber(ev);
+            }}
+            // defaultValue={selected?.codigo_ean_iac ?? ""}
+            required
+          />
+          <Input
+            id={"nombre_convenio"}
+            label={"Nombre del convenio"}
+            name={"nombre_convenio"}
+            type="text"
+            autoComplete="off"
+            maxLength={"30"}
+            // defaultValue={selected?.nombre_convenio ?? ""}
+            required
+          />
+        </TableEnterprise>
       ) : (<>cargando...</>)}
     </Fragment>
   )

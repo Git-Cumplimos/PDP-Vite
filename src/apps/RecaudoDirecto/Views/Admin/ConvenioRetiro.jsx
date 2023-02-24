@@ -7,64 +7,36 @@ import ToggleInput from "../../../../components/Base/ToggleInput";
 import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { getRetirosList } from "../../utils/fetchFunctions"
+import { getRetirosList,addConveniosRetiroList,modConveniosRetiroList } from "../../utils/fetchFunctions"
 
-
-// const datos = {
-//   "name": "State",
-//   "value": [
-//     { activo: true, codigo_ean_iac: '0000000000000', pk_id_convenio: 2041, nombre_convenio: 'pruebas', fecha_creacion: '2022-07-10' },
-//     { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2037, nombre_convenio: 'prueba2', fecha_creacion: '2023-05-06' },
-//     { activo: true, codigo_ean_iac: '2300000000000', pk_id_convenio: 2046, nombre_convenio: 'prueba3', fecha_creacion: '2022-07-10' },
-//     { activo: true, codigo_ean_iac: '7458945645614', pk_id_convenio: 2035, nombre_convenio: 'prueba4', fecha_creacion: '2023-05-06' },
-//     { activo: true, codigo_ean_iac: '0000000000000', pk_id_convenio: 2042, nombre_convenio: 'prueba5', fecha_creacion: '2022-07-10' },
-//     { activo: true, codigo_ean_iac: '8878945645614', pk_id_convenio: 2022, nombre_convenio: 'prueba6', fecha_creacion: '2023-05-06' },
-//     { activo: true, codigo_ean_iac: '9978945645614', pk_id_convenio: 2021, nombre_convenio: 'prueba7', fecha_creacion: '2023-05-06' },
-//     { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2024, nombre_convenio: 'prueba8', fecha_creacion: '2023-05-06' },
-//     { activo: true, codigo_ean_iac: '6878945645614', pk_id_convenio: 2025, nombre_convenio: 'prueba9', fecha_creacion: '2023-05-06' },
-//     { activo: true, codigo_ean_iac: '9798945645614', pk_id_convenio: 2026, nombre_convenio: 'prueba10', fecha_creacion: '2023-05-06' },
-//     { activo: true, codigo_ean_iac: '0078945645614', pk_id_convenio: 2027, nombre_convenio: 'prueba11', fecha_creacion: '2023-05-06' },
-//   ],
-// }
 const tiposValores = [{ label: "verdadero", value: "TRUE" }, { label: "falso", value: "FALSE" }]
 
 const RetiroDirecto = () => {
   const [listaConveniosRetiro, setListaConveniosRetiro] = useState([]);
   const [showModal, setShowModal] = useState(false)
   const [selected, setSelected] = useState(null);
-  const [maxPages, setMaxPages] = useState(0);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [maxPages, setMaxPages] = useState(0);
   const [searchFilters, setSearchFilters] = useState({
     pk_id_convenio_directo: "",
     ean13: "",
     nombre_convenio: "",
   });
 
-  // const [listRecaudos,setListRecaudos] = useState('')
 
-  // const getRecaudos = useCallback(() => {
-  //     getRetirosList()
-  //     .then((res)=>{res.json()})
-  //     .then((data)=>{setListRecaudos(data)})
-  // },[/*pages*/])
-
-  // useEffect(()=>{getRecaudos()},[])
 
   const getConvRetiro = useCallback(async() => {
-    let datos = await getRetirosList()
-      .then((data) => { return data })
+    let datos = await getRetirosList({limit:pageData.limit,offset:pageData.page === 1 ? 0 :  (pageData.page*pageData.limit)-pageData.limit})
+    .then((data) => {setMaxPages(data.maxPages);return(data) })
     // setCargando(true)
 
-
-    let datosFiltrados = datos.filter((item, index) => {
-      if (index < pageData.limit) return item
-    })
+    let datosRetiro = datos.results
     let datosBusqueda;
     // console.log(Object.values(searchFilters).some(val => val !== ""))
     if (Object.values(searchFilters).some(val => val !== "")) {
-      datosBusqueda = datosFiltrados.filter((item) => {
-        console.log(searchFilters.pk_id_convenio_directo)
-
+      let nuevosDatos = await getRetirosList({limit:datos.count,offset:0 })
+        .then((data) => {return(data.results) })
+      datosBusqueda = nuevosDatos.filter((item) => {
         if (searchFilters.pk_id_convenio_directo !== "" &&
           Object.values(item)[0].toString().includes(searchFilters.pk_id_convenio_directo)) return item
         else if (searchFilters.ean13 !== "" &&
@@ -73,20 +45,25 @@ const RetiroDirecto = () => {
           Object.values(item)[1].toString().includes(searchFilters.nombre_convenio.toString())) return item
       })
     }
-
-    console.log(datosBusqueda)
-    setListaConveniosRetiro(datosBusqueda ?? datosFiltrados)
+    setListaConveniosRetiro(datosBusqueda ?? datosRetiro)
   }, [pageData, searchFilters])
 
-  const crearConvenioRetiro = useCallback((e) => {
+
+  const crearModificarConvenioRetiro = useCallback((e) => {
     e.preventDefault();
-    console.log(e)
-  }, [])
+    const formData = new FormData(e.currentTarget);
+    const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    console.log(body)
+    if (!selected) { addConveniosRetiroList(body); handleClose()}
+    else{ modConveniosRetiroList({convenio_id:selected.pk_id_convenio_directo},body); handleClose()}
+  }, [selected])
+
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelected(false)
   }, []);
-  useEffect(() => { getConvRetiro() }, [getConvRetiro])
+
+  useEffect(() => { getConvRetiro() }, [getConvRetiro,pageData])
 
   return (
     <Fragment>
@@ -109,6 +86,7 @@ const RetiroDirecto = () => {
             pk_id_convenio_directo,
             ean13,
             nombre_convenio,
+            permite_vencidos,
             activo,
             fecha_creacion,
           }) => ({
@@ -116,11 +94,11 @@ const RetiroDirecto = () => {
             ean13,
             nombre_convenio,
             activo: activo ? "Activo" : "No activo",
-            fecha_creacion: !fecha_creacion && "No indicada",
+            fecha_creacion: fecha_creacion ?? "No indicada",
           })
         )}
-        maxPage={2}
-        onSetPageData={setPageData}
+        maxPage={maxPages}
+          onSetPageData={setPageData}
         onSelectRow={(e, i) => {
           setShowModal(true);
           setSelected(listaConveniosRetiro[i]);
@@ -172,21 +150,19 @@ const RetiroDirecto = () => {
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
-        <Form onSubmit={crearConvenioRetiro} grid >
-          <Input
-            id={"Codigo_nit"}
-            label={"Codigo nit"}
-            name={"Codigo_nit"}
-            defaultValue={selected?.pk_id_convenio ?? ""}
-            autoComplete="off"
-            required />
-          <Input
-            id={"codigo_ean_iac"}
-            label={"Código EAN o IAC"}
-            name={"codigo_ean_iac"}
-            defaultValue={selected?.codigo_ean_iac ?? ""}
-            autoComplete="off"
-          />
+        <Form onSubmit={crearModificarConvenioRetiro} grid >
+        {selected && (
+            <>
+              <Input
+                id={"Codigo_convenio"}
+                label={"Codigo convenio"}
+                name={"pk_id_convenio_directo"}
+                autoComplete="off"
+                defaultValue={selected?.pk_id_convenio_directo ?? ""}
+                disabled={selected ? true : false}
+                required />
+            </>
+          )}
           <Input
             id={"nombre_convenio"}
             label={"Nombre convenio"}
@@ -195,11 +171,40 @@ const RetiroDirecto = () => {
             defaultValue={selected?.nombre_convenio ?? ""}
             autoComplete="off"
             required />
+          {/* {!selected && ( */}
+            <>
+              <Input
+                id={"NIT"}
+                label={"nit"}
+                name={"nit"}
+                type="text"
+                autoComplete="off"
+                defaultValue={selected?.nit ?? ""}
+                required />
+              <Input
+                id={"id valor a modificar"}
+                label={"id valor para modificar"}
+                name={"fk_modificar_valor"}
+                defaultValue={selected?.fk_modificar_valor ?? ""}
+                type="number"
+                autoComplete="off"
+                required />
+            </>
+          {/* )} */}
+          <Input
+            id={"codigo_ean_iac"}
+            label={"Código EAN o IAC"}
+            name={"ean13"}
+            defaultValue={selected?.ean13 ?? ""}
+            // disabled={selected ? true : false}
+            autoComplete="off"
+          />
+
           <Select
             className="place-self-stretch"
             id={"fk_tipo_valor"}
-            label={"Retiros exactos"}
-            name={"fk_tipo_valor"}
+            label={"Permite vencidos"}
+            name={"permite_vencidos"}
             options={[{ label: "", value: "" }, ...tiposValores]}
             defaultValue={selected?.permite_vencidos ?? ""}
             required
@@ -210,18 +215,28 @@ const RetiroDirecto = () => {
             name={"observaciones"}
             type="text"
             autoComplete="off"
+            defaultValue={selected?.observaciones ?? ""}
             required />
           {selected && (
-            <ToggleInput
-              id={"activo"}
-              label={"Se encuentra activo"}
-              name={"activo"}
-              defaultChecked={selected?.activo}
-            />
+            <Select
+            className="place-self-stretch"
+            id={"activo"}
+            label={"Estado"}
+            name={"estado"}
+            options={[{ label: "", value: "" }, ...tiposValores]}
+            defaultValue={selected?.estado ?? ""}
+            required
+          />
+            // <ToggleInput
+            //   id={"activo"}
+            //   label={"Se encuentra activo"}
+            //   name={"estado"}
+            //   defaultChecked={selected?.activo}
+            // />
           )}
           <ButtonBar>
             <Button type={"submit"} >
-              Crear convenio
+            {selected ? "Realizar cambios" : "Crear Convenio"}
             </Button>
           </ButtonBar>
         </Form>

@@ -7,37 +7,37 @@ import ToggleInput from "../../../../components/Base/ToggleInput";
 import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { getRecaudosList } from "../../utils/fetchFunctions"
+import { getRecaudosList, addConveniosRecaudoList,modConveniosRecaudoList } from "../../utils/fetchFunctions"
 
-
-const datos = {
-  "name": "State",
-  "value": [
-    { activo: true, codigo_ean_iac: '0000000000000', pk_id_convenio: 2041, nombre_convenio: 'pruebas', fecha_creacion: '2022-07-10', permite_vencidos: true },
-    { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2037, nombre_convenio: 'pruebas2', fecha_creacion: '2023-05-06', permite_vencidos: false },
-  ],
-}
 const tiposValores = [{ label: "verdadero", value: true }, { label: "falso", value: false }]
 
 const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(false);
   const [busqueda, setBusqueda] = useState('');
   const [listRecaudos, setListRecaudos] = useState('')
+  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [maxPages, setMaxPages] = useState(0);
   const [cargando, setCargando] = useState(false)
+  const [crear, setCrear] = useState(false)
 
-  const getRecaudos = useCallback(async() => {
-    await getRecaudosList()
-      .then((data) => { setListRecaudos(data) })
+  const getRecaudos = useCallback(async () => {
+    // console.log("pagina",pageData.page,"limite", pageData.limit,"offset",pageData.page === 1 ? 0 : (pageData.page*pageData.limit)-pageData.limit)
+    await getRecaudosList({ limit: pageData.limit, offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit })
+      .then((data) => { setListRecaudos(data.results); setMaxPages(data.maxPages) })
     setCargando(true)
-  }, [])
+  }, [pageData])
 
-  useEffect(() => { getRecaudos() }, [getRecaudos])
+  useEffect(() => { getRecaudos() }, [getRecaudos, pageData])
 
-  const crearConvenioRecaudo = useCallback((e) => {
+  const crearModificarConvenioRecaudo = useCallback((e) => {
     e.preventDefault();
-    console.log(e)
-  }, [])
+    const formData = new FormData(e.currentTarget);
+    const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    if (!selected) { addConveniosRecaudoList(body); handleClose()}
+    else{ modConveniosRecaudoList({convenio_id:selected.pk_id_convenio_directo},body); handleClose()}
+  }, [selected])
+
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelected(false)
@@ -77,13 +77,15 @@ const RecaudoDirecto = () => {
               nombre_convenio,
               permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
               activo: activo ? "Activo" : "No activo",
-              fecha_creacion,
+              fecha_creacion: fecha_creacion ?? "ninguna" ,
             })
           )}
           onSelectRow={(e, i) => {
             setShowModal(true);
             setSelected(listRecaudos[i]);
           }}
+          maxPage={maxPages}
+          onSetPageData={setPageData}
           onChange={(ev) => {
             setBusqueda(ev)
           }
@@ -134,23 +136,19 @@ const RecaudoDirecto = () => {
       </>) : (<>cargando...</>)}
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
-        <Form onSubmit={crearConvenioRecaudo} grid >
-          <Input
-            id={"Codigo_nit"}
-            label={"Codigo nit"}
-            name={"Codigo_nit"}
-            autoComplete="off"
-            defaultValue={selected?.pk_id_convenio_directo ?? ""}
-            disabled={selected ? true : false}
-            required />
-          <Input
-            id={"codigo_ean_iac"}
-            label={"Código EAN o IAC"}
-            name={"codigo_ean_iac"}
-            defaultValue={selected?.ean13 ?? ""}
-            disabled={selected ? true : false}
-            autoComplete="off"
-          />
+        <Form onSubmit={crearModificarConvenioRecaudo} grid >
+          {selected && (
+            <>
+              <Input
+                id={"Codigo_convenio"}
+                label={"Codigo convenio"}
+                name={"pk_id_convenio_directo"}
+                autoComplete="off"
+                defaultValue={selected?.pk_id_convenio_directo ?? ""}
+                disabled={selected ? true : false}
+                required />
+            </>
+          )}
           <Input
             id={"nombre_convenio"}
             label={"Nombre convenio"}
@@ -159,11 +157,40 @@ const RecaudoDirecto = () => {
             defaultValue={selected?.nombre_convenio ?? ""}
             autoComplete="off"
             required />
+          {/* {!selected && ( */}
+            <>
+              <Input
+                id={"NIT"}
+                label={"nit"}
+                name={"nit"}
+                type="text"
+                autoComplete="off"
+                defaultValue={selected?.nit ?? ""}
+                required />
+              <Input
+                id={"id valor a modificar"}
+                label={"id valor para modificar"}
+                name={"fk_modificar_valor"}
+                defaultValue={selected?.fk_modificar_valor ?? ""}
+                type="number"
+                autoComplete="off"
+                required />
+            </>
+          {/* )} */}
+          <Input
+            id={"codigo_ean_iac"}
+            label={"Código EAN o IAC"}
+            name={"ean13"}
+            defaultValue={selected?.ean13 ?? ""}
+            // disabled={selected ? true : false}
+            autoComplete="off"
+          />
+
           <Select
             className="place-self-stretch"
             id={"fk_tipo_valor"}
             label={"Permite vencidos"}
-            name={"fk_tipo_valor"}
+            name={"permite_vencidos"}
             options={[{ label: "", value: "" }, ...tiposValores]}
             defaultValue={selected?.permite_vencidos ?? ""}
             required
@@ -174,14 +201,24 @@ const RecaudoDirecto = () => {
             name={"observaciones"}
             type="text"
             autoComplete="off"
+            defaultValue={selected?.observaciones ?? ""}
             required />
           {selected && (
-            <ToggleInput
-              id={"activo"}
-              label={"Se encuentra activo"}
-              name={"activo"}
-              defaultChecked={selected?.activo}
-            />
+            <Select
+            className="place-self-stretch"
+            id={"activo"}
+            label={"Estado"}
+            name={"estado"}
+            options={[{ label: "", value: "" }, ...tiposValores]}
+            defaultValue={selected?.estado ?? ""}
+            required
+          />
+            // <ToggleInput
+            //   id={"activo"}
+            //   label={"Se encuentra activo"}
+            //   name={"estado"}
+            //   defaultChecked={selected?.activo}
+            // />
           )}
           <ButtonBar>
             <Button type={"submit"} >
