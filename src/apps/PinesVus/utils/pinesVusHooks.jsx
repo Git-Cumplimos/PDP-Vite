@@ -85,7 +85,7 @@ export const useProvidePinesVus = () => {
       tipo_comercio = "OFICINAS PROPIAS"
     }
     const body = {
-      tipo_tramite: tramite,
+      tipo_tramite: [tramite],
       infoTramite: infoTramite,
       tipo_pin: tipoPin,
       doc_cliente: String(documento),
