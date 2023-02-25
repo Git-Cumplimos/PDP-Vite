@@ -29,8 +29,8 @@ const MostrarRecaudosPagar = ({
     valor_total: 0,
     cantidad_transacciones: 0,
   });
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de transferencia comisiones a cupo",
+  const objTicketActual = {
+    title: "RECIBO DE PAGO",
     timeInfo: {
       "Fecha de venta": "",
       Hora: "",
@@ -41,20 +41,27 @@ const MostrarRecaudosPagar = ({
       ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
+      // id trx
+      ["Id Trx", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      // id autorizador
+      ["Id Aut", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      // Nombre comercio
+      [
+        "Comercio",
+        roleInfo?.["nombre comercio"]
+          ? roleInfo?.["nombre comercio"]
+          : "Sin datos",
+      ],
+      ["", ""],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["Tipo de operación", "Transferencia comisiones a cupo"],
       ["", ""],
     ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "Sin datos",
+    commerceName: "RECAUDO MULTIPLE",
     trxInfo: [],
     disclamer:
       "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
-  });
+  };
   const [showModal, setShowModal] = useState(false);
   useEffect(() => {
     fetchRecaudoMultipleFunc();
@@ -68,7 +75,7 @@ const MostrarRecaudosPagar = ({
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
         nombre_comercio: roleInfo?.["nombre comercio"],
-        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_usuario: pdpUser?.uname,
         is_oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO"
@@ -116,7 +123,7 @@ const MostrarRecaudosPagar = ({
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
         nombre_comercio: roleInfo?.["nombre comercio"],
-        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_usuario: pdpUser?.uname,
         is_oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO"
@@ -187,7 +194,7 @@ const MostrarRecaudosPagar = ({
           <MoneyInput
             id='valCashOut'
             name='valCashOut'
-            label='Valor a pagar'
+            label='Valor a recaudar'
             type='text'
             autoComplete='off'
             maxLength={"12"}

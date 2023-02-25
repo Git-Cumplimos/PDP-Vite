@@ -84,3 +84,22 @@ export const reporteTransaccionesRecaudoMultiple = async (bodyObj) => {
     throw err;
   }
 };
+
+export const fetchRecaudosMultiples = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlRecaudoMultiple}/consultar-recaudo-multiple-pag`,
+      "GET",
+      obj,
+      {}
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};

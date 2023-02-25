@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Fieldset from "../../../../components/Base/Fieldset";
+import LoadingIcon from "../../../../components/Base/LoadingIcon";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import { notify, notifyError } from "../../../../utils/notify";
 import {
@@ -40,7 +41,7 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
         nombre_comercio: roleInfo?.["nombre comercio"],
-        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_usuario: pdpUser?.uname,
         is_oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO"
@@ -80,7 +81,7 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
         nombre_comercio: roleInfo?.["nombre comercio"],
-        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_usuario: pdpUser?.uname,
         is_oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO"
@@ -123,7 +124,7 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
         nombre_comercio: roleInfo?.["nombre comercio"],
-        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_usuario: pdpUser?.uname,
         is_oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO"
@@ -165,7 +166,7 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
           <>
             {!consultaRecaudo?.finalizo ? (
               <h1 className='text-3xl text-center mb-2 mt-2'>
-                Procesando recaudos
+                Procesando recaudos <LoadingIcon />
               </h1>
             ) : (
               <h1 className='text-3xl text-center mb-2 mt-2'>

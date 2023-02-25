@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { enumPermisosRecaudoMultiple } from "./enumPermisosAval";
+import { enumPermisosRecaudoMultiple } from "./enumPermisosRecaudoMultiple";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../../components/Base/AppIcons"));
@@ -11,12 +11,13 @@ const RecaudoMultiple = lazy(() => import("./Views/RecaudoMultiple"));
 const ConsultaRecaudoMultiple = lazy(() =>
   import("./Views/ConsultaRecaudoMultiple")
 );
+const SearchRecaudosMultiples = lazy(() =>
+  import("./Views/SearchRecaudosMultiples")
+);
 const RecaudoMultipleNav = lazy(() => import("./RecaudoMultipleNav"));
 
 const listPermissions = Object.values(enumPermisosRecaudoMultiple);
-export const listPermissionsRecaudoMultiple = listPermissions.splice(
-  listPermissions.length / 2
-);
+export const listPermissionsRecaudoMultiple = listPermissions;
 
 const rutasRecaudoMultiple = {
   link: "/corresponsalia/recaudo-multiple",
@@ -28,7 +29,7 @@ const rutasRecaudoMultiple = {
       link: "/corresponsalia/recaudo-multiple/transaccion",
       label: <AppIcons Logo={"MARKETPLACE"} name='Cargar recaudo multiple' />,
       component: RecaudoMultiple,
-      permission: [enumPermisosRecaudoMultiple.recaudo_multiple],
+      permission: [enumPermisosRecaudoMultiple.pago_recaudo_multiple],
     },
     {
       link: "/corresponsalia/recaudo-multiple/consulta",
@@ -36,7 +37,20 @@ const rutasRecaudoMultiple = {
         <AppIcons Logo={"MARKETPLACE"} name='Consultar recaudo multiple' />
       ),
       component: ConsultaRecaudoMultiple,
-      permission: [enumPermisosRecaudoMultiple.recaudo_multiple],
+      permission: [enumPermisosRecaudoMultiple.consulta_recaudo_multiple],
+    },
+    {
+      link: "/corresponsalia/recaudo-multiple/consulta-paginada",
+      label: (
+        <AppIcons
+          Logo={"MARKETPLACE"}
+          name='Consultar recaudo multiple paginado'
+        />
+      ),
+      component: SearchRecaudosMultiples,
+      permission: [
+        enumPermisosRecaudoMultiple.consulta_paginada_recaudo_multiple,
+      ],
     },
   ],
 };
