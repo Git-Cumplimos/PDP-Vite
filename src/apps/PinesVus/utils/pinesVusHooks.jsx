@@ -96,13 +96,8 @@ export const useProvidePinesVus = () => {
       infoTramiteTemp=[infoTramite, infoTramite2]
     }
     const body = {
-<<<<<<< HEAD
-      tipo_tramite: [tramite],
-      infoTramite: infoTramite,
-=======
       tipo_tramite: tramiteTemp,
       infoTramite: infoTramiteTemp,
->>>>>>> ded910e6bd11c947b2641d3b68c13916265975ae
       tipo_pin: tipoPin,
       doc_cliente: String(documento),
       Usuario: user?.Usuario,

@@ -123,6 +123,7 @@ const TramitePines = () => {
         if (!res?.status) {
           notifyError(res?.msg);
         } else {
+          console.log(res)
           setTable(
             res?.obj?.results?.map((row) => {
               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
