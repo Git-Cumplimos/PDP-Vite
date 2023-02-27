@@ -233,7 +233,7 @@ const ArqueoBilletes = ({ route }) => {
     },
     [sorteosLOT, codigosOficina]
   );
-
+  
   const crearArqueoBilletes = useCallback(
     async (fecha_ini, fracDisp, total, id_arqueo, sorteo) => {
       try {
@@ -334,6 +334,7 @@ const ArqueoBilletes = ({ route }) => {
 
   return (
     <>
+      <h1 className="text-3xl mt-6">Arqueo Billetes </h1>
       <Form formDir="col" onSubmit={onSubmit}>
         {userPermissions
           .map(({ id_permission }) => id_permission)
