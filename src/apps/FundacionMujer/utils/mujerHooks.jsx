@@ -63,6 +63,7 @@ export const useProvideFDLM = () => {
       Comercio: user?.Comercio,
       Usuario: user?.Usuario,
       Dispositivo: user?.Dispositivo,
+      nombre_usuario: pdpUser?.uname ?? "",
       nroBusqueda: numero,
       ParametroBusqueda: param,
       Depto: parseInt(user?.Depto),
@@ -74,7 +75,7 @@ export const useProvideFDLM = () => {
     } catch (err) {
       throw err;
     }
-  }, []);
+  }, [pdpUser]);
 
   const ingresoreversorecibo = useCallback(async (values) => {
     const body = {
@@ -82,6 +83,7 @@ export const useProvideFDLM = () => {
       Usuario: values?.usuario,
       Dispositivo: values?.dispositivo,
       Comercio: values?.comercio,
+      nombre_usuario: pdpUser?.uname ?? "",
       Credito: parseInt(values?.credit),
       Valor: parseFloat(values?.val),
       referenciaPago: values?.reference,
@@ -94,7 +96,7 @@ export const useProvideFDLM = () => {
     } catch (err) {
       throw err;
     }
-  }, []);
+  }, [pdpUser]);
 
   const ingresorecibo = useCallback(async (values) => {
     const body = {
@@ -126,6 +128,7 @@ export const useProvideFDLM = () => {
       Usuario: user?.Usuario,
       Dispositivo: user?.Dispositivo,
       Comercio: user?.Comercio,
+      nombre_usuario: pdpUser?.uname ?? "",
       Credito: numero,
       Depto: parseInt(user?.Depto),
       Municipio: parseInt(user?.Municipio),
@@ -137,7 +140,7 @@ export const useProvideFDLM = () => {
     } catch (err) {
       throw err;
     }
-  }, []);
+  }, [pdpUser]);
 
   const consultarPines = useCallback(async (documento, pin, user) => {
     const body = {

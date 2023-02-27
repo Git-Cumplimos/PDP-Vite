@@ -38,10 +38,11 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
   const [valorAportar, setValorAportar] = useState(0);
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
-  const { quotaInfo, roleInfo, infoTicket } = useAuth();
+  const { quotaInfo, roleInfo, infoTicket, pdpUser } = useAuth();
 
-  // console.log(roleInfo);
+  // console.log(pdpUser?.uname);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
+  const [nombreComercio, setNombreComercio] = useState(pdpUser?.uname);
   const [idComercio, setIdComercio] = useState(roleInfo?.["id_comercio"]);
   const [idusuario, setIdUsuario] = useState(roleInfo?.["id_usuario"]);
   const [iddispositivo, setIddispositivo] = useState(
@@ -145,7 +146,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
         // console.log(resTicket);
       })
       .catch((err) => {
-        console.error(err);
+        // console.error(err);
         notifyError("Error guardando el ticket");
       });
   }, [infoTicket, tickets]);
@@ -180,6 +181,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                 id_comercio: idComercio,
                 id_dispositivo: iddispositivo,
                 id_usuario: idusuario,
+                nombre_comercio: nombreComercio,
                 /* es_Propio: esPropio, */
               },
               {},
@@ -211,13 +213,13 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                   notifyError(respuesta?.msg?.["respuesta_colpensiones"]);
                   navigate(`/colpensiones`);
                 }
-                if (
-                  respuesta?.msg?.["respuesta_colpensiones"] ===
-                  "El aportante no existe."
-                ) {
-                  notifyError("El aportante no existe.");
-                  navigate(`/colpensiones`);
-                }
+                // if (
+                //   respuesta?.msg?.["respuesta_colpensiones"] ===
+                //   "El aportante no existe."
+                // ) {
+                //   notifyError("El aportante no existe.");
+                //   navigate(`/colpensiones`);
+                // }
                 // if (
                 //   respuesta?.msg ===
                 //   "El Valor Aportado Debe ser Exacto ej: 5000"
@@ -232,40 +234,40 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                 //   notifyError("Lo sentimos, falló el registro del cupo");
                 //   navigate(`/colpensiones`);
                 // }
-                if (
-                  respuesta?.msg?.["respuesta_colpensiones"] ===
-                  "Cotizante no existe."
-                ) {
-                  notifyError("Cotizante no existe.");
-                  navigate(`/colpensiones`);
-                }
+                // if (
+                //   respuesta?.msg?.["respuesta_colpensiones"] ===
+                //   "Cotizante no existe."
+                // ) {
+                //   notifyError("Cotizante no existe.");
+                //   navigate(`/colpensiones`);
+                // }
 
-                if (
-                  respuesta?.msg ===
-                  "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
-                ) {
-                  notifyError(
-                    "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
-                  );
-                  /* navigate(`/colpensiones`); */
-                  setDisabledBtn(false);
-                }
-                if (
-                  respuesta?.msg?.["RESPUESTA COLPENSIONES"] ===
-                  "Lo Sentimos, Falló el Servicio De Colpensiones"
-                ) {
-                  notifyError("Lo sentimos, falló el servicio de colpensiones");
-                  navigate(`/colpensiones`);
-                }
-                if (
-                  respuesta?.msg?.["respuesta_colpensiones"] ===
-                  "Transacci\u00f3n recibida fuera del horario."
-                ) {
-                  notifyError(
-                    "Lo sentimos, transacción recibida fuera del horario."
-                  );
-                  navigate(`/colpensiones`);
-                }
+                // if (
+                //   respuesta?.msg ===
+                //   "El Valor Aportado Ingresado Esta Fuera Del Rango De 5000 y 149000"
+                // ) {
+                //   notifyError(
+                //     "El valor aportado ingresado esta fuera del rango de 5.000 y 149.000."
+                //   );
+                //   /* navigate(`/colpensiones`); */
+                //   setDisabledBtn(false);
+                // }
+                // if (
+                //   respuesta?.msg?.["RESPUESTA COLPENSIONES"] ===
+                //   "Lo Sentimos, Falló el Servicio De Colpensiones"
+                // ) {
+                //   notifyError("Lo sentimos, falló el servicio de colpensiones");
+                //   navigate(`/colpensiones`);
+                // }
+                // if (
+                //   respuesta?.msg?.["respuesta_colpensiones"] ===
+                //   "Transacci\u00f3n recibida fuera del horario."
+                // ) {
+                //   notifyError(
+                //     "Lo sentimos, transacción recibida fuera del horario."
+                //   );
+                //   navigate(`/colpensiones`);
+                // }
                 /* if (respuesta?.msg === "Lo Sentimos, Falló el Registro Del Cupo") {
                   notifyError("Lo Sentimos, Falló el Registro Del Cupo");
                   navigate(`/colpensiones`);
