@@ -7,9 +7,10 @@ import ToggleInput from "../../../../components/Base/ToggleInput";
 import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { getRetirosList,addConveniosRetiroList,modConveniosRetiroList } from "../../utils/fetchFunctions"
+import TextArea from "../../../../components/Base/TextArea";
+import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
 
-const tiposValores = [{ label: "verdadero", value: "TRUE" }, { label: "falso", value: "FALSE" }]
+const tiposValores = [{ label: "1ra opcion", value: 1 }, { label: "2da opcion", value: 2 }]
 
 const RetiroDirecto = () => {
   const [listaConveniosRetiro, setListaConveniosRetiro] = useState([]);
@@ -23,19 +24,21 @@ const RetiroDirecto = () => {
     nombre_convenio: "",
   });
 
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+    setSelected(false)
+  }, []);
 
-
-  const getConvRetiro = useCallback(async() => {
-    let datos = await getRetirosList({limit:pageData.limit,offset:pageData.page === 1 ? 0 :  (pageData.page*pageData.limit)-pageData.limit})
-    .then((data) => {setMaxPages(data.maxPages);return(data) })
-    // setCargando(true)
+  const getConvRetiro = useCallback(async () => {
+    let datos = await getRetirosList({ limit: pageData.limit, offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit })
+      .then((data) => { setMaxPages(data.maxPages); return (data) })
 
     let datosRetiro = datos.results
     let datosBusqueda;
-    // console.log(Object.values(searchFilters).some(val => val !== ""))
+
     if (Object.values(searchFilters).some(val => val !== "")) {
-      let nuevosDatos = await getRetirosList({limit:datos.count,offset:0 })
-        .then((data) => {return(data.results) })
+      let nuevosDatos = await getRetirosList({ limit: datos.count, offset: 0 })
+        .then((data) => { return (data.results) })
       datosBusqueda = nuevosDatos.filter((item) => {
         if (searchFilters.pk_id_convenio_directo !== "" &&
           Object.values(item)[0].toString().includes(searchFilters.pk_id_convenio_directo)) return item
@@ -54,16 +57,11 @@ const RetiroDirecto = () => {
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
     console.log(body)
-    if (!selected) { addConveniosRetiroList(body); handleClose()}
-    else{ modConveniosRetiroList({convenio_id:selected.pk_id_convenio_directo},body); handleClose()}
-  }, [selected])
+    if (!selected) { addConveniosRetiroList(body); handleClose() }
+    else { modConveniosRetiroList({ convenio_id: selected.pk_id_convenio_directo }, body); handleClose() }
+  }, [handleClose, selected])
 
-  const handleClose = useCallback(() => {
-    setShowModal(false);
-    setSelected(false)
-  }, []);
-
-  useEffect(() => { getConvRetiro() }, [getConvRetiro,pageData])
+  useEffect(() => { getConvRetiro() }, [getConvRetiro, pageData])
 
   return (
     <Fragment>
@@ -87,18 +85,18 @@ const RetiroDirecto = () => {
             ean13,
             nombre_convenio,
             permite_vencidos,
-            activo,
+            estado,
             fecha_creacion,
           }) => ({
             pk_id_convenio_directo,
             ean13,
             nombre_convenio,
-            activo: activo ? "Activo" : "No activo",
+            estado: estado ? "Activo" : "No activo",
             fecha_creacion: fecha_creacion ?? "No indicada",
           })
         )}
         maxPage={maxPages}
-          onSetPageData={setPageData}
+        onSetPageData={setPageData}
         onSelectRow={(e, i) => {
           setShowModal(true);
           setSelected(listaConveniosRetiro[i]);
@@ -151,7 +149,7 @@ const RetiroDirecto = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
         <Form onSubmit={crearModificarConvenioRetiro} grid >
-        {selected && (
+          {selected && (
             <>
               <Input
                 id={"Codigo_convenio"}
@@ -171,26 +169,24 @@ const RetiroDirecto = () => {
             defaultValue={selected?.nombre_convenio ?? ""}
             autoComplete="off"
             required />
-          {/* {!selected && ( */}
-            <>
-              <Input
-                id={"NIT"}
-                label={"nit"}
-                name={"nit"}
-                type="text"
-                autoComplete="off"
-                defaultValue={selected?.nit ?? ""}
-                required />
-              <Input
-                id={"id valor a modificar"}
-                label={"id valor para modificar"}
-                name={"fk_modificar_valor"}
-                defaultValue={selected?.fk_modificar_valor ?? ""}
-                type="number"
-                autoComplete="off"
-                required />
-            </>
-          {/* )} */}
+
+          <Input
+            id={"NIT"}
+            label={"Nit"}
+            name={"nit"}
+            type="text"
+            autoComplete="off"
+            defaultValue={selected?.nit ?? ""}
+            required />
+          <Select
+            className="place-self-stretch"
+            id={"id valor a modificar"}
+            label={"id valor para modificar"}
+            name={"fk_modificar_valor"}
+            options={[{ label: "", value: "" }, ...tiposValores]}
+            defaultValue={selected?.fk_modificar_valor ?? ""}
+            required
+          />
           <Input
             id={"codigo_ean_iac"}
             label={"Código EAN o IAC"}
@@ -200,7 +196,7 @@ const RetiroDirecto = () => {
             autoComplete="off"
           />
 
-          <Select
+          {/* <Select
             className="place-self-stretch"
             id={"fk_tipo_valor"}
             label={"Permite vencidos"}
@@ -208,35 +204,33 @@ const RetiroDirecto = () => {
             options={[{ label: "", value: "" }, ...tiposValores]}
             defaultValue={selected?.permite_vencidos ?? ""}
             required
-          />
-          <Input
+          /> */}
+          <TextArea
             id={1}
             label={"Observaciones"}
             name={"observaciones"}
             type="text"
             autoComplete="off"
             defaultValue={selected?.observaciones ?? ""}
-            required />
-          {selected && (
-            <Select
-            className="place-self-stretch"
-            id={"activo"}
-            label={"Estado"}
-            name={"estado"}
-            options={[{ label: "", value: "" }, ...tiposValores]}
-            defaultValue={selected?.estado ?? ""}
             required
           />
-            // <ToggleInput
-            //   id={"activo"}
-            //   label={"Se encuentra activo"}
-            //   name={"estado"}
-            //   defaultChecked={selected?.activo}
-            // />
+          <ToggleInput
+            id={"permite_vencidos"}
+            label={"Permite vencidos"}
+            name={"permite_vencidos"}
+            defaultChecked={selected?.permite_vencidos ?? ""}
+          />
+          {selected && (
+            <ToggleInput
+              id={"activo"}
+              label={"Se encuentra activo"}
+              name={"estado"}
+              defaultChecked={selected?.estado}
+            />
           )}
           <ButtonBar>
             <Button type={"submit"} >
-            {selected ? "Realizar cambios" : "Crear Convenio"}
+              {selected ? "Realizar cambios" : "Crear Convenio"}
             </Button>
           </ButtonBar>
         </Form>
