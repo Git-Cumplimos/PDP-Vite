@@ -319,7 +319,7 @@ export const useProvideLoteria = () => {
     },
     [roleInfo, codigosOficina]
   );
-
+  
   const sellLoteria = useCallback(
     async (sorteo, ticket, tipoPago) => {
       let fisico = false;
@@ -353,7 +353,7 @@ export const useProvideLoteria = () => {
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
-        tipoPago: tipoPago !== null ? tipoPago : tiposOperaciones?.Venta_Virtual, /// Venta - Virtual
+        tipoPago: tipoPago == tiposOperaciones?.Venta_Fisica ? tiposOperaciones?.Venta_Virtual :  tiposOperaciones?.Venta_Intercambio, /// Venta - Virtual
         ticket: ticket,
         email: customer.email,
       };

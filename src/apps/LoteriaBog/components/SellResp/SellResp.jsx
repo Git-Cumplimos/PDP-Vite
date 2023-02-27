@@ -138,10 +138,15 @@ const SellResp = ({
         ["Fracción", sellResponse?.obj?.fisico === true? JSON.stringify(selecFrac).replace(/,/g," - ").replace(/[[]/,"").replace(/]/,"") : sellResponse?.obj?.fracciones],
         ["Tipo de Billete", sellResponse?.obj?.fisico === true ? "Físico" : "Virtual"],
         ["", ""],
-        ["Valor", formatMoney.format(sellResponse?.obj?.valor_pago)],
+        ["Valor", parseInt(sellResponse?.obj?.tipoPago) ===
+        parseInt(operacion?.Venta_Fisica) || 
+        parseInt(sellResponse?.obj?.tipoPago) === parseInt(operacion?.Venta_Virtual)
+        ? formatMoney.format(sellResponse?.obj?.valor_pago)
+        : formatMoney.format(0)],
         ["", ""],
         ["Forma de Pago", parseInt(sellResponse?.obj?.tipoPago) ===
-          parseInt(operacion?.Venta_Fisica)
+          parseInt(operacion?.Venta_Fisica) || 
+          parseInt(sellResponse?.obj?.tipoPago) === parseInt(operacion?.Venta_Virtual)
           ? "Efectivo"
           : "Bono"],
         ["", ""],

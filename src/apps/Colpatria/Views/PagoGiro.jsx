@@ -23,7 +23,7 @@ import { notifyPending, notifyError } from "../../../utils/notify";
 import { makeMoneyFormatter, onChangeNumber } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 import TicketColpatria from "../components/TicketColpatria";
-import { buildTicket, encryptPin } from "../utils/functions";
+import { encryptPin } from "../utils/functions";
 import Select from "../../../components/Base/Select";
 
 const formatMoney = makeMoneyFormatter(2);
@@ -36,7 +36,7 @@ const ObjTiposPersonas = {
 const PagoGiro = () => {
   const navigate = useNavigate();
 
-  const { roleInfo, pdpUser, infoTicket } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   const [tipoPersona, setTipoPersona] = useState("");
   const [userDocument, setUserDocument] = useState("");
@@ -99,6 +99,19 @@ const PagoGiro = () => {
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valPinPago,
         nombre_usuario: pdpUser?.uname ?? "",
+        nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+        ticket_init: [
+          ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
+          ["", ""],
+          ["No. Identificación", userDocument],
+          ["", ""],
+          ["Fecha de expedición identificación", userDocumentDate],
+          ["", ""],
+          ["No. De PIN", pinNumber],
+          ["", ""],
+          ["Valor a Retirar", formatMoney.format(valPinPago)],
+          ["", ""],
+        ],
 
         // Datos trx colpatria
         colpatria: {
@@ -124,37 +137,7 @@ const PagoGiro = () => {
         {
           render({ data: res }) {
             setLoadingPinPago(false);
-            const trx_id = res?.obj?.id_trx ?? 0;
-            const id_type_trx = res?.obj?.id_type_trx ?? 0;
-            const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
-            const tempTicket = buildTicket(
-              roleInfo,
-              trx_id,
-              codigo_autorizacion,
-              "Pago de giro",
-              [
-                ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
-                ["", ""],
-                ["No. Identificación", userDocument],
-                ["", ""],
-                ["Fecha de expedición identificación", userDocumentDate],
-                ["", ""],
-                ["No. De PIN", pinNumber],
-                ["", ""],
-                ["Valor a Retirar", formatMoney.format(valPinPago)],
-                ["", ""],
-              ]
-            );
-            setPaymentStatus(tempTicket);
-            infoTicket(trx_id, id_type_trx, tempTicket)
-              .then((resTicket) => {
-                console.log(resTicket);
-              })
-              .catch((err) => {
-                console.error(err);
-                notifyError("Error guardando el ticket");
-              });
-
+            setPaymentStatus(res?.obj?.ticket ?? {});
             return "Transacción satisfactoria";
           },
         },
@@ -180,7 +163,6 @@ const PagoGiro = () => {
       valPinPago,
       roleInfo,
       pdpUser?.uname,
-      infoTicket,
       navigate,
     ]
   );
@@ -248,7 +230,7 @@ const PagoGiro = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Pago de Giro</h1>
+      <h1 className="text-3xl mt-6">Retiro con Pin</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
