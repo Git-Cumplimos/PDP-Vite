@@ -33,11 +33,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
       Hora: "",
     },
     commerceInfo: [
-      /*id transaccion recarga*/
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
       /*id_dispositivo*/
-      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      /*telefono*/
-      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
       /*Id trx*/
       ["Id Trx", ""],
       /*Id Aut*/

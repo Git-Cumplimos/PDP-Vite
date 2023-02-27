@@ -32,7 +32,7 @@ const MostrarRecaudosPagar = ({
   const objTicketActual = {
     title: "RECIBO DE PAGO",
     timeInfo: {
-      "Fecha de venta": "",
+      "Fecha de pago": "",
       Hora: "",
     },
     commerceInfo: [
@@ -42,9 +42,9 @@ const MostrarRecaudosPagar = ({
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
       // id trx
-      ["Id Trx", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      ["Id Trx", ""],
       // id autorizador
-      ["Id Aut", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      ["Id Aut", ""],
       // Nombre comercio
       [
         "Comercio",
