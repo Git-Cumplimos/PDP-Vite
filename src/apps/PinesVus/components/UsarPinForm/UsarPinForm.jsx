@@ -58,21 +58,18 @@ const UsarPinForm = ({
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
       ["Id Trx", ""],
-      ["", ""],
+      ["", ""],  
       /*ciudad*/
       ["Comercio", roleInfo?.["nombre comercio"]],
-      ["", ""],
-      ["", ""],
-      ["", ""],
       ["", ""],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
       ["", ""],
 
     ],
-    commerceName: "",
+    commerceName: "PIN PARA GENERACIÓN DE LICENCIA",
     trxInfo: [
-      ["Proceso", "Uso de Pin"],
+      ["Trámite", "Uso de Pin"],
       ["", ""],
 
     ],
@@ -112,14 +109,11 @@ const UsarPinForm = ({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
         "Id Trx": respPinUso?.transacciones_id_trx?.uso,
-        "":"",
-        Comercio : roleInfo?.["nombre comercio"],
-        ".":"",
-        Dirección: roleInfo?.direccion,
-        " .":"",
-
-   
-
+        "::":"",
+        "Comercio" : roleInfo?.["nombre comercio"],
+        " ::":"",
+        "Dirección": roleInfo?.direccion,
+        "  ::":"",
       }),
       trxInfo: [
         ["Trámite", "Uso de Pin"],
@@ -161,10 +155,13 @@ const UsarPinForm = ({
     }).format(new Date());
 
     const objTicket = { ...objTicketActual };
-    objTicket["title"] = "Recibo de pago: " + name_tramite
+    objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = textTipoPin
+    objTicket["trxInfo"][0] = ["Trámite", "Uso de Pin"]
+    objTicket["trxInfo"][1] = ["Valor Trámite", formatMoney.format(0)]
+   
 
     usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin, objTicket) // Pin + IVA
       .then((res) => {
@@ -176,7 +173,7 @@ const UsarPinForm = ({
         } else {
           notify(res?.msg);
           setActivarNavigate(true);
-          setRespPinUso(res?.obj);         
+          setRespPinUso(res?.obj);     
         }
       })
       .catch((err) => console.log("error", err));
