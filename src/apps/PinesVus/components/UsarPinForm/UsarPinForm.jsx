@@ -57,17 +57,24 @@ const UsarPinForm = ({
       ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      ["Id Trx", ""],
+      ["", ""],
       /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
+      ["Comercio", roleInfo?.["nombre comercio"]],
+      ["", ""],
+      ["", ""],
+      ["", ""],
+      ["", ""],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+      ["", ""],
 
-      ["Id Trx", ""],
     ],
     commerceName: "",
     trxInfo: [
       ["Proceso", "Uso de Pin"],
-      ["Valor", formatMoney.format(0)],
+      ["", ""],
+
     ],
     disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
   });
@@ -86,7 +93,7 @@ const UsarPinForm = ({
   const [disabledBtn, setDisabledBtn] = useState(false);
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago: " + name_tramite,
+      title: "Recibo de pago: Servicio voluntario de impresión premium",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -104,13 +111,26 @@ const UsarPinForm = ({
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
         "Id Trx": respPinUso?.transacciones_id_trx?.uso,
+        "":"",
+        Comercio : roleInfo?.["nombre comercio"],
+        ".":"",
+        Dirección: roleInfo?.direccion,
+        " .":"",
+
+   
+
       }),
       trxInfo: [
-        ["Proceso", "Uso de Pin"],
-        ["Valor", formatMoney.format(0)],
+        ["Trámite", "Uso de Pin"],
+        ["Valor", formatMoney.format(0)]
+
+       // ["Valor Pin", formatMoney.format(valor)],
+       // ["IVA Pin",formatMoney.format(valor*0.19)],
+       // ["Total", formatMoney.format(valor*1.19)]
+
+     
+
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -156,7 +176,7 @@ const UsarPinForm = ({
         } else {
           notify(res?.msg);
           setActivarNavigate(true);
-          setRespPinUso(res?.obj);
+          setRespPinUso(res?.obj);         
         }
       })
       .catch((err) => console.log("error", err));

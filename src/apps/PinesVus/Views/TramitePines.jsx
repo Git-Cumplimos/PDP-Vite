@@ -16,7 +16,7 @@ import { enumParametrosPines } from "../utils/enumParametrosPines";
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
   month: "numeric",
-  day: "numeric",
+  day: "numeric", 
 });
 
 const TramitePines = () => {
@@ -156,6 +156,7 @@ const TramitePines = () => {
           setName_tramite(res?.obj?.results?.[0]?.name_tramite);
           setId_pin(res?.obj?.results?.[0]?.id_pin)
           setInfoComercioCreacion(res?.obj?.results?.[0]?.datos_comercio_creacion)
+          console.log(res?.obj?.results?.[0])
         }
       })
       .catch((err) => console.log("error", err));

@@ -51,26 +51,29 @@ const CancelPin = ({
       Hora: "",
     },
     commerceInfo: [
-      /*id_comercio*/
+     /*id_comercio*/
       ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
 
       ["Id Trx", ""],
+      ["", ""],
+      ["Comercio", roleInfo?.["nombre comercio"]],
+      ["", ""],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+      ["", ""],
+
     ],
     commerceName: "",
     trxInfo: [
-      ["Proceso", "Cancelación de Pin"],
+      ["Trámite", "Cancelación de Pin"],
       ["",""],
       ["", ""],
       ["", ""],
       ["",""],
       ["", ""],
-      ["", ""],
+      ["", ""], 
     ],
     disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
   });
@@ -104,7 +107,7 @@ const CancelPin = ({
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago: " + name_tramite,
+      title: "Recibo de pago: Servicio voluntario de impresión premium",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -122,13 +125,17 @@ const CancelPin = ({
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
         "Id Trx": respPinCancel?.id_trx,
+        "":"",
+        Comercio : roleInfo?.["nombre comercio"],
+        ".":"",
+        Dirección: roleInfo?.direccion,
+        " .":"",
+
       }),
       trxInfo: tipCancelacion === "1" ? 
       [
-        ["Proceso", "Cancelación de Pin"],
+        ["Trámite", "Cancelación de Pin"],
         ["",""],
         ["Valor Trámite", formatMoney.format(valor_tramite)],
         ["IVA Trámite",formatMoney.format(0)],
@@ -138,7 +145,7 @@ const CancelPin = ({
       ] 
       : 
       [
-        ["Proceso", "Cancelación de Pin"],
+        ["Trámite", "Cancelación de Pin"],
         ["",""],
         ["Valor Pin", formatMoney.format(valor)],
         ["IVA Pin", formatMoney.format(valor*0.19)],
