@@ -1,5 +1,5 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, Navigate, useParams, useSearchParams } from "react-router-dom";
+import { Fragment, useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -7,14 +7,9 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { searchConveniosRecaudoList } from "../../utils/fetchFunctions"
 
-
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
 
-  const recaudoDirectos = [
-    { pk_id_convenio: 1, referencia: 650122, nombre_cliente: "Kevin Guevara", valor: "25000" },
-    { pk_id_convenio: 2, referencia: 660122, nombre_cliente: "Maria Reyes", valor: "35000" },
-  ]
   const { pk_id_convenio } = useParams()
   const [showModal, setShowModal] = useState(false)
   const [dataRecaudo, setDataRecaudo] = useState('')
@@ -22,7 +17,10 @@ const RecaudoConjunto = () => {
   const [referencia, setReferencia] = useState('')
   const [convenioRetiro, setConvenioRetiro] = useState(null);
 
-
+  const recaudoDirectos = [
+    { pk_id_convenio: 1, referencia: 650122, nombre_cliente: "Kevin Guevara", valor: "25000" },
+    { pk_id_convenio: 2, referencia: 660122, nombre_cliente: "Maria Reyes", valor: "35000" },
+  ]
   const getData = useCallback(async() => {
     try {
       let rest =await searchConveniosRecaudoList({convenio_id:pk_id_convenio})
@@ -34,7 +32,7 @@ const RecaudoConjunto = () => {
       alert("error")
       navigate("/recaudo-directo/recaudo")
     }
-  }, [pk_id_convenio])
+  }, [navigate,pk_id_convenio])
 
   const consultarRecaudoD = (e) => {
     // Datos Estaticos
@@ -53,7 +51,7 @@ const RecaudoConjunto = () => {
     setShowModal(false);
   }, []);
 
-  useEffect(() => {getData()}, [pk_id_convenio])
+  useEffect(() => {getData()}, [getData,pk_id_convenio])
     
   return (
     <>
@@ -132,7 +130,7 @@ const RecaudoConjunto = () => {
                   <Button type={"submit"} >
                     Aceptar
                   </Button>
-                  <Button type={"submit"} >
+                  <Button onClick={()=>handleClose()} >
                     Cancelar
                   </Button>
                 </ButtonBar>

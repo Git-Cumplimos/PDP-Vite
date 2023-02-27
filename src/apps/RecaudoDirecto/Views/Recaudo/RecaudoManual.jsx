@@ -1,23 +1,8 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import Modal from "../../../../components/Base/Modal";
-import Button from "../../../../components/Base/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar";
+import { useNavigate } from "react-router-dom";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import ToggleInput from "../../../../components/Base/ToggleInput";
-import Select from "../../../../components/Base/Select";
-import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { getRecaudosList } from "../../utils/fetchFunctions"
-
-
-// const datos = {
-//   "name": "State",
-//   "value": [
-//     { activo: true, codigo_ean_iac: '0000000000000', pk_id_convenio: 2041, nombre_convenio: 'pruebas', fecha_creacion: '2022-07-10' },
-//     { activo: true, codigo_ean_iac: '8978945645614', pk_id_convenio: 2037, nombre_convenio: 'pruebas2', fecha_creacion: '2023-05-06' },
-//   ],
-// }
 
 const RecaudoManual = () => {
   const navigate = useNavigate();
