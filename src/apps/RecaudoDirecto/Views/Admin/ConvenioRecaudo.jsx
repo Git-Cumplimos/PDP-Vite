@@ -10,27 +10,33 @@ import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
 
-const tiposValores = [{ label: "1ra opcion", value: 1 }, { label: "2da opcion", value: 2 }]
 
 const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
   const [selected, setSelected] = useState(false);
-  // const [busqueda, setBusqueda] = useState('');
+  const [busqueda, setBusqueda] = useState('');
   const [listRecaudos, setListRecaudos] = useState('')
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
   const [cargando, setCargando] = useState(false)
+  const tiposValores = [{ label: "1ra opcion", value: 1 }, { label: "2da opcion", value: 2 }]
+  const [searchFilters, setSearchFilters] = useState({
+    pk_id_convenio_directo: "",
+    ean13: "",
+    nombre_convenio: "",
+  });
 
   const getRecaudos = useCallback(async () => {
-    // console.log("pagina",pageData.page,"limite", pageData.limit,"offset",pageData.page === 1 ? 0 : (pageData.page*pageData.limit)-pageData.limit)
     await getRecaudosList({ 
+      ...searchFilters,
       limit: pageData.limit, 
-      offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit })
-      .then((data) => { setListRecaudos(data.results); setMaxPages(data.maxPages) })
+      offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit,
+      })
+      .then((data) => { setListRecaudos(data.obj.results); setMaxPages(data.obj.maxPages) })
     setCargando(true)
-  }, [pageData])
+  }, [pageData,searchFilters])
 
-  useEffect(() => { getRecaudos() }, [getRecaudos, pageData])
+  useEffect(() => { getRecaudos() }, [getRecaudos, pageData, busqueda,searchFilters])
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -87,19 +93,17 @@ const RecaudoDirecto = () => {
           }}
           maxPage={maxPages}
           onSetPageData={setPageData}
-          // onChange={(ev) => {
-          //   setBusqueda(ev)
-          // }
-            // setSearchFilters((old) => ({
-            //   ...old,
-            //   [ev.target.name]: ev.target.value,
-            // }))
-          // }
+          onChange={(ev) => {
+            setSearchFilters((old) => ({
+              ...old,
+              [ev.target.name]: ev.target.value,
+            }))
+          }}
         >
           <Input
             id={"pk_codigo_convenio"}
             label={"Código de convenio"}
-            name={"pk_codigo_convenio"}
+            name={"pk_id_convenio_directo"}
             type="tel"
             autoComplete="off"
             maxLength={"4"}
@@ -129,6 +133,7 @@ const RecaudoDirecto = () => {
             type="text"
             autoComplete="off"
             maxLength={"30"}
+            onChange={(ev) => {setBusqueda(ev.target.value)}}                     
             required
           />
         </TableEnterprise>
