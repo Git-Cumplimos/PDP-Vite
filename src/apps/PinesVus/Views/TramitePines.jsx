@@ -43,6 +43,7 @@ const TramitePines = () => {
   const [maxPages, setMaxPages] = useState(1);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [valor, setValor] = useState("");
+  const [valores, setValores] = useState("");
   const [id_trx, setId_trx] = useState("");
   const [tipoPin, setTipoPin] = useState("");
   const [valor_tramite, setValor_tramite] = useState("");
@@ -150,13 +151,13 @@ const TramitePines = () => {
           );
           setMaxPages(res?.obj?.maxPages);
           setValor(res?.obj?.results?.[0]?.valor);
+          setValores(res?.obj?.results?.[0]?.valores);
           setId_trx(res?.obj?.results?.[0]?.id_trx?.creacion);
           setTipoPin(res?.obj?.results?.[0]?.tipo_pin);
           setValor_tramite(res?.obj?.results?.[0]?.valor_tramite);
           setName_tramite(res?.obj?.results?.[0]?.name_tramite);
           setId_pin(res?.obj?.results?.[0]?.id_pin)
           setInfoComercioCreacion(res?.obj?.results?.[0]?.datos_comercio_creacion)
-          console.log(res?.obj?.results?.[0])
         }
       })
       .catch((err) => console.log("error", err));
@@ -375,6 +376,7 @@ const TramitePines = () => {
             infoComercioCreacion={infoComercioCreacion}
             setActivarNavigate={setActivarNavigate}
             closeModal={closeModal}
+            valores={valores}
           ></CancelPin>
         ) : (
           ""

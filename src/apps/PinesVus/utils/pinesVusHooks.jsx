@@ -53,6 +53,7 @@ export const useProvidePinesVus = () => {
     if (user?.tipo_comercio === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
     }
+    
     const body = {
       valor_tramite : valor_tramite,
       Usuario: user?.id_usuario,
@@ -72,7 +73,7 @@ export const useProvidePinesVus = () => {
       id_pin: id_pin,
     };
     try {
-      console.log(body)
+    
       const res = await fetchData(urls.cancelPinVus, "PUT", query, body);
       return res;
     } catch (err) {
