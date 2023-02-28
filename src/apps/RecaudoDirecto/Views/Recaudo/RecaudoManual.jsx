@@ -12,14 +12,23 @@ const RecaudoManual = () => {
   const [cargando, setCargando] = useState(false)
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
+  const [searchFilters, setSearchFilters] = useState({
+    pk_id_convenio_directo: "",
+    ean13: "",
+    nombre_convenio: "",
+  });
 
   const getRecaudos = useCallback(async () => {
-    await getRecaudosList({ limit: pageData.limit, offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit })
+    await getRecaudosList({
+      ...searchFilters,
+      limit: pageData.limit,
+      offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit,
+    })
       .then((data) => { setListRecaudos(data.results); setMaxPages(data.maxPages) })
     setCargando(true)
-  }, [pageData])
+  }, [pageData, searchFilters])
 
-  useEffect(() => { getRecaudos() }, [getRecaudos])
+  useEffect(() => { getRecaudos() }, [getRecaudos, searchFilters, pageData])
 
   return (
     <Fragment>
@@ -49,11 +58,18 @@ const RecaudoManual = () => {
           }}
           maxPage={maxPages}
           onSetPageData={setPageData}
+          onChange={(ev) => {
+            setSearchFilters((old) => ({
+              ...old,
+              [ev.target.name]: ev.target.value,
+            }))
+          }}
         >
+
           <Input
             id={"pk_codigo_convenio"}
             label={"Código de convenio"}
-            name={"pk_codigo_convenio_directo"}
+            name={"pk_id_convenio_directo"}
             type="tel"
             autoComplete="off"
             maxLength={"4"}

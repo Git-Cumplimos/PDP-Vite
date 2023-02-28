@@ -5,6 +5,7 @@ const url = `http://127.0.0.1:8000`;
 const buildGetFunction = (url) => {
   return async (args = {}) => {
     try {
+      // console.log(args)
       const res = await fetchData(url, "GET", args);
       // if (!res?.status) {
       //   if (res?.msg) {
@@ -13,6 +14,7 @@ const buildGetFunction = (url) => {
 
       //   throw new Error(res, { cause: "custom" });
       // }
+      // console.log(res)
       return res;
     } catch (err) {
       throw err;
@@ -82,7 +84,7 @@ export const modConveniosRecaudoList = buildPutFunction(
 
 /*--- Retiro ---*/
 export const getRetirosList = buildGetFunction(
-  `${url}/convenio-retiro/lista-retiro`
+  `${url}/convenio-retiro/obtener-paginado`
 );
 // export const searchConveniosRetiroList = buildGetFunction(
 //   `${url}/convenio-retiro/obtener`
