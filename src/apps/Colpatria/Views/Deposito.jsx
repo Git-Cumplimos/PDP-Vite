@@ -73,9 +73,9 @@ const Deposito = () => {
   const summary = useMemo(
     () => ({
       "Tipo de cuenta": accountTypes?.[accountType] ?? "No type",
-      "Numero de cuenta": toAccountNumber(accountNumber),
+      "Número de cuenta": toAccountNumber(accountNumber),
       "No. Documento del depositante": userDocument,
-      "Valor de deposito": formatMoney.format(valDeposito),
+      "Valor de depósito": formatMoney.format(valDeposito),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
@@ -103,11 +103,11 @@ const Deposito = () => {
         ticket_init: [
           ["Tipo de cuenta", accountTypes?.[accountType] ?? "No type"],
           ["", ""],
-          ["Numero de cuenta", toAccountNumber(accountNumber)],
+          ["Número de cuenta", toAccountNumber(accountNumber)],
           ["", ""],
           ["No. Documento del depositante", userDocument],
           ["", ""],
-          ["Valor de deposito", formatMoney.format(valDeposito)],
+          ["Valor de depósito", formatMoney.format(valDeposito)],
           ["", ""],
         ],
 
