@@ -37,7 +37,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     valorVar: "",
   });
   const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago",
+    title: "RECIBO DE PAGO",
     timeInfo: {
       "Fecha de pago": "",
       Hora: "",

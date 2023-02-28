@@ -27,7 +27,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   const [peticion, setPeticion] = useState(0);
   const formatMoney = makeMoneyFormatter(2);
   const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago",
+    title: "RECIBO DE PAGO",
     timeInfo: {
       "Fecha de pago": "",
       Hora: "",
