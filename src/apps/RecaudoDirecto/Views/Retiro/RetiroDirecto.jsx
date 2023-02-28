@@ -25,8 +25,18 @@ const RetiroDirecto = () => {
       limit: pageData.limit,
       offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit
     })
-      .then((data) => { setListRetiro(data.obj.results); setMaxPages(data.obj.maxPages) })
-
+    .then((data) => {
+      setListRetiro(data?.obj?.results ?? []);
+      setMaxPages(data?.obj?.maxPages ?? '')
+    })
+    .catch((err) => {
+      // setListRetiro([]);
+      // if (err?.cause === "custom") {
+      //   notifyError(err?.message);
+      //   return;
+      // }
+      console.error(err?.message);
+    });
     setCargando(true)
   }, [pageData, searchFilters])
 
@@ -73,12 +83,6 @@ const RetiroDirecto = () => {
             type="tel"
             autoComplete="off"
             maxLength={"4"}
-            onChange={(ev) => {
-              // ev.target.value = onChangeNumber(ev);
-            }}
-            // defaultValue={selected?.pk_codigo_convenio ?? ""}
-            // readOnly={selected}
-            required
           />
           <Input
             id={"codigo_ean_iac_search"}
@@ -87,11 +91,6 @@ const RetiroDirecto = () => {
             type="tel"
             autoComplete="off"
             maxLength={"13"}
-            onChange={(ev) => {
-              // ev.target.value = onChangeNumber(ev);
-            }}
-            // defaultValue={selected?.codigo_ean_iac ?? ""}
-            required
           />
           <Input
             id={"nombre_convenio"}
@@ -100,8 +99,6 @@ const RetiroDirecto = () => {
             type="text"
             autoComplete="off"
             maxLength={"30"}
-            // defaultValue={selected?.nombre_convenio ?? ""}
-            required
           />
         </TableEnterprise>
       ) : (<>cargando...</>)}

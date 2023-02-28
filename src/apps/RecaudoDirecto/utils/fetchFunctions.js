@@ -5,19 +5,17 @@ const url = `http://127.0.0.1:8000`;
 const buildGetFunction = (url) => {
   return async (args = {}) => {
     try {
-      // console.log(args)
       const res = await fetchData(url, "GET", args);
-      // if (!res?.status) {
-      //   if (res?.msg) {
-      //     throw new Error(res?.msg, { cause: "custom" });
-      //   }
-
-      //   throw new Error(res, { cause: "custom" });
-      // }
-      // console.log(res)
+      if (!res?.status) {
+        if (res?.msg) {
+          throw new Error(res?.msg, { cause: "custom" });
+        }
+        throw new Error(res, { cause: "custom" });
+      }
       return res;
     } catch (err) {
-      throw err;
+      // console.log(err)
+      throw err
     }
   };
 };
@@ -29,18 +27,17 @@ const buildPostFunction = (url) => {
     }
     try {
       const res = await fetchData(url, "POST", {}, body);
-      // if (!res?.status) {
-      //   if (res?.msg) {
-      //     throw new Error(res?.msg, { cause: "custom" });
-      //   }
-
-      //   throw new Error(res, { cause: "custom" });
-      // }
-      // return res;
-      console.log(res)
-      alert("creacion exitosa") ;
+      if (!res?.status) {
+        if (res?.msg) {
+          throw new Error(res?.msg, { cause: "custom" });
+        }
+        throw new Error(res, { cause: "custom" });
+      }
+      // console.log(res)
+      return res;
     } catch (err) {
-      console.log(err) ;
+      // console.log(err) ;
+      throw err
     }
   };
 };
@@ -53,15 +50,13 @@ const buildPutFunction = (url) => {
     }
     try {
       const res = await fetchData(url, "PUT", args, body);
-      // if (!res?.status) {
-      //   if (res?.msg) {
-      //     throw new Error(res?.msg, { cause: "custom" });
-      //   }
-
-      //   throw new Error(res, { cause: "custom" });
-      // }
-      console.log(res)
-      alert("modificacion exitosa") ;
+      if (!res?.status) {
+        if (res?.msg) {
+          throw new Error(res?.msg, { cause: "custom" });
+        }
+        throw new Error(res, { cause: "custom" });
+      }
+      // console.log(res)
       return res;
     } catch (err) {
       throw err;

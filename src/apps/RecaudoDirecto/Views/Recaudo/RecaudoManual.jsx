@@ -24,7 +24,18 @@ const RecaudoManual = () => {
       limit: pageData.limit,
       offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit,
     })
-    .then((data) => { setListRecaudos(data.obj.results); setMaxPages(data.obj.maxPages) })
+    .then((data) => {
+      setListRecaudos(data?.obj?.results ?? []);
+      setMaxPages(data?.obj?.maxPages ?? '')
+    })
+    .catch((err) => {
+      // setListRecaudos([]);
+      // if (err?.cause === "custom") {
+      //   notifyError(err?.message);
+      //   return;
+      // }
+      console.error(err?.message);
+    });
     setCargando(true)
   }, [pageData, searchFilters])
 

@@ -19,14 +19,15 @@ const RecaudoConjunto = () => {
 
   const recaudoDirectos = [
     { pk_id_convenio: 1, referencia: 650122, nombre_cliente: "Kevin Guevara", valor: "25000" },
-    { pk_id_convenio: 2, referencia: 660122, nombre_cliente: "Maria Reyes", valor: "35000" },
+    { pk_id_convenio: 4, referencia: 660122, nombre_cliente: "Maria Reyes", valor: "35000" },
   ]
+
   const getData = useCallback(async() => {
     try {
       let rest =await searchConveniosRecaudoList({convenio_id:pk_id_convenio})
         .then((rest)=>{ return rest })
       if (rest.length < 1) throw "no hay datos"
-      setConvenioRetiro(rest)
+      setConvenioRetiro(rest.obj)
       setCargando(true)
     } catch (e) {
       alert("error")

@@ -8,13 +8,12 @@ import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
-
 
 const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
-  const [selected, setSelected] = useState(false);
-  const [busqueda, setBusqueda] = useState('');
+  const [selected, setSelected] = useState(false); // fila selecionada
   const [listRecaudos, setListRecaudos] = useState('')
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
@@ -27,16 +26,26 @@ const RecaudoDirecto = () => {
   });
 
   const getRecaudos = useCallback(async () => {
-    await getRecaudosList({ 
+    await getRecaudosList({
       ...searchFilters,
-      limit: pageData.limit, 
+      limit: pageData.limit,
       offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit,
+    })
+      .then((data) => {
+        setListRecaudos(data?.obj?.results ?? []);
+        setMaxPages(data?.obj?.maxPages ?? '')
       })
-      .then((data) => { setListRecaudos(data.obj.results); setMaxPages(data.obj.maxPages) })
+      .catch((err) => {
+        // if (err?.cause === "custom") {
+        //   notifyError(err?.message);
+        //   return;
+        // }
+        console.error(err?.message);
+      });
     setCargando(true)
-  }, [pageData,searchFilters])
+  }, [pageData, searchFilters])
 
-  useEffect(() => { getRecaudos() }, [getRecaudos, pageData, busqueda,searchFilters])
+  useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters])
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -47,9 +56,37 @@ const RecaudoDirecto = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
-    if (!selected) { addConveniosRecaudoList(body); handleClose() }
-    else { modConveniosRecaudoList({ convenio_id: selected.pk_id_convenio_directo }, body); handleClose() }
-  }, [handleClose, selected])
+    notifyPending(
+      selected
+        ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
+        : addConveniosRecaudoList(body),
+      {
+        render() {
+          return "Enviando solicitud";
+        },
+      },
+      {
+        render({ data: res }) {
+          // console.log(res);
+          handleClose();
+          getRecaudos();
+          return `Convenio ${selected ? "modificado" : "agregado"
+            } exitosamente`;
+        },
+      },
+      {
+        render({ data: err }) {
+          if (err?.cause === "custom") {
+            return err?.message;
+          }
+          console.error(err?.message);
+          return `${selected ? "Edicion" : "Creacion"} fallida`;
+        },
+      }
+    )
+    // if (!selected) { addConveniosRecaudoList(body); handleClose() }
+    // else { modConveniosRecaudoList({ convenio_id: selected.pk_id_convenio_directo }, body); handleClose() }
+  }, [handleClose, getRecaudos,selected])
 
   return (
     <Fragment>
@@ -107,12 +144,8 @@ const RecaudoDirecto = () => {
             type="tel"
             autoComplete="off"
             maxLength={"4"}
-            onChange={(ev) => {
-              // ev.target.value = onChangeNumber(ev);
-            }}
-            // defaultValue={selected?.pk_codigo_convenio ?? ""}
-            // readOnly={selected}
-            required
+            onChange={(ev) => { }}
+
           />
           <Input
             id={"codigo_ean_iac_search"}
@@ -121,10 +154,7 @@ const RecaudoDirecto = () => {
             type="tel"
             autoComplete="off"
             maxLength={"13"}
-            onChange={(ev) => {
-              // ev.target.value = onChangeNumber(ev);
-            }}
-            required
+            onChange={(ev) => { }}
           />
           <Input
             id={"nombre_convenio"}
@@ -133,8 +163,7 @@ const RecaudoDirecto = () => {
             type="text"
             autoComplete="off"
             maxLength={"30"}
-            onChange={(ev) => {setBusqueda(ev.target.value)}}                     
-            required
+            onChange={(ev) => { }}
           />
         </TableEnterprise>
       </>) : (<>cargando...</>)}
@@ -160,8 +189,8 @@ const RecaudoDirecto = () => {
             type="text"
             defaultValue={selected?.nombre_convenio ?? ""}
             autoComplete="off"
-            required />
-
+            required 
+          />
           <Input
             id={"NIT"}
             label={"Nit"}
@@ -169,7 +198,8 @@ const RecaudoDirecto = () => {
             type="text"
             autoComplete="off"
             defaultValue={selected?.nit ?? ""}
-            required />
+            required 
+          />
           <Select
             className="place-self-stretch"
             id={"id valor a modificar"}
@@ -194,8 +224,8 @@ const RecaudoDirecto = () => {
             type="text"
             autoComplete="off"
             defaultValue={selected?.observaciones ?? ""}
-            required 
-            />
+            required
+          />
           <ToggleInput
             id={"permite_vencidos"}
             label={"Permite vencidos"}

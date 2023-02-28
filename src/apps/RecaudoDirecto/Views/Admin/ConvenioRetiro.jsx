@@ -8,6 +8,7 @@ import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
 
 const tiposValores = [{ label: "1ra opcion", value: 1 }, { label: "2da opcion", value: 2 }]
@@ -36,20 +37,58 @@ const RetiroDirecto = () => {
       limit: pageData.limit,
       offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit
     })
-      .then((data) => { setListRetiro(data.obj.results); setMaxPages(data.obj.maxPages) })
+    .then((data) => {
+      setListRetiro(data?.obj?.results ?? []);
+      setMaxPages(data?.obj?.maxPages ?? '')
+    })
+    .catch((err) => {
+      // setListRetiro([]);
+      // if (err?.cause === "custom") {
+      //   notifyError(err?.message);
+      //   return;
+      // }
+      console.error(err?.message);
+    });
 
     setCargando(true)
   }, [pageData, searchFilters])
-
 
   const crearModificarConvenioRetiro = useCallback((e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
     console.log(body)
-    if (!selected) { addConveniosRetiroList(body); handleClose() }
-    else { modConveniosRetiroList({ convenio_id: selected.pk_id_convenio_directo }, body); handleClose() }
-  }, [handleClose, selected])
+    notifyPending(
+      selected
+        ? modConveniosRetiroList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
+        : addConveniosRetiroList(body),
+      {
+        render() {
+          return "Enviando solicitud";
+        },
+      },
+      {
+        render({ data: res }) {
+          // console.log(res);
+          handleClose();
+          getConvRetiro();
+          return `Convenio ${selected ? "modificado" : "agregado"
+            } exitosamente`;
+        },
+      },
+      {
+        render({ data: err }) {
+          if (err?.cause === "custom") {
+            return err?.message;
+          }
+          console.error(err?.message);
+          return `${selected ? "Edicion" : "Creacion"} fallida`;
+        },
+      }
+    )
+    // if (!selected) { addConveniosRetiroList(body); handleClose() }
+    // else { modConveniosRetiroList({ convenio_id: selected.pk_id_convenio_directo }, body); handleClose() }
+  }, [handleClose, getConvRetiro,selected])
 
   useEffect(() => { getConvRetiro() }, [getConvRetiro, pageData, searchFilters])
 
