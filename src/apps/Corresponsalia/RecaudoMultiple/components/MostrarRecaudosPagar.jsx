@@ -57,7 +57,7 @@ const MostrarRecaudosPagar = ({
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
       ["", ""],
     ],
-    commerceName: "RECAUDO MULTIPLE",
+    commerceName: "RECAUDO MÚLTIPLE",
     trxInfo: [],
     disclamer:
       "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
