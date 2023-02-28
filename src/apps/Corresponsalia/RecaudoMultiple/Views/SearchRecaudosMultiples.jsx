@@ -83,7 +83,7 @@ const SearchRecaudosMultiples = () => {
     <>
       {uuid === "" ? (
         <TableEnterprise
-          title='Recaudos multiples'
+          title='Recaudos Múltiples'
           maxPage={maxPages}
           headers={[
             "Id",
@@ -96,7 +96,7 @@ const SearchRecaudosMultiples = () => {
           onSetPageData={setPageData}>
           <Input
             id='pk_tbl_recaudo_multiple'
-            label='Id recaudo multiple'
+            label='Id recaudo múltiple'
             type='text'
             name='pk_tbl_recaudo_multiple'
             minLength='1'
@@ -113,7 +113,7 @@ const SearchRecaudosMultiples = () => {
       ) : (
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
           <h1 className='text-3xl text-center mb-10 mt-5'>
-            Consulta recaudo multiple
+            Consulta Recaudo Múltiple
           </h1>
           <ConsultarRecaudosMultiples
             uuid={uuid}
