@@ -324,6 +324,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
+      hour12: false,
     }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
@@ -619,22 +620,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
               )}
               {peticion === 4 && (
                 <>
-                  <h2>
-                    <ButtonBar>
-                      <Button onClick={handlePrint}>Imprimir</Button>
-                      <Button
-                        type='submit'
-                        onClick={() => {
-                          hideModalReset();
-                          navigate(-1);
-                        }}>
-                        Aceptar
-                      </Button>
-                    </ButtonBar>
-                  </h2>
                   <TicketsAval
                     ticket={objTicketActual}
                     refPrint={printDiv}></TicketsAval>
+
+                  <ButtonBar>
+                    <Button onClick={handlePrint}>Imprimir</Button>
+                    <Button
+                      type='button'
+                      onClick={() => {
+                        hideModalReset();
+                        navigate(-1);
+                      }}>
+                      Cerrar
+                    </Button>
+                  </ButtonBar>
                 </>
               )}
             </div>
