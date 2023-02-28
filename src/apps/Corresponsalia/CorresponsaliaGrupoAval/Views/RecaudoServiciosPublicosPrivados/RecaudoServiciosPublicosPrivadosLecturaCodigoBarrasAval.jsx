@@ -366,8 +366,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         62: datosConsulta?.tipoRecaudo?.["62"] ?? "",
         103: datosConsulta?.tipoRecaudo?.["103"] ?? "",
         104: datosConsulta?.tipoRecaudo?.["104"] ?? "",
-        numeroConvenio: convenio.nura,
-        valReferencia1: datosTrans.ref1,
+        numeroConvenio: datosEnvio?.datosConvenio?.nura,
+        valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
         location: {
           address: roleInfo?.["direccion"],
           dane_code: roleInfo?.codigo_dane,
