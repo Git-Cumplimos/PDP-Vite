@@ -511,6 +511,7 @@ const Loteria = ({ route }) => {
           />
         ) : (
           <SellResp
+            codigos_lot={codigos_lot}
             sellResponse={sellResponse}
             setSellResponse={setSellResponse}
             closeModal={closeModal}
