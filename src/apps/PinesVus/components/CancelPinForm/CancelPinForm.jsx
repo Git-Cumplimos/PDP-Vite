@@ -27,7 +27,12 @@ const CancelPin = ({
   infoComercioCreacion,
   closeModal,
   setActivarNavigate,
+  valores
 }) => {
+ /* console.log(name_tramite.search(","))
+  console.log(name_tramite.slice(0,41))
+  console.log(name_tramite.slice(41))*/
+
   const { cancelPinVus, con_estado_tipoPin } = usePinesVus();
 
   const printDiv = useRef();
@@ -51,26 +56,29 @@ const CancelPin = ({
       Hora: "",
     },
     commerceInfo: [
-      /*id_comercio*/
+     /*id_comercio*/
       ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
 
       ["Id Trx", ""],
+      ["", ""],
+      ["Comercio", roleInfo?.["nombre comercio"]],
+      ["", ""],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+      ["", ""],
+
     ],
     commerceName: "",
     trxInfo: [
-      ["Proceso", "Cancelación de Pin"],
+      ["Trámite", "Cancelación de Pin"],
       ["",""],
       ["", ""],
       ["", ""],
       ["",""],
       ["", ""],
-      ["", ""],
+      ["", ""], 
     ],
     disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
   });
@@ -104,7 +112,7 @@ const CancelPin = ({
 
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago: " + name_tramite,
+      title: "Recibo de pago: Servicio voluntario de impresión premium",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -122,23 +130,39 @@ const CancelPin = ({
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
         "Id Trx": respPinCancel?.id_trx,
+        "::":"",
+        Comercio : roleInfo?.["nombre comercio"],
+        " ::":"",
+        Dirección: roleInfo?.direccion,
+        "  ::":"",
+
       }),
       trxInfo: tipCancelacion === "1" ? 
-      [
-        ["Proceso", "Cancelación de Pin"],
+      valores[1]?
+      [ 
+        ["Trámite", "Cancelación de Pin"],
+        ["",""],
+        ["Valor Trámite 1", formatMoney.format(valores[0])],
+        ["",""],
+        ["Valor Trámite 2", formatMoney.format(valores[1])],
+        ["",""],
+        ["Valor Pin", formatMoney.format(valor)],
+        ["IVA Pin", formatMoney.format(valor*0.19)],
+        ["Total", formatMoney.format(valor*1.19 + valores[0]+ valores[1] )], // Valor + IVA
+      ] :
+      [ 
+        ["Trámite", "Cancelación de Pin"],
         ["",""],
         ["Valor Trámite", formatMoney.format(valor_tramite)],
         ["IVA Trámite",formatMoney.format(0)],
         ["Valor Pin", formatMoney.format(valor)],
         ["IVA Pin", formatMoney.format(valor*0.19)],
         ["Total", formatMoney.format(valor*1.19 + valor_tramite)], // Valor + IVA
-      ] 
+      ]
       : 
       [
-        ["Proceso", "Cancelación de Pin"],
+        ["Trámite", "Cancelación de Pin"],
         ["",""],
         ["Valor Pin", formatMoney.format(valor)],
         ["IVA Pin", formatMoney.format(valor*0.19)],
@@ -171,20 +195,33 @@ const CancelPin = ({
     }).format(new Date());
 
     const objTicket = { ...objTicketActual };
-    objTicket["title"] = "Recibo de pago: " + name_tramite
+    objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = textTipoPin
-
-    objTicket["trxInfo"][2] = ["Valor Trámite", formatMoney.format(valor_tramite)]
-    objTicket["trxInfo"][3] = ["IVA Trámite",formatMoney.format(0)]
-    objTicket["trxInfo"][4] = ["Valor Pin", formatMoney.format(valor)]
-    objTicket["trxInfo"][5] = ["IVA Pin", formatMoney.format(valor*0.19)]
-    objTicket["trxInfo"][6] = ["Total", formatMoney.format(valor*1.19 + valor_tramite)]
+ if( valores[1]){
+    objTicket["trxInfo"][2] = ["Valor Trámite 1", formatMoney.format(valores[0])]
+    objTicket["trxInfo"][3] = ["",""]
+    objTicket["trxInfo"][4] = ["Valor Trámite 2",formatMoney.format(valores[1])]
+    objTicket["trxInfo"][5] = ["",""]
+    objTicket["trxInfo"][6] = ["Valor Pin", formatMoney.format(valor)]
+    objTicket["trxInfo"][7] = ["IVA Pin", formatMoney.format(valor*0.19)]
+    objTicket["trxInfo"][8] = ["Total", formatMoney.format(valor*1.19 + valores[0]+ valores[1])]
+  }
+    else{    
+      objTicket["trxInfo"][2] = ["Valor Trámite", formatMoney.format(valor_tramite)]
+      objTicket["trxInfo"][3] = ["",""]
+      objTicket["trxInfo"][4] = ["IVA Trámite",formatMoney.format(0)]
+      objTicket["trxInfo"][5] = ["",""]
+      objTicket["trxInfo"][6] = ["Valor Pin", formatMoney.format(valor)]
+      objTicket["trxInfo"][7] = ["IVA Pin", formatMoney.format(valor*0.19)]
+      objTicket["trxInfo"][8] = ["Total", formatMoney.format(valor*1.19 + valor_tramite)]
+  }
 
     if (tipCancelacion === '2') {
-      objTicket["trxInfo"][6] = ["Total", formatMoney.format(valor*1.19)]     
-      objTicket["trxInfo"].splice(2,2)
+   
+      objTicket["trxInfo"][8] = ["Total", formatMoney.format(valor*1.19)]     
+      objTicket["trxInfo"].splice(2,4)
     }
 
     cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion, objTicket) //// Valor = valor + IVA
@@ -201,7 +238,7 @@ const CancelPin = ({
       })
       .catch((err) => console.log("error", err));
   };
-  console.log(infoComercioCreacion)
+  
 
   return (
     <>
@@ -213,6 +250,7 @@ const CancelPin = ({
             <h1 className="flex flex-row justify-center text-lg font-medium">{name_tramite}</h1>
             <br></br>
             { tipCancelacion === "1" ?
+             !valores[1]?
             <>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
@@ -244,7 +282,39 @@ const CancelPin = ({
                 <h1>Total</h1>
                 <h1>{formatMoney.format(valor*1.19 + valor_tramite)}</h1>
               </div>
-            </>
+            </>:
+            <>
+            <div
+              className="flex flex-row justify-between text-lg font-medium"
+            >
+              <h1>Valor Trámite 1: </h1>
+              <h1>{formatMoney.format(valores[0])}</h1>
+            </div>
+            <div
+              className="flex flex-row justify-between text-lg font-medium"
+            >
+              <h1>Valor Trámite 2: </h1>
+              <h1>{formatMoney.format(valores[1])}</h1>
+            </div>
+            <div
+              className="flex flex-row justify-between text-lg font-medium"
+            >
+              <h1>Valor Pin</h1>
+              <h1>{formatMoney.format(valor)}</h1>
+            </div>
+            <div
+              className="flex flex-row justify-between text-lg font-medium"
+            >
+              <h1>IVA Pin</h1>
+              <h1>{formatMoney.format(valor*0.19)}</h1>
+            </div>
+            <div
+              className="flex flex-row justify-between text-lg font-medium"
+            >
+              <h1>Total</h1>
+              <h1>{formatMoney.format(valor*1.19 + valores[0] +  valores[1])}</h1>
+            </div>
+          </>
             :
             <>
             {tipCancelacion === "2"? 

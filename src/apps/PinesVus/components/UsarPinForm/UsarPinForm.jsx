@@ -57,17 +57,21 @@ const UsarPinForm = ({
       ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      ["Id Trx", ""],
+      ["", ""],  
       /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
+      ["Comercio", roleInfo?.["nombre comercio"]],
+      ["", ""],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+      ["", ""],
 
-      ["Id Trx", ""],
     ],
-    commerceName: "",
+    commerceName: "PIN PARA GENERACIÓN DE LICENCIA",
     trxInfo: [
-      ["Proceso", "Uso de Pin"],
-      ["Valor", formatMoney.format(0)],
+      ["Trámite", "Uso de Pin"],
+      ["", ""],
+
     ],
     disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
   });
@@ -86,7 +90,7 @@ const UsarPinForm = ({
   const [disabledBtn, setDisabledBtn] = useState(false);
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago: " + name_tramite,
+      title: "Recibo de pago: Servicio voluntario de impresión premium",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -104,13 +108,23 @@ const UsarPinForm = ({
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo?.id_comercio,
         "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
         "Id Trx": respPinUso?.transacciones_id_trx?.uso,
+        "::":"",
+        "Comercio" : roleInfo?.["nombre comercio"],
+        " ::":"",
+        "Dirección": roleInfo?.direccion,
+        "  ::":"",
       }),
       trxInfo: [
-        ["Proceso", "Uso de Pin"],
-        ["Valor", formatMoney.format(0)],
+        ["Trámite", "Uso de Pin"],
+        ["Valor", formatMoney.format(0)]
+
+       // ["Valor Pin", formatMoney.format(valor)],
+       // ["IVA Pin",formatMoney.format(valor*0.19)],
+       // ["Total", formatMoney.format(valor*1.19)]
+
+     
+
       ],
       disclamer:
         "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
@@ -141,10 +155,13 @@ const UsarPinForm = ({
     }).format(new Date());
 
     const objTicket = { ...objTicketActual };
-    objTicket["title"] = "Recibo de pago: " + name_tramite
+    objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = textTipoPin
+    objTicket["trxInfo"][0] = ["Trámite", "Uso de Pin"]
+    objTicket["trxInfo"][1] = ["Valor Trámite", formatMoney.format(0)]
+   
 
     usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin, objTicket) // Pin + IVA
       .then((res) => {
@@ -156,7 +173,7 @@ const UsarPinForm = ({
         } else {
           notify(res?.msg);
           setActivarNavigate(true);
-          setRespPinUso(res?.obj);
+          setRespPinUso(res?.obj);     
         }
       })
       .catch((err) => console.log("error", err));
