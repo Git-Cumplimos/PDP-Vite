@@ -15,6 +15,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const SellResp = ({
+  codigos_lot,
   sellResponse,
   setSellResponse,
   closeModal,
@@ -65,6 +66,7 @@ const SellResp = ({
     content: () => printDiv.current,
     pageStyle: pageStyle,
   });
+
   const voucherInfo = useMemo(() => {
     const vinfo = {};
     if (sellResponse?.status) {
@@ -103,7 +105,7 @@ const SellResp = ({
     roleInfo.id_dispositivo,
     sellResponse,
   ]);
-
+  console.log("sellResponse--->",sellResponse?.obj?.cod_loteria)
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -130,7 +132,8 @@ const SellResp = ({
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: sellResponse?.obj?.nom_loteria,
+      commerceName: sellResponse?.obj?.cod_loteria !== '064' 
+      ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
       trxInfo: [
         ["Sorteo", sellResponse?.obj?.sorteo],
         ["Billete", sellResponse?.obj?.num_billete],
