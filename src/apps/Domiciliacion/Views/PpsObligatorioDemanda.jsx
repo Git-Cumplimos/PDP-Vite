@@ -26,7 +26,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
- const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
+const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
 // const url = "http://127.0.0.1:5000";
 const PpsObligatorioDemanda = ({ ced }) => {
   const { quotaInfo, roleInfo, infoTicket, pdpUser } = useAuth();
@@ -146,8 +146,8 @@ const PpsObligatorioDemanda = ({ ced }) => {
       ) {
         if (datosAportante?.["valorAportar"] % 100 == 0) {
           fetchData(
-            // `${url}/pps_obligatorio_demada_colpensiones`,
-            `http://127.0.0.1:5000/pps_obligatorio_demada_colpensiones`,
+            `${url}/pps_obligatorio_demada_colpensiones`,
+            // `http://127.0.0.1:5000/pps_obligatorio_demada_colpensiones`,
             // `http://127.0.0.1:5000//simulacionColpensiones`,
             "POST",
             {},
@@ -173,12 +173,11 @@ const PpsObligatorioDemanda = ({ ced }) => {
             true
           )
             .then((respuesta) => {
-              console.log(
-                "RESPUESTA:",
-                respuesta?.obj?.datos_recibidos
-                  ?.trazabilityFinancialInstitutionCode
-              );
-              console.log("RESPUESTA", respuesta);
+              // console.log(
+              //   "RESPUESTA:",
+              //   respuesta?.obj?.datos_recibidos?.["ResponseCode"]
+              // );
+              // console.log("RESPUESTA", respuesta);
               setProcesandoTrx(false);
               setDatosComercio((old) => {
                 return {
@@ -188,7 +187,30 @@ const PpsObligatorioDemanda = ({ ced }) => {
                       ?.trazabilityFinancialInstitutionCode,
                 };
               });
-              console.log("++++++idtrx", datosComercio?.idTrx);
+              // console.log("++++++idtrx", datosComercio?.idTrx);
+
+              // nuevo respuesta
+              if (respuesta?.msg) {
+                if (
+                  respuesta?.msg ===
+                  "El valor aportado debe ser exacto ej: 5000, debe ser múltiplo de 100"
+                ) {
+                  notifyError(respuesta?.msg);
+                  /* navigate(`/colpensiones`); */
+                  setDisabledBtn(false);
+                } else if (
+                  respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "SUCCESS"
+                ) {
+                  setShowModalVoucher(true);
+                  notify(respuesta?.msg);
+                  //  setDatosRespuesta(respuesta?.obj);
+                } else {
+                  // console.log("mensajeeeee");
+                  notifyError(respuesta?.msg);
+                  navigate(`/colpensiones`);
+                }
+              }
+
               // console.log("DATOS RECIBIDOS:", respuesta?.obj?.datos_recibidos);
               // console.log(
               //   "idtrx:",
@@ -197,31 +219,32 @@ const PpsObligatorioDemanda = ({ ced }) => {
               // );
 
               // console.log("MENSJAE", datosComercio?.["idTrx"]);
-              setDisabledBtn(false);
+              // setDisabledBtn(false);
 
-              if (
-                respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "SUCCESS"
-              ) {
-                notify(
-                  "Transaccion Colpensiones PPS obligatorio demanda Exitosa."
-                );
-                setShowModalVoucher(true);
-              }
+              // if (
+              //   respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "SUCCESS"
+              // ) {
+              //   notify(
+              //     "Transaccion Colpensiones PPS obligatorio demanda Exitosa."
+              //   );
+              //   setShowModalVoucher(true);
+              // }
 
-              //si la respuesta de colpensiones viene vacia entra a este if
-              if (
-                Object.entries(respuesta?.obj?.datos_recibidos).length === 0
-              ) {
-                notifyError(respuesta?.msg);
-              }
+              // //si la respuesta de colpensiones viene vacia entra a este if
+              // if (
+              //   Object.entries(respuesta?.obj?.datos_recibidos).length === 0
+              // ) {
+              //   notifyError(respuesta?.msg);
+              // }
 
-              if (
-                respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "FAILED"
-              ) {
-                notifyError(respuesta?.obj?.datos_recibidos?.["messageError"]);
-                navigate(`/colpensiones`);
-              }
+              // if (
+              //   respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "FAILED"
+              // ) {
+              //   notifyError(respuesta?.obj?.datos_recibidos?.["messageError"]);
+              //   navigate(`/colpensiones`);
+              // }
 
+              // ---------------------------------------------
               // if (respuesta.obj["datos_recibidos"].ResponseCode == "SUCCESS") {
               //   notify("Pago Exitoso.");
               //   setShowModalVoucher(true);
