@@ -22,7 +22,7 @@ const TransaccionesRecaudo = lazy(() =>
   import("./views/TransaccionesRecaudo/Transacciones")
 );
 
-const as = lazy(() => import("../Views/Bancolombia/Views/CargarArchivos"));
+// const as = lazy(() => import("../Views/Bancolombia/Views/CargarArchivos"));
 
 const listPermissions = Object.values(enumPermisosBancolombia);
 

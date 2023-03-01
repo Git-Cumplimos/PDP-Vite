@@ -189,40 +189,40 @@ const RecaudoCodigo = lazy(() => import("../apps/Recaudo/Views/RecaudoCodigo"));
 /**
  * RecaudoIntegrado
  */
-const RecaudoIntegrado = lazy(() =>
-  import("../apps/RecaudoIntegrado/RecaudoIntegrado")
-);
-const RecaudoDavivienda = lazy(() =>
-  import("../apps/RecaudoIntegrado/Views/Davivienda/RecaudoDavivienda")
-);
+// const RecaudoIntegrado = lazy(() =>
+//   import("../apps/RecaudoIntegrado/RecaudoIntegrado")
+// );
+// const RecaudoDavivienda = lazy(() =>
+//   import("../apps/RecaudoIntegrado/Views/Davivienda/RecaudoDavivienda")
+// );
 
-const cargarArchivos = lazy(() =>
-  import("../apps/RecaudoIntegrado/Views/Davivienda/Views/CargarArchivos")
-);
-const HistoricoContingenciaDavivienda = lazy(() =>
-  import(
-    "../apps/RecaudoIntegrado/Views/Davivienda/Views/HistoricoContingencia"
-  )
-);
-const TransaccionesDavivienda = lazy(() =>
-  import("../apps/RecaudoIntegrado/Views/Davivienda/Views/Transacciones")
-);
+// const cargarArchivos = lazy(() =>
+//   import("../apps/RecaudoIntegrado/Views/Davivienda/Views/CargarArchivos")
+// );
+// const HistoricoContingenciaDavivienda = lazy(() =>
+//   import(
+//     "../apps/RecaudoIntegrado/Views/Davivienda/Views/HistoricoContingencia"
+//   )
+// );
+// const TransaccionesDavivienda = lazy(() =>
+//   import("../apps/RecaudoIntegrado/Views/Davivienda/Views/Transacciones")
+// );
 
-const RecaudoBancolombia = lazy(() =>
-  import("../apps/RecaudoIntegrado/Views/Bancolombia/RecaudoBancolombia")
-);
+// const RecaudoBancolombia = lazy(() =>
+//   import("../apps/RecaudoIntegrado/Views/Bancolombia/RecaudoBancolombia")
+// );
 
-const cargarArchivosBancolombia = lazy(() =>
-  import("../apps/RecaudoIntegrado/Views/Bancolombia/Views/CargarArchivos")
-);
-const HistoricoContingenciaBancolombia = lazy(() =>
-  import(
-    "../apps/RecaudoIntegrado/Views/Bancolombia/Views/HistoricoContingencia"
-  )
-);
-const TransaccionesBancolombia = lazy(() =>
-  import("../apps/RecaudoIntegrado/Views/Bancolombia/Views/Transacciones")
-);
+// const cargarArchivosBancolombia = lazy(() =>
+//   import("../apps/RecaudoIntegrado/Views/Bancolombia/Views/CargarArchivos")
+// );
+// const HistoricoContingenciaBancolombia = lazy(() =>
+//   import(
+//     "../apps/RecaudoIntegrado/Views/Bancolombia/Views/HistoricoContingencia"
+//   )
+// );
+// const TransaccionesBancolombia = lazy(() =>
+//   import("../apps/RecaudoIntegrado/Views/Bancolombia/Views/Transacciones")
+// );
 
 /**
  * RUNT Banco Agrario
@@ -928,71 +928,71 @@ const allUrlsPrivateApps = [
     ],
   },
 
-  {
-    link: "/recaudo-integrado",
-    label: <AppIcons Logo={"RECAUDO"} name={"Recaudo Integrado"} />,
-    component: RecaudoIntegrado,
-    permission: [55, 56, 57],
-    subRoutes: [
-      {
-        link: "/recaudo-integrado/davivienda",
-        label: <AppIcons Logo={"RETIRO"} name={"Davivienda"} />,
-        component: RecaudoDavivienda,
-        permission: [56, 57],
-        subRoutes: [
-          {
-            link: "/recaudo-integrado/davivienda/cargar",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
-            component: cargarArchivos,
-            permission: [55],
-          },
-          {
-            link: "/recaudo-integrado/davivienda/historicocontingencia",
-            label: (
-              <AppIcons Logo={"IMPUESTO"} name={"Histórico de contingencia"} />
-            ),
-            component: HistoricoContingenciaDavivienda,
-            permission: [55],
-          },
-          {
-            link: "/recaudo-integrado/davivienda/transacciones",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Transacciones"} />,
-            component: TransaccionesDavivienda,
-            permission: [55],
-          },
-        ],
-      },
-      //--------------------
-      {
-        link: "/recaudo-integrado/bancolombia",
-        label: <AppIcons Logo={"RETIRO"} name={"Bancolombia"} />,
-        component: RecaudoBancolombia,
-        permission: [56, 57],
-        subRoutes: [
-          {
-            link: "/recaudo-integrado/bancolombia/cargar",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
-            component: cargarArchivosBancolombia,
-            permission: [55],
-          },
-          {
-            link: "/recaudo-integrado/bancolombia/historicocontingencia",
-            label: (
-              <AppIcons Logo={"IMPUESTO"} name={"Histórico de contingencia"} />
-            ),
-            component: HistoricoContingenciaBancolombia,
-            permission: [55],
-          },
-          {
-            link: "/recaudo-integrado/bancolombia/transacciones",
-            label: <AppIcons Logo={"IMPUESTO"} name={"Transacciones"} />,
-            component: TransaccionesBancolombia,
-            permission: [55],
-          },
-        ],
-      },
-    ],
-  },
+  // {
+  //   link: "/recaudo-integrado",
+  //   label: <AppIcons Logo={"RECAUDO"} name={"Recaudo Integrado"} />,
+  //   component: RecaudoIntegrado,
+  //   permission: [55, 56, 57],
+  //   subRoutes: [
+  //     {
+  //       link: "/recaudo-integrado/davivienda",
+  //       label: <AppIcons Logo={"RETIRO"} name={"Davivienda"} />,
+  //       component: RecaudoDavivienda,
+  //       permission: [56, 57],
+  //       subRoutes: [
+  //         {
+  //           link: "/recaudo-integrado/davivienda/cargar",
+  //           label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
+  //           component: cargarArchivos,
+  //           permission: [55],
+  //         },
+  //         {
+  //           link: "/recaudo-integrado/davivienda/historicocontingencia",
+  //           label: (
+  //             <AppIcons Logo={"IMPUESTO"} name={"Histórico de contingencia"} />
+  //           ),
+  //           component: HistoricoContingenciaDavivienda,
+  //           permission: [55],
+  //         },
+  //         {
+  //           link: "/recaudo-integrado/davivienda/transacciones",
+  //           label: <AppIcons Logo={"IMPUESTO"} name={"Transacciones"} />,
+  //           component: TransaccionesDavivienda,
+  //           permission: [55],
+  //         },
+  //       ],
+  //     },
+  //     //--------------------
+  //     {
+  //       link: "/recaudo-integrado/bancolombia",
+  //       label: <AppIcons Logo={"RETIRO"} name={"Bancolombia"} />,
+  //       component: RecaudoBancolombia,
+  //       permission: [56, 57],
+  //       subRoutes: [
+  //         {
+  //           link: "/recaudo-integrado/bancolombia/cargar",
+  //           label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
+  //           component: cargarArchivosBancolombia,
+  //           permission: [55],
+  //         },
+  //         {
+  //           link: "/recaudo-integrado/bancolombia/historicocontingencia",
+  //           label: (
+  //             <AppIcons Logo={"IMPUESTO"} name={"Histórico de contingencia"} />
+  //           ),
+  //           component: HistoricoContingenciaBancolombia,
+  //           permission: [55],
+  //         },
+  //         {
+  //           link: "/recaudo-integrado/bancolombia/transacciones",
+  //           label: <AppIcons Logo={"IMPUESTO"} name={"Transacciones"} />,
+  //           component: TransaccionesBancolombia,
+  //           permission: [55],
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
 
   // {
   //   link: "/runt",
