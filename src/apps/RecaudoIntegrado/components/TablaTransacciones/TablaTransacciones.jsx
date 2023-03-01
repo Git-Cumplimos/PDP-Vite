@@ -1,11 +1,16 @@
-import TableEnterprise from "../../../../../components/Base/TableEnterprise";
-import React, { useCallback, useEffect, useState } from "react";
-import fetchData from "../../../../../utils/fetchData";
-import Input from "../../../../../components/Base/Input";
-import Select from "../../../../../components/Base/Select";
-import { notifyError } from "../../../../../utils/notify";
+import { useEffect, useState } from "react";
 
-const Transacciones = () => {
+import {
+  BuscarPorBanco,
+  BuscarPorFecha,
+  BuscarPorTipoOperacion,
+} from "../../utils/fetchTransacciones";
+import Input from "../../../../components/Base/Input";
+import Select from "../../../../components/Base/Select";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import { notifyError } from "../../../../utils/notify";
+
+const TablaTransacciones = ({ banco }) => {
   const [datosTablaTrx, setDatosTablaTrx] = useState([]);
   const [datosFiltradosFecha, setDatosFiltradosFecha] = useState([]);
   const [datosFiltradosTipoOperacion, setDatosFiltradosTipoOperacion] =
@@ -14,85 +19,65 @@ const Transacciones = () => {
   const [fechaInicial, setFechaInicial] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
   const [tipoOperacion, setTipoOperacion] = useState("");
-  const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
+
   useEffect(() => {
-    fetchData(
-      `${urlBackend}/searchtrx?nombre_banco=davivienda`,
-      "GET",
-      {},
-      {},
-      {},
-      true
-    )
-      .then((res) => {
-        setCantidadPaginas(res?.obj?.maxPages);
-        // console.log(
-        //   "datos contingencia davivienda",
-        //   res?.obj?.results["results"]
-        // );
-        if (res?.obj?.results["results"].length == 0) {
-          notifyError("No se encontraron registros");
-        }
-        setDatosTablaTrx(res?.obj?.results["results"]);
-      })
-      .catch((err) => {
-        console.log(err);
-        notifyError("Error al cargar Datos ");
-      });
+    ActualizarTablaPorBanco();
   }, []);
-
   useEffect(() => {
-    if (fechaInicial && fechaFinal) {
-      fetchData(
-        //    `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actualizacionestado?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}`,
-
-        `${urlBackend}/searchtrx?fecha_inicio_inicio=${fechaInicial}&fecha_inicio_fin=${fechaFinal}&nombre_banco=davivienda`,
-
-        "GET",
-        {},
-        {},
-        {},
-        true
-      )
-        /* .then((response) => response.json()) */
-        .then((respuesta) => {
-          setDatosFiltradosFecha(respuesta?.obj?.results["results"]);
-          // console.log("respuesta", datosFiltradosFecha);
-          if (respuesta?.obj?.results["results"].length == 0) {
-            notifyError("No se encontraron registros");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          notifyError("Error al cargar Datos Por Fecha y Estado");
-        });
-    }
+    ActualizarTablaPorTipoOperacion();
+  }, [tipoOperacion]);
+  useEffect(() => {
+    ActualizarTablaPorFecha();
   }, [fechaInicial, fechaFinal]);
 
-  useEffect(() => {
-    if (tipoOperacion) {
-      fetchData(
-        `${urlBackend}/searchtrx?nombre_banco=davivienda&id_tipo_transaccion=${tipoOperacion}`,
-
-        "GET",
-        {},
-        {},
-        true
-      )
-        /* .then((response) => response.json()) */
-        .then((respuesta) => {
-          if (respuesta?.obj?.results["results"].length == 0) {
-            notifyError("No se encontraron registros");
-          }
-          setDatosFiltradosTipoOperacion(respuesta?.obj?.results["results"]);
-          // console.log("DATOS TIPPOS DE OPERACION", datosFiltradosTipoOperacion);
-        })
-        .catch((err) => {
-          console.log(err);
-          notifyError("Error al cargar Datos Por Fecha y Estado");
-        });
-    }
-  }, [tipoOperacion]);
+  const ActualizarTablaPorBanco = () => {
+    BuscarPorBanco(banco)
+      .then((res) => {
+        console.log("------------", res);
+        if (res?.results?.length == 0) {
+          notifyError("No se encontraron registros");
+        } else {
+          setCantidadPaginas(res?.maxPages);
+          setDatosTablaTrx(res?.results);
+        }
+      })
+      .catch((err) => {
+        // console.log("ERROR", err);
+        notifyError("Error al cargar Datos ");
+      });
+  };
+  const ActualizarTablaPorTipoOperacion = () => {
+    BuscarPorTipoOperacion(banco, tipoOperacion)
+      .then((res) => {
+        console.log("------------", res);
+        if (res?.results?.length == 0) {
+          notifyError("No se encontraron registros");
+        } else {
+          setCantidadPaginas(res?.maxPages);
+          setDatosFiltradosTipoOperacion(res?.results);
+        }
+      })
+      .catch((err) => {
+        // console.log("ERROR", err);
+        notifyError("Error al cargar Datos ");
+      });
+  };
+  const ActualizarTablaPorFecha = () => {
+    BuscarPorFecha(fechaInicial, fechaFinal, banco)
+      .then((res) => {
+        console.log("RESPUESTA FECHAS", res?.results);
+        if (res?.results?.length == 0) {
+          notifyError("No se encontraron registros");
+        } else {
+          setCantidadPaginas(res?.maxPages);
+          setDatosFiltradosFecha(res?.results);
+        }
+      })
+      .catch((err) => {
+        // console.log("ERROR", err);
+        notifyError("Error al cargar datos por fecha ");
+      });
+  };
 
   return (
     <div>
@@ -272,4 +257,4 @@ const Transacciones = () => {
   );
 };
 
-export default Transacciones;
+export default TablaTransacciones;
