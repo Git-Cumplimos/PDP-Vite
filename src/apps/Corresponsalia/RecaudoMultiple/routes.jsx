@@ -21,20 +21,20 @@ export const listPermissionsRecaudoMultiple = listPermissions;
 
 const rutasRecaudoMultiple = {
   link: "/corresponsalia/recaudo-multiple",
-  label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo multiple' />,
+  label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo Múltiple' />,
   component: RecaudoMultipleNav,
   permission: listPermissionsRecaudoMultiple,
   subRoutes: [
     {
       link: "/corresponsalia/recaudo-multiple/transaccion",
-      label: <AppIcons Logo={"MARKETPLACE"} name='Cargar recaudo multiple' />,
+      label: <AppIcons Logo={"MARKETPLACE"} name='Cargar recaudo múltiple' />,
       component: RecaudoMultiple,
       permission: [enumPermisosRecaudoMultiple.pago_recaudo_multiple],
     },
     {
       link: "/corresponsalia/recaudo-multiple/consulta",
       label: (
-        <AppIcons Logo={"MARKETPLACE"} name='Consultar recaudo multiple' />
+        <AppIcons Logo={"MARKETPLACE"} name='Consultar recaudo múltiple' />
       ),
       component: ConsultaRecaudoMultiple,
       permission: [enumPermisosRecaudoMultiple.consulta_recaudo_multiple],
@@ -44,7 +44,7 @@ const rutasRecaudoMultiple = {
       label: (
         <AppIcons
           Logo={"MARKETPLACE"}
-          name='Consultar recaudo multiple paginado'
+          name='Consultar recaudo múltiple paginado'
         />
       ),
       component: SearchRecaudosMultiples,

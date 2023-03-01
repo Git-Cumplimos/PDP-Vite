@@ -147,7 +147,7 @@ const Inventario = () => {
           navigate(`/loteria`);
           setProcesandoTrx(false);
         } else {
-          notifyError("Error inconsistencia no agregada.");
+          notifyError("Error inventario no agregado.");
           setHabilitarBtnAgregarInconsistencia(false);
           setProcesandoTrx(false);
         }
