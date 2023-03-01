@@ -42,7 +42,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
 
   // console.log(pdpUser?.uname);
   const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
-  const [nombreComercio, setNombreComercio] = useState(pdpUser?.uname);
+  const [nombre_usuario, setNombreComercio] = useState(pdpUser?.uname);
   const [idComercio, setIdComercio] = useState(roleInfo?.["id_comercio"]);
   const [idusuario, setIdUsuario] = useState(roleInfo?.["id_usuario"]);
   const [iddispositivo, setIddispositivo] = useState(
@@ -181,7 +181,8 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                 id_comercio: idComercio,
                 id_dispositivo: iddispositivo,
                 id_usuario: idusuario,
-                nombre_comercio: nombreComercio,
+                nombre_usuario: nombre_usuario,
+
                 /* es_Propio: esPropio, */
               },
               {},
@@ -325,6 +326,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                   id_comercio: idComercio,
                   id_dispositivo: iddispositivo,
                   id_usuario: idusuario,
+                  nombre_usuario: nombre_usuario,
                   /* es_Propio: esPropio, */
                 },
                 {},

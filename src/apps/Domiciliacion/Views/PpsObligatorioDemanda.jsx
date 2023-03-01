@@ -26,8 +26,8 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
-// const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
-const url = "http://127.0.0.1:5000";
+ const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
+// const url = "http://127.0.0.1:5000";
 const PpsObligatorioDemanda = ({ ced }) => {
   const { quotaInfo, roleInfo, infoTicket, pdpUser } = useAuth();
   const navigate = useNavigate();
@@ -58,7 +58,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
     idComercio: roleInfo?.["id_comercio"],
     idusuario: roleInfo?.["id_usuario"],
     iddispositivo: roleInfo["id_dispositivo"],
-    u_name: pdpUser?.uname,
+    nombre_usuario: pdpUser?.uname,
     oficina_propia:
       roleInfo["tipo_comercio"] === "OFICINAS PROPIAS" ||
       roleInfo["tipo_comercio"] === "KIOSCO"
@@ -161,6 +161,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
               oficina_propia: datosComercio?.["oficina_propia"],
               valor_total_trx: datosAportante?.["valorAportar"],
               nombre_comercio: datosComercio?.["nombreComercio"],
+              nombre_usuario: datosComercio?.["nombre_usuario"],
               obligatorioDemanda: {
                 Identificacion: datosAportante?.["numDocumento"],
                 PlanillaCode: datosAportante?.["numPlanilla"],
