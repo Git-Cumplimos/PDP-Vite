@@ -157,7 +157,7 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
   return (
     <>
       <SimpleLoading show={estadoTrx} />
-      <Fieldset legend='Consulta del estado del recaudo multiple'>
+      <Fieldset legend='Consulta del estado del Recaudo Múltiple'>
         {!consultaRecaudo?.exist ? (
           <h1 className='text-3xl text-center mb-2 mt-5'>
             No existe operación de recaudo con el Id indicado

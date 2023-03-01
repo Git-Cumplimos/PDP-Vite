@@ -27,7 +27,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   const [peticion, setPeticion] = useState(0);
   const formatMoney = makeMoneyFormatter(2);
   const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago",
+    title: "RECIBO DE PAGO",
     timeInfo: {
       "Fecha de pago": "",
       Hora: "",
@@ -324,6 +324,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
+      hour12: false,
     }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
@@ -365,6 +366,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         62: datosConsulta?.tipoRecaudo?.["62"] ?? "",
         103: datosConsulta?.tipoRecaudo?.["103"] ?? "",
         104: datosConsulta?.tipoRecaudo?.["104"] ?? "",
+        numeroConvenio: datosEnvio?.datosConvenio?.nura,
+        valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
         location: {
           address: roleInfo?.["direccion"],
           dane_code: roleInfo?.codigo_dane,
@@ -619,22 +622,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
               )}
               {peticion === 4 && (
                 <>
-                  <h2>
-                    <ButtonBar>
-                      <Button onClick={handlePrint}>Imprimir</Button>
-                      <Button
-                        type='submit'
-                        onClick={() => {
-                          hideModalReset();
-                          navigate(-1);
-                        }}>
-                        Aceptar
-                      </Button>
-                    </ButtonBar>
-                  </h2>
                   <TicketsAval
                     ticket={objTicketActual}
                     refPrint={printDiv}></TicketsAval>
+
+                  <ButtonBar>
+                    <Button onClick={handlePrint}>Imprimir</Button>
+                    <Button
+                      type='button'
+                      onClick={() => {
+                        hideModalReset();
+                        navigate(-1);
+                      }}>
+                      Cerrar
+                    </Button>
+                  </ButtonBar>
                 </>
               )}
             </div>

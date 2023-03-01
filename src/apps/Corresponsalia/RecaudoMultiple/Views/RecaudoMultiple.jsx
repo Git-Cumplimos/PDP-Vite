@@ -21,7 +21,7 @@ const RecaudoMultiple = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center mb-10 mt-5'>Recaudo multiple</h1>
+      <h1 className='text-3xl text-center mb-10 mt-5'>Recaudo Múltiple</h1>
       {estadoTrx === 0 ? (
         <CargueArchivoRecaudoMultiple
           setIsUploading={setIsUploading}
