@@ -42,7 +42,7 @@ const RetiroDirecto = () => {
       setMaxPages(data?.obj?.maxPages ?? '')
     })
     .catch((err) => {
-      // setListRetiro([]);
+      setListRetiro([]);
       // if (err?.cause === "custom") {
       //   notifyError(err?.message);
       //   return;
