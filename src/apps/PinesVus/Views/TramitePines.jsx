@@ -7,7 +7,8 @@ import Modal from "../../../components/Base/Modal";
 import { usePinesVus } from "../utils/pinesVusHooks";
 import { notifyError, notify } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
-import TableEnterprise from "../../../components/Base/TableEnterprise";
+import TableVertical from "../Views/TableVertical";
+
 import UsarPinForm from "../components/UsarPinForm/UsarPinForm";
 import CancelPin from "../components/CancelPinForm/CancelPinForm";
 import { useNavigate } from "react-router-dom";
@@ -124,8 +125,56 @@ const TramitePines = () => {
         if (!res?.status) {
           notifyError(res?.msg);
         } else {
+
+     
+            const fecha_vencimiento = new Date(res?.obj?.results[0]["fecha_vencimiento"]);
+            fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
+            const fecha_nacimiento = new Date(res?.obj?.results[0]["fecha_nacimiento"]);
+            fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
+           //setFormatMon(res?.obj?.results[0]["ValorPagar"]);
+
+      let    objetoVertical=[{
+        clave: "Documento",
+        info: res?.obj?.results[0]["doc_cliente"]
+      },
+      {
+        clave: "Tipo Documento",
+        info: res?.obj?.results[0]["tipo_documento_descripcion"]
+      },{
+        clave: "Nombre",
+                info: res?.obj?.results[0]["nombre"]
+      },{
+        clave: "Apellidos",
+                info: res?.obj?.results[0]["apellidos"]
+      },{
+        clave: "Fecha Nacimiento",
+                info: dateFormatter.format(fecha_nacimiento)
+      },{
+        clave: "Celular",
+                info: res?.obj?.results[0]["celular"]
+      },{
+        clave: "Email",
+                info: res?.obj?.results[0]["email"]
+      },{
+        clave: "Dirección",
+                info: res?.obj?.results[0]["direccion"]
+      },{
+        clave: "Estado",
+                info: res?.obj?.results[0]["name_estado_pin"]
+      },{
+        clave: "Vencimiento",
+                info: dateFormatter.format(fecha_vencimiento)
+      },{
+        clave: "Trámite",
+                info: res?.obj?.results[0]["name_tramite"]
+      },{
+        clave: "Valor",
+                info: formatMoney.format(res?.obj?.results[0]["valor"]*1.19 + res?.obj?.results[0]["valor_tramite"])
+      },]
+
+
           setTable(
-            res?.obj?.results?.map((row) => {
+       /*     res?.obj?.results?.map((row) => {
               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
               const fecha_nacimiento = new Date(row?.fecha_nacimiento);
@@ -147,7 +196,22 @@ const TramitePines = () => {
                 Tramite: row?.name_tramite,
                 Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite), // Solo pin tiene iva
               };
+
+            })*/
+
+
+            objetoVertical.map((row) => {
+
+              return {
+
+               clave: row?.clave,
+               info: row?.info,
+
+              };
+
             })
+
+
           );
           setMaxPages(res?.obj?.maxPages);
           setValor(res?.obj?.results?.[0]?.valor);
@@ -254,26 +318,28 @@ const TramitePines = () => {
 
       {info?.status && (
         <>
-          <TableEnterprise
+
+          <TableVertical
             title="Información Pin"
             maxPage={maxPages}
             headers={[
-              "Documento",
-              "Tipo Documento",
-              "Nombre",
-              "Apellidos",
-              "Fecha Nacimiento",
-              "Celular", 
-              "Email",
-              "Dirección",
-              "Estado",
-              "Vencimiento",
-              "Trámite",
-              "Valor",
+              "",""
+               //    "Documento",
+          //    "Tipo Documento",
+          //     "Nombre",
+          //     "Apellidos",
+         //      "Fecha Nacimiento",
+         //      "Celular", 
+         //      "Email",
+         //      "Dirección",
+              //    "Estado",
+         //      "Vencimiento",
+         //      "Trámite",
+         //      "Valor",
             ]}
             data={table || []}
-            onSelectRow={(e, index) => {
-              if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Dispersado no usado")) {
+       /*     onSelectRow={(e, index) => {
+              if (!(table[index][""] === "Pin creado" || table[index][""] === "Dispersado no usado")) {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
@@ -281,11 +347,32 @@ const TramitePines = () => {
                 setShowModal(true);
                 setActivarNavigate(false);
               }
-            }}
+            }}*/
             onSetPageData={setPageData}
-          ></TableEnterprise>
-        </>
+            
+          ></TableVertical>
+                <ButtonBar className="col-auto md:col-span-1">
+              <Button type=""
+                  onClick = { () => {
+                  
+                      if (!(info?.obj?.results[0]["name_estado_pin"] === "Pin creado" || info?.obj?.results[0]["name_estado_pin"] === "Dispersado no usado")) {
+                        notifyError(info?.obj?.results[0]["name_estado_pin"]);
+                      } else {
+                        
+                        setSelected(info?.obj?.results[0]);
+        
+                        setShowModal(true);
+                        setActivarNavigate(false);
+                      }
+                  }}>
+              Gestionar Pin
+              </Button>
+    
+            </ButtonBar>
+        </>   
       )}
+
+
       <Modal show={showModal} handleClose={() => closeModal()}>
         {(modalUsar !== true) & (modalCancel !== true) ? (
           <>
@@ -331,7 +418,7 @@ const TramitePines = () => {
               <Form onSubmit={onSubmitUsar}>
                 <ButtonBar>
                   <Button type="submit">Usar pin</Button>
-                  {selected.Estado==="Pin creado" ? 
+                  {selected.name_estado_pin==="Pin creado" ? 
                   <Button
                   onClick={() => {
                     setModalCancel(true);

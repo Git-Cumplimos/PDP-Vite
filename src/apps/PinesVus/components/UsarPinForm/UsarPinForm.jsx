@@ -105,16 +105,18 @@ const UsarPinForm = ({
         }).format(new Date()),
       },
       commerceName: textTipoPin,
-      commerceInfo: Object.entries({
-        "Id Comercio": roleInfo?.id_comercio,
-        "No. terminal": roleInfo?.id_dispositivo,
-        "Id Trx": respPinUso?.transacciones_id_trx?.uso,
-        "::":"",
-        "Comercio" : roleInfo?.["nombre comercio"],
-        " ::":"",
-        "Dirección": roleInfo?.direccion,
-        "  ::":"",
-      }),
+      commerceInfo:    [
+        ["Id Comercio", roleInfo?.id_comercio],
+        [ "No. terminal", roleInfo?.id_dispositivo],
+        [ "Id Trx", respPinUso?.transacciones_id_trx?.uso],
+        [ "",""],
+        [ "Comercio" , roleInfo?.["nombre comercio"]],
+         [ "",""],
+         ["Dirección", roleInfo?.direccion],
+         [  "",""],
+ 
+       ]
+      ,
       trxInfo: [
         ["Trámite", "Uso de Pin"],
         ["Valor", formatMoney.format(0)]
