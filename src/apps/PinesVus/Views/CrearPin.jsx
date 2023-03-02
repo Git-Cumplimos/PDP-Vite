@@ -23,7 +23,7 @@ import TextArea from "../../../components/Base/TextArea";
 const dateFormatter = Intl.DateTimeFormat("az", {
   year: "numeric",
   month: "2-digit",
-  day: "2-digit",
+  day: "2-digit"
 });
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -52,6 +52,7 @@ const CrearPin = () => {
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [disabledBtnsContinuar, setDisabledBtnsContinuar] = useState(false);
   const [showTramiteAdicional, setShowTramiteAdicional] = useState(false);
+  const [showPinLicencia, setShowPinLicencia,] = useState(false);
   const [txtButtonTramiteAdicional, settxtButtonTramiteAdicional] = useState("+ Agregar Segundo Trámite");
   const [respPin, setRespPin] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
@@ -927,6 +928,7 @@ const CrearPin = () => {
         </Fieldset>
       </Fieldset>      */}
       <Fieldset legend="Datos Trámite" className="lg:col-span-2">
+      
         <Select
           className="place-self-stretch"
           id="tipoPin"
@@ -943,8 +945,19 @@ const CrearPin = () => {
           required={true}
           onChange={(e) => {
             setTipoPin(parseInt(e.target.value) ?? "");
+            consultaClientes(documento,olimpia,idPin,tipoPin).then((resp) => {
+              if (!resp?.status){
+                notifyError(resp?.msg)
+              }else{console.log(resp)}})
+            console.log(tipoPin)
           }}
         />
+        <div> </div>
+       
+           {tipoPin == "1" ? 
+      <>
+
+
         <Select
           className="place-self-stretch"
           id="tramite"
@@ -983,6 +996,7 @@ const CrearPin = () => {
           }
         }
           />
+
           <br></br>
 
           <ButtonBar className="col-auto md:col-span-2">
@@ -990,11 +1004,13 @@ const CrearPin = () => {
               ev.preventDefault()
               
              if (showTramiteAdicional==false&&!isNaN(tramite)&&categoria!=""){
+
+              setOptionsTramites2([...(optionsTramites)])
               
-              if(!isNaN(tramite)&&tramite!="3"&&tramite!="4"&&tramite!="5"&&tramite!="6"){
+          //    if(!isNaN(tramite)&&tramite!="3"&&tramite!="4"&&tramite!="5"&&tramite!="6"){
                 setShowTramiteAdicional(true)
               settxtButtonTramiteAdicional("- Suprimir Segundo Trámite")
-                if(tramite=="1"||tramite=="2"){
+             /*   if(tramite=="1"||tramite=="2"){
                   setOptionsTramites2([...(optionsTramites.slice(6,10))])
                 }else if(tramite=="7"||tramite=="8"){
                   setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(8,10))])
@@ -1003,8 +1019,9 @@ const CrearPin = () => {
                 }
                 else{
                   setOptionsTramites2([])
-                }
-            }
+                }*/
+                
+         //   }
                 }
               else{
                 setShowTramiteAdicional(false)
@@ -1017,6 +1034,8 @@ const CrearPin = () => {
                      {txtButtonTramiteAdicional}
                     </Button>
                     </ButtonBar>
+
+
                     {showTramiteAdicional? 
               
                 <Fieldset legend="Datos Trámite Adicional" className="lg:col-span-2">
@@ -1055,7 +1074,9 @@ const CrearPin = () => {
               :
               ""
               }  
-  
+                      </>
+      :"" 
+      }
       </Fieldset>       
       <ButtonBar className="col-auto md:col-span-2">
         <Button type="submit" disabled={disabledBtns}>
