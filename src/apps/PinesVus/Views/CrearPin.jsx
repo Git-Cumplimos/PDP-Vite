@@ -945,7 +945,7 @@ const CrearPin = () => {
           required={true}
           onChange={(e) => {
             setTipoPin(parseInt(e.target.value) ?? "");
-            consultaClientes(documento,olimpia,idPin,tipoPin).then((resp) => {
+            consultaClientes(documento,olimpia,idPin).then((resp) => {
               if (!resp?.status){
                 notifyError(resp?.msg)
               }else{console.log(resp)}})
