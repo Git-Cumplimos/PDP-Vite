@@ -81,10 +81,7 @@ const TicketColpatria = ({
                             : "justify-end"
                         } flex-auto gap-2`}
                       >
-                        <h1
-                          className="font-semibold"
-                          style={{ "max-width": "50%" }}
-                        >
+                        <h1 className="font-semibold">
                           {key ? `${key}:` : ""}
                         </h1>
                         <h1>{val}</h1>
