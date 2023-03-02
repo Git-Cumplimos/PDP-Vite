@@ -24,7 +24,13 @@ const TablaHistoricoContingencia = ({ banco }) => {
     respuesta_trx_exitosas: "",
     respuesta_trx_fallidas: "",
   });
-
+  const dateFormatter = Intl.DateTimeFormat("es-CO", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
   const [tablaSeleccionada, setTablaSeleccionada] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -105,14 +111,19 @@ const TablaHistoricoContingencia = ({ banco }) => {
             "Nombre del archivo",
           ]}
           data={
-            datosFiltradosFecha?.map((inf) => ({
-              identificador_banco: inf.identificador_banco,
-              cantidad_registros: inf.cantidad_registros,
-              cantidad_trx_exitos: inf.cantidad_trx_exitosas,
-              cantidad_trx_fallidas: inf.cantidad_trx_fallidas,
-              fecha_carga_archivo: inf.fecha_carga_archivo,
-              nombre_archivo: inf.nombre_archivo,
-            })) ?? []
+            datosFiltradosFecha?.map((inf, created) => {
+              const tempDate = new Date(inf.fecha_carga_archivo);
+              tempDate.setHours(tempDate.getHours() + 5);
+              created = dateFormatter.format(tempDate);
+              return {
+                identificador_banco: inf.identificador_banco,
+                cantidad_registros: inf.cantidad_registros,
+                cantidad_trx_exitos: inf.cantidad_trx_exitosas,
+                cantidad_trx_fallidas: inf.cantidad_trx_fallidas,
+                fecha_carga_archivo: created,
+                nombre_archivo: inf.nombre_archivo,
+              };
+            }) ?? []
           }
           onSelectRow={(e, i) => {
             console.log("esta es la tabla i", datosFiltradosFecha[i]);
@@ -169,15 +180,33 @@ const TablaHistoricoContingencia = ({ banco }) => {
             "Fecha y hora de la ejecución",
             "Nombre del archivo",
           ]}
+          // data={
+          //   datosTablaContingencia?.map((inf) => ({
+          //     identificador_banco: inf.identificador_banco,
+          //     cantidad_registros: inf.cantidad_registros,
+          //     cantidad_trx_exitos: inf.cantidad_trx_exitosas,
+          //     cantidad_trx_fallidas: inf.cantidad_trx_fallidas,
+          //     fecha_carga_archivo: inf.fecha_carga_archivo,
+          //     nombre_archivo: inf.nombre_archivo,
+          //   })) ?? []
+          // }
           data={
-            datosTablaContingencia?.map((inf) => ({
-              identificador_banco: inf.identificador_banco,
-              cantidad_registros: inf.cantidad_registros,
-              cantidad_trx_exitos: inf.cantidad_trx_exitosas,
-              cantidad_trx_fallidas: inf.cantidad_trx_fallidas,
-              fecha_carga_archivo: inf.fecha_carga_archivo,
-              nombre_archivo: inf.nombre_archivo,
-            })) ?? []
+            datosTablaContingencia?.map((inf, created) => {
+              const tempDate = new Date(inf.fecha_carga_archivo);
+              tempDate.setHours(tempDate.getHours() + 5);
+              created = dateFormatter.format(tempDate);
+              const identificadorBanco =
+                inf.identificador_banco.charAt(0).toUpperCase() +
+                inf.identificador_banco.slice(1).toLowerCase();
+              return {
+                identificador_banco: identificadorBanco,
+                cantidad_registros: inf.cantidad_registros,
+                cantidad_trx_exitos: inf.cantidad_trx_exitosas,
+                cantidad_trx_fallidas: inf.cantidad_trx_fallidas,
+                fecha_carga_archivo: created,
+                nombre_archivo: inf.nombre_archivo,
+              };
+            }) ?? []
           }
           onSelectRow={(e, i) => {
             // console.log("esta es la tabla i", datosTablaContingencia[i]);

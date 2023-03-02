@@ -141,8 +141,8 @@ const TablaTransacciones = ({ banco }) => {
             label="Tipo operación"
             options={{
               "": "",
-              "Liberación cupo": "126",
-              "Reverso cupo": "127",
+              "Notificación recaudo": "126",
+              "Reverso notificación recaudo": "127",
             }}
             value={tipoOperacion}
             /* required={true} */
@@ -204,8 +204,8 @@ const TablaTransacciones = ({ banco }) => {
             label="Tipo operación"
             options={{
               "": "",
-              "Liberación cupo": "126",
-              "Reverso cupo": "127",
+              "Notificación recaudo": "126",
+              "Reverso notificación recaudo": "127",
             }}
             value={tipoOperacion}
             /* required={true} */
@@ -302,8 +302,8 @@ const TablaTransacciones = ({ banco }) => {
             label="Tipo operación"
             options={{
               "": "",
-              "Liberación cupo": "126",
-              "Reverso cupo": "127",
+              "Notificación recaudo": "126",
+              "Reverso notificación recaudo": "127",
             }}
             value={tipoOperacion}
             /* required={true} */
