@@ -89,7 +89,6 @@ const TablaHistoricoContingencia = ({ banco }) => {
     setTablaSeleccionada(false);
   }
 
-
   return (
     <div>
       {datosFiltradosFecha?.length > 0 ? (
@@ -103,7 +102,7 @@ const TablaHistoricoContingencia = ({ banco }) => {
             "Cantidad de registros fallidos",
 
             "Fecha y hora de la ejecución",
-            "nombre del archivo",
+            "Nombre del archivo",
           ]}
           data={
             datosFiltradosFecha?.map((inf) => ({
@@ -136,7 +135,6 @@ const TablaHistoricoContingencia = ({ banco }) => {
               };
             });
             setTablaSeleccionada(true);
-
           }}
         >
           <Input
@@ -169,7 +167,7 @@ const TablaHistoricoContingencia = ({ banco }) => {
             "Cantidad de registros fallidos",
 
             "Fecha y hora de la ejecución",
-            "nombre del archivo",
+            "Nombre del archivo",
           ]}
           data={
             datosTablaContingencia?.map((inf) => ({
@@ -203,8 +201,6 @@ const TablaHistoricoContingencia = ({ banco }) => {
               };
             });
             setTablaSeleccionada(true);
-
-            
           }}
         >
           <Input
@@ -225,7 +221,6 @@ const TablaHistoricoContingencia = ({ banco }) => {
               setFechaFinal(e.target.value);
             }}
           />
-          
         </TableEnterprise>
       )}
     </div>
