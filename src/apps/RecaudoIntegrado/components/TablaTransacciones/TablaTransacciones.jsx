@@ -9,6 +9,7 @@ import Input from "../../../../components/Base/Input";
 import Select from "../../../../components/Base/Select";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { notifyError } from "../../../../utils/notify";
+import { formatMoney } from "../../../../components/Base/MoneyInput";
 
 const TablaTransacciones = ({ banco }) => {
   const [datosTablaTrx, setDatosTablaTrx] = useState([]);
@@ -105,10 +106,11 @@ const TablaTransacciones = ({ banco }) => {
               const tempDate = new Date(inf.fecha_trx);
               tempDate.setHours(tempDate.getHours() + 5);
               created = dateFormatter.format(tempDate);
+              const money = formatMoney.format(inf.valor_trx);
               return {
                 id_transaccion: inf.id_trx,
                 operacion: inf.name_tipo_transaccion,
-                monto: inf.valor_trx,
+                monto: money,
                 fecha: created,
 
                 status: inf.status_trx ? "True" : "False",
@@ -168,10 +170,11 @@ const TablaTransacciones = ({ banco }) => {
               const tempDate = new Date(inf.fecha_trx);
               tempDate.setHours(tempDate.getHours() + 5);
               created = dateFormatter.format(tempDate);
+              const money = formatMoney.format(inf.valor_trx);
               return {
                 id_transaccion: inf.id_trx,
                 operacion: inf.name_tipo_transaccion,
-                monto: inf.valor_trx,
+                monto: money,
                 fecha: created,
 
                 status: inf.status_trx ? "True" : "False",
@@ -266,10 +269,11 @@ const TablaTransacciones = ({ banco }) => {
               const tempDate = new Date(inf.fecha_trx);
               tempDate.setHours(tempDate.getHours() + 5);
               created = dateFormatter.format(tempDate);
+              const money = formatMoney.format(inf.valor_trx);
               return {
                 id_transaccion: inf.id_trx,
                 operacion: inf.name_tipo_transaccion,
-                monto: inf.valor_trx,
+                monto: money,
                 fecha: created,
 
                 status: inf.status_trx ? "True" : "False",
