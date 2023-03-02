@@ -11,7 +11,16 @@ import TextArea from "../../../../components/Base/TextArea";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
 
-const tiposValores = [{ label: "1ra opcion", value: 1 }, { label: "2da opcion", value: 2 }]
+const tipoModificacion = [
+  { label: "Valor igual", value: 1 }, 
+  { label: "Valor menor", value: 2 },
+  { label: "Valor mayor", value: 3 },
+  { label: "Valor menor o mayor", value: 4 },
+]
+const tipoConvenio = [
+  { label: "Interno", value: 1 }, 
+  { label: "Con autorizador", value: 2 },
+]
 
 const RetiroDirecto = () => {
   const [listRetiro, setListRetiro] = useState('');
@@ -115,6 +124,7 @@ const RetiroDirecto = () => {
               ean13,
               nombre_convenio,
               permite_vencidos,
+              fk_id_tipo_convenio,
               estado,
               fecha_creacion,
             }) => ({
@@ -212,12 +222,23 @@ const RetiroDirecto = () => {
           <Select
             className="place-self-stretch"
             id={"id valor a modificar"}
-            label={"id valor para modificar"}
+            label={"Tipo modificacion"}
             name={"fk_modificar_valor"}
-            options={[{ label: "", value: "" }, ...tiposValores]}
+            options={[{ label: "", value: "" }, ...tipoModificacion]}
             defaultValue={selected?.fk_modificar_valor ?? ""}
             required
           />
+          <Select
+            className="place-self-stretch"
+            id={"id tipo de convenio"}
+            label={"Tipo de convenio"}
+            name={"fk_id_tipo_convenio"}
+            options={[{ label: "", value: "" }, ...tipoConvenio]}
+            defaultValue={selected?.fk_id_tipo_convenio ?? ""}
+            // disabled={selected ? true : false}
+            readOnly={true}
+            required
+          />  
           <Input
             id={"codigo_ean_iac"}
             label={"Código EAN o IAC"}
