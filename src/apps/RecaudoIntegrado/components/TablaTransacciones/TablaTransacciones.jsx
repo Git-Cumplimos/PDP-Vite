@@ -20,6 +20,13 @@ const TablaTransacciones = ({ banco }) => {
   const [fechaFinal, setFechaFinal] = useState("");
   const [tipoOperacion, setTipoOperacion] = useState("");
 
+  const dateFormatter = Intl.DateTimeFormat("es-CO", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
   useEffect(() => {
     ActualizarTablaPorBanco();
   }, []);
@@ -94,16 +101,22 @@ const TablaTransacciones = ({ banco }) => {
             "Tipo de proceso",
           ]}
           data={
-            datosFiltradosFecha?.map((inf) => ({
-              id_transaccion: inf.id_trx,
-              operacion: inf.name_tipo_transaccion,
-              monto: inf.valor_trx,
-              fecha: inf.fecha_trx,
-              status: inf.status_trx ? "True" : "False",
-              tipo_proceso: inf.is_trx_contingencia
-                ? "Contingencia"
-                : "En linea",
-            })) ?? []
+            datosFiltradosFecha?.map((inf, created) => {
+              const tempDate = new Date(inf.fecha_trx);
+              tempDate.setHours(tempDate.getHours() + 5);
+              created = dateFormatter.format(tempDate);
+              return {
+                id_transaccion: inf.id_trx,
+                operacion: inf.name_tipo_transaccion,
+                monto: inf.valor_trx,
+                fecha: created,
+
+                status: inf.status_trx ? "True" : "False",
+                tipo_proceso: inf.is_trx_contingencia
+                  ? "Contingencia"
+                  : "En linea",
+              };
+            }) ?? []
           }
         >
           <Input
@@ -151,16 +164,22 @@ const TablaTransacciones = ({ banco }) => {
             "Tipo de proceso",
           ]}
           data={
-            datosFiltradosTipoOperacion?.map((inf) => ({
-              id_transaccion: inf.id_trx,
-              operacion: inf.name_tipo_transaccion,
-              monto: inf.valor_trx,
-              fecha: inf.fecha_trx,
-              status: inf.status_trx ? "True" : "False",
-              tipo_proceso: inf.is_trx_contingencia
-                ? "Contingencia"
-                : "En linea",
-            })) ?? []
+            datosFiltradosTipoOperacion?.map((inf, created) => {
+              const tempDate = new Date(inf.fecha_trx);
+              tempDate.setHours(tempDate.getHours() + 5);
+              created = dateFormatter.format(tempDate);
+              return {
+                id_transaccion: inf.id_trx,
+                operacion: inf.name_tipo_transaccion,
+                monto: inf.valor_trx,
+                fecha: created,
+
+                status: inf.status_trx ? "True" : "False",
+                tipo_proceso: inf.is_trx_contingencia
+                  ? "Contingencia"
+                  : "En linea",
+              };
+            }) ?? []
           }
         >
           <Input
@@ -207,17 +226,58 @@ const TablaTransacciones = ({ banco }) => {
             "Estado Trx",
             "Tipo de proceso",
           ]}
+          // data={
+          //   datosTablaTrx?.map((inf) => {
+          //     const fecha = new Date(inf.fecha_trx);
+          //     const year = fecha.getUTCFullYear().toString();
+          //     const month = (fecha.getUTCMonth() + 1)
+          //       .toString()
+          //       .padStart(2, "0");
+          //     const day = fecha.getUTCDate().toString().padStart(2, "0");
+          //     const hours = fecha.getUTCHours().toString().padStart(2, "0");
+          //     const minutes = fecha.getUTCMinutes().toString().padStart(2, "0");
+          //     const seconds = fecha.getUTCSeconds().toString().padStart(2, "0");
+          //     return {
+          //       id_transaccion: inf.id_trx,
+          //       operacion: inf.name_tipo_transaccion,
+          //       monto: inf.valor_trx,
+          //       fecha: `${year}${month}${day} ${hours}${minutes}${seconds}`,
+          //       status: inf.status_trx ? "True" : "False",
+          //       tipo_proceso: inf.is_trx_contingencia
+          //         ? "Contingencia"
+          //         : "En linea",
+          //     };
+          //   }) ?? []
+          // }
+          // data={
+          //   datosTablaTrx?.map((inf) => ({
+          //     id_transaccion: inf.id_trx,
+          //     operacion: inf.name_tipo_transaccion,
+          //     monto: inf.valor_trx,
+          //     fecha: inf.fecha_trx,
+          //     status: inf.status_trx ? "True" : "False",
+          //     tipo_proceso: inf.is_trx_contingencia
+          //       ? "Contingencia"
+          //       : "En linea",
+          //   })) ?? []
+          // }
           data={
-            datosTablaTrx?.map((inf) => ({
-              id_transaccion: inf.id_trx,
-              operacion: inf.name_tipo_transaccion,
-              monto: inf.valor_trx,
-              fecha: inf.fecha_trx,
-              status: inf.status_trx ? "True" : "False",
-              tipo_proceso: inf.is_trx_contingencia
-                ? "Contingencia"
-                : "En linea",
-            })) ?? []
+            datosTablaTrx?.map((inf, created) => {
+              const tempDate = new Date(inf.fecha_trx);
+              tempDate.setHours(tempDate.getHours() + 5);
+              created = dateFormatter.format(tempDate);
+              return {
+                id_transaccion: inf.id_trx,
+                operacion: inf.name_tipo_transaccion,
+                monto: inf.valor_trx,
+                fecha: created,
+
+                status: inf.status_trx ? "True" : "False",
+                tipo_proceso: inf.is_trx_contingencia
+                  ? "Contingencia"
+                  : "En linea",
+              };
+            }) ?? []
           }
         >
           <Input
