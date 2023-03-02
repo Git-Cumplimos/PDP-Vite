@@ -224,12 +224,15 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const consultaClientes = useCallback(async (cedula, olimpia, idPin) => {
+  const consultaClientes = useCallback(async (cedula, olimpia, idPin, tipoPin) => {
     const query = { pk_documento_cliente: cedula};
     query.olimpia = olimpia
     query.id_comercio = roleInfo?.id_comercio
     if (idPin != ""){
       query.Pin = idPin}
+    if (tipoPin !=""){
+      query.tipoPin = tipoPin
+    }
     try {
       const res = await fetchData(urls.consultaClientes, "GET", query);
       return res;
