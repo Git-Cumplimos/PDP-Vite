@@ -61,7 +61,7 @@ const BuscarCedulaPpsADemanda = () => {
         {}
       )
         .then((respuesta) => {
-          console.log(respuesta?.obj?.results);
+          // console.log(respuesta?.obj?.results);
           setDatosConsulta(respuesta?.obj?.results);
           setEstado(true);
         })
