@@ -6,7 +6,6 @@ import Select from "../../../../components/Base/Select";
 import classes from "./Inventario.module.css";
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { notify, notifyError } from "../../../../utils/notify";
-import Input from "../../../../components/Base/Input";
 import InputX from "../../../../components/Base/InputX/InputX";
 import Button from "../../../../components/Base/Button";
 import Form from "../../../../components/Base/Form";
@@ -45,10 +44,8 @@ const Inventario = () => {
   const [datosCantidadBilletes, setDatosCantidadBilletes] = useState("");
   const [cantidadBilletes, setCantidadBilletes] = useState("");
   const [mensajeCausal, setMensajeCausal] = useState("");
-  const [mensajeInventarioInvalido, setMensajeInventarioInvalido] =
-  useState("");
-  const [mensajeInventarioInvalido2, setMensajeInventarioInvalido2] =
-  useState("");
+  const [mensajeInventarioInvalido, setMensajeInventarioInvalido] = useState("");
+  const [mensajeInventarioInvalido2, setMensajeInventarioInvalido2] = useState("");
   const [showCrearInventario, setShowCrearInventario] = useState(false);
   const [datosEscaneados, setDatosEscaneados] = useState({
     escaneado1: "",
@@ -97,14 +94,9 @@ const Inventario = () => {
 
         if (sortOrdfisico.length > 0) {
           setSorteofisico(sortOrdfisico[0]);
-        } else {
-          /*    notifyError("No se encontraron extraordinarios fisicos"); */
         }
-
         if (sortExtfisico.length > 0) {
           setSorteofisicoextraordinario(sortExtfisico[0]);
-        } else {
-          /*   notifyError("No se encontraron extraordinarios fisicos"); */
         }
       })
       .catch((err) => console.error(err));
@@ -540,5 +532,4 @@ const Inventario = () => {
     </>
   );
 };
-
 export default Inventario;
