@@ -102,9 +102,7 @@ const Inventario = () => {
       .catch((err) => console.error(err));
   }, [codigos_lot, sorteosLOT]);
 
-  const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
-    { value: "", label: "" },
-  ]);
+  const [opcionesdisponibles, SetOpcionesDisponibles] = useState([{ value: "", label: "" },]);
 
   useEffect(() => {
     const copy = [{ value: "", label: "" }];
@@ -271,11 +269,10 @@ const Inventario = () => {
       {showModal ? (
         <>
           <SimpleLoading show={procesandoTrx}></SimpleLoading>
-          <Modal show={showModal} /* handleClose={handleClose} */>
+          <Modal show={showModal}>
             <div className={contenedorImagen}>
               <LogoPDP xsmall></LogoPDP>
             </div>
-            {/* <Form grid onSubmit={(e) => enviar(e)}> */}
             <Form grid onSubmit={(e) => onSubmitMensajeInconsistencia(e)}>
               <Fieldset className="lg:col-span-3">
                 <div className={autorizacionMensajes}>
@@ -301,19 +298,10 @@ const Inventario = () => {
                 {
                   <Button
                     type="submit"
-                    /*      disabled={disabledBtn}
-                  onSubmit={(e) => enviar(e)} */
-                    /*   onSubmit={(e) => {
-                    if (mensajeCausal) {
-                      setHabilitarBtnAgregarInconsistencia(false);
-                      onSubmitMensajeInconsistencia(e);
-                    }
-                  }} */
                     disabled={habilitarBtnAgregarInconsistencia}
                   >
                     Agregar inconsistencia
                   </Button>
-                  /*  ) : null */
                 }
                 <Button onClick={() => setShowModal(false)}>Cancelar</Button>
               </ButtonBar>
