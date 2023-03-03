@@ -18,8 +18,17 @@ const RecaudoDirecto = () => {
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
   const [cargando, setCargando] = useState(false)
-  const tiposValores = [{ label: "1ra opcion", value: 1 }, { label: "2da opcion", value: 2 }]
-  const [searchFilters, setSearchFilters] = useState({
+  const tipoModificacion = [
+    { label: "Valor igual", value: 1 },
+    { label: "Valor menor", value: 2 },
+    { label: "Valor mayor", value: 3 },
+    { label: "Valor menor o mayor", value: 4 },
+  ]
+  const tipoConvenio = [
+    { label: "Interno", value: 1 },
+    { label: "Con autorizador", value: 2 },
+  ]
+   const [searchFilters, setSearchFilters] = useState({
     pk_id_convenio_directo: "",
     ean13: "",
     nombre_convenio: "",
@@ -56,6 +65,8 @@ const RecaudoDirecto = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    if (selected)body['fk_id_tipo_convenio']=selected.fk_id_tipo_convenio
+    console.log(body)
     notifyPending(
       selected
         ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
@@ -205,9 +216,19 @@ const RecaudoDirecto = () => {
             id={"id valor a modificar"}
             label={"id valor para modificar"}
             name={"fk_modificar_valor"}
-            options={[{ label: "", value: "" }, ...tiposValores]}
+            options={[{ label: "", value: "" }, ...tipoModificacion]}
             defaultValue={selected?.fk_modificar_valor ?? ""}
             required
+          />
+          <Select
+            className="place-self-stretch"
+            id={"id tipo de convenio"}
+            label={"Tipo de convenio"}
+            name={"fk_id_tipo_convenio"}
+            options={[{ label: "", value: "" }, ...tipoConvenio]}
+            defaultValue={selected?.fk_id_tipo_convenio ?? ""}
+            required
+            disabled={selected ? true : false}
           />
           <Input
             id={"codigo_ean_iac"}

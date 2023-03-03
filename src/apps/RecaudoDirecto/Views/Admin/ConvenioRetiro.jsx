@@ -11,16 +11,6 @@ import TextArea from "../../../../components/Base/TextArea";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
 
-const tipoModificacion = [
-  { label: "Valor igual", value: 1 }, 
-  { label: "Valor menor", value: 2 },
-  { label: "Valor mayor", value: 3 },
-  { label: "Valor menor o mayor", value: 4 },
-]
-const tipoConvenio = [
-  { label: "Interno", value: 1 }, 
-  { label: "Con autorizador", value: 2 },
-]
 
 const RetiroDirecto = () => {
   const [listRetiro, setListRetiro] = useState('');
@@ -29,6 +19,16 @@ const RetiroDirecto = () => {
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
   const [cargando, setCargando] = useState(false)
+  const tipoModificacion = [
+    { label: "Valor igual", value: 1 },
+    { label: "Valor menor", value: 2 },
+    { label: "Valor mayor", value: 3 },
+    { label: "Valor menor o mayor", value: 4 },
+  ]
+  const tipoConvenio = [
+    { label: "Interno", value: 1 },
+    { label: "Con autorizador", value: 2 },
+  ]
   const [searchFilters, setSearchFilters] = useState({
     pk_id_convenio_directo: "",
     ean13: "",
@@ -46,18 +46,18 @@ const RetiroDirecto = () => {
       limit: pageData.limit,
       offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit
     })
-    .then((data) => {
-      setListRetiro(data?.obj?.results ?? []);
-      setMaxPages(data?.obj?.maxPages ?? '')
-    })
-    .catch((err) => {
-      setListRetiro([]);
-      // if (err?.cause === "custom") {
-      //   notifyError(err?.message);
-      //   return;
-      // }
-      console.error(err?.message);
-    });
+      .then((data) => {
+        setListRetiro(data?.obj?.results ?? []);
+        setMaxPages(data?.obj?.maxPages ?? '')
+      })
+      .catch((err) => {
+        setListRetiro([]);
+        // if (err?.cause === "custom") {
+        //   notifyError(err?.message);
+        //   return;
+        // }
+        console.error(err?.message);
+      });
 
     setCargando(true)
   }, [pageData, searchFilters])
@@ -66,6 +66,7 @@ const RetiroDirecto = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    if (selected)body['fk_id_tipo_convenio']=selected.fk_id_tipo_convenio
     console.log(body)
     notifyPending(
       selected
@@ -95,9 +96,7 @@ const RetiroDirecto = () => {
         },
       }
     )
-    // if (!selected) { addConveniosRetiroList(body); handleClose() }
-    // else { modConveniosRetiroList({ convenio_id: selected.pk_id_convenio_directo }, body); handleClose() }
-  }, [handleClose, getConvRetiro,selected])
+  }, [handleClose, getConvRetiro, selected])
 
   useEffect(() => { getConvRetiro() }, [getConvRetiro, pageData, searchFilters])
 
@@ -227,7 +226,7 @@ const RetiroDirecto = () => {
             options={[{ label: "", value: "" }, ...tipoModificacion]}
             defaultValue={selected?.fk_modificar_valor ?? ""}
             required
-          />
+          />  
           <Select
             className="place-self-stretch"
             id={"id tipo de convenio"}
@@ -235,10 +234,9 @@ const RetiroDirecto = () => {
             name={"fk_id_tipo_convenio"}
             options={[{ label: "", value: "" }, ...tipoConvenio]}
             defaultValue={selected?.fk_id_tipo_convenio ?? ""}
-            // disabled={selected ? true : false}
-            readOnly={true}
             required
-          />  
+            disabled={selected ? true : false}
+          />
           <Input
             id={"codigo_ean_iac"}
             label={"Código EAN o IAC"}
