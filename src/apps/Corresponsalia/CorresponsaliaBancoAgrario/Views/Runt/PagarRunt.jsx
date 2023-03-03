@@ -111,19 +111,24 @@ const PagarRunt = () => {
   };
 
   const onSubmitPayRunt = (e) => {
+    const tipo__comercio = roleInfo.tipo_comercio.toLowerCase();
     const data = {
       comercio: {
         id_comercio: roleInfo.id_comercio,
         id_terminal: roleInfo.id_dispositivo,
         id_usuario: roleInfo.id_usuario,
       },
+      oficina_propia:
+        tipo__comercio.search("kiosco") >= 0 ||
+        tipo__comercio.search("oficinas propias") >= 0
+          ? true
+          : false,
       nombre_usuario: pdpUser["uname"],
       numero_runt: numeroRunt,
-      id_trx: resConsultRunt.id_trx,
+      id_trx_original: resConsultRunt.id_trx,
       valor_mt: resConsultRunt.valor_mt,
       valor_runt: resConsultRunt.valor_runt,
       valor_total_trx: resConsultRunt.valor_total_trx,
-      nombre_comercio: roleInfo["nombre comercio"],
       ciudad: roleInfo.ciudad,
       direccion: roleInfo.direccion,
     };
