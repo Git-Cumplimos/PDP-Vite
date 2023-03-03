@@ -20,6 +20,7 @@ import SimpleLoading from "../../../../components/Base/SimpleLoading";
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 const {
   contenedorPrincipal,
+  BarcodeCompleto,
   contenedorBotones,
   contenedorImagen,
   titulosSecundarios,
@@ -44,11 +45,10 @@ const Inventario = () => {
   const [datosCantidadBilletes, setDatosCantidadBilletes] = useState("");
   const [cantidadBilletes, setCantidadBilletes] = useState("");
   const [mensajeCausal, setMensajeCausal] = useState("");
-  const [flagInventario, setFlagInventario] = useState(0);
   const [mensajeInventarioInvalido, setMensajeInventarioInvalido] =
-    useState("");
+  useState("");
   const [mensajeInventarioInvalido2, setMensajeInventarioInvalido2] =
-    useState("");
+  useState("");
   const [showCrearInventario, setShowCrearInventario] = useState(false);
   const [datosEscaneados, setDatosEscaneados] = useState({
     escaneado1: "",
@@ -59,6 +59,11 @@ const Inventario = () => {
     escaneado1Validados: false,
     escaneado2Validados: false,
     escaneado3Validados: false,
+  });
+  const [flagloading, setFlagloading] = useState({
+    flagescaneado1: false,
+    flagescaneado2: false,
+    flagescaneado3: false,
   });
   const [
     habilitarBtnAgregarInconsistencia,
@@ -196,23 +201,30 @@ const Inventario = () => {
         sorteo.split("-")[1],
         ).then((response) => {
           if (response?.status === true) {
-            console.log(response?.msg)
-            setFlagInventario(flagInventario+1)
-            if (referencia==datosAzar[0]){
+            if (referencia==datosAzar[0] && !datosEscaneadosValidados["escaneado1Validados"]){
+              setFlagloading((old) => {
+                return { ...old, flagescaneado1: false };
+              });
               setDatosEscaneadosValidados((old) => {
                 return { ...old, escaneado1Validados: true };
               });
               setDatosEscaneados((old) => {
                 return { ...old, escaneado1: response?.obj};
               });
-            } else if (referencia==datosAzar[1]){
+            } else if (referencia==datosAzar[1] && !datosEscaneadosValidados["escaneado2Validados"]){
+                setFlagloading((old) => {
+                  return { ...old, flagescaneado2: false };
+                });
                 setDatosEscaneadosValidados((old) => {
                   return { ...old, escaneado2Validados: true };
                 });
                 setDatosEscaneados((old) => {
                   return { ...old, escaneado2: response?.obj};
                 });
-            } else if (referencia==datosAzar[2]){
+            } else if (referencia==datosAzar[2] && !datosEscaneadosValidados["escaneado3Validados"]){
+                setFlagloading((old) => {
+                  return { ...old, flagescaneado3: false };
+                });
                 setDatosEscaneadosValidados((old) => {
                   return { ...old, escaneado3Validados: true };
                 });
@@ -229,28 +241,37 @@ const Inventario = () => {
           console.log(error);
         });
     },
-    [sorteo,flagInventario,datosEscaneadosValidados,datosAzar]
+    [sorteo,datosEscaneadosValidados,datosAzar,flagloading]
   );
 
   const onSubmitBarcode0 = useCallback(
     (info) => {
       onSubmitBarcode(datosAzar[0],info)
+      setFlagloading((old) => {
+        return { ...old, flagescaneado1: true };
+      });
     },
-    [datosAzar,onSubmitBarcode]
+    [datosAzar,onSubmitBarcode,setFlagloading]
   );
 
   const onSubmitBarcode1 = useCallback(
     (info) => {
       onSubmitBarcode(datosAzar[1],info)
+      setFlagloading((old) => {
+        return { ...old, flagescaneado2: true };
+      });
     },
-    [datosAzar,onSubmitBarcode]
+    [datosAzar,onSubmitBarcode,setFlagloading]
   );
 
   const onSubmitBarcode2 = useCallback(
     (info) => {
       onSubmitBarcode(datosAzar[2],info)
+      setFlagloading((old) => {
+        return { ...old, flagescaneado3: true };
+      });
     },
-    [datosAzar,onSubmitBarcode]
+    [datosAzar,onSubmitBarcode,setFlagloading]
   );
 
   return (
@@ -352,6 +373,7 @@ const Inventario = () => {
               }}
             ></InputX>
             <div className={contenedorPrincipal}>
+              {/* Segmento billete 1 */}
               <div>
                 <InputX
                   id="billete1"  
@@ -360,31 +382,98 @@ const Inventario = () => {
                   type="search"
                   disabled
                 ></InputX>
+              </div>
+              <div className={BarcodeCompleto}>
+                {!datosEscaneadosValidados["escaneado1Validados"]
+                  ? !flagloading["flagescaneado1"] ?  (
+                      <>
+                        <BarcodeReader onSearchCodigo={onSubmitBarcode0}/>
+                        <Button type="reset">Escanear de nuevo</Button>
+                      </>
+                    ) : (
+                      <>
+                        <h1 className="text-2xl font-semibold" align="center"> Procesando . . .</h1>
+                      </>
+                    )
+                  : <InputX
+                      label="Código de barras"
+                      type="text"
+                      autoComplete="off"
+                      value={datosEscaneados.escaneado1}
+                      disabled
+                    />
+                }
+              </div>
+              {/* Segmento billete 2 */}
+              <div>
                 <InputX
+                  id="billete2"
                   value={datosAzar[1] ?? ""}
                   label="Billete"
                   type="search"
                   disabled
                 ></InputX>
+              </div>
+              <div className={BarcodeCompleto}>
+                {!datosEscaneadosValidados["escaneado2Validados"]
+                  ? !flagloading["flagescaneado2"] ? (
+                    <>
+                      <BarcodeReader onSearchCodigo={onSubmitBarcode1}/>
+                      <Button type="reset">Escanear de nuevo</Button>
+                    </>
+                  ) : (
+                    <>
+                      <h1 className="text-2xl font-semibold" align="center"> Procesando . . .</h1>
+                    </>
+                  )
+                  : <InputX
+                      label="Código de barras"
+                      type="text"
+                      autoComplete="off"
+                      value={datosEscaneados.escaneado2}
+                      disabled
+                    />
+                }
+              </div>
+              {/* Segmento billete 3 */}
+              <div>
                 <InputX
-                  value={datosAzar[2] ?? ""}
+                  id="billete3"  
+                  value={datosAzar?.[2] ?? ""}
                   label="Billete"
                   type="search"
                   disabled
                 ></InputX>
               </div>
-              <div>
-                <BarcodeReader onSearchCodigo={onSubmitBarcode0}/>
-                <BarcodeReader onSearchCodigo={onSubmitBarcode1}/>
-                <BarcodeReader onSearchCodigo={onSubmitBarcode2}/>
-
+              <div className={BarcodeCompleto}>
+                {!datosEscaneadosValidados["escaneado3Validados"]
+                  ? !flagloading["flagescaneado3"] ? (
+                    <>
+                      <BarcodeReader onSearchCodigo={onSubmitBarcode2}/>
+                      <Button type="reset">Escanear de nuevo</Button>
+                    </>
+                  ) : (
+                    <>
+                      <h1 className="text-2xl font-semibold" align="center"> Procesando . . .</h1>
+                    </>
+                  )
+                  : <InputX
+                      label="Código de barras"
+                      type="text"
+                      autoComplete="off"
+                      value={datosEscaneados.escaneado3}
+                      disabled
+                    />
+                }
               </div>
             </div>
             <div className={contenedorBotones}>
               <Button
                 type="submit"
                 disabled={
-                  flagInventario !== 3 ||
+                  !datosEscaneadosValidados["escaneado1Validados"] ||
+                  !datosEscaneadosValidados["escaneado2Validados"] ||
+                  !datosEscaneadosValidados["escaneado3Validados"] ||
                   datosCantidadBilletes !== cantidadBilletes
                 }
               >
@@ -393,7 +482,9 @@ const Inventario = () => {
               <Button
                 type="button"
                 disabled={
-                  flagInventario === 3 &&
+                  datosEscaneadosValidados["escaneado1Validados"] &&
+                  datosEscaneadosValidados["escaneado2Validados"] &&
+                  datosEscaneadosValidados["escaneado3Validados"] &&
                   datosCantidadBilletes === cantidadBilletes
                 }
                 onClick={() => {
@@ -425,7 +516,9 @@ const Inventario = () => {
                       setShowModal(true);
                     }
                     if (
-                      flagInventario !== 3
+                      !datosEscaneadosValidados["escaneado1Validados"] ||
+                      !datosEscaneadosValidados["escaneado2Validados"] ||
+                      !datosEscaneadosValidados["escaneado3Validados"]
                     ) {
                       setMensajeInventarioInvalido2(
                         ` No se encontraron los siguientes billetes: ${Strcaso1}${Strcaso2}${Strcaso3}`
