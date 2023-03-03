@@ -138,6 +138,12 @@ const MostrarRecaudosPagar = ({
     };
     postInicializacionRecaudoMultiple(obj)
       .then((res) => {
+        if (res?.message === "Endpoint request timed out") {
+          setIsUploading(false);
+          setEstadoTrx(2);
+          setUuid(uniqueId);
+          return notify("Inicializacion de transacción multiple exitosa");
+        }
         if (!res?.status) {
           setIsUploading(false);
           setEstadoTrx(0);
