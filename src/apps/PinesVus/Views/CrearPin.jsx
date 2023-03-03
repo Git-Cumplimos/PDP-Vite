@@ -304,6 +304,7 @@ const CrearPin = () => {
     disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
   });
 
+  
 
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
@@ -412,7 +413,7 @@ const CrearPin = () => {
     e.preventDefault();
     setDisabledBtnsContinuar(true);
     setShowFormulario(false)
-    consultaClientes(documento,olimpia,idPin).then((resp) => {
+    consultaClientes(documento,olimpia,idPin,tipoPin).then((resp) => {
       if (!resp?.status){
         notifyError(resp?.msg)
       }else{
@@ -945,7 +946,10 @@ const CrearPin = () => {
           required={true}
           onChange={(e) => {
             setTipoPin(parseInt(e.target.value) ?? "");
-            consultaClientes(documento,olimpia,idPin).then((resp) => {
+            if(isNaN(tipoPin)){
+              setTipoPin("")
+            }
+            consultaClientes(documento,olimpia,idPin,e.target.value).then((resp) => {
               if (!resp?.status){
                 notifyError(resp?.msg)
               }else{console.log(resp)}})
