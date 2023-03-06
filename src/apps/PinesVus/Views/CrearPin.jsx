@@ -948,17 +948,37 @@ const CrearPin = () => {
             setTipoPin(parseInt(e.target.value) ?? "");
             if(isNaN(tipoPin)){
               setTipoPin("")
-            }
+            } setDisabledBtns(true)
             consultaClientes(documento,olimpia,idPin,e.target.value).then((resp) => {
               if (!resp?.status){
                 notifyError(resp?.msg)
-              }else{console.log(resp)}})
-            console.log(tipoPin)
+                setShowPinLicencia(false)
+                setTipoPin("")
+                setDisabledBtns(false)
+                console.log(resp)
+              }else{
+                if(e.target.value=="1"){
+                  setShowPinLicencia(true)
+                  setShowTramiteAdicional(false)
+                  setTramite2("")
+                  setCategoria2("")
+                  settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
+                  setTramite("")
+                  setCategoria("")
+                  setDisabledBtns(false)
+                }else{
+                setShowPinLicencia(false)
+                setDisabledBtns(false)
+
+                //setDisabledBtns(false)
+                console.log(resp)
+                }
+              }})
           }}
         />
         <div> </div>
-       
-           {tipoPin == "1" ? 
+    
+           {showPinLicencia ? 
       <>
 
 
@@ -1011,21 +1031,27 @@ const CrearPin = () => {
 
               setOptionsTramites2([...(optionsTramites)])
               
-          //    if(!isNaN(tramite)&&tramite!="3"&&tramite!="4"&&tramite!="5"&&tramite!="6"){
+             if(!isNaN(tramite)&&tramite!="3"&&tramite!="4"&&tramite!="5"&&tramite!="6"){
                 setShowTramiteAdicional(true)
               settxtButtonTramiteAdicional("- Suprimir Segundo Trámite")
-             /*   if(tramite=="1"||tramite=="2"){
-                  setOptionsTramites2([...(optionsTramites.slice(6,10))])
-                }else if(tramite=="7"||tramite=="8"){
-                  setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(8,10))])
-                }else if(tramite=="9"||tramite=="10"){
-                  setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(6,8))])
+                if(tramite=="1"){
+                  setOptionsTramites2([...(optionsTramites.slice(1,2)),...(optionsTramites.slice(6,10))])
+                }else if(tramite=="2"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,1)),...(optionsTramites.slice(6,10))])
+                }else if(tramite=="7"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(7,8)),...(optionsTramites.slice(8,10))])
+                }else if(tramite=="8"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(6,7)),...(optionsTramites.slice(8,10))])
+                }else if(tramite=="9"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(6,8)),...(optionsTramites.slice(9,10))])
+                }else if(tramite=="10"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(6,8)),...(optionsTramites.slice(8,9))])
                 }
                 else{
                   setOptionsTramites2([])
-                }*/
+                }
                 
-         //   }
+           }
                 }
               else{
                 setShowTramiteAdicional(false)
