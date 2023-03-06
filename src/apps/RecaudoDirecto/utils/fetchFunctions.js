@@ -63,7 +63,7 @@ const buildPutFunction = (url) => {
     }
   };
 };
-/*--- Recaudo ---*/
+/*--- Convenios Recaudo ---*/
 export const getRecaudosList = buildGetFunction(
   `${url}/convenio-recaudo/obtener-paginado`
 );
@@ -76,8 +76,12 @@ export const addConveniosRecaudoList = buildPostFunction(
 export const modConveniosRecaudoList = buildPutFunction(
   `${url}/convenio-recaudo/modificar`
 );
+export const getRecaudo = buildGetFunction(
+  `${url}/convenio-recaudo/obtener-recaudo`
+);
 
-/*--- Retiro ---*/
+
+/*--- Convenios Retiro ---*/
 export const getRetirosList = buildGetFunction(
   `${url}/convenio-retiro/obtener-paginado`
 );

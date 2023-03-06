@@ -5,7 +5,8 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { searchConveniosRecaudoList } from "../../utils/fetchFunctions"
+import { notify, notifyPending, notifyError } from "../../../../utils/notify";
+import { getRecaudo, searchConveniosRecaudoList } from "../../utils/fetchFunctions"
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
@@ -17,15 +18,14 @@ const RecaudoConjunto = () => {
   const [referencia, setReferencia] = useState('')
   const [convenioRetiro, setConvenioRetiro] = useState(null);
 
-  const recaudoDirectos = [
-    { pk_id_convenio: 1, referencia: 650122, nombre_cliente: "Kevin Guevara", valor: "25000" },
-    { pk_id_convenio: 4, referencia: 660122, nombre_cliente: "Maria Reyes", valor: "35000" },
-  ]
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+  }, []);
 
-  const getData = useCallback(async() => {
+  const getData = useCallback(async () => {
     try {
-      let rest =await searchConveniosRecaudoList({convenio_id:pk_id_convenio})
-        .then((rest)=>{ return rest })
+      let rest = await searchConveniosRecaudoList({ convenio_id: pk_id_convenio })
+        .then((rest) => { return rest })
       if (rest.length < 1) throw "no hay datos"
       setConvenioRetiro(rest.obj)
       setCargando(true)
@@ -33,116 +33,117 @@ const RecaudoConjunto = () => {
       alert("error")
       navigate("/recaudo-directo/recaudo")
     }
-  }, [navigate,pk_id_convenio])
+  }, [navigate, pk_id_convenio])
 
-  const consultarRecaudoD = (e) => {
-    // Datos Estaticos
+  const consultarRecaudoD = useCallback(async (e) => {
     e.preventDefault()
-    const buscarRecaudo = recaudoDirectos.filter((data) => {
-      return parseInt(data.pk_id_convenio) === parseInt(e.target.id_convenio.value) && parseInt(data.referencia) === parseInt(referencia)
+    await getRecaudo({
+      convenio_id: pk_id_convenio,
+      referencia: e.target.referencia.value
     })
-    if (buscarRecaudo.length < 1) { setReferencia(''); alert("Datos Incorrectos"); return false }
-    setDataRecaudo(buscarRecaudo)
-    setShowModal(true);
-  }
+      .then((data) => {
+        console.log(data)
+        setDataRecaudo(data?.obj ?? "")
+        notify(data.msg)
+        setShowModal(true);
+      })
+      .catch((err) => {
+        notifyError(err?.message);
+        handleClose()
+      });
+
+  }, [pk_id_convenio,handleClose])
+
   const hacerRecaudo = (e) => {
     e.preventDefault()
   }
-  const handleClose = useCallback(() => {
-    setShowModal(false);
-  }, []);
 
-  useEffect(() => {getData()}, [getData,pk_id_convenio])
-    
+  useEffect(() => { getData() }, [getData, pk_id_convenio])
+
   return (
-    <>
+
+    <Fragment>
+      <h1 className="text-3xl mt-6">Recaudos</h1>
       {cargando ? (
-        <Fragment>
-          <h1 className="text-3xl mt-6">Recaudos</h1>
-          <Form onSubmit={consultarRecaudoD}>
-            <Input
-              label='Número de convenio'
-              name={"id_convenio"}
-              type='text'
-              autoComplete='off'
-              defaultValue={convenioRetiro?.pk_id_convenio_directo}
-              disabled
-            />
-            <Input
-              label='Código EAN o IAC'
-              type='text'
-              defaultValue={convenioRetiro?.ean13}
-              autoComplete='off'
+        <Form onSubmit={consultarRecaudoD}>
+          <Input
+            label='Número de convenio'
+            name={"pk_id_convenio_directo"}
+            type='text'
+            autoComplete='off'
+            defaultValue={convenioRetiro?.pk_id_convenio_directo}
+            disabled
+          />
+          <Input
+            label='Código EAN o IAC'
+            type='text'
+            defaultValue={convenioRetiro?.ean13}
+            autoComplete='off'
 
-              disabled
-            />
-            <Input
-              label='Nombre de convenio'
-              type='text'
-              defaultValue={convenioRetiro?.nombre_convenio}
-              autoComplete='off'
-              disabled
-            />
-            <Input
-              label='Factura/Referencia'
-              type='text'
-              value={referencia ?? ""}
-              onChange={(e) => { setReferencia(e.target.value) }}
-              autoComplete='off'
-              required
-            />
-            <ButtonBar className={"lg:col-span-2"}>
-              <Button type={"submit"}>
-                Realizar consulta
-              </Button>
-            </ButtonBar>
-          </Form>
-          {dataRecaudo !== '' &&
-            <Modal show={showModal} handleClose={handleClose}>
-              <h2 className="text-3xl mx-auto text-center mb-4"> Realizar recaudo </h2>
-              <Form onSubmit={hacerRecaudo} grid >
-                <Input
-                  id={"Codigo_nit"}
-                  label={"Codigo convenio"}
-                  name={"Codigo_nit"}
-                  autoComplete="off"
-                  defaultValue={dataRecaudo[0].pk_id_convenio}
-                  disabled
-                  required />
-                <Input
-                  id={1}
-                  label={"Nombre cliente"}
-                  name={"nombre_cliente"}
-                  type="text"
-                  defaultValue={dataRecaudo[0].nombre_cliente ?? ""}
-                  autoComplete="off"
-                  disabled
-                  required />
-                <Input
-                  id={1}
-                  label={"Valor"}
-                  name={"valor"}
-                  type="text"
-                  defaultValue={dataRecaudo[0].valor ?? ""}
-                  autoComplete="off"
-                  disabled
-                  required />
-                <ButtonBar>
-                  <Button type={"submit"} >
-                    Aceptar
-                  </Button>
-                  <Button onClick={()=>handleClose()} >
-                    Cancelar
-                  </Button>
-                </ButtonBar>
-              </Form>
-            </Modal>
-          }
-
-        </Fragment>
+            disabled
+          />
+          <Input
+            label='Nombre de convenio'
+            type='text'
+            defaultValue={convenioRetiro?.nombre_convenio}
+            autoComplete='off'
+            disabled
+          />
+          <Input
+            label='Factura/Referencia'
+            name={"referencia"}
+            type='text'
+            value={referencia ?? ""}
+            onChange={(e) => { setReferencia(e.target.value) }}
+            autoComplete='off'
+            required
+          />
+          <ButtonBar className={"lg:col-span-2"}>
+            <Button type={"submit"}>
+              Realizar consulta
+            </Button>
+          </ButtonBar>
+        </Form>
       ) : (<> Cargando...</>)}
-    </>
-
+      <Modal show={showModal} handleClose={handleClose}>
+        <h2 className="text-3xl mx-auto text-center mb-4"> Realizar recaudo </h2>
+        <Form onSubmit={hacerRecaudo} grid >
+        <Input
+            id={1}
+            label={"Estado"}
+            name={"nombre_estado"}
+            type="text"
+            defaultValue={dataRecaudo.nombre_estado ?? ""}
+            autoComplete="off"
+            disabled
+            />
+          <Input
+            id={1}
+            label={"Valor a pagar"}
+            name={"valor"}
+            type="text"
+            defaultValue={dataRecaudo.valor ?? ""}
+            autoComplete="off"
+            disabled
+            required />
+          <Input
+            id={1}
+            label={"Valor recibido"}
+            name={"valor_recibido"}
+            type="text"
+            autoComplete="off"
+            required />
+          <ButtonBar>
+            <Button type={"submit"} >
+              Aceptar
+            </Button>
+            <Button onClick={() => handleClose()} >
+              Cancelar
+            </Button>
+          </ButtonBar>
+        </Form>
+      </Modal>
+    </Fragment>
   )
 }
 
