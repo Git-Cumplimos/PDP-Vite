@@ -128,9 +128,6 @@ const CargueArchivoRecaudoMultiple = ({
                 {`Archivo seleccionado: ${file.name}`}
               </h2>
               <ButtonBar>
-                <Button type='button' onClick={() => {}}>
-                  Cancelar
-                </Button>
                 <Button type='submit'>Subir</Button>
               </ButtonBar>
             </>

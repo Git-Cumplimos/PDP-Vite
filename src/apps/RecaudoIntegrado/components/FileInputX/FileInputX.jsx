@@ -41,6 +41,7 @@ const FileInputX = ({ banco }) => {
   }, []);
   const EliminarDocumento = (e) => {
     e.preventDefault();
+    document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
     setArchivo([]);
     setNombreDocumento("");
     setDisabledBtn(true);
@@ -78,6 +79,7 @@ const FileInputX = ({ banco }) => {
             <label className={contenedorLabel}>
               <div className={divinferior}>
                 <FileInput
+                  id="contingencia"
                   label={" "}
                   className={fileInput}
                   onGetFile={onFileChange}
