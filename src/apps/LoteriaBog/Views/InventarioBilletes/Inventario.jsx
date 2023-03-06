@@ -225,6 +225,9 @@ const Inventario = () => {
           }
           else {
             notifyError(response?.obj?.msg)
+            setFlagloading((old) => {
+              return { ...old, flagescaneado1: false, flagescaneado2: false, flagescaneado3: false};
+            });
           }
         })
         .catch((error) => {
