@@ -33,7 +33,7 @@ const InformacionPin = () => {
       ...pines?.map(({ productDesc, sell, validity }) => {
         return {
           "Nombre del Pin": productDesc,
-          Valor: formatMoney.format(sell) ,
+          Valor: formatMoney.format(sell),
           "Días de validez": validity * 1,
         };
       }),
