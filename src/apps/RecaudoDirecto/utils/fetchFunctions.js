@@ -94,3 +94,6 @@ export const addConveniosRetiroList = buildPostFunction(
 export const modConveniosRetiroList = buildPutFunction(
   `${url}/convenio-retiro/modificar`
 );
+export const getRetiro = buildGetFunction(
+  `${url}/convenio-retiro/obtener-retiro`
+);
