@@ -112,7 +112,7 @@ const CargueArchivoRecaudoMultiple = ({
       <Form formDir='col' onSubmit={saveFile}>
         <Fieldset legend='Archivo Recaudo Múltiple' className='lg:col-span-2'>
           <h1 className='text-2xl text-center mb-10 mt-5'>
-            Archivo Recaudo Múltiple
+            Cargue archivo recaudo múltiple
           </h1>
           <InputX
             id={`archivo`}
@@ -128,9 +128,6 @@ const CargueArchivoRecaudoMultiple = ({
                 {`Archivo seleccionado: ${file.name}`}
               </h2>
               <ButtonBar>
-                <Button type='button' onClick={() => {}}>
-                  Cancelar
-                </Button>
                 <Button type='submit'>Subir</Button>
               </ButtonBar>
             </>
