@@ -65,7 +65,7 @@ const RecaudoDirecto = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
-    if (selected)body['fk_id_tipo_convenio']=selected.fk_id_tipo_convenio
+    // if (selected)body['fk_id_tipo_convenio']=selected.fk_id_tipo_convenio
     console.log(body)
     notifyPending(
       selected
@@ -213,8 +213,8 @@ const RecaudoDirecto = () => {
           />
           <Select
             className="place-self-stretch"
-            id={"id valor a modificar"}
-            label={"id valor para modificar"}
+            id={"Tipo modificacion"}
+            label={"Tipo modificacion"}
             name={"fk_modificar_valor"}
             options={[{ label: "", value: "" }, ...tipoModificacion]}
             defaultValue={selected?.fk_modificar_valor ?? ""}
@@ -222,7 +222,7 @@ const RecaudoDirecto = () => {
           />
           <Select
             className="place-self-stretch"
-            id={"id tipo de convenio"}
+            id={"Tipo de convenio"}
             label={"Tipo de convenio"}
             name={"fk_id_tipo_convenio"}
             options={[{ label: "", value: "" }, ...tipoConvenio]}

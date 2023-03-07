@@ -4,8 +4,8 @@ import PermissionsRecaudoDirecto from "./permissions";
 
 const ConvenioRecaudo = lazy(() => import("./Views/Admin/ConvenioRecaudo"));
 const ConvenioRetiro = lazy(() => import("./Views/Admin/ConvenioRetiro"));
-const CargarArchivosRecaudo = lazy(() => import("./Views/Admin/CargarArchivosRecaudo"));
-const CargarArchivosRetiro = lazy(() => import("./Views/Admin/CargarArchivosRetiro"));
+const GestionArchivosRecaudo = lazy(() => import("./Views/Admin/GestionArchivosRecaudo"));
+const GestionArchivosRetiro = lazy(() => import("./Views/Admin/GestionArchivosRetiro"));
 const DescargarReporteRecaudo = lazy(() => import("./Views/Admin/DescargarReporteRecaudo"));
 const DescargarReporteRetiro = lazy(() => import("./Views/Admin/DescargarReporteRetiro"));
 const RecaudoManual = lazy(() => import("./Views/Recaudo/RecaudoManual"));
@@ -87,14 +87,14 @@ export const rutasGestionRecaudoDirecto = {
       component: ConvenioRetiro,
       permission: [PermissionsRecaudoDirecto.recaudo],
     }, {
-      link: "/recaudo-directo/gestion/cargar-archivo-recaudo",
-      label: <AppIcons Logo={"Reporte"} name={"Cargar Archivos de Recaudo"} />,
-      component: CargarArchivosRecaudo,
+      link: "/recaudo-directo/gestion/archivos-recaudo",
+      label: <AppIcons Logo={"Reporte"} name={"Gestion Archivos de Recaudo"} />,
+      component: GestionArchivosRecaudo,
       permission: [PermissionsRecaudoDirecto.recaudo],
     }, {
-      link: "/recaudo-directo/gestion/cargar-archivo-retiro",
-      label: <AppIcons Logo={"Reporte"} name={"Cargar Archivos de Retiro"} />,
-      component: CargarArchivosRetiro,
+      link: "/recaudo-directo/gestion/archivo-retiro",
+      label: <AppIcons Logo={"Reporte"} name={"Gestion Archivos de Retiro"} />,
+      component: GestionArchivosRetiro,
       permission: [PermissionsRecaudoDirecto.recaudo],
     },
     {
@@ -102,12 +102,14 @@ export const rutasGestionRecaudoDirecto = {
       label: <AppIcons Logo={"Reporte"} name={"Descargar Reporte de Recaudo"} />,
       component: DescargarReporteRecaudo,
       permission: [PermissionsRecaudoDirecto.recaudo],
+      show:false,
     },
     {
       link: "/recaudo-directo/gestion/descargar-reporte-retiro",
       label: <AppIcons Logo={"Reporte"} name={"Descargar Reporte de Retiro"} />,
       component: DescargarReporteRetiro,
       permission: [PermissionsRecaudoDirecto.recaudo],
+      show:false,
     },
   ]
 }

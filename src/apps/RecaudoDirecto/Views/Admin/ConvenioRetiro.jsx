@@ -66,7 +66,7 @@ const RetiroDirecto = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
-    if (selected)body['fk_id_tipo_convenio']=selected.fk_id_tipo_convenio
+    // if (selected)body['fk_id_tipo_convenio']=selected.fk_id_tipo_convenio
     console.log(body)
     notifyPending(
       selected

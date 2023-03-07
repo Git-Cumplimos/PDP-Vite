@@ -6,7 +6,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { notify, notifyError, notifyPending } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 import { getRetirosList } from "../../utils/fetchFunctions"
 
 export const fetchUploadFileCustom = async (url) => {
