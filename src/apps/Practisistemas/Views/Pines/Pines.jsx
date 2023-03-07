@@ -53,19 +53,44 @@ const Pines = () => {
         return categoriaMatchFilter && nombreMatch;
       }).map(({ desc, op }) => {
         return {
-          "Nombre del Pin": desc,
+          "Nombre del Pin": op == "cb" ? "Certificado de Tradición y Libertad (SNR)" : desc,
           "Categoría": op == "em" || op == "cb" || op == "hv" ? "Pin de Servicio" : "Pin de Contenido"
         };
       }),
     ];
   }, [pines, categoriaPin, nombrePin]);
 
+  // const onSelectAutorizador = useCallback(
+
+  //   (e, i) => {
+  //     console.log("*******", tablePines[i])
+  //     console.log("*******", tablePines[i]["op"], i)
+  //     fecthTablaConveniosPaginadoFunc2(tablePines[i]["op"], i);
+  //   },
+  //   [navigate, pines, tablePines]
+  // );
+
   const onSelectAutorizador = useCallback(
     (e, i) => {
       fecthTablaConveniosPaginadoFunc2(pines[i]["op"], i);
     },
-    [navigate, pines]
+    [navigate, pines, tablePines]
   );
+  // const onSelectAutorizador = useCallback(
+  //   (e, i) => {
+  //     const filteredIndex = tablePines.findIndex((pin) => pin["Nombre del Pin"] === pines[i]["desc"] && pin["Categoría"] === (pines[i]["op"] == "em" || pines[i]["op"] == "cb" || pines[i]["op"] == "hv" ? "Pin de Servicio" : "Pin de Contenido"));
+  //     fecthTablaConveniosPaginadoFunc2(pines[i]["op"], filteredIndex);
+  //   },
+  //   [navigate, pines, tablePines]
+  // );
+  // const onSelectAutorizador = useCallback(
+  //   (e, i) => {
+  //     const selectedPin = tablePines[i];
+  //     fecthTablaConveniosPaginadoFunc2(selectedPin["op"], i);
+  //   },
+  //   [navigate, tablePines]
+  // );
+
 
   const fecthTablaConveniosPaginadoFunc2 = (op, i) => {
     setShowLoading(true)
