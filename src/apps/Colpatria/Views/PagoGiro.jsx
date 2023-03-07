@@ -275,12 +275,12 @@ const PagoGiro = () => {
           required
         />
         <Input
-          id='numPin'
-          name='numPin'
-          label='No. De PIN'
-          type='text'
-          autoComplete='off'
-          maxLength={"12"}
+          id="numPin"
+          name="numPin"
+          label="No. De PIN"
+          type="text"
+          autoComplete="off"
+          maxLength={"6"}
           onInput={(ev) => setAccountNumber(ev.target.value)}
           required
         />
