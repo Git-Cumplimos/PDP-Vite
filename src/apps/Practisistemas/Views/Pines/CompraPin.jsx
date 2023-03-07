@@ -158,7 +158,7 @@ const CompraPin = () => {
   const [infTicket, setInfTicket] = useState({
     title: "Recibo de pago",
     timeInfo: {
-      "Fecha de venta": "",
+      "Fecha de pago": "",
       Hora: "",
     },
     commerceInfo: [
@@ -270,43 +270,44 @@ const CompraPin = () => {
     }).format(new Date());
     const newVoucher = { ...infTicket };
 
-    newVoucher["timeInfo"]["Fecha de venta"] = fecha;
+    newVoucher["timeInfo"]["Fecha de pago"] = fecha;
 
     newVoucher["timeInfo"]["Hora"] = hora;
 
-    newVoucher["trxInfo"][0] = ["Nombre del Pin", state.desc];
+    newVoucher["trxInfo"][0] = ["Convenio", state.desc];
 
     if (state?.op == "cb") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular", toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
       newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor del Pin", formatMoney.format(consultaDatosSNR?.valorPin),];
+      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(consultaDatosSNR?.valorPin),];
       newVoucher["trxInfo"][7] = ["", ""];
     } else if (state?.op == "em") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular", toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
       newVoucher["trxInfo"][4] = ["Contador", inputContador];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor del Pin", formatMoney.format(inputValor),];
+      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
       newVoucher["trxInfo"][7] = ["", ""];
     } else if (state?.op == "hv") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular", toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
       newVoucher["trxInfo"][4] = ["Placa", inputPlaca];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor del Pin", formatMoney.format(inputValor),];
+      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
       newVoucher["trxInfo"][7] = ["", ""];
     } else {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular", toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Valor del Pin", formatMoney.format(state.sell ? state.sell : inputValor),];
+      newVoucher["trxInfo"][4] = ["Valor", formatMoney.format(state.sell ? state.sell : inputValor),];
       newVoucher["trxInfo"][5] = ["", ""];
     }
+    console.log("ESTO ES EL VALOR DE NETFLIX", inputValor)
     fetchData(
       `${url_compra_pines}/transacciones`,
       "POST",
@@ -327,7 +328,7 @@ const CompraPin = () => {
             : state.sell
               ? state.sell
               : inputValor,
-        celular: state?.op == "em" ? inputContador : inputCelular,
+        celular: state?.op == "em" ? inputContador.toString() : inputCelular,
         operador: state?.op,
         valor:
           state?.op == "cb"
@@ -339,16 +340,11 @@ const CompraPin = () => {
           placaVh: inputPlaca,
         } : state?.op == "em" ? {
           telEnvio: inputCelular,
-        } : state?.op == "nx" ? {
         } : state?.op == "cb" ? {
           circulo: inputCirculo,
           matricula: inputMatricula,
         } : {
-          nombre_usuario: userInfo?.attributes?.name,
-          // id_uuid_trx: uniqueId,
-          telEnvio: inputCelular,
-          circulo: inputCirculo,
-          matricula: inputMatricula,
+
         },
         ticket: newVoucher,
       },
@@ -468,7 +464,7 @@ const CompraPin = () => {
     const voucher = {
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de venta": fecha,
+        "Fecha de pago": fecha,
         Hora: hora,
       },
       commerceInfo: [
@@ -550,7 +546,7 @@ const CompraPin = () => {
     setInfTicket({
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de venta": "",
+        "Fecha de pago": "",
         Hora: "",
       },
       commerceInfo: [
@@ -643,7 +639,7 @@ const CompraPin = () => {
             <Input
               name="contador"
               label="Número de contador"
-              type="num"
+              type="text"
               autoComplete="off"
               minLength={"10"}
               maxLength={"20"}
@@ -766,11 +762,15 @@ const CompraPin = () => {
                   <label className="font-medium ml-20">{`${consultaDatosSNR?.matricula}`}</label>
                 </div>
                 <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Círculo:`}</label>
+                  <label className="font-medium ml-20">{`${inputCirculo}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
                   <label className="font-semibold text-xl">{`Municipio:`}</label>
                   <label className="font-medium ml-20">{`${consultaDatosSNR?.municipio}`}</label>
                 </div>
                 <div className={contenedorTitulos}>
-                  <label className="font-semibold text-xl">{`Valor del Pin :`}</label>
+                  <label className="font-semibold text-xl">{`Valor :`}</label>
                   <label className="font-medium ml-20">{`${formatMoney.format(
                     consultaDatosSNR?.valorPin
                   )}`}</label>
