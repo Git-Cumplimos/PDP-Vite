@@ -8,8 +8,10 @@ import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
-import { notifyError, notifyPending } from "../../../../utils/notify";
+import Fieldset from "../../../../components/Base/Fieldset";
+import { notifyPending } from "../../../../utils/notify";
 import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
+
 
 const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
@@ -18,6 +20,7 @@ const RecaudoDirecto = () => {
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
   const [cargando, setCargando] = useState(false)
+  const [referencias, setReferencias] = useState([])
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
     { label: "Valor menor", value: 2 },
@@ -28,12 +31,11 @@ const RecaudoDirecto = () => {
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
   ]
-   const [searchFilters, setSearchFilters] = useState({
+  const [searchFilters, setSearchFilters] = useState({
     pk_id_convenio_directo: "",
     ean13: "",
     nombre_convenio: "",
   });
-
   const getRecaudos = useCallback(async () => {
     await getRecaudosList({
       ...searchFilters,
@@ -52,21 +54,27 @@ const RecaudoDirecto = () => {
         console.error(err?.message);
       });
     setCargando(true)
-  }, [pageData, searchFilters])
+    // console.log(referencias)
+  }, [pageData, searchFilters, referencias])
 
-  useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters])
+  useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters, referencias])
 
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelected(false)
+    setReferencias([])
   }, []);
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
-    // if (selected)body['fk_id_tipo_convenio']=selected.fk_id_tipo_convenio
+    if (body['Nombre de Referencia']) {
+      delete body['Nombre de Referencia']; delete body['Longitud minima']; delete body['Longitud maxima']
+      body['referencias'] = referencias
+    }
     console.log(body)
+    // console.log(referencias)
     notifyPending(
       selected
         ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
@@ -95,9 +103,20 @@ const RecaudoDirecto = () => {
         },
       }
     )
-    // if (!selected) { addConveniosRecaudoList(body); handleClose() }
-    // else { modConveniosRecaudoList({ convenio_id: selected.pk_id_convenio_directo }, body); handleClose() }
-  }, [handleClose, getRecaudos,selected])
+  }, [handleClose, getRecaudos, selected, referencias])
+
+  useEffect(() => {
+    let referencias = []
+    for (let i in selected['referencias']) {
+      referencias.push({
+        "Nombre de Referencia": selected['referencias'][i]['nombre_referencia'],
+        "Longitud minima": selected['referencias'][i]['length'][0],
+        "Longitud maxima": selected['referencias'][i]['length'][0],
+      })
+    }
+    setReferencias(referencias)
+  }, [selected])
+
 
   return (
     <Fragment>
@@ -177,7 +196,7 @@ const RecaudoDirecto = () => {
             onChange={(ev) => { }}
           />
         </TableEnterprise>
-      </>) : (<>cargando...</>)}
+      </>) : (<>Cargando...</>)}
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
         <Form onSubmit={crearModificarConvenioRecaudo} grid >
@@ -200,7 +219,7 @@ const RecaudoDirecto = () => {
             type="text"
             defaultValue={selected?.nombre_convenio ?? ""}
             autoComplete="off"
-            required 
+            required
           />
           <Input
             id={"NIT"}
@@ -209,7 +228,7 @@ const RecaudoDirecto = () => {
             type="text"
             autoComplete="off"
             defaultValue={selected?.nit ?? ""}
-            required 
+            required
           />
           <Select
             className="place-self-stretch"
@@ -238,6 +257,64 @@ const RecaudoDirecto = () => {
             // disabled={selected ? true : false}
             autoComplete="off"
           />
+
+          <Fieldset legend={"Referencias"}>
+            {referencias?.map((obj, index) => {
+              return (
+                <div key={index}>
+                  {Object.entries(obj).map(([keyRef, valRef]) => {
+                    return (
+                      <Input
+                        key={keyRef}
+                        className={"mb-4"}
+                        id={`${keyRef}_${index}`}
+                        name={keyRef}
+                        label={keyRef}
+                        type={`${keyRef.includes("Longitud") ? "number" : "text"}`}
+                        autoComplete="off"
+                        value={valRef}
+                        onChange={(e) => {
+                          const copyRef = [...referencias];
+                          copyRef[index][keyRef] = e.target.value;
+                          setReferencias(copyRef);
+                        }}
+                        required
+                      />
+                    );
+                  })}
+                  <ButtonBar>
+                    <Button
+                      type='button'
+                      onClick={() => {
+                        let copyRef = [...referencias]
+                        copyRef = copyRef.filter((item) => item !== copyRef[index])
+                        setReferencias(copyRef)
+                        getRecaudos()
+                      }}
+                    >Eliminar referencia</Button>
+                  </ButtonBar>
+                </div>
+              )
+            })}
+            <ButtonBar>
+              <Button
+                type='button'
+                onClick={() => {
+                  let copyRef = [...referencias]
+                  if (copyRef.length < 2) {
+                    copyRef.push({
+                      "Nombre de Referencia": "",
+                      "Longitud minima": "",
+                      "Longitud maxima": "",
+                    })
+                    setReferencias(copyRef)
+                    getRecaudos()
+                  }
+                }}
+              >Añadir referencia</Button>
+            </ButtonBar>
+          </Fieldset>
+
           <TextArea
             id={1}
             label={"Observaciones"}
