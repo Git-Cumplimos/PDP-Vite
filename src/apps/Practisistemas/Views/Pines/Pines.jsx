@@ -120,18 +120,6 @@ const Pines = () => {
   //   [navigate, pines, tablePines]
   // );
 
-  // const onSelectAutorizador = useCallback(
-  //   (_, i) => {
-  //     const op = pines[i]["op"];
-  //     fecthTablaConveniosPaginadoFunc2(op, i);
-  //   },
-  //   [pines]
-  // );
-
-
-
-
-
   const fecthTablaConveniosPaginadoFunc2 = (op, i) => {
     setShowLoading(true)
     postConsultaPin({
