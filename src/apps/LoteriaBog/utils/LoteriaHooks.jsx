@@ -53,6 +53,7 @@ const urls = {
   consulta_operaciones: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_operaciones`,
   consulta_codigos_oficina: `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`,
   consultaInventario: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_numeros_inventario`,
+  get_barcode: `${process.env.REACT_APP_URL_LOTERIAS}/lectura_cod_barras`,
   consultaInventarioReporte: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_inventario`,
   registrarInventario: `${process.env.REACT_APP_URL_LOTERIAS}/registrar_inventario`,
 };
@@ -102,6 +103,7 @@ export const LoteriaContext = createContext({
   con_sort_ventas: () => { },
   cargueVentasExtra_S3: () => { },
   reportVentas: () => { },
+  peticionBarcode: () => { },
   consultaInventario: () => { },
   consultaInventarioReporte: () => { },
   registrarInventario: () => { },
@@ -835,6 +837,28 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
+  const peticionBarcode = useCallback(
+    async (referencia,barcode,numSorteo,numLoteria) => {
+      try {
+        const res = await fetchData(
+          urls.get_barcode,
+          "POST",
+          {},
+          { 
+            datoAzar: referencia,
+            barcode: barcode,
+            num_sorteo: numSorteo,
+            num_loteria: numLoteria,
+          }
+        );
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
+
   const consultaInventario = useCallback(
     async (numSorteo, numLoteria) => {
       try {
@@ -962,6 +986,7 @@ export const useProvideLoteria = () => {
     con_SortVentas_S3,
     descargaVentas_S3,
     reportVentas,
+    peticionBarcode,
     consultaInventario,
     consultaInventarioReporte,
     registrarInventario,

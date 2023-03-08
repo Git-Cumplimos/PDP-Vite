@@ -169,7 +169,7 @@ const PinDePago = () => {
     fetchData(
       `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`,
       "GET",
-      { tipo_op: 106 }
+      { tipo_op: 131 }
     )
       .then((res) => {
         if (!res?.status) {

@@ -53,6 +53,7 @@ export const useProvidePinesVus = () => {
     if (user?.tipo_comercio === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
     }
+    
     const body = {
       valor_tramite : valor_tramite,
       Usuario: user?.id_usuario,
@@ -72,6 +73,7 @@ export const useProvidePinesVus = () => {
       id_pin: id_pin,
     };
     try {
+    
       const res = await fetchData(urls.cancelPinVus, "PUT", query, body);
       return res;
     } catch (err) {
@@ -79,14 +81,25 @@ export const useProvidePinesVus = () => {
     }
   }, [roleInfo, pdpUser]);
   
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma, motivoCompra, descripcionTipDocumento, ticket1, ticket2) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, tramite2, user, infoTramite, infoTramite2, infoCliente, olimpia, categoria, categoria2, idPin, firma, motivoCompra, descripcionTipDocumento, ticket1, ticket2) => {
     let tipo_comercio = user?.Tipo
     if (user?.Tipo === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
     }
+    let tramiteTemp
+    let infoTramiteTemp
+    infoTramite["categoria"]=categoria
+    if (tramite2==""){
+      tramiteTemp= [tramite]
+      infoTramiteTemp=[infoTramite]
+    }else{
+      tramiteTemp= [tramite, tramite2]
+      infoTramite2["categoria"]=categoria2
+      infoTramiteTemp=[infoTramite, infoTramite2]
+    }
     const body = {
-      tipo_tramite: tramite,
-      infoTramite: infoTramite,
+      tipo_tramite: tramiteTemp,
+      infoTramite: infoTramiteTemp,
       tipo_pin: tipoPin,
       doc_cliente: String(documento),
       Usuario: user?.Usuario,
@@ -109,6 +122,7 @@ export const useProvidePinesVus = () => {
       body.Pin = idPin
     }
     try {
+      //console.log(body)
       const res = await fetchData(urls.PinVus, "POST", {}, body);
       return res;
     } catch (err) {

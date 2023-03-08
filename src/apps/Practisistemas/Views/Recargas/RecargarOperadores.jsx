@@ -58,11 +58,11 @@ const RecargasOperadores = () => {
     ],
     commerceName: "RECARGA",
     trxInfo: [
-      ["Operador",state?.operador_recargar],
+      ["Operador", state?.operador_recargar],
       ["", ""],
     ],
     disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
   });
 
   const onChangeMoney = useMoney({
@@ -156,8 +156,8 @@ const RecargasOperadores = () => {
       .then(async (res) => {
         if (res?.status === true) {
           notify("Recarga exitosa");
-          infTicketFinal["commerceInfo"].splice(2,0,["Id Trx",res?.obj?.response?.["idtrans"],]);
-          infTicketFinal["commerceInfo"].splice(3,0,["Id Aut",res?.obj?.response?.["codigoauth"],]);
+          infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
+          infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
           setInfTicket(infTicketFinal);
           setRespuesta(false);
           setTypeInfo("RecargaExitosa");
@@ -180,15 +180,15 @@ const RecargasOperadores = () => {
                             res?.obj?.response?.estado == "00"
                           ) {
                             notify("Recarga exitosa");
-                            infTicketFinal["commerceInfo"].splice(2,0,["Id Trx",res?.obj?.response?.["idtrans"],]);
-                            infTicketFinal["commerceInfo"].splice(3,0,["Id Aut",res?.obj?.response?.["codigoauth"],]);
+                            infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
+                            infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
                             setInfTicket(infTicketFinal);
                             setRespuesta(false);
                             setTypeInfo("RecargaExitosa");
                           } else {
                             notifyError(
                               typeof res?.msg == typeof {}
-                                ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                                ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
                                 : res?.msg
                             );
                             setRespuesta(true);
@@ -223,7 +223,7 @@ const RecargasOperadores = () => {
           else {
             notifyError(
               typeof res?.msg == typeof {}
-                ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
                 : res?.msg
             );
             setRespuesta(false);

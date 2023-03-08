@@ -188,6 +188,7 @@ const TrxRecaudo = () => {
 
   const onMakePayment = useCallback(
     (ev) => {
+      ev.preventDefault();
       if (valTrxRecaudo <= 0) {
         notifyError("El valor debe ser mayor a cero");
         return;
@@ -486,19 +487,21 @@ const TrxRecaudo = () => {
             </ButtonBar>
           </div>
         ) : (
-          <PaymentSummary summaryTrx={summary}>
-            <ButtonBar>
-              <Button
-                type='submit'
-                onClick={onMakePayment}
-                disabled={loadingSell}>
-                Aceptar
-              </Button>
-              <Button onClick={handleClose} disabled={loadingSell}>
-                Cancelar
-              </Button>
-            </ButtonBar>
-          </PaymentSummary>
+          <form onSubmit={onMakePayment}>
+            <PaymentSummary summaryTrx={summary}>
+              <ButtonBar>
+                <Button
+                  type="submit"
+                  disabled={loadingSell}
+                >
+                  Aceptar
+                </Button>
+                <Button onClick={handleClose} disabled={loadingSell}>
+                  Cancelar
+                </Button>
+              </ButtonBar>
+            </PaymentSummary>
+          </form>
         )}
       </Modal>
     </Fragment>
