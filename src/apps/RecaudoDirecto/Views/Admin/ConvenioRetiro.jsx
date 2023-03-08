@@ -19,7 +19,11 @@ const RetiroDirecto = () => {
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
   const [cargando, setCargando] = useState(false)
-  const [referencias, setReferencias] = useState([])
+  const [referencias, setReferencias] = useState([{
+    "Nombre de Referencia": "",
+    "Longitud minima": "",
+    "Longitud maxima": "",
+  }])
   const [searchFilters, setSearchFilters] = useState({
     pk_id_convenio_directo: "",
     ean13: "",
@@ -36,10 +40,35 @@ const RetiroDirecto = () => {
     { label: "Con autorizador", value: 2 },
   ]
 
+  useEffect(() => {
+    let referencia = []
+    if (selected['referencias']) {
+      for (let i in selected['referencias']) {
+        referencia.push({
+          "Nombre de Referencia": selected['referencias'][i]['nombre_referencia'],
+          "Longitud minima": selected['referencias'][i]['length'][0],
+          "Longitud maxima": selected['referencias'][i]['length'][0],
+        })
+      }
+    }
+    else {
+      referencia = [{
+        "Nombre de Referencia": "",
+        "Longitud minima": "",
+        "Longitud maxima": "",
+      }]
+    }
+    setReferencias(referencia)
+  }, [selected])
+
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelected(false)
-    setReferencias([])
+    setReferencias([{
+      "Nombre de Referencia": "",
+      "Longitud minima": "",
+      "Longitud maxima": "",
+    }])
   }, []);
 
   const getConvRetiro = useCallback(async () => {
@@ -64,7 +93,7 @@ const RetiroDirecto = () => {
     setCargando(true)
   }, [pageData, searchFilters])
 
-  useEffect(() => { getConvRetiro() }, [getConvRetiro, pageData, searchFilters, referencias])
+  useEffect(() => { getConvRetiro() }, [getConvRetiro, pageData, searchFilters])
 
   const crearModificarConvenioRetiro = useCallback((e) => {
     e.preventDefault();
@@ -105,17 +134,7 @@ const RetiroDirecto = () => {
     )
   }, [handleClose, getConvRetiro, selected, referencias])
 
-  useEffect(() => {
-    let referencias = []
-    for (let i in selected['referencias']) {
-      referencias.push({
-        "Nombre de Referencia": selected['referencias'][i]['nombre_referencia'],
-        "Longitud minima": selected['referencias'][i]['length'][0],
-        "Longitud maxima": selected['referencias'][i]['length'][0],
-      })
-    }
-    setReferencias(referencias)
-  }, [selected])
+
 
   return (
     <Fragment>
@@ -296,37 +315,41 @@ const RetiroDirecto = () => {
                       />
                     );
                   })}
-                  <ButtonBar>
-                    <Button
-                      type='button'
-                      onClick={() => {
-                        let copyRef = [...referencias]
-                        copyRef = copyRef.filter((item) => item !== copyRef[index])
-                        setReferencias(copyRef)
-                        getConvRetiro()
-                      }}
-                    >Eliminar referencia</Button>
-                  </ButtonBar>
+                  {referencias.length > 1 &&
+                    <ButtonBar>
+                      <Button
+                        type='button'
+                        onClick={() => {
+                          let copyRef = [...referencias]
+                          copyRef = copyRef.filter((item) => item !== copyRef[index])
+                          setReferencias(copyRef)
+                          getConvRetiro()
+                        }}
+                      >Eliminar referencia</Button>
+                    </ButtonBar>
+                  }
                 </div>
               )
             })}
-            <ButtonBar>
-              <Button
-                type='button'
-                onClick={() => {
-                  let copyRef = [...referencias]
-                  if (copyRef.length < 2) {
-                    copyRef.push({
-                      "Nombre de Referencia": "",
-                      "Longitud minima": "",
-                      "Longitud maxima": "",
-                    })
-                    setReferencias(copyRef)
-                    getConvRetiro()
-                  }
-                }}
-              >Añadir referencia</Button>
-            </ButtonBar>
+            {referencias.length < 2 &&
+              <ButtonBar>
+                <Button
+                  type='button'
+                  onClick={() => {
+                    let copyRef = [...referencias]
+                    if (copyRef.length < 2) {
+                      copyRef.push({
+                        "Nombre de Referencia": "",
+                        "Longitud minima": "",
+                        "Longitud maxima": "",
+                      })
+                      setReferencias(copyRef)
+                      getConvRetiro()
+                    }
+                  }}
+                >Añadir referencia</Button>
+              </ButtonBar>
+            }
           </Fieldset>
 
           <ToggleInput
