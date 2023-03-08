@@ -12,15 +12,19 @@ import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyPending } from "../../../../utils/notify";
 import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
 
-
 const RecaudoDirecto = () => {
-  const [showModal, setShowModal] = useState(false)
-  const [selected, setSelected] = useState(false); // fila selecionada
   const [listRecaudos, setListRecaudos] = useState('')
+  const [selected, setSelected] = useState(false); // fila selecionada
+  const [showModal, setShowModal] = useState(false)
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
   const [cargando, setCargando] = useState(false)
   const [referencias, setReferencias] = useState([])
+  const [searchFilters, setSearchFilters] = useState({
+    pk_id_convenio_directo: "",
+    ean13: "",
+    nombre_convenio: "",
+  });
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
     { label: "Valor menor", value: 2 },
@@ -31,11 +35,7 @@ const RecaudoDirecto = () => {
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
   ]
-  const [searchFilters, setSearchFilters] = useState({
-    pk_id_convenio_directo: "",
-    ean13: "",
-    nombre_convenio: "",
-  });
+
   const getRecaudos = useCallback(async () => {
     await getRecaudosList({
       ...searchFilters,
@@ -55,7 +55,7 @@ const RecaudoDirecto = () => {
       });
     setCargando(true)
     // console.log(referencias)
-  }, [pageData, searchFilters, referencias])
+  }, [pageData, searchFilters])
 
   useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters, referencias])
 
@@ -73,7 +73,7 @@ const RecaudoDirecto = () => {
       delete body['Nombre de Referencia']; delete body['Longitud minima']; delete body['Longitud maxima']
       body['referencias'] = referencias
     }
-    console.log(body)
+    // console.log(body)
     // console.log(referencias)
     notifyPending(
       selected
