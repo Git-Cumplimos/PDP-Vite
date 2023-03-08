@@ -54,28 +54,36 @@ const Pines = () => {
       }).map(({ desc, op }) => {
         return {
           "Nombre del Pin": op == "cb" ? "Certificado de Tradición y Libertad (SNR)" : desc,
-          "Categoría": op == "em" || op == "cb" || op == "hv" ? "Pin de Servicio" : "Pin de Contenido"
+          "Categoría": op == "em" || op == "cb" || op == "hv" ? "Pin de Servicio" : "Pin de Contenido",
         };
       }),
     ];
   }, [pines, categoriaPin, nombrePin]);
 
-  // const onSelectAutorizador = useCallback(
-
-  //   (e, i) => {
-  //     console.log("*******", tablePines[i])
-  //     console.log("*******", tablePines[i]["op"], i)
-  //     fecthTablaConveniosPaginadoFunc2(tablePines[i]["op"], i);
-  //   },
-  //   [navigate, pines, tablePines]
-  // );
-
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      fecthTablaConveniosPaginadoFunc2(pines[i]["op"], i);
+      console.log("*******tablePines[i]", tablePines[i])
+      console.log("*******tablePines[i][op], i", tablePines[i]["op"], i)
+      console.log("*******pines[i][op], i", pines[i]["op"], i)
+      console.log("*******ACAAAAAAAAA, i", i)
+      const nombrePin = tablePines[i]["Nombre del Pin"];
+      console.log("*******ACAAAAAAAAA, nombrePin", nombrePin)
+      const index = pines.findIndex(pin => pin.desc === nombrePin);
+      console.log("*******ACAAAAAAAAA, index", index)
+      console.log("*******ACAAAAAAAAA, pines[index].op", pines[index].op)
+      if (index !== -1) {
+        fecthTablaConveniosPaginadoFunc2(pines[index].op, index);
+      }
     },
     [navigate, pines, tablePines]
   );
+
+  // const onSelectAutorizador = useCallback(
+  //   (e, i) => {
+  //     fecthTablaConveniosPaginadoFunc2(pines[i]["op"], i);
+  //   },
+  //   [navigate, pines, tablePines]
+  // );
   // const onSelectAutorizador = useCallback(
   //   (e, i) => {
   //     const filteredIndex = tablePines.findIndex((pin) => pin["Nombre del Pin"] === pines[i]["desc"] && pin["Categoría"] === (pines[i]["op"] == "em" || pines[i]["op"] == "cb" || pines[i]["op"] == "hv" ? "Pin de Servicio" : "Pin de Contenido"));
@@ -85,11 +93,35 @@ const Pines = () => {
   // );
   // const onSelectAutorizador = useCallback(
   //   (e, i) => {
+  //     console.log("*******", tablePines[i])
+  //     console.log("*******tablePines[i][op]", tablePines[i]["op"])
+  //     console.log("*******i", i)
   //     const selectedPin = tablePines[i];
   //     fecthTablaConveniosPaginadoFunc2(selectedPin["op"], i);
   //   },
   //   [navigate, tablePines]
   // );
+
+  // const onSelectAutorizador = useCallback(
+  //   (e, i) => {
+  //     const selectedPin = tablePines.find(pin => pin["Nombre del Pin"] === pines[i]["desc"]);
+  //     if (selectedPin) {
+  //       fecthTablaConveniosPaginadoFunc2(selectedPin["Nombre del Pin"], selectedPin["Categoría"]);
+  //     }
+  //   },
+  //   [navigate, pines, tablePines]
+  // );
+
+  // const onSelectAutorizador = useCallback(
+  //   (_, i) => {
+  //     const op = pines[i]["op"];
+  //     fecthTablaConveniosPaginadoFunc2(op, i);
+  //   },
+  //   [pines]
+  // );
+
+
+
 
 
   const fecthTablaConveniosPaginadoFunc2 = (op, i) => {
@@ -158,6 +190,7 @@ const Pines = () => {
         headers={["Nombre del Pin", "Categoría"]}
         data={tablePines}
         onSelectRow={onSelectAutorizador}
+
         onSetPageData={setPageData}
       >
         <Input

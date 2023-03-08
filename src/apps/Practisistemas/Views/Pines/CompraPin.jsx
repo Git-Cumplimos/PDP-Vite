@@ -154,7 +154,7 @@ const CompraPin = () => {
         });
     }
   };
-
+  console.log("ESTO ES EL OP3=======", state?.op)
   const [infTicket, setInfTicket] = useState({
     title: "Recibo de pago",
     timeInfo: {
@@ -169,10 +169,13 @@ const CompraPin = () => {
       ["Dirección", roleInfo.direccion],
       ["", ""],
     ],
-    commerceName: "VENTA PINES DE CONTENIDO",
+    commerceName:
+      state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+        ? "VENTA PINES DE SERVICIO"
+        : "VENTA PINES DE CONTENIDO",
     trxInfo: [],
     disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
   });
 
   const onChangeMoney = useMoney({
@@ -280,17 +283,17 @@ const CompraPin = () => {
       newVoucher["trxInfo"][1] = ["", ""];
       newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
-      newVoucher["trxInfo"][5] = ["", ""];
       newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(consultaDatosSNR?.valorPin),];
+      newVoucher["trxInfo"][5] = ["", ""];
+      newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
       newVoucher["trxInfo"][7] = ["", ""];
     } else if (state?.op == "em") {
       newVoucher["trxInfo"][1] = ["", ""];
       newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Contador", inputContador];
-      newVoucher["trxInfo"][5] = ["", ""];
       newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
+      newVoucher["trxInfo"][5] = ["", ""];
+      newVoucher["trxInfo"][4] = ["Contador", inputContador];
       newVoucher["trxInfo"][7] = ["", ""];
     } else if (state?.op == "hv") {
       newVoucher["trxInfo"][1] = ["", ""];
@@ -460,7 +463,17 @@ const CompraPin = () => {
       const pin = result_?.jsonAdicional?.info;
       var hiddenPin = '******' + pin.substring(6);
     }
+    // if (result_?.jsonAdicional?.["Numero Pin"] || result_?.jsonAdicional?.info) {
 
+    //   console.log("ENTRO AL IF", result_)
+    //   // const pin = result_?.jsonAdicional?.info;
+    //   const pin = state?.op == "em" ? result_?.jsonAdicional?.["Numero Pin"] : state?.op == "hv" || state?.op == "nx" ? result_?.jsonAdicional?.info : ["", ""];
+    //   setHiddenPin('******' + pin.substring(6))
+    // }
+    console.log("ESTO ES EL OP 2=======", state?.op)
+    console.log("ESTO ES EL OP 2=======state", state)
+    console.log("ESTO ES EL OP 2=======hiddenPin", hiddenPin)
+    console.log("ESTO ES EL OP 2=======hiddenPin", result_)
     const voucher = {
       title: "Recibo de pago",
       timeInfo: {
@@ -494,6 +507,14 @@ const CompraPin = () => {
         ["", ""],
         ["No. Celular", toPhoneNumber(inputCelular)],
         ["", ""],
+        state?.op == "cb"
+          ? ["Matrícula", inputMatricula]
+          : state?.op == "hv"
+            ? ["Placa", inputPlaca]
+            : state?.op == "em"
+              ? ["Contador", inputContador]
+              : [],
+        ["", ""],
         ["Valor",
           formatMoney.format(
             state.sell
@@ -503,17 +524,9 @@ const CompraPin = () => {
                 : inputValor
           ),],
         ["", ""],
-        state?.op == "cb"
-          ? ["Matrícula", inputMatricula]
-          : state?.op == "hv"
-            ? ["Placa", inputPlaca]
-            : state?.op == "em"
-              ? ["Contador", inputContador]
-              : [],
-        ["", ""],
       ],
       disclamer:
-        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
     };
     setTypeInfo("VentaExitosa");
     setInfTicket(voucher);
@@ -534,6 +547,7 @@ const CompraPin = () => {
   }, []);
 
   const handleClose = useCallback(() => {
+    console.log("ESTO ES EL OP1=======", state?.op)
     setShowModal(false);
     setTypeInfo("Ninguno");
     setInputCelular("");
@@ -557,10 +571,13 @@ const CompraPin = () => {
         ["Dirección", roleInfo.direccion],
         ["", ""],
       ],
-      commerceName: "VENTA PINES DE CONTENIDO",
+      commerceName:
+        state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+          ? "VENTA PINES DE SERVICIO"
+          : "VENTA PINES DE CONTENIDO",
       trxInfo: [],
       disclamer:
-        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
     });
     validNavigate("/Pines/PinesContenido");
   }, []);
