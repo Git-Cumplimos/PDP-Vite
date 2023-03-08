@@ -172,7 +172,8 @@ export const useProvidePinesVus = () => {
       estadoPin,
       tipoPin,
       doc_cliente,
-      pageData
+      pageData,
+      pinesCliente
     ) => {
       const query = { ...pageData };
       if (cod_hash_pin !== "") {
@@ -194,9 +195,12 @@ export const useProvidePinesVus = () => {
       if (doc_cliente !== "") {
         query.doc_cliente = doc_cliente;
       }
-
+      if (pinesCliente == 1) {
+        query.pinesCliente = pinesCliente;
+      }
       try {
         const res = await fetchData(urls.PinVus, "GET", query);
+        console.log(query)
         return res;
       } catch (err) {
         throw err;
@@ -400,6 +404,7 @@ export const useProvidePinesVus = () => {
       const query = { doc_cliente : doc_cliente, reenviarFormulario : reenviarFormulario };
       try {
         const res = await fetchData(urls.reenvioHash, "GET", query);
+        console.log(res)
         return res;
       } catch (err) {
         throw err;
