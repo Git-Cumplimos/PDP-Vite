@@ -154,7 +154,6 @@ const CompraPin = () => {
         });
     }
   };
-  console.log("ESTO ES EL OP3=======", state?.op)
   const [infTicket, setInfTicket] = useState({
     title: "Recibo de pago",
     timeInfo: {
@@ -310,7 +309,6 @@ const CompraPin = () => {
       newVoucher["trxInfo"][4] = ["Valor", formatMoney.format(state.sell ? state.sell : inputValor),];
       newVoucher["trxInfo"][5] = ["", ""];
     }
-    console.log("ESTO ES EL VALOR DE NETFLIX", inputValor)
     fetchData(
       `${url_compra_pines}/transacciones`,
       "POST",
@@ -356,13 +354,11 @@ const CompraPin = () => {
       60000
     )
       .then(async (res) => {
-        console.log("ESTO ES EL RES###", res)
         if (res?.status == true) {
           notify("Venta exitosa");
           setShowLoading(false);
           VentaExitosa(res?.obj?.response, fecha, hora);
         } else {
-          console.log("ENTRO AL ELSE")
           if (res?.message === "Endpoint request timed out") {
             notify("Se está procesando la transacción");
             setShowLoading(true);
@@ -374,7 +370,6 @@ const CompraPin = () => {
             }).format(today);
 
             for (let i = 0; i <= 8; i++) {
-              console.log("ENTRO A ESTE FOR 1")
               try {
                 const promesa = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -385,7 +380,6 @@ const CompraPin = () => {
                       id_uuid_trx: uniqueId,
                     })
                       .then((res) => {
-                        console.log("Esto es es res linea 414", res);
                         if (res?.msg !== "No ha terminado el reintento") {
                           if (
                             res?.status === true ||
@@ -448,9 +442,7 @@ const CompraPin = () => {
             setInputValor(0);
           }
         }
-        console.log("ESTO ES EL RES pero llegó al final###", res)
       }).catch(async (err) => {
-        console.log("al catch", err)
         notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
         setShowLoading(false);
         handleClose();
@@ -463,17 +455,6 @@ const CompraPin = () => {
       const pin = result_?.jsonAdicional?.info;
       var hiddenPin = '******' + pin.substring(6);
     }
-    // if (result_?.jsonAdicional?.["Numero Pin"] || result_?.jsonAdicional?.info) {
-
-    //   console.log("ENTRO AL IF", result_)
-    //   // const pin = result_?.jsonAdicional?.info;
-    //   const pin = state?.op == "em" ? result_?.jsonAdicional?.["Numero Pin"] : state?.op == "hv" || state?.op == "nx" ? result_?.jsonAdicional?.info : ["", ""];
-    //   setHiddenPin('******' + pin.substring(6))
-    // }
-    console.log("ESTO ES EL OP 2=======", state?.op)
-    console.log("ESTO ES EL OP 2=======state", state)
-    console.log("ESTO ES EL OP 2=======hiddenPin", hiddenPin)
-    console.log("ESTO ES EL OP 2=======hiddenPin", result_)
     const voucher = {
       title: "Recibo de pago",
       timeInfo: {
@@ -547,7 +528,6 @@ const CompraPin = () => {
   }, []);
 
   const handleClose = useCallback(() => {
-    console.log("ESTO ES EL OP1=======", state?.op)
     setShowModal(false);
     setTypeInfo("Ninguno");
     setInputCelular("");

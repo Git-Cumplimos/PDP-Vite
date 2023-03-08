@@ -62,14 +62,8 @@ const Pines = () => {
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      console.log("*******tablePines[i]", tablePines[i])
-      console.log("*******tablePines[i][op], i", tablePines[i]["op"], i)
-      console.log("*******pines[i][op], i", pines[i]["op"], i)
-      console.log("*******ACAAAAAAAAA, i", i)
       const nombrePin = tablePines[i]["Nombre del Pin"] == "Certificado de Tradición y Libertad (SNR)" ? "Certificado TL" : tablePines[i]["Nombre del Pin"];
-      console.log("*******ACAAAAAAAAA, nombrePin", nombrePin)
       const index = pines.findIndex(pin => pin.desc === nombrePin);
-      console.log("*******ACAAAAAAAAA, index", index)
       // console.log("*******ACAAAAAAAAA, pines[index].op", pines[index].op)
       if (index !== -1) {
         fecthTablaConveniosPaginadoFunc2(pines[index].op, index);
@@ -146,8 +140,12 @@ const Pines = () => {
   }, [datosTrans, page, limit]);
 
   useEffect(() => {
+    fecthTablaConveniosPaginadoFunc2();
+  }, [datosTrans, page, limit, nombrePin, categoriaPin]);
+
+  useEffect(() => {
     fecthTablaPines();
-  }, [datosTrans, page, limit]);
+  }, [datosTrans, page, limit, nombrePin, categoriaPin]);
 
   const fecthTablaPines = () => {
     setShowLoading(true)
@@ -155,10 +153,9 @@ const Pines = () => {
       idcomercio: roleInfo?.["id_comercio"],
       page,
       limit,
-      pin: datosTrans.pin
+      pin: nombrePin
     })
       .then((autoArr) => {
-        console.log("ESTO ES AUTOARR de fecthTablaPines", autoArr)
         setShowLoading(false)
         setMaxPages(autoArr?.maxPages);
         setPines(autoArr?.results ?? []);
