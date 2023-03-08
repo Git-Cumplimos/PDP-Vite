@@ -610,7 +610,7 @@ const CompraPin = () => {
   return (
     <Fragment>
       <SimpleLoading show={showLoading} />
-      <h1 className="text-3xl mt-6">Compra Pin: {state?.desc} </h1>
+      <h1 className="text-3xl mt-6">Compra Pin: {state?.desc == "Certificado TL" ? "Certificado de Tradición y Libertad (SNR)" : state?.desc} </h1>
       <Form onSubmit={onSubmitCheck} grid>
         {state?.op == "cb" ? (
           <>
