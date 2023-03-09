@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useCallback, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -6,25 +6,48 @@ import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
 import Input from "../../../../components/Base/Input";
 import { notify, notifyPending, notifyError } from "../../../../utils/notify";
-import { getRetiro, searchConveniosRecaudoList } from "../../utils/fetchFunctions"
+import { getRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
+
 
 const FormularioRetiro = () => {
 
   const { pk_id_convenio } = useParams();
-  const { nombre_convenio } = useParams();
+  // const { nombre_convenio } = useParams();
+  const [cargando, setCargando] = useState(false)
   const [dataRetiro, setDataRetiro] = useState('')
+  const [dataConvRetiro, setDataConvRetiro] = useState('')
   const [showModal, setShowModal] = useState(false)
-  
+  const [dataReferencias,setDataReferencias] = useState({
+    referencia1: '',
+    referencia2: ''
+  }) 
+
   const handleClose = useCallback(() => {
     setShowModal(false);
+    setDataReferencias({
+      referencia1: '',
+      referencia2: ''
+    })
   }, []);
+
+  const getData = useCallback(async () => {
+    try {
+      let rest = await searchConveniosRetiroList({ convenio_id: pk_id_convenio })
+        
+        .then((rest) => { return rest })
+      if (rest.length < 1) { throw "no hay datos" }
+      setDataConvRetiro(rest?.obj)
+      setCargando(true)
+    } catch (e) {
+      console.error(e)
+    }
+  }, [pk_id_convenio])
 
   const consultarRetiroD = useCallback(async (e) => {
     e.preventDefault()
     await getRetiro({
+      ...dataReferencias,
       convenio_id: pk_id_convenio,
-      otp: e.target.otp.value,
-      documento: e.target.documento.value
     })
       .then((data) => {
         setDataRetiro(data?.obj ?? "")
@@ -36,7 +59,9 @@ const FormularioRetiro = () => {
         handleClose()
       });
 
-  }, [pk_id_convenio,handleClose])
+  }, [pk_id_convenio, handleClose,dataReferencias])
+
+  useEffect(() => { getData() }, [getData, pk_id_convenio])
 
   const hacerRetiro = useCallback((e) => {
     e.preventDefault();
@@ -54,54 +79,51 @@ const FormularioRetiro = () => {
   return (
     <Fragment>
       <h2 className="text-3xl mx-auto text-center mb-4"> Realizar retiro </h2>
-      <Form onSubmit={consultarRetiroD} grid >
-        <Input
-          id={"Codigo_nit"}
-          label={"Codigo convenio"}
-          name={"Codigo_nit"}
-          autoComplete="off"
-          value={pk_id_convenio ?? ""}
-          disabled
-          required />
-        <Input
-          id={"nombre_convenio"}
-          label={"Nombre convenio"}
-          name={"nombre_convenio"}
-          type="text"
-          value={nombre_convenio ?? ""}
-          autoComplete="off"
-          disabled
-          required
-        />
-        <Input
-          id={1}
-          label={"Numero OTP"}
-          name={"otp"}
-          type="text"
-          minLength={"6"}
-          maxLength={"6"}
-          autoComplete="off"
-          required />
-
-        <Input
-          id={1}
-          label={"Documento Cliente"}
-          name={"documento"}
-          type="text"
-          minLength={"5"}
-          maxLength={"11"}
-          autoComplete="off"
-          required />
-        <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"} >
-            Consultar
-          </Button>
-        </ButtonBar>
-      </Form>
-
-        <Modal show={showModal} handleClose={handleClose}>
-          <h2 className="text-3xl mx-auto text-center mb-4"> Realizar retiro </h2>
-          <Form onSubmit={hacerRetiro} grid >
+      {cargando ? (
+        <Form onSubmit={consultarRetiroD} grid >
+          <Input
+            id={"Codigo_nit"}
+            label={"Codigo convenio"}
+            name={"Codigo_nit"}
+            autoComplete="off"
+            value={dataConvRetiro?.pk_id_convenio_directo ?? ""}
+            disabled
+            required />
+          <Input
+            id={"nombre_convenio"}
+            label={"Nombre convenio"}
+            name={"nombre_convenio"}
+            type="text"
+            value={dataConvRetiro?.nombre_convenio ?? ""}
+            autoComplete="off"
+            disabled
+            required
+          />
+          {dataConvRetiro?.referencias.map((dict, index) => {
+            return (
+              <Input
+                key={index}
+                id={1}
+                label={dict?.nombre_referencia ?? "Referencia 1"}
+                name={'referencia'+ (index + 1)}
+                type="text"
+                // minLength={dict?.length[0]}
+                // maxLength={dict?.length[1]}
+                onChange={(e)=>{setDataReferencias({...dataReferencias,[e.target.name]:e.target.value})}}
+                autoComplete="off"
+                required />
+            )
+          })}
+          <ButtonBar className={"lg:col-span-2"}>
+            <Button type={"submit"} >
+              Consultar
+            </Button>
+          </ButtonBar>
+        </Form>
+      ) : (<>cargando...</>)}
+      <Modal show={showModal} handleClose={handleClose}>
+        <h2 className="text-3xl mx-auto text-center mb-4"> Realizar retiro </h2>
+        <Form onSubmit={hacerRetiro} grid >
           <Input
             id={1}
             label={"Estado"}
@@ -110,7 +132,7 @@ const FormularioRetiro = () => {
             defaultValue={dataRetiro?.nombre_estado ?? ""}
             autoComplete="off"
             disabled
-            />
+          />
           <Input
             id={1}
             label={"Valor a retirar"}
@@ -120,16 +142,16 @@ const FormularioRetiro = () => {
             autoComplete="off"
             disabled
             required />
-            <ButtonBar>
-              <Button type={"submit"} >
-                Aceptar
-              </Button>
-              <Button onClick={()=>handleClose()} >
-                Cancelar
-              </Button>
-            </ButtonBar>
-          </Form>
-        </Modal>
+          <ButtonBar>
+            <Button type={"submit"} >
+              Aceptar
+            </Button>
+            <Button onClick={() => handleClose()} >
+              Cancelar
+            </Button>
+          </ButtonBar>
+        </Form>
+      </Modal>
 
     </Fragment>
   )

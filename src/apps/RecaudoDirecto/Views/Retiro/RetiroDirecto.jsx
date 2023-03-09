@@ -65,7 +65,7 @@ const RetiroDirecto = () => {
             })
           )}
           onSelectRow={(e, i) => {
-            navigate(`/recaudo-directo/consultar-retiro/retirar/${listRetiro[i].pk_id_convenio_directo}/${listRetiro[i].nombre_convenio}`)
+            navigate(`/recaudo-directo/consultar-retiro/retirar/${listRetiro[i].pk_id_convenio_directo}`)
           }}
           maxPage={maxPages}
           onSetPageData={setPageData}

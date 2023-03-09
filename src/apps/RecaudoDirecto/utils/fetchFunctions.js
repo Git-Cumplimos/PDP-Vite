@@ -85,9 +85,9 @@ export const getRecaudo = buildGetFunction(
 export const getRetirosList = buildGetFunction(
   `${url}/convenio-retiro/obtener-paginado`
 );
-// export const searchConveniosRetiroList = buildGetFunction(
-//   `${url}/convenio-retiro/obtener`
-// );
+export const searchConveniosRetiroList = buildGetFunction(
+  `${url}/convenio-retiro/obtener`
+);
 export const addConveniosRetiroList = buildPostFunction(
   `${url}/convenio-retiro/agregar`
 );
