@@ -342,32 +342,17 @@ const GestionArchivosRetiro = () => {
     try {
       fetchDownloadFile(url)
         .then(async (data) => {
-          const resp = await data.json()
-          console.log(resp)
-          if (resp.status){
-            notify(`${resp.msg}`)
-            const url = window.URL.createObjectURL(new Blob([resp.obj]));
+          const dataBlob = await data.blob()
+          if (dataBlob.type === 'text/csv'){
+            const file = window.URL.createObjectURL(new Blob([dataBlob]));
             const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', resp.file_name);
+            link.href = file;
+            link.setAttribute('download', `Reporte_${selected?.nombre_convenio}.csv`);
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
-          }
-          else{
-            notifyError(`${resp.msg}`)
-            handleClose()
-          }
-          // const dataBlob = await data.blob()
-          // const file = window.URL.createObjectURL(new Blob([dataBlob]));
-          // const link = document.createElement('a');
-          // link.href = file;
-          // link.setAttribute('download', `Reporte_${selected?.nombre_convenio}.csv`);
-          // document.body.appendChild(link);
-          // link.click();
-          // link.parentNode.removeChild(link);
-          // }
-          // else {notifyError(`ERROR al descargar reporte`)}
+           }          
+          else {notifyError(`ERROR al descargar reporte`);handleClose()}
         })
         .catch((e) => console.log("err", e))
     }
