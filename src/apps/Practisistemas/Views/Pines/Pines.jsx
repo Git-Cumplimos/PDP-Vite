@@ -116,36 +116,37 @@ const Pines = () => {
 
         setShowLoading(false)
         setPin(autoArr?.results ?? []);
-
-        if (autoArr.results.length == 0) {
-          navigate("../Pines/PinesContenido/CompraPin", {
-            state: {
-              desc: pines[i]["desc"],
-              op: pines[i]["op"],
-            },
-          });
-        } else {
-          navigate("../Pines/PinesContenido/InformacionPin", {
-            state: {
-              op: pines[i]["op"],
-            },
-          });
+        setPines(autoArr?.results ?? []);
+        if (i !== undefined) {
+          console.log("ESASSASASASas")
+          if (autoArr.results.length == 0) {
+            navigate("../Pines/PinesContenido/CompraPin", {
+              state: {
+                desc: pines[i]["desc"],
+                op: pines[i]["op"],
+              },
+            });
+          } else {
+            navigate("../Pines/PinesContenido/InformacionPin", {
+              state: {
+                op: pines[i]["op"],
+              },
+            });
+          }
         }
+
       })
       .catch((err) => console.error(err));
   };
 
   useEffect(() => {
     fecthTablaPines();
-  }, [datosTrans, page, limit]);
+  }, [datosTrans, page, limit, nombrePin, categoriaPin]);
 
   useEffect(() => {
     fecthTablaConveniosPaginadoFunc2();
   }, [datosTrans, page, limit, nombrePin, categoriaPin]);
 
-  useEffect(() => {
-    fecthTablaPines();
-  }, [datosTrans, page, limit, nombrePin, categoriaPin]);
 
   const fecthTablaPines = () => {
     setShowLoading(true)
@@ -153,7 +154,8 @@ const Pines = () => {
       idcomercio: roleInfo?.["id_comercio"],
       page,
       limit,
-      pin: nombrePin
+      pin: nombrePin !== undefined || nombrePin !== "" ? nombrePin : "",
+      categoria: categoriaPin
     })
       .then((autoArr) => {
         setShowLoading(false)
@@ -175,7 +177,6 @@ const Pines = () => {
         headers={["Nombre del Pin", "Categoría"]}
         data={tablePines}
         onSelectRow={onSelectAutorizador}
-
         onSetPageData={setPageData}
       >
         <Input
