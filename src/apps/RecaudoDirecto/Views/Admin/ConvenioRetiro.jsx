@@ -47,7 +47,7 @@ const RetiroDirecto = () => {
         referencia.push({
           "Nombre de Referencia": selected['referencias'][i]['nombre_referencia'],
           "Longitud minima": selected['referencias'][i]['length'][0],
-          "Longitud maxima": selected['referencias'][i]['length'][0],
+          "Longitud maxima": selected['referencias'][i]['length'][1],
         })
       }
     }
@@ -101,7 +101,16 @@ const RetiroDirecto = () => {
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
     if (body['Nombre de Referencia']) {
       delete body['Nombre de Referencia']; delete body['Longitud minima']; delete body['Longitud maxima']
-      body['referencias'] = referencias
+      let allReferencias = []
+      for (let i in referencias){
+        // console.log(referencias[i])
+        allReferencias.push({
+          "nombre_referencia": referencias[i]["Nombre de Referencia"],
+          "length": [referencias[i]["Longitud minima"], referencias[i]["Longitud maxima"],]
+        })
+      }
+      body['referencias'] = allReferencias
+      console.log(body)
     }
     // console.log(body)
     notifyPending(
