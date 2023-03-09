@@ -61,7 +61,7 @@ export const rutasRetiro = {
   permission: [PermissionsRecaudoDirecto.recaudo],
   subRoutes: [
     {
-      link: "/recaudo-directo/consultar-retiro/retirar/:pk_id_convenio/:nombre_convenio",
+      link: "/recaudo-directo/consultar-retiro/retirar/:pk_id_convenio",
       label: <AppIcons Logo={"Retiro"} name={"Realizar retiro"} />,
       component: FormularioRetiro,
       permission: [PermissionsRecaudoDirecto.recaudo],

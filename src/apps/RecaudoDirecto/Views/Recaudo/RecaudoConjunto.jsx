@@ -15,8 +15,12 @@ const RecaudoConjunto = () => {
   const [showModal, setShowModal] = useState(false)
   const [dataRecaudo, setDataRecaudo] = useState('')
   const [cargando, setCargando] = useState(false)
-  const [referencia, setReferencia] = useState('')
+  // const [referencia, setReferencia] = useState('')
   const [convenioRetiro, setConvenioRetiro] = useState(null);
+  const [dataReferencias,setDataReferencias] = useState({
+    referencia1: '',
+    referencia2: ''
+  }) 
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -38,8 +42,9 @@ const RecaudoConjunto = () => {
   const consultarRecaudoD = useCallback(async (e) => {
     e.preventDefault()
     await getRecaudo({
+      ...dataReferencias,
       convenio_id: pk_id_convenio,
-      referencia: e.target.referencia.value
+      
     })
       .then((data) => {
         console.log(data)
@@ -52,7 +57,7 @@ const RecaudoConjunto = () => {
         handleClose()
       });
 
-  }, [pk_id_convenio,handleClose])
+  }, [pk_id_convenio,dataReferencias,handleClose])
 
   const hacerRecaudo = (e) => {
     e.preventDefault()
@@ -89,7 +94,22 @@ const RecaudoConjunto = () => {
             autoComplete='off'
             disabled
           />
-          <Input
+          {convenioRetiro?.referencias.map((dict, index) => {
+            return (
+              <Input
+                key={index}
+                id={1}
+                label={dict?.nombre_referencia ?? "Referencia 1"}
+                name={'referencia'+ (index + 1)}
+                type="text"
+                // minLength={dict?.length[0]}
+                // maxLength={dict?.length[1]}
+                onChange={(e)=>{setDataReferencias({...dataReferencias,[e.target.name]:e.target.value})}}
+                autoComplete="off"
+                required />
+            )
+          })}
+          {/* <Input
             label='Factura/Referencia'
             name={"referencia"}
             type='text'
@@ -97,7 +117,7 @@ const RecaudoConjunto = () => {
             onChange={(e) => { setReferencia(e.target.value) }}
             autoComplete='off'
             required
-          />
+          /> */}
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"}>
               Realizar consulta
