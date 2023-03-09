@@ -15,7 +15,7 @@ const filterExtraDigit = (data, digits = 0) => {
 
 const useMoney = ({
   limits = [0, 10000000],
-  equalError = true,
+  equalError = false,
   decimalDigits = 0,
 }) => {
   const onChangeMoney = useCallback(
