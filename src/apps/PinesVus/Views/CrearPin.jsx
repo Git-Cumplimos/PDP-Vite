@@ -990,21 +990,39 @@ const CrearPin = () => {
               ev.preventDefault()
               
              if (showTramiteAdicional==false&&!isNaN(tramite)&&categoria!=""){
+
+              setOptionsTramites2([...(optionsTramites)])
               
-              if(!isNaN(tramite)&&tramite!="3"&&tramite!="4"&&tramite!="5"&&tramite!="6"){
+             //if(!isNaN(tramite)&&tramite!="3"&&tramite!="4"&&tramite!="5"&&tramite!="6"){
+              if(!isNaN(tramite)){
                 setShowTramiteAdicional(true)
               settxtButtonTramiteAdicional("- Suprimir Segundo Trámite")
-                if(tramite=="1"||tramite=="2"){
-                  setOptionsTramites2([...(optionsTramites.slice(6,10))])
-                }else if(tramite=="7"||tramite=="8"){
-                  setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(8,10))])
-                }else if(tramite=="9"||tramite=="10"){
-                  setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(6,8))])
+                if(tramite=="1"){
+                  setOptionsTramites2([...(optionsTramites.slice(1,2)),...(optionsTramites.slice(3,4)),...(optionsTramites.slice(5,10))])
+                }else if(tramite=="2"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,1)),...(optionsTramites.slice(2,3)),...(optionsTramites.slice(4,5)),...(optionsTramites.slice(6,10))])
+                }else if(tramite=="3"){
+                  setOptionsTramites2([...(optionsTramites.slice(1,2)),...(optionsTramites.slice(3,4)),...(optionsTramites.slice(5,6)),...(optionsTramites.slice(7,8)),...(optionsTramites.slice(9,10))])
+                }else if(tramite=="4"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,1)),...(optionsTramites.slice(2,3)),...(optionsTramites.slice(4,5)),...(optionsTramites.slice(6,7)),...(optionsTramites.slice(8,9))])
+                }else if(tramite=="5"){
+                  setOptionsTramites2([...(optionsTramites.slice(1,2)),...(optionsTramites.slice(3,4)),...(optionsTramites.slice(5,6)),...(optionsTramites.slice(7,8)),...(optionsTramites.slice(9,10))])
+                }else if(tramite=="6"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,1)),...(optionsTramites.slice(2,3)),...(optionsTramites.slice(4,5)),...(optionsTramites.slice(6,7)),...(optionsTramites.slice(8,9))])
+                }else if(tramite=="7"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(3,4)),...(optionsTramites.slice(5,6)),...(optionsTramites.slice(7,10))])
+                }else if(tramite=="8"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,3)),...(optionsTramites.slice(4,5)),...(optionsTramites.slice(6,7)),...(optionsTramites.slice(8,10))])
+                }else if(tramite=="9"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,2)),...(optionsTramites.slice(3,4)),...(optionsTramites.slice(5,8)),...(optionsTramites.slice(9,10))])
+                }else if(tramite=="10"){
+                  setOptionsTramites2([...(optionsTramites.slice(0,3)),...(optionsTramites.slice(4,5)),...(optionsTramites.slice(6,9))])
                 }
                 else{
                   setOptionsTramites2([])
                 }
-            }
+                
+           }
                 }
               else{
                 setShowTramiteAdicional(false)

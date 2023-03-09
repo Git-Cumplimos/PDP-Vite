@@ -154,11 +154,10 @@ const CompraPin = () => {
         });
     }
   };
-
   const [infTicket, setInfTicket] = useState({
     title: "Recibo de pago",
     timeInfo: {
-      "Fecha de venta": "",
+      "Fecha de pago": "",
       Hora: "",
     },
     commerceInfo: [
@@ -169,10 +168,13 @@ const CompraPin = () => {
       ["Dirección", roleInfo.direccion],
       ["", ""],
     ],
-    commerceName: "VENTA PINES DE CONTENIDO",
+    commerceName:
+      state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+        ? "VENTA PINES DE SERVICIO"
+        : "VENTA PINES DE CONTENIDO",
     trxInfo: [],
     disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
   });
 
   const onChangeMoney = useMoney({
@@ -270,41 +272,41 @@ const CompraPin = () => {
     }).format(new Date());
     const newVoucher = { ...infTicket };
 
-    newVoucher["timeInfo"]["Fecha de venta"] = fecha;
+    newVoucher["timeInfo"]["Fecha de pago"] = fecha;
 
     newVoucher["timeInfo"]["Hora"] = hora;
 
-    newVoucher["trxInfo"][0] = ["Nombre del Pin", state.desc];
+    newVoucher["trxInfo"][0] = ["Convenio", state.desc];
 
     if (state?.op == "cb") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular", toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
+      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(consultaDatosSNR?.valorPin),];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor del Pin", formatMoney.format(consultaDatosSNR?.valorPin),];
+      newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
       newVoucher["trxInfo"][7] = ["", ""];
     } else if (state?.op == "em") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular", toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Contador", inputContador];
+      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor del Pin", formatMoney.format(inputValor),];
+      newVoucher["trxInfo"][4] = ["Contador", inputContador];
       newVoucher["trxInfo"][7] = ["", ""];
     } else if (state?.op == "hv") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular", toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
       newVoucher["trxInfo"][4] = ["Placa", inputPlaca];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor del Pin", formatMoney.format(inputValor),];
+      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
       newVoucher["trxInfo"][7] = ["", ""];
     } else {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular", toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Valor del Pin", formatMoney.format(state.sell ? state.sell : inputValor),];
+      newVoucher["trxInfo"][4] = ["Valor", formatMoney.format(state.sell ? state.sell : inputValor),];
       newVoucher["trxInfo"][5] = ["", ""];
     }
     fetchData(
@@ -327,7 +329,7 @@ const CompraPin = () => {
             : state.sell
               ? state.sell
               : inputValor,
-        celular: state?.op == "em" ? inputContador : inputCelular,
+        celular: state?.op == "em" ? inputContador.toString() : inputCelular,
         operador: state?.op,
         valor:
           state?.op == "cb"
@@ -339,16 +341,11 @@ const CompraPin = () => {
           placaVh: inputPlaca,
         } : state?.op == "em" ? {
           telEnvio: inputCelular,
-        } : state?.op == "nx" ? {
         } : state?.op == "cb" ? {
           circulo: inputCirculo,
           matricula: inputMatricula,
         } : {
-          nombre_usuario: userInfo?.attributes?.name,
-          // id_uuid_trx: uniqueId,
-          telEnvio: inputCelular,
-          circulo: inputCirculo,
-          matricula: inputMatricula,
+
         },
         ticket: newVoucher,
       },
@@ -357,13 +354,11 @@ const CompraPin = () => {
       60000
     )
       .then(async (res) => {
-        console.log("ESTO ES EL RES###", res)
         if (res?.status == true) {
           notify("Venta exitosa");
           setShowLoading(false);
           VentaExitosa(res?.obj?.response, fecha, hora);
         } else {
-          console.log("ENTRO AL ELSE")
           if (res?.message === "Endpoint request timed out") {
             notify("Se está procesando la transacción");
             setShowLoading(true);
@@ -375,7 +370,6 @@ const CompraPin = () => {
             }).format(today);
 
             for (let i = 0; i <= 8; i++) {
-              console.log("ENTRO A ESTE FOR 1")
               try {
                 const promesa = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -386,7 +380,6 @@ const CompraPin = () => {
                       id_uuid_trx: uniqueId,
                     })
                       .then((res) => {
-                        console.log("Esto es es res linea 414", res);
                         if (res?.msg !== "No ha terminado el reintento") {
                           if (
                             res?.status === true ||
@@ -449,9 +442,7 @@ const CompraPin = () => {
             setInputValor(0);
           }
         }
-        console.log("ESTO ES EL RES pero llegó al final###", res)
       }).catch(async (err) => {
-        console.log("al catch", err)
         notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
         setShowLoading(false);
         handleClose();
@@ -464,11 +455,10 @@ const CompraPin = () => {
       const pin = result_?.jsonAdicional?.info;
       var hiddenPin = '******' + pin.substring(6);
     }
-
     const voucher = {
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de venta": fecha,
+        "Fecha de pago": fecha,
         Hora: hora,
       },
       commerceInfo: [
@@ -498,6 +488,14 @@ const CompraPin = () => {
         ["", ""],
         ["No. Celular", toPhoneNumber(inputCelular)],
         ["", ""],
+        state?.op == "cb"
+          ? ["Matrícula", inputMatricula]
+          : state?.op == "hv"
+            ? ["Placa", inputPlaca]
+            : state?.op == "em"
+              ? ["Contador", inputContador]
+              : [],
+        ["", ""],
         ["Valor",
           formatMoney.format(
             state.sell
@@ -507,17 +505,9 @@ const CompraPin = () => {
                 : inputValor
           ),],
         ["", ""],
-        state?.op == "cb"
-          ? ["Matrícula", inputMatricula]
-          : state?.op == "hv"
-            ? ["Placa", inputPlaca]
-            : state?.op == "em"
-              ? ["Contador", inputContador]
-              : [],
-        ["", ""],
       ],
       disclamer:
-        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
     };
     setTypeInfo("VentaExitosa");
     setInfTicket(voucher);
@@ -550,7 +540,7 @@ const CompraPin = () => {
     setInfTicket({
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de venta": "",
+        "Fecha de pago": "",
         Hora: "",
       },
       commerceInfo: [
@@ -561,10 +551,13 @@ const CompraPin = () => {
         ["Dirección", roleInfo.direccion],
         ["", ""],
       ],
-      commerceName: "VENTA PINES DE CONTENIDO",
+      commerceName:
+        state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+          ? "VENTA PINES DE SERVICIO"
+          : "VENTA PINES DE CONTENIDO",
       trxInfo: [],
       disclamer:
-        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
     });
     validNavigate("/Pines/PinesContenido");
   }, []);
@@ -597,7 +590,7 @@ const CompraPin = () => {
   return (
     <Fragment>
       <SimpleLoading show={showLoading} />
-      <h1 className="text-3xl mt-6">Compra Pin: {state?.desc} </h1>
+      <h1 className="text-3xl mt-6">Compra Pin: {state?.desc == "Certificado TL" ? "Certificado de Tradición y Libertad (SNR)" : state?.desc} </h1>
       <Form onSubmit={onSubmitCheck} grid>
         {state?.op == "cb" ? (
           <>
@@ -643,7 +636,7 @@ const CompraPin = () => {
             <Input
               name="contador"
               label="Número de contador"
-              type="num"
+              type="text"
               autoComplete="off"
               minLength={"10"}
               maxLength={"20"}
@@ -766,11 +759,15 @@ const CompraPin = () => {
                   <label className="font-medium ml-20">{`${consultaDatosSNR?.matricula}`}</label>
                 </div>
                 <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Círculo:`}</label>
+                  <label className="font-medium ml-20">{`${inputCirculo}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
                   <label className="font-semibold text-xl">{`Municipio:`}</label>
                   <label className="font-medium ml-20">{`${consultaDatosSNR?.municipio}`}</label>
                 </div>
                 <div className={contenedorTitulos}>
-                  <label className="font-semibold text-xl">{`Valor del Pin :`}</label>
+                  <label className="font-semibold text-xl">{`Valor :`}</label>
                   <label className="font-medium ml-20">{`${formatMoney.format(
                     consultaDatosSNR?.valorPin
                   )}`}</label>

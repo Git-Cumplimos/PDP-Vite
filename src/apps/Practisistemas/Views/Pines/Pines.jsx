@@ -53,8 +53,8 @@ const Pines = () => {
         return categoriaMatchFilter && nombreMatch;
       }).map(({ desc, op }) => {
         return {
-          "Nombre del Pin": desc,
-          "Categoría": op == "em" || op == "cb" || op == "hv" ? "Pin de Servicio" : "Pin de Contenido"
+          "Nombre del Pin": op == "cb" ? "Certificado de Tradición y Libertad (SNR)" : desc,
+          "Categoría": op == "em" || op == "cb" || op == "hv" ? "Pin de Servicio" : "Pin de Contenido",
         };
       }),
     ];
@@ -62,10 +62,49 @@ const Pines = () => {
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      fecthTablaConveniosPaginadoFunc2(pines[i]["op"], i);
+      const nombrePin = tablePines[i]["Nombre del Pin"] == "Certificado de Tradición y Libertad (SNR)" ? "Certificado TL" : tablePines[i]["Nombre del Pin"];
+      const index = pines.findIndex(pin => pin.desc === nombrePin);
+      // console.log("*******ACAAAAAAAAA, pines[index].op", pines[index].op)
+      if (index !== -1) {
+        fecthTablaConveniosPaginadoFunc2(pines[index].op, index);
+      }
     },
-    [navigate, pines]
+    [navigate, pines, tablePines]
   );
+
+  // const onSelectAutorizador = useCallback(
+  //   (e, i) => {
+  //     fecthTablaConveniosPaginadoFunc2(pines[i]["op"], i);
+  //   },
+  //   [navigate, pines, tablePines]
+  // );
+  // const onSelectAutorizador = useCallback(
+  //   (e, i) => {
+  //     const filteredIndex = tablePines.findIndex((pin) => pin["Nombre del Pin"] === pines[i]["desc"] && pin["Categoría"] === (pines[i]["op"] == "em" || pines[i]["op"] == "cb" || pines[i]["op"] == "hv" ? "Pin de Servicio" : "Pin de Contenido"));
+  //     fecthTablaConveniosPaginadoFunc2(pines[i]["op"], filteredIndex);
+  //   },
+  //   [navigate, pines, tablePines]
+  // );
+  // const onSelectAutorizador = useCallback(
+  //   (e, i) => {
+  //     console.log("*******", tablePines[i])
+  //     console.log("*******tablePines[i][op]", tablePines[i]["op"])
+  //     console.log("*******i", i)
+  //     const selectedPin = tablePines[i];
+  //     fecthTablaConveniosPaginadoFunc2(selectedPin["op"], i);
+  //   },
+  //   [navigate, tablePines]
+  // );
+
+  // const onSelectAutorizador = useCallback(
+  //   (e, i) => {
+  //     const selectedPin = tablePines.find(pin => pin["Nombre del Pin"] === pines[i]["desc"]);
+  //     if (selectedPin) {
+  //       fecthTablaConveniosPaginadoFunc2(selectedPin["Nombre del Pin"], selectedPin["Categoría"]);
+  //     }
+  //   },
+  //   [navigate, pines, tablePines]
+  // );
 
   const fecthTablaConveniosPaginadoFunc2 = (op, i) => {
     setShowLoading(true)
@@ -77,32 +116,37 @@ const Pines = () => {
 
         setShowLoading(false)
         setPin(autoArr?.results ?? []);
-
-        if (autoArr.results.length == 0) {
-          navigate("../Pines/PinesContenido/CompraPin", {
-            state: {
-              desc: pines[i]["desc"],
-              op: pines[i]["op"],
-            },
-          });
-        } else {
-          navigate("../Pines/PinesContenido/InformacionPin", {
-            state: {
-              op: pines[i]["op"],
-            },
-          });
+        setPines(autoArr?.results ?? []);
+        if (i !== undefined) {
+          console.log("ESASSASASASas")
+          if (autoArr.results.length == 0) {
+            navigate("../Pines/PinesContenido/CompraPin", {
+              state: {
+                desc: pines[i]["desc"],
+                op: pines[i]["op"],
+              },
+            });
+          } else {
+            navigate("../Pines/PinesContenido/InformacionPin", {
+              state: {
+                op: pines[i]["op"],
+              },
+            });
+          }
         }
+
       })
       .catch((err) => console.error(err));
   };
 
   useEffect(() => {
     fecthTablaPines();
-  }, [datosTrans, page, limit]);
+  }, [datosTrans, page, limit, nombrePin, categoriaPin]);
 
   useEffect(() => {
-    fecthTablaPines();
-  }, [datosTrans, page, limit]);
+    fecthTablaConveniosPaginadoFunc2();
+  }, [datosTrans, page, limit, nombrePin, categoriaPin]);
+
 
   const fecthTablaPines = () => {
     setShowLoading(true)
@@ -110,10 +154,10 @@ const Pines = () => {
       idcomercio: roleInfo?.["id_comercio"],
       page,
       limit,
-      pin: datosTrans.pin
+      pin: nombrePin !== undefined || nombrePin !== "" ? nombrePin : "",
+      categoria: categoriaPin
     })
       .then((autoArr) => {
-        console.log("ESTO ES AUTOARR de fecthTablaPines", autoArr)
         setShowLoading(false)
         setMaxPages(autoArr?.maxPages);
         setPines(autoArr?.results ?? []);
