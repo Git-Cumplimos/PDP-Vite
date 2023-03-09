@@ -84,7 +84,8 @@ const Deposito = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-  }, []);
+    navigate("/corresponsalia/colpatria");
+  }, [navigate]);
 
   const onMakePayment = useCallback(
     (ev) => {

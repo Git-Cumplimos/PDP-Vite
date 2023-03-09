@@ -276,7 +276,7 @@ const CompraPin = () => {
 
     newVoucher["timeInfo"]["Hora"] = hora;
 
-    newVoucher["trxInfo"][0] = ["Convenio", state.desc];
+    newVoucher["trxInfo"][0] = ["Convenio", state.desc == "Certificado TL" ? "Certificado (SNR)" : state.desc];
 
     if (state?.op == "cb") {
       newVoucher["trxInfo"][1] = ["", ""];
@@ -476,7 +476,7 @@ const CompraPin = () => {
           ? "VENTA PINES DE SERVICIO"
           : "VENTA PINES DE CONTENIDO",
       trxInfo: [
-        ["Convenio", state.desc],
+        ["Convenio", state.desc == "Certificado TL" ? "Certificado (SNR)" : state.desc],
         ["", ""],
         state?.op == "em"
           ? ["No. PIN", result_?.jsonAdicional?.["Numero Pin"]]
