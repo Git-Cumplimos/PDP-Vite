@@ -49,14 +49,22 @@ const Pines = () => {
 
     // Transformamos los datos de la página actual
     return currentPagePines.map((pin) => ({
+<<<<<<< HEAD
       NombrePin: pin?.op === "cb" ? "Certificado de Tradición y Libertad (SNR)" : pin?.desc,
+=======
+      NombrePin: pin?.op === "cb" ? "Certificado de Tradición y Libertad (SNR)" : pin?.op === "hv" ? "Histórico Vehicular" : pin?.desc,
+>>>>>>> Fix/QA-Practisistemas-Inci
       CategoriaPin: pin?.op === "hv" || pin?.op === "em" || pin?.op === "cb" ? "Pin de Servicio" : "Pin de Contenido",
     }));
   }, [nombrePin, categoriaPin, pines, page, limit]);
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
+<<<<<<< HEAD
       const nombrePin = tablePines[i]["NombrePin"] == "Certificado de Tradición y Libertad (SNR)" ? "Certificado TL" : tablePines[i]["NombrePin"]
+=======
+      const nombrePin = tablePines[i]["NombrePin"] == "Certificado de Tradición y Libertad (SNR)" ? "Certificado TL" : tablePines[i]["NombrePin"] == "Histórico Vehicular" ? "Historico Vehicular" : tablePines[i]["NombrePin"]
+>>>>>>> Fix/QA-Practisistemas-Inci
       const index = pines.findIndex(pin => pin?.desc === nombrePin);
       if (index !== -1) {
         fecthTablaConveniosPaginadoFunc2(pines[index]["op"], index);
