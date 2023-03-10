@@ -255,13 +255,9 @@ export const useProvidePinesVus = () => {
   const registroPagoParticipacion = useCallback(async (
     participante, 
     id_pago,
-    // banco, 
-    // num_cuenta, 
-    // num_aprobacion,
-    // num_transaccion, 
     valor,
-    fecha_participacion
-    // voucher
+    fecha_participacion,
+    ticket
     ) => {
     let tipo_comercio = roleInfo.tipo_comercio
     if (roleInfo?.tipo_comercio === "KIOSCO"){
@@ -270,18 +266,14 @@ export const useProvidePinesVus = () => {
     const body = {
       participante: participante, 
       id_pago: id_pago,
-      // banco: banco, 
-      // num_cuenta: num_cuenta, 
-      // num_aprobacion: num_aprobacion,
-      // num_transaccion: num_transaccion, 
       valor: valor,
       fecha_participacion: fecha_participacion,
-      // voucher: voucher,
       Usuario: roleInfo?.id_usuario,
       Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
       nombre_usuario: pdpUser?.uname ?? "",
       Tipo: tipo_comercio,
+      ticket: ticket
     };
     try {
       const res = await fetchData(urls.registroPagoParticipacion, "POST", {}, body);
