@@ -323,7 +323,7 @@ export const useProvideLoteria = () => {
   );
   
   const sellLoteria = useCallback(
-    async (sorteo, ticket, tipoPago) => {
+    async (sorteo, selecFrac, ticket, tipoPago) => {
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -344,6 +344,7 @@ export const useProvideLoteria = () => {
         cod_distribuidor: codigosOficina?.cod_oficina_lot,
         cod_sucursal: codigosOficina?.cod_sucursal_lot,
         can_frac_venta: parseInt(customer.fracciones),
+        frac_virtual_venta: selecFrac,
         can_fracciones: parseInt(selected.Fracciones_disponibles),
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,

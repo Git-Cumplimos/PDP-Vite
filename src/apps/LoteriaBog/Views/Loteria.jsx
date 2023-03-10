@@ -280,6 +280,7 @@ const Loteria = ({ route }) => {
     };
   }, [roleInfo, sellResponse]
   );
+  
   return (
     <>
       <h1 className="text-3xl mt-6">Venta {nom_loteria} </h1>
@@ -506,7 +507,7 @@ const Loteria = ({ route }) => {
             handleSubmit={(event) => {
               sorteo.split("-")[1] === "true"
                 ? sellLoteriafisica(sorteo, selecFrac, tipoPago, ticket)
-                : sellLoteria(sorteo, ticket, tipoPago);
+                : sellLoteria(sorteo, selecFrac, ticket, tipoPago);
             }}
           />
         ) : (
