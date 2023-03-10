@@ -5,8 +5,10 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { notify, notifyError,  } from "../../../../utils/notify";
-import { getRecaudosList } from "../../utils/fetchFunctions"
+import { notify, notifyError, } from "../../../../utils/notify";
+import { getRecaudosList, downloadFile } from "../../utils/fetchFunctions"
+import { ExportToCsv } from "export-to-csv";
+
 
 export const fetchImportFile = async (url, body) => {
   try {
@@ -21,24 +23,13 @@ export const fetchImportFile = async (url, body) => {
     throw error;
   }
 };
-export const fetchDownloadFile = async (url) => {
-  try {
-    const Peticion = await fetch(url, {
-      method: "GET",
-      mode: "cors",
-    });
-    return Peticion;
-  } catch (error) {
-    throw error;
-  }
-};
 
 const GestionArchivosRecaudo = () => {
   const [showModal, setShowModal] = useState(false)
   const [showMainModal, setShowMainModal] = useState(false)
   const [showModalOptions, setShowModalOptions] = useState(false)
   const [selected, setSelected] = useState(false); // fila selecionada
-  
+
   const [listRecaudos, setListRecaudos] = useState('')
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
@@ -99,16 +90,34 @@ const GestionArchivosRecaudo = () => {
 
     handleClose()
   }, [handleClose, file, selected])
-  
+
   const DescargarArchivo = useCallback(async (e) => {
-    const url = `http://127.0.0.1:8000/convenio-recaudo/descargar_reporte?convenio_id=${selected.pk_id_convenio_directo}`;
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
     try {
-      fetchDownloadFile(url)
-        .then(async (data) => {
-          // const resp = await data.json()
-          // console.log(resp)
-          // if (resp.status){
+      downloadFile({...body,convenio_id:selected.pk_id_convenio_directo})
+      .then(async (res) => {
+        if (res.codigo) throw res.msg
+        const options = {
+          fieldSeparator: ";",
+          quoteStrings: '"',
+          decimalSeparator: ",",
+          showLabels: true,
+          showTitle: false,
+          title: `Reporte_${selected?.nombre_convenio}`,
+          useTextFile: false,
+          useBom: true,
+          useKeysAsHeaders: false,
+          filename: `Reporte_${selected?.nombre_convenio}`,
+        };
+        const csvExporter = new ExportToCsv(options);
+        const data = JSON.stringify(res)
+        csvExporter.generateCsv(data);
+        
+        // const resp = await data.json()
+        // console.log(resp)
+        // if (resp.status){
           //   notify(`${resp.msg}`)
           //   const url = window.URL.createObjectURL(new Blob([resp.obj]));
           //   const link = document.createElement('a');
@@ -119,22 +128,23 @@ const GestionArchivosRecaudo = () => {
           //   link.parentNode.removeChild(link);
           // }
           // else{
-          //   notifyError(`${resp.msg}`)
-          //   handleClose()
+            //   notifyError(`${resp.msg}`)
+            //   handleClose()
+            // }
+
+          // const dataBlob = await data.blob()
+          // if (dataBlob.type === 'text/csv') {
+          //   const file = window.URL.createObjectURL(new Blob([dataBlob]));
+          //   const link = document.createElement('a');
+          //   link.href = file;
+          //   link.setAttribute('download', `Reporte_${selected?.nombre_convenio}.csv`);
+          //   document.body.appendChild(link);
+          //   link.click();
+          //   link.parentNode.removeChild(link);
           // }
-          const dataBlob = await data.blob()
-          if (dataBlob.type === 'text/csv'){
-            const file = window.URL.createObjectURL(new Blob([dataBlob]));
-            const link = document.createElement('a');
-            link.href = file;
-            link.setAttribute('download', `Reporte_${selected?.nombre_convenio}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-           }          
-          else {notifyError(`ERROR al descargar reporte`);handleClose()}
+          // else { notifyError(`ERROR al descargar reporte`); handleClose() }
         })
-        .catch((e) => console.log("err", e))
+        .catch((e) => {notifyError(e); handleClose()} )
     }
     catch (e) { console.log(e) }
 
@@ -219,8 +229,8 @@ const GestionArchivosRecaudo = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">Gestion de archivos de recaudo</h2>
         <ButtonBar>
-          <Button onClick={()=>{setShowMainModal(true);setShowModalOptions(true)}}>Cargar Archivo</Button>
-          <Button onClick={()=>{setShowMainModal(true)}}>Descargar Reporte</Button>
+          <Button onClick={() => { setShowMainModal(true); setShowModalOptions(true) }}>Cargar Archivo</Button>
+          <Button onClick={() => { setShowMainModal(true) }}>Descargar Reporte</Button>
         </ButtonBar>
       </Modal>
       <Modal show={showMainModal} handleClose={handleClose}>
@@ -237,8 +247,34 @@ const GestionArchivosRecaudo = () => {
               required
             />
           )}
+          {!showModalOptions && (
+            <>
+              <Input
+                // label='Seleccionar Archivo'
+                type='date'
+                autoComplete='off'
+                name={"fecha_inicial"}
+                label={"Fecha inicial"}
+                // onChange={(e) => {
+                //   setFile(e.target.files[0]);
+                // }}
+                required
+              />
+              <Input
+                // label='Seleccionar Archivo'
+                type='date'
+                autoComplete='off'
+                name={"fecha_final"}
+                label={"Fecha final"}
+                // onChange={(e) => {
+                //   setFile(e.target.files[0]);
+                // }}
+                required
+              />
+            </>
+          )}
           <ButtonBar>
-            <Button type="submit">{showModalOptions ? "Cargar Archivo" : "Descargar Reporte" }</Button>
+            <Button type="submit">{showModalOptions ? "Cargar Archivo" : "Descargar Reporte"}</Button>
           </ButtonBar>
         </Form>
       </Modal>

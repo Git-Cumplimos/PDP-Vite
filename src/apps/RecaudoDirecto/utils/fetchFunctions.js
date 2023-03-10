@@ -97,3 +97,28 @@ export const modConveniosRetiroList = buildPutFunction(
 export const getRetiro = buildGetFunction(
   `${url}/convenio-retiro/obtener-retiro`
 );
+const fetchDownloadFile = (url) => {
+  return async (args = {}) => {
+    try {
+      const Peticion = await fetchData(url, 'GET', args);
+      return Peticion;
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+// const fetchDownloadFile = (url) => {
+//   return async (args={})=> {
+//     try {
+//       console.log("ARGUMENTOS",url,args)
+//       const Peticion = await fetch(url+`?convenio_id=${args.convenio_id}&fecha_inicial=${args['Fecha inicial']}&fecha_final=${args['Fecha final']}`);
+//       return Peticion;
+//     } catch (error) {
+//       throw error;
+//     }
+//   }
+// };
+
+export const downloadFile = fetchDownloadFile(
+  `${url}/convenio-recaudo/descargar_reporte`
+);
