@@ -6,7 +6,7 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notify, notifyError, } from "../../../../utils/notify";
-import { getRecaudosList, downloadFile } from "../../utils/fetchFunctions"
+import { getRecaudosList, downloadFileRecaudo } from "../../utils/fetchFunctions"
 import { ExportToCsv } from "export-to-csv";
 
 
@@ -96,7 +96,7 @@ const GestionArchivosRecaudo = () => {
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
     try {
-      downloadFile({...body,convenio_id:selected.pk_id_convenio_directo})
+      downloadFileRecaudo({...body,convenio_id:selected.pk_id_convenio_directo})
       .then(async (res) => {
         if (res.codigo) throw res.msg
         const options = {
@@ -250,7 +250,7 @@ const GestionArchivosRecaudo = () => {
           {!showModalOptions && (
             <>
               <Input
-                // label='Seleccionar Archivo'
+
                 type='date'
                 autoComplete='off'
                 name={"fecha_inicial"}
@@ -261,7 +261,6 @@ const GestionArchivosRecaudo = () => {
                 required
               />
               <Input
-                // label='Seleccionar Archivo'
                 type='date'
                 autoComplete='off'
                 name={"fecha_final"}

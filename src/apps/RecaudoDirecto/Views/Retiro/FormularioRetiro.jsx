@@ -33,9 +33,8 @@ const FormularioRetiro = () => {
   const getData = useCallback(async () => {
     try {
       let rest = await searchConveniosRetiroList({ convenio_id: pk_id_convenio })
-        
         .then((rest) => { return rest })
-      if (rest.length < 1) { throw "no hay datos" }
+      if (rest.length < 1) throw "no hay datos" 
       setDataConvRetiro(rest?.obj)
       setCargando(true)
     } catch (e) {

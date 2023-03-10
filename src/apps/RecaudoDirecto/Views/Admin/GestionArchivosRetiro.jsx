@@ -243,7 +243,9 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notify } from "../../../../utils/notify";
-import { getRetirosList } from "../../utils/fetchFunctions"
+import { getRetirosList, downloadFileRetiro } from "../../utils/fetchFunctions"
+import { ExportToCsv } from "export-to-csv";
+
 
 export const fetchImportFile = async (url, body) => {
   try {
@@ -254,17 +256,6 @@ export const fetchImportFile = async (url, body) => {
     });
     const res = await Peticion.json()
     return res;
-  } catch (error) {
-    throw error;
-  }
-};
-export const fetchDownloadFile = async (url) => {
-  try {
-    const Peticion = await fetch(url, {
-      method: "GET",
-      mode: "cors",
-    });
-    return Peticion;
   } catch (error) {
     throw error;
   }
@@ -337,24 +328,32 @@ const GestionArchivosRetiro = () => {
     handleClose()
   }, [handleClose, file, selected])
   const DescargarArchivo = useCallback(async (e) => {
-    const url = `http://127.0.0.1:8000/convenio-retiro/descargar_reporte?convenio_id=${selected.pk_id_convenio_directo}`;
+    const formData = new FormData(e.currentTarget);
+    const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    
+    // const url = `http://127.0.0.1:8000/convenio-retiro/descargar_reporte?convenio_id=${selected.pk_id_convenio_directo}`;
     e.preventDefault();
     try {
-      fetchDownloadFile(url)
-        .then(async (data) => {
-          const dataBlob = await data.blob()
-          if (dataBlob.type === 'text/csv'){
-            const file = window.URL.createObjectURL(new Blob([dataBlob]));
-            const link = document.createElement('a');
-            link.href = file;
-            link.setAttribute('download', `Reporte_${selected?.nombre_convenio}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-           }          
-          else {notifyError(`ERROR al descargar reporte`);handleClose()}
+      downloadFileRetiro({...body,convenio_id:selected.pk_id_convenio_directo})
+      .then(async (res) => {
+        if (res.codigo) throw res.msg
+        const options = {
+          fieldSeparator: ";",
+          quoteStrings: '"',
+          decimalSeparator: ",",
+          showLabels: true,
+          showTitle: false,
+          title: `Reporte_${selected?.nombre_convenio}`,
+          useTextFile: false,
+          useBom: true,
+          useKeysAsHeaders: false,
+          filename: `Reporte_${selected?.nombre_convenio}`,
+        };
+        const csvExporter = new ExportToCsv(options);
+        const data = JSON.stringify(res)
+        csvExporter.generateCsv(data);
         })
-        .catch((e) => console.log("err", e))
+        .catch((e) => {notifyError(e); handleClose()} )
     }
     catch (e) { console.log(e) }
 
@@ -456,6 +455,31 @@ const GestionArchivosRetiro = () => {
               }}
               required
             />
+          )}
+           {!showModalOptions && (
+            <>
+              <Input
+
+                type='date'
+                autoComplete='off'
+                name={"fecha_inicial"}
+                label={"Fecha inicial"}
+                // onChange={(e) => {
+                //   setFile(e.target.files[0]);
+                // }}
+                required
+              />
+              <Input
+                type='date'
+                autoComplete='off'
+                name={"fecha_final"}
+                label={"Fecha final"}
+                // onChange={(e) => {
+                //   setFile(e.target.files[0]);
+                // }}
+                required
+              />
+            </>
           )}
           <ButtonBar>
             <Button type="submit">{showModalOptions ? "Cargar Archivo" : "Descargar Reporte"}</Button>
