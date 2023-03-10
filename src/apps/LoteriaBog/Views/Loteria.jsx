@@ -445,7 +445,7 @@ const Loteria = ({ route }) => {
         <>
           <Table
             headers={[
-              "Numero",
+              "Número",
               "Serie",
               "Fracciones disponibles",
               // "Valor por fraccion",
