@@ -122,7 +122,7 @@ const TramitePines = () => {
     // };
     consultaPinesVus("", "", "", "", "", parametroBusqueda,pageData,1)
       .then((res) => {
-        console.log(res)
+        //console.log(res)
         setInfo(res);
         setDisabledBtn(false);
         if (!res?.status) {

@@ -200,7 +200,7 @@ export const useProvidePinesVus = () => {
       }
       try {
         const res = await fetchData(urls.PinVus, "GET", query);
-        console.log(query)
+        //console.log(query)
         return res;
       } catch (err) {
         throw err;
@@ -404,7 +404,7 @@ export const useProvidePinesVus = () => {
       const query = { doc_cliente : doc_cliente, reenviarFormulario : reenviarFormulario };
       try {
         const res = await fetchData(urls.reenvioHash, "GET", query);
-        console.log(res)
+        //console.log(res)
         return res;
       } catch (err) {
         throw err;
