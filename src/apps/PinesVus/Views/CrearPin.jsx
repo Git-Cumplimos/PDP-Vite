@@ -320,6 +320,7 @@ const CrearPin = () => {
   
     consultaTramite()
     .then((res) => {
+      //console.log(res)
       setDisabledBtns(false);
       if (!res?.status) {
         notifyError(res?.msg);
@@ -955,8 +956,8 @@ const CrearPin = () => {
                 setShowPinLicencia(false)
                 setTipoPin("")
                 setDisabledBtns(false)
-                console.log(resp)
-              }else{
+               // console.log(resp)
+              }else{               // console.log(resp)
                 if(e.target.value=="1"){
                   setShowPinLicencia(true)
                   setShowTramiteAdicional(false)
@@ -971,16 +972,12 @@ const CrearPin = () => {
                 setDisabledBtns(false)
 
                 //setDisabledBtns(false)
-                console.log(resp)
+
                 }
               }})
           }}
         />
-        <div> </div>
-    
-           {showPinLicencia ? 
-      <>
-
+        
 
         <Select
           className="place-self-stretch"
@@ -990,7 +987,12 @@ const CrearPin = () => {
             Object.fromEntries([
               ["", ""],
               ...optionsTramites?.map(({ descripcion, id }) => {
+
+              if(optionsTramites[id-1]["tipoPin"]==tipoPin){
                 return [descripcion, id];
+              }else{
+                return ["", ""];
+              }
               }),
             ]) || { "": "" }
           }
@@ -1004,6 +1006,11 @@ const CrearPin = () => {
             settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
           }}
         />
+    
+    {showPinLicencia ? 
+      <>
+
+
         <Select
           className="place-self-stretch"
           id="categoria"

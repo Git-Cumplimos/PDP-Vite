@@ -97,6 +97,7 @@ export const useProvidePinesVus = () => {
       infoTramite2["categoria"]=categoria2
       infoTramiteTemp=[infoTramite, infoTramite2]
     }
+    
     const body = {
       tipo_tramite: tramiteTemp,
       infoTramite: infoTramiteTemp,
@@ -118,6 +119,7 @@ export const useProvidePinesVus = () => {
       ticket_pin:ticket1,
       ticket_tramite:ticket2
     };
+  
     if (idPin !== ""){
       body.Pin = idPin
     }

@@ -423,7 +423,7 @@ const TramitePines = () => {
               <Form onSubmit={onSubmitUsar}>
                 <ButtonBar>
                   <Button type="submit">Usar pin</Button>
-                  {selected.name_estado_pin==="Pin creado" ? 
+                  {selected.Estado==="Pin creado" ? 
                   <Button
                   onClick={() => {
                     setModalCancel(true);
