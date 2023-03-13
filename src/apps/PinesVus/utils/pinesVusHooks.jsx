@@ -269,7 +269,8 @@ export const useProvidePinesVus = () => {
     // num_aprobacion,
     // num_transaccion, 
     valor,
-    fecha_participacion
+    fecha_participacion,
+    ticket
     // voucher
     ) => {
     let tipo_comercio = roleInfo.tipo_comercio
@@ -291,6 +292,7 @@ export const useProvidePinesVus = () => {
       Comercio: roleInfo?.id_comercio,
       nombre_usuario: pdpUser?.uname ?? "",
       Tipo: tipo_comercio,
+      ticket: ticket
     };
     try {
       const res = await fetchData(urls.registroPagoParticipacion, "POST", {}, body);
