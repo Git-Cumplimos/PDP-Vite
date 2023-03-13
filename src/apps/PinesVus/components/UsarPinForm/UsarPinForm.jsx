@@ -73,7 +73,7 @@ const UsarPinForm = ({
       ["", ""],
 
     ],
-    disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    disclamer: "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
   });
 
 
@@ -129,7 +129,7 @@ const UsarPinForm = ({
 
       ],
       disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
   }, [respPinUso, roleInfo]);
 
@@ -162,7 +162,7 @@ const UsarPinForm = ({
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = textTipoPin
     objTicket["trxInfo"][0] = ["Trámite", "Uso de Pin"]
-    objTicket["trxInfo"][1] = ["Valor Trámite", formatMoney.format(0)]
+    objTicket["trxInfo"][1] = ["Valor trámite", formatMoney.format(0)]
    
 
     usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin, objTicket) // Pin + IVA

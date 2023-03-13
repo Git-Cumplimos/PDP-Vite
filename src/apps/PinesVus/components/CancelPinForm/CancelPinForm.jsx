@@ -84,7 +84,7 @@ const CancelPin = ({
       ["", ""],
       ["", ""], 
     ],
-    disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    disclamer: "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
   });
 
   useEffect(() => {
@@ -147,13 +147,13 @@ const CancelPin = ({
       [ 
         ["Trámite", "Cancelación de Pin"],
         ["",""],
-        ["Detalle trámite 1", tramite1],
+        ["Detalle trámite_1", tramite1],
         ["",""],
-        ["Valor Trámite 1", formatMoney.format(valores[0])],
+        ["Valor trámite_1", formatMoney.format(valores[0])],
         ["",""],
-        ["Detalle trámite 2", tramite2],
+        ["Detalle trámite_2", tramite2],
         ["",""],
-        ["Valor Trámite 2", formatMoney.format(valores[1])],
+        ["Valor trámite_2", formatMoney.format(valores[1])],
         ["",""],
         ["Valor Pin", formatMoney.format(valor)],
         ["",""],
@@ -167,7 +167,7 @@ const CancelPin = ({
         ["",""],
         ["Detalle trámite", name_tramite],
         ["",""],
-        ["Valor Trámite", formatMoney.format(valor_tramite)],
+        ["Valor trámite", formatMoney.format(valor_tramite)],
         ["",""],
         ["Valor Pin", formatMoney.format(valor)],
         ["",""],
@@ -190,7 +190,7 @@ const CancelPin = ({
       
       ,
       disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
   }, [respPinCancel, roleInfo, valor]);
 
@@ -219,13 +219,13 @@ const CancelPin = ({
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = textTipoPin
  if( valores[1]){
-    objTicket["trxInfo"][2] = ["Detalle trámite 1", tramite1]
+    objTicket["trxInfo"][2] = ["Detalle trámite_1", tramite1]
     objTicket["trxInfo"][3] = ["",""]
-    objTicket["trxInfo"][4] = ["Valor Trámite 1", formatMoney.format(valores[0])]
+    objTicket["trxInfo"][4] = ["Valor trámite_1", formatMoney.format(valores[0])]
     objTicket["trxInfo"][5] = ["",""]
-    objTicket["trxInfo"][6] = ["Detalle trámite 2", tramite2]
+    objTicket["trxInfo"][6] = ["Detalle trámite_2", tramite2]
     objTicket["trxInfo"][7] = ["",""]
-    objTicket["trxInfo"][8] = ["Valor Trámite 2",formatMoney.format(valores[1])]
+    objTicket["trxInfo"][8] = ["Valor trámite_2",formatMoney.format(valores[1])]
     objTicket["trxInfo"][9] = ["",""]
     objTicket["trxInfo"][10] = ["Valor Pin", formatMoney.format(valor)]
     objTicket["trxInfo"][11] = ["",""]
@@ -237,7 +237,7 @@ const CancelPin = ({
     else{    
       objTicket["trxInfo"][2] = ["Detalle trámite", name_tramite]
       objTicket["trxInfo"][3] = ["",""]
-      objTicket["trxInfo"][4] = ["Valor Trámite", formatMoney.format(valor_tramite)]
+      objTicket["trxInfo"][4] = ["Valor trámite", formatMoney.format(valor_tramite)]
       objTicket["trxInfo"][5] = ["",""]
       objTicket["trxInfo"][6] = ["",""]
       objTicket["trxInfo"][7] = ["",""]

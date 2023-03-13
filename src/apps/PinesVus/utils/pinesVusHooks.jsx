@@ -97,6 +97,7 @@ export const useProvidePinesVus = () => {
       infoTramite2["categoria"]=categoria2
       infoTramiteTemp=[infoTramite, infoTramite2]
     }
+    
     const body = {
       tipo_tramite: tramiteTemp,
       infoTramite: infoTramiteTemp,
@@ -118,6 +119,7 @@ export const useProvidePinesVus = () => {
       ticket_pin:ticket1,
       ticket_tramite:ticket2
     };
+  
     if (idPin !== ""){
       body.Pin = idPin
     }
@@ -172,7 +174,8 @@ export const useProvidePinesVus = () => {
       estadoPin,
       tipoPin,
       doc_cliente,
-      pageData
+      pageData,
+      pinesCliente
     ) => {
       const query = { ...pageData };
       if (cod_hash_pin !== "") {
@@ -194,9 +197,12 @@ export const useProvidePinesVus = () => {
       if (doc_cliente !== "") {
         query.doc_cliente = doc_cliente;
       }
-
+      if (pinesCliente == 1) {
+        query.pinesCliente = pinesCliente;
+      }
       try {
         const res = await fetchData(urls.PinVus, "GET", query);
+        //console.log(query)
         return res;
       } catch (err) {
         throw err;
@@ -224,12 +230,15 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const consultaClientes = useCallback(async (cedula, olimpia, idPin) => {
+  const consultaClientes = useCallback(async (cedula, olimpia, idPin, tipoPin) => {
     const query = { pk_documento_cliente: cedula};
     query.olimpia = olimpia
     query.id_comercio = roleInfo?.id_comercio
     if (idPin != ""){
       query.Pin = idPin}
+    if (tipoPin !=""){
+      query.tipoPin = tipoPin
+    }
     try {
       const res = await fetchData(urls.consultaClientes, "GET", query);
       return res;
@@ -255,9 +264,14 @@ export const useProvidePinesVus = () => {
   const registroPagoParticipacion = useCallback(async (
     participante, 
     id_pago,
+    // banco, 
+    // num_cuenta, 
+    // num_aprobacion,
+    // num_transaccion, 
     valor,
     fecha_participacion,
     ticket
+    // voucher
     ) => {
     let tipo_comercio = roleInfo.tipo_comercio
     if (roleInfo?.tipo_comercio === "KIOSCO"){
@@ -266,8 +280,13 @@ export const useProvidePinesVus = () => {
     const body = {
       participante: participante, 
       id_pago: id_pago,
+      // banco: banco, 
+      // num_cuenta: num_cuenta, 
+      // num_aprobacion: num_aprobacion,
+      // num_transaccion: num_transaccion, 
       valor: valor,
       fecha_participacion: fecha_participacion,
+      // voucher: voucher,
       Usuario: roleInfo?.id_usuario,
       Dispositivo: roleInfo?.id_dispositivo,
       Comercio: roleInfo?.id_comercio,
@@ -389,6 +408,7 @@ export const useProvidePinesVus = () => {
       const query = { doc_cliente : doc_cliente, reenviarFormulario : reenviarFormulario };
       try {
         const res = await fetchData(urls.reenvioHash, "GET", query);
+        //console.log(res)
         return res;
       } catch (err) {
         throw err;

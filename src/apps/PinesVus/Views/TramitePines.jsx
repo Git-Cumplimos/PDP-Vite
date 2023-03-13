@@ -8,6 +8,7 @@ import { usePinesVus } from "../utils/pinesVusHooks";
 import { notifyError, notify } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import TableVertical from "../Views/TableVertical";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 
 import UsarPinForm from "../components/UsarPinForm/UsarPinForm";
 import CancelPin from "../components/CancelPinForm/CancelPinForm";
@@ -98,8 +99,9 @@ const TramitePines = () => {
         if (!res?.status) {
           notifyError(res?.msg);
         } else {
-          notify(res?.msg)
-          setMsgRespReenvio(res?.msg);
+          //notify(res?.msg)
+          notify("Verificación exitosa")
+         // setMsgRespReenvio(res?.msg);
           setUrlAutogestion(res?.obj?.url_autogestion)
         }
       })
@@ -118,8 +120,9 @@ const TramitePines = () => {
     //   Depto: roleInfo?.codigo_dane?.slice(0, 2),
     //   Municipio: roleInfo?.codigo_dane?.slice(2),
     // };
-    consultaPinesVus(parametroBusqueda, "", "", "", "", "",pageData)
+    consultaPinesVus("", "", "", "", "", parametroBusqueda,pageData,1)
       .then((res) => {
+        //console.log(res)
         setInfo(res);
         setDisabledBtn(false);
         if (!res?.status) {
@@ -127,13 +130,13 @@ const TramitePines = () => {
         } else {
 
      
-            const fecha_vencimiento = new Date(res?.obj?.results[0]["fecha_vencimiento"]);
+      /*      const fecha_vencimiento = new Date(res?.obj?.results[0]["fecha_vencimiento"]);
             fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
             const fecha_nacimiento = new Date(res?.obj?.results[0]["fecha_nacimiento"]);
             fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
            //setFormatMon(res?.obj?.results[0]["ValorPagar"]);
 
-      let    objetoVertical=[{
+     let    objetoVertical=[{
         clave: "Documento",
         info: res?.obj?.results[0]["doc_cliente"]
       },
@@ -170,11 +173,11 @@ const TramitePines = () => {
       },{
         clave: "Valor",
                 info: formatMoney.format(res?.obj?.results[0]["valor"]*1.19 + res?.obj?.results[0]["valor_tramite"])
-      },]
+      },]*/
 
 
           setTable(
-       /*     res?.obj?.results?.map((row) => {
+            res?.obj?.results?.map((row) => {
               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
               const fecha_nacimiento = new Date(row?.fecha_nacimiento);
@@ -197,10 +200,10 @@ const TramitePines = () => {
                 Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite), // Solo pin tiene iva
               };
 
-            })*/
+            })
 
 
-            objetoVertical.map((row) => {
+       /*     objetoVertical.map((row) => {
 
               return {
 
@@ -209,19 +212,11 @@ const TramitePines = () => {
 
               };
 
-            })
+            })*/
 
 
           );
           setMaxPages(res?.obj?.maxPages);
-          setValor(res?.obj?.results?.[0]?.valor);
-          setValores(res?.obj?.results?.[0]?.valores);
-          setId_trx(res?.obj?.results?.[0]?.id_trx?.creacion);
-          setTipoPin(res?.obj?.results?.[0]?.tipo_pin);
-          setValor_tramite(res?.obj?.results?.[0]?.valor_tramite);
-          setName_tramite(res?.obj?.results?.[0]?.name_tramite);
-          setId_pin(res?.obj?.results?.[0]?.id_pin)
-          setInfoComercioCreacion(res?.obj?.results?.[0]?.datos_comercio_creacion)
         }
       })
       .catch((err) => console.log("error", err));
@@ -272,6 +267,25 @@ const TramitePines = () => {
 
   }, [parametroBusqueda, hora, horaCierre, navigate, cierreManual])
 
+              /*    <ButtonBar className="col-auto md:col-span-1">
+              <Button type=""
+                  onClick = { () => {
+                  
+                      if (!(info?.obj?.results[0]["name_estado_pin"] === "Pin creado" || info?.obj?.results[0]["name_estado_pin"] === "Dispersado no usado")) {
+                        notifyError(info?.obj?.results[0]["name_estado_pin"]);
+                      } else {
+                        
+                        setSelected(info?.obj?.results[0]);
+        
+                        setShowModal(true);
+                        setActivarNavigate(false);
+                      }
+                  }}>
+              Gestionar Pin
+              </Button>
+    
+            </ButtonBar>*/
+
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -284,10 +298,10 @@ const TramitePines = () => {
             <Form onSubmit={onSubmit} grid>
               <Input
                 id="paramBusqueda"
-                label="Código"
-                type="text"
-                minLength="4"
-                maxLength="4"
+                label="Documento"//"Código"
+                type="number"
+                minLength="10"
+                maxLength="10"
                 autoComplete="off"
                 value={parametroBusqueda}
                 required
@@ -305,7 +319,7 @@ const TramitePines = () => {
                     setShowModalReenvio(true)
                   }}
                   >
-                  Reenviar Código
+                  Diligenciar formulario
                 </Button>
               </ButtonBar>
             </Form>
@@ -319,56 +333,47 @@ const TramitePines = () => {
       {info?.status && (
         <>
 
-          <TableVertical
+          <TableEnterprise
             title="Información Pin"
             maxPage={maxPages}
             headers={[
-              "",""
-               //    "Documento",
-          //    "Tipo Documento",
-          //     "Nombre",
-          //     "Apellidos",
-         //      "Fecha Nacimiento",
-         //      "Celular", 
-         //      "Email",
-         //      "Dirección",
-              //    "Estado",
-         //      "Vencimiento",
-         //      "Trámite",
-         //      "Valor",
+           //   "",""
+                   "Documento",
+              "Tipo Documento",
+               "Nombre",
+              "Apellidos",
+               "Fecha Nacimiento",
+               "Celular", 
+               "Email",
+               "Dirección",
+                  "Estado",
+               "Vencimiento",
+               "Trámite",
+               "Valor",
             ]}
             data={table || []}
-       /*     onSelectRow={(e, index) => {
-              if (!(table[index][""] === "Pin creado" || table[index][""] === "Dispersado no usado")) {
+            onSelectRow={(e, index) => {
+              if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Dispersado no usado")) {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
+                setValor(info?.obj?.results?.[index]?.valor);
+                setValores(info?.obj?.results?.[index]?.valores);
+                setId_trx(info?.obj?.results?.[index]?.id_trx?.creacion);
+                setTipoPin(info?.obj?.results?.[index]?.tipo_pin);
+                setValor_tramite(info?.obj?.results?.[index]?.valor_tramite);
+                setName_tramite(info?.obj?.results?.[index]?.name_tramite);
+                setId_pin(info?.obj?.results?.[index]?.id_pin)
+                setInfoComercioCreacion(info?.obj?.results?.[index]?.datos_comercio_creacion)
 
                 setShowModal(true);
                 setActivarNavigate(false);
               }
-            }}*/
+            }}
             onSetPageData={setPageData}
             
-          ></TableVertical>
-                <ButtonBar className="col-auto md:col-span-1">
-              <Button type=""
-                  onClick = { () => {
-                  
-                      if (!(info?.obj?.results[0]["name_estado_pin"] === "Pin creado" || info?.obj?.results[0]["name_estado_pin"] === "Dispersado no usado")) {
-                        notifyError(info?.obj?.results[0]["name_estado_pin"]);
-                      } else {
-                        
-                        setSelected(info?.obj?.results[0]);
-        
-                        setShowModal(true);
-                        setActivarNavigate(false);
-                      }
-                  }}>
-              Gestionar Pin
-              </Button>
-    
-            </ButtonBar>
+          ></TableEnterprise>
+
         </>   
       )}
 
@@ -418,7 +423,7 @@ const TramitePines = () => {
               <Form onSubmit={onSubmitUsar}>
                 <ButtonBar>
                   <Button type="submit">Usar pin</Button>
-                  {selected.name_estado_pin==="Pin creado" ? 
+                  {selected.Estado==="Pin creado" ? 
                   <Button
                   onClick={() => {
                     setModalCancel(true);
@@ -473,7 +478,7 @@ const TramitePines = () => {
       {urlAutogestion === '' ?
       <>
         <div className="flex flex-col w-1/2 mx-auto ">
-        <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
+        <h1 className="text-3xl mt-3 mx-auto">Verificar documento</h1>
         <br></br>
         </div>  
         <div className="flex flex-col justify-center items-center mx-auto container">          
@@ -493,7 +498,7 @@ const TramitePines = () => {
             />
             <ButtonBar className="col-auto md:col-span-2">
               <Button type="submit" disabled={disabledBtn}>
-                Reenviar código
+                Verificar
               </Button>
               <Button 
                 type="button"
@@ -510,8 +515,8 @@ const TramitePines = () => {
         </div>    
         </>         
         :
-        <div className="flex flex-col w-1/2 mx-auto ">
-        <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
+        <div className="flex flex-col w-2/3 mx-auto ">
+        <h1 className="text-2xl mt-3 mx-auto">Link para diligenciar formulario:</h1>
         <br></br>
         <h1 className="text-1xl mt-3 mx-auto">{msgRespReenvio}</h1>
         <h1 className="text-1xl mt-3 mx-auto font-semibold">Formulario autogestión: 
@@ -520,6 +525,7 @@ const TramitePines = () => {
           target="blank"
           className="text-1xl mt-3 mx-auto text-sky-400"
           > click aquí</a></h1>
+           <br></br>
         <Button 
           type="button"
           onClick = {() => {
