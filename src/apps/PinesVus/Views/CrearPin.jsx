@@ -362,6 +362,8 @@ const CrearPin = () => {
       iva : resp[0]?.iva,
       total : resp[0]?.valor + resp[0]?.iva
     }
+    console.log(pinData, tipoPin)
+    console.log(tramite, tramite2)
     return pinData;
   }, [optionsTipoPines, tipoPin]);
 
@@ -514,25 +516,29 @@ const CrearPin = () => {
     objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["commerceName"] = "PIN PARA GENERACIÓN DE LICENCIA"
+    objTicket["commerceName"] = pinData["descripcion"]
     objTicket["trxInfo"][0] = ["Trámite", "Creación de Pin"]
     // objTicket["trxInfo"][2] = ["Valor Pin", formatMoney.format(respPin?.valor)]
     // objTicket["trxInfo"][3] = ["IVA Pin",formatMoney.format(respPin?.valor_iva)]
     // objTicket["trxInfo"][4] = ["Total", formatMoney.format(respPin?.valor + respPin?.valor_iva)] 
 
     const objTicket2 = { ...objTicketActual2 };
-    objTicket2["title"] = "Recibo de pago: Trámite de licencias " 
+    objTicket2["title"] = "Recibo de pago: TRÁMITE "+ tramiteData?.descripcion.toUpperCase() 
     objTicket2["timeInfo"]["Fecha de venta"] = fecha;
     objTicket2["timeInfo"]["Hora"] = hora;
-    objTicket2["commerceName"] = "TRÁMITE GENERACIÓN DE LICENCIA"
+    if(tipoPin==1){
+      objTicket2["commerceName"] = "TRÁMITE GENERACIÓN DE LICENCIA"
+    }else{
+      objTicket2["commerceName"] = "TRÁMITE "+ tramiteData?.descripcion.toUpperCase() 
+    }
     if (!isNaN(tramiteData2.total)){
-    objTicket2["trxInfo"][0] = ["Detalle trámite 1", tramiteData?.descripcion]
+    objTicket2["trxInfo"][0] = ["Detalle trámite_1", tramiteData?.descripcion]
     objTicket2["trxInfo"][1] = ["", ""]
-    objTicket2["trxInfo"][2] = ["Valor trámite 1", formatMoney.format(tramiteData?.valor)]
+    objTicket2["trxInfo"][2] = ["Valor trámite_1", formatMoney.format(tramiteData?.valor)]
     objTicket2["trxInfo"][3] = ["", ""]
-    objTicket2["trxInfo"][4] = ["Detalle trámite 2", tramiteData2?.descripcion]
+    objTicket2["trxInfo"][4] = ["Detalle trámite_2", tramiteData2?.descripcion]
     objTicket2["trxInfo"][5] = ["", ""]
-    objTicket2["trxInfo"][6] = ["Valor trámite 2", formatMoney.format(tramiteData2?.valor)]
+    objTicket2["trxInfo"][6] = ["Valor trámite_2", formatMoney.format(tramiteData2?.valor)]
     objTicket2["trxInfo"][7] = ["", ""]
     objTicket2["trxInfo"][8] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva + tramiteData2?.valor)] 
     objTicket2["trxInfo"][9] = ["", ""]
@@ -540,9 +546,9 @@ const CrearPin = () => {
 
     }
     else{
-      objTicket2["trxInfo"][0] = ["Detalle trámite 1", tramiteData?.descripcion]
+      objTicket2["trxInfo"][0] = ["Detalle trámite", tramiteData?.descripcion]
       objTicket2["trxInfo"][1] = ["", ""]
-      objTicket2["trxInfo"][2] = ["Valor trámite 1", formatMoney.format(tramiteData?.valor)]
+      objTicket2["trxInfo"][2] = ["Valor trámite", formatMoney.format(tramiteData?.valor)]
       objTicket2["trxInfo"][3] = ["", ""]
       objTicket2["trxInfo"][4] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)] 
       objTicket2["trxInfo"][5] = ["", ""]
