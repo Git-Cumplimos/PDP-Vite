@@ -40,10 +40,7 @@ const RecaudoDirecto = () => {
     { label: "Con autorizador", value: 2 },
   ]
   
-  useEffect(() => {
-    setPageData(pageData => ({ ...pageData, page: 1 }));
-  }, [pageData.limit]);
-
+  
   useEffect(() => {
     let referencia = []
     if (selected['referencias']) {
@@ -96,6 +93,11 @@ const RecaudoDirecto = () => {
   }, [pageData, searchFilters])
 
   useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters])
+  
+  useEffect(() => {
+    setPageData(pageData => ({ ...pageData, page: 1 }));
+  }, [pageData.limit]);
+
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
     e.preventDefault();

@@ -5,19 +5,23 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { notify, notifyError, } from "../../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../../utils/notify";
 import { getRecaudosList, downloadFileRecaudo } from "../../utils/fetchFunctions"
 import { ExportToCsv } from "export-to-csv";
+import fetchData from "../../../../utils/fetchData";
 
 
 export const fetchImportFile = async (url, body) => {
   try {
-    const Peticion = await fetch(url, {
-      method: "POST",
-      body,
-      mode: "cors",
-    });
-    const res = await Peticion.json()
+    const res = await fetchData(url,'POST',{},body);
+    if (!res?.status) {
+      if (res?.msg) {
+        throw new Error(res?.msg, { cause: "custom" });
+      }
+      throw new Error(res, { cause: "custom" });
+    }
+
+    // const res = await Peticion.json()
     return res;
   } catch (error) {
     throw error;
@@ -79,19 +83,42 @@ const GestionArchivosRecaudo = () => {
     e.preventDefault();
     const formData = new FormData();
     formData.set("file", file);
-    try {
-      fetchImportFile(url, formData)
-        .then((data) => {
-          if (data?.status === true) {
-            console.log(data)
+    notifyPending(
+      fetchImportFile(url, formData),
+      {
+        render() {
+          return "Enviando solicitud";
+        },
+      },
+      {
+        render({data:res}){
+          handleClose()
+          return res?.msg;
+        }
+      },
+      {
+        render({data:err}){
+          if (err?.cause === "custom") {
+            return err?.message;
           }
-          else { console.log(data) }
-        })
-        .catch((e) => console.log("err", e))
-    }
-    catch (e) { console.log(e) }
+          console.error(err?.message);
+          return `Archivo erroneo`;
+        }
+      }
+    )
+    // try {
+    //   fetchImportFile(url, formData)
+    //     .then((data) => {
+    //       if (data?.status === true) {
+    //         console.log(data)
+    //       }
+    //       else { console.log(data) }
+    //     })
+    //     .catch((e) => console.log("err", e))
+    // }
+    // catch (e) { console.log(e) }
 
-    handleClose()
+    // handleClose()
   }, [handleClose, file, selected])
 
   const DescargarArchivo = useCallback(async (e) => {
