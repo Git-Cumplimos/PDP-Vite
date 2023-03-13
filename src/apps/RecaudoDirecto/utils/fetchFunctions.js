@@ -73,6 +73,8 @@ const fetchDownloadFile = (url) => {
     }
   }
 };
+
+
 /*--- Convenios Recaudo ---*/
 export const getRecaudosList = buildGetFunction(
   `${url}/convenio-recaudo/obtener-paginado`
@@ -86,8 +88,14 @@ export const addConveniosRecaudoList = buildPostFunction(
 export const modConveniosRecaudoList = buildPutFunction(
   `${url}/convenio-recaudo/modificar`
 );
-export const getRecaudo = buildGetFunction(
-  `${url}/convenio-recaudo/obtener-recaudo`
+export const downloadFileRecaudo = fetchDownloadFile(
+  `${url}/convenio-recaudo/descargar_reporte`
+);
+
+
+/* -- Recaudo -- */
+export const getRecaudo = buildPostFunction(
+  `${url}/recaudo/obtener-recaudo`
 );
 
 
@@ -104,26 +112,14 @@ export const addConveniosRetiroList = buildPostFunction(
 export const modConveniosRetiroList = buildPutFunction(
   `${url}/convenio-retiro/modificar`
 );
-export const getRetiro = buildGetFunction(
-  `${url}/convenio-retiro/obtener-retiro`
-);
-
-// const fetchDownloadFile = (url) => {
-//   return async (args={})=> {
-//     try {
-//       console.log("ARGUMENTOS",url,args)
-//       const Peticion = await fetch(url+`?convenio_id=${args.convenio_id}&fecha_inicial=${args['Fecha inicial']}&fecha_final=${args['Fecha final']}`);
-//       return Peticion;
-//     } catch (error) {
-//       throw error;
-//     }
-//   }
-// };
-
-export const downloadFileRecaudo = fetchDownloadFile(
-  `${url}/convenio-recaudo/descargar_reporte`
-);
-
 export const downloadFileRetiro = fetchDownloadFile(
   `${url}/convenio-retiro/descargar_reporte`
 );
+
+/* -- Retiro -- */
+export const getRetiro = buildGetFunction(
+  `${url}/retiro/obtener-retiro`
+);
+
+
+

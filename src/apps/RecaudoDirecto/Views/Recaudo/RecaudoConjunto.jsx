@@ -5,22 +5,25 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyPending, notifyError } from "../../../../utils/notify";
 import { getRecaudo, searchConveniosRecaudoList } from "../../utils/fetchFunctions"
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
 
+  const { roleInfo, pdpUser, infoTicket } = useAuth();
   const { pk_id_convenio } = useParams()
   const [showModal, setShowModal] = useState(false)
   const [dataRecaudo, setDataRecaudo] = useState('')
+  const [id_trx, setId_Trx] = useState(false)
   const [cargando, setCargando] = useState(false)
   // const [referencia, setReferencia] = useState('')
   const [convenioRetiro, setConvenioRetiro] = useState(null);
-  const [dataReferencias,setDataReferencias] = useState({
+  const [dataReferencias, setDataReferencias] = useState({
     referencia1: '',
     referencia2: ''
-  }) 
+  })
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -41,14 +44,24 @@ const RecaudoConjunto = () => {
 
   const consultarRecaudoD = useCallback(async (e) => {
     e.preventDefault()
-    await getRecaudo({
+    const data = {
       ...dataReferencias,
       convenio_id: pk_id_convenio,
-      
-    })
+      comercio: {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+      is_oficina_propia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO",
+      valor_total_trx: 0,
+      nombre_usuario: pdpUser?.uname ?? "",
+    };
+    await getRecaudo(data)
       .then((data) => {
-        console.log(data)
-        setDataRecaudo(data?.obj ?? "")
+        setDataRecaudo(data?.obj?.recaudo ?? "")
+        setId_Trx(data?.obj?.id_trx ?? false)
         notify(data.msg)
         setShowModal(true);
       })
@@ -57,7 +70,7 @@ const RecaudoConjunto = () => {
         handleClose()
       });
 
-  }, [pk_id_convenio,dataReferencias,handleClose])
+  }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, handleClose])
 
   const hacerRecaudo = (e) => {
     e.preventDefault()
@@ -100,11 +113,11 @@ const RecaudoConjunto = () => {
                 key={index}
                 id={1}
                 label={dict?.nombre_referencia ?? "Referencia 1"}
-                name={'referencia'+ (index + 1)}
+                name={'referencia' + (index + 1)}
                 type="text"
                 // minLength={dict?.length[0]}
                 // maxLength={dict?.length[1]}
-                onChange={(e)=>{setDataReferencias({...dataReferencias,[e.target.name]:e.target.value})}}
+                onChange={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: e.target.value }) }}
                 autoComplete="off"
                 required />
             )
@@ -128,7 +141,7 @@ const RecaudoConjunto = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar recaudo </h2>
         <Form onSubmit={hacerRecaudo} grid >
-        <Input
+          <Input
             id={1}
             label={"Estado"}
             name={"nombre_estado"}
@@ -136,7 +149,7 @@ const RecaudoConjunto = () => {
             defaultValue={dataRecaudo.nombre_estado ?? ""}
             autoComplete="off"
             disabled
-            />
+          />
           <Input
             id={1}
             label={"Valor a pagar"}
