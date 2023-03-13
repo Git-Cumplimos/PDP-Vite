@@ -2,7 +2,6 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Input from "../../../../components/Base/Input";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import { notify, notifyError } from "../../../../utils/notify";
 import { postConsultaPines, postConsultaPin } from "../../utils/fetchBackPines";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
@@ -10,101 +9,61 @@ import SimpleLoading from "../../../../components/Base/SimpleLoading";
 const Pines = () => {
   const [showLoading, setShowLoading] = useState(false);
   const navigate = useNavigate();
-  // const [{ searchPin = "" }, setQuery] = useQuery();
   const [categoriaPin, setCategoriaPin] = useState("");
   const [nombrePin, setNombrePin] = useState("");
-  const { roleInfo, infoTicket } = useAuth();
-
+  const { roleInfo } = useAuth();
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
   });
-  const [datosTrans, setDatosTrans] = useState({
-    pin: "",
-  });
-
   const [pines, setPines] = useState([]);
-  const [pin, setPin] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
 
-  // const tablePines = useMemo(() => {
-  //   return [
-  //     ...pines.map(({ desc, op }) => {
-  //       return {
-  //         "Nombre del Pin": desc,
-  //         "Categoría": "Pin de Contenido",
-  //         "Categoría": op == "em" || op == "cb" || op == "hv" ? "Pin de Servicio" : "Pin de Contenido"
-  //       };
-  //     }),
-  //   ];
-  // }, [pines]);
-
   const tablePines = useMemo(() => {
-    return [
-      ...pines.filter(({ desc, op }) => {
-        const categoriaMatch =
-          op == "em" || op == "cb" || op == "hv"
-            ? "Pin de Servicio"
-            : "Pin de Contenido";
-        const nombreMatch = desc.toLowerCase().includes(nombrePin.toLowerCase());
-        const categoriaMatchFilter = categoriaPin
-          ? categoriaMatch.toLowerCase().includes(categoriaPin.toLowerCase())
-          : true;
-        return categoriaMatchFilter && nombreMatch;
-      }).map(({ desc, op }) => {
-        return {
-          "Nombre del Pin": op == "cb" ? "Certificado de Tradición y Libertad (SNR)" : desc,
-          "Categoría": op == "em" || op == "cb" || op == "hv" ? "Pin de Servicio" : "Pin de Contenido",
-        };
-      }),
-    ];
-  }, [pines, categoriaPin, nombrePin]);
+    // Aplicamos los filtros
+    const filteredPines = pines.filter((pin) => {
+      const nombrePinMatches = pin?.desc?.toLowerCase()?.includes(nombrePin?.toLowerCase());
+      const categoriaPinMatches =
+        pin?.op === "hv" || pin?.op === "em" || pin?.op === "cb" ? "Pin de Servicio" : "Pin de Contenido";
+
+      if (!nombrePin && !categoriaPin) {
+        return true;
+      } else if (nombrePin && categoriaPin) {
+        return nombrePinMatches && categoriaPinMatches.toLowerCase()?.includes(categoriaPin?.toLowerCase());
+      } else if (nombrePin) {
+        return nombrePinMatches;
+      } else {
+        return categoriaPinMatches?.toLowerCase().includes(categoriaPin?.toLowerCase());
+      }
+    });
+
+    // Calculamos los datos de la página actual y la cantidad de páginas
+    const startIndex = (page - 1) * limit;
+    const endIndex = Math.min(startIndex + limit, filteredPines.length);
+    const currentPagePines = filteredPines.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(filteredPines.length / limit);
+
+    // Actualizamos maxPage y onSetPageData con el número de páginas
+    setMaxPages(totalPages);
+    setPageData({ page, limit });
+
+    // Transformamos los datos de la página actual
+    return currentPagePines.map((pin) => ({
+      NombrePin: pin?.op === "cb" ? "Certificado de Tradición y Libertad (SNR)" : pin?.op === "hv" ? "Histórico Vehicular" : pin?.desc,
+      CategoriaPin: pin?.op === "hv" || pin?.op === "em" || pin?.op === "cb" ? "Pin de Servicio" : "Pin de Contenido",
+    }));
+  }, [nombrePin, categoriaPin, pines, page, limit]);
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      const nombrePin = tablePines[i]["Nombre del Pin"] == "Certificado de Tradición y Libertad (SNR)" ? "Certificado TL" : tablePines[i]["Nombre del Pin"];
-      const index = pines.findIndex(pin => pin.desc === nombrePin);
-      // console.log("*******ACAAAAAAAAA, pines[index].op", pines[index].op)
+      const nombrePin = tablePines[i]["NombrePin"] == "Certificado de Tradición y Libertad (SNR)" ? "Certificado TL" : tablePines[i]["NombrePin"] == "Histórico Vehicular" ? "Historico Vehicular" : tablePines[i]["NombrePin"]
+      const index = pines.findIndex(pin => pin?.desc === nombrePin);
       if (index !== -1) {
-        fecthTablaConveniosPaginadoFunc2(pines[index].op, index);
+        fecthTablaConveniosPaginadoFunc2(pines[index]["op"], index);
       }
     },
-    [navigate, pines, tablePines]
+    [navigate, pines, tablePines, nombrePin, categoriaPin]
   );
-
-  // const onSelectAutorizador = useCallback(
-  //   (e, i) => {
-  //     fecthTablaConveniosPaginadoFunc2(pines[i]["op"], i);
-  //   },
-  //   [navigate, pines, tablePines]
-  // );
-  // const onSelectAutorizador = useCallback(
-  //   (e, i) => {
-  //     const filteredIndex = tablePines.findIndex((pin) => pin["Nombre del Pin"] === pines[i]["desc"] && pin["Categoría"] === (pines[i]["op"] == "em" || pines[i]["op"] == "cb" || pines[i]["op"] == "hv" ? "Pin de Servicio" : "Pin de Contenido"));
-  //     fecthTablaConveniosPaginadoFunc2(pines[i]["op"], filteredIndex);
-  //   },
-  //   [navigate, pines, tablePines]
-  // );
-  // const onSelectAutorizador = useCallback(
-  //   (e, i) => {
-  //     console.log("*******", tablePines[i])
-  //     console.log("*******tablePines[i][op]", tablePines[i]["op"])
-  //     console.log("*******i", i)
-  //     const selectedPin = tablePines[i];
-  //     fecthTablaConveniosPaginadoFunc2(selectedPin["op"], i);
-  //   },
-  //   [navigate, tablePines]
-  // );
-
-  // const onSelectAutorizador = useCallback(
-  //   (e, i) => {
-  //     const selectedPin = tablePines.find(pin => pin["Nombre del Pin"] === pines[i]["desc"]);
-  //     if (selectedPin) {
-  //       fecthTablaConveniosPaginadoFunc2(selectedPin["Nombre del Pin"], selectedPin["Categoría"]);
-  //     }
-  //   },
-  //   [navigate, pines, tablePines]
-  // );
 
   const fecthTablaConveniosPaginadoFunc2 = (op, i) => {
     setShowLoading(true)
@@ -113,13 +72,10 @@ const Pines = () => {
       producto: op,
     })
       .then((autoArr) => {
-
         setShowLoading(false)
-        setPin(autoArr?.results ?? []);
         setPines(autoArr?.results ?? []);
         if (i !== undefined) {
-          console.log("ESASSASASASas")
-          if (autoArr.results.length == 0) {
+          if (autoArr?.results?.length == 0) {
             navigate("../Pines/PinesContenido/CompraPin", {
               state: {
                 desc: pines[i]["desc"],
@@ -138,15 +94,9 @@ const Pines = () => {
       })
       .catch((err) => console.error(err));
   };
-
   useEffect(() => {
     fecthTablaPines();
-  }, [datosTrans, page, limit, nombrePin, categoriaPin]);
-
-  useEffect(() => {
-    fecthTablaConveniosPaginadoFunc2();
-  }, [datosTrans, page, limit, nombrePin, categoriaPin]);
-
+  }, [limit]);
 
   const fecthTablaPines = () => {
     setShowLoading(true)
@@ -159,7 +109,6 @@ const Pines = () => {
     })
       .then((autoArr) => {
         setShowLoading(false)
-        setMaxPages(autoArr?.maxPages);
         setPines(autoArr?.results ?? []);
       })
       .catch((err) => console.error(err));

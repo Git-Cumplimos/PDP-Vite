@@ -105,7 +105,7 @@ const SellResp = ({
     roleInfo.id_dispositivo,
     sellResponse,
   ]);
-  console.log("sellResponse--->",sellResponse?.obj?.cod_loteria)
+  
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -138,7 +138,7 @@ const SellResp = ({
         ["Sorteo", sellResponse?.obj?.sorteo],
         ["Billete", sellResponse?.obj?.num_billete],
         ["Serie", sellResponse?.obj?.serie],
-        ["Fracción", sellResponse?.obj?.fisico === true? JSON.stringify(selecFrac).replace(/,/g," - ").replace(/[[]/,"").replace(/]/,"") : sellResponse?.obj?.fracciones],
+        ["Fracción", sellResponse?.obj?.fisico === true? JSON.stringify(selecFrac).replace(/,/g," - ").replace(/[[]/,"").replace(/]/,"") : JSON.stringify(selecFrac).replace(/[[]/,"").replace(/]/,"")],
         ["Tipo de Billete", sellResponse?.obj?.fisico === true ? "Físico" : "Virtual"],
         ["", ""],
         ["Valor", parseInt(sellResponse?.obj?.tipoPago) ===
