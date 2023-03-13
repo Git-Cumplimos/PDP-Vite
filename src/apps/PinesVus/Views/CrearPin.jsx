@@ -1015,7 +1015,11 @@ const CrearPin = () => {
           className="place-self-stretch"
           id="categoria"
           label="Categoría de Licencia"
-          options={optionsCategoria}
+          options={
+           tramite==1||tramite==3||tramite==5||tramite==7||tramite==9?  [...(optionsCategoria.slice(0,1)),...(optionsCategoria.slice(3))]:
+           tramite==2||tramite==4||tramite==6||tramite==8||tramite==10?  [...(optionsCategoria.slice(0,3))]:
+           tramite==""||isNaN(tramite)?  [...(optionsCategoria.slice(0,1))]:""
+             }
           required={true}
           value={categoria}
           onChange={(e) => {
@@ -1108,7 +1112,11 @@ const CrearPin = () => {
                     className="place-self-stretch"
                     id="categoria2"
                     label="Categoría de Licencia"
-                    options={optionsCategoria}
+                    options={
+                      tramite2==1||tramite2==3||tramite2==5||tramite2==7||tramite2==9?  [...(optionsCategoria.slice(0,1)),...(optionsCategoria.slice(3))]:
+                      tramite2==2||tramite2==4||tramite2==6||tramite2==8||tramite2==10?  [...(optionsCategoria.slice(0,3))]:
+                      tramite2==""||isNaN(tramite2)?  [...(optionsCategoria.slice(0,1))]:""
+                    }
                     required={true}
                     value={categoria2}
                     onChange={(e) => {
