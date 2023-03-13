@@ -39,6 +39,10 @@ const RecaudoDirecto = () => {
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
   ]
+  
+  useEffect(() => {
+    setPageData(pageData => ({ ...pageData, page: 1 }));
+  }, [pageData.limit]);
 
   useEffect(() => {
     let referencia = []
@@ -73,9 +77,8 @@ const RecaudoDirecto = () => {
 
   const getRecaudos = useCallback(async () => {
     await getRecaudosList({
-      ...searchFilters,
-      limit: pageData.limit,
-      offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit,
+      ...pageData,
+      ...searchFilters
     })
       .then((data) => {
         setListRecaudos(data?.obj?.results ?? []);

@@ -41,11 +41,14 @@ const GestionArchivosRecaudo = () => {
     nombre_convenio: "",
   });
 
+  useEffect(() => {
+    setPageData(pageData => ({ ...pageData, page: 1 }));
+  }, [pageData.limit]);
+
   const getRecaudos = useCallback(async () => {
     await getRecaudosList({
+      ...pageData,
       ...searchFilters,
-      limit: pageData.limit,
-      offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit,
     })
       .then((data) => {
         setListRecaudos(data?.obj?.results ?? []);

@@ -278,11 +278,14 @@ const GestionArchivosRetiro = () => {
     nombre_convenio: "",
   });
 
+  useEffect(() => {
+    setPageData(pageData => ({ ...pageData, page: 1 }));
+  }, [pageData.limit]);
+
   const getRetiros = useCallback(async () => {
     await getRetirosList({
-      ...searchFilters,
-      limit: pageData.limit,
-      offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit,
+      ...pageData,
+      ...searchFilters
     })
       .then((data) => {
         setListRetiros(data?.obj?.results ?? []);

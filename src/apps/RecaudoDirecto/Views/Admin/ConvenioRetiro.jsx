@@ -41,6 +41,10 @@ const RetiroDirecto = () => {
   ]
 
   useEffect(() => {
+    setPageData(pageData => ({ ...pageData, page: 1 }));
+  }, [pageData.limit]);
+
+  useEffect(() => {
     let referencia = []
     if (selected['referencias']) {
       for (let i in selected['referencias']) {
@@ -73,9 +77,8 @@ const RetiroDirecto = () => {
 
   const getConvRetiro = useCallback(async () => {
     await getRetirosList({
-      ...searchFilters,
-      limit: pageData.limit,
-      offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit
+      ...pageData,
+      ...searchFilters
     })
       .then((data) => {
         setListRetiro(data?.obj?.results ?? []);
