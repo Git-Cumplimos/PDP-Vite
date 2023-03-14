@@ -34,7 +34,7 @@ const InformacionPin = () => {
         return {
           "Nombre del Pin": productDesc,
           Valor: formatMoney.format(sell),
-          "Días de validez": validity * 1,
+          "Vigencia del Plan": validity * 1,
         };
       }),
     ];
@@ -75,7 +75,7 @@ const InformacionPin = () => {
       <h1 className="text-3xl text-center">Información del Pin</h1>
       <TableEnterprise
         title="Tabla pines"
-        headers={["Nombre del tipo de Pin", "Valor", "Días de validez"]}
+        headers={["Nombre del tipo de Pin", "Valor", "Vigencia del Plan"]}
         data={tableTipoPin}
         onSelectRow={onSelectAutorizador}
       >
