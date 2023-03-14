@@ -20,7 +20,7 @@ const RecaudoConjunto = () => {
   const [id_trx, setId_Trx] = useState(false)
   const [cargando, setCargando] = useState(false)
   const [convenioRetiro, setConvenioRetiro] = useState(null);
-  const [valorRecibido, setValorRecibido] = useState({ valor_total_trx : '' })
+  const [valorRecibido, setValorRecibido] = useState({ valor_total_trx: '' })
   const [dataReferencias, setDataReferencias] = useState({
     referencia1: '',
     referencia2: ''
@@ -79,23 +79,78 @@ const RecaudoConjunto = () => {
 
   }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, handleClose])
 
-  const hacerRecaudo = useCallback(async(e) => {
+  const hacerRecaudo = useCallback(async (e) => {
     e.preventDefault()
-    const data = {
-      valor_antes:dataRecaudo?.valor_pagado,
-      comercio: {
-        id_comercio: roleInfo?.id_comercio,
-        id_usuario: roleInfo?.id_usuario,
-        id_terminal: roleInfo?.id_dispositivo,
-      },
-      is_oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-        roleInfo?.tipo_comercio === "KIOSCO",
-      ...valorRecibido,
-      nombre_usuario: pdpUser?.uname ?? "",
+
+    let valoresRecibido = parseInt(valorRecibido.valor_total_trx)
+
+    const FlujosTRX = {
+      1: () => valoresRecibido === dataRecaudo.valor ? 
+      { estado: true, fk_estado: 2 } : undefined,
+      2: () => valoresRecibido <= dataRecaudo.valor ? 
+      { estado: true, fk_estado: valoresRecibido === dataRecaudo.valor ? 2 : 1 } : undefined,
+      3: () => valoresRecibido >= dataRecaudo.valor ? 
+      { estado: true, fk_estado: valoresRecibido === dataRecaudo.valor ? 2 : 1 } : undefined,
+      4: () => (valoresRecibido < dataRecaudo.valor || valoresRecibido >= dataRecaudo.valor) ? 
+      { estado: true, fk_estado: valoresRecibido >= dataRecaudo.valor ? 2 : 1 } : undefined,
     };
-    await modRecaudo ({pk_id_recaudo:dataRecaudo.pk_id_recaudo},data)
-  },[roleInfo, pdpUser, valorRecibido, dataRecaudo])
+    
+    // const FlujosTRX = {
+    //   1: { condicion: function(valoresRecibido,dataRecaudo){
+    //     if (valoresRecibido === dataRecaudo) { return {estado : true,fk_estado : 2 }}},
+    //   2: { condicion: function(valoresRecibido,dataRecaudo){
+    //     if (valoresRecibido <= dataRecaudo) { 
+    //       if (valoresRecibido === dataRecaudo) return{estado : true,fk_estado : 2 }
+    //       else return{estado : true,fk_estado : 1 }
+    //     }
+    //   }},
+    //   3: {condicion: function(valoresRecibido,dataRecaudo){
+    //     if (valoresRecibido >= dataRecaudo) { 
+    //       if (valoresRecibido === dataRecaudo) return{estado : true,fk_estado : 2 }
+    //       else return{estado : true,fk_estado : 1 }
+    //     }
+    //   }},
+    //   4: {condicion: function(valoresRecibido,dataRecaudo){
+    //     if (valoresRecibido < dataRecaudo || valoresRecibido >= dataRecaudo) { 
+    //       if (valoresRecibido >= dataRecaudo) return{estado : true,fk_estado : 2 }
+    //       else return{estado : true,fk_estado : 1 }
+    //     }
+    //   }},
+    // }}
+    // const resp = FlujosTRX[dataRecaudo?.fk_modificar_valor]?.condicion(valoresRecibido,dataRecaudo.valor) || {'estado':false}
+    // console.log(resp);
+    
+    
+    const resp = FlujosTRX[dataRecaudo?.fk_modificar_valor]?.() || { estado: false };
+
+    console.log(resp.estado)
+
+    if (resp.estado) {
+      const data = {
+        valor_antes: dataRecaudo?.valor_pagado ?? 0,
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        is_oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
+        ...valorRecibido,
+        nombre_usuario: pdpUser?.uname ?? "",
+      };
+      await modRecaudo({ pk_id_recaudo: dataRecaudo.pk_id_recaudo }, data)
+      .then((data)=>{
+        data?.status && notify(data?.msg) 
+      })
+      .catch((err) => {
+        notifyError(err?.msg);
+      });
+      handleClose()
+    }
+    else {notifyError("El valor recibido debe estar a corde al tipo de pago")}
+    
+  }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, handleClose])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
@@ -193,7 +248,7 @@ const RecaudoConjunto = () => {
             label={"Valor recibido"}
             name={"valor_total_trx"}
             type="text"
-            onChange={(e)=>{ setValorRecibido({ ...valorRecibido, [e.target.name]: e.target.value })}}
+            onChange={(e) => { setValorRecibido({ ...valorRecibido, [e.target.name]: e.target.value }) }}
             autoComplete="off"
             required />
           <ButtonBar>
