@@ -217,14 +217,6 @@ const TramitePines = () => {
 
           );
           setMaxPages(res?.obj?.maxPages);
-          setValor(res?.obj?.results?.[0]?.valor);
-          setValores(res?.obj?.results?.[0]?.valores);
-          setId_trx(res?.obj?.results?.[0]?.id_trx?.creacion);
-          setTipoPin(res?.obj?.results?.[0]?.tipo_pin);
-          setValor_tramite(res?.obj?.results?.[0]?.valor_tramite);
-          setName_tramite(res?.obj?.results?.[0]?.name_tramite);
-          setId_pin(res?.obj?.results?.[0]?.id_pin)
-          setInfoComercioCreacion(res?.obj?.results?.[0]?.datos_comercio_creacion)
         }
       })
       .catch((err) => console.log("error", err));
@@ -365,6 +357,14 @@ const TramitePines = () => {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
+                setValor(info?.obj?.results?.[index]?.valor);
+                setValores(info?.obj?.results?.[index]?.valores);
+                setId_trx(info?.obj?.results?.[index]?.id_trx?.creacion);
+                setTipoPin(info?.obj?.results?.[index]?.tipo_pin);
+                setValor_tramite(info?.obj?.results?.[index]?.valor_tramite);
+                setName_tramite(info?.obj?.results?.[index]?.name_tramite);
+                setId_pin(info?.obj?.results?.[index]?.id_pin)
+                setInfoComercioCreacion(info?.obj?.results?.[index]?.datos_comercio_creacion)
 
                 setShowModal(true);
                 setActivarNavigate(false);
