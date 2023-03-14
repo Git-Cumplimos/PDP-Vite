@@ -105,6 +105,7 @@ const FormularioRetiro = () => {
       const data = {
         id_trx: id_trx,
         fk_estado: resp.fk_estado,
+        convenio_id: pk_id_convenio,
         valor_antes: dataRetiro?.valor_retirado ?? 0,
         valor_retirado: sumaTotal,
         comercio: {
@@ -201,7 +202,7 @@ const FormularioRetiro = () => {
             />
             <Input
               id={1}
-              label={"Valor a retirar"}
+              label={"Valor total a retirar"}
               name={"valor"}
               type="text"
               defaultValue={dataRetiro?.valor ?? ""}
@@ -211,7 +212,7 @@ const FormularioRetiro = () => {
             {dataRetiro.valor_retirado !== 0 &&
               <Input
                 id={1}
-                label={"saldo a restante"}
+                label={"Saldo restante"}
                 name={"valor"}
                 type="text"
                 defaultValue={dataRetiro.fk_modificar_valor === 2 ?
