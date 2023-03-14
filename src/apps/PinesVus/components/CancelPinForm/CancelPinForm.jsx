@@ -115,8 +115,14 @@ const CancelPin = ({
   const [respPinCancel, setRespPinCancel] = useState("");
 
   const tickets = useMemo(() => {
+    let tittle
+    if(tipoPin==1){
+      tittle = "Recibo de pago: Servicio voluntario de impresión premium"
+    }else{
+      tittle = "Recibo de pago: " + textTipoPin
+    }
     return {
-      title: "Recibo de pago: Servicio voluntario de impresión premium",
+      title: tittle,
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -214,7 +220,11 @@ const CancelPin = ({
     }).format(new Date());
 
     const objTicket = { ...objTicketActual };
-    objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
+    if(tipoPin==1){
+      objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
+    }else{
+      objTicket["title"] = "Recibo de pago: " + textTipoPin
+    }
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = textTipoPin

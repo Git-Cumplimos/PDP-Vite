@@ -513,7 +513,11 @@ const CrearPin = () => {
     }).format(new Date());
 
     const objTicket = { ...objTicketActual };
-    objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
+    if(tipoPin==1){
+      objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
+    }else{
+      objTicket["title"] = "Recibo de pago: " +pinData["descripcion"].toUpperCase() 
+    }
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = pinData["descripcion"]
