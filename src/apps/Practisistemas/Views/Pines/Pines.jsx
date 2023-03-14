@@ -5,6 +5,7 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { postConsultaPines, postConsultaPin } from "../../utils/fetchBackPines";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
+import Select from "../../../../components/Base/Select";
 
 const Pines = () => {
   const [showLoading, setShowLoading] = useState(false);
@@ -49,7 +50,7 @@ const Pines = () => {
 
     // Transformamos los datos de la página actual
     return currentPagePines.map((pin) => ({
-      NombrePin: pin?.op === "cb" ? "Certificado de Tradición y Libertad (SNR)" : pin?.op === "hv" ? "Histórico Vehicular" : pin?.desc,
+      NombrePin: pin?.op === "cb" ? "Certificado de Tradición y Libertad (SNR)" : pin?.op === "hv" ? "Histórico Vehicular" : pin?.op === "ff" ? "FreeFire Pines" : pin?.op === "ng" ? "Noggin Pines" : pin?.desc,
       CategoriaPin: pin?.op === "hv" || pin?.op === "em" || pin?.op === "cb" ? "Pin de Servicio" : "Pin de Contenido",
     }));
   }, [nombrePin, categoriaPin, pines, page, limit]);
@@ -140,17 +141,19 @@ const Pines = () => {
             setNombrePin(e.target.value);
           }}
         />
-        <Input
-          id="searchCategoria"
-          name="searchCategoria"
+        <Select
+          id={"estado"}
           label={"Categoría del Pin"}
-          minLength="1"
-          maxLength="30"
-          type="text"
-          autoComplete="off"
+          name={"estado"}
+          options={[
+            { value: "", label: "" },
+            { value: "Pin de Contenido", label: "Pin de Contenido" },
+            { value: "Pin de Servicio", label: "Pin de Servicio" },
+          ]}
           onInput={(e) => {
             setCategoriaPin(e.target.value);
           }}
+          required
         />
       </TableEnterprise>
     </>

@@ -275,7 +275,7 @@ const RecargarPaquetes = () => {
       <h1 className="text-3xl mt-6">{state?.operador_recargar}</h1>
       <p> {state?.descripcion} </p>
       <p> Valor: {formatMoney.format(state?.valor_paquete)} </p>
-      <Form onSubmit={onSubmitCheck} grid>
+      <Form onSubmit={onSubmitCheck} >
         <Input
           name="celular"
           label="Número de celular"

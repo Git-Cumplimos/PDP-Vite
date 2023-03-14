@@ -488,11 +488,13 @@ const CompraPin = () => {
         ["", ""],
         state?.op == "em"
           ? ["No. PIN", result_?.jsonAdicional?.["Numero Pin"]]
-          : state?.op !== "hv"
-            ? ["No. PIN", result_?.jsonAdicional?.info]
-            : state?.op !== "nx"
+          : state?.op == "hv"
+            ? ["No. PIN", result_?.jsonAdicional?.Url2]
+            : state?.op == "nx"
               ? ["No. PIN", hiddenPin]
-              : ["", ""],
+              : state?.op == "cb"
+                ? ["No. PIN", result_?.jsonAdicional?.Url]
+                : ["", ""],
         ["", ""],
         ["No. Celular", toPhoneNumber(inputCelular)],
         ["", ""],
