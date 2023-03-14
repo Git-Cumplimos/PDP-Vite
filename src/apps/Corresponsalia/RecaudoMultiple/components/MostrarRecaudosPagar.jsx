@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Fieldset from "../../../../components/Base/Fieldset";
@@ -6,16 +6,14 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import MoneyInput from "../../../../components/Base/MoneyInput";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import { makeMoneyFormatter } from "../../../../utils/functions";
 import { notify, notifyError } from "../../../../utils/notify";
 import {
   postConsultaRecaudoMultiple,
+  postConsultaRecaudoMultipleComercios,
   postInicializacionRecaudoMultiple,
+  postInicializacionRecaudoMultipleComercios,
 } from "../utils/fetchRecaudoMultiple";
 import { v4 } from "uuid";
-
-const formatMoney = makeMoneyFormatter(2);
 
 const MostrarRecaudosPagar = ({
   fileName,
@@ -24,6 +22,7 @@ const MostrarRecaudosPagar = ({
   roleInfo,
   pdpUser,
   setUuid,
+  type = "Operaciones",
 }) => {
   const [recaudosMultiples, setRecaudosMultiples] = useState({
     valor_total: 0,
@@ -64,8 +63,12 @@ const MostrarRecaudosPagar = ({
   };
   const [showModal, setShowModal] = useState(false);
   useEffect(() => {
-    fetchRecaudoMultipleFunc();
-  }, [fileName]);
+    if (type === "Operaciones") {
+      fetchRecaudoMultipleFunc();
+    } else {
+      fetchRecaudoMultipleComerciosFunc();
+    }
+  }, [fileName, type]);
   const fetchRecaudoMultipleFunc = () => {
     setIsUploading(true);
     let obj = {
@@ -89,6 +92,50 @@ const MostrarRecaudosPagar = ({
       },
     };
     postConsultaRecaudoMultiple(obj)
+      .then((res) => {
+        if (!res?.status) {
+          setIsUploading(false);
+          setEstadoTrx(0);
+          return notifyError(res?.msg);
+        }
+        // console.log(res);
+        setRecaudosMultiples(
+          res?.obj ?? {
+            valor_total: 0,
+            cantidad_transacciones: 0,
+          }
+        );
+      })
+      .catch((err) => {
+        notifyError("Error de conexion con el servicio");
+        setIsUploading(false);
+        setEstadoTrx(0);
+        console.error(err);
+      });
+  };
+  const fetchRecaudoMultipleComerciosFunc = () => {
+    setIsUploading(true);
+    let obj = {
+      filename: fileName,
+      comercio: {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        nombre_usuario: pdpUser?.uname,
+        is_oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
+      },
+      ubicacion: {
+        address: roleInfo?.direccion,
+        dane_code: roleInfo?.codigo_dane,
+        city: roleInfo?.ciudad,
+      },
+    };
+    postConsultaRecaudoMultipleComercios(obj)
       .then((res) => {
         if (!res?.status) {
           setIsUploading(false);
@@ -136,30 +183,59 @@ const MostrarRecaudosPagar = ({
         city: roleInfo?.ciudad,
       },
     };
-    postInicializacionRecaudoMultiple(obj)
-      .then((res) => {
-        if (res?.message === "Endpoint request timed out") {
+    if (type === "Operaciones") {
+      postInicializacionRecaudoMultiple(obj)
+        .then((res) => {
+          if (res?.message === "Endpoint request timed out") {
+            setIsUploading(false);
+            setEstadoTrx(2);
+            setUuid(uniqueId);
+            return notify("Inicializacion de transacción multiple exitosa");
+          }
+          if (!res?.status) {
+            setIsUploading(false);
+            setEstadoTrx(0);
+            return notifyError(res?.msg);
+          }
           setIsUploading(false);
+          notify(res?.msg);
           setEstadoTrx(2);
           setUuid(uniqueId);
-          return notify("Inicializacion de transacción multiple exitosa");
-        }
-        if (!res?.status) {
+        })
+        .catch((err) => {
+          notifyError("Error de conexion con el servicio");
           setIsUploading(false);
           setEstadoTrx(0);
-          return notifyError(res?.msg);
-        }
-        setIsUploading(false);
-        notify(res?.msg);
-        setEstadoTrx(2);
-        setUuid(uniqueId);
-      })
-      .catch((err) => {
-        notifyError("Error de conexion con el servicio");
-        setIsUploading(false);
-        setEstadoTrx(0);
-        console.error(err);
-      });
+          console.error(err);
+        });
+    } else {
+      obj["comercio"]["idterminal_punto"] = roleInfo?.id_dispositivo;
+      obj["comercio"]["serial_dispositivo"] = "WP-845696";
+      postInicializacionRecaudoMultipleComercios(obj)
+        .then((res) => {
+          if (res?.message === "Endpoint request timed out") {
+            setIsUploading(false);
+            setEstadoTrx(2);
+            setUuid(uniqueId);
+            return notify("Inicializacion de transacción multiple exitosa");
+          }
+          if (!res?.status) {
+            setIsUploading(false);
+            setEstadoTrx(0);
+            return notifyError(res?.msg);
+          }
+          setIsUploading(false);
+          notify(res?.msg);
+          setEstadoTrx(2);
+          setUuid(uniqueId);
+        })
+        .catch((err) => {
+          notifyError("Error de conexion con el servicio");
+          setIsUploading(false);
+          setEstadoTrx(0);
+          console.error(err);
+        });
+    }
   };
   return (
     <>

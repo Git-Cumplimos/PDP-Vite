@@ -23,6 +23,27 @@ export const postConsultaRecaudoMultiple = async (bodyObj) => {
     throw err;
   }
 };
+export const postConsultaRecaudoMultipleComercios = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlRecaudoMultiple}/lectura-archivo-recaudo-multiple-comercios`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
 export const postInicializacionRecaudoMultiple = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
@@ -30,6 +51,27 @@ export const postInicializacionRecaudoMultiple = async (bodyObj) => {
   try {
     const res = await fetchData(
       `${urlRecaudoMultiple}/inicializacion-recaudo-multiple`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+export const postInicializacionRecaudoMultipleComercios = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlRecaudoMultiple}/inicializacion-recaudo-multiple-comercios`,
       "POST",
       {},
       bodyObj,

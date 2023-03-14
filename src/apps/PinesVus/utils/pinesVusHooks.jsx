@@ -97,6 +97,7 @@ export const useProvidePinesVus = () => {
       infoTramite2["categoria"]=categoria2
       infoTramiteTemp=[infoTramite, infoTramite2]
     }
+    
     const body = {
       tipo_tramite: tramiteTemp,
       infoTramite: infoTramiteTemp,
@@ -118,6 +119,7 @@ export const useProvidePinesVus = () => {
       ticket_pin:ticket1,
       ticket_tramite:ticket2
     };
+  
     if (idPin !== ""){
       body.Pin = idPin
     }
@@ -172,7 +174,8 @@ export const useProvidePinesVus = () => {
       estadoPin,
       tipoPin,
       doc_cliente,
-      pageData
+      pageData,
+      pinesCliente
     ) => {
       const query = { ...pageData };
       if (cod_hash_pin !== "") {
@@ -194,9 +197,12 @@ export const useProvidePinesVus = () => {
       if (doc_cliente !== "") {
         query.doc_cliente = doc_cliente;
       }
-
+      if (pinesCliente == 1) {
+        query.pinesCliente = pinesCliente;
+      }
       try {
         const res = await fetchData(urls.PinVus, "GET", query);
+        //console.log(query)
         return res;
       } catch (err) {
         throw err;
@@ -224,12 +230,15 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const consultaClientes = useCallback(async (cedula, olimpia, idPin) => {
+  const consultaClientes = useCallback(async (cedula, olimpia, idPin, tipoPin) => {
     const query = { pk_documento_cliente: cedula};
     query.olimpia = olimpia
     query.id_comercio = roleInfo?.id_comercio
     if (idPin != ""){
       query.Pin = idPin}
+    if (tipoPin !=""){
+      query.tipoPin = tipoPin
+    }
     try {
       const res = await fetchData(urls.consultaClientes, "GET", query);
       return res;
@@ -260,7 +269,8 @@ export const useProvidePinesVus = () => {
     // num_aprobacion,
     // num_transaccion, 
     valor,
-    fecha_participacion
+    fecha_participacion,
+    ticket
     // voucher
     ) => {
     let tipo_comercio = roleInfo.tipo_comercio
@@ -282,6 +292,7 @@ export const useProvidePinesVus = () => {
       Comercio: roleInfo?.id_comercio,
       nombre_usuario: pdpUser?.uname ?? "",
       Tipo: tipo_comercio,
+      ticket: ticket
     };
     try {
       const res = await fetchData(urls.registroPagoParticipacion, "POST", {}, body);
@@ -397,6 +408,7 @@ export const useProvidePinesVus = () => {
       const query = { doc_cliente : doc_cliente, reenviarFormulario : reenviarFormulario };
       try {
         const res = await fetchData(urls.reenvioHash, "GET", query);
+        //console.log(res)
         return res;
       } catch (err) {
         throw err;

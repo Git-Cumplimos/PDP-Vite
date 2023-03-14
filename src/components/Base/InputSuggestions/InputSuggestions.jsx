@@ -13,7 +13,7 @@ const InputSuggestions = ({
   ...input
 }) => {
   const { id: _id, type } = input;
-  
+
   const inputRef = useRef(null);
   const [timer, setTimer] = useState(null);
 
@@ -83,11 +83,11 @@ const InputSuggestions = ({
 
   useEffect(() => {
     const inpRef = inputRef.current;
-    inpRef.addEventListener("search", onClearSearch)
+    inpRef.addEventListener("search", onClearSearch);
     return () => {
-      inpRef.removeEventListener("search", onClearSearch)
-    }
-  }, [onClearSearch])
+      inpRef.removeEventListener("search", onClearSearch);
+    };
+  }, [onClearSearch]);
 
   return (
     <div className={`${formItem}`}>
@@ -114,8 +114,7 @@ const InputSuggestions = ({
                       el.click();
                     }
                   );
-                }}
-              >
+                }}>
                 {el}
               </li>
             ))}

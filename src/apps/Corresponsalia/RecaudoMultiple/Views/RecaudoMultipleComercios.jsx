@@ -6,7 +6,7 @@ import CargueArchivoRecaudoMultiple from "../components/CargueArchivoRecaudoMult
 import MostrarRecaudosPagar from "../components/MostrarRecaudosPagar";
 import ConsultarRecaudosMultiples from "../components/ConsultarRecaudosMultiples";
 
-const RecaudoMultiple = () => {
+const RecaudoMultipleComercios = () => {
   const navigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
@@ -38,7 +38,7 @@ const RecaudoMultiple = () => {
           fileName={fileName}
           pdpUser={pdpUser}
           setUuid={setUuid}
-          type={"Operaciones"}
+          type={"Comercios"}
         />
       ) : estadoTrx === 2 ? (
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
@@ -61,4 +61,4 @@ const RecaudoMultiple = () => {
   );
 };
 
-export default RecaudoMultiple;
+export default RecaudoMultipleComercios;
