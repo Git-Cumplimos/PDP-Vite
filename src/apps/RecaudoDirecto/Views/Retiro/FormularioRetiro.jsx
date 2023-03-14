@@ -5,6 +5,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
 import Input from "../../../../components/Base/Input";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyPending, notifyError } from "../../../../utils/notify";
 import { getRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
 
@@ -17,10 +18,12 @@ const FormularioRetiro = () => {
   const [dataRetiro, setDataRetiro] = useState('')
   const [dataConvRetiro, setDataConvRetiro] = useState('')
   const [showModal, setShowModal] = useState(false)
+  const { roleInfo, pdpUser, infoTicket } = useAuth();
   const [dataReferencias,setDataReferencias] = useState({
     referencia1: '',
     referencia2: ''
-  }) 
+  })
+
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -40,16 +43,28 @@ const FormularioRetiro = () => {
     } catch (e) {
       console.error(e)
     }
+
   }, [pk_id_convenio])
 
   const consultarRetiroD = useCallback(async (e) => {
     e.preventDefault()
-    await getRetiro({
+    const data = {
       ...dataReferencias,
       convenio_id: pk_id_convenio,
-    })
+      comercio: {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+      is_oficina_propia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO",
+      valor_total_trx: 0,
+      nombre_usuario: pdpUser?.uname ?? "",
+    };
+    await getRetiro(data)
       .then((data) => {
-        setDataRetiro(data?.obj ?? "")
+        setDataRetiro(data?.obj.retiro ?? "")
         notify(data.msg)
         setShowModal(true);
       })
@@ -58,7 +73,7 @@ const FormularioRetiro = () => {
         handleClose()
       });
 
-  }, [pk_id_convenio, handleClose,dataReferencias])
+  }, [pk_id_convenio, handleClose, dataReferencias, roleInfo, pdpUser])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 

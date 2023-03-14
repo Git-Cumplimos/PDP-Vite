@@ -97,6 +97,9 @@ export const downloadFileRecaudo = fetchDownloadFile(
 export const getRecaudo = buildPostFunction(
   `${url}/recaudo/obtener-recaudo`
 );
+export const modRecaudo = buildPutFunction(
+  `${url}/recaudo/hacer-recaudo`
+);
 
 
 /*--- Convenios Retiro ---*/
@@ -117,7 +120,7 @@ export const downloadFileRetiro = fetchDownloadFile(
 );
 
 /* -- Retiro -- */
-export const getRetiro = buildGetFunction(
+export const getRetiro = buildPostFunction(
   `${url}/retiro/obtener-retiro`
 );
 

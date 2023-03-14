@@ -3,27 +3,34 @@ import { useNavigate, useParams } from "react-router-dom";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
+import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyPending, notifyError } from "../../../../utils/notify";
-import { getRecaudo, searchConveniosRecaudoList } from "../../utils/fetchFunctions"
+import { getRecaudo, modRecaudo, searchConveniosRecaudoList } from "../../utils/fetchFunctions"
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
 
-  const { roleInfo, pdpUser, infoTicket } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const { pk_id_convenio } = useParams()
   const [showModal, setShowModal] = useState(false)
   const [dataRecaudo, setDataRecaudo] = useState('')
   const [id_trx, setId_Trx] = useState(false)
   const [cargando, setCargando] = useState(false)
-  // const [referencia, setReferencia] = useState('')
   const [convenioRetiro, setConvenioRetiro] = useState(null);
+  const [valorRecibido, setValorRecibido] = useState({ valor_total_trx : '' })
   const [dataReferencias, setDataReferencias] = useState({
     referencia1: '',
     referencia2: ''
   })
+  const tipoModificacion = [
+    { label: "Valor igual", value: 1 },
+    { label: "Valor menor o igual", value: 2 },
+    { label: "Valor mayor o igual", value: 3 },
+    { label: "Valor menor, mayor o igual", value: 4 },
+  ]
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -72,9 +79,23 @@ const RecaudoConjunto = () => {
 
   }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, handleClose])
 
-  const hacerRecaudo = (e) => {
+  const hacerRecaudo = useCallback(async(e) => {
     e.preventDefault()
-  }
+    const data = {
+      valor_antes:dataRecaudo?.valor_pagado,
+      comercio: {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+      is_oficina_propia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO",
+      ...valorRecibido,
+      nombre_usuario: pdpUser?.uname ?? "",
+    };
+    await modRecaudo ({pk_id_recaudo:dataRecaudo.pk_id_recaudo},data)
+  },[roleInfo, pdpUser, valorRecibido, dataRecaudo])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
@@ -150,6 +171,15 @@ const RecaudoConjunto = () => {
             autoComplete="off"
             disabled
           />
+          <Select
+            className="place-self-stretch"
+            id={"Tipo modificacion"}
+            label={"Tipo de pago"}
+            name={"fk_modificar_valor"}
+            options={[{ label: "", value: "" }, ...tipoModificacion]}
+            defaultValue={dataRecaudo?.fk_modificar_valor ?? ""}
+            disabled
+          />
           <Input
             id={1}
             label={"Valor a pagar"}
@@ -157,13 +187,13 @@ const RecaudoConjunto = () => {
             type="text"
             defaultValue={dataRecaudo.valor ?? ""}
             autoComplete="off"
-            disabled
             required />
           <Input
             id={1}
             label={"Valor recibido"}
-            name={"valor_recibido"}
+            name={"valor_total_trx"}
             type="text"
+            onChange={(e)=>{ setValorRecibido({ ...valorRecibido, [e.target.name]: e.target.value })}}
             autoComplete="off"
             required />
           <ButtonBar>
