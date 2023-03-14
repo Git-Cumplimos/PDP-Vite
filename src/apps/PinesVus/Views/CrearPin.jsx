@@ -1041,7 +1041,6 @@ const CrearPin = () => {
           }
         }
           />
-
           <br></br>
 
           <ButtonBar className="col-auto md:col-span-2">

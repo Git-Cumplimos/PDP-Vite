@@ -136,7 +136,11 @@ const TramitePines = () => {
             fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
            //setFormatMon(res?.obj?.results[0]["ValorPagar"]);
 
+<<<<<<< HEAD
      let    objetoVertical=[{
+=======
+      let    objetoVertical=[{
+>>>>>>> origin/incidencias-practisistemas-ale
         clave: "Documento",
         info: res?.obj?.results[0]["doc_cliente"]
       },
@@ -177,7 +181,7 @@ const TramitePines = () => {
 
 
           setTable(
-            res?.obj?.results?.map((row) => {
+       /*     res?.obj?.results?.map((row) => {
               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
               fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
               const fecha_nacimiento = new Date(row?.fecha_nacimiento);
@@ -353,8 +357,8 @@ const TramitePines = () => {
                "Valor",
             ]}
             data={table || []}
-            onSelectRow={(e, index) => {
-              if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Dispersado no usado")) {
+       /*     onSelectRow={(e, index) => {
+              if (!(table[index][""] === "Pin creado" || table[index][""] === "Dispersado no usado")) {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
@@ -370,7 +374,7 @@ const TramitePines = () => {
                 setShowModal(true);
                 setActivarNavigate(false);
               }
-            }}
+            }}*/
             onSetPageData={setPageData}
             
           ></TableEnterprise>
@@ -424,7 +428,7 @@ const TramitePines = () => {
               <Form onSubmit={onSubmitUsar}>
                 <ButtonBar>
                   <Button type="submit">Usar pin</Button>
-                  {selected.Estado==="Pin creado" ? 
+                  {selected.name_estado_pin==="Pin creado" ? 
                   <Button
                   onClick={() => {
                     setModalCancel(true);

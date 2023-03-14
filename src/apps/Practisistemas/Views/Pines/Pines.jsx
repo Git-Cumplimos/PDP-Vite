@@ -127,6 +127,7 @@ const Pines = () => {
         headers={["Nombre del Pin", "Categoría"]}
         data={tablePines}
         onSelectRow={onSelectAutorizador}
+
         onSetPageData={setPageData}
       >
         <Input

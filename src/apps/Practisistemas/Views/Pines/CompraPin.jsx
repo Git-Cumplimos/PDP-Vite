@@ -538,6 +538,7 @@ const CompraPin = () => {
   }, []);
 
   const handleClose = useCallback(() => {
+    console.log("ESTO ES EL OP1=======", state?.op)
     setShowModal(false);
     setTypeInfo("Ninguno");
     setInputCelular("");
