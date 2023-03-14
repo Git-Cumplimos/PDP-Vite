@@ -49,7 +49,7 @@ const Pines = () => {
 
     // Transformamos los datos de la página actual
     return currentPagePines.map((pin) => ({
-      NombrePin: pin?.op === "cb" ? "Certificado de Tradición y Libertad (SNR)" : pin?.op === "hv" ? "Histórico Vehicular" : pin?.desc,
+      NombrePin: pin?.op === "cb" ? "Certificado de Tradición y Libertad (SNR)" : pin?.op === "hv" ? "Histórico Vehicular" : pin?.op === "ff" ? "FreeFire Pines" : pin?.op === "ng" ? "Noggin Pines" : pin?.desc,
       CategoriaPin: pin?.op === "hv" || pin?.op === "em" || pin?.op === "cb" ? "Pin de Servicio" : "Pin de Contenido",
     }));
   }, [nombrePin, categoriaPin, pines, page, limit]);
