@@ -123,6 +123,9 @@ export const downloadFileRetiro = fetchDownloadFile(
 export const getRetiro = buildPostFunction(
   `${url}/retiro/obtener-retiro`
 );
+export const modRetiro = buildPutFunction(
+  `${url}/retiro/hacer-retiro`
+);
 
 
 

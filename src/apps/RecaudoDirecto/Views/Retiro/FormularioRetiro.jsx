@@ -4,10 +4,11 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
+import Select from "../../../../components/Base/Select";
 import Input from "../../../../components/Base/Input";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyPending, notifyError } from "../../../../utils/notify";
-import { getRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
+import { getRetiro, modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
 
 
 const FormularioRetiro = () => {
@@ -17,12 +18,18 @@ const FormularioRetiro = () => {
   const [cargando, setCargando] = useState(false)
   const [dataRetiro, setDataRetiro] = useState('')
   const [dataConvRetiro, setDataConvRetiro] = useState('')
+  const [id_trx, setId_Trx] = useState('')
   const [showModal, setShowModal] = useState(false)
+  const [valorRecibido, setValorRecibido] = useState({ valor_total_trx: '' })
   const { roleInfo, pdpUser, infoTicket } = useAuth();
-  const [dataReferencias,setDataReferencias] = useState({
+  const [dataReferencias, setDataReferencias] = useState({
     referencia1: '',
     referencia2: ''
   })
+  const tipoModificacion = [
+    { label: "Valor igual", value: 1 },
+    { label: "Valor menor o igual", value: 2 },
+  ]
 
 
   const handleClose = useCallback(() => {
@@ -37,7 +44,7 @@ const FormularioRetiro = () => {
     try {
       let rest = await searchConveniosRetiroList({ convenio_id: pk_id_convenio })
         .then((rest) => { return rest })
-      if (rest.length < 1) throw "no hay datos" 
+      if (rest.length < 1) throw "no hay datos"
       setDataConvRetiro(rest?.obj)
       setCargando(true)
     } catch (e) {
@@ -65,6 +72,7 @@ const FormularioRetiro = () => {
     await getRetiro(data)
       .then((data) => {
         setDataRetiro(data?.obj.retiro ?? "")
+        setId_Trx(data?.obj?.id_trx ?? "")
         notify(data.msg)
         setShowModal(true);
       })
@@ -77,18 +85,51 @@ const FormularioRetiro = () => {
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
-  const hacerRetiro = useCallback((e) => {
+  const hacerRetiro = useCallback(async (e) => {
     e.preventDefault();
-    // Funcionalidad Basica ()
-    // const buscarCuentaRetiro = dataRetiro
-    // if (buscarCuentaRetiro.length < 1) { setOtp(''); setMonto(''); setDocumento(''); alert("Datos Incorrectos"); return false }
-    // if (parseInt(monto) <= parseInt(buscarCuentaRetiro[0].monto)) {
-    //   alert("Retiro Exitoso")
-    //   buscarCuentaRetiro[0].monto = buscarCuentaRetiro[0].monto - monto
-    //   setShowModal(false);
-    //   setOtp(''); setMonto(''); setDocumento('');
-    // } else { alert("Saldo insuficiente"); setMonto('') }
-  }, [])
+
+    let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
+    let sumaTotal = valoresRecibido + dataRetiro.valor_retirado
+
+    const FlujosTRX = {
+      1: () => sumaTotal === dataRetiro.valor ?
+        { estado: true, fk_estado: 2 } : undefined,
+      2: () => sumaTotal <= dataRetiro.valor ?
+        { estado: true, fk_estado: sumaTotal === dataRetiro.valor ? 2 : 1 } : undefined,
+    };
+
+    const resp = FlujosTRX[dataRetiro?.fk_modificar_valor]?.() || { estado: false };
+
+    if (resp.estado) {
+
+      const data = {
+        id_trx: id_trx,
+        fk_estado: resp.fk_estado,
+        valor_antes: dataRetiro?.valor_retirado ?? 0,
+        valor_retirado: sumaTotal,
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        is_oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
+        ...valorRecibido,
+        nombre_usuario: pdpUser?.uname ?? "",
+      };
+      console.log(data)
+      await modRetiro({ pk_id_retiro: dataRetiro.pk_id_recaudo }, data)
+        .then((data) => {
+          data?.status && notify(data?.msg)
+        })
+        .catch((err) => {
+          notifyError(err?.msg);
+        });
+      handleClose()
+    }
+    else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
+  }, [dataRetiro, roleInfo, pdpUser, id_trx, valorRecibido, handleClose])
 
   return (
     <Fragment>
@@ -119,11 +160,12 @@ const FormularioRetiro = () => {
                 key={index}
                 id={1}
                 label={dict?.nombre_referencia ?? "Referencia 1"}
-                name={'referencia'+ (index + 1)}
+                name={'referencia' + (index + 1)}
                 type="text"
                 // minLength={dict?.length[0]}
                 // maxLength={dict?.length[1]}
-                onChange={(e)=>{setDataReferencias({...dataReferencias,[e.target.name]:e.target.value})}}
+                value={dataReferencias['referencia'+ (index + 1)]}
+                onChange={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: e.target.value }) }}
                 autoComplete="off"
                 required />
             )
@@ -137,34 +179,73 @@ const FormularioRetiro = () => {
       ) : (<>cargando...</>)}
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar retiro </h2>
-        <Form onSubmit={hacerRetiro} grid >
-          <Input
-            id={1}
-            label={"Estado"}
-            name={"nombre_estado"}
-            type="text"
-            defaultValue={dataRetiro?.nombre_estado ?? ""}
-            autoComplete="off"
-            disabled
-          />
-          <Input
-            id={1}
-            label={"Valor a retirar"}
-            name={"valor"}
-            type="text"
-            defaultValue={dataRetiro?.valor ?? ""}
-            autoComplete="off"
-            disabled
-            required />
-          <ButtonBar>
-            <Button type={"submit"} >
-              Aceptar
-            </Button>
-            <Button onClick={() => handleClose()} >
-              Cancelar
-            </Button>
-          </ButtonBar>
-        </Form>
+        {dataRetiro.fk_estado !== 2 ?
+          <Form onSubmit={hacerRetiro} grid >
+            <Input
+              id={1}
+              label={"Estado"}
+              name={"nombre_estado"}
+              type="text"
+              defaultValue={dataRetiro?.nombre_estado ?? ""}
+              autoComplete="off"
+              disabled
+            />
+            <Select
+              className="place-self-stretch"
+              id={"Tipo modificacion"}
+              label={"Tipo de pago"}
+              name={"fk_modificar_valor"}
+              options={[{ label: "", value: "" }, ...tipoModificacion]}
+              defaultValue={dataRetiro?.fk_modificar_valor ?? ""}
+              disabled
+            />
+            <Input
+              id={1}
+              label={"Valor a retirar"}
+              name={"valor"}
+              type="text"
+              defaultValue={dataRetiro?.valor ?? ""}
+              autoComplete="off"
+              disabled
+              required />
+            {dataRetiro.valor_retirado !== 0 &&
+              <Input
+                id={1}
+                label={"saldo a restante"}
+                name={"valor"}
+                type="text"
+                defaultValue={dataRetiro.fk_modificar_valor === 2 ?
+                  parseInt(dataRetiro.valor - parseInt(dataRetiro.valor_retirado)) : dataRetiro.valor_retirado}
+                autoComplete="off"
+                disabled
+              />
+            }
+            <Input
+              id={1}
+              label={"Valor recibido"}
+              name={"valor_total_trx"}
+              type="text"
+              onChange={(e) => { setValorRecibido({ ...valorRecibido, [e.target.name]: e.target.value }) }}
+              autoComplete="off"
+              required />
+            <ButtonBar>
+              <Button type={"submit"} >
+                Aceptar
+              </Button>
+              <Button onClick={() => handleClose()} >
+                Cancelar
+              </Button>
+            </ButtonBar>
+          </Form>
+          : (
+            <>
+              <h2 className="text-2xl mx-auto text-center mb-4">No tiene saldo para retirar</h2>
+              <Button onClick={() => handleClose()} >
+                Cerrar
+              </Button>
+            </>
+
+          )}
       </Modal>
 
     </Fragment>

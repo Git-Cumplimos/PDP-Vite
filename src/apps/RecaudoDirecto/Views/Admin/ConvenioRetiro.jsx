@@ -32,8 +32,6 @@ const RetiroDirecto = () => {
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
     { label: "Valor menor", value: 2 },
-    { label: "Valor mayor", value: 3 },
-    { label: "Valor menor o mayor", value: 4 },
   ]
   const tipoConvenio = [
     { label: "Interno", value: 1 },
