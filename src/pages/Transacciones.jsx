@@ -97,6 +97,7 @@ const Transacciones = () => {
     }
 
     const queries = new URLSearchParams(tempMap.entries()).toString();
+
     fetchTrxs(`${url}?${queries}`);
   }, [fetchTrxs, searchFilters]);
 
