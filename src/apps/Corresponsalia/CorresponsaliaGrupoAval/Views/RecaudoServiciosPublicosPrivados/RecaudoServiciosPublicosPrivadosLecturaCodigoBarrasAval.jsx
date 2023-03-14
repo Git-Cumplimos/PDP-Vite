@@ -584,7 +584,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                       datosTransaccion.valorSinModificar2
                     )} `}
                   </h2>
-                  {datosEnvio?.datosConvenio?.parciales === "0" && (
+                  {datosEnvio?.datosConvenio?.parciales === "1" && (
                     <Form grid onSubmit={onSubmitPago}>
                       <Input
                         id='valor'

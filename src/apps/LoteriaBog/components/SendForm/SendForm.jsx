@@ -40,12 +40,14 @@ const SendForm = ({
   }, [tiposOperaciones]);
 
   const [checkedState, setCheckedState] = useState([]);
+  const [flagFraccionV, setFlagFraccionV] = useState([]);
   useEffect(() => {
     const copy = [];
     selected?.Fracciones?.forEach(() => {
       copy.push(false);
     });
     setCheckedState([...copy]);
+    setFlagFraccionV([...copy]);
   }, [selected]);
 
   const [disabledBtns, setDisabledBtns] = useState(false);
@@ -57,6 +59,7 @@ const SendForm = ({
     );
 
     setCheckedState(updatedCheckedState);
+    setFlagFraccionV(updatedCheckedState);
 
     for (var i = 0; i < selected?.Fracciones?.length; i++) {
       if (updatedCheckedState[i] === true) {
@@ -67,8 +70,13 @@ const SendForm = ({
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (sorteo.split("-")[1] === "true" & selecFrac.length == "0") {
-      notifyError("Seleccione la(s) fraccion(es) a vender");
+    if (selecFrac.length == "0") {
+      if (sorteo.split("-")[1] === "true") {
+        notifyError("Seleccione la(s) fraccion(es) a vender");
+      }
+      else {
+        notifyError("Seleccione la fracción a vender");
+      }
     }
     else if(tipoPago == null) {
       notifyError("Seleccione método de pago");
@@ -94,7 +102,7 @@ const SendForm = ({
     const cus = { fracciones, phone, doc_id, email };
     cus.fracciones = "1";
     setCustomer({ ...cus });
-  }, [fracciones])
+  }, [fracciones,sorteo])
 
   return (
     <>
@@ -125,12 +133,11 @@ const SendForm = ({
                     checked={checkedState[index]}
                     onChange={() => handleOnChange(index)}
                   />
-                );
-              })}
+                  );
+                })}
             </>
           ) : (
             <>
-
               <Input
                 id="cantFrac"
                 label="Fracciones a comprar"
@@ -139,12 +146,29 @@ const SendForm = ({
                 min="1"
                 value={fracciones}
                 required={true}
-              // onInput={(e) => {
-              //   const cus = { fracciones, phone, doc_id };
-              //   cus.fracciones = e.target.value;
-              //   setCustomer({ ...cus });
-              // }}
+                disabled
               />
+              {selected?.Fracciones?.map((frac, index) => {
+                return (
+                  <Input
+                    id={frac}
+                    label={`Fracción ${frac}:`}
+                    type="checkbox"
+                    value={frac}
+                    checked={checkedState[index]}
+                    disabled={flagFraccionV[index]}
+                    onChange={() => {
+                      handleOnChange(index)
+                      if (!checkedState[index]){
+                        const updatedCheckedState = checkedState.map((item, frac) =>
+                          frac === index ? item : !item
+                        );
+                        setFlagFraccionV(updatedCheckedState);
+                      }
+                    }}
+                  />
+                );
+              })}
               <Input
                 id="email"
                 label="Email"

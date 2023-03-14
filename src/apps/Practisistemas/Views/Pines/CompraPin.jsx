@@ -204,6 +204,14 @@ const CompraPin = () => {
     setInputContador(e.target.value);
   };
 
+  const handleKeyPress = (event) => {
+    const pattern = /^[a-zA-Z0-9 ]*$/; // Patrón para aceptar solo letras, números y espacios en blanco
+    const inputChar = String.fromCharCode(event.charCode);
+
+    if (!pattern.test(inputChar)) {
+      event.preventDefault(); // Prevenir que se ingrese el caracter especial
+    }
+  };
   const onPlacaChange = (e, placaVh) => {
     setInputPlaca(e.target.value);
   };
@@ -276,7 +284,7 @@ const CompraPin = () => {
 
     newVoucher["timeInfo"]["Hora"] = hora;
 
-    newVoucher["trxInfo"][0] = ["Convenio", state.desc];
+    newVoucher["trxInfo"][0] = ["Convenio", state.desc == "Certificado TL" ? "Certificado (SNR)" : state.desc];
 
     if (state?.op == "cb") {
       newVoucher["trxInfo"][1] = ["", ""];
@@ -476,7 +484,7 @@ const CompraPin = () => {
           ? "VENTA PINES DE SERVICIO"
           : "VENTA PINES DE CONTENIDO",
       trxInfo: [
-        ["Convenio", state.desc],
+        ["Convenio", state.desc == "Certificado TL" ? "Certificado (SNR)" : state.desc],
         ["", ""],
         state?.op == "em"
           ? ["No. PIN", result_?.jsonAdicional?.["Numero Pin"]]
@@ -590,7 +598,7 @@ const CompraPin = () => {
   return (
     <Fragment>
       <SimpleLoading show={showLoading} />
-      <h1 className="text-3xl mt-6">Compra Pin: {state?.desc == "Certificado TL" ? "Certificado de Tradición y Libertad (SNR)" : state?.desc} </h1>
+      <h1 className="text-3xl mt-6">Compra Pin: {state?.desc == "Certificado TL" ? "Certificado de Tradición y Libertad (SNR)" : state?.desc == "Historico Vehicular" ? "Histórico Vehicular" : state?.desc} </h1>
       <Form onSubmit={onSubmitCheck} grid>
         {state?.op == "cb" ? (
           <>
@@ -603,6 +611,7 @@ const CompraPin = () => {
               maxLength={"20"}
               value={inputCirculo}
               onChange={onCirculoChange}
+              onKeyPress={handleKeyPress}
               required
             />
             <Input
@@ -614,6 +623,7 @@ const CompraPin = () => {
               maxLength={"12"}
               value={inputMatricula}
               onChange={onMatriculaChange}
+              onKeyPress={handleKeyPress}
               required
             />
             <Input
@@ -642,6 +652,7 @@ const CompraPin = () => {
               maxLength={"20"}
               value={inputContador}
               onChange={onContadorChange}
+              onKeyPress={handleKeyPress}
               required
             />
             <MoneyInput
@@ -705,6 +716,7 @@ const CompraPin = () => {
               maxLength={"6"}
               value={inputPlaca}
               onChange={onPlacaChange}
+              onKeyPress={handleKeyPress}
               required
             />
             <ButtonBar className={"lg:col-span-2"}>
