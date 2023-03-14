@@ -300,8 +300,8 @@ const TramitePines = () => {
                 id="paramBusqueda"
                 label="Documento"//"Código"
                 type="text"
-                minLength="12"
-                maxLength="5"
+                minLength="5"
+                maxLength="12"
                 autoComplete="off"
                 value={parametroBusqueda}
                 required
