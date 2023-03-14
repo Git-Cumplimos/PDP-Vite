@@ -17,7 +17,7 @@ const RecaudoConjunto = () => {
   const { pk_id_convenio } = useParams()
   const [showModal, setShowModal] = useState(false)
   const [dataRecaudo, setDataRecaudo] = useState('')
-  const [id_trx, setId_Trx] = useState(false)
+  const [id_trx, setId_Trx] = useState('')
   const [cargando, setCargando] = useState(false)
   const [convenioRetiro, setConvenioRetiro] = useState(null);
   const [valorRecibido, setValorRecibido] = useState({ valor_total_trx: '' })
@@ -82,19 +82,21 @@ const RecaudoConjunto = () => {
   const hacerRecaudo = useCallback(async (e) => {
     e.preventDefault()
 
-    let valoresRecibido = parseInt(valorRecibido.valor_total_trx)
+    let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
+    let sumaTotal = valoresRecibido + dataRecaudo.valor_pagado
+    notify(sumaTotal)
 
     const FlujosTRX = {
-      1: () => valoresRecibido === dataRecaudo.valor ? 
-      { estado: true, fk_estado: 2 } : undefined,
-      2: () => valoresRecibido <= dataRecaudo.valor ? 
-      { estado: true, fk_estado: valoresRecibido === dataRecaudo.valor ? 2 : 1 } : undefined,
-      3: () => valoresRecibido >= dataRecaudo.valor ? 
-      { estado: true, fk_estado: valoresRecibido === dataRecaudo.valor ? 2 : 1 } : undefined,
-      4: () => (valoresRecibido < dataRecaudo.valor || valoresRecibido >= dataRecaudo.valor) ? 
-      { estado: true, fk_estado: valoresRecibido >= dataRecaudo.valor ? 2 : 1 } : undefined,
+      1: () => sumaTotal === dataRecaudo.valor ?
+        { estado: true, fk_estado: 2 } : undefined,
+      2: () => sumaTotal <= dataRecaudo.valor ?
+        { estado: true, fk_estado: sumaTotal === dataRecaudo.valor ? 2 : 1 } : undefined,
+      3: () => sumaTotal >= dataRecaudo.valor ?
+        { estado: true, fk_estado: 2 } : undefined,
+      4: () => (sumaTotal < dataRecaudo.valor || sumaTotal >= dataRecaudo.valor) ?
+        { estado: true, fk_estado: sumaTotal >= dataRecaudo.valor ? 2 : 1 } : undefined,
     };
-    
+
     // const FlujosTRX = {
     //   1: { condicion: function(valoresRecibido,dataRecaudo){
     //     if (valoresRecibido === dataRecaudo) { return {estado : true,fk_estado : 2 }}},
@@ -119,15 +121,16 @@ const RecaudoConjunto = () => {
     // }}
     // const resp = FlujosTRX[dataRecaudo?.fk_modificar_valor]?.condicion(valoresRecibido,dataRecaudo.valor) || {'estado':false}
     // console.log(resp);
-    
-    
+
+
     const resp = FlujosTRX[dataRecaudo?.fk_modificar_valor]?.() || { estado: false };
-
-    console.log(resp.estado)
-
+    console.log(id_trx)
     if (resp.estado) {
       const data = {
+        id_trx:id_trx,
+        fk_estado: resp.fk_estado,
         valor_antes: dataRecaudo?.valor_pagado ?? 0,
+        valor_pagado: sumaTotal,
         comercio: {
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
@@ -140,17 +143,17 @@ const RecaudoConjunto = () => {
         nombre_usuario: pdpUser?.uname ?? "",
       };
       await modRecaudo({ pk_id_recaudo: dataRecaudo.pk_id_recaudo }, data)
-      .then((data)=>{
-        data?.status && notify(data?.msg) 
-      })
-      .catch((err) => {
-        notifyError(err?.msg);
-      });
+        .then((data) => {
+          data?.status && notify(data?.msg)
+        })
+        .catch((err) => {
+          notifyError(err?.msg);
+        });
       handleClose()
     }
-    else {notifyError("El valor recibido debe estar a corde al tipo de pago")}
-    
-  }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, handleClose])
+    else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
+
+  }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx, handleClose])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
@@ -193,6 +196,7 @@ const RecaudoConjunto = () => {
                 type="text"
                 // minLength={dict?.length[0]}
                 // maxLength={dict?.length[1]}
+                value={dataReferencias['referencia'+ (index + 1)]}
                 onChange={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: e.target.value }) }}
                 autoComplete="off"
                 required />
@@ -237,12 +241,24 @@ const RecaudoConjunto = () => {
           />
           <Input
             id={1}
-            label={"Valor a pagar"}
+            label={"Valor total a pagar"}
             name={"valor"}
             type="text"
             defaultValue={dataRecaudo.valor ?? ""}
             autoComplete="off"
             required />
+          {dataRecaudo.valor_pagado !== 0 && 
+            <Input
+              id={1}
+              label={dataRecaudo.fk_modificar_valor === 2  ? "valor a restante": "saldo a favor"}
+              name={"valor"}
+              type="text"
+              defaultValue={dataRecaudo.fk_modificar_valor === 2 ? 
+                parseInt(dataRecaudo.valor - parseInt(dataRecaudo.valor_pagado)) ?? 0: dataRecaudo.valor_pagado}
+              autoComplete="off"
+              disabled
+            />
+          }
           <Input
             id={1}
             label={"Valor recibido"}
