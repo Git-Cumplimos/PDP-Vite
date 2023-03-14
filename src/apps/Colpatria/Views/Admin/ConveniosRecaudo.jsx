@@ -318,7 +318,6 @@ const ConveniosRecaudo = () => {
             ev.target.value = onChangeNumber(ev);
           }}
           defaultValue={selected?.codigo_ean_iac ?? ""}
-          required
         />
         <Input
           id={"nombre_convenio"}

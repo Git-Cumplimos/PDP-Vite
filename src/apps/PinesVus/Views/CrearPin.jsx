@@ -23,7 +23,7 @@ import TextArea from "../../../components/Base/TextArea";
 const dateFormatter = Intl.DateTimeFormat("az", {
   year: "numeric",
   month: "2-digit",
-  day: "2-digit",
+  day: "2-digit"
 });
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -52,6 +52,7 @@ const CrearPin = () => {
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [disabledBtnsContinuar, setDisabledBtnsContinuar] = useState(false);
   const [showTramiteAdicional, setShowTramiteAdicional] = useState(false);
+  const [showPinLicencia, setShowPinLicencia,] = useState(false);
   const [txtButtonTramiteAdicional, settxtButtonTramiteAdicional] = useState("+ Agregar Segundo Trámite");
   const [respPin, setRespPin] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
@@ -274,7 +275,7 @@ const CrearPin = () => {
       ["",""],
       ["", ""],
     ],
-    disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    disclamer: "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
   });
 
   const [objTicketActual2, setObjTicketActual2] = useState({
@@ -300,9 +301,10 @@ const CrearPin = () => {
     commerceName: "",
     trxInfo: [
     ],
-    disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    disclamer: "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
   });
 
+  
 
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
@@ -318,6 +320,7 @@ const CrearPin = () => {
   
     consultaTramite()
     .then((res) => {
+      //console.log(res)
       setDisabledBtns(false);
       if (!res?.status) {
         notifyError(res?.msg);
@@ -359,6 +362,8 @@ const CrearPin = () => {
       iva : resp[0]?.iva,
       total : resp[0]?.valor + resp[0]?.iva
     }
+    console.log(pinData, tipoPin)
+    console.log(tramite, tramite2)
     return pinData;
   }, [optionsTipoPines, tipoPin]);
 
@@ -411,7 +416,7 @@ const CrearPin = () => {
     e.preventDefault();
     setDisabledBtnsContinuar(true);
     setShowFormulario(false)
-    consultaClientes(documento,olimpia,idPin).then((resp) => {
+    consultaClientes(documento,olimpia,idPin,tipoPin).then((resp) => {
       if (!resp?.status){
         notifyError(resp?.msg)
       }else{
@@ -508,28 +513,36 @@ const CrearPin = () => {
     }).format(new Date());
 
     const objTicket = { ...objTicketActual };
-    objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
+    if(tipoPin==1){
+      objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
+    }else{
+      objTicket["title"] = "Recibo de pago: " +pinData["descripcion"].toUpperCase() 
+    }
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["commerceName"] = "PIN PARA GENERACIÓN DE LICENCIA"
+    objTicket["commerceName"] = pinData["descripcion"]
     objTicket["trxInfo"][0] = ["Trámite", "Creación de Pin"]
     // objTicket["trxInfo"][2] = ["Valor Pin", formatMoney.format(respPin?.valor)]
     // objTicket["trxInfo"][3] = ["IVA Pin",formatMoney.format(respPin?.valor_iva)]
     // objTicket["trxInfo"][4] = ["Total", formatMoney.format(respPin?.valor + respPin?.valor_iva)] 
 
     const objTicket2 = { ...objTicketActual2 };
-    objTicket2["title"] = "Recibo de pago: Tramite de licencias " 
+    objTicket2["title"] = "Recibo de pago: TRÁMITE "+ tramiteData?.descripcion.toUpperCase() 
     objTicket2["timeInfo"]["Fecha de venta"] = fecha;
     objTicket2["timeInfo"]["Hora"] = hora;
-    objTicket2["commerceName"] = "TRAMITE GENERACIÓN DE LICENCIA"
+    if(tipoPin==1){
+      objTicket2["commerceName"] = "TRÁMITE GENERACIÓN DE LICENCIA"
+    }else{
+      objTicket2["commerceName"] = "TRÁMITE "+ tramiteData?.descripcion.toUpperCase() 
+    }
     if (!isNaN(tramiteData2.total)){
-    objTicket2["trxInfo"][0] = ["Trámite 1", tramiteData?.descripcion]
+    objTicket2["trxInfo"][0] = ["Detalle trámite_1", tramiteData?.descripcion]
     objTicket2["trxInfo"][1] = ["", ""]
-    objTicket2["trxInfo"][2] = ["Valor Trámite 1", formatMoney.format(tramiteData?.valor)]
+    objTicket2["trxInfo"][2] = ["Valor trámite_1", formatMoney.format(tramiteData?.valor)]
     objTicket2["trxInfo"][3] = ["", ""]
-    objTicket2["trxInfo"][4] = ["Trámite 2", tramiteData2?.descripcion]
+    objTicket2["trxInfo"][4] = ["Detalle trámite_2", tramiteData2?.descripcion]
     objTicket2["trxInfo"][5] = ["", ""]
-    objTicket2["trxInfo"][6] = ["Valor Trámite 2", formatMoney.format(tramiteData2?.valor)]
+    objTicket2["trxInfo"][6] = ["Valor trámite_2", formatMoney.format(tramiteData2?.valor)]
     objTicket2["trxInfo"][7] = ["", ""]
     objTicket2["trxInfo"][8] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva + tramiteData2?.valor)] 
     objTicket2["trxInfo"][9] = ["", ""]
@@ -537,9 +550,9 @@ const CrearPin = () => {
 
     }
     else{
-      objTicket2["trxInfo"][0] = ["Trámite 1", tramiteData?.descripcion]
+      objTicket2["trxInfo"][0] = ["Detalle trámite", tramiteData?.descripcion]
       objTicket2["trxInfo"][1] = ["", ""]
-      objTicket2["trxInfo"][2] = ["Valor Trámite 1", formatMoney.format(tramiteData?.valor)]
+      objTicket2["trxInfo"][2] = ["Valor trámite", formatMoney.format(tramiteData?.valor)]
       objTicket2["trxInfo"][3] = ["", ""]
       objTicket2["trxInfo"][4] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)] 
       objTicket2["trxInfo"][5] = ["", ""]
@@ -927,6 +940,7 @@ const CrearPin = () => {
         </Fieldset>
       </Fieldset>      */}
       <Fieldset legend="Datos Trámite" className="lg:col-span-2">
+      
         <Select
           className="place-self-stretch"
           id="tipoPin"
@@ -943,8 +957,38 @@ const CrearPin = () => {
           required={true}
           onChange={(e) => {
             setTipoPin(parseInt(e.target.value) ?? "");
+            if(isNaN(tipoPin)){
+              setTipoPin("")
+            } setDisabledBtns(true)
+            consultaClientes(documento,olimpia,idPin,e.target.value).then((resp) => {
+              if (!resp?.status){
+                notifyError(resp?.msg)
+                setShowPinLicencia(false)
+                setTipoPin("")
+                setDisabledBtns(false)
+               // console.log(resp)
+              }else{               // console.log(resp)
+                if(e.target.value=="1"){
+                  setShowPinLicencia(true)
+                  setShowTramiteAdicional(false)
+                  setTramite2("")
+                  setCategoria2("")
+                  settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
+                  setTramite("")
+                  setCategoria("")
+                  setDisabledBtns(false)
+                }else{
+                setShowPinLicencia(false)
+                setDisabledBtns(false)
+
+                //setDisabledBtns(false)
+
+                }
+              }})
           }}
         />
+        
+
         <Select
           className="place-self-stretch"
           id="tramite"
@@ -953,7 +997,12 @@ const CrearPin = () => {
             Object.fromEntries([
               ["", ""],
               ...optionsTramites?.map(({ descripcion, id }) => {
+
+              if(optionsTramites[id-1]["tipoPin"]==tipoPin){
                 return [descripcion, id];
+              }else{
+                return ["", ""];
+              }
               }),
             ]) || { "": "" }
           }
@@ -967,11 +1016,20 @@ const CrearPin = () => {
             settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
           }}
         />
+    
+    {showPinLicencia ? 
+      <>
+
+
         <Select
           className="place-self-stretch"
           id="categoria"
           label="Categoría de Licencia"
-          options={optionsCategoria}
+          options={
+           tramite==1||tramite==3||tramite==5||tramite==7||tramite==9?  [...(optionsCategoria.slice(0,1)),...(optionsCategoria.slice(3))]:
+           tramite==2||tramite==4||tramite==6||tramite==8||tramite==10?  [...(optionsCategoria.slice(0,3))]:
+           tramite==""||isNaN(tramite)?  [...(optionsCategoria.slice(0,1))]:""
+             }
           required={true}
           value={categoria}
           onChange={(e) => {
@@ -983,6 +1041,7 @@ const CrearPin = () => {
           }
         }
           />
+
           <br></br>
 
           <ButtonBar className="col-auto md:col-span-2">
@@ -1035,6 +1094,8 @@ const CrearPin = () => {
                      {txtButtonTramiteAdicional}
                     </Button>
                     </ButtonBar>
+
+
                     {showTramiteAdicional? 
               
                 <Fieldset legend="Datos Trámite Adicional" className="lg:col-span-2">
@@ -1061,7 +1122,11 @@ const CrearPin = () => {
                     className="place-self-stretch"
                     id="categoria2"
                     label="Categoría de Licencia"
-                    options={optionsCategoria}
+                    options={
+                      tramite2==1||tramite2==3||tramite2==5||tramite2==7||tramite2==9?  [...(optionsCategoria.slice(0,1)),...(optionsCategoria.slice(3))]:
+                      tramite2==2||tramite2==4||tramite2==6||tramite2==8||tramite2==10?  [...(optionsCategoria.slice(0,3))]:
+                      tramite2==""||isNaN(tramite2)?  [...(optionsCategoria.slice(0,1))]:""
+                    }
                     required={true}
                     value={categoria2}
                     onChange={(e) => {
@@ -1073,7 +1138,9 @@ const CrearPin = () => {
               :
               ""
               }  
-  
+                      </>
+      :"" 
+      }
       </Fieldset>       
       <ButtonBar className="col-auto md:col-span-2">
         <Button type="submit" disabled={disabledBtns}>
