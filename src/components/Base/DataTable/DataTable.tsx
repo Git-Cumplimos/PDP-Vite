@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import Form from "../Form";
 import classes from "./DataTable.module.css";
+import LimitSelector from "./LimitSelector";
+import PaginationButtons from "./PaginationButtons";
 
 const { dataTable, tooling, iconBtn, filterDiv, wrapper, staticBar } = classes;
 
@@ -125,5 +127,8 @@ const DataTable = ({
     </div>
   );
 };
+
+DataTable.LimitSelector = LimitSelector
+DataTable.PaginationButtons = PaginationButtons
 
 export default DataTable;

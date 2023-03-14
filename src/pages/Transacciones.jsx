@@ -14,10 +14,7 @@ import TicketsPines from "../apps/PinesVus/components/TicketsPines";
 import TicketsAval from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
 import TicketColpatria from "../apps/Colpatria/components/TicketColpatria";
 import TicketsAgrario from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
-import DataTable, {
-  PaginationButtons,
-  LimitSelector,
-} from "../components/Base/DataTable";
+import DataTable from "../components/Base/DataTable";
 import useFetchDispatchDebounce from "../hooks/useFetchDispatchDebounce";
 import useMap from "../hooks/useMap";
 import { onChangeNumber } from "../utils/functions";
@@ -227,13 +224,13 @@ const Transacciones = () => {
         }}
         tblFooter={
           <Fragment>
-            <LimitSelector
+            <DataTable.LimitSelector
               defaultValue={searchFilters.get("limit")}
               onChangeLimit={(limit) => {
                 setSingleFilter("limit", limit);
               }}
             />
-            <PaginationButtons
+            <DataTable.PaginationButtons
               onClickNext={(_) =>
                 setSingleFilter("page", (oldPage) =>
                   isNextPage ? oldPage + 1 : oldPage
@@ -244,7 +241,7 @@ const Transacciones = () => {
                   oldPage > 1 ? oldPage - 1 : oldPage
                 )
               }
-            ></PaginationButtons>
+            ></DataTable.PaginationButtons>
           </Fragment>
         }
         onChange={(ev) => {
