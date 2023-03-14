@@ -25,8 +25,8 @@ export interface HookOptions {
 export class ErrorPDPFetch extends Error {
   errorJson: any;
 
-  constructor(message: string, obj: any, options?: ErrorOptions) {
-    super(message, options);
+  constructor(message: string, obj: any, ...params: any[]) {
+    super(message, ...params);
 
     // Maintains proper stack trace for where our error was thrown (only available on V8)
     if (Error.captureStackTrace) {
