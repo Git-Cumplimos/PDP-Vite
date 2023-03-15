@@ -24,7 +24,7 @@ const RecargasPaquetes = ({ subRoutes }) => {
   /* Filtrado de la matriz de operadores. */
 
   const tableOperadores = useMemo(() => {
-    const filteredOperadores = operadores.filter((operador) => {
+    let filteredOperadores = operadores.filter((operador) => {
       return (
         operador.desc.toLowerCase().includes(search.operador.toLowerCase()) &&
         operador.isPack.toLowerCase().includes(search.isPack.toLowerCase())
