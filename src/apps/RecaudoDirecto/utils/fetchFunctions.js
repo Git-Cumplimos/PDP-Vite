@@ -95,9 +95,9 @@ export const downloadFileRecaudo = fetchDownloadFile(
 
 /* -- Recaudo -- */
 export const getRecaudo = buildPostFunction(
-  `${url}/recaudo/obtener-recaudo`
+  `${url}/recaudo/consulta-recaudo`
 );
-export const modRecaudo = buildPutFunction(
+export const modRecaudo = buildPostFunction(
   `${url}/recaudo/hacer-recaudo`
 );
 

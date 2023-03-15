@@ -7,7 +7,7 @@ import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { notify, notifyPending, notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 import { getRecaudo, modRecaudo, searchConveniosRecaudoList } from "../../utils/fetchFunctions"
 
 const RecaudoConjunto = () => {
@@ -40,11 +40,11 @@ const RecaudoConjunto = () => {
     try {
       let rest = await searchConveniosRecaudoList({ convenio_id: pk_id_convenio })
         .then((rest) => { return rest })
-      if (rest.length < 1) throw "no hay datos"
+      if (rest.length < 1) throw new Error("Convenio no existe")
       setConvenioRetiro(rest.obj)
       setCargando(true)
     } catch (e) {
-      alert("error")
+      notifyError(e.message)
       navigate("/recaudo-directo/recaudo")
     }
   }, [navigate, pk_id_convenio])
@@ -52,8 +52,11 @@ const RecaudoConjunto = () => {
   const consultarRecaudoD = useCallback(async (e) => {
     e.preventDefault()
     const data = {
-      ...dataReferencias,
-      convenio_id: pk_id_convenio,
+      consulta_recaudo: {
+        convenio_id: pk_id_convenio,
+        referencias: Object.values(dataReferencias).filter((ref)=>ref !== '') ,
+      },
+      valor_total_trx: 0,
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
@@ -62,7 +65,6 @@ const RecaudoConjunto = () => {
       is_oficina_propia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
         roleInfo?.tipo_comercio === "KIOSCO",
-      valor_total_trx: 0,
       nombre_usuario: pdpUser?.uname ?? "",
     };
     await getRecaudo(data)
@@ -84,50 +86,20 @@ const RecaudoConjunto = () => {
 
     let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
     let sumaTotal = valoresRecibido + dataRecaudo.valor_pagado
-    notify(sumaTotal)
 
-    const FlujosTRX = {
-      1: () => sumaTotal === dataRecaudo.valor ?
-        { estado: true, fk_estado: 2 } : undefined,
-      2: () => sumaTotal <= dataRecaudo.valor ?
-        { estado: true, fk_estado: sumaTotal === dataRecaudo.valor ? 2 : 1 } : undefined,
-      3: () => sumaTotal >= dataRecaudo.valor ?
-        { estado: true, fk_estado: 2 } : undefined,
-      4: () => (sumaTotal < dataRecaudo.valor || sumaTotal >= dataRecaudo.valor) ?
-        { estado: true, fk_estado: sumaTotal >= dataRecaudo.valor ? 2 : 1 } : undefined,
+    const ValidacionTRX = {
+      1: () => sumaTotal === dataRecaudo.valor ? { estado: true} : undefined,
+      2: () => sumaTotal <= dataRecaudo.valor ? { estado: true} : undefined,
+      3: () => sumaTotal >= dataRecaudo.valor ? { estado: true} : undefined,
+      4: () => (sumaTotal < dataRecaudo.valor || sumaTotal >= dataRecaudo.valor) ? { estado: true } : undefined,
     };
 
-    // const FlujosTRX = {
-    //   1: { condicion: function(valoresRecibido,dataRecaudo){
-    //     if (valoresRecibido === dataRecaudo) { return {estado : true,fk_estado : 2 }}},
-    //   2: { condicion: function(valoresRecibido,dataRecaudo){
-    //     if (valoresRecibido <= dataRecaudo) { 
-    //       if (valoresRecibido === dataRecaudo) return{estado : true,fk_estado : 2 }
-    //       else return{estado : true,fk_estado : 1 }
-    //     }
-    //   }},
-    //   3: {condicion: function(valoresRecibido,dataRecaudo){
-    //     if (valoresRecibido >= dataRecaudo) { 
-    //       if (valoresRecibido === dataRecaudo) return{estado : true,fk_estado : 2 }
-    //       else return{estado : true,fk_estado : 1 }
-    //     }
-    //   }},
-    //   4: {condicion: function(valoresRecibido,dataRecaudo){
-    //     if (valoresRecibido < dataRecaudo || valoresRecibido >= dataRecaudo) { 
-    //       if (valoresRecibido >= dataRecaudo) return{estado : true,fk_estado : 2 }
-    //       else return{estado : true,fk_estado : 1 }
-    //     }
-    //   }},
-    // }}
-    // const resp = FlujosTRX[dataRecaudo?.fk_modificar_valor]?.condicion(valoresRecibido,dataRecaudo.valor) || {'estado':false}
-    // console.log(resp);
+    const resp = ValidacionTRX[dataRecaudo?.fk_modificar_valor]?.() || { estado: false };
 
-
-    const resp = FlujosTRX[dataRecaudo?.fk_modificar_valor]?.() || { estado: false };
-    console.log(id_trx)
     if (resp.estado) {
       const data = {
         id_trx:id_trx,
+        convenio_id: pk_id_convenio,
         fk_estado: resp.fk_estado,
         valor_antes: dataRecaudo?.valor_pagado ?? 0,
         valor_pagado: sumaTotal,
@@ -153,7 +125,7 @@ const RecaudoConjunto = () => {
     }
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
 
-  }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx, handleClose])
+  }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx, pk_id_convenio, handleClose])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
