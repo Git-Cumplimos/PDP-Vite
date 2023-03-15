@@ -20,14 +20,14 @@ const RecargasPaquetes = ({ subRoutes }) => {
   });
   const [operadores, setOperadores] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
-  const {roleInfo} = useAuth();
+  const { roleInfo } = useAuth();
 
   const tableOperadores = useMemo(() => {
     return [
-      ...operadores.map(({desc,isPack,op}) => {
+      ...operadores.map(({ desc, isPack, op }) => {
         return {
           "Descripcion": desc,
-          "Servicio": isPack, 
+          "Servicio": isPack,
         };
       }),
     ];
@@ -35,33 +35,33 @@ const RecargasPaquetes = ({ subRoutes }) => {
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      if (operadores[i]["desc"] === "Movistar"){
-        navigate ("../movistar/recargas-movistar")
+      if (operadores[i]["desc"] === "Movistar") {
+        navigate("../movistar/recargas-movistar")
       }
-      else if (operadores[i]["desc"] === "Paquetes Movistar"){
-        navigate ("../movistar/paquetes-movistar")
-      }      
+      else if (operadores[i]["desc"] === "Paquetes Movistar") {
+        navigate("../movistar/paquetes-movistar")
+      }
       else {
         (operadores[i]["isPack"] === "Recarga")
-        ? navigate(
-          "../recargas-paquetes/Recargar",
-          {
-            state: {
-              operador_recargar: operadores[i]["desc"],
-              producto: operadores[i]["op"],
-            },
-          }         
-        )
-        : navigate(
-          "../recargas-paquetes/Venta-paquetes",
-          {
-            state: {
-              operador_recargar: operadores[i]["desc"],
-              producto: operadores[i]["op"],
-              operadorPaquete: operadores[i]["operadorPacks"],
-            },
-          }        
-        )        
+          ? navigate(
+            "../recargas-paquetes/Recargar",
+            {
+              state: {
+                operador_recargar: operadores[i]["desc"],
+                producto: operadores[i]["op"],
+              },
+            }
+          )
+          : navigate(
+            "../recargas-paquetes/Venta-paquetes",
+            {
+              state: {
+                operador_recargar: operadores[i]["desc"],
+                producto: operadores[i]["op"],
+                operadorPaquete: operadores[i]["operadorPacks"],
+              },
+            }
+          )
       }
     },
     [navigate, operadores]
@@ -73,19 +73,18 @@ const RecargasPaquetes = ({ subRoutes }) => {
 
   const fecthTablaConveniosPaginadoFunc = () => {
     postConsultaOperadores({
-      idcomercio : roleInfo?.["id_comercio"],
+      idcomercio: roleInfo?.["id_comercio"],
       page,
       limit,
       operador: datosTrans.operador,
     })
       .then((autoArr) => {
-        console.log("autoArr",autoArr)
         setMaxPages(autoArr?.maxPages);
         setOperadores(autoArr?.response ?? []);
       })
       .catch((err) => console.error(err));
   };
-  
+
   return (
     <>
       <h1 className='text-3xl text-center'>
@@ -94,7 +93,7 @@ const RecargasPaquetes = ({ subRoutes }) => {
       <TableEnterprise
         title='Tabla servicio de recargas'
         maxPage={maxPages}
-        headers={["Descripción","Servicio"]}
+        headers={["Descripción", "Servicio"]}
         data={tableOperadores}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}

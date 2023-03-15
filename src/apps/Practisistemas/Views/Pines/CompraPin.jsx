@@ -1,4 +1,4 @@
-import React, {Fragment,useCallback,useEffect,useRef,useState,} from "react";
+import React, { Fragment, useCallback, useEffect, useRef, useState, } from "react";
 import useMoney from "../../../../hooks/useMoney";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../components/Base/Button";
@@ -16,7 +16,7 @@ import { notify, notifyError } from "../../../../utils/notify";
 import { toPhoneNumber } from "../../../../utils/functions";
 import classes from "./FormularioVentaPines.module.css";
 import fetchData from "../../../../utils/fetchData";
-import {postCheckReintentoPines,fetchConsultaPinEPM,fetchConsultaPinSNR,} from "../../utils/fetchBackPines";
+import { postCheckReintentoPines, fetchConsultaPinEPM, fetchConsultaPinSNR, } from "../../utils/fetchBackPines";
 import { useNavigate, useLocation } from "react-router-dom";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import { v4 } from "uuid";
@@ -79,20 +79,24 @@ const CompraPin = () => {
         },
       })
         .then((res) => {
+          setShowLoading(false);
           if (res?.obj?.respuesta == "Consulta con error") {
             if (res?.obj?.data?.nombre == "Usuario no existe") {
-              notifyError("Usuario no existe");
+              notifyError("Error respuesta Practisistemas:(Consulta invalida[Usuario no existe])")
+              // notifyError("Usuario no existe");
             } else if (
               res?.obj?.data?.reply ==
               "Error consultando Matricula, Posiblemente no existe"
             ) {
-              notifyError(
-                "Error consultando Matrícula, posiblemente no existe"
-              );
+              notifyError("Error respuesta Practisistemas:(Consulta invalida [Error consultando Matrícula, posiblemente no existe])")
+              // notifyError(
+              //   "Error consultando Matrícula, posiblemente no existe"
+              // );
             } else if (
               res?.obj?.data?.reply == "Error en el codigo de municipio"
             ) {
-              notifyError("Error consultando Círculo, posiblemente no existe");
+              notifyError("Error respuesta Practisistemas:(Consulta invalida[Error consultando Círculo, posiblemente no existe])")
+              // notifyError("Error consultando Círculo, posiblemente no existe");
             }
           } else {
             showModalDatosSNR(true);
@@ -109,7 +113,8 @@ const CompraPin = () => {
           }
         })
         .catch((err) => {
-          notifyError("Transaccón declinada", err);
+          notifyError("Error respuesta PDP:Transaccón declinada", err)
+          // notifyError("Transaccón declinada", err);
         });
     } else if (state?.op == "em") {
       fetchConsultaPinEPM({
@@ -120,9 +125,11 @@ const CompraPin = () => {
         },
       })
         .then((res) => {
+          setShowLoading(false);
           if (res?.obj?.respuesta == "Consulta con error") {
             if (res?.obj?.data?.nombre == "Usuario no existe") {
-              notifyError("Usuario no existe");
+              notifyError("Error respuesta Practisistemas:(Consulta invalida[Usuario no existe])")
+              // notifyError("Usuario no existe");
             } else if (res?.obj?.data?.reply) {
               notifyError("Cantidad no puede ser menor de 5000");
             }
@@ -143,15 +150,14 @@ const CompraPin = () => {
           }
         })
         .catch((err) => {
-          notifyError("Transaccón declinada", err);
+          notifyError("Error respuesta PDP:Transaccón declinada", err)
         });
     }
   };
-
   const [infTicket, setInfTicket] = useState({
     title: "Recibo de pago",
     timeInfo: {
-      "Fecha de venta": "",
+      "Fecha de pago": "",
       Hora: "",
     },
     commerceInfo: [
@@ -162,10 +168,13 @@ const CompraPin = () => {
       ["Dirección", roleInfo.direccion],
       ["", ""],
     ],
-    commerceName: "VENTA PINES DE CONTENIDO",
+    commerceName:
+      state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+        ? "VENTA PINES DE SERVICIO"
+        : "VENTA PINES DE CONTENIDO",
     trxInfo: [],
     disclamer:
-    "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
   });
 
   const onChangeMoney = useMoney({
@@ -195,6 +204,14 @@ const CompraPin = () => {
     setInputContador(e.target.value);
   };
 
+  const handleKeyPress = (event) => {
+    const pattern = /^[a-zA-Z0-9 ]*$/; // Patrón para aceptar solo letras, números y espacios en blanco
+    const inputChar = String.fromCharCode(event.charCode);
+
+    if (!pattern.test(inputChar)) {
+      event.preventDefault(); // Prevenir que se ingrese el caracter especial
+    }
+  };
   const onPlacaChange = (e, placaVh) => {
     setInputPlaca(e.target.value);
   };
@@ -231,6 +248,7 @@ const CompraPin = () => {
       }
     } else {
       if (inputMatricula || inputContador) {
+        setShowLoading(true);
         ConsultaPinEPM(e);
       } else {
         setShowModal(true);
@@ -262,42 +280,42 @@ const CompraPin = () => {
     }).format(new Date());
     const newVoucher = { ...infTicket };
 
-    newVoucher["timeInfo"]["Fecha de venta"] = fecha;
+    newVoucher["timeInfo"]["Fecha de pago"] = fecha;
 
     newVoucher["timeInfo"]["Hora"] = hora;
 
-    newVoucher["trxInfo"][0] = ["Nombre del Pin", state.desc];
+    newVoucher["trxInfo"][0] = ["Convenio", state.desc == "Certificado TL" ? "Certificado (SNR)" : state.desc];
 
     if (state?.op == "cb") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular",toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
+      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(consultaDatosSNR?.valorPin),];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor del Pin",formatMoney.format(consultaDatosSNR?.valorPin),];
+      newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
       newVoucher["trxInfo"][7] = ["", ""];
     } else if (state?.op == "em") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular",toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Contador", inputContador];
+      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor del Pin",formatMoney.format(inputValor),];
+      newVoucher["trxInfo"][4] = ["Contador", inputContador];
       newVoucher["trxInfo"][7] = ["", ""];
     } else if (state?.op == "hv") {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular",toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
       newVoucher["trxInfo"][4] = ["Placa", inputPlaca];
       newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor del Pin",formatMoney.format(inputValor),];
+      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
       newVoucher["trxInfo"][7] = ["", ""];
     } else {
       newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["Número celular",toPhoneNumber(inputCelular),];
+      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
       newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Valor del Pin",formatMoney.format(state.sell ? state.sell : inputValor),];
-      newVoucher["trxInfo"][5] = ["",""];
+      newVoucher["trxInfo"][4] = ["Valor", formatMoney.format(state.sell ? state.sell : inputValor),];
+      newVoucher["trxInfo"][5] = ["", ""];
     }
     fetchData(
       `${url_compra_pines}/transacciones`,
@@ -317,25 +335,25 @@ const CompraPin = () => {
           state?.op == "cb"
             ? consultaDatosSNR?.valorPin
             : state.sell
-            ? state.sell
-            : inputValor,
-        jsonPines: {
-          celular: state?.op == "em" ? inputContador : inputCelular,
-          operador: state?.op,
-          valor:
-            state?.op == "cb"
-              ? consultaDatosSNR?.valorPin
-              : state.sell
+              ? state.sell
+              : inputValor,
+        celular: state?.op == "em" ? inputContador.toString() : inputCelular,
+        operador: state?.op,
+        valor:
+          state?.op == "cb"
+            ? consultaDatosSNR?.valorPin
+            : state.sell
               ? state?.cod // Desde informacionPin
               : inputValor,
-          jsonAdicional: {
-            nombre_usuario: userInfo?.attributes?.name,
-            id_uuid_trx: uniqueId,
-            placaVh: inputPlaca,
-            telEnvio: inputCelular,
-            circulo: inputCirculo,
-            matricula: inputMatricula,
-          },
+        jsonAdicional: state?.op == "hv" ? {
+          placaVh: inputPlaca,
+        } : state?.op == "em" ? {
+          telEnvio: inputCelular,
+        } : state?.op == "cb" ? {
+          circulo: inputCirculo,
+          matricula: inputMatricula,
+        } : {
+
         },
         ticket: newVoucher,
       },
@@ -370,7 +388,6 @@ const CompraPin = () => {
                       id_uuid_trx: uniqueId,
                     })
                       .then((res) => {
-                        console.log("Esto es es res linea 414", res);
                         if (res?.msg !== "No ha terminado el reintento") {
                           if (
                             res?.status === true ||
@@ -382,7 +399,7 @@ const CompraPin = () => {
                           } else {
                             notifyError(
                               typeof res?.msg == typeof {}
-                                ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                                ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
                                 : res?.msg);
                             setShowLoading(true);
                             setShowModal(false);
@@ -422,7 +439,7 @@ const CompraPin = () => {
                 ":Error en el numero telefónico, si crees que el número esta correcto comunícalo al distribuidor"
                 ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
                 : typeof res?.msg == typeof {}
-                  ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                  ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
                   : res?.msg
             );
             setShowLoading(false);
@@ -433,8 +450,7 @@ const CompraPin = () => {
             setInputValor(0);
           }
         }
-      })
-      .catch(async (err) => {
+      }).catch(async (err) => {
         notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
         setShowLoading(false);
         handleClose();
@@ -442,10 +458,15 @@ const CompraPin = () => {
   };
 
   const VentaExitosa = (result_, fecha, hora) => {
+    if (result_?.jsonAdicional?.info) {
+
+      const pin = result_?.jsonAdicional?.info;
+      var hiddenPin = '******' + pin.substring(6);
+    }
     const voucher = {
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de venta": fecha,
+        "Fecha de pago": fecha,
         Hora: hora,
       },
       commerceInfo: [
@@ -456,55 +477,59 @@ const CompraPin = () => {
         ["Comercio", roleInfo["nombre comercio"]],
         ["", ""],
         ["Dirección", roleInfo.direccion],
-        ["", ""],       
+        ["", ""],
       ],
-      commerceName: 
-      state?.op == "em" || state?.op == "hv" || state?.op == "cb"
-        ? "VENTA PINES DE SERVICIO"
-        : "VENTA PINES DE CONTENIDO",
+      commerceName:
+        state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+          ? "VENTA PINES DE SERVICIO"
+          : "VENTA PINES DE CONTENIDO",
       trxInfo: [
-        ["Convenio", state.desc],
-        ["", ""],       
+        ["Convenio", state.desc == "Certificado TL" ? "Certificado (SNR)" : state.desc],
+        ["", ""],
         state?.op == "em"
-          ? ["No. PIN",result_?.jsonAdicional?.["Numero Pin"]]
-          : state?.op !== "hv" || state?.op !== "cb"
-            ? ["No. PIN",result_?.jsonAdicional?.info]
-            : ["", ""],
+          ? ["No. PIN", result_?.jsonAdicional?.["Numero Pin"]]
+          : state?.op == "hv"
+            ? ["No. PIN", result_?.jsonAdicional?.Url2]
+            : state?.op == "nx"
+              ? ["No. PIN", hiddenPin]
+              : state?.op == "cb"
+                ? ["No. PIN", result_?.jsonAdicional?.Url]
+                : ["", ""],
         ["", ""],
         ["No. Celular", toPhoneNumber(inputCelular)],
+        ["", ""],
+        state?.op == "cb"
+          ? ["Matrícula", inputMatricula]
+          : state?.op == "hv"
+            ? ["Placa", inputPlaca]
+            : state?.op == "em"
+              ? ["Contador", inputContador]
+              : [],
         ["", ""],
         ["Valor",
           formatMoney.format(
             state.sell
               ? state.sell
               : consultaDatosSNR.valorPin
-              ? consultaDatosSNR.valorPin
-              : inputValor
+                ? consultaDatosSNR.valorPin
+                : inputValor
           ),],
-        ["", ""],
-        state?.op == "cb"
-          ? ["Matrícula", inputMatricula]
-          : state?.op == "hv"
-          ? ["Placa", inputPlaca]
-          : state?.op == "em"
-          ? ["Contador", inputContador]
-          : [],
         ["", ""],
       ],
       disclamer:
-        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
     };
     setTypeInfo("VentaExitosa");
     setInfTicket(voucher);
 
-    infoTicket(result_.idtrans, tipo_operacion, voucher)
-      .then((resTicket) => {
-        console.log(resTicket);
-      })
-      .catch((err) => {
-        console.error(err);
-        notifyError("Error respuesta PDP: Fallo en la inserción en tabla de transacciones [0040001]");
-      });
+    // infoTicket(result_.idtrans, tipo_operacion, voucher)
+    //   .then((resTicket) => {
+    //     console.log(resTicket);
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //     notifyError("Error respuesta PDP: Fallo en la inserción en tabla de transacciones [0040001]");
+    //   });
   };
 
   const handleClosePin = useCallback(() => {
@@ -525,7 +550,7 @@ const CompraPin = () => {
     setInfTicket({
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de venta": "",
+        "Fecha de pago": "",
         Hora: "",
       },
       commerceInfo: [
@@ -536,10 +561,13 @@ const CompraPin = () => {
         ["Dirección", roleInfo.direccion],
         ["", ""],
       ],
-      commerceName: "VENTA PINES DE CONTENIDO",
+      commerceName:
+        state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+          ? "VENTA PINES DE SERVICIO"
+          : "VENTA PINES DE CONTENIDO",
       trxInfo: [],
       disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
     });
     validNavigate("/Pines/PinesContenido");
   }, []);
@@ -572,7 +600,7 @@ const CompraPin = () => {
   return (
     <Fragment>
       <SimpleLoading show={showLoading} />
-      <h1 className="text-3xl mt-6">Compra Pin: {state?.desc} </h1>
+      <h1 className="text-3xl mt-6">Compra Pin: {state?.desc == "Certificado TL" ? "Certificado de Tradición y Libertad (SNR)" : state?.desc == "Historico Vehicular" ? "Histórico Vehicular" : state?.desc} </h1>
       <Form onSubmit={onSubmitCheck} grid>
         {state?.op == "cb" ? (
           <>
@@ -585,6 +613,7 @@ const CompraPin = () => {
               maxLength={"20"}
               value={inputCirculo}
               onChange={onCirculoChange}
+              onKeyPress={handleKeyPress}
               required
             />
             <Input
@@ -596,6 +625,7 @@ const CompraPin = () => {
               maxLength={"12"}
               value={inputMatricula}
               onChange={onMatriculaChange}
+              onKeyPress={handleKeyPress}
               required
             />
             <Input
@@ -618,12 +648,13 @@ const CompraPin = () => {
             <Input
               name="contador"
               label="Número de contador"
-              type="num"
+              type="text"
               autoComplete="off"
               minLength={"10"}
               maxLength={"20"}
               value={inputContador}
               onChange={onContadorChange}
+              onKeyPress={handleKeyPress}
               required
             />
             <MoneyInput
@@ -687,6 +718,7 @@ const CompraPin = () => {
               maxLength={"6"}
               value={inputPlaca}
               onChange={onPlacaChange}
+              onKeyPress={handleKeyPress}
               required
             />
             <ButtonBar className={"lg:col-span-2"}>
@@ -727,7 +759,7 @@ const CompraPin = () => {
       </Form>
       {/* ########################### Modal de consulta a SNR ##################################3*/}
       {consultaDatosSNR?.repuesta == "Consulta Correcta" &&
-      consultaDatosSNR?.municipio ? (
+        consultaDatosSNR?.municipio ? (
         <Modal show={modalDatosSNR} handleClose={handleClose}>
           <Fieldset legend="Datos Propietario">
             <Form className="lg:col-span-2">
@@ -741,11 +773,15 @@ const CompraPin = () => {
                   <label className="font-medium ml-20">{`${consultaDatosSNR?.matricula}`}</label>
                 </div>
                 <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Círculo:`}</label>
+                  <label className="font-medium ml-20">{`${inputCirculo}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
                   <label className="font-semibold text-xl">{`Municipio:`}</label>
                   <label className="font-medium ml-20">{`${consultaDatosSNR?.municipio}`}</label>
                 </div>
                 <div className={contenedorTitulos}>
-                  <label className="font-semibold text-xl">{`Valor del Pin :`}</label>
+                  <label className="font-semibold text-xl">{`Valor :`}</label>
                   <label className="font-medium ml-20">{`${formatMoney.format(
                     consultaDatosSNR?.valorPin
                   )}`}</label>
@@ -779,7 +815,7 @@ const CompraPin = () => {
       {/* ############################Termina modal de consulta a SNR ######################3/}
       {/* ************************Modal de consulta a EPM ***********************/}
       {consultaDatosEPM?.respuesta == "Consulta Correcta" &&
-      consultaDatosEPM?.nombreClienteEpm ? (
+        consultaDatosEPM?.nombreClienteEpm ? (
         <Modal show={modalDatosEPM} handleClose={handleClose}>
           <Fieldset legend="Datos Propietario">
             <Form className="lg:col-span-2">

@@ -1,9 +1,6 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import { useNavigate } from "react-router-dom";
+import { Fragment, useCallback, useState } from "react";
 import { notify, notifyError } from "../../../../utils/notify";
 import fetchData from "../../../../utils/fetchData";
-import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 import Form from "../../../../components/Base/Form/Form";
 import InputX from "../../../../components/Base/InputX/InputX";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
@@ -128,9 +125,6 @@ const CargueArchivoRecaudoMultiple = ({
                 {`Archivo seleccionado: ${file.name}`}
               </h2>
               <ButtonBar>
-                <Button type='button' onClick={() => {}}>
-                  Cancelar
-                </Button>
                 <Button type='submit'>Subir</Button>
               </ButtonBar>
             </>

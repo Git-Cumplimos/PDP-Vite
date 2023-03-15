@@ -180,6 +180,7 @@ const VentaPines = () => {
 
   const onMakePayment = useCallback(
     (ev) => {
+      ev.preventDefault();
       if (valVentaPines <= 0) {
         notifyError("El valor del pin debe ser mayor a cero");
         return;
@@ -456,19 +457,18 @@ const VentaPines = () => {
             </ButtonBar>
           </div>
         ) : (
-          <PaymentSummary summaryTrx={summary}>
-            <ButtonBar>
-              <Button
-                type='submit'
-                onClick={onMakePayment}
-                disabled={loadingSell}>
-                Aceptar
-              </Button>
-              <Button onClick={handleClose} disabled={loadingSell}>
-                Cancelar
-              </Button>
-            </ButtonBar>
-          </PaymentSummary>
+          <form onSubmit={onMakePayment}>
+            <PaymentSummary summaryTrx={summary}>
+              <ButtonBar>
+                <Button type="submit" disabled={loadingSell}>
+                  Aceptar
+                </Button>
+                <Button onClick={handleClose} disabled={loadingSell}>
+                  Cancelar
+                </Button>
+              </ButtonBar>
+            </PaymentSummary>
+          </form>
         )}
       </Modal>
     </Fragment>
