@@ -209,8 +209,8 @@ const MostrarRecaudosPagar = ({
           console.error(err);
         });
     } else {
-      obj["comercio"]["idterminal_punto"] = roleInfo?.idterminal_punto;
-      obj["comercio"]["serial_dispositivo"] = roleInfo?.serial_dispositivo;
+      obj["comercio"]["idterminal_punto"] = roleInfo?.id_dispositivo;
+      obj["comercio"]["serial_dispositivo"] = "WP-845696";
       postInicializacionRecaudoMultipleComercios(obj)
         .then((res) => {
           if (res?.message === "Endpoint request timed out") {

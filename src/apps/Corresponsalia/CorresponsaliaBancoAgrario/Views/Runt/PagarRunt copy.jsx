@@ -15,10 +15,6 @@ import { useFetch } from "../../../../../hooks/useFetch";
 
 import { fetchCustom, ErrorCustom } from "../../utils/fetchRunt";
 import { ComponentsModalSummaryTrx } from "../Runt/components/components_modal";
-import {
-  LecturaBarcode,
-  LecturaRunt,
-} from "../Runt/components/components_form";
 
 //Constantes
 const url_get_barcode = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
@@ -27,14 +23,13 @@ const url_pagar_runt = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}
 const option_manual = "Manual";
 const option_barcode = "Código de barras";
 const options_select = [
-  { value: option_barcode, label: option_barcode },
   { value: option_manual, label: option_manual },
+  { value: option_barcode, label: option_barcode },
 ];
 
 const PagarRunt = () => {
-  const [paso, setPaso] = useState("LecturaBarcode");
+  const [paso, setPaso] = useState("LecturaRunt");
   const [numeroRunt, setNumeroRunt] = useState(null);
-  const [procedimiento, setProcedimiento] = useState(option_barcode);
   const [showModal, setShowModal] = useState(false);
   const [resConsultRunt, setResConsultRunt] = useState({});
   const [infTicket, setInfTicket] = useState(null);
@@ -52,19 +47,12 @@ const PagarRunt = () => {
     fetchCustom(url_pagar_runt, "POST", "Pago runt")
   );
 
-  const onChangeNumeroRunt = useCallback((e) => {
-    setNumeroRunt(e.target.value);
-  }, []);
-
   const onChangeSelect = useCallback((e) => {
-    if (e.target.value === option_barcode) {
-      setPaso("LecturaBarcode");
-      setProcedimiento(option_barcode);
-    } else if (e.target.value === option_manual) {
+    if (e.target.value === option_manual) {
       setPaso("LecturaRunt");
-      setProcedimiento(option_manual);
+    } else if (e.target.value === option_barcode) {
+      setPaso("LecturaRunt");
     }
-    setNumeroRunt(null);
   }, []);
 
   const onSubmitBarcode = useCallback(
@@ -76,7 +64,7 @@ const PagarRunt = () => {
         .then((response) => {
           if (response?.status === true) {
             setNumeroRunt(response?.obj?.result?.numero_runt);
-            setPaso("LecturaRunt");
+            setPaso("RespuestaLecturaRunt");
           }
         })
         .catch((error) => {
@@ -111,24 +99,19 @@ const PagarRunt = () => {
   };
 
   const onSubmitPayRunt = (e) => {
-    const tipo__comercio = roleInfo.tipo_comercio.toLowerCase();
     const data = {
       comercio: {
         id_comercio: roleInfo.id_comercio,
         id_terminal: roleInfo.id_dispositivo,
         id_usuario: roleInfo.id_usuario,
       },
-      oficina_propia:
-        tipo__comercio.search("kiosco") >= 0 ||
-        tipo__comercio.search("oficinas propias") >= 0
-          ? true
-          : false,
       nombre_usuario: pdpUser["uname"],
       numero_runt: numeroRunt,
-      id_trx_original: resConsultRunt.id_trx,
+      id_trx: resConsultRunt.id_trx,
       valor_mt: resConsultRunt.valor_mt,
       valor_runt: resConsultRunt.valor_runt,
       valor_total_trx: resConsultRunt.valor_total_trx,
+      nombre_comercio: roleInfo["nombre comercio"],
       ciudad: roleInfo.ciudad,
       direccion: roleInfo.direccion,
     };
@@ -165,11 +148,10 @@ const PagarRunt = () => {
     } else {
       notifyError(msg);
     }
-    setPaso("LecturaBarcode");
+    setPaso("LecturaRunt");
     setNumeroRunt(null);
     setResConsultRunt(null);
     setShowModal(false);
-    setProcedimiento(option_barcode);
   }
 
   const handlePrint = useReactToPrint({
@@ -178,28 +160,26 @@ const PagarRunt = () => {
 
   //********************Funciones para cerrar el Modal**************************
   const HandleCloseTrx = useCallback(() => {
-    setPaso("LecturaBarcode");
+    setPaso("LecturaRunt");
     setShowModal(false);
     notify("Transacción cancelada");
     setNumeroRunt(null);
     setResConsultRunt(null);
-    setProcedimiento(option_barcode);
   }, []);
 
   const HandleCloseTrxExitosa = useCallback(() => {
-    setPaso("LecturaBarcode");
+    setPaso("LecturaRunt");
     setShowModal(false);
     setNumeroRunt(null);
     setResConsultRunt(null);
     setInfTicket(null);
-    setProcedimiento(option_barcode);
     validNavigate("/corresponsalia/corresponsalia-banco-agrario");
   }, [validNavigate]);
 
   const HandleCloseModal = useCallback(() => {
-    if (paso === "LecturaBarcode" && !loadingPeticionBarcode) {
+    if (paso === "LecturaRunt" && !loadingPeticionBarcode) {
       HandleCloseTrx();
-    } else if (paso === "LecturaRunt" && !loadingPeticionConsultRunt) {
+    } else if (paso === "RespuestaLecturaRunt" && !loadingPeticionConsultRunt) {
       HandleCloseTrx();
     } else if (paso === "ResumenTrx" && !loadingPeticionPayRunt) {
       HandleCloseTrx();
@@ -218,36 +198,54 @@ const PagarRunt = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Pago de RUNT</h1>
-      <Form>
-        <Select
-          id="opciones"
-          label=""
-          options={options_select}
-          onChange={onChangeSelect}
-          value={procedimiento}
-          required
-        />
+      <Form grid>
         {/******************************Lectura runt*******************************************************/}
-        {paso === "LecturaBarcode" && (
-          <LecturaBarcode
-            loadingPeticion={loadingPeticionBarcode}
-            onSubmit={onSubmitBarcode}
-          ></LecturaBarcode>
+        {paso === "LecturaRunt" && (
+          <Fragment>
+            <Select
+              id="opciones"
+              label=""
+              options={options_select}
+              // value={banco}
+              onChange={onChangeSelect}
+              required
+            />
+            <br></br>
+            <BarcodeReader onSearchCodigo={onSubmitBarcode} />
+            <ButtonBar className="lg:col-span-2">
+              <Button type="reset">Volver a ingresar código de barras</Button>
+            </ButtonBar>
+          </Fragment>
         )}
         {/******************************Lectura runt*******************************************************/}
 
         {/******************************Respuesta Lectura runt*******************************************************/}
-        {paso === "LecturaRunt" && (
-          <LecturaRunt
-            loadingPeticion={loadingPeticionConsultRunt}
-            onSubmit={onSubmitConsultRunt}
-            handleClose={HandleCloseTrx}
-            onChange={onChangeNumeroRunt}
-            procedimiento={procedimiento}
-            option_barcode={option_barcode}
-            option_manual={option_manual}
-            numeroRunt={numeroRunt}
-          ></LecturaRunt>
+        {paso === "RespuestaLecturaRunt" && (
+          <Fragment>
+            <Input
+              label="Número de RUNT"
+              type="text"
+              autoComplete="off"
+              value={numeroRunt}
+              disabled
+            />
+            <ButtonBar className="lg:col-span-2">
+              <Button
+                type={"submit"}
+                onClick={onSubmitConsultRunt}
+                disabled={loadingPeticionConsultRunt}
+              >
+                Tramitar RUNT
+              </Button>
+              <Button
+                type={"reset"}
+                onClick={HandleCloseTrx}
+                disabled={loadingPeticionConsultRunt}
+              >
+                Cancelar
+              </Button>
+            </ButtonBar>
+          </Fragment>
         )}
         {/******************************Respuesta Lectura runt*******************************************************/}
       </Form>
