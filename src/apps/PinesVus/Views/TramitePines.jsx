@@ -136,11 +136,7 @@ const TramitePines = () => {
                 fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
                //setFormatMon(res?.obj?.results[0]["ValorPagar"]);
     
-    <<<<<<< HEAD
          let    objetoVertical=[{
-    =======
-          let    objetoVertical=[{
-    >>>>>>> origin/incidencias-practisistemas-ale
             clave: "Documento",
             info: res?.obj?.results[0]["doc_cliente"]
           },
@@ -181,32 +177,32 @@ const TramitePines = () => {
 
 
           setTable(
-            /*     res?.obj?.results?.map((row) => {
-                   const fecha_vencimiento = new Date(row?.fecha_vencimiento);
-                   fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
-                   const fecha_nacimiento = new Date(row?.fecha_nacimiento);
-                   fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
-                   setFormatMon(row?.ValorPagar);
-                   return {
-                     // Id: row?.id_pin,
-                     Documento: row?.doc_cliente,
-                     "Tipo Documento": row?.tipo_documento_descripcion,
-                     Nombre: row?.nombre,
-                     Apellidos: row?.apellidos,
-                     "Fecha Nacimiento":  dateFormatter.format(fecha_nacimiento),
-                     Celular: row?.celular, 
-                     Email: row?.email,
-                     Dirección: row?.direccion,
-                     Estado: row?.name_estado_pin,
-                     // "Codigo Estado": row?.estado_pin,
-                     Vencimiento: dateFormatter.format(fecha_vencimiento),
-                     Tramite: row?.name_tramite,
-                     Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite), // Solo pin tiene iva
-                   };
-     
-                 })
-     
-     
+            res?.obj?.results?.map((row) => {
+              const fecha_vencimiento = new Date(row?.fecha_vencimiento);
+              fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
+              const fecha_nacimiento = new Date(row?.fecha_nacimiento);
+              fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
+              setFormatMon(row?.ValorPagar);
+              return {
+                // Id: row?.id_pin,
+                Documento: row?.doc_cliente,
+                "Tipo Documento": row?.tipo_documento_descripcion,
+                Nombre: row?.nombre,
+                Apellidos: row?.apellidos,
+                "Fecha Nacimiento": dateFormatter.format(fecha_nacimiento),
+                Celular: row?.celular,
+                Email: row?.email,
+                Dirección: row?.direccion,
+                Estado: row?.name_estado_pin,
+                // "Codigo Estado": row?.estado_pin,
+                Vencimiento: dateFormatter.format(fecha_vencimiento),
+                Tramite: row?.name_tramite,
+                Valor: formatMoney.format(row?.valor * 1.19 + row?.valor_tramite), // Solo pin tiene iva
+              };
+
+            })
+
+
             /*     objetoVertical.map((row) => {
      
                    return {
@@ -357,24 +353,24 @@ const TramitePines = () => {
                   "Valor",
                 ]}
                 data={table || []}
-                /*     onSelectRow={(e, index) => {
-                       if (!(table[index][""] === "Pin creado" || table[index][""] === "Dispersado no usado")) {
-                         notifyError(table[index].Estado);
-                       } else {
-                         setSelected(table[index]);
-                         setValor(info?.obj?.results?.[index]?.valor);
-                         setValores(info?.obj?.results?.[index]?.valores);
-                         setId_trx(info?.obj?.results?.[index]?.id_trx?.creacion);
-                         setTipoPin(info?.obj?.results?.[index]?.tipo_pin);
-                         setValor_tramite(info?.obj?.results?.[index]?.valor_tramite);
-                         setName_tramite(info?.obj?.results?.[index]?.name_tramite);
-                         setId_pin(info?.obj?.results?.[index]?.id_pin)
-                         setInfoComercioCreacion(info?.obj?.results?.[index]?.datos_comercio_creacion)
-         
-                         setShowModal(true);
-                         setActivarNavigate(false);
-                       }
-                     }}*/
+                onSelectRow={(e, index) => {
+                  if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Dispersado no usado")) {
+                    notifyError(table[index].Estado);
+                  } else {
+                    setSelected(table[index]);
+                    setValor(info?.obj?.results?.[index]?.valor);
+                    setValores(info?.obj?.results?.[index]?.valores);
+                    setId_trx(info?.obj?.results?.[index]?.id_trx?.creacion);
+                    setTipoPin(info?.obj?.results?.[index]?.tipo_pin);
+                    setValor_tramite(info?.obj?.results?.[index]?.valor_tramite);
+                    setName_tramite(info?.obj?.results?.[index]?.name_tramite);
+                    setId_pin(info?.obj?.results?.[index]?.id_pin)
+                    setInfoComercioCreacion(info?.obj?.results?.[index]?.datos_comercio_creacion)
+
+                    setShowModal(true);
+                    setActivarNavigate(false);
+                  }
+                }}
                 onSetPageData={setPageData}
 
               ></TableEnterprise>
@@ -428,7 +424,7 @@ const TramitePines = () => {
                   <Form onSubmit={onSubmitUsar}>
                     <ButtonBar>
                       <Button type="submit">Usar pin</Button>
-                      {selected.name_estado_pin === "Pin creado" ?
+                      {selected.Estado === "Pin creado" ?
                         <Button
                           onClick={() => {
                             setModalCancel(true);
