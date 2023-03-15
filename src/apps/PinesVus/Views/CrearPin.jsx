@@ -362,8 +362,6 @@ const CrearPin = () => {
       iva : resp[0]?.iva,
       total : resp[0]?.valor + resp[0]?.iva
     }
-    console.log(pinData, tipoPin)
-    console.log(tramite, tramite2)
     return pinData;
   }, [optionsTipoPines, tipoPin]);
 

@@ -249,16 +249,16 @@ const CancelPin = ({
       objTicket["trxInfo"][3] = ["",""]
       objTicket["trxInfo"][4] = ["Valor trámite", formatMoney.format(valor_tramite)]
       objTicket["trxInfo"][5] = ["",""]
-      objTicket["trxInfo"][6] = ["",""]
+      objTicket["trxInfo"][6] = ["Valor Pin", formatMoney.format(valor)]
       objTicket["trxInfo"][7] = ["",""]
-      objTicket["trxInfo"][8] = ["",""]
+      objTicket["trxInfo"][8] = ["IVA Pin", formatMoney.format(valor*0.19)]
       objTicket["trxInfo"][9] = ["",""]
-      objTicket["trxInfo"][10] = ["Valor Pin", formatMoney.format(valor)]
+      objTicket["trxInfo"][10] = ["Total", formatMoney.format(valor*1.19 + valor_tramite)]
       objTicket["trxInfo"][11] = ["",""]
-      objTicket["trxInfo"][12] = ["IVA Pin", formatMoney.format(valor*0.19)]
+      objTicket["trxInfo"][12] = ["",""]
       objTicket["trxInfo"][13] = ["",""]
-      objTicket["trxInfo"][14] = ["Total", formatMoney.format(valor*1.19 + valor_tramite)]
-      objTicket["trxInfo"][15] = ["",""]
+      objTicket["trxInfo"][14] = ["",""]
+      //objTicket["trxInfo"][15] = ["",""]
   }
 
     if (tipCancelacion === '2') {
