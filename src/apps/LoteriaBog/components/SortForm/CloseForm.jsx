@@ -73,7 +73,7 @@ const CloseForm = ({ closeModal, tip_sorteo, sorteo, disable_botoOrdinario, disa
       <div className="flex flex-col justify-center items-center mx-auto container">
         <Form onSubmit={onSubmit} grid>
           <div className="flex flex-row justify-center text-lg font-medium">
-            <h1>¿Está seguro de cerrar el sorteo {tipo_sorteo} {sorteo}  ?</h1>
+            <h1>¿Está seguro de cerrar el sorteo {tipo_sorteo}?</h1>
           </div>
 
           <ButtonBar>
