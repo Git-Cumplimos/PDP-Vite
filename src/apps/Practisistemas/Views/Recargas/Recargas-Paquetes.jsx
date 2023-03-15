@@ -1,15 +1,21 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-
 import { useNavigate } from "react-router-dom";
 import Input from "../../../../components/Base/Input";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { postConsultaOperadores } from "../../utils/fetchServicioRecargas";
 import Select from "../../../../components/Base/Select";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
 const RecargasPaquetes = ({ subRoutes }) => {
   const navigate = useNavigate();
+
+  const path = require("path");
+
   const { roleInfo } = useAuth();
+  const [showLoading, setShowLoading] = useState(false);
+  const [operadores, setOperadores] = useState([]);
+  const [maxPages, setMaxPages] = useState(3);
 
   const [{ page, limit }, setPageData] = useState({
     page: 1,
@@ -19,94 +25,122 @@ const RecargasPaquetes = ({ subRoutes }) => {
     operador: "",
     isPack: "",
   });
-  const [operadores, setOperadores] = useState([]);
-  const [maxPages, setMaxPages] = useState(3);
-  /* Filtrado de la matriz de operadores. */
 
+  /**
+   * Toma una cadena, la divide en una matriz de palabras, escribe en mayúscula la primera letra de cada
+   * palabra y luego vuelve a unir la matriz en una cadena.
+   * @return una cadena con la primera letra de cada palabra en mayúscula.
+   */
+  const capitalize = (str) => {
+    return str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  /* Filtrado de los datos recibidos del Fetch */
   const tableOperadores = useMemo(() => {
-    let filteredOperadores = operadores.filter((operador) => {
+    const filteredOperadores = operadores.filter((operador) => {
       return (
-        operador.desc.toLowerCase().includes(search.operador.toLowerCase()) &&
-        operador.isPack.toLowerCase().includes(search.isPack.toLowerCase())
+        (operador.isPack === search.isPack || search.isPack === "") &&
+        (operador.desc.toLowerCase().includes(search.operador.toLowerCase()) ||
+          search.operador === "")
       );
     });
 
-    if (search.isPack) {
-      filteredOperadores = filteredOperadores.filter((operador) => {
-        return operador.isPack.toLowerCase() === search.isPack.toLowerCase();
-      });
+    /* Cálculo del número de páginas que tendrá la tabla. */
+    const totalItems = filteredOperadores.length;
+    if (totalItems <= limit) {
+      setMaxPages(1);
+    } else if (totalItems > limit) {
+      setMaxPages(Math.ceil(totalItems / limit));
     }
-    return filteredOperadores
-      .slice((page - 1) * limit, page * limit)
-      .map(({ desc, isPack }) => {
-        return {
-          Descripcion: desc,
-          Servicio: isPack,
-        };
-      });
+
+    /* Una función que se llama cuando se cambia la página. */
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const pageOperadores = filteredOperadores.slice(startIndex, endIndex);
+
+    return pageOperadores.map((operador) => [
+      capitalize(operador.desc),
+      operador.isPack,
+    ]);
   }, [operadores, search, page, limit]);
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      if (operadores[i].desc === "Movistar") {
+      const nombrePin = tableOperadores[i][0];
+      const index = operadores.findIndex((item) => item?.desc === nombrePin);
+      const desc = operadores[index].desc;
+      const isPack = operadores[index].isPack;
+      const op = operadores[index].op;
+      const operadorPacks = operadores[index].packs;
+
+      if (desc === "Movistar") {
         navigate("../movistar/recargas-movistar");
-      } else if (operadores[i].desc === "Paquetes Movistar") {
+      } else if (desc === "Paquetes Movistar") {
         navigate("../movistar/paquetes-movistar");
+      } else if (desc === "Avantel") {
+        navigate("../recargas-paquetes/Venta-paquetes", {
+          state: {
+            operador_recargar: desc,
+            producto: op,
+          },
+        });
       } else {
-        operadores[i].isPack === "Recarga"
+        isPack === "Recarga"
           ? navigate("../recargas-paquetes/Recargar", {
               state: {
-                operador_recargar: operadores[i].desc,
-                producto: operadores[i].op,
+                operador_recargar: desc,
+                producto: op,
               },
             })
           : navigate("../recargas-paquetes/Venta-paquetes", {
               state: {
-                operador_recargar: operadores[i].desc,
-                producto: operadores[i].op,
-                operadorPaquete: operadores[i].operadorPacks,
+                operador_recargar: desc,
+                producto: op,
+                operadorPaquete: operadorPacks,
               },
             });
       }
     },
-    [navigate, operadores]
+    [navigate, operadores, tableOperadores]
   );
-  /**
-   * Obtiene los datos y establece el estado del componente.
-   */
 
-  const fecthTablaConveniosPaginadoFunc = async () => {
+  /**
+   * Obtiene datos y establece los datos en una variable de estado.
+   */
+  const fecthTablaPaginadoFunc = async () => {
     try {
+      setShowLoading(true);
       const autoArr = await postConsultaOperadores({
         idcomercio: roleInfo?.["id_comercio"],
-        page,
-        limit,
-        operador: search.operador,
-        ispack: search.isPack,
-        category: search.category,
+        // page,
+        // limit,
+        // operador,
+        // ispack,
       });
-      setMaxPages(autoArr?.maxPages);
-      setOperadores(autoArr?.response[0] ?? []);
+      setOperadores(autoArr?.response ?? [0]);
+      setMaxPages(autoArr?.maxPages ?? 3);
     } catch (e) {
       console.error(e);
+    } finally {
+      setShowLoading(false); // Ocultar indicador de carga
     }
   };
 
-  /* Establecer el estado de maxPages en la longitud de la matriz de operadores dividida por el límite. */
   useEffect(() => {
-    if (operadores.length > limit) {
-      setMaxPages(Math.ceil(operadores.length / limit));
-    } else {
-      setMaxPages(3);
-    }
-  }, [operadores, limit]);
+    const page = 1;
+    const limit = 10;
+    const operador = search.operador;
+    const ispack = search.isPack;
 
-  useEffect(() => {
-    fecthTablaConveniosPaginadoFunc();
-  }, [page, limit, search.operador, search.isPack, search.category, roleInfo]);
-
+    /* Llamar a la función con los parámetros. */
+    fecthTablaPaginadoFunc(page, limit, operador, ispack);
+  }, []);
   return (
     <>
+      <SimpleLoading show={showLoading} />
       <h1 className="text-3xl text-center">
         Servicios de recargas y venta de paquetes
       </h1>
@@ -116,8 +150,7 @@ const RecargasPaquetes = ({ subRoutes }) => {
         headers={["Descripción", "Servicio"]}
         data={tableOperadores}
         onSelectRow={onSelectAutorizador}
-        // onSetPageData={setPageData}
-        onSetPageData={({ page, limit }) => setPageData({ page, limit })}
+        onSetPageData={setPageData}
       >
         <Input
           id="searchConvenio"
@@ -125,9 +158,10 @@ const RecargasPaquetes = ({ subRoutes }) => {
           label={"Nombre operador"}
           minLength="1"
           maxLength="30"
+          subRoutes={subRoutes}
           type="text"
           autoComplete="off"
-          // value={search.operador}
+          /* Una función de devolución de llamada que se llama cuando cambia la entrada. */
           onInput={(e) =>
             setSearch((old) => ({ ...old, operador: e.target.value }))
           }
@@ -145,7 +179,6 @@ const RecargasPaquetes = ({ subRoutes }) => {
             setSearch((old) => ({ ...old, isPack: e.target.value }))
           } */}
         {/* /> */}
-        {/* <div></div> */}
         <Select
           id={"category"}
           label={"Categoria del Servicio"}
