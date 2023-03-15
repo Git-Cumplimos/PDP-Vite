@@ -19,6 +19,7 @@ import {
   LecturaBarcode,
   LecturaRunt,
 } from "../Runt/components/components_form";
+import TextArea from "../../../../../components/Base/TextArea";
 
 //Constantes
 const url_get_barcode = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
@@ -97,6 +98,7 @@ const PagarRunt = () => {
       nombre_usuario: pdpUser["uname"],
       numero_runt: numeroRunt,
     };
+
     peticionConsultRunt({}, data)
       .then((response) => {
         if (response?.status === true) {
@@ -131,7 +133,11 @@ const PagarRunt = () => {
       valor_total_trx: resConsultRunt.valor_total_trx,
       ciudad: roleInfo.ciudad,
       direccion: roleInfo.direccion,
+      idterminal_punto: roleInfo.idterminal_punto,
+      idtipo_dispositivo: roleInfo.idtipo_dispositivo,
+      serial_dispositivo: roleInfo.serial_dispositivo,
     };
+
     peticionPayRunt({}, data)
       .then((response) => {
         if (response?.status === true) {
@@ -225,8 +231,11 @@ const PagarRunt = () => {
           options={options_select}
           onChange={onChangeSelect}
           value={procedimiento}
-          required
+          disabled={
+            loadingPeticionBarcode || loadingPeticionConsultRunt ? true : false
+          }
         />
+
         {/******************************Lectura runt*******************************************************/}
         {paso === "LecturaBarcode" && (
           <LecturaBarcode
