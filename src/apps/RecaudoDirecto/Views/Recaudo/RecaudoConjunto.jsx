@@ -6,6 +6,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRecaudo, modRecaudo, searchConveniosRecaudoList } from "../../utils/fetchFunctions"
@@ -34,7 +35,15 @@ const RecaudoConjunto = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
+    setDataReferencias({
+      referencia1: '',
+      referencia2: ''
+    })
   }, []);
+  const limitesMontos = {
+    max: 999999999,
+    min: 1,
+  };
 
   const getData = useCallback(async () => {
     try {
@@ -54,7 +63,7 @@ const RecaudoConjunto = () => {
     const data = {
       consulta_recaudo: {
         convenio_id: pk_id_convenio,
-        referencias: Object.values(dataReferencias).filter((ref)=>ref !== '') ,
+        referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
       },
       valor_total_trx: 0,
       comercio: {
@@ -81,16 +90,17 @@ const RecaudoConjunto = () => {
 
   }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, handleClose])
 
+
   const hacerRecaudo = useCallback(async (e) => {
     e.preventDefault()
-
+    
     let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
     let sumaTotal = valoresRecibido + dataRecaudo.valor_pagado
 
     const ValidacionTRX = {
-      1: () => sumaTotal === dataRecaudo.valor ? { estado: true} : undefined,
-      2: () => sumaTotal <= dataRecaudo.valor ? { estado: true} : undefined,
-      3: () => sumaTotal >= dataRecaudo.valor ? { estado: true} : undefined,
+      1: () => sumaTotal === dataRecaudo.valor ? { estado: true } : undefined,
+      2: () => sumaTotal <= dataRecaudo.valor ? { estado: true } : undefined,
+      3: () => sumaTotal >= dataRecaudo.valor ? { estado: true } : undefined,
       4: () => (sumaTotal < dataRecaudo.valor || sumaTotal >= dataRecaudo.valor) ? { estado: true } : undefined,
     };
 
@@ -98,11 +108,11 @@ const RecaudoConjunto = () => {
 
     if (resp.estado) {
       const data = {
-        id_trx:id_trx,
-        convenio_id: pk_id_convenio,
-        fk_estado: resp.fk_estado,
-        valor_antes: dataRecaudo?.valor_pagado ?? 0,
-        valor_pagado: sumaTotal,
+        id_trx: id_trx,
+        recaudo: {
+          convenio_id: pk_id_convenio,
+          pk_id_recaudo: dataRecaudo.pk_id_recaudo,
+        },
         comercio: {
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
@@ -114,7 +124,7 @@ const RecaudoConjunto = () => {
         ...valorRecibido,
         nombre_usuario: pdpUser?.uname ?? "",
       };
-      await modRecaudo({ pk_id_recaudo: dataRecaudo.pk_id_recaudo }, data)
+      await modRecaudo(data)
         .then((data) => {
           data?.status && notify(data?.msg)
         })
@@ -168,21 +178,12 @@ const RecaudoConjunto = () => {
                 type="text"
                 // minLength={dict?.length[0]}
                 // maxLength={dict?.length[1]}
-                value={dataReferencias['referencia'+ (index + 1)]}
+                value={dataReferencias['referencia' + (index + 1)]}
                 onChange={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: e.target.value }) }}
                 autoComplete="off"
                 required />
             )
           })}
-          {/* <Input
-            label='Factura/Referencia'
-            name={"referencia"}
-            type='text'
-            value={referencia ?? ""}
-            onChange={(e) => { setReferencia(e.target.value) }}
-            autoComplete='off'
-            required
-          /> */}
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"}>
               Realizar consulta
@@ -211,34 +212,20 @@ const RecaudoConjunto = () => {
             defaultValue={dataRecaudo?.fk_modificar_valor ?? ""}
             disabled
           />
-          <Input
-            id={1}
-            label={"Valor total a pagar"}
-            name={"valor"}
-            type="text"
-            defaultValue={dataRecaudo.valor ?? ""}
+          <MoneyInput
+            label="Valor a recaudar"
+            name="valor_total_trx"
             autoComplete="off"
-            required />
-          {dataRecaudo.valor_pagado !== 0 && 
-            <Input
-              id={1}
-              label={dataRecaudo.fk_modificar_valor === 2  ? "valor a restante": "saldo a favor"}
-              name={"valor"}
-              type="text"
-              defaultValue={dataRecaudo.fk_modificar_valor === 2 ? 
-                parseInt(dataRecaudo.valor - parseInt(dataRecaudo.valor_pagado)) ?? 0: dataRecaudo.valor_pagado}
-              autoComplete="off"
-              disabled
-            />
-          }
-          <Input
-            id={1}
-            label={"Valor recibido"}
-            name={"valor_total_trx"}
-            type="text"
-            onChange={(e) => { setValorRecibido({ ...valorRecibido, [e.target.name]: e.target.value }) }}
-            autoComplete="off"
-            required />
+            min={limitesMontos?.min}
+            max={dataRecaudo?.fk_modificar_valor === 1 ||
+              dataRecaudo?.fk_modificar_valor === 2 ?
+              parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado)
+              : limitesMontos.max}
+            onInput={(e, valor) =>
+              setValorRecibido({ ...valorRecibido, [e.target.name]: valor})
+            }
+            required
+          />
           <ButtonBar>
             <Button type={"submit"} >
               Aceptar
