@@ -35,7 +35,6 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
           const paquete = Object.values(objeto)[0];
           const searchValue = datosTrans.valor;
           const numCost = paquete.cost;
-          console.log("searchValue:", searchValue, "numCost:", numCost);
           return numCost.toString().startsWith(searchValue.toString());
         })
       : validPaquetes;

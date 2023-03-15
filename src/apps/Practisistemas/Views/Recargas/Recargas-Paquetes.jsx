@@ -74,15 +74,10 @@ const RecargasPaquetes = ({ subRoutes }) => {
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      console.log("OPERADORES", operadores);
       const nombrePin = tableOperadores[i][0];
       const index = operadores.findIndex(
         (item) => item?.desc.toLowerCase() === nombrePin.toLowerCase()
       );
-
-      console.log("index", index);
-      console.log("tableOperadores[i][0]", tableOperadores[i][0]);
-      console.log("operadores[index]", operadores[index]);
       const desc = operadores[index]?.desc;
       const isPack = operadores[index]?.isPack;
       const op = operadores[index]?.op;
@@ -117,7 +112,6 @@ const RecargasPaquetes = ({ subRoutes }) => {
   const fecthTablaPaginadoFunc = async () => {
     try {
       setShowLoading(true);
-      console.log(roleInfo, "roleinfo");
       const autoArr = await postConsultaOperadores({
         idcomercio: roleInfo?.["id_comercio"],
         // page,
