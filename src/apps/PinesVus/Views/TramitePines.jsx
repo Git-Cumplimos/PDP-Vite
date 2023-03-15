@@ -136,7 +136,15 @@ const TramitePines = () => {
             fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
            //setFormatMon(res?.obj?.results[0]["ValorPagar"]);
 
+<<<<<<< HEAD
      let    objetoVertical=[{
+=======
+<<<<<<< HEAD
+     let    objetoVertical=[{
+=======
+      let    objetoVertical=[{
+>>>>>>> origin/incidencias-practisistemas-ale
+>>>>>>> Fix/QA-Practisistemas-Inci
         clave: "Documento",
         info: res?.obj?.results[0]["doc_cliente"]
       },
@@ -353,8 +361,13 @@ const TramitePines = () => {
                "Valor",
             ]}
             data={table || []}
+<<<<<<< HEAD
             onSelectRow={(e, index) => {
               if (!(table[index]["Estado"] === "Pin creado" || table[index]["Estado"] === "Dispersado no usado")) {
+=======
+       /*     onSelectRow={(e, index) => {
+              if (!(table[index][""] === "Pin creado" || table[index][""] === "Dispersado no usado")) {
+>>>>>>> Fix/QA-Practisistemas-Inci
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
@@ -370,7 +383,11 @@ const TramitePines = () => {
                 setShowModal(true);
                 setActivarNavigate(false);
               }
+<<<<<<< HEAD
             }}
+=======
+            }}*/
+>>>>>>> Fix/QA-Practisistemas-Inci
             onSetPageData={setPageData}
             
           ></TableEnterprise>
