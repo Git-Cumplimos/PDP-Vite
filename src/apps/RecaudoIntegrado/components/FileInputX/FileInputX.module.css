@@ -41,7 +41,14 @@
   line-height: 18px;
   color: #2c2c2c;
 }
-
+.nombreLabel {
+  font-family: "Avenir";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 18px;
+  color: #2c2c2c;
+}
 .contenedorSecundarioInput {
   box-sizing: border-box;
 
@@ -134,7 +141,12 @@
   background-color: white;
   border: none;
 }
-
+.nombreArchivoStyle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80%;
+}
 .contenedorArchivosBasura {
   box-sizing: border-box;
   cursor: pointer;
@@ -236,6 +248,14 @@
     font-weight: 200;
     font-size: 16px;
     line-height: 20px;
+    color: #2c2c2c;
+  }
+  .nombreLabel {
+    font-family: "Avenir";
+    font-style: normal;
+    font-weight: 800;
+    font-size: 14px;
+    line-height: 18px;
     color: #2c2c2c;
   }
 
