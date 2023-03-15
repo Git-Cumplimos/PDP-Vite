@@ -10,7 +10,7 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
   
   const navigate = useNavigate();
   const { state } = useLocation();
-
+console.log("ESTO ES STATE",state)
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
@@ -65,6 +65,7 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
   }, [state?.producto]);
   
   const fecthTablaPaquetesFunc = () => {
+    console.log("LLEGO A ESTE PUNTO",state?.producto)
     postConsultaPaquetes({
       idcomercio : roleInfo?.["id_comercio"],
       producto : state?.producto,
