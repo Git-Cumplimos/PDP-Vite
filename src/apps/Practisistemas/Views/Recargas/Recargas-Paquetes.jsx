@@ -42,9 +42,9 @@ const RecargasPaquetes = ({ subRoutes }) => {
   const tableOperadores = useMemo(() => {
     const filteredOperadores = operadores.filter((operador) => {
       return (
-        (operador.isPack === search.isPack || search.isPack === "") &&
-        (operador.desc.toLowerCase().includes(search.operador.toLowerCase()) ||
-          search.operador === "")
+        (operador?.isPack === search?.isPack || search?.isPack === "") &&
+        (operador?.desc.toLowerCase().includes(search?.operador.toLowerCase()) ||
+          search?.operador === "")
       );
     });
 
@@ -62,31 +62,26 @@ const RecargasPaquetes = ({ subRoutes }) => {
     const pageOperadores = filteredOperadores.slice(startIndex, endIndex);
 
     return pageOperadores.map((operador) => [
-      capitalize(operador.desc),
-      operador.isPack,
+      capitalize(operador?.desc),
+      operador?.isPack,
     ]);
   }, [operadores, search, page, limit]);
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      const nombrePin = tableOperadores[i][0];
-      const index = operadores.findIndex((item) => item?.desc === nombrePin);
-      const desc = operadores[index].desc;
-      const isPack = operadores[index].isPack;
-      const op = operadores[index].op;
-      const operadorPacks = operadores[index].packs;
-
+      console.log("OPERADORES",operadores)
+      const nombreOperador = tableOperadores[i][0];
+      const index = operadores.findIndex((item) => item?.desc === nombreOperador);
+      const desc = operadores[index]?.desc;
+      const isPack = operadores[index]?.isPack;
+      const op = operadores[index]?.op;
+      const operadorPacks = operadores[index]?.packs;
+      
+      console.log("OPERADORES",operadores)
       if (desc === "Movistar") {
         navigate("../movistar/recargas-movistar");
       } else if (desc === "Paquetes Movistar") {
         navigate("../movistar/paquetes-movistar");
-      } else if (desc === "Avantel") {
-        navigate("../recargas-paquetes/Venta-paquetes", {
-          state: {
-            operador_recargar: desc,
-            producto: op,
-          },
-        });
       } else {
         isPack === "Recarga"
           ? navigate("../recargas-paquetes/Recargar", {
@@ -158,7 +153,6 @@ const RecargasPaquetes = ({ subRoutes }) => {
           label={"Nombre operador"}
           minLength="1"
           maxLength="30"
-          subRoutes={subRoutes}
           type="text"
           autoComplete="off"
           /* Una función de devolución de llamada que se llama cuando cambia la entrada. */
