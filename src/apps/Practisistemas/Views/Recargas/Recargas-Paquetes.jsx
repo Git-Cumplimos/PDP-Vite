@@ -77,6 +77,7 @@ const RecargasPaquetes = ({ subRoutes }) => {
       page,
       limit,
       operador: datosTrans.operador,
+      ispack: datosTrans.isPack,
     })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
@@ -84,7 +85,6 @@ const RecargasPaquetes = ({ subRoutes }) => {
       })
       .catch((err) => console.error(err));
   };
-
   return (
     <>
       <h1 className='text-3xl text-center'>
@@ -112,6 +112,23 @@ const RecargasPaquetes = ({ subRoutes }) => {
             });
           }}
         />
+        <Input
+          id='searchServicio'
+          name='searchServicio'
+          label={"Categoria del Servicio"}
+          minLength='1'
+          maxLength='30'
+          type='text'
+          autoComplete='off'
+          onInput={(e) => {
+            setDatosTrans((old) => {
+            return {
+            ...old,
+              isPack: e.target.value,
+              };
+            });
+          }}
+        />      
       </TableEnterprise>
     </>
   );
