@@ -12,18 +12,12 @@ import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { useFetch } from "../../../../../hooks/useFetch";
-import classes from "./PagarRunt.module.css"
 import { fetchCustom, ErrorCustom } from "../../utils/fetchRunt";
 import { ComponentsModalSummaryTrx } from "../Runt/components/components_modal";
 import {
   LecturaBarcode,
   LecturaRunt,
 } from "../Runt/components/components_form";
-import TextArea from "../../../../../components/Base/TextArea";
-
-//Clases estilos
-
-const {contenedorSelect}=classes
 
 //Constantes
 const url_get_barcode = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
@@ -102,7 +96,6 @@ const PagarRunt = () => {
       nombre_usuario: pdpUser["uname"],
       numero_runt: numeroRunt,
     };
-
     peticionConsultRunt({}, data)
       .then((response) => {
         if (response?.status === true) {
@@ -137,11 +130,7 @@ const PagarRunt = () => {
       valor_total_trx: resConsultRunt.valor_total_trx,
       ciudad: roleInfo.ciudad,
       direccion: roleInfo.direccion,
-      idterminal_punto: roleInfo.idterminal_punto,
-      idtipo_dispositivo: roleInfo.idtipo_dispositivo,
-      serial_dispositivo: roleInfo.serial_dispositivo,
     };
-
     peticionPayRunt({}, data)
       .then((response) => {
         if (response?.status === true) {
@@ -229,16 +218,14 @@ const PagarRunt = () => {
     <Fragment>
       <h1 className="text-3xl mt-6">Pago de RUNT</h1>
       <Form>
-        <div className={contenedorSelect}>
-          <Select
-            id="opciones"
-            label=""
-            options={options_select}
-            onChange={onChangeSelect}
-            value={procedimiento}
-            required
-          />
-        </div>
+        <Select
+          id="opciones"
+          label=""
+          options={options_select}
+          onChange={onChangeSelect}
+          value={procedimiento}
+          required
+        />
         {/******************************Lectura runt*******************************************************/}
         {paso === "LecturaBarcode" && (
           <LecturaBarcode
