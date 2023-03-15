@@ -255,16 +255,17 @@ const CancelPin = ({
       objTicket["trxInfo"][9] = ["",""]
       objTicket["trxInfo"][10] = ["Total", formatMoney.format(valor*1.19 + valor_tramite)]
       objTicket["trxInfo"][11] = ["",""]
-      objTicket["trxInfo"][12] = ["",""]
-      objTicket["trxInfo"][13] = ["",""]
-      objTicket["trxInfo"][14] = ["",""]
-      //objTicket["trxInfo"][15] = ["",""]
+      objTicket["trxInfo"].splice(12)
   }
 
     if (tipCancelacion === '2') {
-   
-      objTicket["trxInfo"][14] = ["Total", formatMoney.format(valor*1.19)]  
-      objTicket["trxInfo"].splice(2,8)
+      objTicket["trxInfo"][2] = ["Valor Pin", formatMoney.format(valor)]
+      objTicket["trxInfo"][3] = ["",""]
+      objTicket["trxInfo"][4] = ["IVA Pin", formatMoney.format(valor*0.19)]
+      objTicket["trxInfo"][5] = ["",""]
+      objTicket["trxInfo"][6] = ["Total", formatMoney.format(valor*1.19)] 
+      objTicket["trxInfo"][7] = ["",""]
+      objTicket["trxInfo"].splice(8)
     }
 
     cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion, objTicket) //// Valor = valor + IVA
