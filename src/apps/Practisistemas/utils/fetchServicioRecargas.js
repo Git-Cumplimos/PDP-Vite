@@ -25,7 +25,6 @@ export const postConsultaOperadores = async (bodyObj) => {
     throw err;
   }
 };
-
 export const postConsultaPaquetes = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";

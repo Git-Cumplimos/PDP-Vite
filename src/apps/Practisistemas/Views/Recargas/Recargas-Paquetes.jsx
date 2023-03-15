@@ -9,9 +9,6 @@ import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
 const RecargasPaquetes = ({ subRoutes }) => {
   const navigate = useNavigate();
-
-  const path = require("path");
-
   const { roleInfo } = useAuth();
   const [showLoading, setShowLoading] = useState(false);
   const [operadores, setOperadores] = useState([]);
@@ -39,8 +36,13 @@ const RecargasPaquetes = ({ subRoutes }) => {
   };
 
   /* Filtrado de los datos recibidos del Fetch */
+  /* Filtrado de los datos recibidos del Fetch */
   const tableOperadores = useMemo(() => {
     const filteredOperadores = operadores.filter((operador) => {
+      if (!operador || !operador.desc) {
+        return false;
+      }
+
       return (
         (operador?.isPack === search?.isPack || search?.isPack === "") &&
         (operador?.desc.toLowerCase().includes(search?.operador.toLowerCase()) ||
@@ -61,23 +63,30 @@ const RecargasPaquetes = ({ subRoutes }) => {
     const endIndex = page * limit;
     const pageOperadores = filteredOperadores.slice(startIndex, endIndex);
 
-    return pageOperadores.map((operador) => [
-      capitalize(operador?.desc),
-      operador?.isPack,
-    ]);
+    return pageOperadores.map((operador) => {
+      if (!operador || !operador.desc) {
+        return ["", ""];
+      }
+
+      return [capitalize(operador.desc), operador.isPack];
+    });
   }, [operadores, search, page, limit]);
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      console.log("OPERADORES",operadores)
-      const nombreOperador = tableOperadores[i][0];
-      const index = operadores.findIndex((item) => item?.desc === nombreOperador);
+      console.log("OPERADORES", operadores);
+      const nombrePin = tableOperadores[i][0];
+      const index = operadores.findIndex(
+        (item) => item?.desc.toLowerCase() === nombrePin.toLowerCase()
+      );
+
+      console.log("index", index);
+      console.log("tableOperadores[i][0]", tableOperadores[i][0]);
+      console.log("operadores[index]", operadores[index]);
       const desc = operadores[index]?.desc;
       const isPack = operadores[index]?.isPack;
       const op = operadores[index]?.op;
       const operadorPacks = operadores[index]?.packs;
-      
-      console.log("OPERADORES",operadores)
       if (desc === "Movistar") {
         navigate("../movistar/recargas-movistar");
       } else if (desc === "Paquetes Movistar") {
@@ -108,6 +117,7 @@ const RecargasPaquetes = ({ subRoutes }) => {
   const fecthTablaPaginadoFunc = async () => {
     try {
       setShowLoading(true);
+      console.log(roleInfo, "roleinfo");
       const autoArr = await postConsultaOperadores({
         idcomercio: roleInfo?.["id_comercio"],
         // page,
