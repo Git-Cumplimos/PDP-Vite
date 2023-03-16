@@ -17,7 +17,6 @@ const BarcodeReader = ({
       className={"place-self-stretch w-full"}
       autoComplete="off"
       autoFocus
-      required
       disabled={disabled}
       onChange={(ev) => onSetCodigo(ev.target.value)}
       onKeyDown={(ev) => {
@@ -63,6 +62,7 @@ const BarcodeReader = ({
           };
         }
       }}
+      required
     />
   );
 };

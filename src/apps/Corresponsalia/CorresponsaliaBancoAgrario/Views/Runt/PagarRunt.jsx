@@ -18,7 +18,7 @@ import {
 } from "../Runt/components/components_form";
 import classes from "./PagarRunt.module.css";
 
-//Clases estilos
+//Constantes Style
 const { styleComponents } = classes;
 
 //Constantes
@@ -108,40 +108,36 @@ const PagarRunt = () => {
           }
         })
         .catch((error) => {
-          buttonDelate.current.click();
+          // buttonDelate.current.click();
           CallErrorPeticion(error);
         });
     },
     [peticionBarcode, CallErrorPeticion]
   );
 
-  const onSubmitConsultRunt = useCallback(
-    (e) => {
-      e.preventDefault();
-      const data = {
-        comercio: {
-          id_comercio: roleInfo.id_comercio,
-          id_terminal: roleInfo.id_dispositivo,
-          id_usuario: roleInfo.id_usuario,
-        },
-        nombre_usuario: pdpUser["uname"],
-        numero_runt: numeroRunt,
-      };
-
-      peticionConsultRunt({}, data)
-        .then((response) => {
-          if (response?.status === true) {
-            setResConsultRunt(response?.obj?.result);
-            setPaso("ResumenTrx");
-            setShowModal(true);
-          }
-        })
-        .catch((error) => {
-          CallErrorPeticion(error);
-        });
-    },
-    [numeroRunt, pdpUser, peticionConsultRunt, roleInfo]
-  );
+  const onSubmitConsultRunt = (e) => {
+    e.preventDefault();
+    const data = {
+      comercio: {
+        id_comercio: roleInfo.id_comercio,
+        id_terminal: roleInfo.id_dispositivo,
+        id_usuario: roleInfo.id_usuario,
+      },
+      nombre_usuario: pdpUser["uname"],
+      numero_runt: numeroRunt,
+    };
+    peticionConsultRunt({}, data)
+      .then((response) => {
+        if (response?.status === true) {
+          setResConsultRunt(response?.obj?.result);
+          setPaso("ResumenTrx");
+          setShowModal(true);
+        }
+      })
+      .catch((error) => {
+        CallErrorPeticion(error);
+      });
+  };
 
   const onSubmitPayRunt = useCallback(
     (e) => {
@@ -183,7 +179,14 @@ const PagarRunt = () => {
           CallErrorPeticion(error);
         });
     },
-    [numeroRunt, pdpUser, roleInfo, peticionPayRunt, resConsultRunt]
+    [
+      numeroRunt,
+      pdpUser,
+      roleInfo,
+      peticionPayRunt,
+      resConsultRunt,
+      CallErrorPeticion,
+    ]
   );
 
   const handlePrint = useReactToPrint({
@@ -247,7 +250,6 @@ const PagarRunt = () => {
             }
           />
         </div>
-
         {/******************************Lectura runt*******************************************************/}
         {paso === "LecturaBarcode" && (
           <LecturaBarcode

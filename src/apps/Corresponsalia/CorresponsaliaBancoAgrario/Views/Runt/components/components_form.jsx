@@ -6,22 +6,18 @@ import Input from "../../../../../../components/Base/Input";
 import classes from "../PagarRunt.module.css";
 
 //Clases estilos
-const { styleComponentsInput } = classes;
+const { styleComponentsInput, formItem } = classes;
 
 export const LecturaBarcode = ({ loadingPeticion, onSubmit, buttonDelate }) => {
   return (
     <Fragment>
       <ButtonBar></ButtonBar>
       <BarcodeReader onSearchCodigo={onSubmit} disabled={loadingPeticion} />
+      <ButtonBar></ButtonBar>
       {!loadingPeticion ? (
-        <>
-          <ButtonBar className="lg:col-span-2">
-            <button ref={buttonDelate} type="reset">
-              Volver a ingresar código de barras
-            </button>
-            {/* <Button type="reset">Volver a ingresar código de barras</Button> */}
-          </ButtonBar>
-        </>
+        <div className={formItem} ref={buttonDelate}>
+          <button type="reset">Volver a ingresar código de barras</button>
+        </div>
       ) : (
         <Fragment>
           <ButtonBar></ButtonBar>
