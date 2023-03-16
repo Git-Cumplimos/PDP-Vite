@@ -458,11 +458,11 @@ const CompraPin = () => {
   };
 
   const VentaExitosa = (result_, fecha, hora) => {
-    if (result_?.jsonAdicional?.info) {
+    // if (result_?.jsonAdicional?.info) {
 
-      const pin = result_?.jsonAdicional?.info;
-      var hiddenPin = '******' + pin.substring(6);
-    }
+    //   const pin = result_?.jsonAdicional?.info;
+    //   var hiddenPin = '******' + pin.substring(6);
+    // }
     const voucher = {
       title: "Recibo de pago",
       timeInfo: {
@@ -491,7 +491,7 @@ const CompraPin = () => {
           : state?.op == "hv"
             ? ["No. PIN", result_?.jsonAdicional?.Url2]
             : state?.op == "nx"
-              ? ["No. PIN", hiddenPin]
+              ? ["No. PIN", result_?.jsonAdicional?.info]
               : state?.op == "cb"
                 ? ["No. PIN", result_?.jsonAdicional?.Url]
                 : ["", ""],
