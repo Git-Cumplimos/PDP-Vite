@@ -280,7 +280,7 @@ const PinDePago = () => {
           type="text"
           autoComplete="off"
           maxLength={"12"}
-          onInput={(ev) => setAccountNumber(ev.target.value)}
+          onInput={(ev) => setAccountNumber(onChangeNumber(ev))}
           required
         />
         <Input

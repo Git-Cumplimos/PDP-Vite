@@ -281,7 +281,7 @@ const PagoGiro = () => {
           type="text"
           autoComplete="off"
           maxLength={"6"}
-          onInput={(ev) => setAccountNumber(ev.target.value)}
+          onInput={(ev) => setAccountNumber(onChangeNumber(ev))}
           required
         />
         <Input

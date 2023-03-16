@@ -30,7 +30,7 @@ import {
 
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import {
-  makeMoneyFormatter,
+  makeMoneyFormatter, onChangeNumber,
   // onChangeNumber,
 } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
@@ -444,7 +444,7 @@ const TrxRecaudo = () => {
               onInput={(ev) =>
                 setUserReferences((old) => ({
                   ...old,
-                  [ev.target.name]: ev.target.value,
+                  [ev.target.name]: onChangeNumber(ev),
                 }))
               }
               readOnly={disableRefs?.[index]}
