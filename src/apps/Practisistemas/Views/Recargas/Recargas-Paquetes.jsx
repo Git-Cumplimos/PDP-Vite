@@ -77,11 +77,11 @@ const RecargasPaquetes = ({ subRoutes }) => {
       const nombrePin = tableOperadores[i][0];
       const index = operadores.findIndex(
         (item) => item?.desc.toLowerCase() === nombrePin.toLowerCase()
-      );
+        );
       const desc = operadores[index]?.desc;
       const isPack = operadores[index]?.isPack;
       const op = operadores[index]?.op;
-      const operadorPacks = operadores[index]?.packs;
+      const operadorPacks = operadores[index]?.operadorPacks;
       if (desc === "Movistar") {
         navigate("../movistar/recargas-movistar");
       } else if (desc === "Paquetes Movistar") {

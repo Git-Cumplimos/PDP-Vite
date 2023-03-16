@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Input from "../../../../components/Base/Input";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { postConsultaPaquetes } from "../../utils/fetchServicioRecargas";
@@ -12,7 +13,7 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
   const [paquetes, setPaquetes] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
   const { roleInfo } = useAuth();
-
+  const [showLoading, setShowLoading] = useState(false);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
@@ -32,23 +33,34 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
 
     const filteredPaquetes = datosTrans.valor
       ? validPaquetes.filter((objeto) => {
-          const paquete = Object.values(objeto)[0];
-          const searchValue = datosTrans.valor;
-          const numCost = paquete.cost;
-          return numCost.toString().startsWith(searchValue.toString());
-        })
+        const paquete = Object.values(objeto)[0];
+        const searchValue = datosTrans.valor;
+        const numCost = paquete.cost;
+        return numCost.toString().startsWith(searchValue.toString());
+      })
       : validPaquetes;
 
     return filteredPaquetes;
   }, [paquetes, datosTrans.valor]);
-
   const onSelectAutorizador = useCallback(
     (e, i) => {
+      let costs = [];
+      let practiCodes = [];
+      let productDescs = [];
+
+      for (let i = 0; i < currentPaquetes.length; i++) {
+        var element = currentPaquetes[i];
+        var product = Object.values(element)[0];
+        costs.push(product?.cost);
+        practiCodes.push(product?.practiCode);
+        productDescs.push(product?.productDesc);
+      }
+
       navigate("../recargas-paquetes/Recargar-paquete", {
         state: {
-          valor_paquete: currentPaquetes[i]["sell"],
-          codigo_paq: currentPaquetes[i]["practiCode"],
-          descripcion: currentPaquetes[i]["productDesc"],
+          valor_paquete: costs[i],
+          codigo_paq: practiCodes[i],
+          descripcion: productDescs[i],
           operador: state?.producto,
           operador_recargar: state?.operador_recargar,
           operadorPaquete: state?.operadorPaquete,
@@ -84,16 +96,20 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
       page,
       limit,
     };
-
+    setShowLoading(true);
     postConsultaPaquetes(postData)
       .then((autoArr) => {
+        setShowLoading(false);
         /* Configuración del estado del componente. */
         if (autoArr && autoArr.response && autoArr.response.data) {
           setMaxPages(autoArr.maxPages);
           setPaquetes(autoArr.response.data);
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setShowLoading(false);
+        console.error(err)
+      });
   };
 
   const data2 = currentPaquetes
@@ -107,6 +123,7 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
 
   return (
     <>
+      <SimpleLoading show={showLoading} />
       <h1 className="text-3xl text-center">
         Servicios de recargas y venta de paquetes
       </h1>
