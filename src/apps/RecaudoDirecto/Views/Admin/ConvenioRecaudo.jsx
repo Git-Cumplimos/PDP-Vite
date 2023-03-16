@@ -38,6 +38,7 @@ const RecaudoDirecto = () => {
   const tipoConvenio = [
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
+    { label: "Sin base de datos", value: 3 },
   ]
   
   
