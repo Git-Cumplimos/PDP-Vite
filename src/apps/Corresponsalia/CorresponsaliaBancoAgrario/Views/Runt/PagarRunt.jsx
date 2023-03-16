@@ -1,8 +1,6 @@
 import { useState, useCallback, Fragment, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
-import Input from "../../../../../components/Base/Input";
-import BarcodeReader from "../../../../../components/Base/BarcodeReader";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
@@ -12,18 +10,16 @@ import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { useFetch } from "../../../../../hooks/useFetch";
-import classes from "./PagarRunt.module.css";
 import { fetchCustom, ErrorCustom } from "../../utils/fetchRunt";
 import { ComponentsModalSummaryTrx } from "../Runt/components/components_modal";
 import {
   LecturaBarcode,
   LecturaRunt,
 } from "../Runt/components/components_form";
-import TextArea from "../../../../../components/Base/TextArea";
+import classes from "./PagarRunt.module.css";
 
 //Clases estilos
-
-const { contenedorSelect } = classes;
+const { styleComponents } = classes;
 
 //Constantes
 const url_get_barcode = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
@@ -44,6 +40,7 @@ const PagarRunt = () => {
   const [resConsultRunt, setResConsultRunt] = useState({});
   const [infTicket, setInfTicket] = useState(null);
   const printDiv = useRef();
+  const buttonDelate = useRef(null);
   const validNavigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
 
@@ -56,6 +53,32 @@ const PagarRunt = () => {
   const [loadingPeticionPayRunt, peticionPayRunt] = useFetch(
     fetchCustom(url_pagar_runt, "POST", "Pago runt")
   );
+
+  const CallErrorPeticion = useCallback((error) => {
+    let msg = "Pago RUNT no exitosa";
+    if (error instanceof ErrorCustom) {
+      switch (error.name) {
+        case "ErrorCustomBackend":
+          notifyError(error.message);
+          break;
+        case "msgCustomBackend":
+          notify(error.message);
+          break;
+        default:
+          if (error.notificacion == null) {
+            notifyError(`${msg}: ${error.message}`);
+          }
+          break;
+      }
+    } else {
+      notifyError(msg);
+    }
+    setPaso("LecturaBarcode");
+    setNumeroRunt(null);
+    setResConsultRunt(null);
+    setShowModal(false);
+    setProcedimiento(option_barcode);
+  }, []);
 
   const onChangeNumeroRunt = useCallback((e) => {
     setNumeroRunt(e.target.value);
@@ -85,102 +108,83 @@ const PagarRunt = () => {
           }
         })
         .catch((error) => {
+          buttonDelate.current.click();
           CallErrorPeticion(error);
         });
     },
-    [peticionBarcode]
+    [peticionBarcode, CallErrorPeticion]
   );
 
-  const onSubmitConsultRunt = (e) => {
-    e.preventDefault();
-    const data = {
-      comercio: {
-        id_comercio: roleInfo.id_comercio,
-        id_terminal: roleInfo.id_dispositivo,
-        id_usuario: roleInfo.id_usuario,
-      },
-      nombre_usuario: pdpUser["uname"],
-      numero_runt: numeroRunt,
-    };
+  const onSubmitConsultRunt = useCallback(
+    (e) => {
+      e.preventDefault();
+      const data = {
+        comercio: {
+          id_comercio: roleInfo.id_comercio,
+          id_terminal: roleInfo.id_dispositivo,
+          id_usuario: roleInfo.id_usuario,
+        },
+        nombre_usuario: pdpUser["uname"],
+        numero_runt: numeroRunt,
+      };
 
-    peticionConsultRunt({}, data)
-      .then((response) => {
-        if (response?.status === true) {
-          setResConsultRunt(response?.obj?.result);
-          setPaso("ResumenTrx");
-          setShowModal(true);
-        }
-      })
-      .catch((error) => {
-        CallErrorPeticion(error);
-      });
-  };
-
-  const onSubmitPayRunt = (e) => {
-    const tipo__comercio = roleInfo.tipo_comercio.toLowerCase();
-    const data = {
-      comercio: {
-        id_comercio: roleInfo.id_comercio,
-        id_terminal: roleInfo.id_dispositivo,
-        id_usuario: roleInfo.id_usuario,
-      },
-      oficina_propia:
-        tipo__comercio.search("kiosco") >= 0 ||
-        tipo__comercio.search("oficinas propias") >= 0
-          ? true
-          : false,
-      nombre_usuario: pdpUser["uname"],
-      numero_runt: numeroRunt,
-      id_trx_original: resConsultRunt.id_trx,
-      valor_mt: resConsultRunt.valor_mt,
-      valor_runt: resConsultRunt.valor_runt,
-      valor_total_trx: resConsultRunt.valor_total_trx,
-      ciudad: roleInfo.ciudad,
-      direccion: roleInfo.direccion,
-      idterminal_punto: roleInfo.idterminal_punto,
-      idtipo_dispositivo: roleInfo.idtipo_dispositivo,
-      serial_dispositivo: roleInfo.serial_dispositivo,
-    };
-
-    peticionPayRunt({}, data)
-      .then((response) => {
-        if (response?.status === true) {
-          const voucher = response.obj.result.ticket;
-          setInfTicket(JSON.parse(voucher));
-          setPaso("TransaccionExitosa");
-        }
-        notify("Pago del runt exitoso");
-      })
-      .catch((error) => {
-        CallErrorPeticion(error);
-      });
-  };
-
-  function CallErrorPeticion(error) {
-    let msg = "Recarga no exitosa";
-    if (error instanceof ErrorCustom) {
-      switch (error.name) {
-        case "ErrorCustomBackend":
-          notifyError(error.message);
-          break;
-        case "msgCustomBackend":
-          notify(error.message);
-          break;
-        default:
-          if (error.notificacion == null) {
-            notifyError(`${msg}: ${error.message}`);
+      peticionConsultRunt({}, data)
+        .then((response) => {
+          if (response?.status === true) {
+            setResConsultRunt(response?.obj?.result);
+            setPaso("ResumenTrx");
+            setShowModal(true);
           }
-          break;
-      }
-    } else {
-      notifyError(msg);
-    }
-    setPaso("LecturaBarcode");
-    setNumeroRunt(null);
-    setResConsultRunt(null);
-    setShowModal(false);
-    setProcedimiento(option_barcode);
-  }
+        })
+        .catch((error) => {
+          CallErrorPeticion(error);
+        });
+    },
+    [numeroRunt, pdpUser, peticionConsultRunt, roleInfo]
+  );
+
+  const onSubmitPayRunt = useCallback(
+    (e) => {
+      const tipo__comercio = roleInfo.tipo_comercio.toLowerCase();
+      const data = {
+        comercio: {
+          id_comercio: roleInfo.id_comercio,
+          id_terminal: roleInfo.id_dispositivo,
+          id_usuario: roleInfo.id_usuario,
+        },
+        oficina_propia:
+          tipo__comercio.search("kiosco") >= 0 ||
+          tipo__comercio.search("oficinas propias") >= 0
+            ? true
+            : false,
+        nombre_usuario: pdpUser["uname"],
+        numero_runt: numeroRunt,
+        id_trx_original: resConsultRunt.id_trx,
+        valor_mt: resConsultRunt.valor_mt,
+        valor_runt: resConsultRunt.valor_runt,
+        valor_total_trx: resConsultRunt.valor_total_trx,
+        ciudad: roleInfo.ciudad,
+        direccion: roleInfo.direccion,
+        idterminal_punto: roleInfo.idterminal_punto,
+        idtipo_dispositivo: roleInfo.idtipo_dispositivo,
+        serial_dispositivo: roleInfo.serial_dispositivo,
+      };
+
+      peticionPayRunt({}, data)
+        .then((response) => {
+          if (response?.status === true) {
+            const voucher = response.obj.result.ticket;
+            setInfTicket(JSON.parse(voucher));
+            setPaso("TransaccionExitosa");
+          }
+          notify("Pago del runt exitoso");
+        })
+        .catch((error) => {
+          CallErrorPeticion(error);
+        });
+    },
+    [numeroRunt, pdpUser, roleInfo, peticionPayRunt, resConsultRunt]
+  );
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -229,7 +233,7 @@ const PagarRunt = () => {
     <Fragment>
       <h1 className="text-3xl mt-6">Pago de RUNT</h1>
       <Form>
-        <div className={contenedorSelect}>
+        <div className={styleComponents}>
           <Select
             id="opciones"
             label=""
@@ -249,6 +253,7 @@ const PagarRunt = () => {
           <LecturaBarcode
             loadingPeticion={loadingPeticionBarcode}
             onSubmit={onSubmitBarcode}
+            buttonDelate={buttonDelate}
           ></LecturaBarcode>
         )}
         {/******************************Lectura runt*******************************************************/}

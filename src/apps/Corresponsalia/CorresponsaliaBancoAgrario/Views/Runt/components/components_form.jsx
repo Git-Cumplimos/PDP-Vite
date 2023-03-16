@@ -3,16 +3,23 @@ import BarcodeReader from "../../../../../../components/Base/BarcodeReader";
 import Button from "../../../../../../components/Base/Button";
 import ButtonBar from "../../../../../../components/Base/ButtonBar";
 import Input from "../../../../../../components/Base/Input";
+import classes from "../PagarRunt.module.css";
 
-export const LecturaBarcode = ({ loadingPeticion, onSubmit }) => {
+//Clases estilos
+const { styleComponentsInput } = classes;
+
+export const LecturaBarcode = ({ loadingPeticion, onSubmit, buttonDelate }) => {
   return (
     <Fragment>
       <ButtonBar></ButtonBar>
-      <BarcodeReader onSearchCodigo={onSubmit} />
+      <BarcodeReader onSearchCodigo={onSubmit} disabled={loadingPeticion} />
       {!loadingPeticion ? (
         <>
           <ButtonBar className="lg:col-span-2">
-            <Button type="reset">Volver a ingresar código de barras</Button>
+            <button ref={buttonDelate} type="reset">
+              Volver a ingresar código de barras
+            </button>
+            {/* <Button type="reset">Volver a ingresar código de barras</Button> */}
           </ButtonBar>
         </>
       ) : (
@@ -42,16 +49,16 @@ export const LecturaRunt = ({
       <ButtonBar></ButtonBar>
       {procedimiento === option_barcode && (
         <Input
-          // label="Número de RUNT"
+          className={styleComponentsInput}
           type="text"
           autoComplete="off"
           value={numeroRunt}
-          disabled
+          disabled={true}
         />
       )}
       {procedimiento === option_manual && (
         <Input
-          // label="Número de RUNT"
+          className={styleComponentsInput}
           type="text"
           autoComplete="off"
           value={numeroRunt}
@@ -59,7 +66,8 @@ export const LecturaRunt = ({
           onChange={onChange}
         />
       )}
-      <ButtonBar className="lg:col-span-0.6">
+
+      <ButtonBar className="flex justify-center py-6">
         <Button type={"submit"} onClick={onSubmit} disabled={loadingPeticion}>
           Tramitar RUNT
         </Button>
