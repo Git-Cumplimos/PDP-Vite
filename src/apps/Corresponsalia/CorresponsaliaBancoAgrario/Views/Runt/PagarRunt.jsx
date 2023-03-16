@@ -108,7 +108,7 @@ const PagarRunt = () => {
           }
         })
         .catch((error) => {
-          // buttonDelate.current.click();
+          buttonDelate.current.click();
           CallErrorPeticion(error);
         });
     },
