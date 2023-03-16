@@ -5,7 +5,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { notify, notifyError, notifyPending } from "../../../../utils/notify";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRecaudosList, downloadFileRecaudo } from "../../utils/fetchFunctions"
 import { ExportToCsv } from "export-to-csv";
 import fetchData from "../../../../utils/fetchData";

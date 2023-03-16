@@ -6,8 +6,9 @@ import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
 import Select from "../../../../components/Base/Select";
 import Input from "../../../../components/Base/Input";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { notify, notifyPending, notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 import { getRetiro, modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
 
 
@@ -21,7 +22,7 @@ const FormularioRetiro = () => {
   const [id_trx, setId_Trx] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [valorRecibido, setValorRecibido] = useState({ valor_total_trx: '' })
-  const { roleInfo, pdpUser, infoTicket } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const [dataReferencias, setDataReferencias] = useState({
     referencia1: '',
     referencia2: ''
@@ -30,6 +31,10 @@ const FormularioRetiro = () => {
     { label: "Valor igual", value: 1 },
     { label: "Valor menor o igual", value: 2 },
   ]
+  const limitesMontos = {
+    max: 999999999,
+    min: 1,
+  };
 
 
   const handleClose = useCallback(() => {
@@ -44,7 +49,7 @@ const FormularioRetiro = () => {
     try {
       let rest = await searchConveniosRetiroList({ convenio_id: pk_id_convenio })
         .then((rest) => { return rest })
-      if (rest.length < 1) throw "no hay datos"
+      if (rest.length < 1) throw new Error("No hay datos");
       setDataConvRetiro(rest?.obj)
       setCargando(true)
     } catch (e) {
@@ -56,8 +61,10 @@ const FormularioRetiro = () => {
   const consultarRetiroD = useCallback(async (e) => {
     e.preventDefault()
     const data = {
-      ...dataReferencias,
-      convenio_id: pk_id_convenio,
+      consulta_retiro: {
+        convenio_id: pk_id_convenio,
+        referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
+      },
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
@@ -93,9 +100,9 @@ const FormularioRetiro = () => {
 
     const FlujosTRX = {
       1: () => sumaTotal === dataRetiro.valor ?
-        { estado: true, fk_estado: 2 } : undefined,
+        { estado: true } : undefined,
       2: () => sumaTotal <= dataRetiro.valor ?
-        { estado: true, fk_estado: sumaTotal === dataRetiro.valor ? 2 : 1 } : undefined,
+        { estado: true } : undefined,
     };
 
     const resp = FlujosTRX[dataRetiro?.fk_modificar_valor]?.() || { estado: false };
@@ -104,10 +111,6 @@ const FormularioRetiro = () => {
 
       const data = {
         id_trx: id_trx,
-        fk_estado: resp.fk_estado,
-        convenio_id: pk_id_convenio,
-        valor_antes: dataRetiro?.valor_retirado ?? 0,
-        valor_retirado: sumaTotal,
         comercio: {
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
@@ -117,10 +120,14 @@ const FormularioRetiro = () => {
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         ...valorRecibido,
+        retiro: {
+          convenio_id: pk_id_convenio,
+          pk_id_retiro: dataRetiro.pk_id_recaudo,
+        },
         nombre_usuario: pdpUser?.uname ?? "",
       };
       console.log(data)
-      await modRetiro({ pk_id_retiro: dataRetiro.pk_id_recaudo }, data)
+      await modRetiro(data)
         .then((data) => {
           data?.status && notify(data?.msg)
         })
@@ -130,7 +137,7 @@ const FormularioRetiro = () => {
       handleClose()
     }
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
-  }, [dataRetiro, roleInfo, pdpUser, id_trx, valorRecibido, handleClose])
+  }, [dataRetiro, roleInfo, pdpUser, id_trx, valorRecibido, pk_id_convenio, handleClose])
 
   return (
     <Fragment>
@@ -165,7 +172,7 @@ const FormularioRetiro = () => {
                 type="text"
                 // minLength={dict?.length[0]}
                 // maxLength={dict?.length[1]}
-                value={dataReferencias['referencia'+ (index + 1)]}
+                value={dataReferencias['referencia' + (index + 1)]}
                 onChange={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: e.target.value }) }}
                 autoComplete="off"
                 required />
@@ -200,35 +207,17 @@ const FormularioRetiro = () => {
               defaultValue={dataRetiro?.fk_modificar_valor ?? ""}
               disabled
             />
-            <Input
-              id={1}
-              label={"Valor total a retirar"}
-              name={"valor"}
-              type="text"
-              defaultValue={dataRetiro?.valor ?? ""}
+            <MoneyInput
+              label="Valor a recaudar"
+              name="valor_total_trx"
               autoComplete="off"
-              disabled
-              required />
-            {dataRetiro.valor_retirado !== 0 &&
-              <Input
-                id={1}
-                label={"Saldo restante"}
-                name={"valor"}
-                type="text"
-                defaultValue={dataRetiro.fk_modificar_valor === 2 ?
-                  parseInt(dataRetiro.valor - parseInt(dataRetiro.valor_retirado)) : dataRetiro.valor_retirado}
-                autoComplete="off"
-                disabled
-              />
-            }
-            <Input
-              id={1}
-              label={"Valor recibido"}
-              name={"valor_total_trx"}
-              type="text"
-              onChange={(e) => { setValorRecibido({ ...valorRecibido, [e.target.name]: e.target.value }) }}
-              autoComplete="off"
-              required />
+              min={dataRetiro?.fk_modificar_valor === 1 ? ((dataRetiro.valor - 1) - dataRetiro.valor_retirado) :limitesMontos?.min}
+              max={((dataRetiro.valor+1) - dataRetiro.valor_retirado)?? limitesMontos?.max}
+              onInput={(e, valor) =>
+                setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
+              }
+              required
+            />
             <ButtonBar>
               <Button type={"submit"} >
                 Aceptar
