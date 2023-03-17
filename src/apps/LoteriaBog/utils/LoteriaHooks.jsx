@@ -40,7 +40,6 @@ const urls = {
 
   consultaPago: `${process.env.REACT_APP_URL_LOTERIAS}/consultaPremio`,
   pagoPremioLoterias: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremio`,
-  // pagoPremioLoterias: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremio`,
   premiohash: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioVirtual`,
   premiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioFisico`,
   pagopremio: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioVirtual`,
@@ -788,17 +787,15 @@ export const useProvideLoteria = () => {
   );
 
   const con_SortVentas_S3 = useCallback(
-    async (sorteo, fecha_ini, fecha_fin, page) => {
-      const query = {};
-      if (sorteo !== "") {
-        query.sorteo = sorteo;
-        query.numero = page;
-      } else {
-        query.fecha_ini = fecha_ini;
-        query.fecha_fin = fecha_fin;
-        query.numero = page;
+    async (fecha_ini, fecha_fin, sorteo, page, limit) => {
+      const query = {
+        fecha_ini : fecha_ini.fecha_ini,
+        fecha_fin : fecha_ini.fecha_fin,
+        sorteo: fecha_ini.sorteo,
+        codigos_loteria : sorteosLOT,
+        page : fecha_ini.page,
+        limit: fecha_ini.limit
       }
-      query.codigos_loteria = sorteosLOT;
       try {
         const res = await fetchData(urls.con_SortVentas_S3, "GET", query, {});
         return res;

@@ -35,6 +35,9 @@ const Loteria = ({ route }) => {
   });
   const { tiposOperaciones } = useLoteria();
 
+  const fecha_trx = useMemo(()=>
+    new Date(),[])
+
   const operacion = useMemo(() => {
     return tiposOperaciones;
   }, [tiposOperaciones]);
@@ -244,13 +247,13 @@ const Loteria = ({ route }) => {
           year: "2-digit",
           month: "2-digit",
           day: "2-digit",
-        }).format(new Date()),
+        }).format(fecha_trx),
         Hora: Intl.DateTimeFormat("es-CO", {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
           hour12: false,
-        }).format(new Date()),
+        }).format(fecha_trx),
       },
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
@@ -276,9 +279,9 @@ const Loteria = ({ route }) => {
         ["", ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese, al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese, al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [roleInfo, sellResponse]
+  }, [roleInfo, sellResponse, fecha_trx]
   );
   
   return (
@@ -448,7 +451,6 @@ const Loteria = ({ route }) => {
               "Número",
               "Serie",
               "Fracciones disponibles",
-              // "Valor por fraccion",
             ]}
             data={loterias.map(
               ({ Fracciones_disponibles, Num_billete, serie: Serie_lot }) => {
@@ -464,29 +466,6 @@ const Loteria = ({ route }) => {
               setShowModal(true);
             }}
           />
-          {/* <TableEnterprise
-            headers={[
-              "Número",
-              "Serie",
-              "Fracciones disponibles",
-            ]}
-            maxPage={maxPages}
-            data={loterias.map(
-              ({ Fracciones_disponibles, Num_billete, serie: Serie_lot }) => {
-                return {
-                  Num_billete,
-                  Serie_lot,
-                  Fracciones_disponibles,
-                };
-              }
-            )}
-            onSelectRow={(e, index) => {
-              setSelected(loterias[index]);
-              setShowModal(true);
-            }}
-          >
-
-          </TableEnterprise> */}
         </>
       ) : (
         ""
@@ -519,6 +498,7 @@ const Loteria = ({ route }) => {
             setCustomer={setCustomer}
             selecFrac={selecFrac}
             setSelecFrac={setSelecFrac}
+            fecha_trx={fecha_trx}
           />
         )}
       </Modal>
