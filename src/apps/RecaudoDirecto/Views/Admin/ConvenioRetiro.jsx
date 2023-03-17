@@ -104,7 +104,6 @@ const RetiroDirecto = () => {
       delete body['Nombre de Referencia']; delete body['Longitud minima']; delete body['Longitud maxima']
       let allReferencias = []
       for (let i in referencias){
-        // console.log(referencias[i])
         allReferencias.push({
           "nombre_referencia": referencias[i]["Nombre de Referencia"],
           "length": [referencias[i]["Longitud minima"], referencias[i]["Longitud maxima"],]
@@ -113,7 +112,6 @@ const RetiroDirecto = () => {
       body['referencias'] = allReferencias
       console.log(body)
     }
-    // console.log(body)
     notifyPending(
       selected
         ? modConveniosRetiroList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
@@ -125,7 +123,6 @@ const RetiroDirecto = () => {
       },
       {
         render({ data: res }) {
-          // console.log(res);
           handleClose();
           getConvRetiro();
           return `Convenio ${selected ? "modificado" : "agregado"

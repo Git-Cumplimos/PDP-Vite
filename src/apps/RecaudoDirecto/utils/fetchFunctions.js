@@ -63,10 +63,31 @@ const buildPutFunction = (url) => {
     }
   };
 };
-const fetchDownloadFile = (url) => {
+export const fetchImportFile = (url) => {
+  return async (args, body) => {
+    try {
+      const res = await fetchData(url + `?convenio_id=${args.convenio_id}`, 'POST', {}, body);
+      if (!res?.status) {
+        if (res?.msg) {
+          throw new Error(res?.msg, { cause: "custom" });
+        }
+        throw new Error(res, { cause: "custom" });
+      }
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+export const fetchDownloadFile = (url) => {
   return async (args = {}) => {
     try {
       const Peticion = await fetchData(url, 'GET', args);
+      if (!Peticion?.status) {
+        if (Peticion?.msg) {
+          throw new Error(Peticion?.msg, { cause: "custom" });
+        }
+      }
       return Peticion;
     } catch (error) {
       throw error;
@@ -90,6 +111,9 @@ export const modConveniosRecaudoList = buildPutFunction(
 );
 export const downloadFileRecaudo = fetchDownloadFile(
   `${url}/convenio-recaudo/descargar_reporte`
+);
+export const importFileRecaudo = fetchImportFile(
+  `${url}/convenio-recaudo/validar_csv`
 );
 
 
@@ -120,6 +144,9 @@ export const modConveniosRetiroList = buildPutFunction(
 );
 export const downloadFileRetiro = fetchDownloadFile(
   `${url}/convenio-retiro/descargar_reporte`
+);
+export const importFileRetiro = fetchImportFile(
+  `${url}/convenio-retiro/validar_csv`
 );
 
 /* -- Retiro -- */

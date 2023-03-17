@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Input from "../../../../components/Base/Input";
 import { getRecaudosList } from "../../utils/fetchFunctions"
+import { notifyError } from "../../../../utils/notify";
 
 const RecaudoManual = () => {
   const navigate = useNavigate();
@@ -65,7 +66,9 @@ const RecaudoManual = () => {
             })
           )}
           onSelectRow={(e, i) => {
-            navigate(`/recaudo-directo/recaudo/${listRecaudos[i].pk_id_convenio_directo}`)
+            if (listRecaudos[i].fk_id_tipo_convenio !== 2){
+              navigate(`/recaudo-directo/recaudo/${listRecaudos[i].pk_id_convenio_directo}`)
+            }else{notifyError("Error, convenio con autorizador en desarrollo!")}
           }}
           maxPage={maxPages}
           onSetPageData={setPageData}

@@ -5,8 +5,8 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import { notify, notifyError, notifyPending } from "../../../../utils/notify";
-import { getRecaudosList, addFileConveniosRecaudo } from "../../utils/fetchFunctions"
+import { notify, notifyError } from "../../../../utils/notify";
+import { getRecaudosList } from "../../utils/fetchFunctions"
 
 export const fetchUploadFileCustom = async (url) => {
   try {

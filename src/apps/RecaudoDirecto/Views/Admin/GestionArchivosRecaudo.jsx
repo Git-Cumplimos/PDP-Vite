@@ -6,27 +6,8 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getRecaudosList, downloadFileRecaudo } from "../../utils/fetchFunctions"
+import { getRecaudosList, downloadFileRecaudo , importFileRecaudo  } from "../../utils/fetchFunctions"
 import { ExportToCsv } from "export-to-csv";
-import fetchData from "../../../../utils/fetchData";
-
-
-export const fetchImportFile = async (url, body) => {
-  try {
-    const res = await fetchData(url,'POST',{},body);
-    if (!res?.status) {
-      if (res?.msg) {
-        throw new Error(res?.msg, { cause: "custom" });
-      }
-      throw new Error(res, { cause: "custom" });
-    }
-
-    // const res = await Peticion.json()
-    return res;
-  } catch (error) {
-    throw error;
-  }
-};
 
 const GestionArchivosRecaudo = () => {
   const [showModal, setShowModal] = useState(false)
@@ -79,12 +60,12 @@ const GestionArchivosRecaudo = () => {
 
 
   const CargarArchivo = useCallback(async (e) => {
-    const url = `http://127.0.0.1:8000/convenio-recaudo/validar_csv?convenio_id=${selected.pk_id_convenio_directo}`;
     e.preventDefault();
-    const formData = new FormData();
-    formData.set("file", file);
-    notifyPending(
-      fetchImportFile(url, formData),
+    if (selected.fk_id_tipo_convenio === 1){
+      const formData = new FormData();
+      formData.set("file", file);
+      notifyPending(
+      importFileRecaudo({convenio_id: selected?.pk_id_convenio_directo ?? ''}, formData),
       {
         render() {
           return "Enviando solicitud";
@@ -105,30 +86,17 @@ const GestionArchivosRecaudo = () => {
           return `Archivo erroneo`;
         }
       }
-    )
-    // try {
-    //   fetchImportFile(url, formData)
-    //     .then((data) => {
-    //       if (data?.status === true) {
-    //         console.log(data)
-    //       }
-    //       else { console.log(data) }
-    //     })
-    //     .catch((e) => console.log("err", e))
-    // }
-    // catch (e) { console.log(e) }
-
-    // handleClose()
+      )
+    } else {notifyError("Convenio no permite cargar archivo")}
   }, [handleClose, file, selected])
-
+  
   const DescargarArchivo = useCallback(async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
     try {
-      downloadFileRecaudo({...body,convenio_id:selected.pk_id_convenio_directo})
+      downloadFileRecaudo ({...body,convenio_id:selected.pk_id_convenio_directo})
       .then(async (res) => {
-        if (res.codigo) throw res.msg
         const options = {
           fieldSeparator: ";",
           quoteStrings: '"',
@@ -144,37 +112,15 @@ const GestionArchivosRecaudo = () => {
         const csvExporter = new ExportToCsv(options);
         const data = JSON.stringify(res)
         csvExporter.generateCsv(data);
-        
-        // const resp = await data.json()
-        // console.log(resp)
-        // if (resp.status){
-          //   notify(`${resp.msg}`)
-          //   const url = window.URL.createObjectURL(new Blob([resp.obj]));
-          //   const link = document.createElement('a');
-          //   link.href = url;
-          //   link.setAttribute('download', resp.file_name);
-          //   document.body.appendChild(link);
-          //   link.click();
-          //   link.parentNode.removeChild(link);
-          // }
-          // else{
-            //   notifyError(`${resp.msg}`)
-            //   handleClose()
-            // }
-
-          // const dataBlob = await data.blob()
-          // if (dataBlob.type === 'text/csv') {
-          //   const file = window.URL.createObjectURL(new Blob([dataBlob]));
-          //   const link = document.createElement('a');
-          //   link.href = file;
-          //   link.setAttribute('download', `Reporte_${selected?.nombre_convenio}.csv`);
-          //   document.body.appendChild(link);
-          //   link.click();
-          //   link.parentNode.removeChild(link);
-          // }
-          // else { notifyError(`ERROR al descargar reporte`); handleClose() }
         })
-        .catch((e) => {notifyError(e); handleClose()} )
+        .catch((err) => {
+          if (err?.cause === "custom") {
+            notifyError(err?.message);
+            return;
+          }
+          notifyError(err);
+          handleClose()
+        } )
     }
     catch (e) { console.log(e) }
 
@@ -195,7 +141,6 @@ const GestionArchivosRecaudo = () => {
             "Estado",
             "Fecha creacion",
           ]}
-          // data={datos['value'].map(
           data={listRecaudos.map(
             ({
               pk_id_convenio_directo,
@@ -259,7 +204,9 @@ const GestionArchivosRecaudo = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">Gestion de archivos de recaudo</h2>
         <ButtonBar>
+          {selected.fk_id_tipo_convenio === 1 && 
           <Button onClick={() => { setShowMainModal(true); setShowModalOptions(true) }}>Cargar Archivo</Button>
+          }
           <Button onClick={() => { setShowMainModal(true) }}>Descargar Reporte</Button>
         </ButtonBar>
       </Modal>
@@ -280,14 +227,10 @@ const GestionArchivosRecaudo = () => {
           {!showModalOptions && (
             <>
               <Input
-
                 type='date'
                 autoComplete='off'
                 name={"fecha_inicial"}
                 label={"Fecha inicial"}
-                // onChange={(e) => {
-                //   setFile(e.target.files[0]);
-                // }}
                 required
               />
               <Input
@@ -295,9 +238,6 @@ const GestionArchivosRecaudo = () => {
                 autoComplete='off'
                 name={"fecha_final"}
                 label={"Fecha final"}
-                // onChange={(e) => {
-                //   setFile(e.target.files[0]);
-                // }}
                 required
               />
             </>

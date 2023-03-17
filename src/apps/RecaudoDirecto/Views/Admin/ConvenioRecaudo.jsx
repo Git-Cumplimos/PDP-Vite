@@ -90,7 +90,6 @@ const RecaudoDirecto = () => {
         console.error(err?.message);
       });
     setCargando(true)
-    // console.log(referencias)
   }, [pageData, searchFilters])
 
   useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters])
@@ -108,7 +107,6 @@ const RecaudoDirecto = () => {
       delete body['Nombre de Referencia']; delete body['Longitud minima']; delete body['Longitud maxima']
       let allReferencias = []
       for (let i in referencias){
-        // console.log(referencias[i])
         allReferencias.push({
           "nombre_referencia": referencias[i]["Nombre de Referencia"],
           "length": [referencias[i]["Longitud minima"], referencias[i]["Longitud maxima"],]
@@ -117,8 +115,6 @@ const RecaudoDirecto = () => {
       body['referencias'] = allReferencias
       console.log(body)
     }
-    // console.log(body)
-    // console.log(referencias)
     notifyPending(
       selected
         ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
@@ -167,7 +163,6 @@ const RecaudoDirecto = () => {
             "Estado",
             "Fecha creacion",
           ]}
-          // data={datos['value'].map(
           data={listRecaudos.map(
             ({
               pk_id_convenio_directo,

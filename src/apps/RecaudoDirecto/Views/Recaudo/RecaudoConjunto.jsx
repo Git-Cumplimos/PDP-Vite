@@ -83,7 +83,7 @@ const RecaudoConjunto = () => {
 
         setDataRecaudo(data?.obj?.recaudo)
         setId_Trx(data?.obj?.id_trx ?? false)
-        notify(data.msg)
+        data?.obj?.recaudo && notify(data.msg) 
         setShowModal(true);
       })
       .catch((err) => {
@@ -161,7 +161,6 @@ const RecaudoConjunto = () => {
         ...valorRecibido,
         nombre_usuario: pdpUser?.uname ?? "",
       };
-      console.log("data",data)
       await createRecaudo(data)
         .then((data) => {
           data?.status && notify(data?.msg)
@@ -232,7 +231,6 @@ const RecaudoConjunto = () => {
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar recaudo {
           !dataRecaudo && convenioRecaudo?.fk_id_tipo_convenio === 3 ? 'no registrado' : ''
         } </h2>
-        {console.log("data",dataRecaudo,"id tipo", convenioRecaudo?.fk_id_tipo_convenio)}
         <Form onSubmit={!dataRecaudo && convenioRecaudo?.fk_id_tipo_convenio === 3 ?  nuevoRecaudo : hacerRecaudo} grid >
           {convenioRecaudo?.fk_id_tipo_convenio !== 3 ? (
             <>
@@ -249,7 +247,8 @@ const RecaudoConjunto = () => {
                 label="Valor a recaudar"
                 name="valor_total_trx"
                 autoComplete="off"
-                min={limitesMontos?.min}
+                min={dataRecaudo?.fk_modificar_valor === 1 ? ((dataRecaudo.valor - 1) - dataRecaudo.valor_pagado) :limitesMontos?.min}
+                equalError={false}
                 max={dataRecaudo?.fk_modificar_valor === 1 ||
                   dataRecaudo?.fk_modificar_valor === 2 ?
                   parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado)
