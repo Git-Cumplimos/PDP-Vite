@@ -392,6 +392,13 @@ const Premios = ({ route }) => {
       return { ...old, celular: valueInput };
     });
   };
+
+  const onDocChange = (e) => {
+    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+    setDatosCliente((old) => {
+      return { ...old, documento: valueInput };
+    });
+  };
  
   const cancelar = () => {
     notifyError("Se canceló el pago del premio");
@@ -515,7 +522,7 @@ const Premios = ({ route }) => {
                   type="text"
                   autoComplete="off"
                   minLength={"3"}
-                  maxLength={"50"}
+                  maxLength={"60"}
                   value={datosCliente?.nombre}
                   onInput={(e) => {
                     setDatosCliente((old) => {
@@ -530,20 +537,13 @@ const Premios = ({ route }) => {
                 <Input
                   id="cedula"
                   label="Cédula"
-                  type="text"
-                  minLength={"10"}
-                  maxLength={"10"}
+                  type="tel"
+                  minLength="10"
+                  maxLength="10"
                   autoComplete="off"
-                  required={true}
+                  required
                   value={datosCliente?.documento}
-                  onInput={(e) => {
-                    setDatosCliente((old) => {
-                      return {
-                        ...old,
-                        documento: e.target.value,
-                      };
-                    });
-                  }}
+                  onChange={onDocChange}
                 />
                 <Input
                   id="numCel"
@@ -562,6 +562,8 @@ const Premios = ({ route }) => {
                   label="Dirección"
                   type="text"
                   autoComplete="off"
+                  minLength={"3"}
+                  maxLength={"60"}
                   required={true}
                   value={datosCliente?.direccion}
                   onInput={(e) => {
