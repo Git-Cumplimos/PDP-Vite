@@ -347,13 +347,16 @@ const CompraPin = () => {
               : inputValor,
         jsonAdicional: state?.op == "hv" ? {
           placaVh: inputPlaca,
+          nombre_usuario: userInfo?.attributes?.name,
         } : state?.op == "em" ? {
+            nombre_usuario: userInfo?.attributes?.name,
           telEnvio: inputCelular,
-        } : state?.op == "cb" ? {
+          } : state?.op == "cb" ? {
+              nombre_usuario: userInfo?.attributes?.name,
           circulo: inputCirculo,
           matricula: inputMatricula,
         } : {
-
+                nombre_usuario: userInfo?.attributes?.name,
         },
         ticket: newVoucher,
       },
