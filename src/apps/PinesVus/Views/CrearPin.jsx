@@ -534,16 +534,20 @@ const CrearPin = () => {
       objTicket2["commerceName"] = "TRÁMITE "+ tramiteData?.descripcion.toUpperCase() 
     }
     if (!isNaN(tramiteData2.total)){
-    objTicket2["trxInfo"][0] = ["Detalle trámite_1", tramiteData?.descripcion]
+    objTicket2["trxInfo"][0] = ["Detalle primer trámite", ""]
     objTicket2["trxInfo"][1] = ["", ""]
-    objTicket2["trxInfo"][2] = ["Valor trámite_1", formatMoney.format(tramiteData?.valor)]
+    objTicket2["trxInfo"][2] = ["", tramiteData?.descripcion]
     objTicket2["trxInfo"][3] = ["", ""]
-    objTicket2["trxInfo"][4] = ["Detalle trámite_2", tramiteData2?.descripcion]
+    objTicket2["trxInfo"][4] = ["Valor primer trámite", formatMoney.format(tramiteData?.valor)]
     objTicket2["trxInfo"][5] = ["", ""]
-    objTicket2["trxInfo"][6] = ["Valor trámite_2", formatMoney.format(tramiteData2?.valor)]
+    objTicket2["trxInfo"][6] = ["Detalle segundo trámite", ""]
     objTicket2["trxInfo"][7] = ["", ""]
-    objTicket2["trxInfo"][8] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva + tramiteData2?.valor)] 
+    objTicket2["trxInfo"][8] = ["", tramiteData2?.descripcion]
     objTicket2["trxInfo"][9] = ["", ""]
+    objTicket2["trxInfo"][10] = ["Valor segundo trámite", formatMoney.format(tramiteData2?.valor)]
+    objTicket2["trxInfo"][11] = ["", ""]
+    objTicket2["trxInfo"][12] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva + tramiteData2?.valor)] 
+    objTicket2["trxInfo"][13] = ["", ""]
 
 
     }
