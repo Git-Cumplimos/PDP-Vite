@@ -106,7 +106,7 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 					>
 						<Input
 							id="numSorteo"
-							label="Numero de sorte: "
+							label="Número de sorteo: "
 							type="text"
 							value={numeroSorteo}
 							onInput={(e) => setNumeroSorteo(e.target.value)}
