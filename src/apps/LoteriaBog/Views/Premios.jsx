@@ -208,7 +208,7 @@ const Premios = ({ route }) => {
       })
       .catch(() => setDisabledBtns(false));
   };
-  console.log("seleccionarFraccion--->",seleccionarFraccion)
+  
   const tickets = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -538,7 +538,7 @@ const Premios = ({ route }) => {
                   id="cedula"
                   label="Cédula"
                   type="tel"
-                  minLength="10"
+                  minLength="5"
                   maxLength="12"
                   autoComplete="off"
                   required
