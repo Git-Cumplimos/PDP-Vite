@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Input from "../../../../components/Base/Input";
 import { getRetirosList } from "../../utils/fetchFunctions"
+import { notifyError } from "../../../../utils/notify";
 
 const RetiroDirecto = () => {
   const navigate = useNavigate()
-  const [busqueda, setBusqueda] = useState('');
-
 
   const [listRetiro, setListRetiro] = useState('')
   const [cargando, setCargando] = useState(false)
@@ -65,7 +64,9 @@ const RetiroDirecto = () => {
             })
           )}
           onSelectRow={(e, i) => {
-            navigate(`/recaudo-directo/consultar-retiro/retirar/${listRetiro[i].pk_id_convenio_directo}`)
+            if (listRetiro[i].fk_id_tipo_convenio !== 2){
+              navigate(`/recaudo-directo/consultar-retiro/retirar/${listRetiro[i].pk_id_convenio_directo}`)
+            }else{notifyError("Error, convenio con autorizador esta en desarrollo!")}
           }}
           maxPage={maxPages}
           onSetPageData={setPageData}

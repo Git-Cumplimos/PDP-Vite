@@ -58,31 +58,33 @@ const GestionArchivosRetiro = () => {
 
   const CargarArchivo = useCallback(async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.set("file", file);
-    notifyPending(
-      importFileRetiro({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, formData),
-      {
-        render() {
-          return "Enviando solicitud";
+    if (selected.fk_id_tipo_convenio === 1) {
+      const formData = new FormData();
+      formData.set("file", file);
+      notifyPending(
+        importFileRetiro({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, formData),
+        {
+          render() {
+            return "Enviando solicitud";
+          },
         },
-      },
-      {
-        render({ data: res }) {
-          handleClose()
-          return res?.msg;
-        }
-      },
-      {
-        render({ data: err }) {
-          if (err?.cause === "custom") {
-            return err?.message;
+        {
+          render({ data: res }) {
+            handleClose()
+            return res?.msg;
           }
-          console.error(err?.message);
-          return `Archivo erroneo`;
+        },
+        {
+          render({ data: err }) {
+            if (err?.cause === "custom") {
+              return err?.message;
+            }
+            console.error(err?.message);
+            return `Archivo erroneo`;
+          }
         }
-      }
-    )
+      )
+    }else {notifyError("Convenio no permite cargar archivo")}
 
     handleClose()
   }, [handleClose, file, selected])
@@ -202,7 +204,9 @@ const GestionArchivosRetiro = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">Gestion de archivos de retiro</h2>
         <ButtonBar>
-          <Button onClick={() => { setShowMainModal(true); setShowModalOptions(true) }}>Cargar Archivo</Button>
+          {selected.fk_id_tipo_convenio === 1 &&
+            <Button onClick={() => { setShowMainModal(true); setShowModalOptions(true) }}>Cargar Archivo</Button>
+          }
           <Button onClick={() => { setShowMainModal(true) }}>Descargar Reporte</Button>
         </ButtonBar>
       </Modal>

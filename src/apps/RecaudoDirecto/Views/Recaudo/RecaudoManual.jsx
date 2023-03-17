@@ -68,7 +68,7 @@ const RecaudoManual = () => {
           onSelectRow={(e, i) => {
             if (listRecaudos[i].fk_id_tipo_convenio !== 2){
               navigate(`/recaudo-directo/recaudo/${listRecaudos[i].pk_id_convenio_directo}`)
-            }else{notifyError("Error, convenio con autorizador en desarrollo!")}
+            }else{notifyError("Error, convenio con autorizador esta en desarrollo!")}
           }}
           maxPage={maxPages}
           onSetPageData={setPageData}

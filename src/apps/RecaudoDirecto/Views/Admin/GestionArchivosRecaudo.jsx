@@ -6,8 +6,9 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getRecaudosList, downloadFileRecaudo , importFileRecaudo  } from "../../utils/fetchFunctions"
+import { getRecaudosList, downloadFileRecaudo, importFileRecaudo } from "../../utils/fetchFunctions"
 import { ExportToCsv } from "export-to-csv";
+import AWS from 'aws-sdk';
 
 const GestionArchivosRecaudo = () => {
   const [showModal, setShowModal] = useState(false)
@@ -59,8 +60,12 @@ const GestionArchivosRecaudo = () => {
   }, []);
 
 
+
+
+
   const CargarArchivo = useCallback(async (e) => {
     e.preventDefault();
+
     if (selected.fk_id_tipo_convenio === 1){
       const formData = new FormData();
       formData.set("file", file);
@@ -89,29 +94,29 @@ const GestionArchivosRecaudo = () => {
       )
     } else {notifyError("Convenio no permite cargar archivo")}
   }, [handleClose, file, selected])
-  
+
   const DescargarArchivo = useCallback(async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
     try {
-      downloadFileRecaudo ({...body,convenio_id:selected.pk_id_convenio_directo})
-      .then(async (res) => {
-        const options = {
-          fieldSeparator: ";",
-          quoteStrings: '"',
-          decimalSeparator: ",",
-          showLabels: true,
-          showTitle: false,
-          title: `Reporte_${selected?.nombre_convenio}`,
-          useTextFile: false,
-          useBom: true,
-          useKeysAsHeaders: false,
-          filename: `Reporte_${selected?.nombre_convenio}`,
-        };
-        const csvExporter = new ExportToCsv(options);
-        const data = JSON.stringify(res)
-        csvExporter.generateCsv(data);
+      downloadFileRecaudo({ ...body, convenio_id: selected.pk_id_convenio_directo })
+        .then(async (res) => {
+          const options = {
+            fieldSeparator: ";",
+            quoteStrings: '"',
+            decimalSeparator: ",",
+            showLabels: true,
+            showTitle: false,
+            title: `Reporte_${selected?.nombre_convenio}`,
+            useTextFile: false,
+            useBom: true,
+            useKeysAsHeaders: false,
+            filename: `Reporte_${selected?.nombre_convenio}`,
+          };
+          const csvExporter = new ExportToCsv(options);
+          const data = JSON.stringify(res)
+          csvExporter.generateCsv(data);
         })
         .catch((err) => {
           if (err?.cause === "custom") {
@@ -120,7 +125,7 @@ const GestionArchivosRecaudo = () => {
           }
           notifyError(err);
           handleClose()
-        } )
+        })
     }
     catch (e) { console.log(e) }
 
@@ -204,8 +209,8 @@ const GestionArchivosRecaudo = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">Gestion de archivos de recaudo</h2>
         <ButtonBar>
-          {selected.fk_id_tipo_convenio === 1 && 
-          <Button onClick={() => { setShowMainModal(true); setShowModalOptions(true) }}>Cargar Archivo</Button>
+          {selected.fk_id_tipo_convenio === 1 &&
+            <Button onClick={() => { setShowMainModal(true); setShowModalOptions(true) }}>Cargar Archivo</Button>
           }
           <Button onClick={() => { setShowMainModal(true) }}>Descargar Reporte</Button>
         </ButtonBar>
