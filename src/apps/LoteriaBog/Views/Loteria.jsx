@@ -187,19 +187,19 @@ const Loteria = ({ route }) => {
     if (sorteoOrdi !== null) {
       copy.push({
         value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
-        label: `Sorteo Ordinario Virtual- ${sorteoOrdi.num_sorteo}`,
+        label: `Sorteo Ordinario Virtual - ${sorteoOrdi.num_sorteo}`,
       });
     }
     if (sorteoExtra !== null) {
       copy.push({
         value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}-${sorteoExtra.num_loteria}`,
-        label: `Sorteo Extraordinario Virtual- ${sorteoExtra.num_sorteo}`,
+        label: `Sorteo Extraordinario Virtual - ${sorteoExtra.num_sorteo}`,
       });
     }
     if (sorteoOrdifisico !== null) {
       copy.push({
         value: `${sorteoOrdifisico.num_sorteo}-${sorteoOrdifisico.fisico}-${sorteoOrdifisico.num_loteria}`,
-        label: `Sorteo Ordinario  Físico- ${sorteoOrdifisico.num_sorteo}`,
+        label: `Sorteo Ordinario Físico - ${sorteoOrdifisico.num_sorteo}`,
       });
     }
 
