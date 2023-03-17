@@ -4,7 +4,7 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
-import Select from "../../../../components/Base/Select";
+// import Select from "../../../../components/Base/Select";
 import Input from "../../../../components/Base/Input";
 import MoneyInput from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
@@ -27,10 +27,10 @@ const FormularioRetiro = () => {
     referencia1: '',
     referencia2: ''
   })
-  const tipoModificacion = [
-    { label: "Valor igual", value: 1 },
-    { label: "Valor menor o igual", value: 2 },
-  ]
+  // const tipoModificacion = [
+  //   { label: "Valor igual", value: 1 },
+  //   { label: "Valor menor o igual", value: 2 },
+  // ]
   const limitesMontos = {
     max: 999999999,
     min: 1,
@@ -198,7 +198,7 @@ const FormularioRetiro = () => {
               autoComplete="off"
               disabled
             />
-            <Select
+            {/* <Select
               className="place-self-stretch"
               id={"Tipo modificacion"}
               label={"Tipo de pago"}
@@ -206,7 +206,7 @@ const FormularioRetiro = () => {
               options={[{ label: "", value: "" }, ...tipoModificacion]}
               defaultValue={dataRetiro?.fk_modificar_valor ?? ""}
               disabled
-            />
+            /> */}
             <MoneyInput
               label="Valor a recaudar"
               name="valor_total_trx"

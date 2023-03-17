@@ -51,7 +51,6 @@ const RecaudoConjunto = () => {
       let rest = await searchConveniosRecaudoList({ convenio_id: pk_id_convenio })
         .then((rest) => { return rest })
       if (rest.length < 1) throw new Error("Convenio no existe")
-      console.log(rest)
       setConvenioRecaudo(rest.obj)
       setCargando(true)
     } catch (e) {
@@ -89,7 +88,7 @@ const RecaudoConjunto = () => {
       })
       .catch((err) => {
         notifyError(err?.message);
-        // handleClose()
+        handleClose()
       });
 
   }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose])
@@ -144,7 +143,7 @@ const RecaudoConjunto = () => {
 
   const nuevoRecaudo = useCallback(async (e) => {
     e.preventDefault()
-    console.log("nuevo recaudo")
+
       const data = {
         id_trx: id_trx,
         recaudo: {
@@ -173,7 +172,7 @@ const RecaudoConjunto = () => {
       handleClose()
 
 
-  }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx, pk_id_convenio, handleClose])
+  }, [roleInfo, pdpUser, valorRecibido, id_trx, pk_id_convenio,dataReferencias, handleClose])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
