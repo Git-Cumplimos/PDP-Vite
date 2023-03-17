@@ -1,8 +1,7 @@
-import { useState, useCallback, useEffect, useMemo} from "react";
+import { useState, useCallback, useEffect} from "react";
 import Button from "../../../components/Base/Button";
 import { useLoteria } from "../utils/LoteriaHooks";
 import Form from "../../../components/Base/Form";
-import Table from "../../../components/Base/Table";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import DescargaForm from "../components/DescargaForm/DescargaForm";
@@ -11,7 +10,6 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { notifyError } from "../../../utils/notify";
 
 const DescargarArchivosS3 = ({ route }) => {
-  const { label } = route;
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const { descargaVentas_S3 } = useLoteria();

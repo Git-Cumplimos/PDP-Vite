@@ -276,7 +276,7 @@ const Loteria = ({ route }) => {
         ["", ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese, al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese, al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
   }, [roleInfo, sellResponse]
   );
