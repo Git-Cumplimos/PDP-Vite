@@ -539,7 +539,7 @@ const Premios = ({ route }) => {
                   label="Cédula"
                   type="tel"
                   minLength="10"
-                  maxLength="10"
+                  maxLength="12"
                   autoComplete="off"
                   required
                   value={datosCliente?.documento}
@@ -595,12 +595,13 @@ const Premios = ({ route }) => {
                     id="codHash"
                     label="Código de seguridad"
                     type="text"
+                    maxLength="10"
                     autoComplete="off"
                     value={hash}
                     onChange={(e) => {
                       setHash(e.target.value);
                     }}
-                    required={true}
+                    required
                   />
                 ) : (
                   ""
@@ -648,6 +649,7 @@ const Premios = ({ route }) => {
                           id="codHash1"
                           label="Código de seguridad"
                           type="text"
+                          maxLength="10"
                           autoComplete="off"
                           value={hash}
                           onChange={(e) => {
