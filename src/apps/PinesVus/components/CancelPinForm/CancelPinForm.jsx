@@ -153,17 +153,17 @@ const CancelPin = ({
       [ 
         ["Trámite", "Cancelación de Pin"],
         ["",""],
-        ["Detalle primer trámite",""],
+        ["Detalle trámite 1",""],
         ["",""],
         ["", tramite1],
         ["",""],
-        ["Valor primer trámite", formatMoney.format(valores[0])],
+        ["Valor trámite 1", formatMoney.format(valores[0])],
         ["",""],
-        ["Detalle segundo trámite", ""],
+        ["Detalle trámite 2", ""],
         ["",""],
         ["", tramite2],
         ["",""],
-        ["Valor segundo trámite", formatMoney.format(valores[1])],
+        ["Valor trámite 2", formatMoney.format(valores[1])],
         ["",""],
         ["Valor Pin", formatMoney.format(valor)],
         ["",""],
@@ -233,17 +233,17 @@ const CancelPin = ({
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = textTipoPin
  if( valores[1]){
-    objTicket["trxInfo"][2] = ["Detalle primer trámite", ""]
+    objTicket["trxInfo"][2] = ["Detalle trámite 1", ""]
     objTicket["trxInfo"][3] = ["",""]
     objTicket["trxInfo"][4] = ["", tramite1]
     objTicket["trxInfo"][5] = ["",""]
-    objTicket["trxInfo"][6] = ["Valor primer trámite", formatMoney.format(valores[0])]
+    objTicket["trxInfo"][6] = ["Valor trámite 1", formatMoney.format(valores[0])]
     objTicket["trxInfo"][7] = ["",""]
-    objTicket["trxInfo"][8] = ["Detalle segundo trámite", ""]
+    objTicket["trxInfo"][8] = ["Detalle trámite 2", ""]
     objTicket["trxInfo"][9] = ["",""]
     objTicket["trxInfo"][10] = ["", tramite2]
     objTicket["trxInfo"][11] = ["",""]
-    objTicket["trxInfo"][12] = ["Valor segundo trámite",formatMoney.format(valores[1])]
+    objTicket["trxInfo"][12] = ["Valor trámite 2",formatMoney.format(valores[1])]
     objTicket["trxInfo"][13] = ["",""]
     objTicket["trxInfo"][14] = ["Valor Pin", formatMoney.format(valor)]
     objTicket["trxInfo"][15] = ["",""]
