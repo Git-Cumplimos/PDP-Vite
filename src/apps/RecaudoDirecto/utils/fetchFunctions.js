@@ -124,9 +124,7 @@ export const getRecaudo = buildPostFunction(
 export const modRecaudo = buildPostFunction(
   `${url}/recaudo/hacer-recaudo`
 );
-export const createRecaudo = buildPostFunction(
-  `${url}/recaudo/crear-recaudo`
-);
+
 
 
 /*--- Convenios Retiro ---*/

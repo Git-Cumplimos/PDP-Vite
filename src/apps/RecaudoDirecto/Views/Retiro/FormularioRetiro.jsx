@@ -187,7 +187,6 @@ const FormularioRetiro = () => {
       ) : (<>cargando...</>)}
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar retiro </h2>
-        {dataRetiro.fk_estado !== 2 ?
           <Form onSubmit={hacerRetiro} grid >
             <Input
               id={1}
@@ -227,15 +226,7 @@ const FormularioRetiro = () => {
               </Button>
             </ButtonBar>
           </Form>
-          : (
-            <>
-              <h2 className="text-2xl mx-auto text-center mb-4">No tiene saldo para retirar</h2>
-              <Button onClick={() => handleClose()} >
-                Cerrar
-              </Button>
-            </>
 
-          )}
       </Modal>
 
     </Fragment>
