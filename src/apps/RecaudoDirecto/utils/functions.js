@@ -30,6 +30,11 @@ export const cargueArchivo = async (file,nombre_convenio, convenio_id) => {
       `${urlVerificacionArchivo}?filename=${filename}&convenio_id=${convenio_id}`
     );
     const resValidacionArchivo = await responseValidacionArchivo.json();
+    
+    if (!resValidacionArchivo?.status) {
+      console.log(resValidacionArchivo)
+      throw resValidacionArchivo;
+    }
 
     return resValidacionArchivo;
   } catch (error) {
