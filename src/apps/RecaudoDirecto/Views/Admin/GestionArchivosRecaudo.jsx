@@ -71,8 +71,9 @@ const GestionArchivosRecaudo = () => {
       if (selected.fk_id_tipo_convenio === 1) {
         const formData = new FormData();
         formData.set("file", file);
+
         notifyPending(
-          cargueArchivo(file, selected?.pk_id_convenio_directo),
+          cargueArchivo(file,selected?.nombre_convenio, selected?.pk_id_convenio_directo),
           {
             render() {
               return "Enviando solicitud";
