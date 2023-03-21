@@ -122,13 +122,14 @@ const TramitePines = () => {
     // };
     consultaPinesVus("", "", "", "", "", parametroBusqueda,pageData,1)
       .then((res) => {
-        //console.log(res)
-        setInfo(res);
+       // console.log(res)
         setDisabledBtn(false);
         if (!res?.status) {
           notifyError(res?.msg);
-        } else {
+        } else { 
 
+          if (res.obj.results[0].nombre!==""&&res.obj.results[0].apellidos!==""){
+            setInfo(res);
      
       /*      const fecha_vencimiento = new Date(res?.obj?.results[0]["fecha_vencimiento"]);
             fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
@@ -217,7 +218,9 @@ const TramitePines = () => {
 
           );
           setMaxPages(res?.obj?.maxPages);
-        }
+        }else{
+          notifyError("Es necesario diligenciar el formulario");
+        }}
       })
       .catch((err) => console.log("error", err));
   };

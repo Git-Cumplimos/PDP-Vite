@@ -362,8 +362,6 @@ const CrearPin = () => {
       iva : resp[0]?.iva,
       total : resp[0]?.valor + resp[0]?.iva
     }
-    console.log(pinData, tipoPin)
-    console.log(tramite, tramite2)
     return pinData;
   }, [optionsTipoPines, tipoPin]);
 
@@ -536,26 +534,34 @@ const CrearPin = () => {
       objTicket2["commerceName"] = "TRÁMITE "+ tramiteData?.descripcion.toUpperCase() 
     }
     if (!isNaN(tramiteData2.total)){
-    objTicket2["trxInfo"][0] = ["Detalle trámite_1", tramiteData?.descripcion]
+    //objTicket2["title"] = "Recibo de pago: TRÁMITE "+ tramiteData?.descripcion.toUpperCase() +", "+ tramiteData2?.descripcion.toUpperCase()
+    objTicket2["trxInfo"][0] = ["Detalle trámite 1", ""]
     objTicket2["trxInfo"][1] = ["", ""]
-    objTicket2["trxInfo"][2] = ["Valor trámite_1", formatMoney.format(tramiteData?.valor)]
+    objTicket2["trxInfo"][2] = ["", tramiteData?.descripcion]
     objTicket2["trxInfo"][3] = ["", ""]
-    objTicket2["trxInfo"][4] = ["Detalle trámite_2", tramiteData2?.descripcion]
+    objTicket2["trxInfo"][4] = ["Valor trámite 1", formatMoney.format(tramiteData?.valor)]
     objTicket2["trxInfo"][5] = ["", ""]
-    objTicket2["trxInfo"][6] = ["Valor trámite_2", formatMoney.format(tramiteData2?.valor)]
+    objTicket2["trxInfo"][6] = ["Detalle trámite 2", ""]
     objTicket2["trxInfo"][7] = ["", ""]
-    objTicket2["trxInfo"][8] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva + tramiteData2?.valor)] 
+    objTicket2["trxInfo"][8] = ["", tramiteData2?.descripcion]
     objTicket2["trxInfo"][9] = ["", ""]
+    objTicket2["trxInfo"][10] = ["Valor trámite 2", formatMoney.format(tramiteData2?.valor)]
+    objTicket2["trxInfo"][11] = ["", ""]
+    objTicket2["trxInfo"][12] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva + tramiteData2?.valor)] 
+    objTicket2["trxInfo"][13] = ["", ""]
 
 
     }
     else{
-      objTicket2["trxInfo"][0] = ["Detalle trámite", tramiteData?.descripcion]
+     // objTicket2["title"] = "Recibo de pago: TRÁMITE "+ tramiteData?.descripcion.toUpperCase() 
+      objTicket2["trxInfo"][0] = ["Detalle trámite", ""]
       objTicket2["trxInfo"][1] = ["", ""]
-      objTicket2["trxInfo"][2] = ["Valor trámite", formatMoney.format(tramiteData?.valor)]
+      objTicket2["trxInfo"][2] = ["", tramiteData?.descripcion]
       objTicket2["trxInfo"][3] = ["", ""]
-      objTicket2["trxInfo"][4] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)] 
+      objTicket2["trxInfo"][4] = ["Valor trámite", formatMoney.format(tramiteData?.valor)]
       objTicket2["trxInfo"][5] = ["", ""]
+      objTicket2["trxInfo"][6] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)] 
+      objTicket2["trxInfo"][7] = ["", ""]
 
     }
 
@@ -1199,9 +1205,18 @@ const CrearPin = () => {
           <div className="flex flex-col w-1/2 mx-auto">
             <h1 className="text-3xl mt-3 mx-auto">Crear Pin</h1>
             <br></br>
-            <h1 className="flex flex-row justify-center text-lg font-medium">{tramiteData.descripcion}   -   {tramiteData2.descripcion}</h1>
+            
+            { tramiteData2.descripcion ?
+              <h1 className="flex flex-row justify-center text-lg font-medium">{tramiteData.descripcion}, {tramiteData2.descripcion}</h1>
+            : 
+              <h1 className="flex flex-row justify-center text-lg font-medium">{tramiteData.descripcion}</h1>
+            }
+            
             <br></br>
             <>
+              
+              {showTramiteAdicional? 
+              <div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
@@ -1214,8 +1229,6 @@ const CrearPin = () => {
                 <h1>IVA Trámite 1</h1>
                 <h1>{formatMoney.format(tramiteData.iva)}</h1>
               </div>
-              {showTramiteAdicional? 
-              <div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
@@ -1230,7 +1243,20 @@ const CrearPin = () => {
               </div>
               </div>
               :
-              ""
+              <>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Trámite</h1>
+                <h1>{formatMoney.format(tramiteData.valor)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>IVA Trámite</h1>
+                <h1>{formatMoney.format(tramiteData.iva)}</h1>
+              </div>
+              </>
               }  
               <div
                 className="flex flex-row justify-between text-lg font-medium"

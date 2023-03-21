@@ -46,12 +46,9 @@ const Premios = ({ route }) => {
   const [checkDisableFisico, setCheckDisableFisico] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
   const { isWinner, makePayment } = useLoteria();
-  const optionsDocumento = [
-    { value: 0, label: "Seleccione la fracción" },
-    { value: 1, label: "Fracción # 1" },
-    { value: 2, label: "Fracción # 2" },
-    { value: 3, label: "Fracción # 3" },
-  ];
+  const [fraccionesporbillete, setFraccionesporbillete] = useState(1);
+  const [fracciones_disponibles,setFracciones_disponibles] = useState([]);
+
   const [showAllmodals, setShowAllmodals] = useState({
     showModalVoucher: false,
     voucherAprobado: false,
@@ -70,6 +67,7 @@ const Premios = ({ route }) => {
     statusPagoPremio: false,
     tipo_operacion: "",
   });
+
   const [datosComercio, setDatosComercio] = useState({
     comercio: "",
     terminal: "",
@@ -77,7 +75,9 @@ const Premios = ({ route }) => {
     codigo_dane: "",
     nom_loteria: "",
   });
+
   const handleClose = useCallback(() => {
+    setSeleccionarFraccion(0)
     setShowAllmodals((old) => {
       return {
         ...old,
@@ -100,8 +100,8 @@ const Premios = ({ route }) => {
       progress: undefined,
     });
   };
+
   const onSubmit = (e) => {
-    setSeleccionarFraccion(0);
     setShowTable(false);
     setDisabledBtns(true);
     setRespuesta(true);
@@ -118,6 +118,7 @@ const Premios = ({ route }) => {
         statusPagoPremio: false,
       };
     });
+
     isWinner(sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual)
       .then((res) => {
         var salvarRes = res;
@@ -126,6 +127,7 @@ const Premios = ({ route }) => {
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
         setTipopago(salvarRes?.obj?.tipo_ganancia);
+        setFraccionesporbillete(res?.obj?.fracciones_billete)
         setDatosComercio((old) => {
           setRespuesta(false);
           setValorbruto(res?.obj?.valorbruto);
@@ -173,7 +175,6 @@ const Premios = ({ route }) => {
             gana = res?.obj?.gana;
             ValNetoFraccion = res?.obj?.ValNetoFraccion;
             totalPagarLoteria = res?.obj?.total;
-
             res = [];
             for (let i = 0; i < gana.length; i++) {
               res.push([
@@ -190,9 +191,9 @@ const Premios = ({ route }) => {
               "",
               "",
               formatMoney.format(totalPagarLoteria),
-            ]);
+            ]);        
             setRespagar(res);
-            setShowTable(true);
+            setShowTable(true); 
           } else if (res?.obj?.ganador == false && "msg" in res) {
             notifyError(res?.obj?.gana);
             setIsSelf(false);
@@ -208,6 +209,22 @@ const Premios = ({ route }) => {
       })
       .catch(() => setDisabledBtns(false));
   };
+
+  const selectFraccionP = (fraccionesporbillete) => {
+    const optionsDocumento = [
+      { value: 0, label: "Seleccione la fracción" }
+    ]
+    for (let i = 1; i <= fraccionesporbillete; i++) {
+      optionsDocumento.push(
+        { value: i, label: "Fracción # "+i }
+      );
+    }
+    setFracciones_disponibles(optionsDocumento)
+  };
+
+  useEffect(() => {
+    selectFraccionP(fraccionesporbillete);
+  }, [fraccionesporbillete]);
   
   const tickets = useMemo(() => {
     return {
@@ -249,6 +266,7 @@ const Premios = ({ route }) => {
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
   }, [estadoTransaccion,sorteo,billete,serie,checkBilleteFisico,checkBilleteVirtual,seleccionarFraccion,datosCliente,totalPagar,valorbruto]);
+  
   const onPay1 = (e) => {
     e.preventDefault();
     if (tipopago === 2) {
@@ -579,7 +597,7 @@ const Premios = ({ route }) => {
                   <Select
                     id="selectFraccion"
                     label="Fracción"
-                    options={optionsDocumento}
+                    options={fracciones_disponibles}
                     value={seleccionarFraccion}
                     required={true}
                     onChange={(e) => {
@@ -634,7 +652,7 @@ const Premios = ({ route }) => {
                         <Select
                           id="selectFraccion"
                           label="Fracción"
-                          options={optionsDocumento}
+                          options={fracciones_disponibles}
                           value={seleccionarFraccion}
                           required={true}
                           onChange={(e) => {
