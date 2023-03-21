@@ -1205,14 +1205,18 @@ const CrearPin = () => {
           <div className="flex flex-col w-1/2 mx-auto">
             <h1 className="text-3xl mt-3 mx-auto">Crear Pin</h1>
             <br></br>
-            <h1 className="flex flex-row justify-center text-lg font-medium">- {tramiteData.descripcion}</h1>
+            
             { tramiteData2.descripcion ?
-              <h1 className="flex flex-row justify-center text-lg font-medium">- {tramiteData2.descripcion}</h1>
-            : ""
+              <h1 className="flex flex-row justify-center text-lg font-medium">{tramiteData.descripcion}, {tramiteData2.descripcion}</h1>
+            : 
+              <h1 className="flex flex-row justify-center text-lg font-medium">{tramiteData.descripcion}</h1>
             }
             
             <br></br>
             <>
+              
+              {showTramiteAdicional? 
+              <div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
@@ -1225,8 +1229,6 @@ const CrearPin = () => {
                 <h1>IVA Trámite 1</h1>
                 <h1>{formatMoney.format(tramiteData.iva)}</h1>
               </div>
-              {showTramiteAdicional? 
-              <div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
@@ -1241,7 +1243,20 @@ const CrearPin = () => {
               </div>
               </div>
               :
-              ""
+              <>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>Valor Trámite</h1>
+                <h1>{formatMoney.format(tramiteData.valor)}</h1>
+              </div>
+              <div
+                className="flex flex-row justify-between text-lg font-medium"
+              >
+                <h1>IVA Trámite</h1>
+                <h1>{formatMoney.format(tramiteData.iva)}</h1>
+              </div>
+              </>
               }  
               <div
                 className="flex flex-row justify-between text-lg font-medium"
