@@ -106,7 +106,7 @@ const ConveniosRecaudo = () => {
           ])
           .filter(([key, val]) =>
             !selected
-              ? val
+              ? key !== "activo" && val
               : selected[key] !== val || key === "pk_codigo_convenio"
           )
           .map(([key, val]) => [key, key === "activo" ? val === "on" : val])

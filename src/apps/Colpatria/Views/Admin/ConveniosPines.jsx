@@ -96,7 +96,7 @@ const ConveniosPines = () => {
       ev.preventDefault();
       const formData = new FormData(ev.currentTarget);
       if (!formData.has("activo")) {
-        formData.set("activo", "off")
+        formData.set("activo", "off");
       }
       const body = Object.fromEntries(
         Object.entries(Object.fromEntries(formData))
@@ -106,7 +106,7 @@ const ConveniosPines = () => {
           ])
           .filter(([key, val]) =>
             !selected
-              ? val
+              ? key !== "activo" && val
               : selected[key] !== val || key === "pk_codigo_convenio"
           )
           .map(([key, val]) => [key, key === "activo" ? val === "on" : val])
