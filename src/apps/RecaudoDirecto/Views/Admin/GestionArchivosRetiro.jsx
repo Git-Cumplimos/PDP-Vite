@@ -6,7 +6,8 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getRetirosList, downloadFileRetiro, importFileRetiro } from "../../utils/fetchFunctions"
+import { getRetirosList, downloadFileRetiro } from "../../utils/fetchFunctions"
+import { cargarArchivoRetiro } from "../../utils/functions";
 import { ExportToCsv } from "export-to-csv";
 
 
@@ -14,6 +15,7 @@ const GestionArchivosRetiro = () => {
   const [showModal, setShowModal] = useState(false)
   const [showMainModal, setShowMainModal] = useState(false)
   const [showModalOptions, setShowModalOptions] = useState(false)
+  const [showModalErrors, setShowModalErrors] = useState(false);
   const [selected, setSelected] = useState(false); // fila selecionada
 
   const [listRetiros, setListRetiros] = useState('')
@@ -51,6 +53,7 @@ const GestionArchivosRetiro = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
     setShowMainModal(false);
+    setShowModalErrors(false);
     setShowModalOptions(false);
     setSelected(false)
   }, []);
@@ -61,8 +64,9 @@ const GestionArchivosRetiro = () => {
     if (selected.fk_id_tipo_convenio === 1) {
       const formData = new FormData();
       formData.set("file", file);
+
       notifyPending(
-        importFileRetiro({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, formData),
+        cargarArchivoRetiro(file, selected?.nombre_convenio, selected?.pk_id_convenio_directo),
         {
           render() {
             return "Enviando solicitud";
@@ -76,10 +80,7 @@ const GestionArchivosRetiro = () => {
         },
         {
           render({ data: err }) {
-            if (err?.cause === "custom") {
-              return err?.message;
-            }
-            console.error(err?.message);
+            setShowModalErrors(err)
             return `Archivo erroneo`;
           }
         }
@@ -217,6 +218,7 @@ const GestionArchivosRetiro = () => {
             <Input
               type='file'
               autoComplete='off'
+              accept=".csv"
               onChange={(e) => {
                 setFile(e.target.files[0]);
               }}
@@ -246,6 +248,53 @@ const GestionArchivosRetiro = () => {
             <Button type="submit">{showModalOptions ? "Cargar Archivo" : "Descargar Reporte"}</Button>
           </ButtonBar>
         </Form>
+      </Modal>
+      <Modal show={showModalErrors} handleClose={handleClose}>
+        <h2 className="text-2xl mx-auto text-center mb-4">
+          {showModalErrors.msg ?? "Errores en el archivo"}
+        </h2>
+        {showModalErrors?.obj?.error?.map((err) => {
+          return (<>
+            {
+              Array.isArray(err.complete_info) && err.complete_info.length > 1 ? (
+                err.complete_info.map((err_esp) => {
+                  return (
+                    <>
+                      <h3>Linea {err_esp.line}</h3>
+                      {Array.isArray(Object.keys(err_esp.error)) ? (
+                        Object.keys(err_esp.error).map((item, index) => {
+                          return (
+                            <>
+                              <h3>{Object.keys(err_esp.error)[index]}</h3>
+                              <h3>Descripcion: {Object.values(err_esp.error)[index]}</h3>
+                            </>
+                          )
+                        })
+                      ) : (
+                        <>
+                          <h3>{Object.keys(err_esp.error)}</h3>
+                          <h3>Descripcion: {Object.values(err_esp.error)}</h3>
+                        </>
+                      )
+                      }
+                      <hr></hr>
+                    </>
+                  )
+                })
+              ) : (
+                Object.keys(err.complete_info).map((item, index) => {
+                  return (
+                    <>
+                      <h3>{Object.keys(err.complete_info)[index]}</h3>
+                      <h3>Descripcion: {Object.values(err.complete_info)[index]}</h3>
+                      <hr></hr>
+                    </>
+                  )
+                })
+              )
+            }
+          </>)
+        })}
       </Modal>
     </Fragment>
   )

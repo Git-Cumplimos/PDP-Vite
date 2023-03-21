@@ -11,7 +11,7 @@ import {
   downloadFileRecaudo,
 } from "../../utils/fetchFunctions";
 import { ExportToCsv } from "export-to-csv";
-import { cargueArchivo } from "../../utils/functions";
+import { cargarArchivoRecaudo } from "../../utils/functions";
 
 const GestionArchivosRecaudo = () => {
   const [showModal, setShowModal] = useState(false);
@@ -75,7 +75,7 @@ const GestionArchivosRecaudo = () => {
         formData.set("file", file);
 
         notifyPending(
-          cargueArchivo(file, selected?.nombre_convenio, selected?.pk_id_convenio_directo),
+          cargarArchivoRecaudo(file, selected?.nombre_convenio, selected?.pk_id_convenio_directo),
           {
             render() {
               return "Enviando solicitud";
@@ -257,6 +257,7 @@ const GestionArchivosRecaudo = () => {
             <Input
               // label='Seleccionar Archivo'
               type="file"
+              accept=".csv"
               autoComplete="off"
               onChange={(e) => {
                 setFile(e.target.files[0]);
@@ -297,38 +298,38 @@ const GestionArchivosRecaudo = () => {
           return (<>
             {
               Array.isArray(err.complete_info) && err.complete_info.length > 1 ? (
-                err.complete_info.map((err_esp) => {
+                err.complete_info.map((err_esp,index) => {
                   return (
-                    <>
+                    <div key={index+10}>
                       <h3>Linea {err_esp.line}</h3>
                       {Array.isArray(Object.keys(err_esp.error)) ? (
                         Object.keys(err_esp.error).map((item, index) => {
                           return (
-                            <>
+                            <div key={index}>
                               <h3>{Object.keys(err_esp.error)[index]}</h3>
-                              <h3>Descripcion {Object.values(err_esp.error)[index]}</h3>
-                            </>
+                              <h3>Descripcion: {Object.values(err_esp.error)[index]}</h3>
+                            </div>
                           )
                         })
                       ) : (
                         <>
                           <h3>{Object.keys(err_esp.error)}</h3>
-                          <h3>Descripcion {Object.values(err_esp.error)}</h3>
+                          <h3>Descripcion: {Object.values(err_esp.error)}</h3>
                         </>
                       )
                       }
                       <hr></hr>
-                    </>
+                    </div>
                   )
                 })
               ) : (
                 Object.keys(err.complete_info).map((item, index) => {
                   return (
-                    <>
+                    <div key={index}>
                       <h3>{Object.keys(err.complete_info)[index]}</h3>
-                      <h3>Descripcion {Object.values(err.complete_info)[index]}</h3>
+                      <h3>Descripcion: {Object.values(err.complete_info)[index]}</h3>
                       <hr></hr>
-                    </>
+                    </div>
                   )
                 })
               )
