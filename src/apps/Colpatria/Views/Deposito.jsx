@@ -29,7 +29,6 @@ import {
 } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 import TicketColpatria from "../components/TicketColpatria";
-import { buildTicket } from "../utils/functions";
 
 const accountTypes = {
   10: "Cuenta ahorros",
@@ -41,7 +40,7 @@ const formatMoney = makeMoneyFormatter(2);
 const Deposito = () => {
   const navigate = useNavigate();
 
-  const { roleInfo, pdpUser, infoTicket } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   const [userDocument, setUserDocument] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
@@ -74,9 +73,9 @@ const Deposito = () => {
   const summary = useMemo(
     () => ({
       "Tipo de cuenta": accountTypes?.[accountType] ?? "No type",
-      "Numero de cuenta": toAccountNumber(accountNumber),
-      "C.C. del depositante": userDocument,
-      "Valor de deposito": formatMoney.format(valDeposito),
+      "Número de cuenta": toAccountNumber(accountNumber),
+      "No. Documento del depositante": userDocument,
+      "Valor de depósito": formatMoney.format(valDeposito),
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
@@ -85,7 +84,8 @@ const Deposito = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-  }, []);
+    navigate("/corresponsalia/colpatria");
+  }, [navigate]);
 
   const onMakePayment = useCallback(
     (ev) => {
@@ -100,6 +100,17 @@ const Deposito = () => {
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valDeposito,
         nombre_usuario: pdpUser?.uname ?? "",
+        nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+        ticket_init: [
+          ["Tipo de cuenta", accountTypes?.[accountType] ?? "No type"],
+          ["", ""],
+          ["Número de cuenta", toAccountNumber(accountNumber)],
+          ["", ""],
+          ["No. Documento del depositante", userDocument],
+          ["", ""],
+          ["Valor de depósito", formatMoney.format(valDeposito)],
+          ["", ""],
+        ],
 
         // Datos trx colpatria
         colpatria: {
@@ -124,35 +135,7 @@ const Deposito = () => {
         {
           render({ data: res }) {
             setLoadingDeposit(false);
-            const trx_id = res?.obj?.id_trx ?? 0;
-            const id_type_trx = res?.obj?.id_type_trx ?? 0;
-            const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
-            const tempTicket = buildTicket(
-              roleInfo,
-              trx_id,
-              codigo_autorizacion,
-              "Deposito",
-              [
-                ["Tipo de cuenta", accountTypes?.[accountType] ?? "No type"],
-                ["", ""],
-                ["Numero de cuenta", toAccountNumber(accountNumber)],
-                ["", ""],
-                ["C.C. del depositante", userDocument],
-                ["", ""],
-                ["Valor de deposito", formatMoney.format(valDeposito)],
-                ["", ""],
-              ]
-            );
-            setPaymentStatus(tempTicket);
-            infoTicket(trx_id, id_type_trx, tempTicket)
-              .then((resTicket) => {
-                console.log(resTicket);
-              })
-              .catch((err) => {
-                console.error(err);
-                notifyError("Error guardando el ticket");
-              });
-
+            setPaymentStatus(res?.obj?.ticket ?? {});
             return "Transaccion satisfactoria";
           },
         },
@@ -177,7 +160,6 @@ const Deposito = () => {
       valDeposito,
       roleInfo,
       pdpUser?.uname,
-      infoTicket,
       navigate,
     ]
   );

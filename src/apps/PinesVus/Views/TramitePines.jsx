@@ -302,14 +302,15 @@ const TramitePines = () => {
               <Input
                 id="paramBusqueda"
                 label="Documento"//"Código"
-                type="number"
-                minLength="10"
-                maxLength="10"
+                type="text"
+                minLength="5"
+                maxLength="12"
                 autoComplete="off"
                 value={parametroBusqueda}
                 required
                 onInput={(e) => {
-                  setParametroBusqueda(e.target.value);
+                  const num = parseInt(e.target.value) || "";
+                  setParametroBusqueda(num);
                 }}
               />
               <ButtonBar className="col-auto md:col-span-2">

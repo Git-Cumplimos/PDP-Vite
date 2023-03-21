@@ -235,6 +235,7 @@ const Loteria = ({ route }) => {
   },
     [numero, page, searchLoteria, searchLoteriafisica, serie, setCustomer, setSelected, setSellResponse, sorteo]
   );
+  
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -275,7 +276,7 @@ const Loteria = ({ route }) => {
         ["", ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese, al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese, al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
   }, [roleInfo, sellResponse]
   );
@@ -444,7 +445,7 @@ const Loteria = ({ route }) => {
         <>
           <Table
             headers={[
-              "Numero",
+              "Número",
               "Serie",
               "Fracciones disponibles",
               // "Valor por fraccion",
@@ -506,11 +507,12 @@ const Loteria = ({ route }) => {
             handleSubmit={(event) => {
               sorteo.split("-")[1] === "true"
                 ? sellLoteriafisica(sorteo, selecFrac, tipoPago, ticket)
-                : sellLoteria(sorteo, ticket);
+                : sellLoteria(sorteo, selecFrac, ticket, tipoPago);
             }}
           />
         ) : (
           <SellResp
+            codigos_lot={codigos_lot}
             sellResponse={sellResponse}
             setSellResponse={setSellResponse}
             closeModal={closeModal}

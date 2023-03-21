@@ -7,7 +7,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { useEffect } from "react";
 import Tickets from "../../../../components/Base/Tickets";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -15,6 +15,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const SellResp = ({
+  codigos_lot,
   sellResponse,
   setSellResponse,
   closeModal,
@@ -56,12 +57,16 @@ const SellResp = ({
       closeModal()
       notifyError(sellResponse?.msg || "Error respuesta PDP: (Fallo al consumir el servicio (loterías) [0010002])")
     }
+    else {
+      notify("Venta de lotería exitosa")
+    }
   }, [sellResponse])
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
     pageStyle: pageStyle,
   });
+
   const voucherInfo = useMemo(() => {
     const vinfo = {};
     if (sellResponse?.status) {
@@ -100,7 +105,7 @@ const SellResp = ({
     roleInfo.id_dispositivo,
     sellResponse,
   ]);
-
+  
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -127,26 +132,33 @@ const SellResp = ({
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: sellResponse?.obj?.nom_loteria,
+      commerceName: sellResponse?.obj?.cod_loteria !== '064' 
+      ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
       trxInfo: [
         ["Sorteo", sellResponse?.obj?.sorteo],
         ["Billete", sellResponse?.obj?.num_billete],
         ["Serie", sellResponse?.obj?.serie],
-        ["Fracción", sellResponse?.obj?.fisico === true? JSON.stringify(selecFrac).replace(/,/g," - ").replace(/[[]/,"").replace(/]/,"") : sellResponse?.obj?.fracciones],
+        ["Fracción", sellResponse?.obj?.fisico === true? JSON.stringify(selecFrac).replace(/,/g," - ").replace(/[[]/,"").replace(/]/,"") : JSON.stringify(selecFrac).replace(/[[]/,"").replace(/]/,"")],
         ["Tipo de Billete", sellResponse?.obj?.fisico === true ? "Físico" : "Virtual"],
         ["", ""],
-        ["Valor", formatMoney.format(sellResponse?.obj?.valor_pago)],
+        ["Valor", parseInt(sellResponse?.obj?.tipoPago) ===
+        parseInt(operacion?.Venta_Fisica) || 
+        parseInt(sellResponse?.obj?.tipoPago) === parseInt(operacion?.Venta_Virtual)
+        ? formatMoney.format(sellResponse?.obj?.valor_pago)
+        : formatMoney.format(0)],
         ["", ""],
         ["Forma de Pago", parseInt(sellResponse?.obj?.tipoPago) ===
-          parseInt(operacion?.Venta_Fisica) || sellResponse?.obj?.fisico == false
+          parseInt(operacion?.Venta_Fisica) || 
+          parseInt(sellResponse?.obj?.tipoPago) === parseInt(operacion?.Venta_Virtual)
           ? "Efectivo"
           : "Bono"],
         ["", ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [roleInfo, sellResponse, voucherInfo]);
+  }, [roleInfo, sellResponse,operacion,selecFrac]);
+ 
   return !sellResponse?.status ? (
     <div className="flex flex-col justify-center items-center">
       <h1>Error: {sellResponse.msg}</h1>

@@ -9,7 +9,7 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 	const initReporte = [
 		{
 			num_sorteo: "",
-			num_loteria: "",
+			nom_loteria: "",
 			estado_sorteo: "",
 			fecha_creacion: "",
 			inventario: "",
@@ -60,10 +60,10 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 						maxPage={maxPages}
 						headers={[
 							"Sorteo",
-							"Loteria",
-							"cod_distribuidor",
-							"cod_sucursal",
-							"Fecha Inicio",
+							"Lotería",
+							"Distribuidor",
+							"Sucursal",
+							"Fecha creación Sorteo",
 							"Inventario",
 							"Total Asignado",
 							"Total Inventariado",
@@ -75,7 +75,7 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 							reporteInventario?.map(
 								({
 									num_sorteo,
-									num_loteria,
+									nom_loteria,
 									cod_distribuidor,
 									cod_sucursal,
 									fecha_creacion,
@@ -90,7 +90,7 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 									fecha_creacion = dateFormatter.format(tempDate);
 									return {
 										num_sorteo,
-										num_loteria,
+										nom_loteria,
 										cod_distribuidor,
 										cod_sucursal,
 										fecha_creacion,
@@ -106,7 +106,7 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 					>
 						<Input
 							id="numSorteo"
-							label="Numero de sorte: "
+							label="Número de sorteo: "
 							type="text"
 							value={numeroSorteo}
 							onInput={(e) => setNumeroSorteo(e.target.value)}

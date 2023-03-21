@@ -39,6 +39,7 @@ export const fetchCustom = (url_, metodo_, name_) => {
         error.message
       );
     }
+    console.log(Peticion);
 
     //Evaluar si la respuesta es json
     try {
@@ -54,10 +55,7 @@ export const fetchCustom = (url_, metodo_, name_) => {
 
     //evaluar respuesta de api gateway
     try {
-      if (
-        Peticion?.hasOwnProperty("status") === false &&
-        Peticion?.hasOwnProperty("status") === false
-      ) {
+      if (Peticion?.hasOwnProperty("status") === false) {
         //No es una respuesta directamente del servicio sino del api gateway
         if (Peticion?.hasOwnProperty("message") === true) {
           if (Peticion.message === "Endpoint request timed out") {

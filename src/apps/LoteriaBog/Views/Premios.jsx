@@ -89,7 +89,6 @@ const Premios = ({ route }) => {
     navigate(-1);
   }, []);
 
-
   const notifyError = (msg) => {
     toast.warn(msg, {
       position: "top-center",
@@ -209,6 +208,7 @@ const Premios = ({ route }) => {
       })
       .catch(() => setDisabledBtns(false));
   };
+  console.log("seleccionarFraccion--->",seleccionarFraccion)
   const tickets = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -241,34 +241,20 @@ const Premios = ({ route }) => {
         ["Billete", billete],
         ["Serie", serie],
         ["Fracción", seleccionarFraccion],
-        // [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
-        // ["", ""],
         ["Valor a pagar", formatMoney.format(totalPagar)],
-        // ["", ""],
-        // ["Forma de Pago", "Efectivo"],
-        // ["", ""],
         [tipopago === 2 ? "Nombre" : "", tipopago === 2 ? datosCliente?.nombre : ""],
         [tipopago === 2 ? "Celular" : "", tipopago === 2 ? datosCliente?.celular : ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [estadoTransaccion, sorteo,
-    billete,
-    serie,
-    checkBilleteFisico,
-    checkBilleteVirtual,
-    seleccionarFraccion,
-    datosCliente,
-    totalPagar,
-    valorbruto]);
+  }, [estadoTransaccion,sorteo,billete,serie,checkBilleteFisico,checkBilleteVirtual,seleccionarFraccion,datosCliente,totalPagar,valorbruto]);
   const onPay1 = (e) => {
     e.preventDefault();
     if (tipopago === 2) {
       if (String(datosCliente?.celular).charAt(0) === "3") {
         setRespuesta(true);
         if (checkBilleteVirtual === true && hash === "") {
-          // notifyError("Por favor, ingrese el código hash")
           setRespuesta(false);
         } else if (
           seleccionarFraccion === 0 ||
@@ -280,19 +266,6 @@ const Premios = ({ route }) => {
             notifyError("Seleccione una fracción")
           }
         }
-        // if (
-        //   seleccionarFraccion === 0 ||
-        //   seleccionarFraccion === "0" ||
-        //   seleccionarFraccion === undefined
-        // ) {
-        //   setRespuesta(false);
-        //   if (checkBilleteVirtual === false) {
-        //     notifyError("Seleccione una fracción")
-        //   } else if (checkBilleteVirtual === true) {
-        //     notifyError("Por favor, ingrese el código hash")
-        //   }
-
-        // }
         else {
           makePayment(
             sorteo,
@@ -344,7 +317,6 @@ const Premios = ({ route }) => {
       }
     } else {
       if (checkBilleteVirtual === true && hash === "") {
-        // notifyError("Por favor, ingrese el código hash")
         setRespuesta(false);
       } else if ((checkBilleteFisico) && (
         seleccionarFraccion === 0 ||
@@ -402,13 +374,12 @@ const Premios = ({ route }) => {
     }
   };
 
-
   const handlePrint = useReactToPrint({
     content: () => printDiv?.current,
   });
+
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-
     if (valueInput[0] != 3) {
       if (valueInput.length == 1 && datosCliente?.celular == "") {
         notifyError(
@@ -421,25 +392,19 @@ const Premios = ({ route }) => {
       return { ...old, celular: valueInput };
     });
   };
-  // useEffect(() => {
-  //   const ticket = tickets;
-  //   infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
-  //     .then((resTicket) => { })
-  //     .catch((err) => {
-  //       console.error(err);
-  //       notifyError("Error guardando el ticket");
-  //     });
-  // }, [
-  //   infoTicket,
-  //   datosCliente,
-  //   estadoTransaccion,
-  //   tickets,
-  //   tipopago,
-  // ]);
+
+  const onDocChange = (e) => {
+    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+    setDatosCliente((old) => {
+      return { ...old, documento: valueInput };
+    });
+  };
+ 
   const cancelar = () => {
     notifyError("Se canceló el pago del premio");
     navigate(-1);
   };
+
   return (
     <>
       <Form onSubmit={onSubmit} grid>
@@ -556,6 +521,8 @@ const Premios = ({ route }) => {
                   label="Nombre"
                   type="text"
                   autoComplete="off"
+                  minLength={"3"}
+                  maxLength={"60"}
                   value={datosCliente?.nombre}
                   onInput={(e) => {
                     setDatosCliente((old) => {
@@ -570,20 +537,13 @@ const Premios = ({ route }) => {
                 <Input
                   id="cedula"
                   label="Cédula"
-                  type="text"
-                  minLength={"10"}
-                  maxLength={"10"}
+                  type="tel"
+                  minLength="10"
+                  maxLength="12"
                   autoComplete="off"
-                  required={true}
+                  required
                   value={datosCliente?.documento}
-                  onInput={(e) => {
-                    setDatosCliente((old) => {
-                      return {
-                        ...old,
-                        documento: e.target.value,
-                      };
-                    });
-                  }}
+                  onChange={onDocChange}
                 />
                 <Input
                   id="numCel"
@@ -593,16 +553,8 @@ const Premios = ({ route }) => {
                   minLength={"10"}
                   maxLength={"10"}
                   autoComplete="off"
-                  required={true}
+                  required
                   value={datosCliente?.celular}
-                  onInput={(e) => {
-                    setDatosCliente((old) => {
-                      return {
-                        ...old,
-                        celular: e.target.value,
-                      };
-                    });
-                  }}
                   onChange={onCelChange}
                 />
                 <Input
@@ -610,6 +562,8 @@ const Premios = ({ route }) => {
                   label="Dirección"
                   type="text"
                   autoComplete="off"
+                  minLength={"3"}
+                  maxLength={"60"}
                   required={true}
                   value={datosCliente?.direccion}
                   onInput={(e) => {
@@ -641,12 +595,13 @@ const Premios = ({ route }) => {
                     id="codHash"
                     label="Código de seguridad"
                     type="text"
+                    maxLength="10"
                     autoComplete="off"
                     value={hash}
                     onChange={(e) => {
                       setHash(e.target.value);
                     }}
-                    required={true}
+                    required
                   />
                 ) : (
                   ""
@@ -694,6 +649,7 @@ const Premios = ({ route }) => {
                           id="codHash1"
                           label="Código de seguridad"
                           type="text"
+                          maxLength="10"
                           autoComplete="off"
                           value={hash}
                           onChange={(e) => {

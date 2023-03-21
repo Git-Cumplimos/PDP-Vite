@@ -103,7 +103,6 @@ const Reversos = () => {
       fetchData(`${url_USERS}/users`, "GET", queries)
         .then((res) => {
           if (res?.status) {
-            console.log(res);
             setUsuariosDB(res?.obj?.results);
             setMaxPageUsers(res?.obj?.maxpages);
           }
@@ -128,7 +127,6 @@ const Reversos = () => {
   useEffect(() => {
     searchUsers(email, nombre, pageUSER, limitUSER);
   }, [nombre, email, pageUSER, limitUSER]);
-  console.log(pageUSER, limitUSER);
 
   useEffect(() => {
     reversosFDLM(page, comercio, 5, fecha_ini, fecha_fin, true, limit);
@@ -139,7 +137,6 @@ const Reversos = () => {
     const query = { correo: email };
     try {
       const res = await fetchData(url_datosComercio, "GET", query);
-      console.log(res);
       if ("id_comercio" in res) {
         setComercio(res);
         reversosFDLM(page, res, 5, fecha_ini, fecha_fin, true, limit);
@@ -222,10 +219,8 @@ const Reversos = () => {
       if (limit !== undefined || limit !== null) {
         queries.limit = limit;
       }
-      console.log(queries);
       fetchData(url, "GET", queries)
         .then((res) => {
-          console.log(res);
           if (res?.status) {
             setStop(false);
             if (res?.obj?.trxs.length < 1) {
@@ -294,7 +289,6 @@ const Reversos = () => {
     setTicket(false);
     setShowModal(false);
     handleChange();
-    console.log(ticket);
   }, []);
 
   const onSubmit = (e) => {
@@ -304,15 +298,15 @@ const Reversos = () => {
 
   const reverse = (e) => {
     e.preventDefault();
-    let tipo_comercio = comercio?.tipo_comercio
+    let tipo_comercio = selected?.res_obj?.tipo_comercio ?? ""
     if (comercio?.tipo_comercio === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
     }
     const values = {
       tipo: tipo_comercio,
-      dispositivo: comercio?.id_dispositivo,
-      usuario: comercio?.id_usuario,
-      comercio: comercio?.id_comercio,
+      dispositivo: selected?.id_terminal,
+      usuario: selected?.id_usuario,
+      comercio: selected?.id_comercio,
       idtrx: selected?.id_trx,
       val: value,
       motivo: motivo,
@@ -320,11 +314,9 @@ const Reversos = () => {
     };
     ingresoreversorecibo(values)
       .then((res) => {
-        console.log(res);
         setTicket(true);
         if (!res?.status) {
           setTicket(false);
-          console.log(res);
           notifyError(res?.obj?.Mensaje);
         }
       })
@@ -332,7 +324,6 @@ const Reversos = () => {
         console.log(err);
       });
   };
-  console.log(selectedUsers);
   return (
     <>
       <h1 className='text-3xl mt-6'>Reversos</h1>

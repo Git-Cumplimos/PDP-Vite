@@ -4,11 +4,9 @@ import ButtonBar from "../components/Base/ButtonBar";
 import Modal from "../components/Base/Modal";
 import Select from "../components/Base/Select";
 import Input from "../components/Base/Input";
-import fetchData from "../utils/fetchData";
 import { useAuth } from "../hooks/AuthHooks";
 import Tickets from "../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
-import TableEnterprise from "../components/Base/TableEnterprise";
 import { formatMoney } from "../components/Base/MoneyInput";
 import PaymentSummary from "../components/Compound/PaymentSummary";
 import TicketsDavivienda from "../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
@@ -16,6 +14,10 @@ import TicketsPines from "../apps/PinesVus/components/TicketsPines";
 import TicketsAval from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
 import TicketColpatria from "../apps/Colpatria/components/TicketColpatria";
 import TicketsAgrario from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
+import DataTable from "../components/Base/DataTable";
+import useFetchDispatchDebounce from "../hooks/useFetchDispatchDebounce";
+import useMap from "../hooks/useMap";
+import { onChangeNumber } from "../utils/functions";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -25,96 +27,78 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
   minute: "numeric",
 });
 
+const initialSearchFilters = new Map([
+  ["id_comercio", ""],
+  ["id_usuario", ""],
+  ["id_tipo_transaccion", ""],
+  ["id_trx", ""],
+  ["date_ini", ""],
+  ["date_end", ""],
+  ["page", 1],
+  ["limit", 10],
+]);
+
+const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-paginated`;
+
 const Transacciones = () => {
   const { roleInfo, userPermissions } = useAuth();
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
-  const [montoAcumulado, setMontoAcumulado] = useState(null);
+  const [isNextPage, setIsNextPage] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
   const [summaryTrx, setSummaryTrx] = useState(null);
 
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
+    useMap(initialSearchFilters);
 
-  const [maxPages, setMaxPages] = useState(1);
-  const [idComercio, setIdComercio] = useState(-1);
-  const [usuario, setUsuario] = useState(-1);
-  const [tipoComercio, setTipoComercio] = useState(null);
-  const [tipoOp, setTipoOp] = useState("");
-  const [fechaInicial, setFechaInicial] = useState("");
-  const [fechaFinal, setFechaFinal] = useState("");
+  const [fetchTrxs] = useFetchDispatchDebounce({
+    onSuccess: useCallback((res) => {
+      setIsNextPage(res?.obj?.next_exist);
+      setTrxs(res?.obj?.trxs);
+    }, []),
+    onError: useCallback((error) => console.error(error), []),
+  });
 
-  const transacciones = useCallback(() => {
-    const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
-    const urlAcumulado = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-acumulado`;
-    const queries = { ...pageData };
-    if (!(idComercio === -1 || idComercio === "")) {
-      queries.id_comercio = parseInt(idComercio);
-    }
-    if (!(usuario === -1 || usuario === "")) {
-      queries.id_usuario = parseInt(usuario);
-    }
-    if (tipoOp) {
-      queries.id_tipo_transaccion = tipoOp;
-    }
-    if (fechaInicial && fechaFinal) {
-      const fecha_ini = new Date(fechaInicial);
+  const searchTrxs = useCallback(() => {
+    const tempMap = new Map(searchFilters);
+
+    tempMap.forEach((val, key, map) => {
+      if (!val) {
+        map.delete(key);
+      }
+    });
+    if (!tempMap.has("date_ini") || !tempMap.has("date_end")) {
+      tempMap.delete("date_ini");
+      tempMap.delete("date_end");
+    } else {
+      const fecha_ini = new Date(tempMap.get("date_ini"));
       fecha_ini.setHours(fecha_ini.getHours() + 5);
-      queries.date_ini = Intl.DateTimeFormat("es-CO", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-      }).format(fecha_ini);
+      tempMap.set(
+        "date_ini",
+        Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(fecha_ini)
+      );
 
-      const fecha_fin = new Date(fechaFinal);
+      const fecha_fin = new Date(tempMap.get("date_end"));
       fecha_fin.setHours(fecha_fin.getHours() + 5);
-      queries.date_end = Intl.DateTimeFormat("es-CO", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-      }).format(fecha_fin);
-    }
-    if (
-      userPermissions.map(({ id_permission }) => id_permission).includes(5) ||
-      queries.id_comercio !== -1
-    ) {
-      fetchData(url, "GET", queries)
-        .then((res) => {
-          if (res?.status) {
-            setMaxPages(res?.obj?.maxpages);
-            setTrxs(res?.obj?.trxs);
-          } else {
-            throw new Error(res?.msg);
-          }
-        })
-        .catch(() => {});
+      tempMap.set(
+        "date_end",
+        Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }).format(fecha_fin)
+      );
     }
 
-    if (tipoComercio !== null) {
-      const acumQueries = { ...queries, oficina_propia: tipoComercio };
-      delete acumQueries.limit;
-      delete acumQueries.page;
-      fetchData(urlAcumulado, "GET", acumQueries)
-        .then((res) => {
-          if (res?.status) {
-            setMontoAcumulado(res?.obj);
-          } else {
-            throw new Error(res?.msg);
-          }
-        })
-        .catch(() => {});
-    }
-  }, [
-    pageData,
-    idComercio,
-    fechaFinal,
-    fechaInicial,
-    tipoOp,
-    usuario,
-    tipoComercio,
-    userPermissions,
-  ]);
+    const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${url}?${queries}`);
+  }, [fetchTrxs, searchFilters]);
 
   const closeModal = useCallback(async () => {
     setShowModal(false);
@@ -139,33 +123,37 @@ const Transacciones = () => {
     );
     setTiposOp([
       ...allTypes
-        .sort((a, b) => a.Nombre.localeCompare(b.Nombre))
         .filter(
           (value, index, self) =>
             index ===
             self.findIndex(
               (t) => t.id_tipo_operacion === value.id_tipo_operacion
             )
-        ),
+        )
+        .sort((a, b) => a.Nombre.localeCompare(b.Nombre)),
     ]);
-
-    setIdComercio(roleInfo?.id_comercio || -1);
-    setUsuario(roleInfo?.id_usuario || -1);
-    setTipoComercio(
-      "tipo_comercio" in roleInfo
-        ? roleInfo.tipo_comercio === "OFICINAS PROPIAS"
-        : null
-    );
-  }, [userPermissions, roleInfo]);
+  }, [userPermissions]);
 
   useEffect(() => {
-    transacciones();
-  }, [transacciones]);
-  console.log("trxs",trxs)
+    searchTrxs();
+  }, [searchTrxs]);
+
+  useEffect(() => {
+    setSearchFilters((old) => {
+      if (!roleInfo?.id_comercio || !roleInfo?.id_usuario) {
+        return old;
+      }
+      const copy = initialSearchFilters
+        .set("id_comercio", roleInfo?.id_comercio ?? "")
+        .set("id_usuario", roleInfo?.id_usuario ?? "");
+      return copy;
+    });
+  }, [roleInfo, setSearchFilters]);
+
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
       <h1 className="text-3xl">Transacciones</h1>
-      <TableEnterprise
+      <DataTable
         title="Transacciones"
         headers={[
           "Id transaccion",
@@ -181,7 +169,10 @@ const Transacciones = () => {
             monto,
             created,
             status_trx,
-          },index) => {
+            tipo_afectacion,
+            id_tipo_transaccion,
+            ticket,
+          }) => {
             const tempDate = new Date(created);
             tempDate.setHours(tempDate.getHours() + 5);
             created = dateFormatter.format(tempDate);
@@ -191,63 +182,102 @@ const Transacciones = () => {
               Tipo_operacion,
               money,
               created,
-              status_trx: trxs[index]?.tipo_afectacion !== "NA" &&
-              !(trxs[index]?.id_tipo_transaccion === 66 ||
-              trxs[index]?.id_tipo_transaccion === 67)
-              ? trxs[index]?.status_trx
-                ? trxs[index]?.ticket == null
-                  ? "Transaccion pendiente"  
-                  : "Transaccion aprobada"
-                : "Transaccion rechazada"
-              : trxs[index]?.status_trx
-                ? "Transaccion aprobada"
-                : "Transaccion rechazada"
+              status_trx:
+                tipo_afectacion !== "NA" &&
+                !(id_tipo_transaccion === 66 || id_tipo_transaccion === 67)
+                  ? status_trx
+                    ? ticket == null
+                      ? "Transaccion pendiente"
+                      : "Transaccion aprobada"
+                    : "Transaccion rechazada"
+                  : status_trx
+                  ? "Transaccion aprobada"
+                  : "Transaccion rechazada",
             };
           }
         )}
-        maxPage={maxPages}
-        onSelectRow={(_e, index) => {
+        onClickRow={(_, index) => {
           setSelected(trxs[index]);
           const fecha = new Date(trxs[index]?.created);
           fecha.setHours(fecha.getHours() + 5);
           setSummaryTrx({
-            "Tipo transacción": trxs[index]?.["Tipo transaccion"],
+            "Tipo transaccion": trxs[index]?.["Tipo transaccion"],
             Fecha: dateFormatter.format(fecha),
             "Mensaje de respuesta trx": trxs[index]?.message_trx,
             Monto: formatMoney.format(trxs[index]?.monto),
-            "Estado de la transacción": trxs[index]?.tipo_afectacion !== "NA" &&
-            !(trxs[index]?.id_tipo_transaccion === 66 ||
-            trxs[index]?.id_tipo_transaccion === 67)
-            ? trxs[index]?.status_trx
-              ? trxs[index]?.ticket == null
-                ? "Transaccion pendiente"  
-                : "Transaccion aprobada"
-              : "Transaccion rechazada"
-            : trxs[index]?.status_trx
-              ? "Transaccion aprobada"
-              : "Transaccion rechazada"
+            "Estado de la transacción":
+              trxs[index]?.tipo_afectacion !== "NA" &&
+              !(
+                trxs[index]?.id_tipo_transaccion === 66 ||
+                trxs[index]?.id_tipo_transaccion === 67
+              )
+                ? trxs[index]?.status_trx
+                  ? trxs[index]?.ticket == null
+                    ? "Transaccion pendiente"
+                    : "Transaccion aprobada"
+                  : "Transaccion rechazada"
+                : trxs[index]?.status_trx
+                ? "Transaccion aprobada"
+                : "Transaccion rechazada",
           });
           setShowModal(true);
         }}
-        onSetPageData={setPageData}
+        tblFooter={
+          <Fragment>
+            <DataTable.LimitSelector
+              defaultValue={searchFilters.get("limit")}
+              onChangeLimit={(limit) => {
+                setSingleFilter("limit", limit);
+              }}
+            />
+            <DataTable.PaginationButtons
+              onClickNext={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  isNextPage ? oldPage + 1 : oldPage
+                )
+              }
+              onClickPrev={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  oldPage > 1 ? oldPage - 1 : oldPage
+                )
+              }
+            ></DataTable.PaginationButtons>
+          </Fragment>
+        }
+        onChange={(ev) => {
+          setSearchFilters((old) => {
+            const copy = new Map(old)
+              .set(
+                ev.target.name,
+                ["id_trx", "id_comercio", "id_usuario"].includes(ev.target.name)
+                  ? onChangeNumber(ev)
+                  : "id_tipo_transaccion" === ev.target.name
+                  ? parseInt(ev.target.value) ?? ""
+                  : ev.target.value
+              )
+              .set("page", 1);
+            return copy;
+          });
+        }}
       >
         <Input
           id="dateInit"
+          name="date_ini"
           label="Fecha inicial"
           type="date"
-          value={fechaInicial}
-          onInput={(e) => setFechaInicial(e.target.value)}
+          onChange={() => {}}
         />
         <Input
           id="dateEnd"
+          name="date_end"
           label="Fecha final"
           type="date"
-          value={fechaFinal}
-          onInput={(e) => setFechaFinal(e.target.value)}
+          onChange={() => {}}
         />
         <Select
           className="place-self-stretch"
           id="searchBySorteo"
+          name="id_tipo_transaccion"
           label="Tipo de busqueda"
           options={[
             { value: "", label: "" },
@@ -255,58 +285,40 @@ const Transacciones = () => {
               return { label: Nombre, value: id_tipo_operacion };
             }),
           ]}
-          value={tipoOp}
-          required={true}
-          onChange={(e) => setTipoOp(parseInt(e.target.value) ?? "")}
+          value={searchFilters.get("id_tipo_transaccion")}
+          onChange={() => {}}
+        />
+        <Input
+          id="id_trx"
+          name="id_trx"
+          label="Id de transaccion"
+          type="tel"
+          value={searchFilters.get("id_trx")}
+          onChange={() => {}}
         />
         {userPermissions
           .map(({ id_permission }) => id_permission)
-          .includes(58) &&
-          tipoComercio !== null && (
-            <Fragment>
-              <Input
-                label="Monto acumulado"
-                type="tel"
-                value={formatMoney.format(montoAcumulado ?? 0)}
-                readOnly
-              />
-            </Fragment>
-          )}
-        {userPermissions
-          .map(({ id_permission }) => id_permission)
-          .includes(5) ? (
-          <>
+          .includes(5) && (
+          <Fragment>
             <Input
               id="id_comercio"
+              name="id_comercio"
               label="Id comercio"
-              type="numeric"
-              value={idComercio}
-              onChange={(e) => {
-                setIdComercio(e.target.value);
-              }}
-              onLazyInput={{
-                callback: (e) => {},
-                timeOut: 500,
-              }}
+              type="tel"
+              value={searchFilters.get("id_comercio")}
+              onChange={() => {}}
             />
             <Input
               id="id_usuario"
+              name="id_usuario"
               label="Id usuario"
-              type="numeric"
-              value={usuario}
-              onChange={(e) => {
-                setUsuario(e.target.value);
-              }}
-              onLazyInput={{
-                callback: (e) => {},
-                timeOut: 500,
-              }}
+              type="tel"
+              value={searchFilters.get("id_usuario")}
+              onChange={() => {}}
             />
-          </>
-        ) : (
-          ""
+          </Fragment>
         )}
-      </TableEnterprise>
+      </DataTable>
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (
           <div className="flex flex-col justify-center items-center">
@@ -331,13 +343,6 @@ const Transacciones = () => {
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.id_autorizador === 14 ? (
-              <TicketColpatria
-                refPrint={printDiv}
-                type="Reimpresión"
-                ticket={selected?.ticket}
-                stateTrx={selected?.status_trx}
-              />
             ) : selected?.id_autorizador === 16 ? (
               <TicketsAgrario
                 refPrint={printDiv}
@@ -346,8 +351,8 @@ const Transacciones = () => {
                 stateTrx={selected?.status_trx}
               />
             ) : selected?.id_tipo_transaccion === 43 ||
-                selected?.id_tipo_transaccion === 44 ||
-                selected?.id_tipo_transaccion === 45 ? (
+              selected?.id_tipo_transaccion === 44 ||
+              selected?.id_tipo_transaccion === 45 ? (
               <div ref={printDiv}>
                 {selected?.ticket?.ticket2 ? (
                   <>
