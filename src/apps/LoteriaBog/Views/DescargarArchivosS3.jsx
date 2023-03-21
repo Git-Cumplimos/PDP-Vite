@@ -84,6 +84,13 @@ const DescargarArchivosS3 = ({ route }) => {
       .catch((err) => console.error(err));
   };
 
+  const onSorteoChange = (e) => {
+    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+    setDatosTrans((old) => {
+      return { ...old, sorteo: valueInput };
+    });
+  };
+
   return (
     <>
       <h1 class="text-3xl">Descarga de archivos</h1>
@@ -126,19 +133,6 @@ const DescargarArchivosS3 = ({ route }) => {
         }}
       >
         <Input
-          id="num_sorteo"
-          label="Número de sorteo"
-          type="search"
-          minLength="1"
-          maxLength="4"
-          autoComplete="false"
-          onInput={(e) => {
-            setDatosTrans((old) => {
-              return { ...old, sorteo: e.target.value };
-            });
-          }}
-        />
-        <Input
           id="dateInit"
           label="Fecha inicial"
           type="date"
@@ -150,147 +144,17 @@ const DescargarArchivosS3 = ({ route }) => {
           type="date"
           onInput={handleChange2}
         />
+        <Input
+          id="num_sorteo"
+          label="Número de sorteo"
+          type="tel"
+          minLength="1"
+          maxLength="6"
+          autoComplete="off"
+          value={datosTrans?.sorteo}
+          onChange={onSorteoChange}
+        />
       </TableEnterprise>
-      {/* <div>
-        <Form grid>
-          <Input
-            id="num_sorteo"
-            label="Número de sorteo"
-            type="search"
-            minLength="1"
-            maxLength="4"
-            autoComplete="false"
-            value={sorteo}
-            onInput={(e) => {
-              if (!isNaN(e.target.value)) {
-                setFecha_ini("");
-                setFecha_fin("");
-                setSorteo(e.target.value);
-              }
-            }}
-            onLazyInput={{
-              callback: (e) => {
-                if (e.target.value !== "") {
-                  con_SortVentas_S3(e.target.value, null, null, page).then(
-                    (res) => {
-                      if (res !== undefined) {
-                        if (!("msg" in res)) {
-                          setResp_con_sort(res.info);
-                          setMaxPages(res.num_datos);
-                        } else {
-                          notifyError(res.msg);
-                          setResp_con_sort("");
-                        }
-                      }
-                    }
-                  );
-                }
-              },
-              timeOut: 1000,
-            }}
-          />
-          {sorteo === "" ? (
-            <>
-              <div className="flex flex-row justify-center w-full">
-              </div>
-
-              <Input
-                id="dateInit"
-                label="Fecha inicial"
-                type="date"
-                value={fecha_ini}
-                onChange={handleChange}
-                onLazyInput={{
-                  callback: (e) => {
-                    if (fecha_fin !== "") {
-                      con_SortVentas_S3(
-                        sorteo,
-                        e.target.value,
-                        fecha_fin,
-                        page
-                      ).then((res) => {
-                        if (res !== undefined) {
-                          if (!("msg" in res)) {
-                            setResp_con_sort(res.info);
-                            setMaxPages(res.num_datos);
-                          } else {
-                            notifyError(res.msg);
-                          }
-                        }
-                      });
-                    }
-                  },
-                  timeOut: 1000,
-                }}
-              />
-              <div className="flex flex-row justify-center w-full">
-              </div>
-              <Input
-                id="dateEnd"
-                label="Fecha final"
-                type="date"
-                value={fecha_fin}
-                onInput={handleChange2}
-                onLazyInput={{
-                  callback: (e) => {
-                    if (fecha_ini !== "") {
-                      con_SortVentas_S3(
-                        sorteo,
-                        fecha_ini,
-                        e.target.value,
-                        page
-                      ).then((res) => {
-                        if (res !== undefined) {
-                          if (!("msg" in res) && res?.length !== 0) {
-                            setResp_con_sort(res.info);
-                            setMaxPages(res.num_datos);
-                          } else {
-                            notifyError(res.msg)
-                          }
-                        }
-                      });
-                    }
-                  },
-                  timeOut: 1000,
-                }}
-              />
-            </>
-          ) : (
-            ""
-          )}
-        </Form>
-        {Array.isArray(resp_con_sort) && resp_con_sort.length > 0 ? (
-          <>
-            <Table
-              headers={["Sorteo", "Fecha de juego"]}
-              data={resp_con_sort.map(({ num_sorteo, fecha_juego }) => {
-                return {
-                  num_sorteo,
-                  fecha_juego,
-                };
-              })}
-              onSelectRow={(_e, index) => {
-                setSelected(resp_con_sort[index]);
-                descargaVentas_S3(resp_con_sort[index]).then((res) => {
-                  if (res !== undefined) {
-                    if (!("msg" in res) && res?.length !== 0) {
-                      setUrls(res);
-                      setShowModal(true);
-                    } else {
-                      notifyError("No existen archivos")
-                    }
-                  } else {
-                    notifyError("No existen archivos parar descargar")
-
-                  }
-                });
-              }}
-            />
-          </>
-        ) : (
-          ""
-        )}
-      </div> */}
     </>
   );
 };

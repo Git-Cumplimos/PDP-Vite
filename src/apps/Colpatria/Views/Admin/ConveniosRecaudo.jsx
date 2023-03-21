@@ -95,21 +95,21 @@ const ConveniosRecaudo = () => {
     (ev) => {
       ev.preventDefault();
       const formData = new FormData(ev.currentTarget);
+      if (!formData.has("activo")) {
+        formData.set("activo", "off")
+      }
       const body = Object.fromEntries(
         Object.entries(Object.fromEntries(formData))
           .map(([key, val]) => [
             key,
-            key.includes("referencia_") && val === ""
-              ? null
-              : key === "activo"
-              ? val === "on"
-              : val,
+            key.includes("referencia_") && val === "" ? null : val,
           ])
           .filter(([key, val]) =>
             !selected
               ? val
               : selected[key] !== val || key === "pk_codigo_convenio"
           )
+          .map(([key, val]) => [key, key === "activo" ? val === "on" : val])
       );
       notifyPending(
         selected
