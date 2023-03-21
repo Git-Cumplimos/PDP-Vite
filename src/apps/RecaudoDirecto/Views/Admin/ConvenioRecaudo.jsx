@@ -40,6 +40,10 @@ const RecaudoDirecto = () => {
     { label: "Con autorizador", value: 2 },
     { label: "Sin base de datos", value: 3 },
   ]
+  const tipoVerificacion = [
+    { label: "Schema1", value: 1 },
+    { label: "Schema2", value: 2 },
+  ]
   
   
   useEffect(() => {
@@ -283,6 +287,15 @@ const RecaudoDirecto = () => {
             defaultValue={selected?.ean13 ?? ""}
             // disabled={selected ? true : false}
             autoComplete="off"
+          />
+          <Select
+            className="place-self-stretch"
+            id={"Modelo_verificacion"}
+            label={"Modelo verificacion de archivos"}
+            name={"modelo_verificacion"}
+            options={[{ label: "", value: "" }, ...tipoVerificacion]}
+            defaultValue={selected?.modelo ?? ""}
+            required
           />
 
           <Fieldset legend={"Referencias"}>

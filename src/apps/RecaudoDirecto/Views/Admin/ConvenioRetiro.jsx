@@ -37,6 +37,10 @@ const RetiroDirecto = () => {
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
   ]
+  const tipoVerificacion = [
+    { label: "Schema1", value: 1 },
+    { label: "Schema2", value: 2 },
+  ]
 
   useEffect(() => {
     setPageData(pageData => ({ ...pageData, page: 1 }));
@@ -288,13 +292,13 @@ const RetiroDirecto = () => {
             // disabled={selected ? true : false}
             autoComplete="off"
           />
-          <TextArea
-            id={1}
-            label={"Observaciones"}
-            name={"observaciones"}
-            type="text"
-            autoComplete="off"
-            defaultValue={selected?.observaciones ?? ""}
+          <Select
+            className="place-self-stretch"
+            id={"Modelo_verificacion"}
+            label={"Modelo verificacion de archivos"}
+            name={"modelo_verificacion"}
+            options={[{ label: "", value: "" }, ...tipoVerificacion]}
+            defaultValue={selected?.modelo ?? ""}
             required
           />
 
@@ -359,6 +363,15 @@ const RetiroDirecto = () => {
             }
           </Fieldset>
 
+          <TextArea
+            id={1}
+            label={"Observaciones"}
+            name={"observaciones"}
+            type="text"
+            autoComplete="off"
+            defaultValue={selected?.observaciones ?? ""}
+            required
+          />
           <ToggleInput
             id={"permite_vencidos"}
             label={"Permite vencidos"}

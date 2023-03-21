@@ -62,11 +62,14 @@ const GestionArchivosRetiro = () => {
   const CargarArchivo = useCallback(async (e) => {
     e.preventDefault();
     if (selected.fk_id_tipo_convenio === 1) {
-      const formData = new FormData();
-      formData.set("file", file);
 
       notifyPending(
-        cargarArchivoRetiro(file, selected?.nombre_convenio, selected?.pk_id_convenio_directo),
+        cargarArchivoRetiro(
+          file,
+          selected?.nombre_convenio,
+          selected?.pk_id_convenio_directo,
+          selected?.modelo
+          ),
         {
           render() {
             return "Enviando solicitud";
@@ -130,10 +133,10 @@ const GestionArchivosRetiro = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Convenios de Recaudos Directo</h1>
+      <h1 className="text-3xl mt-6">Gestion de Archivos de Retiros</h1>
       {cargando ? (<>
         <TableEnterprise
-          title="Convenios de Recaudos"
+          title="Convenios de Retiros"
           headers={[
             "Código convenio",
             "Código EAN o IAC",

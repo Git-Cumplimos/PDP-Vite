@@ -71,11 +71,14 @@ const GestionArchivosRecaudo = () => {
       e.preventDefault();
 
       if (selected.fk_id_tipo_convenio === 1) {
-        const formData = new FormData();
-        formData.set("file", file);
 
         notifyPending(
-          cargarArchivoRecaudo(file, selected?.nombre_convenio, selected?.pk_id_convenio_directo),
+          cargarArchivoRecaudo(
+            file,
+            selected?.nombre_convenio,
+            selected?.pk_id_convenio_directo,
+            selected?.modelo
+            ),
           {
             render() {
               return "Enviando solicitud";
@@ -149,7 +152,7 @@ const GestionArchivosRecaudo = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Convenios de Recaudos Directos</h1>
+      <h1 className="text-3xl mt-6">Gestion de Archivos de Recaudos</h1>
       {cargando ? (
         <>
           <TableEnterprise
