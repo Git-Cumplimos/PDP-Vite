@@ -554,12 +554,14 @@ const CrearPin = () => {
     }
     else{
      // objTicket2["title"] = "Recibo de pago: TRÁMITE "+ tramiteData?.descripcion.toUpperCase() 
-      objTicket2["trxInfo"][0] = ["Detalle trámite", tramiteData?.descripcion]
+      objTicket2["trxInfo"][0] = ["Detalle trámite", ""]
       objTicket2["trxInfo"][1] = ["", ""]
-      objTicket2["trxInfo"][2] = ["Valor trámite", formatMoney.format(tramiteData?.valor)]
+      objTicket2["trxInfo"][2] = ["", tramiteData?.descripcion]
       objTicket2["trxInfo"][3] = ["", ""]
-      objTicket2["trxInfo"][4] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)] 
+      objTicket2["trxInfo"][4] = ["Valor trámite", formatMoney.format(tramiteData?.valor)]
       objTicket2["trxInfo"][5] = ["", ""]
+      objTicket2["trxInfo"][6] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)] 
+      objTicket2["trxInfo"][7] = ["", ""]
 
     }
 
@@ -1203,7 +1205,12 @@ const CrearPin = () => {
           <div className="flex flex-col w-1/2 mx-auto">
             <h1 className="text-3xl mt-3 mx-auto">Crear Pin</h1>
             <br></br>
-            <h1 className="flex flex-row justify-center text-lg font-medium">{tramiteData.descripcion}   -   {tramiteData2.descripcion}</h1>
+            <h1 className="flex flex-row justify-center text-lg font-medium">- {tramiteData.descripcion}</h1>
+            { tramiteData2.descripcion ?
+              <h1 className="flex flex-row justify-center text-lg font-medium">- {tramiteData2.descripcion}</h1>
+            : ""
+            }
+            
             <br></br>
             <>
               <div
