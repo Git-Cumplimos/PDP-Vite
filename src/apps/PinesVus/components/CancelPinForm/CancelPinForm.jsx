@@ -153,13 +153,17 @@ const CancelPin = ({
       [ 
         ["Trámite", "Cancelación de Pin"],
         ["",""],
-        ["Detalle trámite_1", tramite1],
+        ["Detalle trámite 1",""],
         ["",""],
-        ["Valor trámite_1", formatMoney.format(valores[0])],
+        ["", tramite1],
         ["",""],
-        ["Detalle trámite_2", tramite2],
+        ["Valor trámite 1", formatMoney.format(valores[0])],
         ["",""],
-        ["Valor trámite_2", formatMoney.format(valores[1])],
+        ["Detalle trámite 2", ""],
+        ["",""],
+        ["", tramite2],
+        ["",""],
+        ["Valor trámite 2", formatMoney.format(valores[1])],
         ["",""],
         ["Valor Pin", formatMoney.format(valor)],
         ["",""],
@@ -229,42 +233,47 @@ const CancelPin = ({
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = textTipoPin
  if( valores[1]){
-    objTicket["trxInfo"][2] = ["Detalle trámite_1", tramite1]
+    objTicket["trxInfo"][2] = ["Detalle trámite 1", ""]
     objTicket["trxInfo"][3] = ["",""]
-    objTicket["trxInfo"][4] = ["Valor trámite_1", formatMoney.format(valores[0])]
+    objTicket["trxInfo"][4] = ["", tramite1]
     objTicket["trxInfo"][5] = ["",""]
-    objTicket["trxInfo"][6] = ["Detalle trámite_2", tramite2]
+    objTicket["trxInfo"][6] = ["Valor trámite 1", formatMoney.format(valores[0])]
     objTicket["trxInfo"][7] = ["",""]
-    objTicket["trxInfo"][8] = ["Valor trámite_2",formatMoney.format(valores[1])]
+    objTicket["trxInfo"][8] = ["Detalle trámite 2", ""]
     objTicket["trxInfo"][9] = ["",""]
-    objTicket["trxInfo"][10] = ["Valor Pin", formatMoney.format(valor)]
+    objTicket["trxInfo"][10] = ["", tramite2]
     objTicket["trxInfo"][11] = ["",""]
-    objTicket["trxInfo"][12] = ["IVA Pin", formatMoney.format(valor*0.19)]
+    objTicket["trxInfo"][12] = ["Valor trámite 2",formatMoney.format(valores[1])]
     objTicket["trxInfo"][13] = ["",""]
-    objTicket["trxInfo"][14] = ["Total", formatMoney.format(valor*1.19 + valores[0]+ valores[1])]
+    objTicket["trxInfo"][14] = ["Valor Pin", formatMoney.format(valor)]
     objTicket["trxInfo"][15] = ["",""]
+    objTicket["trxInfo"][16] = ["IVA Pin", formatMoney.format(valor*0.19)]
+    objTicket["trxInfo"][17] = ["",""]
+    objTicket["trxInfo"][18] = ["Total", formatMoney.format(valor*1.19 + valores[0]+ valores[1])]
+    objTicket["trxInfo"][19] = ["",""]
   }
     else{    
       objTicket["trxInfo"][2] = ["Detalle trámite", name_tramite]
       objTicket["trxInfo"][3] = ["",""]
       objTicket["trxInfo"][4] = ["Valor trámite", formatMoney.format(valor_tramite)]
       objTicket["trxInfo"][5] = ["",""]
-      objTicket["trxInfo"][6] = ["",""]
+      objTicket["trxInfo"][6] = ["Valor Pin", formatMoney.format(valor)]
       objTicket["trxInfo"][7] = ["",""]
-      objTicket["trxInfo"][8] = ["",""]
+      objTicket["trxInfo"][8] = ["IVA Pin", formatMoney.format(valor*0.19)]
       objTicket["trxInfo"][9] = ["",""]
-      objTicket["trxInfo"][10] = ["Valor Pin", formatMoney.format(valor)]
+      objTicket["trxInfo"][10] = ["Total", formatMoney.format(valor*1.19 + valor_tramite)]
       objTicket["trxInfo"][11] = ["",""]
-      objTicket["trxInfo"][12] = ["IVA Pin", formatMoney.format(valor*0.19)]
-      objTicket["trxInfo"][13] = ["",""]
-      objTicket["trxInfo"][14] = ["Total", formatMoney.format(valor*1.19 + valor_tramite)]
-      objTicket["trxInfo"][15] = ["",""]
+      objTicket["trxInfo"].splice(12)
   }
 
     if (tipCancelacion === '2') {
-   
-      objTicket["trxInfo"][14] = ["Total", formatMoney.format(valor*1.19)]  
-      objTicket["trxInfo"].splice(2,8)
+      objTicket["trxInfo"][2] = ["Valor Pin", formatMoney.format(valor)]
+      objTicket["trxInfo"][3] = ["",""]
+      objTicket["trxInfo"][4] = ["IVA Pin", formatMoney.format(valor*0.19)]
+      objTicket["trxInfo"][5] = ["",""]
+      objTicket["trxInfo"][6] = ["Total", formatMoney.format(valor*1.19)] 
+      objTicket["trxInfo"][7] = ["",""]
+      objTicket["trxInfo"].splice(8)
     }
 
     cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion, objTicket) //// Valor = valor + IVA
@@ -430,11 +439,13 @@ const CancelPin = ({
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center">
+          <div ref={printDiv}>
           <TicketsPines
               refPrint={null}
               ticket={tickets}
               logo="LogoVus"
           />
+          </div>
           <ButtonBar>
             <Button
               onClick={() => {

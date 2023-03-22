@@ -24,7 +24,7 @@ import {
 } from "../../utils/fetchFunctions";
 
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { makeMoneyFormatter } from "../../../../utils/functions";
+import { makeMoneyFormatter, onChangeNumber } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
 import ScreenBlocker from "../../components/ScreenBlocker";
 import TicketColpatria from "../../components/TicketColpatria";
@@ -416,7 +416,7 @@ const VentaPines = () => {
               onInput={(ev) =>
                 setUserReferences((old) => ({
                   ...old,
-                  [ev.target.name]: ev.target.value,
+                  [ev.target.name]: onChangeNumber(ev),
                 }))
               }
               readOnly={inquiryStatus}
