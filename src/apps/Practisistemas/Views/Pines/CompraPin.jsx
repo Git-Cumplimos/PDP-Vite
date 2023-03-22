@@ -265,7 +265,6 @@ const CompraPin = () => {
 
   const compraPines = () => {
     setShowLoading(true);
-
     const uniqueId = v4();
     const fecha = Intl.DateTimeFormat("es-CO", {
       year: "numeric",
@@ -527,7 +526,6 @@ const CompraPin = () => {
 
     // infoTicket(result_.idtrans, tipo_operacion, voucher)
     //   .then((resTicket) => {
-    //     console.log(resTicket);
     //   })
     //   .catch((err) => {
     //     console.error(err);

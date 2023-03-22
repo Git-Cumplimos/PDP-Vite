@@ -257,6 +257,7 @@ const RecargarPaquetes = () => {
     notify("Recarga cancelada");
     validNavigate("/recargas-paquetes");
     handleClose();
+
   }, []);
 
   const handlePrint = useReactToPrint({
