@@ -1,6 +1,7 @@
 import { fetchSecure } from "../../../utils/functions";
 
-const url = `http://127.0.0.1:8000`;
+// const url = `http://127.0.0.1:8000`;
+const url = `${process.env.REACT_APP_URL_RECAUDO_RETIRO_DIRECTO}`;
 
 export const cargueArchivo = (url_cargar,url_verificar) => {
   return async (file, nombre_convenio, convenio_id) => {
