@@ -147,6 +147,10 @@
   white-space: nowrap;
   max-width: 80%;
 }
+.contendorLista {
+  overflow-y: auto;
+  max-height: 435px;
+}
 .contenedorArchivosBasura {
   box-sizing: border-box;
   cursor: pointer;

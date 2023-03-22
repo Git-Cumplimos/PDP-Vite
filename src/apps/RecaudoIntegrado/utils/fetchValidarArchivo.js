@@ -33,6 +33,7 @@ export const Validar_archivo = async (banco, nombre_archivo) => {
 
     //   }
   } catch (err) {
-    throw err;
+    console.log();
+    // throw err;
   }
 };

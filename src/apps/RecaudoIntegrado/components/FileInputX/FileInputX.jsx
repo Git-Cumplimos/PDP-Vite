@@ -6,8 +6,13 @@ import { Presigned, Presigned_validar } from "../../utils/fetchBucket";
 import { notify, notifyError, notifyPending } from "../../../../utils/notify";
 import { Validar_archivo } from "../../utils/fetchValidarArchivo";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
+import Modal from "../../../../components/Base/Modal";
+import Fieldset from "../../../../components/Base/Fieldset";
+import LogoPDP from "../../../../components/Base/LogoPDP";
 
 const FileInputX = ({ banco }) => {
+  const [showModal, setShowModal] = useState(true);
+  const [errors, setErrors] = useState([]);
   const banco_minuscula = banco.charAt(0).toLowerCase() + banco.slice(1);
   // console.log(banco_minuscula);
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
@@ -20,6 +25,7 @@ const FileInputX = ({ banco }) => {
     contenedorArchivos,
     contenedorBtns,
     nombreArchivo,
+    contendorLista,
     nombreArchivoStyle,
     fileInput,
     contenedorLabel,
@@ -106,8 +112,11 @@ const FileInputX = ({ banco }) => {
       }
 
       Validar_archivo(banco_minuscula, nombreArchivoS3).then((res) => {
-        console.log(res);
-
+        console.log("RESPUESTA VALIDAR", res);
+        if (res?.codigo == 400) {
+          setShowModal(true);
+          setErrors(res?.obj);
+        }
         setProcesandoValidacion(false);
         document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
         setProcesandoValidacion(false);
@@ -121,6 +130,10 @@ const FileInputX = ({ banco }) => {
       setDisabledBtn(false);
     }
   };
+
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+  }, []);
 
   // const EnviarArchivos = async (e) => {
   //   e.preventDefault();
@@ -278,6 +291,24 @@ const FileInputX = ({ banco }) => {
           </Button>
         </div>
       </form>
+
+      {errors?.length > 0 ? (
+        <Modal show={showModal} handleClose={handleClose}>
+          <LogoPDP xsmall></LogoPDP>
+          <Fieldset legend="Archivo con errores">
+            <ul className={contendorLista}>
+              {errors.map((error, index) => (
+                <li key={index}>
+                  {index + 1}) <li>Error: {error.error}</li>
+                  <li> Línea: {error.line}</li>
+                </li>
+              ))}
+            </ul>
+          </Fieldset>
+        </Modal>
+      ) : (
+        ""
+      )}
     </div>
   );
 };
