@@ -259,6 +259,7 @@ const RecargasOperadores = () => {
         trxInfo: [],
       };
     });
+    validNavigate("/recargas-paquetes");
   }, []);
 
   const handleCloseRecarga = useCallback(() => {
