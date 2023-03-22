@@ -279,6 +279,7 @@ const RetiroDirecto = () => {
             label={"Nit"}
             name={"nit"}
             type="text"
+            placeholder={"333.333.333-3"}
             autoComplete="off"
             defaultValue={selected?.nit ?? ""}
             required />

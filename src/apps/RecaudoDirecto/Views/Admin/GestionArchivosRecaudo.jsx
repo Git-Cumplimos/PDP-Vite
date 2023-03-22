@@ -314,10 +314,10 @@ const GestionArchivosRecaudo = () => {
                           )
                         })
                       ) : (
-                        <>
+                        <div key={index}>
                           <h3>{Object.keys(err_esp.error)}</h3>
                           <h3>Descripcion: {Object.values(err_esp.error)}</h3>
-                        </>
+                        </div>
                       )
                       }
                       <hr></hr>
