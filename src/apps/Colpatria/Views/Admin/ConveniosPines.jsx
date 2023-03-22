@@ -124,7 +124,6 @@ const ConveniosPines = () => {
         {
           render({ data: res }) {
             setLoading(false);
-            console.log(res);
             handleClose();
             getConvPines();
             return `Convenio ${
@@ -215,7 +214,6 @@ const ConveniosPines = () => {
         {
           render({ data: res }) {
             setLoading(false);
-            console.log(res);
             handleClose();
             getConvPines();
             return `Se han creado ${res?.obj?.stats_creados} y se han modificado ${res?.obj?.stats_modificados} convenios de pines de colpatria`;
@@ -240,7 +238,7 @@ const ConveniosPines = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Convenio de pines de recaudo Colpatria</h1>
+      <h1 className='text-3xl mt-6'>Convenio de pines de recaudo Colpatria</h1>
       <ButtonBar>
         <Button type={"submit"} onClick={() => setShowModal(true)}>
           Crear nuevo convenio
@@ -250,13 +248,12 @@ const ConveniosPines = () => {
           onClick={() => {
             setShowModal(true);
             setUploadMasivo(true);
-          }}
-        >
+          }}>
           Crear convenios (masivo)
         </Button>
       </ButtonBar>
       <TableEnterprise
-        title="Convenios de pines"
+        title='Convenios de pines'
         headers={["Código convenio", "Código pin", "Nombre convenio", "Estado"]}
         data={listaConveniosPines.map(
           ({
@@ -286,14 +283,13 @@ const ConveniosPines = () => {
         }
         actions={{
           download: downloadMasive,
-        }}
-      >
+        }}>
         <Input
           id={"pk_codigo_convenio"}
           label={"Código de convenio"}
           name={"pk_codigo_convenio"}
-          type="tel"
-          autoComplete="off"
+          type='tel'
+          autoComplete='off'
           maxLength={"6"}
           onChange={(ev) => {
             ev.target.value = onChangeNumber(ev);
@@ -306,8 +302,8 @@ const ConveniosPines = () => {
           id={"codigo_pin_search"}
           label={"Código pin"}
           name={"codigo_pin"}
-          type="tel"
-          autoComplete="off"
+          type='tel'
+          autoComplete='off'
           maxLength={"4"}
           onChange={(ev) => {
             ev.target.value = onChangeNumber(ev);
@@ -319,8 +315,8 @@ const ConveniosPines = () => {
           id={"nombre_convenio"}
           label={"Nombre del Convenio"}
           name={"nombre_convenio"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           maxLength={"30"}
           defaultValue={selected?.nombre_convenio ?? ""}
           required
@@ -352,8 +348,8 @@ const ConveniosPines = () => {
               readOnly
             />
             {uploadingError && (
-              <div className="p-4 rounded bg-yellow-300">
-                <p className="whitespace-pre-wrap">{uploadingError}</p>
+              <div className='p-4 rounded bg-yellow-300'>
+                <p className='whitespace-pre-wrap'>{uploadingError}</p>
               </div>
             )}
             <ButtonBar>
@@ -362,7 +358,7 @@ const ConveniosPines = () => {
           </Form>
         ) : (
           <Fragment>
-            <h1 className="text-3xl mx-auto text-center mb-4">
+            <h1 className='text-3xl mx-auto text-center mb-4'>
               {selected ? "Editar" : "Crear"} convenio
             </h1>
             <Form onSubmit={handleConvenio} grid>
@@ -370,8 +366,8 @@ const ConveniosPines = () => {
                 id={"pk_codigo_convenio"}
                 label={"Código de convenio"}
                 name={"pk_codigo_convenio"}
-                type="tel"
-                autoComplete="off"
+                type='tel'
+                autoComplete='off'
                 maxLength={"6"}
                 onChange={(ev) => {
                   ev.target.value = onChangeNumber(ev);
@@ -384,8 +380,8 @@ const ConveniosPines = () => {
                 id={"codigo_pin"}
                 label={"Código pin"}
                 name={"codigo_pin"}
-                type="tel"
-                autoComplete="off"
+                type='tel'
+                autoComplete='off'
                 maxLength={"4"}
                 onChange={(ev) => {
                   ev.target.value = onChangeNumber(ev);
@@ -397,14 +393,14 @@ const ConveniosPines = () => {
                 id={"nombre_convenio"}
                 label={"Nombre del Convenio"}
                 name={"nombre_convenio"}
-                type="text"
-                autoComplete="off"
+                type='text'
+                autoComplete='off'
                 maxLength={"30"}
                 defaultValue={selected?.nombre_convenio ?? ""}
                 required
               />
               <Select
-                className="place-self-stretch"
+                className='place-self-stretch'
                 id={"fk_tipo_valor"}
                 label={"Modificar valor"}
                 name={"fk_tipo_valor"}
@@ -416,8 +412,8 @@ const ConveniosPines = () => {
                 id={"referencia_1"}
                 label={"Referencia 1"}
                 name={"referencia_1"}
-                type="text"
-                autoComplete="off"
+                type='text'
+                autoComplete='off'
                 maxLength={"30"}
                 defaultValue={selected?.referencia_1 ?? ""}
                 required
@@ -426,8 +422,8 @@ const ConveniosPines = () => {
                 id={"referencia_2"}
                 label={"Referencia 2"}
                 name={"referencia_2"}
-                type="text"
-                autoComplete="off"
+                type='text'
+                autoComplete='off'
                 maxLength={"30"}
                 defaultValue={selected?.referencia_2 ?? ""}
               />
@@ -435,8 +431,8 @@ const ConveniosPines = () => {
                 id={"referencia_3"}
                 label={"Referencia 3"}
                 name={"referencia_3"}
-                type="text"
-                autoComplete="off"
+                type='text'
+                autoComplete='off'
                 maxLength={"30"}
                 defaultValue={selected?.referencia_3 ?? ""}
               />
@@ -444,8 +440,8 @@ const ConveniosPines = () => {
                 id={"referencia_4"}
                 label={"Referencia 4"}
                 name={"referencia_4"}
-                type="text"
-                autoComplete="off"
+                type='text'
+                autoComplete='off'
                 maxLength={"30"}
                 defaultValue={selected?.referencia_4 ?? ""}
               />
@@ -453,8 +449,8 @@ const ConveniosPines = () => {
                 id={"referencia_5"}
                 label={"Referencia 5"}
                 name={"referencia_5"}
-                type="text"
-                autoComplete="off"
+                type='text'
+                autoComplete='off'
                 maxLength={"30"}
                 defaultValue={selected?.referencia_5 ?? ""}
               />
