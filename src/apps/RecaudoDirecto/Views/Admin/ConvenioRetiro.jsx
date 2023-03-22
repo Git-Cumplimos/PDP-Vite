@@ -20,7 +20,6 @@ const RetiroDirecto = () => {
   const [showModal, setShowModal] = useState(false)
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
-  const [modelo, setModelo] = useState(1);
   const [cargando, setCargando] = useState(false)
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
@@ -32,19 +31,15 @@ const RetiroDirecto = () => {
     ean13: "",
     nombre_convenio: "",
   });
-  const [res, setRes] = useState({
-    1: [
+  const [res, setRes] = useState(
+    [
       ["ID_PRODUCTOR", "NUMERO_DOCUMENTO", "NOMBRE_PRODUCTOR",
-        "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "TIPO_PAGO", "NUMERO_QUINCENA","OTP"],
-      [333, 332421666, "nombre", "apellido", 50000, "EFECTIVO", 125, 654321]
-    ],
-    2: [
-      ["ID_PRODUCTOR", "NUMERO_DOCUMENTO", "NOMBRE_PRODUCTOR",
-        "TOTAL_PAGAR", "TIPO_PAGO", "NUMERO_QUINCENA","OTP"],
-      [333, 332421666, "nombre", "apellido", 50000, "EFECTIVO", 125, 654321]
-    ],
-  })
-
+        "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "TIPO_PAGO", "NUMERO_QUINCENA"],
+      [333, 332421666, "nombre", "apellido", 50000, "EFECTIVO", 125],
+      [333, 332421667, "nombre", "apellido", 865000, "EFECTIVO", 125],
+      [333, 332421668, "nombre", "apellido", 20000, "EFECTIVO", 125],
+    ]
+  )
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
     { label: "Valor menor", value: 2 },
@@ -52,10 +47,6 @@ const RetiroDirecto = () => {
   const tipoConvenio = [
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
-  ]
-  const tipoVerificacion = [
-    { label: "Modelo 1", value: 1 },
-    { label: "Modelo 2", value: 2 },
   ]
 
   useEffect(() => {
@@ -80,7 +71,6 @@ const RetiroDirecto = () => {
         "Longitud maxima": "",
       }]
     }
-    setModelo(selected?.modelo ?? 1 )
     setReferencias(referencia)
   }, [selected])
 
@@ -131,7 +121,6 @@ const RetiroDirecto = () => {
         })
       }
       body['referencias'] = allReferencias
-      console.log(body)
     }
     notifyPending(
       selected
@@ -162,24 +151,23 @@ const RetiroDirecto = () => {
     )
   }, [handleClose, getConvRetiro, selected, referencias])
 
-  const descargarEjModelo = useCallback(() => {
-    let ejemplo = res[modelo]
+  const descargarPlantilla = useCallback(() => {
     const options = {
       fieldSeparator: ";",
       quoteStrings: '"',
       decimalSeparator: ",",
       showLabels: true,
       showTitle: false,
-      title: `Ejemplo_de_archivo_retiro_csv`,
+      title: `Ejemplo_de_archivo_retiro`,
       useTextFile: false,
       useBom: true,
       useKeysAsHeaders: false,
-      filename: `Ejemplo_de_archivo_csv`,
+      filename: `Ejemplo_de_archivo_retiro`,
     };
     const csvExporter = new ExportToCsv(options);
-    const data = JSON.stringify(ejemplo);
+    const data = JSON.stringify(res);
     csvExporter.generateCsv(data);
-  }, [res, modelo])
+  }, [res]);
 
   return (
     <Fragment>
@@ -203,8 +191,6 @@ const RetiroDirecto = () => {
               pk_id_convenio_directo,
               ean13,
               nombre_convenio,
-              permite_vencidos,
-              fk_id_tipo_convenio,
               estado,
               fecha_creacion,
             }) => ({
@@ -227,6 +213,9 @@ const RetiroDirecto = () => {
               [ev.target.name]: ev.target.value,
             }))
           }}
+          actions={{
+            download: descargarPlantilla,
+          }}
         >
           <Input
             id={"pk_codigo_convenio"}
@@ -236,10 +225,7 @@ const RetiroDirecto = () => {
             autoComplete="off"
             maxLength={"4"}
             onChange={(ev) => {
-              // ev.target.value = onChangeNumber(ev);
             }}
-            // defaultValue={selected?.pk_codigo_convenio ?? ""}
-            // readOnly={selected}
             required
           />
           <Input
@@ -249,10 +235,8 @@ const RetiroDirecto = () => {
             type="tel"
             autoComplete="off"
             maxLength={"13"}
-            onChange={(ev) => {
-              // ev.target.value = onChangeNumber(ev);
+            onChange={(ev) => {            
             }}
-            // defaultValue={selected?.codigo_ean_iac ?? ""}
             required
           />
           <Input
@@ -262,7 +246,6 @@ const RetiroDirecto = () => {
             type="text"
             autoComplete="off"
             maxLength={"30"}
-            // defaultValue={selected?.nombre_convenio ?? ""}
             required
           />
         </TableEnterprise>
@@ -326,41 +309,6 @@ const RetiroDirecto = () => {
             // disabled={selected ? true : false}
             autoComplete="off"
           />
-          <Select
-            className="place-self-stretch"
-            id={"Modelo_verificacion"}
-            label={"Modelo verificacion de archivos"}
-            name={"modelo_verificacion"}
-            options={[{ label: "", value: "" }, ...tipoVerificacion]}
-            defaultValue={selected?.modelo ?? ""}
-            required
-          />
-          <Fieldset legend={"Archivos"}>
-            <Select
-              className="place-self-stretch"
-              id={"Modelo_verificacion"}
-              label={"Modelo verificacion de archivos"}
-              name={"modelo_verificacion"}
-              options={[{ label: "", value: "" }, ...tipoVerificacion]}
-              defaultValue={selected?.modelo ?? 1}
-              onChange={(e) => { setModelo(e.target.value); }}
-              required
-            />
-            <div className="bg-gray-200 rounded-lg p-4  mx-auto md:auto text-center">
-              <pre><b>COLUMNAS:</b>{res[modelo][0].length}</pre>
-              <pre><b>HEADERS:</b></pre>
-              {res[modelo][0].map((data, index) => {
-                return (
-                  <pre className="max-h-50" key={index}>{data}</pre>
-                )
-              })}
-              <ButtonBar>
-                <Button type={"button"} onClick={() => { descargarEjModelo() }}>
-                  descargar ejemplo
-                </Button>
-              </ButtonBar>
-            </div>
-          </Fieldset>
 
           <Fieldset legend={"Referencias"}>
             {referencias?.map((obj, index) => {

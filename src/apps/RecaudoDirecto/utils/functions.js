@@ -3,7 +3,7 @@ import { fetchSecure } from "../../../utils/functions";
 const url = `http://127.0.0.1:8000`;
 
 export const cargueArchivo = (url_cargar,url_verificar) => {
-  return async (file, nombre_convenio, convenio_id, modelo) => {
+  return async (file, nombre_convenio, convenio_id) => {
 
     try {
       // const tempFileName = file.name.split('.').slice(0, -1).join('.') +  new Date().toJSON() + ".csv";
@@ -26,7 +26,7 @@ export const cargueArchivo = (url_cargar,url_verificar) => {
       });
 
       const responseValidacionArchivo = await fetchSecure(
-        `${url_verificar}?filename=${filename}&convenio_id=${convenio_id}&modelo=${modelo}`
+        `${url_verificar}?filename=${filename}&convenio_id=${convenio_id}`
       );
       const resValidacionArchivo = await responseValidacionArchivo.json();
 

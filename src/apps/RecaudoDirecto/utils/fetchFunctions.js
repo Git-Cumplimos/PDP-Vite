@@ -51,6 +51,11 @@ const buildPutFunction = (url) => {
     try {
       const res = await fetchData(url, "PUT", args, body);
       if (!res?.status) {
+        
+        if(res?.obj?.error[0]?.complete_info?.nit) {
+          throw new Error(res?.obj?.error[0]?.complete_info?.nit,{ cause: "custom" })
+        }
+        
         if (res?.msg) {
           throw new Error(res?.msg, { cause: "custom" });
         }

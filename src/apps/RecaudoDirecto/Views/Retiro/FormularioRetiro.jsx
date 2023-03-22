@@ -63,6 +63,7 @@ const FormularioRetiro = () => {
     const data = {
       consulta_retiro: {
         convenio_id: pk_id_convenio,
+        permite_vencidos: dataConvRetiro.permite_vencidos ?? false,
         referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
       },
       comercio: {

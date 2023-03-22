@@ -19,7 +19,6 @@ const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
-  const [modelo, setModelo] = useState(1);
   const [cargando, setCargando] = useState(false)
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
@@ -31,17 +30,13 @@ const RecaudoDirecto = () => {
     ean13: "",
     nombre_convenio: "",
   });
-  const [res, setRes] = useState({
-    1: [
-      ["ID_PRODUCTOR", "NUMERO_DOCUMENTO", "NOMBRE_PRODUCTOR",
-       "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "TIPO_PAGO", "NUMERO_QUINCENA"],
-      [333, 332421666, "nombre", "apellido", 50000, "EFECTIVO", 125]
-    ],
-    2: [
-      ["ID_PRODUCTOR", "DOCUMENTO", "NOMBRE", "APELLIDO", "TOTAL_PAGAR", "TIPO_PAGO", "NUMERO_QUINCENA"],
-      [333, 332421666, "nombre", "apellido", 50000, "EFECTIVO", 125]
-    ],
-  })
+  const [res] = useState([
+    ["ID_PRODUCTOR", "NUMERO_DOCUMENTO", "NOMBRE_PRODUCTOR",
+      "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "TIPO_PAGO", "NUMERO_QUINCENA"],
+    [333, 332421116, "nombre", "apellido", 50000, "EFECTIVO", 125],
+    [333, 332421117, "nombre", "apellido", 80000, "CONSIGNACION", 125],
+    [333, 332421118, "nombre", "apellido", 1250000, "EFECTIVO", 125],
+  ])
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
     { label: "Valor menor", value: 2 },
@@ -52,10 +47,6 @@ const RecaudoDirecto = () => {
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
     { label: "Sin base de datos", value: 3 },
-  ]
-  const tipoVerificacion = [
-    { label: "Modelo 1", value: 1 },
-    { label: "Modelo 2", value: 2 },
   ]
 
   useEffect(() => {
@@ -76,7 +67,6 @@ const RecaudoDirecto = () => {
         "Longitud maxima": "",
       }]
     }
-    setModelo(selected?.modelo ?? 1 )
     setReferencias(referencia)
   }, [selected])
 
@@ -162,25 +152,23 @@ const RecaudoDirecto = () => {
   }, [handleClose, getRecaudos, selected, referencias])
 
 
-  const descargarEjModelo = useCallback(() => {
-    let ejemplo = res[modelo]
+  const descargarPlantilla = useCallback(() => {
     const options = {
       fieldSeparator: ";",
       quoteStrings: '"',
       decimalSeparator: ",",
       showLabels: true,
       showTitle: false,
-      title: `Ejemplo_de_archivo_csv`,
+      title: `Ejemplo_de_archivo_recaudo_csv`,
       useTextFile: false,
       useBom: true,
       useKeysAsHeaders: false,
-      filename: `Ejemplo_de_archivo_csv`,
+      filename: `Ejemplo_de_archivo_recaudo`,
     };
     const csvExporter = new ExportToCsv(options);
-    const data = JSON.stringify(ejemplo);
+    const data = JSON.stringify(res);
     csvExporter.generateCsv(data);
-  }, [res,modelo])
-
+  }, [res]);
 
   return (
     <Fragment>
@@ -228,6 +216,9 @@ const RecaudoDirecto = () => {
               ...old,
               [ev.target.name]: ev.target.value,
             }))
+          }}
+          actions={{
+            download: descargarPlantilla,
           }}
         >
           <Input
@@ -321,30 +312,6 @@ const RecaudoDirecto = () => {
             // disabled={selected ? true : false}
             autoComplete="off"
           />
-          <Fieldset legend={"Archivos"}>
-            <Select
-              className="place-self-stretch"
-              id={"Modelo_verificacion"}
-              label={"Modelo verificacion de archivos"}
-              name={"modelo_verificacion"}
-              options={[{ label: "", value: "" }, ...tipoVerificacion]}
-              defaultValue={selected?.modelo ?? 1}
-              onChange={(e) => { setModelo(e.target.value); }}
-              required
-            />
-            <div className="bg-gray-200 rounded-lg p-4  mx-auto md:auto text-center">
-            <pre><b>COLUMNAS:</b>{res[modelo][0].length}</pre>
-            <pre><b>HEADERS:</b></pre>
-              {res[modelo][0].map((data,index)=>{return (
-                <pre className="max-h-50" key={index}>{data}</pre>
-              )})}
-              <ButtonBar>
-                <Button type={"button"} onClick={() => { descargarEjModelo() }}>
-                  descargar ejemplo
-                </Button>
-              </ButtonBar>
-            </div>
-          </Fieldset>
 
           <Fieldset legend={"Referencias"}>
             {referencias?.map((obj, index) => {

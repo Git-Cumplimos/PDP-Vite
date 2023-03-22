@@ -61,6 +61,7 @@ const RecaudoConjunto = () => {
     const data = {
       consulta_recaudo: {
         convenio_id: pk_id_convenio,
+        permite_vencidos: convenioRecaudo.permite_vencidos ?? false,
         tipo_convenio: convenioRecaudo.fk_id_tipo_convenio,
         referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
       },
@@ -77,7 +78,6 @@ const RecaudoConjunto = () => {
     };
     await getRecaudo(data)
       .then((data) => {
-
         setDataRecaudo(data?.obj?.recaudo)
         setId_Trx(data?.obj?.id_trx ?? false)
         data?.obj?.recaudo && notify(data.msg)
@@ -148,12 +148,11 @@ const RecaudoConjunto = () => {
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
   return (
-
     <Fragment>
       <h1 className="text-3xl mt-6">Recaudos</h1>
       {cargando ? (
         <Form onSubmit={convenioRecaudo?.fk_id_tipo_convenio !== 3 ?
-          consultarRecaudoD : (e) => { setShowModal(true); e.preventDefault() }}>
+          consultarRecaudoD : (e) => { setShowModal(true); e.preventDefault() }} grid>
           <Input
             label='Número de convenio'
             name={"pk_id_convenio_directo"}

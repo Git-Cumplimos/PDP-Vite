@@ -68,7 +68,6 @@ const GestionArchivosRetiro = () => {
           file,
           selected?.nombre_convenio,
           selected?.pk_id_convenio_directo,
-          selected?.modelo
           ),
         {
           render() {
