@@ -25,18 +25,18 @@ const RecaudoManual = () => {
       limit: pageData.limit,
       offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit,
     })
-    .then((data) => {
-      setListRecaudos(data?.obj?.results ?? []);
-      setMaxPages(data?.obj?.maxPages ?? '')
-    })
-    .catch((err) => {
-      // setListRecaudos([]);
-      // if (err?.cause === "custom") {
-      //   notifyError(err?.message);
-      //   return;
-      // }
-      console.error(err?.message);
-    });
+      .then((data) => {
+        setListRecaudos(data?.obj?.results ?? []);
+        setMaxPages(data?.obj?.maxPages ?? '')
+      })
+      .catch((err) => {
+        // setListRecaudos([]);
+        // if (err?.cause === "custom") {
+        //   notifyError(err?.message);
+        //   return;
+        // }
+        console.error(err?.message);
+      });
     setCargando(true)
   }, [pageData, searchFilters])
 
@@ -66,9 +66,12 @@ const RecaudoManual = () => {
             })
           )}
           onSelectRow={(e, i) => {
-            if (listRecaudos[i].fk_id_tipo_convenio !== 2){
-              navigate(`/recaudo-directo/recaudo/${listRecaudos[i].pk_id_convenio_directo}`)
-            }else{notifyError("Error, convenio con autorizador esta en desarrollo!")}
+
+            if (listRecaudos[i].estado) {
+              if (listRecaudos[i].fk_id_tipo_convenio !== 2) {
+                navigate(`/recaudo-directo/recaudo/${listRecaudos[i].pk_id_convenio_directo}`)
+              } else { notifyError("Error, convenio con autorizador esta en desarrollo!") }
+            }else{notifyError("Error, convenio no activo!")}
           }}
           maxPage={maxPages}
           onSetPageData={setPageData}

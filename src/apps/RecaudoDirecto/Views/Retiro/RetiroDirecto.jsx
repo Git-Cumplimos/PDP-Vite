@@ -64,9 +64,11 @@ const RetiroDirecto = () => {
             })
           )}
           onSelectRow={(e, i) => {
-            if (listRetiro[i].fk_id_tipo_convenio !== 2){
-              navigate(`/recaudo-directo/consultar-retiro/retirar/${listRetiro[i].pk_id_convenio_directo}`)
-            }else{notifyError("Error, convenio con autorizador esta en desarrollo!")}
+            if (listRetiro[i].estado){
+              if (listRetiro[i].fk_id_tipo_convenio !== 2){
+                navigate(`/recaudo-directo/consultar-retiro/retirar/${listRetiro[i].pk_id_convenio_directo}`)
+              }else{notifyError("Error, convenio con autorizador esta en desarrollo!")}
+            }else{notifyError("Error, convenio no activo!")}
           }}
           maxPage={maxPages}
           onSetPageData={setPageData}

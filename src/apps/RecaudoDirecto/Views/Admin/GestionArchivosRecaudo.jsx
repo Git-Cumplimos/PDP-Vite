@@ -231,7 +231,7 @@ const GestionArchivosRecaudo = () => {
           Gestion de archivos de recaudo
         </h2>
         <ButtonBar>
-          {selected.fk_id_tipo_convenio === 1 && (
+          {selected.fk_id_tipo_convenio === 1 && selected.estado  && (
             <Button
               onClick={() => {
                 setShowMainModal(true);

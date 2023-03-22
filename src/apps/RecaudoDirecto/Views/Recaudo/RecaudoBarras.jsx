@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
-// import { notifyError, notifyPending } from "../../../../utils/notify";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Button from "../../../../components/Base/Button";
@@ -10,7 +10,8 @@ const RecaudoBarras = () => {
   const navigate = useNavigate();
 
   const searchCodigo = ({ codigo_barras }) => {
-    navigate(`/recaudo-directo/recaudo/${codigo_barras}`);
+    notifyError("Lectura de barras en desarrollo")
+    // navigate(`/recaudo-directo/recaudo/${codigo_barras}`);
   };
 
   return (

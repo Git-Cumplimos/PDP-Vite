@@ -68,7 +68,7 @@ const GestionArchivosRetiro = () => {
           file,
           selected?.nombre_convenio,
           selected?.pk_id_convenio_directo,
-          ),
+        ),
         {
           render() {
             return "Enviando solicitud";
@@ -87,7 +87,7 @@ const GestionArchivosRetiro = () => {
           }
         }
       )
-    }else {notifyError("Convenio no permite cargar archivo")}
+    } else { notifyError("Convenio no permite cargar archivo") }
 
     handleClose()
   }, [handleClose, file, selected])
@@ -207,8 +207,15 @@ const GestionArchivosRetiro = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">Gestion de archivos de retiro</h2>
         <ButtonBar>
-          {selected.fk_id_tipo_convenio === 1 &&
-            <Button onClick={() => { setShowMainModal(true); setShowModalOptions(true) }}>Cargar Archivo</Button>
+          {selected.fk_id_tipo_convenio === 1 && selected.estado &&
+            <Button
+              onClick={() => {
+                setShowMainModal(true);
+                setShowModalOptions(true)
+              }}
+            >
+              Cargar Archivo
+            </Button>
           }
           <Button onClick={() => { setShowMainModal(true) }}>Descargar Reporte</Button>
         </ButtonBar>
