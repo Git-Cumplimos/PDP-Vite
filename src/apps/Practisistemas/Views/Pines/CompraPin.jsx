@@ -420,6 +420,9 @@ const CompraPin = () => {
                             showModalDatosEPM(false);
                             showModalDatosSNR(false);
                             setInputCelular("");
+                            setInputMatricula("")
+                            setInputCirculo("")
+                            setInputPlaca("")
                             setInputValor(0);
                             resolve(true);
                           }
@@ -461,6 +464,9 @@ const CompraPin = () => {
             showModalDatosSNR(false);
             setShowModal(false);
             setInputCelular("");
+            setInputMatricula("")
+            setInputCirculo("")
+            setInputPlaca("")
             setInputValor(0);
           }
         }
