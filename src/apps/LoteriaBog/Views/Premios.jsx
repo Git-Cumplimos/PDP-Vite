@@ -259,13 +259,18 @@ const Premios = ({ route }) => {
         ["Serie", serie],
         ["Fracción", seleccionarFraccion],
         ["Valor a pagar", formatMoney.format(totalPagar)],
-        [tipopago === 2 ? "Nombre" : "", tipopago === 2 ? datosCliente?.nombre : ""],
-        [tipopago === 2 ? "Celular" : "", tipopago === 2 ? datosCliente?.celular : ""],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Nombre", tipopago === 2 && datosCliente?.nombre],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Número Documento", tipopago === 2 && datosCliente?.documento],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Celular", tipopago === 2 && datosCliente?.celular],
+        [tipopago === 2 && "", tipopago === 2 && ""],
       ],
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [estadoTransaccion,sorteo,billete,serie,checkBilleteFisico,checkBilleteVirtual,seleccionarFraccion,datosCliente,totalPagar,valorbruto]);
+  }, [estadoTransaccion,sorteo,billete,serie,checkBilleteFisico,checkBilleteVirtual,seleccionarFraccion,datosCliente,totalPagar,valorbruto,tipopago]);
   
   const onPay1 = (e) => {
     e.preventDefault();
