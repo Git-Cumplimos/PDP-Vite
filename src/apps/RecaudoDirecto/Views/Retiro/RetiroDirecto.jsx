@@ -8,8 +8,7 @@ import { notifyError } from "../../../../utils/notify";
 const RetiroDirecto = () => {
   const navigate = useNavigate()
 
-  const [listRetiro, setListRetiro] = useState('')
-  const [cargando, setCargando] = useState(false)
+  const [listRetiro, setListRetiro] = useState([])
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
   const [searchFilters, setSearchFilters] = useState({
@@ -36,7 +35,6 @@ const RetiroDirecto = () => {
       // }
       console.error(err?.message);
     });
-    setCargando(true)
   }, [pageData, searchFilters])
 
   useEffect(() => { getRetiros() }, [getRetiros, pageData, searchFilters])
@@ -44,7 +42,6 @@ const RetiroDirecto = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Convenios de Retiros Directos</h1>
-      {cargando ? (
         <TableEnterprise
           title="Convenios de Retiros"
           headers={[
@@ -104,7 +101,6 @@ const RetiroDirecto = () => {
             maxLength={"30"}
           />
         </TableEnterprise>
-      ) : (<>cargando...</>)}
     </Fragment>
   )
 }

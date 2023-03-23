@@ -18,10 +18,9 @@ const GestionArchivosRetiro = () => {
   const [showModalErrors, setShowModalErrors] = useState(false);
   const [selected, setSelected] = useState(false); // fila selecionada
 
-  const [listRetiros, setListRetiros] = useState('')
+  const [listRetiros, setListRetiros] = useState([])
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
-  const [cargando, setCargando] = useState(false)
   const [file, setFile] = useState(null);
   const [searchFilters, setSearchFilters] = useState({
     pk_id_convenio_directo: "",
@@ -45,7 +44,6 @@ const GestionArchivosRetiro = () => {
       .catch((err) => {
         console.error(err?.message);
       });
-    setCargando(true)
   }, [pageData, searchFilters])
 
   useEffect(() => { getRetiros() }, [getRetiros, pageData, searchFilters])
@@ -133,7 +131,6 @@ const GestionArchivosRetiro = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Gestion de Archivos de Retiros</h1>
-      {cargando ? (<>
         <TableEnterprise
           title="Convenios de Retiros"
           headers={[
@@ -203,7 +200,6 @@ const GestionArchivosRetiro = () => {
             onChange={(ev) => { }}
           />
         </TableEnterprise>
-      </>) : (<>cargando...</>)}
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">Gestion de archivos de retiro</h2>
         <ButtonBar>

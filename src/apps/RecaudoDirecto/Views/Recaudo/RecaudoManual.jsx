@@ -9,8 +9,7 @@ const RecaudoManual = () => {
   const navigate = useNavigate();
 
 
-  const [listRecaudos, setListRecaudos] = useState('')
-  const [cargando, setCargando] = useState(false)
+  const [listRecaudos, setListRecaudos] = useState([])
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
   const [searchFilters, setSearchFilters] = useState({
@@ -37,7 +36,6 @@ const RecaudoManual = () => {
         // }
         console.error(err?.message);
       });
-    setCargando(true)
   }, [pageData, searchFilters])
 
   useEffect(() => { getRecaudos() }, [getRecaudos, searchFilters, pageData])
@@ -45,7 +43,6 @@ const RecaudoManual = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Consulta recaudos manual</h1>
-      {cargando ? (
         <TableEnterprise
           title="Convenios de recaudo"
           headers={[
@@ -121,7 +118,6 @@ const RecaudoManual = () => {
             required
           />
         </TableEnterprise>
-      ) : (<>cargando...</>)}
     </Fragment>
   )
 }

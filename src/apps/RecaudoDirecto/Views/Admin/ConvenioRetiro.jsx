@@ -15,12 +15,12 @@ import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "
 
 const RetiroDirecto = () => {
 
-  const [listRetiro, setListRetiro] = useState('');
+  const [listRetiro, setListRetiro] = useState([]);
   const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
-  const [cargando, setCargando] = useState(false)
+  // const [cargando, setCargando] = useState(false)
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
     "Longitud minima": "",
@@ -102,7 +102,7 @@ const RetiroDirecto = () => {
         console.error(err?.message);
       });
 
-    setCargando(true)
+    // setCargando(true)
   }, [pageData, searchFilters])
 
   useEffect(() => { getConvRetiro() }, [getConvRetiro, pageData, searchFilters])
@@ -176,7 +176,7 @@ const RetiroDirecto = () => {
         <Button type={"submit"} onClick={() => setShowModal(true)} >
           Crear Convenio</Button>
       </ButtonBar>
-      {cargando ? (<>
+      {/* {cargando ? (<> */}
         <TableEnterprise
           title="Convenios de Retiros"
           headers={[
@@ -249,7 +249,7 @@ const RetiroDirecto = () => {
             required
           />
         </TableEnterprise>
-      </>) : (<>cargando...</>)}
+      {/* </>) : (<>cargando...</>)} */}
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
         <Form onSubmit={crearModificarConvenioRetiro} grid >

@@ -14,12 +14,12 @@ import { notifyPending } from "../../../../utils/notify";
 import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
 
 const RecaudoDirecto = () => {
-  const [listRecaudos, setListRecaudos] = useState('')
+  const [listRecaudos, setListRecaudos] = useState([])
   const [selected, setSelected] = useState(false); // fila selecionada
   const [showModal, setShowModal] = useState(false)
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
-  const [cargando, setCargando] = useState(false)
+  // const [cargando, setCargando] = useState(false)
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
     "Longitud minima": "",
@@ -96,7 +96,7 @@ const RecaudoDirecto = () => {
         // }
         console.error(err?.message);
       });
-    setCargando(true)
+    // setCargando(true)
   }, [pageData, searchFilters])
 
   useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters])
@@ -177,7 +177,7 @@ const RecaudoDirecto = () => {
         <Button type={"submit"} onClick={() => setShowModal(true)} >
           Crear Convenio</Button>
       </ButtonBar>
-      {cargando ? (<>
+      {/* {cargando ? (<> */}
         <TableEnterprise
           title="Convenios de Recaudos"
           headers={[
@@ -250,7 +250,7 @@ const RecaudoDirecto = () => {
             onChange={(ev) => { }}
           />
         </TableEnterprise>
-      </>) : (<>Cargando...</>)}
+      {/* </>) : (<>Cargando...</>)} */}
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
         <Form onSubmit={crearModificarConvenioRecaudo} grid >
