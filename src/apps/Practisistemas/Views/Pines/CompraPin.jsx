@@ -114,6 +114,7 @@ const CompraPin = () => {
         })
         .catch((err) => {
           notifyError("Error respuesta PDP:Transaccón declinada", err)
+          setShowLoading(false);
           // notifyError("Transaccón declinada", err);
         });
     } else if (state?.op == "em") {
@@ -151,6 +152,7 @@ const CompraPin = () => {
         })
         .catch((err) => {
           notifyError("Error respuesta PDP:Transaccón declinada", err)
+          setShowLoading(false);
         });
     }
   };
@@ -368,6 +370,10 @@ const CompraPin = () => {
           notify("Venta exitosa");
           setShowLoading(false);
           VentaExitosa(res?.obj?.response, fecha, hora);
+        } else if (res?.obj?.response?.respuesta == "Error respuesta practisistemas: No se recibi\u00f3 respuesta del autorizador en el tiempo esperado [0010003]") {
+          notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
+          setShowLoading(false)
+          handleClose()
         } else {
           if (res?.message === "Endpoint request timed out") {
             notify("Se está procesando la transacción");
@@ -442,7 +448,7 @@ const CompraPin = () => {
                 ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
                 : typeof res?.msg == typeof {}
                   ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                  : res?.msg
+                  : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])": res?.msg
             );
             setShowLoading(false);
             showModalDatosEPM(false);
@@ -453,7 +459,18 @@ const CompraPin = () => {
           }
         }
       }).catch(async (err) => {
-        notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
+        if (err.name === "AbortError") {
+          // lanzar notificación para timeOut
+          notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
+        } else if (err.name === "TypeError") {
+          // lanzar notificación para fetch fallido
+          notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
+
+        } else {
+          // otro tipo de error
+          notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
+
+        }
         setShowLoading(false);
         handleClose();
       });
