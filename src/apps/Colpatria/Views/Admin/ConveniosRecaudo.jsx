@@ -533,7 +533,7 @@ const ConveniosRecaudo = () => {
                           name={"limiteMenor"}
                           type='text'
                           autoComplete='off'
-                          maxLength={"30"}
+                          maxLength={"2"}
                           onInput={(e) => {
                             let valor = e.target.value;
                             let num = valor.replace(/[\s.-]/g, "");
@@ -553,7 +553,7 @@ const ConveniosRecaudo = () => {
                           name={"limiteMayor"}
                           type='text'
                           autoComplete='off'
-                          maxLength={"30"}
+                          maxLength={"2"}
                           onInput={(e) => {
                             let valor = e.target.value;
                             let num = valor.replace(/[\s.-]/g, "");
