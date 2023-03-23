@@ -40,10 +40,10 @@ export const cargueArchivo = (url_cargar,url_verificar) => {
 };
 
 export const cargarArchivoRecaudo = cargueArchivo(
-  `${url}/convenio-recaudo/obtener-url-carga`,
-  `${url}/convenio-recaudo/verificar-archivo`
+  `${url}/convenio-recaudo-masivo/obtener-url-carga`,
+  `${url}/convenio-recaudo-masivo/verificar-archivo`
 );
 export const cargarArchivoRetiro = cargueArchivo(
-  `${url}/convenio-retiro/obtener-url-carga`,
-  `${url}/convenio-retiro/verificar-archivo`
+  `${url}/convenio-retiro-masivo/obtener-url-carga`,
+  `${url}/convenio-retiro-masivo/verificar-archivo`
 );

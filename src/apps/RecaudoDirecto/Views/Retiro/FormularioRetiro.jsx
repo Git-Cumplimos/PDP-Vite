@@ -89,7 +89,7 @@ const FormularioRetiro = () => {
         handleClose()
       });
 
-  }, [pk_id_convenio, handleClose, dataReferencias, roleInfo, pdpUser])
+  }, [pk_id_convenio, handleClose, dataReferencias, dataConvRetiro, roleInfo, pdpUser])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
@@ -188,45 +188,37 @@ const FormularioRetiro = () => {
       ) : (<>cargando...</>)}
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar retiro </h2>
-          <Form onSubmit={hacerRetiro} grid >
-            <Input
-              id={1}
-              label={"Estado"}
-              name={"nombre_estado"}
-              type="text"
-              defaultValue={dataRetiro?.nombre_estado ?? ""}
-              autoComplete="off"
-              disabled
-            />
-            {/* <Select
-              className="place-self-stretch"
-              id={"Tipo modificacion"}
-              label={"Tipo de pago"}
-              name={"fk_modificar_valor"}
-              options={[{ label: "", value: "" }, ...tipoModificacion]}
-              defaultValue={dataRetiro?.fk_modificar_valor ?? ""}
-              disabled
-            /> */}
-            <MoneyInput
-              label="Valor a recaudar"
-              name="valor_total_trx"
-              autoComplete="off"
-              min={dataRetiro?.fk_modificar_valor === 1 ? ((dataRetiro.valor - 1) - dataRetiro.valor_retirado) :limitesMontos?.min}
-              max={((dataRetiro.valor+1) - dataRetiro.valor_retirado)?? limitesMontos?.max}
-              onInput={(e, valor) =>
-                setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
-              }
-              required
-            />
-            <ButtonBar>
-              <Button type={"submit"} >
-                Aceptar
-              </Button>
-              <Button onClick={() => handleClose()} >
-                Cancelar
-              </Button>
-            </ButtonBar>
-          </Form>
+        <Form onSubmit={hacerRetiro} grid >
+          <Input
+            id={1}
+            label={"Estado"}
+            name={"nombre_estado"}
+            type="text"
+            defaultValue={dataRetiro?.nombre_estado ?? ""}
+            autoComplete="off"
+            disabled
+          />
+          <MoneyInput
+            label="Valor a recaudar"
+            name="valor_total_trx"
+            autoComplete="off"
+            min={dataRetiro?.fk_modificar_valor === 1 ? ((dataRetiro.valor - 1) - dataRetiro.valor_retirado) ?? 0 : limitesMontos?.min}
+            equalError={false}
+            max={parseInt(dataRetiro.valor) - parseInt(dataRetiro.valor_retirado ?? 0)}
+            onInput={(e, valor) =>
+              setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
+            }
+            required
+          />
+          <ButtonBar>
+            <Button type={"submit"} >
+              Aceptar
+            </Button>
+            <Button onClick={() => handleClose()} >
+              Cancelar
+            </Button>
+          </ButtonBar>
+        </Form>
 
       </Modal>
 

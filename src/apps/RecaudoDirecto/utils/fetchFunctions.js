@@ -116,10 +116,7 @@ export const modConveniosRecaudoList = buildPutFunction(
   `${url}/convenio-recaudo/modificar`
 );
 export const downloadFileRecaudo = fetchDownloadFile(
-  `${url}/convenio-recaudo/descargar_reporte`
-);
-export const importFileRecaudo = fetchImportFile(
-  `${url}/convenio-recaudo/validar_csv`
+  `${url}/convenio-recaudo/descargar-reporte`
 );
 
 
@@ -130,7 +127,6 @@ export const getRecaudo = buildPostFunction(
 export const modRecaudo = buildPostFunction(
   `${url}/recaudo/hacer-recaudo`
 );
-
 
 
 /*--- Convenios Retiro ---*/
@@ -147,10 +143,7 @@ export const modConveniosRetiroList = buildPutFunction(
   `${url}/convenio-retiro/modificar`
 );
 export const downloadFileRetiro = fetchDownloadFile(
-  `${url}/convenio-retiro/descargar_reporte`
-);
-export const importFileRetiro = fetchImportFile(
-  `${url}/convenio-retiro/validar_csv`
+  `${url}/convenio-retiro/descargar-reporte`
 );
 
 /* -- Retiro -- */

@@ -87,7 +87,6 @@ const GestionArchivosRetiro = () => {
       )
     } else { notifyError("Convenio no permite cargar archivo") }
 
-    handleClose()
   }, [handleClose, file, selected])
 
   const DescargarArchivo = useCallback(async (e) => {
@@ -131,75 +130,75 @@ const GestionArchivosRetiro = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Gestion de Archivos de Retiros</h1>
-        <TableEnterprise
-          title="Convenios de Retiros"
-          headers={[
-            "Código convenio",
-            "Código EAN o IAC",
-            "Nombre convenio",
-            "Permite vencidos",
-            "Estado",
-            "Fecha creacion",
-          ]}
-          data={listRetiros.map(
-            ({
-              pk_id_convenio_directo,
-              ean13,
-              nombre_convenio,
-              permite_vencidos,
-              estado,
-              fecha_creacion,
-            }) => ({
-              pk_id_convenio_directo,
-              ean13,
-              nombre_convenio,
-              permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
-              estado: estado ? "Activo" : "No activo",
-              fecha_creacion: fecha_creacion ?? "ninguna",
-            })
-          )}
-          onSelectRow={(e, i) => {
-            setShowModal(true);
-            setSelected(listRetiros[i]);
-          }}
-          maxPage={maxPages}
-          onSetPageData={setPageData}
-          onChange={(ev) => {
-            setSearchFilters((old) => ({
-              ...old,
-              [ev.target.name]: ev.target.value,
-            }))
-          }}
-        >
-          <Input
-            id={"pk_codigo_convenio"}
-            label={"Código de convenio"}
-            name={"pk_id_convenio_directo"}
-            type="tel"
-            autoComplete="off"
-            maxLength={"4"}
-            onChange={(ev) => { }}
+      <TableEnterprise
+        title="Convenios de Retiros"
+        headers={[
+          "Código convenio",
+          "Código EAN o IAC",
+          "Nombre convenio",
+          "Permite vencidos",
+          "Estado",
+          "Fecha creacion",
+        ]}
+        data={listRetiros.map(
+          ({
+            pk_id_convenio_directo,
+            ean13,
+            nombre_convenio,
+            permite_vencidos,
+            estado,
+            fecha_creacion,
+          }) => ({
+            pk_id_convenio_directo,
+            ean13,
+            nombre_convenio,
+            permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
+            estado: estado ? "Activo" : "No activo",
+            fecha_creacion: fecha_creacion ?? "ninguna",
+          })
+        )}
+        onSelectRow={(e, i) => {
+          setShowModal(true);
+          setSelected(listRetiros[i]);
+        }}
+        maxPage={maxPages}
+        onSetPageData={setPageData}
+        onChange={(ev) => {
+          setSearchFilters((old) => ({
+            ...old,
+            [ev.target.name]: ev.target.value,
+          }))
+        }}
+      >
+        <Input
+          id={"pk_codigo_convenio"}
+          label={"Código de convenio"}
+          name={"pk_id_convenio_directo"}
+          type="tel"
+          autoComplete="off"
+          maxLength={"4"}
+          onChange={(ev) => { }}
 
-          />
-          <Input
-            id={"codigo_ean_iac_search"}
-            label={"Código EAN o IAC"}
-            name={"ean13"}
-            type="tel"
-            autoComplete="off"
-            maxLength={"13"}
-            onChange={(ev) => { }}
-          />
-          <Input
-            id={"nombre_convenio"}
-            label={"Nombre del convenio"}
-            name={"nombre_convenio"}
-            type="text"
-            autoComplete="off"
-            maxLength={"30"}
-            onChange={(ev) => { }}
-          />
-        </TableEnterprise>
+        />
+        <Input
+          id={"codigo_ean_iac_search"}
+          label={"Código EAN o IAC"}
+          name={"ean13"}
+          type="tel"
+          autoComplete="off"
+          maxLength={"13"}
+          onChange={(ev) => { }}
+        />
+        <Input
+          id={"nombre_convenio"}
+          label={"Nombre del convenio"}
+          name={"nombre_convenio"}
+          type="text"
+          autoComplete="off"
+          maxLength={"30"}
+          onChange={(ev) => { }}
+        />
+      </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">Gestion de archivos de retiro</h2>
         <ButtonBar>
@@ -213,7 +212,12 @@ const GestionArchivosRetiro = () => {
               Cargar Archivo
             </Button>
           }
-          <Button onClick={() => { setShowMainModal(true) }}>Descargar Reporte</Button>
+          <Button onClick={() => {
+            setShowMainModal(true)
+          }}
+          >
+            Descargar Reporte
+          </Button>
         </ButtonBar>
       </Modal>
       <Modal show={showMainModal} handleClose={handleClose}>

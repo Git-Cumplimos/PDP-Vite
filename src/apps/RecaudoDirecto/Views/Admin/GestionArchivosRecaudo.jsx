@@ -77,7 +77,7 @@ const GestionArchivosRecaudo = () => {
             file,
             selected?.nombre_convenio,
             selected?.pk_id_convenio_directo,
-            ),
+          ),
           {
             render() {
               return "Enviando solicitud";
@@ -96,12 +96,9 @@ const GestionArchivosRecaudo = () => {
             },
           }
         );
-      } else {
-        notifyError("Convenio no permite cargar archivo");
-      }
-    },
-    [handleClose, file, selected]
-  );
+      } else { notifyError("Convenio no permite cargar archivo") }
+      
+    }, [handleClose, file, selected]);
 
   const DescargarArchivo = useCallback(
     async (e) => {
@@ -140,92 +137,88 @@ const GestionArchivosRecaudo = () => {
             notifyError(err);
             handleClose();
           });
-      } catch (e) {
-        console.log(e);
-      }
+      } catch (e) { console.log(e) }
 
       handleClose();
-    },
-    [handleClose, selected]
-  );
+    }, [handleClose, selected]);
 
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Gestion de Archivos de Recaudos</h1>
-          <TableEnterprise
-            title="Convenios de Recaudos"
-            headers={[
-              "Código convenio",
-              "Código EAN o IAC",
-              "Nombre convenio",
-              "Permite vencidos",
-              "Estado",
-              "Fecha creacion",
-            ]}
-            data={listRecaudos.map(
-              ({
-                pk_id_convenio_directo,
-                ean13,
-                nombre_convenio,
-                permite_vencidos,
-                estado,
-                fecha_creacion,
-              }) => ({
-                pk_id_convenio_directo,
-                ean13,
-                nombre_convenio,
-                permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
-                estado: estado ? "Activo" : "No activo",
-                fecha_creacion: fecha_creacion ?? "ninguna",
-              })
-            )}
-            onSelectRow={(e, i) => {
-              setShowModal(true);
-              setSelected(listRecaudos[i]);
-            }}
-            maxPage={maxPages}
-            onSetPageData={setPageData}
-            onChange={(ev) => {
-              setSearchFilters((old) => ({
-                ...old,
-                [ev.target.name]: ev.target.value,
-              }));
-            }}
-          >
-            <Input
-              id={"pk_codigo_convenio"}
-              label={"Código de convenio"}
-              name={"pk_id_convenio_directo"}
-              type="tel"
-              autoComplete="off"
-              maxLength={"4"}
-              onChange={(ev) => { }}
-            />
-            <Input
-              id={"codigo_ean_iac_search"}
-              label={"Código EAN o IAC"}
-              name={"ean13"}
-              type="tel"
-              autoComplete="off"
-              maxLength={"13"}
-              onChange={(ev) => { }}
-            />
-            <Input
-              id={"nombre_convenio"}
-              label={"Nombre del convenio"}
-              name={"nombre_convenio"}
-              type="text"
-              autoComplete="off"
-              maxLength={"30"}
-              onChange={(ev) => { }}
-            />
-          </TableEnterprise>
+      <TableEnterprise
+        title="Convenios de Recaudos"
+        headers={[
+          "Código convenio",
+          "Código EAN o IAC",
+          "Nombre convenio",
+          "Permite vencidos",
+          "Estado",
+          "Fecha creacion",
+        ]}
+        data={listRecaudos.map(
+          ({
+            pk_id_convenio_directo,
+            ean13,
+            nombre_convenio,
+            permite_vencidos,
+            estado,
+            fecha_creacion,
+          }) => ({
+            pk_id_convenio_directo,
+            ean13,
+            nombre_convenio,
+            permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
+            estado: estado ? "Activo" : "No activo",
+            fecha_creacion: fecha_creacion ?? "ninguna",
+          })
+        )}
+        onSelectRow={(e, i) => {
+          setShowModal(true);
+          setSelected(listRecaudos[i]);
+        }}
+        maxPage={maxPages}
+        onSetPageData={setPageData}
+        onChange={(ev) => {
+          setSearchFilters((old) => ({
+            ...old,
+            [ev.target.name]: ev.target.value,
+          }));
+        }}
+      >
+        <Input
+          id={"pk_codigo_convenio"}
+          label={"Código de convenio"}
+          name={"pk_id_convenio_directo"}
+          type="tel"
+          autoComplete="off"
+          maxLength={"4"}
+          onChange={(ev) => { }}
+        />
+        <Input
+          id={"codigo_ean_iac_search"}
+          label={"Código EAN o IAC"}
+          name={"ean13"}
+          type="tel"
+          autoComplete="off"
+          maxLength={"13"}
+          onChange={(ev) => { }}
+        />
+        <Input
+          id={"nombre_convenio"}
+          label={"Nombre del convenio"}
+          name={"nombre_convenio"}
+          type="text"
+          autoComplete="off"
+          maxLength={"30"}
+          onChange={(ev) => { }}
+        />
+      </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">
           Gestion de archivos de recaudo
         </h2>
         <ButtonBar>
-          {selected.fk_id_tipo_convenio === 1 && selected.estado  && (
+          {selected.fk_id_tipo_convenio === 1 && selected.estado && (
             <Button
               onClick={() => {
                 setShowMainModal(true);
@@ -294,9 +287,9 @@ const GestionArchivosRecaudo = () => {
           return (<>
             {
               Array.isArray(err.complete_info) && err.complete_info.length > 1 ? (
-                err.complete_info.map((err_esp,index) => {
+                err.complete_info.map((err_esp, index) => {
                   return (
-                    <div key={index+10}>
+                    <div key={index + 10}>
                       <h3>Linea {err_esp.line}</h3>
                       {Array.isArray(Object.keys(err_esp.error)) ? (
                         Object.keys(err_esp.error).map((item, index) => {
