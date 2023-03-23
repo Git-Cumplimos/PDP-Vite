@@ -125,6 +125,7 @@ const ConveniosRecaudo = () => {
       ev.preventDefault();
       const formData = new FormData(ev.currentTarget);
       if (!formData.has("activo")) {
+<<<<<<< HEAD
         formData.set("activo", "off");
       }
       let body = Object.fromEntries(
@@ -135,15 +136,28 @@ const ConveniosRecaudo = () => {
               key.includes("referencia_") && val === "" ? null : val,
             ];
           })
+=======
+        formData.set("activo", "off")
+      }
+      const body = Object.fromEntries(
+        Object.entries(Object.fromEntries(formData))
+          .map(([key, val]) => [
+            key,
+            key.includes("referencia_") && val === "" ? null : val,
+          ])
+>>>>>>> Fix/QA-Practisistemas-Incidencias
           .filter(([key, val]) =>
             !selected
               ? key !== "activo" && val
               : selected[key] !== val || key === "pk_codigo_convenio"
           )
+<<<<<<< HEAD
           .filter(([key, val]) => {
             const data = ["limiteMayor", "limiteMenor", "referencia"];
             return !data.includes(key);
           })
+=======
+>>>>>>> Fix/QA-Practisistemas-Incidencias
           .map(([key, val]) => [key, key === "activo" ? val === "on" : val])
       );
       if (restriccionReferencias.length > 0) {
