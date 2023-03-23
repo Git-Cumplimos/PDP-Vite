@@ -56,7 +56,6 @@ const GestionArchivosRetiro = () => {
     setSelected(false)
   }, []);
 
-
   const CargarArchivo = useCallback(async (e) => {
     e.preventDefault();
     if (selected.fk_id_tipo_convenio === 1) {
@@ -80,7 +79,7 @@ const GestionArchivosRetiro = () => {
         },
         {
           render({ data: err }) {
-            setShowModalErrors(err)
+            setShowModalErrors({msg:err.msg, errores: err.obj?.error[0].complete_info})
             return `Archivo erroneo`;
           }
         }
@@ -262,48 +261,37 @@ const GestionArchivosRetiro = () => {
         <h2 className="text-2xl mx-auto text-center mb-4">
           {showModalErrors.msg ?? "Errores en el archivo"}
         </h2>
-        {showModalErrors?.obj?.error?.map((err) => {
-          return (<>
-            {
-              Array.isArray(err.complete_info) && err.complete_info.length > 1 ? (
-                err.complete_info.map((err_esp) => {
-                  return (
-                    <>
-                      <h3>Linea {err_esp.line}</h3>
-                      {Array.isArray(Object.keys(err_esp.error)) ? (
-                        Object.keys(err_esp.error).map((item, index) => {
-                          return (
-                            <>
-                              <h3>{Object.keys(err_esp.error)[index]}</h3>
-                              <h3>Descripcion: {Object.values(err_esp.error)[index]}</h3>
-                            </>
-                          )
-                        })
-                      ) : (
-                        <>
-                          <h3>{Object.keys(err_esp.error)}</h3>
-                          <h3>Descripcion: {Object.values(err_esp.error)}</h3>
-                        </>
+        {showModalErrors && (
+          Array.isArray(showModalErrors?.errores) ?
+            (
+              showModalErrors?.errores.map((err_esp, index) => {
+                return (
+                  <div key={index}>
+                    <h3>Linea {err_esp.line}</h3>
+                    {Object.keys(err_esp.error).map((item, index) => {
+                      return (
+                        <div key={index}>
+                          <h3>{item}</h3>
+                          <h3>Descripcion: {err_esp.error[item]}</h3>
+                        </div>
                       )
-                      }
-                      <hr></hr>
-                    </>
-                  )
-                })
-              ) : (
-                Object.keys(err.complete_info).map((item, index) => {
-                  return (
-                    <>
-                      <h3>{Object.keys(err.complete_info)[index]}</h3>
-                      <h3>Descripcion: {Object.values(err.complete_info)[index]}</h3>
-                      <hr></hr>
-                    </>
-                  )
-                })
-              )
-            }
-          </>)
-        })}
+                    })}
+                    <hr></hr>
+                  </div>
+                )
+              })
+            ) : (
+              Object.keys(showModalErrors?.errores).map((item, index) => {
+                return (
+                  <div key={index}>
+                    <h3>{item ?? ""}</h3>
+                    <h3>Descripcion: {showModalErrors?.errores[item] ?? ""}</h3>
+                    <hr></hr>
+                  </div>
+                )
+              })
+            )
+        )}
       </Modal>
     </Fragment>
   )

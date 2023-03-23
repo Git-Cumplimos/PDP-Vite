@@ -6,12 +6,9 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import {
-  getRecaudosList,
-  downloadFileRecaudo,
-} from "../../utils/fetchFunctions";
-import { ExportToCsv } from "export-to-csv";
+import { getRecaudosList, downloadFileRecaudo, } from "../../utils/fetchFunctions";
 import { cargarArchivoRecaudo } from "../../utils/functions";
+import { ExportToCsv } from "export-to-csv";
 
 const GestionArchivosRecaudo = () => {
   const [showModal, setShowModal] = useState(false);
@@ -23,7 +20,6 @@ const GestionArchivosRecaudo = () => {
   const [listRecaudos, setListRecaudos] = useState([]);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
-  // const [cargando, setCargando] = useState(false);
   const [file, setFile] = useState(null);
   const [searchFilters, setSearchFilters] = useState({
     pk_id_convenio_directo: "",
@@ -45,18 +41,12 @@ const GestionArchivosRecaudo = () => {
         setMaxPages(data?.obj?.maxPages ?? "");
       })
       .catch((err) => {
-        // if (err?.cause === "custom") {
-        //   notifyError(err?.message);
-        //   return;
-        // }
         console.error(err?.message);
       });
-    // setCargando(true);
+
   }, [pageData, searchFilters]);
 
-  useEffect(() => {
-    getRecaudos();
-  }, [getRecaudos, pageData, searchFilters]);
+  useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -71,7 +61,6 @@ const GestionArchivosRecaudo = () => {
       e.preventDefault();
 
       if (selected.fk_id_tipo_convenio === 1) {
-
         notifyPending(
           cargarArchivoRecaudo(
             file,
@@ -91,13 +80,13 @@ const GestionArchivosRecaudo = () => {
           },
           {
             render({ data: err }) {
-              setShowModalErrors(err)
+              setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
               return `Archivo erroneo`;
             },
           }
         );
       } else { notifyError("Convenio no permite cargar archivo") }
-      
+
     }, [handleClose, file, selected]);
 
   const DescargarArchivo = useCallback(
@@ -281,53 +270,41 @@ const GestionArchivosRecaudo = () => {
       </Modal>
       <Modal show={showModalErrors} handleClose={handleClose}>
         <h2 className="text-2xl mx-auto text-center mb-4">
-          {showModalErrors.msg ?? "Errores en el archivo"}
+          {showModalErrors?.msg ?? "Errores en el archivo"}
         </h2>
-        {showModalErrors?.obj?.error?.map((err) => {
-          return (<>
-            {
-              Array.isArray(err.complete_info) && err.complete_info.length > 1 ? (
-                err.complete_info.map((err_esp, index) => {
-                  return (
-                    <div key={index + 10}>
-                      <h3>Linea {err_esp.line}</h3>
-                      {Array.isArray(Object.keys(err_esp.error)) ? (
-                        Object.keys(err_esp.error).map((item, index) => {
-                          return (
-                            <div key={index}>
-                              <h3>{Object.keys(err_esp.error)[index]}</h3>
-                              <h3>Descripcion: {Object.values(err_esp.error)[index]}</h3>
-                            </div>
-                          )
-                        })
-                      ) : (
+        {showModalErrors && (
+          Array.isArray(showModalErrors?.errores) ?
+            (
+              showModalErrors?.errores.map((err_esp, index) => {
+                return (
+                  <div key={index}>
+                    <h3>Linea {err_esp.line}</h3>
+                    {Object.keys(err_esp.error).map((item, index) => {
+                      return (
                         <div key={index}>
-                          <h3>{Object.keys(err_esp.error)}</h3>
-                          <h3>Descripcion: {Object.values(err_esp.error)}</h3>
+                          <h3>{item}</h3>
+                          <h3>Descripcion: {err_esp.error[item]}</h3>
                         </div>
                       )
-                      }
-                      <hr></hr>
-                    </div>
-                  )
-                })
-              ) : (
-                Object.keys(err.complete_info).map((item, index) => {
-                  return (
-                    <div key={index}>
-                      <h3>{Object.keys(err.complete_info)[index]}</h3>
-                      <h3>Descripcion: {Object.values(err.complete_info)[index]}</h3>
-                      <hr></hr>
-                    </div>
-                  )
-                })
-              )
-            }
-          </>)
-        })}
-
-      </Modal>
-    </Fragment>
+                    })}
+                    <hr></hr>
+                  </div>
+                )
+              })
+            ) : (
+              Object.keys(showModalErrors?.errores).map((item, index) => {
+                return (
+                  <div key={index}>
+                    <h3>{item ?? ""}</h3>
+                    <h3>Descripcion: {showModalErrors?.errores[item] ?? ""}</h3>
+                    <hr></hr>
+                  </div>
+                )
+              })
+            )
+        )}
+      </Modal >
+    </Fragment >
   );
 };
 
