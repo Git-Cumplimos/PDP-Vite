@@ -376,7 +376,7 @@ const CompraPin = () => {
           setShowLoading(false)
           handleClose()
         } else if (res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (consulta_compra_pines) [0010002]) -> list index out of range") {
-          notifyError("Error respuesta PDP: (Fallo al consumir el servicio (consulta_compra_pines)");
+          notifyError("Error respuesta PDP: (Fallo al consumir el servicio (consulta_compra_pines)[0010002]");
           setShowLoading(false)
           handleClose()
         } else {
