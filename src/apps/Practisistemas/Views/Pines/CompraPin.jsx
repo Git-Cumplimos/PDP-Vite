@@ -366,12 +366,17 @@ const CompraPin = () => {
       60000
     )
       .then(async (res) => {
+        console.log("respuesta",res)
         if (res?.status == true) {
           notify("Venta exitosa");
           setShowLoading(false);
           VentaExitosa(res?.obj?.response, fecha, hora);
         } else if (res?.obj?.response?.respuesta == "Error respuesta practisistemas: No se recibi\u00f3 respuesta del autorizador en el tiempo esperado [0010003]") {
           notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
+          setShowLoading(false)
+          handleClose()
+        } else if (res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (consulta_compra_pines) [0010002]) -> list index out of range") {
+          notifyError("Error respuesta PDP: (Fallo al consumir el servicio (consulta_compra_pines)");
           setShowLoading(false)
           handleClose()
         } else {
