@@ -37,17 +37,17 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     valorVar: "",
   });
   const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago",
+    title: "RECIBO DE PAGO",
     timeInfo: {
       "Fecha de pago": "",
       Hora: "",
     },
     commerceInfo: [
       /*id transaccion recarga*/
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
       /*id_dispositivo*/
-      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      /*telefono*/
-      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
       /*Id trx*/
       ["Id Trx", ""],
       /*Id Aut*/
@@ -160,6 +160,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
+      hour12: false,
     }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
@@ -452,22 +453,20 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
             </>
           ) : estadoPeticion === 4 ? (
             <>
-              <h2>
-                <ButtonBar>
-                  <Button onClick={handlePrint}>Imprimir</Button>
-                  <Button
-                    type='submit'
-                    onClick={() => {
-                      handleClose();
-                      navigate(-1);
-                    }}>
-                    Aceptar
-                  </Button>
-                </ButtonBar>
-              </h2>
               <TicketsAval
                 ticket={objTicketActual}
                 refPrint={printDiv}></TicketsAval>
+              <ButtonBar>
+                <Button onClick={handlePrint}>Imprimir</Button>
+                <Button
+                  type='button'
+                  onClick={() => {
+                    handleClose();
+                    navigate(-1);
+                  }}>
+                  Cerrar
+                </Button>
+              </ButtonBar>
             </>
           ) : (
             <></>

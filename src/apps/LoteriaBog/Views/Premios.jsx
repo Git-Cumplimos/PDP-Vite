@@ -46,12 +46,9 @@ const Premios = ({ route }) => {
   const [checkDisableFisico, setCheckDisableFisico] = useState(false);
   const [disabledBtns, setDisabledBtns] = useState(false);
   const { isWinner, makePayment } = useLoteria();
-  const optionsDocumento = [
-    { value: 0, label: "Seleccione la fracción" },
-    { value: 1, label: "Fracción # 1" },
-    { value: 2, label: "Fracción # 2" },
-    { value: 3, label: "Fracción # 3" },
-  ];
+  const [fraccionesporbillete, setFraccionesporbillete] = useState(1);
+  const [fracciones_disponibles,setFracciones_disponibles] = useState([]);
+
   const [showAllmodals, setShowAllmodals] = useState({
     showModalVoucher: false,
     voucherAprobado: false,
@@ -70,6 +67,7 @@ const Premios = ({ route }) => {
     statusPagoPremio: false,
     tipo_operacion: "",
   });
+
   const [datosComercio, setDatosComercio] = useState({
     comercio: "",
     terminal: "",
@@ -77,7 +75,9 @@ const Premios = ({ route }) => {
     codigo_dane: "",
     nom_loteria: "",
   });
+
   const handleClose = useCallback(() => {
+    setSeleccionarFraccion(0)
     setShowAllmodals((old) => {
       return {
         ...old,
@@ -88,7 +88,6 @@ const Premios = ({ route }) => {
     });
     navigate(-1);
   }, []);
-
 
   const notifyError = (msg) => {
     toast.warn(msg, {
@@ -101,8 +100,8 @@ const Premios = ({ route }) => {
       progress: undefined,
     });
   };
+
   const onSubmit = (e) => {
-    setSeleccionarFraccion(0);
     setShowTable(false);
     setDisabledBtns(true);
     setRespuesta(true);
@@ -119,6 +118,7 @@ const Premios = ({ route }) => {
         statusPagoPremio: false,
       };
     });
+
     isWinner(sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual)
       .then((res) => {
         var salvarRes = res;
@@ -127,6 +127,7 @@ const Premios = ({ route }) => {
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
         setTipopago(salvarRes?.obj?.tipo_ganancia);
+        setFraccionesporbillete(res?.obj?.fracciones_billete)
         setDatosComercio((old) => {
           setRespuesta(false);
           setValorbruto(res?.obj?.valorbruto);
@@ -174,7 +175,6 @@ const Premios = ({ route }) => {
             gana = res?.obj?.gana;
             ValNetoFraccion = res?.obj?.ValNetoFraccion;
             totalPagarLoteria = res?.obj?.total;
-
             res = [];
             for (let i = 0; i < gana.length; i++) {
               res.push([
@@ -191,9 +191,9 @@ const Premios = ({ route }) => {
               "",
               "",
               formatMoney.format(totalPagarLoteria),
-            ]);
+            ]);        
             setRespagar(res);
-            setShowTable(true);
+            setShowTable(true); 
           } else if (res?.obj?.ganador == false && "msg" in res) {
             notifyError(res?.obj?.gana);
             setIsSelf(false);
@@ -209,6 +209,23 @@ const Premios = ({ route }) => {
       })
       .catch(() => setDisabledBtns(false));
   };
+
+  const selectFraccionP = (fraccionesporbillete) => {
+    const optionsDocumento = [
+      { value: 0, label: "Seleccione la fracción" }
+    ]
+    for (let i = 1; i <= fraccionesporbillete; i++) {
+      optionsDocumento.push(
+        { value: i, label: "Fracción # "+i }
+      );
+    }
+    setFracciones_disponibles(optionsDocumento)
+  };
+
+  useEffect(() => {
+    selectFraccionP(fraccionesporbillete);
+  }, [fraccionesporbillete]);
+  
   const tickets = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -241,58 +258,36 @@ const Premios = ({ route }) => {
         ["Billete", billete],
         ["Serie", serie],
         ["Fracción", seleccionarFraccion],
-        // [checkBilleteVirtual === true || checkBilleteFisico === true ? "Tipo de billete" : "", checkBilleteFisico === true ? "Físico" : checkBilleteVirtual === true ? "Virtual" : ""],
-        // ["", ""],
         ["Valor a pagar", formatMoney.format(totalPagar)],
-        // ["", ""],
-        // ["Forma de Pago", "Efectivo"],
-        // ["", ""],
-        [tipopago === 2 ? "Nombre" : "", tipopago === 2 ? datosCliente?.nombre : ""],
-        [tipopago === 2 ? "Celular" : "", tipopago === 2 ? datosCliente?.celular : ""],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Nombre", tipopago === 2 && datosCliente?.nombre],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Número Documento", tipopago === 2 && datosCliente?.documento],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Celular", tipopago === 2 && datosCliente?.celular],
+        [tipopago === 2 && "", tipopago === 2 && ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [estadoTransaccion, sorteo,
-    billete,
-    serie,
-    checkBilleteFisico,
-    checkBilleteVirtual,
-    seleccionarFraccion,
-    datosCliente,
-    totalPagar,
-    valorbruto]);
+  }, [estadoTransaccion,sorteo,billete,serie,checkBilleteFisico,checkBilleteVirtual,seleccionarFraccion,datosCliente,totalPagar,valorbruto,tipopago]);
+  
   const onPay1 = (e) => {
     e.preventDefault();
     if (tipopago === 2) {
       if (String(datosCliente?.celular).charAt(0) === "3") {
         setRespuesta(true);
-        if (checkBilleteVirtual === true && hash === "") {
-          // notifyError("Por favor, ingrese el código hash")
-          setRespuesta(false);
-        } else if (
+        if (
           seleccionarFraccion === 0 ||
           seleccionarFraccion === "0" ||
-          seleccionarFraccion === undefined
-        ) {
-          setRespuesta(false);
-          if (checkBilleteVirtual === false) {
+          seleccionarFraccion === undefined) {
+            setRespuesta(false);
             notifyError("Seleccione una fracción")
-          }
         }
-        // if (
-        //   seleccionarFraccion === 0 ||
-        //   seleccionarFraccion === "0" ||
-        //   seleccionarFraccion === undefined
-        // ) {
-        //   setRespuesta(false);
-        //   if (checkBilleteVirtual === false) {
-        //     notifyError("Seleccione una fracción")
-        //   } else if (checkBilleteVirtual === true) {
-        //     notifyError("Por favor, ingrese el código hash")
-        //   }
-
-        // }
+        else if (checkBilleteVirtual === true && hash === ""){
+          setRespuesta(false);
+          notifyError("Ingresar código hash")
+        }
         else {
           makePayment(
             sorteo,
@@ -339,76 +334,74 @@ const Premios = ({ route }) => {
         }
       } else {
         notifyError(
-          "Numero invalido, el N° de celular debe comenzar con el número 3."
+          "Número invalido, el N° de celular debe comenzar con el número 3."
         );
       }
     } else {
-      if (checkBilleteVirtual === true && hash === "") {
-        // notifyError("Por favor, ingrese el código hash")
-        setRespuesta(false);
-      } else if ((checkBilleteFisico) && (
-        seleccionarFraccion === 0 ||
-        seleccionarFraccion === "0" ||
-        seleccionarFraccion === undefined)
-      ) {
-        if (checkBilleteVirtual === false) {
-          setRespuesta(false);
-          notifyError("Seleccione una fracción")
-        }
-      } else {
-        setRespuesta(true);
-        makePayment(
-          sorteo,
-          billete,
-          serie,
-          checkBilleteFisico,
-          checkBilleteVirtual,
-          seleccionarFraccion,
-          datosCliente?.nombre,
-          datosCliente?.documento,
-          datosCliente?.direccion,
-          datosCliente?.celular,
-          totalPagar,
-          valorbruto,
-          datosComercio.comercio,
-          datosComercio.terminal,
-          datosComercio.usuario,
-          datosComercio.codigo_dane,
-          cod_distribuidor,
-          idLoteria,
-          tipopago,
-          hash,
-          pdpUser?.uname,
-          tickets,
-        )
-          .then((res) => {
+        if (
+          seleccionarFraccion === 0 ||
+          seleccionarFraccion === "0" ||
+          seleccionarFraccion === undefined) {
             setRespuesta(false);
-            setDatosCliente((old) => {
-              return {
-                ...old,
-                statusPagoPremio: res?.status,
-                idTransaccion: res?.obj?.id_trx,
-                tipo_operacion: res?.obj?.tipo_operacion,
-              };
-            });
-            setEstadoTransaccion(res?.status);
-            if (res?.status === false) {
-              notifyError(res?.obj?.msg);
-              navigate(-1);
-            }
-          })
-          .catch(() => setDisabledBtns(false));
-      }
+            notifyError("Seleccione una fracción")
+        }
+        else if (checkBilleteVirtual === true && hash === ""){
+            setRespuesta(false);
+            notifyError("Ingresar código hash")
+        }
+        else {
+          setRespuesta(true);
+          makePayment(
+            sorteo,
+            billete,
+            serie,
+            checkBilleteFisico,
+            checkBilleteVirtual,
+            seleccionarFraccion,
+            datosCliente?.nombre,
+            datosCliente?.documento,
+            datosCliente?.direccion,
+            datosCliente?.celular,
+            totalPagar,
+            valorbruto,
+            datosComercio.comercio,
+            datosComercio.terminal,
+            datosComercio.usuario,
+            datosComercio.codigo_dane,
+            cod_distribuidor,
+            idLoteria,
+            tipopago,
+            hash,
+            pdpUser?.uname,
+            tickets,
+          )
+            .then((res) => {
+              setRespuesta(false);
+              setDatosCliente((old) => {
+                return {
+                  ...old,
+                  statusPagoPremio: res?.status,
+                  idTransaccion: res?.obj?.id_trx,
+                  tipo_operacion: res?.obj?.tipo_operacion,
+                };
+              });
+              setEstadoTransaccion(res?.status);
+              if (res?.status === false) {
+                notifyError(res?.obj?.msg);
+                navigate(-1);
+              }
+            })
+            .catch(() => setDisabledBtns(false));
+        }
     }
   };
-
 
   const handlePrint = useReactToPrint({
     content: () => printDiv?.current,
   });
+
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-
     if (valueInput[0] != 3) {
       if (valueInput.length == 1 && datosCliente?.celular == "") {
         notifyError(
@@ -421,25 +414,19 @@ const Premios = ({ route }) => {
       return { ...old, celular: valueInput };
     });
   };
-  // useEffect(() => {
-  //   const ticket = tickets;
-  //   infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
-  //     .then((resTicket) => { })
-  //     .catch((err) => {
-  //       console.error(err);
-  //       notifyError("Error guardando el ticket");
-  //     });
-  // }, [
-  //   infoTicket,
-  //   datosCliente,
-  //   estadoTransaccion,
-  //   tickets,
-  //   tipopago,
-  // ]);
+
+  const onDocChange = (e) => {
+    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+    setDatosCliente((old) => {
+      return { ...old, documento: valueInput };
+    });
+  };
+ 
   const cancelar = () => {
     notifyError("Se canceló el pago del premio");
     navigate(-1);
   };
+
   return (
     <>
       <Form onSubmit={onSubmit} grid>
@@ -556,6 +543,8 @@ const Premios = ({ route }) => {
                   label="Nombre"
                   type="text"
                   autoComplete="off"
+                  minLength={"3"}
+                  maxLength={"60"}
                   value={datosCliente?.nombre}
                   onInput={(e) => {
                     setDatosCliente((old) => {
@@ -570,20 +559,13 @@ const Premios = ({ route }) => {
                 <Input
                   id="cedula"
                   label="Cédula"
-                  type="text"
-                  minLength={"10"}
-                  maxLength={"10"}
+                  type="tel"
+                  minLength="5"
+                  maxLength="12"
                   autoComplete="off"
-                  required={true}
+                  required
                   value={datosCliente?.documento}
-                  onInput={(e) => {
-                    setDatosCliente((old) => {
-                      return {
-                        ...old,
-                        documento: e.target.value,
-                      };
-                    });
-                  }}
+                  onChange={onDocChange}
                 />
                 <Input
                   id="numCel"
@@ -593,16 +575,8 @@ const Premios = ({ route }) => {
                   minLength={"10"}
                   maxLength={"10"}
                   autoComplete="off"
-                  required={true}
+                  required
                   value={datosCliente?.celular}
-                  onInput={(e) => {
-                    setDatosCliente((old) => {
-                      return {
-                        ...old,
-                        celular: e.target.value,
-                      };
-                    });
-                  }}
                   onChange={onCelChange}
                 />
                 <Input
@@ -610,6 +584,8 @@ const Premios = ({ route }) => {
                   label="Dirección"
                   type="text"
                   autoComplete="off"
+                  minLength={"3"}
+                  maxLength={"60"}
                   required={true}
                   value={datosCliente?.direccion}
                   onInput={(e) => {
@@ -621,32 +597,28 @@ const Premios = ({ route }) => {
                     });
                   }}
                 />
-                {checkBilleteVirtual == false ? (
-                  <Select
-                    id="selectFraccion"
-                    label="Fracción"
-                    options={optionsDocumento}
-                    value={seleccionarFraccion}
-                    required={true}
-                    onChange={(e) => {
-                      setSeleccionarFraccion(e.target.value);
-                    }}
-                  />
-                ) : (
-                  ""
-                )}
-
+                <Select
+                  id="selectFraccion"
+                  label="Fracción"
+                  options={fracciones_disponibles}
+                  value={seleccionarFraccion}
+                  required={true}
+                  onChange={(e) => {
+                    setSeleccionarFraccion(e.target.value);
+                  }}
+                />
                 {checkBilleteVirtual == true ? (
                   <Input
                     id="codHash"
                     label="Código de seguridad"
                     type="text"
+                    maxLength="10"
                     autoComplete="off"
                     value={hash}
                     onChange={(e) => {
                       setHash(e.target.value);
                     }}
-                    required={true}
+                    required
                   />
                 ) : (
                   ""
@@ -674,26 +646,23 @@ const Premios = ({ route }) => {
                   <Form onSubmit={onPay1} grid>
                     <Fieldset
                       className="lg:col-span-2 flex justify-center items-center"
-                      legend={checkBilleteVirtual === true ? ("Por favor, Ingresar el Código Hash.") : ("Por favor, seleccione la fracción del billete a pagar")}>
-                      {checkBilleteVirtual === false ? (
-                        <Select
-                          id="selectFraccion"
-                          label="Fracción"
-                          options={optionsDocumento}
-                          value={seleccionarFraccion}
-                          required={true}
-                          onChange={(e) => {
-                            setSeleccionarFraccion(e.target.value);
-                          }}
-                        />
-                      ) : (
-                        ""
-                      )}
+                      legend={checkBilleteVirtual === true ? ("Por favor, Ingresar la Fracción y el Código Hash del billete a pagar.") : ("Por favor, seleccione la Fracción del billete a pagar")}>
+                      <Select
+                        id="selectFraccion"
+                        label="Fracción"
+                        options={fracciones_disponibles}
+                        value={seleccionarFraccion}
+                        required={true}
+                        onChange={(e) => {
+                          setSeleccionarFraccion(e.target.value);
+                        }}
+                      />
                       {checkBilleteVirtual === true ? (
                         <Input
                           id="codHash1"
                           label="Código de seguridad"
                           type="text"
+                          maxLength="10"
                           autoComplete="off"
                           value={hash}
                           onChange={(e) => {
@@ -732,7 +701,7 @@ const Premios = ({ route }) => {
         ""
       )}
       {estadoTransaccion && tipopago === 2 || tipopago === 1 ? (
-        /**************** Compra Soat Exitosa Voucher **********************/
+        /**************** Pago premio Exitosa Voucher **********************/
         <Modal show={estadoTransaccion} handleClose={handleClose}>
           {/* <Modal show={showAllmodals.showModalVoucher} handleClose={handleClose}> */}
           <div className="flex flex-col justify-center items-center">

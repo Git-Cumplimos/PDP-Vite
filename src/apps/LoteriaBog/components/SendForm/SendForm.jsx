@@ -40,12 +40,14 @@ const SendForm = ({
   }, [tiposOperaciones]);
 
   const [checkedState, setCheckedState] = useState([]);
+  const [flagFraccionV, setFlagFraccionV] = useState([]);
   useEffect(() => {
     const copy = [];
     selected?.Fracciones?.forEach(() => {
       copy.push(false);
     });
     setCheckedState([...copy]);
+    setFlagFraccionV([...copy]);
   }, [selected]);
 
   const [disabledBtns, setDisabledBtns] = useState(false);
@@ -57,6 +59,7 @@ const SendForm = ({
     );
 
     setCheckedState(updatedCheckedState);
+    setFlagFraccionV(updatedCheckedState);
 
     for (var i = 0; i < selected?.Fracciones?.length; i++) {
       if (updatedCheckedState[i] === true) {
@@ -67,9 +70,21 @@ const SendForm = ({
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if ((selecFrac.length == 0) & (fracciones == 0)) {
-      notifyError("Seleccione la(s) fraccion(es) a vender");
-    } else {
+    if (selecFrac.length == "0") {
+      if (sorteo.split("-")[1] === "true") {
+        notifyError("Seleccione la(s) fraccion(es) a vender");
+      }
+      else {
+        notifyError("Seleccione la fracción a vender");
+      }
+    }
+    else if(tipoPago == null) {
+      notifyError("Seleccione método de pago");
+    }
+    else if(tipoPago == operacion?.Venta_Intercambio & selecFrac.length > 1) {
+      notifyError("El método de pago por bono aplica para una única fracción");
+    }
+     else {
       setDisabledBtns(true);
       handleSubmit();
     }
@@ -82,11 +97,13 @@ const SendForm = ({
   const formPago = (value) => {
     setTipoPago(value);
   };
+
   useEffect(() => {
     const cus = { fracciones, phone, doc_id, email };
     cus.fracciones = "1";
     setCustomer({ ...cus });
-  }, [fracciones])
+  }, [fracciones,sorteo])
+
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">
@@ -116,30 +133,11 @@ const SendForm = ({
                     checked={checkedState[index]}
                     onChange={() => handleOnChange(index)}
                   />
-                );
-              })}
-              <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
-                Efectivo
-                <input
-                  id="Efectivo"
-                  value={operacion?.Venta_Fisica}
-                  name="pago"
-                  type="radio"
-                  onChange={(e) => formPago(e.target.value)}
-                />
-                Bono
-                <input
-                  id="Bono"
-                  value={operacion?.Venta_Intercambio}
-                  name="pago"
-                  type="radio"
-                  onChange={(e) => formPago(e.target.value)}
-                />
-              </div>
+                  );
+                })}
             </>
           ) : (
             <>
-
               <Input
                 id="cantFrac"
                 label="Fracciones a comprar"
@@ -148,12 +146,29 @@ const SendForm = ({
                 min="1"
                 value={fracciones}
                 required={true}
-              // onInput={(e) => {
-              //   const cus = { fracciones, phone, doc_id };
-              //   cus.fracciones = e.target.value;
-              //   setCustomer({ ...cus });
-              // }}
+                disabled
               />
+              {selected?.Fracciones?.map((frac, index) => {
+                return (
+                  <Input
+                    id={frac}
+                    label={`Fracción ${frac}:`}
+                    type="checkbox"
+                    value={frac}
+                    checked={checkedState[index]}
+                    disabled={flagFraccionV[index]}
+                    onChange={() => {
+                      handleOnChange(index)
+                      if (!checkedState[index]){
+                        const updatedCheckedState = checkedState.map((item, frac) =>
+                          frac === index ? item : !item
+                        );
+                        setFlagFraccionV(updatedCheckedState);
+                      }
+                    }}
+                  />
+                );
+              })}
               <Input
                 id="email"
                 label="Email"
@@ -170,7 +185,6 @@ const SendForm = ({
               />
             </>
           )}
-
           <Input
             id="numCel"
             label="Celular"
@@ -195,7 +209,6 @@ const SendForm = ({
               }
             }}
           />
-
           <Input
             id="num_id"
             label="Documento de identidad"
@@ -212,7 +225,24 @@ const SendForm = ({
               }
             }}
           />
-
+          <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
+            Efectivo
+            <input
+              id="Efectivo"
+              value={operacion?.Venta_Fisica}
+              name="pago"
+              type="radio"
+              onChange={(e) => formPago(e.target.value)}
+            />
+            Bono
+            <input
+              id="Bono"
+              value={operacion?.Venta_Intercambio}
+              name="pago"
+              type="radio"
+              onChange={(e) => formPago(e.target.value)}
+            />
+          </div>
           <ButtonBar>
             <Button type="submit" disabled={disabledBtns}>
               Aceptar

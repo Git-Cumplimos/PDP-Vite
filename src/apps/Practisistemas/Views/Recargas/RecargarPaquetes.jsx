@@ -52,13 +52,13 @@ const RecargarPaquetes = () => {
     ],
     commerceName: "RECARGA",
     trxInfo: [
-      ["Operador",state?.operadorPaquete],
+      ["Operador", state?.operadorPaquete],
       ["", ""],
-      ["Tipo paquete",state?.operador_recargar],
+      ["Tipo paquete", state?.operador_recargar],
       ["", ""],
     ],
     disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
   });
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
@@ -85,7 +85,6 @@ const RecargarPaquetes = () => {
       handleClose();
     }
   };
-
   const fecthEnvioTransaccion = () => {
     setRespuesta(true);
     const fecha = Intl.DateTimeFormat("es-CO", {
@@ -140,8 +139,8 @@ const RecargarPaquetes = () => {
       .then(async (res) => {
         if (res?.status === true) {
           notify("Compra de paquete exitosa");
-          infTicketFinal["commerceInfo"].splice(2,0,["Id Trx",res?.obj?.response?.["idtrans"],]);
-          infTicketFinal["commerceInfo"].splice(3,0,["Id Aut",res?.obj?.response?.["codigoauth"],]);
+          infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
+          infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
           setInfTicket(infTicketFinal);
           setRespuesta(false);
           setTypeInfo("RecargaExitosa");
@@ -164,15 +163,15 @@ const RecargarPaquetes = () => {
                             res?.status === true ||
                             res?.obj?.response?.estado == "00"
                           ) {
-                            infTicketFinal["commerceInfo"].splice(2,0,["Id Trx",res?.obj?.response?.["idtrans"],]);
-                            infTicketFinal["commerceInfo"].splice(3,0,["Id Aut",res?.obj?.response?.["codigoauth"],]);
+                            infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
+                            infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
                             setInfTicket(infTicketFinal);
                             setRespuesta(false);
                             setTypeInfo("RecargaExitosa");
                           } else {
                             notifyError(
                               typeof res?.msg == typeof {}
-                                ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                                ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
                                 : res?.msg
                             );
                             setRespuesta(true);
@@ -206,7 +205,7 @@ const RecargarPaquetes = () => {
           } else {
             notifyError(
               typeof res?.msg == typeof {}
-                ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
+                ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
                 : res?.msg
             );
             setRespuesta(false);
@@ -258,6 +257,7 @@ const RecargarPaquetes = () => {
     notify("Recarga cancelada");
     validNavigate("/recargas-paquetes");
     handleClose();
+
   }, []);
 
   const handlePrint = useReactToPrint({
@@ -275,7 +275,7 @@ const RecargarPaquetes = () => {
       <h1 className="text-3xl mt-6">{state?.operador_recargar}</h1>
       <p> {state?.descripcion} </p>
       <p> Valor: {formatMoney.format(state?.valor_paquete)} </p>
-      <Form onSubmit={onSubmitCheck} grid>
+      <Form onSubmit={onSubmitCheck} >
         <Input
           name="celular"
           label="Número de celular"

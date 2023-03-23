@@ -40,7 +40,6 @@ const urls = {
 
   consultaPago: `${process.env.REACT_APP_URL_LOTERIAS}/consultaPremio`,
   pagoPremioLoterias: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremio`,
-  // pagoPremioLoterias: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremio`,
   premiohash: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioVirtual`,
   premiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioFisico`,
   pagopremio: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioVirtual`,
@@ -53,6 +52,7 @@ const urls = {
   consulta_operaciones: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_operaciones`,
   consulta_codigos_oficina: `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`,
   consultaInventario: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_numeros_inventario`,
+  get_barcode: `${process.env.REACT_APP_URL_LOTERIAS}/lectura_cod_barras`,
   consultaInventarioReporte: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_inventario`,
   registrarInventario: `${process.env.REACT_APP_URL_LOTERIAS}/registrar_inventario`,
 };
@@ -102,6 +102,7 @@ export const LoteriaContext = createContext({
   con_sort_ventas: () => { },
   cargueVentasExtra_S3: () => { },
   reportVentas: () => { },
+  peticionBarcode: () => { },
   consultaInventario: () => { },
   consultaInventarioReporte: () => { },
   registrarInventario: () => { },
@@ -177,7 +178,7 @@ export const useProvideLoteria = () => {
     }
   }, []);
 
-  //// Conaulta id disribuidor y de sucursal asociadas a la lotería
+  //// Consulta id disribuidor y de sucursal asociadas a la lotería
   const consulta_codigos_oficina = useCallback(
     async (nit) => {
       const query = { nit_loteria: nit, id_comercio: roleInfo?.id_comercio };
@@ -319,9 +320,9 @@ export const useProvideLoteria = () => {
     },
     [roleInfo, codigosOficina]
   );
-
+  
   const sellLoteria = useCallback(
-    async (sorteo, ticket) => {
+    async (sorteo, selecFrac, ticket, tipoPago) => {
       let fisico = false;
       const sort = sorteo.split("-");
       if (sort[1] === "true") {
@@ -342,6 +343,7 @@ export const useProvideLoteria = () => {
         cod_distribuidor: codigosOficina?.cod_oficina_lot,
         cod_sucursal: codigosOficina?.cod_sucursal_lot,
         can_frac_venta: parseInt(customer.fracciones),
+        frac_virtual_venta: selecFrac,
         can_fracciones: parseInt(selected.Fracciones_disponibles),
         cantidad_frac_billete: selected.Can_fraccion_billete,
         id_comercio: roleInfo.id_comercio,
@@ -353,7 +355,7 @@ export const useProvideLoteria = () => {
         fisico: fisico,
         cod_dane: roleInfo.codigo_dane,
         tipo_comercio: tipo_comercio,
-        tipoPago: tiposOperaciones?.Venta_Virtual, /// Venta - Virtual
+        tipoPago: tipoPago == tiposOperaciones?.Venta_Fisica ? tiposOperaciones?.Venta_Virtual :  tiposOperaciones?.Venta_Intercambio, /// Venta - Virtual
         ticket: ticket,
         email: customer.email,
       };
@@ -785,17 +787,15 @@ export const useProvideLoteria = () => {
   );
 
   const con_SortVentas_S3 = useCallback(
-    async (sorteo, fecha_ini, fecha_fin, page) => {
-      const query = {};
-      if (sorteo !== "") {
-        query.sorteo = sorteo;
-        query.numero = page;
-      } else {
-        query.fecha_ini = fecha_ini;
-        query.fecha_fin = fecha_fin;
-        query.numero = page;
+    async (fecha_ini, fecha_fin, sorteo, page, limit) => {
+      const query = {
+        fecha_ini : fecha_ini.fecha_ini,
+        fecha_fin : fecha_ini.fecha_fin,
+        sorteo: fecha_ini.sorteo,
+        codigos_loteria : sorteosLOT,
+        page : fecha_ini.page,
+        limit: fecha_ini.limit
       }
-      query.codigos_loteria = sorteosLOT;
       try {
         const res = await fetchData(urls.con_SortVentas_S3, "GET", query, {});
         return res;
@@ -834,6 +834,28 @@ export const useProvideLoteria = () => {
       console.error(err);
     }
   }, []);
+
+  const peticionBarcode = useCallback(
+    async (referencia,barcode,numSorteo,numLoteria) => {
+      try {
+        const res = await fetchData(
+          urls.get_barcode,
+          "POST",
+          {},
+          { 
+            datoAzar: referencia,
+            barcode: barcode,
+            num_sorteo: numSorteo,
+            num_loteria: numLoteria,
+          }
+        );
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
 
   const consultaInventario = useCallback(
     async (numSorteo, numLoteria) => {
@@ -962,6 +984,7 @@ export const useProvideLoteria = () => {
     con_SortVentas_S3,
     descargaVentas_S3,
     reportVentas,
+    peticionBarcode,
     consultaInventario,
     consultaInventarioReporte,
     registrarInventario,

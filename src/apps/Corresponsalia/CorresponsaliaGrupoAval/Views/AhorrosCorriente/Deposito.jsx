@@ -37,7 +37,7 @@ const Deposito = () => {
     equalError: false
   });
 
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   const [loadingDepositoCorresponsalGrupoAval, fetchDepositoCorresponsalGrupoAval] =
     useFetch(depositoCorresponsalGrupoAval);
@@ -317,6 +317,7 @@ const Deposito = () => {
 
         }
       },
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
     };
 
@@ -491,7 +492,7 @@ const Deposito = () => {
                   disabled={loadingDepositoCorresponsalGrupoAval}>
                   Realizar depósito
                 </Button>
-                {showBTNConsulta ? 
+                {/* {showBTNConsulta ? 
                 <Button
                 type='submit'
                 onClick={consultarCosto}
@@ -500,7 +501,7 @@ const Deposito = () => {
                 </Button>                
                 :
                 ""
-                }
+                } */}
                 
                 <Button
                   onClick={(e) => {

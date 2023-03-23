@@ -210,7 +210,8 @@ const CrearSorteos = ({ route }) => {
             disable_botoExtra={setDisable_botoExtra}
             disabledBtns={setDisabledBtns}
             disable_botoOrdinario={setDisable_botoOrdinario}
-
+            setResp_con={setResp_con}
+            sorteosLOT={sorteosLOT}
           ></CloseForm>
         </Modal>
         <Modal show={showparams} handleClose={() => closeparams()}>
