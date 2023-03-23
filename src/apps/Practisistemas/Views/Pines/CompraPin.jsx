@@ -413,7 +413,8 @@ const CompraPin = () => {
                             notifyError(
                               typeof res?.msg == typeof {}
                                 ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                                : res?.msg);
+                                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg
+                            );
                             setShowLoading(true);
                             setShowModal(false);
                             showModalDatosEPM(false);

@@ -172,7 +172,7 @@ const RecargarPaquetes = () => {
                             notifyError(
                               typeof res?.msg == typeof {}
                                 ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                                : res?.msg
+                                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg
                             );
                             setRespuesta(true);
                             handleClose();
@@ -206,7 +206,7 @@ const RecargarPaquetes = () => {
             notifyError(
               typeof res?.msg == typeof {}
                 ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                : res?.msg
+                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg
             );
             setRespuesta(false);
             handleClose();
