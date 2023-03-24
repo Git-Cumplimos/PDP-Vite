@@ -1,4 +1,5 @@
 import { fetchSecure } from "../../../utils/functions";
+import { ExportToCsv } from "export-to-csv";
 
 // const url = `http://127.0.0.1:8000`;
 const url = `${process.env.REACT_APP_URL_RECAUDO_RETIRO_DIRECTO}`;
@@ -47,3 +48,21 @@ export const cargarArchivoRetiro = cargueArchivo(
   `${url}/convenio-retiro-masivo/obtener-url-carga`,
   `${url}/convenio-retiro-masivo/verificar-archivo`
 );
+
+export const descargarCSV = (nombreArchivo, info) => {
+  const options = {
+    fieldSeparator: ";",
+    quoteStrings: '"',
+    decimalSeparator: ",",
+    showLabels: true,
+    showTitle: false,
+    title: nombreArchivo,
+    useTextFile: false,
+    useBom: true,
+    useKeysAsHeaders: false,
+    filename: nombreArchivo,
+  };
+  const csvExporter = new ExportToCsv(options);
+  const data = JSON.stringify(info);
+  csvExporter.generateCsv(data);
+}
