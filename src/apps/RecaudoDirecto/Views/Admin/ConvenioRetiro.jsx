@@ -306,6 +306,9 @@ const RetiroDirecto = () => {
             id={"codigo_ean_iac"}
             label={"Código EAN o IAC"}
             name={"ean13"}
+            type='tel'
+            minLength={"13"}
+            maxLength={"13"}
             defaultValue={selected?.ean13 ?? ""}
             // disabled={selected ? true : false}
             autoComplete="off"

@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
@@ -13,6 +13,7 @@ import { getRetiro, modRetiro, searchConveniosRetiroList } from "../../utils/fet
 
 
 const FormularioRetiro = () => {
+  const navigate = useNavigate()
 
   const { pk_id_convenio } = useParams();
   // const { nombre_convenio } = useParams();
@@ -131,6 +132,7 @@ const FormularioRetiro = () => {
       await modRetiro(data)
         .then((data) => {
           data?.status && notify(data?.msg)
+          navigate("/recaudo-directo/consultar-retiro")
         })
         .catch((err) => {
           notifyError(err?.msg);
@@ -138,7 +140,7 @@ const FormularioRetiro = () => {
       handleClose()
     }
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
-  }, [dataRetiro, roleInfo, pdpUser, id_trx, valorRecibido, pk_id_convenio, handleClose])
+  }, [dataRetiro, roleInfo, pdpUser, id_trx, valorRecibido, pk_id_convenio, navigate, handleClose])
 
   return (
     <Fragment>

@@ -35,7 +35,7 @@ const GestionArchivosRetiro = () => {
   const getRetiros = useCallback(async () => {
     await getRetirosList({
       ...pageData,
-      ...searchFilters
+      ...searchFilters,
     })
       .then((data) => {
         setListRetiros(data?.obj?.results ?? []);

@@ -93,7 +93,6 @@ const RecaudoConjunto = () => {
 
   const hacerRecaudo = useCallback(async (e) => {
     e.preventDefault()
-    console.log("hacer recaudo")
 
     let resp = ''
     const data = {
@@ -109,7 +108,7 @@ const RecaudoConjunto = () => {
       ...valorRecibido,
       nombre_usuario: pdpUser?.uname ?? "",
     };
-    if (convenioRecaudo?.fk_id_tipo_convenio !== 3) {
+    if (convenioRecaudo?.fk_id_tipo_convenio !== 3) { // validacion del conv si tiene bbdd
       let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
       let sumaTotal = valoresRecibido + dataRecaudo.valor_pagado
 
@@ -134,6 +133,7 @@ const RecaudoConjunto = () => {
       await modRecaudo(data)
         .then((data) => {
           data?.status && notify(data?.msg)
+          navigate("/recaudo-directo/recaudo/manual")
         })
         .catch((err) => {
           notifyError(err?.msg);
@@ -143,7 +143,7 @@ const RecaudoConjunto = () => {
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
 
   }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx,
-     pk_id_convenio, convenioRecaudo, dataReferencias, handleClose])
+     pk_id_convenio, convenioRecaudo, dataReferencias, navigate, handleClose])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
