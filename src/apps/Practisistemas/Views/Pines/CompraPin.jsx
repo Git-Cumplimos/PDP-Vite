@@ -450,6 +450,7 @@ const CompraPin = () => {
               );
             }
             validNavigate("/Pines/PinesContenido");
+            notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
           } else {
             notifyError(
               res?.obj?.response?.respuesta ==
