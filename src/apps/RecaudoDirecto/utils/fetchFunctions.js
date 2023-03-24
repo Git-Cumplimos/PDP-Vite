@@ -1,7 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 
-const url = `http://127.0.0.1:8000`;
-// const url = `${process.env.REACT_APP_URL_RECAUDO_RETIRO_DIRECTO}`;
+// const url = `http://127.0.0.1:8000`;
+const url = `${process.env.REACT_APP_URL_RECAUDO_RETIRO_DIRECTO}`;
 
 const buildGetFunction = (url) => {
   return async (args = {}) => {
