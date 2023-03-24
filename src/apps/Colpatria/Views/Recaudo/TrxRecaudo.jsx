@@ -30,7 +30,8 @@ import {
 
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import {
-  makeMoneyFormatter, onChangeNumber,
+  makeMoneyFormatter,
+  onChangeNumber,
   // onChangeNumber,
 } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
@@ -128,7 +129,6 @@ const TrxRecaudo = () => {
         },
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valTrxRecaudo,
         nombre_usuario: pdpUser?.uname ?? "",
@@ -490,10 +490,7 @@ const TrxRecaudo = () => {
           <form onSubmit={onMakePayment}>
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
-                <Button
-                  type="submit"
-                  disabled={loadingSell}
-                >
+                <Button type='submit' disabled={loadingSell}>
                   Aceptar
                 </Button>
                 <Button onClick={handleClose} disabled={loadingSell}>

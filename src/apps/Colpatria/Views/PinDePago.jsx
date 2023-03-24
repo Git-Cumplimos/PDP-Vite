@@ -94,7 +94,9 @@ const PinDePago = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valPinPago,
         nombre_usuario: pdpUser?.uname ?? "",
         nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
