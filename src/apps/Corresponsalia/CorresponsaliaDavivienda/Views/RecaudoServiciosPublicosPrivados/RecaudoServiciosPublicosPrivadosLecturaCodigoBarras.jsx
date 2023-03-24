@@ -294,7 +294,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       }
       if (valorTransaccion > valor_maximo_recaudo) {
         return notifyError(
-          `El valor de transacción es superior al valor maximo permitido ${formatMoney.format(
+          `El valor de transacción es superior al valor máximo permitido ${formatMoney.format(
             valor_maximo_recaudo
           )}`
         );

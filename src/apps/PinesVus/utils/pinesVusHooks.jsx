@@ -53,6 +53,7 @@ export const useProvidePinesVus = () => {
     if (user?.tipo_comercio === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
     }
+    
     const body = {
       valor_tramite : valor_tramite,
       Usuario: user?.id_usuario,
@@ -72,6 +73,7 @@ export const useProvidePinesVus = () => {
       id_pin: id_pin,
     };
     try {
+    
       const res = await fetchData(urls.cancelPinVus, "PUT", query, body);
       return res;
     } catch (err) {
@@ -79,14 +81,26 @@ export const useProvidePinesVus = () => {
     }
   }, [roleInfo, pdpUser]);
   
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, user, infoTramite, infoCliente, olimpia, categoria, idPin, firma, motivoCompra, descripcionTipDocumento, ticket1, ticket2) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, tramite2, user, infoTramite, infoTramite2, infoCliente, olimpia, categoria, categoria2, idPin, firma, motivoCompra, descripcionTipDocumento, ticket1, ticket2) => {
     let tipo_comercio = user?.Tipo
     if (user?.Tipo === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
     }
+    let tramiteTemp
+    let infoTramiteTemp
+    infoTramite["categoria"]=categoria
+    if (tramite2==""){
+      tramiteTemp= [tramite]
+      infoTramiteTemp=[infoTramite]
+    }else{
+      tramiteTemp= [tramite, tramite2]
+      infoTramite2["categoria"]=categoria2
+      infoTramiteTemp=[infoTramite, infoTramite2]
+    }
+    
     const body = {
-      tipo_tramite: tramite,
-      infoTramite: infoTramite,
+      tipo_tramite: tramiteTemp,
+      infoTramite: infoTramiteTemp,
       tipo_pin: tipoPin,
       doc_cliente: String(documento),
       Usuario: user?.Usuario,
@@ -105,10 +119,12 @@ export const useProvidePinesVus = () => {
       ticket_pin:ticket1,
       ticket_tramite:ticket2
     };
+  
     if (idPin !== ""){
       body.Pin = idPin
     }
     try {
+      //console.log(body)
       const res = await fetchData(urls.PinVus, "POST", {}, body);
       return res;
     } catch (err) {
@@ -158,7 +174,8 @@ export const useProvidePinesVus = () => {
       estadoPin,
       tipoPin,
       doc_cliente,
-      pageData
+      pageData,
+      pinesCliente
     ) => {
       const query = { ...pageData };
       if (cod_hash_pin !== "") {
@@ -180,9 +197,12 @@ export const useProvidePinesVus = () => {
       if (doc_cliente !== "") {
         query.doc_cliente = doc_cliente;
       }
-
+      if (pinesCliente == 1) {
+        query.pinesCliente = pinesCliente;
+      }
       try {
         const res = await fetchData(urls.PinVus, "GET", query);
+        //console.log(query)
         return res;
       } catch (err) {
         throw err;
@@ -210,12 +230,15 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const consultaClientes = useCallback(async (cedula, olimpia, idPin) => {
+  const consultaClientes = useCallback(async (cedula, olimpia, idPin, tipoPin) => {
     const query = { pk_documento_cliente: cedula};
     query.olimpia = olimpia
     query.id_comercio = roleInfo?.id_comercio
     if (idPin != ""){
       query.Pin = idPin}
+    if (tipoPin !=""){
+      query.tipoPin = tipoPin
+    }
     try {
       const res = await fetchData(urls.consultaClientes, "GET", query);
       return res;
@@ -246,7 +269,8 @@ export const useProvidePinesVus = () => {
     // num_aprobacion,
     // num_transaccion, 
     valor,
-    fecha_participacion
+    fecha_participacion,
+    ticket
     // voucher
     ) => {
     let tipo_comercio = roleInfo.tipo_comercio
@@ -268,6 +292,7 @@ export const useProvidePinesVus = () => {
       Comercio: roleInfo?.id_comercio,
       nombre_usuario: pdpUser?.uname ?? "",
       Tipo: tipo_comercio,
+      ticket: ticket
     };
     try {
       const res = await fetchData(urls.registroPagoParticipacion, "POST", {}, body);
@@ -383,6 +408,7 @@ export const useProvidePinesVus = () => {
       const query = { doc_cliente : doc_cliente, reenviarFormulario : reenviarFormulario };
       try {
         const res = await fetchData(urls.reenvioHash, "GET", query);
+        //console.log(res)
         return res;
       } catch (err) {
         throw err;

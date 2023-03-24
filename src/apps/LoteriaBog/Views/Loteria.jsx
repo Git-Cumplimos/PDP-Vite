@@ -35,6 +35,9 @@ const Loteria = ({ route }) => {
   });
   const { tiposOperaciones } = useLoteria();
 
+  const fecha_trx = useMemo(()=>
+    new Date(),[])
+
   const operacion = useMemo(() => {
     return tiposOperaciones;
   }, [tiposOperaciones]);
@@ -184,19 +187,19 @@ const Loteria = ({ route }) => {
     if (sorteoOrdi !== null) {
       copy.push({
         value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
-        label: `Sorteo Ordinario Virtual- ${sorteoOrdi.num_sorteo}`,
+        label: `Sorteo Ordinario Virtual - ${sorteoOrdi.num_sorteo}`,
       });
     }
     if (sorteoExtra !== null) {
       copy.push({
         value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}-${sorteoExtra.num_loteria}`,
-        label: `Sorteo Extraordinario Virtual- ${sorteoExtra.num_sorteo}`,
+        label: `Sorteo Extraordinario Virtual - ${sorteoExtra.num_sorteo}`,
       });
     }
     if (sorteoOrdifisico !== null) {
       copy.push({
         value: `${sorteoOrdifisico.num_sorteo}-${sorteoOrdifisico.fisico}-${sorteoOrdifisico.num_loteria}`,
-        label: `Sorteo Ordinario  Físico- ${sorteoOrdifisico.num_sorteo}`,
+        label: `Sorteo Ordinario Físico - ${sorteoOrdifisico.num_sorteo}`,
       });
     }
 
@@ -235,6 +238,7 @@ const Loteria = ({ route }) => {
   },
     [numero, page, searchLoteria, searchLoteriafisica, serie, setCustomer, setSelected, setSellResponse, sorteo]
   );
+  
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -243,13 +247,13 @@ const Loteria = ({ route }) => {
           year: "2-digit",
           month: "2-digit",
           day: "2-digit",
-        }).format(new Date()),
+        }).format(fecha_trx),
         Hora: Intl.DateTimeFormat("es-CO", {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
           hour12: false,
-        }).format(new Date()),
+        }).format(fecha_trx),
       },
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
@@ -275,9 +279,9 @@ const Loteria = ({ route }) => {
         ["", ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese, al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese, al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [roleInfo, sellResponse]
+  }, [roleInfo, sellResponse, fecha_trx]
   );
   
   return (
@@ -444,10 +448,9 @@ const Loteria = ({ route }) => {
         <>
           <Table
             headers={[
-              "Numero",
+              "Número",
               "Serie",
               "Fracciones disponibles",
-              // "Valor por fraccion",
             ]}
             data={loterias.map(
               ({ Fracciones_disponibles, Num_billete, serie: Serie_lot }) => {
@@ -463,29 +466,6 @@ const Loteria = ({ route }) => {
               setShowModal(true);
             }}
           />
-          {/* <TableEnterprise
-            headers={[
-              "Número",
-              "Serie",
-              "Fracciones disponibles",
-            ]}
-            maxPage={maxPages}
-            data={loterias.map(
-              ({ Fracciones_disponibles, Num_billete, serie: Serie_lot }) => {
-                return {
-                  Num_billete,
-                  Serie_lot,
-                  Fracciones_disponibles,
-                };
-              }
-            )}
-            onSelectRow={(e, index) => {
-              setSelected(loterias[index]);
-              setShowModal(true);
-            }}
-          >
-
-          </TableEnterprise> */}
         </>
       ) : (
         ""
@@ -506,17 +486,19 @@ const Loteria = ({ route }) => {
             handleSubmit={(event) => {
               sorteo.split("-")[1] === "true"
                 ? sellLoteriafisica(sorteo, selecFrac, tipoPago, ticket)
-                : sellLoteria(sorteo, ticket);
+                : sellLoteria(sorteo, selecFrac, ticket, tipoPago);
             }}
           />
         ) : (
           <SellResp
+            codigos_lot={codigos_lot}
             sellResponse={sellResponse}
             setSellResponse={setSellResponse}
             closeModal={closeModal}
             setCustomer={setCustomer}
             selecFrac={selecFrac}
             setSelecFrac={setSelecFrac}
+            fecha_trx={fecha_trx}
           />
         )}
       </Modal>

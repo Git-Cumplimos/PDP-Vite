@@ -101,7 +101,6 @@ const ConveniosRecaudoAgrario = () => {
   };
   const onSelectConvenio = useCallback(
     (e, i) => {
-      console.log(convenios[i]);
       const refTemp = [];
       if (convenios[i].nombre_ref1 !== "" && convenios[i].nombre_ref1) {
         refTemp.push({
@@ -168,9 +167,7 @@ const ConveniosRecaudoAgrario = () => {
       files = Array.from(files);
       if (files.length === 1) {
         const m_file = files[0];
-        // console.log(m_file);
         setFile(m_file);
-        // setFileName(m_file.name);
       } else {
         if (files.length > 1) {
           notifyError("Se debe ingresar un solo archivo para subir");
@@ -272,7 +269,6 @@ const ConveniosRecaudoAgrario = () => {
               }
 
               formData2.set("file", file);
-              // console.log(formData2, `${respuesta?.obj?.url}`);
               fetch(`${respuesta?.obj?.url}`, {
                 method: "POST",
                 body: formData2,

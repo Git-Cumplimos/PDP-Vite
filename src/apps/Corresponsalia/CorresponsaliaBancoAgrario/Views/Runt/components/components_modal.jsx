@@ -16,7 +16,7 @@ export const ComponentsModalSummaryTrx = ({
         title="¿Está seguro de realizar la transacción?"
         subtitle="Resumen de transacción"
         summaryTrx={{
-          "Número Runt": summary.numero_runt,
+          "Número RUNT": summary.numero_runt,
           "Fecha de pago": summary.fecha_vencimiento,
           "Total derechos Runt": formatMoney.format(summary.valor_runt),
           "Total derechos MT": formatMoney.format(summary.valor_mt),
