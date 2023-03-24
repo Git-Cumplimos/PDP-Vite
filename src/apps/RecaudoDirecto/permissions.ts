@@ -1,5 +1,5 @@
 enum Permissions {
-    recaudo = 1,
-  }
-  export default Permissions;
-  
+  recaudo = 1,
+}
+export default Permissions;
+

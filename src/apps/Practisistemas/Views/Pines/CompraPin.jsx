@@ -413,12 +413,16 @@ const CompraPin = () => {
                             notifyError(
                               typeof res?.msg == typeof {}
                                 ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                                : res?.msg);
+                                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg
+                            );
                             setShowLoading(true);
                             setShowModal(false);
                             showModalDatosEPM(false);
                             showModalDatosSNR(false);
                             setInputCelular("");
+                            setInputMatricula("")
+                            setInputCirculo("")
+                            setInputPlaca("")
                             setInputValor(0);
                             resolve(true);
                           }
@@ -441,11 +445,15 @@ const CompraPin = () => {
               } catch (error) {
                 console.error(error);
               }
-              notify(
-                "Su transacción esta siendo procesada, no recargue la página"
-              );
+              if (i <= 7) { 
+                notify(
+                  "Su transacción esta siendo procesada, no recargue la página"
+                );
+
+              }
             }
             validNavigate("/Pines/PinesContenido");
+            notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
           } else {
             notifyError(
               res?.obj?.response?.respuesta ==
@@ -460,6 +468,9 @@ const CompraPin = () => {
             showModalDatosSNR(false);
             setShowModal(false);
             setInputCelular("");
+            setInputMatricula("")
+            setInputCirculo("")
+            setInputPlaca("")
             setInputValor(0);
           }
         }
@@ -899,7 +910,9 @@ const CompraPin = () => {
               subtitle="Resumen de transacción"
               summaryTrx={{
                 "Número De Contador": inputContador,
+                Descripción: state?.desc,
                 Celular: toPhoneNumber(inputCelular),
+                Pin: "EPM",
                 Valor: formatMoney.format(inputValor),
               }}>
               <>
@@ -916,9 +929,11 @@ const CompraPin = () => {
               title="¿Está seguro de realizar la transacción?"
               subtitle="Resumen de transacción"
               summaryTrx={{
+                Descripción: "Certificado de tradición y libertad",
                 Matricula: inputMatricula,
                 Circulo: inputCirculo,
                 Celular: toPhoneNumber(inputCelular),
+                Pin: state?.desc,
                 Valor: formatMoney.format(consultaDatosSNR?.valorPin),
               }}>
               <>
@@ -935,8 +950,9 @@ const CompraPin = () => {
               title="¿Está seguro de realizar la transacción?"
               subtitle="Resumen de transacción"
               summaryTrx={{
-                Placa: inputPlaca,
+                Descripción: "Histórico Vehicular",
                 Celular: toPhoneNumber(inputCelular),
+                Placa: inputPlaca,
                 Valor: formatMoney.format(inputValor),
               }}>
               <>
@@ -953,7 +969,9 @@ const CompraPin = () => {
               title="¿Está seguro de realizar la transacción?"
               subtitle="Resumen de transacción"
               summaryTrx={{
+                Descripción:state?.desc,
                 Celular: toPhoneNumber(inputCelular),
+                Pin: state?.op === "nx" ? "Netflix" : state?.op === "sf" ? "Spotify" : state?.op === "xb" ? "Xbox" : state?.op === "of" ? "Microsoft Office" : state?.op === "pt" ? "Play Station" : state?.op === "ka" ? "Kaspersky" : state?.op === "ra" ? "Razer GOLD" : state?.op === "iu" ? "Imvu" : state?.op === "ws" ? "WinSports" : state?.op === "j4" ? "J4 Infinity" : state?.op === "pp" ? "Paramount+" : state?.op === "dz" ? "Deezer" : state?.op === "cr" ? "Crunchyroll" : state?.op === "dg" ? "Directv GO" : state?.op,
                 Valor: formatMoney.format(
                   state?.sell ? state?.sell : inputValor
                 ),
