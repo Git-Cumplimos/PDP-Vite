@@ -141,7 +141,11 @@ const RecargarApuestas = () => {
         setTypeInfo("RecargaExitosa");
       }
       else {
-        notifyError(res?.msg);
+        notifyError(
+          typeof res?.msg == typeof {}
+            ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
+            : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
+        );
         setRespuesta(false);
         handleClose();
       }
@@ -194,8 +198,14 @@ const RecargarApuestas = () => {
         } catch (error) {
           console.error(error);
         }        
-        notify("Su transacción esta siendo procesada");
+        if (i <= 7) {
+          notify(
+            "Su transacción esta siendo procesada, no recargue la página"
+          );
+
+        }
       }
+      notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
     });
   };
      

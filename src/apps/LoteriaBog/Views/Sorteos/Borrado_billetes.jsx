@@ -104,7 +104,7 @@ const Borrado_billetes = ({ route }) => {
         setNum_sorteo(res?.num_sorteos[0]['sorteo']);
       }
     });
-  }, [sorteosLOT]);
+  }, [sorteosLOT,cod_distribuidor,cod_sucursal]);
 
   const handleCloseCancelar = useCallback(() => {
     notifyError("Eliminación de billeteria cancelada por el usuario");
@@ -116,7 +116,7 @@ const Borrado_billetes = ({ route }) => {
       }
     });
   })
-
+  
   return (
     <>
       <h1 className="text-3xl mt-6">Eliminar billeteria</h1>
