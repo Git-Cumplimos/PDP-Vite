@@ -197,10 +197,13 @@ const RecargarPaquetes = () => {
               } catch (error) {
                 console.error(error);
               }
-              notify(
-                "Su transacción esta siendo procesada, no recargue la página"
-              );
+              if (i <= 7) {
+                notify(
+                  "Su transacción esta siendo procesada, no recargue la página"
+                );
+              }
             }
+            notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
             validNavigate("/recargas-paquetes");
           } else {
             notifyError(
