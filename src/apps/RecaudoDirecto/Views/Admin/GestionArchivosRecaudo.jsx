@@ -7,7 +7,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRecaudosList, downloadFileRecaudo, } from "../../utils/fetchFunctions";
-import { cargarArchivoRecaudo, descargarCSV } from "../../utils/functions";
+import { cargarArchivoRecaudo, descargarCSV, onChangeEan13Number } from "../../utils/functions";
 
 
 const GestionArchivosRecaudo = () => {
@@ -102,7 +102,7 @@ const GestionArchivosRecaudo = () => {
           convenio_id: selected.pk_id_convenio_directo,
         })
           .then(async (res) => {
-            descargarCSV(`Reporte_${selected?.nombre_convenio}`,res)
+            descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
           })
           .catch((err) => {
             if (err?.cause === "custom") {
@@ -122,7 +122,7 @@ const GestionArchivosRecaudo = () => {
       let errores = []
 
       if (Array.isArray(showModalErrors?.errores)) {
-        errores.push(['Linea','Columna','Descripcion'])
+        errores.push(['Linea', 'Columna', 'Descripcion'])
         showModalErrors?.errores.map((err_esp) => {
           Object.keys(err_esp.error).map((item) => {
             errores.push([err_esp.line, item, err_esp.error[item]])
@@ -131,14 +131,14 @@ const GestionArchivosRecaudo = () => {
           return null
         })
       } else {
-        errores.push(['ERRORES EN HEADERS',''],['Columna','Descripcion'])
+        errores.push(['ERRORES EN HEADERS', ''], ['Columna', 'Descripcion'])
         Object.keys(showModalErrors?.errores).map((item) => {
           errores.push([item, showModalErrors?.errores[item]])
           return null
         })
       }
 
-      descargarCSV('Errores_del_archivo',errores)
+      descargarCSV('Errores_del_archivo', errores)
       handleClose();
     }, [handleClose, showModalErrors]);
 
@@ -201,6 +201,7 @@ const GestionArchivosRecaudo = () => {
           type="tel"
           autoComplete="off"
           maxLength={"13"}
+          onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
           onChange={(ev) => { }}
         />
         <Input

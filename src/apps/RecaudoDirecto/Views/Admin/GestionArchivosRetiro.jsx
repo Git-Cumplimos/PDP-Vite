@@ -7,7 +7,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRetirosList, downloadFileRetiro } from "../../utils/fetchFunctions"
-import { cargarArchivoRetiro, descargarCSV } from "../../utils/functions";
+import { cargarArchivoRetiro, descargarCSV, onChangeEan13Number } from "../../utils/functions";
 
 
 const GestionArchivosRetiro = () => {
@@ -196,6 +196,7 @@ const GestionArchivosRetiro = () => {
           type="tel"
           autoComplete="off"
           maxLength={"13"}
+          onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
           onChange={(ev) => { }}
         />
         <Input

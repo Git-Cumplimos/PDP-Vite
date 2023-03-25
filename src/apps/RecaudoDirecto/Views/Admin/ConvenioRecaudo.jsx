@@ -9,8 +9,8 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
-import { ExportToCsv } from "export-to-csv";
 import { notifyPending } from "../../../../utils/notify";
+import { onChangeEan13Number, descargarCSV } from "../../utils/functions";
 import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
 
 const RecaudoDirecto = () => {
@@ -120,8 +120,8 @@ const RecaudoDirecto = () => {
         })
       }
       body['referencias'] = allReferencias
-      console.log(body)
     }
+
     notifyPending(
       selected
         ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
@@ -151,25 +151,9 @@ const RecaudoDirecto = () => {
     )
   }, [handleClose, getRecaudos, selected, referencias])
 
-
   const descargarPlantilla = useCallback(() => {
-    const options = {
-      fieldSeparator: ";",
-      quoteStrings: '"',
-      decimalSeparator: ",",
-      showLabels: true,
-      showTitle: false,
-      title: `Ejemplo_de_archivo_recaudo_csv`,
-      useTextFile: false,
-      useBom: true,
-      useKeysAsHeaders: false,
-      filename: `Ejemplo_de_archivo_recaudo`,
-    };
-    const csvExporter = new ExportToCsv(options);
-    const data = JSON.stringify(res);
-    csvExporter.generateCsv(data);
+    descargarCSV('Ejemplo_de_archivo_recaudo',res)
   }, [res]);
-
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Convenios de Recaudos Directo</h1>
@@ -238,7 +222,7 @@ const RecaudoDirecto = () => {
           type="tel"
           autoComplete="off"
           maxLength={"13"}
-          onChange={(ev) => { }}
+          onInput={(ev) =>{ev.target.value = onChangeEan13Number(ev);}}
         />
         <Input
           id={"nombre_convenio"}
@@ -309,8 +293,8 @@ const RecaudoDirecto = () => {
             label={"Código EAN o IAC"}
             name={"ean13"}
             type='tel'
-            minLength={"13"}
             maxLength={"13"}
+            onInput={(ev) =>{ev.target.value = onChangeEan13Number(ev);}}
             defaultValue={selected?.ean13 ?? ""}
             // disabled={selected ? true : false}
             autoComplete="off"
