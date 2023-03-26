@@ -390,7 +390,7 @@ const CompraPin = () => {
               day: "2-digit",
             }).format(today);
 
-            for (let i = 0; i <= 8; i++) {
+            for (let i = 0; i <= 4; i++) {
               try {
                 const promesa = await new Promise((resolve, reject) =>
                   setTimeout(() => {

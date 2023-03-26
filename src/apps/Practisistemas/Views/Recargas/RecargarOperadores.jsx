@@ -164,7 +164,7 @@ const RecargasOperadores = () => {
         } else {
           if (res?.message === "Endpoint request timed out") {
             notify("Su transacción esta siendo procesada");
-            for (let i = 0; i <= 8; i++) {
+            for (let i = 0; i <= 4; i++) {
               try {
                 const prom = await new Promise((resolve, reject) =>
                   setTimeout(() => {
