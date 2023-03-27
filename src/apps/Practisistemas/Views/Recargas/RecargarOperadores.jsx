@@ -214,7 +214,7 @@ const RecargasOperadores = () => {
               } catch (error) {
                 console.error(error);
               }
-              if (i <= 7) {
+              if (i <= 4) {
                 notify(
                   "Su transacción esta siendo procesada, no recargue la página"
                 );
