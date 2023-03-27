@@ -366,7 +366,6 @@ const CompraPin = () => {
       60000
     )
       .then(async (res) => {
-        console.log("respuesta",res)
         if (res?.status == true) {
           notify("Venta exitosa");
           setShowLoading(false);
