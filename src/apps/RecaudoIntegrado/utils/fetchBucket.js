@@ -41,7 +41,7 @@ export const Presigned = async (archivo, banco) => {
       body: formData2,
     })
       .then((resrut) => {
-        notify("Archivo enviado con éxito.");
+        notify("Archivo cargado con éxito.");
       })
       .catch((err) => {
         {
@@ -109,7 +109,6 @@ export const Presigned = async (archivo, banco) => {
 //   }
 //   return {"nombre_archivo": nombre_archivo };
 // };
-
 
 export const Presigned_validar = async (archivo, banco) => {
   try {

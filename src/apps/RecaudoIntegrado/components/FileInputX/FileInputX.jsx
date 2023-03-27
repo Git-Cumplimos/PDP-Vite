@@ -58,7 +58,7 @@ const FileInputX = ({ banco }) => {
           document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
           setArchivo([]);
           setNombreDocumento("");
-          notifyError("La extensión del archivo debe ser de tipo text/csv");
+          notifyError("La extensión del archivo debe ser de tipo csv");
           return;
         } else if (
           tipo_archivo !== "text/plain" &&
@@ -68,7 +68,7 @@ const FileInputX = ({ banco }) => {
           document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
           setArchivo([]);
           setNombreDocumento("");
-          notifyError("La extensión del archivo debe ser .fil");
+          notifyError("La extensión del archivo debe ser de tipo .fil");
           return;
         }
       }
