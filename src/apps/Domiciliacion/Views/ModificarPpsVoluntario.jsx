@@ -286,7 +286,7 @@ const ModificarPps = () => {
             /*    }} */
           ></PaymentSummary>
           <ul className={contenedorSubtitle}>
-            Numero De Identificación: {datosConsulta[0]?.identificacion ?? ""}
+            Número De Identificación: {datosConsulta[0]?.identificacion ?? ""}
           </ul>
           <Form grid onSubmit={(e) => ModificarGuardar(e)}>
             <Fieldset legend="Modificar Domiciliación">
@@ -321,7 +321,7 @@ const ModificarPps = () => {
               <Input
                 id="celular"
                 name="celular"
-                label="Celular: "
+                label="Celular"
                 type="tel"
                 autoComplete="off"
                 minLength="10"
@@ -344,7 +344,7 @@ const ModificarPps = () => {
               <div className={contenedorLogo}>
                 <Input
                   name="N° Pagos Punto Pago"
-                  label="N° Pagos Punto Pago"
+                  label="N.° Pagos Punto de Pago"
                   type="tel"
                   autoComplete="off"
                   minLength={"1"}
