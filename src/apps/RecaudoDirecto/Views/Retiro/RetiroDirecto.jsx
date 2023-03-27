@@ -19,9 +19,9 @@ const RetiroDirecto = () => {
 
   const getRetiros = useCallback(async () => {
     await getRetirosList({
+      ...pageData,
       ...searchFilters,
-      limit: pageData.limit,
-      offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit
+      estado: true
     })
     .then((data) => {
       setListRetiro(data?.obj?.results ?? []);

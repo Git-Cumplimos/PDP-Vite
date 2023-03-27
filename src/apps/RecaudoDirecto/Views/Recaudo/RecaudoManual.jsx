@@ -20,9 +20,9 @@ const RecaudoManual = () => {
 
   const getRecaudos = useCallback(async () => {
     await getRecaudosList({
+      ...pageData,
       ...searchFilters,
-      limit: pageData.limit,
-      offset: pageData.page === 1 ? 0 : (pageData.page * pageData.limit) - pageData.limit,
+      estado: true
     })
       .then((data) => {
         setListRecaudos(data?.obj?.results ?? []);

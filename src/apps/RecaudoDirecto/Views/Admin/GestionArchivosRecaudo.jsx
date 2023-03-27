@@ -6,9 +6,9 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getRecaudosList, downloadFileRecaudo, } from "../../utils/fetchFunctions";
-import { cargarArchivoRecaudo } from "../../utils/functions";
-import { ExportToCsv } from "export-to-csv";
+import { getRecaudosList, downloadFileRecaudo, cargarArchivoRecaudo } from "../../utils/fetchFunctions";
+import { descargarCSV, onChangeEan13Number } from "../../utils/functions";
+
 
 const GestionArchivosRecaudo = () => {
   const [showModal, setShowModal] = useState(false);
@@ -89,7 +89,7 @@ const GestionArchivosRecaudo = () => {
 
     }, [handleClose, file, selected]);
 
-  const DescargarArchivo = useCallback(
+  const DescargarReporte = useCallback(
     async (e) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
@@ -102,21 +102,7 @@ const GestionArchivosRecaudo = () => {
           convenio_id: selected.pk_id_convenio_directo,
         })
           .then(async (res) => {
-            const options = {
-              fieldSeparator: ";",
-              quoteStrings: '"',
-              decimalSeparator: ",",
-              showLabels: true,
-              showTitle: false,
-              title: `Reporte_${selected?.nombre_convenio}`,
-              useTextFile: false,
-              useBom: true,
-              useKeysAsHeaders: false,
-              filename: `Reporte_${selected?.nombre_convenio}`,
-            };
-            const csvExporter = new ExportToCsv(options);
-            const data = JSON.stringify(res);
-            csvExporter.generateCsv(data);
+            descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
           })
           .catch((err) => {
             if (err?.cause === "custom") {
@@ -130,6 +116,31 @@ const GestionArchivosRecaudo = () => {
 
       handleClose();
     }, [handleClose, selected]);
+
+  const DescargarErrores = useCallback(
+    async () => {
+      let errores = []
+
+      if (Array.isArray(showModalErrors?.errores)) {
+        errores.push(['Linea', 'Columna', 'Descripcion'])
+        showModalErrors?.errores.map((err_esp) => {
+          Object.keys(err_esp.error).map((item) => {
+            errores.push([err_esp.line, item, err_esp.error[item]])
+            return null
+          })
+          return null
+        })
+      } else {
+        errores.push(['ERRORES EN HEADERS', ''], ['Columna', 'Descripcion'])
+        Object.keys(showModalErrors?.errores).map((item) => {
+          errores.push([item, showModalErrors?.errores[item]])
+          return null
+        })
+      }
+
+      descargarCSV('Errores_del_archivo', errores)
+      handleClose();
+    }, [handleClose, showModalErrors]);
 
   return (
     <Fragment>
@@ -190,6 +201,7 @@ const GestionArchivosRecaudo = () => {
           type="tel"
           autoComplete="off"
           maxLength={"13"}
+          onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
           onChange={(ev) => { }}
         />
         <Input
@@ -230,7 +242,7 @@ const GestionArchivosRecaudo = () => {
         <h2 className="text-3xl mx-auto text-center mb-4">
           Gestion de archivos de recaudo
         </h2>
-        <Form onSubmit={showModalOptions ? CargarArchivo : DescargarArchivo}>
+        <Form onSubmit={showModalOptions ? CargarArchivo : DescargarReporte}>
           {showModalOptions && (
             <Input
               // label='Seleccionar Archivo'
@@ -272,37 +284,11 @@ const GestionArchivosRecaudo = () => {
         <h2 className="text-2xl mx-auto text-center mb-4">
           {showModalErrors?.msg ?? "Errores en el archivo"}
         </h2>
-        {showModalErrors && (
-          Array.isArray(showModalErrors?.errores) ?
-            (
-              showModalErrors?.errores.map((err_esp, index) => {
-                return (
-                  <div key={index}>
-                    <h3>Linea {err_esp.line}</h3>
-                    {Object.keys(err_esp.error).map((item, index) => {
-                      return (
-                        <div key={index}>
-                          <h3>{item}</h3>
-                          <h3>Descripcion: {err_esp.error[item]}</h3>
-                        </div>
-                      )
-                    })}
-                    <hr></hr>
-                  </div>
-                )
-              })
-            ) : (
-              Object.keys(showModalErrors?.errores).map((item, index) => {
-                return (
-                  <div key={index}>
-                    <h3>{item ?? ""}</h3>
-                    <h3>Descripcion: {showModalErrors?.errores[item] ?? ""}</h3>
-                    <hr></hr>
-                  </div>
-                )
-              })
-            )
-        )}
+        <ButtonBar>
+          <Button onClick={() => { DescargarErrores() }}>
+            Descargar errores del archivo
+          </Button>
+        </ButtonBar>
       </Modal >
     </Fragment >
   );
