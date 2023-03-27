@@ -6,8 +6,8 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getRecaudosList, downloadFileRecaudo, } from "../../utils/fetchFunctions";
-import { cargarArchivoRecaudo, descargarCSV, onChangeEan13Number } from "../../utils/functions";
+import { getRecaudosList, downloadFileRecaudo, cargarArchivoRecaudo } from "../../utils/fetchFunctions";
+import { descargarCSV, onChangeEan13Number } from "../../utils/functions";
 
 
 const GestionArchivosRecaudo = () => {

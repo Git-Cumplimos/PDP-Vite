@@ -15,11 +15,10 @@ import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } fro
 
 const RecaudoDirecto = () => {
   const [listRecaudos, setListRecaudos] = useState([])
-  const [selected, setSelected] = useState(false); // fila selecionada
+  const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
-  // const [cargando, setCargando] = useState(false)
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
     "Longitud minima": "",
@@ -90,13 +89,8 @@ const RecaudoDirecto = () => {
         setMaxPages(data?.obj?.maxPages ?? '')
       })
       .catch((err) => {
-        // if (err?.cause === "custom") {
-        //   notifyError(err?.message);
-        //   return;
-        // }
         console.error(err?.message);
       });
-    // setCargando(true)
   }, [pageData, searchFilters])
 
   useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters])
@@ -104,7 +98,6 @@ const RecaudoDirecto = () => {
   useEffect(() => {
     setPageData(pageData => ({ ...pageData, page: 1 }));
   }, [pageData.limit]);
-
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
     e.preventDefault();
@@ -152,8 +145,9 @@ const RecaudoDirecto = () => {
   }, [handleClose, getRecaudos, selected, referencias])
 
   const descargarPlantilla = useCallback(() => {
-    descargarCSV('Ejemplo_de_archivo_recaudo',res)
+    descargarCSV('Ejemplo_de_archivo_recaudo', res)
   }, [res]);
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Convenios de Recaudos Directo</h1>
@@ -161,7 +155,6 @@ const RecaudoDirecto = () => {
         <Button type={"submit"} onClick={() => setShowModal(true)} >
           Crear Convenio</Button>
       </ButtonBar>
-      {/* {cargando ? (<> */}
       <TableEnterprise
         title="Convenios de Recaudos"
         headers={[
@@ -212,8 +205,6 @@ const RecaudoDirecto = () => {
           type="tel"
           autoComplete="off"
           maxLength={"4"}
-          onChange={(ev) => { }}
-
         />
         <Input
           id={"codigo_ean_iac_search"}
@@ -222,7 +213,7 @@ const RecaudoDirecto = () => {
           type="tel"
           autoComplete="off"
           maxLength={"13"}
-          onInput={(ev) =>{ev.target.value = onChangeEan13Number(ev);}}
+          onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
         />
         <Input
           id={"nombre_convenio"}
@@ -231,24 +222,21 @@ const RecaudoDirecto = () => {
           type="text"
           autoComplete="off"
           maxLength={"30"}
-          onChange={(ev) => { }}
         />
       </TableEnterprise>
-      {/* </>) : (<>Cargando...</>)} */}
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
         <Form onSubmit={crearModificarConvenioRecaudo} grid >
           {selected && (
-            <>
-              <Input
-                id={"Codigo_convenio"}
-                label={"Codigo convenio"}
-                name={"pk_id_convenio_directo"}
-                autoComplete="off"
-                defaultValue={selected?.pk_id_convenio_directo ?? ""}
-                disabled={selected ? true : false}
-                required />
-            </>
+            <Input
+              id={"Codigo_convenio"}
+              label={"Codigo convenio"}
+              name={"pk_id_convenio_directo"}
+              autoComplete="off"
+              defaultValue={selected?.pk_id_convenio_directo ?? ""}
+              disabled={selected ? true : false}
+              required
+            />
           )}
           <Input
             id={"nombre_convenio"}
@@ -294,12 +282,10 @@ const RecaudoDirecto = () => {
             name={"ean13"}
             type='tel'
             maxLength={"13"}
-            onInput={(ev) =>{ev.target.value = onChangeEan13Number(ev);}}
+            onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
             defaultValue={selected?.ean13 ?? ""}
-            // disabled={selected ? true : false}
             autoComplete="off"
           />
-
           <Fieldset legend={"Referencias"}>
             {referencias?.map((obj, index) => {
               return (
@@ -360,7 +346,6 @@ const RecaudoDirecto = () => {
               </ButtonBar>
             }
           </Fieldset>
-          {/*  */}
           <TextArea
             id={1}
             label={"Observaciones"}
@@ -368,8 +353,6 @@ const RecaudoDirecto = () => {
             type="text"
             autoComplete="off"
             defaultValue={selected?.observaciones ?? ""}
-            required
-
           />
           <ToggleInput
             id={"permite_vencidos"}
@@ -392,7 +375,6 @@ const RecaudoDirecto = () => {
           </ButtonBar>
         </Form>
       </Modal>
-
     </Fragment>
   )
 }

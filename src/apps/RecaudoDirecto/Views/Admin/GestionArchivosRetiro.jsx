@@ -6,8 +6,8 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getRetirosList, downloadFileRetiro } from "../../utils/fetchFunctions"
-import { cargarArchivoRetiro, descargarCSV, onChangeEan13Number } from "../../utils/functions";
+import { getRetirosList, downloadFileRetiro, cargarArchivoRetiro } from "../../utils/fetchFunctions"
+import { descargarCSV, onChangeEan13Number } from "../../utils/functions";
 
 
 const GestionArchivosRetiro = () => {

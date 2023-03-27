@@ -1,3 +1,4 @@
+import { fetchSecure } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 
 // const url = `http://127.0.0.1:8000`;
@@ -15,12 +16,10 @@ const buildGetFunction = (url) => {
       }
       return res;
     } catch (err) {
-      // console.log(err)
       throw err
     }
   };
 };
-
 const buildPostFunction = (url) => {
   return async (body) => {
     if (!body) {
@@ -34,10 +33,8 @@ const buildPostFunction = (url) => {
         }
         throw new Error(res, { cause: "custom" });
       }
-      // console.log(res)
       return res;
     } catch (err) {
-      // console.log(err) ;
       throw err
     }
   };
@@ -62,30 +59,14 @@ const buildPutFunction = (url) => {
         }
         throw new Error(res, { cause: "custom" });
       }
-      // console.log(res)
       return res;
     } catch (err) {
       throw err;
     }
   };
 };
-export const fetchImportFile = (url) => {
-  return async (args, body) => {
-    try {
-      const res = await fetchData(url + `?convenio_id=${args.convenio_id}`, 'POST', {}, body);
-      if (!res?.status) {
-        if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
-        }
-        throw new Error(res, { cause: "custom" });
-      }
-      return res;
-    } catch (error) {
-      throw error;
-    }
-  }
-};
-export const fetchDownloadFile = (url) => {
+
+export const descargarReporte = (url) => {
   return async (args = {}) => {
     try {
       const Peticion = await fetchData(url, 'GET', args);
@@ -95,6 +76,41 @@ export const fetchDownloadFile = (url) => {
         }
       }
       return Peticion;
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+export const cargueArchivo = (url_cargar,url_verificar) => {
+  return async (file, nombre_convenio, convenio_id) => {
+
+    try {
+      const responsePostUrl = await fetchSecure(`${url_cargar}?nombre_convenio=${nombre_convenio}`);
+      const resPostUrl = await responsePostUrl.json();
+
+      const { url, fields } = resPostUrl.obj;
+      const filename = fields.key;
+      const formData = new FormData();
+      for (var key in fields) {
+        formData.append(key, fields[key]);
+      }
+      formData.set("file", file);
+      await fetch(url, {
+        method: "POST",
+        body: formData,
+        mode: "no-cors",
+      });
+
+      const responseValidacionArchivo = await fetchSecure(
+        `${url_verificar}?filename=${filename}&convenio_id=${convenio_id}`
+      );
+      const resValidacionArchivo = await responseValidacionArchivo.json();
+
+      if (!resValidacionArchivo?.status) {
+        throw resValidacionArchivo;
+      }
+
+      return resValidacionArchivo;
     } catch (error) {
       throw error;
     }
@@ -115,10 +131,13 @@ export const addConveniosRecaudoList = buildPostFunction(
 export const modConveniosRecaudoList = buildPutFunction(
   `${url}/convenio-recaudo/modificar`
 );
-export const downloadFileRecaudo = fetchDownloadFile(
+export const downloadFileRecaudo = descargarReporte(
   `${url}/convenio-recaudo/descargar-reporte`
 );
-
+export const cargarArchivoRecaudo = cargueArchivo(
+  `${url}/convenio-recaudo-masivo/obtener-url-carga`,
+  `${url}/convenio-recaudo-masivo/verificar-archivo`
+);
 
 /* -- Recaudo -- */
 export const getRecaudo = buildPostFunction(
@@ -142,9 +161,14 @@ export const addConveniosRetiroList = buildPostFunction(
 export const modConveniosRetiroList = buildPutFunction(
   `${url}/convenio-retiro/modificar`
 );
-export const downloadFileRetiro = fetchDownloadFile(
+export const downloadFileRetiro = descargarReporte(
   `${url}/convenio-retiro/descargar-reporte`
 );
+export const cargarArchivoRetiro = cargueArchivo(
+  `${url}/convenio-retiro-masivo/obtener-url-carga`,
+  `${url}/convenio-retiro-masivo/verificar-archivo`
+);
+
 
 /* -- Retiro -- */
 export const getRetiro = buildPostFunction(
