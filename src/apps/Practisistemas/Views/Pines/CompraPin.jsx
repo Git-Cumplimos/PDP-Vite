@@ -390,7 +390,7 @@ const CompraPin = () => {
               day: "2-digit",
             }).format(today);
 
-            for (let i = 0; i <= 4; i++) {
+            for (let i = 0; i <= 3; i++) {
               try {
                 const promesa = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -445,7 +445,7 @@ const CompraPin = () => {
               } catch (error) {
                 console.error(error);
               }
-              if (i <= 4) { 
+              if (i <= 2) { 
                 notify(
                   "Su transacción esta siendo procesada, no recargue la página"
                 );
