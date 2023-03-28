@@ -15,3 +15,43 @@
   margin-bottom: 0.4vw;
   font-weight: bold;
 }
+/* .contenedorSelect {
+  width: 96%;
+  padding-left: 11px;
+} */
+.contenedorSelect {
+  width: 100%;
+  display: flex;
+  /* padding-left: 120px; */
+  align-items: center;
+  justify-content: space-around;
+  /* background: red; */
+  flex-direction: column;
+  gap: 15px;
+}
+.tituloTipoDomiciliacion {
+  font-size: 21px;
+}
+.estiloSelect {
+  /* background: blue; */
+  width: 56%;
+}
+@media (min-width: 770px) {
+  .contenedorSelect {
+    width: 98%;
+    display: flex;
+    padding-left: 0px;
+    align-items: center;
+    /* background: red; */
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .tituloTipoDomiciliacion {
+    font-size: 21px;
+  }
+  .estiloSelect {
+    /* background: blue; */
+    width: 53%;
+    padding-left: 27px;
+  }
+}

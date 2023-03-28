@@ -43,7 +43,13 @@ const ModificarPps = () => {
   const [numPagosPdp, setNumPagosPdp] = useState("");
   const [estadoComercio, setEstadoComercio] = useState("");
   const [estadoComercioString, setEstadoComercioString] = useState("");
-  const { contenedorLogo, contenedorSubtitle } = classes;
+  const {
+    contenedorLogo,
+    contenedorSubtitle,
+    contenedorSelect,
+    tituloTipoDomiciliacion,
+    estiloSelect,
+  } = classes;
   const navigate = useNavigate();
   //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
   useEffect(() => {
@@ -358,19 +364,28 @@ const ModificarPps = () => {
                   }}
                   required
                 />
-                <Select
-                  onChange={(event) =>
-                    setTipoDomiciliacion(event?.target?.value)
-                  }
-                  id="comissionType"
-                  label="Tipo de Domiciliación"
-                  value={tipoDomiciliacion}
-                  options={{
-                    Mensual: 1,
-                    Quincenal: 2,
-                    Semanal: 3,
-                  }}
-                ></Select>
+                <div className={contenedorSelect}>
+                  <div>
+                    <h1 className={tituloTipoDomiciliacion}>
+                      Tipo de Domiciliación
+                    </h1>
+                  </div>
+                  <div className={estiloSelect}>
+                    <Select
+                      onChange={(event) =>
+                        setTipoDomiciliacion(event?.target?.value)
+                      }
+                      id="comissionType"
+                      // label="Tipo de Domiciliación"
+                      value={tipoDomiciliacion}
+                      options={{
+                        Mensual: 1,
+                        Quincenal: 2,
+                        Semanal: 3,
+                      }}
+                    ></Select>
+                  </div>
+                </div>
                 <ToggleInput
                   checked={estadoComercio}
                   onClick={() => setEstadoComercio((old) => !old)}
