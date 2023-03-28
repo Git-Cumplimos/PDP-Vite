@@ -11,7 +11,7 @@ import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyPending } from "../../../../utils/notify";
 import { onChangeNumber } from "../../../../utils/functions";
-import { onChangeEan13Number, descargarCSV } from "../../utils/functions";
+import { onChangeEan13Number, onChangeNit, descargarCSV } from "../../utils/functions";
 import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
 
 const RetiroDirecto = () => {
@@ -252,6 +252,7 @@ const RetiroDirecto = () => {
             type="text"
             placeholder={"333.333.333-3"}
             autoComplete="off"
+            onInput={(ev) => { ev.target.value = onChangeNit(ev); }}
             defaultValue={selected?.nit ?? ""}
             required />
           <Select

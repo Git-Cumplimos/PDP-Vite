@@ -146,7 +146,6 @@ const GestionArchivosRetiro = () => {
           "Código convenio",
           "Código EAN o IAC",
           "Nombre convenio",
-          "Permite vencidos",
           "Estado",
           "Fecha creacion",
         ]}
@@ -155,14 +154,12 @@ const GestionArchivosRetiro = () => {
             pk_id_convenio_directo,
             ean13,
             nombre_convenio,
-            permite_vencidos,
             estado,
             fecha_creacion,
           }) => ({
             pk_id_convenio_directo,
             ean13,
             nombre_convenio,
-            permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
             estado: estado ? "Activo" : "No activo",
             fecha_creacion: fecha_creacion ?? "ninguna",
           })
