@@ -10,6 +10,7 @@ import MoneyInput from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRecaudo, searchConveniosRecaudoList, modRecaudo } from "../../utils/fetchFunctions"
+import useDelayedCallback from "../../../../hooks/useDelayedCallback";
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
@@ -26,6 +27,10 @@ const RecaudoConjunto = () => {
     referencia1: '',
     referencia2: ''
   })
+  const limitesMontos = {
+    max: 999999999,
+    min: 1,
+  };
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -38,10 +43,6 @@ const RecaudoConjunto = () => {
       valor_total_trx: ''
     })
   }, []);
-  const limitesMontos = {
-    max: 999999999,
-    min: 1,
-  };
 
   const getData = useCallback(async () => {
     try {
@@ -56,39 +57,42 @@ const RecaudoConjunto = () => {
     }
   }, [navigate, pk_id_convenio])
 
-  const consultarRecaudoD = useCallback(async (e) => {
-    e.preventDefault()
-    const data = {
-      consulta_recaudo: {
-        convenio_id: pk_id_convenio,
-        permite_vencidos: convenioRecaudo.permite_vencidos ?? false,
-        tipo_convenio: convenioRecaudo.fk_id_tipo_convenio,
-        referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
-      },
-      valor_total_trx: 0,
-      comercio: {
-        id_comercio: roleInfo?.id_comercio,
-        id_usuario: roleInfo?.id_usuario,
-        id_terminal: roleInfo?.id_dispositivo,
-      },
-      is_oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-        roleInfo?.tipo_comercio === "KIOSCO",
-      nombre_usuario: pdpUser?.uname ?? "",
-    };
-    await getRecaudo(data)
-      .then((data) => {
-        setDataRecaudo(data?.obj?.recaudo)
-        setId_Trx(data?.obj?.id_trx ?? false)
-        data?.obj?.recaudo && notify(data.msg)
-        setShowModal(true);
-      })
-      .catch((err) => {
-        notifyError(err?.message);
-        handleClose()
-      });
+  const consultarRecaudoD = useDelayedCallback(
+    useCallback(async (e) => {
+      e.preventDefault()
+      const data = {
+        consulta_recaudo: {
+          convenio_id: pk_id_convenio,
+          permite_vencidos: convenioRecaudo.permite_vencidos ?? false,
+          tipo_convenio: convenioRecaudo.fk_id_tipo_convenio,
+          referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
+        },
+        valor_total_trx: 0,
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        is_oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
+        nombre_usuario: pdpUser?.uname ?? "",
+      };
+      await getRecaudo(data)
+        .then((data) => {
+          setDataRecaudo(data?.obj?.recaudo)
+          setId_Trx(data?.obj?.id_trx ?? false)
+          data?.obj?.recaudo && notify(data.msg)
+          setShowModal(true);
+        })
+        .catch((err) => {
+          notifyError(err?.message);
+          handleClose()
+        })
 
-  }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose])
+    }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose]),
+    300
+  )
 
 
   const hacerRecaudo = useCallback(async (e) => {
@@ -143,7 +147,7 @@ const RecaudoConjunto = () => {
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
 
   }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx,
-     pk_id_convenio, convenioRecaudo, dataReferencias, navigate, handleClose])
+    pk_id_convenio, convenioRecaudo, dataReferencias, navigate, handleClose])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
@@ -180,7 +184,7 @@ const RecaudoConjunto = () => {
             return (
               <Input
                 key={index}
-                id={1}
+                id={dict?.nombre_referencia ?? `referencia ${index + 1}`}
                 label={dict?.nombre_referencia ?? "Referencia 1"}
                 name={'referencia' + (index + 1)}
                 type="text"
@@ -224,7 +228,7 @@ const RecaudoConjunto = () => {
           {convenioRecaudo?.fk_id_tipo_convenio !== 3 ? (
             <>
               <Input
-                id={1}
+                id={"Estado"}
                 label={"Estado"}
                 name={"nombre_estado"}
                 type="text"
@@ -236,8 +240,9 @@ const RecaudoConjunto = () => {
                 label="Valor a recaudar"
                 name="valor_total_trx"
                 autoComplete="off"
-                min={dataRecaudo?.fk_modificar_valor === 1 ? ((dataRecaudo.valor - 1) - dataRecaudo.valor_pagado) ?? 0 : limitesMontos?.min}
                 equalError={false}
+                min={dataRecaudo?.fk_modificar_valor === 1 ?
+                  ((dataRecaudo.valor - 1) - dataRecaudo.valor_pagado) ?? 0 : limitesMontos?.min}
                 max={dataRecaudo?.fk_modificar_valor === 1 ||
                   dataRecaudo?.fk_modificar_valor === 2 ?
                   parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0)
@@ -254,7 +259,7 @@ const RecaudoConjunto = () => {
                 return (
                   <Input
                     key={index}
-                    id={1}
+                    id={dict?.nombre_referencia ?? `referencia ${index + 1}`}
                     label={dict?.nombre_referencia ?? "Referencia 1"}
                     name={'referencia' + (index + 1)}
                     type="text"
@@ -276,7 +281,7 @@ const RecaudoConjunto = () => {
           )}
           <ButtonBar>
             <Button type={"submit"} >
-              {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Confirmar":"Aceptar"}
+              {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Confirmar" : "Aceptar"}
             </Button>
             <Button onClick={() => handleClose()} >
               Cancelar

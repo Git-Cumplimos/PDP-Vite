@@ -348,7 +348,7 @@ const RetiroDirecto = () => {
             }
           </Fieldset>
           <TextArea
-            id={1}
+            id={"Observaciones"}
             label={"Observaciones"}
             name={"observaciones"}
             type="text"
