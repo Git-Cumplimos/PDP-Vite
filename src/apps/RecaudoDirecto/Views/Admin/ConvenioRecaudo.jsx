@@ -12,6 +12,7 @@ import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyPending } from "../../../../utils/notify";
 import { onChangeEan13Number, descargarCSV } from "../../utils/functions";
 import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
+import { onChangeNumber } from "../../../../utils/functions";
 
 const RecaudoDirecto = () => {
   const [listRecaudos, setListRecaudos] = useState([])
@@ -203,8 +204,9 @@ const RecaudoDirecto = () => {
           label={"Código de convenio"}
           name={"pk_id_convenio_directo"}
           type="tel"
-          autoComplete="off"
           maxLength={"4"}
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
+          autoComplete="off"
         />
         <Input
           id={"codigo_ean_iac_search"}

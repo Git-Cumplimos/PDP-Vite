@@ -8,6 +8,7 @@ import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRetirosList, downloadFileRetiro, cargarArchivoRetiro } from "../../utils/fetchFunctions"
 import { descargarCSV, onChangeEan13Number } from "../../utils/functions";
+import { onChangeNumber } from "../../../../utils/functions";
 
 
 const GestionArchivosRetiro = () => {
@@ -186,8 +187,7 @@ const GestionArchivosRetiro = () => {
           type="tel"
           autoComplete="off"
           maxLength={"4"}
-          onChange={(ev) => { }}
-
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
         />
         <Input
           id={"codigo_ean_iac_search"}
@@ -197,7 +197,6 @@ const GestionArchivosRetiro = () => {
           autoComplete="off"
           maxLength={"13"}
           onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
-          onChange={(ev) => { }}
         />
         <Input
           id={"nombre_convenio"}
@@ -206,7 +205,6 @@ const GestionArchivosRetiro = () => {
           type="text"
           autoComplete="off"
           maxLength={"30"}
-          onChange={(ev) => { }}
         />
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>

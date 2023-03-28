@@ -10,6 +10,7 @@ import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyPending } from "../../../../utils/notify";
+import { onChangeNumber } from "../../../../utils/functions";
 import { onChangeEan13Number, descargarCSV } from "../../utils/functions";
 import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
 
@@ -199,32 +200,26 @@ const RetiroDirecto = () => {
           label={"Código de convenio"}
           name={"pk_id_convenio_directo"}
           type="tel"
-          autoComplete="off"
           maxLength={"4"}
-          onChange={(ev) => {
-          }}
-          required
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
+          autoComplete="off"
         />
         <Input
           id={"codigo_ean_iac_search"}
           label={"Código EAN o IAC"}
           name={"ean13"}
           type="tel"
-          autoComplete="off"
           maxLength={"13"}
           onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
-          onChange={(ev) => {
-          }}
-          required
+          autoComplete="off"
         />
         <Input
           id={"nombre_convenio"}
           label={"Nombre del convenio"}
           name={"nombre_convenio"}
           type="text"
-          autoComplete="off"
           maxLength={"30"}
-          required
+          autoComplete="off"
         />
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>

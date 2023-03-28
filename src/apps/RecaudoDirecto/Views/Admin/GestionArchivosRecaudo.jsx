@@ -6,6 +6,7 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
+import { onChangeNumber } from "../../../../utils/functions";
 import { getRecaudosList, downloadFileRecaudo, cargarArchivoRecaudo } from "../../utils/fetchFunctions";
 import { descargarCSV, onChangeEan13Number } from "../../utils/functions";
 
@@ -190,28 +191,26 @@ const GestionArchivosRecaudo = () => {
           label={"Código de convenio"}
           name={"pk_id_convenio_directo"}
           type="tel"
-          autoComplete="off"
           maxLength={"4"}
-          onChange={(ev) => { }}
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
+          autoComplete="off"
         />
         <Input
           id={"codigo_ean_iac_search"}
           label={"Código EAN o IAC"}
           name={"ean13"}
           type="tel"
-          autoComplete="off"
           maxLength={"13"}
           onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
-          onChange={(ev) => { }}
+          autoComplete="off"
         />
         <Input
           id={"nombre_convenio"}
           label={"Nombre del convenio"}
           name={"nombre_convenio"}
           type="text"
-          autoComplete="off"
           maxLength={"30"}
-          onChange={(ev) => { }}
+          autoComplete="off"
         />
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
