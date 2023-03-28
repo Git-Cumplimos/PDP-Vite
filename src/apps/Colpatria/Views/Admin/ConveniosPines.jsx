@@ -88,6 +88,7 @@ const ConveniosPines = () => {
       setSelected(null);
       setUploadMasivo(false);
       setMassiveFile(null);
+      setUploadingError("");
     }
   }, [loading]);
 

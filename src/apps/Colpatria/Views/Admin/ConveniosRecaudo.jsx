@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Fieldset from "../../../../components/Base/Fieldset";
@@ -117,6 +117,7 @@ const ConveniosRecaudo = () => {
       setSelected(null);
       setUploadMasivo(false);
       setMassiveFile(null);
+      setUploadingError("");
     }
   }, [loading]);
 
