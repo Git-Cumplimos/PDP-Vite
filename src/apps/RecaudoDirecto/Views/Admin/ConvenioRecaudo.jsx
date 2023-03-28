@@ -10,7 +10,7 @@ import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyPending } from "../../../../utils/notify";
-import { onChangeEan13Number, onChangeNit, descargarCSV } from "../../utils/functions";
+import { onChangeEan13Number, onChangeNit, descargarCSV,changeDateFormat } from "../../utils/functions";
 import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
 import { onChangeNumber } from "../../../../utils/functions";
 
@@ -172,13 +172,16 @@ const RecaudoDirecto = () => {
             nombre_convenio,
             estado,
             fecha_creacion,
-          }) => ({
-            pk_id_convenio_directo,
-            ean13,
-            nombre_convenio,
-            estado: estado ? "Activo" : "No activo",
-            fecha_creacion: fecha_creacion ?? "ninguna",
-          })
+          }) => {
+            fecha_creacion = changeDateFormat(fecha_creacion)
+            return{
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+              estado: estado ? "Activo" : "No activo",
+              fecha_creacion: fecha_creacion ??"ninguna",
+            }
+          }
         )}
         onSelectRow={(e, i) => {
           setShowModal(true);
@@ -375,7 +378,7 @@ const RecaudoDirecto = () => {
           </ButtonBar>
         </Form>
       </Modal>
-    </Fragment>
+    </Fragment >
   )
 }
 

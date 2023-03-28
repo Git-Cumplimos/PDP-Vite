@@ -11,7 +11,7 @@ import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyPending } from "../../../../utils/notify";
 import { onChangeNumber } from "../../../../utils/functions";
-import { onChangeEan13Number, onChangeNit, descargarCSV } from "../../utils/functions";
+import { onChangeEan13Number, onChangeNit, descargarCSV,changeDateFormat } from "../../utils/functions";
 import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
 
 const RetiroDirecto = () => {
@@ -171,13 +171,16 @@ const RetiroDirecto = () => {
             nombre_convenio,
             estado,
             fecha_creacion,
-          }) => ({
-            pk_id_convenio_directo,
-            ean13,
-            nombre_convenio,
-            estado: estado ? "Activo" : "No activo",
-            fecha_creacion: fecha_creacion ?? "No indicada",
-          })
+          }) => {
+            fecha_creacion = changeDateFormat(fecha_creacion)
+            return{
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+              estado: estado ? "Activo" : "No activo",
+              fecha_creacion: fecha_creacion ?? "No indicada",
+            }
+          }
         )}
         maxPage={maxPages}
         onSetPageData={setPageData}

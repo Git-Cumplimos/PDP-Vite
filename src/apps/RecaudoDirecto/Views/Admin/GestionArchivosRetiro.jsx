@@ -7,7 +7,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRetirosList, downloadFileRetiro, cargarArchivoRetiro } from "../../utils/fetchFunctions"
-import { descargarCSV, onChangeEan13Number } from "../../utils/functions";
+import { descargarCSV, onChangeEan13Number, changeDateFormat } from "../../utils/functions";
 import { onChangeNumber } from "../../../../utils/functions";
 
 
@@ -156,13 +156,16 @@ const GestionArchivosRetiro = () => {
             nombre_convenio,
             estado,
             fecha_creacion,
-          }) => ({
-            pk_id_convenio_directo,
-            ean13,
-            nombre_convenio,
-            estado: estado ? "Activo" : "No activo",
-            fecha_creacion: fecha_creacion ?? "ninguna",
-          })
+          }) => {
+            fecha_creacion = changeDateFormat(fecha_creacion)
+            return {
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+              estado: estado ? "Activo" : "No activo",
+              fecha_creacion: fecha_creacion ?? "ninguna",
+            }
+          }
         )}
         onSelectRow={(e, i) => {
           setShowModal(true);

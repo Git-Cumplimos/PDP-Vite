@@ -82,29 +82,28 @@ export const onChangeEan13Number = (ev) => {
 export const onChangeNit = (ev) => {
   let caret_pos = ev.target.selectionStart ?? 0;
   const len = ev.target.value.length;
-  
+
   ev.target.value = ((ev.target.value ?? "").match(/[\d-]/g) ?? []).join("");
-  
-  const matches = ev.target.value.match(/(\d{3})/g);
+
+  const matches = ev.target.value.match(/(\d{3})/g );
 
   let newStr = "";
-  if (matches) {
-    if (matches[0]) {
-      newStr = `${newStr}${matches[0]}.`;
-      if (matches[1]) {
-        newStr = `${newStr}${matches[1]}.`;
-        if (matches[2] && ev.target.value.match(/(\d{3}-)/g)) {
-          console.log("entro")
-          newStr = `${newStr}${matches[2]}-${calcularDigitoVerificacion(
-            ev.target.value
-          )}`;
-        } else {
-          newStr = `${newStr}${ev.target.value.substring(6, 9)}`;
-        }
+  if (matches && matches[0]) {
+    newStr = `${newStr}${matches[0]}.`;
+    if (matches[1]) {
+      newStr = `${newStr}${matches[1]}.`;
+      if (matches[2] && ev.target.value.match(/(\d{3}-)/g)) {
+        console.log("entro")
+        newStr = `${newStr}${matches[2]}-${calcularDigitoVerificacion(
+          ev.target.value
+        )}`;
       } else {
-        newStr = `${newStr}${ev.target.value.substring(3)}`;
+        newStr = `${newStr}${ev.target.value.substring(6, 9)}`;
       }
+    } else {
+      newStr = `${newStr}${ev.target.value.substring(3)}`;
     }
+
     ev.target.value = newStr;
 
     ev.target.focus();
@@ -113,3 +112,16 @@ export const onChangeNit = (ev) => {
   }
   return ev.target.value;
 };
+
+export const changeDateFormat = (fecha)=>{
+  const dateFormatter = Intl.DateTimeFormat("es-CO", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
+  const tempDate = new Date(fecha);
+  tempDate.setHours(tempDate.getHours() + 5);
+  return dateFormatter.format(tempDate);
+}
