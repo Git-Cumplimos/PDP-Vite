@@ -94,6 +94,7 @@ const CrearPin = () => {
     { value: "3", label: "Tarjeta Identidad" },
     { value: "4", label: "NIT" },
     { value: "5", label: "Pasaporte" },
+    { value: "13", label: "PPT (Permiso por Protección Temporal)" },
   ];
   const [tipoDocumento, setTipoDocumento] = useState("")
 
@@ -414,7 +415,7 @@ const CrearPin = () => {
     e.preventDefault();
     setDisabledBtnsContinuar(true);
     setShowFormulario(false)
-    consultaClientes(documento,olimpia,idPin,tipoPin).then((resp) => {
+    consultaClientes(documento,olimpia,tipoDocumento,idPin,tipoPin).then((resp) => {
       if (!resp?.status){
         notifyError(resp?.msg)
       }else{
@@ -709,7 +710,7 @@ const CrearPin = () => {
           setCategoria("")
         }}
       />
-      {olimpia === "true" ? 
+      {/* {olimpia === "true" ? 
       <>
        <Input
        id="idPin"
@@ -726,7 +727,7 @@ const CrearPin = () => {
        }}
       />
       </>
-      :"" }
+      :"" } */}
       <ButtonBar className="lg:col-span-2">
       <Button type="submit" disabled={disabledBtnsContinuar}>
         Continuar
@@ -966,7 +967,7 @@ const CrearPin = () => {
             if(isNaN(tipoPin)){
               setTipoPin("")
             } setDisabledBtns(true)
-            consultaClientes(documento,olimpia,idPin,e.target.value).then((resp) => {
+            consultaClientes(documento,olimpia,tipoDocumento,idPin,e.target.value).then((resp) => {
               if (!resp?.status){
                 notifyError(resp?.msg)
                 setShowPinLicencia(false)
