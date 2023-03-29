@@ -13,6 +13,7 @@ const initialSearchFilters = new Map([
   ["pk_id_convenio_directo", ""],
   ["ean13", ""],
   ["nombre_convenio", ""],
+  ["estado",true],
   ["page", 1],
   ["limit", 10],
 ]);
