@@ -187,7 +187,7 @@ const RecargarPaquetes = () => {
                         setRespuesta(false);
                         console.error(err);
                       });
-                  }, 11000)
+                  }, 7500)
                 );
                 if (prom === true) {
                   setRespuesta(false);
