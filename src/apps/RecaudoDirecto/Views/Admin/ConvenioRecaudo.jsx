@@ -10,8 +10,9 @@ import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyPending } from "../../../../utils/notify";
-import { onChangeEan13Number, descargarCSV } from "../../utils/functions";
+import { onChangeEan13Number, onChangeNit, descargarCSV,changeDateFormat } from "../../utils/functions";
 import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
+import { onChangeNumber } from "../../../../utils/functions";
 
 const RecaudoDirecto = () => {
   const [listRecaudos, setListRecaudos] = useState([])
@@ -161,7 +162,6 @@ const RecaudoDirecto = () => {
           "Código convenio",
           "Código EAN o IAC",
           "Nombre convenio",
-          "Permite vencidos",
           "Estado",
           "Fecha creacion",
         ]}
@@ -170,17 +170,18 @@ const RecaudoDirecto = () => {
             pk_id_convenio_directo,
             ean13,
             nombre_convenio,
-            permite_vencidos,
             estado,
             fecha_creacion,
-          }) => ({
-            pk_id_convenio_directo,
-            ean13,
-            nombre_convenio,
-            permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
-            estado: estado ? "Activo" : "No activo",
-            fecha_creacion: fecha_creacion ?? "ninguna",
-          })
+          }) => {
+            fecha_creacion = changeDateFormat(fecha_creacion)
+            return{
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+              estado: estado ? "Activo" : "No activo",
+              fecha_creacion: fecha_creacion ??"ninguna",
+            }
+          }
         )}
         onSelectRow={(e, i) => {
           setShowModal(true);
@@ -203,8 +204,9 @@ const RecaudoDirecto = () => {
           label={"Código de convenio"}
           name={"pk_id_convenio_directo"}
           type="tel"
-          autoComplete="off"
           maxLength={"4"}
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
+          autoComplete="off"
         />
         <Input
           id={"codigo_ean_iac_search"}
@@ -253,8 +255,9 @@ const RecaudoDirecto = () => {
             name={"nit"}
             type="text"
             placeholder={"333.333.333-3"}
-            autoComplete="off"
             defaultValue={selected?.nit ?? ""}
+            onInput={(ev) => { ev.target.value = onChangeNit(ev); }}
+            autoComplete="off"
             required
           />
           <Select
@@ -347,7 +350,7 @@ const RecaudoDirecto = () => {
             }
           </Fieldset>
           <TextArea
-            id={1}
+            id={"Observaciones"}
             label={"Observaciones"}
             name={"observaciones"}
             type="text"
@@ -365,7 +368,7 @@ const RecaudoDirecto = () => {
               id={"activo"}
               label={"Se encuentra activo"}
               name={"estado"}
-              defaultChecked={selected?.estado}
+              defaultChecked={selected?.estado ?? ""}
             />
           )}
           <ButtonBar>
@@ -375,7 +378,7 @@ const RecaudoDirecto = () => {
           </ButtonBar>
         </Form>
       </Modal>
-    </Fragment>
+    </Fragment >
   )
 }
 

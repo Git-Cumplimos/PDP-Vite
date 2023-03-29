@@ -7,7 +7,8 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRetirosList, downloadFileRetiro, cargarArchivoRetiro } from "../../utils/fetchFunctions"
-import { descargarCSV, onChangeEan13Number } from "../../utils/functions";
+import { descargarCSV, onChangeEan13Number, changeDateFormat } from "../../utils/functions";
+import { onChangeNumber } from "../../../../utils/functions";
 
 
 const GestionArchivosRetiro = () => {
@@ -145,7 +146,6 @@ const GestionArchivosRetiro = () => {
           "Código convenio",
           "Código EAN o IAC",
           "Nombre convenio",
-          "Permite vencidos",
           "Estado",
           "Fecha creacion",
         ]}
@@ -154,17 +154,18 @@ const GestionArchivosRetiro = () => {
             pk_id_convenio_directo,
             ean13,
             nombre_convenio,
-            permite_vencidos,
             estado,
             fecha_creacion,
-          }) => ({
-            pk_id_convenio_directo,
-            ean13,
-            nombre_convenio,
-            permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
-            estado: estado ? "Activo" : "No activo",
-            fecha_creacion: fecha_creacion ?? "ninguna",
-          })
+          }) => {
+            fecha_creacion = changeDateFormat(fecha_creacion)
+            return {
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+              estado: estado ? "Activo" : "No activo",
+              fecha_creacion: fecha_creacion ?? "ninguna",
+            }
+          }
         )}
         onSelectRow={(e, i) => {
           setShowModal(true);
@@ -186,8 +187,7 @@ const GestionArchivosRetiro = () => {
           type="tel"
           autoComplete="off"
           maxLength={"4"}
-          onChange={(ev) => { }}
-
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
         />
         <Input
           id={"codigo_ean_iac_search"}
@@ -197,7 +197,6 @@ const GestionArchivosRetiro = () => {
           autoComplete="off"
           maxLength={"13"}
           onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
-          onChange={(ev) => { }}
         />
         <Input
           id={"nombre_convenio"}
@@ -206,7 +205,6 @@ const GestionArchivosRetiro = () => {
           type="text"
           autoComplete="off"
           maxLength={"30"}
-          onChange={(ev) => { }}
         />
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
