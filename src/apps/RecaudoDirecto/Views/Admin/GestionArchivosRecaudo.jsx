@@ -1,15 +1,24 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
+import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import useMap from "../../../../hooks/useMap";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import DataTable from "../../../../components/Base/DataTable";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getRecaudosList, downloadFileRecaudo, cargarArchivoRecaudo } from "../../utils/fetchFunctions";
+import { getUrlRecaudosList, downloadFileRecaudo, cargarArchivoRecaudo } from "../../utils/fetchFunctions";
 import { descargarCSV, onChangeEan13Number, changeDateFormat } from "../../utils/functions";
 import { onChangeNumber } from "../../../../utils/functions";
 
+const initialSearchFilters = new Map([
+  ["pk_id_convenio_directo", ""],
+  ["ean13", ""],
+  ["nombre_convenio", ""],
+  ["page", 1],
+  ["limit", 10],
+]);
 
 const GestionArchivosRecaudo = () => {
   const [showModal, setShowModal] = useState(false);
@@ -19,35 +28,38 @@ const GestionArchivosRecaudo = () => {
   const [selected, setSelected] = useState(false); // fila selecionada
 
   const [listRecaudos, setListRecaudos] = useState([]);
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
-  const [maxPages, setMaxPages] = useState(0);
+  const [isNextPage, setIsNextPage] = useState(false);
   const [file, setFile] = useState(null);
-  const [searchFilters, setSearchFilters] = useState({
-    pk_id_convenio_directo: "",
-    ean13: "",
-    nombre_convenio: "",
+
+
+  const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
+  useMap(initialSearchFilters);
+
+const [fetchTrxs] = useFetchDispatchDebounce({
+  onSuccess: useCallback((data) => {
+    setListRecaudos(data?.obj?.results ?? []);
+    setIsNextPage(data?.obj?.next_exist);
+  }, []),
+  onError: useCallback((error) => {
+    if (!error instanceof DOMException) console.error(error)
+  }, []),
+}, { delay: 0 });
+
+const searchTrxs = useCallback(() => {
+  const tempMap = new Map(searchFilters2);
+  const url = getUrlRecaudosList()
+  tempMap.forEach((val, key, map) => {
+    if (!val) {
+      map.delete(key);
+    }
   });
+  const queries = new URLSearchParams(tempMap.entries()).toString();
+  fetchTrxs(`${url}?${queries}`);
+}, [fetchTrxs, searchFilters2]);
 
-  useEffect(() => {
-    setPageData((pageData) => ({ ...pageData, page: 1 }));
-  }, [pageData.limit]);
-
-  const getRecaudos = useCallback(async () => {
-    await getRecaudosList({
-      ...pageData,
-      ...searchFilters,
-    })
-      .then((data) => {
-        setListRecaudos(data?.obj?.results ?? []);
-        setMaxPages(data?.obj?.maxPages ?? "");
-      })
-      .catch((err) => {
-        console.error(err?.message);
-      });
-
-  }, [pageData, searchFilters]);
-
-  useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters]);
+useEffect(() => {
+  searchTrxs();
+}, [searchTrxs]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -146,7 +158,7 @@ const GestionArchivosRecaudo = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Gestion de Archivos de Recaudos</h1>
-      <TableEnterprise
+      <DataTable
         title="Convenios de Recaudos"
         headers={[
           "Código convenio",
@@ -173,17 +185,42 @@ const GestionArchivosRecaudo = () => {
             }
           }
         )}
-        onSelectRow={(e, i) => {
+        onClickRow={(_, index) => {
           setShowModal(true);
-          setSelected(listRecaudos[i]);
+          setSelected(listRecaudos[index]);
         }}
-        maxPage={maxPages}
-        onSetPageData={setPageData}
+        tblFooter={
+          <Fragment>
+            <DataTable.LimitSelector
+              defaultValue={10}
+              onChangeLimit={(limit) => {
+                setSingleFilter("limit", limit);
+                setSingleFilter("page", 1)
+              }}
+            />
+            <DataTable.PaginationButtons
+              onClickNext={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  isNextPage ? oldPage + 1 : oldPage
+                )
+              }
+              onClickPrev={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  oldPage > 1 ? oldPage - 1 : oldPage
+                )
+              }
+            />
+          </Fragment>
+        }
         onChange={(ev) => {
-          setSearchFilters((old) => ({
-            ...old,
-            [ev.target.name]: ev.target.value,
-          }));
+          setSearchFilters2((old) => {
+            const copy = new Map(old)
+              .set(
+                ev.target.name, ev.target.value
+              )
+              .set("page", 1);
+            return copy;
+          })
         }}
       >
         <Input
@@ -200,19 +237,19 @@ const GestionArchivosRecaudo = () => {
           label={"Código EAN o IAC"}
           name={"ean13"}
           type="tel"
+          autoComplete="off"
           maxLength={"13"}
           onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
-          autoComplete="off"
         />
         <Input
           id={"nombre_convenio"}
           label={"Nombre del convenio"}
           name={"nombre_convenio"}
           type="text"
-          maxLength={"30"}
           autoComplete="off"
+          maxLength={"30"}
         />
-      </TableEnterprise>
+      </DataTable>
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">
           Gestion de archivos de recaudo

@@ -91,7 +91,7 @@ const RecaudoConjunto = () => {
         })
 
     }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose]),
-    300
+    500
   )
 
 

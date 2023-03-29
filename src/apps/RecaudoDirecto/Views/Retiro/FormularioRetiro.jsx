@@ -94,7 +94,7 @@ const FormularioRetiro = () => {
         });
 
     }, [pk_id_convenio, handleClose, dataReferencias, dataConvRetiro, roleInfo, pdpUser]),
-    300
+    500
   )
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
