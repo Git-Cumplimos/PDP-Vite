@@ -7,7 +7,8 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getRecaudosList, downloadFileRecaudo, cargarArchivoRecaudo } from "../../utils/fetchFunctions";
-import { descargarCSV, onChangeEan13Number } from "../../utils/functions";
+import { descargarCSV, onChangeEan13Number, changeDateFormat } from "../../utils/functions";
+import { onChangeNumber } from "../../../../utils/functions";
 
 
 const GestionArchivosRecaudo = () => {
@@ -151,7 +152,6 @@ const GestionArchivosRecaudo = () => {
           "Código convenio",
           "Código EAN o IAC",
           "Nombre convenio",
-          "Permite vencidos",
           "Estado",
           "Fecha creacion",
         ]}
@@ -160,17 +160,18 @@ const GestionArchivosRecaudo = () => {
             pk_id_convenio_directo,
             ean13,
             nombre_convenio,
-            permite_vencidos,
             estado,
             fecha_creacion,
-          }) => ({
-            pk_id_convenio_directo,
-            ean13,
-            nombre_convenio,
-            permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
-            estado: estado ? "Activo" : "No activo",
-            fecha_creacion: fecha_creacion ?? "ninguna",
-          })
+          }) => {
+            fecha_creacion = changeDateFormat(fecha_creacion)
+            return {
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+              estado: estado ? "Activo" : "No activo",
+              fecha_creacion: fecha_creacion ?? "ninguna",
+            }
+          }
         )}
         onSelectRow={(e, i) => {
           setShowModal(true);
@@ -190,28 +191,26 @@ const GestionArchivosRecaudo = () => {
           label={"Código de convenio"}
           name={"pk_id_convenio_directo"}
           type="tel"
-          autoComplete="off"
           maxLength={"4"}
-          onChange={(ev) => { }}
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
+          autoComplete="off"
         />
         <Input
           id={"codigo_ean_iac_search"}
           label={"Código EAN o IAC"}
           name={"ean13"}
           type="tel"
-          autoComplete="off"
           maxLength={"13"}
           onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
-          onChange={(ev) => { }}
+          autoComplete="off"
         />
         <Input
           id={"nombre_convenio"}
           label={"Nombre del convenio"}
           name={"nombre_convenio"}
           type="text"
-          autoComplete="off"
           maxLength={"30"}
-          onChange={(ev) => { }}
+          autoComplete="off"
         />
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>

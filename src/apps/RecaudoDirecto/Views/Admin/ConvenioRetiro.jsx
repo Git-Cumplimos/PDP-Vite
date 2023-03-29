@@ -10,7 +10,8 @@ import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyPending } from "../../../../utils/notify";
-import { onChangeEan13Number, descargarCSV } from "../../utils/functions";
+import { onChangeNumber } from "../../../../utils/functions";
+import { onChangeEan13Number, onChangeNit, descargarCSV,changeDateFormat } from "../../utils/functions";
 import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
 
 const RetiroDirecto = () => {
@@ -170,13 +171,16 @@ const RetiroDirecto = () => {
             nombre_convenio,
             estado,
             fecha_creacion,
-          }) => ({
-            pk_id_convenio_directo,
-            ean13,
-            nombre_convenio,
-            estado: estado ? "Activo" : "No activo",
-            fecha_creacion: fecha_creacion ?? "No indicada",
-          })
+          }) => {
+            fecha_creacion = changeDateFormat(fecha_creacion)
+            return{
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+              estado: estado ? "Activo" : "No activo",
+              fecha_creacion: fecha_creacion ?? "No indicada",
+            }
+          }
         )}
         maxPage={maxPages}
         onSetPageData={setPageData}
@@ -199,32 +203,26 @@ const RetiroDirecto = () => {
           label={"Código de convenio"}
           name={"pk_id_convenio_directo"}
           type="tel"
-          autoComplete="off"
           maxLength={"4"}
-          onChange={(ev) => {
-          }}
-          required
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
+          autoComplete="off"
         />
         <Input
           id={"codigo_ean_iac_search"}
           label={"Código EAN o IAC"}
           name={"ean13"}
           type="tel"
-          autoComplete="off"
           maxLength={"13"}
           onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
-          onChange={(ev) => {
-          }}
-          required
+          autoComplete="off"
         />
         <Input
           id={"nombre_convenio"}
           label={"Nombre del convenio"}
           name={"nombre_convenio"}
           type="text"
-          autoComplete="off"
           maxLength={"30"}
-          required
+          autoComplete="off"
         />
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
@@ -257,6 +255,7 @@ const RetiroDirecto = () => {
             type="text"
             placeholder={"333.333.333-3"}
             autoComplete="off"
+            onInput={(ev) => { ev.target.value = onChangeNit(ev); }}
             defaultValue={selected?.nit ?? ""}
             required />
           <Select
@@ -349,7 +348,7 @@ const RetiroDirecto = () => {
             }
           </Fieldset>
           <TextArea
-            id={1}
+            id={"Observaciones"}
             label={"Observaciones"}
             name={"observaciones"}
             type="text"
