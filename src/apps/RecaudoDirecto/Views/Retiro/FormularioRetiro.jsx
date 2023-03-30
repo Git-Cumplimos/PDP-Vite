@@ -4,15 +4,11 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
-// import Select from "../../../../components/Base/Select";
 import Input from "../../../../components/Base/Input";
 import MoneyInput from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRetiro, modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
-import useDelayedCallback from "../../../../hooks/useDelayedCallback";
-
-
 
 const FormularioRetiro = () => {
   const navigate = useNavigate()
@@ -61,7 +57,7 @@ const FormularioRetiro = () => {
 
   }, [pk_id_convenio])
 
-  const consultarRetiroD = useDelayedCallback(
+  const consultarRetiroD = 
     useCallback(async (e) => {
       e.preventDefault()
       const data = {
@@ -93,9 +89,8 @@ const FormularioRetiro = () => {
           handleClose()
         });
 
-    }, [pk_id_convenio, handleClose, dataReferencias, dataConvRetiro, roleInfo, pdpUser]),
-    500
-  )
+    }, [pk_id_convenio, handleClose, dataReferencias, dataConvRetiro, roleInfo, pdpUser])
+ 
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
