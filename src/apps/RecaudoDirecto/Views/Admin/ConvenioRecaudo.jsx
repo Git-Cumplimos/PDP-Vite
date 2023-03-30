@@ -9,17 +9,17 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
-import { ExportToCsv } from "export-to-csv";
 import { notifyPending } from "../../../../utils/notify";
+import { onChangeEan13Number, onChangeNit, descargarCSV,changeDateFormat } from "../../utils/functions";
 import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
+import { onChangeNumber } from "../../../../utils/functions";
 
 const RecaudoDirecto = () => {
   const [listRecaudos, setListRecaudos] = useState([])
-  const [selected, setSelected] = useState(false); // fila selecionada
+  const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
-  // const [cargando, setCargando] = useState(false)
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
     "Longitud minima": "",
@@ -90,13 +90,8 @@ const RecaudoDirecto = () => {
         setMaxPages(data?.obj?.maxPages ?? '')
       })
       .catch((err) => {
-        // if (err?.cause === "custom") {
-        //   notifyError(err?.message);
-        //   return;
-        // }
         console.error(err?.message);
       });
-    // setCargando(true)
   }, [pageData, searchFilters])
 
   useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters])
@@ -104,7 +99,6 @@ const RecaudoDirecto = () => {
   useEffect(() => {
     setPageData(pageData => ({ ...pageData, page: 1 }));
   }, [pageData.limit]);
-
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
     e.preventDefault();
@@ -120,8 +114,8 @@ const RecaudoDirecto = () => {
         })
       }
       body['referencias'] = allReferencias
-      console.log(body)
     }
+
     notifyPending(
       selected
         ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
@@ -151,23 +145,8 @@ const RecaudoDirecto = () => {
     )
   }, [handleClose, getRecaudos, selected, referencias])
 
-
   const descargarPlantilla = useCallback(() => {
-    const options = {
-      fieldSeparator: ";",
-      quoteStrings: '"',
-      decimalSeparator: ",",
-      showLabels: true,
-      showTitle: false,
-      title: `Ejemplo_de_archivo_recaudo_csv`,
-      useTextFile: false,
-      useBom: true,
-      useKeysAsHeaders: false,
-      filename: `Ejemplo_de_archivo_recaudo`,
-    };
-    const csvExporter = new ExportToCsv(options);
-    const data = JSON.stringify(res);
-    csvExporter.generateCsv(data);
+    descargarCSV('Ejemplo_de_archivo_recaudo', res)
   }, [res]);
 
   return (
@@ -177,94 +156,89 @@ const RecaudoDirecto = () => {
         <Button type={"submit"} onClick={() => setShowModal(true)} >
           Crear Convenio</Button>
       </ButtonBar>
-      {/* {cargando ? (<> */}
-        <TableEnterprise
-          title="Convenios de Recaudos"
-          headers={[
-            "Código convenio",
-            "Código EAN o IAC",
-            "Nombre convenio",
-            "Permite vencidos",
-            "Estado",
-            "Fecha creacion",
-          ]}
-          data={listRecaudos.map(
-            ({
+      <TableEnterprise
+        title="Convenios de Recaudos"
+        headers={[
+          "Código convenio",
+          "Código EAN o IAC",
+          "Nombre convenio",
+          "Estado",
+          "Fecha creacion",
+        ]}
+        data={listRecaudos.map(
+          ({
+            pk_id_convenio_directo,
+            ean13,
+            nombre_convenio,
+            estado,
+            fecha_creacion,
+          }) => {
+            fecha_creacion = changeDateFormat(fecha_creacion)
+            return{
               pk_id_convenio_directo,
               ean13,
               nombre_convenio,
-              permite_vencidos,
-              estado,
-              fecha_creacion,
-            }) => ({
-              pk_id_convenio_directo,
-              ean13,
-              nombre_convenio,
-              permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
               estado: estado ? "Activo" : "No activo",
-              fecha_creacion: fecha_creacion ?? "ninguna",
-            })
-          )}
-          onSelectRow={(e, i) => {
-            setShowModal(true);
-            setSelected(listRecaudos[i]);
-          }}
-          maxPage={maxPages}
-          onSetPageData={setPageData}
-          onChange={(ev) => {
-            setSearchFilters((old) => ({
-              ...old,
-              [ev.target.name]: ev.target.value,
-            }))
-          }}
-          actions={{
-            download: descargarPlantilla,
-          }}
-        >
-          <Input
-            id={"pk_codigo_convenio"}
-            label={"Código de convenio"}
-            name={"pk_id_convenio_directo"}
-            type="tel"
-            autoComplete="off"
-            maxLength={"4"}
-            onChange={(ev) => { }}
-
-          />
-          <Input
-            id={"codigo_ean_iac_search"}
-            label={"Código EAN o IAC"}
-            name={"ean13"}
-            type="tel"
-            autoComplete="off"
-            maxLength={"13"}
-            onChange={(ev) => { }}
-          />
-          <Input
-            id={"nombre_convenio"}
-            label={"Nombre del convenio"}
-            name={"nombre_convenio"}
-            type="text"
-            autoComplete="off"
-            maxLength={"30"}
-            onChange={(ev) => { }}
-          />
-        </TableEnterprise>
-      {/* </>) : (<>Cargando...</>)} */}
+              fecha_creacion: fecha_creacion ??"ninguna",
+            }
+          }
+        )}
+        onSelectRow={(e, i) => {
+          setShowModal(true);
+          setSelected(listRecaudos[i]);
+        }}
+        maxPage={maxPages}
+        onSetPageData={setPageData}
+        onChange={(ev) => {
+          setSearchFilters((old) => ({
+            ...old,
+            [ev.target.name]: ev.target.value,
+          }))
+        }}
+        actions={{
+          download: descargarPlantilla,
+        }}
+      >
+        <Input
+          id={"pk_codigo_convenio"}
+          label={"Código de convenio"}
+          name={"pk_id_convenio_directo"}
+          type="tel"
+          maxLength={"4"}
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
+          autoComplete="off"
+        />
+        <Input
+          id={"codigo_ean_iac_search"}
+          label={"Código EAN o IAC"}
+          name={"ean13"}
+          type="tel"
+          autoComplete="off"
+          maxLength={"13"}
+          onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
+        />
+        <Input
+          id={"nombre_convenio"}
+          label={"Nombre del convenio"}
+          name={"nombre_convenio"}
+          type="text"
+          autoComplete="off"
+          maxLength={"30"}
+        />
+      </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
         <Form onSubmit={crearModificarConvenioRecaudo} grid >
           {selected && (
-            <>
-              <Input
-                id={"Codigo_convenio"}
-                label={"Codigo convenio"}
-                name={"pk_id_convenio_directo"}
-                autoComplete="off"
-                defaultValue={selected?.pk_id_convenio_directo ?? ""}
-                disabled={selected ? true : false}
-                required />
-            </>
+            <Input
+              id={"Codigo_convenio"}
+              label={"Codigo convenio"}
+              name={"pk_id_convenio_directo"}
+              autoComplete="off"
+              defaultValue={selected?.pk_id_convenio_directo ?? ""}
+              disabled={selected ? true : false}
+              required
+            />
           )}
           <Input
             id={"nombre_convenio"}
@@ -281,8 +255,9 @@ const RecaudoDirecto = () => {
             name={"nit"}
             type="text"
             placeholder={"333.333.333-3"}
-            autoComplete="off"
             defaultValue={selected?.nit ?? ""}
+            onInput={(ev) => { ev.target.value = onChangeNit(ev); }}
+            autoComplete="off"
             required
           />
           <Select
@@ -308,11 +283,12 @@ const RecaudoDirecto = () => {
             id={"codigo_ean_iac"}
             label={"Código EAN o IAC"}
             name={"ean13"}
+            type='tel'
+            maxLength={"13"}
+            onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
             defaultValue={selected?.ean13 ?? ""}
-            // disabled={selected ? true : false}
             autoComplete="off"
           />
-
           <Fieldset legend={"Referencias"}>
             {referencias?.map((obj, index) => {
               return (
@@ -373,16 +349,13 @@ const RecaudoDirecto = () => {
               </ButtonBar>
             }
           </Fieldset>
-          {/*  */}
           <TextArea
-            id={1}
+            id={"Observaciones"}
             label={"Observaciones"}
             name={"observaciones"}
             type="text"
             autoComplete="off"
             defaultValue={selected?.observaciones ?? ""}
-            required
-
           />
           <ToggleInput
             id={"permite_vencidos"}
@@ -395,7 +368,7 @@ const RecaudoDirecto = () => {
               id={"activo"}
               label={"Se encuentra activo"}
               name={"estado"}
-              defaultChecked={selected?.estado}
+              defaultChecked={selected?.estado ?? ""}
             />
           )}
           <ButtonBar>
@@ -405,8 +378,7 @@ const RecaudoDirecto = () => {
           </ButtonBar>
         </Form>
       </Modal>
-
-    </Fragment>
+    </Fragment >
   )
 }
 

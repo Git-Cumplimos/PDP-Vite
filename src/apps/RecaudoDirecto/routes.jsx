@@ -6,8 +6,6 @@ const ConvenioRecaudo = lazy(() => import("./Views/Admin/ConvenioRecaudo"));
 const ConvenioRetiro = lazy(() => import("./Views/Admin/ConvenioRetiro"));
 const GestionArchivosRecaudo = lazy(() => import("./Views/Admin/GestionArchivosRecaudo"));
 const GestionArchivosRetiro = lazy(() => import("./Views/Admin/GestionArchivosRetiro"));
-const DescargarReporteRecaudo = lazy(() => import("./Views/Admin/DescargarReporteRecaudo"));
-const DescargarReporteRetiro = lazy(() => import("./Views/Admin/DescargarReporteRetiro"));
 const RecaudoManual = lazy(() => import("./Views/Recaudo/RecaudoManual"));
 const RecaudoBarras = lazy(() => import("./Views/Recaudo/RecaudoBarras"));
 const RecaudoConjunto = lazy(() => import("./Views/Recaudo/RecaudoConjunto"));
@@ -96,20 +94,6 @@ export const rutasGestionRecaudoDirecto = {
       label: <AppIcons Logo={"Reporte"} name={"Gestion Archivos de Retiro"} />,
       component: GestionArchivosRetiro,
       permission: [PermissionsRecaudoDirecto.recaudo],
-    },
-    {
-      link: "/recaudo-directo/gestion/descargar-reporte-recaudo",
-      label: <AppIcons Logo={"Reporte"} name={"Descargar Reporte de Recaudo"} />,
-      component: DescargarReporteRecaudo,
-      permission: [PermissionsRecaudoDirecto.recaudo],
-      show:false,
-    },
-    {
-      link: "/recaudo-directo/gestion/descargar-reporte-retiro",
-      label: <AppIcons Logo={"Reporte"} name={"Descargar Reporte de Retiro"} />,
-      component: DescargarReporteRetiro,
-      permission: [PermissionsRecaudoDirecto.recaudo],
-      show:false,
     },
   ]
 }

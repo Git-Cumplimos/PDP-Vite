@@ -30,7 +30,7 @@ const tipo_operacion = 113;
 
 const CompraPin = () => {
   const { contenedorbtn, contenedorTitulos } = classes;
-  const { roleInfo, userInfo, infoTicket } = useAuth();
+  const { roleInfo, userInfo, pdpUser, infoTicket } = useAuth();
   const [inputCelular, setInputCelular] = useState("");
   const [inputContador, setInputContador] = useState("");
   const [inputPlaca, setInputPlaca] = useState("");
@@ -348,16 +348,16 @@ const CompraPin = () => {
               : inputValor,
         jsonAdicional: state?.op == "hv" ? {
           placaVh: inputPlaca,
-          nombre_usuario: userInfo?.attributes?.name,
+          "nombre_usuario": pdpUser?.uname ?? "",
         } : state?.op == "em" ? {
-            nombre_usuario: userInfo?.attributes?.name,
+            "nombre_usuario": pdpUser?.uname ?? "",
           telEnvio: inputCelular,
           } : state?.op == "cb" ? {
-              nombre_usuario: userInfo?.attributes?.name,
+              "nombre_usuario": pdpUser?.uname ?? "",
           circulo: inputCirculo,
           matricula: inputMatricula,
         } : {
-                nombre_usuario: userInfo?.attributes?.name,
+                "nombre_usuario": pdpUser?.uname ?? "",
         },
         ticket: newVoucher,
       },

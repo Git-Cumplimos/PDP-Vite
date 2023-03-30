@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
@@ -10,9 +10,12 @@ import MoneyInput from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRetiro, modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
+import useDelayedCallback from "../../../../hooks/useDelayedCallback";
+
 
 
 const FormularioRetiro = () => {
+  const navigate = useNavigate()
 
   const { pk_id_convenio } = useParams();
   // const { nombre_convenio } = useParams();
@@ -58,38 +61,41 @@ const FormularioRetiro = () => {
 
   }, [pk_id_convenio])
 
-  const consultarRetiroD = useCallback(async (e) => {
-    e.preventDefault()
-    const data = {
-      consulta_retiro: {
-        convenio_id: pk_id_convenio,
-        permite_vencidos: dataConvRetiro.permite_vencidos ?? false,
-        referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
-      },
-      comercio: {
-        id_comercio: roleInfo?.id_comercio,
-        id_usuario: roleInfo?.id_usuario,
-        id_terminal: roleInfo?.id_dispositivo,
-      },
-      is_oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-        roleInfo?.tipo_comercio === "KIOSCO",
-      valor_total_trx: 0,
-      nombre_usuario: pdpUser?.uname ?? "",
-    };
-    await getRetiro(data)
-      .then((data) => {
-        setDataRetiro(data?.obj.retiro ?? "")
-        setId_Trx(data?.obj?.id_trx ?? "")
-        notify(data.msg)
-        setShowModal(true);
-      })
-      .catch((err) => {
-        notifyError(err?.message);
-        handleClose()
-      });
+  const consultarRetiroD = useDelayedCallback(
+    useCallback(async (e) => {
+      e.preventDefault()
+      const data = {
+        consulta_retiro: {
+          convenio_id: pk_id_convenio,
+          permite_vencidos: dataConvRetiro.permite_vencidos ?? false,
+          referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
+        },
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        is_oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
+        valor_total_trx: 0,
+        nombre_usuario: pdpUser?.uname ?? "",
+      };
+      await getRetiro(data)
+        .then((data) => {
+          setDataRetiro(data?.obj.retiro ?? "")
+          setId_Trx(data?.obj?.id_trx ?? "")
+          notify(data.msg)
+          setShowModal(true);
+        })
+        .catch((err) => {
+          notifyError(err?.message);
+          handleClose()
+        });
 
-  }, [pk_id_convenio, handleClose, dataReferencias, dataConvRetiro, roleInfo, pdpUser])
+    }, [pk_id_convenio, handleClose, dataReferencias, dataConvRetiro, roleInfo, pdpUser]),
+    300
+  )
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
@@ -131,6 +137,7 @@ const FormularioRetiro = () => {
       await modRetiro(data)
         .then((data) => {
           data?.status && notify(data?.msg)
+          navigate("/recaudo-directo/consultar-retiro")
         })
         .catch((err) => {
           notifyError(err?.msg);
@@ -138,7 +145,7 @@ const FormularioRetiro = () => {
       handleClose()
     }
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
-  }, [dataRetiro, roleInfo, pdpUser, id_trx, valorRecibido, pk_id_convenio, handleClose])
+  }, [dataRetiro, roleInfo, pdpUser, id_trx, valorRecibido, pk_id_convenio, navigate, handleClose])
 
   return (
     <Fragment>
@@ -167,7 +174,7 @@ const FormularioRetiro = () => {
             return (
               <Input
                 key={index}
-                id={1}
+                id={dict?.nombre_referencia ?? `referencia ${index + 1}`}
                 label={dict?.nombre_referencia ?? "Referencia 1"}
                 name={'referencia' + (index + 1)}
                 type="text"
@@ -190,7 +197,7 @@ const FormularioRetiro = () => {
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar retiro </h2>
         <Form onSubmit={hacerRetiro} grid >
           <Input
-            id={1}
+            id={"Estado"}
             label={"Estado"}
             name={"nombre_estado"}
             type="text"
@@ -202,8 +209,9 @@ const FormularioRetiro = () => {
             label="Valor a recaudar"
             name="valor_total_trx"
             autoComplete="off"
-            min={dataRetiro?.fk_modificar_valor === 1 ? ((dataRetiro.valor - 1) - dataRetiro.valor_retirado) ?? 0 : limitesMontos?.min}
             equalError={false}
+            min={dataRetiro?.fk_modificar_valor === 1 ?
+              ((dataRetiro.valor - 1) - dataRetiro.valor_retirado) ?? 0 : limitesMontos?.min}
             max={parseInt(dataRetiro.valor) - parseInt(dataRetiro.valor_retirado ?? 0)}
             onInput={(e, valor) =>
               setValorRecibido({ ...valorRecibido, [e.target.name]: valor })

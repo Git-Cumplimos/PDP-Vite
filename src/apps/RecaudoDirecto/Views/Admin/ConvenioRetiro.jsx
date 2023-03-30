@@ -9,18 +9,17 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
-import { ExportToCsv } from "export-to-csv";
 import { notifyPending } from "../../../../utils/notify";
+import { onChangeNumber } from "../../../../utils/functions";
+import { onChangeEan13Number, onChangeNit, descargarCSV,changeDateFormat } from "../../utils/functions";
 import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
 
 const RetiroDirecto = () => {
-
   const [listRetiro, setListRetiro] = useState([]);
   const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(0);
-  // const [cargando, setCargando] = useState(false)
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
     "Longitud minima": "",
@@ -31,7 +30,7 @@ const RetiroDirecto = () => {
     ean13: "",
     nombre_convenio: "",
   });
-  const [res, setRes] = useState(
+  const [res] = useState(
     [
       ["ID_PRODUCTOR", "NUMERO_DOCUMENTO", "NOMBRE_PRODUCTOR",
         "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "TIPO_PAGO", "NUMERO_QUINCENA"],
@@ -95,14 +94,8 @@ const RetiroDirecto = () => {
       })
       .catch((err) => {
         setListRetiro([]);
-        // if (err?.cause === "custom") {
-        //   notifyError(err?.message);
-        //   return;
-        // }
         console.error(err?.message);
       });
-
-    // setCargando(true)
   }, [pageData, searchFilters])
 
   useEffect(() => { getConvRetiro() }, [getConvRetiro, pageData, searchFilters])
@@ -152,21 +145,7 @@ const RetiroDirecto = () => {
   }, [handleClose, getConvRetiro, selected, referencias])
 
   const descargarPlantilla = useCallback(() => {
-    const options = {
-      fieldSeparator: ";",
-      quoteStrings: '"',
-      decimalSeparator: ",",
-      showLabels: true,
-      showTitle: false,
-      title: `Ejemplo_de_archivo_retiro`,
-      useTextFile: false,
-      useBom: true,
-      useKeysAsHeaders: false,
-      filename: `Ejemplo_de_archivo_retiro`,
-    };
-    const csvExporter = new ExportToCsv(options);
-    const data = JSON.stringify(res);
-    csvExporter.generateCsv(data);
+    descargarCSV('Ejemplo_de_archivo_retiro', res)
   }, [res]);
 
   return (
@@ -176,80 +155,76 @@ const RetiroDirecto = () => {
         <Button type={"submit"} onClick={() => setShowModal(true)} >
           Crear Convenio</Button>
       </ButtonBar>
-      {/* {cargando ? (<> */}
-        <TableEnterprise
-          title="Convenios de Retiros"
-          headers={[
-            "Código convenio",
-            "Código EAN o IAC",
-            "Nombre convenio",
-            "Estado",
-            "Fecha creacion",
-          ]}
-          data={listRetiro.map(
-            ({
-              pk_id_convenio_directo,
-              ean13,
-              nombre_convenio,
-              estado,
-              fecha_creacion,
-            }) => ({
+      <TableEnterprise
+        title="Convenios de Retiros"
+        headers={[
+          "Código convenio",
+          "Código EAN o IAC",
+          "Nombre convenio",
+          "Estado",
+          "Fecha creacion",
+        ]}
+        data={listRetiro.map(
+          ({
+            pk_id_convenio_directo,
+            ean13,
+            nombre_convenio,
+            estado,
+            fecha_creacion,
+          }) => {
+            fecha_creacion = changeDateFormat(fecha_creacion)
+            return{
               pk_id_convenio_directo,
               ean13,
               nombre_convenio,
               estado: estado ? "Activo" : "No activo",
               fecha_creacion: fecha_creacion ?? "No indicada",
-            })
-          )}
-          maxPage={maxPages}
-          onSetPageData={setPageData}
-          onSelectRow={(e, i) => {
-            setShowModal(true);
-            setSelected(listRetiro[i]);
-          }}
-          onChange={(ev) => {
-            setSearchFilters((old) => ({
-              ...old,
-              [ev.target.name]: ev.target.value,
-            }))
-          }}
-          actions={{
-            download: descargarPlantilla,
-          }}
-        >
-          <Input
-            id={"pk_codigo_convenio"}
-            label={"Código de convenio"}
-            name={"pk_id_convenio_directo"}
-            type="tel"
-            autoComplete="off"
-            maxLength={"4"}
-            onChange={(ev) => {
-            }}
-            required
-          />
-          <Input
-            id={"codigo_ean_iac_search"}
-            label={"Código EAN o IAC"}
-            name={"ean13"}
-            type="tel"
-            autoComplete="off"
-            maxLength={"13"}
-            onChange={(ev) => {            
-            }}
-            required
-          />
-          <Input
-            id={"nombre_convenio"}
-            label={"Nombre del convenio"}
-            name={"nombre_convenio"}
-            type="text"
-            autoComplete="off"
-            maxLength={"30"}
-            required
-          />
-        </TableEnterprise>
-      {/* </>) : (<>cargando...</>)} */}
+            }
+          }
+        )}
+        maxPage={maxPages}
+        onSetPageData={setPageData}
+        onSelectRow={(e, i) => {
+          setShowModal(true);
+          setSelected(listRetiro[i]);
+        }}
+        onChange={(ev) => {
+          setSearchFilters((old) => ({
+            ...old,
+            [ev.target.name]: ev.target.value,
+          }))
+        }}
+        actions={{
+          download: descargarPlantilla,
+        }}
+      >
+        <Input
+          id={"pk_codigo_convenio"}
+          label={"Código de convenio"}
+          name={"pk_id_convenio_directo"}
+          type="tel"
+          maxLength={"4"}
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
+          autoComplete="off"
+        />
+        <Input
+          id={"codigo_ean_iac_search"}
+          label={"Código EAN o IAC"}
+          name={"ean13"}
+          type="tel"
+          maxLength={"13"}
+          onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
+          autoComplete="off"
+        />
+        <Input
+          id={"nombre_convenio"}
+          label={"Nombre del convenio"}
+          name={"nombre_convenio"}
+          type="text"
+          maxLength={"30"}
+          autoComplete="off"
+        />
+      </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
         <Form onSubmit={crearModificarConvenioRetiro} grid >
@@ -273,7 +248,6 @@ const RetiroDirecto = () => {
             defaultValue={selected?.nombre_convenio ?? ""}
             autoComplete="off"
             required />
-
           <Input
             id={"NIT"}
             label={"Nit"}
@@ -281,6 +255,7 @@ const RetiroDirecto = () => {
             type="text"
             placeholder={"333.333.333-3"}
             autoComplete="off"
+            onInput={(ev) => { ev.target.value = onChangeNit(ev); }}
             defaultValue={selected?.nit ?? ""}
             required />
           <Select
@@ -306,11 +281,12 @@ const RetiroDirecto = () => {
             id={"codigo_ean_iac"}
             label={"Código EAN o IAC"}
             name={"ean13"}
+            type='tel'
+            maxLength={"13"}
+            onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
             defaultValue={selected?.ean13 ?? ""}
-            // disabled={selected ? true : false}
             autoComplete="off"
           />
-
           <Fieldset legend={"Referencias"}>
             {referencias?.map((obj, index) => {
               return (
@@ -371,15 +347,13 @@ const RetiroDirecto = () => {
               </ButtonBar>
             }
           </Fieldset>
-
           <TextArea
-            id={1}
+            id={"Observaciones"}
             label={"Observaciones"}
             name={"observaciones"}
             type="text"
             autoComplete="off"
             defaultValue={selected?.observaciones ?? ""}
-            required
           />
           <ToggleInput
             id={"permite_vencidos"}
@@ -402,7 +376,6 @@ const RetiroDirecto = () => {
           </ButtonBar>
         </Form>
       </Modal>
-
     </Fragment>
   )
 }

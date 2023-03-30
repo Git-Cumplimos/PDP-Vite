@@ -6,9 +6,9 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getRetirosList, downloadFileRetiro } from "../../utils/fetchFunctions"
-import { cargarArchivoRetiro } from "../../utils/functions";
-import { ExportToCsv } from "export-to-csv";
+import { getRetirosList, downloadFileRetiro, cargarArchivoRetiro } from "../../utils/fetchFunctions"
+import { descargarCSV, onChangeEan13Number, changeDateFormat } from "../../utils/functions";
+import { onChangeNumber } from "../../../../utils/functions";
 
 
 const GestionArchivosRetiro = () => {
@@ -35,7 +35,7 @@ const GestionArchivosRetiro = () => {
   const getRetiros = useCallback(async () => {
     await getRetirosList({
       ...pageData,
-      ...searchFilters
+      ...searchFilters,
     })
       .then((data) => {
         setListRetiros(data?.obj?.results ?? []);
@@ -79,7 +79,7 @@ const GestionArchivosRetiro = () => {
         },
         {
           render({ data: err }) {
-            setShowModalErrors({msg:err.msg, errores: err.obj?.error[0].complete_info})
+            setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
             return `Archivo erroneo`;
           }
         }
@@ -88,7 +88,7 @@ const GestionArchivosRetiro = () => {
 
   }, [handleClose, file, selected])
 
-  const DescargarArchivo = useCallback(async (e) => {
+  const DescargarReporte = useCallback(async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
@@ -96,21 +96,7 @@ const GestionArchivosRetiro = () => {
       downloadFileRetiro({ ...body, convenio_id: selected.pk_id_convenio_directo })
         .then(async (res) => {
           if (res.codigo) throw res.msg
-          const options = {
-            fieldSeparator: ";",
-            quoteStrings: '"',
-            decimalSeparator: ",",
-            showLabels: true,
-            showTitle: false,
-            title: `Reporte_${selected?.nombre_convenio}`,
-            useTextFile: false,
-            useBom: true,
-            useKeysAsHeaders: false,
-            filename: `Reporte_${selected?.nombre_convenio}`,
-          };
-          const csvExporter = new ExportToCsv(options);
-          const data = JSON.stringify(res)
-          csvExporter.generateCsv(data);
+          descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
         })
         .catch((err) => {
           if (err?.cause === "custom") {
@@ -126,6 +112,31 @@ const GestionArchivosRetiro = () => {
     handleClose()
   }, [handleClose, selected])
 
+  const DescargarErrores = useCallback(
+    async () => {
+      let errores = []
+
+      if (Array.isArray(showModalErrors?.errores)) {
+        errores.push(['Linea', 'Columna', 'Descripcion'])
+        showModalErrors?.errores.map((err_esp) => {
+          Object.keys(err_esp.error).map((item) => {
+            errores.push([err_esp.line, item, err_esp.error[item]])
+            return null
+          })
+          return null
+        })
+      } else {
+        errores.push(['ERRORES EN HEADERS', ''], ['Columna', 'Descripcion'])
+        Object.keys(showModalErrors?.errores).map((item) => {
+          errores.push([item, showModalErrors?.errores[item]])
+          return null
+        })
+      }
+
+      descargarCSV('Errores_del_archivo', errores)
+      handleClose();
+    }, [handleClose, showModalErrors]);
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Gestion de Archivos de Retiros</h1>
@@ -135,7 +146,6 @@ const GestionArchivosRetiro = () => {
           "Código convenio",
           "Código EAN o IAC",
           "Nombre convenio",
-          "Permite vencidos",
           "Estado",
           "Fecha creacion",
         ]}
@@ -144,17 +154,18 @@ const GestionArchivosRetiro = () => {
             pk_id_convenio_directo,
             ean13,
             nombre_convenio,
-            permite_vencidos,
             estado,
             fecha_creacion,
-          }) => ({
-            pk_id_convenio_directo,
-            ean13,
-            nombre_convenio,
-            permite_vencidos: permite_vencidos ? "Verdadero" : "Falso",
-            estado: estado ? "Activo" : "No activo",
-            fecha_creacion: fecha_creacion ?? "ninguna",
-          })
+          }) => {
+            fecha_creacion = changeDateFormat(fecha_creacion)
+            return {
+              pk_id_convenio_directo,
+              ean13,
+              nombre_convenio,
+              estado: estado ? "Activo" : "No activo",
+              fecha_creacion: fecha_creacion ?? "ninguna",
+            }
+          }
         )}
         onSelectRow={(e, i) => {
           setShowModal(true);
@@ -176,8 +187,7 @@ const GestionArchivosRetiro = () => {
           type="tel"
           autoComplete="off"
           maxLength={"4"}
-          onChange={(ev) => { }}
-
+          onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
         />
         <Input
           id={"codigo_ean_iac_search"}
@@ -186,7 +196,7 @@ const GestionArchivosRetiro = () => {
           type="tel"
           autoComplete="off"
           maxLength={"13"}
-          onChange={(ev) => { }}
+          onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
         />
         <Input
           id={"nombre_convenio"}
@@ -195,7 +205,6 @@ const GestionArchivosRetiro = () => {
           type="text"
           autoComplete="off"
           maxLength={"30"}
-          onChange={(ev) => { }}
         />
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
@@ -221,7 +230,7 @@ const GestionArchivosRetiro = () => {
       </Modal>
       <Modal show={showMainModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">Gestion de archivos de retiro</h2>
-        <Form onSubmit={showModalOptions ? CargarArchivo : DescargarArchivo}>
+        <Form onSubmit={showModalOptions ? CargarArchivo : DescargarReporte}>
           {showModalOptions && (
             <Input
               type='file'
@@ -261,37 +270,11 @@ const GestionArchivosRetiro = () => {
         <h2 className="text-2xl mx-auto text-center mb-4">
           {showModalErrors.msg ?? "Errores en el archivo"}
         </h2>
-        {showModalErrors && (
-          Array.isArray(showModalErrors?.errores) ?
-            (
-              showModalErrors?.errores.map((err_esp, index) => {
-                return (
-                  <div key={index}>
-                    <h3>Linea {err_esp.line}</h3>
-                    {Object.keys(err_esp.error).map((item, index) => {
-                      return (
-                        <div key={index}>
-                          <h3>{item}</h3>
-                          <h3>Descripcion: {err_esp.error[item]}</h3>
-                        </div>
-                      )
-                    })}
-                    <hr></hr>
-                  </div>
-                )
-              })
-            ) : (
-              Object.keys(showModalErrors?.errores).map((item, index) => {
-                return (
-                  <div key={index}>
-                    <h3>{item ?? ""}</h3>
-                    <h3>Descripcion: {showModalErrors?.errores[item] ?? ""}</h3>
-                    <hr></hr>
-                  </div>
-                )
-              })
-            )
-        )}
+        <ButtonBar>
+          <Button onClick={() => { DescargarErrores() }}>
+            Descargar errores del archivo
+          </Button>
+        </ButtonBar>
       </Modal>
     </Fragment>
   )

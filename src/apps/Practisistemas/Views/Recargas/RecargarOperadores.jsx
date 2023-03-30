@@ -37,7 +37,7 @@ const RecargasOperadores = () => {
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
-  const { roleInfo, userInfo } = useAuth();
+  const { roleInfo, userInfo, pdpUser } = useAuth();
   const { state } = useLocation();
   const printDiv = useRef();
   const validNavigate = useNavigate();
@@ -148,7 +148,7 @@ const RecargasOperadores = () => {
         operador: state?.producto,
         valor: parseInt(inputValor),
         jsonAdicional: {
-          nombre_usuario: userInfo?.attributes?.name,
+          "nombre_usuario": pdpUser?.uname ?? "",
           operador: state?.operador_recargar,
         },
       },
