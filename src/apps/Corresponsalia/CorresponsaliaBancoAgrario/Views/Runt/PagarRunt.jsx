@@ -154,6 +154,7 @@ const PagarRunt = () => {
             ? true
             : false,
         nombre_usuario: pdpUser["uname"],
+        nombre_comercio: roleInfo?.["nombre comercio"],
         numero_runt: numeroRunt,
         id_trx_original: resConsultRunt.id_trx,
         valor_mt: resConsultRunt.valor_mt,
