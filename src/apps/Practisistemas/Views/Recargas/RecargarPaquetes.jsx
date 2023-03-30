@@ -28,7 +28,7 @@ import { v4 } from "uuid";
 const RecargarPaquetes = () => {
   //Variables
   const printDiv = useRef();
-  const { roleInfo, userInfo } = useAuth();
+  const { roleInfo, userInfo, pdpUser } = useAuth();
   const [inputCelular, setInputCelular] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
@@ -131,7 +131,7 @@ const RecargarPaquetes = () => {
         operador: state?.operador,
         valor: parseInt(state?.codigo_paq),
         jsonAdicional: {
-          nombre_usuario: userInfo?.attributes?.name,
+          "nombre_usuario": pdpUser?.uname ?? "",
           operador: state?.operador_recargar,
         },
       },
