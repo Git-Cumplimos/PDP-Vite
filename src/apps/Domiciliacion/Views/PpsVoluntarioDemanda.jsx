@@ -119,24 +119,24 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
       ],
 
       trxInfo: [
-        ["PISO DE PROTECCION SOCIAL - APORTE VOLUNTARIO"],
+        ["PISO DE PROTECCIÓN SOCIAL - APORTE VOLUNTARIO"],
         ["", ""],
         [
           "Número de documento",
           /* "33" */ datosRespuesta?.[1]?.["Identificacion"],
         ],
         ["", ""],
-        ["Número de autorización ", datosRespuesta?.[0]?.["inserted_id"]],
+        ["Número de autorización", datosRespuesta?.[0]?.["inserted_id"]],
         /* ["Proceso", "Aporte Voluntario A Demanda"], */
         ["", ""],
-        ["N° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
+        ["N.° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
         ["", ""],
         ["Valor", formatMoney.format(valorAportar)],
         ["", ""],
       ],
 
       disclamer:
-        "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
+        "ESTA TRANSACCIÓN NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORRESPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNÍQUESE EN BOGOTÁ 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
     };
   }, [roleInfo, valorAportar, datosRespuesta, tipoComercio]);
 
