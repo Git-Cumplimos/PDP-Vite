@@ -148,7 +148,7 @@ const RecargarPaquetes = () => {
           if (res?.message === "Endpoint request timed out") {
             notify("Su transacción esta siendo procesada");
             setRespuesta(true);
-            for (let i = 0; i <= 3; i++) {
+            for (let i = 0; i <= 8; i++) {
               try {
                 const prom = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -187,7 +187,7 @@ const RecargarPaquetes = () => {
                         setRespuesta(false);
                         console.error(err);
                       });
-                  }, 7500)
+                  }, 11000)
                 );
                 if (prom === true) {
                   setRespuesta(false);
@@ -197,7 +197,7 @@ const RecargarPaquetes = () => {
               } catch (error) {
                 console.error(error);
               }
-              if (i <= 2) {
+              if (i <= 7) {
                 notify(
                   "Su transacción esta siendo procesada, no recargue la página"
                 );

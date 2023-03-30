@@ -154,7 +154,7 @@ const RecargarApuestas = () => {
       notify("Su transacción esta siendo procesada");
       setRespuesta(true);
       console.error(err);
-      for (let i = 0; i <=3; i++) {
+      for (let i = 0; i <= 8; i++) {
         try {
           const prom = await new Promise((resolve, reject) =>
             setTimeout(() => {
@@ -188,7 +188,7 @@ const RecargarApuestas = () => {
                 setRespuesta(false);
                 console.error(err);
               });
-            }, 7500)
+            }, 11000)
           );
           if (prom === true) {
             setRespuesta(false);
@@ -198,7 +198,7 @@ const RecargarApuestas = () => {
         } catch (error) {
           console.error(error);
         }        
-        if (i <= 2) {
+        if (i <= 7) {
           notify(
             "Su transacción esta siendo procesada, no recargue la página"
           );
