@@ -65,7 +65,7 @@ const RecaudoDirecto = () => {
     onError: useCallback((error) => {
       if (!error instanceof DOMException) console.error(error)
     }, []),
-  }, { delay: 0 });
+  });
 
   const searchTrxs = useCallback(() => {
     const tempMap = new Map(searchFilters2);

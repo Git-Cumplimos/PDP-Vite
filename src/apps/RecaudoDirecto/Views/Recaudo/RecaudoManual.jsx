@@ -13,7 +13,7 @@ const initialSearchFilters = new Map([
   ["pk_id_convenio_directo", ""],
   ["ean13", ""],
   ["nombre_convenio", ""],
-  ["estado",true],
+  ["estado", true],
   ["page", 1],
   ["limit", 10],
 ]);
@@ -24,33 +24,33 @@ const RecaudoManual = () => {
   const [listRecaudos, setListRecaudos] = useState([])
   const [isNextPage, setIsNextPage] = useState(false);
   const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
-  useMap(initialSearchFilters);
+    useMap(initialSearchFilters);
 
-const [fetchTrxs] = useFetchDispatchDebounce({
-  onSuccess: useCallback((data) => {
-    setListRecaudos(data?.obj?.results ?? []);
-    setIsNextPage(data?.obj?.next_exist);
-  }, []),
-  onError: useCallback((error) => {
-    if (!error instanceof DOMException) console.error(error)
-  }, []),
-}, { delay: 0 });
-
-const searchTrxs = useCallback(() => {
-  const tempMap = new Map(searchFilters2);
-  const url = getUrlRecaudosList()
-  tempMap.forEach((val, key, map) => {
-    if (!val) {
-      map.delete(key);
-    }
+  const [fetchTrxs] = useFetchDispatchDebounce({
+    onSuccess: useCallback((data) => {
+      setListRecaudos(data?.obj?.results ?? []);
+      setIsNextPage(data?.obj?.next_exist);
+    }, []),
+    onError: useCallback((error) => {
+      if (!error instanceof DOMException) console.error(error)
+    }, []),
   });
-  const queries = new URLSearchParams(tempMap.entries()).toString();
-  fetchTrxs(`${url}?${queries}`);
-}, [fetchTrxs, searchFilters2]);
 
-useEffect(() => {
-  searchTrxs();
-}, [searchTrxs]);
+  const searchTrxs = useCallback(() => {
+    const tempMap = new Map(searchFilters2);
+    const url = getUrlRecaudosList()
+    tempMap.forEach((val, key, map) => {
+      if (!val) {
+        map.delete(key);
+      }
+    });
+    const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${url}?${queries}`);
+  }, [fetchTrxs, searchFilters2]);
+
+  useEffect(() => {
+    searchTrxs();
+  }, [searchTrxs]);
 
   return (
     <Fragment>

@@ -2,7 +2,9 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import DataTable from "../../../../components/Base/DataTable";
+import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import useMap from "../../../../hooks/useMap";
 import ToggleInput from "../../../../components/Base/ToggleInput";
 import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
@@ -11,25 +13,27 @@ import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyPending } from "../../../../utils/notify";
 import { onChangeNumber } from "../../../../utils/functions";
-import { onChangeEan13Number, onChangeNit, descargarCSV,changeDateFormat } from "../../utils/functions";
-import { getRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
+import { onChangeEan13Number, onChangeNit, descargarCSV, changeDateFormat } from "../../utils/functions";
+import { getUrlRetirosList, addConveniosRetiroList, modConveniosRetiroList } from "../../utils/fetchFunctions"
+
+const initialSearchFilters = new Map([
+  ["pk_id_convenio_directo", ""],
+  ["ean13", ""],
+  ["nombre_convenio", ""],
+  ["page", 1],
+  ["limit", 10],
+]);
 
 const RetiroDirecto = () => {
   const [listRetiro, setListRetiro] = useState([]);
   const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
-  const [maxPages, setMaxPages] = useState(0);
+  const [isNextPage, setIsNextPage] = useState(false);
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
     "Longitud minima": "",
     "Longitud maxima": "",
   }])
-  const [searchFilters, setSearchFilters] = useState({
-    pk_id_convenio_directo: "",
-    ean13: "",
-    nombre_convenio: "",
-  });
   const [res] = useState(
     [
       ["ID_PRODUCTOR", "NUMERO_DOCUMENTO", "NOMBRE_PRODUCTOR",
@@ -47,10 +51,6 @@ const RetiroDirecto = () => {
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
   ]
-
-  useEffect(() => {
-    setPageData(pageData => ({ ...pageData, page: 1 }));
-  }, [pageData.limit]);
 
   useEffect(() => {
     let referencia = []
@@ -83,22 +83,34 @@ const RetiroDirecto = () => {
     }])
   }, []);
 
-  const getConvRetiro = useCallback(async () => {
-    await getRetirosList({
-      ...pageData,
-      ...searchFilters
-    })
-      .then((data) => {
-        setListRetiro(data?.obj?.results ?? []);
-        setMaxPages(data?.obj?.maxPages ?? '')
-      })
-      .catch((err) => {
-        setListRetiro([]);
-        console.error(err?.message);
-      });
-  }, [pageData, searchFilters])
+  const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
+    useMap(initialSearchFilters);
 
-  useEffect(() => { getConvRetiro() }, [getConvRetiro, pageData, searchFilters])
+  const [fetchTrxs] = useFetchDispatchDebounce({
+    onSuccess: useCallback((data) => {
+      setListRetiro(data?.obj?.results ?? []);
+      setIsNextPage(data?.obj?.next_exist);
+    }, []),
+    onError: useCallback((error) => {
+      if (!error instanceof DOMException) console.error(error)
+    }, []),
+  });
+
+  const searchTrxs = useCallback(() => {
+    const tempMap = new Map(searchFilters2);
+    const url = getUrlRetirosList()
+    tempMap.forEach((val, key, map) => {
+      if (!val) {
+        map.delete(key);
+      }
+    });
+    const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${url}?${queries}`);
+  }, [fetchTrxs, searchFilters2]);
+
+  useEffect(() => {
+    searchTrxs();
+  }, [searchTrxs]);
 
   const crearModificarConvenioRetiro = useCallback((e) => {
     e.preventDefault();
@@ -127,7 +139,7 @@ const RetiroDirecto = () => {
       {
         render({ data: res }) {
           handleClose();
-          getConvRetiro();
+          searchTrxs();
           return `Convenio ${selected ? "modificado" : "agregado"
             } exitosamente`;
         },
@@ -142,7 +154,7 @@ const RetiroDirecto = () => {
         },
       }
     )
-  }, [handleClose, getConvRetiro, selected, referencias])
+  }, [handleClose, searchTrxs, selected, referencias])
 
   const descargarPlantilla = useCallback(() => {
     descargarCSV('Ejemplo_de_archivo_retiro', res)
@@ -155,7 +167,7 @@ const RetiroDirecto = () => {
         <Button type={"submit"} onClick={() => setShowModal(true)} >
           Crear Convenio</Button>
       </ButtonBar>
-      <TableEnterprise
+      <DataTable
         title="Convenios de Retiros"
         headers={[
           "Código convenio",
@@ -173,26 +185,51 @@ const RetiroDirecto = () => {
             fecha_creacion,
           }) => {
             fecha_creacion = changeDateFormat(fecha_creacion)
-            return{
+            return {
               pk_id_convenio_directo,
               ean13,
               nombre_convenio,
               estado: estado ? "Activo" : "No activo",
-              fecha_creacion: fecha_creacion ?? "No indicada",
+              fecha_creacion: fecha_creacion ?? "ninguna",
             }
           }
         )}
-        maxPage={maxPages}
-        onSetPageData={setPageData}
-        onSelectRow={(e, i) => {
+        onClickRow={(_, index) => {
           setShowModal(true);
-          setSelected(listRetiro[i]);
+          setSelected(listRetiro[index]);
         }}
+        tblFooter={
+          <Fragment>
+            <DataTable.LimitSelector
+              defaultValue={10}
+              onChangeLimit={(limit) => {
+                setSingleFilter("limit", limit);
+                setSingleFilter("page", 1)
+              }}
+            />
+            <DataTable.PaginationButtons
+              onClickNext={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  isNextPage ? oldPage + 1 : oldPage
+                )
+              }
+              onClickPrev={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  oldPage > 1 ? oldPage - 1 : oldPage
+                )
+              }
+            />
+          </Fragment>
+        }
         onChange={(ev) => {
-          setSearchFilters((old) => ({
-            ...old,
-            [ev.target.name]: ev.target.value,
-          }))
+          setSearchFilters2((old) => {
+            const copy = new Map(old)
+              .set(
+                ev.target.name, ev.target.value
+              )
+              .set("page", 1);
+            return copy;
+          })
         }}
         actions={{
           download: descargarPlantilla,
@@ -212,19 +249,19 @@ const RetiroDirecto = () => {
           label={"Código EAN o IAC"}
           name={"ean13"}
           type="tel"
+          autoComplete="off"
           maxLength={"13"}
           onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
-          autoComplete="off"
         />
         <Input
           id={"nombre_convenio"}
           label={"Nombre del convenio"}
           name={"nombre_convenio"}
           type="text"
-          maxLength={"30"}
           autoComplete="off"
+          maxLength={"30"}
         />
-      </TableEnterprise>
+      </DataTable>
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
         <Form onSubmit={crearModificarConvenioRetiro} grid >
@@ -319,7 +356,6 @@ const RetiroDirecto = () => {
                           let copyRef = [...referencias]
                           copyRef = copyRef.filter((item) => item !== copyRef[index])
                           setReferencias(copyRef)
-                          getConvRetiro()
                         }}
                       >Eliminar referencia</Button>
                     </ButtonBar>
@@ -340,7 +376,6 @@ const RetiroDirecto = () => {
                         "Longitud maxima": "",
                       })
                       setReferencias(copyRef)
-                      getConvRetiro()
                     }
                   }}
                 >Añadir referencia</Button>

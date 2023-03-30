@@ -149,9 +149,9 @@ export const modRecaudo = buildPostFunction(
 
 
 /*--- Convenios Retiro ---*/
-export const getRetirosList = buildGetFunction(
-  `${url}/convenio-retiro/obtener-paginado`
-);
+export const getUrlRetirosList = () =>{
+  return `${url}/convenio-retiro/obtener-paginado`
+};
 export const searchConveniosRetiroList = buildGetFunction(
   `${url}/convenio-retiro/obtener`
 );
