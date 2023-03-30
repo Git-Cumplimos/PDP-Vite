@@ -204,7 +204,7 @@ const RecargasOperadores = () => {
                         setRespuesta(false);
                         console.error(err);
                       });
-                  }, 7500)
+                  }, 11000)
                 );
                 if (prom === true) {
                   setRespuesta(false);

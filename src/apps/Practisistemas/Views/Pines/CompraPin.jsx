@@ -434,7 +434,7 @@ const CompraPin = () => {
                         setShowLoading(false);
                         console.error(err);
                       });
-                  }, 7500)
+                  }, 11000)
                 );
                 if (promesa === true) {
                   setShowLoading(false);
