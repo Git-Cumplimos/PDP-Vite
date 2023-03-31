@@ -3,20 +3,21 @@ import { toast } from "react-toastify";
 import Form from "../../../components/Base/Form";
 import InputX from "../../../components/Base/InputX/InputX";
 import Select from "../../../components/Base/Select";
-import AWS, { CostExplorer } from "aws-sdk";
+import AWS from "aws-sdk";
 import ProgressBar from "../../../components/Base/ProgressBar/ProgressBar";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import Modal from "../../../components/Base/Modal";
 import CargarForm from "../components/CargarForm/CargarForm";
 import { useLoteria } from "../utils/LoteriaHooks";
-import SubPage from "../../../components/Base/SubPage/SubPage";
+import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
 const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/cargueS3`;
 
 const CargaArchivos = ({ route }) => {
   const { codigos_lot, setCodigos_lot } = useLoteria();
+  const { pdpUser } = useAuth();
 
   const { label } = route;
   const options = [
@@ -61,13 +62,14 @@ const CargaArchivos = ({ route }) => {
 
   const [progress, setProgress] = useState(0);
 
+  const nombreUsuario = pdpUser.uname.replace(/ /g,"_").replace(/-/g,"");
   const S3_BUCKET = process.env.REACT_APP_BUCKET;
   const REGION = process.env.REACT_APP_REGION;
   const bucket = new AWS.S3({
     params: { Bucket: S3_BUCKET },
     region: REGION,
   });
-
+  
   //------------------Funcion Para Subir El Formulario---------------------//
   const saveFile = useCallback(
     (e) => {
@@ -75,8 +77,8 @@ const CargaArchivos = ({ route }) => {
       const f = new Date();
       const query = {
         contentType: "application/text",
-        filename: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${f.getMonth() + 1
-          }${f.getFullYear()}${fileName}`,
+        filename: `${tipoSorteo}${archivo}/${fisiVirtual}${nombreUsuario}-${f.getDate()}${f.getMonth() + 1
+          }${f.getFullYear()}-${fileName}`,
       };
       fetchData(url_cargueS3, "GET", query)
         .then((respuesta) => {
@@ -178,9 +180,13 @@ const CargaArchivos = ({ route }) => {
 
   const onSubmit = (event) => {
     event.preventDefault();
-    //saveFile();
-    setShowModal(true);
-    setDisabledBtns(false);
+    if (!fileName.includes("-")){
+      setShowModal(true);
+      setDisabledBtns(false);
+    }
+    else {
+      notifyError("El nombre del archivo no es correcto, no incluir el carácter guion medio")
+    }
   };
 
   useEffect(() => {
@@ -223,7 +229,9 @@ const CargaArchivos = ({ route }) => {
           <Select
             class="mb-3"
             id="tip_sorteo"
-            label={(archivo === "Asignacion") ? (`Tipo de sorteo para asignación`) : (`Tipo de sorteo para ${archivo}`)}
+            label={(archivo === "PlanDePremios") ? (`Tipo de sorteo para plan de premios`) : 
+                  (archivo === "Asignacion") ? (`Tipo de sorteo para asignación`) :
+                  (`Tipo de sorteo para resultados`)}
             options={optionsTipoSorteo}
             disabled={progress !== 0 && progress !== 100}
             value={tipoSorteo}

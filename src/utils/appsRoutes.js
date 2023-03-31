@@ -76,6 +76,9 @@ const CrearSorteos = lazy(() =>
 const CargaArchivos = lazy(() =>
   import("../apps/LoteriaBog/Views/CargaArchivos")
 );
+const HistoricoCargues = lazy(() =>
+  import("../apps/LoteriaBog/Views/HistoricoCargues")
+);
 const ArqueoBilletes = lazy(() =>
   import("../apps/LoteriaBog/Views/InventarioBilletes/ArqueoBilletes")
 );
@@ -360,6 +363,13 @@ const allUrlsPrivateApps = [
           label: <AppIcons Logo={"CARGAR"} name='Carga de archivos' />,
           component: CargaArchivos,
           permission: [4],
+        },
+        {
+          link: `/loteria/${name}/historico_cargues`,
+          label: <AppIcons Logo={"REPORTE"} name='Histórico cargues de archivos' />,
+          component: HistoricoCargues,
+          extern: false,
+          permission: [3, 44, 95], ///////////////////////////////////////////////////////////////////
         },
         {
           link: `/loteria/${name}/sorteos`,
