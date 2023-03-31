@@ -355,7 +355,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
                 }}
               ></Select>
               <Input
-                label={"N° Documento"}
+                label={"N.° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={datosAportante?.["numDocumento"]}
                 minLength="6"
@@ -367,7 +367,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
               <Input
                 id="planilla"
                 name="planilla"
-                label="N° Planilla: "
+                label="N.° Planilla"
                 type="tel"
                 autoComplete="off"
                 minLength="10"
