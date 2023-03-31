@@ -51,30 +51,30 @@ const RecaudoConjunto = () => {
       setCargando(true)
     } catch (e) {
       notifyError(e.message)
-      // navigate("/recaudo-directo/recaudo")
+      navigate("/recaudo-directo/recaudo")
     }
   }, [navigate, pk_id_convenio])
 
-  const consultarRecaudoD = 
+  const consultarRecaudoD =
     useCallback(async (e) => {
       e.preventDefault()
       const data = {
-        consulta_recaudo: {
-          convenio_id: pk_id_convenio,
-          permite_vencidos: convenioRecaudo.permite_vencidos ?? false,
-          tipo_convenio: convenioRecaudo.fk_id_tipo_convenio,
-          referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
-        },
-        valor_total_trx: 0,
-        comercio: {
-          id_comercio: roleInfo?.id_comercio,
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
-        },
-        is_oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO",
-        nombre_usuario: pdpUser?.uname ?? "",
+          consulta_recaudo: {
+            convenio_id: pk_id_convenio,
+            permite_vencidos: convenioRecaudo.permite_vencidos ?? false,
+            tipo_convenio: convenioRecaudo.fk_id_tipo_convenio,
+            referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
+          },
+          valor_total_trx: 0,
+          comercio: {
+            id_comercio: roleInfo?.id_comercio,
+            id_usuario: roleInfo?.id_usuario,
+            id_terminal: roleInfo?.id_dispositivo,
+          },
+          is_oficina_propia:
+            roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+            roleInfo?.tipo_comercio === "KIOSCO",
+          nombre_usuario: pdpUser?.uname ?? "",
       };
       await getRecaudo(data)
         .then((data) => {
@@ -89,8 +89,8 @@ const RecaudoConjunto = () => {
         })
 
     }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose])
-    
-  
+
+
 
 
   const hacerRecaudo = useCallback(async (e) => {
