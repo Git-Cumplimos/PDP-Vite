@@ -1,12 +1,11 @@
-import { useState, useCallback, useEffect} from "react";
+import { useState, useEffect} from "react";
 import { useLoteria } from "../utils/LoteriaHooks";
-import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { notifyError } from "../../../utils/notify";
+import Select from "../../../components/Base/Select"
 
 const HistoricoCargues = ({ route }) => {
-  const [urls, setUrls] = useState(false);
   const { historicoCargues } = useLoteria();
   const [resp_con_sort, setResp_con_sort] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
@@ -19,6 +18,13 @@ const HistoricoCargues = ({ route }) => {
     fecha_fin: "",
     archivo: "",
   });
+
+  const opcionesdisponibles = ([
+    { value: "", label: "" },
+    { value: "Plan de premios", label: "Plan de premios" },
+    { value: "Asignación", label: "Asignación" },
+    { value: "Resultados", label: "Resultados" },
+  ]);
 
   const handleChange = (e) => {
     if (e.target.value) {
@@ -63,20 +69,13 @@ const HistoricoCargues = ({ route }) => {
       .catch((err) => console.error(err));
   };
 
-  const onArchivoChange = (e) => {
-    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-    setDatosTrans((old) => {
-      return { ...old, archivo: valueInput };
-    });
-  };
-
   return (
     <>
       <h1 class="text-3xl">Histórico cargues de archivos</h1>
       <TableEnterprise
         title='Registros de cargues de archivos'
         maxPage={maxPages}
-        headers={["Lotería","Archivo","Nombre","Estado","Detalle","Registros cargados","Usuario","Fecha y hora"]}
+        headers={["Nombre Lotería","Archivo","Nombre Archivo","Estado","Detalle Cargue","Registros cargados","Usuario","Fecha y hora"]}
         onSetPageData={setPageData}
         data={resp_con_sort.map(({ nom_loteria,archivo,nombrearchivo,estado,motivo,numregistros,usuario,fecha_cargue }) => {
           return {nom_loteria,archivo,nombrearchivo,estado,motivo,numregistros,usuario,fecha_cargue};
@@ -94,15 +93,19 @@ const HistoricoCargues = ({ route }) => {
           type="date"
           onInput={handleChange2}
         />
-        <select
-          id="num_sorteo"
+        <Select
+          id="searchBySorteo"
           label="Tipo de archivo"
-          type="tel"
-          minLength="1"
-          maxLength="6"
-          autoComplete="off"
+          options={opcionesdisponibles}
           value={datosTrans?.archivo}
-          onChange={onArchivoChange}
+          onInput={(e) => {
+            setDatosTrans((old) => {
+              return {
+                ...old,
+                archivo: e.target.value,
+              };
+            });
+          }}
         />
       </TableEnterprise>
     </>
