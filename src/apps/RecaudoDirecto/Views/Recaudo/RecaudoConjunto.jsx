@@ -3,14 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-// import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import MoneyInput from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRecaudo, searchConveniosRecaudoList, modRecaudo } from "../../utils/fetchFunctions"
-import useDelayedCallback from "../../../../hooks/useDelayedCallback";
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
@@ -57,7 +55,7 @@ const RecaudoConjunto = () => {
     }
   }, [navigate, pk_id_convenio])
 
-  const consultarRecaudoD = useDelayedCallback(
+  const consultarRecaudoD = 
     useCallback(async (e) => {
       e.preventDefault()
       const data = {
@@ -90,9 +88,9 @@ const RecaudoConjunto = () => {
           handleClose()
         })
 
-    }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose]),
-    300
-  )
+    }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose])
+    
+  
 
 
   const hacerRecaudo = useCallback(async (e) => {
