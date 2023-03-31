@@ -65,6 +65,12 @@ const ModificarPps = () => {
     // console.log(cantNum);
   }
 
+  const hijoAPadre = () => {
+    setBuscarCedula("");
+    setDatosConsulta("");
+    setEstado(false);
+  };
+
   useEffect(() => {
     cantidadNumeroCel(celular);
   }, [celular]);
@@ -397,7 +403,14 @@ const ModificarPps = () => {
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"} type="">
               {<Button type="submit">Modificar y Guardar</Button>}
-              <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+              <Button
+                onClick={() => {
+                  setShowModal(false);
+                  hijoAPadre();
+                }}
+              >
+                Cancelar
+              </Button>
             </ButtonBar>
           </Form>
         </Modal>
