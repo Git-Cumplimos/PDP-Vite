@@ -5,7 +5,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
 import Input from "../../../../components/Base/Input";
-import MoneyInput from "../../../../components/Base/MoneyInput";
+import MoneyInput from "../../utils/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRetiro, modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
@@ -204,9 +204,8 @@ const FormularioRetiro = () => {
             label="Valor a recaudar"
             name="valor_total_trx"
             autoComplete="off"
-            equalError={false}
-            min={dataRetiro?.fk_modificar_valor === 1 ?
-              ((dataRetiro.valor - 1) - dataRetiro.valor_retirado) ?? 0 : limitesMontos?.min}
+            equalError={dataRetiro?.fk_modificar_valor}
+            min={parseInt(dataRetiro.valor) - parseInt(dataRetiro.valor_retirado ?? 0)}
             max={parseInt(dataRetiro.valor) - parseInt(dataRetiro.valor_retirado ?? 0)}
             onInput={(e, valor) =>
               setValorRecibido({ ...valorRecibido, [e.target.name]: valor })

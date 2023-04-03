@@ -5,7 +5,7 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import MoneyInput from "../../../../components/Base/MoneyInput";
+import MoneyInput from "../../utils/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRecaudo, searchConveniosRecaudoList, modRecaudo } from "../../utils/fetchFunctions"
@@ -198,12 +198,9 @@ const RecaudoConjunto = () => {
               label="Valor a recaudar"
               name="valor_total_trx"
               autoComplete="off"
-              min={dataRecaudo?.fk_modificar_valor === 1 ? ((dataRecaudo.valor - 1) - dataRecaudo.valor_pagado) ?? 0 : limitesMontos?.min}
+              min={dataRecaudo.valor ?? limitesMontos?.min}
               equalError={false}
-              max={dataRecaudo?.fk_modificar_valor === 1 ||
-                dataRecaudo?.fk_modificar_valor === 2 ?
-                parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0)
-                : limitesMontos.max}
+              max={parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0) ?? limitesMontos.max}
               value={valorRecibido.valor_total_trx}
               onInput={(e, valor) =>
                 setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
@@ -238,13 +235,9 @@ const RecaudoConjunto = () => {
                 label="Valor a recaudar"
                 name="valor_total_trx"
                 autoComplete="off"
-                equalError={false}
-                min={dataRecaudo?.fk_modificar_valor === 1 ?
-                  ((dataRecaudo.valor - 1) - dataRecaudo.valor_pagado) ?? 0 : limitesMontos?.min}
-                max={dataRecaudo?.fk_modificar_valor === 1 ||
-                  dataRecaudo?.fk_modificar_valor === 2 ?
-                  parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0)
-                  : limitesMontos.max}
+                min={parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0) ?? limitesMontos?.min}
+                equalError={dataRecaudo?.fk_modificar_valor}
+                max={parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0) ?? limitesMontos.max}
                 onInput={(e, valor) =>
                   setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
                 }

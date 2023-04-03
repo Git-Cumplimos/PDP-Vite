@@ -150,7 +150,7 @@ const RetiroDirecto = () => {
             return err?.message;
           }
           console.error(err?.message);
-          return `${selected ? "Edicion" : "Creacion"} fallida`;
+          return `${selected ? "Edicion" : "Creación"} fallida`;
         },
       }
     )
@@ -174,7 +174,7 @@ const RetiroDirecto = () => {
           "Código EAN o IAC",
           "Nombre convenio",
           "Estado",
-          "Fecha creacion",
+          "Fecha creación",
         ]}
         data={listRetiro.map(
           ({

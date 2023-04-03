@@ -31,35 +31,34 @@ const GestionArchivosRecaudo = () => {
   const [isNextPage, setIsNextPage] = useState(false);
   const [file, setFile] = useState(null);
 
-
   const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
-  useMap(initialSearchFilters);
+    useMap(initialSearchFilters);
 
-const [fetchTrxs] = useFetchDispatchDebounce({
-  onSuccess: useCallback((data) => {
-    setListRecaudos(data?.obj?.results ?? []);
-    setIsNextPage(data?.obj?.next_exist);
-  }, []),
-  onError: useCallback((error) => {
-    if (!error instanceof DOMException) console.error(error)
-  }, []),
-});
-
-const searchTrxs = useCallback(() => {
-  const tempMap = new Map(searchFilters2);
-  const url = getUrlRecaudosList()
-  tempMap.forEach((val, key, map) => {
-    if (!val) {
-      map.delete(key);
-    }
+  const [fetchTrxs] = useFetchDispatchDebounce({
+    onSuccess: useCallback((data) => {
+      setListRecaudos(data?.obj?.results ?? []);
+      setIsNextPage(data?.obj?.next_exist);
+    }, []),
+    onError: useCallback((error) => {
+      if (!error instanceof DOMException) console.error(error)
+    }, []),
   });
-  const queries = new URLSearchParams(tempMap.entries()).toString();
-  fetchTrxs(`${url}?${queries}`);
-}, [fetchTrxs, searchFilters2]);
 
-useEffect(() => {
-  searchTrxs();
-}, [searchTrxs]);
+  const searchTrxs = useCallback(() => {
+    const tempMap = new Map(searchFilters2);
+    const url = getUrlRecaudosList()
+    tempMap.forEach((val, key, map) => {
+      if (!val) {
+        map.delete(key);
+      }
+    });
+    const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${url}?${queries}`);
+  }, [fetchTrxs, searchFilters2]);
+
+  useEffect(() => {
+    searchTrxs();
+  }, [searchTrxs]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -157,7 +156,7 @@ useEffect(() => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Gestion de Archivos de Recaudos</h1>
+      <h1 className="text-3xl mt-6">Gestión de Archivos de Recaudos</h1>
       <DataTable
         title="Convenios de Recaudos"
         headers={[
@@ -165,7 +164,7 @@ useEffect(() => {
           "Código EAN o IAC",
           "Nombre convenio",
           "Estado",
-          "Fecha creacion",
+          "Fecha creación",
         ]}
         data={listRecaudos.map(
           ({
@@ -252,7 +251,7 @@ useEffect(() => {
       </DataTable>
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">
-          Gestion de archivos de recaudo
+          Gestión de archivos de recaudo
         </h2>
         <ButtonBar>
           {selected.fk_id_tipo_convenio === 1 && selected.estado && (
@@ -276,7 +275,7 @@ useEffect(() => {
       </Modal>
       <Modal show={showMainModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">
-          Gestion de archivos de recaudo
+        Gestión de archivos de recaudo
         </h2>
         <Form onSubmit={showModalOptions ? CargarArchivo : DescargarReporte}>
           {showModalOptions && (

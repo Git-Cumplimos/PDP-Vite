@@ -153,7 +153,7 @@ const RecaudoDirecto = () => {
             return err?.message;
           }
           console.error(err?.message);
-          return `${selected ? "Edicion" : "Creacion"} fallida`;
+          return `${selected ? "Edicion" : "Creación"} fallida`;
         },
       }
     )
@@ -177,7 +177,7 @@ const RecaudoDirecto = () => {
           "Código EAN o IAC",
           "Nombre convenio",
           "Estado",
-          "Fecha creacion",
+          "Fecha creación",
         ]}
         data={listRecaudos.map(
           ({

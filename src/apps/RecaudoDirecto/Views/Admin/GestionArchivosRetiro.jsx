@@ -151,7 +151,7 @@ useEffect(() => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Gestion de Archivos de Retiros</h1>
+      <h1 className="text-3xl mt-6">Gestión de Archivos de Retiros</h1>
       <DataTable
         title="Convenios de Retiros"
         headers={[
@@ -159,7 +159,7 @@ useEffect(() => {
           "Código EAN o IAC",
           "Nombre convenio",
           "Estado",
-          "Fecha creacion",
+          "Fecha creación",
         ]}
         data={listRetiros.map(
           ({
@@ -245,7 +245,7 @@ useEffect(() => {
         />
       </DataTable>
       <Modal show={showModal} handleClose={handleClose}>
-        <h2 className="text-3xl mx-auto text-center mb-4">Gestion de archivos de retiro</h2>
+        <h2 className="text-3xl mx-auto text-center mb-4">Gestión de archivos de retiro</h2>
         <ButtonBar>
           {selected.fk_id_tipo_convenio === 1 && selected.estado &&
             <Button
@@ -266,7 +266,7 @@ useEffect(() => {
         </ButtonBar>
       </Modal>
       <Modal show={showMainModal} handleClose={handleClose}>
-        <h2 className="text-3xl mx-auto text-center mb-4">Gestion de archivos de retiro</h2>
+        <h2 className="text-3xl mx-auto text-center mb-4">Gestión de archivos de retiro</h2>
         <Form onSubmit={showModalOptions ? CargarArchivo : DescargarReporte}>
           {showModalOptions && (
             <Input

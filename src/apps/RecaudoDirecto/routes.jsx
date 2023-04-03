@@ -86,12 +86,12 @@ export const rutasGestionRecaudoDirecto = {
       permission: [PermissionsRecaudoDirecto.recaudo],
     }, {
       link: "/recaudo-directo/gestion/archivos-recaudo",
-      label: <AppIcons Logo={"Reporte"} name={"Gestion Archivos de Recaudo"} />,
+      label: <AppIcons Logo={"Reporte"} name={"Gestión Archivos de Recaudo"} />,
       component: GestionArchivosRecaudo,
       permission: [PermissionsRecaudoDirecto.recaudo],
     }, {
       link: "/recaudo-directo/gestion/archivo-retiro",
-      label: <AppIcons Logo={"Reporte"} name={"Gestion Archivos de Retiro"} />,
+      label: <AppIcons Logo={"Reporte"} name={"Gestión Archivos de Retiro"} />,
       component: GestionArchivosRetiro,
       permission: [PermissionsRecaudoDirecto.recaudo],
     },
