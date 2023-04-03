@@ -3,8 +3,9 @@
   justify-content: left;
   margin-bottom: 3rem;
 }
-.contenedorFormulario{
+.contenedorFormulario {
   display: flex;
   flex-direction: column;
-  flex-wrap: wrap;
+  /* flex-wrap: wrap; */
+  gap: 2.5rem;
 }

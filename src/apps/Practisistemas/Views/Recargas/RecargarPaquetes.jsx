@@ -28,7 +28,7 @@ import { v4 } from "uuid";
 const RecargarPaquetes = () => {
   //Variables
   const printDiv = useRef();
-  const { roleInfo, userInfo } = useAuth();
+  const { roleInfo, userInfo, pdpUser } = useAuth();
   const [inputCelular, setInputCelular] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
@@ -131,7 +131,7 @@ const RecargarPaquetes = () => {
         operador: state?.operador,
         valor: parseInt(state?.codigo_paq),
         jsonAdicional: {
-          nombre_usuario: userInfo?.attributes?.name,
+          "nombre_usuario": pdpUser?.uname ?? "",
           operador: state?.operador_recargar,
         },
       },
@@ -148,7 +148,7 @@ const RecargarPaquetes = () => {
           if (res?.message === "Endpoint request timed out") {
             notify("Su transacción esta siendo procesada");
             setRespuesta(true);
-            for (let i = 0; i <= 3; i++) {
+            for (let i = 0; i <= 8; i++) {
               try {
                 const prom = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -197,7 +197,7 @@ const RecargarPaquetes = () => {
               } catch (error) {
                 console.error(error);
               }
-              if (i <= 2) {
+              if (i <= 7) {
                 notify(
                   "Su transacción esta siendo procesada, no recargue la página"
                 );

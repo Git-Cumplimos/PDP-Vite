@@ -15,7 +15,7 @@ export const Validar_archivo = async (banco, nombre_archivo) => {
   try {
     const res = await fetchData(
       `${urlBackendValidar}/verificar?id_proceso=${banco}&nombre_archivo=${new_nombre_archivo}`,
-      "POST",
+      "GET",
       {},
       {},
       {},

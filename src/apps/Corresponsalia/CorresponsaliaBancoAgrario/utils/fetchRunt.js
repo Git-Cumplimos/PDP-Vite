@@ -39,8 +39,6 @@ export const fetchCustom = (url_, metodo_, name_) => {
         error.message
       );
     }
-    console.log(Peticion);
-
     //Evaluar si la respuesta es json
     try {
       if (typeof Peticion !== "object") {
