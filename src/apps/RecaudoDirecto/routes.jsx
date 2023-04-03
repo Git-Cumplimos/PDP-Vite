@@ -28,25 +28,25 @@ export const rutasRecaudo = {
   link: "/recaudo-directo/recaudo",
   label: <AppIcons Logo={"Recaudo"} name={"Recaudo Directo"} />,
   component: RecaudoDirecto,
-  permission: listPermissionsRecaudoDirecto,
+  permission: [PermissionsRecaudoDirecto.Trx_recaudo_directo],
   subRoutes: [
     {
       link: "/recaudo-directo/recaudo/manual",
       label: <AppIcons Logo={"RecaudoManual"} name={"Recaudo Manual"} />,
       component: RecaudoManual,
-      permission: [PermissionsRecaudoDirecto.recaudo],
+      permission: [PermissionsRecaudoDirecto.Trx_recaudo_directo],
     },
     {
       link: "/recaudo-directo/recaudo/barras",
       label: <AppIcons Logo={"RecaudoCodigoDeBarras"} name={"Recaudo con Código de Barras"} />,
       component: RecaudoBarras,
-      permission: [PermissionsRecaudoDirecto.recaudo],
+      permission: [PermissionsRecaudoDirecto.Trx_recaudo_directo],
     },
     {
       link: "/recaudo-directo/recaudo/:pk_id_convenio",
       label: <AppIcons Logo={"Recaudo"} name={"Consultas de recaudo"} />,
       component: RecaudoConjunto,
-      permission: [PermissionsRecaudoDirecto.recaudo],
+      permission: [PermissionsRecaudoDirecto.Trx_recaudo_directo],
       show: false,
     },
   ],
@@ -56,13 +56,13 @@ export const rutasRetiro = {
   link: "/recaudo-directo/consultar-retiro",
   label: <AppIcons Logo={"Retiro"} name={"Retiro Directo"} />,
   component: RetiroDirecto,
-  permission: [PermissionsRecaudoDirecto.recaudo],
+  permission: [PermissionsRecaudoDirecto.Trx_retiro_directo],
   subRoutes: [
     {
       link: "/recaudo-directo/consultar-retiro/retirar/:pk_id_convenio",
       label: <AppIcons Logo={"Retiro"} name={"Realizar retiro"} />,
       component: FormularioRetiro,
-      permission: [PermissionsRecaudoDirecto.recaudo],
+      permission: [PermissionsRecaudoDirecto.Trx_retiro_directo],
       show:false,
     },
   ],
@@ -72,28 +72,28 @@ export const rutasGestionRecaudoDirecto = {
   link: "/recaudo-directo/gestion",
   label: <AppIcons Logo={"Reporte"} name={"Gestión"} />,
   component: AdminRecaudoDirecto,
-  permission: [PermissionsRecaudoDirecto.recaudo],
+  permission: [PermissionsRecaudoDirecto.Gestion_recaudo_retiro_directo],
   subRoutes: [
     {
       link: "/recaudo-directo/gestion/recaudo",
       label: <AppIcons Logo={"Reporte"} name={"Convenios de Recaudos"} />,
       component: ConvenioRecaudo,
-      permission: [PermissionsRecaudoDirecto.recaudo],
+      permission: [PermissionsRecaudoDirecto.Gestion_recaudo_retiro_directo],
     }, {
       link: "/recaudo-directo/gestion/retiro",
       label: <AppIcons Logo={"Reporte"} name={"Convenios de Retiros"} />,
       component: ConvenioRetiro,
-      permission: [PermissionsRecaudoDirecto.recaudo],
+      permission: [PermissionsRecaudoDirecto.Gestion_recaudo_retiro_directo],
     }, {
       link: "/recaudo-directo/gestion/archivos-recaudo",
       label: <AppIcons Logo={"Reporte"} name={"Gestión Archivos de Recaudo"} />,
       component: GestionArchivosRecaudo,
-      permission: [PermissionsRecaudoDirecto.recaudo],
+      permission: [PermissionsRecaudoDirecto.Gestion_recaudo_retiro_directo],
     }, {
       link: "/recaudo-directo/gestion/archivo-retiro",
       label: <AppIcons Logo={"Reporte"} name={"Gestión Archivos de Retiro"} />,
       component: GestionArchivosRetiro,
-      permission: [PermissionsRecaudoDirecto.recaudo],
+      permission: [PermissionsRecaudoDirecto.Gestion_recaudo_retiro_directo],
     },
   ]
 }

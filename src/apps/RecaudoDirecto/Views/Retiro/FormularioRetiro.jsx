@@ -201,7 +201,7 @@ const FormularioRetiro = () => {
             disabled
           />
           <MoneyInput
-            label="Valor a recaudar"
+            label="Valor a retirar"
             name="valor_total_trx"
             autoComplete="off"
             equalError={dataRetiro?.fk_modificar_valor}
