@@ -11,6 +11,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
+import MoneyInput from "../../utils/MoneyInput";
 import { notifyPending } from "../../../../utils/notify";
 import { onChangeEan13Number, onChangeNit, descargarCSV, changeDateFormat } from "../../utils/functions";
 import { getUrlRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
@@ -29,6 +30,10 @@ const RecaudoDirecto = () => {
   const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
   const [isNextPage, setIsNextPage] = useState(false);
+  const [limites, setlimites] = useState({
+    "Valor minimo": "",
+    "Valor maximo": "",
+  })
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
     "Longitud minima": "",
@@ -101,6 +106,19 @@ const RecaudoDirecto = () => {
         "Longitud maxima": "",
       }]
     }
+    let limite = {}
+    if (selected['limite_monto']) {
+      limite = {
+        "Valor minimo": selected['limite_monto'][0] ?? 0,
+        "Valor maximo": selected['limite_monto'][1] ?? 0,
+      }
+    } else {
+      limite = {
+        "Valor minimo": "",
+        "Valor maximo": "",
+      }
+    }
+    setlimites(limite)
     setReferencias(referencia)
   }, [selected])
 
@@ -128,6 +146,10 @@ const RecaudoDirecto = () => {
         })
       }
       body['referencias'] = allReferencias
+    }
+    if (body['Valor minimo'] || body['Valor maximo']) {
+      delete body['Valor minimo']; delete body['Valor maximo'];
+      body['limite_monto'] = [`${[limites['Valor minimo']]}`, `${limites['Valor maximo']}`]
     }
 
     notifyPending(
@@ -157,7 +179,7 @@ const RecaudoDirecto = () => {
         },
       }
     )
-  }, [handleClose, searchTrxs, selected, referencias])
+  }, [handleClose, searchTrxs, selected, referencias, limites])
 
   const descargarPlantilla = useCallback(() => {
     descargarCSV('Ejemplo_de_archivo_recaudo', res)
@@ -301,15 +323,6 @@ const RecaudoDirecto = () => {
           />
           <Select
             className="place-self-stretch"
-            id={"Tipo modificacion"}
-            label={"Tipo modificacion"}
-            name={"fk_modificar_valor"}
-            options={[{ label: "", value: "" }, ...tipoModificacion]}
-            defaultValue={selected?.fk_modificar_valor ?? ""}
-            required
-          />
-          <Select
-            className="place-self-stretch"
             id={"Tipo de convenio"}
             label={"Tipo de convenio"}
             name={"fk_id_tipo_convenio"}
@@ -328,6 +341,37 @@ const RecaudoDirecto = () => {
             defaultValue={selected?.ean13 ?? ""}
             autoComplete="off"
           />
+          <Fieldset legend={"Valores"}>
+            <Select
+              className="place-self-stretch"
+              id={"Tipo modificacion"}
+              label={"Tipo modificacion"}
+              name={"fk_modificar_valor"}
+              options={[{ label: "", value: "" }, ...tipoModificacion]}
+              defaultValue={selected?.fk_modificar_valor ?? ""}
+              required
+            />
+            {Object.entries(limites).map(([keyLimit, valLimit], index) => {
+              return (
+                <MoneyInput
+                  key={keyLimit}
+                  className={"mb-4"}
+                  id={`${keyLimit}_${index}`}
+                  name={keyLimit}
+                  label={keyLimit}
+                  autoComplete="off"
+                  value={valLimit}
+                  equalError={false}
+                  onInput={(e, valor) => {
+                    const copyRef = { ...limites };
+                    copyRef[keyLimit] = valor;
+                    setlimites(copyRef);
+                  }}
+                  required
+                />
+              )
+            })}
+          </Fieldset>
           <Fieldset legend={"Referencias"}>
             {referencias?.map((obj, index) => {
               return (
