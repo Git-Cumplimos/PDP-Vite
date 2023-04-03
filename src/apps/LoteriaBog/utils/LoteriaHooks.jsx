@@ -249,77 +249,54 @@ export const useProvideLoteria = () => {
     return cod;
   }, [codigos_lot]);
 
-  const searchLoteria = useCallback(async (sorteo, num, ser, page) => {
-    let fisico = false;
-    const sort = sorteo.split("-");
-    if (sort[1] === "true") {
-      fisico = true;
-    }
-    if (num === "" && ser === "") return;
-
-    try {
-      setLoadConsulta(true);
-      const { Resultado: res, Num_Datos } = await fetchData(
+  const searchLoteria = useCallback(
+    async (sorteo, lot, num, ser, page, limit) => {
+      try {
+      const res = await fetchData(
         urls.ordinario,
         "GET",
         {
-          loteria: sort[2],
-          num_loteria: num,
-          serie: ser,
-          sorteo: sort[0],
-          numero: page,
-          fisico: fisico,
+          loteria: sorteo.lot,
+          sorteo: sorteo.sorteo,
+          fisico: false,
+          num_loteria: sorteo.num,
+          serie: sorteo.ser,
+          page : sorteo.page,
+          limit: sorteo.limit
         },
         {}
       );
-      setLoterias(res);
-      setLoadConsulta(false);
-      return Num_Datos;
+      return res;
     } catch (err) {
-      setLoterias([]);
       console.error(err);
-      setLoadConsulta(false);
     }
   }, []);
 
   const searchLoteriafisica = useCallback(
-    async (sorteo, num, ser, page) => {
-      let fisico = false;
-      const sort = sorteo.split("-");
-      if (sort[1] === "true") {
-        fisico = true;
-      }
-
-      if (num === "" && ser === "") return;
-
+    async (sorteo, lot, num, ser, page, limit) => {
       try {
-        setLoadConsulta(true);
-        const { Resultado: res, Num_Datos } = await fetchData(
+        const res = await fetchData(
           urls.ordinariofisico,
           "GET",
           {
-            loteria: sort[2],
-            num_loteria: num,
-            serie: ser,
-            sorteo: sort[0],
-            numero: page,
-            fisico: fisico,
+            loteria: sorteo.lot,
+            sorteo: sorteo.sorteo,
+            fisico: true,
             cod_distribuidor: codigosOficina?.cod_oficina_lot,
             cod_sucursal: codigosOficina?.cod_sucursal_lot,
+            num_loteria: sorteo.num,
+            serie: sorteo.ser,
+            page : sorteo.page,
+            limit: sorteo.limit
           },
           {}
         );
-
-        setLoterias(res);
-        setLoadConsulta(false);
-        return Num_Datos;
+        return res;
       } catch (err) {
-        setLoterias([]);
-        setLoadConsulta(false);
         console.error(err);
       }
     },
-    [roleInfo, codigosOficina]
+    [codigosOficina]
   );
   
   const sellLoteria = useCallback(
