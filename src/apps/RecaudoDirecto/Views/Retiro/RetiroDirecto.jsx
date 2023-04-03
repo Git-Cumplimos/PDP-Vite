@@ -1,50 +1,61 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Input from "../../../../components/Base/Input";
-import { getRetirosList } from "../../utils/fetchFunctions"
+import DataTable from "../../../../components/Base/DataTable";
+import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import useMap from "../../../../hooks/useMap";
+import { getUrlRetirosList } from "../../utils/fetchFunctions"
 import { notifyError } from "../../../../utils/notify";
 import { onChangeEan13Number } from "../../utils/functions";
 import { onChangeNumber } from "../../../../utils/functions";
+
+const initialSearchFilters = new Map([
+  ["pk_id_convenio_directo", ""],
+  ["ean13", ""],
+  ["nombre_convenio", ""],
+  ["estado", true],
+  ["page", 1],
+  ["limit", 10],
+]);
 
 const RetiroDirecto = () => {
   const navigate = useNavigate()
 
   const [listRetiro, setListRetiro] = useState([])
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
-  const [maxPages, setMaxPages] = useState(0);
-  const [searchFilters, setSearchFilters] = useState({
-    pk_id_convenio_directo: "",
-    ean13: "",
-    nombre_convenio: "",
+  const [isNextPage, setIsNextPage] = useState(false);
+  const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
+    useMap(initialSearchFilters);
+
+  const [fetchTrxs] = useFetchDispatchDebounce({
+    onSuccess: useCallback((data) => {
+      setListRetiro(data?.obj?.results ?? []);
+      setIsNextPage(data?.obj?.next_exist);
+    }, []),
+    onError: useCallback((error) => {
+      if (!error instanceof DOMException) console.error(error)
+    }, []),
   });
 
-  const getRetiros = useCallback(async () => {
-    await getRetirosList({
-      ...pageData,
-      ...searchFilters,
-      estado: true
-    })
-      .then((data) => {
-        setListRetiro(data?.obj?.results ?? []);
-        setMaxPages(data?.obj?.maxPages ?? '')
-      })
-      .catch((err) => {
-        // setListRetiro([]);
-        // if (err?.cause === "custom") {
-        //   notifyError(err?.message);
-        //   return;
-        // }
-        console.error(err?.message);
-      });
-  }, [pageData, searchFilters])
+  const searchTrxs = useCallback(() => {
+    const tempMap = new Map(searchFilters2);
+    const url = getUrlRetirosList()
+    tempMap.forEach((val, key, map) => {
+      if (!val) {
+        map.delete(key);
+      }
+    });
+    const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${url}?${queries}`);
+  }, [fetchTrxs, searchFilters2]);
 
-  useEffect(() => { getRetiros() }, [getRetiros, pageData, searchFilters])
+  useEffect(() => {
+    searchTrxs();
+  }, [searchTrxs]);
 
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Convenios de Retiros Directos</h1>
-      <TableEnterprise
+      <DataTable
         title="Convenios de Retiros"
         headers={[
           "Código convenio",
@@ -62,20 +73,44 @@ const RetiroDirecto = () => {
             nombre_convenio,
           })
         )}
-        onSelectRow={(e, i) => {
-          if (listRetiro[i].estado) {
-            if (listRetiro[i].fk_id_tipo_convenio !== 2) {
-              navigate(`/recaudo-directo/consultar-retiro/retirar/${listRetiro[i].pk_id_convenio_directo}`)
-            } else { notifyError("Error, convenio con autorizador esta en desarrollo!") }
-          } else { notifyError("Error, convenio no activo!") }
+        onClickRow={(_, index) => {
+          if (listRetiro[index].estado) {
+            if (listRetiro[index].fk_id_tipo_convenio !== 2) {
+              navigate(`/recaudo-directo/consultar-retiro/retirar/${listRetiro[index].pk_id_convenio_directo}`)
+            } else { notifyError("Error, convenio con autorizador esta en desarrollo!") }}
         }}
-        maxPage={maxPages}
-        onSetPageData={setPageData}
+        tblFooter={
+          <Fragment>
+            <DataTable.LimitSelector
+              defaultValue={10}
+              onChangeLimit={(limit) => {
+                setSingleFilter("limit", limit);
+                setSingleFilter("page", 1)
+              }}
+            />
+            <DataTable.PaginationButtons
+              onClickNext={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  isNextPage ? oldPage + 1 : oldPage
+                )
+              }
+              onClickPrev={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  oldPage > 1 ? oldPage - 1 : oldPage
+                )
+              }
+            />
+          </Fragment>
+        }
         onChange={(ev) => {
-          setSearchFilters((old) => ({
-            ...old,
-            [ev.target.name]: ev.target.value,
-          }))
+          setSearchFilters2((old) => {
+            const copy = new Map(old)
+              .set(
+                ev.target.name, ev.target.value
+              )
+              .set("page", 1);
+            return copy;
+          })
         }}
       >
         <Input
@@ -92,9 +127,9 @@ const RetiroDirecto = () => {
           label={"Código EAN o IAC"}
           name={"ean13"}
           type="tel"
+          autoComplete="off"
           maxLength={"13"}
           onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
-          autoComplete="off"
         />
         <Input
           id={"nombre_convenio"}
@@ -104,7 +139,7 @@ const RetiroDirecto = () => {
           autoComplete="off"
           maxLength={"30"}
         />
-      </TableEnterprise>
+      </DataTable>
     </Fragment>
   )
 }

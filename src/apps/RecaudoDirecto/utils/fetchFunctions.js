@@ -49,11 +49,11 @@ const buildPutFunction = (url) => {
     try {
       const res = await fetchData(url, "PUT", args, body);
       if (!res?.status) {
-        
-        if(res?.obj?.error[0]?.complete_info?.nit) {
-          throw new Error(res?.obj?.error[0]?.complete_info?.nit,{ cause: "custom" })
+
+        if (res?.obj?.error[0]?.complete_info?.nit) {
+          throw new Error(res?.obj?.error[0]?.complete_info?.nit, { cause: "custom" })
         }
-        
+
         if (res?.msg) {
           throw new Error(res?.msg, { cause: "custom" });
         }
@@ -81,7 +81,7 @@ export const descargarReporte = (url) => {
     }
   }
 };
-export const cargueArchivo = (url_cargar,url_verificar) => {
+export const cargueArchivo = (url_cargar, url_verificar) => {
   return async (file, nombre_convenio, convenio_id) => {
 
     try {
@@ -119,9 +119,9 @@ export const cargueArchivo = (url_cargar,url_verificar) => {
 
 
 /*--- Convenios Recaudo ---*/
-export const getRecaudosList = buildGetFunction(
-  `${url}/convenio-recaudo/obtener-paginado`
-);
+export const getUrlRecaudosList = () =>{
+  return `${url}/convenio-recaudo/obtener-paginado`
+};
 export const searchConveniosRecaudoList = buildGetFunction(
   `${url}/convenio-recaudo/obtener` // Recaudo Conjunto
 );
@@ -149,9 +149,9 @@ export const modRecaudo = buildPostFunction(
 
 
 /*--- Convenios Retiro ---*/
-export const getRetirosList = buildGetFunction(
-  `${url}/convenio-retiro/obtener-paginado`
-);
+export const getUrlRetirosList = () =>{
+  return `${url}/convenio-retiro/obtener-paginado`
+};
 export const searchConveniosRetiroList = buildGetFunction(
   `${url}/convenio-retiro/obtener`
 );
@@ -177,6 +177,3 @@ export const getRetiro = buildPostFunction(
 export const modRetiro = buildPostFunction(
   `${url}/retiro/hacer-retiro`
 );
-
-
-
