@@ -30,7 +30,7 @@ const tipo_operacion = 113;
 
 const CompraPin = () => {
   const { contenedorbtn, contenedorTitulos } = classes;
-  const { roleInfo, userInfo, infoTicket } = useAuth();
+  const { roleInfo, userInfo, pdpUser, infoTicket } = useAuth();
   const [inputCelular, setInputCelular] = useState("");
   const [inputContador, setInputContador] = useState("");
   const [inputPlaca, setInputPlaca] = useState("");
@@ -348,16 +348,16 @@ const CompraPin = () => {
               : inputValor,
         jsonAdicional: state?.op == "hv" ? {
           placaVh: inputPlaca,
-          nombre_usuario: userInfo?.attributes?.name,
+          "nombre_usuario": pdpUser?.uname ?? "",
         } : state?.op == "em" ? {
-            nombre_usuario: userInfo?.attributes?.name,
+            "nombre_usuario": pdpUser?.uname ?? "",
           telEnvio: inputCelular,
           } : state?.op == "cb" ? {
-              nombre_usuario: userInfo?.attributes?.name,
+              "nombre_usuario": pdpUser?.uname ?? "",
           circulo: inputCirculo,
           matricula: inputMatricula,
         } : {
-                nombre_usuario: userInfo?.attributes?.name,
+                "nombre_usuario": pdpUser?.uname ?? "",
         },
         ticket: newVoucher,
       },
@@ -389,7 +389,7 @@ const CompraPin = () => {
               day: "2-digit",
             }).format(today);
 
-            for (let i = 0; i <= 3; i++) {
+            for (let i = 0; i <= 8; i++) {
               try {
                 const promesa = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -444,7 +444,7 @@ const CompraPin = () => {
               } catch (error) {
                 console.error(error);
               }
-              if (i <= 2) { 
+              if (i <= 7) { 
                 notify(
                   "Su transacción esta siendo procesada, no recargue la página"
                 );

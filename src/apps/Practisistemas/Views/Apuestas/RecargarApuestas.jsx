@@ -34,7 +34,7 @@ const RecargarApuestas = () => {
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
-  const {roleInfo,userInfo} = useAuth();
+  const { roleInfo, userInfo, pdpUser } = useAuth();
   const {state} = useLocation();
   const printDiv = useRef();
   const validNavigate = useNavigate();
@@ -126,7 +126,7 @@ const RecargarApuestas = () => {
           operador:state?.producto,
           valor: parseInt(inputValor),
           jsonAdicional:{
-            "nombre_usuario": userInfo?.attributes?.name,
+            "nombre_usuario": pdpUser?.uname ?? "",
             "operador": state?.casaApuesta
           } 
       }
@@ -154,7 +154,7 @@ const RecargarApuestas = () => {
       notify("Su transacción esta siendo procesada");
       setRespuesta(true);
       console.error(err);
-      for (let i = 0; i <=8; i++) {
+      for (let i = 0; i <= 8; i++) {
         try {
           const prom = await new Promise((resolve, reject) =>
             setTimeout(() => {

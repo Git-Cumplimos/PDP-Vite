@@ -119,24 +119,24 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
       ],
 
       trxInfo: [
-        ["PISO DE PROTECCION SOCIAL - APORTE VOLUNTARIO"],
+        ["PISO DE PROTECCIÓN SOCIAL - APORTE VOLUNTARIO"],
         ["", ""],
         [
           "Número de documento",
           /* "33" */ datosRespuesta?.[1]?.["Identificacion"],
         ],
         ["", ""],
-        ["Número de autorización ", datosRespuesta?.[0]?.["inserted_id"]],
+        ["Número de autorización", datosRespuesta?.[0]?.["inserted_id"]],
         /* ["Proceso", "Aporte Voluntario A Demanda"], */
         ["", ""],
-        ["N° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
+        ["N.° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
         ["", ""],
         ["Valor", formatMoney.format(valorAportar)],
         ["", ""],
       ],
 
       disclamer:
-        "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
+        "ESTA TRANSACCIÓN NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORRESPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNÍQUESE EN BOGOTÁ 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
     };
   }, [roleInfo, valorAportar, datosRespuesta, tipoComercio]);
 
@@ -467,7 +467,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                   setTipoIdentificacion(event?.target?.value)
                 }
                 id="comissionType"
-                label="Tipo Identificación: "
+                label="Tipo Identificación"
                 required
                 options={{
                   "": "",
@@ -483,7 +483,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               ></Select>
 
               <Input
-                label={"N° Documento: "}
+                label={"N.° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={numDocumento}
                 minLength="6"
@@ -500,7 +500,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               <Input
                 id="celular"
                 name="celular"
-                label="N° Celular: "
+                label="N.° Celular"
                 type="tel"
                 autoComplete="off"
                 minLength="10"
@@ -533,7 +533,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               required
             /> */}
               <MoneyInput
-                label={"Valor Aportar: "}
+                label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}
                 value={valorAportar}
                 min={limitesMontos?.min}

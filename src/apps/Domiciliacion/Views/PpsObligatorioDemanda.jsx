@@ -28,7 +28,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
 const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
 // const url = "http://127.0.0.1:5000";
-const PpsObligatorioDemanda = ({ ced }) => {
+const PpsObligatorioDemanda = ({ ced, fun }) => {
   const { quotaInfo, roleInfo, infoTicket, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(true);
@@ -108,20 +108,20 @@ const PpsObligatorioDemanda = ({ ced }) => {
       ],
 
       trxInfo: [
-        ["PISO DE PROTECCION SOCIAL - APORTE OBLIGATORIO"],
+        ["PISO DE PROTECCIÓN SOCIAL - APORTE OBLIGATORIO"],
         ["", ""],
         ["Número de documento", datosAportante?.["numDocumento"]],
         ["", ""],
-        ["Número de autorización: ", datosComercio?.["idTrx"]],
+        ["Número de autorización", datosComercio?.["idTrx"]],
         ["", ""],
-        ["N° Planilla", datosAportante?.["numPlanilla"]],
+        ["N.° Planilla", datosAportante?.["numPlanilla"]],
         ["", ""],
         ["Valor", formatMoney.format(datosAportante?.["valorAportar"])],
         ["", ""],
       ],
 
       disclamer:
-        "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
+        "ESTA TRANSACCIÓN NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORRESPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNÍQUESE EN BOGOTÁ 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
     };
   }, [
     roleInfo,
@@ -355,7 +355,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
                 }}
               ></Select>
               <Input
-                label={"N° Documento"}
+                label={"N.° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={datosAportante?.["numDocumento"]}
                 minLength="6"
@@ -367,7 +367,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
               <Input
                 id="planilla"
                 name="planilla"
-                label="N° Planilla: "
+                label="N.° Planilla"
                 type="tel"
                 autoComplete="off"
                 minLength="10"
@@ -413,7 +413,14 @@ const PpsObligatorioDemanda = ({ ced }) => {
               </Button>
               /*  ) : null */
             }
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setShowModal(false);
+                fun();
+              }}
+            >
+              Cancelar
+            </Button>
           </ButtonBar>
         </Form>
       </Modal>

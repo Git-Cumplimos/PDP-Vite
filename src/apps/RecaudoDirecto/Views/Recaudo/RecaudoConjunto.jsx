@@ -55,7 +55,7 @@ const RecaudoConjunto = () => {
     }
   }, [navigate, pk_id_convenio])
 
-  const consultarRecaudoD =
+  const consultarRecaudoD = 
     useCallback(async (e) => {
       e.preventDefault()
       const data = {
@@ -89,8 +89,6 @@ const RecaudoConjunto = () => {
         })
 
     }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose])
-
-
 
 
   const hacerRecaudo = useCallback(async (e) => {
