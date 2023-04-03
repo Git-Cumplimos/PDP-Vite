@@ -41,11 +41,11 @@ const RetiroDirecto = () => {
   }])
   const [res] = useState(
     [
-      ["ID_PRODUCTOR", "NUMERO_DOCUMENTO", "NOMBRE_PRODUCTOR",
-        "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "TIPO_PAGO", "NUMERO_QUINCENA"],
-      [333, 332421666, "nombre", "apellido", 50000, "EFECTIVO", 125],
-      [333, 332421667, "nombre", "apellido", 865000, "EFECTIVO", 125],
-      [333, 332421668, "nombre", "apellido", 20000, "EFECTIVO", 125],
+      ["REFERENCIA_1", "REFERENCIA_2",
+        "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "FECHA_VENCIMIENTO", "NUMERO_QUINCENA"],
+      [ 332421666, 5645454, "apellido", 50000, "8/06/2023", 125],
+      [ 332421667, 5456458, "apellido", 865000, "8/06/2023", 125],
+      [ 332421668, 5456458, "apellido", 20000, "8/06/2023", 125],
     ]
   )
   const tipoModificacion = [

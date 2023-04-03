@@ -42,11 +42,11 @@ const RecaudoDirecto = () => {
   }])
 
   const [res] = useState([
-    ["ID_PRODUCTOR", "NUMERO_DOCUMENTO", "NOMBRE_PRODUCTOR",
-      "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "TIPO_PAGO", "NUMERO_QUINCENA"],
-    [333, 332421116, "nombre", "apellido", 50000, "EFECTIVO", 125],
-    [333, 332421117, "nombre", "apellido", 80000, "CONSIGNACION", 125],
-    [333, 332421118, "nombre", "apellido", 1250000, "EFECTIVO", 125],
+    ["REFERENCIA_1", "REFERENCIA_2",
+      "APELLIDO_PRODUCTOR", "TOTAL_PAGAR","FECHA_VENCIMIENTO", "NUMERO_QUINCENA"],
+    [332421116, "JUAN", "apellido", 50000, "8/06/2023", 125],
+    [332421117, "PEDRO", "apellido", 80000, "16/06/2023", 125],
+    [332421118, "MARIA", "apellido", 1250000, "12/06/2023", 125],
   ])
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
@@ -365,11 +365,11 @@ const RecaudoDirecto = () => {
                   name={keyLimit}
                   label={keyLimit}
                   autoComplete="off"
-                  value={valLimit ?? 0}
+                  value={valLimit}
                   equalError={false}
                   onInput={(e, valor) => {
                     const copyRef = { ...limites };
-                    copyRef[keyLimit] = valor === "" && 0;
+                    copyRef[keyLimit] = valor;
                     setlimites(copyRef);
                   }}
                   required
