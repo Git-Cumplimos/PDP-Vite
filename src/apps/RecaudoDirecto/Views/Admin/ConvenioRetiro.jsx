@@ -11,6 +11,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
+import MoneyInput from "../../utils/MoneyInput";
 import { notifyPending } from "../../../../utils/notify";
 import { onChangeNumber } from "../../../../utils/functions";
 import { onChangeEan13Number, onChangeNit, descargarCSV, changeDateFormat } from "../../utils/functions";
@@ -29,6 +30,10 @@ const RetiroDirecto = () => {
   const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
   const [isNextPage, setIsNextPage] = useState(false);
+  const [limites, setlimites] = useState({
+    "Valor minimo": "0",
+    "Valor maximo": "0",
+  })
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
     "Longitud minima": "",
@@ -70,6 +75,19 @@ const RetiroDirecto = () => {
         "Longitud maxima": "",
       }]
     }
+    let limite = {}
+    if (selected['limite_monto']) {
+      limite = {
+        "Valor minimo": selected['limite_monto'][0] ?? 0,
+        "Valor maximo": selected['limite_monto'][1] ?? 0,
+      }
+    } else {
+      limite = {
+        "Valor minimo": "0",
+        "Valor maximo": "0",
+      }
+    }
+    setlimites(limite)
     setReferencias(referencia)
   }, [selected])
 
@@ -81,6 +99,10 @@ const RetiroDirecto = () => {
       "Longitud minima": "",
       "Longitud maxima": "",
     }])
+    setlimites({
+      "Valor minimo": "0",
+      "Valor maximo": "0",
+    })
   }, []);
 
   const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
@@ -127,6 +149,10 @@ const RetiroDirecto = () => {
       }
       body['referencias'] = allReferencias
     }
+    if (body['Valor minimo'] || body['Valor maximo']) {
+      delete body['Valor minimo']; delete body['Valor maximo'];
+      body['limite_monto'] = [`${[limites['Valor minimo']] ?? 0}`, `${limites['Valor maximo'] ?? 0}`]
+    }
     notifyPending(
       selected
         ? modConveniosRetiroList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
@@ -154,7 +180,7 @@ const RetiroDirecto = () => {
         },
       }
     )
-  }, [handleClose, searchTrxs, selected, referencias])
+  }, [handleClose, searchTrxs, selected, referencias, limites])
 
   const descargarPlantilla = useCallback(() => {
     descargarCSV('Ejemplo_de_archivo_retiro', res)
@@ -294,14 +320,6 @@ const RetiroDirecto = () => {
             autoComplete="off"
             onInput={(ev) => { ev.target.value = onChangeNit(ev); }}
             defaultValue={selected?.nit ?? ""}
-            required />
-          <Select
-            className="place-self-stretch"
-            id={"id valor a modificar"}
-            label={"Tipo modificacion"}
-            name={"fk_modificar_valor"}
-            options={[{ label: "", value: "" }, ...tipoModificacion]}
-            defaultValue={selected?.fk_modificar_valor ?? ""}
             required
           />
           <Select
@@ -324,6 +342,38 @@ const RetiroDirecto = () => {
             defaultValue={selected?.ean13 ?? ""}
             autoComplete="off"
           />
+          <Fieldset legend={"Valores"}>
+            <Select
+              className="place-self-stretch mb-1"
+              id={"Tipo modificación"}
+              label={"Tipo modificación"}
+              name={"fk_modificar_valor"}
+              options={[{ label: "", value: "" }, ...tipoModificacion]}
+              defaultValue={selected?.fk_modificar_valor ?? ""}
+
+              required
+            />
+            {Object.entries(limites).map(([keyLimit, valLimit], index) => {
+              return (
+                <MoneyInput
+                  key={keyLimit}
+                  className={"mb-1"}
+                  id={`${keyLimit}_${index}`}
+                  name={keyLimit}
+                  label={keyLimit}
+                  autoComplete="off"
+                  value={valLimit ?? 0}
+                  equalError={false}
+                  onInput={(e, valor) => {
+                    const copyRef = { ...limites };
+                    copyRef[keyLimit] = valor;
+                    setlimites(copyRef);
+                  }}
+                  required
+                />
+              )
+            })}
+          </Fieldset>
           <Fieldset legend={"Referencias"}>
             {referencias?.map((obj, index) => {
               return (

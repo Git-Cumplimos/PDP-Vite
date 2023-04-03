@@ -27,12 +27,13 @@ const initialSearchFilters = new Map([
 
 const RecaudoDirecto = () => {
   const [listRecaudos, setListRecaudos] = useState([])
+  // const [sinBaseDatos, setSinBaseDatos] = useState(false);
   const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
   const [isNextPage, setIsNextPage] = useState(false);
   const [limites, setlimites] = useState({
-    "Valor minimo": "",
-    "Valor maximo": "",
+    "Valor minimo": "0",
+    "Valor maximo": "0",
   })
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
@@ -114,8 +115,8 @@ const RecaudoDirecto = () => {
       }
     } else {
       limite = {
-        "Valor minimo": "",
-        "Valor maximo": "",
+        "Valor minimo": "0",
+        "Valor maximo": "0",
       }
     }
     setlimites(limite)
@@ -130,6 +131,10 @@ const RecaudoDirecto = () => {
       "Longitud minima": "",
       "Longitud maxima": "",
     }])
+    setlimites({
+      "Valor minimo": "0",
+      "Valor maximo": "0",
+    })
   }, []);
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
@@ -149,9 +154,8 @@ const RecaudoDirecto = () => {
     }
     if (body['Valor minimo'] || body['Valor maximo']) {
       delete body['Valor minimo']; delete body['Valor maximo'];
-      body['limite_monto'] = [`${[limites['Valor minimo']]}`, `${limites['Valor maximo']}`]
+      body['limite_monto'] = [`${[limites['Valor minimo']] ?? 0 }`, `${limites['Valor maximo'] ?? 0}`]
     }
-
     notifyPending(
       selected
         ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
@@ -328,6 +332,7 @@ const RecaudoDirecto = () => {
             name={"fk_id_tipo_convenio"}
             options={[{ label: "", value: "" }, ...tipoConvenio]}
             defaultValue={selected?.fk_id_tipo_convenio ?? ""}
+            // onInput={(e) => { setSinBaseDatos(e.target.value === 3 ? true : false) }}
             required
             disabled={selected ? true : false}
           />
@@ -343,9 +348,9 @@ const RecaudoDirecto = () => {
           />
           <Fieldset legend={"Valores"}>
             <Select
-              className="place-self-stretch"
-              id={"Tipo modificacion"}
-              label={"Tipo modificacion"}
+              className="place-self-stretch mb-1"
+              id={"Tipo modificación"}
+              label={"Tipo modificación"}
               name={"fk_modificar_valor"}
               options={[{ label: "", value: "" }, ...tipoModificacion]}
               defaultValue={selected?.fk_modificar_valor ?? ""}
@@ -355,16 +360,16 @@ const RecaudoDirecto = () => {
               return (
                 <MoneyInput
                   key={keyLimit}
-                  className={"mb-4"}
+                  className={"mb-1"}
                   id={`${keyLimit}_${index}`}
                   name={keyLimit}
                   label={keyLimit}
                   autoComplete="off"
-                  value={valLimit}
+                  value={valLimit ?? 0}
                   equalError={false}
                   onInput={(e, valor) => {
                     const copyRef = { ...limites };
-                    copyRef[keyLimit] = valor;
+                    copyRef[keyLimit] = valor === "" && 0;
                     setlimites(copyRef);
                   }}
                   required

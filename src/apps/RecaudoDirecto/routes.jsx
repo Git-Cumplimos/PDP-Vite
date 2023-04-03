@@ -38,7 +38,7 @@ export const rutasRecaudo = {
     },
     {
       link: "/recaudo-directo/recaudo/barras",
-      label: <AppIcons Logo={"RecaudoCodigoDeBarras"} name={"Recaudo con Codigo de Barras"} />,
+      label: <AppIcons Logo={"RecaudoCodigoDeBarras"} name={"Recaudo con Código de Barras"} />,
       component: RecaudoBarras,
       permission: [PermissionsRecaudoDirecto.recaudo],
     },
