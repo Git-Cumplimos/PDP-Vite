@@ -411,21 +411,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center mb-10 mt-5'>
+      <h1 className="text-3xl text-center mb-10 mt-5">
         Recaudo servicios públicos y privados
       </h1>
       {!datosEnvio.estadoConsulta ? (
         <>
           <Form>
             <TextArea
-              id='codBarras'
-              label='Escanee el código de barras'
-              type='text'
-              name='codBarras'
+              id="codBarras"
+              label="Escanee el código de barras"
+              type="text"
+              name="codBarras"
               required
               value={datosTrans.codBarras}
               autoFocus
-              autoComplete='off'
+              autoComplete="off"
               onInput={onChangeFormat}
               onKeyDown={(ev) => {
                 if (ev.keyCode === 13 && ev.shiftKey === false) {
@@ -467,14 +467,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                     data: "",
                   };
                 }
-              }}></TextArea>
+              }}
+            ></TextArea>
             {datosTrans.codBarras !== "" && (
               <ButtonBar>
                 <Button
-                  type='button'
+                  type="button"
                   onClick={() => {
                     setDatosTrans({ codBarras: "" });
-                  }}>
+                  }}
+                >
                   Volver a ingresar código de barras
                 </Button>
               </ButtonBar>
@@ -483,50 +485,65 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         </>
       ) : (
         <>
-          <h1 className='text-3xl text-center  mb-10'>{`Convenio: ${
+          <h1 className="text-3xl text-center  mb-10">{`Convenio: ${
             datosEnvio?.datosConvenio?.convenio ?? ""
           }`}</h1>
-          <Form grid onSubmit={onSubmitConfirm}>
+          <Form
+            onSubmit={onSubmitConfirm}
+            // grid={
+            //   datosEnvio.datosCodigoBarras.parciales === "1" &&
+            //   (datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 ||
+            //     datosEnvio.datosCodigoBarras.pago[0])
+            // }
+            grid={
+              (datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
+                datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0) ||
+              datosEnvio.datosCodigoBarras.pago[0]
+            }
+          >
             <Input
-              id='ref1'
-              label='Referencia 1'
-              type='text'
-              name='ref1'
-              minLength='32'
-              maxLength='32'
+              id="ref1"
+              label="Referencia 1"
+              type="text"
+              name="ref1"
+              minLength="32"
+              maxLength="32"
               disabled={true}
               value={datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""}
               onInput={(e) => {
                 // setDatosTransaccion((old) => {
                 //   return { ...old, ref1: e.target.value };
                 // });
-              }}></Input>
+              }}
+            ></Input>
+
             {datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
             datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 ? (
               <Input
-                id='ref2'
-                label='Fecha de caducidad'
-                type='text'
-                name='ref2'
-                minLength='32'
-                maxLength='32'
+                id="ref2"
+                label="Fecha de caducidad"
+                type="text"
+                name="ref2"
+                minLength="32"
+                maxLength="32"
                 disabled={true}
                 value={datosEnvio.datosCodigoBarras.fechaCaducidad[0] ?? ""}
                 onInput={(e) => {
                   // setDatosTransaccion((old) => {
                   //   return { ...old, ref2: e.target.value };
                   // });
-                }}></Input>
+                }}
+              ></Input>
             ) : (
               <></>
             )}
             {datosEnvio.datosCodigoBarras.pago[0] && (
               <MoneyInputDec
-                id='valCashOut'
-                name='valCashOut'
-                label='Valor a pagar original'
-                type='text'
-                autoComplete='off'
+                id="valCashOut"
+                name="valCashOut"
+                label="Valor a pagar original"
+                type="text"
+                autoComplete="off"
                 maxLength={"15"}
                 disabled={true}
                 value={datosTransaccion.valorSinModificar ?? ""}
@@ -538,11 +555,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                     // });
                   }
                 }}
-                required></MoneyInputDec>
+                required
+              ></MoneyInputDec>
             )}
-            <ButtonBar className='lg:col-span-2'>
+            <ButtonBar className="lg:col-span-2">
               <Button
-                type='button'
+                type="button"
                 onClick={() => {
                   setDatosEnvio({
                     datosCodigoBarras: {},
@@ -559,19 +577,20 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                     valorSinModificar: "",
                     data: "",
                   });
-                }}>
+                }}
+              >
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
-                <Button type='submit'>Realizar consulta</Button>
+                <Button type="submit">Realizar consulta</Button>
               )}
             </ButtonBar>
           </Form>
           <Modal show={showModal} handleClose={hideModal}>
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
               {peticion === 2 && (
                 <>
-                  <h1 className='text-2xl text-center mb-5 font-semibold'>
+                  <h1 className="text-2xl text-center mb-5 font-semibold">
                     Resultado consulta
                   </h1>
                   <h2>{`Nombre convenio: ${datosEnvio?.datosConvenio?.convenio}`}</h2>
@@ -579,7 +598,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                   <h2>{`Referencia 1: ${
                     datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
                   }`}</h2>
-                  <h2 className='text-base'>
+                  <h2 className="text-base">
                     {`Valor consultado: ${formatMoney.format(
                       datosTransaccion.valorSinModificar2
                     )} `}
@@ -587,11 +606,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                   {datosEnvio?.datosConvenio?.parciales === "1" && (
                     <Form grid onSubmit={onSubmitPago}>
                       <Input
-                        id='valor'
-                        name='valor'
-                        label='Valor a pagar'
-                        autoComplete='off'
-                        type='tel'
+                        id="valor"
+                        name="valor"
+                        label="Valor a pagar"
+                        autoComplete="off"
+                        type="tel"
                         minLength={"5"}
                         maxLength={"20"}
                         defaultValue={datosTransaccion.showValor2 ?? ""}
@@ -611,10 +630,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                       onClick={() => {
                         notifyError("Transacción cancelada por el usuario");
                         hideModalReset();
-                      }}>
+                      }}
+                    >
                       Cancelar
                     </Button>
-                    <Button type='submit' onClick={onSubmitPago}>
+                    <Button type="submit" onClick={onSubmitPago}>
                       Realizar pago
                     </Button>
                   </ButtonBar>
@@ -624,16 +644,18 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                 <>
                   <TicketsAval
                     ticket={objTicketActual}
-                    refPrint={printDiv}></TicketsAval>
+                    refPrint={printDiv}
+                  ></TicketsAval>
 
                   <ButtonBar>
                     <Button onClick={handlePrint}>Imprimir</Button>
                     <Button
-                      type='button'
+                      type="button"
                       onClick={() => {
                         hideModalReset();
                         navigate(-1);
-                      }}>
+                      }}
+                    >
                       Cerrar
                     </Button>
                   </ButtonBar>
