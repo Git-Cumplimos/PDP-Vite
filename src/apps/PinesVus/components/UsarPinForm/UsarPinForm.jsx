@@ -287,11 +287,13 @@ const UsarPinForm = ({
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center">
+          <div ref={printDiv}>
           <TicketsPines
               refPrint={null}
               ticket={tickets}
               logo="LogoVus"
           />
+          </div>
           <ButtonBar>
             <Button
               onClick={() => {
