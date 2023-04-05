@@ -30,7 +30,6 @@ const Premios = ({ route }) => {
   const [valorbruto, setValorbruto] = useState("");
   const [serie, setSerie] = useState("");
   const [idLoteria, seIdLoteria] = useState("");
-  const [cod_distribuidor, setCod_distribuidor] = useState("");
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
@@ -60,6 +59,7 @@ const Premios = ({ route }) => {
   const [datosCliente, setDatosCliente] = useState({
     selectFraccion: 0,
     nombre: "",
+    apellido:"",
     documento: "",
     direccion: "",
     celular: "",
@@ -111,6 +111,7 @@ const Premios = ({ route }) => {
         ...old,
         selectFraccion: "0",
         nombre: "",
+        apellido: "",
         documento: "",
         direccion: "",
         celular: "",
@@ -122,7 +123,6 @@ const Premios = ({ route }) => {
     isWinner(sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual)
       .then((res) => {
         var salvarRes = res;
-        setCod_distribuidor(roleInfo.cod_oficina_lot);
         setMaxPago(res?.obj?.max_pago);
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
@@ -260,7 +260,9 @@ const Premios = ({ route }) => {
         ["Fracción", seleccionarFraccion],
         ["Valor a pagar", formatMoney.format(totalPagar)],
         [tipopago === 2 && "", tipopago === 2 && ""],
-        [tipopago === 2 && "Nombre", tipopago === 2 && datosCliente?.nombre],
+        [tipopago === 2 && "Nombres", tipopago === 2 && datosCliente?.nombre],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Apellidos", tipopago === 2 && datosCliente?.apellido],
         [tipopago === 2 && "", tipopago === 2 && ""],
         [tipopago === 2 && "Número Documento", tipopago === 2 && datosCliente?.documento],
         [tipopago === 2 && "", tipopago === 2 && ""],
@@ -297,6 +299,7 @@ const Premios = ({ route }) => {
             checkBilleteVirtual,
             seleccionarFraccion,
             datosCliente?.nombre,
+            datosCliente?.apellido,
             datosCliente?.documento,
             datosCliente?.direccion,
             datosCliente?.celular,
@@ -306,7 +309,6 @@ const Premios = ({ route }) => {
             datosComercio.terminal,
             datosComercio.usuario,
             datosComercio.codigo_dane,
-            cod_distribuidor,
             idLoteria,
             tipopago,
             hash,
@@ -359,6 +361,7 @@ const Premios = ({ route }) => {
             checkBilleteVirtual,
             seleccionarFraccion,
             datosCliente?.nombre,
+            datosCliente?.apellido,
             datosCliente?.documento,
             datosCliente?.direccion,
             datosCliente?.celular,
@@ -368,7 +371,6 @@ const Premios = ({ route }) => {
             datosComercio.terminal,
             datosComercio.usuario,
             datosComercio.codigo_dane,
-            cod_distribuidor,
             idLoteria,
             tipopago,
             hash,
@@ -540,7 +542,7 @@ const Premios = ({ route }) => {
                 }>
                 <Input
                   id="nombre"
-                  label="Nombre"
+                  label="Nombres"
                   type="text"
                   autoComplete="off"
                   minLength={"3"}
@@ -551,6 +553,24 @@ const Premios = ({ route }) => {
                       return {
                         ...old,
                         nombre: e.target.value,
+                      };
+                    });
+                  }}
+                  required={true}
+                />
+                <Input
+                  id="apellido"
+                  label="Apellidos"
+                  type="text"
+                  autoComplete="off"
+                  minLength={"3"}
+                  maxLength={"60"}
+                  value={datosCliente?.apellido}
+                  onInput={(e) => {
+                    setDatosCliente((old) => {
+                      return {
+                        ...old,
+                        apellido: e.target.value,
                       };
                     });
                   }}
