@@ -69,6 +69,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
     tipoComercio: roleInfo?.["tipo_comercio"],
     nombreComercio: roleInfo?.["nombre comercio"],
     idTrx: "",
+    datocontacto: "",
   });
   const [procesandoTrx, setProcesandoTrx] = useState(false);
   const [disabledBtn, setDisabledBtn] = useState(false);
@@ -101,7 +102,10 @@ const PpsObligatorioDemanda = ({ ced }) => {
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Municipio", roleInfo?.ciudad],
+        ["Id Trx", datosComercio?.["idTrx"]],
+        ["Id Aut", datosComercio?.["idTrx"]],
+        ["Comercio", roleInfo?.nombre_comercio],
+        // ["Municipio", roleInfo?.ciudad],
         ["", ""],
         ["Dirección", roleInfo?.direccion],
         ["", ""],
@@ -110,9 +114,12 @@ const PpsObligatorioDemanda = ({ ced }) => {
       trxInfo: [
         ["PISO DE PROTECCIÓN SOCIAL - APORTE OBLIGATORIO"],
         ["", ""],
-        ["Número de documento", datosAportante?.["numDocumento"]],
+        ["Nombre", datosComercio?.["datocontacto"]],
+
         ["", ""],
-        ["Número de autorización", datosComercio?.["idTrx"]],
+        ["Número de documento", datosAportante?.["numDocumento"]],
+        // ["", ""],
+        // ["Número de autorización", datosComercio?.["idTrx"]],
         ["", ""],
         ["N.° Planilla", datosAportante?.["numPlanilla"]],
         ["", ""],
@@ -185,6 +192,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
                   idTrx:
                     respuesta?.obj?.datos_recibidos
                       ?.trazabilityFinancialInstitutionCode,
+                  datocontacto: respuesta?.obj?.datos_recibidos?.datocontacto,
                 };
               });
               // console.log("++++++idtrx", datosComercio?.idTrx);
