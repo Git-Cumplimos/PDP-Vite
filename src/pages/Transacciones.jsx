@@ -195,7 +195,7 @@ const Transacciones = () => {
                 tipo_afectacion !== "NA" &&
                 !(id_tipo_transaccion === 66 || id_tipo_transaccion === 67)
                   ? status_trx
-                    ? ticket == null
+                    ? (ticket === null || JSON.stringify(ticket) === '{}')
                       ? "Transacción pendiente"
                       : "Transacción aprobada"
                     : "Transacción rechazada"
