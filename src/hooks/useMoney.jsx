@@ -15,7 +15,7 @@ const filterExtraDigit = (data, digits = 0) => {
 
 const useMoney = ({
   limits = [0, 10000000],
-  equalError = true,
+  equalError = false,
   decimalDigits = 0,
 }) => {
   const onChangeMoney = useCallback(
@@ -55,7 +55,7 @@ const useMoney = ({
           ? ","
           : "";
       ev.target.value =
-        moneyValue === 0 ? "$ 0" : moneyFormatter.format(moneyValue) + toAdd;
+        moneyValue === 0 ? "$ " : moneyFormatter.format(moneyValue) + toAdd;
 
       ev.target.focus();
       caret_pos += ev.target.value.length - len;

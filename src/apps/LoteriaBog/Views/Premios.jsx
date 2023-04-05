@@ -30,7 +30,6 @@ const Premios = ({ route }) => {
   const [valorbruto, setValorbruto] = useState("");
   const [serie, setSerie] = useState("");
   const [idLoteria, seIdLoteria] = useState("");
-  const [cod_distribuidor, setCod_distribuidor] = useState("");
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
@@ -124,7 +123,6 @@ const Premios = ({ route }) => {
     isWinner(sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual)
       .then((res) => {
         var salvarRes = res;
-        setCod_distribuidor(roleInfo.cod_oficina_lot);
         setMaxPago(res?.obj?.max_pago);
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
@@ -311,7 +309,6 @@ const Premios = ({ route }) => {
             datosComercio.terminal,
             datosComercio.usuario,
             datosComercio.codigo_dane,
-            cod_distribuidor,
             idLoteria,
             tipopago,
             hash,
@@ -374,7 +371,6 @@ const Premios = ({ route }) => {
             datosComercio.terminal,
             datosComercio.usuario,
             datosComercio.codigo_dane,
-            cod_distribuidor,
             idLoteria,
             tipopago,
             hash,

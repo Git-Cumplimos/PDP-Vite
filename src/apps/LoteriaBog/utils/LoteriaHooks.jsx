@@ -502,7 +502,6 @@ export const useProvideLoteria = () => {
       terminal,
       usuario,
       codigo_dane,
-      cod_distribuidor,
       idLoteria,
       tipopago,
       hash,
@@ -542,7 +541,7 @@ export const useProvideLoteria = () => {
               oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
               nombre_usuario: nombre_usuario,
-              cod_distribuidor: cod_distribuidor,
+              cod_distribuidor: codigosOficina?.cod_oficina_lot,
               cod_dane_ciudad: codigo_dane,
               ticket: tickets,
             },
@@ -582,7 +581,7 @@ export const useProvideLoteria = () => {
               oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
               nombre_usuario: nombre_usuario,
-              cod_distribuidor: cod_distribuidor,
+              cod_distribuidor: codigosOficina?.cod_oficina_lot,
               cod_dane_ciudad: codigo_dane,
               ticket: tickets,
             },
