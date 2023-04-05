@@ -28,7 +28,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
 const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
 // const url = "http://127.0.0.1:5000";
-const PpsObligatorioDemanda = ({ ced }) => {
+const PpsObligatorioDemanda = ({ ced, fun }) => {
   const { quotaInfo, roleInfo, infoTicket, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(true);
@@ -355,7 +355,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
                 }}
               ></Select>
               <Input
-                label={"N° Documento"}
+                label={"N.° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={datosAportante?.["numDocumento"]}
                 minLength="6"
@@ -367,7 +367,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
               <Input
                 id="planilla"
                 name="planilla"
-                label="N° Planilla: "
+                label="N.° Planilla"
                 type="tel"
                 autoComplete="off"
                 minLength="10"
@@ -413,7 +413,14 @@ const PpsObligatorioDemanda = ({ ced }) => {
               </Button>
               /*  ) : null */
             }
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setShowModal(false);
+                fun();
+              }}
+            >
+              Cancelar
+            </Button>
           </ButtonBar>
         </Form>
       </Modal>
