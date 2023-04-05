@@ -10,6 +10,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
 import { notifyError } from "../utils/notify";
+import useFetchDispatchDebounce from "./useFetchDispatchDebounce";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
@@ -17,7 +18,7 @@ const urlComisiones = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SER
 const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
-const url_permissions = process.env.REACT_APP_URL_IAM_PDP;
+const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
 const url_user =
   "https://7i347am3a5.execute-api.us-east-2.amazonaws.com/v1/cognitovalidator";
 
@@ -96,48 +97,6 @@ const fetchOficinaLoteria = async (id_comercio) => {
   } catch (err) {}
 };
 
-const getPermissions = async (email = "") => {
-  if (!email) {
-    return { uAccess: [], pdpU: null };
-  }
-  try {
-    // Get user
-    const user_res = await fetchData(`${url_permissions}/users`, "GET", {
-      email: email,
-    });
-    if (!user_res?.status) {
-      throw new Error(user_res?.msg);
-    }
-    const user_res_arr = user_res?.obj?.results;
-    if (!Array.isArray(user_res_arr) || user_res_arr.length === 0) {
-      notifyError("User not found in db");
-      return { uAccess: [], pdpU: null };
-    }
-    const uuid = user_res_arr?.[0].uuid ?? 0;
-    if (uuid === 0) {
-      notifyError("User not found in db");
-      return { uAccess: [], pdpU: null };
-    }
-
-    // Get user
-    const permissions = await fetchData(
-      `${url_permissions}/users-permissions`,
-      "GET",
-      { uuid }
-    );
-    if (!permissions?.status) {
-      throw new Error(user_res?.msg);
-    }
-    const userAccess = permissions?.obj;
-
-    if (userAccess.length === 0) {
-      notifyError("User has no permissions in db");
-      return { uAccess: [], pdpU: null };
-    }
-    return { uAccess: userAccess, pdpU: user_res_arr?.[0] };
-  } catch (err) {}
-};
-
 const initialUser = {
   isSignedIn: false,
   cognitoUser: null,
@@ -151,8 +110,6 @@ const initialUser = {
 const SIGN_IN = "SIGN_IN";
 const CONFIRM_SIGN_IN = "CONFIRM_SIGN_IN";
 const SIGN_OUT = "SIGN_OUT";
-const FETCH_PERMISSIONS = "FETCH_PERMISSIONS";
-const FETCH_QUOTAINFO = "FETCH_QUOTAINFO";
 const SET_COGNITOUSER = "SET_COGNITOUSER";
 const SET_USERINFO = "SET_USERINFO";
 const SET_ROLEINFO = "SET_ROLEINFO";
@@ -198,82 +155,13 @@ const reducerAuth = (userState, action) => {
       const { quota } = payload;
       return { ...userState, quotaInfo: quota };
 
-    case FETCH_PERMISSIONS:
-      const { email } = payload;
-      getPermissions(email)
-        .then(({ uAccess, pdpU }) => {
-          dispatch?.({ type: SET_PERMISSIONS, payload: { uAccess } });
-          dispatch?.({ type: SET_PDPUSER, payload: { pdpU } });
-        })
-        .catch(() => {});
-      return userState;
-
-    case FETCH_QUOTAINFO:
-      const { id_comercio, id_dispositivo } = payload;
-      fetchData(
-        urlQuota,
-        "GET",
-        {
-          id_comercio: id_comercio,
-          id_dispositivo: id_dispositivo,
-        },
-        {}
-      )
-        .then((quota) => {
-          const tempRole = { quota: 0, comision: 0 };
-          tempRole.quota = quota["cupo disponible"];
-          tempRole.comision = quota["comisiones"];
-          dispatch?.({ type: SET_QUOTA, payload: { quota: tempRole } });
-        })
-        .catch(() =>
-          dispatch?.({
-            type: SET_QUOTA,
-            payload: { quota: { quota: 0, comision: 0 } },
-          })
-        );
-      return userState;
-
     case CONFIRM_SIGN_IN:
       const { loggedUser } = payload;
       if (!loggedUser) {
         return initialUser;
       }
       Auth.currentUserInfo()
-        .then((uInfo) => {
-          dispatch?.({ type: SET_USERINFO, payload: { uInfo } });
-          const email = uInfo?.attributes?.email;
-
-          // Fetch suser info
-          fetchData(urlLog, "GET", { correo: email }, {})
-            .then((suserInfo) => {
-              if (!("msg" in suserInfo)) {
-                dispatch?.({ type: SET_ROLEINFO, payload: suserInfo });
-              }
-              fetchDane(suserInfo.codigo_dane)
-                .then((ciudad) => {
-                  dispatch?.({
-                    type: SET_ROLEINFO,
-                    payload: { ciudad },
-                  });
-                })
-                .catch(() => {});
-              fetchOficinaLoteria(suserInfo.id_comercio)
-                .then((oficina) => {
-                  dispatch?.({
-                    type: SET_ROLEINFO,
-                    payload: { ...oficina },
-                  });
-                })
-                .catch(() => {});
-            })
-            .catch(() => {});
-
-          // Fetch user permissions
-          dispatch({
-            type: FETCH_PERMISSIONS,
-            payload: { email, dispatch: dispatch },
-          });
-        })
+        .then((uInfo) => dispatch?.({ type: SET_USERINFO, payload: { uInfo } }))
         .catch(() => {});
       return { ...userState, cognitoUser: loggedUser, isSignedIn: true };
 
@@ -469,6 +357,79 @@ export const useProvideAuth = () => {
     [cognitoUser, handlesetPreferredMFA]
   );
 
+  const [getQuota] = useFetchDispatchDebounce({
+    onSuccess: useCallback((quota) => {
+      const tempRole = { quota: 0, comision: 0 };
+      tempRole.quota = quota["cupo disponible"];
+      tempRole.comision = quota["comisiones"];
+      dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
+    }, []),
+    onError: useCallback((error) => {
+      dispatchAuth({
+        type: SET_QUOTA,
+        payload: { quota: { quota: 0, comision: 0 } },
+      });
+      if (error?.cause === "custom") {
+        notifyError(error.message);
+      } else {
+        console.error(error);
+      }
+    }, []),
+  });
+  const [getSuserInfo] = useFetchDispatchDebounce({
+    onSuccess: useCallback((suserInfo) => {
+      if (!("msg" in suserInfo)) {
+        dispatchAuth({ type: SET_ROLEINFO, payload: suserInfo });
+      }
+      fetchDane(suserInfo.codigo_dane)
+        .then((ciudad) => {
+          dispatchAuth({
+            type: SET_ROLEINFO,
+            payload: { ciudad },
+          });
+        })
+        .catch(() => {});
+      fetchOficinaLoteria(suserInfo.id_comercio)
+        .then((oficina) => {
+          dispatchAuth({
+            type: SET_ROLEINFO,
+            payload: { ...oficina },
+          });
+        })
+        .catch(() => {});
+    }, []),
+    onError: useCallback((error) => {
+      if (error?.cause === "custom") {
+        notifyError(error.message);
+      } else {
+        console.error(error);
+      }
+    }, []),
+  });
+  const [getLoginPdp] = useFetchDispatchDebounce({
+    onSuccess: useCallback((res) => {
+      const pdpU = res?.obj?.pdpU;
+      if (!pdpU && !("active" in pdpU) && !pdpU.active) {
+        notifyError("Usuario inactivo");
+        signOut();
+        return;
+      }
+
+      dispatchAuth({
+        type: SET_PERMISSIONS,
+        payload: { uAccess: res?.obj?.uAccess },
+      });
+      dispatchAuth({ type: SET_PDPUSER, payload: { pdpU } });
+    }, [signOut]),
+    onError: useCallback((error) => {
+      if (error?.cause === "custom") {
+        notifyError(error.message);
+      } else {
+        console.error(error);
+      }
+    }, []),
+  });
+
   // Runs only when route change
   useEffect(() => {
     Auth.currentAuthenticatedUser()
@@ -491,30 +452,28 @@ export const useProvideAuth = () => {
     // }
   }, [pathname]);
 
-  // Runs when route change
   useEffect(() => {
     if (id_comercio && id_dispositivo) {
-      dispatchAuth({
-        type: FETCH_QUOTAINFO,
-        payload: {
-          id_comercio: id_comercio,
-          id_dispositivo: id_dispositivo,
-          dispatch: dispatchAuth,
-        },
-      });
+      getQuota(
+        `${urlQuota}?id_comercio=${id_comercio}&id_dispositivo=${id_dispositivo}`
+      );
     }
-  }, [pathname, id_comercio, id_dispositivo]);
-
-  // Runs when route change
+  }, [pathname, id_comercio, id_dispositivo, getQuota]);
   useEffect(() => {
-    if (pathname?.includes("iam")) {
-      const email = userState?.userInfo?.attributes?.email;
-      dispatchAuth({
-        type: FETCH_PERMISSIONS,
-        payload: { email, dispatch: dispatchAuth },
-      });
+    const email = userState?.userInfo?.attributes?.email;
+    if (email) {
+      getSuserInfo(
+        `${urlLog}?correo=${userState?.userInfo?.attributes?.email}`
+      );
+      getLoginPdp(
+        `${url_iam_pdp_users}/user-login?email=${userState?.userInfo?.attributes?.email}`
+      );
     }
-  }, [pathname, userState?.userInfo?.attributes?.email]);
+  }, [
+    userState?.userInfo?.attributes?.email,
+    getSuserInfo,
+    getLoginPdp,
+  ]);
 
   useEffect(() => {
     const validate = async () => {
