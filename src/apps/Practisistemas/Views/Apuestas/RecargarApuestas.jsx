@@ -206,11 +206,7 @@ const RecargarApuestas = () => {
         } catch (error) {
           console.error(error);
         }        
-<<<<<<< HEAD
-        if (i <= 6) {
-=======
         if (i <= 3) {
->>>>>>> Fix/QA-Practisistemas-Incidencias
           notify(
             "Su transacción esta siendo procesada, no recargue la página"
           );
