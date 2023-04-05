@@ -467,7 +467,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                   setTipoIdentificacion(event?.target?.value)
                 }
                 id="comissionType"
-                label="Tipo Identificación: "
+                label="Tipo Identificación"
                 required
                 options={{
                   "": "",
@@ -483,7 +483,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               ></Select>
 
               <Input
-                label={"N° Documento: "}
+                label={"N.° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={numDocumento}
                 minLength="6"
@@ -500,7 +500,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               <Input
                 id="celular"
                 name="celular"
-                label="N° Celular: "
+                label="N.° Celular"
                 type="tel"
                 autoComplete="off"
                 minLength="10"
@@ -533,7 +533,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               required
             /> */}
               <MoneyInput
-                label={"Valor Aportar: "}
+                label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}
                 value={valorAportar}
                 min={limitesMontos?.min}

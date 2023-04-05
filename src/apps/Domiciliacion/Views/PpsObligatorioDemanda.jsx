@@ -367,7 +367,7 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
               <Input
                 id="planilla"
                 name="planilla"
-                label="N.° Planilla: "
+                label="N.° Planilla"
                 type="tel"
                 autoComplete="off"
                 minLength="10"

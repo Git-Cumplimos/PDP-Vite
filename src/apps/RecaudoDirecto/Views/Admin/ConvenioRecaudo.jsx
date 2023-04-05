@@ -1,41 +1,52 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
+import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import useMap from "../../../../hooks/useMap";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import DataTable from "../../../../components/Base/DataTable";
 import ToggleInput from "../../../../components/Base/ToggleInput";
 import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
+import MoneyInput from "../../utils/MoneyInput";
 import { notifyPending } from "../../../../utils/notify";
-import { onChangeEan13Number, onChangeNit, descargarCSV,changeDateFormat } from "../../utils/functions";
-import { getRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
+import { onChangeEan13Number, onChangeNit, descargarCSV, changeDateFormat } from "../../utils/functions";
+import { getUrlRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
 import { onChangeNumber } from "../../../../utils/functions";
+
+const initialSearchFilters = new Map([
+  ["pk_id_convenio_directo", ""],
+  ["ean13", ""],
+  ["nombre_convenio", ""],
+  ["page", 1],
+  ["limit", 10],
+]);
 
 const RecaudoDirecto = () => {
   const [listRecaudos, setListRecaudos] = useState([])
+  // const [sinBaseDatos, setSinBaseDatos] = useState(false);
   const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
-  const [maxPages, setMaxPages] = useState(0);
+  const [isNextPage, setIsNextPage] = useState(false);
+  const [limites, setlimites] = useState({
+    "Valor minimo": "0",
+    "Valor maximo": "0",
+  })
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
     "Longitud minima": "",
     "Longitud maxima": "",
   }])
-  const [searchFilters, setSearchFilters] = useState({
-    pk_id_convenio_directo: "",
-    ean13: "",
-    nombre_convenio: "",
-  });
+
   const [res] = useState([
-    ["ID_PRODUCTOR", "NUMERO_DOCUMENTO", "NOMBRE_PRODUCTOR",
-      "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "TIPO_PAGO", "NUMERO_QUINCENA"],
-    [333, 332421116, "nombre", "apellido", 50000, "EFECTIVO", 125],
-    [333, 332421117, "nombre", "apellido", 80000, "CONSIGNACION", 125],
-    [333, 332421118, "nombre", "apellido", 1250000, "EFECTIVO", 125],
+    ["REFERENCIA_1", "REFERENCIA_2",
+      "APELLIDO_PRODUCTOR", "TOTAL_PAGAR","FECHA_VENCIMIENTO", "NUMERO_QUINCENA"],
+    [332421116, "JUAN", "apellido", 50000, "8/06/2023", 125],
+    [332421117, "PEDRO", "apellido", 80000, "16/06/2023", 125],
+    [332421118, "MARIA", "apellido", 1250000, "12/06/2023", 125],
   ])
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
@@ -48,6 +59,35 @@ const RecaudoDirecto = () => {
     { label: "Con autorizador", value: 2 },
     { label: "Sin base de datos", value: 3 },
   ]
+
+  const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
+    useMap(initialSearchFilters);
+
+  const [fetchTrxs] = useFetchDispatchDebounce({
+    onSuccess: useCallback((data) => {
+      setListRecaudos(data?.obj?.results ?? []);
+      setIsNextPage(data?.obj?.next_exist);
+    }, []),
+    onError: useCallback((error) => {
+      if (!error instanceof DOMException) console.error(error)
+    }, []),
+  });
+
+  const searchTrxs = useCallback(() => {
+    const tempMap = new Map(searchFilters2);
+    const url = getUrlRecaudosList()
+    tempMap.forEach((val, key, map) => {
+      if (!val) {
+        map.delete(key);
+      }
+    });
+    const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${url}?${queries}`);
+  }, [fetchTrxs, searchFilters2]);
+
+  useEffect(() => {
+    searchTrxs();
+  }, [searchTrxs]);
 
   useEffect(() => {
     let referencia = []
@@ -67,6 +107,19 @@ const RecaudoDirecto = () => {
         "Longitud maxima": "",
       }]
     }
+    let limite = {}
+    if (selected['limite_monto']) {
+      limite = {
+        "Valor minimo": selected['limite_monto'][0] ?? 0,
+        "Valor maximo": selected['limite_monto'][1] ?? 0,
+      }
+    } else {
+      limite = {
+        "Valor minimo": "0",
+        "Valor maximo": "0",
+      }
+    }
+    setlimites(limite)
     setReferencias(referencia)
   }, [selected])
 
@@ -78,27 +131,11 @@ const RecaudoDirecto = () => {
       "Longitud minima": "",
       "Longitud maxima": "",
     }])
-  }, []);
-
-  const getRecaudos = useCallback(async () => {
-    await getRecaudosList({
-      ...pageData,
-      ...searchFilters
+    setlimites({
+      "Valor minimo": "0",
+      "Valor maximo": "0",
     })
-      .then((data) => {
-        setListRecaudos(data?.obj?.results ?? []);
-        setMaxPages(data?.obj?.maxPages ?? '')
-      })
-      .catch((err) => {
-        console.error(err?.message);
-      });
-  }, [pageData, searchFilters])
-
-  useEffect(() => { getRecaudos() }, [getRecaudos, pageData, searchFilters])
-
-  useEffect(() => {
-    setPageData(pageData => ({ ...pageData, page: 1 }));
-  }, [pageData.limit]);
+  }, []);
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
     e.preventDefault();
@@ -115,7 +152,10 @@ const RecaudoDirecto = () => {
       }
       body['referencias'] = allReferencias
     }
-
+    if (body['Valor minimo'] || body['Valor maximo']) {
+      delete body['Valor minimo']; delete body['Valor maximo'];
+      body['limite_monto'] = [`${[limites['Valor minimo']] ?? 0 }`, `${limites['Valor maximo'] ?? 0}`]
+    }
     notifyPending(
       selected
         ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
@@ -127,8 +167,8 @@ const RecaudoDirecto = () => {
       },
       {
         render({ data: res }) {
+          searchTrxs();
           handleClose();
-          getRecaudos();
           return `Convenio ${selected ? "modificado" : "agregado"
             } exitosamente`;
         },
@@ -139,11 +179,11 @@ const RecaudoDirecto = () => {
             return err?.message;
           }
           console.error(err?.message);
-          return `${selected ? "Edicion" : "Creacion"} fallida`;
+          return `${selected ? "Edicion" : "Creación"} fallida`;
         },
       }
     )
-  }, [handleClose, getRecaudos, selected, referencias])
+  }, [handleClose, searchTrxs, selected, referencias, limites])
 
   const descargarPlantilla = useCallback(() => {
     descargarCSV('Ejemplo_de_archivo_recaudo', res)
@@ -156,14 +196,14 @@ const RecaudoDirecto = () => {
         <Button type={"submit"} onClick={() => setShowModal(true)} >
           Crear Convenio</Button>
       </ButtonBar>
-      <TableEnterprise
+      <DataTable
         title="Convenios de Recaudos"
         headers={[
           "Código convenio",
           "Código EAN o IAC",
           "Nombre convenio",
           "Estado",
-          "Fecha creacion",
+          "Fecha creación",
         ]}
         data={listRecaudos.map(
           ({
@@ -174,26 +214,51 @@ const RecaudoDirecto = () => {
             fecha_creacion,
           }) => {
             fecha_creacion = changeDateFormat(fecha_creacion)
-            return{
+            return {
               pk_id_convenio_directo,
               ean13,
               nombre_convenio,
               estado: estado ? "Activo" : "No activo",
-              fecha_creacion: fecha_creacion ??"ninguna",
+              fecha_creacion: fecha_creacion ?? "ninguna",
             }
           }
         )}
-        onSelectRow={(e, i) => {
+        onClickRow={(_, index) => {
           setShowModal(true);
-          setSelected(listRecaudos[i]);
+          setSelected(listRecaudos[index]);
         }}
-        maxPage={maxPages}
-        onSetPageData={setPageData}
+        tblFooter={
+          <Fragment>
+            <DataTable.LimitSelector
+              defaultValue={10}
+              onChangeLimit={(limit) => {
+                setSingleFilter("limit", limit);
+                setSingleFilter("page", 1)
+              }}
+            />
+            <DataTable.PaginationButtons
+              onClickNext={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  isNextPage ? oldPage + 1 : oldPage
+                )
+              }
+              onClickPrev={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  oldPage > 1 ? oldPage - 1 : oldPage
+                )
+              }
+            />
+          </Fragment>
+        }
         onChange={(ev) => {
-          setSearchFilters((old) => ({
-            ...old,
-            [ev.target.name]: ev.target.value,
-          }))
+          setSearchFilters2((old) => {
+            const copy = new Map(old)
+              .set(
+                ev.target.name, ev.target.value
+              )
+              .set("page", 1);
+            return copy;
+          })
         }}
         actions={{
           download: descargarPlantilla,
@@ -225,7 +290,7 @@ const RecaudoDirecto = () => {
           autoComplete="off"
           maxLength={"30"}
         />
-      </TableEnterprise>
+      </DataTable>
       <Modal show={showModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4"> {selected ? "Editar" : "Crear"} convenio</h2>
         <Form onSubmit={crearModificarConvenioRecaudo} grid >
@@ -262,20 +327,12 @@ const RecaudoDirecto = () => {
           />
           <Select
             className="place-self-stretch"
-            id={"Tipo modificacion"}
-            label={"Tipo modificacion"}
-            name={"fk_modificar_valor"}
-            options={[{ label: "", value: "" }, ...tipoModificacion]}
-            defaultValue={selected?.fk_modificar_valor ?? ""}
-            required
-          />
-          <Select
-            className="place-self-stretch"
             id={"Tipo de convenio"}
             label={"Tipo de convenio"}
             name={"fk_id_tipo_convenio"}
             options={[{ label: "", value: "" }, ...tipoConvenio]}
             defaultValue={selected?.fk_id_tipo_convenio ?? ""}
+            // onInput={(e) => { setSinBaseDatos(e.target.value === 3 ? true : false) }}
             required
             disabled={selected ? true : false}
           />
@@ -289,6 +346,37 @@ const RecaudoDirecto = () => {
             defaultValue={selected?.ean13 ?? ""}
             autoComplete="off"
           />
+          <Fieldset legend={"Valores"}>
+            <Select
+              className="place-self-stretch mb-1"
+              id={"Tipo modificación"}
+              label={"Tipo modificación"}
+              name={"fk_modificar_valor"}
+              options={[{ label: "", value: "" }, ...tipoModificacion]}
+              defaultValue={selected?.fk_modificar_valor ?? ""}
+              required
+            />
+            {Object.entries(limites).map(([keyLimit, valLimit], index) => {
+              return (
+                <MoneyInput
+                  key={keyLimit}
+                  className={"mb-1"}
+                  id={`${keyLimit}_${index}`}
+                  name={keyLimit}
+                  label={keyLimit}
+                  autoComplete="off"
+                  value={valLimit}
+                  equalError={false}
+                  onInput={(e, valor) => {
+                    const copyRef = { ...limites };
+                    copyRef[keyLimit] = valor;
+                    setlimites(copyRef);
+                  }}
+                  required
+                />
+              )
+            })}
+          </Fieldset>
           <Fieldset legend={"Referencias"}>
             {referencias?.map((obj, index) => {
               return (
@@ -321,7 +409,6 @@ const RecaudoDirecto = () => {
                           let copyRef = [...referencias]
                           copyRef = copyRef.filter((item) => item !== copyRef[index])
                           setReferencias(copyRef)
-                          getRecaudos()
                         }}
                       >Eliminar referencia</Button>
                     </ButtonBar>
@@ -342,7 +429,6 @@ const RecaudoDirecto = () => {
                         "Longitud maxima": "",
                       })
                       setReferencias(copyRef)
-                      getRecaudos()
                     }
                   }}
                 >Añadir referencia</Button>

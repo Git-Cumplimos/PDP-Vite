@@ -3,14 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-// import Select from "../../../../components/Base/Select";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import MoneyInput from "../../../../components/Base/MoneyInput";
+import MoneyInput from "../../utils/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRecaudo, searchConveniosRecaudoList, modRecaudo } from "../../utils/fetchFunctions"
-import useDelayedCallback from "../../../../hooks/useDelayedCallback";
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
@@ -57,26 +55,26 @@ const RecaudoConjunto = () => {
     }
   }, [navigate, pk_id_convenio])
 
-  const consultarRecaudoD = useDelayedCallback(
+  const consultarRecaudoD = 
     useCallback(async (e) => {
       e.preventDefault()
       const data = {
-        consulta_recaudo: {
-          convenio_id: pk_id_convenio,
-          permite_vencidos: convenioRecaudo.permite_vencidos ?? false,
-          tipo_convenio: convenioRecaudo.fk_id_tipo_convenio,
-          referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
-        },
-        valor_total_trx: 0,
-        comercio: {
-          id_comercio: roleInfo?.id_comercio,
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
-        },
-        is_oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO",
-        nombre_usuario: pdpUser?.uname ?? "",
+          consulta_recaudo: {
+            convenio_id: pk_id_convenio,
+            permite_vencidos: convenioRecaudo.permite_vencidos ?? false,
+            tipo_convenio: convenioRecaudo.fk_id_tipo_convenio,
+            referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
+          },
+          valor_total_trx: 0,
+          comercio: {
+            id_comercio: roleInfo?.id_comercio,
+            id_usuario: roleInfo?.id_usuario,
+            id_terminal: roleInfo?.id_dispositivo,
+          },
+          is_oficina_propia:
+            roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+            roleInfo?.tipo_comercio === "KIOSCO",
+          nombre_usuario: pdpUser?.uname ?? "",
       };
       await getRecaudo(data)
         .then((data) => {
@@ -90,9 +88,7 @@ const RecaudoConjunto = () => {
           handleClose()
         })
 
-    }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose]),
-    300
-  )
+    }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose])
 
 
   const hacerRecaudo = useCallback(async (e) => {
@@ -200,12 +196,9 @@ const RecaudoConjunto = () => {
               label="Valor a recaudar"
               name="valor_total_trx"
               autoComplete="off"
-              min={dataRecaudo?.fk_modificar_valor === 1 ? ((dataRecaudo.valor - 1) - dataRecaudo.valor_pagado) ?? 0 : limitesMontos?.min}
+              min={dataRecaudo.valor ?? limitesMontos?.min}
               equalError={false}
-              max={dataRecaudo?.fk_modificar_valor === 1 ||
-                dataRecaudo?.fk_modificar_valor === 2 ?
-                parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0)
-                : limitesMontos.max}
+              max={parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0) ?? limitesMontos.max}
               value={valorRecibido.valor_total_trx}
               onInput={(e, valor) =>
                 setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
@@ -240,13 +233,9 @@ const RecaudoConjunto = () => {
                 label="Valor a recaudar"
                 name="valor_total_trx"
                 autoComplete="off"
-                equalError={false}
-                min={dataRecaudo?.fk_modificar_valor === 1 ?
-                  ((dataRecaudo.valor - 1) - dataRecaudo.valor_pagado) ?? 0 : limitesMontos?.min}
-                max={dataRecaudo?.fk_modificar_valor === 1 ||
-                  dataRecaudo?.fk_modificar_valor === 2 ?
-                  parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0)
-                  : limitesMontos.max}
+                min={parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0) ?? limitesMontos?.min}
+                equalError={dataRecaudo?.fk_modificar_valor}
+                max={parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0) ?? limitesMontos.max}
                 onInput={(e, valor) =>
                   setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
                 }

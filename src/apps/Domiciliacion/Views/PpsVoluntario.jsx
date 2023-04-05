@@ -225,6 +225,19 @@ const PpsVoluntario = ({ datosConsulta }) => {
               <div className={contenedorFormulario}>
                 <Select
                   onChange={(event) =>
+                    setTipoDomiciliacion(event?.target?.value)
+                  }
+                  id="comissionType"
+                  label="Tipo de Domiciliación"
+                  value={tipoDomiciliacion}
+                  options={{
+                    Mensual: 1,
+                    Quincenal: 2,
+                    Semanal: 3,
+                  }}
+                ></Select>
+                <Select
+                  onChange={(event) =>
                     setTipoIdentificacion(event?.target?.value)
                   }
                   id="comissionType"
@@ -242,19 +255,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   }}
                   required
                 ></Select>
-                <Select
-                  onChange={(event) =>
-                    setTipoDomiciliacion(event?.target?.value)
-                  }
-                  id="comissionType"
-                  label="Tipo de Domiciliación"
-                  value={tipoDomiciliacion}
-                  options={{
-                    Mensual: 1,
-                    Quincenal: 2,
-                    Semanal: 3,
-                  }}
-                ></Select>
+
                 {/*               <Input
                 label={"N° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
