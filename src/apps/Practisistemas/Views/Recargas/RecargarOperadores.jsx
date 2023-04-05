@@ -204,9 +204,17 @@ const RecargasOperadores = () => {
                         setRespuesta(false);
                         console.error(err);
                       });
-                  }, 11000)
+                  }, 9000)
                 );
                 if (prom === true) {
+                  setRespuesta(false);
+                  handleClose();
+                  break;
+                }
+                if (i >= 3) {
+                  notify(
+                    "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 2 minutos"
+                  );
                   setRespuesta(false);
                   handleClose();
                   break;
@@ -214,13 +222,17 @@ const RecargasOperadores = () => {
               } catch (error) {
                 console.error(error);
               }
+<<<<<<< HEAD
               if (i <= 6) {
+=======
+              if (i <= 3) {
+>>>>>>> Fix/QA-Practisistemas-Incidencias
                 notify(
                   "Su transacción esta siendo procesada, no recargue la página"
                 );
               }
             }
-            notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
+            // notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
             validNavigate("/recargas-paquetes");
           }
           else {

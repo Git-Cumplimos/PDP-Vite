@@ -434,9 +434,17 @@ const CompraPin = () => {
                         setShowLoading(false);
                         console.error(err);
                       });
-                  }, 11000)
+                  }, 9000)
                 );
                 if (promesa === true) {
+                  setShowLoading(false);
+                  handleClose();
+                  break;
+                }
+                if (i >= 3) {
+                  notify(
+                    "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 2 minutos"
+                  );
                   setShowLoading(false);
                   handleClose();
                   break;
@@ -444,7 +452,11 @@ const CompraPin = () => {
               } catch (error) {
                 console.error(error);
               }
+<<<<<<< HEAD
               if (i <= 6) { 
+=======
+              if (i <= 3) { 
+>>>>>>> Fix/QA-Practisistemas-Incidencias
                 notify(
                   "Su transacción esta siendo procesada, no recargue la página"
                 );
@@ -452,7 +464,8 @@ const CompraPin = () => {
               }
             }
             validNavigate("/Pines/PinesContenido");
-            notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
+            // No se muestra esta notificación ya que se debe revisar el estado de la trx si quedo aprobada o rechazada
+            // notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003] Numero2");
           } else {
             notifyError(
               res?.obj?.response?.respuesta ==
