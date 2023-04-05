@@ -38,7 +38,7 @@ const PinDePago = () => {
 
   const { roleInfo, pdpUser } = useAuth();
 
-  const [tipoPersona, setTipoPersona] = useState("");
+  // const [tipoPersona, setTipoPersona] = useState("");
   const [userDocument, setUserDocument] = useState("");
   const [userDocumentDate, setUserDocumentDate] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
@@ -69,13 +69,13 @@ const PinDePago = () => {
 
   const summary = useMemo(
     () => ({
-      "Tipo de persona": ObjTiposPersonas[tipoPersona],
+      // "Tipo de persona": ObjTiposPersonas[tipoPersona],
       "No. Identificación": userDocument,
       "Fecha de expedición identificación": userDocumentDate,
       "No. De PIN": pinNumber,
       "Valor a Retirar": formatMoney.format(valPinPago),
     }),
-    [pinNumber, userDocument, valPinPago, tipoPersona, userDocumentDate]
+    [pinNumber, userDocument, valPinPago, userDocumentDate]
   );
 
   const handleClose = useCallback(() => {
@@ -94,13 +94,15 @@ const PinDePago = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS",
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valPinPago,
         nombre_usuario: pdpUser?.uname ?? "",
         nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
         ticket_init: [
-          ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
-          ["", ""],
+          // ["Tipo de persona", ObjTiposPersonas[tipoPersona]],
+          // ["", ""],
           ["No. Identificación", userDocument],
           ["", ""],
           ["Fecha de expedición identificación", userDocumentDate],
@@ -116,7 +118,7 @@ const PinDePago = () => {
           user_document: userDocument,
           numero_pin: encryptPin(pinNumber),
           fecha_expedicion: userDocumentDate,
-          is_persona_natural: tipoPersona === "t",
+          // is_persona_natural: tipoPersona === "t",
           location: {
             address: userAddress,
             dane_code: roleInfo?.codigo_dane,
@@ -153,7 +155,6 @@ const PinDePago = () => {
       );
     },
     [
-      tipoPersona,
       pinNumber,
       userDocument,
       userDocumentDate,
@@ -228,15 +229,14 @@ const PinDePago = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Pin de Pago</h1>
+      <h1 className='text-3xl mt-6'>Pin de Pago</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
           setShowModal(true);
         }}
-        grid
-      >
-        <Select
+        grid>
+        {/* <Select
           id="accType"
           name="accType"
           label="Seleccionar"
@@ -250,13 +250,13 @@ const PinDePago = () => {
           value={tipoPersona}
           onChange={(ev) => setTipoPersona(ev.target.value)}
           required
-        />
+        /> */}
         <Input
-          id="docCliente"
-          name="docCliente"
-          label="No. Identificación"
-          type="tel"
-          autoComplete="off"
+          id='docCliente'
+          name='docCliente'
+          label='No. Identificación'
+          type='tel'
+          autoComplete='off'
           minLength={"5"}
           maxLength={"12"}
           value={userDocument}
@@ -264,31 +264,31 @@ const PinDePago = () => {
           required
         />
         <Input
-          id="docClienteDate"
-          name="docClienteDate"
-          label="Fecha expedición identificación"
-          type="date"
-          autoComplete="off"
+          id='docClienteDate'
+          name='docClienteDate'
+          label='Fecha expedición identificación'
+          type='date'
+          autoComplete='off'
           value={userDocumentDate}
           onInput={(ev) => setUserDocumentDate(ev.target.value)}
           required
         />
         <Input
-          id="numPin"
-          name="numPin"
-          label="No. De PIN"
-          type="text"
-          autoComplete="off"
+          id='numPin'
+          name='numPin'
+          label='No. De PIN'
+          type='text'
+          autoComplete='off'
           maxLength={"12"}
-          onInput={(ev) => setAccountNumber(ev.target.value)}
+          onInput={(ev) => setAccountNumber(onChangeNumber(ev))}
           required
         />
         <Input
-          id="valor"
-          name="valor"
-          label="Valor a Retirar"
-          autoComplete="off"
-          type="tel"
+          id='valor'
+          name='valor'
+          label='Valor a Retirar'
+          autoComplete='off'
+          type='tel'
           minLength={"5"}
           maxLength={"11"}
           onInput={(ev) => setValPinPago(onChangeMoney(ev))}
@@ -300,10 +300,9 @@ const PinDePago = () => {
       </Form>
       <Modal
         show={showModal}
-        handleClose={loadingPinPago ? () => {} : handleClose}
-      >
+        handleClose={loadingPinPago ? () => {} : handleClose}>
         {paymentStatus ? (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -314,10 +313,9 @@ const PinDePago = () => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type="submit"
+                type='submit'
                 onClick={onMakePayment}
-                disabled={loadingPinPago}
-              >
+                disabled={loadingPinPago}>
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingPinPago}>

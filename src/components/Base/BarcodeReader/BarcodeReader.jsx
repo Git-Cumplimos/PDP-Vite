@@ -4,6 +4,7 @@ import TextArea from "../TextArea";
 const BarcodeReader = ({
   onSearchCodigo = (codigo) => {},
   onSetCodigo = (codigoActual) => {},
+  disabled = false,
 }) => {
   const isAlt = useRef("");
   const isAltCR = useRef({ data: "", state: false });
@@ -16,6 +17,7 @@ const BarcodeReader = ({
       className={"place-self-stretch w-full"}
       autoComplete="off"
       autoFocus
+      disabled={disabled}
       onChange={(ev) => onSetCodigo(ev.target.value)}
       onKeyDown={(ev) => {
         if (ev.keyCode === 13 && ev.shiftKey === false) {

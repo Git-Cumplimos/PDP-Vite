@@ -225,6 +225,19 @@ const PpsVoluntario = ({ datosConsulta }) => {
               <div className={contenedorFormulario}>
                 <Select
                   onChange={(event) =>
+                    setTipoDomiciliacion(event?.target?.value)
+                  }
+                  id="comissionType"
+                  label="Tipo de Domiciliación"
+                  value={tipoDomiciliacion}
+                  options={{
+                    Mensual: 1,
+                    Quincenal: 2,
+                    Semanal: 3,
+                  }}
+                ></Select>
+                <Select
+                  onChange={(event) =>
                     setTipoIdentificacion(event?.target?.value)
                   }
                   id="comissionType"
@@ -242,6 +255,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   }}
                   required
                 ></Select>
+
                 {/*               <Input
                 label={"N° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
@@ -258,7 +272,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
 
                 <Input
                   name="N° Identificación"
-                  label="N° Identificación"
+                  label="N.° Identificación"
                   type="tel"
                   autoComplete="off"
                   minLength={"5"}
@@ -342,19 +356,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
                   type={"text"}
                   required
                 ></MoneyInput>
-                <Select
-                  onChange={(event) =>
-                    setTipoDomiciliacion(event?.target?.value)
-                  }
-                  id="comissionType"
-                  label="Tipo de Domiciliación"
-                  value={tipoDomiciliacion}
-                  options={{
-                    Mensual: 1,
-                    Quincenal: 2,
-                    Semanal: 3,
-                  }}
-                ></Select>
+
                 {/*               <Select
                 onChange={(event) => setNumPagosPdp(event?.target?.value)}
                 id="comissionType"
@@ -369,7 +371,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
               ></Select> */}
                 <Input
                   name="N° Pagos Punto Pago"
-                  label="N° Pagos Punto Pago"
+                  label="N.° Pagos Punto de Pago"
                   type="tel"
                   autoComplete="off"
                   minLength="1"

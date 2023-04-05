@@ -8,6 +8,9 @@ const AppIcons = lazy(() => import("../../../components/Base/AppIcons"));
  * Corresponsalia Grupo Aval
  */
 const RecaudoMultiple = lazy(() => import("./Views/RecaudoMultiple"));
+const RecaudoMultipleComercios = lazy(() =>
+  import("./Views/RecaudoMultipleComercios")
+);
 const ConsultaRecaudoMultiple = lazy(() =>
   import("./Views/ConsultaRecaudoMultiple")
 );
@@ -30,6 +33,17 @@ const rutasRecaudoMultiple = {
       label: <AppIcons Logo={"MARKETPLACE"} name='Cargar recaudo múltiple' />,
       component: RecaudoMultiple,
       permission: [enumPermisosRecaudoMultiple.pago_recaudo_multiple],
+    },
+    {
+      link: "/corresponsalia/recaudo-multiple/transaccion-comercio",
+      label: (
+        <AppIcons
+          Logo={"MARKETPLACE"}
+          name='Cargar recaudo múltiple comercio'
+        />
+      ),
+      component: RecaudoMultipleComercios,
+      permission: [enumPermisosRecaudoMultiple.pago_recaudo_multiple_comercio],
     },
     {
       link: "/corresponsalia/recaudo-multiple/consulta",

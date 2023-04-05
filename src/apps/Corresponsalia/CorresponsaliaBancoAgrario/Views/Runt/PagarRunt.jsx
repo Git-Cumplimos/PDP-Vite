@@ -1,24 +1,25 @@
 import { useState, useCallback, Fragment, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
-import Input from "../../../../../components/Base/Input";
-import BarcodeReader from "../../../../../components/Base/BarcodeReader";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
 import Modal from "../../../../../components/Base/Modal";
 import Select from "../../../../../components/Base/Select";
-import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { useFetch } from "../../../../../hooks/useFetch";
-
 import { fetchCustom, ErrorCustom } from "../../utils/fetchRunt";
 import { ComponentsModalSummaryTrx } from "../Runt/components/components_modal";
 import {
   LecturaBarcode,
   LecturaRunt,
 } from "../Runt/components/components_form";
+import classes from "./PagarRunt.module.css";
+import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
+
+//Constantes Style
+const { styleComponents } = classes;
 
 //Constantes
 const url_get_barcode = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
@@ -33,12 +34,13 @@ const options_select = [
 
 const PagarRunt = () => {
   const [paso, setPaso] = useState("LecturaBarcode");
-  const [numeroRunt, setNumeroRunt] = useState(null);
+  const [numeroRunt, setNumeroRunt] = useState("");
   const [procedimiento, setProcedimiento] = useState(option_barcode);
   const [showModal, setShowModal] = useState(false);
   const [resConsultRunt, setResConsultRunt] = useState({});
   const [infTicket, setInfTicket] = useState(null);
   const printDiv = useRef();
+  const buttonDelate = useRef(null);
   const validNavigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
 
@@ -52,6 +54,32 @@ const PagarRunt = () => {
     fetchCustom(url_pagar_runt, "POST", "Pago runt")
   );
 
+  const CallErrorPeticion = useCallback((error) => {
+    let msg = "Pago RUNT no exitosa";
+    if (error instanceof ErrorCustom) {
+      switch (error.name) {
+        case "ErrorCustomBackend":
+          notifyError(error.message);
+          break;
+        case "msgCustomBackend":
+          notify(error.message);
+          break;
+        default:
+          if (error.notificacion == null) {
+            notifyError(`${msg}: ${error.message}`);
+          }
+          break;
+      }
+    } else {
+      notifyError(msg);
+    }
+    setPaso("LecturaBarcode");
+    setNumeroRunt("");
+    setResConsultRunt(null);
+    setShowModal(false);
+    setProcedimiento(option_barcode);
+  }, []);
+
   const onChangeNumeroRunt = useCallback((e) => {
     setNumeroRunt(e.target.value);
   }, []);
@@ -64,7 +92,7 @@ const PagarRunt = () => {
       setPaso("LecturaRunt");
       setProcedimiento(option_manual);
     }
-    setNumeroRunt(null);
+    setNumeroRunt("");
   }, []);
 
   const onSubmitBarcode = useCallback(
@@ -80,10 +108,11 @@ const PagarRunt = () => {
           }
         })
         .catch((error) => {
+          buttonDelate.current.click();
           CallErrorPeticion(error);
         });
     },
-    [peticionBarcode]
+    [peticionBarcode, CallErrorPeticion]
   );
 
   const onSubmitConsultRunt = (e) => {
@@ -110,67 +139,57 @@ const PagarRunt = () => {
       });
   };
 
-  const onSubmitPayRunt = (e) => {
-    const tipo__comercio = roleInfo.tipo_comercio.toLowerCase();
-    const data = {
-      comercio: {
-        id_comercio: roleInfo.id_comercio,
-        id_terminal: roleInfo.id_dispositivo,
-        id_usuario: roleInfo.id_usuario,
-      },
-      oficina_propia:
-        tipo__comercio.search("kiosco") >= 0 ||
-        tipo__comercio.search("oficinas propias") >= 0
-          ? true
-          : false,
-      nombre_usuario: pdpUser["uname"],
-      numero_runt: numeroRunt,
-      id_trx_original: resConsultRunt.id_trx,
-      valor_mt: resConsultRunt.valor_mt,
-      valor_runt: resConsultRunt.valor_runt,
-      valor_total_trx: resConsultRunt.valor_total_trx,
-      ciudad: roleInfo.ciudad,
-      direccion: roleInfo.direccion,
-    };
-    peticionPayRunt({}, data)
-      .then((response) => {
-        if (response?.status === true) {
-          const voucher = response.obj.result.ticket;
-          setInfTicket(JSON.parse(voucher));
-          setPaso("TransaccionExitosa");
-        }
-        notify("Pago del runt exitoso");
-      })
-      .catch((error) => {
-        CallErrorPeticion(error);
-      });
-  };
+  const onSubmitPayRunt = useCallback(
+    (e) => {
+      const tipo__comercio = roleInfo.tipo_comercio.toLowerCase();
+      const data = {
+        comercio: {
+          id_comercio: roleInfo.id_comercio,
+          id_terminal: roleInfo.id_dispositivo,
+          id_usuario: roleInfo.id_usuario,
+        },
+        oficina_propia:
+          tipo__comercio.search("kiosco") >= 0 ||
+          tipo__comercio.search("oficinas propias") >= 0
+            ? true
+            : false,
+        nombre_usuario: pdpUser["uname"],
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        numero_runt: numeroRunt,
+        id_trx_original: resConsultRunt.id_trx,
+        valor_mt: resConsultRunt.valor_mt,
+        valor_runt: resConsultRunt.valor_runt,
+        valor_total_trx: resConsultRunt.valor_total_trx,
+        ciudad: roleInfo.ciudad,
+        direccion: roleInfo.direccion,
+        idterminal_punto: roleInfo.idterminal_punto,
+        idtipo_dispositivo: roleInfo.idtipo_dispositivo,
+        serial_dispositivo: roleInfo.serial_dispositivo,
+        telefono: roleInfo?.telefono,
+      };
 
-  function CallErrorPeticion(error) {
-    let msg = "Recarga no exitosa";
-    if (error instanceof ErrorCustom) {
-      switch (error.name) {
-        case "ErrorCustomBackend":
-          notifyError(error.message);
-          break;
-        case "msgCustomBackend":
-          notify(error.message);
-          break;
-        default:
-          if (error.notificacion == null) {
-            notifyError(`${msg}: ${error.message}`);
+      peticionPayRunt({}, data)
+        .then((response) => {
+          if (response?.status === true) {
+            const voucher = response.obj.result.ticket;
+            setInfTicket(JSON.parse(voucher));
+            setPaso("TransaccionExitosa");
           }
-          break;
-      }
-    } else {
-      notifyError(msg);
-    }
-    setPaso("LecturaBarcode");
-    setNumeroRunt(null);
-    setResConsultRunt(null);
-    setShowModal(false);
-    setProcedimiento(option_barcode);
-  }
+          notify("Pago del RUNT exitoso");
+        })
+        .catch((error) => {
+          CallErrorPeticion(error);
+        });
+    },
+    [
+      numeroRunt,
+      pdpUser,
+      roleInfo,
+      peticionPayRunt,
+      resConsultRunt,
+      CallErrorPeticion,
+    ]
+  );
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -181,7 +200,7 @@ const PagarRunt = () => {
     setPaso("LecturaBarcode");
     setShowModal(false);
     notify("Transacción cancelada");
-    setNumeroRunt(null);
+    setNumeroRunt("");
     setResConsultRunt(null);
     setProcedimiento(option_barcode);
   }, []);
@@ -189,7 +208,7 @@ const PagarRunt = () => {
   const HandleCloseTrxExitosa = useCallback(() => {
     setPaso("LecturaBarcode");
     setShowModal(false);
-    setNumeroRunt(null);
+    setNumeroRunt("");
     setResConsultRunt(null);
     setInfTicket(null);
     setProcedimiento(option_barcode);
@@ -217,22 +236,28 @@ const PagarRunt = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Pago de RUNT</h1>
+      <h1 className='text-3xl mt-6'>Pago de RUNT</h1>
       <Form>
-        <Select
-          id="opciones"
-          label=""
-          options={options_select}
-          onChange={onChangeSelect}
-          value={procedimiento}
-          required
-        />
+        <div className={styleComponents}>
+          <Select
+            id='opciones'
+            label=''
+            options={options_select}
+            onChange={onChangeSelect}
+            value={procedimiento}
+            disabled={
+              loadingPeticionBarcode || loadingPeticionConsultRunt
+                ? true
+                : false
+            }
+          />
+        </div>
         {/******************************Lectura runt*******************************************************/}
         {paso === "LecturaBarcode" && (
           <LecturaBarcode
             loadingPeticion={loadingPeticionBarcode}
             onSubmit={onSubmitBarcode}
-          ></LecturaBarcode>
+            buttonDelate={buttonDelate}></LecturaBarcode>
         )}
         {/******************************Lectura runt*******************************************************/}
 
@@ -246,8 +271,7 @@ const PagarRunt = () => {
             procedimiento={procedimiento}
             option_barcode={option_barcode}
             option_manual={option_manual}
-            numeroRunt={numeroRunt}
-          ></LecturaRunt>
+            numeroRunt={numeroRunt}></LecturaRunt>
         )}
         {/******************************Respuesta Lectura runt*******************************************************/}
       </Form>
@@ -259,15 +283,14 @@ const PagarRunt = () => {
             summary={resConsultRunt}
             loadingPeticion={loadingPeticionPayRunt}
             peticion={onSubmitPayRunt}
-            handleClose={HandleCloseTrx}
-          ></ComponentsModalSummaryTrx>
+            handleClose={HandleCloseTrx}></ComponentsModalSummaryTrx>
         )}
         {/******************************Resumen de trx*******************************************************/}
 
         {/**************** TransaccionExitosa **********************/}
         {infTicket && paso === "TransaccionExitosa" && (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={infTicket} />
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={HandleCloseTrxExitosa}>Cerrar</Button>

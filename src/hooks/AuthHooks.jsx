@@ -15,7 +15,6 @@ import useFetchDispatchDebounce from "./useFetchDispatchDebounce";
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
 const urlComisiones = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/servicio-wallet-comisiones/consulta-wallet-comercio`;
-const urlCod_loteria_oficina = `${process.env.REACT_APP_URL_LOTERIAS}/cod_loteria_oficina`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
@@ -67,36 +66,6 @@ const fetchDane = async (codigo_dane) => {
   } catch (err) {}
 };
 
-const fetchOficinaLoteria = async (id_comercio) => {
-  if (!id_comercio) {
-    return {
-      cod_oficina_lot: "",
-      cod_sucursal_lot: "",
-    };
-  }
-  try {
-    const resp_cod = await fetchData(
-      urlCod_loteria_oficina,
-      "GET",
-      {
-        id_comercio: id_comercio,
-      },
-      {}
-    );
-    if (!("msg" in resp_cod)) {
-      return {
-        cod_oficina_lot: resp_cod.cod_oficina_lot,
-        cod_sucursal_lot: resp_cod.cod_sucursal_lot,
-      };
-    } else {
-      return {
-        cod_oficina_lot: "PPVIR",
-        cod_sucursal_lot: "00",
-      };
-    }
-  } catch (err) {}
-};
-
 const initialUser = {
   isSignedIn: false,
   cognitoUser: null,
@@ -110,7 +79,6 @@ const initialUser = {
 const SIGN_IN = "SIGN_IN";
 const CONFIRM_SIGN_IN = "CONFIRM_SIGN_IN";
 const SIGN_OUT = "SIGN_OUT";
-const SET_COGNITOUSER = "SET_COGNITOUSER";
 const SET_USERINFO = "SET_USERINFO";
 const SET_ROLEINFO = "SET_ROLEINFO";
 const SET_PERMISSIONS = "SET_PERMISSIONS";
@@ -119,7 +87,6 @@ const SET_QUOTA = "SET_QUOTA";
 
 const reducerAuth = (userState, action) => {
   const { payload } = action;
-  const dispatch = payload?.dispatch;
   switch (action.type) {
     case SIGN_IN:
       const { user } = payload;
@@ -128,18 +95,11 @@ const reducerAuth = (userState, action) => {
     case SIGN_OUT:
       return initialUser;
 
-    case SET_COGNITOUSER:
-      const { cogUser } = payload;
-      return { ...userState, cognitoUser: cogUser, isSignedIn: true };
-
     case SET_USERINFO:
       const { uInfo } = payload;
       return { ...userState, userInfo: uInfo };
 
     case SET_ROLEINFO:
-      if (payload?.dispatch) {
-        delete payload.dispatch;
-      }
       const { roleInfo: role } = userState;
       return { ...userState, roleInfo: { ...role, ...payload } };
 
@@ -160,9 +120,6 @@ const reducerAuth = (userState, action) => {
       if (!loggedUser) {
         return initialUser;
       }
-      Auth.currentUserInfo()
-        .then((uInfo) => dispatch?.({ type: SET_USERINFO, payload: { uInfo } }))
-        .catch(() => {});
       return { ...userState, cognitoUser: loggedUser, isSignedIn: true };
 
     default:
@@ -190,8 +147,6 @@ export const useAuth = () => {
 
 export const useProvideAuth = () => {
   const [qr, setQr] = useState("");
-
-  const [username] = useState("PROD");
 
   const [parameters, setParameters] = useState("");
 
@@ -229,8 +184,13 @@ export const useProvideAuth = () => {
         );
         dispatchAuth({
           type: CONFIRM_SIGN_IN,
-          payload: { loggedUser, dispatch: dispatchAuth },
+          payload: { loggedUser },
         });
+        Auth.currentUserInfo()
+          .then((uInfo) =>
+            dispatchAuth({ type: SET_USERINFO, payload: { uInfo } })
+          )
+          .catch(() => {});
         navigate(
           state?.from?.pathname
             ? state?.from?.pathname
@@ -378,25 +338,21 @@ export const useProvideAuth = () => {
   });
   const [getSuserInfo] = useFetchDispatchDebounce({
     onSuccess: useCallback((suserInfo) => {
+      let _roleinfo = {};
       if (!("msg" in suserInfo)) {
-        dispatchAuth({ type: SET_ROLEINFO, payload: suserInfo });
+        _roleinfo = structuredClone(suserInfo);
       }
       fetchDane(suserInfo.codigo_dane)
         .then((ciudad) => {
+          _roleinfo.ciudad = ciudad;
+        })
+        .catch(() => {})
+        .finally(() => {
           dispatchAuth({
             type: SET_ROLEINFO,
-            payload: { ciudad },
+            payload: structuredClone(_roleinfo),
           });
-        })
-        .catch(() => {});
-      fetchOficinaLoteria(suserInfo.id_comercio)
-        .then((oficina) => {
-          dispatchAuth({
-            type: SET_ROLEINFO,
-            payload: { ...oficina },
-          });
-        })
-        .catch(() => {});
+        });
     }, []),
     onError: useCallback((error) => {
       if (error?.cause === "custom") {
@@ -411,7 +367,7 @@ export const useProvideAuth = () => {
       const pdpU = res?.obj?.pdpU;
       if (!pdpU && !("active" in pdpU) && !pdpU.active) {
         notifyError("Usuario inactivo");
-        signOut();
+        signOut()
         return;
       }
 
@@ -436,7 +392,7 @@ export const useProvideAuth = () => {
       .then((user) => {
         dispatchAuth({
           type: CONFIRM_SIGN_IN,
-          payload: { loggedUser: user, dispatch: dispatchAuth },
+          payload: { loggedUser: user },
         });
       })
       .catch(() => {
@@ -447,7 +403,7 @@ export const useProvideAuth = () => {
     //   dispatchAuth({ type: SIGN_OUT });
     //   dispatchAuth({
     //     type: CONFIRM_SIGN_IN,
-    //     payload: { loggedUser: Auth.user, dispatch: dispatchAuth },
+    //     payload: { loggedUser: Auth.user },
     //   });
     // }
   }, [pathname]);
@@ -469,11 +425,7 @@ export const useProvideAuth = () => {
         `${url_iam_pdp_users}/user-login?email=${userState?.userInfo?.attributes?.email}`
       );
     }
-  }, [
-    userState?.userInfo?.attributes?.email,
-    getSuserInfo,
-    getLoginPdp,
-  ]);
+  }, [userState?.userInfo?.attributes?.email, getSuserInfo, getLoginPdp]);
 
   useEffect(() => {
     const validate = async () => {
@@ -498,7 +450,7 @@ export const useProvideAuth = () => {
       }
     };
     validate();
-  }, [cognitoUser, username, signOut]);
+  }, [cognitoUser, signOut]);
 
   useEffect(() => {
     const temp = async () => {

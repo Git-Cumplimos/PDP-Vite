@@ -25,6 +25,7 @@ const UsarPinForm = ({
   id_pin,
   tipoPin,
   setActivarNavigate,
+  datosOlimpia
 }) => {
   const printDiv = useRef();
 
@@ -73,7 +74,7 @@ const UsarPinForm = ({
       ["", ""],
 
     ],
-    disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    disclamer: "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
   });
 
 
@@ -87,10 +88,19 @@ const UsarPinForm = ({
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const [disabledBtn, setDisabledBtn] = useState(false);
+  const [disabledBtn, setDisabledBtn] = useState(true);
   const tickets = useMemo(() => {
+    let tittle
+    if(tipoPin==1){
+      tittle = "Recibo de pago: Servicio voluntario de impresión premium"
+    }else{
+      tittle = "Recibo de pago: " + textTipoPin
+    }
+    if(typeof(textTipoPin)==='string'){
+      setDisabledBtn(false)
+    }
     return {
-      title: "Recibo de pago: Servicio voluntario de impresión premium",
+      title: tittle,
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -129,9 +139,9 @@ const UsarPinForm = ({
 
       ],
       disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [respPinUso, roleInfo]);
+  }, [respPinUso, roleInfo, textTipoPin]);
 
   // useEffect(() => {
   //   infoTicket(
@@ -157,16 +167,20 @@ const UsarPinForm = ({
     }).format(new Date());
 
     const objTicket = { ...objTicketActual };
-    objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
+    if(tipoPin==1){
+      objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
+    }else{
+      objTicket["title"] = "Recibo de pago: " + textTipoPin
+    }
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = textTipoPin
     objTicket["trxInfo"][0] = ["Trámite", "Uso de Pin"]
-    objTicket["trxInfo"][1] = ["Valor Trámite", formatMoney.format(0)]
-   
+    objTicket["trxInfo"][1] = ["Valor trámite", formatMoney.format(0)]
+    
 
-    usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin, objTicket) // Pin + IVA
-      .then((res) => {
+    usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin, objTicket, datosOlimpia) // Pin + IVA
+          .then((res) => {
         setNum_tramite("");
         setActivarNavigate(false);
         setDisabledBtn(false);
@@ -273,11 +287,13 @@ const UsarPinForm = ({
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center">
+          <div ref={printDiv}>
           <TicketsPines
               refPrint={null}
               ticket={tickets}
               logo="LogoVus"
           />
+          </div>
           <ButtonBar>
             <Button
               onClick={() => {

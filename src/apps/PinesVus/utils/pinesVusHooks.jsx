@@ -88,15 +88,19 @@ export const useProvidePinesVus = () => {
     }
     let tramiteTemp
     let infoTramiteTemp
+    let categoriaTemp
     infoTramite["categoria"]=categoria
     if (tramite2==""){
       tramiteTemp= [tramite]
       infoTramiteTemp=[infoTramite]
+      categoriaTemp=[categoria]
     }else{
       tramiteTemp= [tramite, tramite2]
       infoTramite2["categoria"]=categoria2
       infoTramiteTemp=[infoTramite, infoTramite2]
+      categoriaTemp=[categoria, categoria2]
     }
+
     const body = {
       tipo_tramite: tramiteTemp,
       infoTramite: infoTramiteTemp,
@@ -111,13 +115,14 @@ export const useProvidePinesVus = () => {
       DireccionComercio: roleInfo?.direccion,
       infoCliente: infoCliente,
       olimpia: olimpia,
-      categoria: categoria,
+      categoria: categoriaTemp,
       firma: firma,
       motivoCompra: motivoCompra,
       descripcionTipDocumento:descripcionTipDocumento,
       ticket_pin:ticket1,
       ticket_tramite:ticket2
     };
+  
     if (idPin !== ""){
       body.Pin = idPin
     }
@@ -131,7 +136,7 @@ export const useProvidePinesVus = () => {
   }, [roleInfo, pdpUser]);
 
   const usarPinVus = useCallback(
-    async (valor, trx, num_tramite, user, id_pin, ticket) => {
+    async (valor, trx, num_tramite, user, id_pin, ticket, datosOlimpia) => {
       let tipo_comercio = user?.tipo_comercio
       if (user?.tipo_comercio === "KIOSCO"){
         tipo_comercio = "OFICINAS PROPIAS"
@@ -145,7 +150,8 @@ export const useProvidePinesVus = () => {
         NombreComercio: roleInfo?.["nombre comercio"],
         valor: parseFloat(valor),
         id_trx: trx,
-        ticket: ticket
+        ticket: ticket,
+        datosOlimpia: datosOlimpia
       };
       if (num_tramite !== "") {
         body.num_tramite = String(num_tramite);
@@ -172,7 +178,8 @@ export const useProvidePinesVus = () => {
       estadoPin,
       tipoPin,
       doc_cliente,
-      pageData
+      pageData,
+      pinesCliente
     ) => {
       const query = { ...pageData };
       if (cod_hash_pin !== "") {
@@ -194,9 +201,12 @@ export const useProvidePinesVus = () => {
       if (doc_cliente !== "") {
         query.doc_cliente = doc_cliente;
       }
-
+      if (pinesCliente == 1) {
+        query.pinesCliente = pinesCliente;
+      }
       try {
         const res = await fetchData(urls.PinVus, "GET", query);
+        //console.log(res)
         return res;
       } catch (err) {
         throw err;
@@ -224,12 +234,16 @@ export const useProvidePinesVus = () => {
     }
   }, []);
 
-  const consultaClientes = useCallback(async (cedula, olimpia, idPin) => {
+  const consultaClientes = useCallback(async (cedula, olimpia, tipoDocumento, idPin, tipoPin) => {
     const query = { pk_documento_cliente: cedula};
     query.olimpia = olimpia
     query.id_comercio = roleInfo?.id_comercio
+    query.tipo_documento = tipoDocumento
     if (idPin != ""){
       query.Pin = idPin}
+    if (tipoPin !=""){
+      query.tipoPin = tipoPin
+    }
     try {
       const res = await fetchData(urls.consultaClientes, "GET", query);
       return res;
@@ -260,7 +274,8 @@ export const useProvidePinesVus = () => {
     // num_aprobacion,
     // num_transaccion, 
     valor,
-    fecha_participacion
+    fecha_participacion,
+    ticket
     // voucher
     ) => {
     let tipo_comercio = roleInfo.tipo_comercio
@@ -282,6 +297,7 @@ export const useProvidePinesVus = () => {
       Comercio: roleInfo?.id_comercio,
       nombre_usuario: pdpUser?.uname ?? "",
       Tipo: tipo_comercio,
+      ticket: ticket
     };
     try {
       const res = await fetchData(urls.registroPagoParticipacion, "POST", {}, body);
@@ -397,6 +413,7 @@ export const useProvidePinesVus = () => {
       const query = { doc_cliente : doc_cliente, reenviarFormulario : reenviarFormulario };
       try {
         const res = await fetchData(urls.reenvioHash, "GET", query);
+        //console.log(res)
         return res;
       } catch (err) {
         throw err;

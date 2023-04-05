@@ -38,6 +38,7 @@ const RecaudoMultiple = () => {
           fileName={fileName}
           pdpUser={pdpUser}
           setUuid={setUuid}
+          type={"Operaciones"}
         />
       ) : estadoTrx === 2 ? (
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>

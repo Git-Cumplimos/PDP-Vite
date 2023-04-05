@@ -24,7 +24,10 @@ import {
 } from "../../utils/fetchFunctions";
 
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { makeMoneyFormatter } from "../../../../utils/functions";
+import {
+  makeMoneyFormatter,
+  onChangeNumber,
+} from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
 import ScreenBlocker from "../../components/ScreenBlocker";
 import TicketColpatria from "../../components/TicketColpatria";
@@ -119,7 +122,6 @@ const VentaPines = () => {
         },
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valVentaPines,
         nombre_usuario: pdpUser?.uname ?? "",
@@ -180,6 +182,7 @@ const VentaPines = () => {
 
   const onMakePayment = useCallback(
     (ev) => {
+      ev.preventDefault();
       if (valVentaPines <= 0) {
         notifyError("El valor del pin debe ser mayor a cero");
         return;
@@ -415,7 +418,7 @@ const VentaPines = () => {
               onInput={(ev) =>
                 setUserReferences((old) => ({
                   ...old,
-                  [ev.target.name]: ev.target.value,
+                  [ev.target.name]: onChangeNumber(ev),
                 }))
               }
               readOnly={inquiryStatus}
@@ -456,19 +459,18 @@ const VentaPines = () => {
             </ButtonBar>
           </div>
         ) : (
-          <PaymentSummary summaryTrx={summary}>
-            <ButtonBar>
-              <Button
-                type='submit'
-                onClick={onMakePayment}
-                disabled={loadingSell}>
-                Aceptar
-              </Button>
-              <Button onClick={handleClose} disabled={loadingSell}>
-                Cancelar
-              </Button>
-            </ButtonBar>
-          </PaymentSummary>
+          <form onSubmit={onMakePayment}>
+            <PaymentSummary summaryTrx={summary}>
+              <ButtonBar>
+                <Button type='submit' disabled={loadingSell}>
+                  Aceptar
+                </Button>
+                <Button onClick={handleClose} disabled={loadingSell}>
+                  Cancelar
+                </Button>
+              </ButtonBar>
+            </PaymentSummary>
+          </form>
         )}
       </Modal>
     </Fragment>

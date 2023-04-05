@@ -94,20 +94,17 @@ const Recaudo = () => {
       Hora: "",
     },
     commerceInfo: [
-      /*id_comercio*/
       ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      ["Id Trx", ""],
+      ["Id Aut", ""],  
       /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
+      ["Comercio", roleInfo?.["nombre comercio"]],
+      ["", ""],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
-
-      ["Id Trx", ""],
-
-      ["Id Confirmación",""]
-
-
+      ["", ""],
     ],
     commerceName: "FUNDACIÓN DE LA MUJER",
     trxInfo: [],
@@ -256,12 +253,12 @@ const Recaudo = () => {
         if (res?.status === true) {
           console.log(res);
           setResponse(res?.obj);
-          objTicket["commerceInfo"][4]=[
+          objTicket["commerceInfo"][2]=[
             "Id Trx",
             res?.obj?.id_trx,
           ]
-          objTicket["commerceInfo"][5]=[
-            "Id Confirmación",
+          objTicket["commerceInfo"][3]=[
+            "Id Aut",
             res?.obj?.Confirmacion,
           ]
           setTickets(objTicket)

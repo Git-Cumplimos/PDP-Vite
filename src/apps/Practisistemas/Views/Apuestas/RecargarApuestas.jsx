@@ -34,7 +34,7 @@ const RecargarApuestas = () => {
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
-  const {roleInfo,userInfo} = useAuth();
+  const { roleInfo, userInfo, pdpUser } = useAuth();
   const {state} = useLocation();
   const printDiv = useRef();
   const validNavigate = useNavigate();
@@ -126,7 +126,7 @@ const RecargarApuestas = () => {
           operador:state?.producto,
           valor: parseInt(inputValor),
           jsonAdicional:{
-            "nombre_usuario": userInfo?.attributes?.name,
+            "nombre_usuario": pdpUser?.uname ?? "",
             "operador": state?.casaApuesta
           } 
       }
@@ -141,7 +141,11 @@ const RecargarApuestas = () => {
         setTypeInfo("RecargaExitosa");
       }
       else {
-        notifyError(res?.msg);
+        notifyError(
+          typeof res?.msg == typeof {}
+            ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
+            : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
+        );
         setRespuesta(false);
         handleClose();
       }
@@ -150,7 +154,7 @@ const RecargarApuestas = () => {
       notify("Su transacción esta siendo procesada");
       setRespuesta(true);
       console.error(err);
-      for (let i = 0; i <=8; i++) {
+      for (let i = 0; i <= 7; i++) {
         try {
           const prom = await new Promise((resolve, reject) =>
             setTimeout(() => {
@@ -184,9 +188,17 @@ const RecargarApuestas = () => {
                 setRespuesta(false);
                 console.error(err);
               });
-            }, 11000)
+            }, 9000)
           );
           if (prom === true) {
+            setRespuesta(false);
+            handleClose();
+            break;
+          }
+          if (i >= 3) {
+            notify(
+              "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 2 minutos"
+            );
             setRespuesta(false);
             handleClose();
             break;
@@ -194,8 +206,14 @@ const RecargarApuestas = () => {
         } catch (error) {
           console.error(error);
         }        
-        notify("Su transacción esta siendo procesada");
+        if (i <= 3) {
+          notify(
+            "Su transacción esta siendo procesada, no recargue la página"
+          );
+
+        }
       }
+      notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
     });
   };
      

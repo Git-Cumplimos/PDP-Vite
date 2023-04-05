@@ -208,7 +208,10 @@ const buildGetFunction = (url) => {
       const res = await fetchData(url, "GET", args);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
+          throw new Error(
+            res?.obj?.error_user_msg ?? res?.msg ?? "",
+            { cause: "custom" }
+          );
         }
 
         throw new Error(res, { cause: "custom" });
@@ -228,7 +231,10 @@ const buildPostFunction = (url) => {
       const res = await fetchData(url, "POST", {}, body);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
+          throw new Error(
+            res?.obj?.error_user_msg ?? res?.msg ?? "",
+            { cause: "custom" }
+          );
         }
 
         throw new Error(res, { cause: "custom" });
@@ -250,7 +256,10 @@ const buildPutFunction = (url) => {
       const res = await fetchData(url, "PUT", args, body);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
+          throw new Error(
+            res?.obj?.error_user_msg ?? res?.msg ?? "",
+            { cause: "custom" }
+          );
         }
 
         throw new Error(res, { cause: "custom" });

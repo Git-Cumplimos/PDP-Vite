@@ -28,7 +28,7 @@ import { v4 } from "uuid";
 const RecargarPaquetes = () => {
   //Variables
   const printDiv = useRef();
-  const { roleInfo, userInfo } = useAuth();
+  const { roleInfo, userInfo, pdpUser } = useAuth();
   const [inputCelular, setInputCelular] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
@@ -52,13 +52,13 @@ const RecargarPaquetes = () => {
     ],
     commerceName: "RECARGA",
     trxInfo: [
-      ["Operador",state?.operadorPaquete],
+      ["Operador", state?.operadorPaquete],
       ["", ""],
-      ["Tipo paquete",state?.operador_recargar],
+      ["Tipo paquete", state?.operador_recargar],
       ["", ""],
     ],
     disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al telefono en Bogotá 756 0417.",
+      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
   });
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
@@ -85,7 +85,6 @@ const RecargarPaquetes = () => {
       handleClose();
     }
   };
-
   const fecthEnvioTransaccion = () => {
     setRespuesta(true);
     const fecha = Intl.DateTimeFormat("es-CO", {
@@ -132,7 +131,7 @@ const RecargarPaquetes = () => {
         operador: state?.operador,
         valor: parseInt(state?.codigo_paq),
         jsonAdicional: {
-          nombre_usuario: userInfo?.attributes?.name,
+          "nombre_usuario": pdpUser?.uname ?? "",
           operador: state?.operador_recargar,
         },
       },
@@ -140,8 +139,8 @@ const RecargarPaquetes = () => {
       .then(async (res) => {
         if (res?.status === true) {
           notify("Compra de paquete exitosa");
-          infTicketFinal["commerceInfo"].splice(2,0,["Id Trx",res?.obj?.response?.["idtrans"],]);
-          infTicketFinal["commerceInfo"].splice(3,0,["Id Aut",res?.obj?.response?.["codigoauth"],]);
+          infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
+          infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
           setInfTicket(infTicketFinal);
           setRespuesta(false);
           setTypeInfo("RecargaExitosa");
@@ -149,7 +148,7 @@ const RecargarPaquetes = () => {
           if (res?.message === "Endpoint request timed out") {
             notify("Su transacción esta siendo procesada");
             setRespuesta(true);
-            for (let i = 0; i <= 8; i++) {
+            for (let i = 0; i <= 7; i++) {
               try {
                 const prom = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -164,16 +163,16 @@ const RecargarPaquetes = () => {
                             res?.status === true ||
                             res?.obj?.response?.estado == "00"
                           ) {
-                            infTicketFinal["commerceInfo"].splice(2,0,["Id Trx",res?.obj?.response?.["idtrans"],]);
-                            infTicketFinal["commerceInfo"].splice(3,0,["Id Aut",res?.obj?.response?.["codigoauth"],]);
+                            infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
+                            infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
                             setInfTicket(infTicketFinal);
                             setRespuesta(false);
                             setTypeInfo("RecargaExitosa");
                           } else {
                             notifyError(
                               typeof res?.msg == typeof {}
-                                ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
-                                : res?.msg
+                                ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
+                                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
                             );
                             setRespuesta(true);
                             handleClose();
@@ -188,9 +187,17 @@ const RecargarPaquetes = () => {
                         setRespuesta(false);
                         console.error(err);
                       });
-                  }, 11000)
+                  }, 9000)
                 );
                 if (prom === true) {
+                  setRespuesta(false);
+                  handleClose();
+                  break;
+                }
+                if (i >= 3) {
+                  notify(
+                    "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 2 minutos"
+                  );
                   setRespuesta(false);
                   handleClose();
                   break;
@@ -198,16 +205,19 @@ const RecargarPaquetes = () => {
               } catch (error) {
                 console.error(error);
               }
-              notify(
-                "Su transacción esta siendo procesada, no recargue la página"
-              );
+              if (i <= 3) {
+                notify(
+                  "Su transacción esta siendo procesada, no recargue la página"
+                );
+              }
             }
+            // notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
             validNavigate("/recargas-paquetes");
           } else {
             notifyError(
               typeof res?.msg == typeof {}
-                ? "Error respuesta Practisistemas:(Transacción invalida ["+res?.msg?.estado+"])"
-                : res?.msg
+                ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
+                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
             );
             setRespuesta(false);
             handleClose();
@@ -258,6 +268,7 @@ const RecargarPaquetes = () => {
     notify("Recarga cancelada");
     validNavigate("/recargas-paquetes");
     handleClose();
+
   }, []);
 
   const handlePrint = useReactToPrint({
@@ -275,7 +286,7 @@ const RecargarPaquetes = () => {
       <h1 className="text-3xl mt-6">{state?.operador_recargar}</h1>
       <p> {state?.descripcion} </p>
       <p> Valor: {formatMoney.format(state?.valor_paquete)} </p>
-      <Form onSubmit={onSubmitCheck} grid>
+      <Form onSubmit={onSubmitCheck} >
         <Input
           name="celular"
           label="Número de celular"
