@@ -188,9 +188,17 @@ const RecargarApuestas = () => {
                 setRespuesta(false);
                 console.error(err);
               });
-            }, 11000)
+            }, 9000)
           );
           if (prom === true) {
+            setRespuesta(false);
+            handleClose();
+            break;
+          }
+          if (i >= 3) {
+            notify(
+              "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 2 minutos"
+            );
             setRespuesta(false);
             handleClose();
             break;
@@ -198,7 +206,7 @@ const RecargarApuestas = () => {
         } catch (error) {
           console.error(error);
         }        
-        if (i <= 6) {
+        if (i <= 3) {
           notify(
             "Su transacción esta siendo procesada, no recargue la página"
           );
