@@ -7,6 +7,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import DataTable from "../../../../components/Base/DataTable";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
+import MultipleSelect from "../../../../components/Base/MultipleSelect";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getUrlRecaudosList, downloadFileRecaudo, cargarArchivoRecaudo } from "../../utils/fetchFunctions";
 import { descargarCSV, onChangeEan13Number, changeDateFormat } from "../../utils/functions";
@@ -25,13 +26,25 @@ const GestionArchivosRecaudo = () => {
   const [showMainModal, setShowMainModal] = useState(false);
   const [showModalOptions, setShowModalOptions] = useState(false);
   const [showModalErrors, setShowModalErrors] = useState(false);
+  const [archivoConcilia, setArchivoConcilia] = useState(false);
   const [selected, setSelected] = useState(false); // fila selecionada
 
   const [listRecaudos, setListRecaudos] = useState([]);
   const [isNextPage, setIsNextPage] = useState(false);
   const [file, setFile] = useState(null);
+  const [reporte, setReporte] = useState(null);
 
-  const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
+  const [filas, setFilas] = useState({
+    pk_id_recaudo: false,
+    nombre_convenio: false,
+    valor: false,
+    valor_pagado: false,
+    nombre_estado: false,
+  });
+
+
+
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
 
   const [fetchTrxs] = useFetchDispatchDebounce({
@@ -45,7 +58,7 @@ const GestionArchivosRecaudo = () => {
   });
 
   const searchTrxs = useCallback(() => {
-    const tempMap = new Map(searchFilters2);
+    const tempMap = new Map(searchFilters);
     const url = getUrlRecaudosList()
     tempMap.forEach((val, key, map) => {
       if (!val) {
@@ -54,7 +67,7 @@ const GestionArchivosRecaudo = () => {
     });
     const queries = new URLSearchParams(tempMap.entries()).toString();
     fetchTrxs(`${url}?${queries}`);
-  }, [fetchTrxs, searchFilters2]);
+  }, [fetchTrxs, searchFilters]);
 
   useEffect(() => {
     searchTrxs();
@@ -66,6 +79,14 @@ const GestionArchivosRecaudo = () => {
     setShowModalOptions(false);
     setShowModalErrors(false);
     setSelected(false);
+    setReporte(null)
+    setFilas({
+      pk_id_recaudo: false,
+      nombre_convenio: false,
+      valor: false,
+      valor_pagado: false,
+      nombre_estado: false,
+    })
   }, []);
 
   const CargarArchivo = useCallback(
@@ -105,16 +126,20 @@ const GestionArchivosRecaudo = () => {
     async (e) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
-      const body = Object.fromEntries(
+      const timebody = Object.fromEntries(
         Object.entries(Object.fromEntries(formData))
       );
+      const body = {
+        convenio_id: selected.pk_id_convenio_directo,
+        ...timebody,
+        ...reporte
+      }
       try {
-        downloadFileRecaudo({
-          ...body,
-          convenio_id: selected.pk_id_convenio_directo,
-        })
+        downloadFileRecaudo(body)
           .then(async (res) => {
-            descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
+            if (selected.fk_nombre_tipo_archivo) {
+              descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
+            } else { notifyError('Funcion para este archivo en desarrollo'); }
           })
           .catch((err) => {
             if (err?.cause === "custom") {
@@ -127,7 +152,7 @@ const GestionArchivosRecaudo = () => {
       } catch (e) { console.log(e) }
 
       handleClose();
-    }, [handleClose, selected]);
+    }, [handleClose, selected, reporte]);
 
   const DescargarErrores = useCallback(
     async () => {
@@ -153,6 +178,10 @@ const GestionArchivosRecaudo = () => {
       descargarCSV('Errores_del_archivo', errores)
       handleClose();
     }, [handleClose, showModalErrors]);
+
+  const personalizarReporte = (e) => {
+    try {setReporte(e)} catch(e){console.log(e)}
+  }
 
   return (
     <Fragment>
@@ -212,7 +241,7 @@ const GestionArchivosRecaudo = () => {
           </Fragment>
         }
         onChange={(ev) => {
-          setSearchFilters2((old) => {
+          setSearchFilters((old) => {
             const copy = new Map(old)
               .set(
                 ev.target.name, ev.target.value
@@ -275,7 +304,7 @@ const GestionArchivosRecaudo = () => {
       </Modal>
       <Modal show={showMainModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">
-        Gestión de archivos de recaudo
+          Gestión de archivos de recaudo
         </h2>
         <Form onSubmit={showModalOptions ? CargarArchivo : DescargarReporte}>
           {showModalOptions && (
@@ -306,6 +335,19 @@ const GestionArchivosRecaudo = () => {
                 label={"Fecha final"}
                 required
               />
+              <ButtonBar>
+                <Button type="button" onClick={(e) => { setArchivoConcilia(archivoConcilia ? false : true) }}>
+                  Archivo Perzonalizado
+                </Button>
+              </ButtonBar>
+              {archivoConcilia && (
+                <MultipleSelect
+                  label='Opciones para el archivo'
+                  options={filas}
+                  onChange={(e) => personalizarReporte(e)}
+                />
+              )}
+
             </>
           )}
           <ButtonBar>

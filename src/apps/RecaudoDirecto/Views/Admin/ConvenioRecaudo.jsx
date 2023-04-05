@@ -59,8 +59,11 @@ const RecaudoDirecto = () => {
     { label: "Con autorizador", value: 2 },
     { label: "Sin base de datos", value: 3 },
   ]
+  const tipoArchivoConciliacion = [
+    { label: "Reporte Generico csv", value: "Reporte Generico csv" },
+  ]
 
-  const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
 
   const [fetchTrxs] = useFetchDispatchDebounce({
@@ -74,7 +77,7 @@ const RecaudoDirecto = () => {
   });
 
   const searchTrxs = useCallback(() => {
-    const tempMap = new Map(searchFilters2);
+    const tempMap = new Map(searchFilters);
     const url = getUrlRecaudosList()
     tempMap.forEach((val, key, map) => {
       if (!val) {
@@ -83,7 +86,7 @@ const RecaudoDirecto = () => {
     });
     const queries = new URLSearchParams(tempMap.entries()).toString();
     fetchTrxs(`${url}?${queries}`);
-  }, [fetchTrxs, searchFilters2]);
+  }, [fetchTrxs, searchFilters]);
 
   useEffect(() => {
     searchTrxs();
@@ -251,7 +254,7 @@ const RecaudoDirecto = () => {
           </Fragment>
         }
         onChange={(ev) => {
-          setSearchFilters2((old) => {
+          setSearchFilters((old) => {
             const copy = new Map(old)
               .set(
                 ev.target.name, ev.target.value
@@ -435,6 +438,15 @@ const RecaudoDirecto = () => {
               </ButtonBar>
             }
           </Fieldset>
+          <Select
+              className="place-self-stretch mb-1"
+              id={"Tipo_archivo"}
+              label={"Tipo archivo Conciliación"}
+              name={"fk_nombre_tipo_archivo"}
+              options={[{ label: "", value: "" }, ...tipoArchivoConciliacion]}
+              defaultValue={selected?.fk_nombre_tipo_archivo ?? ""}
+              required
+            />
           <TextArea
             id={"Observaciones"}
             label={"Observaciones"}

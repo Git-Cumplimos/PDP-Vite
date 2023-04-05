@@ -128,7 +128,6 @@ const FormularioRetiro = () => {
         },
         nombre_usuario: pdpUser?.uname ?? "",
       };
-      console.log(data)
       await modRetiro(data)
         .then((data) => {
           data?.status && notify(data?.msg)

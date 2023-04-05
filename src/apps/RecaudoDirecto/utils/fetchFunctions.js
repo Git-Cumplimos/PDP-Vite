@@ -81,6 +81,25 @@ export const descargarReporte = (url) => {
     }
   }
 };
+
+export const descargarReporteP = (url) => {
+  return async (body) => {
+    if (!body) {
+      throw new Error("Sin datos en el body", { cause: "custom" });
+    }
+    try {
+      const res = await fetchData(url, "POST", {}, body);
+      if (!res?.status) {
+        if (res?.msg) {
+          throw new Error(res?.msg, { cause: "custom" });
+        }
+      }
+      return res;
+    } catch (err) {
+      throw err
+    }
+  };
+};
 export const cargueArchivo = (url_cargar, url_verificar) => {
   return async (file, nombre_convenio, convenio_id) => {
 
@@ -131,7 +150,7 @@ export const addConveniosRecaudoList = buildPostFunction(
 export const modConveniosRecaudoList = buildPutFunction(
   `${url}/convenio-recaudo/modificar`
 );
-export const downloadFileRecaudo = descargarReporte(
+export const downloadFileRecaudo = descargarReporteP(
   `${url}/convenio-recaudo/descargar-reporte`
 );
 export const cargarArchivoRecaudo = cargueArchivo(

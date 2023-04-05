@@ -22,7 +22,6 @@ const useMoney = ({
 }) => {
     const onChangeMoney = useCallback(
         (ev) => {
-            console.log(equalError)
 
             const moneyFormatter = makeMoneyFormatter(decimalDigits);
 
