@@ -58,11 +58,7 @@ export const postCheckReintentoPines = async (bodyObj) => {
       bodyObj,
       {},
       true,
-<<<<<<< HEAD
-      11000
-=======
       9000
->>>>>>> Fix/QA-Practisistemas-Incidencias
     );
     if (!res?.status) {
       console.error(res?.msg);
