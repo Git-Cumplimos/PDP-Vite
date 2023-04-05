@@ -75,14 +75,14 @@ export const rutasSoat = {
 
 export const rutasRecargas = {
   link: "/recargas-paquetes",
-  label: <AppIcons Logo={"RecargaCelular"} name="Recargas y venta de paquetes" />,
+  label: <AppIcons Logo={"RecargaCelular"} name="Recargas y Venta de Paquetes" />,
   component: RecargasPaquetes,
   permission: [enumPermisosPractisistemas.practisistemasRecargas],
   subRoutes: [
     {
       link: "/recargas-paquetes/Recargar",
       label: (
-        <AppIcons Logo={"RecargaCelular"} name="Recargas y venta de paquetes" />
+        <AppIcons Logo={"RecargaCelular"} name="Recargas y Venta de Paquetes" />
       ),
       component: RecargasOperadores,
       permission: [enumPermisosPractisistemas.practisistemasSoat],
@@ -91,7 +91,7 @@ export const rutasRecargas = {
     {
       link: "/recargas-paquetes/Venta-paquetes",
       label: (
-        <AppIcons Logo={"RecargaCelular"} name="Recargas y venta de paquetes" />
+        <AppIcons Logo={"RecargaCelular"} name="Recargas y Venta de Paquetes" />
       ),
       component: SubPaquetesMoviles,
       permission: [enumPermisosPractisistemas.practisistemasRecargas],
