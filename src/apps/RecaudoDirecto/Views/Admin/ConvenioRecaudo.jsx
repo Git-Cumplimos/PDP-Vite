@@ -11,7 +11,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
-import MoneyInput from "../../utils/MoneyInput";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 import { notifyPending } from "../../../../utils/notify";
 import { onChangeEan13Number, onChangeNit, descargarCSV, changeDateFormat } from "../../utils/functions";
 import { getUrlRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
@@ -32,13 +32,13 @@ const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
   const [isNextPage, setIsNextPage] = useState(false);
   const [limites, setlimites] = useState({
-    "Valor minimo": "0",
-    "Valor maximo": "0",
+    "Valor mínimo": "0",
+    "Valor máximo": "0",
   })
   const [referencias, setReferencias] = useState([{
     "Nombre de Referencia": "",
-    "Longitud minima": "",
-    "Longitud maxima": "",
+    "Longitud mínima": "",
+    "Longitud máxima": "",
   }])
 
   const [res] = useState([
@@ -98,28 +98,28 @@ const RecaudoDirecto = () => {
       for (let i in selected['referencias']) {
         referencia.push({
           "Nombre de Referencia": selected['referencias'][i]['nombre_referencia'],
-          "Longitud minima": selected['referencias'][i]['length'][0],
-          "Longitud maxima": selected['referencias'][i]['length'][1],
+          "Longitud mínima": selected['referencias'][i]['length'][0],
+          "Longitud máxima": selected['referencias'][i]['length'][1],
         })
       }
     }
     else {
       referencia = [{
         "Nombre de Referencia": "",
-        "Longitud minima": "",
-        "Longitud maxima": "",
+        "Longitud mínima": "",
+        "Longitud máxima": "",
       }]
     }
     let limite = {}
     if (selected['limite_monto']) {
       limite = {
-        "Valor minimo": selected['limite_monto'][0] ?? 0,
-        "Valor maximo": selected['limite_monto'][1] ?? 0,
+        "Valor mínimo": selected['limite_monto'][0] ?? 0,
+        "Valor máximo": selected['limite_monto'][1] ?? 0,
       }
     } else {
       limite = {
-        "Valor minimo": "0",
-        "Valor maximo": "0",
+        "Valor mínimo": "0",
+        "Valor máximo": "0",
       }
     }
     setlimites(limite)
@@ -131,12 +131,12 @@ const RecaudoDirecto = () => {
     setSelected(false)
     setReferencias([{
       "Nombre de Referencia": "",
-      "Longitud minima": "",
-      "Longitud maxima": "",
+      "Longitud mínima": "",
+      "Longitud máxima": "",
     }])
     setlimites({
-      "Valor minimo": "0",
-      "Valor maximo": "0",
+      "Valor mínimo": "0",
+      "Valor máximo": "0",
     })
   }, []);
 
@@ -145,19 +145,19 @@ const RecaudoDirecto = () => {
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
     if (body['Nombre de Referencia']) {
-      delete body['Nombre de Referencia']; delete body['Longitud minima']; delete body['Longitud maxima']
+      delete body['Nombre de Referencia']; delete body['Longitud mínima']; delete body['Longitud máxima']
       let allReferencias = []
       for (let i in referencias) {
         allReferencias.push({
           "nombre_referencia": referencias[i]["Nombre de Referencia"],
-          "length": [referencias[i]["Longitud minima"], referencias[i]["Longitud maxima"],]
+          "length": [referencias[i]["Longitud mínima"], referencias[i]["Longitud máxima"],]
         })
       }
       body['referencias'] = allReferencias
     }
-    if (body['Valor minimo'] || body['Valor maximo']) {
-      delete body['Valor minimo']; delete body['Valor maximo'];
-      body['limite_monto'] = [`${[limites['Valor minimo']] ?? 0 }`, `${limites['Valor maximo'] ?? 0}`]
+    if (body['Valor mínimo'] || body['Valor máximo']) {
+      delete body['Valor mínimo']; delete body['Valor máximo'];
+      body['limite_monto'] = [`${[limites['Valor mínimo']] ?? 0 }`, `${limites['Valor máximo'] ?? 0}`]
     }
     notifyPending(
       selected
@@ -428,8 +428,8 @@ const RecaudoDirecto = () => {
                     if (copyRef.length < 2) {
                       copyRef.push({
                         "Nombre de Referencia": "",
-                        "Longitud minima": "",
-                        "Longitud maxima": "",
+                        "Longitud mínima": "",
+                        "Longitud máxima": "",
                       })
                       setReferencias(copyRef)
                     }

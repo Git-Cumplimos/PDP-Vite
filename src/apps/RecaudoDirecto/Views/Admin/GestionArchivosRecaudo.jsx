@@ -7,7 +7,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import DataTable from "../../../../components/Base/DataTable";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import MultipleSelect from "../../../../components/Base/MultipleSelect";
+// import MultipleSelect from "../../../../components/Base/MultipleSelect";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { getUrlRecaudosList, downloadFileRecaudo, cargarArchivoRecaudo } from "../../utils/fetchFunctions";
 import { descargarCSV, onChangeEan13Number, changeDateFormat } from "../../utils/functions";
@@ -26,21 +26,11 @@ const GestionArchivosRecaudo = () => {
   const [showMainModal, setShowMainModal] = useState(false);
   const [showModalOptions, setShowModalOptions] = useState(false);
   const [showModalErrors, setShowModalErrors] = useState(false);
-  const [archivoConcilia, setArchivoConcilia] = useState(false);
   const [selected, setSelected] = useState(false); // fila selecionada
 
   const [listRecaudos, setListRecaudos] = useState([]);
   const [isNextPage, setIsNextPage] = useState(false);
   const [file, setFile] = useState(null);
-  const [reporte, setReporte] = useState(null);
-
-  const [filas, setFilas] = useState({
-    pk_id_recaudo: false,
-    nombre_convenio: false,
-    valor: false,
-    valor_pagado: false,
-    nombre_estado: false,
-  });
 
 
 
@@ -79,14 +69,6 @@ const GestionArchivosRecaudo = () => {
     setShowModalOptions(false);
     setShowModalErrors(false);
     setSelected(false);
-    setReporte(null)
-    setFilas({
-      pk_id_recaudo: false,
-      nombre_convenio: false,
-      valor: false,
-      valor_pagado: false,
-      nombre_estado: false,
-    })
   }, []);
 
   const CargarArchivo = useCallback(
@@ -131,8 +113,7 @@ const GestionArchivosRecaudo = () => {
       );
       const body = {
         convenio_id: selected.pk_id_convenio_directo,
-        ...timebody,
-        ...reporte
+        ...timebody
       }
       try {
         downloadFileRecaudo(body)
@@ -152,7 +133,7 @@ const GestionArchivosRecaudo = () => {
       } catch (e) { console.log(e) }
 
       handleClose();
-    }, [handleClose, selected, reporte]);
+    }, [handleClose, selected]);
 
   const DescargarErrores = useCallback(
     async () => {
@@ -179,9 +160,6 @@ const GestionArchivosRecaudo = () => {
       handleClose();
     }, [handleClose, showModalErrors]);
 
-  const personalizarReporte = (e) => {
-    try {setReporte(e)} catch(e){console.log(e)}
-  }
 
   return (
     <Fragment>
@@ -335,18 +313,6 @@ const GestionArchivosRecaudo = () => {
                 label={"Fecha final"}
                 required
               />
-              <ButtonBar>
-                <Button type="button" onClick={(e) => { setArchivoConcilia(archivoConcilia ? false : true) }}>
-                  Archivo Perzonalizado
-                </Button>
-              </ButtonBar>
-              {archivoConcilia && (
-                <MultipleSelect
-                  label='Opciones para el archivo'
-                  options={filas}
-                  onChange={(e) => personalizarReporte(e)}
-                />
-              )}
 
             </>
           )}

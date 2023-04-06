@@ -5,7 +5,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
 import Input from "../../../../components/Base/Input";
-import MoneyInput from "../../utils/MoneyInput";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRetiro, modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
@@ -14,7 +14,6 @@ const FormularioRetiro = () => {
   const navigate = useNavigate()
 
   const { pk_id_convenio } = useParams();
-  // const { nombre_convenio } = useParams();
   const [cargando, setCargando] = useState(false)
   const [dataRetiro, setDataRetiro] = useState('')
   const [dataConvRetiro, setDataConvRetiro] = useState('')
@@ -26,12 +25,8 @@ const FormularioRetiro = () => {
     referencia1: '',
     referencia2: ''
   })
-  // const tipoModificacion = [
-  //   { label: "Valor igual", value: 1 },
-  //   { label: "Valor menor o igual", value: 2 },
-  // ]
   const limitesMontos = {
-    max: 999999999,
+    max: 99999999,
     min: 1,
   };
 
@@ -57,7 +52,7 @@ const FormularioRetiro = () => {
 
   }, [pk_id_convenio])
 
-  const consultarRetiroD = 
+  const consultarRetiroD =
     useCallback(async (e) => {
       e.preventDefault()
       const data = {
@@ -81,6 +76,7 @@ const FormularioRetiro = () => {
         .then((data) => {
           setDataRetiro(data?.obj.retiro ?? "")
           setId_Trx(data?.obj?.id_trx ?? "")
+          if (data?.obj?.retiro?.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.retiro?.valor }) }
           notify(data.msg)
           setShowModal(true);
         })
@@ -90,7 +86,7 @@ const FormularioRetiro = () => {
         });
 
     }, [pk_id_convenio, handleClose, dataReferencias, dataConvRetiro, roleInfo, pdpUser])
- 
+
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
@@ -199,18 +195,29 @@ const FormularioRetiro = () => {
             autoComplete="off"
             disabled
           />
-          <MoneyInput
-            label="Valor a retirar"
-            name="valor_total_trx"
-            autoComplete="off"
-            equalError={dataRetiro?.fk_modificar_valor}
-            min={parseInt(dataRetiro.valor) - parseInt(dataRetiro.valor_retirado ?? 0)}
-            max={parseInt(dataRetiro.valor) - parseInt(dataRetiro.valor_retirado ?? 0)}
-            onInput={(e, valor) =>
-              setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
-            }
-            required
-          />
+          {dataRetiro?.fk_modificar_valor === 1 ? (
+            <MoneyInput
+              label="Valor a retirar"
+              name="valor_total_trx"
+              autoComplete="off"
+              value={(dataRetiro.valor - dataRetiro.valor_retirado ?? 0)}
+              disabled
+              required
+            />
+          ) : (
+            <MoneyInput
+              label="Valor a retirar"
+              name="valor_total_trx"
+              autoComplete="off"
+              min={limitesMontos.min}
+              equalError={dataRetiro?.fk_modificar_valor === 2 ? null : false}
+              max={(dataRetiro.valor - dataRetiro.valor_retirado ?? 0)}
+              onInput={(e, valor) =>
+                setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
+              }
+              required
+            />
+          )}
           <ButtonBar>
             <Button type={"submit"} >
               Aceptar

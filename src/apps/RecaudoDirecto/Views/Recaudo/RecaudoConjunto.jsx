@@ -5,7 +5,7 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-import MoneyInput from "../../utils/MoneyInput";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRecaudo, searchConveniosRecaudoList, modRecaudo } from "../../utils/fetchFunctions"
@@ -26,7 +26,7 @@ const RecaudoConjunto = () => {
     referencia2: ''
   })
   const limitesMontos = {
-    max: 999999999,
+    max: 99999999,
     min: 1,
   };
 
@@ -55,32 +55,33 @@ const RecaudoConjunto = () => {
     }
   }, [navigate, pk_id_convenio])
 
-  const consultarRecaudoD = 
+  const consultarRecaudoD =
     useCallback(async (e) => {
       e.preventDefault()
       const data = {
-          consulta_recaudo: {
-            convenio_id: pk_id_convenio,
-            permite_vencidos: convenioRecaudo.permite_vencidos ?? false,
-            tipo_convenio: convenioRecaudo.fk_id_tipo_convenio,
-            referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
-          },
-          valor_total_trx: 0,
-          comercio: {
-            id_comercio: roleInfo?.id_comercio,
-            id_usuario: roleInfo?.id_usuario,
-            id_terminal: roleInfo?.id_dispositivo,
-          },
-          is_oficina_propia:
-            roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-            roleInfo?.tipo_comercio === "KIOSCO",
-          nombre_usuario: pdpUser?.uname ?? "",
+        consulta_recaudo: {
+          convenio_id: pk_id_convenio,
+          permite_vencidos: convenioRecaudo.permite_vencidos ?? false,
+          tipo_convenio: convenioRecaudo.fk_id_tipo_convenio,
+          referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
+        },
+        valor_total_trx: 0,
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        is_oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
+        nombre_usuario: pdpUser?.uname ?? "",
       };
       await getRecaudo(data)
         .then((data) => {
           setDataRecaudo(data?.obj?.recaudo)
           setId_Trx(data?.obj?.id_trx ?? false)
           data?.obj?.recaudo && notify(data.msg)
+          if (data?.obj?.recaudo.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.recaudo.valor }) }
           setShowModal(true);
         })
         .catch((err) => {
@@ -196,10 +197,9 @@ const RecaudoConjunto = () => {
               label="Valor a recaudar"
               name="valor_total_trx"
               autoComplete="off"
-              min={dataRecaudo.valor ?? limitesMontos?.min}
+              min={limitesMontos.min}
               equalError={false}
-              max={parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0) ?? limitesMontos.max}
-              value={valorRecibido.valor_total_trx}
+              max={limitesMontos.max}
               onInput={(e, valor) =>
                 setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
               }
@@ -229,18 +229,31 @@ const RecaudoConjunto = () => {
                 autoComplete="off"
                 disabled
               />
-              <MoneyInput
-                label="Valor a recaudar"
-                name="valor_total_trx"
-                autoComplete="off"
-                min={parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0) ?? limitesMontos?.min}
-                equalError={dataRecaudo?.fk_modificar_valor}
-                max={parseInt(dataRecaudo.valor) - parseInt(dataRecaudo.valor_pagado ?? 0) ?? limitesMontos.max}
-                onInput={(e, valor) =>
-                  setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
-                }
-                required
-              />
+              {dataRecaudo?.fk_modificar_valor === 1 ? (
+                <MoneyInput
+                  label="Valor a recaudar"
+                  name="valor_total_trx"
+                  autoComplete="off"
+                  value={(dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)}
+                  disabled
+                  required
+                />
+              ) : (
+                <MoneyInput
+                  label="Valor a recaudar"
+                  name="valor_total_trx"
+                  autoComplete="off"
+                  min={dataRecaudo?.fk_modificar_valor === 3 ?
+                    (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) : limitesMontos.min}
+                  equalError={dataRecaudo?.fk_modificar_valor === 2 ? null : false}
+                  max={dataRecaudo?.fk_modificar_valor === 2 ?
+                    (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) : limitesMontos.max}
+                  onInput={(e, valor) =>
+                    setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
+                  }
+                  required
+                />
+              )}
             </>
           ) : (
             <>
