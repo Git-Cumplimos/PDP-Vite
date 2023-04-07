@@ -89,10 +89,8 @@ export const descargarReporteP = (url) => {
     }
     try {
       const res = await fetchData(url, "POST", {}, body);
-      if (!res?.status) {
-        if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
-        }
+      if (res?.msg) {
+        throw new Error(res?.msg, { cause: "custom" });
       }
       return res;
     } catch (err) {
@@ -150,8 +148,11 @@ export const addConveniosRecaudoList = buildPostFunction(
 export const modConveniosRecaudoList = buildPutFunction(
   `${url}/convenio-recaudo/modificar`
 );
-export const downloadFileRecaudo = descargarReporteP(
+export const downloadCsvRecaudo = descargarReporteP(
   `${url}/convenio-recaudo/descargar-reporte`
+);
+export const downloadTxtRecaudo = descargarReporteP(
+  `${url}/convenio-recaudo/descargar-reporte-txt`
 );
 export const cargarArchivoRecaudo = cargueArchivo(
   `${url}/convenio-recaudo-masivo/obtener-url-carga`,

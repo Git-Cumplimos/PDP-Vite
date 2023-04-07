@@ -19,6 +19,15 @@ export const descargarCSV = (nombreArchivo, info) => {
   const data = JSON.stringify(info);
   csvExporter.generateCsv(data);
 }
+export const descargarTXT= (nombreArchivo, info) => {
+  const blob = new Blob([info]);
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${nombreArchivo}.txt`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
 
 const calcularDigitoVerificacion = (myNit) => {
   let vpri, z;

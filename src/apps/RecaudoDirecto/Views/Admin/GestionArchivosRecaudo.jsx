@@ -7,11 +7,20 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import DataTable from "../../../../components/Base/DataTable";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
-// import MultipleSelect from "../../../../components/Base/MultipleSelect";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getUrlRecaudosList, downloadFileRecaudo, cargarArchivoRecaudo } from "../../utils/fetchFunctions";
-import { descargarCSV, onChangeEan13Number, changeDateFormat } from "../../utils/functions";
 import { onChangeNumber } from "../../../../utils/functions";
+import {
+  descargarCSV,
+  descargarTXT,
+  onChangeEan13Number,
+  changeDateFormat
+} from "../../utils/functions";
+import {
+  getUrlRecaudosList,
+  downloadCsvRecaudo,
+  downloadTxtRecaudo,
+  cargarArchivoRecaudo
+} from "../../utils/fetchFunctions";
 
 const initialSearchFilters = new Map([
   ["pk_id_convenio_directo", ""],
@@ -115,11 +124,19 @@ const GestionArchivosRecaudo = () => {
         convenio_id: selected.pk_id_convenio_directo,
         ...timebody
       }
+      const tipoArchivo = {
+        'Reporte Generico csv': downloadCsvRecaudo,
+        'Asobancaria 2001': downloadTxtRecaudo
+      };
       try {
-        downloadFileRecaudo(body)
+        tipoArchivo[selected.fk_nombre_tipo_archivo](body)
           .then(async (res) => {
-            if (selected.fk_nombre_tipo_archivo) {
+            if (selected.fk_nombre_tipo_archivo === 'Reporte Generico csv') {
               descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
+            }
+            if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2001') {
+              descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
+              return;
             } else { notifyError('Funcion para este archivo en desarrollo'); }
           })
           .catch((err) => {
@@ -306,13 +323,15 @@ const GestionArchivosRecaudo = () => {
                 label={"Fecha inicial"}
                 required
               />
-              <Input
-                type="date"
-                autoComplete="off"
-                name={"fecha_final"}
-                label={"Fecha final"}
-                required
-              />
+              {selected.fk_nombre_tipo_archivo === 'Reporte Generico csv' && (
+                <Input
+                  type="date"
+                  autoComplete="off"
+                  name={"fecha_final"}
+                  label={"Fecha final"}
+                  required
+                />
+              )}
 
             </>
           )}
