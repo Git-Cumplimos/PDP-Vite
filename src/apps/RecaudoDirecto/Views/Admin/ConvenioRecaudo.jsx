@@ -61,6 +61,7 @@ const RecaudoDirecto = () => {
   ]
   const tipoArchivoConciliacion = [
     { label: "Reporte Generico csv", value: "Reporte Generico csv" },
+    { label: "Asobancaria 2001", value: "Asobancaria 2001" }
   ]
 
   const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
