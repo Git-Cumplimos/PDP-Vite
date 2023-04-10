@@ -117,7 +117,8 @@ const RecaudoConjunto = () => {
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
         roleInfo?.tipo_comercio === "KIOSCO",
       ...valorRecibido,
-      nombre_usuario: pdpUser?.uname ?? "",
+      nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+      direccion: roleInfo?.direccion ?? ""
     };
     if (convenioRecaudo?.fk_id_tipo_convenio !== 3) { // validacion del conv si tiene bbdd
       let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
@@ -154,7 +155,7 @@ const RecaudoConjunto = () => {
     }
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
 
-  }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx,
+  }, [roleInfo, valorRecibido, dataRecaudo, id_trx,
     pk_id_convenio, convenioRecaudo, dataReferencias, handleClose])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])

@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useState, useEffect } from "react";
+import { Fragment, useCallback, useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -6,7 +6,9 @@ import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
 import Input from "../../../../components/Base/Input";
 import MoneyInput from "../../../../components/Base/MoneyInput";
+import Tickets from "../../../../components/Base/Tickets";
 import { useAuth } from "../../../../hooks/AuthHooks";
+import { useReactToPrint } from "react-to-print";
 import { notify, notifyError } from "../../../../utils/notify";
 import { getRetiro, modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
 
@@ -18,6 +20,7 @@ const FormularioRetiro = () => {
   const [dataRetiro, setDataRetiro] = useState('')
   const [dataConvRetiro, setDataConvRetiro] = useState('')
   const [id_trx, setId_Trx] = useState('')
+  const [pago, setPago] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [valorRecibido, setValorRecibido] = useState({ valor_total_trx: '' })
   const { roleInfo, pdpUser } = useAuth();
@@ -30,6 +33,11 @@ const FormularioRetiro = () => {
     min: 1,
   };
 
+  const printDiv = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -122,12 +130,13 @@ const FormularioRetiro = () => {
           convenio_id: pk_id_convenio,
           pk_id_retiro: dataRetiro.pk_id_recaudo,
         },
-        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+        direccion: roleInfo?.direccion ?? ""
       };
       await modRetiro(data)
         .then((data) => {
           data?.status && notify(data?.msg)
-          navigate("/recaudo-directo/consultar-retiro")
+          setPago(data?.obj?.ticket)
         })
         .catch((err) => {
           notifyError(err?.msg);
@@ -135,7 +144,7 @@ const FormularioRetiro = () => {
       handleClose()
     }
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
-  }, [dataRetiro, roleInfo, pdpUser, id_trx, valorRecibido, pk_id_convenio, navigate, handleClose])
+  }, [dataRetiro, roleInfo, pdpUser, id_trx, valorRecibido, pk_id_convenio, handleClose])
 
   return (
     <Fragment>
@@ -228,6 +237,17 @@ const FormularioRetiro = () => {
           </ButtonBar>
         </Form>
 
+      </Modal>
+      <Modal show={pago !== false}>
+        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+          <Tickets refPrint={printDiv} ticket={pago} />
+          <ButtonBar>
+            <Button onClick={handlePrint}>Imprimir</Button>
+            <Button onClick={() =>  navigate("/recaudo-directo/consultar-retiro")}>
+              Cerrar
+            </Button>
+          </ButtonBar>
+        </div>
       </Modal>
 
     </Fragment>
