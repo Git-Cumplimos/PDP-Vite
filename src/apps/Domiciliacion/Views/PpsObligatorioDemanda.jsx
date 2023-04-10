@@ -68,6 +68,7 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
     cupoLogin: quotaInfo?.["quota"],
     tipoComercio: roleInfo?.["tipo_comercio"],
     nombreComercio: roleInfo?.["nombre comercio"],
+
     idTrx: "",
     datocontacto: "",
   });
