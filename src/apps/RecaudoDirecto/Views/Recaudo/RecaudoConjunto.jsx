@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
@@ -8,7 +8,10 @@ import Input from "../../../../components/Base/Input";
 import MoneyInput from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
+import { useReactToPrint } from "react-to-print";
+import Tickets from "../../../../components/Base/Tickets";
 import { getRecaudo, searchConveniosRecaudoList, modRecaudo } from "../../utils/fetchFunctions"
+
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
@@ -18,6 +21,7 @@ const RecaudoConjunto = () => {
   const [showModal, setShowModal] = useState(false)
   const [dataRecaudo, setDataRecaudo] = useState('')
   const [id_trx, setId_Trx] = useState(null)
+  const [pago, setPago] = useState(false)
   const [cargando, setCargando] = useState(false)
   const [convenioRecaudo, setConvenioRecaudo] = useState(null);
   const [valorRecibido, setValorRecibido] = useState({ valor_total_trx: '' })
@@ -29,6 +33,12 @@ const RecaudoConjunto = () => {
     max: 99999999,
     min: 1,
   };
+
+  const printDiv = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -123,6 +133,7 @@ const RecaudoConjunto = () => {
       data.recaudo = {
         convenio_id: pk_id_convenio,
         pk_id_recaudo: dataRecaudo.pk_id_recaudo,
+        referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
       }
     } else {
       data.recaudo = {
@@ -134,7 +145,7 @@ const RecaudoConjunto = () => {
       await modRecaudo(data)
         .then((data) => {
           data?.status && notify(data?.msg)
-          navigate("/recaudo-directo/recaudo/manual")
+          setPago(data?.obj?.ticket)
         })
         .catch((err) => {
           notifyError(err?.msg);
@@ -144,7 +155,7 @@ const RecaudoConjunto = () => {
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
 
   }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx,
-    pk_id_convenio, convenioRecaudo, dataReferencias, navigate, handleClose])
+    pk_id_convenio, convenioRecaudo, dataReferencias, handleClose])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
@@ -290,6 +301,17 @@ const RecaudoConjunto = () => {
             </Button>
           </ButtonBar>
         </Form>
+      </Modal>
+      <Modal show={pago !== false}>
+        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+          <Tickets refPrint={printDiv} ticket={pago} />
+          <ButtonBar>
+            <Button onClick={handlePrint}>Imprimir</Button>
+            <Button onClick={() => navigate("/recaudo-directo/recaudo/manual")}>
+              Cerrar
+            </Button>
+          </ButtonBar>
+        </div>
       </Modal>
     </Fragment>
   )
