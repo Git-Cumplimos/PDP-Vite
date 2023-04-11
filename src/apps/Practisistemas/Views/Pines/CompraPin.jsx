@@ -443,7 +443,7 @@ const CompraPin = () => {
                 }
                 if (i >= 3) {
                   notify(
-                    "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 2 minutos"
+                    "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
                   );
                   setShowLoading(false);
                   handleClose();
