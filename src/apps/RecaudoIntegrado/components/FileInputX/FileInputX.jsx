@@ -115,7 +115,7 @@ const FileInputX = ({ banco }) => {
         console.log("RESPUESTA VALIDAR", res);
         if (res?.codigo == 400) {
           // setShowModal(true);
-          setErrors(res?.obj);
+          // setErrors(res?.obj);
           window.open(res?.url, "_self");
         }
         setProcesandoValidacion(false);
