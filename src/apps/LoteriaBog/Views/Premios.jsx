@@ -28,6 +28,8 @@ const Premios = ({ route }) => {
   const [billete, setBillete] = useState("");
   const [totalPagar, setTotalPagar] = useState("");
   const [valorbruto, setValorbruto] = useState("");
+  const [valor17, setValor17] = useState("");
+  const [valor20, setValor20] = useState("");
   const [serie, setSerie] = useState("");
   const [idLoteria, seIdLoteria] = useState("");
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
@@ -131,6 +133,8 @@ const Premios = ({ route }) => {
         setDatosComercio((old) => {
           setRespuesta(false);
           setValorbruto(res?.obj?.valorbruto);
+          setValor17(res?.obj?.valor17);
+          setValor20(res?.obj?.valor20);
           setDisabledBtns(false);
           return {
             ...old,
@@ -305,6 +309,8 @@ const Premios = ({ route }) => {
             datosCliente?.celular,
             totalPagar,
             valorbruto,
+            valor17,
+            valor20,
             datosComercio.comercio,
             datosComercio.terminal,
             datosComercio.usuario,
@@ -367,6 +373,8 @@ const Premios = ({ route }) => {
             datosCliente?.celular,
             totalPagar,
             valorbruto,
+            valor17,
+            valor20,
             datosComercio.comercio,
             datosComercio.terminal,
             datosComercio.usuario,
