@@ -18,7 +18,7 @@ const FormularioRetiro = () => {
   const { pk_id_convenio } = useParams();
   const [cargando, setCargando] = useState(false)
   const [dataRetiro, setDataRetiro] = useState('')
-  const [dataConvRetiro, setDataConvRetiro] = useState('')
+  const [dataConvRetiro, setDataConvRetiro] = useState(null)
   const [id_trx, setId_Trx] = useState('')
   const [pago, setPago] = useState(false)
   const [showModal, setShowModal] = useState(false)
@@ -49,11 +49,15 @@ const FormularioRetiro = () => {
 
   const getData = useCallback(async () => {
     try {
-      let rest = await searchConveniosRetiroList({ convenio_id: pk_id_convenio })
-        .then((rest) => { return rest })
-      if (rest.length < 1) throw new Error("No hay datos");
-      setDataConvRetiro(rest?.obj)
-      setCargando(true)
+      searchConveniosRetiroList({ convenio_id: pk_id_convenio })
+        .then((rest) => {
+          if (rest.length < 1) throw new Error("No hay datos");
+          setDataConvRetiro(rest?.obj)
+          setCargando(true)
+        })
+        .catch((err) => {
+          notifyError(err?.msg);
+        });
     } catch (e) {
       console.error(e)
     }
@@ -80,7 +84,7 @@ const FormularioRetiro = () => {
         valor_total_trx: 0,
         nombre_usuario: pdpUser?.uname ?? "",
       };
-      await getRetiro(data)
+      getRetiro(data)
         .then((data) => {
           setDataRetiro(data?.obj.retiro ?? "")
           setId_Trx(data?.obj?.id_trx ?? "")
@@ -103,7 +107,7 @@ const FormularioRetiro = () => {
 
     let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
     let sumaTotal = valoresRecibido + dataRetiro.valor_retirado
-
+    
     const FlujosTRX = {
       1: () => sumaTotal === dataRetiro.valor ?
         { estado: true } : undefined,
@@ -128,23 +132,26 @@ const FormularioRetiro = () => {
         ...valorRecibido,
         retiro: {
           convenio_id: pk_id_convenio,
+          nombre_convenio: dataConvRetiro?.nombre_convenio ?? "",
           pk_id_retiro: dataRetiro.pk_id_recaudo,
+          referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
         },
         nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
         direccion: roleInfo?.direccion ?? ""
       };
-      await modRetiro(data)
+      modRetiro(data)
         .then((data) => {
           data?.status && notify(data?.msg)
           setPago(data?.obj?.ticket)
+          handleClose()
         })
         .catch((err) => {
           notifyError(err?.msg);
+          handleClose()
         });
-      handleClose()
     }
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
-  }, [dataRetiro, roleInfo, pdpUser, id_trx, valorRecibido, pk_id_convenio, handleClose])
+  }, [dataRetiro, roleInfo, dataReferencias, id_trx, valorRecibido, dataConvRetiro, pk_id_convenio, handleClose])
 
   return (
     <Fragment>
@@ -218,9 +225,16 @@ const FormularioRetiro = () => {
               label="Valor a retirar"
               name="valor_total_trx"
               autoComplete="off"
-              min={limitesMontos.min}
+              min={parseInt(dataConvRetiro?.limite_monto[0])  !== 0 && // tipo 2 (menor o igual) 
+                parseInt(dataConvRetiro?.limite_monto[0]) <= (dataRetiro.valor - dataRetiro.valor_retirado ?? 0) ?
+                parseInt(dataConvRetiro?.limite_monto[0]) : limitesMontos.min
+              }
               equalError={dataRetiro?.fk_modificar_valor === 2 ? null : false}
-              max={(dataRetiro.valor - dataRetiro.valor_retirado ?? 0)}
+              
+              max={parseInt(dataConvRetiro?.limite_monto[1]) !== 0 &&
+                parseInt(dataConvRetiro?.limite_monto[1]) <= (dataRetiro.valor - dataRetiro.valor_retirado ?? 0) ?
+                parseInt(dataConvRetiro?.limite_monto[1]) : (dataRetiro.valor - dataRetiro.valor_retirado ?? 0)
+              }
               onInput={(e, valor) =>
                 setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
               }
@@ -243,7 +257,7 @@ const FormularioRetiro = () => {
           <Tickets refPrint={printDiv} ticket={pago} />
           <ButtonBar>
             <Button onClick={handlePrint}>Imprimir</Button>
-            <Button onClick={() =>  navigate("/recaudo-directo/consultar-retiro")}>
+            <Button onClick={() => navigate("/recaudo-directo/consultar-retiro")}>
               Cerrar
             </Button>
           </ButtonBar>

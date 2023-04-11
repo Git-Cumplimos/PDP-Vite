@@ -86,7 +86,7 @@ const RecaudoConjunto = () => {
           roleInfo?.tipo_comercio === "KIOSCO",
         nombre_usuario: pdpUser?.uname ?? "",
       };
-      await getRecaudo(data)
+      getRecaudo(data)
         .then((data) => {
           setDataRecaudo(data?.obj?.recaudo)
           setId_Trx(data?.obj?.id_trx ?? false)
@@ -120,38 +120,35 @@ const RecaudoConjunto = () => {
       nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
       direccion: roleInfo?.direccion ?? ""
     };
-    if (convenioRecaudo?.fk_id_tipo_convenio !== 3) { // validacion del conv si tiene bbdd
-      let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
-      let sumaTotal = valoresRecibido + dataRecaudo.valor_pagado
 
-      const ValidacionTRX = {
-        1: () => sumaTotal === dataRecaudo.valor ? { estado: true } : undefined,
-        2: () => sumaTotal <= dataRecaudo.valor ? { estado: true } : undefined,
-        3: () => sumaTotal >= dataRecaudo.valor ? { estado: true } : undefined,
-        4: () => (sumaTotal < dataRecaudo.valor || sumaTotal >= dataRecaudo.valor) ? { estado: true } : undefined,
-      };
-      resp = ValidacionTRX[dataRecaudo?.fk_modificar_valor]?.() || { estado: false };
-      data.recaudo = {
-        convenio_id: pk_id_convenio,
-        pk_id_recaudo: dataRecaudo.pk_id_recaudo,
-        referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
-      }
-    } else {
-      data.recaudo = {
-        convenio_id: pk_id_convenio,
-        referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
-      }
+    let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
+    let sumaTotal = valoresRecibido + dataRecaudo.valor_pagado
+
+    const ValidacionTRX = {
+      1: () => sumaTotal === dataRecaudo.valor ? { estado: true } : undefined,
+      2: () => sumaTotal <= dataRecaudo.valor ? { estado: true } : undefined,
+      3: () => sumaTotal >= dataRecaudo.valor ? { estado: true } : undefined,
+      4: () => (sumaTotal < dataRecaudo.valor || sumaTotal >= dataRecaudo.valor) ? { estado: true } : undefined,
+    };
+    resp = ValidacionTRX[dataRecaudo?.fk_modificar_valor]?.() || { estado: false };
+    data.recaudo = {
+      convenio_id: pk_id_convenio,
+      nombre_convenio: dataRecaudo?.nombre_convenio ?? "",
+      pk_id_recaudo: dataRecaudo.pk_id_recaudo,
+      referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
     }
     if ((convenioRecaudo?.fk_id_tipo_convenio !== 3 && resp.estado) || convenioRecaudo?.fk_id_tipo_convenio === 3) {
-      await modRecaudo(data)
+      modRecaudo(data)
         .then((data) => {
           data?.status && notify(data?.msg)
           setPago(data?.obj?.ticket)
+          handleClose()
         })
         .catch((err) => {
           notifyError(err?.msg);
+          handleClose()
         });
-      handleClose()
+
     }
     else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
 
@@ -255,11 +252,27 @@ const RecaudoConjunto = () => {
                   label="Valor a recaudar"
                   name="valor_total_trx"
                   autoComplete="off"
-                  min={dataRecaudo?.fk_modificar_valor === 3 ?
-                    (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) : limitesMontos.min}
+                  min={dataRecaudo?.fk_modificar_valor === 3 ? // tipo 3 mayor o igual
+                    (parseInt(convenioRecaudo?.limite_monto[0]) !== 0 &&
+                      parseInt(convenioRecaudo?.limite_monto[0]) >= (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) ?
+                      convenioRecaudo?.limite_monto[0] : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)
+                    ) // declarar min de acuerdo al limite min
+                    : (parseInt(convenioRecaudo?.limite_monto[0]) !== 0 && // tipo 2 (menor o igual) y 4 (cualquier v)
+                      parseInt(convenioRecaudo?.limite_monto[0]) <= (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) ?
+                      convenioRecaudo?.limite_monto[0] : limitesMontos.min
+                    )
+                  }
                   equalError={dataRecaudo?.fk_modificar_valor === 2 ? null : false}
-                  max={dataRecaudo?.fk_modificar_valor === 2 ?
-                    (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) : limitesMontos.max}
+                  max={dataRecaudo?.fk_modificar_valor === 2 ?// tipo 2 menor o igual
+                    (parseInt(convenioRecaudo?.limite_monto[1]) !== 0 &&
+                      parseInt(convenioRecaudo?.limite_monto[1]) <= (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) ?
+                      convenioRecaudo?.limite_monto[1] : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)
+                    )
+                    : (parseInt(convenioRecaudo?.limite_monto[1]) !== 0 && // tipo 3 (mayor o igual) y 4 (cualquier v)
+                      parseInt(convenioRecaudo?.limite_monto[1]) >= (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) ?
+                      convenioRecaudo?.limite_monto[1] : limitesMontos.max
+                    )
+                  }
                   onInput={(e, valor) =>
                     setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
                   }
