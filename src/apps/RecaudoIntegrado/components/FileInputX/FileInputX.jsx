@@ -114,8 +114,9 @@ const FileInputX = ({ banco }) => {
       Validar_archivo(banco_minuscula, nombreArchivoS3).then((res) => {
         console.log("RESPUESTA VALIDAR", res);
         if (res?.codigo == 400) {
-          setShowModal(true);
+          // setShowModal(true);
           setErrors(res?.obj);
+          window.open(res?.url, "_self");
         }
         setProcesandoValidacion(false);
         document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
