@@ -13,8 +13,9 @@ import { notify, notifyError } from "../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
-
+import { useAuth } from "../../../hooks/AuthHooks";
 const PpsVoluntario = ({ datosConsulta }) => {
+  const { pdpUser } = useAuth();
   const [limitesMontos] = useState({
     max: 149000,
     min: 5000,
@@ -38,8 +39,9 @@ const PpsVoluntario = ({ datosConsulta }) => {
   const [numPagosPdp, setNumPagosPdp] = useState(0);
   const [tipoDomiciliacion, setTipoDomiciliacion] = useState(1);
   const [showModal, setShowModal] = useState(true);
+  const [nombreUsuario, setNombreUsuariol] = useState(pdpUser?.uname);
   const navigate = useNavigate();
-
+  // console.log(pdpUser?.uname);
   const { contenedorImagen, contenedorFormulario } = classes;
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -48,7 +50,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
   const url = process.env.REACT_APP_URL_COLPENSIONES;
   // const url = "http://127.0.0.1:2500";
 
-  useEffect(() => {}, [numCelular]);
+  useEffect(() => {}, [numCelular, nombreUsuario]);
 
   //Consultar
   // useEffect(() => {
@@ -98,6 +100,7 @@ const PpsVoluntario = ({ datosConsulta }) => {
             // estado_pago: "",
             tipo_pps: "voluntario",
             num_pago_pdp: numPagosPdp,
+            nombre_usuario: nombreUsuario,
             tipo_domiciliacion: tipoDomiciliacion,
           },
           {},
