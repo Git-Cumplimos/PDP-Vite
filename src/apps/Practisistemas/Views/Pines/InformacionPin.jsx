@@ -5,10 +5,10 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { postConsultaPin } from "../../utils/fetchBackPines";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
-
+import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 const InformacionPin = () => {
   const navigate = useNavigate();
-  ////////////////////
+  const [showLoading, setShowLoading] = useState(false);
 
   const { state } = useLocation();
 
@@ -59,12 +59,14 @@ const InformacionPin = () => {
   }, [datosTrans]);
 
   const fecthTablaTiposPines = () => {
+    setShowLoading(true)
     postConsultaPin({
       idcomercio: roleInfo?.["id_comercio"],
       producto: state.op,
       pin: datosTrans.pin,
     })
       .then((autoArr) => {
+        setShowLoading(false)
         setPines(autoArr?.results ?? []);
       })
       .catch((err) => console.error(err));
@@ -72,6 +74,7 @@ const InformacionPin = () => {
 
   return (
     <>
+      <SimpleLoading show={showLoading} />
       <h1 className="text-3xl text-center">Información del Pin</h1>
       <TableEnterprise
         title="Tabla pines"
