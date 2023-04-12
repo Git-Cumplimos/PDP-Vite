@@ -196,8 +196,8 @@ const FormularioRetiro = () => {
                 label={dict?.nombre_referencia ?? "Referencia 1"}
                 name={'referencia' + (index + 1)}
                 type="text"
-                // minLength={dict?.length[0]}
-                // maxLength={dict?.length[1]}
+                minLength={dict['length'][0] ?? 0}
+                maxLength={dict['length'][1] ?? 20}
                 value={dataReferencias['referencia' + (index + 1)]}
                 onChange={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: e.target.value }) }}
                 autoComplete="off"

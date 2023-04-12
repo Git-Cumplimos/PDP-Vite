@@ -218,6 +218,8 @@ const RecaudoConjunto = () => {
                 key={index}
                 id={dict?.nombre_referencia ?? `referencia ${index + 1}`}
                 label={dict?.nombre_referencia ?? "Referencia 1"}
+                minLength={convenioRecaudo['referencias'][index]['length'][0] ?? 0}
+                maxLength={convenioRecaudo['referencias'][index]['length'][1] ?? 20}
                 name={'referencia' + (index + 1)}
                 type="text"
                 value={dataReferencias['referencia' + (index + 1)]}
