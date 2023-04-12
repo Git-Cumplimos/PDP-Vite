@@ -3,6 +3,8 @@ import { lazy } from "react";
 /**
  * Rutas
  */
+import rutasIAM from "../apps/IAM/routes";
+
 import rutasBancolombiaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialBancolombia/routes";
 import rutasDaviviendaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialDavivienda/routes";
 
@@ -448,13 +450,13 @@ const allUrlsPrivateApps = [
       ],
     })),
   },
-
   {
     link: "/transacciones",
     label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones" />,
     component: Transacciones,
     permission: [8],
   },
+  rutasIAM,
   {
     link: "/update-commerce",
     label: <AppIcons Logo={"ACTUALIZACION"} name="Actualizacion de datos" />,
@@ -523,7 +525,7 @@ const allUrlsPrivateApps = [
   },
 
   {
-    link: "/PinesVus",
+    link: "/Pines",
     label: <AppIcons Logo={"CrearPines"} name="Pines" />,
     component: PinesVus,
     permission: [
