@@ -438,7 +438,7 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
             <Button onClick={handlePrint}>Imprimir</Button>
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <Button onClick={() => { setShowModal(false);  fun()}}>Cancelar</Button>
           </div>
         </Modal>
       ) : (
