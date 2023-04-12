@@ -80,8 +80,13 @@ const GestionArchivosRetiro = () => {
 
   const CargarArchivo = useCallback(async (e) => {
     e.preventDefault();
-    if (selected.fk_id_tipo_convenio === 1) {
 
+    if (file.type !== 'text/csv'){
+      notifyError('Tipo de archivo incorrecto')
+      return;
+    }
+    
+    if (selected.fk_id_tipo_convenio === 1) {
       notifyPending(
         cargarArchivoRetiro(
           file,

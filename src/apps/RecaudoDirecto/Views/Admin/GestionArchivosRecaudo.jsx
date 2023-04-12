@@ -83,7 +83,10 @@ const GestionArchivosRecaudo = () => {
   const CargarArchivo = useCallback(
     async (e) => {
       e.preventDefault();
-
+      if (file.type !== 'text/csv'){
+        notifyError('Tipo de archivo incorrecto')
+        return;
+      }
       if (selected.fk_id_tipo_convenio === 1) {
         notifyPending(
           cargarArchivoRecaudo(
@@ -138,7 +141,6 @@ const GestionArchivosRecaudo = () => {
             }
             if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2001') {
               descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
-              // descargarTXT(res)
               return;
             }
             notifyError('Funcion para este archivo en desarrollo')
@@ -310,11 +312,11 @@ const GestionArchivosRecaudo = () => {
             <Input
               // label='Seleccionar Archivo'
               type="file"
-              accept=".csv"
               autoComplete="off"
               onChange={(e) => {
                 setFile(e.target.files[0]);
               }}
+              accept=".csv"
               required
             />
           )}
