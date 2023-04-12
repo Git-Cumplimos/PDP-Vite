@@ -237,7 +237,7 @@ export const useProvideLoteria = () => {
         }
       }
     }
-  }, [pathname, roleInfo]);
+  }, [pathname, roleInfo,codigosOficina,consulta_codigos_oficina]);
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -510,6 +510,7 @@ export const useProvideLoteria = () => {
       nombre_usuario,
       tickets,
     ) => {
+      console.log("codigosOficina?.cod_oficina_lot-->",codigosOficina?.cod_oficina_lot)
       if (tipopago == 2) {
         try {
           const res = await fetchData(
