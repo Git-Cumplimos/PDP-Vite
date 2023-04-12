@@ -23,7 +23,7 @@ import {
 
 // ************ constantes *******************
 const minValor = 1000;
-const maxValor = 300001;
+const maxValor = 9000000;
 const dataInputInitial = {
   documento: "",
   numeroCelular: "",

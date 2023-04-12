@@ -285,7 +285,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 20000000],
+    limits: [1, 9999999],
     decimalDigits: 2,
   });
   return (
