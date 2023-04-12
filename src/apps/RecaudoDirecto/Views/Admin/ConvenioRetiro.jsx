@@ -43,9 +43,9 @@ const RetiroDirecto = () => {
     [
       ["REFERENCIA_1", "REFERENCIA_2",
         "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "FECHA_VENCIMIENTO", "NUMERO_QUINCENA"],
-      [ 332421666, 5645454, "apellido", 50000, "8/06/2023", 125],
-      [ 332421667, 5456458, "apellido", 865000, "8/06/2023", 125],
-      [ 332421668, 5456458, "apellido", 20000, "8/06/2023", 125],
+      [332421666, 5645454, "apellido", 50000, "8/06/2023", 125],
+      [332421667, 5456458, "apellido", 865000, "8/06/2023", 125],
+      [332421668, 5456458, "apellido", 20000, "8/06/2023", 125],
     ]
   )
   const tipoModificacion = [
@@ -55,6 +55,10 @@ const RetiroDirecto = () => {
   const tipoConvenio = [
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
+  ]
+  const tipoArchivoConciliacion = [
+    { label: "Reporte Generico csv", value: "Reporte Generico csv" },
+    { label: "Asobancaria 2001", value: "Asobancaria 2001" }
   ]
 
   useEffect(() => {
@@ -432,6 +436,15 @@ const RetiroDirecto = () => {
               </ButtonBar>
             }
           </Fieldset>
+          <Select
+            className="place-self-stretch mb-1"
+            id={"Tipo_archivo"}
+            label={"Tipo archivo Conciliación"}
+            name={"fk_nombre_tipo_archivo"}
+            options={[{ label: "", value: "" }, ...tipoArchivoConciliacion]}
+            defaultValue={selected?.fk_nombre_tipo_archivo ?? ""}
+            required
+          />
           <TextArea
             id={"Observaciones"}
             label={"Observaciones"}

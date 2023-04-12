@@ -10,7 +10,10 @@ import Tickets from "../../../../components/Base/Tickets";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { useReactToPrint } from "react-to-print";
 import { notify, notifyError } from "../../../../utils/notify";
-import { getRetiro, modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
+import { modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
+import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+
+const url = 'http://127.0.0.1:8000/retiro/consultar-retiro'
 
 const FormularioRetiro = () => {
   const navigate = useNavigate()
@@ -46,6 +49,20 @@ const FormularioRetiro = () => {
       referencia2: ''
     })
   }, []);
+
+  const [consultaFetch] = useFetchDispatchDebounce({
+    onSuccess: useCallback((data) => {
+      setDataRetiro(data?.obj.retiro ?? "")
+      setId_Trx(data?.obj?.id_trx ?? "")
+      if (data?.obj?.retiro?.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.retiro?.valor }) }
+      notify(data.msg)
+      setShowModal(true);
+    }, []),
+    onError: useCallback((err) => {
+      notifyError(err?.message);
+      handleClose()
+    }, [handleClose]),
+  });
 
   const getData = useCallback(async () => {
     try {
@@ -84,20 +101,15 @@ const FormularioRetiro = () => {
         valor_total_trx: 0,
         nombre_usuario: pdpUser?.uname ?? "",
       };
-      getRetiro(data)
-        .then((data) => {
-          setDataRetiro(data?.obj.retiro ?? "")
-          setId_Trx(data?.obj?.id_trx ?? "")
-          if (data?.obj?.retiro?.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.retiro?.valor }) }
-          notify(data.msg)
-          setShowModal(true);
-        })
-        .catch((err) => {
-          notifyError(err?.message);
-          handleClose()
-        });
-
-    }, [pk_id_convenio, handleClose, dataReferencias, dataConvRetiro, roleInfo, pdpUser])
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      };
+      consultaFetch(`${url}`, options)
+    }, [pk_id_convenio, consultaFetch, dataReferencias, dataConvRetiro, roleInfo, pdpUser])
 
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
@@ -107,7 +119,7 @@ const FormularioRetiro = () => {
 
     let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
     let sumaTotal = valoresRecibido + dataRetiro.valor_retirado
-    
+
     const FlujosTRX = {
       1: () => sumaTotal === dataRetiro.valor ?
         { estado: true } : undefined,
@@ -225,12 +237,12 @@ const FormularioRetiro = () => {
               label="Valor a retirar"
               name="valor_total_trx"
               autoComplete="off"
-              min={parseInt(dataConvRetiro?.limite_monto[0])  !== 0 && // tipo 2 (menor o igual) 
+              min={parseInt(dataConvRetiro?.limite_monto[0]) !== 0 && // tipo 2 (menor o igual) 
                 parseInt(dataConvRetiro?.limite_monto[0]) <= (dataRetiro.valor - dataRetiro.valor_retirado ?? 0) ?
                 parseInt(dataConvRetiro?.limite_monto[0]) : limitesMontos.min
               }
               equalError={dataRetiro?.fk_modificar_valor === 2 ? null : false}
-              
+
               max={parseInt(dataConvRetiro?.limite_monto[1]) !== 0 &&
                 parseInt(dataConvRetiro?.limite_monto[1]) <= (dataRetiro.valor - dataRetiro.valor_retirado ?? 0) ?
                 parseInt(dataConvRetiro?.limite_monto[1]) : (dataRetiro.valor - dataRetiro.valor_retirado ?? 0)

@@ -122,6 +122,7 @@ const GestionArchivosRecaudo = () => {
       );
       const body = {
         convenio_id: selected.pk_id_convenio_directo,
+        nombre_convenio:selected.nombre_convenio,
         ...timebody
       }
       const tipoArchivo = {
@@ -133,11 +134,14 @@ const GestionArchivosRecaudo = () => {
           .then(async (res) => {
             if (selected.fk_nombre_tipo_archivo === 'Reporte Generico csv') {
               descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
+              return;
             }
             if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2001') {
               descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
+              // descargarTXT(res)
               return;
-            } else { notifyError('Funcion para este archivo en desarrollo'); }
+            }
+            notifyError('Funcion para este archivo en desarrollo')
           })
           .catch((err) => {
             if (err?.cause === "custom") {
@@ -320,7 +324,7 @@ const GestionArchivosRecaudo = () => {
                 type="date"
                 autoComplete="off"
                 name={"fecha_inicial"}
-                label={"Fecha inicial"}
+                label={`Fecha${selected.fk_nombre_tipo_archivo === 'Reporte Generico csv'? " inicial":""}`}
                 required
               />
               {selected.fk_nombre_tipo_archivo === 'Reporte Generico csv' && (

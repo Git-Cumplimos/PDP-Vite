@@ -181,8 +181,11 @@ export const addConveniosRetiroList = buildPostFunction(
 export const modConveniosRetiroList = buildPutFunction(
   `${url}/convenio-retiro/modificar`
 );
-export const downloadFileRetiro = descargarReporte(
+export const downloadCsvRetiro = descargarReporteP(
   `${url}/convenio-retiro/descargar-reporte`
+);
+export const downloadTxtRetiro = descargarReporteP(
+  `${url}/convenio-retiro/descargar-reporte-txt`
 );
 export const cargarArchivoRetiro = cargueArchivo(
   `${url}/convenio-retiro-masivo/obtener-url-carga`,

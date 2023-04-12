@@ -10,8 +10,10 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useReactToPrint } from "react-to-print";
 import Tickets from "../../../../components/Base/Tickets";
-import { getRecaudo, searchConveniosRecaudoList, modRecaudo } from "../../utils/fetchFunctions"
+import { searchConveniosRecaudoList, modRecaudo } from "../../utils/fetchFunctions"
+import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 
+const url = 'http://127.0.0.1:8000/recaudo/consulta-recaudo'
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
@@ -33,13 +35,6 @@ const RecaudoConjunto = () => {
     max: 99999999,
     min: 1,
   };
-
-  const printDiv = useRef();
-
-  const handlePrint = useReactToPrint({
-    content: () => printDiv.current,
-  });
-
   const handleClose = useCallback(() => {
     setShowModal(false);
     setDataRecaudo('')
@@ -51,6 +46,26 @@ const RecaudoConjunto = () => {
       valor_total_trx: ''
     })
   }, []);
+
+  const [consultaFetch] = useFetchDispatchDebounce({
+    onSuccess: useCallback((data) => {
+      setDataRecaudo(data?.obj?.recaudo)
+          setId_Trx(data?.obj?.id_trx ?? false)
+          data?.obj?.recaudo && notify(data.msg)
+          if (data?.obj?.recaudo.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.recaudo.valor }) }
+          setShowModal(true);
+    }, []),
+    onError: useCallback((err) => {
+      notifyError(err?.message);
+      handleClose()
+    }, [handleClose]),
+  });
+
+  const printDiv = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
 
   const getData = useCallback(async () => {
     try {
@@ -86,20 +101,15 @@ const RecaudoConjunto = () => {
           roleInfo?.tipo_comercio === "KIOSCO",
         nombre_usuario: pdpUser?.uname ?? "",
       };
-      getRecaudo(data)
-        .then((data) => {
-          setDataRecaudo(data?.obj?.recaudo)
-          setId_Trx(data?.obj?.id_trx ?? false)
-          data?.obj?.recaudo && notify(data.msg)
-          if (data?.obj?.recaudo.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.recaudo.valor }) }
-          setShowModal(true);
-        })
-        .catch((err) => {
-          notifyError(err?.message);
-          handleClose()
-        })
-
-    }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, handleClose])
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      };
+      consultaFetch(`${url}`, options)
+    }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, consultaFetch])
 
 
   const hacerRecaudo = useCallback(async (e) => {
@@ -133,7 +143,7 @@ const RecaudoConjunto = () => {
     resp = ValidacionTRX[dataRecaudo?.fk_modificar_valor]?.() || { estado: false };
     data.recaudo = {
       convenio_id: pk_id_convenio,
-      nombre_convenio: dataRecaudo?.nombre_convenio ?? "",
+      nombre_convenio: convenioRecaudo?.nombre_convenio ?? "",
       pk_id_recaudo: dataRecaudo.pk_id_recaudo,
       referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
     }

@@ -19,11 +19,22 @@ export const descargarCSV = (nombreArchivo, info) => {
   const data = JSON.stringify(info);
   csvExporter.generateCsv(data);
 }
-export const descargarTXT= (nombreArchivo, info) => {
-  const blob = new Blob([info]);
-  const url = window.URL.createObjectURL(blob);
+// export const descargarTXT= (nombreArchivo, info) => {
+//   const blob = new Blob([info]);
+//   const url = window.URL.createObjectURL(blob);
+//   const a = document.createElement('a');
+//   a.href = url;
+//   a.download = `${nombreArchivo}.txt`;
+//   a.click();
+//   window.URL.revokeObjectURL(url);
+// }
+export const descargarTXT= async(nombreArchivo, url) => {
+  const response = await fetch(url);
+  const content = await response.text();
+  const blob = new Blob([content]);
+  const link = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
+  a.href = link;
   a.download = `${nombreArchivo}.txt`;
   a.click();
   window.URL.revokeObjectURL(url);
