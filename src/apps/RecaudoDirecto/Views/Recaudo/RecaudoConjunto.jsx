@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -20,6 +20,7 @@ const RecaudoConjunto = () => {
 
   const { roleInfo, pdpUser } = useAuth();
   const { pk_id_convenio } = useParams()
+  const [searchParams] = useSearchParams();
   const [showModal, setShowModal] = useState(false)
   const [dataRecaudo, setDataRecaudo] = useState('')
   const [id_trx, setId_Trx] = useState(null)
@@ -166,6 +167,21 @@ const RecaudoConjunto = () => {
     pk_id_convenio, convenioRecaudo, dataReferencias, handleClose])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
+
+  useEffect(() => {
+    const urlData = Object.fromEntries(searchParams);
+    if ("refs" in urlData ) {
+      setDataReferencias(
+        Object.fromEntries(
+          [1, 2]
+            .map((ref) => [
+              `referencia${ref}`,
+              JSON.parse(urlData.refs)?.[`referencia${ref}`] ?? "",
+            ])
+        )
+      );
+    }
+  }, [searchParams]);
 
   return (
     <Fragment>

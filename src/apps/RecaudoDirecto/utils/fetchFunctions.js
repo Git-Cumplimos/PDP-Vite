@@ -158,6 +158,9 @@ export const cargarArchivoRecaudo = cargueArchivo(
   `${url}/convenio-recaudo-masivo/obtener-url-carga`,
   `${url}/convenio-recaudo-masivo/verificar-archivo`
 );
+export const decoCodigoBarras = buildPostFunction(
+  `${url}/convenio-recaudo/codigo-barras`
+);
 
 /* -- Recaudo -- */
 export const getRecaudo = buildPostFunction(
