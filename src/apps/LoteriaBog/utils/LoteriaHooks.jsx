@@ -237,7 +237,7 @@ export const useProvideLoteria = () => {
         }
       }
     }
-  }, [pathname, roleInfo]);
+  }, [pathname,roleInfo,codigosOficina]);
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
