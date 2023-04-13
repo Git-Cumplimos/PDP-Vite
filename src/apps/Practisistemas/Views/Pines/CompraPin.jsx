@@ -30,7 +30,7 @@ const tipo_operacion = 113;
 
 const CompraPin = () => {
   const { contenedorbtn, contenedorTitulos } = classes;
-  const { roleInfo, userInfo, infoTicket } = useAuth();
+  const { roleInfo, userInfo, pdpUser, infoTicket } = useAuth();
   const [inputCelular, setInputCelular] = useState("");
   const [inputContador, setInputContador] = useState("");
   const [inputPlaca, setInputPlaca] = useState("");
@@ -114,6 +114,7 @@ const CompraPin = () => {
         })
         .catch((err) => {
           notifyError("Error respuesta PDP:Transaccón declinada", err)
+          setShowLoading(false);
           // notifyError("Transaccón declinada", err);
         });
     } else if (state?.op == "em") {
@@ -151,6 +152,7 @@ const CompraPin = () => {
         })
         .catch((err) => {
           notifyError("Error respuesta PDP:Transaccón declinada", err)
+          setShowLoading(false);
         });
     }
   };
@@ -265,7 +267,6 @@ const CompraPin = () => {
 
   const compraPines = () => {
     setShowLoading(true);
-
     const uniqueId = v4();
     const fecha = Intl.DateTimeFormat("es-CO", {
       year: "numeric",
@@ -347,13 +348,16 @@ const CompraPin = () => {
               : inputValor,
         jsonAdicional: state?.op == "hv" ? {
           placaVh: inputPlaca,
+          "nombre_usuario": pdpUser?.uname ?? "",
         } : state?.op == "em" ? {
+            "nombre_usuario": pdpUser?.uname ?? "",
           telEnvio: inputCelular,
-        } : state?.op == "cb" ? {
+          } : state?.op == "cb" ? {
+              "nombre_usuario": pdpUser?.uname ?? "",
           circulo: inputCirculo,
           matricula: inputMatricula,
         } : {
-
+                "nombre_usuario": pdpUser?.uname ?? "",
         },
         ticket: newVoucher,
       },
@@ -366,6 +370,14 @@ const CompraPin = () => {
           notify("Venta exitosa");
           setShowLoading(false);
           VentaExitosa(res?.obj?.response, fecha, hora);
+        } else if (res?.obj?.response?.respuesta == "Error respuesta practisistemas: No se recibi\u00f3 respuesta del autorizador en el tiempo esperado [0010003]") {
+          notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
+          setShowLoading(false)
+          handleClose()
+        } else if (res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (consulta_compra_pines) [0010002]) -> list index out of range") {
+          notifyError("Error respuesta PDP: (Fallo al consumir el servicio (consulta_compra_pines)[0010002]");
+          setShowLoading(false)
+          handleClose()
         } else {
           if (res?.message === "Endpoint request timed out") {
             notify("Se está procesando la transacción");
@@ -377,7 +389,7 @@ const CompraPin = () => {
               day: "2-digit",
             }).format(today);
 
-            for (let i = 0; i <= 8; i++) {
+            for (let i = 0; i <= 7; i++) {
               try {
                 const promesa = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -400,12 +412,16 @@ const CompraPin = () => {
                             notifyError(
                               typeof res?.msg == typeof {}
                                 ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                                : res?.msg);
+                                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg
+                            );
                             setShowLoading(true);
                             setShowModal(false);
                             showModalDatosEPM(false);
                             showModalDatosSNR(false);
                             setInputCelular("");
+                            setInputMatricula("")
+                            setInputCirculo("")
+                            setInputPlaca("")
                             setInputValor(0);
                             resolve(true);
                           }
@@ -418,9 +434,20 @@ const CompraPin = () => {
                         setShowLoading(false);
                         console.error(err);
                       });
-                  }, 11000)
+                  }, 9000)
                 );
                 if (promesa === true) {
+                  setShowLoading(false);
+                  handleClose();
+                  break;
+                }
+                if (i >= 3) {
+                  // notify(
+                  //   "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
+                  // );
+                  notify(
+                    "Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]"
+                  );
                   setShowLoading(false);
                   handleClose();
                   break;
@@ -428,11 +455,16 @@ const CompraPin = () => {
               } catch (error) {
                 console.error(error);
               }
-              notify(
-                "Su transacción esta siendo procesada, no recargue la página"
-              );
+              if (i <= 3) { 
+                notify(
+                  "Su transacción esta siendo procesada, no recargue la página"
+                );
+
+              }
             }
             validNavigate("/Pines/PinesContenido");
+            // No se muestra esta notificación ya que se debe revisar el estado de la trx si quedo aprobada o rechazada
+            // notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003] Numero2");
           } else {
             notifyError(
               res?.obj?.response?.respuesta ==
@@ -440,29 +472,43 @@ const CompraPin = () => {
                 ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
                 : typeof res?.msg == typeof {}
                   ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                  : res?.msg
+                  : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])": res?.msg
             );
             setShowLoading(false);
             showModalDatosEPM(false);
             showModalDatosSNR(false);
             setShowModal(false);
             setInputCelular("");
+            setInputMatricula("")
+            setInputCirculo("")
+            setInputPlaca("")
             setInputValor(0);
           }
         }
       }).catch(async (err) => {
-        notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
+        if (err.name === "AbortError") {
+          // lanzar notificación para timeOut
+          notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
+        } else if (err.name === "TypeError") {
+          // lanzar notificación para fetch fallido
+          notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
+
+        } else {
+          // otro tipo de error
+          notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
+
+        }
         setShowLoading(false);
         handleClose();
       });
   };
 
   const VentaExitosa = (result_, fecha, hora) => {
-    if (result_?.jsonAdicional?.info) {
+    // if (result_?.jsonAdicional?.info) {
 
-      const pin = result_?.jsonAdicional?.info;
-      var hiddenPin = '******' + pin.substring(6);
-    }
+    //   const pin = result_?.jsonAdicional?.info;
+    //   var hiddenPin = '******' + pin.substring(6);
+    // }
     const voucher = {
       title: "Recibo de pago",
       timeInfo: {
@@ -491,7 +537,7 @@ const CompraPin = () => {
           : state?.op == "hv"
             ? ["No. PIN", result_?.jsonAdicional?.Url2]
             : state?.op == "nx"
-              ? ["No. PIN", hiddenPin]
+              ? ["No. PIN", result_?.jsonAdicional?.info]
               : state?.op == "cb"
                 ? ["No. PIN", result_?.jsonAdicional?.Url]
                 : ["", ""],
@@ -524,7 +570,6 @@ const CompraPin = () => {
 
     // infoTicket(result_.idtrans, tipo_operacion, voucher)
     //   .then((resTicket) => {
-    //     console.log(resTicket);
     //   })
     //   .catch((err) => {
     //     console.error(err);
@@ -876,7 +921,9 @@ const CompraPin = () => {
               subtitle="Resumen de transacción"
               summaryTrx={{
                 "Número De Contador": inputContador,
+                Descripción: state?.desc,
                 Celular: toPhoneNumber(inputCelular),
+                Pin: "EPM",
                 Valor: formatMoney.format(inputValor),
               }}>
               <>
@@ -893,9 +940,11 @@ const CompraPin = () => {
               title="¿Está seguro de realizar la transacción?"
               subtitle="Resumen de transacción"
               summaryTrx={{
+                Descripción: "Certificado de tradición y libertad",
                 Matricula: inputMatricula,
                 Circulo: inputCirculo,
                 Celular: toPhoneNumber(inputCelular),
+                Pin: state?.desc,
                 Valor: formatMoney.format(consultaDatosSNR?.valorPin),
               }}>
               <>
@@ -912,8 +961,9 @@ const CompraPin = () => {
               title="¿Está seguro de realizar la transacción?"
               subtitle="Resumen de transacción"
               summaryTrx={{
-                Placa: inputPlaca,
+                Descripción: "Histórico Vehicular",
                 Celular: toPhoneNumber(inputCelular),
+                Placa: inputPlaca,
                 Valor: formatMoney.format(inputValor),
               }}>
               <>
@@ -930,7 +980,9 @@ const CompraPin = () => {
               title="¿Está seguro de realizar la transacción?"
               subtitle="Resumen de transacción"
               summaryTrx={{
+                Descripción:state?.desc,
                 Celular: toPhoneNumber(inputCelular),
+                Pin: state?.op === "nx" ? "Netflix" : state?.op === "sf" ? "Spotify" : state?.op === "xb" ? "Xbox" : state?.op === "of" ? "Microsoft Office" : state?.op === "pt" ? "Play Station" : state?.op === "ka" ? "Kaspersky" : state?.op === "ra" ? "Razer GOLD" : state?.op === "iu" ? "Imvu" : state?.op === "ws" ? "WinSports" : state?.op === "j4" ? "J4 Infinity" : state?.op === "pp" ? "Paramount+" : state?.op === "dz" ? "Deezer" : state?.op === "cr" ? "Crunchyroll" : state?.op === "dg" ? "Directv GO" : state?.op,
                 Valor: formatMoney.format(
                   state?.sell ? state?.sell : inputValor
                 ),

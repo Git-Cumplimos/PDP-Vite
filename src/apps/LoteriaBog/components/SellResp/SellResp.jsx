@@ -21,7 +21,8 @@ const SellResp = ({
   closeModal,
   setCustomer,
   selecFrac,
-  setSelecFrac
+  setSelecFrac,
+  fecha_trx
 }) => {
   const pageStyle = `
   @page {
@@ -67,45 +68,6 @@ const SellResp = ({
     pageStyle: pageStyle,
   });
 
-  const voucherInfo = useMemo(() => {
-    const vinfo = {};
-    if (sellResponse?.status) {
-      sellResponse.obj.fecha_venta = sellResponse?.obj?.fecha_venta.replace(/-/g, "/");
-
-      vinfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-      }).format(new Date(sellResponse?.obj?.fecha_venta));
-      vinfo["Hora"] = Intl.DateTimeFormat("es-CO", {
-        hour: "numeric",
-        minute: "numeric",
-        second: "numeric",
-        hour12: false,
-      }).format(new Date(sellResponse?.obj?.fecha_venta));
-
-      vinfo["Nombre de loteria"] = sellResponse?.obj?.nom_loteria;
-      vinfo.Comercio = roleInfo.id_comercio;
-      vinfo["Dirección"] = roleInfo.direccion;
-      vinfo.Fracciones = sellResponse?.obj?.fracciones;
-      vinfo["Id Transacción"] = sellResponse?.obj?.id_Transaccion;
-      vinfo["Numero de billete"] = sellResponse?.obj?.num_billete;
-      vinfo.ciudad = roleInfo.ciudad;
-      vinfo.Serie = sellResponse?.obj?.serie;
-      vinfo["Valor pagado"] = sellResponse?.obj?.valor_pago;
-      vinfo.id_trx = sellResponse?.obj?.["id_trx"];
-      vinfo["No.terminal"] = roleInfo.id_dispositivo;
-
-      return vinfo;
-    }
-  }, [
-    roleInfo.ciudad,
-    roleInfo.direccion,
-    roleInfo.id_comercio,
-    roleInfo.id_dispositivo,
-    sellResponse,
-  ]);
-  
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
@@ -114,13 +76,13 @@ const SellResp = ({
           year: "2-digit",
           month: "2-digit",
           day: "2-digit",
-        }).format(new Date()),
+        }).format(fecha_trx),
         Hora: Intl.DateTimeFormat("es-CO", {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
           hour12: false,
-        }).format(new Date()),
+        }).format(fecha_trx),
       },
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
@@ -155,9 +117,9 @@ const SellResp = ({
         ["", ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [roleInfo, sellResponse,operacion,selecFrac]);
+  }, [roleInfo, sellResponse,operacion,selecFrac,fecha_trx]);
  
   return !sellResponse?.status ? (
     <div className="flex flex-col justify-center items-center">

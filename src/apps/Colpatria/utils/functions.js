@@ -8,9 +8,9 @@ import { encrypt3DES, decrypt3DES } from "../../../utils/functions";
 export function encryptPin(pin) {
   return encrypt3DES(
     `${pin}`.padStart(16, "0"),
-    "EFBAE60423DCF2FE",
-    "8F7973DFABEA3D97",
-    "EFBAE60423DCF2FE"
+    process.env.REACT_APP_URL_COLPATRIA_3DES_ENCRYPT_K1,
+    process.env.REACT_APP_URL_COLPATRIA_3DES_ENCRYPT_K2,
+    process.env.REACT_APP_URL_COLPATRIA_3DES_ENCRYPT_K3
   );
 }
 
@@ -23,9 +23,9 @@ export function decryptPin(pin_encriptado) {
   return Number(
     decrypt3DES(
       pin_encriptado,
-      "EFBAE60423DCF2FE",
-      "8F7973DFABEA3D97",
-      "EFBAE60423DCF2FE"
+      process.env.REACT_APP_URL_COLPATRIA_3DES_DECRYPT_K1,
+      process.env.REACT_APP_URL_COLPATRIA_3DES_DECRYPT_K2,
+      process.env.REACT_APP_URL_COLPATRIA_3DES_DECRYPT_K3
     )
   );
 }

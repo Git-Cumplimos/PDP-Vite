@@ -25,7 +25,7 @@ const FormularioVentaSoat = () => {
   const { contenedorbtn, contenedorTitulos } = classes;
   const navigate = useNavigate();
   const printDiv = useRef();
-  const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
+  const { quotaInfo, roleInfo, infoTicket, userInfo, pdpUser } = useAuth();
 
   //******************* Datos del propietario (Variables) ***************
   const [datosPropietarioSoat, setDatosPropietarioSoat] = useState({
@@ -254,7 +254,7 @@ const FormularioVentaSoat = () => {
           tipoSoat: datosPropietarioSoat?.claseSoat,
           linea: datosPropietarioSoat?.linea,
           idtrans: datosPropietarioSoat?.idTransaccion,
-          nombre_usuario: userInfo?.attributes?.name,
+          "nombre_usuario": pdpUser?.uname ?? "",
         },
       },
     })

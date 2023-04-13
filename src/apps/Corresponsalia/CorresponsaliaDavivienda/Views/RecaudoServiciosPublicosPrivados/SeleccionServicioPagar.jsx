@@ -4,6 +4,7 @@ import Input from "../../../../../components/Base/Input";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { postConsultaTablaConveniosPaginado } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
 
 const SeleccionServicioPagar = () => {
   const navigate = useNavigate();
@@ -68,24 +69,29 @@ const SeleccionServicioPagar = () => {
     [navigate, convenios, pathname]
   );
 
+  const fecthTablaConveniosPaginadoFunc = useDelayedCallback(
+    useCallback(() => {
+      postConsultaTablaConveniosPaginado({
+        nom_convenio_cnb: datosTrans.convenio,
+        cod_convenio_cnb: datosTrans.idConvenio,
+        cod_iac_cnb: datosTrans.idIAC,
+        page,
+        limit,
+      })
+        .then((autoArr) => {
+          setMaxPages(autoArr?.maxPages);
+          setConvenios(autoArr?.results ?? []);
+        })
+        .catch((err) => console.error(err));
+    },[datosTrans, page, limit]),
+    500
+  );
+
   useEffect(() => {
     fecthTablaConveniosPaginadoFunc();
   }, [datosTrans, page, limit]);
 
-  const fecthTablaConveniosPaginadoFunc = () => {
-    postConsultaTablaConveniosPaginado({
-      nom_convenio_cnb: datosTrans.convenio,
-      cod_convenio_cnb: datosTrans.idConvenio,
-      cod_iac_cnb: datosTrans.idIAC,
-      page,
-      limit,
-    })
-      .then((autoArr) => {
-        setMaxPages(autoArr?.maxPages);
-        setConvenios(autoArr?.results ?? []);
-      })
-      .catch((err) => console.error(err));
-  };
+  
   return (
     <>
       <h1 className='text-3xl text-center mt-5'>

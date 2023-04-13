@@ -43,7 +43,13 @@ const ModificarPps = () => {
   const [numPagosPdp, setNumPagosPdp] = useState("");
   const [estadoComercio, setEstadoComercio] = useState("");
   const [estadoComercioString, setEstadoComercioString] = useState("");
-  const { contenedorLogo, contenedorSubtitle } = classes;
+  const {
+    contenedorLogo,
+    contenedorSubtitle,
+    contenedorSelect,
+    tituloTipoDomiciliacion,
+    estiloSelect,
+  } = classes;
   const navigate = useNavigate();
   //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
   useEffect(() => {
@@ -58,6 +64,12 @@ const ModificarPps = () => {
     setCantNum(contador);
     // console.log(cantNum);
   }
+
+  const hijoAPadre = () => {
+    setBuscarCedula("");
+    setDatosConsulta("");
+    setEstado(false);
+  };
 
   useEffect(() => {
     cantidadNumeroCel(celular);
@@ -286,7 +298,7 @@ const ModificarPps = () => {
             /*    }} */
           ></PaymentSummary>
           <ul className={contenedorSubtitle}>
-            Numero De Identificación: {datosConsulta[0]?.identificacion ?? ""}
+            Número De Identificación: {datosConsulta[0]?.identificacion ?? ""}
           </ul>
           <Form grid onSubmit={(e) => ModificarGuardar(e)}>
             <Fieldset legend="Modificar Domiciliación">
@@ -321,7 +333,7 @@ const ModificarPps = () => {
               <Input
                 id="celular"
                 name="celular"
-                label="Celular: "
+                label="Celular"
                 type="tel"
                 autoComplete="off"
                 minLength="10"
@@ -344,7 +356,7 @@ const ModificarPps = () => {
               <div className={contenedorLogo}>
                 <Input
                   name="N° Pagos Punto Pago"
-                  label="N° Pagos Punto Pago"
+                  label="N.° Pagos Punto de Pago"
                   type="tel"
                   autoComplete="off"
                   minLength={"1"}
@@ -358,19 +370,28 @@ const ModificarPps = () => {
                   }}
                   required
                 />
-                <Select
-                  onChange={(event) =>
-                    setTipoDomiciliacion(event?.target?.value)
-                  }
-                  id="comissionType"
-                  label="Tipo de Domiciliación"
-                  value={tipoDomiciliacion}
-                  options={{
-                    Mensual: 1,
-                    Quincenal: 2,
-                    Semanal: 3,
-                  }}
-                ></Select>
+                <div className={contenedorSelect}>
+                  <div>
+                    <h1 className={tituloTipoDomiciliacion}>
+                      Tipo de Domiciliación
+                    </h1>
+                  </div>
+                  <div className={estiloSelect}>
+                    <Select
+                      onChange={(event) =>
+                        setTipoDomiciliacion(event?.target?.value)
+                      }
+                      id="comissionType"
+                      // label="Tipo de Domiciliación"
+                      value={tipoDomiciliacion}
+                      options={{
+                        Mensual: 1,
+                        Quincenal: 2,
+                        Semanal: 3,
+                      }}
+                    ></Select>
+                  </div>
+                </div>
                 <ToggleInput
                   checked={estadoComercio}
                   onClick={() => setEstadoComercio((old) => !old)}
@@ -382,7 +403,14 @@ const ModificarPps = () => {
             </Fieldset>
             <ButtonBar className={"lg:col-span-2"} type="">
               {<Button type="submit">Modificar y Guardar</Button>}
-              <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+              <Button
+                onClick={() => {
+                  setShowModal(false);
+                  hijoAPadre();
+                }}
+              >
+                Cancelar
+              </Button>
             </ButtonBar>
           </Form>
         </Modal>

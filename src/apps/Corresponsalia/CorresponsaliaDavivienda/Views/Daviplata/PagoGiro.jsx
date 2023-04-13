@@ -92,7 +92,6 @@ const PagoGiro = () => {
           } else {
             setIsUploading(false);
             notifyError(res?.msg);
-            hideModal();
           }
         })
         .catch((err) => {

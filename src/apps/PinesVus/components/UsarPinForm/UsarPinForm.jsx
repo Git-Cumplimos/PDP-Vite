@@ -25,6 +25,7 @@ const UsarPinForm = ({
   id_pin,
   tipoPin,
   setActivarNavigate,
+  datosOlimpia
 }) => {
   const printDiv = useRef();
 
@@ -176,10 +177,10 @@ const UsarPinForm = ({
     objTicket["commerceName"] = textTipoPin
     objTicket["trxInfo"][0] = ["Trámite", "Uso de Pin"]
     objTicket["trxInfo"][1] = ["Valor trámite", formatMoney.format(0)]
-   
+    
 
-    usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin, objTicket) // Pin + IVA
-      .then((res) => {
+    usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin, objTicket, datosOlimpia) // Pin + IVA
+          .then((res) => {
         setNum_tramite("");
         setActivarNavigate(false);
         setDisabledBtn(false);
@@ -286,11 +287,13 @@ const UsarPinForm = ({
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center">
+          <div ref={printDiv}>
           <TicketsPines
               refPrint={null}
               ticket={tickets}
               logo="LogoVus"
           />
+          </div>
           <ButtonBar>
             <Button
               onClick={() => {
