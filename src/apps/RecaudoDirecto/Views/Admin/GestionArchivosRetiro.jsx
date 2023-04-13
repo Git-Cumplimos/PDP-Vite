@@ -8,9 +8,19 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import DataTable from "../../../../components/Base/DataTable";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getUrlRetirosList, downloadFileRetiro, cargarArchivoRetiro } from "../../utils/fetchFunctions"
-import { descargarCSV, onChangeEan13Number, changeDateFormat } from "../../utils/functions";
 import { onChangeNumber } from "../../../../utils/functions";
+import {
+  descargarCSV,
+  descargarTXT,
+  onChangeEan13Number,
+  changeDateFormat
+} from "../../utils/functions";
+import {
+  getUrlRetirosList,
+  downloadCsvRetiro,
+  downloadTxtRetiro,
+  cargarArchivoRetiro
+} from "../../utils/fetchFunctions";
 
 const initialSearchFilters = new Map([
   ["pk_id_convenio_directo", ""],
@@ -31,34 +41,34 @@ const GestionArchivosRetiro = () => {
   const [isNextPage, setIsNextPage] = useState(false);
   const [file, setFile] = useState(null);
 
-  const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
-  useMap(initialSearchFilters);
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
+    useMap(initialSearchFilters);
 
-const [fetchTrxs] = useFetchDispatchDebounce({
-  onSuccess: useCallback((data) => {
-    setListRetiros(data?.obj?.results ?? []);
-    setIsNextPage(data?.obj?.next_exist);
-  }, []),
-  onError: useCallback((error) => {
-    if (!error instanceof DOMException) console.error(error)
-  }, []),
-});
-
-const searchTrxs = useCallback(() => {
-  const tempMap = new Map(searchFilters2);
-  const url = getUrlRetirosList()
-  tempMap.forEach((val, key, map) => {
-    if (!val) {
-      map.delete(key);
-    }
+  const [fetchTrxs] = useFetchDispatchDebounce({
+    onSuccess: useCallback((data) => {
+      setListRetiros(data?.obj?.results ?? []);
+      setIsNextPage(data?.obj?.next_exist);
+    }, []),
+    onError: useCallback((error) => {
+      if (!error instanceof DOMException) console.error(error)
+    }, []),
   });
-  const queries = new URLSearchParams(tempMap.entries()).toString();
-  fetchTrxs(`${url}?${queries}`);
-}, [fetchTrxs, searchFilters2]);
 
-useEffect(() => {
-  searchTrxs();
-}, [searchTrxs]);
+  const searchTrxs = useCallback(() => {
+    const tempMap = new Map(searchFilters);
+    const url = getUrlRetirosList()
+    tempMap.forEach((val, key, map) => {
+      if (!val) {
+        map.delete(key);
+      }
+    });
+    const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${url}?${queries}`);
+  }, [fetchTrxs, searchFilters]);
+
+  useEffect(() => {
+    searchTrxs();
+  }, [searchTrxs]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -70,8 +80,13 @@ useEffect(() => {
 
   const CargarArchivo = useCallback(async (e) => {
     e.preventDefault();
-    if (selected.fk_id_tipo_convenio === 1) {
 
+    if (file.type !== 'text/csv'){
+      notifyError('Tipo de archivo incorrecto')
+      return;
+    }
+    
+    if (selected.fk_id_tipo_convenio === 1) {
       notifyPending(
         cargarArchivoRetiro(
           file,
@@ -103,12 +118,48 @@ useEffect(() => {
   const DescargarReporte = useCallback(async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    const timebody = Object.fromEntries(
+      Object.entries(Object.fromEntries(formData))
+    );
+    // const formData = new FormData(e.currentTarget);
+    // const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    // try {
+    //   downloadFileRetiro({ ...body, convenio_id: selected.pk_id_convenio_directo })
+    //     .then(async (res) => {
+    //       if (res.codigo) throw res.msg
+    //       descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
+    //     })
+    //     .catch((err) => {
+    //       if (err?.cause === "custom") {
+    //         notifyError(err?.message);
+    //         return;
+    //       }
+    //       notifyError(err);
+    //       handleClose()
+    //     })
+    // }
+    const body = {
+      convenio_id: selected.pk_id_convenio_directo,
+      nombre_convenio: selected.nombre_convenio,
+      ...timebody
+    }
+    const tipoArchivo = {
+      'Reporte Generico csv': downloadCsvRetiro,
+      'Asobancaria 2001': downloadTxtRetiro
+    };
     try {
-      downloadFileRetiro({ ...body, convenio_id: selected.pk_id_convenio_directo })
+      tipoArchivo[selected.fk_nombre_tipo_archivo](body)
         .then(async (res) => {
-          if (res.codigo) throw res.msg
-          descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
+          if (selected.fk_nombre_tipo_archivo === 'Reporte Generico csv') {
+            descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
+            return;
+          }
+          if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2001') {
+            descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
+            // descargarTXT(res)
+            return;
+          } 
+          notifyError('Funcion para este archivo en desarrollo')
         })
         .catch((err) => {
           if (err?.cause === "custom") {
@@ -116,8 +167,8 @@ useEffect(() => {
             return;
           }
           notifyError(err);
-          handleClose()
-        })
+          handleClose();
+        });
     }
     catch (e) { console.log(e) }
 
@@ -207,7 +258,7 @@ useEffect(() => {
           </Fragment>
         }
         onChange={(ev) => {
-          setSearchFilters2((old) => {
+          setSearchFilters((old) => {
             const copy = new Map(old)
               .set(
                 ev.target.name, ev.target.value
@@ -282,20 +333,22 @@ useEffect(() => {
           {!showModalOptions && (
             <>
               <Input
-
-                type='date'
-                autoComplete='off'
+                type="date"
+                autoComplete="off"
                 name={"fecha_inicial"}
-                label={"Fecha inicial"}
+                label={`Fecha${selected.fk_nombre_tipo_archivo === 'Reporte Generico csv' ? " inicial" : ""}`}
                 required
               />
-              <Input
-                type='date'
-                autoComplete='off'
-                name={"fecha_final"}
-                label={"Fecha final"}
-                required
-              />
+              {selected.fk_nombre_tipo_archivo === 'Reporte Generico csv' && (
+                <Input
+                  type="date"
+                  autoComplete="off"
+                  name={"fecha_final"}
+                  label={"Fecha final"}
+                  required
+                />
+              )}
+
             </>
           )}
           <ButtonBar>
