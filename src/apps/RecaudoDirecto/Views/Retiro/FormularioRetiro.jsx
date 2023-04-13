@@ -13,7 +13,8 @@ import { notify, notifyError } from "../../../../utils/notify";
 import { modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 
-const url = 'http://127.0.0.1:8000/retiro/consultar-retiro'
+const url = `${process.env.REACT_APP_URL_RECAUDO_RETIRO_DIRECTO}/retiro/consultar-retiro`
+// const url = `http://127.0.0.1:8000/retiro/consultar-retiro`
 
 const FormularioRetiro = () => {
   const navigate = useNavigate()

@@ -28,16 +28,14 @@ export const descargarCSV = (nombreArchivo, info) => {
 //   a.click();
 //   window.URL.revokeObjectURL(url);
 // }
-export const descargarTXT= async(nombreArchivo, url) => {
-  const response = await fetch(url);
-  const content = await response.text();
-  const blob = new Blob([content]);
-  const link = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = link;
-  a.download = `${nombreArchivo}.txt`;
-  a.click();
-  window.URL.revokeObjectURL(url);
+export const descargarTXT = async (nombreArchivo, url) => {
+  try {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${nombreArchivo}.txt`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  } catch (err) { console.error(err) }
 }
 
 const calcularDigitoVerificacion = (myNit) => {
@@ -64,7 +62,7 @@ const calcularDigitoVerificacion = (myNit) => {
     x += y * vpri[z - i];
   }
   y = x % 11;
-  console.log("RESP",y > 1 ? 11 - y : y)
+  console.log("RESP", y > 1 ? 11 - y : y)
   return y > 1 ? 11 - y : y;
 };
 
@@ -105,7 +103,7 @@ export const onChangeNit = (ev) => {
 
   ev.target.value = ((ev.target.value ?? "").match(/[\d-]/g) ?? []).join("");
 
-  const matches = ev.target.value.match(/(\d{3})/g );
+  const matches = ev.target.value.match(/(\d{3})/g);
 
   let newStr = "";
   if (matches && matches[0]) {
@@ -133,7 +131,7 @@ export const onChangeNit = (ev) => {
   return ev.target.value;
 };
 
-export const changeDateFormat = (fecha)=>{
+export const changeDateFormat = (fecha) => {
   const dateFormatter = Intl.DateTimeFormat("es-CO", {
     year: "numeric",
     month: "numeric",

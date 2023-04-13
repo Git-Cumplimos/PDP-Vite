@@ -13,7 +13,8 @@ import Tickets from "../../../../components/Base/Tickets";
 import { searchConveniosRecaudoList, modRecaudo } from "../../utils/fetchFunctions"
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 
-const url = 'http://127.0.0.1:8000/recaudo/consulta-recaudo'
+const url = `${process.env.REACT_APP_URL_RECAUDO_RETIRO_DIRECTO}/recaudo/consulta-recaudo`
+// const url = `http://127.0.0.1:8000/recaudo/consulta-recaudo`
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
