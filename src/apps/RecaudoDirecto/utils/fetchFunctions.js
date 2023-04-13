@@ -81,6 +81,23 @@ export const descargarReporte = (url) => {
     }
   }
 };
+
+export const descargarReporteP = (url) => {
+  return async (body) => {
+    if (!body) {
+      throw new Error("Sin datos en el body", { cause: "custom" });
+    }
+    try {
+      const res = await fetchData(url, "POST", {}, body);
+      if (res?.msg) {
+        throw new Error(res?.msg, { cause: "custom" });
+      }
+      return res;
+    } catch (err) {
+      throw err
+    }
+  };
+};
 export const cargueArchivo = (url_cargar, url_verificar) => {
   return async (file, nombre_convenio, convenio_id) => {
 
@@ -131,12 +148,18 @@ export const addConveniosRecaudoList = buildPostFunction(
 export const modConveniosRecaudoList = buildPutFunction(
   `${url}/convenio-recaudo/modificar`
 );
-export const downloadFileRecaudo = descargarReporte(
+export const downloadCsvRecaudo = descargarReporteP(
   `${url}/convenio-recaudo/descargar-reporte`
+);
+export const downloadTxtRecaudo = descargarReporteP(
+  `${url}/convenio-recaudo/descargar-reporte-txt`
 );
 export const cargarArchivoRecaudo = cargueArchivo(
   `${url}/convenio-recaudo-masivo/obtener-url-carga`,
   `${url}/convenio-recaudo-masivo/verificar-archivo`
+);
+export const decoCodigoBarras = buildPostFunction(
+  `${url}/convenio-recaudo/codigo-barras`
 );
 
 /* -- Recaudo -- */
@@ -161,8 +184,11 @@ export const addConveniosRetiroList = buildPostFunction(
 export const modConveniosRetiroList = buildPutFunction(
   `${url}/convenio-retiro/modificar`
 );
-export const downloadFileRetiro = descargarReporte(
+export const downloadCsvRetiro = descargarReporteP(
   `${url}/convenio-retiro/descargar-reporte`
+);
+export const downloadTxtRetiro = descargarReporteP(
+  `${url}/convenio-retiro/descargar-reporte-txt`
 );
 export const cargarArchivoRetiro = cargueArchivo(
   `${url}/convenio-retiro-masivo/obtener-url-carga`,

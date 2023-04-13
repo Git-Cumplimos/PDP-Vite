@@ -8,9 +8,19 @@ import DataTable from "../../../../components/Base/DataTable";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { getUrlRecaudosList, downloadFileRecaudo, cargarArchivoRecaudo } from "../../utils/fetchFunctions";
-import { descargarCSV, onChangeEan13Number, changeDateFormat } from "../../utils/functions";
 import { onChangeNumber } from "../../../../utils/functions";
+import {
+  descargarCSV,
+  descargarTXT,
+  onChangeEan13Number,
+  changeDateFormat
+} from "../../utils/functions";
+import {
+  getUrlRecaudosList,
+  downloadCsvRecaudo,
+  downloadTxtRecaudo,
+  cargarArchivoRecaudo
+} from "../../utils/fetchFunctions";
 
 const initialSearchFilters = new Map([
   ["pk_id_convenio_directo", ""],
@@ -31,7 +41,9 @@ const GestionArchivosRecaudo = () => {
   const [isNextPage, setIsNextPage] = useState(false);
   const [file, setFile] = useState(null);
 
-  const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
+
+
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
 
   const [fetchTrxs] = useFetchDispatchDebounce({
@@ -45,7 +57,7 @@ const GestionArchivosRecaudo = () => {
   });
 
   const searchTrxs = useCallback(() => {
-    const tempMap = new Map(searchFilters2);
+    const tempMap = new Map(searchFilters);
     const url = getUrlRecaudosList()
     tempMap.forEach((val, key, map) => {
       if (!val) {
@@ -54,7 +66,7 @@ const GestionArchivosRecaudo = () => {
     });
     const queries = new URLSearchParams(tempMap.entries()).toString();
     fetchTrxs(`${url}?${queries}`);
-  }, [fetchTrxs, searchFilters2]);
+  }, [fetchTrxs, searchFilters]);
 
   useEffect(() => {
     searchTrxs();
@@ -71,7 +83,10 @@ const GestionArchivosRecaudo = () => {
   const CargarArchivo = useCallback(
     async (e) => {
       e.preventDefault();
-
+      if (file.type !== 'text/csv'){
+        notifyError('Tipo de archivo incorrecto')
+        return;
+      }
       if (selected.fk_id_tipo_convenio === 1) {
         notifyPending(
           cargarArchivoRecaudo(
@@ -105,16 +120,30 @@ const GestionArchivosRecaudo = () => {
     async (e) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
-      const body = Object.fromEntries(
+      const timebody = Object.fromEntries(
         Object.entries(Object.fromEntries(formData))
       );
+      const body = {
+        convenio_id: selected.pk_id_convenio_directo,
+        nombre_convenio:selected.nombre_convenio,
+        ...timebody
+      }
+      const tipoArchivo = {
+        'Reporte Generico csv': downloadCsvRecaudo,
+        'Asobancaria 2001': downloadTxtRecaudo
+      };
       try {
-        downloadFileRecaudo({
-          ...body,
-          convenio_id: selected.pk_id_convenio_directo,
-        })
+        tipoArchivo[selected.fk_nombre_tipo_archivo](body)
           .then(async (res) => {
-            descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
+            if (selected.fk_nombre_tipo_archivo === 'Reporte Generico csv') {
+              descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
+              return;
+            }
+            if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2001') {
+              descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
+              return;
+            }
+            notifyError('Funcion para este archivo en desarrollo')
           })
           .catch((err) => {
             if (err?.cause === "custom") {
@@ -153,6 +182,7 @@ const GestionArchivosRecaudo = () => {
       descargarCSV('Errores_del_archivo', errores)
       handleClose();
     }, [handleClose, showModalErrors]);
+
 
   return (
     <Fragment>
@@ -212,7 +242,7 @@ const GestionArchivosRecaudo = () => {
           </Fragment>
         }
         onChange={(ev) => {
-          setSearchFilters2((old) => {
+          setSearchFilters((old) => {
             const copy = new Map(old)
               .set(
                 ev.target.name, ev.target.value
@@ -275,18 +305,18 @@ const GestionArchivosRecaudo = () => {
       </Modal>
       <Modal show={showMainModal} handleClose={handleClose}>
         <h2 className="text-3xl mx-auto text-center mb-4">
-        Gestión de archivos de recaudo
+          Gestión de archivos de recaudo
         </h2>
         <Form onSubmit={showModalOptions ? CargarArchivo : DescargarReporte}>
           {showModalOptions && (
             <Input
               // label='Seleccionar Archivo'
               type="file"
-              accept=".csv"
               autoComplete="off"
               onChange={(e) => {
                 setFile(e.target.files[0]);
               }}
+              accept=".csv"
               required
             />
           )}
@@ -296,16 +326,19 @@ const GestionArchivosRecaudo = () => {
                 type="date"
                 autoComplete="off"
                 name={"fecha_inicial"}
-                label={"Fecha inicial"}
+                label={`Fecha${selected.fk_nombre_tipo_archivo === 'Reporte Generico csv'? " inicial":""}`}
                 required
               />
-              <Input
-                type="date"
-                autoComplete="off"
-                name={"fecha_final"}
-                label={"Fecha final"}
-                required
-              />
+              {selected.fk_nombre_tipo_archivo === 'Reporte Generico csv' && (
+                <Input
+                  type="date"
+                  autoComplete="off"
+                  name={"fecha_final"}
+                  label={"Fecha final"}
+                  required
+                />
+              )}
+
             </>
           )}
           <ButtonBar>

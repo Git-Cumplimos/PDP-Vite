@@ -23,7 +23,7 @@ const RecaudoManual = () => {
 
   const [listRecaudos, setListRecaudos] = useState([])
   const [isNextPage, setIsNextPage] = useState(false);
-  const [searchFilters2, { setAll: setSearchFilters2, set: setSingleFilter }] =
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
 
   const [fetchTrxs] = useFetchDispatchDebounce({
@@ -37,7 +37,7 @@ const RecaudoManual = () => {
   });
 
   const searchTrxs = useCallback(() => {
-    const tempMap = new Map(searchFilters2);
+    const tempMap = new Map(searchFilters);
     const url = getUrlRecaudosList()
     tempMap.forEach((val, key, map) => {
       if (!val) {
@@ -46,7 +46,7 @@ const RecaudoManual = () => {
     });
     const queries = new URLSearchParams(tempMap.entries()).toString();
     fetchTrxs(`${url}?${queries}`);
-  }, [fetchTrxs, searchFilters2]);
+  }, [fetchTrxs, searchFilters]);
 
   useEffect(() => {
     searchTrxs();
@@ -104,7 +104,7 @@ const RecaudoManual = () => {
           </Fragment>
         }
         onChange={(ev) => {
-          setSearchFilters2((old) => {
+          setSearchFilters((old) => {
             const copy = new Map(old)
               .set(
                 ev.target.name, ev.target.value
