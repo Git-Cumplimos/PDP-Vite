@@ -442,8 +442,11 @@ const CompraPin = () => {
                   break;
                 }
                 if (i >= 3) {
+                  // notify(
+                  //   "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
+                  // );
                   notify(
-                    "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 2 minutos"
+                    "Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]"
                   );
                   setShowLoading(false);
                   handleClose();

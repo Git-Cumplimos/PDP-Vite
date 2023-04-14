@@ -363,20 +363,23 @@ export const useProvideAuth = () => {
     }, []),
   });
   const [getLoginPdp] = useFetchDispatchDebounce({
-    onSuccess: useCallback((res) => {
-      const pdpU = res?.obj?.pdpU;
-      if (!pdpU && !("active" in pdpU) && !pdpU.active) {
-        notifyError("Usuario inactivo");
-        signOut()
-        return;
-      }
+    onSuccess: useCallback(
+      (res) => {
+        const pdpU = res?.obj?.pdpU;
+        if (!pdpU && !("active" in pdpU) && !pdpU.active) {
+          notifyError("Usuario inactivo");
+          signOut();
+          return;
+        }
 
-      dispatchAuth({
-        type: SET_PERMISSIONS,
-        payload: { uAccess: res?.obj?.uAccess },
-      });
-      dispatchAuth({ type: SET_PDPUSER, payload: { pdpU } });
-    }, [signOut]),
+        dispatchAuth({
+          type: SET_PERMISSIONS,
+          payload: { uAccess: res?.obj?.uAccess },
+        });
+        dispatchAuth({ type: SET_PDPUSER, payload: { pdpU } });
+      },
+      [signOut]
+    ),
     onError: useCallback((error) => {
       if (error?.cause === "custom") {
         notifyError(error.message);
@@ -394,6 +397,11 @@ export const useProvideAuth = () => {
           type: CONFIRM_SIGN_IN,
           payload: { loggedUser: user },
         });
+        Auth.currentUserInfo()
+          .then((uInfo) =>
+            dispatchAuth({ type: SET_USERINFO, payload: { uInfo } })
+          )
+          .catch(() => {});
       })
       .catch(() => {
         dispatchAuth({ type: SIGN_OUT });

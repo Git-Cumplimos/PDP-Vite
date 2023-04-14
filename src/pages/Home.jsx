@@ -12,7 +12,7 @@ import { useWindowSize } from "../hooks/WindowSizeHooks";
 const Home = () => {
   const { urlsPrivateApps } = useUrls();
   const { banners } = useImgs();
-  const [ width ] = useWindowSize()
+  const [width] = useWindowSize();
 
   // const [emails, setEmails] = useState([
   //   "directora.mercadeo@puntodepago.com.co",
@@ -33,12 +33,11 @@ const Home = () => {
         showThumbs={false}
         showStatus={false}
         showIndicators={width > 1024}
-        className="w-3/4 mx-auto hidden md:block"
-      >
+        className='w-3/4 mx-auto hidden md:block'>
         {imgsCarousel.map(({ name, url }) => {
           return (
-            <div className="aspect-w-16 aspect-h-2" key={url}>
-              <img alt={name} src={url} className="object-cover" />
+            <div className='aspect-w-16 aspect-h-2' key={url}>
+              <img alt={name} src={url} className='object-cover' />
             </div>
           );
         })}

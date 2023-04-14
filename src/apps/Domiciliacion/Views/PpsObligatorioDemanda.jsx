@@ -68,6 +68,7 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
     cupoLogin: quotaInfo?.["quota"],
     tipoComercio: roleInfo?.["tipo_comercio"],
     nombreComercio: roleInfo?.["nombre comercio"],
+
     idTrx: "",
     datocontacto: "",
   });
@@ -437,7 +438,7 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
             <Button onClick={handlePrint}>Imprimir</Button>
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <Button onClick={() => { setShowModal(false);  fun()}}>Cancelar</Button>
           </div>
         </Modal>
       ) : (

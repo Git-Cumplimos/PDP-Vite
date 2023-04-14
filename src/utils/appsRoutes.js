@@ -525,7 +525,7 @@ const allUrlsPrivateApps = [
   },
 
   {
-    link: "/PinesVus",
+    link: "/Pines",
     label: <AppIcons Logo={"CrearPines"} name="Pines" />,
     component: PinesVus,
     permission: [
