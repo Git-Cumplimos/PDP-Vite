@@ -237,7 +237,7 @@ export const useProvideLoteria = () => {
         }
       }
     }
-  }, [pathname,roleInfo,codigosOficina]);
+  }, [pathname,roleInfo]);
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -482,7 +482,7 @@ export const useProvideLoteria = () => {
     },
     [sorteosLOT]
   );
-
+  
   const makePayment = useCallback(
     async (
       sorteo,
