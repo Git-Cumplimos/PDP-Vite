@@ -106,8 +106,12 @@ const GestionArchivosRetiro = () => {
         },
         {
           render({ data: err }) {
-            setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
-            return `Archivo erróneo`;
+            if (err.msg !== "Error: Archivo vacio"){
+              setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
+              return `Archivo erróneo`;
+            }
+            handleClose()
+            return err.msg
           }
         }
       )
