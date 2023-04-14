@@ -107,7 +107,7 @@ const GestionArchivosRetiro = () => {
         {
           render({ data: err }) {
             setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
-            return `Archivo erroneo`;
+            return `Archivo erróneo`;
           }
         }
       )
