@@ -10,11 +10,14 @@ import Tickets from "../../../../components/Base/Tickets";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { useReactToPrint } from "react-to-print";
 import { notify, notifyError } from "../../../../utils/notify";
-import { modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
+import { getRetiro, modRetiro, searchConveniosRetiroList } from "../../utils/fetchFunctions"
+import { onChangeNumber } from "../../../../utils/functions";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 
-const url = `${process.env.REACT_APP_URL_RECAUDO_RETIRO_DIRECTO}/retiro/consultar-retiro`
-// const url = `http://127.0.0.1:8000/retiro/consultar-retiro`
+const limitesMontos = {
+  max: 99999999,
+  min: 1,
+};
 
 const FormularioRetiro = () => {
   const navigate = useNavigate()
@@ -32,10 +35,7 @@ const FormularioRetiro = () => {
     referencia1: '',
     referencia2: ''
   })
-  const limitesMontos = {
-    max: 99999999,
-    min: 1,
-  };
+
 
   const printDiv = useRef();
 
@@ -64,6 +64,22 @@ const FormularioRetiro = () => {
       handleClose()
     }, [handleClose]),
   });
+
+  const validarLimiteMax = useCallback((tipo, valor) => {
+    let res = ''
+    if (valor === 'max') {
+      if (tipo === 2) {
+        res = (parseInt(dataConvRetiro?.limite_monto[1]) !== 0 &&
+          parseInt(dataConvRetiro?.limite_monto[1]) <= (dataRetiro.valor - dataRetiro.valor_retirado ?? 0) ?
+          dataConvRetiro?.limite_monto[1] : (dataRetiro.valor - dataRetiro.valor_retirado ?? 0)
+        )
+      } else {
+        res = dataConvRetiro?.limite_monto[1] === '0' ? limitesMontos.max : dataConvRetiro?.limite_monto[1]
+      }
+    }
+    res = parseInt(res)
+    return res
+  }, [dataConvRetiro, dataRetiro])
 
   const getData = useCallback(async () => {
     try {
@@ -109,6 +125,7 @@ const FormularioRetiro = () => {
         },
         body: JSON.stringify(data)
       };
+      const url = getRetiro()
       consultaFetch(`${url}`, options)
     }, [pk_id_convenio, consultaFetch, dataReferencias, dataConvRetiro, roleInfo, pdpUser])
 
@@ -121,14 +138,17 @@ const FormularioRetiro = () => {
     let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
     let sumaTotal = valoresRecibido + dataRetiro.valor_retirado
 
-    const FlujosTRX = {
-      1: () => sumaTotal === dataRetiro.valor ?
-        { estado: true } : undefined,
-      2: () => sumaTotal <= dataRetiro.valor ?
-        { estado: true } : undefined,
+    const ValidacionTRX = {
+      1: () => sumaTotal === dataRetiro.valor &&
+        valoresRecibido >= (dataConvRetiro?.limite_monto[0] ?? limitesMontos.min) &&
+        valoresRecibido <= validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max') ? { estado: true } : undefined,
+      2: () => (valoresRecibido >= (dataConvRetiro?.limite_monto[0] ?? limitesMontos.min) &&
+        valoresRecibido <= validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')
+      ) ? { estado: true } : undefined,
+
     };
 
-    const resp = FlujosTRX[dataRetiro?.fk_modificar_valor]?.() || { estado: false };
+    const resp = ValidacionTRX[dataRetiro?.fk_modificar_valor]?.() || { estado: false };
 
     if (resp.estado) {
 
@@ -163,8 +183,9 @@ const FormularioRetiro = () => {
           handleClose()
         });
     }
-    else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
-  }, [dataRetiro, roleInfo, dataReferencias, id_trx, valorRecibido, dataConvRetiro, pk_id_convenio, handleClose])
+    else { notifyError("El valor recibido no cumple con los limites establecidos") }
+  }, [dataRetiro, roleInfo, dataReferencias, id_trx, valorRecibido,
+    dataConvRetiro, pk_id_convenio, handleClose, validarLimiteMax])
 
   return (
     <Fragment>
@@ -200,7 +221,8 @@ const FormularioRetiro = () => {
                 minLength={dict['length'][0] ?? 0}
                 maxLength={dict['length'][1] ?? 20}
                 value={dataReferencias['referencia' + (index + 1)]}
-                onChange={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: e.target.value }) }}
+                onInput={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: onChangeNumber(e) }) }}
+                // onChange={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: e.target.value }) }}
                 autoComplete="off"
                 required />
             )
@@ -238,16 +260,9 @@ const FormularioRetiro = () => {
               label="Valor a retirar"
               name="valor_total_trx"
               autoComplete="off"
-              min={parseInt(dataConvRetiro?.limite_monto[0]) !== 0 && // tipo 2 (menor o igual) 
-                parseInt(dataConvRetiro?.limite_monto[0]) <= (dataRetiro.valor - dataRetiro.valor_retirado ?? 0) ?
-                parseInt(dataConvRetiro?.limite_monto[0]) : limitesMontos.min
-              }
+              min={dataConvRetiro?.limite_monto[0] ?? limitesMontos.min}
               equalError={dataRetiro?.fk_modificar_valor === 2 ? null : false}
-
-              max={parseInt(dataConvRetiro?.limite_monto[1]) !== 0 &&
-                parseInt(dataConvRetiro?.limite_monto[1]) <= (dataRetiro.valor - dataRetiro.valor_retirado ?? 0) ?
-                parseInt(dataConvRetiro?.limite_monto[1]) : (dataRetiro.valor - dataRetiro.valor_retirado ?? 0)
-              }
+              max={validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')}
               onInput={(e, valor) =>
                 setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
               }

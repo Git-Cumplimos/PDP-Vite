@@ -10,11 +10,14 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useReactToPrint } from "react-to-print";
 import Tickets from "../../../../components/Base/Tickets";
-import { searchConveniosRecaudoList, modRecaudo } from "../../utils/fetchFunctions"
+import { searchConveniosRecaudoList, modRecaudo, getRecaudo } from "../../utils/fetchFunctions"
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import { onChangeNumber } from "../../../../utils/functions";
 
-const url = `${process.env.REACT_APP_URL_RECAUDO_RETIRO_DIRECTO}/recaudo/consulta-recaudo`
-// const url = `http://127.0.0.1:8000/recaudo/consulta-recaudo`
+const limitesMontos = {
+  max: 99999999,
+  min: 1,
+};
 
 const RecaudoConjunto = () => {
   const navigate = useNavigate()
@@ -22,6 +25,8 @@ const RecaudoConjunto = () => {
   const { roleInfo, pdpUser } = useAuth();
   const { pk_id_convenio } = useParams()
   const [searchParams] = useSearchParams();
+  const [modificar, setModificar] = useState(false)
+  const [valorCodigoBarras, setValorCodigoBarras] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [dataRecaudo, setDataRecaudo] = useState('')
   const [id_trx, setId_Trx] = useState(null)
@@ -33,34 +38,34 @@ const RecaudoConjunto = () => {
     referencia1: '',
     referencia2: ''
   })
-  const limitesMontos = {
-    max: 99999999,
-    min: 1,
-  };
+
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setDataRecaudo('')
-    setDataReferencias({
-      referencia1: '',
-      referencia2: ''
-    })
-    setValorRecibido({
-      valor_total_trx: ''
-    })
-  }, []);
+    if (modificar !== true) {
+      setDataRecaudo('')
+      setDataReferencias({
+        referencia1: '',
+        referencia2: ''
+      })
+      setValorRecibido({
+        valor_total_trx: ''
+      })
+    }
+  }, [modificar]);
 
   const [consultaFetch] = useFetchDispatchDebounce({
     onSuccess: useCallback((data) => {
       setDataRecaudo(data?.obj?.recaudo)
-          setId_Trx(data?.obj?.id_trx ?? false)
-          data?.obj?.recaudo && notify(data.msg)
-          if (data?.obj?.recaudo.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.recaudo.valor }) }
-          setShowModal(true);
+      setId_Trx(data?.obj?.id_trx ?? false)
+      data?.obj?.recaudo && notify(data.msg)
+      if (data?.obj?.recaudo.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.recaudo.valor }) }
+      setShowModal(true);
     }, []),
     onError: useCallback((err) => {
       notifyError(err?.message);
+      if (modificar === true) navigate("/recaudo-directo/recaudo/barras")
       handleClose()
-    }, [handleClose]),
+    }, [handleClose, modificar, navigate]),
   });
 
   const printDiv = useRef();
@@ -110,9 +115,36 @@ const RecaudoConjunto = () => {
         },
         body: JSON.stringify(data)
       };
+      const url = getRecaudo()
       consultaFetch(`${url}`, options)
     }, [pk_id_convenio, dataReferencias, roleInfo, pdpUser, convenioRecaudo, consultaFetch])
 
+  const validarLimites = useCallback((tipo, valor) => {
+    let res = ''
+    if (valor === 'min') {
+      if (tipo === 3) {
+        res = (parseInt(convenioRecaudo?.limite_monto[0]) !== 0 &&
+          parseInt(convenioRecaudo?.limite_monto[0]) >= (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) ?
+          convenioRecaudo?.limite_monto[0] : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)
+        )
+      }
+      else { // tipo 2 (menor o igual) y 4 (cualquier valor)
+        res = convenioRecaudo?.limite_monto[0] ?? 0
+      }
+    }
+    if (valor === 'max') {
+      if (tipo === 2) {
+        res = (parseInt(convenioRecaudo?.limite_monto[1]) !== 0 &&
+          parseInt(convenioRecaudo?.limite_monto[1]) <= (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) ?
+          convenioRecaudo?.limite_monto[1] : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)
+        )
+      } else {
+        res = convenioRecaudo?.limite_monto[1] === '0' ? limitesMontos.max : convenioRecaudo?.limite_monto[1]
+      }
+    }
+    res = parseInt(res)
+    return res
+  }, [convenioRecaudo, dataRecaudo])
 
   const hacerRecaudo = useCallback(async (e) => {
     e.preventDefault()
@@ -137,12 +169,18 @@ const RecaudoConjunto = () => {
     let sumaTotal = valoresRecibido + dataRecaudo.valor_pagado
 
     const ValidacionTRX = {
-      1: () => sumaTotal === dataRecaudo.valor ? { estado: true } : undefined,
-      2: () => sumaTotal <= dataRecaudo.valor ? { estado: true } : undefined,
-      3: () => sumaTotal >= dataRecaudo.valor ? { estado: true } : undefined,
-      4: () => (sumaTotal < dataRecaudo.valor || sumaTotal >= dataRecaudo.valor) ? { estado: true } : undefined,
+      1: () => sumaTotal === dataRecaudo.valor &&
+        valoresRecibido >= validarLimites(dataRecaudo?.fk_modificar_valor, 'min') &&
+        valoresRecibido <= validarLimites(dataRecaudo?.fk_modificar_valor, 'max') ? { estado: true } : undefined,
+      2: () => (valoresRecibido >= validarLimites(dataRecaudo?.fk_modificar_valor, 'min') &&
+        valoresRecibido <= validarLimites(dataRecaudo?.fk_modificar_valor, 'max')
+      ) ? { estado: true } : undefined,
+
     };
-    resp = ValidacionTRX[dataRecaudo?.fk_modificar_valor]?.() || { estado: false };
+
+    let tipo = dataRecaudo?.fk_modificar_valor !== 1 ? 2 : 1
+    resp = ValidacionTRX[tipo]?.() || { estado: false };
+
     data.recaudo = {
       convenio_id: pk_id_convenio,
       nombre_convenio: convenioRecaudo?.nombre_convenio ?? "",
@@ -162,16 +200,16 @@ const RecaudoConjunto = () => {
         });
 
     }
-    else { notifyError("El valor recibido debe estar a corde al tipo de pago") }
+    else { notifyError("El valor recibido no cumple con los limites establecidos") }
 
   }, [roleInfo, valorRecibido, dataRecaudo, id_trx,
-    pk_id_convenio, convenioRecaudo, dataReferencias, handleClose])
+    pk_id_convenio, convenioRecaudo, dataReferencias, handleClose, validarLimites])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
   useEffect(() => {
     const urlData = Object.fromEntries(searchParams);
-    if ("refs" in urlData ) {
+    if ("refs" in urlData) {
       setDataReferencias(
         Object.fromEntries(
           [1, 2]
@@ -182,6 +220,10 @@ const RecaudoConjunto = () => {
         )
       );
     }
+    if ("valor" in urlData) setValorRecibido({ valor_total_trx: urlData.valor });
+    if ("modificar" in urlData) setModificar(true);
+    if ("valorRegistrado" in urlData) setValorCodigoBarras(true);
+
   }, [searchParams]);
 
   return (
@@ -224,23 +266,27 @@ const RecaudoConjunto = () => {
                 name={'referencia' + (index + 1)}
                 type="text"
                 value={dataReferencias['referencia' + (index + 1)]}
-                onChange={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: e.target.value }) }}
+                onInput={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: onChangeNumber(e) }) }}
+                // onChange={(e) => { setDataReferencias({ ...dataReferencias, [e.target.name]: e.target.value }) }}
                 autoComplete="off"
+                disabled={modificar === true ? true : false}
                 required />
             )
           })}
           {
-            convenioRecaudo?.fk_id_tipo_convenio === 3 &&
+            (convenioRecaudo?.fk_id_tipo_convenio === 3 || valorCodigoBarras) &&
             <MoneyInput
               label="Valor a recaudar"
               name="valor_total_trx"
               autoComplete="off"
-              min={limitesMontos.min}
               equalError={false}
-              max={limitesMontos.max}
+              min={validarLimites(4, 'min')}
+              value={valorRecibido.valor_total_trx}
+              max={validarLimites(4, 'max')}
               onInput={(e, valor) =>
                 setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
               }
+              disabled={valorCodigoBarras ? true : false}
               required
             />
           }
@@ -267,12 +313,12 @@ const RecaudoConjunto = () => {
                 autoComplete="off"
                 disabled
               />
-              {dataRecaudo?.fk_modificar_valor === 1 ? (
+              {dataRecaudo?.fk_modificar_valor === 1 || valorCodigoBarras ? (
                 <MoneyInput
                   label="Valor a recaudar"
                   name="valor_total_trx"
                   autoComplete="off"
-                  value={(dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)}
+                  value={valorCodigoBarras ? valorRecibido.valor_total_trx : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)}
                   disabled
                   required
                 />
@@ -281,27 +327,9 @@ const RecaudoConjunto = () => {
                   label="Valor a recaudar"
                   name="valor_total_trx"
                   autoComplete="off"
-                  min={dataRecaudo?.fk_modificar_valor === 3 ? // tipo 3 mayor o igual
-                    (parseInt(convenioRecaudo?.limite_monto[0]) !== 0 &&
-                      parseInt(convenioRecaudo?.limite_monto[0]) >= (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) ?
-                      convenioRecaudo?.limite_monto[0] : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)
-                    ) // declarar min de acuerdo al limite min
-                    : (parseInt(convenioRecaudo?.limite_monto[0]) !== 0 && // tipo 2 (menor o igual) y 4 (cualquier v)
-                      parseInt(convenioRecaudo?.limite_monto[0]) <= (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) ?
-                      convenioRecaudo?.limite_monto[0] : limitesMontos.min
-                    )
-                  }
+                  min={validarLimites(dataRecaudo?.fk_modificar_valor, 'min')}
                   equalError={dataRecaudo?.fk_modificar_valor === 2 ? null : false}
-                  max={dataRecaudo?.fk_modificar_valor === 2 ?// tipo 2 menor o igual
-                    (parseInt(convenioRecaudo?.limite_monto[1]) !== 0 &&
-                      parseInt(convenioRecaudo?.limite_monto[1]) <= (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) ?
-                      convenioRecaudo?.limite_monto[1] : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)
-                    )
-                    : (parseInt(convenioRecaudo?.limite_monto[1]) !== 0 && // tipo 3 (mayor o igual) y 4 (cualquier v)
-                      parseInt(convenioRecaudo?.limite_monto[1]) >= (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0) ?
-                      convenioRecaudo?.limite_monto[1] : limitesMontos.max
-                    )
-                  }
+                  max={validarLimites(dataRecaudo?.fk_modificar_valor, 'max')}
                   onInput={(e, valor) =>
                     setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
                   }
