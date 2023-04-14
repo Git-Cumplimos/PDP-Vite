@@ -140,9 +140,9 @@ const FormularioRetiro = () => {
 
     const ValidacionTRX = {
       1: () => sumaTotal === dataRetiro.valor &&
-        valoresRecibido >= (dataConvRetiro?.limite_monto[0] ?? limitesMontos.min) &&
+        valoresRecibido >= (dataConvRetiro?.limite_monto[0] ==="0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]) &&
         valoresRecibido <= validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max') ? { estado: true } : undefined,
-      2: () => (valoresRecibido >= (dataConvRetiro?.limite_monto[0] ?? limitesMontos.min) &&
+      2: () => (valoresRecibido >= (dataConvRetiro?.limite_monto[0] ==="0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]) &&
         valoresRecibido <= validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')
       ) ? { estado: true } : undefined,
 
@@ -260,7 +260,7 @@ const FormularioRetiro = () => {
               label="Valor a retirar"
               name="valor_total_trx"
               autoComplete="off"
-              min={dataConvRetiro?.limite_monto[0] ?? limitesMontos.min}
+              min={dataConvRetiro?.limite_monto[0] ==="0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]}
               equalError={dataRetiro?.fk_modificar_valor === 2 ? null : false}
               max={validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')}
               onInput={(e, valor) =>

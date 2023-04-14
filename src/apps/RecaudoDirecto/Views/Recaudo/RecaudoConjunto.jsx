@@ -129,7 +129,7 @@ const RecaudoConjunto = () => {
         )
       }
       else { // tipo 2 (menor o igual) y 4 (cualquier valor)
-        res = convenioRecaudo?.limite_monto[0] ?? 0
+        res = convenioRecaudo?.limite_monto[0] === "0" ? limitesMontos.min : convenioRecaudo?.limite_monto[0]
       }
     }
     if (valor === 'max') {
@@ -139,7 +139,7 @@ const RecaudoConjunto = () => {
           convenioRecaudo?.limite_monto[1] : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)
         )
       } else {
-        res = convenioRecaudo?.limite_monto[1] === '0' ? limitesMontos.max : convenioRecaudo?.limite_monto[1]
+        res = convenioRecaudo?.limite_monto[1] === "0" ? limitesMontos.max : convenioRecaudo?.limite_monto[1]
       }
     }
     res = parseInt(res)
