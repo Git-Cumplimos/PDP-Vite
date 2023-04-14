@@ -28,7 +28,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
 const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
 // const url = "http://127.0.0.1:5000";
-const PpsObligatorioDemanda = ({ ced, fun}) => {
+const PpsObligatorioDemanda = ({ ced, fun }) => {
   const { quotaInfo, roleInfo, infoTicket, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(true);
@@ -115,7 +115,7 @@ const PpsObligatorioDemanda = ({ ced, fun}) => {
       trxInfo: [
         ["PISO DE PROTECCIÓN SOCIAL - APORTE OBLIGATORIO"],
         ["", ""],
-        ["Nombre", datosComercio?.["datocontacto"]],
+        ["Nombre", datosComercio?.["datocontacto"].slice(207, 307)],
 
         ["", ""],
         ["Número de documento", datosAportante?.["numDocumento"]],
@@ -431,7 +431,14 @@ const PpsObligatorioDemanda = ({ ced, fun}) => {
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
             <Button onClick={handlePrint}>Imprimir</Button>
-            <Button onClick={() => { setShowModal(false);  fun();}}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setShowModal(false);
+                fun();
+              }}
+            >
+              Cancelar
+            </Button>
           </div>
         </Modal>
       ) : (
