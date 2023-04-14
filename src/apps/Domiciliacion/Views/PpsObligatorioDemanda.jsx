@@ -115,7 +115,7 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
       trxInfo: [
         ["PISO DE PROTECCIÓN SOCIAL - APORTE OBLIGATORIO"],
         ["", ""],
-        ["Nombre", datosComercio?.["datocontacto"]],
+        ["Nombre", datosComercio?.["datocontacto"].slice(207, 307)],
 
         ["", ""],
         ["Número de documento", datosAportante?.["numDocumento"]],
@@ -438,7 +438,14 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
             <Button onClick={handlePrint}>Imprimir</Button>
-            <Button onClick={() => { setShowModal(false);  fun()}}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setShowModal(false);
+                fun();
+              }}
+            >
+              Cancelar
+            </Button>
           </div>
         </Modal>
       ) : (
