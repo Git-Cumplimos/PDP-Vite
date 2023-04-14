@@ -34,6 +34,9 @@ const RecaudoBarras = () => {
 
             const builderSP = new URLSearchParams();
             builderSP.append("refs", JSON.stringify(refs));;
+            builderSP.append("modificar",'true');;
+            if (res?.obj.valor) builderSP.append("valor", res?.obj.valor );
+            if (res?.obj.valorRegistrado) builderSP.append("valorRegistrado", res?.obj.valorRegistrado);
 
             const pk_id_convenio = res?.obj?.pk_id_convenio;
 

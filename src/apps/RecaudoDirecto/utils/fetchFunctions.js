@@ -163,9 +163,9 @@ export const decoCodigoBarras = buildPostFunction(
 );
 
 /* -- Recaudo -- */
-export const getRecaudo = buildPostFunction(
-  `${url}/recaudo/consulta-recaudo`
-);
+export const getRecaudo = () => {
+  return `${url}/recaudo/consulta-recaudo`
+}
 export const modRecaudo = buildPostFunction(
   `${url}/recaudo/hacer-recaudo`
 );
@@ -197,9 +197,9 @@ export const cargarArchivoRetiro = cargueArchivo(
 
 
 /* -- Retiro -- */
-export const getRetiro = buildPostFunction(
-  `${url}/retiro/consultar-retiro`
-);
+export const getRetiro = () =>{
+  return `${url}/retiro/consultar-retiro`
+};
 export const modRetiro = buildPostFunction(
   `${url}/retiro/hacer-retiro`
 );
