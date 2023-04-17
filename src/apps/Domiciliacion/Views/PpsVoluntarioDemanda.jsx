@@ -583,15 +583,17 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
         <Modal show={showModal} handleClose={handleClose}>
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
-            <Button onClick={handlePrint}>Imprimir</Button>
-            <Button
-              onClick={() => {
-                setShowModal(false);
-                fun();
-              }}
-            >
-              Cancelar
-            </Button>
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button
+                onClick={() => {
+                  setShowModal(false);
+                  fun();
+                }}
+              >
+                Cancelar
+              </Button>
+            </ButtonBar>
           </div>
         </Modal>
       ) : (
