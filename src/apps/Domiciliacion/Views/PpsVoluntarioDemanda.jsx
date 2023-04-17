@@ -437,7 +437,9 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
         }
       }
     } else {
-      notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
+      notifyError(
+        "Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003])"
+      );
       navigate(`/colpensiones`);
     }
   };
