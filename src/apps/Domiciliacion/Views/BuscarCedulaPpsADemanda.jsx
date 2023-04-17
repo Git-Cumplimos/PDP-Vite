@@ -87,14 +87,6 @@ const BuscarCedulaPpsADemanda = () => {
   };
   return (
     <div>
-      {(datosConsulta?.length >= 0) & estado ? (
-        <TipoPpsADemanda
-          numCed={buscarCedula}
-          fun={hijoAPadre}
-        ></TipoPpsADemanda>
-      ) : (
-        ""
-      )}
       <Form grid onSubmit={(e) => BuscarCedula(e)}>
         <Input
           name="N° Identificación"
@@ -117,6 +109,14 @@ const BuscarCedulaPpsADemanda = () => {
           }
         </ButtonBar>
       </Form>
+      {(datosConsulta?.length >= 0) & estado ? (
+        <TipoPpsADemanda
+          numCed={buscarCedula}
+          fun={hijoAPadre}
+        ></TipoPpsADemanda>
+      ) : (
+        ""
+      )}
     </div>
   );
 };
