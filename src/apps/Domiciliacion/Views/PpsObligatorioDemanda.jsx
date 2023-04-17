@@ -115,7 +115,7 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
       trxInfo: [
         ["PISO DE PROTECCIÓN SOCIAL - APORTE OBLIGATORIO"],
         ["", ""],
-        ["Nombre", datosComercio?.["datocontacto"].slice(207, 307)],
+        ["Nombre", datosComercio?.["datocontacto"]?.slice(207, 307)],
 
         ["", ""],
         ["Número de documento", datosAportante?.["numDocumento"]],
