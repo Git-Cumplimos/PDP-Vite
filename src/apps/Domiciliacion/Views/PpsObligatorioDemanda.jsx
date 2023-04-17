@@ -424,7 +424,14 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
               </Button>
               /*  ) : null */
             }
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setShowModal(false);
+                fun();
+              }}
+            >
+              Cancelar
+            </Button>
           </ButtonBar>
         </Form>
       </Modal>

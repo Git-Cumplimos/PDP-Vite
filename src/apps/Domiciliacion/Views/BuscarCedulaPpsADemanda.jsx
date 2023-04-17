@@ -23,6 +23,7 @@ const BuscarCedulaPpsADemanda = () => {
     setBuscarCedula("");
     setDatosConsulta("");
     setEstado(false);
+    setEstadoInput(false);
   };
   /* function hijoAPadre() {
     setBuscarCedula("");
