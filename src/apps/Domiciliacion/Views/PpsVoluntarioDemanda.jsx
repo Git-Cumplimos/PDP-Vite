@@ -437,7 +437,9 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
         }
       }
     } else {
-      notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
+      notifyError(
+        "Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003])"
+      );
       navigate(`/colpensiones`);
     }
   };
@@ -581,15 +583,17 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
         <Modal show={showModal} handleClose={handleClose}>
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
-            <Button onClick={handlePrint}>Imprimir</Button>
-            <Button
-              onClick={() => {
-                setShowModal(false);
-                fun();
-              }}
-            >
-              Cancelar
-            </Button>
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button
+                onClick={() => {
+                  setShowModal(false);
+                  fun();
+                }}
+              >
+                Cancelar
+              </Button>
+            </ButtonBar>
           </div>
         </Modal>
       ) : (
