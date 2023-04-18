@@ -150,11 +150,7 @@ const FormularioRetiro = () => {
 
     };
 
-    console.log("tipo modificacion",dataRetiro?.fk_modificar_valor)
-    console.log("valor retirado",valoresRecibido)
-
     const resp = ValidacionTRX[dataRetiro?.fk_modificar_valor]?.() || { estado: false };
-    console.log(resp)
 
     if (resp.estado) {
 

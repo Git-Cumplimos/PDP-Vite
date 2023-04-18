@@ -178,8 +178,7 @@ const RecaudoConjunto = () => {
       ) ? { estado: true } : undefined,
 
     };
-    console.log("tipo modificacion",dataRecaudo?.fk_modificar_valor)
-    console.log("valor retirado",valoresRecibido)
+
     let tipo = dataRecaudo?.fk_modificar_valor !== 1 ? 2 : 1
     resp = ValidacionTRX[tipo]?.() || { estado: false };
 
