@@ -58,7 +58,7 @@ const RecaudoBarras = () => {
         }
       );
     },
-    []
+    [navigate]
   );
 
   return (

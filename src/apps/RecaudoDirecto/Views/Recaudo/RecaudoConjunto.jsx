@@ -39,8 +39,9 @@ const RecaudoConjunto = () => {
     referencia2: ''
   })
 
-  const handleClose = useCallback(() => {
+  const handleClose = useCallback((err = null) => {
     setShowModal(false);
+    if (err) notifyError("Transacción de recaudo cancelada")
     if (modificar !== true) {
       setDataRecaudo('')
       setDataReferencias({
@@ -297,7 +298,7 @@ const RecaudoConjunto = () => {
           </ButtonBar>
         </Form>
       ) : (<> Cargando...</>)}
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal} handleClose={()=>handleClose(true)}>
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar recaudo {
           !dataRecaudo && convenioRecaudo?.fk_id_tipo_convenio === 3 ? 'no registrado' : ''
         } </h2>
@@ -367,7 +368,7 @@ const RecaudoConjunto = () => {
             <Button type={"submit"} >
               {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Confirmar" : "Aceptar"}
             </Button>
-            <Button onClick={() => handleClose()} >
+            <Button onClick={() => handleClose(true)} >
               Cancelar
             </Button>
           </ButtonBar>

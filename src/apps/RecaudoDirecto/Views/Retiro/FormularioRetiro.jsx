@@ -43,7 +43,8 @@ const FormularioRetiro = () => {
     content: () => printDiv.current,
   });
 
-  const handleClose = useCallback(() => {
+  const handleClose = useCallback((err = null) => {
+    if (err) notifyError("Transacción de retiro cancelada")
     setShowModal(false);
     setDataReferencias({
       referencia1: '',
@@ -234,7 +235,7 @@ const FormularioRetiro = () => {
           </ButtonBar>
         </Form>
       ) : (<>cargando...</>)}
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal} handleClose={()=>handleClose(true)}>
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar retiro </h2>
         <Form onSubmit={hacerRetiro} grid >
           <Input
@@ -273,7 +274,7 @@ const FormularioRetiro = () => {
             <Button type={"submit"} >
               Aceptar
             </Button>
-            <Button onClick={() => handleClose()} >
+            <Button onClick={() => handleClose(true)} >
               Cancelar
             </Button>
           </ButtonBar>

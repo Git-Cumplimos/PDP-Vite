@@ -314,7 +314,6 @@ const GestionArchivosRecaudo = () => {
         <Form onSubmit={showModalOptions ? CargarArchivo : DescargarReporte}>
           {showModalOptions && (
             <Input
-              // label='Seleccionar Archivo'
               type="file"
               autoComplete="off"
               onChange={(e) => {
