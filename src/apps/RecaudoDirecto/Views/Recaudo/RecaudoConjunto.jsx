@@ -39,8 +39,9 @@ const RecaudoConjunto = () => {
     referencia2: ''
   })
 
-  const handleClose = useCallback(() => {
+  const handleClose = useCallback((err = null) => {
     setShowModal(false);
+    if (err) notifyError("Transacción de recaudo cancelada por el usuario")
     if (modificar !== true) {
       setDataRecaudo('')
       setDataReferencias({
@@ -58,7 +59,7 @@ const RecaudoConjunto = () => {
       setDataRecaudo(data?.obj?.recaudo)
       setId_Trx(data?.obj?.id_trx ?? false)
       data?.obj?.recaudo && notify(data.msg)
-      if (data?.obj?.recaudo.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.recaudo.valor }) }
+      if (data?.obj?.recaudo.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.recaudo.valor - data?.obj?.recaudo?.valor_pagado }) }
       setShowModal(true);
     }, []),
     onError: useCallback((err) => {
@@ -165,7 +166,7 @@ const RecaudoConjunto = () => {
       direccion: roleInfo?.direccion ?? ""
     };
 
-    let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
+    let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0 
     let sumaTotal = valoresRecibido + dataRecaudo.valor_pagado
 
     const ValidacionTRX = {
@@ -297,7 +298,7 @@ const RecaudoConjunto = () => {
           </ButtonBar>
         </Form>
       ) : (<> Cargando...</>)}
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal} handleClose={()=>handleClose(true)}>
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar recaudo {
           !dataRecaudo && convenioRecaudo?.fk_id_tipo_convenio === 3 ? 'no registrado' : ''
         } </h2>
@@ -367,7 +368,7 @@ const RecaudoConjunto = () => {
             <Button type={"submit"} >
               {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Confirmar" : "Aceptar"}
             </Button>
-            <Button onClick={() => handleClose()} >
+            <Button onClick={() => handleClose(true)} >
               Cancelar
             </Button>
           </ButtonBar>
