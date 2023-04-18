@@ -44,7 +44,7 @@ const FormularioRetiro = () => {
   });
 
   const handleClose = useCallback((err = null) => {
-    if (err) notifyError("Transacción de retiro cancelada")
+    if (err) notifyError("Transacción de retiro cancelada por el usuario")
     setShowModal(false);
     setDataReferencias({
       referencia1: '',
@@ -56,7 +56,7 @@ const FormularioRetiro = () => {
     onSuccess: useCallback((data) => {
       setDataRetiro(data?.obj.retiro ?? "")
       setId_Trx(data?.obj?.id_trx ?? "")
-      if (data?.obj?.retiro?.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.retiro?.valor }) }
+      if (data?.obj?.retiro?.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.retiro?.valor-data?.obj?.retiro?.valor_retirado }) }
       notify(data.msg)
       setShowModal(true);
     }, []),
@@ -140,16 +140,21 @@ const FormularioRetiro = () => {
     let sumaTotal = valoresRecibido + dataRetiro.valor_retirado
 
     const ValidacionTRX = {
-      1: () => sumaTotal === dataRetiro.valor &&
-        valoresRecibido >= (dataConvRetiro?.limite_monto[0] ==="0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]) &&
-        valoresRecibido <= validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max') ? { estado: true } : undefined,
+      1: () => (sumaTotal === dataRetiro.valor &&
+        valoresRecibido >= (dataConvRetiro?.limite_monto[0] === "0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]) &&
+        valoresRecibido <= validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')) ? { estado: true } : undefined,
+
       2: () => (valoresRecibido >= (dataConvRetiro?.limite_monto[0] ==="0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]) &&
         valoresRecibido <= validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')
       ) ? { estado: true } : undefined,
 
     };
 
+    console.log("tipo modificacion",dataRetiro?.fk_modificar_valor)
+    console.log("valor retirado",valoresRecibido)
+
     const resp = ValidacionTRX[dataRetiro?.fk_modificar_valor]?.() || { estado: false };
+    console.log(resp)
 
     if (resp.estado) {
 

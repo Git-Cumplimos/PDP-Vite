@@ -41,7 +41,7 @@ const RecaudoConjunto = () => {
 
   const handleClose = useCallback((err = null) => {
     setShowModal(false);
-    if (err) notifyError("Transacción de recaudo cancelada")
+    if (err) notifyError("Transacción de recaudo cancelada por el usuario")
     if (modificar !== true) {
       setDataRecaudo('')
       setDataReferencias({
@@ -59,7 +59,7 @@ const RecaudoConjunto = () => {
       setDataRecaudo(data?.obj?.recaudo)
       setId_Trx(data?.obj?.id_trx ?? false)
       data?.obj?.recaudo && notify(data.msg)
-      if (data?.obj?.recaudo.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.recaudo.valor }) }
+      if (data?.obj?.recaudo.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.recaudo.valor - data?.obj?.recaudo?.valor_pagado }) }
       setShowModal(true);
     }, []),
     onError: useCallback((err) => {
@@ -166,7 +166,7 @@ const RecaudoConjunto = () => {
       direccion: roleInfo?.direccion ?? ""
     };
 
-    let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
+    let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0 
     let sumaTotal = valoresRecibido + dataRecaudo.valor_pagado
 
     const ValidacionTRX = {
@@ -178,7 +178,8 @@ const RecaudoConjunto = () => {
       ) ? { estado: true } : undefined,
 
     };
-
+    console.log("tipo modificacion",dataRecaudo?.fk_modificar_valor)
+    console.log("valor retirado",valoresRecibido)
     let tipo = dataRecaudo?.fk_modificar_valor !== 1 ? 2 : 1
     resp = ValidacionTRX[tipo]?.() || { estado: false };
 
