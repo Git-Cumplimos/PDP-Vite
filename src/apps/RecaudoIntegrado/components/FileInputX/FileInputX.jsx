@@ -10,8 +10,11 @@ import Modal from "../../../../components/Base/Modal";
 import Fieldset from "../../../../components/Base/Fieldset";
 import LogoPDP from "../../../../components/Base/LogoPDP";
 import ButtonBar from "../../../../components/Base/ButtonBar";
+import { useNavigate, Navigate } from "react-router-dom";
+
 
 const FileInputX = ({ banco }) => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState([]);
 
@@ -84,9 +87,20 @@ const FileInputX = ({ banco }) => {
     setNombreDocumento("");
     setDisabledBtn(true);
   };
+  const CancelarDocumento = (e) => {
+    e.preventDefault();
+    setShowModal(false);
+    notifyError("El usuario canceló el proceso de contingencia");
+    navigate("/recaudoEmpresarial/recaudoEmpresarialBancolombia");
+    document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
+    setArchivo([]);
+    setNombreDocumento("");
+    setDisabledBtn(true);
+  };
 
   const EnviarArchivos = async (e) => {
     e.preventDefault();
+    setShowModal(false);
     setDisabledBtn(true);
 
     if (!archivo[0]) {
@@ -309,7 +323,7 @@ const FileInputX = ({ banco }) => {
           <Button type="submit" onClick={(e) => EnviarArchivos(e)}>
             Aceptar
           </Button>
-          <Button>Cancelar</Button>
+          <Button onClick={(e) => CancelarDocumento(e)}>Cancelar</Button>
         </ButtonBar>
         {/* <Fieldset legend="Archivo con errores">
             <ul className={contendorLista}>
