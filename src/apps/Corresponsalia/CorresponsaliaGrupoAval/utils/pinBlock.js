@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 const CryptoJS = require("crypto-js");
 
 // /**
@@ -16,7 +17,6 @@ const CryptoJS = require("crypto-js");
 // }
 
 function encryptAES(data, key) {
-
   key = CryptoJS.enc.Hex.parse(key);
   data = CryptoJS.enc.Hex.parse(data);
   const encrypted = CryptoJS.TripleDES.encrypt(data, key, {
@@ -76,7 +76,6 @@ export const pinBlock = (pinX, panX) => {
   let pin = pinX;
   let pan = panX; /////// Verificar en donde poner el PAN
   const L = pin.length;
-  
 
   pin = `0${L}${pin}ffffffffffffffff`;
   const pinHexa = pin.slice(0, 16);

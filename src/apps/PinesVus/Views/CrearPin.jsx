@@ -94,6 +94,7 @@ const CrearPin = () => {
     { value: "3", label: "Tarjeta Identidad" },
     { value: "4", label: "NIT" },
     { value: "5", label: "Pasaporte" },
+    { value: "13", label: "PPT (Permiso por Protección Temporal)" },
   ];
   const [tipoDocumento, setTipoDocumento] = useState("")
 
@@ -414,7 +415,7 @@ const CrearPin = () => {
     e.preventDefault();
     setDisabledBtnsContinuar(true);
     setShowFormulario(false)
-    consultaClientes(documento,olimpia,idPin,tipoPin).then((resp) => {
+    consultaClientes(documento,olimpia,tipoDocumento,idPin,tipoPin).then((resp) => {
       if (!resp?.status){
         notifyError(resp?.msg)
       }else{
@@ -709,7 +710,7 @@ const CrearPin = () => {
           setCategoria("")
         }}
       />
-      {olimpia === "true" ? 
+      {/* {olimpia === "true" ? 
       <>
        <Input
        id="idPin"
@@ -726,7 +727,7 @@ const CrearPin = () => {
        }}
       />
       </>
-      :"" }
+      :"" } */}
       <ButtonBar className="lg:col-span-2">
       <Button type="submit" disabled={disabledBtnsContinuar}>
         Continuar
@@ -966,7 +967,7 @@ const CrearPin = () => {
             if(isNaN(tipoPin)){
               setTipoPin("")
             } setDisabledBtns(true)
-            consultaClientes(documento,olimpia,idPin,e.target.value).then((resp) => {
+            consultaClientes(documento,olimpia,tipoDocumento,idPin,e.target.value).then((resp) => {
               if (!resp?.status){
                 notifyError(resp?.msg)
                 setShowPinLicencia(false)
@@ -1205,18 +1206,14 @@ const CrearPin = () => {
           <div className="flex flex-col w-1/2 mx-auto">
             <h1 className="text-3xl mt-3 mx-auto">Crear Pin</h1>
             <br></br>
-            
+            <h1 className="flex flex-row justify-center text-lg font-medium">- {tramiteData.descripcion}</h1>
             { tramiteData2.descripcion ?
-              <h1 className="flex flex-row justify-center text-lg font-medium">{tramiteData.descripcion}, {tramiteData2.descripcion}</h1>
-            : 
-              <h1 className="flex flex-row justify-center text-lg font-medium">{tramiteData.descripcion}</h1>
+              <h1 className="flex flex-row justify-center text-lg font-medium">- {tramiteData2.descripcion}</h1>
+            : ""
             }
             
             <br></br>
             <>
-              
-              {showTramiteAdicional? 
-              <div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
@@ -1229,6 +1226,8 @@ const CrearPin = () => {
                 <h1>IVA Trámite 1</h1>
                 <h1>{formatMoney.format(tramiteData.iva)}</h1>
               </div>
+              {showTramiteAdicional? 
+              <div>
               <div
                 className="flex flex-row justify-between text-lg font-medium"
               >
@@ -1243,20 +1242,7 @@ const CrearPin = () => {
               </div>
               </div>
               :
-              <>
-              <div
-                className="flex flex-row justify-between text-lg font-medium"
-              >
-                <h1>Valor Trámite</h1>
-                <h1>{formatMoney.format(tramiteData.valor)}</h1>
-              </div>
-              <div
-                className="flex flex-row justify-between text-lg font-medium"
-              >
-                <h1>IVA Trámite</h1>
-                <h1>{formatMoney.format(tramiteData.iva)}</h1>
-              </div>
-              </>
+              ""
               }  
               <div
                 className="flex flex-row justify-between text-lg font-medium"

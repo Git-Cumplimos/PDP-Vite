@@ -9,10 +9,15 @@ import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import Modal from "../../../../components/Base/Modal";
 import Fieldset from "../../../../components/Base/Fieldset";
 import LogoPDP from "../../../../components/Base/LogoPDP";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import { useNavigate, Navigate } from "react-router-dom";
+
 
 const FileInputX = ({ banco }) => {
-  const [showModal, setShowModal] = useState(true);
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState([]);
+
   const banco_minuscula = banco.charAt(0).toLowerCase() + banco.slice(1);
   // console.log(banco_minuscula);
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
@@ -38,7 +43,7 @@ const FileInputX = ({ banco }) => {
 
   const [nombreDocumento, setNombreDocumento] = useState("");
   const [archivo, setArchivo] = useState([]);
-  const [disabledBtn, setDisabledBtn] = useState(true);
+  const [disabledBtn, setDisabledBtn] = useState(false);
   const [procesandoValidacion, setProcesandoValidacion] = useState(false);
   const [type1, setType1] = useState([]);
 
@@ -82,9 +87,20 @@ const FileInputX = ({ banco }) => {
     setNombreDocumento("");
     setDisabledBtn(true);
   };
+  const CancelarDocumento = (e) => {
+    e.preventDefault();
+    setShowModal(false);
+    notifyError("El usuario canceló el proceso de contingencia");
+    navigate("/recaudoEmpresarial/recaudoEmpresarialBancolombia");
+    document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
+    setArchivo([]);
+    setNombreDocumento("");
+    setDisabledBtn(true);
+  };
 
   const EnviarArchivos = async (e) => {
     e.preventDefault();
+    setShowModal(false);
     setDisabledBtn(true);
 
     if (!archivo[0]) {
@@ -114,8 +130,9 @@ const FileInputX = ({ banco }) => {
       Validar_archivo(banco_minuscula, nombreArchivoS3).then((res) => {
         console.log("RESPUESTA VALIDAR", res);
         if (res?.codigo == 400) {
-          setShowModal(true);
-          setErrors(res?.obj);
+          // setShowModal(true);
+          // setErrors(res?.obj);
+          window.open(res?.url, "_self");
         }
         setProcesandoValidacion(false);
         document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
@@ -241,7 +258,7 @@ const FileInputX = ({ banco }) => {
   return (
     <div className={contendorPrincipalFormulario}>
       <SimpleLoading show={procesandoValidacion}></SimpleLoading>
-      <form onSubmit={(e) => EnviarArchivos(e)} className={contenedorForm}>
+      <form className={contenedorForm}>
         <div className={contenedorInput}>
           <h2 className={titulo}>
             {`Cargar archivo de contingencia ${banco}`}
@@ -282,20 +299,33 @@ const FileInputX = ({ banco }) => {
           )}
         </div>
         <div></div>
-        <div className={contenedorBtns}>
-          <Button
-            disabled={disabledBtn}
-            /*  className={btnEnviar} */ type="submit"
-          >
-            Cargar
-          </Button>
-        </div>
       </form>
+      <div className={contenedorBtns}>
+        <Button
+          disabled={disabledBtn}
+          onClick={(e) => setShowModal(true)} /* type="submit" */
+          /*  className={btnEnviar} */
+        >
+          Cargar archivo
+        </Button>
+      </div>
 
-      {errors?.length > 0 ? (
-        <Modal show={showModal} handleClose={handleClose}>
-          <LogoPDP xsmall></LogoPDP>
-          <Fieldset legend="Archivo con errores">
+      {/* {errors?.length > 0 ? ( */}
+      <Modal show={showModal} handleClose={handleClose}>
+        <LogoPDP xsmall></LogoPDP>
+        <br />
+        <br />
+        <h1 className="text-xl font-semibold">
+          ¿Está seguro de cargar el archivo de los registros de pagos?
+        </h1>
+
+        <ButtonBar>
+          <Button type="submit" onClick={(e) => EnviarArchivos(e)}>
+            Aceptar
+          </Button>
+          <Button onClick={(e) => CancelarDocumento(e)}>Cancelar</Button>
+        </ButtonBar>
+        {/* <Fieldset legend="Archivo con errores">
             <ul className={contendorLista}>
               {errors.map((error, index) => (
                 <li key={index}>
@@ -304,11 +334,11 @@ const FileInputX = ({ banco }) => {
                 </li>
               ))}
             </ul>
-          </Fieldset>
-        </Modal>
-      ) : (
+          </Fieldset> */}
+      </Modal>
+      {/* ) : (
         ""
-      )}
+      )} */}
     </div>
   );
 };

@@ -57,6 +57,7 @@ const TramitePines = () => {
   const [infoComercioCreacion, setInfoComercioCreacion] = useState("")
   const [msgRespReenvio, setMsgRespReenvio] = useState("")
   const [urlAutogestion, setUrlAutogestion] = useState("")
+  const [datosOlimpia,   setDatosOlimpia] = useState("")
 
   useEffect(() => {
     ///////////////
@@ -122,7 +123,7 @@ const TramitePines = () => {
     // };
     consultaPinesVus("", "", "", "", "", parametroBusqueda,pageData,1)
       .then((res) => {
-       // console.log(res)
+        //console.log(res)
         setDisabledBtn(false);
         if (!res?.status) {
           notifyError(res?.msg);
@@ -220,7 +221,11 @@ const TramitePines = () => {
           setMaxPages(res?.obj?.maxPages);
         }else{
           notifyError("Es necesario diligenciar el formulario");
-        }}
+        }
+        
+        setDatosOlimpia(res.obj.results)
+      
+      }
       })
       .catch((err) => console.log("error", err));
   };
@@ -456,6 +461,7 @@ const TramitePines = () => {
             tipoPin={tipoPin}
             setActivarNavigate={setActivarNavigate}
             closeModal={closeModal}
+            datosOlimpia={datosOlimpia}
           ></UsarPinForm>
         ) : (
           ""

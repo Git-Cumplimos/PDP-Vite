@@ -1,5 +1,4 @@
 import { Auth } from "@aws-amplify/auth";
-import https from "https";
 
 const fetchData = async (
   url = "",

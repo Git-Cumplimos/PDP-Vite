@@ -22,6 +22,7 @@ const TicketsAgrario = ({
         <div className='flex flex-row justify-center items-center w-full'>
           <LogoAgrario xsmall />
         </div>
+        <h1 className='text-xs font-semibold text-center uppercase mb-5'>CORRESPONSAL BANCARIO PUNTO DE PAGO</h1>
         <h1 className='text-xl font-semibold text-center uppercase'>{title}</h1>
         <hr className='border-gray-400 my-3' />
         <div className='flex flex-col gap-2 px-2 text-xs'>

@@ -6,7 +6,6 @@ import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
 import Modal from "../../../../../components/Base/Modal";
 import Select from "../../../../../components/Base/Select";
-import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { useFetch } from "../../../../../hooks/useFetch";
@@ -17,6 +16,7 @@ import {
   LecturaRunt,
 } from "../Runt/components/components_form";
 import classes from "./PagarRunt.module.css";
+import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 
 //Constantes Style
 const { styleComponents } = classes;
@@ -34,7 +34,7 @@ const options_select = [
 
 const PagarRunt = () => {
   const [paso, setPaso] = useState("LecturaBarcode");
-  const [numeroRunt, setNumeroRunt] = useState(null);
+  const [numeroRunt, setNumeroRunt] = useState("");
   const [procedimiento, setProcedimiento] = useState(option_barcode);
   const [showModal, setShowModal] = useState(false);
   const [resConsultRunt, setResConsultRunt] = useState({});
@@ -74,7 +74,7 @@ const PagarRunt = () => {
       notifyError(msg);
     }
     setPaso("LecturaBarcode");
-    setNumeroRunt(null);
+    setNumeroRunt("");
     setResConsultRunt(null);
     setShowModal(false);
     setProcedimiento(option_barcode);
@@ -92,7 +92,7 @@ const PagarRunt = () => {
       setPaso("LecturaRunt");
       setProcedimiento(option_manual);
     }
-    setNumeroRunt(null);
+    setNumeroRunt("");
   }, []);
 
   const onSubmitBarcode = useCallback(
@@ -154,6 +154,7 @@ const PagarRunt = () => {
             ? true
             : false,
         nombre_usuario: pdpUser["uname"],
+        nombre_comercio: roleInfo?.["nombre comercio"],
         numero_runt: numeroRunt,
         id_trx_original: resConsultRunt.id_trx,
         valor_mt: resConsultRunt.valor_mt,
@@ -164,6 +165,7 @@ const PagarRunt = () => {
         idterminal_punto: roleInfo.idterminal_punto,
         idtipo_dispositivo: roleInfo.idtipo_dispositivo,
         serial_dispositivo: roleInfo.serial_dispositivo,
+        telefono: roleInfo?.telefono,
       };
 
       peticionPayRunt({}, data)
@@ -173,7 +175,7 @@ const PagarRunt = () => {
             setInfTicket(JSON.parse(voucher));
             setPaso("TransaccionExitosa");
           }
-          notify("Pago del runt exitoso");
+          notify("Pago del RUNT exitoso");
         })
         .catch((error) => {
           CallErrorPeticion(error);
@@ -198,7 +200,7 @@ const PagarRunt = () => {
     setPaso("LecturaBarcode");
     setShowModal(false);
     notify("Transacción cancelada");
-    setNumeroRunt(null);
+    setNumeroRunt("");
     setResConsultRunt(null);
     setProcedimiento(option_barcode);
   }, []);
@@ -206,7 +208,7 @@ const PagarRunt = () => {
   const HandleCloseTrxExitosa = useCallback(() => {
     setPaso("LecturaBarcode");
     setShowModal(false);
-    setNumeroRunt(null);
+    setNumeroRunt("");
     setResConsultRunt(null);
     setInfTicket(null);
     setProcedimiento(option_barcode);
@@ -234,12 +236,12 @@ const PagarRunt = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Pago de RUNT</h1>
+      <h1 className='text-3xl mt-6'>Pago de RUNT</h1>
       <Form>
         <div className={styleComponents}>
           <Select
-            id="opciones"
-            label=""
+            id='opciones'
+            label=''
             options={options_select}
             onChange={onChangeSelect}
             value={procedimiento}
@@ -255,8 +257,7 @@ const PagarRunt = () => {
           <LecturaBarcode
             loadingPeticion={loadingPeticionBarcode}
             onSubmit={onSubmitBarcode}
-            buttonDelate={buttonDelate}
-          ></LecturaBarcode>
+            buttonDelate={buttonDelate}></LecturaBarcode>
         )}
         {/******************************Lectura runt*******************************************************/}
 
@@ -270,8 +271,7 @@ const PagarRunt = () => {
             procedimiento={procedimiento}
             option_barcode={option_barcode}
             option_manual={option_manual}
-            numeroRunt={numeroRunt}
-          ></LecturaRunt>
+            numeroRunt={numeroRunt}></LecturaRunt>
         )}
         {/******************************Respuesta Lectura runt*******************************************************/}
       </Form>
@@ -283,15 +283,14 @@ const PagarRunt = () => {
             summary={resConsultRunt}
             loadingPeticion={loadingPeticionPayRunt}
             peticion={onSubmitPayRunt}
-            handleClose={HandleCloseTrx}
-          ></ComponentsModalSummaryTrx>
+            handleClose={HandleCloseTrx}></ComponentsModalSummaryTrx>
         )}
         {/******************************Resumen de trx*******************************************************/}
 
         {/**************** TransaccionExitosa **********************/}
         {infTicket && paso === "TransaccionExitosa" && (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={infTicket} />
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={HandleCloseTrxExitosa}>Cerrar</Button>

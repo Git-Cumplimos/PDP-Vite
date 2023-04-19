@@ -1,58 +1,67 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import DataTable from "../../../../components/Base/DataTable";
+import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import useMap from "../../../../hooks/useMap";
 import Input from "../../../../components/Base/Input";
-import { getRecaudosList } from "../../utils/fetchFunctions"
 import { notifyError } from "../../../../utils/notify";
-import { onChangeEan13Number } from "../../utils/functions";
+import { getUrlRecaudosList } from "../../utils/fetchFunctions";
 import { onChangeNumber } from "../../../../utils/functions";
+import { onChangeEan13Number } from "../../utils/functions";
+
+const initialSearchFilters = new Map([
+  ["pk_id_convenio_directo", ""],
+  ["ean13", ""],
+  ["nombre_convenio", ""],
+  ["estado", true],
+  ["page", 1],
+  ["limit", 10],
+]);
 
 const RecaudoManual = () => {
   const navigate = useNavigate();
 
-
   const [listRecaudos, setListRecaudos] = useState([])
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
-  const [maxPages, setMaxPages] = useState(0);
-  const [searchFilters, setSearchFilters] = useState({
-    pk_id_convenio_directo: "",
-    ean13: "",
-    nombre_convenio: "",
+  const [isNextPage, setIsNextPage] = useState(false);
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
+    useMap(initialSearchFilters);
+
+  const [fetchTrxs] = useFetchDispatchDebounce({
+    onSuccess: useCallback((data) => {
+      setListRecaudos(data?.obj?.results ?? []);
+      setIsNextPage(data?.obj?.next_exist);
+    }, []),
+    onError: useCallback((error) => {
+      if (!error instanceof DOMException) console.error(error)
+    }, []),
   });
 
-  const getRecaudos = useCallback(async () => {
-    await getRecaudosList({
-      ...pageData,
-      ...searchFilters,
-      estado: true
-    })
-      .then((data) => {
-        setListRecaudos(data?.obj?.results ?? []);
-        setMaxPages(data?.obj?.maxPages ?? '')
-      })
-      .catch((err) => {
-        // setListRecaudos([]);
-        // if (err?.cause === "custom") {
-        //   notifyError(err?.message);
-        //   return;
-        // }
-        console.error(err?.message);
-      });
-  }, [pageData, searchFilters])
+  const searchTrxs = useCallback(() => {
+    const tempMap = new Map(searchFilters);
+    const url = getUrlRecaudosList()
+    tempMap.forEach((val, key, map) => {
+      if (!val) {
+        map.delete(key);
+      }
+    });
+    const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${url}?${queries}`);
+  }, [fetchTrxs, searchFilters]);
 
-  useEffect(() => { getRecaudos() }, [getRecaudos, searchFilters, pageData])
+  useEffect(() => {
+    searchTrxs();
+  }, [searchTrxs]);
 
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Consulta recaudos manual</h1>
-      <TableEnterprise
-        title="Convenios de recaudo"
+      <DataTable
+        title="Convenios de Recaudos"
         headers={[
           "Código convenio",
           "Código EAN o IAC",
           "Nombre convenio",
         ]}
-        // data={datos['value'].map(
         data={listRecaudos.map(
           ({
             pk_id_convenio_directo,
@@ -64,33 +73,55 @@ const RecaudoManual = () => {
             nombre_convenio,
           })
         )}
-        onSelectRow={(e, i) => {
-
-          if (listRecaudos[i].estado) {
-            if (listRecaudos[i].fk_id_tipo_convenio !== 2) {
-              navigate(`/recaudo-directo/recaudo/${listRecaudos[i].pk_id_convenio_directo}`)
+        onClickRow={(_, index) => {
+          if (listRecaudos[index].estado) {
+            if (listRecaudos[index].fk_id_tipo_convenio !== 2) {
+              navigate(`/recaudo-directo/recaudo/${listRecaudos[index].pk_id_convenio_directo}`)
             } else { notifyError("Error, convenio con autorizador esta en desarrollo!") }
           } else { notifyError("Error, convenio no activo!") }
         }}
-        maxPage={maxPages}
-        onSetPageData={setPageData}
+        tblFooter={
+          <Fragment>
+            <DataTable.LimitSelector
+              defaultValue={10}
+              onChangeLimit={(limit) => {
+                setSingleFilter("limit", limit);
+                setSingleFilter("page", 1)
+              }}
+            />
+            <DataTable.PaginationButtons
+              onClickNext={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  isNextPage ? oldPage + 1 : oldPage
+                )
+              }
+              onClickPrev={(_) =>
+                setSingleFilter("page", (oldPage) =>
+                  oldPage > 1 ? oldPage - 1 : oldPage
+                )
+              }
+            />
+          </Fragment>
+        }
         onChange={(ev) => {
-          setSearchFilters((old) => ({
-            ...old,
-            [ev.target.name]: ev.target.value,
-          }))
+          setSearchFilters((old) => {
+            const copy = new Map(old)
+              .set(
+                ev.target.name, ev.target.value
+              )
+              .set("page", 1);
+            return copy;
+          })
         }}
       >
-
         <Input
           id={"pk_codigo_convenio"}
           label={"Código de convenio"}
           name={"pk_id_convenio_directo"}
           type="tel"
-          autoComplete="off"
           maxLength={"4"}
           onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
-          required
+          autoComplete="off"
         />
         <Input
           id={"codigo_ean_iac_search"}
@@ -100,7 +131,6 @@ const RecaudoManual = () => {
           autoComplete="off"
           maxLength={"13"}
           onInput={(ev) => { ev.target.value = onChangeEan13Number(ev); }}
-          required
         />
         <Input
           id={"nombre_convenio"}
@@ -109,11 +139,9 @@ const RecaudoManual = () => {
           type="text"
           autoComplete="off"
           maxLength={"30"}
-
-          required
         />
-      </TableEnterprise>
-    </Fragment>
+      </DataTable>
+    </Fragment >
   )
 }
 

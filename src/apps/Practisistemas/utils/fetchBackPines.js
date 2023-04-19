@@ -58,7 +58,7 @@ export const postCheckReintentoPines = async (bodyObj) => {
       bodyObj,
       {},
       true,
-      10000
+      9000
     );
     if (!res?.status) {
       console.error(res?.msg);

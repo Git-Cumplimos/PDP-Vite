@@ -28,7 +28,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
 const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
 // const url = "http://127.0.0.1:5000";
-const PpsObligatorioDemanda = ({ ced }) => {
+const PpsObligatorioDemanda = ({ ced, fun }) => {
   const { quotaInfo, roleInfo, infoTicket, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(true);
@@ -68,7 +68,9 @@ const PpsObligatorioDemanda = ({ ced }) => {
     cupoLogin: quotaInfo?.["quota"],
     tipoComercio: roleInfo?.["tipo_comercio"],
     nombreComercio: roleInfo?.["nombre comercio"],
+
     idTrx: "",
+    datocontacto: "",
   });
   const [procesandoTrx, setProcesandoTrx] = useState(false);
   const [disabledBtn, setDisabledBtn] = useState(false);
@@ -101,7 +103,10 @@ const PpsObligatorioDemanda = ({ ced }) => {
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Municipio", roleInfo?.ciudad],
+        ["Id Trx", datosComercio?.["idTrx"]],
+        ["Id Aut", datosComercio?.["idTrx"]],
+        ["Comercio", roleInfo?.nombre_comercio],
+        // ["Municipio", roleInfo?.ciudad],
         ["", ""],
         ["Dirección", roleInfo?.direccion],
         ["", ""],
@@ -110,9 +115,12 @@ const PpsObligatorioDemanda = ({ ced }) => {
       trxInfo: [
         ["PISO DE PROTECCIÓN SOCIAL - APORTE OBLIGATORIO"],
         ["", ""],
-        ["Número de documento", datosAportante?.["numDocumento"]],
+        ["Nombre", datosComercio?.["datocontacto"]?.slice(207, 307)],
+
         ["", ""],
-        ["Número de autorización", datosComercio?.["idTrx"]],
+        ["Número de documento", datosAportante?.["numDocumento"]],
+        // ["", ""],
+        // ["Número de autorización", datosComercio?.["idTrx"]],
         ["", ""],
         ["N.° Planilla", datosAportante?.["numPlanilla"]],
         ["", ""],
@@ -185,6 +193,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
                   idTrx:
                     respuesta?.obj?.datos_recibidos
                       ?.trazabilityFinancialInstitutionCode,
+                  datocontacto: respuesta?.obj?.datos_recibidos?.datocontacto,
                 };
               });
               // console.log("++++++idtrx", datosComercio?.idTrx);
@@ -295,7 +304,9 @@ const PpsObligatorioDemanda = ({ ced }) => {
         setDisabledBtn(false);
       }
     } else {
-      notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
+      notifyError(
+        "Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003])"
+      );
       navigate(`/colpensiones`);
     }
   };
@@ -355,7 +366,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
                 }}
               ></Select>
               <Input
-                label={"N° Documento"}
+                label={"N.° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={datosAportante?.["numDocumento"]}
                 minLength="6"
@@ -367,7 +378,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
               <Input
                 id="planilla"
                 name="planilla"
-                label="N° Planilla: "
+                label="N.° Planilla"
                 type="tel"
                 autoComplete="off"
                 minLength="10"
@@ -413,7 +424,14 @@ const PpsObligatorioDemanda = ({ ced }) => {
               </Button>
               /*  ) : null */
             }
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setShowModal(false);
+                fun();
+              }}
+            >
+              Cancelar
+            </Button>
           </ButtonBar>
         </Form>
       </Modal>
@@ -421,8 +439,17 @@ const PpsObligatorioDemanda = ({ ced }) => {
         <Modal show={showModal} handleClose={handleClose}>
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
-            <Button onClick={handlePrint}>Imprimir</Button>
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button
+                onClick={() => {
+                  setShowModal(false);
+                  fun();
+                }}
+              >
+                Cancelar
+              </Button>
+            </ButtonBar>
           </div>
         </Modal>
       ) : (

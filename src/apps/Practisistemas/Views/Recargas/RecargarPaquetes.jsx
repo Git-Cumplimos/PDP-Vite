@@ -148,7 +148,7 @@ const RecargarPaquetes = () => {
           if (res?.message === "Endpoint request timed out") {
             notify("Su transacción esta siendo procesada");
             setRespuesta(true);
-            for (let i = 0; i <= 3; i++) {
+            for (let i = 0; i <= 7; i++) {
               try {
                 const prom = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -187,9 +187,17 @@ const RecargarPaquetes = () => {
                         setRespuesta(false);
                         console.error(err);
                       });
-                  }, 7500)
+                  }, 9000)
                 );
                 if (prom === true) {
+                  setRespuesta(false);
+                  handleClose();
+                  break;
+                }
+                if (i >= 3) {
+                  notify(
+                    "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
+                  );
                   setRespuesta(false);
                   handleClose();
                   break;
@@ -197,13 +205,13 @@ const RecargarPaquetes = () => {
               } catch (error) {
                 console.error(error);
               }
-              if (i <= 2) {
+              if (i <= 3) {
                 notify(
                   "Su transacción esta siendo procesada, no recargue la página"
                 );
               }
             }
-            notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
+            // notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
             validNavigate("/recargas-paquetes");
           } else {
             notifyError(

@@ -389,7 +389,7 @@ const CompraPin = () => {
               day: "2-digit",
             }).format(today);
 
-            for (let i = 0; i <= 3; i++) {
+            for (let i = 0; i <= 7; i++) {
               try {
                 const promesa = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -434,9 +434,20 @@ const CompraPin = () => {
                         setShowLoading(false);
                         console.error(err);
                       });
-                  }, 7500)
+                  }, 9000)
                 );
                 if (promesa === true) {
+                  setShowLoading(false);
+                  handleClose();
+                  break;
+                }
+                if (i >= 3) {
+                  // notify(
+                  //   "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
+                  // );
+                  notify(
+                    "Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]"
+                  );
                   setShowLoading(false);
                   handleClose();
                   break;
@@ -444,7 +455,7 @@ const CompraPin = () => {
               } catch (error) {
                 console.error(error);
               }
-              if (i <= 2) { 
+              if (i <= 3) { 
                 notify(
                   "Su transacción esta siendo procesada, no recargue la página"
                 );
@@ -452,7 +463,8 @@ const CompraPin = () => {
               }
             }
             validNavigate("/Pines/PinesContenido");
-            notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
+            // No se muestra esta notificación ya que se debe revisar el estado de la trx si quedo aprobada o rechazada
+            // notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003] Numero2");
           } else {
             notifyError(
               res?.obj?.response?.respuesta ==

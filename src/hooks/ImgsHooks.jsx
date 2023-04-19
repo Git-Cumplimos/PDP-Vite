@@ -20,9 +20,12 @@ const reducerImgs = (state, action) => {
   switch (_type) {
     case SET_IMGS:
       return { ...state, imgs: { ...state.imgs, [payload.name]: payload.img } };
-    
+
     case SET_BANNERS:
-      return { ...state, imgs: { ...state.imgs, [payload.name]: payload.img } };
+      return {
+        ...state,
+        banners: payload,
+      };
 
     case SET_SVGS:
       return { ...state, svgs: { ...state.svgs, [payload.name]: payload.svg } };
@@ -35,14 +38,12 @@ const reducerImgs = (state, action) => {
         });
       }
       return state;
-    
+
     case FETCH_BANNERS:
-      for (const [key, val] of Object.entries(images)) {
-        payload.dispatch({
-          type: SET_BANNERS,
-          payload: { name: key, img: val },
-        });
-      }
+      payload.dispatch({
+        type: SET_BANNERS,
+        payload: payload.banners,
+      });
       return state;
 
     case FETCH_SVGS:
@@ -72,8 +73,37 @@ export const useProvideImgs = () => {
   const [assets, dispatchImgs] = useReducer(reducerImgs, initialImgs);
   useEffect(() => {
     dispatchImgs({ type: FETCH_IMGS, payload: { dispatch: dispatchImgs } });
-    dispatchImgs({ type: FETCH_BANNERS, payload: { dispatch: dispatchImgs } });
     dispatchImgs({ type: FETCH_SVGS, payload: { dispatch: dispatchImgs } });
+    checkBanners(banners).then((data) => {
+      dispatchImgs({
+        type: FETCH_BANNERS,
+        payload: { banners: data, dispatch: dispatchImgs },
+      });
+    });
   }, []);
   return assets;
 };
+
+const checkBanners = async (banners_data) => {
+  const data_banners = {};
+  for (const [key, val] of Object.entries(banners_data)) {
+    const res = await checkImage(val);
+    if (res) {
+      data_banners[key] = val;
+    }
+  }
+  return data_banners;
+};
+
+const checkImage = async (url) => {
+  try {
+    const response = await fetch(url);
+    if (response.status >= 400) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+export default checkImage;

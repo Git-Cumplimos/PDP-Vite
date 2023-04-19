@@ -154,7 +154,7 @@ const RecargarApuestas = () => {
       notify("Su transacción esta siendo procesada");
       setRespuesta(true);
       console.error(err);
-      for (let i = 0; i <=3; i++) {
+      for (let i = 0; i <= 7; i++) {
         try {
           const prom = await new Promise((resolve, reject) =>
             setTimeout(() => {
@@ -188,9 +188,17 @@ const RecargarApuestas = () => {
                 setRespuesta(false);
                 console.error(err);
               });
-            }, 7500)
+            }, 9000)
           );
           if (prom === true) {
+            setRespuesta(false);
+            handleClose();
+            break;
+          }
+          if (i >= 3) {
+            notify(
+              "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
+            );
             setRespuesta(false);
             handleClose();
             break;
@@ -198,7 +206,7 @@ const RecargarApuestas = () => {
         } catch (error) {
           console.error(error);
         }        
-        if (i <= 2) {
+        if (i <= 3) {
           notify(
             "Su transacción esta siendo procesada, no recargue la página"
           );
