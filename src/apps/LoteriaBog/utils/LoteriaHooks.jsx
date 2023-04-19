@@ -483,9 +483,6 @@ export const useProvideLoteria = () => {
     [sorteosLOT]
   );
   
-  useEffect(() => {
-  }, [codigosOficina]);
-  
   const makePayment = useCallback(
     async (
       sorteo,
@@ -604,7 +601,7 @@ export const useProvideLoteria = () => {
         }
       }
     },
-    []
+    [codigosOficina]
   );
 
   const makePayment2 = useCallback(
