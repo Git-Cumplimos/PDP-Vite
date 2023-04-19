@@ -42,7 +42,7 @@ const RetiroEfectivo = () => {
   const [loadingPeticionRetiroEfectivo, peticionRetiroEfectivo] =
     useFetch(fetchRetiroEfectivo);
   const validNavigate = useNavigate();
-  const { roleInfo, infoTicket: guardarTicket } = useAuth();
+  const { roleInfo, infoTicket: guardarTicket, pdpUser } = useAuth();
 
   const onCuentaChange = (e) => {
     const cuenta = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
@@ -98,6 +98,7 @@ const RetiroEfectivo = () => {
       ciudad: roleInfo.ciudad,
       codigo_dane: roleInfo.codigo_dane,
       nombre_comercio: roleInfo["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
     };
 
     peticionRetiroEfectivo(dataPeticion)
@@ -168,11 +169,11 @@ const RetiroEfectivo = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Retiro en efectivo</h1>
+      <h1 className='text-3xl mt-6'>Retiro en efectivo</h1>
       <Form grid onSubmit={onSubmitCheck}>
         <Select
-          name="tipoCuenta"
-          label="Tipo de cuenta"
+          name='tipoCuenta'
+          label='Tipo de cuenta'
           options={optionsSelect}
           value={dataInput.tipoCuenta}
           onChange={(e) => {
@@ -183,31 +184,31 @@ const RetiroEfectivo = () => {
           }}
         />
         <Input
-          name="cuenta"
-          label="Cuenta"
-          type="text"
-          minLength="1"
-          maxLength="12"
-          autoComplete="off"
+          name='cuenta'
+          label='Cuenta'
+          type='text'
+          minLength='1'
+          maxLength='12'
+          autoComplete='off'
           value={dataInput.cuenta}
           onChange={(e) => onCuentaChange(e)}
           required
         />
         <Input
-          name="OTP"
-          label="Token de retiro"
-          type="text"
-          minLength="1"
-          maxLength="8"
-          autoComplete="off"
+          name='OTP'
+          label='Token de retiro'
+          type='text'
+          minLength='1'
+          maxLength='8'
+          autoComplete='off'
           value={dataInput.OTP}
           onChange={(e) => onOtpChange(e)}
           required
         />
         <MoneyInput
-          name="amount"
-          label="Valor a retirar"
-          autoComplete="off"
+          name='amount'
+          label='Valor a retirar'
+          autoComplete='off'
           min={limitesMontos?.min}
           max={limitesMontos?.max}
           onInput={(e, valor) =>
@@ -218,7 +219,7 @@ const RetiroEfectivo = () => {
           }
           required
         />
-        <ButtonBar className="lg:col-span-2">
+        <ButtonBar className='lg:col-span-2'>
           <Button>Retirar</Button>
         </ButtonBar>
       </Form>
@@ -230,23 +231,20 @@ const RetiroEfectivo = () => {
             : loadingPeticionRetiroEfectivo
             ? () => {}
             : handleClose
-        }
-      >
+        }>
         {tipoModal == 1 && (
           <PaymentSummaryInicial
             dataInput={dataInput}
             handleClose={handleClose}
             realizarRetiroEfectivo={realizarRetiroEfectivo}
             loadingPeticionRetiroEfectivo={loadingPeticionRetiroEfectivo}
-            optionsSelect={optionsSelect}
-          ></PaymentSummaryInicial>
+            optionsSelect={optionsSelect}></PaymentSummaryInicial>
         )}
 
         {tipoModal == 2 && (
           <ModalTicket
             infTicket={infTicket}
-            handleClose2={handleClose2}
-          ></ModalTicket>
+            handleClose2={handleClose2}></ModalTicket>
         )}
       </Modal>
     </Fragment>
