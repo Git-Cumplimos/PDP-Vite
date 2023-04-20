@@ -73,7 +73,7 @@ const SellResp = ({
       title: "Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "2-digit",
+          year: "numeric",
           month: "2-digit",
           day: "2-digit",
         }).format(fecha_trx),

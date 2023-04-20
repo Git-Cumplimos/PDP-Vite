@@ -107,8 +107,12 @@ const GestionArchivosRecaudo = () => {
           },
           {
             render({ data: err }) {
-              setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
-              return `Archivo erroneo`;
+              if (err.msg !== "Error: Archivo vacio"){
+                setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
+                return `Archivo erróneo`;
+              }
+              handleClose()
+              return err.msg
             },
           }
         );
@@ -310,7 +314,6 @@ const GestionArchivosRecaudo = () => {
         <Form onSubmit={showModalOptions ? CargarArchivo : DescargarReporte}>
           {showModalOptions && (
             <Input
-              // label='Seleccionar Archivo'
               type="file"
               autoComplete="off"
               onChange={(e) => {

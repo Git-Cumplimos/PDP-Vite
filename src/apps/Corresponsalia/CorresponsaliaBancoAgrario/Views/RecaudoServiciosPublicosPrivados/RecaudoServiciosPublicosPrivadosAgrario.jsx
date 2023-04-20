@@ -23,7 +23,7 @@ import {
 
 const RecaudoServiciosPublicosPrivadosAgrario = () => {
   const { state } = useLocation();
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
 
   const [{ showModal, estadoPeticion }, setShowModal] = useState({
@@ -166,6 +166,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
           : false,
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,

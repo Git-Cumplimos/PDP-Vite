@@ -68,6 +68,10 @@ const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
 /** Loteria Bogota */
 const venta = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
 const Sorteos = lazy(() => import("../apps/LoteriaBog/Views/Sorteos"));
+const DownloadArchivos = lazy(() => import("../apps/LoteriaBog/Views/DownloadArchivos"));
+const ArchivosPagoPremios = lazy(() =>
+  import("../apps/LoteriaBog/Views/ArchivosPagoPremios")
+);
 const DescargarArchivosS3 = lazy(() =>
   import("../apps/LoteriaBog/Views/DescargarArchivosS3")
 );
@@ -327,7 +331,7 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/loteria",
-    label: <AppIcons Logo={"Loteria"} name="Loteria" />,
+    label: <AppIcons Logo={"Loteria"} name="Lotería" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
     permission: [3, 4, 5, 6, 44, 45, 46, 47, 95],
@@ -396,10 +400,24 @@ const allUrlsPrivateApps = [
           ],
         },
         {
-          link: `/loteria/${name}/descargar/descarga_reportes`,
-          label: <AppIcons Logo={"DESCARGAR"} name="Descarga de archivos" />,
-          component: DescargarArchivosS3,
+          link: `/loteria/${name}/descargarArchivos`,
+          label: <AppIcons Logo={"DESCARGAR"} name="Descarga de archivos"/>,
+          component: DownloadArchivos,
           permission: [6],
+          subRoutes : [
+            {
+              link: `/loteria/${name}/descargarArchivos/descarga_reportes`,
+              label: <AppIcons Logo={"DESCARGAR"} name="Archivos de ventas"/>,
+              component: DescargarArchivosS3,
+              permission: [6],
+            },
+            {
+              link: `/loteria/${name}/descargarArchivos/descarga_reportes_pagoPremios`,
+              label: <AppIcons Logo={"DESCARGAR"} name="Archivos de pago de premios"/>,
+              component: ArchivosPagoPremios,
+              permission: [6],
+            },
+          ]
         },
         {
           link: `/loteria/${name}/premios`,

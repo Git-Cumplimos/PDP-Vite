@@ -106,8 +106,12 @@ const GestionArchivosRetiro = () => {
         },
         {
           render({ data: err }) {
-            setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
-            return `Archivo erroneo`;
+            if (err.msg !== "Error: Archivo vacio"){
+              setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
+              return `Archivo erróneo`;
+            }
+            handleClose()
+            return err.msg
           }
         }
       )
@@ -121,23 +125,6 @@ const GestionArchivosRetiro = () => {
     const timebody = Object.fromEntries(
       Object.entries(Object.fromEntries(formData))
     );
-    // const formData = new FormData(e.currentTarget);
-    // const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
-    // try {
-    //   downloadFileRetiro({ ...body, convenio_id: selected.pk_id_convenio_directo })
-    //     .then(async (res) => {
-    //       if (res.codigo) throw res.msg
-    //       descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
-    //     })
-    //     .catch((err) => {
-    //       if (err?.cause === "custom") {
-    //         notifyError(err?.message);
-    //         return;
-    //       }
-    //       notifyError(err);
-    //       handleClose()
-    //     })
-    // }
     const body = {
       convenio_id: selected.pk_id_convenio_directo,
       nombre_convenio: selected.nombre_convenio,

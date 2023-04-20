@@ -44,7 +44,7 @@ const rutasBancolombiaRecaudoEmpresarial = {
   subRoutes: [
     {
       link: "/recaudoEmpresarial/recaudoEmpresarialBancolombia/CargarArchivos",
-      label: <AppIcons Logo={"DepositoDaviplata"} name="Cargar Archivos" />,
+      label: <AppIcons Logo={"DepositoDaviplata"} name="Cargue archivo contingencia Bancolombia" />,
       component: CargarArchivos,
       permission: [4001],
     },
