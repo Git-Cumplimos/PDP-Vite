@@ -22,7 +22,7 @@ const PaymentSummary = ({
             <li key={key}>
               <h1 className="grid grid-flow-col auto-cols-fr gap-6">
                 <strong className="justify-self-end">{key}:</strong>
-                <p>{val}</p>
+                <p className="justify-self-start whitespace-pre-wrap">{val}</p>
               </h1>
             </li>
           );

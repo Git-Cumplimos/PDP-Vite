@@ -21,7 +21,7 @@ import {
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
@@ -275,6 +275,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
           : false,
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,
