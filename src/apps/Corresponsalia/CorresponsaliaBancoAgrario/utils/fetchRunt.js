@@ -48,9 +48,10 @@ export const fetchCustom = (url_, metodo_, name_) => {
         );
       }
     } catch (error) {
+      console.log("error", error)
       throw error;
     }
-
+    console.log("Peticion", Peticion)
     //evaluar respuesta de api gateway
     try {
       if (Peticion?.hasOwnProperty("status") === false) {

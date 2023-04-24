@@ -166,13 +166,15 @@ const PagarRunt = () => {
         idtipo_dispositivo: roleInfo.idtipo_dispositivo,
         serial_dispositivo: roleInfo.serial_dispositivo,
         telefono: roleInfo?.telefono,
+        dane_code: roleInfo?.codigo_dane,
+        city: roleInfo?.["ciudad"],
       };
 
       peticionPayRunt({}, data)
         .then((response) => {
           if (response?.status === true) {
-            const voucher = response.obj.result.ticket;
-            setInfTicket(JSON.parse(voucher));
+            const voucher = response?.obj?.result?.ticket;
+            setInfTicket(voucher);
             setPaso("TransaccionExitosa");
           }
           notify("Pago del RUNT exitoso");
