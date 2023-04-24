@@ -104,6 +104,7 @@ const PagarRunt = () => {
         .then((response) => {
           if (response?.status === true) {
             setNumeroRunt(response?.obj?.result?.numero_runt);
+            notify(response?.msg);
             setPaso("LecturaRunt");
           }
         })
