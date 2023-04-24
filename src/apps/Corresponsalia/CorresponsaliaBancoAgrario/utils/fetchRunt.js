@@ -103,13 +103,12 @@ export const EvaluateResponse = (res, name_ = "") => {
       error.message
     );
   }
-
   // trx no exitosa
   //para los errores customizados del backend
   try {
     if (
       res?.status === false &&
-      res?.obj?.error_status === true &&
+      (res?.obj?.error_status === true || res?.obj?.error === true) &&
       res?.obj?.error_msg
     ) {
       throw new ErrorCustomBackend(`${res?.msg}`, `${res?.msg}`);
@@ -124,7 +123,6 @@ export const EvaluateResponse = (res, name_ = "") => {
       );
     }
   }
-
   // cuando status es false pero no hay errores
   try {
     if (res?.status === false && res?.obj?.error === false && res?.msg) {
