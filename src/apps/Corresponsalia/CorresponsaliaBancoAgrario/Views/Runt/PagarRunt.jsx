@@ -100,6 +100,10 @@ const PagarRunt = () => {
       const data = {
         codigo_barras: info,
       };
+      if (info === "") { 
+        notifyError("El campo del código de barras está vacío, por favor scanee o dijite el código");
+        return;
+      }
       peticionBarcode({}, data)
         .then((response) => {
           if (response?.status === true) {
@@ -240,7 +244,7 @@ const PagarRunt = () => {
   return (
     <Fragment>
       <h1 className='text-3xl mt-6'>Pago de RUNT</h1>
-      <Form>
+      <Form >
         <div className={styleComponents}>
           <Select
             id='opciones'

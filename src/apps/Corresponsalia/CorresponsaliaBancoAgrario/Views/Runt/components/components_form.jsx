@@ -4,6 +4,7 @@ import Button from "../../../../../../components/Base/Button";
 import ButtonBar from "../../../../../../components/Base/ButtonBar";
 import Input from "../../../../../../components/Base/Input";
 import classes from "../PagarRunt.module.css";
+import Form from "../../../../../../components/Base/Form/Form";
 
 //Clases estilos
 const { styleComponentsInput, formItem } = classes;
@@ -43,8 +44,12 @@ export const LecturaRunt = ({
       <ButtonBar></ButtonBar>
       <h2 className="text-1xl mt-6">Número de RUNT</h2>
       <ButtonBar></ButtonBar>
+      {/* <Form > */}
+
       {procedimiento === option_barcode && (
+        
         <Input
+          required
           className={styleComponentsInput}
           type="text"
           autoComplete="off"
@@ -54,6 +59,7 @@ export const LecturaRunt = ({
       )}
       {procedimiento === option_manual && (
         <Input
+          required
           className={styleComponentsInput}
           type="text"
           autoComplete="off"
@@ -64,13 +70,14 @@ export const LecturaRunt = ({
       )}
 
       <ButtonBar className="flex justify-center py-6">
-        <Button type={"submit"} onClick={onSubmit} disabled={loadingPeticion}>
+        <Button type={"submit"} onClick={onSubmit} disabled={numeroRunt === "" || numeroRunt === 0 ? !loadingPeticion : loadingPeticion }>
           Tramitar RUNT
         </Button>
         <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
           Cancelar
         </Button>
       </ButtonBar>
+      {/* </Form> */}
     </Fragment>
   );
 };
