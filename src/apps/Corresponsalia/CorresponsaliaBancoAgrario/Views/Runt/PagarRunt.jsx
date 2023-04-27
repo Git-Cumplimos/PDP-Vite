@@ -100,6 +100,10 @@ const PagarRunt = () => {
       const data = {
         codigo_barras: info,
       };
+      if (info === "") { 
+        notifyError("El campo del código de barras está vacío, por favor scanee o dijite el código");
+        return;
+      }
       peticionBarcode({}, data)
         .then((response) => {
           if (response?.status === true) {
