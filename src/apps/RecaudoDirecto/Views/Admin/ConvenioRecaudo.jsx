@@ -60,7 +60,7 @@ const RecaudoDirecto = () => {
     { label: "Sin base de datos", value: 3 },
   ]
   const tipoArchivoConciliacion = [
-    { label: "Reporte Generico csv", value: "Reporte Generico csv" },
+    { label: "Reporte Genérico csv", value: "Reporte Generico csv" },
     { label: "Asobancaria 2001", value: "Asobancaria 2001" }
   ]
 

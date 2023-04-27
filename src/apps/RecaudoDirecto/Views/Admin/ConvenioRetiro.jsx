@@ -57,7 +57,7 @@ const RetiroDirecto = () => {
     { label: "Con autorizador", value: 2 },
   ]
   const tipoArchivoConciliacion = [
-    { label: "Reporte Generico csv", value: "Reporte Generico csv" },
+    { label: "Reporte Genérico csv", value: "Reporte Generico csv" },
     { label: "Asobancaria 2001", value: "Asobancaria 2001" }
   ]
 
