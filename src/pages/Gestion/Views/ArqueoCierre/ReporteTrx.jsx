@@ -1,28 +1,21 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
-import TicketColpatria from "../../../../apps/Colpatria/components/TicketColpatria";
-import TicketsAgrario from "../../../../apps/Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
-import TicketsDavivienda from "../../../../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
-import TicketsAval from "../../../../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
-import TicketsPines from "../../../../apps/PinesVus/components/TicketsPines";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Fragment, useState } from "react";
+
 import Accordion from "../../../../components/Base/Accordion";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-import ButtonLink from "../../../../components/Base/ButtonLink";
-import Form from "../../../../components/Base/Form";
-import Modal from "../../../../components/Base/Modal";
-import Select from "../../../../components/Base/Select";
-import Tickets from "../../../../components/Base/Tickets";
-import PaymentSummary from "../../../../components/Compound/PaymentSummary";
-import { useAuth } from "../../../../hooks/AuthHooks";
+import Input from "../../../../components/Base/Input";
+
+
 import { makeMoneyFormatter } from "../../../../utils/functions";
 import { notifyError } from "../../../../utils/notify";
-import { buscarReporteTrxArqueo } from "../../utils/fetchCaja";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import Error404 from "../../../Error404";
 
 const formatMoney = makeMoneyFormatter(2);
+const urlReportes = `${process.env.REACT_APP_URL_ARQUEO}/get-data`;
 
-const GridRow = ({ cols = [], self = false, onClick = () => {} }) => (
+const GridRow = ({ cols = [], self = false }) => (
   <div
     className={`grid gap-4 ${
       self ? "py-4 px-2 bg-secondary-light" : ""
@@ -30,7 +23,6 @@ const GridRow = ({ cols = [], self = false, onClick = () => {} }) => (
     style={{
       gridTemplateColumns: `repeat(${cols?.length || 1}, minmax(0, 1fr))`,
     }}
-    onClick={onClick}
   >
     {cols.map((val, ind) => (
       <div key={ind}>{val}</div>
@@ -38,264 +30,302 @@ const GridRow = ({ cols = [], self = false, onClick = () => {} }) => (
   </div>
 );
 
-const TreeView = ({ tree = {}, onClickLastChild = (info, ev) => {} }) =>
+const TreeView = ({ tree = {}, child }) =>
   Object.entries(tree).map(([key, info]) => {
-    const cols = [
-      key,
-      info?.nombre ?? "",
-      formatMoney.format(info?.monto) ?? "No data",
-      "status" in info
-        ? info?.status === true
-          ? "Transaccion exitosa"
-          : info?.status === false
-          ? "Transaccion fallida"
-          : ""
-        : "No. txns",
-      info?.date_trx ?? info?.total_trxs ?? "",
-    ];
-
-    if (info?.nodes) {
-      return (
-        <Accordion titulo={<GridRow cols={cols} />} key={key}>
-          {info?.nodes && (
-            <TreeView tree={info?.nodes} onClickLastChild={onClickLastChild} />
-          )}
-        </Accordion>
-      );
+    var cols = []
+    if (child) {
+      cols = [
+        info.id,
+        info.nombre, 
+        info.transaccionesExitosas,
+        info.transaccionesFallidas, 
+        formatMoney.format(info.monto), 
+        formatMoney.format(info.comisiones)
+      ];
+      if (info?.transacciones) {
+        return (
+          <Accordion titulo={<GridRow cols={cols} />} key={key}>
+            {info?.transacciones && (
+              <TreeView tree={info?.transacciones} child={true} />
+            )}
+          </Accordion>
+        );
+      }
+    } else {
+      cols = [
+        "",
+        info.nombre,
+        valoresCalculadosGrupos(info.autorizadores,"transaccionesExitosas"),
+        valoresCalculadosGrupos(info.autorizadores,"transaccionesFallidas"), 
+        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,"cupo")), 
+        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,"comisiones"))
+      ];
+      if (info?.autorizadores) {
+        return (
+          <Accordion titulo={<GridRow cols={cols} />} key={key}>
+            {info?.autorizadores && (
+              <TreeView tree={info?.autorizadores} child={true} />
+            )}
+          </Accordion>
+        );
+      }
     }
     return (
       <GridRow
         key={key}
         cols={cols}
-        onClick={(ev) => onClickLastChild(info, ev)}
         self
       />
     );
   });
 
-const ReporteTrx = () => {
-  const { roleInfo } = useAuth();
-  const { pathname } = useLocation();
-
-  const printDiv = useRef();
-
-  const handlePrint = useReactToPrint({
-    content: () => printDiv.current,
-  });
-
-  const [trxState, setTrxState] = useState("true");
-
-  const [trxTree, setTrxTree] = useState({});
-  const [montoTotal, setMontoTotal] = useState(0.0);
-  const [totalTransacciones, setTotalTransacciones] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState(null);
-  const [summaryTrx, setSummaryTrx] = useState(null);
-
-  const handleClose = useCallback(() => {
-    setSelected(null);
-    setSummaryTrx(null);
-  }, []);
-
-  useEffect(() => {
-    const conditions = [
-      roleInfo?.id_usuario !== undefined,
-      roleInfo?.id_usuario !== null,
-      roleInfo?.id_comercio !== undefined,
-      roleInfo?.id_comercio !== null,
-      roleInfo?.id_dispositivo !== undefined,
-      roleInfo?.id_dispositivo !== null,
-    ];
-    if (conditions.every((val) => val)) {
-      setLoading(true);
-      buscarReporteTrxArqueo({
-        id_usuario: roleInfo?.id_usuario,
-        id_comercio: roleInfo?.id_comercio,
-        id_terminal: roleInfo?.id_dispositivo,
-        status: trxState,
-      })
-        .then((res) => {
-          setTrxTree(res?.obj?.results);
-          setMontoTotal(res?.obj?.monto);
-          setTotalTransacciones(res?.obj?.total_trxs);
-        })
-        .catch((error) => {
-          if (error?.cause === "custom") {
-            notifyError(error?.message);
-            return;
+  const valoresCalculadosTotales = (gruposTransaccion, valor) => {
+    var valorCalculado = 0
+    if (gruposTransaccion !== null && gruposTransaccion !== undefined) {
+      if (gruposTransaccion.length > 0) {
+        gruposTransaccion.map((autorizadores) => {
+          if (autorizadores.autorizadores.length > 0) {
+            if (valor === "transaccionesExitosas") {
+              autorizadores.autorizadores.map((autorizador) => {
+                valorCalculado += autorizador.transaccionesExitosas;
+              })
+            }
+            if (valor === "transaccionesFallidas") {
+              autorizadores.autorizadores.map((autorizador) => {
+                valorCalculado += autorizador.transaccionesFallidas;
+              })
+            }
+            if (valor === "cupo") {
+              autorizadores.autorizadores.map((autorizador) => {
+                valorCalculado += autorizador.monto;
+              })
+            }
+            if (valor === "comisiones") {
+              autorizadores.autorizadores.map((autorizador) => {
+                valorCalculado += autorizador.comisiones;
+              })
+            }
           }
-          console.error(error?.message);
-          notifyError("Consulta fallida");
         })
-        .finally(() => setLoading(false));
+      }
     }
-  }, [
-    roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
-    roleInfo?.id_usuario,
-    trxState,
-  ]);
+    return valorCalculado
+  }
+  
+  const valoresCalculadosGrupos = (autorizadores, valor) => {
+    var valorCalculado = 0
+    if (autorizadores !== null && autorizadores !== undefined) {
+      if (autorizadores.length > 0) {
+        if (valor === "transaccionesExitosas") {
+          autorizadores.map((autorizador) => {
+            valorCalculado += autorizador.transaccionesExitosas;
+          })
+        }
+        if (valor === "transaccionesFallidas") {
+          autorizadores.map((autorizador) => {
+            valorCalculado += autorizador.transaccionesFallidas;
+          })
+        }
+        if (valor === "cupo") {
+          autorizadores.map((autorizador) => {
+            valorCalculado += autorizador.monto;
+          })
+        }
+        if (valor === "comisiones") {
+          autorizadores.map((autorizador) => {
+            valorCalculado += autorizador.comisiones;
+          })
+        }
+      }
+    }
+    return valorCalculado
+  }
 
-  return (
-    <Fragment>
-      <h1 className="text-3xl mt-6">Reporte de transacciones</h1>
-      <div className="w-full px-10 my-10">
-        <Form grid>
-          <Select
-            id="trxState"
-            name="trxState"
-            label="Estado de la transaccion"
-            options={[
-              // { value: "null", label: "" },
-              { value: "true", label: "Aprobada" },
-              { value: "false", label: "Fallida" },
-            ]}
-            onChange={(ev) => setTrxState(ev.target.value)}
-            defaultValue={"true"}
-            disabled={loading}
+const headers = [
+  "",
+  "",
+  "Transacciones Exitosas",
+  "Transacciones Fallidas",
+  "Monto",
+  "Comisiones"
+]
+
+export const getDataBack = async (body) => {
+  const url = urlReportes;
+  try {
+    const result = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await result.json();
+    return data;
+  } catch (error) {
+    console.log("ERROR BACK: ", error.message.toString())
+    return null;
+  }
+};
+
+const ReporteTrx = () => {  
+
+  const { roleInfo } = useAuth();
+  const [dataCapitalizar, setDataCapitalizar] = useState({});
+  const [dataInicioDia, setDataInicioDia] = useState({});
+  const [dataTransacciones, setDataTransacciones] = useState([]);
+
+  const [loadScreen, setLoadScreen] = useState(false);
+  const [fechas, setFechas] = useState({ fechaInicial: "", fechaFinal: "" });
+
+  try{
+      
+    const getData = async () => {
+      setLoadScreen(true);
+      try {
+        if (fechas.fechaInicial !== "" && fechas.fechaFinal !== "") {
+          if (new Date(fechas.fechaFinal) <= new Date(fechas.fechaInicial)) {
+            notifyError("La fecha final debe ser mayor a la inicial");
+          } else {
+            const body = {
+              idComercio: roleInfo.id_comercio,
+              fechaInicio: fechas.fechaInicial,
+              fechaFin: fechas.fechaFinal
+            }
+            const dataBack = await getDataBack(body);
+            if (dataBack != null) {
+              if (dataBack.codigo === 200 && dataBack.status === true) {
+                if (dataBack.obj.grupoTransacciones.length > 0) {
+                  setDataCapitalizar(dataBack.obj.capitalizar);
+                  setDataInicioDia(dataBack.obj.inicioDia);
+                  setDataTransacciones(dataBack.obj.grupoTransacciones);
+                } else {
+                  notifyError("No se encontraron registros en el rango de fecha");
+                }
+              } else {
+                notifyError("Consulta fallida");
+              }
+            }
+          }
+        } else {
+          notifyError("Debe seleccionar ambas fechas");
+        }
+      } catch (error) {
+        notifyError("Hubo un error, vuelva a intentar");
+      }
+      setLoadScreen(false);
+    }
+
+    return (
+      <Fragment>
+        { loadScreen &&
+          <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-50 overflow-hidden bg-gray-700 opacity-75 flex flex-col items-center justify-center">
+            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4" />
+            <h2 className="text-center text-white text-xl font-semibold">{"Cargando"}</h2>
+          </div>
+        }
+        <h1 className="text-3xl mt-6">Reporte de transacciones</h1>        
+        <div className="w-full px-10 my-10">
+          <Input
+            id="fechaInicial"
+            name="fechaInicial"
+            label={"Fecha inicio"}
+            type="date"
+            autoComplete="off"
+            value={fechas?.["fechaInicial"]}
+            onChange={(e) => {
+              setFechas((last) => {
+                return { ...last, fechaInicial: e.target.value };
+              });
+            }}
+            required
           />
-          <ButtonBar />
-        </Form>
-        <Accordion
-          titulo={
-            <GridRow
-              cols={["", "Total Valor", "No. Transacciones", "", ""]}
-            />
-          }
-        />
-        <Accordion
-          titulo={
-            <GridRow
-              cols={["", formatMoney.format(montoTotal), totalTransacciones, "", ""]}
-            />
-          }
-        />
-        <TreeView
-          tree={trxTree}
-          onClickLastChild={(info, ev) => {
-            setSelected(info);
-            setSummaryTrx({
-              "Tipo transaccion": info?.nombre_tipo_transaccion,
-              Fecha: info?.date_trx,
-              "Mensaje de respuesta trx": info?.message_trx,
-              Monto: formatMoney.format(info?.monto),
-              "Estado de la trasaccion": info?.status
-                ? "Transaccion aprobada"
-                : "Transaccion rechazada",
-            });
-          }}
-        />
-      </div>
-      <Modal show={selected} handleClose={handleClose}>
-        {selected?.ticket &&
-        Object.entries(selected?.ticket ?? {}).length > 0 &&
-        JSON.stringify(selected?.ticket) !== "{}" ? (
-          <div className="flex flex-col justify-center items-center">
-            {selected?.id_autorizador === 13 ? (
-              <TicketsDavivienda
-                refPrint={printDiv}
-                type="Reimpresión"
-                ticket={selected?.ticket}
-                stateTrx={selected?.status_trx}
-              />
-            ) : selected?.id_autorizador === 14 ? (
-              <TicketColpatria
-                refPrint={printDiv}
-                type="Reimpresión"
-                ticket={selected?.ticket}
-                stateTrx={selected?.status_trx}
-              />
-            ) : selected?.id_autorizador === 17 ? (
-              <TicketsAval
-                refPrint={printDiv}
-                type="Reimpresión"
-                ticket={selected?.ticket}
-                stateTrx={selected?.status_trx}
-              />
-            ) : selected?.id_autorizador === 14 ? (
-              <TicketColpatria
-                refPrint={printDiv}
-                type="Reimpresión"
-                ticket={selected?.ticket}
-                stateTrx={selected?.status_trx}
-              />
-            ) : selected?.id_autorizador === 16 ? (
-              <TicketsAgrario
-                refPrint={printDiv}
-                type="Reimpresión"
-                ticket={selected?.ticket}
-                stateTrx={selected?.status_trx}
-              />
-            ) : selected?.id_tipo_transaccion === 43 ? (
-              <div ref={printDiv}>
-                {selected?.ticket?.ticket2 ? (
-                  <>
-                    <TicketsPines
-                      refPrint={null}
-                      ticket={selected?.ticket?.ticket1}
-                      type="Reimpresión"
-                      stateTrx={selected?.status_trx}
-                      logo="LogoMiLicensia"
-                    />
-                    <TicketsPines
-                      refPrint={null}
-                      ticket={selected?.ticket?.ticket2}
-                      type="Reimpresión"
-                      stateTrx={selected?.status_trx}
-                      logo="LogoVus"
-                    />
-                  </>
-                ) : (
-                  <Tickets
-                    refPrint={null}
-                    ticket={selected?.ticket}
-                    type="Reimpresión"
-                    stateTrx={selected?.status_trx}
-                  />
-                )}
-              </div>
-            ) : (
-              <Tickets
-                refPrint={printDiv}
-                type="Reimpresión"
-                ticket={selected?.ticket}
-                stateTrx={selected?.status_trx}
-              />
-            )}
-            <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={handleClose}>Cerrar</Button>
-            </ButtonBar>
-          </div>
-        ) : (
-          <div className="flex flex-col justify-center items-center mx-auto container">
-            <PaymentSummary
-              title="Resumen transaccion"
-              subtitle=""
-              summaryTrx={summaryTrx}
+          <br/>
+          <Input
+            id="fechaFinal"
+            name='fechaFinal'
+            label={"Fecha fin"}
+            type="date"
+            autoComplete="off"
+            value={fechas?.["fechaFinal"]}
+            onChange={(e) => {
+              setFechas((last) => {
+                return { ...last, fechaFinal: e.target.value };
+              });
+            }}
+            required
+          />
+          <ButtonBar className='lg:col-span-2'>
+            <Button
+              onClick={() => getData()}
+              type='submit'
             >
-              <h1 className="text-3xl mt-6 text-aling">
-                No hay ticket registrado
-              </h1>
-              <ButtonBar>
-                <Button onClick={handleClose}>Cerrar</Button>
-              </ButtonBar>
-            </PaymentSummary>
+              Generar reporte
+            </Button>
+          </ButtonBar>
+        </div>
+        { dataTransacciones.length > 0 &&
+          <div className="w-full px-10 my-10">          
+            <Accordion
+              titulo={
+                <GridRow
+                  cols={headers}
+                />
+              }
+            />
+            <Accordion
+              titulo={
+                <GridRow
+                  cols={[
+                    "", 
+                    dataInicioDia.nombre, 
+                    "",
+                    "",
+                    formatMoney.format(dataInicioDia.monto), 
+                    formatMoney.format(dataInicioDia.comisiones)
+                  ]}
+                />
+              }
+            />
+            <TreeView
+              tree={dataTransacciones}
+              child={false}
+            />
+            <Accordion
+              titulo={
+                <GridRow
+                  cols={[
+                    "", 
+                    dataCapitalizar.nombre, 
+                    dataCapitalizar.transaccionesExitosas,
+                    dataCapitalizar.transaccionesFallidas,
+                    formatMoney.format(dataCapitalizar.monto), 
+                    formatMoney.format(dataCapitalizar.comisiones)
+                  ]}
+                />
+              }
+            />
+            <Accordion
+              titulo={
+                <GridRow
+                  cols={[
+                    "", 
+                    "Calculado", 
+                    valoresCalculadosTotales(dataTransacciones,"transaccionesExitosas")+dataCapitalizar.transaccionesExitosas,
+                    valoresCalculadosTotales(dataTransacciones,"transaccionesFallidas")+dataCapitalizar.transaccionesFallidas,
+                    formatMoney.format(valoresCalculadosTotales(dataTransacciones,"cupo")+dataInicioDia.monto+dataCapitalizar.monto), 
+                    formatMoney.format(valoresCalculadosTotales(dataTransacciones,"comisiones")+dataInicioDia.comisiones+dataCapitalizar.comisiones)
+                  ]}
+                />
+              }
+            />
           </div>
-        )}
-      </Modal>
-      {pathname === "/gestion/arqueo/arqueo-cierre/reporte" && (
-        <ButtonBar>
-          <ButtonLink
-            className="px-4 py-2 bg-primary text-white rounded-full transition-opacity duration-300"
-            to={"/gestion/arqueo/arqueo-cierre"}
-          >
-            Realizar arqueo y cierre de caja
-          </ButtonLink>
-        </ButtonBar>
-      )}
-    </Fragment>
-  );
+        }
+      </Fragment>
+    );
+  } catch (error) {
+    return(<Error404 />)
+  }
 };
 
 export default ReporteTrx;
