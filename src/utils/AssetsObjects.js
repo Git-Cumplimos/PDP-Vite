@@ -95,11 +95,11 @@ const banners = {
   // SOI: `${urlAssets}/assets/img/banners/SOI_BANNER.jpg`,
   // FUNDACION_DE_LA_MUJER: `${urlAssets}/assets/img/banners/FUNDACION_BANNER.png`,
   // CORRESPONSAL: `${urlAssets}/assets/img/banners/CORRESPONSAL_banner.jpg`,
-  BANNER_1: `${urlAssets}/assets/img/banners/BANNER_1.jpg`,
+  BANNER_1: `${urlAssets}/assets/img/banners/BANNER_5.png`,
   BANNER_2: `${urlAssets}/assets/img/banners/BANNER_2.jpg`,
-  BANNER_3: `${urlAssets}/assets/img/banners/BANNER_3.jpg`,
-  BANNER_4: `${urlAssets}/assets/img/banners/BANNER_4.jpg`,
-  BANNER_5: `${urlAssets}/assets/img/banners/BANNER_5.jpg`,
+  BANNER_3: `${urlAssets}/assets/img/banners/BANNER_6.png`,
+  BANNER_4: `${urlAssets}/assets/img/banners/BANNER_7.png`,
+  // BANNER_5: `${urlAssets}/assets/img/banners/BANNER_5.png`,
 };
 
 export { images, svgs, banners };
