@@ -17,7 +17,7 @@ import {
 } from "../Runt/components/components_form";
 import classes from "./PagarRunt.module.css";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
-
+import { v4 } from 'uuid';
 //Constantes Style
 const { styleComponents } = classes;
 
@@ -33,6 +33,7 @@ const options_select = [
 ];
 
 const PagarRunt = () => {
+  const uniqueId = v4();
   const [paso, setPaso] = useState("LecturaBarcode");
   const [numeroRunt, setNumeroRunt] = useState("");
   const [procedimiento, setProcedimiento] = useState(option_barcode);
@@ -153,6 +154,7 @@ const PagarRunt = () => {
           id_terminal: roleInfo.id_dispositivo,
           id_usuario: roleInfo.id_usuario,
         },
+        id_uuid_trx: uniqueId,
         oficina_propia:
           tipo__comercio.search("kiosco") >= 0 ||
           tipo__comercio.search("oficinas propias") >= 0
