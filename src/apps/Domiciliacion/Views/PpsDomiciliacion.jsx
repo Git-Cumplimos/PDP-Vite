@@ -18,7 +18,7 @@ const PpsDomiciliacion = ({ datosDomiciliacion }) => {
             label="Tipo de PPS"
             options={{
               "": "",
-              "Pps Voluntario": "Pps Voluntario",
+              "PPS Voluntario": "Pps Voluntario",
               // "Pps Obligatorio": "Pps Obligatorio",
             }}
             info={"Seleccione un elemento de la lista"}
