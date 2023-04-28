@@ -4,6 +4,7 @@ import TextArea from "../TextArea";
 const BarcodeReader = ({
   onSearchCodigo = (codigo) => {},
   onSetCodigo = (codigoActual) => {},
+  disabled = false,
 }) => {
   const isAlt = useRef("");
   const isAltCR = useRef({ data: "", state: false });
@@ -16,8 +17,18 @@ const BarcodeReader = ({
       className={"place-self-stretch w-full"}
       autoComplete="off"
       autoFocus
+      disabled={disabled}
       onChange={(ev) => onSetCodigo(ev.target.value)}
       onKeyDown={(ev) => {
+        // validación si el valor es vacío o solo espacios
+        if (
+          (ev.keyCode === 13 || ev.keyCode === 32) &&
+          ev.shiftKey === false &&
+          ev.target.value.trim() === ""
+        ) {
+          ev.preventDefault();
+          return;
+        }
         if (ev.keyCode === 13 && ev.shiftKey === false) {
           onSearchCodigo(ev.target.value);
           return;
@@ -45,7 +56,8 @@ const BarcodeReader = ({
           let value = String.fromCharCode(parseInt(isAlt.current));
           isAlt.current = "";
           if (value === "\u001d") {
-            ev.target.value = ev.target.value.slice(0, -1) + "\u001d";
+            ev.target.value = ev.target.value + "\u001d";
+            //ev.target.value = ev.target.value.slice(0, -1) + "\u001d";
           }
         }
         if (ev.keyCode === 18) {

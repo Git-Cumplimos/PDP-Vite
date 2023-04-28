@@ -15,6 +15,7 @@ const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 const reportPermisions = {
   "reporte-general-transacciones/": 41,
+  "reporte-general-transacciones-csv/": 41
 };
 
 const filterPermissions = (permissionList) => {

@@ -1,18 +1,21 @@
-import { forwardRef, useState } from "react";
+import { ComponentPropsWithRef, FormEvent, forwardRef, useState } from "react";
 import classes from "./Form.module.css";
 
-const Form = forwardRef(
-  ({
-    children,
-    grid = false,
-    formDir = "row",
-    className = "",
-    onLazyChange,
-    ...formProps
-  }, ref) => {
-    const { Flex, Grid } = classes;
+interface Props extends ComponentPropsWithRef<"form"> {
+  grid: boolean;
+  formDir?: "row" | "col";
+  onLazyChange?: {
+    callback: (ev: FormEvent<HTMLFormElement>) => void;
+    timeOut: number;
+  };
+};
 
-    const [timer, setTimer] = useState(null);
+const Form = forwardRef<HTMLFormElement, Props>(
+  ({ grid = false, formDir = "row", onLazyChange, ...props }, ref) => {
+    const { Flex, Grid } = classes;
+    const { children, className = "", ...formProps } = props;
+
+    const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 
     if (onLazyChange !== undefined) {
       const { callback, timeOut } = onLazyChange;

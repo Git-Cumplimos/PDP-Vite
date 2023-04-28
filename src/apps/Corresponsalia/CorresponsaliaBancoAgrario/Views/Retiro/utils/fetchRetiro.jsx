@@ -10,7 +10,6 @@ export const fetchRetiroEfectivo = async (data_) => {
     var Peticion = await fetchData(url_retiro_efectivo, "POST", {}, data_);
 
     try {
-      console.log(Peticion);
       if (
         // Para los errores
         !Peticion?.status &&
@@ -26,7 +25,6 @@ export const fetchRetiroEfectivo = async (data_) => {
             error_msg_vector.push(`${error_msg_ind?.global} (${nombre_error})`);
           }
         });
-        console.log("gg");
         if (error_msg_vector.length > 0) {
           notifyError(`Retiro NO EXITOSO >> ${error_msg_vector.join(", ")} `);
         }

@@ -414,13 +414,14 @@ const Convenios = () => {
               <h1 className='text-3xl text-center'>Crear convenio</h1>
               <Input
                 id='id_convenio'
-                label='Id convenio(Opcional)'
+                label='Id convenio'
                 type='text'
                 name='id_convenio'
                 autoComplete='off'
                 minLength='1'
                 maxLength='32'
                 defaultValue={selectedConvenio?.["id_convenio"]}
+                required
                 onChange={() => {}}></Input>
             </>
           ) : (

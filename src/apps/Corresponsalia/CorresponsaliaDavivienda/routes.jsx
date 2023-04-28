@@ -131,7 +131,6 @@ const rutasDaviviendaCB = {
       component: PagoDeProductosPropios,
       permission: [
         enumPermisosDavivienda.davivienda_cb_pago_productos_propios,
-        enumPermisosDavivienda.davivienda_cb_recaudo_operaciones,
       ],
     },
     {
@@ -143,7 +142,8 @@ const rutasDaviviendaCB = {
         />
       ),
       component: RecaudoServiciosPublicosPrivadosMenu,
-      permission: [enumPermisosDavivienda.davivienda_cb_recaudo],
+      permission: [enumPermisosDavivienda.davivienda_cb_recaudo,
+        enumPermisosDavivienda.davivienda_cb_recaudo_operaciones],
       subRoutes: [
         {
           link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccion",

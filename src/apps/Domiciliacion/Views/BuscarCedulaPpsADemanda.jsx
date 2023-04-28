@@ -1,46 +1,34 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Input from "../../../components/Base/Input";
 import Form from "../../../components/Base/Form";
 import fetchData from "../../../utils/fetchData";
-import classes from "./BuscarCedulaPpsDemanda.module.css";
-import { notify, notifyError } from "../../../utils/notify";
+
+import { notifyError } from "../../../utils/notify";
 import TipoPpsADemanda from "./TipoPpsADemanda";
-import Modal from "../../../components/Base/Modal";
-import LogoPDP from "../../../components/Base/LogoPDP";
 
 const BuscarCedulaPpsADemanda = () => {
   const [datosConsulta, setDatosConsulta] = useState("");
   const [buscarCedula, setBuscarCedula] = useState(null);
-  const [invalidCedula, setInvalidCedula] = useState("");
+
   const [cantNum, setCantNum] = useState(0);
   const [showModal, setShowModal] = useState(true);
   const [estado, setEstado] = useState(false);
-  const [message, setMessage] = useState("3");
+  const [estadoInput, setEstadoInput] = useState(false);
   const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
-
-  const [datos, estableceDatos] = useState("");
+  // const url = "http://127.0.0.1:2500/";
 
   const hijoAPadre = () => {
     setBuscarCedula("");
     setDatosConsulta("");
     setEstado(false);
+    setEstadoInput(false);
   };
   /* function hijoAPadre() {
     setBuscarCedula("");
   } */
   //------------------Constantes para Dar Estilos---------------------//
-  const {
-    contenedorForm,
-    contenedorDatos,
-    contenedorTitulos,
-    tituloDatos,
-    contenedorValoresTitulos,
-    contendorBoton,
-    tituloNotificacion,
-    contenedorImagen,
-  } = classes;
 
   //------------------Funcion Para Calcular la Cantidad De Digitos Ingresados---------------------//
   useEffect(() => {
@@ -53,14 +41,14 @@ const BuscarCedulaPpsADemanda = () => {
       numero = numero / 10;
     }
     setCantNum(contador);
-    console.log(cantNum);
+    // console.log(cantNum);
   }
 
-  const handleClose = useCallback(() => {
-    setShowModal(false);
-    setDatosConsulta(0);
-    setBuscarCedula("");
-  }, []);
+  // const handleClose = useCallback(() => {
+  //   setShowModal(false);
+  //   setDatosConsulta(0);
+  //   setBuscarCedula("");
+  // }, []);
 
   const BuscarCedula = (e) => {
     setShowModal(true);
@@ -75,29 +63,15 @@ const BuscarCedulaPpsADemanda = () => {
         {}
       )
         .then((respuesta) => {
-          console.log(respuesta?.obj?.results);
+          // console.log(respuesta?.obj?.results);
           setDatosConsulta(respuesta?.obj?.results);
           setEstado(true);
-          /* if (
-            respuesta?.obj?.msg ==
-            "Fallo peticion de datos para correo suser: El usuario no existe o se encuentra en estado INACTIVO. Por favor validar e intentar nuevamente !"
-          ) {
-            notifyError(
-              "El usuario no existe o se encuentra en estado INACTIVO"
-            );
-          } else {
-            if (
-              respuesta?.msg == "La consulta a Suser del Email a sido exitosa"
-            ) {
-              notify("Consulta Exitosa");
-              setEstadoConsulta(true);
-              setShowModal(true);
-            }
-          } */
         })
         .catch((err) => {
-          console.log(err);
-          notifyError("Error al consultar identificación");
+          // console.log(err);
+          notifyError(
+            "Error respuesta PDP: (Falló al consumir el servicio [0010002])"
+          );
         });
     } else {
       if (cantNum < 6 || cantNum > 13) {
@@ -115,14 +89,6 @@ const BuscarCedulaPpsADemanda = () => {
   };
   return (
     <div>
-      {(datosConsulta?.length >= 0) & estado ? (
-        <TipoPpsADemanda
-          numCed={buscarCedula}
-          fun={hijoAPadre}
-        ></TipoPpsADemanda>
-      ) : (
-        ""
-      )}
       <Form grid onSubmit={(e) => BuscarCedula(e)}>
         <Input
           name="N° Identificación"
@@ -135,16 +101,25 @@ const BuscarCedulaPpsADemanda = () => {
           value={buscarCedula ?? ""}
           onChange={onCedChange}
           required
+          disabled={estadoInput}
         />
 
         <ButtonBar className={"lg:col-span-2"} type="">
           {
-            <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>
+            <Button type="submit" onClick={() => setEstadoInput(true)}>
               Buscar Cliente
             </Button>
           }
         </ButtonBar>
       </Form>
+      {(datosConsulta?.length >= 0) & estado ? (
+        <TipoPpsADemanda
+          numCed={buscarCedula}
+          fun={hijoAPadre}
+        ></TipoPpsADemanda>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

@@ -28,8 +28,8 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
 const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
 // const url = "http://127.0.0.1:5000";
-const PpsObligatorioDemanda = ({ ced }) => {
-  const { quotaInfo, roleInfo, infoTicket } = useAuth();
+const PpsObligatorioDemanda = ({ ced, fun }) => {
+  const { quotaInfo, roleInfo, infoTicket, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(true);
   const [showModalVoucher, setShowModalVoucher] = useState(false);
@@ -58,6 +58,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
     idComercio: roleInfo?.["id_comercio"],
     idusuario: roleInfo?.["id_usuario"],
     iddispositivo: roleInfo["id_dispositivo"],
+    nombre_usuario: pdpUser?.uname,
     oficina_propia:
       roleInfo["tipo_comercio"] === "OFICINAS PROPIAS" ||
       roleInfo["tipo_comercio"] === "KIOSCO"
@@ -67,7 +68,9 @@ const PpsObligatorioDemanda = ({ ced }) => {
     cupoLogin: quotaInfo?.["quota"],
     tipoComercio: roleInfo?.["tipo_comercio"],
     nombreComercio: roleInfo?.["nombre comercio"],
+
     idTrx: "",
+    datocontacto: "",
   });
   const [procesandoTrx, setProcesandoTrx] = useState(false);
   const [disabledBtn, setDisabledBtn] = useState(false);
@@ -100,27 +103,33 @@ const PpsObligatorioDemanda = ({ ced }) => {
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Municipio", roleInfo?.ciudad],
+        ["Id Trx", datosComercio?.["idTrx"]],
+        ["Id Aut", datosComercio?.["idTrx"]],
+        ["Comercio", roleInfo?.nombre_comercio],
+        // ["Municipio", roleInfo?.ciudad],
         ["", ""],
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
 
       trxInfo: [
-        ["PISO DE PROTECCION SOCIAL - APORTE OBLIGATORIO"],
+        ["PISO DE PROTECCIÓN SOCIAL - APORTE OBLIGATORIO"],
+        ["", ""],
+        ["Nombre", datosComercio?.["datocontacto"]?.slice(207, 307)],
+
         ["", ""],
         ["Número de documento", datosAportante?.["numDocumento"]],
+        // ["", ""],
+        // ["Número de autorización", datosComercio?.["idTrx"]],
         ["", ""],
-        ["Número de autorización: ", datosComercio?.["idTrx"]],
-        ["", ""],
-        ["N° Planilla", datosAportante?.["numPlanilla"]],
+        ["N.° Planilla", datosAportante?.["numPlanilla"]],
         ["", ""],
         ["Valor", formatMoney.format(datosAportante?.["valorAportar"])],
         ["", ""],
       ],
 
       disclamer:
-        "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
+        "ESTA TRANSACCIÓN NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORRESPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNÍQUESE EN BOGOTÁ 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
     };
   }, [
     roleInfo,
@@ -128,7 +137,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
     datosComercio?.["idTrx"],
     datosComercio?.["tipoComercio"] /* respPinCancel, roleInfo, valor */,
   ]);
-  console.log(roleInfo);
+  // console.log(roleInfo);
   const enviar = (e) => {
     e.preventDefault();
 
@@ -160,6 +169,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
               oficina_propia: datosComercio?.["oficina_propia"],
               valor_total_trx: datosAportante?.["valorAportar"],
               nombre_comercio: datosComercio?.["nombreComercio"],
+              nombre_usuario: datosComercio?.["nombre_usuario"],
               obligatorioDemanda: {
                 Identificacion: datosAportante?.["numDocumento"],
                 PlanillaCode: datosAportante?.["numPlanilla"],
@@ -171,12 +181,11 @@ const PpsObligatorioDemanda = ({ ced }) => {
             true
           )
             .then((respuesta) => {
-              console.log(
-                "RESPUESTA:",
-                respuesta?.obj?.datos_recibidos
-                  ?.trazabilityFinancialInstitutionCode
-              );
-              console.log("RESPUESTA", respuesta);
+              // console.log(
+              //   "RESPUESTA:",
+              //   respuesta?.obj?.datos_recibidos?.["ResponseCode"]
+              // );
+              // console.log("RESPUESTA", respuesta);
               setProcesandoTrx(false);
               setDatosComercio((old) => {
                 return {
@@ -184,9 +193,33 @@ const PpsObligatorioDemanda = ({ ced }) => {
                   idTrx:
                     respuesta?.obj?.datos_recibidos
                       ?.trazabilityFinancialInstitutionCode,
+                  datocontacto: respuesta?.obj?.datos_recibidos?.datocontacto,
                 };
               });
-              console.log("++++++idtrx", datosComercio?.idTrx);
+              // console.log("++++++idtrx", datosComercio?.idTrx);
+
+              // nuevo respuesta
+              if (respuesta?.msg) {
+                if (
+                  respuesta?.msg ===
+                  "El valor aportado debe ser exacto ej: 5000, debe ser múltiplo de 100"
+                ) {
+                  notifyError(respuesta?.msg);
+                  /* navigate(`/colpensiones`); */
+                  setDisabledBtn(false);
+                } else if (
+                  respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "SUCCESS"
+                ) {
+                  setShowModalVoucher(true);
+                  notify(respuesta?.msg);
+                  //  setDatosRespuesta(respuesta?.obj);
+                } else {
+                  // console.log("mensajeeeee");
+                  notifyError(respuesta?.msg);
+                  navigate(`/colpensiones`);
+                }
+              }
+
               // console.log("DATOS RECIBIDOS:", respuesta?.obj?.datos_recibidos);
               // console.log(
               //   "idtrx:",
@@ -195,31 +228,32 @@ const PpsObligatorioDemanda = ({ ced }) => {
               // );
 
               // console.log("MENSJAE", datosComercio?.["idTrx"]);
-              setDisabledBtn(false);
+              // setDisabledBtn(false);
 
-              if (
-                respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "SUCCESS"
-              ) {
-                notify(
-                  "Transaccion Colpensiones PPS obligatorio demanda Exitosa."
-                );
-                setShowModalVoucher(true);
-              }
+              // if (
+              //   respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "SUCCESS"
+              // ) {
+              //   notify(
+              //     "Transaccion Colpensiones PPS obligatorio demanda Exitosa."
+              //   );
+              //   setShowModalVoucher(true);
+              // }
 
-              //si la respuesta de colpensiones viene vacia entra a este if
-              if (
-                Object.entries(respuesta?.obj?.datos_recibidos).length === 0
-              ) {
-                notifyError(respuesta?.msg);
-              }
+              // //si la respuesta de colpensiones viene vacia entra a este if
+              // if (
+              //   Object.entries(respuesta?.obj?.datos_recibidos).length === 0
+              // ) {
+              //   notifyError(respuesta?.msg);
+              // }
 
-              if (
-                respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "FAILED"
-              ) {
-                notifyError(respuesta?.obj?.datos_recibidos?.["messageError"]);
-                navigate(`/colpensiones`);
-              }
+              // if (
+              //   respuesta?.obj?.datos_recibidos?.["ResponseCode"] == "FAILED"
+              // ) {
+              //   notifyError(respuesta?.obj?.datos_recibidos?.["messageError"]);
+              //   navigate(`/colpensiones`);
+              // }
 
+              // ---------------------------------------------
               // if (respuesta.obj["datos_recibidos"].ResponseCode == "SUCCESS") {
               //   notify("Pago Exitoso.");
               //   setShowModalVoucher(true);
@@ -270,14 +304,16 @@ const PpsObligatorioDemanda = ({ ced }) => {
         setDisabledBtn(false);
       }
     } else {
-      notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
+      notifyError(
+        "Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003])"
+      );
       navigate(`/colpensiones`);
     }
   };
   useEffect(() => {}, [datosComercio, isPropia]);
 
   // useEffect(() => {
-  //   infoTicket(datosComercio?.["idTrx"], 108, tickets)
+  //   ,pdpUser(datosComercio?.["idTrx"], 108, tickets)
   //     .then((resTicket) => {
   //       // console.log("RESTICKET:", resTicket);
   //     })
@@ -285,7 +321,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
   //       // console.error(err);
   //       notifyError("Error guardando el ticket");
   //     });
-  // }, [infoTicket, tickets]);
+  // }, [,pdpUser, tickets]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -330,7 +366,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
                 }}
               ></Select>
               <Input
-                label={"N° Documento"}
+                label={"N.° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={datosAportante?.["numDocumento"]}
                 minLength="6"
@@ -342,7 +378,7 @@ const PpsObligatorioDemanda = ({ ced }) => {
               <Input
                 id="planilla"
                 name="planilla"
-                label="N° Planilla: "
+                label="N.° Planilla"
                 type="tel"
                 autoComplete="off"
                 minLength="10"
@@ -388,7 +424,14 @@ const PpsObligatorioDemanda = ({ ced }) => {
               </Button>
               /*  ) : null */
             }
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setShowModal(false);
+                fun();
+              }}
+            >
+              Cancelar
+            </Button>
           </ButtonBar>
         </Form>
       </Modal>
@@ -396,8 +439,17 @@ const PpsObligatorioDemanda = ({ ced }) => {
         <Modal show={showModal} handleClose={handleClose}>
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
-            <Button onClick={handlePrint}>Imprimir</Button>
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button
+                onClick={() => {
+                  setShowModal(false);
+                  fun();
+                }}
+              >
+                Cancelar
+              </Button>
+            </ButtonBar>
           </div>
         </Modal>
       ) : (

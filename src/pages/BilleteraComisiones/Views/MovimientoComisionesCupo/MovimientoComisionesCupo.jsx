@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
@@ -10,17 +11,45 @@ import MoneyInput, {
 } from "../../../../components/Base/MoneyInput";
 import Select from "../../../../components/Base/Select";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
+import Tickets from "../../../../components/Base/Tickets";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { postTransferenciaComisiones } from "../../utils/fetchTransferenciaCom";
 
 const MovimientoComisionesCupo = () => {
-  const { quotaInfo, roleInfo } = useAuth();
+  const { quotaInfo, roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [estadoPeticion, setEstadoPeticion] = useState(0);
   const [limiteRecarga, setLimiteRecarga] = useState({
     superior: 1000000,
     inferior: 100,
+  });
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "Recibo de transferencia comisiones a cupo",
+    timeInfo: {
+      "Fecha de venta": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      /*id transaccion recarga*/
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
+      /*id_dispositivo*/
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      /*ciudad*/
+      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
+      ["Tipo de operación", "Transferencia comisiones a cupo"],
+      ["", ""],
+    ],
+    commerceName: roleInfo?.["nombre comercio"]
+      ? roleInfo?.["nombre comercio"]
+      : "Sin datos",
+    trxInfo: [],
+    disclamer:
+      "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
   });
   const [datosTrans, setDatosTrans] = useState({
     valor: 0,
@@ -58,36 +87,98 @@ const MovimientoComisionesCupo = () => {
   const habilitarModal = () => {
     setShowModal(!showModal);
   };
+  const printDiv = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
 
   const hideModal = () => {
     setShowModal(false);
-    setDatosTrans({
+    setDatosTrans((old) => ({
+      ...old,
       valor: 0,
       seleccion: "",
+    }));
+    setEstadoPeticion(0);
+    setObjTicketActual({
+      title: "Recibo de transferencia comisiones a cupo",
+      timeInfo: {
+        "Fecha de venta": "",
+        Hora: "",
+      },
+      commerceInfo: [
+        /*id transaccion recarga*/
+        /*id_comercio*/
+        ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
+        /*id_dispositivo*/
+        [
+          "No. terminal",
+          roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+        ],
+        /*ciudad*/
+        ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
+        /*direccion*/
+        ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
+        ["Tipo de operación", "Transferencia comisiones a cupo"],
+        ["", ""],
+      ],
+      commerceName: roleInfo?.["nombre comercio"]
+        ? roleInfo?.["nombre comercio"]
+        : "Sin datos",
+      trxInfo: [],
+      disclamer:
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
     });
   };
 
   const transferenciaComision = () => {
     const obj = {};
     if (datosTrans.seleccion === "Parcial") obj["valor"] = datosTrans.valor;
-
+    const hoy = new Date();
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
+    const objTicket = { ...objTicketActual };
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
     setIsUploading(true);
     postTransferenciaComisiones({
       ...obj,
       id_comercio: roleInfo?.id_comercio ? roleInfo?.id_comercio : 0,
       id_usuario: roleInfo?.id_usuario ? roleInfo?.id_usuario : 0,
       id_terminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+      nombre_usuario: pdpUser?.uname ?? "",
       nombre_comercio: roleInfo?.["nombre comercio"]
         ? roleInfo?.["nombre comercio"]
         : "No hay datos",
       opcion: datosTrans.seleccion,
+      ticket: objTicket,
     })
       .then((res) => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          navigate(-1);
-          hideModal();
+          objTicket["trxInfo"].push([
+            "No. de aprobación PDP",
+            res?.obj?.id_trx,
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          objTicket["trxInfo"].push([
+            "Valor",
+            formatMoney.format(res?.obj?.valor_transferencia),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          setObjTicketActual(objTicket);
+          setEstadoPeticion(1);
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
@@ -101,7 +192,7 @@ const MovimientoComisionesCupo = () => {
         console.error(err);
       });
   };
-  if (parseInt(datosTrans.saldoComision) === 0) {
+  if (parseInt(datosTrans.saldoComision) <= 0) {
     return (
       <>
         <SimpleLoading show={isUploading} />
@@ -112,6 +203,7 @@ const MovimientoComisionesCupo = () => {
       </>
     );
   }
+
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -171,26 +263,49 @@ const MovimientoComisionesCupo = () => {
       </Form>
       <Modal show={showModal} handleClose={hideModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-          <h1 className='text-2xl font-semibold'>
-            ¿Está seguro de realizar la transferencia de comisión?
-          </h1>
-          {datosTrans.seleccion === "Parcial" ? (
-            <h2 className='text-base'>
-              {`Valor de transacción: ${formatMoney.format(datosTrans.valor)} `}
-            </h2>
+          {estadoPeticion === 0 ? (
+            <>
+              <h1 className='text-2xl font-semibold'>
+                ¿Está seguro de realizar la transferencia de comisión?
+              </h1>
+              {datosTrans.seleccion === "Parcial" ? (
+                <h2 className='text-base'>
+                  {`Valor de transferencia: ${formatMoney.format(
+                    datosTrans.valor
+                  )} `}
+                </h2>
+              ) : (
+                <h2 className='text-base'>
+                  {`Valor de transacción: ${formatMoney.format(
+                    datosTrans.saldoComision ?? 0
+                  )} `}
+                </h2>
+              )}
+              <ButtonBar>
+                <Button onClick={hideModal}>Cancelar</Button>
+                <Button type='submit' onClick={transferenciaComision}>
+                  Aceptar
+                </Button>
+              </ButtonBar>
+            </>
           ) : (
-            <h2 className='text-base'>
-              {`Valor de transacción: ${formatMoney.format(
-                datosTrans.saldoComision ?? 0
-              )} `}
-            </h2>
+            <>
+              <h2>
+                <ButtonBar>
+                  <Button onClick={handlePrint}>Imprimir</Button>
+                  <Button
+                    type='submit'
+                    onClick={() => {
+                      hideModal();
+                      navigate(-1);
+                    }}>
+                    Aceptar
+                  </Button>
+                </ButtonBar>
+              </h2>
+              <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
+            </>
           )}
-          <ButtonBar>
-            <Button onClick={hideModal}>Cancelar</Button>
-            <Button type='submit' onClick={transferenciaComision}>
-              Aceptar
-            </Button>
-          </ButtonBar>
         </div>
       </Modal>
     </>

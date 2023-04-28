@@ -12,6 +12,7 @@ import { notify, notifyError } from "../../../../../utils/notify";
 import {
   postCheckEstadoConveniosAval,
   postConsultaTablaConveniosPaginado,
+  postConsultaTablaConveniosPaginadoTotal,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 import { v4 as uuidv4 } from "uuid";
 
@@ -55,7 +56,7 @@ const ConveniosRecaudoAval = () => {
   }, [datosTrans, page, limit]);
 
   const fecthTablaConveniosPaginadoFunc = () => {
-    postConsultaTablaConveniosPaginado({
+    postConsultaTablaConveniosPaginadoTotal({
       convenio: datosTrans.convenio,
       nura: datosTrans.idConvenio,
       ean: datosTrans.ean,
@@ -130,7 +131,8 @@ const ConveniosRecaudoAval = () => {
                             })
                               .then((res) => {
                                 if (
-                                  res?.msg !== "No ha terminado la operación"
+                                  res?.msg !==
+                                  "Error respuesta PDP: (No ha terminado la operación)"
                                 ) {
                                   if (res?.status) {
                                     setIsUploading(false);
@@ -246,7 +248,7 @@ const ConveniosRecaudoAval = () => {
             }
           }}></Input>
         <ButtonBar>
-          <Button type='submit' onClick={() => setShowModal(true)}>
+          <Button type='button' onClick={() => setShowModal(true)}>
             Subir convenios
           </Button>
         </ButtonBar>

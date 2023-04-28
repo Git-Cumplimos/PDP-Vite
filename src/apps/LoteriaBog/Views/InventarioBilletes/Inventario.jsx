@@ -4,16 +4,13 @@ import { useMemo, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "../../../../components/Base/Select";
 import classes from "./Inventario.module.css";
-
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { notify, notifyError } from "../../../../utils/notify";
-import Input from "../../../../components/Base/Input";
 import InputX from "../../../../components/Base/InputX/InputX";
 import Button from "../../../../components/Base/Button";
 import Form from "../../../../components/Base/Form";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-import BarcodeReader from "../../../../components/Base/BarcodeReader";
-import TextArea from "../../../../components/Base/TextArea";
+import BarcodeReader from "../../../../components/Base/BarcodeReader"
 import Modal from "../../../../components/Base/Modal";
 import LogoPDP from "../../../../components/Base/LogoPDP";
 import Fieldset from "../../../../components/Base/Fieldset";
@@ -22,6 +19,7 @@ import SimpleLoading from "../../../../components/Base/SimpleLoading";
 const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 const {
   contenedorPrincipal,
+  BarcodeCompleto,
   contenedorBotones,
   contenedorImagen,
   titulosSecundarios,
@@ -34,6 +32,7 @@ const Inventario = () => {
     infoLoto: { numero, setNumero, serie, setSerie, loterias, setLoterias },
     consultaInventario,
     registrarInventario,
+    peticionBarcode,
     codigos_lot,
   } = useLoteria();
   const [texto, setTexto] = useState("");
@@ -45,10 +44,8 @@ const Inventario = () => {
   const [datosCantidadBilletes, setDatosCantidadBilletes] = useState("");
   const [cantidadBilletes, setCantidadBilletes] = useState("");
   const [mensajeCausal, setMensajeCausal] = useState("");
-  const [mensajeInventarioInvalido, setMensajeInventarioInvalido] =
-    useState("");
-  const [mensajeInventarioInvalido2, setMensajeInventarioInvalido2] =
-    useState("");
+  const [mensajeInventarioInvalido, setMensajeInventarioInvalido] = useState("");
+  const [mensajeInventarioInvalido2, setMensajeInventarioInvalido2] = useState("");
   const [showCrearInventario, setShowCrearInventario] = useState(false);
   const [datosEscaneados, setDatosEscaneados] = useState({
     escaneado1: "",
@@ -59,6 +56,11 @@ const Inventario = () => {
     escaneado1Validados: false,
     escaneado2Validados: false,
     escaneado3Validados: false,
+  });
+  const [flagloading, setFlagloading] = useState({
+    flagescaneado1: false,
+    flagescaneado2: false,
+    flagescaneado3: false,
   });
   const [
     habilitarBtnAgregarInconsistencia,
@@ -92,22 +94,15 @@ const Inventario = () => {
 
         if (sortOrdfisico.length > 0) {
           setSorteofisico(sortOrdfisico[0]);
-        } else {
-          /*    notifyError("No se encontraron extraordinarios fisicos"); */
         }
-
         if (sortExtfisico.length > 0) {
           setSorteofisicoextraordinario(sortExtfisico[0]);
-        } else {
-          /*   notifyError("No se encontraron extraordinarios fisicos"); */
         }
       })
       .catch((err) => console.error(err));
   }, [codigos_lot, sorteosLOT]);
 
-  const [opcionesdisponibles, SetOpcionesDisponibles] = useState([
-    { value: "", label: "" },
-  ]);
+  const [opcionesdisponibles, SetOpcionesDisponibles] = useState([{ value: "", label: "" },]);
 
   useEffect(() => {
     const copy = [{ value: "", label: "" }];
@@ -142,13 +137,12 @@ const Inventario = () => {
         ], //numero_completo
         "true" //inconcistencia-bool
       ).then((resp) => {
-        console.log("resOK", resp);
         if (resp?.response === "Registro exitoso") {
           notify("Inventario agregado exitosamente.");
           navigate(`/loteria`);
           setProcesandoTrx(false);
         } else {
-          notifyError("Error inconsistencia no agregada.");
+          notifyError("Error inventario no agregado.");
           setHabilitarBtnAgregarInconsistencia(false);
           setProcesandoTrx(false);
         }
@@ -173,7 +167,6 @@ const Inventario = () => {
         ], //numero_completo
         "false" //inconcistencia-bool
       ).then((res) => {
-        console.log("Resfalse", res);
         if (res?.response === "Registro exitoso") {
           notify("Inconsistencia agregada exitosamente.");
           setHabilitarBtnAgregarInconsistencia(true);
@@ -188,31 +181,90 @@ const Inventario = () => {
     },
     [sorteo, cantidadBilletes, mensajeCausal, datosEscaneados]
   );
-  /* 
-  const inventarioErrado = (e)=>{
-    e.preventDefault();
-
-  } */
-
-  /* const validarEntradaScanner = (validarNum) => {
-    if (validarNum[0] === "]") {
-      console.log(validarNum.replace("]", ""));
-      setDatosEscaneados((old) => {
-        return { ...old, escaneado1: validarNum.replace("]", " ") };
-      });
-      console.log(datosEscaneados["escaneado1"]);
-    }
-  }; */
-  const validarEntradaScanner = useCallback(
-    (validarNum) => {
-      if (validarNum[0] === "]") {
-        // console.log(validarNum.replace("]C1", ""));
-        return validarNum.replace("]C1", "");
-      } else {
-        return validarNum;
-      }
+ 
+  const onSubmitBarcode = useCallback(
+    (referencia,barcode) => {
+      peticionBarcode(
+        referencia,
+        barcode,
+        sorteo.split("-")[0],
+        sorteo.split("-")[1],
+        ).then((response) => {
+          if (response?.status === true) {
+            if (referencia==datosAzar[0] && !datosEscaneadosValidados["escaneado1Validados"]){
+              setFlagloading((old) => {
+                return { ...old, flagescaneado1: false };
+              });
+              setDatosEscaneadosValidados((old) => {
+                return { ...old, escaneado1Validados: true };
+              });
+              setDatosEscaneados((old) => {
+                return { ...old, escaneado1: response?.obj};
+              });
+            } else if (referencia==datosAzar[1] && !datosEscaneadosValidados["escaneado2Validados"]){
+                setFlagloading((old) => {
+                  return { ...old, flagescaneado2: false };
+                });
+                setDatosEscaneadosValidados((old) => {
+                  return { ...old, escaneado2Validados: true };
+                });
+                setDatosEscaneados((old) => {
+                  return { ...old, escaneado2: response?.obj};
+                });
+            } else if (referencia==datosAzar[2] && !datosEscaneadosValidados["escaneado3Validados"]){
+                setFlagloading((old) => {
+                  return { ...old, flagescaneado3: false };
+                });
+                setDatosEscaneadosValidados((old) => {
+                  return { ...old, escaneado3Validados: true };
+                });
+                setDatosEscaneados((old) => {
+                  return { ...old, escaneado3: response?.obj};
+                });
+              }
+          }
+          else {
+            notifyError(response?.obj?.msg)
+            setFlagloading((old) => {
+              return { ...old, flagescaneado1: false, flagescaneado2: false, flagescaneado3: false};
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
-    [datosEscaneados]
+    [sorteo,datosEscaneadosValidados,datosAzar,flagloading]
+  );
+
+  const onSubmitBarcode0 = useCallback(
+    (info) => {
+      onSubmitBarcode(datosAzar[0],info)
+      setFlagloading((old) => {
+        return { ...old, flagescaneado1: true };
+      });
+    },
+    [datosAzar,onSubmitBarcode,setFlagloading]
+  );
+
+  const onSubmitBarcode1 = useCallback(
+    (info) => {
+      onSubmitBarcode(datosAzar[1],info)
+      setFlagloading((old) => {
+        return { ...old, flagescaneado2: true };
+      });
+    },
+    [datosAzar,onSubmitBarcode,setFlagloading]
+  );
+
+  const onSubmitBarcode2 = useCallback(
+    (info) => {
+      onSubmitBarcode(datosAzar[2],info)
+      setFlagloading((old) => {
+        return { ...old, flagescaneado3: true };
+      });
+    },
+    [datosAzar,onSubmitBarcode,setFlagloading]
   );
 
   return (
@@ -220,11 +272,10 @@ const Inventario = () => {
       {showModal ? (
         <>
           <SimpleLoading show={procesandoTrx}></SimpleLoading>
-          <Modal show={showModal} /* handleClose={handleClose} */>
+          <Modal show={showModal}>
             <div className={contenedorImagen}>
               <LogoPDP xsmall></LogoPDP>
             </div>
-            {/* <Form grid onSubmit={(e) => enviar(e)}> */}
             <Form grid onSubmit={(e) => onSubmitMensajeInconsistencia(e)}>
               <Fieldset className="lg:col-span-3">
                 <div className={autorizacionMensajes}>
@@ -250,19 +301,10 @@ const Inventario = () => {
                 {
                   <Button
                     type="submit"
-                    /*      disabled={disabledBtn}
-                  onSubmit={(e) => enviar(e)} */
-                    /*   onSubmit={(e) => {
-                    if (mensajeCausal) {
-                      setHabilitarBtnAgregarInconsistencia(false);
-                      onSubmitMensajeInconsistencia(e);
-                    }
-                  }} */
                     disabled={habilitarBtnAgregarInconsistencia}
                   >
                     Agregar inconsistencia
                   </Button>
-                  /*  ) : null */
                 }
                 <Button onClick={() => setShowModal(false)}>Cancelar</Button>
               </ButtonBar>
@@ -314,165 +356,98 @@ const Inventario = () => {
               }}
             ></InputX>
             <div className={contenedorPrincipal}>
+              {/* Segmento billete 1 */}
               <div>
                 <InputX
+                  id="billete1"  
                   value={datosAzar?.[0] ?? ""}
                   label="Billete"
                   type="search"
                   disabled
                 ></InputX>
+              </div>
+              <div className={BarcodeCompleto}>
+                {!datosEscaneadosValidados["escaneado1Validados"]
+                  ? !flagloading["flagescaneado1"] ?  (
+                      <>
+                        <BarcodeReader onSearchCodigo={onSubmitBarcode0}/>
+                        <Button type="reset">Escanear de nuevo</Button>
+                      </>
+                    ) : (
+                      <>
+                        <h1 className="text-2xl font-semibold" align="center"> Procesando . . .</h1>
+                      </>
+                    )
+                  : <InputX
+                      label="Código de barras"
+                      type="text"
+                      autoComplete="off"
+                      value={datosEscaneados.escaneado1}
+                      disabled
+                    />
+                }
+              </div>
+              {/* Segmento billete 2 */}
+              <div>
                 <InputX
+                  id="billete2"
                   value={datosAzar[1] ?? ""}
                   label="Billete"
                   type="search"
                   disabled
                 ></InputX>
+              </div>
+              <div className={BarcodeCompleto}>
+                {!datosEscaneadosValidados["escaneado2Validados"]
+                  ? !flagloading["flagescaneado2"] ? (
+                    <>
+                      <BarcodeReader onSearchCodigo={onSubmitBarcode1}/>
+                      <Button type="reset">Escanear de nuevo</Button>
+                    </>
+                  ) : (
+                    <>
+                      <h1 className="text-2xl font-semibold" align="center"> Procesando . . .</h1>
+                    </>
+                  )
+                  : <InputX
+                      label="Código de barras"
+                      type="text"
+                      autoComplete="off"
+                      value={datosEscaneados.escaneado2}
+                      disabled
+                    />
+                }
+              </div>
+              {/* Segmento billete 3 */}
+              <div>
                 <InputX
-                  value={datosAzar[2] ?? ""}
+                  id="billete3"  
+                  value={datosAzar?.[2] ?? ""}
                   label="Billete"
                   type="search"
                   disabled
                 ></InputX>
               </div>
-              {/*               <div>
-                <Button type="submit">Scan</Button>
-                <Button type="submit">Scan</Button>
-                <Button type="submit">Scan</Button>
-              </div> */}
-              <div>
-                <InputX
-                  label="Escanee el código de barras"
-                  type="search"
-                  maxLength="23"
-                  value={datosEscaneados["escaneado1"]}
-                  onInput={(e) => {
-                    const num = e.target.value || "";
-
-                    setDatosEscaneados((old) => {
-                      return { ...old, escaneado1: validarEntradaScanner(num) };
-                    });
-                    setDatosEscaneadosValidados((old) => {
-                      return { ...old, escaneado1Validados: false };
-                    });
-                    if (num?.length === 20) {
-                      /* console.log(num.substr(-9, 4)); */
-                      /*  console.log(
-                        String(num.substr(-5, 3)),
-                        String(datosAzar[0].split("-")[1])
-                      ); */
-                      if (
-                        (String(num.substr(-9, 4)) !==
-                          String(datosAzar[0].split("-")[0])) &
-                        (String(num.substr(-5, 3)) !==
-                          String(datosAzar[0].split("-")[1]))
-                      ) {
-                        notifyError("Número de billete y serie no coinciden");
-                      } else if (
-                        String(num.substr(-9, 4)) !==
-                        String(datosAzar[0].split("-")[0])
-                      ) {
-                        notifyError("Número de billete no coincide");
-                      } else if (
-                        String(num.substr(-5, 3)) !==
-                        String(datosAzar[0].split("-")[1])
-                      ) {
-                        notifyError("Número de serie no coincide");
-                      } else {
-                        setDatosEscaneadosValidados((old) => {
-                          return { ...old, escaneado1Validados: true };
-                        });
-                      }
-                    }
-                  }}
-                ></InputX>
-                <InputX
-                  label="Escanee el código de barras"
-                  type="search"
-                  maxLength="23"
-                  value={datosEscaneados["escaneado2"]}
-                  onInput={(e) => {
-                    const num2 = e.target.value || "";
-
-                    setDatosEscaneados((old) => {
-                      return {
-                        ...old,
-                        escaneado2: validarEntradaScanner(num2),
-                      };
-                    });
-                    setDatosEscaneadosValidados((old) => {
-                      return { ...old, escaneado2Validados: false };
-                    });
-                    if (num2?.length === 20) {
-                      /* console.log(e.target.value.substr(-9, 4)); */
-                      if (
-                        (String(num2.substr(-9, 4)) !==
-                          String(datosAzar[1].split("-")[0])) &
-                        (String(num2.substr(-5, 3)) !==
-                          String(datosAzar[1].split("-")[1]))
-                      ) {
-                        notifyError("Número de billete y serie no coinciden");
-                      } else if (
-                        String(num2.substr(-9, 4)) !==
-                        String(datosAzar[1].split("-")[0])
-                      ) {
-                        notifyError("Número de billete no coincide");
-                      } else if (
-                        String(num2.substr(-5, 3)) !==
-                        String(datosAzar[1].split("-")[1])
-                      ) {
-                        notifyError("Número de serie no coincide");
-                      } else {
-                        setDatosEscaneadosValidados((old) => {
-                          return { ...old, escaneado2Validados: true };
-                        });
-                      }
-                    }
-                  }}
-                ></InputX>
-                <InputX
-                  label="Escanee el código de barras"
-                  type="search"
-                  maxLength="23"
-                  value={datosEscaneados["escaneado3"]}
-                  onInput={(e) => {
-                    const num3 = e.target.value || "";
-
-                    setDatosEscaneados((old) => {
-                      return {
-                        ...old,
-                        escaneado3: validarEntradaScanner(num3),
-                      };
-                    });
-                    setDatosEscaneadosValidados((old) => {
-                      return { ...old, escaneado3Validados: false };
-                    });
-                    if (num3?.length === 20) {
-                      /* console.log(num3.substr(-9, 4)); */
-                      if (
-                        (String(num3.substr(-9, 4)) !==
-                          String(datosAzar[2].split("-")[0])) &
-                        (String(num3.substr(-5, 3)) !==
-                          String(datosAzar[2].split("-")[1]))
-                      ) {
-                        notifyError("Número de billete y serie no coinciden");
-                      } else if (
-                        String(num3.substr(-9, 4)) !==
-                        String(datosAzar[2].split("-")[0])
-                      ) {
-                        notifyError("Número de billete no coincide");
-                      } else if (
-                        String(num3.substr(-5, 3)) !==
-                        String(datosAzar[2].split("-")[1])
-                      ) {
-                        notifyError("Número de serie no coincide");
-                      } else {
-                        setDatosEscaneadosValidados((old) => {
-                          return { ...old, escaneado3Validados: true };
-                        });
-                      }
-                    }
-                  }}
-                ></InputX>
+              <div className={BarcodeCompleto}>
+                {!datosEscaneadosValidados["escaneado3Validados"]
+                  ? !flagloading["flagescaneado3"] ? (
+                    <>
+                      <BarcodeReader onSearchCodigo={onSubmitBarcode2}/>
+                      <Button type="reset">Escanear de nuevo</Button>
+                    </>
+                  ) : (
+                    <>
+                      <h1 className="text-2xl font-semibold" align="center"> Procesando . . .</h1>
+                    </>
+                  )
+                  : <InputX
+                      label="Código de barras"
+                      type="text"
+                      autoComplete="off"
+                      value={datosEscaneados.escaneado3}
+                      disabled
+                    />
+                }
               </div>
             </div>
             <div className={contenedorBotones}>
@@ -519,7 +494,7 @@ const Inventario = () => {
                         "La cantidad de billetes no corresponde al del inventario lógico"
                       );
                       setMensajeInventarioInvalido(
-                        `La cantidad de billetes no coinciden, inventario logico: ${datosCantidadBilletes}, inventario fisico: ${cantidadBilletes}`
+                        `La cantidad de billetes no coinciden, inventario lógico: ${datosCantidadBilletes}, inventario físico: ${cantidadBilletes}`
                       );
                       setShowModal(true);
                     }
@@ -532,7 +507,6 @@ const Inventario = () => {
                         ` No se encontraron los siguientes billetes: ${Strcaso1}${Strcaso2}${Strcaso3}`
                       );
                     }
-
                     setShowModal(true);
                   }
                 }}
@@ -549,5 +523,4 @@ const Inventario = () => {
     </>
   );
 };
-
 export default Inventario;

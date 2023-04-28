@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
+import Fieldset from "../../../../components/Base/Fieldset";
 import FileInput from "../../../../components/Base/FileInput";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
@@ -20,6 +21,32 @@ import {
   addConveniosRecaudoListMassive,
 } from "../../utils/fetchFunctions";
 
+const def_validacion_referencia = (referencias) => {
+  const hashTable = {};
+  for (let i = 0; i < referencias.length; i++) {
+    if (
+      parseInt(referencias[i].limiteMenor) >
+      parseInt(referencias[i].limiteMayor)
+    ) {
+      return [
+        true,
+        "En la restricción de longitud de referencias el limite mayor debe ser mayor al limite menor",
+      ];
+    }
+  }
+  for (let i = 0; i < referencias.length; i++) {
+    if (hashTable[referencias[i].referencia]) {
+      return [
+        true,
+        "En la restricción de longitud de referencias se encuentra repetido alguna referecia",
+      ];
+    } else {
+      hashTable[referencias[i].referencia] = true;
+    }
+  }
+  return [false, ""];
+};
+
 const ConveniosRecaudo = () => {
   const [listaConveniosRecaudo, setListaConveniosRecaudo] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
@@ -35,6 +62,7 @@ const ConveniosRecaudo = () => {
   const [uploadMasivo, setUploadMasivo] = useState(false);
   const [massiveFile, setMassiveFile] = useState(null);
   const [uploadingError, setUploadingError] = useState("");
+  const [restriccionReferencias, setRestriccionReferencias] = useState([]);
 
   const [tiposValores, setTiposValores] = useState([]);
 
@@ -84,10 +112,12 @@ const ConveniosRecaudo = () => {
 
   const handleClose = useCallback(() => {
     if (!loading) {
+      setRestriccionReferencias([]);
       setShowModal(false);
       setSelected(null);
       setUploadMasivo(false);
       setMassiveFile(null);
+      setUploadingError("");
     }
   }, [loading]);
 
@@ -95,22 +125,42 @@ const ConveniosRecaudo = () => {
     (ev) => {
       ev.preventDefault();
       const formData = new FormData(ev.currentTarget);
-      const body = Object.fromEntries(
+      if (!formData.has("activo")) {
+        formData.set("activo", "off");
+      }
+      let body = Object.fromEntries(
         Object.entries(Object.fromEntries(formData))
-          .map(([key, val]) => [
-            key,
-            key.includes("referencia_") && val === ""
-              ? null
-              : key === "activo"
-              ? val === "on"
-              : val,
-          ])
+          .map(([key, val]) => {
+            return [
+              key,
+              key.includes("referencia_") && val === "" ? null : val,
+            ];
+          })
           .filter(([key, val]) =>
             !selected
-              ? val
+              ? key !== "activo" && val
               : selected[key] !== val || key === "pk_codigo_convenio"
           )
+          .filter(([key, val]) => {
+            const data = ["limiteMayor", "limiteMenor", "referencia"];
+            return !data.includes(key);
+          })
+          .map(([key, val]) => [key, key === "activo" ? val === "on" : val])
       );
+      if (restriccionReferencias.length > 0) {
+        const dataValidacion = def_validacion_referencia(
+          restriccionReferencias
+        );
+        if (dataValidacion[0]) {
+          return notifyError(dataValidacion[1]);
+        }
+        body = {
+          ...body,
+          data_opcional: {
+            restriccion_referencia: restriccionReferencias,
+          },
+        };
+      }
       notifyPending(
         selected
           ? modConveniosRecaudoList({ pk_codigo_convenio: "" }, body)
@@ -124,7 +174,6 @@ const ConveniosRecaudo = () => {
         {
           render({ data: res }) {
             setLoading(false);
-            console.log(res);
             handleClose();
             getConvRecaudo();
             return `Convenio ${
@@ -144,7 +193,7 @@ const ConveniosRecaudo = () => {
         }
       );
     },
-    [handleClose, getConvRecaudo, selected]
+    [handleClose, getConvRecaudo, selected, restriccionReferencias]
   );
 
   const downloadMasive = useCallback(() => {
@@ -215,7 +264,6 @@ const ConveniosRecaudo = () => {
         {
           render({ data: res }) {
             setLoading(false);
-            console.log(res);
             handleClose();
             getConvRecaudo();
             return `Se han creado ${res?.obj?.stats_creados} y se han modificado ${res?.obj?.stats_modificados} convenios de recaudo de colpatria`;
@@ -240,7 +288,7 @@ const ConveniosRecaudo = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Convenios de recaudo Colpatria</h1>
+      <h1 className='text-3xl mt-6'>Convenios de recaudo Colpatria</h1>
       <ButtonBar>
         <Button type={"submit"} onClick={() => setShowModal(true)}>
           Crear nuevo convenio
@@ -250,13 +298,12 @@ const ConveniosRecaudo = () => {
           onClick={() => {
             setShowModal(true);
             setUploadMasivo(true);
-          }}
-        >
+          }}>
           Crear convenios (masivo)
         </Button>
       </ButtonBar>
       <TableEnterprise
-        title="Convenios de recaudo"
+        title='Convenios de recaudo'
         headers={[
           "Código convenio",
           "Código EAN o IAC",
@@ -282,6 +329,10 @@ const ConveniosRecaudo = () => {
         onSelectRow={(e, i) => {
           setShowModal(true);
           setSelected(listaConveniosRecaudo[i]);
+          setRestriccionReferencias(
+            listaConveniosRecaudo[i]?.data_opcional?.restriccion_referencia ??
+              []
+          );
         }}
         onChange={(ev) =>
           setSearchFilters((old) => ({
@@ -291,14 +342,13 @@ const ConveniosRecaudo = () => {
         }
         actions={{
           download: downloadMasive,
-        }}
-      >
+        }}>
         <Input
           id={"pk_codigo_convenio"}
           label={"Código de convenio"}
           name={"pk_codigo_convenio"}
-          type="tel"
-          autoComplete="off"
+          type='tel'
+          autoComplete='off'
           maxLength={"4"}
           onChange={(ev) => {
             ev.target.value = onChangeNumber(ev);
@@ -311,21 +361,20 @@ const ConveniosRecaudo = () => {
           id={"codigo_ean_iac_search"}
           label={"Código EAN o IAC"}
           name={"codigo_ean_iac"}
-          type="tel"
-          autoComplete="off"
+          type='tel'
+          autoComplete='off'
           maxLength={"13"}
           onChange={(ev) => {
             ev.target.value = onChangeNumber(ev);
           }}
           defaultValue={selected?.codigo_ean_iac ?? ""}
-          required
         />
         <Input
           id={"nombre_convenio"}
           label={"Nombre del convenio"}
           name={"nombre_convenio"}
-          type="text"
-          autoComplete="off"
+          type='text'
+          autoComplete='off'
           maxLength={"30"}
           defaultValue={selected?.nombre_convenio ?? ""}
           required
@@ -357,8 +406,8 @@ const ConveniosRecaudo = () => {
               readOnly
             />
             {uploadingError && (
-              <div className="p-4 rounded bg-yellow-300">
-                <p className="whitespace-pre-wrap">{uploadingError}</p>
+              <div className='p-4 rounded bg-yellow-300'>
+                <p className='whitespace-pre-wrap'>{uploadingError}</p>
               </div>
             )}
             <ButtonBar>
@@ -367,7 +416,7 @@ const ConveniosRecaudo = () => {
           </Form>
         ) : (
           <Fragment>
-            <h1 className="text-3xl mx-auto text-center mb-4">
+            <h1 className='text-3xl mx-auto text-center mb-4'>
               {selected ? "Editar" : "Crear"} convenio
             </h1>
             <Form onSubmit={handleConvenio} grid>
@@ -375,8 +424,8 @@ const ConveniosRecaudo = () => {
                 id={"pk_codigo_convenio"}
                 label={"Código de convenio"}
                 name={"pk_codigo_convenio"}
-                type="tel"
-                autoComplete="off"
+                type='tel'
+                autoComplete='off'
                 maxLength={"4"}
                 onChange={(ev) => {
                   ev.target.value = onChangeNumber(ev);
@@ -389,28 +438,27 @@ const ConveniosRecaudo = () => {
                 id={"codigo_ean_iac"}
                 label={"Código EAN o IAC"}
                 name={"codigo_ean_iac"}
-                type="tel"
-                autoComplete="off"
+                type='tel'
+                autoComplete='off'
                 minLength={"13"}
                 maxLength={"13"}
                 onChange={(ev) => {
                   ev.target.value = onChangeNumber(ev);
                 }}
                 defaultValue={selected?.codigo_ean_iac ?? ""}
-                required
               />
               <Input
                 id={"nombre_convenio"}
                 label={"Nombre del Convenio"}
                 name={"nombre_convenio"}
-                type="text"
-                autoComplete="off"
+                type='text'
+                autoComplete='off'
                 maxLength={"30"}
                 defaultValue={selected?.nombre_convenio ?? ""}
                 required
               />
               <Select
-                className="place-self-stretch"
+                className='place-self-stretch'
                 id={"fk_tipo_valor"}
                 label={"Modificar valor"}
                 name={"fk_tipo_valor"}
@@ -422,8 +470,8 @@ const ConveniosRecaudo = () => {
                 id={"referencia_1"}
                 label={"Referencia 1"}
                 name={"referencia_1"}
-                type="text"
-                autoComplete="off"
+                type='text'
+                autoComplete='off'
                 maxLength={"30"}
                 defaultValue={selected?.referencia_1 ?? ""}
                 required
@@ -432,8 +480,8 @@ const ConveniosRecaudo = () => {
                 id={"referencia_2"}
                 label={"Referencia 2"}
                 name={"referencia_2"}
-                type="text"
-                autoComplete="off"
+                type='text'
+                autoComplete='off'
                 maxLength={"30"}
                 defaultValue={selected?.referencia_2 ?? ""}
               />
@@ -441,8 +489,8 @@ const ConveniosRecaudo = () => {
                 id={"referencia_3"}
                 label={"Referencia 3"}
                 name={"referencia_3"}
-                type="text"
-                autoComplete="off"
+                type='text'
+                autoComplete='off'
                 maxLength={"30"}
                 defaultValue={selected?.referencia_3 ?? ""}
               />
@@ -454,6 +502,115 @@ const ConveniosRecaudo = () => {
                   defaultChecked={selected?.activo}
                 />
               )}
+              <Fieldset legend='Restricción de longitud de referencias'>
+                {restriccionReferencias.length > 0 ? (
+                  restriccionReferencias.map((data, i) => {
+                    return (
+                      <Fieldset legend='Restricción de referencia' key={i}>
+                        <Select
+                          className='place-self-stretch'
+                          id={"referencia"}
+                          label={"Referencia"}
+                          name={"referencia"}
+                          options={[
+                            { label: "Referencia 1", value: "Referencia1" },
+                            { label: "Referencia 2", value: "Referencia2" },
+                            { label: "Referencia 3", value: "Referencia3" },
+                          ]}
+                          value={
+                            restriccionReferencias[i]?.referencia ??
+                            "Referencia1"
+                          }
+                          onChange={(e) => {
+                            let copy = [...restriccionReferencias];
+                            copy[i]["referencia"] = e.target.value;
+                            setRestriccionReferencias(copy);
+                          }}
+                          required
+                        />
+                        <Input
+                          id={"limiteMenor"}
+                          label={"Limite menor"}
+                          name={"limiteMenor"}
+                          type='text'
+                          autoComplete='off'
+                          maxLength={"2"}
+                          onInput={(e) => {
+                            let valor = e.target.value;
+                            let num = valor.replace(/[\s.-]/g, "");
+                            if (!isNaN(num)) {
+                              let copy = [...restriccionReferencias];
+                              copy[i]["limiteMenor"] = !isNaN(parseInt(num))
+                                ? parseInt(num)
+                                : 0;
+                              setRestriccionReferencias(copy);
+                            }
+                          }}
+                          value={restriccionReferencias[i]?.limiteMenor}
+                        />
+                        <Input
+                          id={"limiteMayor"}
+                          label={"Limite mayor"}
+                          name={"limiteMayor"}
+                          type='text'
+                          autoComplete='off'
+                          maxLength={"2"}
+                          onInput={(e) => {
+                            let valor = e.target.value;
+                            let num = valor.replace(/[\s.-]/g, "");
+                            if (!isNaN(num)) {
+                              let copy = [...restriccionReferencias];
+                              copy[i]["limiteMayor"] = !isNaN(parseInt(num))
+                                ? parseInt(num)
+                                : 0;
+                              setRestriccionReferencias(copy);
+                            }
+                          }}
+                          value={restriccionReferencias[i]?.limiteMayor}
+                        />
+                        <ButtonBar>
+                          <Button
+                            type={"button"}
+                            disabled={loading}
+                            onClick={(e) => {
+                              let copy = [...restriccionReferencias];
+                              copy.splice(i, 1);
+                              setRestriccionReferencias(copy);
+                            }}>
+                            Eliminar restricción
+                          </Button>
+                        </ButtonBar>
+                      </Fieldset>
+                    );
+                  })
+                ) : (
+                  <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+                    <h1>
+                      No se ha configurado ninguna restricción de longitud a las
+                      referencias
+                    </h1>
+                  </div>
+                )}
+                {restriccionReferencias.length < 3 && (
+                  <ButtonBar>
+                    <Button
+                      type={"button"}
+                      disabled={loading}
+                      onClick={(e) => {
+                        setRestriccionReferencias((obj) => [
+                          ...obj,
+                          {
+                            referencia: "Referencia1",
+                            limiteMenor: 0,
+                            limiteMayor: 0,
+                          },
+                        ]);
+                      }}>
+                      Agregar restricción
+                    </Button>
+                  </ButtonBar>
+                )}
+              </Fieldset>
               <ButtonBar>
                 <Button type={"submit"} disabled={loading}>
                   {selected ? "Realizar cambios" : "Crear convenio pin"}

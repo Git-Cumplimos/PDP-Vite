@@ -7,9 +7,6 @@ import Form from "../../../components/Base/Form";
 import { toast } from "react-toastify";
 import Modal from "../../../components/Base/Modal";
 import Tickets from "../../../components/Base/Tickets";
-import PagarForm from "../components/SendForm/PagarForm";
-import PagarFormFisico from "../components/SendForm/PagarFormFisico";
-import PagoResp from "../components/SellResp/PagoResp";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useNavigate } from "react-router-dom";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
@@ -24,10 +21,6 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 });
 
 const Premios = ({ route }) => {
-  const { label } = route;
-  const {
-    infoLoto: { pagoresponse, setPagoresponse },
-  } = useLoteria();
   const [respuesta, setRespuesta] = useState(false);
   const [estadoTransaccion, setEstadoTransaccion] = useState(false);
   const navigate = useNavigate();
@@ -35,66 +28,28 @@ const Premios = ({ route }) => {
   const [billete, setBillete] = useState("");
   const [totalPagar, setTotalPagar] = useState("");
   const [valorbruto, setValorbruto] = useState("");
+  const [valor17, setValor17] = useState("");
+  const [valor20, setValor20] = useState("");
   const [serie, setSerie] = useState("");
   const [idLoteria, seIdLoteria] = useState("");
-  const [phone, setPhone] = useState("");
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
-  const [selectedValue, setSelectedValue] = useState("");
-  const { quotaInfo, roleInfo, infoTicket, userInfo } = useAuth();
-  console.log("ESTO ES ROLEINFO", roleInfo);
-  const [datosCliente, setDatosCliente] = useState({
-    selectFraccion: 0,
-    nombre: "",
-    documento: "",
-    direccion: "",
-    celular: "",
-    idTransaccion: "",
-    statusPagoPremio: false,
-    tipo_operacion: "",
-  });
-  const [datosComercio, setDatosComercio] = useState({
-    comercio: "",
-    terminal: "",
-    usuario: "",
-    codigo_dane: "",
-  });
-  const handleClose = useCallback(() => {
-    setShowAllmodals((old) => {
-      return {
-        ...old,
-        showModalDatosPropietario: false,
-        showModalVoucher: false,
-        showModalconfirmacionVentaSoat: false,
-      };
-    });
-    navigate(`../loteria`);
-  }, []);
+  const { pdpUser, roleInfo, infoTicket } = useAuth();
   const [respagar, setRespagar] = useState([]);
-  // const [respagar, setRespagar] = useState([
-  //   {
-  //     "Premio Mayor1": ["Hola", "Premio Mayor2"],
-  //     "sorteo ": ["Estas", "todo"],
-  //     "numero ": ["Que hay", "Sacan"],
-  //     "serie ": ["De tu vida", "maleta"],
-  //     "neto ": ["que tal todo", "espacio"],
-  //   },
-  // ]);
   const [tipopago, setTipopago] = useState("");
-  const [fracciones_fisi, setFracciones_fisi] = useState("");
-
-  const [winner, setWinner] = useState(false);
   const [isSelf, setIsSelf] = useState(false);
-
-  ///////////////////////////////////////////////////////
-  const [showModal, setShowModal] = useState(false);
   const printDiv = useRef();
   const [showTable, setShowTable] = useState(false);
   const [checkBilleteVirtual, setCheckBilleteVirtual] = useState(false);
   const [checkBilleteFisico, setCheckBilleteFisico] = useState(false);
   const [checkDisableVirtual, setCheckDisableVirtual] = useState(false);
   const [checkDisableFisico, setCheckDisableFisico] = useState(false);
+  const [disabledBtns, setDisabledBtns] = useState(false);
+  const { isWinner, makePayment } = useLoteria();
+  const [fraccionesporbillete, setFraccionesporbillete] = useState(1);
+  const [fracciones_disponibles,setFracciones_disponibles] = useState([]);
+
   const [showAllmodals, setShowAllmodals] = useState({
     showModalVoucher: false,
     voucherAprobado: false,
@@ -103,54 +58,38 @@ const Premios = ({ route }) => {
     showModalconfirmacionVentaSoat: false,
     showLoading: false,
   });
-  const [customer, setCustomer] = useState({
-    doc_id: "",
-    primer_nombre: "",
-    segundo_nombre: "",
-    primer_apellido: "",
-    segundo_apellido: "",
+  const [datosCliente, setDatosCliente] = useState({
+    selectFraccion: 0,
+    nombre: "",
+    apellido:"",
+    documento: "",
     direccion: "",
-    telefono: "",
-    fracciones: "",
+    celular: "",
+    idTransaccion: "",
+    statusPagoPremio: false,
+    tipo_operacion: "",
   });
 
-  const closeModal = useCallback(() => {
-    // setShowModal(false);
-    setWinner("");
-    setPhone("");
-    setHash("");
-    setFracciones_fisi("");
-    setCustomer({
-      doc_id: "",
-      primer_nombre: "",
-      segundo_nombre: "",
-      primer_apellido: "",
-      segundo_apellido: "",
-      direccion: "",
-      telefono: "",
-      fracciones: "",
-    });
+  const [datosComercio, setDatosComercio] = useState({
+    comercio: "",
+    terminal: "",
+    usuario: "",
+    codigo_dane: "",
+    nom_loteria: "",
   });
-  ///////////////////////////////////////////////////////
-  const [disabledBtns, setDisabledBtns] = useState(false);
 
-  const { isWinner, makePayment, makePayment2, pagopremio, pagopremiofisico } =
-    useLoteria();
-
-  const [fracbill, setFracbill] = useState([]);
-  const [selecFrac, setSelecFrac] = useState([]);
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
+  const handleClose = useCallback(() => {
+    setSeleccionarFraccion(0)
+    setShowAllmodals((old) => {
+      return {
+        ...old,
+        showModalDatosPropietario: false,
+        showModalVoucher: false,
+        showModalconfirmacionVentaSoat: false,
+      };
     });
-  };
+    navigate(-1);
+  }, []);
 
   const notifyError = (msg) => {
     toast.warn(msg, {
@@ -163,13 +102,18 @@ const Premios = ({ route }) => {
       progress: undefined,
     });
   };
+
   const onSubmit = (e) => {
-    setSeleccionarFraccion(0);
+    setShowTable(false);
+    setDisabledBtns(true);
+    setRespuesta(true);
+    e.preventDefault();
     setDatosCliente((old) => {
       return {
         ...old,
         selectFraccion: "0",
         nombre: "",
+        apellido: "",
         documento: "",
         direccion: "",
         celular: "",
@@ -177,22 +121,7 @@ const Premios = ({ route }) => {
         statusPagoPremio: false,
       };
     });
-    // this.setState({ setCheckDisableVirtual: false });
-    // this.setState({ setCheckBilleteFisico: false });
-    var state = {
-      // checkDisableVirtual: false,
-      // checkBilleteFisico: false,
-    };
-    // const handleCheckboxChange = (event) => {
-    //   this.setState({ isChecked: event.target.checkDisableVirtual });
-    //   this.setState({ isChecked: event.target.checkBilleteFisico });
-    // };
-    // setCheckDisableVirtual(false);
-    // setCheckBilleteFisico(false);
-    setShowTable(false);
-    setDisabledBtns(true);
-    setRespuesta(true);
-    e.preventDefault();
+
     isWinner(sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual)
       .then((res) => {
         var salvarRes = res;
@@ -200,20 +129,25 @@ const Premios = ({ route }) => {
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
         setTipopago(salvarRes?.obj?.tipo_ganancia);
+        setFraccionesporbillete(res?.obj?.fracciones_billete)
         setDatosComercio((old) => {
+          setRespuesta(false);
+          setValorbruto(res?.obj?.valorbruto);
+          setValor17(res?.obj?.valor17);
+          setValor20(res?.obj?.valor20);
+          setDisabledBtns(false);
           return {
             ...old,
             comercio: roleInfo?.id_comercio,
             usuario: roleInfo?.id_usuario,
             terminal: roleInfo?.id_dispositivo,
             codigo_dane: roleInfo?.codigo_dane,
+            nom_loteria: res?.obj?.nom_loteria,
           };
         });
-
-        setRespuesta(false);
-        setValorbruto(res?.obj?.valorbruto);
-        fracbill.length = 0;
-        setDisabledBtns(false);
+        if (res === undefined) {
+          notifyError("No existen resultados, para el sorteo indicado")
+        }
         if ("msg" in res) {
           if (res?.obj?.max_pago == true) {
             notifyError(
@@ -245,7 +179,6 @@ const Premios = ({ route }) => {
             gana = res?.obj?.gana;
             ValNetoFraccion = res?.obj?.ValNetoFraccion;
             totalPagarLoteria = res?.obj?.total;
-
             res = [];
             for (let i = 0; i < gana.length; i++) {
               res.push([
@@ -262,54 +195,89 @@ const Premios = ({ route }) => {
               "",
               "",
               formatMoney.format(totalPagarLoteria),
-            ]);
-            // setIsSelf(true);
+            ]);        
             setRespagar(res);
-            setShowTable(true);
-            setWinner(true);
+            setShowTable(true); 
           } else if (res?.obj?.ganador == false && "msg" in res) {
             notifyError(res?.obj?.gana);
-            setWinner(false);
             setIsSelf(false);
           }
         }
         if (salvarRes?.obj?.tipo_ganancia == 2) {
-          setWinner(true);
           setTipopago(salvarRes?.obj?.tipo_ganancia);
         }
         if (res[0]["Estado"] === false) {
           notifyError("No ganador");
-          setWinner(false);
           setIsSelf(false);
-        }
-        if (res[0]["Estado"] === true) {
-          if (res[0]["Tipo"] === 2) {
-            notify("Ganador con billete virtual");
-            setTipopago(res[0]["Tipo"]);
-            setWinner(true);
-            setIsSelf(true);
-          } else {
-            notify("Ganador con billete físico");
-            for (var i = 0; i < res[0].cantidad_frac_billete; i++) {
-              fracbill.push(i + 1);
-            }
-            setTipopago(res[0]["Tipo"]);
-            setCheckedState(
-              new Array(res[0].cantidad_frac_billete).fill(false)
-            );
-            setWinner(true);
-            setIsSelf(false);
-          }
         }
       })
       .catch(() => setDisabledBtns(false));
   };
-  const optionsDocumento = [
-    { value: 0, label: "Seleccione la fracción" },
-    { value: 1, label: "Fracción # 1" },
-    { value: 2, label: "Fracción # 2" },
-    { value: 3, label: "Fracción # 3" },
-  ];
+
+  const selectFraccionP = (fraccionesporbillete) => {
+    const optionsDocumento = [
+      { value: 0, label: "Seleccione la fracción" }
+    ]
+    for (let i = 1; i <= fraccionesporbillete; i++) {
+      optionsDocumento.push(
+        { value: i, label: "Fracción # "+i }
+      );
+    }
+    setFracciones_disponibles(optionsDocumento)
+  };
+
+  useEffect(() => {
+    selectFraccionP(fraccionesporbillete);
+  }, [fraccionesporbillete]);
+  
+  const tickets = useMemo(() => {
+    return {
+      title: "Recibo de pago",
+      timeInfo: {
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }).format(new Date()),
+      },
+      commerceInfo: [
+        ["Id Comercio", roleInfo?.id_comercio],
+        ["No. terminal", roleInfo?.id_dispositivo],
+        ["Id Trx ", datosCliente.idTransaccion],
+        ["Id Aut ", datosCliente.idTransaccion],
+        ["Comercio", roleInfo?.["nombre comercio"]],
+        ["", ""],
+        ["Dirección", roleInfo?.direccion],
+        ["", ""],
+      ],
+      commerceName: ["PAGO PREMIO ", datosComercio.nom_loteria],
+      trxInfo: [
+        ["Sorteo", sorteo],
+        ["Billete", billete],
+        ["Serie", serie],
+        ["Fracción", seleccionarFraccion],
+        ["Valor a pagar", formatMoney.format(totalPagar)],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Nombres", tipopago === 2 && datosCliente?.nombre],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Apellidos", tipopago === 2 && datosCliente?.apellido],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Número Documento", tipopago === 2 && datosCliente?.documento],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Celular", tipopago === 2 && datosCliente?.celular],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+      ],
+      disclamer:
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
+    };
+  }, [estadoTransaccion,sorteo,billete,serie,checkBilleteFisico,checkBilleteVirtual,seleccionarFraccion,datosCliente,totalPagar,valorbruto,tipopago]);
+  
   const onPay1 = (e) => {
     e.preventDefault();
     if (tipopago === 2) {
@@ -318,11 +286,15 @@ const Premios = ({ route }) => {
         if (
           seleccionarFraccion === 0 ||
           seleccionarFraccion === "0" ||
-          seleccionarFraccion === undefined
-        ) {
+          seleccionarFraccion === undefined) {
+            setRespuesta(false);
+            notifyError("Seleccione una fracción")
+        }
+        else if (checkBilleteVirtual === true && hash === ""){
           setRespuesta(false);
-          notifyError("Seleccione una fracción");
-        } else {
+          notifyError("Ingresar código hash")
+        }
+        else {
           makePayment(
             sorteo,
             billete,
@@ -331,11 +303,14 @@ const Premios = ({ route }) => {
             checkBilleteVirtual,
             seleccionarFraccion,
             datosCliente?.nombre,
+            datosCliente?.apellido,
             datosCliente?.documento,
             datosCliente?.direccion,
             datosCliente?.celular,
             totalPagar,
             valorbruto,
+            valor17,
+            valor20,
             datosComercio.comercio,
             datosComercio.terminal,
             datosComercio.usuario,
@@ -343,7 +318,8 @@ const Premios = ({ route }) => {
             idLoteria,
             tipopago,
             hash,
-            phone
+            pdpUser?.uname,
+            tickets,
           )
             .then((res) => {
               setRespuesta(false);
@@ -352,210 +328,90 @@ const Premios = ({ route }) => {
                   ...old,
                   statusPagoPremio: res?.status,
                   idTransaccion: res?.obj?.id_trx,
+                  tipo_operacion: res?.obj?.tipo_operacion,
                 };
               });
+              tickets["commerceInfo"].splice(2, 0, ["Id Trx", datosCliente?.idTransaccion,]);
               setEstadoTransaccion(res?.status);
               if (res?.status === false) {
-                var recargarPag = res?.status;
-                // this.setState({ recargarPag: false });
                 notifyError(res?.obj?.msg);
-                navigate(`../loteria`);
+                navigate(-1);
               }
             })
             .catch(() => setDisabledBtns(false));
         }
       } else {
         notifyError(
-          "Numero invalido, el N° de celular debe comenzar con el número 3."
+          "Número invalido, el N° de celular debe comenzar con el número 3."
         );
       }
     } else {
-      setRespuesta(true);
-      if (
-        seleccionarFraccion === 0 ||
-        seleccionarFraccion === "0" ||
-        seleccionarFraccion === undefined
-      ) {
-        setRespuesta(false);
-        notifyError("Seleccione una fracción");
-      } else {
-        makePayment(
-          sorteo,
-          billete,
-          serie,
-          checkBilleteFisico,
-          checkBilleteVirtual,
-          seleccionarFraccion,
-          datosCliente?.nombre,
-          datosCliente?.documento,
-          datosCliente?.direccion,
-          datosCliente?.celular,
-          totalPagar,
-          valorbruto,
-          datosComercio.comercio,
-          datosComercio.terminal,
-          datosComercio.usuario,
-          idLoteria,
-          tipopago,
-          hash,
-          phone
-        )
-          .then((res) => {
+        if (
+          seleccionarFraccion === 0 ||
+          seleccionarFraccion === "0" ||
+          seleccionarFraccion === undefined) {
             setRespuesta(false);
-            setDatosCliente((old) => {
-              return {
-                ...old,
-                statusPagoPremio: res?.status,
-                idTransaccion: res?.obj?.id_trx,
-                tipo_operacion: res?.obj?.tipo_operacion,
-              };
-            });
-            setEstadoTransaccion(res?.status);
-            if (res?.status === false) {
-              var recargarPag = res?.status;
-              // this.setState({ recargarPag: false });
-              notifyError(res?.obj?.msg);
-              navigate(`../loteria`);
-            }
-          })
-          .catch(() => setDisabledBtns(false));
-      }
+            notifyError("Seleccione una fracción")
+        }
+        else if (checkBilleteVirtual === true && hash === ""){
+            setRespuesta(false);
+            notifyError("Ingresar código hash")
+        }
+        else {
+          setRespuesta(true);
+          makePayment(
+            sorteo,
+            billete,
+            serie,
+            checkBilleteFisico,
+            checkBilleteVirtual,
+            seleccionarFraccion,
+            datosCliente?.nombre,
+            datosCliente?.apellido,
+            datosCliente?.documento,
+            datosCliente?.direccion,
+            datosCliente?.celular,
+            totalPagar,
+            valorbruto,
+            valor17,
+            valor20,
+            datosComercio.comercio,
+            datosComercio.terminal,
+            datosComercio.usuario,
+            datosComercio.codigo_dane,
+            idLoteria,
+            tipopago,
+            hash,
+            pdpUser?.uname,
+            tickets,
+          )
+            .then((res) => {
+              setRespuesta(false);
+              setDatosCliente((old) => {
+                return {
+                  ...old,
+                  statusPagoPremio: res?.status,
+                  idTransaccion: res?.obj?.id_trx,
+                  tipo_operacion: res?.obj?.tipo_operacion,
+                };
+              });
+              setEstadoTransaccion(res?.status);
+              if (res?.status === false) {
+                notifyError(res?.obj?.msg);
+                navigate(-1);
+              }
+            })
+            .catch(() => setDisabledBtns(false));
+        }
     }
   };
 
-  const tickets2 = useMemo(() => {
-    return {
-      title: "Recibo de pago",
-      timeInfo: {
-        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }).format(new Date()),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        }).format(new Date()),
-      },
-      commerceInfo: [
-        ["Id Comercio", roleInfo?.id_comercio],
-        ["No. terminal", roleInfo?.id_dispositivo],
-        ["Id Trx ", datosCliente.idTransaccion],
-        ["Municipio", roleInfo?.ciudad],
-        ["", ""],
-        ["Dirección", roleInfo?.direccion],
-        ["", ""],
-      ],
-      commerceName: "LOTERIA DE BOGOTÁ D.C",
-      trxInfo: [
-        ["", ""],
-        ["Valor", formatMoney.format(totalPagar)],
-      ],
-
-      disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-    };
-  }, [estadoTransaccion]);
-
-  const tickets = useMemo(() => {
-    return {
-      title: "Recibo de pago",
-      timeInfo: {
-        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }).format(new Date()),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        }).format(new Date()),
-      },
-      commerceInfo: [
-        ["Id Comercio", roleInfo?.id_comercio],
-        ["No. terminal", roleInfo?.id_dispositivo],
-        ["Id Trx ", datosCliente.idTransaccion],
-        ["Municipio", roleInfo?.ciudad],
-        ["", ""],
-        ["Dirección", roleInfo?.direccion],
-        ["", ""],
-      ],
-      commerceName: "LOTERIA DE BOGOTÁ D.C",
-      trxInfo: [
-        ["", ""],
-        ["", "DATOS DEL CLIENTE"],
-        ["Nombre", datosCliente?.nombre],
-        ["Celular", datosCliente?.celular],
-        ["Valor", formatMoney.format(totalPagar)],
-      ],
-
-      disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-    };
-  }, [estadoTransaccion]);
-
-  const onPay2 = (e) => {
-    setDisabledBtns(true);
-    e.preventDefault();
-
-    makePayment2(sorteo, billete, serie, selecFrac)
-      .then((res) => {
-        // setShowModal(true);
-        setDisabledBtns(false);
-        setRespagar(res);
-
-        if ("msg" in res) {
-          notifyError(res.msg);
-        } else {
-          if (res?.Tipo === 0) {
-            notifyError(
-              "El valor a pagar supera la capacidad de la oficina: " +
-                formatMoney.format(res["valor ganado"])
-            );
-          } else {
-          }
-        }
-      })
-
-      .catch(() => setDisabledBtns(false));
-  };
   const handlePrint = useReactToPrint({
     content: () => printDiv?.current,
   });
-  const [checkedState, setCheckedState] = useState();
-  const handleChange = (event) => {
-    setSelectedValue(event.target.value);
-  };
 
-  const handleOnChange = (position) => {
-    setFracbill(5);
-    selecFrac.length = 0;
-    const updatedCheckedState = checkedState.map((item, frac) =>
-      frac === position ? !item : item
-    );
-
-    setCheckedState(updatedCheckedState);
-
-    for (var i = 0; i < fracbill.length; i++) {
-      if (updatedCheckedState[i] === true) {
-        selecFrac.push(fracbill[i]);
-      }
-    }
-  };
-  // useEffect(() => {
-  //   if (pagoresponse != null && "msg" in pagoresponse) {
-  //     notifyError(pagoresponse.msg);
-  //   }
-  // }, [pagoresponse]);
-  // useEffect(() => {}, [totalPagar]);
-  //------------------Funcion para validar el número del celular------------------------------
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-
     if (valueInput[0] != 3) {
       if (valueInput.length == 1 && datosCliente?.celular == "") {
         notifyError(
@@ -568,44 +424,19 @@ const Premios = ({ route }) => {
       return { ...old, celular: valueInput };
     });
   };
-  //-------------------------------------------------------------------------------
 
-  // const onCelChange = (e) => {
-  //   const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-  //   setDatosCliente((old) => {
-  //     return { ...old, celular: valueInput };
-  //   });
-
-  //   if (valueInput[0] != 3) {
-  //     if (valueInput.length == 1 && datosCliente?.celular == "") {
-  //       notifyError(
-  //         "Número inválido, el No. de celular debe comenzar con el número 3"
-  //       );
-  //       return;
-  //     }
-  //   }
-  // };
-
-  useEffect(() => {
-    const ticket = tipopago === 1 ? tickets : tickets2;
-    infoTicket(datosCliente.idTransaccion, datosCliente.tipo_operacion, ticket)
-      .then((resTicket) => {})
-      .catch((err) => {
-        console.error(err);
-        notifyError("Error guardando el ticket");
-      });
-  }, [
-    infoTicket,
-    datosCliente,
-    estadoTransaccion,
-    tickets2,
-    tickets,
-    tipopago,
-  ]);
-  const cancelar = () => {
-    notifyError("Se cancelo el pago del premio");
-    navigate(`../loteria`);
+  const onDocChange = (e) => {
+    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+    setDatosCliente((old) => {
+      return { ...old, documento: valueInput };
+    });
   };
+ 
+  const cancelar = () => {
+    notifyError("Se canceló el pago del premio");
+    navigate(-1);
+  };
+
   return (
     <>
       <Form onSubmit={onSubmit} grid>
@@ -615,7 +446,7 @@ const Premios = ({ route }) => {
           type="text"
           minLength="1"
           maxLength="4"
-          required
+          required={true}
           autoComplete="off"
           value={sorteo}
           onInput={(e) => {
@@ -631,7 +462,7 @@ const Premios = ({ route }) => {
           type="text"
           minLength="4" /*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="4"
-          required
+          required={true}
           autoComplete="off"
           value={billete}
           onInput={(e) => {
@@ -647,7 +478,7 @@ const Premios = ({ route }) => {
           type="text"
           minLength="3" /*Verificar para que se puedan poner ceros a la izquierda*/
           maxLength="3"
-          required
+          required={true}
           autoComplete="off"
           value={serie}
           onInput={(e) => {
@@ -661,7 +492,7 @@ const Premios = ({ route }) => {
           <Input
             type="checkbox"
             label="Billete Físico"
-            required
+            required={true}
             value={checkBilleteFisico}
             disabled={checkDisableFisico}
             onChange={() => {
@@ -677,7 +508,7 @@ const Premios = ({ route }) => {
           <Input
             label="Billete Virtual"
             type="checkbox"
-            required
+            required={true}
             disabled={checkDisableVirtual}
             value={checkBilleteVirtual}
             onChange={() => {
@@ -719,9 +550,11 @@ const Premios = ({ route }) => {
                 }>
                 <Input
                   id="nombre"
-                  label="Nombre"
+                  label="Nombres"
                   type="text"
                   autoComplete="off"
+                  minLength={"3"}
+                  maxLength={"60"}
                   value={datosCliente?.nombre}
                   onInput={(e) => {
                     setDatosCliente((old) => {
@@ -731,25 +564,36 @@ const Premios = ({ route }) => {
                       };
                     });
                   }}
-                  required
+                  required={true}
                 />
                 <Input
-                  id="cedula"
-                  label="Cédula"
+                  id="apellido"
+                  label="Apellidos"
                   type="text"
-                  minLength={"12"}
-                  maxLength={"12"}
                   autoComplete="off"
-                  required
-                  value={datosCliente?.documento}
+                  minLength={"3"}
+                  maxLength={"60"}
+                  value={datosCliente?.apellido}
                   onInput={(e) => {
                     setDatosCliente((old) => {
                       return {
                         ...old,
-                        documento: e.target.value,
+                        apellido: e.target.value,
                       };
                     });
                   }}
+                  required={true}
+                />
+                <Input
+                  id="cedula"
+                  label="Cédula"
+                  type="tel"
+                  minLength="5"
+                  maxLength="12"
+                  autoComplete="off"
+                  required
+                  value={datosCliente?.documento}
+                  onChange={onDocChange}
                 />
                 <Input
                   id="numCel"
@@ -761,14 +605,6 @@ const Premios = ({ route }) => {
                   autoComplete="off"
                   required
                   value={datosCliente?.celular}
-                  onInput={(e) => {
-                    setDatosCliente((old) => {
-                      return {
-                        ...old,
-                        celular: e.target.value,
-                      };
-                    });
-                  }}
                   onChange={onCelChange}
                 />
                 <Input
@@ -776,7 +612,9 @@ const Premios = ({ route }) => {
                   label="Dirección"
                   type="text"
                   autoComplete="off"
-                  required
+                  minLength={"3"}
+                  maxLength={"60"}
+                  required={true}
                   value={datosCliente?.direccion}
                   onInput={(e) => {
                     setDatosCliente((old) => {
@@ -787,24 +625,12 @@ const Premios = ({ route }) => {
                     });
                   }}
                 />
-                {/* {fracbill.map((frac, index) => {
-                  return (
-                    <Input
-                      id={frac}
-                      label={`Fracción ${frac}:`}
-                      type="checkbox"
-                      value={frac}
-                      checked={checkedState[index]}
-                      onChange={() => handleOnChange(index)}
-                    />
-                  );
-                })} */}
                 <Select
                   id="selectFraccion"
                   label="Fracción"
-                  options={optionsDocumento}
+                  options={fracciones_disponibles}
                   value={seleccionarFraccion}
-                  required
+                  required={true}
                   onChange={(e) => {
                     setSeleccionarFraccion(e.target.value);
                   }}
@@ -812,14 +638,15 @@ const Premios = ({ route }) => {
                 {checkBilleteVirtual == true ? (
                   <Input
                     id="codHash"
-                    label="Codigo de seguridad"
+                    label="Código de seguridad"
                     type="text"
+                    maxLength="10"
                     autoComplete="off"
-                    required
                     value={hash}
                     onChange={(e) => {
                       setHash(e.target.value);
                     }}
+                    required
                   />
                 ) : (
                   ""
@@ -829,8 +656,8 @@ const Premios = ({ route }) => {
                     <ButtonBar
                       className="flex flex-row justify-center items-center
                           mx-auto container gap-10 text-lg lg:col-span-2">
-                      <Button onClick={() => cancelar()}>Cancelar</Button>
-                      <Button type="submit" disabled={disabledBtns}>
+                      <Button type={"button"} onClick={() => cancelar()}>Cancelar</Button>
+                      <Button type={"submit"} >
                         Pagar
                       </Button>
                     </ButtonBar>
@@ -847,42 +674,41 @@ const Premios = ({ route }) => {
                   <Form onSubmit={onPay1} grid>
                     <Fieldset
                       className="lg:col-span-2 flex justify-center items-center"
-                      legend={
-                        "Por favor, seleccione la fracción del billete a pagar"
-                      }>
+                      legend={checkBilleteVirtual === true ? ("Por favor, Ingresar la Fracción y el Código Hash del billete a pagar.") : ("Por favor, seleccione la Fracción del billete a pagar")}>
                       <Select
                         id="selectFraccion"
                         label="Fracción"
-                        options={optionsDocumento}
+                        options={fracciones_disponibles}
                         value={seleccionarFraccion}
-                        required
+                        required={true}
                         onChange={(e) => {
                           setSeleccionarFraccion(e.target.value);
                         }}
                       />
                       {checkBilleteVirtual === true ? (
                         <Input
-                          id="codHash"
-                          label="Codigo de seguridad"
+                          id="codHash1"
+                          label="Código de seguridad"
                           type="text"
+                          maxLength="10"
                           autoComplete="off"
-                          required
                           value={hash}
                           onChange={(e) => {
                             setHash(e.target.value);
                           }}
+                          required={true}
                         />
                       ) : (
                         ""
                       )}
                       {checkBilleteFisico === true ||
-                      checkBilleteVirtual === true ? (
+                        checkBilleteVirtual === true ? (
                         <>
                           <ButtonBar
                             className="flex flex-row justify-center items-center
                           mx-auto container gap-10 text-lg lg:col-span-2">
                             <Button onClick={() => cancelar()}>Cancelar</Button>
-                            <Button type="submit" disabled={disabledBtns}>
+                            <Button type={"submit"} >
                               Pagar
                             </Button>
                           </ButtonBar>
@@ -892,250 +718,22 @@ const Premios = ({ route }) => {
                       )}
                     </Fieldset>
                   </Form>
-                  <Form onSubmit={onPay2} grid>
-                    {fracbill.map((frac, index) => {
-                      return (
-                        <Input
-                          id={frac}
-                          label={`Fracción ${frac}:`}
-                          type="checkbox"
-                          value={frac}
-                          checked={checkedState[index]}
-                          onChange={() => handleOnChange(index)}
-                        />
-                      );
-                    })}
-
-                    {selecFrac.length >= 1 ? (
-                      <ButtonBar className="col-auto md:col-span-2">
-                        <Button type="submit" disabled={disabledBtns}>
-                          Pagar
-                        </Button>
-                      </ButtonBar>
-                    ) : (
-                      ""
-                    )}
-                  </Form>
                 </>
               ) : (
                 ""
               )}
             </>
           )}
-          {/* <Form onSubmit={onPay2} grid>
-            <Fieldset
-              className="lg:col-span-2"
-              legend={"Seleccione un tipo de billete fielset 2"}>
-              {fracbill.map((frac, index) => {
-                return (
-                  <Input
-                    id={frac}
-                    label={`Fracción ${frac}:`}
-                    type="checkbox"
-                    value={frac}
-                    checked={checkedState[index]}
-                    onChange={() => handleOnChange(index)}
-                  />
-                );
-              })}
-              {selecFrac.length >= 1 ? (
-                <ButtonBar className="col-auto md:col-span-2">
-                  <Button type="submit" disabled={disabledBtns}>
-                    Pagar
-                  </Button>
-                </ButtonBar>
-              ) : (
-                ""
-              )}
-            </Fieldset>
-          </Form> */}
         </>
       ) : (
         ""
       )}
-      {winner ? (
-        <>
-          {tipopago === 3 ? (
-            <Form onSubmit={onPay1} grid>
-              <>
-                <Input
-                  id="numCel"
-                  label="Numero de celular"
-                  type="text"
-                  autoComplete="off"
-                  required
-                  value={phone}
-                  onInput={(e) => {
-                    if (!isNaN(e.target.value)) {
-                      const num = e.target.value;
-                      setPhone(num);
-                    }
-                  }}
-                />
-                {isSelf ? (
-                  <Input
-                    id="codHash"
-                    label="Codigo de seguridad"
-                    type="text"
-                    autoComplete="off"
-                    required
-                    value={hash}
-                    onInput={(e) => {
-                      setHash(e.target.value);
-                    }}
-                  />
-                ) : (
-                  ""
-                )}
-              </>
-              <ButtonBar className="col-auto md:col-span-2">
-                <Button type="submit" disabled={disabledBtns}>
-                  Pagar
-                </Button>
-              </ButtonBar>
-            </Form>
-          ) : (
-            <Form onSubmit={onPay2} grid>
-              {/* <h2>Este numero no fue vendido por Punto de pago, solicite el billete</h2> */}
-
-              {fracbill.map((frac, index) => {
-                return (
-                  <Input
-                    id={frac}
-                    label={`Fracción ${frac}:`}
-                    type="checkbox"
-                    value={frac}
-                    checked={checkedState[index]}
-                    onChange={() => handleOnChange(index)}
-                  />
-                );
-              })}
-
-              {selecFrac.length >= 1 ? (
-                <ButtonBar className="col-auto md:col-span-2">
-                  <Button type="submit" disabled={disabledBtns}>
-                    Pagar
-                  </Button>
-                </ButtonBar>
-              ) : (
-                ""
-              )}
-            </Form>
-          )}
-        </>
-      ) : (
-        ""
-      )}
-
-      {respagar["msg"] === undefined && respagar?.Tipo != 0 ? (
-        <>
-          <Modal
-            show={showModal}
-            num_tele={phone}
-            handleClose={() => closeModal()}>
-            {pagoresponse === null || "msg" in pagoresponse ? (
-              <>
-                {tipopago === 2 ? (
-                  <PagarForm
-                    selected={respagar}
-                    customer={customer}
-                    setCustomer={setCustomer}
-                    closeModal={closeModal}
-                    handleSubmit={() => {
-                      pagopremio(
-                        sorteo,
-                        billete,
-                        serie,
-                        hash,
-                        customer,
-                        respagar,
-                        phone
-                      );
-                      setSorteo("");
-                      setBillete("");
-                      setSerie("");
-                      setPhone("");
-                      setHash("");
-                      setWinner("");
-                    }}
-                  />
-                ) : (
-                  <PagarFormFisico
-                    selected={respagar}
-                    canFrac={fracciones_fisi}
-                    numbillete={billete}
-                    sorteo={sorteo}
-                    serie={serie}
-                    customer={customer}
-                    setCustomer={setCustomer}
-                    closeModal={closeModal}
-                    handleSubmit={() => {
-                      pagopremiofisico(
-                        sorteo,
-                        billete,
-                        serie,
-                        customer,
-                        respagar,
-                        selecFrac
-                      );
-                      setSorteo("");
-                      setBillete("");
-                      setSerie("");
-                      setPhone("");
-                      setHash("");
-                      setWinner("");
-                      setFracciones_fisi("");
-                    }}
-                  />
-                )}
-              </>
-            ) : (
-              <PagoResp
-                pagoresponse={pagoresponse}
-                setPagoresponse={setPagoresponse}
-                closeModal={closeModal}
-                setCustomer={setCustomer}
-              />
-            )}
-
-            {/* {showTable ? (
-              <TableEnterprise
-                title="Premios a pagar"
-                headers={[
-                  "Acierto",
-                  "Sorteo",
-                  "Numero",
-                  "Serie",
-                  "Premio Neto x Billete",
-                  "Premio Neto x Fraccion",
-                ]}
-                data={respagar}></TableEnterprise>
-            ) : (
-              ""
-            )} */}
-          </Modal>
-        </>
-      ) : (
-        ""
-      )}
-      {estadoTransaccion && tipopago === 2 ? (
-        /**************** Compra Soat Exitosa Voucher **********************/
+      {estadoTransaccion && tipopago === 2 || tipopago === 1 ? (
+        /**************** Pago premio Exitosa Voucher **********************/
         <Modal show={estadoTransaccion} handleClose={handleClose}>
           {/* <Modal show={showAllmodals.showModalVoucher} handleClose={handleClose}> */}
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
-            <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={handleClose}>Cerrar</Button>
-            </ButtonBar>
-          </div>
-        </Modal>
-      ) : /*************** Compra Soat Exitosa Voucher **********************/
-      tipopago === 1 ? (
-        <Modal show={estadoTransaccion} handleClose={handleClose}>
-          {/* <Modal show={showAllmodals.showModalVoucher} handleClose={handleClose}> */}
-          <div className="flex flex-col justify-center items-center">
-            <Tickets refPrint={printDiv} ticket={tickets2}></Tickets>
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={handleClose}>Cerrar</Button>

@@ -25,6 +25,7 @@ const UsarPinForm = ({
   id_pin,
   tipoPin,
   setActivarNavigate,
+  datosOlimpia
 }) => {
   const printDiv = useRef();
 
@@ -46,6 +47,37 @@ const UsarPinForm = ({
       .catch((err) => console.log("error", err));
   }, []);
 
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "",
+    timeInfo: {
+      "Fecha de venta": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+      /*id_dispositivo*/
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      ["Id Trx", ""],
+      ["", ""],  
+      /*ciudad*/
+      ["Comercio", roleInfo?.["nombre comercio"]],
+      ["", ""],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+      ["", ""],
+
+    ],
+    commerceName: "PIN PARA GENERACIÓN DE LICENCIA",
+    trxInfo: [
+      ["Trámite", "Uso de Pin"],
+      ["", ""],
+
+    ],
+    disclamer: "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
+  });
+
+
   const textTipoPin = useMemo(() => {
     const resp = optionsTipoPines?.filter((id) => id.id === tipoPin);
     return resp[0]?.descripcion.toUpperCase();
@@ -56,10 +88,19 @@ const UsarPinForm = ({
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const [disabledBtn, setDisabledBtn] = useState(false);
+  const [disabledBtn, setDisabledBtn] = useState(true);
   const tickets = useMemo(() => {
+    let tittle
+    if(tipoPin==1){
+      tittle = "Recibo de pago: Servicio voluntario de impresión premium"
+    }else{
+      tittle = "Recibo de pago: " + textTipoPin
+    }
+    if(typeof(textTipoPin)==='string'){
+      setDisabledBtn(false)
+    }
     return {
-      title: "Recibo de pago: " + name_tramite,
+      title: tittle,
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -74,35 +115,72 @@ const UsarPinForm = ({
         }).format(new Date()),
       },
       commerceName: textTipoPin,
-      commerceInfo: Object.entries({
-        "Id Comercio": roleInfo?.id_comercio,
-        "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
-        "Id Trx": respPinUso?.transacciones_id_trx?.uso,
-      }),
+      commerceInfo:    [
+        ["Id Comercio", roleInfo?.id_comercio],
+        [ "No. terminal", roleInfo?.id_dispositivo],
+        [ "Id Trx", respPinUso?.transacciones_id_trx?.uso],
+        [ "",""],
+        [ "Comercio" , roleInfo?.["nombre comercio"]],
+         [ "",""],
+         ["Dirección", roleInfo?.direccion],
+         [  "",""],
+ 
+       ]
+      ,
       trxInfo: [
-        ["Proceso", "Uso de Pin"],
-        ["VALOR", formatMoney.format(0)],
+        ["Trámite", "Uso de Pin"],
+        ["Valor", formatMoney.format(0)]
+
+       // ["Valor Pin", formatMoney.format(valor)],
+       // ["IVA Pin",formatMoney.format(valor*0.19)],
+       // ["Total", formatMoney.format(valor*1.19)]
+
+     
+
       ],
       disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [respPinUso, roleInfo]);
+  }, [respPinUso, roleInfo, textTipoPin]);
 
-  useEffect(() => {
-    infoTicket(
-      respPinUso?.transacciones_id_trx?.uso,
-      respPinUso?.tipo_trx,
-      tickets
-    );
-  }, [infoTicket, respPinUso, tickets]);
+  // useEffect(() => {
+  //   infoTicket(
+  //     respPinUso?.transacciones_id_trx?.uso,
+  //     respPinUso?.tipo_trx,
+  //     tickets
+  //   );
+  // }, [infoTicket, respPinUso, tickets]);
 
   const onSubmitUsar = (e) => {
     e.preventDefault();
     setDisabledBtn(true);
-    usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin) // Pin + IVA
-      .then((res) => {
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
+
+    const objTicket = { ...objTicketActual };
+    if(tipoPin==1){
+      objTicket["title"] = "Recibo de pago: Servicio voluntario de impresión premium"
+    }else{
+      objTicket["title"] = "Recibo de pago: " + textTipoPin
+    }
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["commerceName"] = textTipoPin
+    objTicket["trxInfo"][0] = ["Trámite", "Uso de Pin"]
+    objTicket["trxInfo"][1] = ["Valor trámite", formatMoney.format(0)]
+    
+
+    usarPinVus(valor*1.19, trx, num_tramite, roleInfo, id_pin, objTicket, datosOlimpia) // Pin + IVA
+          .then((res) => {
         setNum_tramite("");
         setActivarNavigate(false);
         setDisabledBtn(false);
@@ -111,7 +189,7 @@ const UsarPinForm = ({
         } else {
           notify(res?.msg);
           setActivarNavigate(true);
-          setRespPinUso(res?.obj);
+          setRespPinUso(res?.obj);     
         }
       })
       .catch((err) => console.log("error", err));
@@ -209,11 +287,13 @@ const UsarPinForm = ({
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center">
+          <div ref={printDiv}>
           <TicketsPines
               refPrint={null}
               ticket={tickets}
               logo="LogoVus"
           />
+          </div>
           <ButtonBar>
             <Button
               onClick={() => {

@@ -24,11 +24,14 @@ import {
 } from "../../utils/fetchFunctions";
 
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import { makeMoneyFormatter } from "../../../../utils/functions";
+import {
+  makeMoneyFormatter,
+  onChangeNumber,
+} from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
 import ScreenBlocker from "../../components/ScreenBlocker";
 import TicketColpatria from "../../components/TicketColpatria";
-import { buildTicket, decryptPin } from "../../utils/functions";
+import { decryptPin } from "../../utils/functions";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -37,7 +40,7 @@ const VentaPines = () => {
 
   const { id_convenio_pin } = useParams();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   const [searchingConvData, setSearchingConvData] = useState(false);
   const [datosConvenio, setDatosConvenio] = useState(null);
@@ -119,12 +122,13 @@ const VentaPines = () => {
         },
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valVentaPines,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio_pdp: datosConvenio?.fk_id_convenio,
           codigo_convenio: datosConvenio?.pk_codigo_convenio,
           codigo_pin: datosConvenio?.codigo_pin,
           ...userReferences,
@@ -157,7 +161,7 @@ const VentaPines = () => {
             setLoadingInquiry(false);
             navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
-              return error?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
             console.error(error?.message);
             return "Consulta fallida";
@@ -171,12 +175,14 @@ const VentaPines = () => {
       userAddress,
       valVentaPines,
       roleInfo,
+      pdpUser?.uname,
       navigate,
     ]
   );
 
   const onMakePayment = useCallback(
     (ev) => {
+      ev.preventDefault();
       if (valVentaPines <= 0) {
         notifyError("El valor del pin debe ser mayor a cero");
         return;
@@ -191,10 +197,26 @@ const VentaPines = () => {
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valVentaPines,
+        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+        ticket_init: [
+          ["Convenio", datosConvenio?.nombre_convenio],
+          ["No. Pin", "pin_desencriptado"],
+          ...Object.entries(userReferences).map(([, val], index) => [
+            datosConvenio[`referencia_${index + 1}`],
+            val,
+          ]),
+          ["Valor", formatMoney.format(valVentaPines)],
+        ].reduce((list, elem, i) => {
+          list.push(elem);
+          if ((i + 1) % 1 === 0) list.push(["", ""]);
+          return list;
+        }, []),
 
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio_pdp: datosConvenio?.fk_id_convenio,
           codigo_convenio: datosConvenio?.pk_codigo_convenio,
           codigo_pin: datosConvenio?.codigo_pin,
           ...userReferences,
@@ -217,39 +239,11 @@ const VentaPines = () => {
         {
           render: ({ data: res }) => {
             setLoadingSell(false);
-            const trx_id = res?.obj?.id_trx ?? 0;
-            const id_type_trx = res?.obj?.id_type_trx ?? 0;
-            const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
+            const tempTicket = res?.obj?.ticket ?? {};
             const pin_encriptado = res?.obj?.pin_encriptado ?? "";
             const pin_desencriptado = decryptPin(pin_encriptado);
-            const tempTicket = buildTicket(
-              roleInfo,
-              trx_id,
-              codigo_autorizacion,
-              "Recaudo Pin",
-              [
-                ["Convenio", datosConvenio?.nombre_convenio],
-                ["No. Pin", pin_desencriptado],
-                ...Object.entries(userReferences).map(([, val], index) => [
-                  datosConvenio[`referencia_${index + 1}`],
-                  val,
-                ]),
-                ["Valor", formatMoney.format(valVentaPines)],
-              ].reduce((list, elem, i) => {
-                list.push(elem);
-                if ((i + 1) % 1 === 0) list.push(["", ""]);
-                return list;
-              }, [])
-            );
+            tempTicket.trxInfo[2][1] = pin_desencriptado;
             setPaymentStatus(tempTicket);
-            infoTicket(trx_id, id_type_trx, tempTicket)
-              .then((resTicket) => {
-                console.log(resTicket);
-              })
-              .catch((err) => {
-                console.error(err);
-                notifyError("Error guardando el ticket");
-              });
             return "Transacción satisfactoria";
           },
         },
@@ -258,7 +252,7 @@ const VentaPines = () => {
             setLoadingSell(false);
             navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
-              return error?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
             console.error(error?.message);
             return "Transacción fallida";
@@ -273,7 +267,7 @@ const VentaPines = () => {
       valVentaPines,
       inquiryStatus,
       roleInfo,
-      infoTicket,
+      pdpUser?.uname,
       navigate,
     ]
   );
@@ -424,7 +418,7 @@ const VentaPines = () => {
               onInput={(ev) =>
                 setUserReferences((old) => ({
                   ...old,
-                  [ev.target.name]: ev.target.value,
+                  [ev.target.name]: onChangeNumber(ev),
                 }))
               }
               readOnly={inquiryStatus}
@@ -465,19 +459,18 @@ const VentaPines = () => {
             </ButtonBar>
           </div>
         ) : (
-          <PaymentSummary summaryTrx={summary}>
-            <ButtonBar>
-              <Button
-                type='submit'
-                onClick={onMakePayment}
-                disabled={loadingSell}>
-                Aceptar
-              </Button>
-              <Button onClick={handleClose} disabled={loadingSell}>
-                Cancelar
-              </Button>
-            </ButtonBar>
-          </PaymentSummary>
+          <form onSubmit={onMakePayment}>
+            <PaymentSummary summaryTrx={summary}>
+              <ButtonBar>
+                <Button type='submit' disabled={loadingSell}>
+                  Aceptar
+                </Button>
+                <Button onClick={handleClose} disabled={loadingSell}>
+                  Cancelar
+                </Button>
+              </ButtonBar>
+            </PaymentSummary>
+          </form>
         )}
       </Modal>
     </Fragment>

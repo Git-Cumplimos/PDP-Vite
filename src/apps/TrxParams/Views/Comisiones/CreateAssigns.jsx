@@ -1,7 +1,4 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-
-import useQuery from "../../../../hooks/useQuery";
-
 import Button from "../../../../components/Base/Button";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useNavigate, useParams } from "react-router-dom";
@@ -254,6 +251,20 @@ const CreateAssigns = () => {
                   ? "Actualizar grupo convenios"
                   : "Agregar grupo convenios"}
               </Button>
+              {newComision?.fk_tbl_grupo_convenios !== "" &&
+                newComision?.pk_asignacion_comisiones === "" && (
+                  <Button
+                    type='button'
+                    onClick={() => {
+                      setNewComision((old) => ({
+                        ...old,
+                        fk_tbl_grupo_convenios: "",
+                        nombre_grupo_convenios: "Vacio",
+                      }));
+                    }}>
+                    Eliminar grupo convenios
+                  </Button>
+                )}
             </ButtonBar>
           </Fieldset>
         </Fieldset>

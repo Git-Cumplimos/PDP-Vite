@@ -6,9 +6,7 @@ name: CD
 on:
   # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
-    branches: [ "certificacion" ]
-  pull_request:
-    branches: [ "certificacion" ]
+    branches: ["certificacion"]
 
   # Allows you to run this workflow manually from the Actions tab
   # workflow_dispatch:
@@ -24,12 +22,12 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    
+
     permissions:
       packages: write
       contents: read
       id-token: write
-    
+
     env:
       ENV_NAME: cert
 
@@ -37,26 +35,29 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-      
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14.20.0
+
       - uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
           role-session-name: GitHub-Action-Role-deploy
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-      
 
       - name: chmod github folder
         run: chmod -R +x ./.github
 
       - name: Get env variables
         run: $GITHUB_WORKSPACE/.github/scripts/get-env-vars.sh $GITHUB_REPOSITORY ${{ env.ENV_NAME }}
-      
+
       - name: Install dependencies 🔨
         run: yarn
 
       - name: Build 📦
         run: yarn build
-        
+
       - name: Deploy 🚀
         run: |
           aws s3 sync build s3://${{ secrets.S3_BUCKET_DEV }}

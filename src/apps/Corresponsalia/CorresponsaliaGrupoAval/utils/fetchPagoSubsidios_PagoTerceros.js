@@ -1,13 +1,58 @@
 import fetchData from "../../../../utils/fetchData";
-import { notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 
 export const fetchCustomPost = async (url_, name_, data_) => {
   let Peticion;
   try {
     Peticion = await fetchData(url_, "POST", {}, data_, {}, true);
   } catch (error) {
-    notifyError(`Falla en el sistema: no conecta con el servicio ${name_}`);
-    throw new ErrorCustom(error.message);
+    throw new ErrorCustomFetch(
+      `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+      error.message
+    );
+  }
+
+  //Evaluar si la respuesta es json
+  try {
+    if (typeof Peticion !== "object") {
+      throw new ErrorCustomFetch(
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+        Peticion
+      );
+    }
+  } catch (error) {
+    throw error;
+  }
+
+  //evaluar respuesta de api gateway
+  try {
+    if (Peticion?.hasOwnProperty("status") === false) {
+      //No es una respuesta directamente del servicio sino del api gateway
+      if (Peticion?.hasOwnProperty("message") === true) {
+        if (Peticion.message === "Endpoint request timed out") {
+          throw new ErrorCustomTimeout(
+            `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
+            "Timeout"
+          );
+        } else {
+          throw new ErrorCustomFetch(
+            `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+            Peticion.message
+          );
+        }
+      }
+    }
+  } catch (error) {
+    if (error instanceof ErrorCustomTimeout) {
+      throw error;
+    } else if (error instanceof ErrorCustomFetch) {
+      throw error;
+    } else {
+      throw new ErrorCustomFetch(
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+        error.message
+      );
+    }
   }
 
   //para los errores customizados del backend
@@ -15,19 +60,9 @@ export const fetchCustomPost = async (url_, name_, data_) => {
     if (
       Peticion?.status === false &&
       Peticion?.obj?.error_status === true &&
-      Peticion?.obj?.error_msg
+      Peticion?.msg
     ) {
-      const error_msg = Peticion?.obj?.error_msg;
-      const error_msg_key = Object.keys(error_msg);
-      const error_msg_vector = [];
-      error_msg_key.map((nombre_error) => {
-        const error_msg_ind = error_msg[nombre_error];
-        if (error_msg_ind?.blocker === true) {
-          error_msg_vector.push(`${error_msg_ind?.description}`);
-        }
-      });
-
-      throw new ErrorCustomBackend(error_msg_vector, error_msg_key);
+      throw new ErrorCustomBackend(`${Peticion?.msg}`, `${Peticion?.msg}`);
     }
 
     // cuando status es false pero no hay errores
@@ -36,16 +71,18 @@ export const fetchCustomPost = async (url_, name_, data_) => {
       Peticion?.obj?.error_status === false &&
       Peticion?.msg
     ) {
-      throw new msgCustomBackend(`${Peticion?.msg}`);
+      throw new msgCustomBackend(`${Peticion?.msg}`, `${Peticion?.msg}`);
     }
   } catch (error) {
     if (error instanceof ErrorCustomBackend) {
-      throw new ErrorCustomBackend(error.message, error.type);
+      throw error;
     } else if (error instanceof msgCustomBackend) {
-      throw new msgCustomBackend(error.message);
+      throw error;
     } else {
-      notifyError("Falla en el sistema: error con el fetch [Front]");
-      throw new ErrorCustom(error.message);
+      throw new ErrorCustomFetch(
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+        error.message
+      );
     }
   }
 
@@ -53,23 +90,46 @@ export const fetchCustomPost = async (url_, name_, data_) => {
 };
 
 export class ErrorCustom extends Error {
-  constructor(message) {
+  constructor(message, name, error_msg, notificacion) {
     super(message);
-    this.name = "ErrorCustom";
+    this.name = name;
+    this.error_msg = error_msg;
+    this.notificacion = notificacion;
+    if (this.notificacion === "notifyError") {
+      notifyError(message);
+    } else if (this.notificacion === "notify") {
+      notify(message);
+    }
+
+    if (
+      this.name === "ErrorCustomFetch" ||
+      this.name === "ErrorCustomTimeout"
+    ) {
+      console.error(`${message}\n ${this.error_msg}`);
+    }
   }
 }
 
-export class ErrorCustomBackend extends Error {
-  constructor(message, type_) {
-    super(message);
-    this.type = type_;
-    this.name = "ErrorCustomBackend";
+export class ErrorCustomFetch extends ErrorCustom {
+  constructor(message, error_msg) {
+    super(message, "ErrorCustomFetch", error_msg, "notifyError");
   }
 }
 
-export class msgCustomBackend extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "msgCustomBackend";
+export class ErrorCustomTimeout extends ErrorCustom {
+  constructor(message, error_msg) {
+    super(message, "ErrorCustomTimeout", error_msg, "notifyError");
+  }
+}
+
+export class ErrorCustomBackend extends ErrorCustom {
+  constructor(message, error_msg) {
+    super(message, "ErrorCustomBackend", error_msg, "notifyError");
+  }
+}
+
+export class msgCustomBackend extends ErrorCustom {
+  constructor(message, error_msg) {
+    super(message, "msgCustomBackend", error_msg, "notify");
   }
 }

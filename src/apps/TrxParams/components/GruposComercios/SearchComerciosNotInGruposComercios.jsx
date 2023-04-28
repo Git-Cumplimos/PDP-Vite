@@ -97,7 +97,7 @@ const SearchComerciosNotInGruposComercios = ({
         onSetPageData={setPageData}>
         <Input
           id='pk_comercio'
-          label='Id grupo de planes'
+          label='Id comercio'
           type='text'
           name='pk_comercio'
           minLength='1'
@@ -114,7 +114,7 @@ const SearchComerciosNotInGruposComercios = ({
           }}></Input>
         <Input
           id='nombre_comercio'
-          label='Nombre grupo de planes'
+          label='Nombre comercio'
           type='text'
           name='nombre_comercio'
           minLength='1'

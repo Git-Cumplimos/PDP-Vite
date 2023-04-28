@@ -1,10 +1,11 @@
+import React, { useCallback, } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import { useState, useEffect, useMemo } from "react";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -18,7 +19,7 @@ const SendForm = ({
   setSelecFrac,
   selected,
   setSelected,
-  customer: { fracciones, phone, doc_id },
+  customer: { fracciones, phone, doc_id, email },
   setCustomer,
   closeModal,
   handleSubmit,
@@ -33,19 +34,20 @@ const SendForm = ({
     Serie: selected ? selected.serie : "",
     "Fracciones disponibles": selected ? selected.Fracciones_disponibles : "",
   };
-
   const { tiposOperaciones } = useLoteria();
-  const operacion = useMemo(() => {    
+  const operacion = useMemo(() => {
     return tiposOperaciones;
   }, [tiposOperaciones]);
 
   const [checkedState, setCheckedState] = useState([]);
+  const [flagFraccionV, setFlagFraccionV] = useState([]);
   useEffect(() => {
     const copy = [];
     selected?.Fracciones?.forEach(() => {
       copy.push(false);
     });
     setCheckedState([...copy]);
+    setFlagFraccionV([...copy]);
   }, [selected]);
 
   const [disabledBtns, setDisabledBtns] = useState(false);
@@ -57,6 +59,7 @@ const SendForm = ({
     );
 
     setCheckedState(updatedCheckedState);
+    setFlagFraccionV(updatedCheckedState);
 
     for (var i = 0; i < selected?.Fracciones?.length; i++) {
       if (updatedCheckedState[i] === true) {
@@ -64,30 +67,43 @@ const SendForm = ({
       }
     }
   };
-  // useEffect(() => {
-  //     setSelecFrac([])
-  //     setTipoPago()
-  // });
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if ((selecFrac.length == 0) & (fracciones == 0)) {
-      notifyError("Seleccione la(s) fraccion(es) a vender");
-    } else {
+    if (selecFrac.length == "0") {
+      if (sorteo.split("-")[1] === "true") {
+        notifyError("Seleccione la(s) fraccion(es) a vender");
+      }
+      else {
+        notifyError("Seleccione la fracción a vender");
+      }
+    }
+    else if(tipoPago == null) {
+      notifyError("Seleccione método de pago");
+    }
+    else if(tipoPago == operacion?.Venta_Intercambio & selecFrac.length > 1) {
+      notifyError("El método de pago por bono aplica para una única fracción");
+    }
+     else {
       setDisabledBtns(true);
       handleSubmit();
     }
   };
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {};
-  // }
+  const handleCloseCancelar = useCallback(() => {
+    notifyError("Venta de lotería cancelada");
+  })
 
   const formPago = (value) => {
     setTipoPago(value);
   };
-  // console.log(selected?.Fracciones)
+
+  useEffect(() => {
+    const cus = { fracciones, phone, doc_id, email };
+    cus.fracciones = "1";
+    setCustomer({ ...cus });
+  }, [fracciones,sorteo])
+
   return (
     <>
       <div className="flex flex-col w-1/2 mx-auto">
@@ -117,42 +133,57 @@ const SendForm = ({
                     checked={checkedState[index]}
                     onChange={() => handleOnChange(index)}
                   />
-                );
-              })}
-              <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
-                Efectivo
-                <input
-                  id="Efectivo"
-                  value={operacion?.Venta_Fisica}
-                  name="pago"
-                  type="radio"
-                  onChange={(e) => formPago(e.target.value)}
-                />
-                Bono
-                <input
-                  id="Bono"
-                  value={operacion?.Venta_Intercambio}
-                  name="pago"
-                  type="radio"
-                  onChange={(e) => formPago(e.target.value)}
-                />
-              </div>
+                  );
+                })}
             </>
           ) : (
-            <Input
-              id="cantFrac"
-              label="Fracciones a comprar"
-              type="number"
-              max={selected ? `${selected.Fracciones_disponibles}` : "3"}
-              min="1"
-              value={fracciones}
-              required
-              onInput={(e) => {
-                const cus = { fracciones, phone, doc_id };
-                cus.fracciones = e.target.value;
-                setCustomer({ ...cus });
-              }}
-            />
+            <>
+              <Input
+                id="cantFrac"
+                label="Fracciones a comprar"
+                type="number"
+                max={selected ? `${selected.Fracciones_disponibles}` : "3"}
+                min="1"
+                value={fracciones}
+                required={true}
+                disabled
+              />
+              {selected?.Fracciones?.map((frac, index) => {
+                return (
+                  <Input
+                    id={frac}
+                    label={`Fracción ${frac}:`}
+                    type="checkbox"
+                    value={frac}
+                    checked={checkedState[index]}
+                    disabled={flagFraccionV[index]}
+                    onChange={() => {
+                      handleOnChange(index)
+                      if (!checkedState[index]){
+                        const updatedCheckedState = checkedState.map((item, frac) =>
+                          frac === index ? item : !item
+                        );
+                        setFlagFraccionV(updatedCheckedState);
+                      }
+                    }}
+                  />
+                );
+              })}
+              <Input
+                id="email"
+                label="Email"
+                type="email"
+                value={email}
+                minLength="5"
+                maxLength="70"
+                required={true}
+                onChange={(e) => {
+                  const cus = { fracciones, phone, doc_id, email };
+                  cus.email = e.target.value;
+                  setCustomer({ ...cus });
+                }}
+              />
+            </>
           )}
           <Input
             id="numCel"
@@ -168,11 +199,11 @@ const SendForm = ({
                 (String(e.target.value).slice(0, 1) !== "3")
               ) {
                 notifyError("El número de celular debe iniciar por 3");
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.phone = "";
                 setCustomer({ ...cus });
               } else {
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.phone = e.target.value;
                 setCustomer({ ...cus });
               }
@@ -188,12 +219,30 @@ const SendForm = ({
             required={true}
             onInput={(e) => {
               if (!isNaN(e.target.value)) {
-                const cus = { fracciones, phone, doc_id };
+                const cus = { fracciones, phone, doc_id, email };
                 cus.doc_id = e.target.value;
                 setCustomer({ ...cus });
               }
             }}
           />
+          <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
+            Efectivo
+            <input
+              id="Efectivo"
+              value={operacion?.Venta_Fisica}
+              name="pago"
+              type="radio"
+              onChange={(e) => formPago(e.target.value)}
+            />
+            Bono
+            <input
+              id="Bono"
+              value={operacion?.Venta_Intercambio}
+              name="pago"
+              type="radio"
+              onChange={(e) => formPago(e.target.value)}
+            />
+          </div>
           <ButtonBar>
             <Button type="submit" disabled={disabledBtns}>
               Aceptar
@@ -201,8 +250,9 @@ const SendForm = ({
             <Button
               type="button"
               onClick={() => {
+                handleCloseCancelar();
                 closeModal();
-                setCustomer({ fracciones: "", phone: "", doc_id: "" });
+                setCustomer({ fracciones: "", phone: "", doc_id: "", email: "" });
                 setCheckedState(
                   new Array(selected?.Fracciones?.length).fill(false)
                 );

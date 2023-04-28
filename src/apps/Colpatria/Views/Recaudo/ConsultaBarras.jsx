@@ -29,7 +29,6 @@ const ConsultaBarras = () => {
         {
           render: ({ data: res }) => {
             setSearchingData(false);
-            console.log(res?.obj);
 
             const refs = Object.fromEntries(
               Object.entries(res?.obj?.barcode ?? {}).filter(([key]) =>
@@ -98,21 +97,20 @@ const ConsultaBarras = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Consulta recaudo código de barras</h1>
+      <h1 className='text-3xl mt-6'>Consulta recaudo código de barras</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
           const formData = new FormData(ev.target);
           searchCodigo(Object.fromEntries(formData));
         }}
-        formDir="col"
-        ref={formRef}
-      >
+        formDir='col'
+        ref={formRef}>
         <BarcodeReader
           onSearchCodigo={(codigo) => searchCodigo({ codigo_barras: codigo })}
         />
-        <ButtonBar className="lg:col-span-2">
-          <Button type="reset" disabled={searchingData}>
+        <ButtonBar className='lg:col-span-2'>
+          <Button type='reset' disabled={searchingData}>
             Volver a ingresar código de barras
           </Button>
         </ButtonBar>
