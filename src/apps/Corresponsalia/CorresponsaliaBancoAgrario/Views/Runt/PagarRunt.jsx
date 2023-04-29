@@ -52,7 +52,7 @@ const PagarRunt = () => {
     fetchCustom(url_consult_runt, "POST", "Consultar runt")
   );
   const [loadingPeticionPayRunt, peticionPayRunt] = useFetch(
-    fetchCustom(url_pagar_runt, "POST", "Pago runt")
+    fetchCustom(url_pagar_runt, "POST", "Pago runt", uniqueId)
   );
 
   const CallErrorPeticion = useCallback((error) => {

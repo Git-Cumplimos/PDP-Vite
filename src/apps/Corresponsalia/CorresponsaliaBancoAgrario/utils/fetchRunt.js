@@ -1,8 +1,11 @@
+import { useAuth } from "../../../../hooks/AuthHooks";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 
-export const fetchCustom = (url_, metodo_, name_) => {
+const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario`;
+export const fetchCustom = (url_, metodo_, name_, id_uuid_trx) => {
   return async (params_ = {}, data_ = {}) => {
+    // const { roleInfo, pdpUser } = useAuth();
     let urlCompleto = url_;
     //armar parametros
     try {
@@ -11,34 +14,34 @@ export const fetchCustom = (url_, metodo_, name_) => {
           let paramsVector = Object.keys(params_);
           paramsVector.map(
             (valueKey, index) =>
-              (paramsVector[index] = `${valueKey}=${params_[valueKey]}`)
-          );
-          urlCompleto += `?${paramsVector.join("&")}`;
-        }
+            (paramsVector[index] = `${valueKey}=${params_[valueKey]}`)
+            );
+            urlCompleto += `?${paramsVector.join("&")}`;
+          }
       }
     } catch (error) {
       throw new ErrorCustomFetch(
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message
-      );
-    }
+        );
+      }
 
-    //Petición
-    let Peticion;
-    try {
-      if (metodo_ === "GET") {
-        Peticion = await fetchData(urlCompleto, "GET", {}, {}, {}, true);
-      } else if (metodo_ === "PUT") {
-        Peticion = await fetchData(urlCompleto, "PUT", {}, data_, {}, true);
-      } else if (metodo_ === "POST") {
-        Peticion = await fetchData(urlCompleto, "POST", {}, data_, true);
-      }
-    } catch (error) {
-      throw new ErrorCustomFetch(
-        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
-        error.message
-      );
-    }
+      //Petición
+      let Peticion;
+      try {
+        if (metodo_ === "GET") {
+          Peticion = await fetchData(urlCompleto, "GET", {}, {}, {}, true);
+        } else if (metodo_ === "PUT") {
+          Peticion = await fetchData(urlCompleto, "PUT", {}, data_, {}, true);
+        } else if (metodo_ === "POST") {
+          Peticion = await fetchData(urlCompleto, "POST", {}, data_, true);
+        }
+      } catch (error) {
+        throw new ErrorCustomFetch(
+          `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+          error.message
+          );
+        }
     //Evaluar si la respuesta es json
     try {
       if (typeof Peticion !== "object") {
@@ -53,15 +56,84 @@ export const fetchCustom = (url_, metodo_, name_) => {
     }
     console.log("Peticion", Peticion)
     //evaluar respuesta de api gateway
+    // console.log("ESO ES FETCHRUNT roleInfo?.id_comercio", roleInfo?.id_comercio)
     try {
-      if (Peticion?.hasOwnProperty("status") === false) {
+      console.log("ESO ES FETCHRUNT PETICION",Peticion)
+      console.log("ESO ES FETCHRUNT data_", data_)
+      console.log("ESO ES FETCHRUNT id_uuid_trx", id_uuid_trx)
+      console.log("ESO ES FETCHRUNT data_?.comercio?.id_comercio", data_?.comercio?.id_comercio)
+      console.log("ESO ES FETCHRUNT data_?.comercio?.id_terminal", data_?.comercio?.id_terminal)
+      console.log("ESO ES FETCHRUNT data_?.comercio?.id_usuario", data_?.comercio?.id_usuario)
+      // if (Peticion?.hasOwnProperty("status") === false) {
+      if (Peticion?.status === false) {        
+        console.log("Peticion?.hasOwnProperty(status)",Peticion)
         //No es una respuesta directamente del servicio sino del api gateway
-        if (Peticion?.hasOwnProperty("message") === true) {
-          if (Peticion.message === "Endpoint request timed out") {
-            throw new ErrorCustomTimeout(
-              `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
-              "Timeout"
-            );
+        // if (Peticion?.hasOwnProperty("message") === true) {
+        if (Peticion?.msg === "Error respuesta Recaudo Banco Agrario: Error respuesta Banco Agrario: ()") {
+          console.log("Peticion?.hasOwnProperty(message)", Peticion)
+          const message = "Endpoint request timed out"
+          // if (Peticion.message === "Endpoint request timed out") {
+            if (message === "Endpoint request timed out") {                   
+            console.log("Entro al if de Endpoint request timed out")
+            notify("Se está procesando la transacción");
+            for (let i = 0; i <= 7; i++) {
+              try {
+                const promesa = await new Promise((resolve, reject) =>
+                
+                setTimeout(() => {
+                    postCheckReintentoRunt({
+                      idComercio: data_?.comercio?.id_comercio,
+                      idUsuario: data_?.comercio?.id_usuario,
+                      idTerminal: data_?.comercio?.id_terminal,
+                      id_uuid_trx: id_uuid_trx,
+                    })
+                      .then((res) => {
+                        if (res?.msg !== "No ha terminado el reintento") {
+                          if (
+                            res?.status === true ||
+                            res?.obj?.response?.estado == "00"
+                          ) {
+                            notify("Venta exitosa");
+                          } else {
+                            resolve(true);
+                          }
+                        } else {
+                          resolve(false);
+                        }
+                      })
+                      .catch((err) => {
+                        console.error(err);
+                      });
+                  }, 9000)
+                );
+                if (promesa === true) {
+                  break;
+                }
+                if (i >= 3) {
+                  // notify(
+                  //   "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
+                  // );
+                  notify(
+                    "Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]"
+                  );
+                  throw new ErrorCustomTimeout(
+                    `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
+                    "Timeout"
+                  );
+                  // break;
+                }
+              } catch (error) {
+                console.error(error);
+              }
+              if (i <= 3) {
+                notify(
+                  "Su transacción esta siendo procesada, no recargue la página"
+                );
+
+              }
+            }
+
+
           } else {
             throw new ErrorCustomFetch(
               `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
@@ -90,6 +162,29 @@ export const fetchCustom = (url_, metodo_, name_) => {
       throw error;
     }
   };
+};
+
+export const postCheckReintentoRunt = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlreintentos}/reintento-runt`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true,
+      9000
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const EvaluateResponse = (res, name_ = "") => {
