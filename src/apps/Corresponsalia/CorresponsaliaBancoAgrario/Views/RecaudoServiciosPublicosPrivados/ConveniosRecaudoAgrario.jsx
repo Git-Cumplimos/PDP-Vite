@@ -418,7 +418,7 @@ const ConveniosRecaudoAgrario = () => {
       <TableEnterprise
         title='Tabla de convenios Banco Agrario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "EAN", "Estado"]}
+        headers={["Código", "Convenio", "EAN", "Estado"]}
         data={tableConvenios}
         onSelectRow={onSelectConvenio}
         onSetPageData={setPageData}>
