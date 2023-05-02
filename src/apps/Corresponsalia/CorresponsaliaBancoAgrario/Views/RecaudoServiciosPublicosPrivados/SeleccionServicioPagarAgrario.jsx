@@ -71,7 +71,7 @@ const SeleccionServicioPagarAgrario = () => {
         Recaudo servicios públicos y privados
       </h1>
       <TableEnterprise
-        title='Tabla convenios Agrario corresponsal bancario'
+        title='Tabla convenios CB Banco Agrario'
         maxPage={maxPages}
         headers={["Código", "Convenio"]}
         data={tableConvenios}

@@ -9,7 +9,6 @@ import Modal from "../../../../../components/Base/Modal";
 import MoneyInputDec from "../../../../../components/Base/MoneyInputDec";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import TextArea from "../../../../../components/Base/TextArea";
-import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
@@ -420,7 +419,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   onInput={onChangeFormat}
                 />
               )}
-            {datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
+            {datosEnvio?.datosConvenio?.nombre_ref2 &&
+              datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
               !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g) && (
                 <Input
                   id='ref2'
@@ -437,7 +437,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   autoComplete='off'
                   onInput={onChangeFormat}></Input>
               )}
-            {datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
+            {datosEnvio?.datosConvenio?.nombre_ref3 &&
+              datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
               !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g) && (
                 <Input
                   id='ref3'
@@ -487,7 +488,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                 required></MoneyInputDec>
             )}
             <ButtonBar className='lg:col-span-2'>
-              <Button type='button' onClick={hideModalReset}>
+              <Button
+                type='button'
+                onClick={() => {
+                  notify("Transacción Cancelada");
+                  hideModalReset();
+                }}>
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
@@ -510,13 +516,15 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                         datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
                       }`}</h2>
                     )}
-                  {datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
+                  {datosEnvio?.datosConvenio?.nombre_ref2 &&
+                    datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
                     !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g) && (
                       <h2>{`Referencia 2: ${
                         datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
                       }`}</h2>
                     )}
-                  {datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
+                  {datosEnvio?.datosConvenio?.nombre_ref3 &&
+                    datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
                     !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g) && (
                       <h2>{`Referencia 3: ${
                         datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? ""
@@ -528,7 +536,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                     )} `}
                   </h2>
                   <ButtonBar>
-                    <Button onClick={hideModalReset}>Cancelar</Button>
+                    <Button
+                      onClick={() => {
+                        notify("Transacción Cancelada");
+                        hideModalReset();
+                      }}>
+                      Cancelar
+                    </Button>
                     <Button type='submit' onClick={onSubmitPago}>
                       Realizar pago
                     </Button>
@@ -537,6 +551,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
               )}
               {peticion === 2 && (
                 <>
+                  <TicketsAgrario
+                    ticket={objTicketActual}
+                    refPrint={printDiv}
+                  />
                   <h2>
                     <ButtonBar>
                       <Button onClick={handlePrint}>Imprimir</Button>
@@ -550,10 +568,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                       </Button>
                     </ButtonBar>
                   </h2>
-                  <TicketsAgrario
-                    ticket={objTicketActual}
-                    refPrint={printDiv}
-                  />
                 </>
               )}
             </div>

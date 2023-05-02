@@ -48,7 +48,7 @@ const ConveniosRecaudoAgrario = () => {
     referencias: [
       {
         nombre_ref1: "",
-        longitud_min_ref1: 0,
+        longitud_min_ref1: 1,
         longitud_max_ref1: 0,
         algoritmo_ref1: "",
       },
@@ -140,10 +140,27 @@ const ConveniosRecaudoAgrario = () => {
     },
     [convenios]
   );
-  const createUpdateConvenio = useCallback((e) => {
-    e.preventDefault();
-    setShowModal((old) => ({ estado: 2, showModal: true }));
-  }, []);
+  const createUpdateConvenio = useCallback(
+    (e) => {
+      e.preventDefault();
+      for (let i = 0; i < dataConvenios.referencias.length; i++) {
+        const element = dataConvenios.referencias[i];
+        if (
+          element.longitud_max_ref1 === 0 ||
+          element.longitud_min_ref1 === 0
+        ) {
+          return notifyError(
+            `La longitud máxima o mínima debe ser diferente de 0`
+          );
+        }
+        if (element.longitud_min_ref1 > element.longitud_max_ref1) {
+          return notifyError(`La longitud mínima debe ser menor a la máxima`);
+        }
+      }
+      setShowModal((old) => ({ estado: 2, showModal: true }));
+    },
+    [dataConvenios]
+  );
   useEffect(() => {
     fecthTablaConveniosPaginadoFunc();
   }, [datosTrans, page, limit]);
@@ -341,20 +358,7 @@ const ConveniosRecaudoAgrario = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-      for (let i = 0; i < dataConvenios.referencias.length; i++) {
-        const element = dataConvenios.referencias[i];
-        if (
-          element.longitud_max_ref1 === 0 ||
-          element.longitud_min_ref1 === 0
-        ) {
-          return notifyError(
-            `La longitud maxima o minima debe ser diferente de 0`
-          );
-        }
-        if (element.longitud_min_ref1 > element.longitud_max_ref1) {
-          return notifyError(`La longitud minima debe ser menor a la maxima`);
-        }
-      }
+
       setIsUploading(true);
       let dataTemp = { ...dataConvenios };
       for (let id = 0; id < dataConvenios.referencias.length; id++) {
@@ -412,7 +416,7 @@ const ConveniosRecaudoAgrario = () => {
     <>
       <SimpleLoading show={isUploading} />
       <TableEnterprise
-        title='Tabla convenios Agrario corresponsal bancario'
+        title='Tabla de convenios Banco Agrario'
         maxPage={maxPages}
         headers={["Id", "Convenio", "EAN", "Estado"]}
         data={tableConvenios}
@@ -434,7 +438,7 @@ const ConveniosRecaudoAgrario = () => {
         />
         <Input
           id='idConvenio'
-          label='Id convenio'
+          label='Código convenio'
           type='text'
           name='idConvenio'
           minLength='1'
@@ -586,7 +590,7 @@ const ConveniosRecaudoAgrario = () => {
             </Fieldset>
             {dataConvenios.referencias.map((item, id) => (
               <Fieldset
-                legend={`Información del referencia ${id + 1}`}
+                legend={`Información referencia ${id + 1}`}
                 className='lg:col-span-2'
                 key={id}>
                 <Input
@@ -618,7 +622,7 @@ const ConveniosRecaudoAgrario = () => {
                 />
                 <Input
                   id={`longitud_min_ref${id + 1}`}
-                  label={`longitud minima referencia ${id + 1}`}
+                  label={`longitud mínima referencia ${id + 1}`}
                   type='text'
                   name={`longitud_min_ref${id + 1}`}
                   minLength='1'
@@ -630,7 +634,7 @@ const ConveniosRecaudoAgrario = () => {
                   onInput={onChangeFormatNumberVect(id)}></Input>
                 <Input
                   id={`longitud_max_ref${id + 1}`}
-                  label={`longitud maxima referencia ${id + 1}`}
+                  label={`longitud máxima referencia ${id + 1}`}
                   type='text'
                   name={`longitud_max_ref${id + 1}`}
                   minLength='1'
@@ -653,7 +657,13 @@ const ConveniosRecaudoAgrario = () => {
               )}
             </ButtonBar>
             <ButtonBar>
-              <Button onClick={hideModal}>Cancelar</Button>
+              <Button
+                onClick={() => {
+                  notify("Operación cancelada");
+                  hideModal();
+                }}>
+                Cancelar
+              </Button>
               <Button type='submit'>
                 {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
                   ? "Editar convenio"
@@ -672,11 +682,17 @@ const ConveniosRecaudoAgrario = () => {
             </h1>
             <>
               <ButtonBar>
-                <Button onClick={hideModal}>Cancelar</Button>
+                <Button
+                  onClick={() => {
+                    notify("Operación cancelada");
+                    hideModal();
+                  }}>
+                  Cancelar
+                </Button>
                 <Button type='submit' onClick={onSubmit}>
                   {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
-                    ? "Editar convenio"
-                    : "Crear convenio"}
+                    ? "Aceptar"
+                    : "Aceptar"}
                 </Button>
               </ButtonBar>
             </>
