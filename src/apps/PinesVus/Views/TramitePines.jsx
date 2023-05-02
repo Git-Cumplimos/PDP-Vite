@@ -81,7 +81,7 @@ const TramitePines = () => {
     setModalCancel(false);
     setParametroBusqueda("");
     if (activarNavigate) {
-      navigate("/PinesVus");
+      navigate("/Pines/PinesVus");
     }
   }, [activarNavigate, navigate]);
 
