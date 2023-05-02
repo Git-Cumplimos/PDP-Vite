@@ -96,11 +96,11 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         return notifyError("Validación de la referencia 1 erronea");
     }
     if (convenio?.algoritmo_ref2?.match(/(Q 108)/g)) {
-      if (!checkLuhn(datosTrans?.ref1))
+      if (!checkLuhn(datosTrans?.ref2))
         return notifyError("Validación de la referencia 2 erronea");
     }
     if (convenio?.algoritmo_ref3?.match(/(Q 108)/g)) {
-      if (!checkLuhn(datosTrans?.ref1))
+      if (!checkLuhn(datosTrans?.ref3))
         return notifyError("Validación de la referencia 3 erronea");
     }
 
@@ -324,7 +324,8 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               autoComplete='off'
               onInput={onChangeFormat}></Input>
           )}
-        {convenio?.nombre_ref2 !== "" &&
+        {convenio?.nombre_ref2 &&
+          convenio?.nombre_ref2 !== "" &&
           !convenio?.nombre_ref2?.match(/-/g) && (
             <Input
               id='ref2'
@@ -338,7 +339,8 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               autoComplete='off'
               onInput={onChangeFormat}></Input>
           )}
-        {convenio?.nombre_ref3 !== "" &&
+        {convenio?.nombre_ref3 &&
+          convenio?.nombre_ref3 !== "" &&
           !convenio?.nombre_ref3?.match(/-/g) && (
             <Input
               id='ref3'
@@ -390,11 +392,13 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                 !convenio?.nombre_ref1?.match(/-/g) && (
                   <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
                 )}
-              {convenio?.nombre_ref2 !== "" &&
+              {convenio?.nombre_ref2 &&
+                convenio?.nombre_ref2 !== "" &&
                 !convenio?.nombre_ref2?.match(/-/g) && (
                   <h2>{`Referencia 2: ${datosTrans.ref2}`}</h2>
                 )}
-              {convenio?.nombre_ref3 !== "" &&
+              {convenio?.nombre_ref3 &&
+                convenio?.nombre_ref3 !== "" &&
                 !convenio?.nombre_ref3?.match(/-/g) && (
                   <h2>{`Referencia 3: ${datosTrans.ref3}`}</h2>
                 )}
@@ -405,7 +409,13 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               </h2>
               <>
                 <ButtonBar>
-                  <Button onClick={handleClose}>Cancelar</Button>
+                  <Button
+                    onClick={() => {
+                      handleClose();
+                      notify("Transacción Cancelada");
+                    }}>
+                    Cancelar
+                  </Button>
                   <Button type='submit' onClick={onSubmitValidacion}>
                     Realizar pago
                   </Button>
@@ -414,6 +424,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
             </>
           ) : estadoPeticion === 1 ? (
             <>
+              <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
               <h2>
                 <ButtonBar>
                   <Button onClick={handlePrint}>Imprimir</Button>
@@ -427,7 +438,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                   </Button>
                 </ButtonBar>
               </h2>
-              <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
             </>
           ) : (
             <></>
