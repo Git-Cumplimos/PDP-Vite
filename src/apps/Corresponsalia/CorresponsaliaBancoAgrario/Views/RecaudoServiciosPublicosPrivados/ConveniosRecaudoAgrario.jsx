@@ -193,8 +193,14 @@ const ConveniosRecaudoAgrario = () => {
     }
   };
   const onChangeFormat = useCallback((ev) => {
+    let value = ev.target.value;
+    if (ev.target.name === "estado") {
+      if (value && typeof value === "string") {
+        value = value.toLowerCase() === "false" ? false : true;
+      }
+    }
     setDataConvenios((old) => {
-      return { ...old, [ev.target.name]: ev.target.value };
+      return { ...old, [ev.target.name]: value };
     });
   }, []);
   const onChangeFormatNumber = useCallback((ev) => {

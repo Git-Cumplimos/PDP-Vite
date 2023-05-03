@@ -11,7 +11,6 @@ import MoneyInput, {
 } from "../../../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import { useAuth } from "../../../../../hooks/AuthHooks";
-import useMoney from "../../../../../hooks/useMoney";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { checkLuhn } from "../../../../../utils/validationUtils";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario";
@@ -34,7 +33,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     ref1: "",
     ref2: "",
     ref3: "",
-    valor: "",
+    valor: 0,
   });
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de Pago",
@@ -214,7 +213,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       ...old,
       ref1: "",
       ref2: "",
-      valor: "",
+      valor: 0,
       valorConst: "",
       valorVar: "",
     }));
@@ -278,21 +277,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     },
     [convenio, datosTrans]
   );
-  const onChangeMoneyLocal = (ev, valor) => {
-    if (!isNaN(valor)) {
-      const num = valor;
-      setDatosTrans((old) => {
-        return { ...old, valor: onChangeMoney(ev) };
-      });
-    }
-  };
-  const onChangeMoney = useMoney({
-    limits: [
-      enumParametrosBancoAgrario.minRecaudo,
-      enumParametrosBancoAgrario.maxRecaudo,
-    ],
-    decimalDigits: 2,
-  });
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -354,19 +338,23 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               autoComplete='off'
               onInput={onChangeFormat}></Input>
           )}
-
-        {/* {convenio?.parciales === "1" && ( */}
         <MoneyInput
           id='valCashOut'
           name='valCashOut'
           label='Valor a pagar'
           type='text'
+          min={enumParametrosBancoAgrario.minRecaudo}
+          max={enumParametrosBancoAgrario.maxRecaudo}
           autoComplete='off'
           maxLength={"12"}
-          value={datosTrans.valor ?? ""}
-          onInput={onChangeMoneyLocal}
-          required></MoneyInput>
-        {/* )} */}
+          value={parseInt(datosTrans.valor)}
+          onInput={(e, val) => {
+            setDatosTrans((old) => {
+              return { ...old, valor: val };
+            });
+          }}
+          required
+        />
         <ButtonBar
           className={
             (convenio?.nombre_ref2 !== "" &&
