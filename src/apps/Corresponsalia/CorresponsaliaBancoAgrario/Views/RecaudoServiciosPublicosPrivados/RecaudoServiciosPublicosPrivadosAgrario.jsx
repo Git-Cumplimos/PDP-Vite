@@ -400,7 +400,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                   <Button
                     onClick={() => {
                       handleClose();
-                      notify("Transacción Cancelada");
+                      notifyError("Transacción cancelada por el usuario");
                     }}>
                     Cancelar
                   </Button>
