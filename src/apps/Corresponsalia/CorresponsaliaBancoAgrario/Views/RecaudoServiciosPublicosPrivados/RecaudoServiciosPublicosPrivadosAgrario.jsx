@@ -42,7 +42,17 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       Hora: "",
     },
     commerceInfo: [
-      /*id transaccion recarga*/
+      /*comercio*/
+      [
+        "Id comercio",
+        roleInfo?.id_comercio ? roleInfo?.id_comercio : "Sin datos",
+      ],
+      /*id_dispositivo*/
+      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      // id trx
+      ["Id Trx", ""],
+      /*id autorizacion*/
+      ["Id Aut", ""],
       /*comercio*/
       [
         "Comercio",
@@ -50,17 +60,15 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
           ? roleInfo?.["nombre comercio"]
           : "Sin datos",
       ],
-      /*id_dispositivo*/
-      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      ["", ""],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      /*telefono*/
-      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+      ["", ""],
     ],
     commerceName: "Recaudo de facturas",
     trxInfo: [],
     disclamer:
-      "En caso de reclamo o inquietud favor comunicarse en Bogota al Tel 594-8500 o gratis en el resto del pais al 01800-915000 o la pagina web http://www.bancoagrario.gov.co",
+      "POR FAVOR VALIDE QUE LOS DATOS IMPRESOS EN ESTE COMPROBANTE SEAN CORRECTOS. EN CASO DE CUALQUIER RECLAMO O INQUIETUD POR FAVOR COMUNICARSE EN BOGOTÁ AL 5945500 O GRATIS EN EL RESTO DEL PAÍS AL 01 8000 915000 O EN LA PÁGINA DE INTERNET WWW.BANCOAGRARIO.GOV.CO ",
   });
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
@@ -116,9 +124,10 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     }).format(new Date());
     /*hora actual */
     const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hourCycle: "h23",
     }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
@@ -127,26 +136,28 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     objTicket["trxInfo"].push(["", ""]);
     // objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
     // objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Referencia de pago 1", datosTrans?.ref1 ?? ""]);
+    objTicket["trxInfo"].push(["Referencia 1", datosTrans?.ref1 ?? ""]);
     objTicket["trxInfo"].push(["", ""]);
     let objRecaudo = {
       nombreConvenio: convenio?.nombre_convenio,
       codigoConvenio: convenio?.codigo,
       referencia1: datosTrans?.ref1,
     };
-    if (convenio?.nombre_ref2 !== "" && !convenio?.nombre_ref2?.match(/-/g)) {
-      objTicket["trxInfo"].push([
-        "Referencia de pago 2",
-        datosTrans?.ref2 ?? "",
-      ]);
+    if (
+      convenio?.nombre_ref2 &&
+      convenio?.nombre_ref2 !== "" &&
+      !convenio?.nombre_ref2?.match(/-/g)
+    ) {
+      objTicket["trxInfo"].push(["Referencia 2", datosTrans?.ref2 ?? ""]);
       objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia2"] = datosTrans?.ref2;
     }
-    if (convenio?.nombre_ref3 !== "" && !convenio?.nombre_ref3?.match(/-/g)) {
-      objTicket["trxInfo"].push([
-        "Referencia de pago 3",
-        datosTrans?.ref3 ?? "",
-      ]);
+    if (
+      convenio?.nombre_ref3 &&
+      convenio?.nombre_ref3 !== "" &&
+      !convenio?.nombre_ref3?.match(/-/g)
+    ) {
+      objTicket["trxInfo"].push(["Referencia 3", datosTrans?.ref3 ?? ""]);
       objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia3"] = datosTrans?.ref3;
     }
@@ -185,13 +196,16 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          objTicket["commerceInfo"].push(["Id Trx", res?.obj?.id_trx]);
-          objTicket["commerceInfo"].push([
+          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
+          objTicket["commerceInfo"][3] = [
             "Id Aut",
             res?.obj?.codigo_autorizacion,
+          ];
+          objTicket["trxInfo"].push([
+            "Costo transacción",
+            formatMoney.format(res?.obj?.costoTrx, 0),
           ]);
-          objTicket["commerceInfo"].push(["", ""]);
-
+          objTicket["trxInfo"].push(["", ""]);
           setObjTicketActual(objTicket);
           setShowModal((old) => ({ ...old, estadoPeticion: 1 }));
         } else {
@@ -221,7 +235,20 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       return {
         ...old,
         commerceInfo: [
-          /*id transaccion recarga*/
+          /*comercio*/
+          [
+            "Id comercio",
+            roleInfo?.id_comercio ? roleInfo?.id_comercio : "Sin datos",
+          ],
+          /*id_dispositivo*/
+          [
+            "No. Terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+          ],
+          // id trx
+          ["Id Trx", ""],
+          /*id autorizacion*/
+          ["Id Aut", ""],
           /*comercio*/
           [
             "Comercio",
@@ -229,23 +256,18 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               ? roleInfo?.["nombre comercio"]
               : "Sin datos",
           ],
-          /*id_dispositivo*/
-          [
-            "No. Terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
+          ["", ""],
           /*direccion*/
           [
             "Dirección",
             roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
           ],
-          /*telefono*/
-          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+          ["", ""],
         ],
         trxInfo: [],
       };
     });
-  }, []);
+  }, [roleInfo]);
   const onChangeFormat = useCallback(
     (ev) => {
       let valor = ev.target.value;
