@@ -18,6 +18,7 @@ import {
 import classes from "./PagarRunt.module.css";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 import { v4 } from 'uuid';
+import { useFetchRunt } from "../../hooks/hookRunt";
 //Constantes Style
 const { styleComponents } = classes;
 
@@ -25,6 +26,7 @@ const { styleComponents } = classes;
 const url_get_barcode = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
 const url_consult_runt = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/consulta-runt`;
 const url_pagar_runt = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/pago-runt`;
+const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const option_manual = "Manual";
 const option_barcode = "Código de barras";
 const options_select = [
@@ -44,15 +46,16 @@ const PagarRunt = () => {
   const buttonDelate = useRef(null);
   const validNavigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
-
+  const [loadingPeticionPayRunt, peticionPayRunt] = useFetchRunt(
+    url_pagar_runt,
+    urlreintentos,
+    "PagarRunt"
+  );
   const [loadingPeticionBarcode, peticionBarcode] = useFetch(
     fetchCustom(url_get_barcode, "POST", "Leer código de barras")
   );
   const [loadingPeticionConsultRunt, peticionConsultRunt] = useFetch(
     fetchCustom(url_consult_runt, "POST", "Consultar runt")
-  );
-  const [loadingPeticionPayRunt, peticionPayRunt] = useFetch(
-    fetchCustom(url_pagar_runt, "POST", "Pago runt", uniqueId)
   );
 
   const CallErrorPeticion = useCallback((error) => {
@@ -176,15 +179,20 @@ const PagarRunt = () => {
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.["ciudad"],
       };
-
-      peticionPayRunt({}, data)
-        .then((response) => {
+      const dataAditional = {
+        id_uuid_trx: uniqueId,
+      }
+      peticionPayRunt(data, dataAditional)
+      .then((response) => {
           if (response?.status === true) {
-            const voucher = response?.obj?.result?.ticket;
+            const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
             setInfTicket(voucher);
             setPaso("TransaccionExitosa");
+            notify("Pago del RUNT exitoso");
+          } else if (response?.status === false || response === undefined) { 
+            HandleCloseTrxExitosa()
+            notifyError("Error respuesta PDP: Transacción Runt no exitosa")
           }
-          notify("Pago del RUNT exitoso");
         })
         .catch((error) => {
           CallErrorPeticion(error);
