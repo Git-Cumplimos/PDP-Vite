@@ -244,8 +244,18 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["trxInfo"].push([
-      "Convenio",
+      "Código convenio",
+      datosEnvio?.datosConvenio?.codigo,
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Nombre del convenio",
       datosEnvio?.datosConvenio?.nombre_convenio,
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Valor transacción",
+      formatMoney.format(valorTransaccion ?? "0"),
     ]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
@@ -272,11 +282,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       objRecaudo["referencia3"] =
         datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? "";
     }
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor",
-      formatMoney.format(valorTransaccion ?? "0"),
-    ]);
     objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
     postRecaudoConveniosAgrario({

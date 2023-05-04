@@ -132,10 +132,18 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push(["Convenio", convenio.nombre_convenio]);
+    objTicket["trxInfo"].push(["Código convenio", convenio.codigo]);
     objTicket["trxInfo"].push(["", ""]);
-    // objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
-    // objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Nombre del convenio",
+      convenio.nombre_convenio,
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Valor transacción",
+      formatMoney.format(valorTransaccion ?? "0"),
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push(["Referencia 1", datosTrans?.ref1 ?? ""]);
     objTicket["trxInfo"].push(["", ""]);
     let objRecaudo = {
@@ -161,11 +169,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia3"] = datosTrans?.ref3;
     }
-    objTicket["trxInfo"].push([
-      "Valor",
-      formatMoney.format(valorTransaccion ?? "0"),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
+
     setIsUploading(true);
 
     postRecaudoConveniosAgrario({
