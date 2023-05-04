@@ -546,7 +546,7 @@ const ConveniosRecaudoAgrario = () => {
                 type='text'
                 name='codigo'
                 minLength='1'
-                maxLength='80'
+                maxLength='6'
                 required
                 value={dataConvenios?.codigo}
                 onInput={onChangeFormat}></Input>

@@ -491,7 +491,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
               <Button
                 type='button'
                 onClick={() => {
-                  notify("Transacción Cancelada");
+                  notifyError("Transacción cancelada por el usuario");
                   hideModalReset();
                 }}>
                 Volver a ingresar código de barras
@@ -538,7 +538,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   <ButtonBar>
                     <Button
                       onClick={() => {
-                        notify("Transacción Cancelada");
+                        notifyError("Transacción cancelada por el usuario");
                         hideModalReset();
                       }}>
                       Cancelar
