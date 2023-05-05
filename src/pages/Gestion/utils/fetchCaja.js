@@ -113,8 +113,8 @@ export const editarComprobante = buildPutFunction(
 export const agregarNota = buildPostFunction(`${urlNotas}/administrar`);
 export const buscarNotas = buildGetFunction(`${urlNotas}/administrar`);
 
-export const buscarReporteTrxArqueo = buildGetFunction(
-  `${urlReportes}/trx-arqueo-usuario`
+export const buscarReporteTrxArqueo = buildPostFunction(
+  `${process.env.REACT_APP_URL_ARQUEO}/get-data`
 );
 
 export const buscarReportesArqueo = async (args) => {
