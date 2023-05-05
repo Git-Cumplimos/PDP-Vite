@@ -9,7 +9,6 @@ import Modal from "../../../../../components/Base/Modal";
 import MoneyInputDec from "../../../../../components/Base/MoneyInputDec";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import TextArea from "../../../../../components/Base/TextArea";
-import Tickets from "../../../../../components/Base/Tickets";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
@@ -33,7 +32,17 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       Hora: "",
     },
     commerceInfo: [
-      /*id transaccion recarga*/
+      /*comercio*/
+      [
+        "Id comercio",
+        roleInfo?.id_comercio ? roleInfo?.id_comercio : "Sin datos",
+      ],
+      /*id_dispositivo*/
+      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      // id trx
+      ["Id Trx", ""],
+      /*id autorizacion*/
+      ["Id Aut", ""],
       /*comercio*/
       [
         "Comercio",
@@ -41,17 +50,15 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
           ? roleInfo?.["nombre comercio"]
           : "Sin datos",
       ],
-      /*id_dispositivo*/
-      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      ["", ""],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      /*telefono*/
-      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+      ["", ""],
     ],
     commerceName: "Recaudo de facturas",
     trxInfo: [],
     disclamer:
-      "En caso de reclamo o inquietud favor comunicarse en Bogota al Tel 594-8500 o gratis en el resto del pais al 01800-915000 o la pagina web http://www.bancoagrario.gov.co",
+      "POR FAVOR VALIDE QUE LOS DATOS IMPRESOS EN ESTE COMPROBANTE SEAN CORRECTOS. EN CASO DE CUALQUIER RECLAMO O INQUIETUD POR FAVOR COMUNICARSE EN BOGOTÁ AL 5945500 O GRATIS EN EL RESTO DEL PAÍS AL 01 8000 915000 O EN LA PÁGINA DE INTERNET WWW.BANCOAGRARIO.GOV.CO",
   });
   const [datosTrans, setDatosTrans] = useState({
     codBarras: "",
@@ -174,7 +181,20 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       return {
         ...old,
         commerceInfo: [
-          /*id transaccion recarga*/
+          /*comercio*/
+          [
+            "Id comercio",
+            roleInfo?.id_comercio ? roleInfo?.id_comercio : "Sin datos",
+          ],
+          /*id_dispositivo*/
+          [
+            "No. Terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+          ],
+          // id trx
+          ["Id Trx", ""],
+          /*id autorizacion*/
+          ["Id Aut", ""],
           /*comercio*/
           [
             "Comercio",
@@ -182,18 +202,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
               ? roleInfo?.["nombre comercio"]
               : "Sin datos",
           ],
-          /*id_dispositivo*/
-          [
-            "No. Terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
+          ["", ""],
           /*direccion*/
           [
             "Dirección",
             roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
           ],
-          /*telefono*/
-          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+          ["", ""],
         ],
         trxInfo: [],
       };
@@ -215,9 +230,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     }).format(new Date());
     /*hora actual */
     const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hourCycle: "h23",
     }).format(new Date());
     const objTicket = { ...objTicketActual };
     let objRecaudo = {
@@ -228,43 +244,44 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["trxInfo"].push([
-      "Convenio",
+      "Código convenio",
+      datosEnvio?.datosConvenio?.codigo,
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Nombre del convenio",
       datosEnvio?.datosConvenio?.nombre_convenio,
     ]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
-      "Referencia de pago 1",
+      "Valor transacción",
+      formatMoney.format(valorTransaccion ?? "0"),
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Referencia 1",
       datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
     ]);
     if (
+      datosEnvio?.datosConvenio?.nombre_ref2 &&
       datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
       !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g)
     ) {
-      objTicket["trxInfo"].push([
-        "Referencia de pago 2",
-        datosTrans?.ref2 ?? "",
-      ]);
+      objTicket["trxInfo"].push(["Referencia 2", datosTrans?.ref2 ?? ""]);
       objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia2"] =
         datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "";
     }
     if (
+      datosEnvio?.datosConvenio?.nombre_ref3 &&
       datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
       !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g)
     ) {
-      objTicket["trxInfo"].push([
-        "Referencia de pago 3",
-        datosTrans?.ref3 ?? "",
-      ]);
+      objTicket["trxInfo"].push(["Referencia 3", datosTrans?.ref3 ?? ""]);
       objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia3"] =
         datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? "";
     }
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor",
-      formatMoney.format(valorTransaccion ?? "0"),
-    ]);
     objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
     postRecaudoConveniosAgrario({
@@ -295,12 +312,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          objTicket["commerceInfo"].push(["Id Trx", res?.obj?.id_trx]);
-          objTicket["commerceInfo"].push([
+          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
+          objTicket["commerceInfo"][3] = [
             "Id Aut",
             res?.obj?.codigo_autorizacion,
+          ];
+          objTicket["trxInfo"].push([
+            "Costo transacción",
+            formatMoney.format(res?.obj?.costoTrx, 0),
           ]);
-          objTicket["commerceInfo"].push(["", ""]);
+          objTicket["trxInfo"].push(["", ""]);
           setObjTicketActual(objTicket);
           setPeticion(2);
         } else {
@@ -420,7 +441,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   onInput={onChangeFormat}
                 />
               )}
-            {datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
+            {datosEnvio?.datosConvenio?.nombre_ref2 &&
+              datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
               !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g) && (
                 <Input
                   id='ref2'
@@ -437,7 +459,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   autoComplete='off'
                   onInput={onChangeFormat}></Input>
               )}
-            {datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
+            {datosEnvio?.datosConvenio?.nombre_ref3 &&
+              datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
               !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g) && (
                 <Input
                   id='ref3'
@@ -487,7 +510,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                 required></MoneyInputDec>
             )}
             <ButtonBar className='lg:col-span-2'>
-              <Button type='button' onClick={hideModalReset}>
+              <Button
+                type='button'
+                onClick={() => {
+                  notifyError("Transacción cancelada por el usuario");
+                  hideModalReset();
+                }}>
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
@@ -510,13 +538,15 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                         datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
                       }`}</h2>
                     )}
-                  {datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
+                  {datosEnvio?.datosConvenio?.nombre_ref2 &&
+                    datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
                     !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g) && (
                       <h2>{`Referencia 2: ${
                         datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
                       }`}</h2>
                     )}
-                  {datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
+                  {datosEnvio?.datosConvenio?.nombre_ref3 &&
+                    datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
                     !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g) && (
                       <h2>{`Referencia 3: ${
                         datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? ""
@@ -528,7 +558,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                     )} `}
                   </h2>
                   <ButtonBar>
-                    <Button onClick={hideModalReset}>Cancelar</Button>
+                    <Button
+                      onClick={() => {
+                        notifyError("Transacción cancelada por el usuario");
+                        hideModalReset();
+                      }}>
+                      Cancelar
+                    </Button>
                     <Button type='submit' onClick={onSubmitPago}>
                       Realizar pago
                     </Button>
@@ -537,6 +573,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
               )}
               {peticion === 2 && (
                 <>
+                  <TicketsAgrario
+                    ticket={objTicketActual}
+                    refPrint={printDiv}
+                  />
                   <h2>
                     <ButtonBar>
                       <Button onClick={handlePrint}>Imprimir</Button>
@@ -550,10 +590,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                       </Button>
                     </ButtonBar>
                   </h2>
-                  <TicketsAgrario
-                    ticket={objTicketActual}
-                    refPrint={printDiv}
-                  />
                 </>
               )}
             </div>

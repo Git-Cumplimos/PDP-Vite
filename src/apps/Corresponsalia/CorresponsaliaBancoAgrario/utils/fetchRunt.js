@@ -1,7 +1,7 @@
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 
-export const fetchCustom = (url_, metodo_, name_) => {
+export const fetchCustom = (url_, metodo_, name_,evaluate=true,notificacion=true) => {
   return async (params_ = {}, data_ = {}) => {
     let urlCompleto = url_;
     //armar parametros
@@ -51,17 +51,25 @@ export const fetchCustom = (url_, metodo_, name_) => {
       console.log("error", error)
       throw error;
     }
-    console.log("Peticion", Peticion)
     //evaluar respuesta de api gateway
     try {
       if (Peticion?.hasOwnProperty("status") === false) {
         //No es una respuesta directamente del servicio sino del api gateway
         if (Peticion?.hasOwnProperty("message") === true) {
           if (Peticion.message === "Endpoint request timed out") {
-            throw new ErrorCustomTimeout(
-              `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
-              "Timeout"
-            );
+            if (notificacion === true) {
+              
+              throw new ErrorCustomTimeout(
+                `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
+                "Timeout"
+              );
+            } else { 
+              throw new ErrorCustomTimeout(
+                `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
+                "Timeout",null
+              );
+
+            }
           } else {
             throw new ErrorCustomFetch(
               `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
@@ -85,7 +93,11 @@ export const fetchCustom = (url_, metodo_, name_) => {
 
     //evaluar la respuesta que llega del backend
     try {
-      return EvaluateResponse(Peticion, name_);
+      if (evaluate === true) {
+        return EvaluateResponse(Peticion, name_);
+      } else { 
+        return Peticion
+      }
     } catch (error) {
       throw error;
     }
@@ -169,8 +181,8 @@ export class ErrorCustomFetch extends ErrorCustom {
 }
 
 export class ErrorCustomTimeout extends ErrorCustom {
-  constructor(message, error_msg) {
-    super(message, "ErrorCustomTimeout", error_msg, "notifyError");
+  constructor(message, error_msg, notificacion = "notifyError") {
+    super(message, "ErrorCustomTimeout", error_msg, notificacion);
   }
 }
 
