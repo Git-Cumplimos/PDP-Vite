@@ -75,7 +75,11 @@ const PagarRunt = () => {
           break;
       }
     } else {
-      notifyError(msg);
+      if (error.message === "Error respuesta Front-end PDP: Timeout al consumir el servicio (PagarRunt) [0010002]") {
+      } else { 
+
+        notifyError(msg);
+      }
     }
     setPaso("LecturaBarcode");
     setNumeroRunt("");
