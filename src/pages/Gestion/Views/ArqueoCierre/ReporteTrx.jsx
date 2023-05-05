@@ -6,14 +6,13 @@ import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Input from "../../../../components/Base/Input";
 
-
+import { buscarReporteTrxArqueo } from "../../utils/fetchCaja";
 import { makeMoneyFormatter } from "../../../../utils/functions";
 import { notifyError } from "../../../../utils/notify";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Error404 from "../../../Error404";
 
 const formatMoney = makeMoneyFormatter(2);
-const urlReportes = `${process.env.REACT_APP_URL_ARQUEO}/get-data`;
 
 const GridRow = ({ cols = [], self = false }) => (
   <div
@@ -57,7 +56,7 @@ const TreeView = ({ tree = {}, child }) =>
         info.nombre,
         valoresCalculadosGrupos(info.autorizadores,"transaccionesExitosas"),
         valoresCalculadosGrupos(info.autorizadores,"transaccionesFallidas"), 
-        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,"cupo")), 
+        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,"monto")), 
         formatMoney.format(valoresCalculadosGrupos(info.autorizadores,"comisiones"))
       ];
       if (info?.autorizadores) {
@@ -87,22 +86,22 @@ const TreeView = ({ tree = {}, child }) =>
           if (autorizadores.autorizadores.length > 0) {
             if (valor === "transaccionesExitosas") {
               autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += autorizador.transaccionesExitosas;
+                valorCalculado += Number(autorizador.transaccionesExitosas);
               })
             }
             if (valor === "transaccionesFallidas") {
               autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += autorizador.transaccionesFallidas;
+                valorCalculado += Number(autorizador.transaccionesFallidas);
               })
             }
-            if (valor === "cupo") {
+            if (valor === "monto") {
               autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += autorizador.monto;
+                valorCalculado += Number(autorizador.monto);
               })
             }
             if (valor === "comisiones") {
               autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += autorizador.comisiones;
+                valorCalculado += Number(autorizador.comisiones);
               })
             }
           }
@@ -118,22 +117,22 @@ const TreeView = ({ tree = {}, child }) =>
       if (autorizadores.length > 0) {
         if (valor === "transaccionesExitosas") {
           autorizadores.map((autorizador) => {
-            valorCalculado += autorizador.transaccionesExitosas;
+            valorCalculado += Number(autorizador.transaccionesExitosas);
           })
         }
         if (valor === "transaccionesFallidas") {
           autorizadores.map((autorizador) => {
-            valorCalculado += autorizador.transaccionesFallidas;
+            valorCalculado += Number(autorizador.transaccionesFallidas);
           })
         }
-        if (valor === "cupo") {
+        if (valor === "monto") {
           autorizadores.map((autorizador) => {
-            valorCalculado += autorizador.monto;
+            valorCalculado += Number(autorizador.monto);
           })
         }
         if (valor === "comisiones") {
           autorizadores.map((autorizador) => {
-            valorCalculado += autorizador.comisiones;
+            valorCalculado += Number(autorizador.comisiones);
           })
         }
       }
@@ -150,25 +149,7 @@ const headers = [
   "Comisiones"
 ]
 
-export const getDataBack = async (body) => {
-  const url = urlReportes;
-  try {
-    const result = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    const data = await result.json();
-    return data;
-  } catch (error) {
-    console.log("ERROR BACK: ", error.message.toString())
-    return null;
-  }
-};
-
-const ReporteTrx = () => {  
+const ReporteTrx = () => {
 
   const { roleInfo } = useAuth();
   const [dataCapitalizar, setDataCapitalizar] = useState({});
@@ -192,7 +173,8 @@ const ReporteTrx = () => {
               fechaInicio: fechas.fechaInicial,
               fechaFin: fechas.fechaFinal
             }
-            const dataBack = await getDataBack(body);
+            const dataBack = await buscarReporteTrxArqueo(body);
+            console.log(dataBack)
             if (dataBack != null) {
               if (dataBack.codigo === 200 && dataBack.status === true) {
                 if (dataBack.obj.grupoTransacciones.length > 0) {
@@ -200,6 +182,9 @@ const ReporteTrx = () => {
                   setDataInicioDia(dataBack.obj.inicioDia);
                   setDataTransacciones(dataBack.obj.grupoTransacciones);
                 } else {
+                  setDataCapitalizar({});
+                  setDataInicioDia({});
+                  setDataTransacciones([]);
                   notifyError("No se encontraron registros en el rango de fecha");
                 }
               } else {
@@ -313,7 +298,7 @@ const ReporteTrx = () => {
                     "Calculado", 
                     valoresCalculadosTotales(dataTransacciones,"transaccionesExitosas")+dataCapitalizar.transaccionesExitosas,
                     valoresCalculadosTotales(dataTransacciones,"transaccionesFallidas")+dataCapitalizar.transaccionesFallidas,
-                    formatMoney.format(valoresCalculadosTotales(dataTransacciones,"cupo")+dataInicioDia.monto+dataCapitalizar.monto), 
+                    formatMoney.format(valoresCalculadosTotales(dataTransacciones,"monto")+dataInicioDia.monto+dataCapitalizar.monto), 
                     formatMoney.format(valoresCalculadosTotales(dataTransacciones,"comisiones")+dataInicioDia.comisiones+dataCapitalizar.comisiones)
                   ]}
                 />
