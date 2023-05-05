@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { Fragment, useState } from "react";
 
 import Accordion from "../../../../components/Base/Accordion";
@@ -174,7 +173,6 @@ const ReporteTrx = () => {
               fechaFin: fechas.fechaFinal
             }
             const dataBack = await buscarReporteTrxArqueo(body);
-            console.log(dataBack)
             if (dataBack != null) {
               if (dataBack.codigo === 200 && dataBack.status === true) {
                 if (dataBack.obj.grupoTransacciones.length > 0) {
