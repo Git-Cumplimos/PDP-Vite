@@ -549,7 +549,7 @@ const ConveniosRecaudoAgrario = () => {
                 maxLength='6'
                 required
                 value={dataConvenios?.codigo}
-                onInput={onChangeFormat}></Input>
+                onInput={onChangeFormatNumber}></Input>
               <Input
                 id='nombre_convenio'
                 label='Nombre convenio'
