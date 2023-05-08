@@ -108,7 +108,9 @@ const ConveniosPines = () => {
           .filter(([key, val]) =>
             !selected
               ? key !== "activo" && val
-              : selected[key] !== val || key === "pk_codigo_convenio"
+              : selected[key] !== val ||
+                key === "pk_codigo_convenio" ||
+                key === "codigo_pin"
           )
           .map(([key, val]) => [key, key === "activo" ? val === "on" : val])
       );
