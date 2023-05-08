@@ -146,9 +146,12 @@ const Premios = ({ route }) => {
           };
         });
         if (res === undefined) {
-          notifyError("No existen resultados, para el sorteo indicado")
+          notifyError("Error respuesta PDP: Fallo al consumir el servicio (loterías) [0010002]")
         }
-        if ("msg" in res) {
+        if (!res.status){
+          notifyError(res.msg)
+        }
+        if (res.status && "msg" in res) {
           if (res?.obj?.max_pago == true) {
             notifyError(
               "El valor del premio, supera el valor asignado para el comercio"
