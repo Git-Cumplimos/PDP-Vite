@@ -524,9 +524,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
             </ButtonBar>
           </Form>
           <Modal show={showModal} handleClose={hideModalReset}>
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+            <>
               {peticion === 1 && (
-                <>
+                <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
                   <h1 className='text-2xl text-center mb-5 font-semibold'>
                     ¿Está seguro de realizar el recaudo?
                   </h1>
@@ -569,10 +569,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                       Realizar pago
                     </Button>
                   </ButtonBar>
-                </>
+                </div>
               )}
               {peticion === 2 && (
-                <>
+                <div className='flex flex-col justify-center items-center'>
                   <TicketsAgrario
                     ticket={objTicketActual}
                     refPrint={printDiv}
@@ -590,9 +590,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                       </Button>
                     </ButtonBar>
                   </h2>
-                </>
+                </div>
               )}
-            </div>
+            </>
           </Modal>
         </>
       )}
