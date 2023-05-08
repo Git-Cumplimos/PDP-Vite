@@ -164,7 +164,7 @@ const ReporteTrx = () => {
       setLoadScreen(true);
       try {
         if (fechas.fechaInicial !== "" && fechas.fechaFinal !== "") {
-          if (new Date(fechas.fechaFinal) <= new Date(fechas.fechaInicial)) {
+          if (new Date(fechas.fechaFinal) < new Date(fechas.fechaInicial)) {
             notifyError("La fecha final debe ser mayor a la inicial");
           } else {
             const body = {
@@ -173,7 +173,7 @@ const ReporteTrx = () => {
               fechaFin: fechas.fechaFinal
             }
             const dataBack = await buscarReporteTrxArqueo(body);
-            if (dataBack != null) {
+            if (dataBack != null) { 
               if (dataBack.codigo === 200 && dataBack.status === true) {
                 if (dataBack.obj.grupoTransacciones.length > 0) {
                   setDataCapitalizar(dataBack.obj.capitalizar);
