@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { ErrorCustomBackend, EvaluateResponse, fetchCustom, msgCustomBackend } from "../utils/fetchRunt";
-import { notify } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 const sleep = (millisecons) => {
     return new Promise((resolve) => setTimeout(resolve, millisecons));
 };
@@ -60,7 +60,14 @@ export const useFetchRunt = (
                         } else if (PeticionConsulta?.obj?.status_trx === "Aprobada") {
                             response = PeticionConsulta
                     } else {
-                        throw new ErrorCustomBackend(PeticionConsulta?.msg, PeticionConsulta?.msg);
+                        if (PeticionConsulta?.msg === "No ha terminado el reintento") {           
+                            throw new ErrorCustomTimeout(
+                                `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
+                                "Timeout"
+                            );
+                        } else { 
+                            throw new ErrorCustomBackend(PeticionConsulta?.msg, PeticionConsulta?.msg);
+                        }
                         }
                     
                 } catch (error) {
@@ -76,3 +83,30 @@ export const useFetchRunt = (
 
     return [state, fetchRuntTrx];
 };
+
+export class ErrorCustom extends Error {
+    constructor(message, name, error_msg, notificacion) {
+        super(message);
+        this.name = name;
+        this.error_msg = error_msg;
+        this.notificacion = notificacion;
+        if (this.notificacion === "notifyError") {
+            notifyError(message);
+        } else if (this.notificacion === "notify") {
+            notify(message);
+        }
+
+        if (
+            this.name === "ErrorCustomFetch" ||
+            this.name === "ErrorCustomTimeout"
+        ) {
+            console.error(`${message}\n ${this.error_msg}`);
+        }
+    }
+}
+
+export class ErrorCustomTimeout extends ErrorCustom {
+    constructor(message, error_msg, notificacion = "notifyError") {
+        super(message, "ErrorCustomTimeout", error_msg, notificacion);
+    }
+}
