@@ -173,7 +173,7 @@ const ReporteTrx = () => {
               fechaFin: fechas.fechaFinal
             }
             const dataBack = await buscarReporteTrxArqueo(body);
-            if (dataBack != null) {
+            if (dataBack != null) { 
               if (dataBack.codigo === 200 && dataBack.status === true) {
                 if (dataBack.obj.grupoTransacciones.length > 0) {
                   setDataCapitalizar(dataBack.obj.capitalizar);
