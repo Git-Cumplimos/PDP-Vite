@@ -50,7 +50,7 @@ const ConveniosRecaudoAgrario = () => {
         nombre_ref1: "",
         longitud_min_ref1: 1,
         longitud_max_ref1: 0,
-        algoritmo_ref1: "",
+        algoritmo_ref1: "N 010 Numérico",
       },
     ],
   });
@@ -94,7 +94,7 @@ const ConveniosRecaudoAgrario = () => {
           nombre_ref1: "",
           longitud_min_ref1: 0,
           longitud_max_ref1: 0,
-          algoritmo_ref1: "",
+          algoritmo_ref1: "N 010 Numérico",
         },
       ],
     });
@@ -240,9 +240,9 @@ const ConveniosRecaudoAgrario = () => {
       if (lenData < 3) {
         tempData.referencias.push({
           [`nombre_ref${lenData + 1}`]: "",
-          [`longitud_min_ref${lenData + 1}`]: 0,
+          [`longitud_min_ref${lenData + 1}`]: 1,
           [`longitud_max_ref${lenData + 1}`]: 0,
-          [`algoritmo_ref${lenData + 1}`]: "",
+          [`algoritmo_ref${lenData + 1}`]: "N 010 Numérico",
         });
         setDataConvenios(tempData);
       }
