@@ -85,68 +85,64 @@ const TablaTransacciones = ({ banco }) => {
   }, [banco, setSingleFilter]);
 
   return (
-    <div className="w-full flex flex-col justify-center items-center my-8">
-      <TableEnterprise
-        title="Transacciones"
-        maxPage={cantidadPaginas}
-        headers={[
-          "Id transaccion",
-          "Operación",
-          "Monto",
-          "Fecha y hora",
-          "Estado Trx",
-          "Tipo de proceso",
-        ]}
-        data={
-          datosTablaTrx?.map((inf, created) => {
-            const tempDate = new Date(inf.fecha_trx);
-            tempDate.setHours(tempDate.getHours() + 5);
-            created = dateFormatter.format(tempDate);
-            const money = formatMoney.format(inf.valor_trx);
-            return {
-              id_transaccion: inf.id_trx,
-              operacion: inf.name_tipo_transaccion,
-              monto: money,
-              fecha: created,
-              status: inf.status_trx ? "Aprobado" : "Declinado",
-              tipo_proceso: inf.is_trx_contingencia
-                ? "Contingencia"
-                : "En linea",
-            };
-          }) ?? []
-        }
-        onSetPageData={setPageData}
-        onChange={(ev) =>
-          setSearchFilters((old) =>
-            new Map(old).set(ev.target.name, ev.target.value)
-          )
-        }
-      >
-        <Input
-          id="dateInit"
-          label="Fecha inicial"
-          name="fecha_inicio_inicio"
-          type="date"
-        />
-        <Input
-          id="dateEnd"
-          label="Fecha final"
-          name="fecha_inicio_fin"
-          type="date"
-        />
-        <Select
-          className="place-self-stretch"
-          label="Tipo operación"
-          name="name_tipo_transaccion"
-          options={[
-            "",
-            "Consulta Liberacion Cupo",
-            "Liberacion Cupo",
-            "Reverso Liberacion Cupo",
-          ].map((val) => ({ value: val, label: val }))}
-        />
-      </TableEnterprise>
-    </div>
+    <TableEnterprise
+      title="Transacciones"
+      maxPage={cantidadPaginas}
+      headers={[
+        "Id transaccion",
+        "Operación",
+        "Monto",
+        "Fecha y hora",
+        "Estado Trx",
+        "Tipo de proceso",
+      ]}
+      data={
+        datosTablaTrx?.map((inf, created) => {
+          const tempDate = new Date(inf.fecha_trx);
+          tempDate.setHours(tempDate.getHours() + 5);
+          created = dateFormatter.format(tempDate);
+          const money = formatMoney.format(inf.valor_trx);
+          return {
+            id_transaccion: inf.id_trx,
+            operacion: inf.name_tipo_transaccion,
+            monto: money,
+            fecha: created,
+            status: inf.status_trx ? "Aprobado" : "Declinado",
+            tipo_proceso: inf.is_trx_contingencia ? "Contingencia" : "En linea",
+          };
+        }) ?? []
+      }
+      onSetPageData={setPageData}
+      onChange={(ev) =>
+        setSearchFilters((old) =>
+          new Map(old).set(ev.target.name, ev.target.value)
+        )
+      }
+    >
+      <Input
+        id="dateInit"
+        label="Fecha inicial"
+        name="fecha_inicio_inicio"
+        type="date"
+      />
+      <Input
+        id="dateEnd"
+        label="Fecha final"
+        name="fecha_inicio_fin"
+        type="date"
+      />
+      <Select
+        className="place-self-stretch"
+        label="Tipo operación"
+        name="name_tipo_transaccion"
+        options={[
+          "",
+          "Consulta recaudo",
+          "Notificación recaudo",
+          "Reverso notificación recaudo",
+        ].map((val) => ({ value: val, label: val }))}
+      />
+    </TableEnterprise>
   );
 };
 
