@@ -1,19 +1,24 @@
-import { Fragment, useState } from "react";
-
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
+import TicketsDavivienda from "../../../../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
 import Accordion from "../../../../components/Base/Accordion";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
-import Input from "../../../../components/Base/Input";
-
-import { buscarReporteTrxArqueo } from "../../utils/fetchCaja";
+import ButtonLink from "../../../../components/Base/ButtonLink";
+import Form from "../../../../components/Base/Form";
+import Modal from "../../../../components/Base/Modal";
+import Select from "../../../../components/Base/Select";
+import Tickets from "../../../../components/Base/Tickets";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import { makeMoneyFormatter } from "../../../../utils/functions";
 import { notifyError } from "../../../../utils/notify";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import Error404 from "../../../Error404";
+import { buscarReporteTrxArqueo } from "../../utils/fetchCaja";
 
 const formatMoney = makeMoneyFormatter(2);
 
-const GridRow = ({ cols = [], self = false }) => (
+const GridRow = ({ cols = [], self = false, onClick = () => {} }) => (
   <div
     className={`grid gap-4 ${
       self ? "py-4 px-2 bg-secondary-light" : ""
@@ -21,6 +26,7 @@ const GridRow = ({ cols = [], self = false }) => (
     style={{
       gridTemplateColumns: `repeat(${cols?.length || 1}, minmax(0, 1fr))`,
     }}
+    onClick={onClick}
   >
     {cols.map((val, ind) => (
       <div key={ind}>{val}</div>
@@ -28,287 +34,208 @@ const GridRow = ({ cols = [], self = false }) => (
   </div>
 );
 
-const TreeView = ({ tree = {}, child }) =>
+const TreeView = ({ tree = {}, onClickLastChild = (info, ev) => {} }) =>
   Object.entries(tree).map(([key, info]) => {
-    var cols = []
-    if (child) {
-      cols = [
-        info.id,
-        info.nombre, 
-        info.transaccionesExitosas,
-        info.transaccionesFallidas, 
-        formatMoney.format(info.monto), 
-        formatMoney.format(info.comisiones)
-      ];
-      if (info?.transacciones) {
-        return (
-          <Accordion titulo={<GridRow cols={cols} />} key={key}>
-            {info?.transacciones && (
-              <TreeView tree={info?.transacciones} child={true} />
-            )}
-          </Accordion>
-        );
-      }
-    } else {
-      cols = [
-        "",
-        info.nombre,
-        valoresCalculadosGrupos(info.autorizadores,"transaccionesExitosas"),
-        valoresCalculadosGrupos(info.autorizadores,"transaccionesFallidas"), 
-        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,"monto")), 
-        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,"comisiones"))
-      ];
-      if (info?.autorizadores) {
-        return (
-          <Accordion titulo={<GridRow cols={cols} />} key={key}>
-            {info?.autorizadores && (
-              <TreeView tree={info?.autorizadores} child={true} />
-            )}
-          </Accordion>
-        );
-      }
+    const cols = [
+      key,
+      info?.nombre ?? "",
+      formatMoney.format(info?.monto) ?? "No data",
+      "status" in info
+        ? info?.status === true
+          ? "Transaccion exitosa"
+          : info?.status === false
+          ? "Transaccion fallida"
+          : ""
+        : "No. txns",
+      info?.date_trx ?? info?.total_trxs ?? "",
+    ];
+
+    if (info?.nodes) {
+      return (
+        <Accordion titulo={<GridRow cols={cols} />} key={key}>
+          {info?.nodes && (
+            <TreeView tree={info?.nodes} onClickLastChild={onClickLastChild} />
+          )}
+        </Accordion>
+      );
     }
     return (
       <GridRow
         key={key}
         cols={cols}
+        onClick={(ev) => onClickLastChild(info, ev)}
         self
       />
     );
   });
 
-  const valoresCalculadosTotales = (gruposTransaccion, valor) => {
-    var valorCalculado = 0
-    if (gruposTransaccion !== null && gruposTransaccion !== undefined) {
-      if (gruposTransaccion.length > 0) {
-        gruposTransaccion.map((autorizadores) => {
-          if (autorizadores.autorizadores.length > 0) {
-            if (valor === "transaccionesExitosas") {
-              autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += Number(autorizador.transaccionesExitosas);
-              })
-            }
-            if (valor === "transaccionesFallidas") {
-              autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += Number(autorizador.transaccionesFallidas);
-              })
-            }
-            if (valor === "monto") {
-              autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += Number(autorizador.monto);
-              })
-            }
-            if (valor === "comisiones") {
-              autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += Number(autorizador.comisiones);
-              })
-            }
-          }
-        })
-      }
-    }
-    return valorCalculado
-  }
-  
-  const valoresCalculadosGrupos = (autorizadores, valor) => {
-    var valorCalculado = 0
-    if (autorizadores !== null && autorizadores !== undefined) {
-      if (autorizadores.length > 0) {
-        if (valor === "transaccionesExitosas") {
-          autorizadores.map((autorizador) => {
-            valorCalculado += Number(autorizador.transaccionesExitosas);
-          })
-        }
-        if (valor === "transaccionesFallidas") {
-          autorizadores.map((autorizador) => {
-            valorCalculado += Number(autorizador.transaccionesFallidas);
-          })
-        }
-        if (valor === "monto") {
-          autorizadores.map((autorizador) => {
-            valorCalculado += Number(autorizador.monto);
-          })
-        }
-        if (valor === "comisiones") {
-          autorizadores.map((autorizador) => {
-            valorCalculado += Number(autorizador.comisiones);
-          })
-        }
-      }
-    }
-    return valorCalculado
-  }
-
-const headers = [
-  "",
-  "",
-  "Transacciones Exitosas",
-  "Transacciones Fallidas",
-  "Monto",
-  "Comisiones"
-]
-
 const ReporteTrx = () => {
-
   const { roleInfo } = useAuth();
-  const [dataCapitalizar, setDataCapitalizar] = useState({});
-  const [dataInicioDia, setDataInicioDia] = useState({});
-  const [dataTransacciones, setDataTransacciones] = useState([]);
+  const { pathname } = useLocation();
 
-  const [loadScreen, setLoadScreen] = useState(false);
-  const [fechas, setFechas] = useState({ fechaInicial: "", fechaFinal: "" });
+  const printDiv = useRef();
 
-  try{
-      
-    const getData = async () => {
-      setLoadScreen(true);
-      try {
-        if (fechas.fechaInicial !== "" && fechas.fechaFinal !== "") {
-          if (new Date(fechas.fechaFinal) < new Date(fechas.fechaInicial)) {
-            notifyError("La fecha final debe ser mayor a la inicial");
-          } else {
-            const body = {
-              idComercio: roleInfo.id_comercio,
-              fechaInicio: fechas.fechaInicial,
-              fechaFin: fechas.fechaFinal
-            }
-            const dataBack = await buscarReporteTrxArqueo(body);
-            if (dataBack != null) { 
-              if (dataBack.codigo === 200 && dataBack.status === true) {
-                if (dataBack.obj.grupoTransacciones.length > 0) {
-                  setDataCapitalizar(dataBack.obj.capitalizar);
-                  setDataInicioDia(dataBack.obj.inicioDia);
-                  setDataTransacciones(dataBack.obj.grupoTransacciones);
-                } else {
-                  setDataCapitalizar({});
-                  setDataInicioDia({});
-                  setDataTransacciones([]);
-                  notifyError("No se encontraron registros en el rango de fecha");
-                }
-              } else {
-                notifyError("Consulta fallida");
-              }
-            }
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
+
+  const [trxState, setTrxState] = useState("true");
+
+  const [trxTree, setTrxTree] = useState({});
+  const [montoTotal, setMontoTotal] = useState(0.0);
+  const [totalTransacciones, setTotalTransacciones] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [summaryTrx, setSummaryTrx] = useState(null);
+
+  const handleClose = useCallback(() => {
+    setSelected(null);
+    setSummaryTrx(null);
+  }, []);
+
+  useEffect(() => {
+    const conditions = [
+      roleInfo?.id_usuario !== undefined,
+      roleInfo?.id_usuario !== null,
+      roleInfo?.id_comercio !== undefined,
+      roleInfo?.id_comercio !== null,
+      roleInfo?.id_dispositivo !== undefined,
+      roleInfo?.id_dispositivo !== null,
+    ];
+    if (conditions.every((val) => val)) {
+      setLoading(true);
+      buscarReporteTrxArqueo({
+        id_usuario: roleInfo?.id_usuario,
+        id_comercio: roleInfo?.id_comercio,
+        id_terminal: roleInfo?.id_dispositivo,
+        status: trxState,
+      })
+        .then((res) => {
+          setTrxTree(res?.obj?.results);
+          setMontoTotal(res?.obj?.monto);
+          setTotalTransacciones(res?.obj?.total_trxs);
+        })
+        .catch((error) => {
+          if (error?.cause === "custom") {
+            notifyError(error?.message);
+            return;
           }
-        } else {
-          notifyError("Debe seleccionar ambas fechas");
-        }
-      } catch (error) {
-        notifyError("Hubo un error, vuelva a intentar");
-      }
-      setLoadScreen(false);
+          console.error(error?.message);
+          notifyError("Consulta fallida");
+        })
+        .finally(() => setLoading(false));
     }
+  }, [
+    roleInfo?.id_comercio,
+    roleInfo?.id_dispositivo,
+    roleInfo?.id_usuario,
+    trxState,
+  ]);
 
-    return (
-      <Fragment>
-        { loadScreen &&
-          <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-50 overflow-hidden bg-gray-700 opacity-75 flex flex-col items-center justify-center">
-            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4" />
-            <h2 className="text-center text-white text-xl font-semibold">{"Cargando"}</h2>
+  return (
+    <Fragment>
+      <h1 className="text-3xl mt-6">Reporte de transacciones</h1>
+      <div className="w-full px-10 my-10">
+        <Form grid>
+          <Select
+            id="trxState"
+            name="trxState"
+            label="Estado de la transaccion"
+            options={[
+              // { value: "null", label: "" },
+              { value: "true", label: "Aprobada" },
+              { value: "false", label: "Fallida" },
+            ]}
+            onChange={(ev) => setTrxState(ev.target.value)}
+            defaultValue={"true"}
+            disabled={loading}
+          />
+          <ButtonBar />
+        </Form>
+        <Accordion
+          titulo={
+            <GridRow
+              cols={["", "Total Valor", "No. Transacciones", "", ""]}
+            />
+          }
+        />
+        <Accordion
+          titulo={
+            <GridRow
+              cols={["", formatMoney.format(montoTotal), totalTransacciones, "", ""]}
+            />
+          }
+        />
+        <TreeView
+          tree={trxTree}
+          onClickLastChild={(info, ev) => {
+            setSelected(info);
+            setSummaryTrx({
+              "Tipo transaccion": info?.nombre_tipo_transaccion,
+              Fecha: info?.date_trx,
+              "Mensaje de respuesta trx": info?.message_trx,
+              Monto: formatMoney.format(info?.monto),
+              "Estado de la trasaccion": info?.status
+                ? "Transaccion aprobada"
+                : "Transaccion rechazada",
+            });
+          }}
+        />
+      </div>
+      <Modal show={selected} handleClose={handleClose}>
+        {selected?.ticket &&
+        Object.entries(selected?.ticket ?? {}).length > 0 &&
+        JSON.stringify(selected?.ticket) !== "{}" ? (
+          <div className="flex flex-col justify-center items-center">
+            {selected?.id_autorizador === 13 ? (
+              <TicketsDavivienda
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : (
+              <Tickets
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            )}
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button onClick={handleClose}>Cerrar</Button>
+            </ButtonBar>
           </div>
-        }
-        <h1 className="text-3xl mt-6">Reporte de transacciones</h1>        
-        <div className="w-full px-10 my-10">
-          <Input
-            id="fechaInicial"
-            name="fechaInicial"
-            label={"Fecha inicio"}
-            type="date"
-            autoComplete="off"
-            value={fechas?.["fechaInicial"]}
-            onChange={(e) => {
-              setFechas((last) => {
-                return { ...last, fechaInicial: e.target.value };
-              });
-            }}
-            required
-          />
-          <br/>
-          <Input
-            id="fechaFinal"
-            name='fechaFinal'
-            label={"Fecha fin"}
-            type="date"
-            autoComplete="off"
-            value={fechas?.["fechaFinal"]}
-            onChange={(e) => {
-              setFechas((last) => {
-                return { ...last, fechaFinal: e.target.value };
-              });
-            }}
-            required
-          />
-          <ButtonBar className='lg:col-span-2'>
-            <Button
-              onClick={() => getData()}
-              type='submit'
+        ) : (
+          <div className="flex flex-col justify-center items-center mx-auto container">
+            <PaymentSummary
+              title="Resumen transaccion"
+              subtitle=""
+              summaryTrx={summaryTrx}
             >
-              Generar reporte
-            </Button>
-          </ButtonBar>
-        </div>
-        { dataTransacciones.length > 0 &&
-          <div className="w-full px-10 my-10">          
-            <Accordion
-              titulo={
-                <GridRow
-                  cols={headers}
-                />
-              }
-            />
-            <Accordion
-              titulo={
-                <GridRow
-                  cols={[
-                    "", 
-                    dataInicioDia.nombre, 
-                    "",
-                    "",
-                    formatMoney.format(dataInicioDia.monto), 
-                    formatMoney.format(dataInicioDia.comisiones)
-                  ]}
-                />
-              }
-            />
-            <TreeView
-              tree={dataTransacciones}
-              child={false}
-            />
-            <Accordion
-              titulo={
-                <GridRow
-                  cols={[
-                    "", 
-                    dataCapitalizar.nombre, 
-                    dataCapitalizar.transaccionesExitosas,
-                    dataCapitalizar.transaccionesFallidas,
-                    formatMoney.format(dataCapitalizar.monto), 
-                    formatMoney.format(dataCapitalizar.comisiones)
-                  ]}
-                />
-              }
-            />
-            <Accordion
-              titulo={
-                <GridRow
-                  cols={[
-                    "", 
-                    "Calculado", 
-                    valoresCalculadosTotales(dataTransacciones,"transaccionesExitosas")+dataCapitalizar.transaccionesExitosas,
-                    valoresCalculadosTotales(dataTransacciones,"transaccionesFallidas")+dataCapitalizar.transaccionesFallidas,
-                    formatMoney.format(valoresCalculadosTotales(dataTransacciones,"monto")+dataInicioDia.monto+dataCapitalizar.monto), 
-                    formatMoney.format(valoresCalculadosTotales(dataTransacciones,"comisiones")+dataInicioDia.comisiones+dataCapitalizar.comisiones)
-                  ]}
-                />
-              }
-            />
+              <h1 className="text-3xl mt-6 text-aling">
+                No hay ticket registrado
+              </h1>
+              <ButtonBar>
+                <Button onClick={handleClose}>Cerrar</Button>
+              </ButtonBar>
+            </PaymentSummary>
           </div>
-        }
-      </Fragment>
-    );
-  } catch (error) {
-    return(<Error404 />)
-  }
+        )}
+      </Modal>
+      {pathname === "/gestion/arqueo/arqueo-cierre/reporte" && (
+        <ButtonBar>
+          <ButtonLink
+            className="px-4 py-2 bg-primary text-white rounded-full transition-opacity duration-300"
+            to={"/gestion/arqueo/arqueo-cierre"}
+          >
+            Realizar arqueo y cierre de caja
+          </ButtonLink>
+        </ButtonBar>
+      )}
+    </Fragment>
+  );
 };
 
 export default ReporteTrx;

@@ -7,6 +7,7 @@ const urlComprobantes = `${process.env.REACT_APP_URL_CAJA}/comprobantes`;
 const urlCuentas = `${process.env.REACT_APP_URL_CAJA}/cuentas`;
 const urlNotas = `${process.env.REACT_APP_URL_CAJA}/notas`;
 const urlReportes = `${process.env.REACT_APP_URL_CAJA}/reportes`;
+const urlCierreCaja = `${process.env.REACT_APP_URL_CAJA}/api`;
 
 // const urlArqueo = `http://localhost:5000/arqueo`;
 // const urlCaja = `http://localhost:5000/caja`;
@@ -113,8 +114,12 @@ export const editarComprobante = buildPutFunction(
 export const agregarNota = buildPostFunction(`${urlNotas}/administrar`);
 export const buscarNotas = buildGetFunction(`${urlNotas}/administrar`);
 
-export const buscarReporteTrxArqueo = buildPostFunction(
-  `${process.env.REACT_APP_URL_ARQUEO}/get-data`
+export const buscarReporteTrxArqueo = buildGetFunction(
+  `${urlReportes}/trx-arqueo-usuario`
+);
+
+export const buscarReporteCierreCaja = buildPostFunction(
+  `${urlCierreCaja}/get-data`
 );
 
 export const buscarReportesArqueo = async (args) => {
