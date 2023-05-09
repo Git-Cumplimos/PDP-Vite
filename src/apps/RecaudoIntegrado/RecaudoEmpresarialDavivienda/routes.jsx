@@ -49,7 +49,7 @@ const rutasDaviviendaRecaudoEmpresarial = {
     {
       link: "/recaudoEmpresarial/recaudoEmpresarialDavivienda/HistoricoContingencia",
       label: (
-        <AppIcons Logo={"DepositoDaviplata"} name="Historico Contingencia" />
+        <AppIcons Logo={"DepositoDaviplata"} name="Histórico Contingencia" />
       ),
       component: HistoricoContingencia,
       permission: [4002],

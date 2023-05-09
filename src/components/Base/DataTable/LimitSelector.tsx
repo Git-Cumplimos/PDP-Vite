@@ -18,7 +18,7 @@ const LimitSelector = ({ onChangeLimit, defaultValue = 10 }: Props) => {
     >
       {[5, 10, 20, 50].map((val, idx) => (
         <option value={val} key={idx}>
-          {val} items por pagina
+          {val} items por página
         </option>
       ))}
     </select>
