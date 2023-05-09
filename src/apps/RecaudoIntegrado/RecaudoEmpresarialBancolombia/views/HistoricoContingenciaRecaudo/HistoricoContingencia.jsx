@@ -1,14 +1,8 @@
 import React from "react";
 import TablaHistoricoContingencia from "../../../components/TablaHistoricoContingencia/TablaHistoricoContingencia";
 
-const HistoricoContingencia = () => {
-  return (
-    <div>
-      <TablaHistoricoContingencia
-        banco={"bancolombia"}
-      ></TablaHistoricoContingencia>
-    </div>
-  );
-};
+const HistoricoContingencia = () => (
+  <TablaHistoricoContingencia banco={"bancolombia"} />
+);
 
 export default HistoricoContingencia;
