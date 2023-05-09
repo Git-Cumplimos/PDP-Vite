@@ -20,7 +20,7 @@ import {
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 import { v4 as uuidv4 } from "uuid";
 
-const url_cargueS3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_recaudo/subir_archivos_convenios`;
+const url_cargueS3 = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco_agrario_cb_recaudo/subir_archivos_convenios`;
 
 const ConveniosRecaudoAgrario = () => {
   const navigate = useNavigate();
