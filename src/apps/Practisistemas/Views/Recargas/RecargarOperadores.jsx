@@ -37,7 +37,7 @@ const RecargasOperadores = () => {
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
-  const { roleInfo, userInfo } = useAuth();
+  const { roleInfo, userInfo, pdpUser } = useAuth();
   const { state } = useLocation();
   const printDiv = useRef();
   const validNavigate = useNavigate();
@@ -148,7 +148,7 @@ const RecargasOperadores = () => {
         operador: state?.producto,
         valor: parseInt(inputValor),
         jsonAdicional: {
-          nombre_usuario: userInfo?.attributes?.name,
+          "nombre_usuario": pdpUser?.uname ?? "",
           operador: state?.operador_recargar,
         },
       },
@@ -164,7 +164,7 @@ const RecargasOperadores = () => {
         } else {
           if (res?.message === "Endpoint request timed out") {
             notify("Su transacción esta siendo procesada");
-            for (let i = 0; i <= 8; i++) {
+            for (let i = 0; i <= 7; i++) {
               try {
                 const prom = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -189,7 +189,7 @@ const RecargasOperadores = () => {
                             notifyError(
                               typeof res?.msg == typeof {}
                                 ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                                : res?.msg
+                                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
                             );
                             setRespuesta(true);
                             handleClose();
@@ -204,9 +204,17 @@ const RecargasOperadores = () => {
                         setRespuesta(false);
                         console.error(err);
                       });
-                  }, 11000)
+                  }, 9000)
                 );
                 if (prom === true) {
+                  setRespuesta(false);
+                  handleClose();
+                  break;
+                }
+                if (i >= 3) {
+                  notify(
+                    "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
+                  );
                   setRespuesta(false);
                   handleClose();
                   break;
@@ -214,17 +222,20 @@ const RecargasOperadores = () => {
               } catch (error) {
                 console.error(error);
               }
-              notify(
-                "Su transacción esta siendo procesada, no recargue la página"
-              );
+              if (i <= 3) {
+                notify(
+                  "Su transacción esta siendo procesada, no recargue la página"
+                );
+              }
             }
+            // notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
             validNavigate("/recargas-paquetes");
           }
           else {
             notifyError(
               typeof res?.msg == typeof {}
                 ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                : res?.msg
+                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
             );
             setRespuesta(false);
             handleClose();
@@ -259,6 +270,7 @@ const RecargasOperadores = () => {
         trxInfo: [],
       };
     });
+    validNavigate("/recargas-paquetes");
   }, []);
 
   const handleCloseRecarga = useCallback(() => {

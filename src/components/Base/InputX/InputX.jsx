@@ -122,8 +122,7 @@ const InputX = ({
       {label && label !== "" && (
         <label
           htmlFor={_id}
-          className={`${type === "file" ? "text-center" : "text-right"}`}
-        >
+          className={`${type === "file" ? "text-center" : "text-right"}`}>
           {label}
         </label>
       )}
@@ -131,7 +130,7 @@ const InputX = ({
       {type === "file" ? (
         <>
           <h1>O</h1>
-          <h1>Arrastar los archivos</h1>
+          <h1>Arrastrar los archivos</h1>
           {!disabled ? (
             <div
               ref={dropZoneRef}
@@ -139,8 +138,7 @@ const InputX = ({
               onDragEnter={allowDrag}
               onDragOver={allowDrag}
               onDragLeave={() => hideDropZone()}
-              onDrop={handleDrop}
-            ></div>
+              onDrop={handleDrop}></div>
           ) : (
             ""
           )}
@@ -153,8 +151,7 @@ const InputX = ({
                 key={idx}
                 onClick={() => {
                   onSelectSuggestion(idx, el);
-                }}
-              >
+                }}>
                 <h1>{el}</h1>
               </li>
             );
@@ -169,8 +166,7 @@ const InputX = ({
       {label && label !== "" && (
         <label
           htmlFor={_id}
-          className={`${type === "file" ? "text-center" : "text-right"}`}
-        >
+          className={`${type === "file" ? "text-center" : "text-right"}`}>
           {label}
         </label>
       )}
@@ -178,7 +174,7 @@ const InputX = ({
       {type === "file" ? (
         <>
           <h1>O</h1>
-          <h1>Arrastar los archivos</h1>
+          <h1>Arrastrar los archivos</h1>
           {!disabled ? (
             <div
               ref={dropZoneRef}
@@ -186,8 +182,7 @@ const InputX = ({
               onDragEnter={allowDrag}
               onDragOver={allowDrag}
               onDragLeave={() => hideDropZone()}
-              onDrop={handleDrop}
-            ></div>
+              onDrop={handleDrop}></div>
           ) : (
             ""
           )}
@@ -200,8 +195,7 @@ const InputX = ({
                 key={idx}
                 onClick={() => {
                   onSelectSuggestion(idx, el);
-                }}
-              >
+                }}>
                 <h1>{el}</h1>
               </li>
             );

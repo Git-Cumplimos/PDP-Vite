@@ -28,6 +28,7 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
 });
 
 const initialSearchFilters = new Map([
+  ["uuid", ""],
   ["id_comercio", ""],
   ["id_usuario", ""],
   ["id_tipo_transaccion", ""],
@@ -38,10 +39,10 @@ const initialSearchFilters = new Map([
   ["limit", 10],
 ]);
 
-const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-paginated`;
+const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transacciones-paginated`;
 
 const Transacciones = () => {
-  const { roleInfo, userPermissions } = useAuth();
+  const { roleInfo, userPermissions, pdpUser } = useAuth();
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
   const [isNextPage, setIsNextPage] = useState(false);
@@ -143,12 +144,20 @@ const Transacciones = () => {
       if (!roleInfo?.id_comercio || !roleInfo?.id_usuario) {
         return old;
       }
-      const copy = initialSearchFilters
+      return initialSearchFilters
         .set("id_comercio", roleInfo?.id_comercio ?? "")
         .set("id_usuario", roleInfo?.id_usuario ?? "");
-      return copy;
     });
   }, [roleInfo, setSearchFilters]);
+
+  useEffect(() => {
+    setSearchFilters((old) => {
+      if (!pdpUser?.uuid) {
+        return old;
+      }
+      return initialSearchFilters.set("uuid", pdpUser?.uuid ?? "");
+    });
+  }, [pdpUser, setSearchFilters]);
 
   return (
     <div className="w-full flex flex-col justify-center items-center my-8">
@@ -160,7 +169,7 @@ const Transacciones = () => {
           "Operación",
           "Monto",
           "Fecha",
-          "Estado de la trasaccion",
+          "Estado de la trasacción",
         ]}
         data={trxs.map(
           ({
@@ -168,10 +177,7 @@ const Transacciones = () => {
             "Tipo transaccion": Tipo_operacion,
             monto,
             created,
-            status_trx,
-            tipo_afectacion,
-            id_tipo_transaccion,
-            ticket,
+            status_trx_text,
           }) => {
             const tempDate = new Date(created);
             tempDate.setHours(tempDate.getHours() + 5);
@@ -182,17 +188,7 @@ const Transacciones = () => {
               Tipo_operacion,
               money,
               created,
-              status_trx:
-                tipo_afectacion !== "NA" &&
-                !(id_tipo_transaccion === 66 || id_tipo_transaccion === 67)
-                  ? status_trx
-                    ? ticket == null
-                      ? "Transaccion pendiente"
-                      : "Transaccion aprobada"
-                    : "Transaccion rechazada"
-                  : status_trx
-                  ? "Transaccion aprobada"
-                  : "Transaccion rechazada",
+              status_trx_text
             };
           }
         )}
@@ -201,24 +197,11 @@ const Transacciones = () => {
           const fecha = new Date(trxs[index]?.created);
           fecha.setHours(fecha.getHours() + 5);
           setSummaryTrx({
-            "Tipo transaccion": trxs[index]?.["Tipo transaccion"],
+            "Tipo transacción": trxs[index]?.["Tipo transaccion"],
             Fecha: dateFormatter.format(fecha),
             "Mensaje de respuesta trx": trxs[index]?.message_trx,
             Monto: formatMoney.format(trxs[index]?.monto),
-            "Estado de la transacción":
-              trxs[index]?.tipo_afectacion !== "NA" &&
-              !(
-                trxs[index]?.id_tipo_transaccion === 66 ||
-                trxs[index]?.id_tipo_transaccion === 67
-              )
-                ? trxs[index]?.status_trx
-                  ? trxs[index]?.ticket == null
-                    ? "Transaccion pendiente"
-                    : "Transaccion aprobada"
-                  : "Transaccion rechazada"
-                : trxs[index]?.status_trx
-                ? "Transaccion aprobada"
-                : "Transaccion rechazada",
+            "Estado de la transacción": trxs[index]?.status_trx_text,
           });
           setShowModal(true);
         }}
@@ -241,7 +224,7 @@ const Transacciones = () => {
                   oldPage > 1 ? oldPage - 1 : oldPage
                 )
               }
-            ></DataTable.PaginationButtons>
+            />
           </Fragment>
         }
         onChange={(ev) => {

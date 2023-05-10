@@ -256,14 +256,19 @@ const Reversos = () => {
           hour12: false,
         }).format(new Date()),
       },
-      commerceInfo: Object.entries({
-        "Id Comercio": comercio?.id_comercio,
-        "No. terminal": comercio?.id_dispositivo,
-        Municipio: municipio,
-        Dirección: comercio?.direccion,
-        "Id Trx": selected.id_trx,
-        "Id Confirmación": "Id FDLM",
-      }),
+      commerceInfo: [
+        ["Id comercio", comercio?.id_comercio],
+        /*id_dispositivo*/
+        ["No. terminal", comercio?.id_dispositivo],
+        ["Id Trx", selected.id_trx],
+        ["Id Aut", "Id FDLM"],  
+        /*ciudad*/
+        ["Comercio", comercio?.["nombre comercio"]],
+        ["", ""],
+        /*direccion*/
+        ["Dirección", comercio?.direccion],
+        ["", ""],
+      ],
       commerceName: "FUNDACIÓN DE LA MUJER",
       trxInfo: [
         ["CRÉDITO", selected?.res_obj?.info?.credito],
@@ -289,6 +294,8 @@ const Reversos = () => {
     setTicket(false);
     setShowModal(false);
     handleChange();
+    setMotivo("")
+    setTrxs([])
   }, []);
 
   const onSubmit = (e) => {
@@ -298,6 +305,7 @@ const Reversos = () => {
 
   const reverse = (e) => {
     e.preventDefault();
+    setStop(true)
     let tipo_comercio = selected?.res_obj?.tipo_comercio ?? ""
     if (comercio?.tipo_comercio === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
@@ -313,15 +321,20 @@ const Reversos = () => {
       ...data,
     };
     ingresoreversorecibo(values)
-      .then((res) => {
-        setTicket(true);
+      .then((res) => {        
         if (!res?.status) {
+          setStop(false)
           setTicket(false);
           notifyError(res?.obj?.Mensaje);
+        }else {
+          setTicket(true);
+          notify(res?.msg)
+          setStop(false)
         }
       })
       .catch((err) => {
         console.log(err);
+        setStop(false)
       });
   };
   return (

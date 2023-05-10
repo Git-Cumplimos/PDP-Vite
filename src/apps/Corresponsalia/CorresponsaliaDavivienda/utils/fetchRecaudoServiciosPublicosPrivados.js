@@ -29,7 +29,6 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
-  console.log("REQUEST--->", bodyObj);
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
@@ -106,7 +105,6 @@ export const postConsultaConveniosDavivienda = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
-  console.log("REQUEST--->", bodyObj);
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(

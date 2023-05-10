@@ -60,7 +60,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
   const [cantNum, setCantNum] = useState(0);
 
   const url = process.env.REACT_APP_URL_COLPENSIONES;
-  // const url = "http://127.0.0.1:2500/";
+  // const url = "http://127.0.0.1:2500";
 
   const printDiv = useRef();
 
@@ -112,31 +112,34 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Municipio", roleInfo?.ciudad],
+        ["Id Trx", datosRespuesta?.[0]?.["inserted_id"]],
+        ["Id Aut", datosRespuesta?.[0]?.["inserted_id"]],
+        ["Comercio", roleInfo?.nombre_comercio],
+
         ["", ""],
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
 
       trxInfo: [
-        ["PISO DE PROTECCION SOCIAL - APORTE VOLUNTARIO"],
+        ["PISO DE PROTECCIÓN SOCIAL - APORTE VOLUNTARIO"],
         ["", ""],
         [
           "Número de documento",
           /* "33" */ datosRespuesta?.[1]?.["Identificacion"],
         ],
-        ["", ""],
-        ["Número de autorización ", datosRespuesta?.[0]?.["inserted_id"]],
+        // ["", ""],
+        // ["Número de autorización", datosRespuesta?.[0]?.["inserted_id"]],
         /* ["Proceso", "Aporte Voluntario A Demanda"], */
         ["", ""],
-        ["N° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
+        ["N.° Planilla", /* "33" */ datosRespuesta?.[1]?.["planillaCode"]],
         ["", ""],
         ["Valor", formatMoney.format(valorAportar)],
         ["", ""],
       ],
 
       disclamer:
-        "ESTA TRANSACCION NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORREPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNIQUESE EN BOGOTA 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
+        "ESTA TRANSACCIÓN NO TIENE COSTO, VERIFIQUE QUE EL VALOR IMPRESO EN EL RECIBO CORRESPONDE AL VALOR ENTREGADO POR USTED. EN CASO DE INQUIETUDES O RECLAMOS COMUNÍQUESE EN BOGOTÁ 4870300  - NAL. 018000410777 O EN WWW.COLPENSIONES.GOV.CO",
     };
   }, [roleInfo, valorAportar, datosRespuesta, tipoComercio]);
 
@@ -204,6 +207,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                   ) {
                     setShowModalVoucher(true);
                     setDatosRespuesta(respuesta?.obj);
+                    // console.log("datos resoyesta", datosRespuesta);
                   } else {
                     notifyError(respuesta?.msg);
                     navigate(`/colpensiones`);
@@ -334,7 +338,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               )
                 .then((respuesta) => {
                   setProcesandoTrx(false);
-                  console.log("********", respuesta);
+                  // console.log("********", respuesta);
                   if (respuesta?.msg) {
                     if (
                       respuesta?.msg ===
@@ -349,8 +353,9 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                     ) {
                       setShowModalVoucher(true);
                       setDatosRespuesta(respuesta?.obj);
+                      // console.log("datos resoyesta", datosRespuesta);
                     } else {
-                      console.log("mensajeeeee");
+                      // console.log("mensajeeeee");
                       notifyError(respuesta?.msg);
                       navigate(`/colpensiones`);
                     }
@@ -432,7 +437,9 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
         }
       }
     } else {
-      notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
+      notifyError(
+        "Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003])"
+      );
       navigate(`/colpensiones`);
     }
   };
@@ -467,7 +474,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
                   setTipoIdentificacion(event?.target?.value)
                 }
                 id="comissionType"
-                label="Tipo Identificación: "
+                label="Tipo Identificación"
                 required
                 options={{
                   "": "",
@@ -483,7 +490,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               ></Select>
 
               <Input
-                label={"N° Documento: "}
+                label={"N.° Documento"}
                 placeholder={"Ingrese su Numero Documento"}
                 value={numDocumento}
                 minLength="6"
@@ -500,7 +507,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               <Input
                 id="celular"
                 name="celular"
-                label="N° Celular: "
+                label="N.° Celular"
                 type="tel"
                 autoComplete="off"
                 minLength="10"
@@ -533,7 +540,7 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
               required
             /> */}
               <MoneyInput
-                label={"Valor Aportar: "}
+                label={"Valor Aportar"}
                 placeholder={"Ingrese Valor Aportar"}
                 value={valorAportar}
                 min={limitesMontos?.min}
@@ -576,8 +583,17 @@ const PpsVoluntarioDemanda = ({ ced, fun, funBorrar }) => {
         <Modal show={showModal} handleClose={handleClose}>
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
-            <Button onClick={handlePrint}>Imprimir</Button>
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button
+                onClick={() => {
+                  setShowModal(false);
+                  fun();
+                }}
+              >
+                Cancelar
+              </Button>
+            </ButtonBar>
           </div>
         </Modal>
       ) : (

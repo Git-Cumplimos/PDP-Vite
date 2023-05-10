@@ -160,7 +160,7 @@ const Retiro = () => {
   const peticionCashOut = () => {
     const hoy = new Date();
     const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
+      year: "numeric",
       month: "2-digit",
       day: "2-digit",
     }).format(new Date());

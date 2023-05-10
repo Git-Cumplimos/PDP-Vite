@@ -32,7 +32,7 @@ const svgs = {
   MARKETPLACE: `${urlAssets}/assets/svg/MARKETPLACE-01.svg`,
   PAGO: `${urlAssets}/assets/svg/PAGO-01.svg`,
   REPORTE: `${urlAssets}/assets/svg/REPORTES-01.svg`,
-  right_arrow: `${urlAssets}/assets/svg/right-arrow.svg`,  
+  right_arrow: `${urlAssets}/assets/svg/right-arrow.svg`,
   SUSER: `${urlAssets}/assets/svg/SUSER-01.svg`,
 
   //MOVISTAR
@@ -56,7 +56,7 @@ const svgs = {
   PagoParticipacion: `${urlAssets}/assets/img/pago participacion.png`,
   ReportePines: `${urlAssets}/assets/img/reporte pines.png`,
   TramitarPines: `${urlAssets}/assets/img/TRAMITAR PINES.png`,
-  
+
   CorresponsalBancario: `${urlAssets}/assets/img/CORRESPONSAL BANCARIO.png`,
   Corresponsalia: `${urlAssets}/assets/img/CORRESPONSALIA.png`,
   Daviplata: `${urlAssets}/assets/img/DAVIPLATA.png`,
@@ -65,8 +65,8 @@ const svgs = {
   DescargarReporte: `${urlAssets}/assets/img/descargar reporte.png`,
   Desembolso: `${urlAssets}/assets/img/DESEMBOLSO.png`,
   Fundacion: `${urlAssets}/assets/img/FUNDACION.jpg`,
-  
-  OperadorPdp: `${urlAssets}/assets/img/operador pdp.png`,  
+
+  OperadorPdp: `${urlAssets}/assets/img/operador pdp.png`,
   PagoPorGiro: `${urlAssets}/assets/img/PAGO POR GIRO.png`,
   PagoProductosPropios: `${urlAssets}/assets/img/PAGO PRODUCTOS PROPIOS.png`,
   PinesEntretenimiento: `${urlAssets}/assets/img/pines entretenimiento.png`,
@@ -75,7 +75,7 @@ const svgs = {
   RecaudoCodigoDeBarras: `${urlAssets}/assets/img/recaudo codigo de barras.png`,
   RecaudoManual: `${urlAssets}/assets/img/RECAUDO MANUAL.png`,
   Recaudo: `${urlAssets}/assets/img/RECAUDO.png`,
-  
+
   Reporte: `${urlAssets}/assets/img/REPORTE.png`,
   RetiroDaviplata: `${urlAssets}/assets/img/RETIRO DAVIPLATA.png`,
   Retiro: `${urlAssets}/assets/img/RETIRO.png`,
@@ -83,7 +83,6 @@ const svgs = {
   Reverso: `${urlAssets}/assets/img/REVERSO.png`,
   ServiciosPublicos: `${urlAssets}/assets/img/servicios publicos.jpg`,
 
-  
   Transacciones: `${urlAssets}/assets/img/transacciones.png`,
 
   VerPagoParticipacion: `${urlAssets}/assets/img/VER PAGO PARTICIPACION-01.png`,
@@ -92,10 +91,15 @@ const svgs = {
 };
 
 const banners = {
-  MOVISTAR: `${urlAssets}/assets/img/banners/movistar_min.jpg`,
-  SOI: `${urlAssets}/assets/img/banners/SOI_BANNER.jpg`,
-  FUNDACION_DE_LA_MUJER: `${urlAssets}/assets/img/banners/FUNDACION_BANNER.png`,
-  CORRESPONSAL: `${urlAssets}/assets/img/banners/CORRESPONSAL_banner.jpg`,
-}
+  // MOVISTAR: `${urlAssets}/assets/img/banners/movistar_min.jpg`,
+  // SOI: `${urlAssets}/assets/img/banners/SOI_BANNER.jpg`,
+  // FUNDACION_DE_LA_MUJER: `${urlAssets}/assets/img/banners/FUNDACION_BANNER.png`,
+  // CORRESPONSAL: `${urlAssets}/assets/img/banners/CORRESPONSAL_banner.jpg`,
+  BANNER_1: `${urlAssets}/assets/img/banners/BANNER_1.jpg`,
+  BANNER_2: `${urlAssets}/assets/img/banners/BANNER_2.jpg`,
+  BANNER_3: `${urlAssets}/assets/img/banners/BANNER_3.jpg`,
+  BANNER_4: `${urlAssets}/assets/img/banners/BANNER_4.jpg`,
+  BANNER_5: `${urlAssets}/assets/img/banners/BANNER_5.jpg`,
+};
 
 export { images, svgs, banners };

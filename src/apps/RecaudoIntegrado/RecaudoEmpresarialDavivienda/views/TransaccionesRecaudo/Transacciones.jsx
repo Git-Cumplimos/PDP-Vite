@@ -1,12 +1,5 @@
 import React from "react";
 import TablaTransacciones from "../../../components/TablaTransacciones/TablaTransacciones";
 
-const Transacciones = () => {
-  return (
-    <div>
-      <TablaTransacciones banco={"davivienda"}></TablaTransacciones>
-    </div>
-  );
-};
-
+const Transacciones = () => <TablaTransacciones banco={"davivienda"} />;
 export default Transacciones;
