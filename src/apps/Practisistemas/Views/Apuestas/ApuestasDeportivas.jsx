@@ -14,7 +14,7 @@ import { postConsultaCasasApuestas, postCasaApuestas, postInsertCasaApuestas, po
 import Form from "../../../../components/Base/Form";
 
 const ApuestasDeportivas = ({ subRoutes }) => {
-
+  const [respuesta, setRespuesta] = useState(false);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [casas, setCasas] = useState([]);
@@ -48,12 +48,14 @@ const ApuestasDeportivas = ({ subRoutes }) => {
   };
   
   const fecthTablaCasasApuestasPaginadoFunc = () => {
+    setRespuesta(true)
     postConsultaCasasApuestas({
       page,
       limit,
       casaApuesta: datosTrans.casaApuesta,
     })
       .then((autoArr) => {
+        setRespuesta(false)
         setMaxPages(autoArr?.maxPages);
         setCasas(autoArr?.response ?? []);
       })
@@ -62,11 +64,13 @@ const ApuestasDeportivas = ({ subRoutes }) => {
   
   const onSelectHouse = useCallback(
     (e, i) => {
+      setRespuesta(true)
       postCasaApuestas({
         idcomercio : roleInfo?.["id_comercio"],
         casaApuesta: casas[i]["descripcion"],
       })
         .then((response) => {
+          setRespuesta(false)
           if (response.length != 0){
             navigate (
               "../apuestas-deportivas/Recargar",
@@ -164,6 +168,7 @@ const ApuestasDeportivas = ({ subRoutes }) => {
 
   return (
     <>
+      <SimpleLoading show={respuesta} />
       <h1 className='text-3xl text-center'>
         Servicios de Apuestas Deportivas
       </h1>
