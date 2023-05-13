@@ -35,6 +35,7 @@ const AdminLayout = () => {
     comision,
     cargar,
   } = classes;
+  const urlAssets = process.env.REACT_APP_ASSETS_URL;
 
   const { quotaInfo, roleInfo, signOut, userPermissions, userInfo } = useAuth();
   const navigate = useNavigate();
@@ -201,7 +202,10 @@ const AdminLayout = () => {
           )}
         </Modal>
         <Modal show={showModalPublicidad} handleClose={handleClose}>
-          <img src="popUpColpatria.png" alt=""></img>
+          <img
+            src={`${urlAssets}/assets/img/PUBLICIDADMODAL.png`}
+            alt="Proximamente Corresponsal Colpatria"
+          ></img>
         </Modal>
       </main>
     </div>
