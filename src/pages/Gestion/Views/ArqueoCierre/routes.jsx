@@ -44,6 +44,12 @@ export const rutasArqueo = [
     permission: [PermissionsCaja.VerReporteTrxCierre],
   },
   {
+    link: "/gestion/arqueo/arqueo-cierre/cierre-caja",
+    label: <AppIcons Logo={"RECAUDO"} name="Cierre de caja" />,
+    component: CierreCaja,
+    permission: [PermissionsCaja.VerReporteTrxCierre],
+  },
+  {
     link: "/gestion/arqueo/carga-comprobante",
     label: <AppIcons Logo={"RECAUDO"} name="Transportadora y Consignaciones" />,
     component: CargaComprobante,
