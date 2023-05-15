@@ -40,7 +40,9 @@ const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
 const Convenios = lazy(() => import("./Views/Convenios/Convenios"));
 const ConveniosPDP = lazy(() => import("./Views/ConveniosPDP"));
 const AdminConveniosPDP = lazy(() => import("./Views/ConveniosPDP/Admin"));
-const ConveniosAutorizadoresRecaudo = lazy(() => import("./Views/ConveniosPDP/AutorizadoresRecaudo"));
+const ConveniosAutorizadoresRecaudo = lazy(() =>
+  import("./Views/ConveniosPDP/AutorizadoresRecaudo")
+);
 const ConvAuto = lazy(() => import("./Views/ConvAuto"));
 const Autorizadores = lazy(() => import("./Views/Autorizadores"));
 const ReporteConfiguracionComisiones = lazy(() =>
@@ -91,7 +93,12 @@ export const listPermissionsTrx = listPermissions.splice(
 
 const rutasConfiguraciones = {
   link: "/params-operations",
-  label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />,
+  label: (
+    <AppIcons
+      Logo={"PARAMETROS_TRANSACCIONALES"}
+      name={"Parametros transaccionales"}
+    />
+  ),
   component: ParamsOperations,
   permission: listPermissionsTrx,
   subRoutes: [
@@ -264,17 +271,13 @@ const rutasConfiguraciones = {
       subRoutes: [
         {
           link: "/params-operations/convenios-recaudo/administrar",
-          label: (
-            <AppIcons Logo={"RETIRO"} name={"Administrar convenios"} />
-          ),
+          label: <AppIcons Logo={"RETIRO"} name={"Administrar convenios"} />,
           component: AdminConveniosPDP,
           permission: [20],
         },
         {
           link: "/params-operations/convenios-recaudo/autorizadores-recaudo",
-          label: (
-            <AppIcons Logo={"RETIRO"} name={"Autorizadores de recaudo"} />
-          ),
+          label: <AppIcons Logo={"RETIRO"} name={"Autorizadores de recaudo"} />,
           component: ConveniosAutorizadoresRecaudo,
           permission: [20],
         },

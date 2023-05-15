@@ -1,4 +1,5 @@
 import { Auth } from "aws-amplify";
+import { Buffer } from "buffer";
 
 const CryptoJS = require("crypto-js");
 

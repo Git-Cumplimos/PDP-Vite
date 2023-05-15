@@ -20,7 +20,7 @@ const FormularioVentaSoat = lazy(() =>
 );
 
 /**
- * Recargas 
+ * Recargas
  */
 const RecargasPaquetes = lazy(() =>
   import("./Views/Recargas/Recargas-Paquetes")
@@ -47,9 +47,7 @@ const RecargarCuentaApuestas = lazy(() =>
 
 export const rutasPines = {
   link: "/Pines/PinesContenido",
-  label: (
-    <AppIcons Logo={"MARKETPLACE"} name="Pines Servicio y Contenido" />
-  ),
+  label: <AppIcons Logo={"MARKETPLACE"} name="Pines Servicio y Contenido" />,
   component: Pines,
   permission: [enumPermisosPractisistemas.practisistemasPines],
   subRoutes: [
@@ -66,11 +64,11 @@ export const rutasPines = {
       permission: [enumPermisosPractisistemas.practisistemasPines],
     },
   ],
-}
+};
 
 export const rutasSoat = {
   link: "/ventaSeguros",
-  label: <AppIcons Logo={"RECAUDO"} name="Venta De Seguros" />,
+  label: <AppIcons Logo={"VENTA_SEGUROS"} name="Venta De Seguros" />,
   component: VentaSoat,
   permission: [enumPermisosPractisistemas.practisistemasSoat],
   subRoutes: [
@@ -81,11 +79,13 @@ export const rutasSoat = {
       permission: [enumPermisosPractisistemas.practisistemasSoat],
     },
   ],
-}
+};
 
 export const rutasRecargas = {
   link: "/recargas-paquetes",
-  label: <AppIcons Logo={"RecargaCelular"} name="Recargas y Venta de Paquetes" />,
+  label: (
+    <AppIcons Logo={"RecargaCelular"} name="Recargas y Venta de Paquetes" />
+  ),
   component: RecargasPaquetes,
   permission: [enumPermisosPractisistemas.practisistemasRecargas],
   subRoutes: [
@@ -133,3 +133,4 @@ export const rutasApuestas = {
     },
   ],
 }
+};
