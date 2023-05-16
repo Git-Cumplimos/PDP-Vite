@@ -55,23 +55,23 @@ const RecargarApuestas = () => {
   const [infTicket, setInfTicket] = useState({
     title: "Recibo de pago",
     timeInfo: {
-      "Fecha de pago": "fecha",
+      "Fecha de pago":"",
       "Hora": "",
     },
     commerceInfo: [
-      ["Id Comercio", roleInfo.id_comercio],
-      ["No. terminal", roleInfo.id_dispositivo],
+      ["Id comercio", roleInfo.id_comercio],
+      ["No. Terminal", roleInfo.id_dispositivo],
       ["Comercio", roleInfo["nombre comercio"]],
       ["", ""],
-      ["Municipio", roleInfo.ciudad],
-      ["", ""],
+      // ["Municipio", roleInfo.ciudad],
+      // ["", ""],
       ["Dirección", roleInfo.direccion],
       ["", ""],
     ],
     commerceName: "RECARGA " +state?.casaApuesta,
     trxInfo: [],
     disclamer:
-      "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
+      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
   });
   const onChangeMoney = useMoney({
     limits: [minValor,maxValor],
@@ -134,9 +134,10 @@ const RecargarApuestas = () => {
     .then((res) => {
       if (res?.status === true) {
         notify("Recarga exitosa");
-        infTicketFinal["commerceInfo"].push(["Id Transacción", res?.obj?.response?.["idtrans"]]);
-        infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);
-        setInfTicket(infTicketFinal)
+        // infTicketFinal["commerceInfo"].push(["Id Transacción", res?.obj?.response?.["idtrans"]]);
+        // infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);  
+        // setInfTicket(infTicketFinal)
+        setInfTicket(res?.request?.ticket)
         setRespuesta(false);
         setTypeInfo("RecargaExitosa");
       }
@@ -167,9 +168,10 @@ const RecargarApuestas = () => {
                 if (res?.msg !== "No ha terminado el reintento") {
                   if (res?.status === true || res?.obj?.response?.estado == "00") {  
                     notify("Recarga exitosa");      
-                    infTicketFinal["commerceInfo"].push(["Id Trx", res?.obj?.response?.["idtrans"]]);
-                    infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);
-                    setInfTicket(infTicketFinal)
+                    // infTicketFinal["commerceInfo"].push(["Id Trx", res?.obj?.response?.["idtrans"]]);
+                    // infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);
+                    // setInfTicket(infTicketFinal)
+                    setInfTicket(res?.request?.ticket)
                     setRespuesta(false);
                     setTypeInfo("RecargaExitosa");
                   }
