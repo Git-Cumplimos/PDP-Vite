@@ -22,6 +22,7 @@ import {
   rutasRecargas,
   rutasPines,
   rutasSoat,
+  rutasApuestas
 } from "../apps/Practisistemas/routes";
 
 import { rutasPinesVus } from "../apps/PinesVus/routes";
@@ -1080,6 +1081,7 @@ const allUrlsPrivateApps = [
   //   permission: [1],
   // },
   rutasSoat,
+  rutasApuestas,
   rutasRecaudoDirecto,
 ];
 

@@ -103,7 +103,7 @@ export const postEnvioTrans = async (bodyObj) => {
       bodyObj,
       {},
       true,
-      8000
+      60000
     );
     if (!res?.status) {
       console.error(res?.msg);

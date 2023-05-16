@@ -245,6 +245,7 @@ const RecargarApuestas = () => {
         trxInfo: [],
       };
     });
+    validNavigate("/apuestas-deportivas")
   }, []);
 
   const handleCloseRecarga = useCallback(() => {
