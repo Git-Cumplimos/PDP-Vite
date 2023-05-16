@@ -14,7 +14,10 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
  const TramitarPines = lazy(() => import("./Views/TramitePines"));
  const AdministrarPines = lazy(() => import("./Views/AdministrarPines"));
  const ReportePines = lazy(() => import("./Views/ReportePines"));
- const CierreManual = lazy(() => import("./Views/CierreManual"))
+ const CierreManual = lazy(() => import("./Views/CierreManual"));
+ const Citas = lazy(() => import("./Views/Citas"))
+ const ConsultaCitas = lazy(() => import("./Views/Citas/Citas"))
+ const ParametrizacionHorarios = lazy(() => import("./Views/Citas/ParametrizacionHorarios"))
  const ReportePinesVer = lazy(() =>
    import("./Views/Reportes/ReportePines")
  );
@@ -131,6 +134,37 @@ export const rutasPinesVus = {
           permission: [enumPermisosPinesVus.administrarPinesVus, enumPermisosPinesVus.operarPinesVus],
         },     
       ]
+    },
+    {
+      link: "/PinesVus/Citas",
+      label: <AppIcons Logo={"TramitarPines"} name={"Citas"} />,
+      component: Citas,
+      permission: [enumPermisosPinesVus.operarPinesVus],
+      subRoutes: [
+        {
+          link: "/PinesVus/Citas/Consultar",
+          label: (
+            <AppIcons
+              Logo={"PagoParticipacion"}
+              name={"Consultar"}
+            />
+          ),
+          component: ConsultaCitas,
+          permission: [enumPermisosPinesVus.operarPinesVus],
+        },
+        {
+          link: "/PinesVus/Citas/Parametrizacion",
+          label: (
+            <AppIcons
+              Logo={"PagoParticipacion"}
+              name={"Parametrizar horarios"}
+            />
+          ),
+          component: ParametrizacionHorarios,
+          permission: [enumPermisosPinesVus.operarPinesVus],
+        },
+      ],
+      
     },
   ],
 };
