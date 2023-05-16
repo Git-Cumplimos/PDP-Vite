@@ -35,6 +35,16 @@ const RecargarPaquetes = lazy(() =>
   import("./Views/Recargas/RecargarPaquetes.jsx")
 );
 
+/**
+ * Apuestas 
+ */
+const ApuestasDeportivas = lazy(() =>
+  import("./Views/Apuestas/ApuestasDeportivas.jsx")
+);
+const RecargarCuentaApuestas = lazy(() =>
+  import("./Views/Apuestas/RecargarApuestas.jsx")
+);
+
 export const rutasPines = {
   link: "/Pines/PinesContenido",
   label: <AppIcons Logo={"MARKETPLACE"} name="Pines Servicio y Contenido" />,
@@ -104,4 +114,22 @@ export const rutasRecargas = {
       show: false,
     },
   ],
-};
+}
+
+export const rutasApuestas = {
+  link: "/apuestas-deportivas",
+  label: <AppIcons Logo={"RECAUDO"} name="Apuestas Deportivas" />,
+  component: ApuestasDeportivas,
+  permission: [enumPermisosPractisistemas.practisistemasApuestas],
+  subRoutes: [
+    {
+      link: "/apuestas-deportivas/Recargar",
+      label: (
+        <AppIcons Logo={"RECAUDO"} name="Apuestas Deportivas" />
+      ),
+      component: RecargarCuentaApuestas,
+      permission: [enumPermisosPractisistemas.practisistemasApuestas],
+      show: false,
+    },
+  ],
+}
