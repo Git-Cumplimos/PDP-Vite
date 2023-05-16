@@ -24,9 +24,10 @@ import { toPhoneNumber } from "../../../../utils/functions";
 import Select from "../../../../components/Base/Select";
 import { postEnvioTrans, postCheckReintentoRecargas } from "../../utils/fetchServicioApuestas";
 import { v4 } from 'uuid';
+import { enumLimiteApuestas } from "../enumLimiteApuestas";
 
-const minValor = process.env.REACT_APP_VALOR_MIN_APUESTAS;
-const maxValor = process.env.REACT_APP_VALOR_MAXIMO_APUESTAS;
+const minValor = enumLimiteApuestas.minApuestas;
+const maxValor = enumLimiteApuestas.maxApuestas;
 const RecargarApuestas = () => {
 
   //Variables
