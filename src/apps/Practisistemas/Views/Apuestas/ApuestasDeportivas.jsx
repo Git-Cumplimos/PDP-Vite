@@ -171,7 +171,7 @@ const ApuestasDeportivas = ({ subRoutes }) => {
       <h1 className='text-3xl text-center'>
         Servicios de Apuestas Deportivas
       </h1>
-      <ButtonBar>
+      {/* <ButtonBar>
         <Button
           type="submit"
           onClick={() => {
@@ -180,7 +180,7 @@ const ApuestasDeportivas = ({ subRoutes }) => {
         >
           Crear Casa de Apuestas Deportivas
         </Button>
-      </ButtonBar>
+      </ButtonBar> */}
       <TableEnterprise
         title='Tabla Casas de Apuestas Deportivas'
         maxPage={maxPages}

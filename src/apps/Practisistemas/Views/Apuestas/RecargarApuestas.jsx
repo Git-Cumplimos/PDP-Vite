@@ -30,6 +30,7 @@ const maxValor = process.env.REACT_APP_VALOR_MAXIMO_APUESTAS;
 const RecargarApuestas = () => {
 
   //Variables
+  const [inputCelular, setInputCelular] = useState("");
   const [inputValor, setInputValor] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
@@ -107,6 +108,8 @@ const RecargarApuestas = () => {
     infTicketFinal["timeInfo"]["Hora"] = hora;
     infTicketFinal["trxInfo"].push(["Número Documento", datosCuenta?.documento ?? " "]);
     infTicketFinal["trxInfo"].push(["", ""]);
+    infTicketFinal["trxInfo"].push(["Número Celular", inputCelular ?? " "]);
+    infTicketFinal["trxInfo"].push(["", ""]);
     infTicketFinal["trxInfo"].push(["Valor recarga", formatMoney.format(inputValor) ?? "0"]);
     infTicketFinal["trxInfo"].push(["", ""]);
     postEnvioTrans({
@@ -122,7 +125,8 @@ const RecargarApuestas = () => {
       ticket: infTicketFinal,
 
       datosRecargas:{
-          celular: datosCuenta?.documento,
+          celular: inputCelular,
+          documento: datosCuenta?.documento,
           operador:state?.producto,
           valor: parseInt(inputValor),
           jsonAdicional:{
@@ -274,7 +278,20 @@ const RecargarApuestas = () => {
       validNavigate("../apuestas-deportivas");
     } 
   }, [state?.casaApuesta]);
-    
+
+  const onCelChange = (e) => {
+    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+    if (valueInput[0] != 3) {
+      if (valueInput.length == 1 && inputCelular == "") {
+        notifyError(
+          "Número inválido, el No. de celular debe comenzar con el número 3"
+        );
+        return;
+      }
+    }
+    setInputCelular(valueInput);
+  };
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Recarga Cuenta Apuesta Deportiva {state?.casaApuesta}</h1>
@@ -304,6 +321,17 @@ const RecargarApuestas = () => {
               return { ...old, tipoDocumento: e.target.value };
             });
           }}
+          required
+        />
+        <Input
+          name="celular"
+          label="Número de celular"
+          type="tel"
+          autoComplete="off"
+          minLength={"10"}
+          maxLength={"10"}
+          value={inputCelular}
+          onChange={onCelChange}
           required
         />
         <MoneyInput
