@@ -539,9 +539,9 @@ const Premios = ({ route }) => {
             headers={[
               "Descripción Premio",
               "Sorteo",
-              "Numero",
+              "Número",
               "Serie",
-              "Premio Neto x Fraccion",
+              "Premio Neto x Fracción",
             ]}
             data={respagar}></TableEnterprise>
           {tipopago === 2 && !maxPago ? (
