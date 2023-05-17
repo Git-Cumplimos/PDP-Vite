@@ -1,11 +1,11 @@
 import React from "react";
-// import { PropsBackendRecargas } from "./TypesSubModulos";
+import { PropsBackendRecargas } from "../utils/TypesSubModulos";
 
-// type PropsRecargas = {
-//   BackendRecargas: () => Promise<PropsBackendRecargas>;
-// };
+type PropsRecargas = {
+  BackendRecargas: () => Promise<PropsBackendRecargas>;
+};
 
-const Recargas = () => {
+const Recargas = ({ BackendRecargas }: PropsRecargas) => {
   return <div>ppppp</div>;
 };
 

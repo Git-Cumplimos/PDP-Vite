@@ -805,13 +805,7 @@ const allUrlsPrivateApps = [
   // },
 
   //Modulo Telefonia Movil
-  {
-    link: "/telefonia-movil",
-    label: <AppIcons Logo={"RecargaCelular"} name="Telefonía móvil" />,
-    component: TelefoniaMovil,
-    permission: [1],
-    subRoutes: [...RoutesTelefoniaMovil],
-  },
+  RoutesTelefoniaMovil,
 
   //Modulo RecargasCelular
   {

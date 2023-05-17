@@ -12,3 +12,12 @@ export type PropsBackendPaquetes = {
 export type PropsBackendOperador = {
   [key: number | string]: ReactNode;
 };
+
+export type PrivateRoute = {
+  link: string;
+  label: ReactNode;
+  component: ReactNode;
+  permission: number[];
+  subRoutes?: PrivateRoute[];
+  show?: boolean;
+};

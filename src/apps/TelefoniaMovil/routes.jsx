@@ -1,49 +1,32 @@
 import { lazy } from "react";
-import { getRoutes } from "./utils/utils";
-import { EstSubRutasTelefoniaMovil } from "./views/routes";
+import withOperadorMovilPDP from "./components/HOC/withOperadorMovilPDP";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 
-// Telefonia Movil
-const OperadorTelefoniaMovil = lazy(() =>
-  import("../TelefoniaMovil/views/OperadorTelefoniaMovil")
-);
-
-const DefRutasTelefoniaMovil = [
+export default withOperadorMovilPDP([
   {
-    link: "/telefonia-movil/claro",
+    name: "claro",
     label: <AppIcons Logo={"MARKETPLACE"} name="Claro" />,
-    component: () => (
-      <OperadorTelefoniaMovil
-        linkModule={"/telefonia-movil/claro"}
-        BackendRecargas={async () => {}}
-        BackendPaquetes={async () => {}}
-        BackendCargaPaquetes={async () => {}}
-        BackendCargaConciliacion={async () => {}}
-      />
-    ),
-    permissionUso: [1],
+    permissionRecargas: [1],
+    permissionPaguetes: [1],
     permissionOperario: [1],
+    subModulos: {
+      BackendRecargas: async () => {},
+      BackendPaquetes: async () => {},
+      BackendCargaPaquetes: async () => {},
+      BackendCargaConciliacion: async () => {},
+    },
   },
   {
-    link: "/telefonia-movil/movistar",
+    name: "movistar",
     label: <AppIcons Logo={"MARKETPLACE"} name="movistar" />,
-    component: () => (
-      <OperadorTelefoniaMovil
-        linkModule={"/telefonia-movil/movistar"}
-        BackendRecargas={async () => {}}
-      />
-    ),
-
-    permissionUso: [1],
+    permissionRecargas: [1],
+    permissionPaguetes: [1],
     permissionOperario: [1],
+    subModulos: {
+      BackendRecargas: async () => {},
+      BackendDescargaConciliacion: async () => {},
+    },
   },
-];
-
-const RoutesTelefoniaMovil = getRoutes(
-  DefRutasTelefoniaMovil,
-  EstSubRutasTelefoniaMovil
-);
-
-export default RoutesTelefoniaMovil;
+]);

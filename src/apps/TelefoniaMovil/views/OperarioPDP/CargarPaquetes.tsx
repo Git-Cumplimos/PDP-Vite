@@ -5,6 +5,12 @@ import FileInput from "../../../../components/Base/FileInput/FileInput";
 import Button from "../../../../components/Base/Button/Button";
 import Input from "../../../../components/Base/Input/Input";
 
+import { PropsBackendRecargas } from "../../utils/TypesSubModulos";
+
+type PropsCargaPaquetes = {
+  BackendCargaPaquetes: () => Promise<PropsBackendRecargas>;
+};
+
 const {
   contendorPrincipalFormulario,
   contenedorForm,
@@ -25,7 +31,7 @@ const {
 
 const urlAssets = process.env.REACT_APP_ASSETS_URL;
 
-const CargarPaquetes = () => {
+const CargarPaquetes = ({ BackendCargaPaquetes }: PropsCargaPaquetes) => {
   const [nombreDocumento, setNombreDocumento] = useState("");
   const [archivo, setArchivo] = useState<any[]>([]);
   const [disabledBtn, setDisabledBtn] = useState(false);

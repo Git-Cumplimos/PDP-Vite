@@ -1,6 +1,12 @@
 import React from "react";
 
-const DescargarConciliacion = () => {
+import { PropsBackendRecargas } from "../../utils/TypesSubModulos";
+
+type PropsDescargarConciliacion = {
+  BackendDescargaConciliacion: () => Promise<PropsBackendRecargas>;
+};
+
+const DescargarConciliacion = ({ BackendDescargaConciliacion }: PropsDescargarConciliacion) => {
   return <div>DescargarConciliacion</div>;
 };
 
