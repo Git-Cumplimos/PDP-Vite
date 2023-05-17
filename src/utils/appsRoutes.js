@@ -16,13 +16,14 @@ import rutasColpatria, {
 import rutasDaviviendaCB, {
   listPermissionsDavivienda,
 } from "../apps/Corresponsalia/CorresponsaliaDavivienda/routes";
+import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
 import {
   rutasRecargas,
   rutasPines,
   rutasSoat,
-  rutasApuestas
+  rutasApuestas,
 } from "../apps/Practisistemas/routes";
 
 import { rutasPinesVus } from "../apps/PinesVus/routes";
@@ -282,6 +283,13 @@ const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
  */
 
 const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
+
+/**
+ * Modulo Telefonia Movil
+ */
+const TelefoniaMovil = lazy(() =>
+  import("../apps/TelefoniaMovil/TelefoniaMovil")
+);
 
 /**
  * Modulo Recargas
@@ -795,6 +803,15 @@ const allUrlsPrivateApps = [
   //     // },
   //   ],
   // },
+
+  //Modulo Telefonia Movil
+  {
+    link: "/telefonia-movil",
+    label: <AppIcons Logo={"RecargaCelular"} name="Telefonía móvil" />,
+    component: TelefoniaMovil,
+    permission: [1],
+    subRoutes: [...RoutesTelefoniaMovil],
+  },
 
   //Modulo RecargasCelular
   {
