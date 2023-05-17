@@ -215,7 +215,9 @@ const CompraPin = () => {
     }
   };
   const onPlacaChange = (e, placaVh) => {
-    setInputPlaca(e.target.value);
+    const input = e.target.value.toUpperCase(); // Convertir a mayúsculas
+    setInputPlaca(input);
+    // setInputPlaca(e.target.value);
   };
 
   const onCirculoChange = (e, circulo) => {
@@ -389,7 +391,7 @@ const CompraPin = () => {
               day: "2-digit",
             }).format(today);
 
-            for (let i = 0; i <= 8; i++) {
+            for (let i = 0; i <= 7; i++) {
               try {
                 const promesa = await new Promise((resolve, reject) =>
                   setTimeout(() => {
@@ -434,9 +436,20 @@ const CompraPin = () => {
                         setShowLoading(false);
                         console.error(err);
                       });
-                  }, 11000)
+                  }, 9000)
                 );
                 if (promesa === true) {
+                  setShowLoading(false);
+                  handleClose();
+                  break;
+                }
+                if (i >= 3) {
+                  // notify(
+                  //   "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
+                  // );
+                  notify(
+                    "Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]"
+                  );
                   setShowLoading(false);
                   handleClose();
                   break;
@@ -444,7 +457,7 @@ const CompraPin = () => {
               } catch (error) {
                 console.error(error);
               }
-              if (i <= 7) { 
+              if (i <= 3) { 
                 notify(
                   "Su transacción esta siendo procesada, no recargue la página"
                 );
@@ -452,7 +465,8 @@ const CompraPin = () => {
               }
             }
             validNavigate("/Pines/PinesContenido");
-            notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
+            // No se muestra esta notificación ya que se debe revisar el estado de la trx si quedo aprobada o rechazada
+            // notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003] Numero2");
           } else {
             notifyError(
               res?.obj?.response?.respuesta ==
@@ -629,7 +643,6 @@ const CompraPin = () => {
       validNavigate("/Pines/PinesContenido");
     }
   }, [state?.op]);
-
   return (
     <Fragment>
       <SimpleLoading show={showLoading} />
@@ -793,8 +806,55 @@ const CompraPin = () => {
       {/* ########################### Modal de consulta a SNR ##################################3*/}
       {consultaDatosSNR?.repuesta == "Consulta Correcta" &&
         consultaDatosSNR?.municipio ? (
-        <Modal show={modalDatosSNR} handleClose={handleClose}>
-          <Fieldset legend="Datos Propietario">
+          <Modal show={modalDatosSNR} handleClose={handleClose}>
+            <Form className="lg:col-span-2">
+              <PaymentSummary 
+                title="Datos del propietario"
+                subtitle=""
+                summaryTrx={{
+                  "Matrícula": consultaDatosSNR?.matricula,
+                  "Círculo": inputCirculo,
+                  "Municipio": consultaDatosSNR?.municipio,
+                  "Valor": formatMoney.format(
+                    consultaDatosSNR?.valorPin),
+                  "Dirección": consultaDatosSNR?.direccion,
+                }}
+                className="text-center">
+                {/* <div className="grid gap-4 hover:gap-6">
+                <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Nombre del Cliente:`}</label>
+                  <label className="font-medium ml-20">{`${consultaDatosEPM?.nombreClienteEpm}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Documento:`}</label>
+                  <label className="font-medium ml-20">{`${consultaDatosEPM?.dniClienteEpm}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
+                  <label className="content-center font-semibold text-xl">{`Dirección:`}</label>
+                  <label className="font-medium ml-20">{`${consultaDatosEPM?.direccionClienteEpm}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Localidad :`}</label>
+                  <label className="font-medium ml-20">{`${consultaDatosEPM?.localidadEpm}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Departamento:`}</label>
+                  <label className="font-medium ml-20">{`${consultaDatosEPM?.departamentoEpm}`}</label>
+                </div>
+              </div> */}
+                <div className={contenedorbtn}>
+                  <ButtonBar>
+                    <Button onClick={handleCloseCancelada}>Cancelar</Button>
+                  </ButtonBar>
+                  <ButtonBar className="lg:col-span-2">
+                    <Button type="" onClick={onSubmitCheck2}>
+                      Realizar Venta Pin
+                    </Button>
+                  </ButtonBar>
+                </div>
+              </PaymentSummary>
+            </Form>
+          {/* <Fieldset legend="Datos Propietario">
             <Form className="lg:col-span-2">
               <div className="grid gap-4 hover:gap-6">
                 <div className={contenedorTitulos}>
@@ -831,7 +891,7 @@ const CompraPin = () => {
                 </ButtonBar>
               </div>
             </Form>
-          </Fieldset>
+          </Fieldset> */}
         </Modal>
       ) : (
         /*************** Compra Exitosa Generación Voucher **********************/
@@ -849,8 +909,53 @@ const CompraPin = () => {
       {/* ************************Modal de consulta a EPM ***********************/}
       {consultaDatosEPM?.respuesta == "Consulta Correcta" &&
         consultaDatosEPM?.nombreClienteEpm ? (
-        <Modal show={modalDatosEPM} handleClose={handleClose}>
-          <Fieldset legend="Datos Propietario">
+          <Modal show={modalDatosEPM} handleClose={handleClose}>
+            <Form className="lg:col-span-2">
+            <PaymentSummary 
+              title="Datos del propietario"
+              subtitle=""
+              summaryTrx={{
+                "Nombre del Cliente": consultaDatosEPM?.nombreClienteEpm,
+                "Documento": consultaDatosEPM?.dniClienteEpm,
+                "Dirección": consultaDatosEPM?.direccionClienteEpm,
+                "Localidad": consultaDatosEPM?.localidadEpm,
+                "Departamento": consultaDatosEPM?.departamentoEpm,
+              }}>
+              {/* <div className="grid gap-4 hover:gap-6">
+                <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Nombre del Cliente:`}</label>
+                  <label className="font-medium ml-20">{`${consultaDatosEPM?.nombreClienteEpm}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Documento:`}</label>
+                  <label className="font-medium ml-20">{`${consultaDatosEPM?.dniClienteEpm}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
+                  <label className="content-center font-semibold text-xl">{`Dirección:`}</label>
+                  <label className="font-medium ml-20">{`${consultaDatosEPM?.direccionClienteEpm}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Localidad :`}</label>
+                  <label className="font-medium ml-20">{`${consultaDatosEPM?.localidadEpm}`}</label>
+                </div>
+                <div className={contenedorTitulos}>
+                  <label className="font-semibold text-xl">{`Departamento:`}</label>
+                  <label className="font-medium ml-20">{`${consultaDatosEPM?.departamentoEpm}`}</label>
+                </div>
+              </div> */}
+              <div className={contenedorbtn}>
+                <ButtonBar>
+                  <Button onClick={handleCloseCancelada}>Cancelar</Button>
+                </ButtonBar>
+                <ButtonBar className="lg:col-span-2">
+                  <Button type="" onClick={onSubmitCheck2}>
+                    Realizar Venta Pin
+                  </Button>
+                </ButtonBar>
+              </div>
+            </PaymentSummary>
+            </Form>
+          {/* <Fieldset legend="Datos Propietario">
             <Form className="lg:col-span-2">
               <div className="grid gap-4 hover:gap-6">
                 <div className={contenedorTitulos}>
@@ -885,7 +990,7 @@ const CompraPin = () => {
                 </ButtonBar>
               </div>
             </Form>
-          </Fieldset>
+          </Fieldset> */}
         </Modal>
       ) : (
         /*************** Compra Exitosa Generación Voucher **********************/

@@ -31,8 +31,7 @@ const Loteria = ({ route }) => {
     limit: 10,
   });
   
-  const fecha_trx = useMemo(()=>
-    new Date(),[])
+  const [fecha_trx, setFecha_trx] = useState(new Date())
    
   const {
     infoLoto: {
@@ -189,21 +188,19 @@ const Loteria = ({ route }) => {
     [setCustomer,setSelected,setSellResponse,navigate]
   );
   
+  useEffect(() => {
+    if (sellResponse !== null){
+      const fecha_venta =new Date();
+      setFecha_trx(fecha_venta)
+    }
+  }, [sellResponse])
+
   const ticket = useMemo(() => {
     return {
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "2-digit",
-          month: "2-digit",
-          day: "2-digit",
-        }).format(fecha_trx),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-        }).format(fecha_trx),
+        "Fecha de pago": "",
+        Hora: "",
       },
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
@@ -231,7 +228,7 @@ const Loteria = ({ route }) => {
       disclamer:
         "Para quejas o reclamos comuníquese, al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [roleInfo, sellResponse, fecha_trx,sorteo,serie,numero]
+  }, [roleInfo,sellResponse,sorteo,serie,numero]
   );
 
   useEffect(() => {

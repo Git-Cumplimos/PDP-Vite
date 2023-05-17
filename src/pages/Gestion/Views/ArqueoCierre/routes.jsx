@@ -7,6 +7,7 @@ const AppIcons = lazy(() => import("../../../../components/Base/AppIcons"));
  */
 const Panel = lazy(() => import("./Panel"));
 const ReporteTrx = lazy(() => import("./ReporteTrx"));
+const CierreCaja = lazy(() => import("./CierreCaja"));
 const CargaComprobante = lazy(() => import("./CargaComprobante"));
 const NotasCD = lazy(() => import("./Notas"));
 const Notas = lazy(() => import("./Notas/Notas"));
@@ -41,6 +42,12 @@ export const rutasArqueo = [
     label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
     // label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
     component: ReporteTrx,
+    permission: [PermissionsCaja.VerReporteTrxCierre],
+  },
+  {
+    link: "/gestion/arqueo/arqueo-cierre/cierre-caja",
+    label: <AppIcons Logo={"RECAUDO"} name="Cierre de caja" />,
+    component: CierreCaja,
     permission: [PermissionsCaja.VerReporteTrxCierre],
   },
   {

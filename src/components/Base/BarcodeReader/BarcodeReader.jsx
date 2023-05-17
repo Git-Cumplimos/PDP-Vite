@@ -20,6 +20,15 @@ const BarcodeReader = ({
       disabled={disabled}
       onChange={(ev) => onSetCodigo(ev.target.value)}
       onKeyDown={(ev) => {
+        // validación si el valor es vacío o solo espacios
+        if (
+          (ev.keyCode === 13 || ev.keyCode === 32) &&
+          ev.shiftKey === false &&
+          ev.target.value.trim() === ""
+        ) {
+          ev.preventDefault();
+          return;
+        }
         if (ev.keyCode === 13 && ev.shiftKey === false) {
           onSearchCodigo(ev.target.value);
           return;

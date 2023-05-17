@@ -447,6 +447,20 @@ const CrearPin = () => {
         homeLocation?.localidad?.[1](resp?.obj?.results?.[0]?.home_location?.localidad?.[0])
         homeLocation?.foundMunicipios?.[1](resp?.obj?.results?.[0]?.home_location?.foundMunicipios?.[0])
         }
+        else{
+          homeLocation?.municipio?.[1]("Bogotá D.C.")
+          homeLocation?.departamento?.[1]("Bogotá D.C.")
+          homeLocation?.direccion?.[1]("")
+          homeLocation?.barrio?.[1]("")
+          homeLocation?.localidad?.[1]("")
+          homeLocation?.foundMunicipios?.[1]([{
+            c_digo_dane_del_departamento: "11",
+            c_digo_dane_del_municipio: "11.001",
+            departamento: "Bogotá D.C.",
+            municipio: "Bogotá D.C.",
+            region: "Región Centro Oriente"}
+          ])
+        }
       }
       else{
         setNombre("")
@@ -464,7 +478,6 @@ const CrearPin = () => {
         setBanco("")
         setComprarVehiculo("")
         setVehiculoCompra("")
-        if (resp?.obj?.results?.[0]?.home_location !== null){ 
         /// Se inicializa en Bogota
         homeLocation?.municipio?.[1]("Bogotá D.C.")
         homeLocation?.departamento?.[1]("Bogotá D.C.")
@@ -478,11 +491,11 @@ const CrearPin = () => {
           municipio: "Bogotá D.C.",
           region: "Región Centro Oriente"}
         ])
-      }
+      
     }}
     });
   };
-
+  console.log("HOMELOATION",homeLocation)
   const onSubmit = (e) => {
     e.preventDefault();
     setDisabledBtns(true);

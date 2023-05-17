@@ -11,7 +11,6 @@ import MoneyInput, {
 } from "../../../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import { useAuth } from "../../../../../hooks/AuthHooks";
-import useMoney from "../../../../../hooks/useMoney";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { checkLuhn } from "../../../../../utils/validationUtils";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario";
@@ -23,7 +22,7 @@ import {
 
 const RecaudoServiciosPublicosPrivadosAgrario = () => {
   const { state } = useLocation();
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
 
   const [{ showModal, estadoPeticion }, setShowModal] = useState({
@@ -34,7 +33,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     ref1: "",
     ref2: "",
     ref3: "",
-    valor: "",
+    valor: 0,
   });
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de Pago",
@@ -43,7 +42,17 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       Hora: "",
     },
     commerceInfo: [
-      /*id transaccion recarga*/
+      /*comercio*/
+      [
+        "Id comercio",
+        roleInfo?.id_comercio ? roleInfo?.id_comercio : "Sin datos",
+      ],
+      /*id_dispositivo*/
+      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      // id trx
+      ["Id Trx", ""],
+      /*id autorizacion*/
+      ["Id Aut", ""],
       /*comercio*/
       [
         "Comercio",
@@ -51,17 +60,15 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
           ? roleInfo?.["nombre comercio"]
           : "Sin datos",
       ],
-      /*id_dispositivo*/
-      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
+      ["", ""],
       /*direccion*/
       ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      /*telefono*/
-      ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+      ["", ""],
     ],
     commerceName: "Recaudo de facturas",
     trxInfo: [],
     disclamer:
-      "En caso de reclamo o inquietud favor comunicarse en Bogota al Tel 594-8500 o gratis en el resto del pais al 01800-915000 o la pagina web http://www.bancoagrario.gov.co",
+      "POR FAVOR VALIDE QUE LOS DATOS IMPRESOS EN ESTE COMPROBANTE SEAN CORRECTOS. EN CASO DE CUALQUIER RECLAMO O INQUIETUD POR FAVOR COMUNICARSE EN BOGOTÁ AL 5945500 O GRATIS EN EL RESTO DEL PAÍS AL 01 8000 915000 O EN LA PÁGINA DE INTERNET WWW.BANCOAGRARIO.GOV.CO ",
   });
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
@@ -96,11 +103,11 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         return notifyError("Validación de la referencia 1 erronea");
     }
     if (convenio?.algoritmo_ref2?.match(/(Q 108)/g)) {
-      if (!checkLuhn(datosTrans?.ref1))
+      if (!checkLuhn(datosTrans?.ref2))
         return notifyError("Validación de la referencia 2 erronea");
     }
     if (convenio?.algoritmo_ref3?.match(/(Q 108)/g)) {
-      if (!checkLuhn(datosTrans?.ref1))
+      if (!checkLuhn(datosTrans?.ref3))
         return notifyError("Validación de la referencia 3 erronea");
     }
 
@@ -117,45 +124,52 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     }).format(new Date());
     /*hora actual */
     const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hourCycle: "h23",
     }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push(["Convenio", convenio.nombre_convenio]);
+    objTicket["trxInfo"].push(["Código convenio", convenio.codigo]);
     objTicket["trxInfo"].push(["", ""]);
-    // objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
-    // objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Referencia de pago 1", datosTrans?.ref1 ?? ""]);
+    objTicket["trxInfo"].push([
+      "Nombre del convenio",
+      convenio.nombre_convenio,
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push([
+      "Valor transacción",
+      formatMoney.format(valorTransaccion ?? "0"),
+    ]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push(["Referencia 1", datosTrans?.ref1 ?? ""]);
     objTicket["trxInfo"].push(["", ""]);
     let objRecaudo = {
       nombreConvenio: convenio?.nombre_convenio,
       codigoConvenio: convenio?.codigo,
       referencia1: datosTrans?.ref1,
     };
-    if (convenio?.nombre_ref2 !== "" && !convenio?.nombre_ref2?.match(/-/g)) {
-      objTicket["trxInfo"].push([
-        "Referencia de pago 2",
-        datosTrans?.ref2 ?? "",
-      ]);
+    if (
+      convenio?.nombre_ref2 &&
+      convenio?.nombre_ref2 !== "" &&
+      !convenio?.nombre_ref2?.match(/-/g)
+    ) {
+      objTicket["trxInfo"].push(["Referencia 2", datosTrans?.ref2 ?? ""]);
       objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia2"] = datosTrans?.ref2;
     }
-    if (convenio?.nombre_ref3 !== "" && !convenio?.nombre_ref3?.match(/-/g)) {
-      objTicket["trxInfo"].push([
-        "Referencia de pago 3",
-        datosTrans?.ref3 ?? "",
-      ]);
+    if (
+      convenio?.nombre_ref3 &&
+      convenio?.nombre_ref3 !== "" &&
+      !convenio?.nombre_ref3?.match(/-/g)
+    ) {
+      objTicket["trxInfo"].push(["Referencia 3", datosTrans?.ref3 ?? ""]);
       objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia3"] = datosTrans?.ref3;
     }
-    objTicket["trxInfo"].push([
-      "Valor",
-      formatMoney.format(valorTransaccion ?? "0"),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
+
     setIsUploading(true);
 
     postRecaudoConveniosAgrario({
@@ -166,6 +180,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
           : false,
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,
@@ -185,13 +200,16 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          objTicket["commerceInfo"].push(["Id Trx", res?.obj?.id_trx]);
-          objTicket["commerceInfo"].push([
+          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
+          objTicket["commerceInfo"][3] = [
             "Id Aut",
             res?.obj?.codigo_autorizacion,
+          ];
+          objTicket["trxInfo"].push([
+            "Costo transacción",
+            formatMoney.format(res?.obj?.costoTrx, 0),
           ]);
-          objTicket["commerceInfo"].push(["", ""]);
-
+          objTicket["trxInfo"].push(["", ""]);
           setObjTicketActual(objTicket);
           setShowModal((old) => ({ ...old, estadoPeticion: 1 }));
         } else {
@@ -213,7 +231,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       ...old,
       ref1: "",
       ref2: "",
-      valor: "",
+      valor: 0,
       valorConst: "",
       valorVar: "",
     }));
@@ -221,7 +239,20 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       return {
         ...old,
         commerceInfo: [
-          /*id transaccion recarga*/
+          /*comercio*/
+          [
+            "Id comercio",
+            roleInfo?.id_comercio ? roleInfo?.id_comercio : "Sin datos",
+          ],
+          /*id_dispositivo*/
+          [
+            "No. Terminal",
+            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
+          ],
+          // id trx
+          ["Id Trx", ""],
+          /*id autorizacion*/
+          ["Id Aut", ""],
           /*comercio*/
           [
             "Comercio",
@@ -229,23 +260,18 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               ? roleInfo?.["nombre comercio"]
               : "Sin datos",
           ],
-          /*id_dispositivo*/
-          [
-            "No. Terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
+          ["", ""],
           /*direccion*/
           [
             "Dirección",
             roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
           ],
-          /*telefono*/
-          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
+          ["", ""],
         ],
         trxInfo: [],
       };
     });
-  }, []);
+  }, [roleInfo]);
   const onChangeFormat = useCallback(
     (ev) => {
       let valor = ev.target.value;
@@ -277,21 +303,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     },
     [convenio, datosTrans]
   );
-  const onChangeMoneyLocal = (ev, valor) => {
-    if (!isNaN(valor)) {
-      const num = valor;
-      setDatosTrans((old) => {
-        return { ...old, valor: onChangeMoney(ev) };
-      });
-    }
-  };
-  const onChangeMoney = useMoney({
-    limits: [
-      enumParametrosBancoAgrario.minRecaudo,
-      enumParametrosBancoAgrario.maxRecaudo,
-    ],
-    decimalDigits: 2,
-  });
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -323,7 +334,8 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               autoComplete='off'
               onInput={onChangeFormat}></Input>
           )}
-        {convenio?.nombre_ref2 !== "" &&
+        {convenio?.nombre_ref2 &&
+          convenio?.nombre_ref2 !== "" &&
           !convenio?.nombre_ref2?.match(/-/g) && (
             <Input
               id='ref2'
@@ -337,7 +349,8 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               autoComplete='off'
               onInput={onChangeFormat}></Input>
           )}
-        {convenio?.nombre_ref3 !== "" &&
+        {convenio?.nombre_ref3 &&
+          convenio?.nombre_ref3 !== "" &&
           !convenio?.nombre_ref3?.match(/-/g) && (
             <Input
               id='ref3'
@@ -351,19 +364,23 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               autoComplete='off'
               onInput={onChangeFormat}></Input>
           )}
-
-        {/* {convenio?.parciales === "1" && ( */}
         <MoneyInput
           id='valCashOut'
           name='valCashOut'
           label='Valor a pagar'
           type='text'
+          min={enumParametrosBancoAgrario.minRecaudo}
+          max={enumParametrosBancoAgrario.maxRecaudo}
           autoComplete='off'
           maxLength={"12"}
-          value={datosTrans.valor ?? ""}
-          onInput={onChangeMoneyLocal}
-          required></MoneyInput>
-        {/* )} */}
+          value={parseInt(datosTrans.valor)}
+          onInput={(e, val) => {
+            setDatosTrans((old) => {
+              return { ...old, valor: val };
+            });
+          }}
+          required
+        />
         <ButtonBar
           className={
             (convenio?.nombre_ref2 !== "" &&
@@ -377,9 +394,9 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={handleClose}>
-        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+        <>
           {estadoPeticion === 0 ? (
-            <>
+            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
               <h1 className='text-2xl text-center mb-5 font-semibold'>
                 ¿Está seguro de realizar el recaudo?
               </h1>
@@ -389,11 +406,13 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                 !convenio?.nombre_ref1?.match(/-/g) && (
                   <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
                 )}
-              {convenio?.nombre_ref2 !== "" &&
+              {convenio?.nombre_ref2 &&
+                convenio?.nombre_ref2 !== "" &&
                 !convenio?.nombre_ref2?.match(/-/g) && (
                   <h2>{`Referencia 2: ${datosTrans.ref2}`}</h2>
                 )}
-              {convenio?.nombre_ref3 !== "" &&
+              {convenio?.nombre_ref3 &&
+                convenio?.nombre_ref3 !== "" &&
                 !convenio?.nombre_ref3?.match(/-/g) && (
                   <h2>{`Referencia 3: ${datosTrans.ref3}`}</h2>
                 )}
@@ -404,15 +423,22 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               </h2>
               <>
                 <ButtonBar>
-                  <Button onClick={handleClose}>Cancelar</Button>
+                  <Button
+                    onClick={() => {
+                      handleClose();
+                      notifyError("Transacción cancelada por el usuario");
+                    }}>
+                    Cancelar
+                  </Button>
                   <Button type='submit' onClick={onSubmitValidacion}>
                     Realizar pago
                   </Button>
                 </ButtonBar>
               </>
-            </>
+            </div>
           ) : estadoPeticion === 1 ? (
-            <>
+            <div className='flex flex-col justify-center items-center'>
+              <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
               <h2>
                 <ButtonBar>
                   <Button onClick={handlePrint}>Imprimir</Button>
@@ -426,12 +452,11 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                   </Button>
                 </ButtonBar>
               </h2>
-              <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
-            </>
+            </div>
           ) : (
             <></>
           )}
-        </div>
+        </>
       </Modal>
     </>
   );

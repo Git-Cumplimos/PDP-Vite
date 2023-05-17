@@ -7,13 +7,13 @@ export const cifrarAES = (llave, iv, texto) => {
     iv: iv,
   }).toString();
 };
-export const decryptAES = (llave,iv,data) => {
-  let dataSin64 = CryptoJS.enc.Base64.parse(data)
-  dataSin64 = CryptoJS.enc.Base64.stringify(dataSin64)
+export const decryptAES = (llave, iv, data) => {
+  let dataSin64 = CryptoJS.enc.Base64.parse(data);
+  dataSin64 = CryptoJS.enc.Base64.stringify(dataSin64);
   const derived_key = CryptoJS.enc.Base64.parse(llave);
   iv = CryptoJS.enc.Utf8.parse(iv);
-  const encrypted = CryptoJS.AES.decrypt(dataSin64, derived_key,{
+  const encrypted = CryptoJS.AES.decrypt(dataSin64, derived_key, {
     iv: iv,
-  }).toString(CryptoJS.enc.Utf8)
+  }).toString(CryptoJS.enc.Utf8);
   return encrypted;
-}
+};

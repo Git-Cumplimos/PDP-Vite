@@ -212,7 +212,7 @@ export const useProvidePinesVus = () => {
         throw err;
       }
     },
-    []
+    [roleInfo]
   );
 
   const con_estado_tipoPin = useCallback(async (table) => {
@@ -250,7 +250,7 @@ export const useProvidePinesVus = () => {
     } catch (err) {
       throw err;
     }
-  }, []);
+  }, [roleInfo]);
 
   const consultaParticipacion = useCallback(async (fecha_ini) => {
     const query = { 
@@ -264,7 +264,7 @@ export const useProvidePinesVus = () => {
     } catch (err) {
       throw err;
     }
-  }, []);
+  }, [roleInfo]);
 
   const registroPagoParticipacion = useCallback(async (
     participante, 
@@ -435,7 +435,7 @@ export const useProvidePinesVus = () => {
         throw err;
       }
     },
-    []
+    [roleInfo]
   );
 
   const consultaCierreManual = useCallback(
@@ -451,7 +451,7 @@ export const useProvidePinesVus = () => {
         throw err;
       }
     },
-    []
+    [roleInfo]
   );
 
   return {

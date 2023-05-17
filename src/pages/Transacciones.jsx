@@ -177,10 +177,7 @@ const Transacciones = () => {
             "Tipo transaccion": Tipo_operacion,
             monto,
             created,
-            status_trx,
-            tipo_afectacion,
-            id_tipo_transaccion,
-            ticket,
+            status_trx_text,
           }) => {
             const tempDate = new Date(created);
             tempDate.setHours(tempDate.getHours() + 5);
@@ -191,17 +188,7 @@ const Transacciones = () => {
               Tipo_operacion,
               money,
               created,
-              status_trx:
-                tipo_afectacion !== "NA" &&
-                !(id_tipo_transaccion === 66 || id_tipo_transaccion === 67)
-                  ? status_trx
-                    ? ticket == null
-                      ? "Transacción pendiente"
-                      : "Transacción aprobada"
-                    : "Transacción rechazada"
-                  : status_trx
-                  ? "Transacción aprobada"
-                  : "Transacción rechazada",
+              status_trx_text
             };
           }
         )}
@@ -214,20 +201,7 @@ const Transacciones = () => {
             Fecha: dateFormatter.format(fecha),
             "Mensaje de respuesta trx": trxs[index]?.message_trx,
             Monto: formatMoney.format(trxs[index]?.monto),
-            "Estado de la transacción":
-              trxs[index]?.tipo_afectacion !== "NA" &&
-              !(
-                trxs[index]?.id_tipo_transaccion === 66 ||
-                trxs[index]?.id_tipo_transaccion === 67
-              )
-                ? trxs[index]?.status_trx
-                  ? trxs[index]?.ticket == null
-                    ? "Transacción pendiente"
-                    : "Transacción aprobada"
-                  : "Transacción rechazada"
-                : trxs[index]?.status_trx
-                ? "Transacción aprobada"
-                : "Transacción rechazada",
+            "Estado de la transacción": trxs[index]?.status_trx_text,
           });
           setShowModal(true);
         }}

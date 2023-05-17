@@ -15,6 +15,7 @@ const BuscarCedulaPpsADemanda = () => {
   const [cantNum, setCantNum] = useState(0);
   const [showModal, setShowModal] = useState(true);
   const [estado, setEstado] = useState(false);
+  const [estadoInput, setEstadoInput] = useState(false);
   const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
   // const url = "http://127.0.0.1:2500/";
 
@@ -22,6 +23,7 @@ const BuscarCedulaPpsADemanda = () => {
     setBuscarCedula("");
     setDatosConsulta("");
     setEstado(false);
+    setEstadoInput(false);
   };
   /* function hijoAPadre() {
     setBuscarCedula("");
@@ -87,14 +89,6 @@ const BuscarCedulaPpsADemanda = () => {
   };
   return (
     <div>
-      {(datosConsulta?.length >= 0) & estado ? (
-        <TipoPpsADemanda
-          numCed={buscarCedula}
-          fun={hijoAPadre}
-        ></TipoPpsADemanda>
-      ) : (
-        ""
-      )}
       <Form grid onSubmit={(e) => BuscarCedula(e)}>
         <Input
           name="N° Identificación"
@@ -107,16 +101,25 @@ const BuscarCedulaPpsADemanda = () => {
           value={buscarCedula ?? ""}
           onChange={onCedChange}
           required
+          disabled={estadoInput}
         />
 
         <ButtonBar className={"lg:col-span-2"} type="">
           {
-            <Button type="submit" /* onClick={(e) => BuscarCedula(e)} */>
+            <Button type="submit" onClick={() => setEstadoInput(true)}>
               Buscar Cliente
             </Button>
           }
         </ButtonBar>
       </Form>
+      {(datosConsulta?.length >= 0) & estado ? (
+        <TipoPpsADemanda
+          numCed={buscarCedula}
+          fun={hijoAPadre}
+        ></TipoPpsADemanda>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

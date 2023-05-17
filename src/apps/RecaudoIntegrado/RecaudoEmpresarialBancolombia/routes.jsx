@@ -44,14 +44,14 @@ const rutasBancolombiaRecaudoEmpresarial = {
   subRoutes: [
     {
       link: "/recaudoEmpresarial/recaudoEmpresarialBancolombia/CargarArchivos",
-      label: <AppIcons Logo={"DepositoDaviplata"} name="Cargar Archivos" />,
+      label: <AppIcons Logo={"DepositoDaviplata"} name="Cargue archivo contingencia Bancolombia" />,
       component: CargarArchivos,
       permission: [4001],
     },
     {
       link: "/recaudoEmpresarial/recaudoEmpresarialBancolombia/HistoricoContingencia",
       label: (
-        <AppIcons Logo={"DepositoDaviplata"} name="Historico Contingencia" />
+        <AppIcons Logo={"DepositoDaviplata"} name="Histórico Contingencia" />
       ),
       component: HistoricoContingencia,
       permission: [4002],

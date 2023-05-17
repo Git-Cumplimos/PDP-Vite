@@ -100,14 +100,15 @@ export const rutasGestionRecaudoDirecto = {
 
 const rutasRecaudoDirecto = {
   link: "/recaudo-directo",
-  label: <AppIcons Logo={"CorresponsalBancario"} name={"Recaudo/Retiro Directos"} />,
+  label: (
+    <AppIcons
+      Logo={"RECAUDO_RETIRO_DIRECTO"}
+      name={"Recaudo/Retiro Directos"}
+    />
+  ),
   component: RecaudoEntryPoint,
   permission: listPermissionsRecaudoDirecto,
-  subRoutes: [
-    rutasRecaudo,
-    rutasRetiro,
-    rutasGestionRecaudoDirecto,
-  ],
+  subRoutes: [rutasRecaudo, rutasRetiro, rutasGestionRecaudoDirecto],
 };
 
 export default rutasRecaudoDirecto;

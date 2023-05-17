@@ -28,9 +28,10 @@ const Premios = ({ route }) => {
   const [billete, setBillete] = useState("");
   const [totalPagar, setTotalPagar] = useState("");
   const [valorbruto, setValorbruto] = useState("");
+  const [valor17, setValor17] = useState("");
+  const [valor20, setValor20] = useState("");
   const [serie, setSerie] = useState("");
   const [idLoteria, seIdLoteria] = useState("");
-  const [cod_distribuidor, setCod_distribuidor] = useState("");
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
@@ -60,6 +61,7 @@ const Premios = ({ route }) => {
   const [datosCliente, setDatosCliente] = useState({
     selectFraccion: 0,
     nombre: "",
+    apellido:"",
     documento: "",
     direccion: "",
     celular: "",
@@ -111,6 +113,7 @@ const Premios = ({ route }) => {
         ...old,
         selectFraccion: "0",
         nombre: "",
+        apellido: "",
         documento: "",
         direccion: "",
         celular: "",
@@ -122,7 +125,6 @@ const Premios = ({ route }) => {
     isWinner(sorteo, billete, serie, checkBilleteFisico, checkBilleteVirtual)
       .then((res) => {
         var salvarRes = res;
-        setCod_distribuidor(roleInfo.cod_oficina_lot);
         setMaxPago(res?.obj?.max_pago);
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
@@ -131,6 +133,8 @@ const Premios = ({ route }) => {
         setDatosComercio((old) => {
           setRespuesta(false);
           setValorbruto(res?.obj?.valorbruto);
+          setValor17(res?.obj?.valor17);
+          setValor20(res?.obj?.valor20);
           setDisabledBtns(false);
           return {
             ...old,
@@ -142,9 +146,12 @@ const Premios = ({ route }) => {
           };
         });
         if (res === undefined) {
-          notifyError("No existen resultados, para el sorteo indicado")
+          notifyError("Error respuesta PDP: Fallo al consumir el servicio (loterías) [0010002]")
         }
-        if ("msg" in res) {
+        if (!res.status){
+          notifyError(res.msg)
+        }
+        if (res.status && "msg" in res) {
           if (res?.obj?.max_pago == true) {
             notifyError(
               "El valor del premio, supera el valor asignado para el comercio"
@@ -231,7 +238,7 @@ const Premios = ({ route }) => {
       title: "Recibo de pago",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "2-digit",
+          year: "numeric",
           month: "2-digit",
           day: "2-digit",
         }).format(new Date()),
@@ -260,7 +267,9 @@ const Premios = ({ route }) => {
         ["Fracción", seleccionarFraccion],
         ["Valor a pagar", formatMoney.format(totalPagar)],
         [tipopago === 2 && "", tipopago === 2 && ""],
-        [tipopago === 2 && "Nombre", tipopago === 2 && datosCliente?.nombre],
+        [tipopago === 2 && "Nombres", tipopago === 2 && datosCliente?.nombre],
+        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Apellidos", tipopago === 2 && datosCliente?.apellido],
         [tipopago === 2 && "", tipopago === 2 && ""],
         [tipopago === 2 && "Número Documento", tipopago === 2 && datosCliente?.documento],
         [tipopago === 2 && "", tipopago === 2 && ""],
@@ -297,16 +306,18 @@ const Premios = ({ route }) => {
             checkBilleteVirtual,
             seleccionarFraccion,
             datosCliente?.nombre,
+            datosCliente?.apellido,
             datosCliente?.documento,
             datosCliente?.direccion,
             datosCliente?.celular,
             totalPagar,
             valorbruto,
+            valor17,
+            valor20,
             datosComercio.comercio,
             datosComercio.terminal,
             datosComercio.usuario,
             datosComercio.codigo_dane,
-            cod_distribuidor,
             idLoteria,
             tipopago,
             hash,
@@ -359,16 +370,18 @@ const Premios = ({ route }) => {
             checkBilleteVirtual,
             seleccionarFraccion,
             datosCliente?.nombre,
+            datosCliente?.apellido,
             datosCliente?.documento,
             datosCliente?.direccion,
             datosCliente?.celular,
             totalPagar,
             valorbruto,
+            valor17,
+            valor20,
             datosComercio.comercio,
             datosComercio.terminal,
             datosComercio.usuario,
             datosComercio.codigo_dane,
-            cod_distribuidor,
             idLoteria,
             tipopago,
             hash,
@@ -526,9 +539,9 @@ const Premios = ({ route }) => {
             headers={[
               "Descripción Premio",
               "Sorteo",
-              "Numero",
+              "Número",
               "Serie",
-              "Premio Neto x Fraccion",
+              "Premio Neto x Fracción",
             ]}
             data={respagar}></TableEnterprise>
           {tipopago === 2 && !maxPago ? (
@@ -540,7 +553,7 @@ const Premios = ({ route }) => {
                 }>
                 <Input
                   id="nombre"
-                  label="Nombre"
+                  label="Nombres"
                   type="text"
                   autoComplete="off"
                   minLength={"3"}
@@ -551,6 +564,24 @@ const Premios = ({ route }) => {
                       return {
                         ...old,
                         nombre: e.target.value,
+                      };
+                    });
+                  }}
+                  required={true}
+                />
+                <Input
+                  id="apellido"
+                  label="Apellidos"
+                  type="text"
+                  autoComplete="off"
+                  minLength={"3"}
+                  maxLength={"60"}
+                  value={datosCliente?.apellido}
+                  onInput={(e) => {
+                    setDatosCliente((old) => {
+                      return {
+                        ...old,
+                        apellido: e.target.value,
                       };
                     });
                   }}

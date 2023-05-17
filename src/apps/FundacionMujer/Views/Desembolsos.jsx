@@ -10,7 +10,6 @@ import SearchForm from "../components/SearchForm/SearchForm";
 import { useMujer } from "../utils/mujerHooks";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/AuthHooks";
-import { normalize } from "path";
 import { notifyError } from "../../../utils/notify";
 
 const Desembolsos = () => {
@@ -123,31 +122,29 @@ const Desembolsos = () => {
     <>
       <Modal
         show={showModalAdvertencia}
-        handleClose={() => closeModalAdvertencia()}
-      >
-        <div className="flex flex-col justify-center items-center">
-          <h1 className="xl:text-center font-semibold">
+        handleClose={() => closeModalAdvertencia()}>
+        <div className='flex flex-col justify-center items-center'>
+          <h1 className='xl:text-center font-semibold'>
             Recuerde verificar si tiene el dinero suficiente en caja para
             realizar la transacción !!!
           </h1>
           <Button
             onClick={() => {
               closeModalAdvertencia();
-            }}
-          >
+            }}>
             Cerrar
           </Button>
         </div>
       </Modal>
       <Form onSubmit={onSubmit} grid>
         <Input
-          id="numDocumento"
-          label="Documento"
-          type="text"
+          id='numDocumento'
+          label='Documento'
+          type='text'
           required
-          minLength="5"
-          maxLength="12"
-          autoComplete="off"
+          minLength='5'
+          maxLength='12'
+          autoComplete='off'
           value={documento}
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
@@ -155,21 +152,21 @@ const Desembolsos = () => {
           }}
         />
         <Input
-          id="numpin"
-          label="Numero de pin"
-          type="text"
+          id='numpin'
+          label='Numero de pin'
+          type='text'
           required
-          minLength="4"
-          maxLength="4"
-          autoComplete="off"
+          minLength='4'
+          maxLength='4'
+          autoComplete='off'
           value={pin}
           onInput={(e) => {
             const num = parseInt(e.target.value) || "";
             setPin(num);
           }}
         />
-        <ButtonBar className="col-auto md:col-span-2">
-          <Button type="submit" disabled={disabledBtns}>
+        <ButtonBar className='col-auto md:col-span-2'>
+          <Button type='submit' disabled={disabledBtns}>
             Consultar pin
           </Button>
         </ButtonBar>

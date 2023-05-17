@@ -68,7 +68,9 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
     cupoLogin: quotaInfo?.["quota"],
     tipoComercio: roleInfo?.["tipo_comercio"],
     nombreComercio: roleInfo?.["nombre comercio"],
+
     idTrx: "",
+    datocontacto: "",
   });
   const [procesandoTrx, setProcesandoTrx] = useState(false);
   const [disabledBtn, setDisabledBtn] = useState(false);
@@ -101,7 +103,10 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
       commerceInfo: [
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
-        ["Municipio", roleInfo?.ciudad],
+        ["Id Trx", datosComercio?.["idTrx"]],
+        ["Id Aut", datosComercio?.["idTrx"]],
+        ["Comercio", roleInfo?.nombre_comercio],
+        // ["Municipio", roleInfo?.ciudad],
         ["", ""],
         ["Dirección", roleInfo?.direccion],
         ["", ""],
@@ -110,9 +115,12 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
       trxInfo: [
         ["PISO DE PROTECCIÓN SOCIAL - APORTE OBLIGATORIO"],
         ["", ""],
-        ["Número de documento", datosAportante?.["numDocumento"]],
+        ["Nombre", datosComercio?.["datocontacto"]?.slice(207, 307)],
+
         ["", ""],
-        ["Número de autorización", datosComercio?.["idTrx"]],
+        ["Número de documento", datosAportante?.["numDocumento"]],
+        // ["", ""],
+        // ["Número de autorización", datosComercio?.["idTrx"]],
         ["", ""],
         ["N.° Planilla", datosAportante?.["numPlanilla"]],
         ["", ""],
@@ -185,6 +193,7 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
                   idTrx:
                     respuesta?.obj?.datos_recibidos
                       ?.trazabilityFinancialInstitutionCode,
+                  datocontacto: respuesta?.obj?.datos_recibidos?.datocontacto,
                 };
               });
               // console.log("++++++idtrx", datosComercio?.idTrx);
@@ -295,7 +304,9 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
         setDisabledBtn(false);
       }
     } else {
-      notifyError("No tiene el cupo suficiente para el aporte a colpensiones.");
+      notifyError(
+        "Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003])"
+      );
       navigate(`/colpensiones`);
     }
   };
@@ -428,8 +439,17 @@ const PpsObligatorioDemanda = ({ ced, fun }) => {
         <Modal show={showModal} handleClose={handleClose}>
           <div className="flex flex-col justify-center items-center">
             <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
-            <Button onClick={handlePrint}>Imprimir</Button>
-            <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button
+                onClick={() => {
+                  setShowModal(false);
+                  fun();
+                }}
+              >
+                Cancelar
+              </Button>
+            </ButtonBar>
           </div>
         </Modal>
       ) : (
